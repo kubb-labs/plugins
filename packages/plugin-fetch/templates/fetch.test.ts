@@ -222,7 +222,7 @@ describe('createClientCore', () => {
       method: 'GET',
       url: '/pet/{id}{filter}',
       path: { id: 5, filter: ['a', 'b'] },
-      styles: { path: { id: { style: 'matrix' }, filter: { style: 'label' } } },
+      serialization: { path: { id: { style: 'matrix' }, filter: { style: 'label' } } },
     })
     expect(calls[0]?.url).toBe('/pet/;id=5.a,b')
   })
@@ -233,7 +233,7 @@ describe('createClientCore', () => {
       method: 'GET',
       url: '/pets',
       query: { id: [3, 4], filter: { a: 1 } },
-      styles: { query: { id: { style: 'pipeDelimited', explode: false }, filter: { style: 'deepObject' } } },
+      serialization: { query: { id: { style: 'pipeDelimited', explode: false }, filter: { style: 'deepObject' } } },
     })
     expect(calls[0]?.url).toBe('/pets?id=3|4&filter%5Ba%5D=1')
   })
@@ -257,7 +257,7 @@ describe('createClientCore', () => {
       method: 'GET',
       url: '/pet',
       headers: { 'X-Ids': [3, 4], 'X-Filter': { role: 'admin' } },
-      styles: { header: { 'X-Ids': {}, 'X-Filter': { explode: true } } },
+      serialization: { header: { 'X-Ids': {}, 'X-Filter': { explode: true } } },
     })
     expect(calls[0]?.headers['X-Ids']).toBe('3,4')
     expect(calls[0]?.headers['X-Filter']).toBe('role=admin')
@@ -408,12 +408,12 @@ describe('getUrl', () => {
 
   test('applies styles.path metadata to the matching placeholders', () => {
     const { client } = createClient()
-    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, styles: { path: { petId: { style: 'matrix' } } } })).toBe('/pet/;petId=7')
+    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, serialization: { path: { petId: { style: 'matrix' } } } })).toBe('/pet/;petId=7')
   })
 
   test('applies styles.query metadata to the query string', () => {
     const { client } = createClient()
-    expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, styles: { query: { id: { style: 'spaceDelimited', explode: false } } } })).toBe(
+    expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, serialization: { query: { id: { style: 'spaceDelimited', explode: false } } } })).toBe(
       '/pets?id=3%204%205',
     )
   })

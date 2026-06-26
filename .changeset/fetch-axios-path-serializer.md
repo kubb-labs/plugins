@@ -12,7 +12,7 @@ defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'pipeDelimited', explod
 serializeCookies({ ids: [1, 2] }) // 'ids=1,2'
 ```
 
-A request carries the per-parameter metadata under one `styles` object (`{ path, query, header, cookie, body }`), mirroring the `serializer` grouping. Params without metadata keep the previous defaults, so existing output is unchanged.
+A request carries the per-parameter metadata under one `serialization` object (`{ path, query, header, cookie, body }`), pairing with the `serializer` option (the functions). Params without metadata keep the previous defaults, so existing output is unchanged.
 
 The default serializers now live in their own `.kubb/serializers.ts`, emitted next to `.kubb/client.ts`, which imports them. Override a serializer through the `serializer` option as before.
 

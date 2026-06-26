@@ -1,5 +1,5 @@
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers'
-import type { HeadersInit, PathParamStyle, PathSerializer, RequestStyles, Serializers } from './serializers'
+import type { HeadersInit, PathParamStyle, PathSerializer, RequestSerialization, Serializers } from './serializers'
 
 /**
  * HTTP status codes treated as a success. A resolved call only ever carries a body from one of
@@ -115,7 +115,7 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   cookies?: Record<string, unknown>
   body?: TBody
   headers?: HeadersInit
-  styles?: RequestStyles
+  serialization?: RequestSerialization
   signal?: AbortSignal
   credentials?: RequestCredentials
   contentType?: string
@@ -390,7 +390,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     const bodySerializer = requestConfig.serializer?.body ?? config.serializer?.body ?? defaultBodySerializer
     const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
 
-    const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.styles?.header))
+    const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.serialization?.header))
     const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
 
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
@@ -403,13 +403,13 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     })
 
     if (requestConfig.cookies) {
-      const cookie = serializeCookies(requestConfig.cookies, requestConfig.styles?.cookie)
+      const cookie = serializeCookies(requestConfig.cookies, requestConfig.serialization?.cookie)
       if (cookie) headers.Cookie = [headers.Cookie, cookie].filter(Boolean).join('; ')
     }
 
     const rawBody = requestConfig.body
     const validatedBody = await runParser(requestConfig.parser?.request, rawBody)
-    const body = bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.styles?.body })
+    const body = bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.serialization?.body })
     // A FormData body must keep its Content-Type unset so the runtime appends the multipart boundary.
     if (body instanceof FormData) {
       delete headers['Content-Type']
@@ -420,9 +420,9 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     const url = serializeUrl({
       parts: [config.baseURL, requestConfig.baseURL, requestConfig.url],
       pathParams: requestConfig.path ?? {},
-      search: querySerializer(query, requestConfig.styles?.query),
+      search: querySerializer(query, requestConfig.serialization?.query),
       pathSerializer,
-      pathStyles: requestConfig.styles?.path,
+      pathStyles: requestConfig.serialization?.path,
     })
 
     let resolvedRequest: ResolvedRequest = {
@@ -478,9 +478,9 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     return serializeUrl({
       parts: [config.baseURL, requestConfig.baseURL, requestConfig.url],
       pathParams: requestConfig.path ?? {},
-      search: querySerializer(query, requestConfig.styles?.query),
+      search: querySerializer(query, requestConfig.serialization?.query),
       pathSerializer,
-      pathStyles: requestConfig.styles?.path,
+      pathStyles: requestConfig.serialization?.path,
     })
   }
   client.interceptors = interceptors
