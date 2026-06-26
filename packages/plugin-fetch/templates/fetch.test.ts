@@ -170,24 +170,24 @@ describe('createClientCore', () => {
     expect(result).toStrictEqual({ status: 405, data: undefined, error: { message: 'invalid' }, request: 'REQ', response: 'RES' })
   })
 
-  test('passes client-level fetchOptions to the transport', async () => {
+  test('passes client-level options to the transport', async () => {
     const { transport, calls } = fakeTransport()
-    const client = createClientCore<string, string>({ defaultTransport: transport, fetchOptions: { cache: 'no-store' } })
+    const client = createClientCore<string, string>({ defaultTransport: transport, options: { cache: 'no-store' } })
     await client({ method: 'GET', url: '/pet' })
-    expect(calls[0]?.fetchOptions).toStrictEqual({ cache: 'no-store' })
+    expect(calls[0]?.options).toStrictEqual({ cache: 'no-store' })
   })
 
-  test('merges request-level fetchOptions over client-level', async () => {
+  test('merges request-level options over client-level', async () => {
     const { transport, calls } = fakeTransport()
-    const client = createClientCore<string, string>({ defaultTransport: transport, fetchOptions: { cache: 'no-store', mode: 'cors' } })
-    await client({ method: 'GET', url: '/pet', fetchOptions: { cache: 'force-cache', next: { revalidate: 60 } } })
-    expect(calls[0]?.fetchOptions).toStrictEqual({ cache: 'force-cache', mode: 'cors', next: { revalidate: 60 } })
+    const client = createClientCore<string, string>({ defaultTransport: transport, options: { cache: 'no-store', mode: 'cors' } })
+    await client({ method: 'GET', url: '/pet', options: { cache: 'force-cache', next: { revalidate: 60 } } })
+    expect(calls[0]?.options).toStrictEqual({ cache: 'force-cache', mode: 'cors', next: { revalidate: 60 } })
   })
 
-  test('leaves fetchOptions undefined when neither level sets it', async () => {
+  test('leaves options undefined when neither level sets it', async () => {
     const { client, calls } = createClient()
     await client({ method: 'GET', url: '/pet' })
-    expect(calls[0]?.fetchOptions).toBeUndefined()
+    expect(calls[0]?.options).toBeUndefined()
   })
 
   test('resolves the per-call transport over the default', async () => {

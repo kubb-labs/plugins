@@ -121,7 +121,7 @@ export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<Auth
  * `method`, `headers`, `params`, `paramsSerializer`, `data`, `transformRequest`, `signal`,
  * `responseType`, `validateStatus`) always win over anything set here. This is the per-request analog
  * of the `transport` instance, which stays the place for cross-cutting concerns like retries and
- * interceptors. It mirrors `fetchOptions` in `@kubb/plugin-fetch`.
+ * interceptors. It mirrors `options` in `@kubb/plugin-fetch`.
  */
 export type AxiosOptions = AxiosRequestConfig
 
@@ -140,7 +140,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   body?: TBody
   headers?: HeadersInit
   signal?: AbortSignal
-  axiosOptions?: AxiosOptions
+  options?: AxiosOptions
   contentType?: string
   responseType?: ResponseType
   throwOnError?: boolean
@@ -174,7 +174,7 @@ export type Options<TData extends DataShape, ThrowOnError extends boolean = true
 export type ClientConfig = {
   baseURL?: string
   headers?: HeadersInit
-  axiosOptions?: AxiosOptions
+  options?: AxiosOptions
   throwOnError?: boolean
   validateStatus?: (status: number) => boolean
   transport?: AxiosInstance
@@ -484,10 +484,10 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
     const validateStatus = requestConfig.validateStatus ?? config.validateStatus ?? (throwOnError ? undefined : () => true)
 
-    const axiosOptions = config.axiosOptions || requestConfig.axiosOptions ? { ...config.axiosOptions, ...requestConfig.axiosOptions } : undefined
+    const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
 
     const axiosConfig: AxiosRequestConfig = {
-      ...axiosOptions, // timeout, proxy, maxRedirects, decompress, onUploadProgress, …
+      ...options, // timeout, proxy, maxRedirects, decompress, onUploadProgress, …
       url,
       baseURL,
       method: requestConfig.method ?? 'GET',

@@ -135,7 +135,7 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   headers?: HeadersInit
   signal?: AbortSignal
   credentials?: RequestCredentials
-  fetchOptions?: FetchOptions
+  options?: FetchOptions
   contentType?: string
   responseType?: ResponseType
   throwOnError?: boolean
@@ -169,7 +169,7 @@ export type ClientConfig<TRequest = Request, TResponse = Response> = {
   baseURL?: string
   headers?: HeadersInit
   credentials?: RequestCredentials
-  fetchOptions?: FetchOptions
+  options?: FetchOptions
   throwOnError?: boolean
   transport?: Transport<TRequest, TResponse>
   querySerializer?: QuerySerializer
@@ -188,7 +188,7 @@ export type ResolvedRequest = {
   body?: BodyInit
   signal?: AbortSignal
   credentials?: RequestCredentials
-  fetchOptions?: FetchOptions
+  options?: FetchOptions
   responseType?: ResponseType
 }
 
@@ -491,7 +491,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     }
     const url = serializeUrl([config.baseURL, requestConfig.baseURL, requestConfig.url], requestConfig.path ?? {}, querySerializer(query))
 
-    const fetchOptions = config.fetchOptions || requestConfig.fetchOptions ? { ...config.fetchOptions, ...requestConfig.fetchOptions } : undefined
+    const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
 
     let resolvedRequest: ResolvedRequest = {
       url,
@@ -500,7 +500,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
       body,
       signal: requestConfig.signal,
       credentials: requestConfig.credentials,
-      fetchOptions,
+      options,
       responseType: requestConfig.responseType,
     }
     resolvedRequest = await interceptors.request.run(resolvedRequest)
@@ -604,7 +604,7 @@ async function parseResponse(response: Response, responseType?: ResponseType): P
  */
 const defaultTransport: Transport = async (request: ResolvedRequest): Promise<TransportResult> => {
   const init: RequestInit = {
-    ...request.fetchOptions, // cache, mode, redirect, keepalive, duplex, next, …
+    ...request.options, // cache, mode, redirect, keepalive, duplex, next, …
     method: request.method,
     headers: request.headers,
     body: request.body,
