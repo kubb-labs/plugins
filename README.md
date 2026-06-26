@@ -5,6 +5,7 @@
 
 [![Stars][stars-src]][stars-href]
 [![License][license-src]][license-href]
+[![OC Backers][oc-backers-src]][oc-backers-href]
 
   <h4>
     <a href="https://kubb.dev" target="_blank">Documentation</a>
@@ -114,3 +115,5 @@ Want to contribute to an existing plugin or add a new one, official or community
 [license-href]: https://github.com/kubb-labs/plugins/blob/main/LICENSE
 [coverage-src]: https://shieldcn.dev/codecov/github/kubb-labs/plugins.svg?variant=secondary&size=xs&theme=zinc&mode=dark
 [coverage-href]: https://app.codecov.io/gh/kubb-labs/plugins
+[oc-backers-src]: https://shieldcn.dev/opencollective/backers/kubb.svg?variant=secondary&size=xs&theme=zinc&mode=dark
+[oc-backers-href]: https://opencollective.com/kubb
