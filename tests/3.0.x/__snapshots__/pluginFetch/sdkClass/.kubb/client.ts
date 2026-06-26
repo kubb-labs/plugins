@@ -395,7 +395,12 @@ function serializeStyledQueryObject(key: string, value: Record<string, unknown>,
   const entries = Object.entries(value).filter(([, item]) => notNullish(item))
   if ((options.style ?? 'form') === 'deepObject') return entries.map(([prop, item]) => `${encode(`${key}[${prop}]`)}=${encode(item)}`)
   if (options.explode ?? true) return entries.map(([prop, item]) => `${encode(prop)}=${encode(item)}`)
-  return [`${encode(key)}=${entries.flatMap(([prop, item]) => [prop, item]).map(encode).join(',')}`]
+  return [
+    `${encode(key)}=${entries
+      .flatMap(([prop, item]) => [prop, item])
+      .map(encode)
+      .join(',')}`,
+  ]
 }
 
 function serializeStyledQueryParam(key: string, value: unknown, options: QueryParamStyle): Array<string> {
