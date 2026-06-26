@@ -26,7 +26,7 @@ const testConfig: Config = {
 
 const defaultOptions: PluginSwr['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  parser: false,
+  validator: false,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -131,7 +131,7 @@ describe('queryGenerator operation', () => {
     { name: 'findByTags', node: findByTagsNode, options: {} },
     { name: 'getPetById', node: getPetByIdNode, options: {} },
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
-    { name: 'findByTagsWithZod', node: findByTagsNode, options: { parser: 'zod' as const } },
+    { name: 'findByTagsWithZod', node: findByTagsNode, options: { validator: 'zod' as const } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginSwr['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {

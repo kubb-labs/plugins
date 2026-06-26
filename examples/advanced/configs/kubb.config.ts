@@ -101,7 +101,7 @@ export default defineConfig({
       },
       infinite: false,
       suspense: false,
-      parser: 'zod',
+      validator: 'zod',
     }),
     pluginAxios({
       output: {
@@ -113,7 +113,7 @@ export default defineConfig({
           pattern: 'store',
         },
       ],
-      parser: 'zod',
+      validator: 'zod',
       group: { type: 'tag', name: ({ group }) => `${group}Service` },
       baseURL: 'https://petstore3.swagger.io/api/v3',
       override: [
@@ -121,14 +121,14 @@ export default defineConfig({
           type: 'contentType',
           pattern: 'multipart/form-data',
           options: {
-            parser: false,
+            validator: false,
           },
         },
         {
           type: 'contentType',
           pattern: 'application/octet-stream',
           options: {
-            parser: false,
+            validator: false,
           },
         },
       ],

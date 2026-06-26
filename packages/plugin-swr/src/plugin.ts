@@ -1,6 +1,6 @@
 import { createGroupConfig } from '@internals/shared'
 import { definePlugin } from '@kubb/core'
-import { isParserEnabled } from '@internals/client'
+import { isValidatorEnabled } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { resolveClient } from '@internals/client'
@@ -18,7 +18,7 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
     exclude = [],
     include,
     override = [],
-    parser = false,
+    validator = false,
     mutation = {},
     query = {},
     mutationKey = mutationKeyTransformer,
@@ -35,7 +35,7 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
   return {
     name: pluginSwrName,
     options,
-    dependencies: [pluginTsName, isParserEnabled(parser) ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
+    dependencies: [pluginTsName, isValidatorEnabled(validator) ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverSwr, ...userResolver } : resolverSwr
@@ -71,7 +71,7 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
                   methods: ['post', 'put', 'patch', 'delete'],
                   ...mutation,
                 },
-          parser,
+          validator,
           group: groupConfig,
           exclude,
           include,

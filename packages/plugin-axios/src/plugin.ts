@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { createSdkGenerator, defaultMacros, isParserEnabled, resolverClient } from '@internals/client'
+import { createSdkGenerator, defaultMacros, isValidatorEnabled, resolverClient } from '@internals/client'
 import { createGroupConfig } from '@internals/shared'
 import { definePlugin } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -43,7 +43,7 @@ export const pluginAxios = definePlugin<PluginAxios>((options) => {
     include,
     override = [],
     baseURL,
-    parser = false,
+    validator = false,
     group,
     sdk,
     resolver: userResolver,
@@ -56,7 +56,7 @@ export const pluginAxios = definePlugin<PluginAxios>((options) => {
     override,
     group: createGroupConfig(group),
     baseURL,
-    parser,
+    validator,
     sdk: sdk ? { mode: sdk.mode ?? 'tag', name: sdk.name } : undefined,
     resolver: userResolver ? { ...resolverClient, ...userResolver } : resolverClient,
   }
@@ -68,7 +68,9 @@ export const pluginAxios = definePlugin<PluginAxios>((options) => {
   return {
     name: pluginAxiosName,
     options,
-    dependencies: [pluginTsName, isParserEnabled(resolved.parser) ? pluginZodName : null].filter((dependency): dependency is string => Boolean(dependency)),
+    dependencies: [pluginTsName, isValidatorEnabled(resolved.validator) ? pluginZodName : null].filter((dependency): dependency is string =>
+      Boolean(dependency),
+    ),
     hooks: {
       'kubb:plugin:setup'(ctx) {
         ctx.setOptions(resolved)

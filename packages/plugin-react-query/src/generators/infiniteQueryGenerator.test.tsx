@@ -24,7 +24,7 @@ const testConfig: Config = {
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  parser: 'zod',
+  validator: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -125,7 +125,7 @@ const infiniteConfig = {
 describe('infiniteQueryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: { infinite: infiniteConfig } },
-    { name: 'findByTagsWithZod', node: findByTagsNode, options: { infinite: infiniteConfig, parser: 'zod' as const } },
+    { name: 'findByTagsWithZod', node: findByTagsNode, options: { infinite: infiniteConfig, validator: 'zod' as const } },
     {
       name: 'clientPostImportPath',
       node: findByTagsNode,

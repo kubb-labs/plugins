@@ -27,7 +27,7 @@ const testConfig: Config = {
 
 const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  parser: 'zod',
+  validator: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -122,7 +122,7 @@ describe('queryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
     { name: 'findByTagsTemplateString', node: findByTagsNode, options: {}, baseURL: '${123456}' },
-    { name: 'findByTagsWithZod', node: findByTagsNode, options: { parser: 'zod' as const } },
+    { name: 'findByTagsWithZod', node: findByTagsNode, options: { validator: 'zod' as const } },
     {
       name: 'findByTagsWithCustomQueryKey',
       node: findByTagsNode,

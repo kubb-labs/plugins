@@ -1,7 +1,7 @@
 import type { ast } from '@kubb/core'
 import type { ResolverZod } from '@kubb/plugin-zod'
-import type { ParserOptions } from '../types.ts'
-import { buildZodErrorParse, buildZodResponseParse, resolveRequestParser, resolveResponseParser } from './parser.ts'
+import type { ValidatorOptions } from '../types.ts'
+import { buildZodErrorParse, buildZodResponseParse, resolveRequestValidator, resolveResponseValidator } from './validatorOptions.ts'
 
 /**
  * The per-call validator references a generated function wires into its request config. Each hook is
@@ -37,25 +37,25 @@ export type ValidatorHooks = {
  */
 export function buildValidatorHooks({
   node,
-  parser,
+  validator,
   zodResolver,
 }: {
   node: ast.OperationNode
-  parser: ParserOptions | undefined
+  validator: ValidatorOptions | undefined
   zodResolver: ResolverZod | null | undefined
 }): ValidatorHooks {
   const importedZodNames: Array<string> = []
 
   const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
-  const zodRequestName = zodResolver && resolveRequestParser(parser) === 'zod' && hasRequestBody ? zodResolver.resolveDataName?.(node) : null
+  const zodRequestName = zodResolver && resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.resolveDataName?.(node) : null
   const request = zodRequestName ?? null
   if (zodRequestName) importedZodNames.push(zodRequestName)
 
-  const responseParse = zodResolver && resolveResponseParser(parser) === 'zod' ? buildZodResponseParse(node, zodResolver) : null
+  const responseParse = zodResolver && resolveResponseValidator(validator) === 'zod' ? buildZodResponseParse(node, zodResolver) : null
   const response = responseParse ? responseParse.expression : null
   if (responseParse) importedZodNames.push(...responseParse.importNames)
 
-  const errorParse = zodResolver && resolveResponseParser(parser) === 'zod' ? buildZodErrorParse(node, zodResolver) : null
+  const errorParse = zodResolver && resolveResponseValidator(validator) === 'zod' ? buildZodErrorParse(node, zodResolver) : null
   const error = errorParse ? errorParse.expression : null
   if (errorParse) importedZodNames.push(...errorParse.importNames)
 

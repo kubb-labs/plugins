@@ -297,7 +297,7 @@ export type Options = OutputOptions & {
    * - `'client'` — no validation. Trusts the API.
    * - `'zod'` — pipes responses through schemas from `@kubb/plugin-zod`.
    */
-  parser?: ClientOptions['parser']
+  validator?: ClientOptions['validator']
   /**
    * Override how hook names and file paths are built. Methods you omit fall
    * back to the default `resolverReactQuery`.
@@ -325,7 +325,7 @@ type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedClient
-  parser: NonNullable<Options['parser']>
+  validator: NonNullable<Options['validator']>
   /**
    * Only used for infinite
    */

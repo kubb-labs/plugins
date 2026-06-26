@@ -9,7 +9,7 @@ import { buildReturnStatement } from '../builders/returnStatement.ts'
 import { type Auth, buildSecurityMetadata } from '../builders/security.ts'
 import { buildGroupedOptionsSignature } from '../builders/signature.ts'
 import { buildValidatorHooks } from '../builders/validator.ts'
-import type { ParserOptions } from '../types.ts'
+import type { ValidatorOptions } from '../types.ts'
 
 type Props = {
   /**
@@ -25,13 +25,13 @@ type Props = {
    */
   tsResolver: ResolverTs
   /**
-   * Resolver for the zod schema names the validators reference, when `parser` is on.
+   * Resolver for the zod schema names the validators reference, when `validator` is on.
    */
   zodResolver?: ResolverZod | null
   /**
-   * The active parser option, driving the validator-hook wiring.
+   * The active validator option, driving the validator-hook wiring.
    */
-  parser?: ParserOptions
+  validator?: ValidatorOptions
   /**
    * Per-operation security, resolved from the spec into inline `Auth` objects and serialized onto the
    * call config's `security` field for the runtime `auth` resolver to consume.
@@ -46,11 +46,11 @@ type Props = {
  * single `options` object to the resolved client and returns the `RequestResult`. The type, signature,
  * and call config are built with the AST factory, and only the jsx-renderer emits the source.
  */
-export function Operation({ name, node, tsResolver, zodResolver, parser, security, isExportable = true, isIndexable = true }: Props): KubbReactNode {
+export function Operation({ name, node, tsResolver, zodResolver, validator, security, isExportable = true, isIndexable = true }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
 
   const signature = buildGroupedOptionsSignature({ node, tsResolver })
-  const validators = buildValidatorHooks({ node, parser, zodResolver })
+  const validators = buildValidatorHooks({ node, validator, zodResolver })
   const securityLiteral = buildSecurityMetadata({ security })
 
   const { defaultContentType } = getContentTypeInfo(node)
