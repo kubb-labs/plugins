@@ -6,12 +6,13 @@ import type {
   CreatePetsStatus201,
   CreatePetsStatusDefault,
 } from '../../models/ts/pets/CreatePets.ts'
+import { createCreatePetsBoolParamFaker } from '../createCreatePetsBoolParamFaker.ts'
 import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLEFaker.ts'
 import { createPetNotFoundFaker } from '../createPetNotFoundFaker.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createCreatePetsQueryBoolParamFaker(data?: CreatePetsQueryBoolParam): CreatePetsQueryBoolParam {
-  return data ?? faker.helpers.arrayElement<CreatePetsQueryBoolParam>([true])
+export function createCreatePetsQueryBoolParamFaker(data?: Partial<CreatePetsQueryBoolParam>): CreatePetsQueryBoolParam {
+  return createCreatePetsBoolParamFaker(data) as CreatePetsQueryBoolParam
 }
 
 export function createCreatePetsPathUuidFaker(data?: string): string {

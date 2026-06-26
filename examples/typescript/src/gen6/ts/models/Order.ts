@@ -5,6 +5,7 @@
 
 import type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum.ts'
 import type { OrderParamsStatusEnumKey } from './OrderParamsStatusEnum.ts'
+import type { OrderStatusKey } from './OrderStatus.ts'
 
 /**
  * @type object
@@ -54,7 +55,7 @@ export type Order = {
   /**
    * @description Order Status
    */
-  status?: 'accepted' | (string & {})
+  status?: OrderStatusKey | string
   /**
    * @description HTTP Status
    * @example 200

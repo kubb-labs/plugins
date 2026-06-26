@@ -11,6 +11,12 @@ export const OrderParamsStatusEnum = {
 
 export type OrderParamsStatusEnumKey = (typeof OrderParamsStatusEnum)[keyof typeof OrderParamsStatusEnum]
 
+export const OrderStatus = {
+  accepted: 'accepted',
+} as const
+
+export type OrderStatusKey = (typeof OrderStatus)[keyof typeof OrderStatus]
+
 export const OrderHttpStatusEnum = {
   '200': 200,
   '400': 400,
@@ -115,7 +121,7 @@ export type Order = {
   /**
    * @description Order Status
    */
-  status?: 'accepted' | (string & {})
+  status?: OrderStatusKey | string
   /**
    * @description HTTP Status
    * @example 200
@@ -274,6 +280,24 @@ export type Cat = {
   name?: string
 }
 
+/**
+ * @type object
+ */
+export type Category1 = {
+  /**
+   * @description
+   * Format: `int64`
+   * @example 1
+   * @type integer | undefined
+   */
+  id?: bigint
+  /**
+   * @example Dogs
+   * @type string | undefined
+   */
+  name?: string
+}
+
 export type Pet = (
   | (Dog & {
       /**
@@ -301,7 +325,10 @@ export type Pet = (
    * @type string
    */
   name: string
-  category?: Category
+  /**
+   * @type object | undefined
+   */
+  category?: Category1
   /**
    * @type array
    */
