@@ -30,6 +30,10 @@ export const addPetResponseSchema = addPetStatus200Schema
 
 export type AddPetResponseSchemaType = z.infer<typeof addPetResponseSchema>
 
+export const addPetErrorSchema = addPetStatus405Schema
+
+export type AddPetErrorSchemaType = z.infer<typeof addPetErrorSchema>
+
 export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
 
 export type AddPetDataSchemaJsonType = z.infer<typeof addPetDataSchemaJson>

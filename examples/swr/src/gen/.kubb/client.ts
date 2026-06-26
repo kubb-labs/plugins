@@ -84,7 +84,8 @@ export type BodySerializer = (body: unknown, contentType?: string) => BodyInit |
 
 /**
  * Parses a value before it is sent or after it is received, returning the parsed (and optionally
- * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` hooks.
+ * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` /
+ * `parser.error` hooks (`error` runs on the error body when a non-2xx call does not throw).
  */
 export type Parser<T = unknown> = (value: T) => T | Promise<T>
 
@@ -112,6 +113,14 @@ export type AuthToken = string | undefined
 export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<AuthToken>)
 
 /**
+ * Extra `fetch` init the transport spreads onto every `Request`, an escape hatch for the fields the
+ * runtime does not set itself: `cache`, `mode`, `redirect`, `keepalive`, `duplex`, and Next.js's
+ * non-standard `next` (`{ revalidate, tags }`). `method`, `headers`, `body`, `signal`, and
+ * `credentials` are always controlled by the runtime and override anything set here.
+ */
+export type FetchOptions = RequestInit & { next?: Record<string, unknown> }
+
+/**
  * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` come
  * from the grouped options; everything else is plain request configuration.
  */
@@ -126,6 +135,7 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   headers?: HeadersInit
   signal?: AbortSignal
   credentials?: RequestCredentials
+  fetchOptions?: FetchOptions
   contentType?: string
   responseType?: ResponseType
   throwOnError?: boolean
@@ -133,7 +143,7 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   transport?: Transport<TRequest, TResponse>
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
-  parser?: { request?: Parser; response?: Parser }
+  parser?: { request?: Parser; response?: Parser; error?: Parser }
   security?: Array<Auth>
   auth?: AuthResolver
 }
@@ -159,6 +169,7 @@ export type ClientConfig<TRequest = Request, TResponse = Response> = {
   baseURL?: string
   headers?: HeadersInit
   credentials?: RequestCredentials
+  fetchOptions?: FetchOptions
   throwOnError?: boolean
   transport?: Transport<TRequest, TResponse>
   querySerializer?: QuerySerializer
@@ -177,6 +188,7 @@ export type ResolvedRequest = {
   body?: BodyInit
   signal?: AbortSignal
   credentials?: RequestCredentials
+  fetchOptions?: FetchOptions
   responseType?: ResponseType
 }
 
@@ -283,13 +295,30 @@ function isFormBody(body: unknown): body is BodyInit {
   )
 }
 
+function appendFormDataValue(formData: FormData, key: string, value: unknown): void {
+  if (value === undefined || value === null) return
+  if (value instanceof Blob) formData.append(key, value)
+  else if (value instanceof Date) formData.append(key, value.toISOString())
+  else if (typeof value === 'object') formData.append(key, JSON.stringify(value))
+  else formData.append(key, String(value))
+}
+
 /**
  * Default body serializer: passes binary/form bodies through and JSON-serializes everything else.
- * For `application/x-www-form-urlencoded` plain objects become `URLSearchParams`.
+ * For `multipart/form-data` plain objects become `FormData` and for
+ * `application/x-www-form-urlencoded` they become `URLSearchParams`.
  */
 export const defaultBodySerializer: BodySerializer = (body, contentType) => {
   if (body === undefined || body === null) return undefined
   if (isFormBody(body)) return body as BodyInit
+  if (contentType?.includes('multipart/form-data')) {
+    const formData = new FormData()
+    for (const [key, value] of Object.entries(body as Record<string, unknown>)) {
+      if (Array.isArray(value)) for (const item of value) appendFormDataValue(formData, key, item)
+      else appendFormDataValue(formData, key, value)
+    }
+    return formData
+  }
   if (contentType?.includes('application/x-www-form-urlencoded')) {
     return new URLSearchParams(body as Record<string, string>)
   }
@@ -439,9 +468,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     const bodySerializer = requestConfig.bodySerializer ?? config.bodySerializer ?? defaultBodySerializer
 
     const headers = mergeHeaders(config.headers, requestConfig.headers)
-    if (requestConfig.contentType && requestConfig.contentType !== 'multipart/form-data') {
-      headers['Content-Type'] = requestConfig.contentType
-    }
+    const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
 
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
 
@@ -454,15 +481,26 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
 
     const rawBody = requestConfig.body
     const validatedBody = await runParser(requestConfig.parser?.request, rawBody)
+    const body = bodySerializer(validatedBody, requestContentType)
+    // A FormData body must keep its Content-Type unset so the runtime appends the multipart boundary.
+    if (body instanceof FormData) {
+      delete headers['Content-Type']
+      delete headers['content-type']
+    } else if (requestConfig.contentType) {
+      headers['Content-Type'] = requestConfig.contentType
+    }
     const url = serializeUrl([config.baseURL, requestConfig.baseURL, requestConfig.url], requestConfig.path ?? {}, querySerializer(query))
+
+    const fetchOptions = config.fetchOptions || requestConfig.fetchOptions ? { ...config.fetchOptions, ...requestConfig.fetchOptions } : undefined
 
     let resolvedRequest: ResolvedRequest = {
       url,
       method: (requestConfig.method ?? 'GET').toUpperCase(),
       headers,
-      body: bodySerializer(validatedBody, headers['Content-Type'] ?? headers['content-type']),
+      body,
       signal: requestConfig.signal,
       credentials: requestConfig.credentials,
+      fetchOptions,
       responseType: requestConfig.responseType,
     }
     resolvedRequest = await interceptors.request.run(resolvedRequest)
@@ -486,11 +524,12 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     }
 
     const data = isSuccess ? await runParser(requestConfig.parser?.response, result.data) : undefined
+    const error = isSuccess ? undefined : await runParser(requestConfig.parser?.error, result.data)
 
     return {
       status: result.status,
       data,
-      error: isSuccess ? undefined : result.data,
+      error,
       request: result.request,
       response: result.response,
     }
@@ -565,6 +604,7 @@ async function parseResponse(response: Response, responseType?: ResponseType): P
  */
 const defaultTransport: Transport = async (request: ResolvedRequest): Promise<TransportResult> => {
   const init: RequestInit = {
+    ...request.fetchOptions, // cache, mode, redirect, keepalive, duplex, next, …
     method: request.method,
     headers: request.headers,
     body: request.body,
