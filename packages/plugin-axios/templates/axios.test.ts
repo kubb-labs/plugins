@@ -122,6 +122,30 @@ describe('createClientCore', () => {
     expect(calls[0]?.baseURL).toBe('https://api.test')
   })
 
+  test('passes client-level axiosOptions to axios', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance, axiosOptions: { timeout: 1000 } })
+    await client({ method: 'GET', url: '/pet' })
+    expect(calls[0]?.timeout).toBe(1000)
+  })
+
+  test('merges request-level axiosOptions over client-level', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance, axiosOptions: { timeout: 1000, maxRedirects: 5 } })
+    await client({ method: 'GET', url: '/pet', axiosOptions: { timeout: 2000, decompress: false } })
+    expect(calls[0]?.timeout).toBe(2000)
+    expect(calls[0]?.maxRedirects).toBe(5)
+    expect(calls[0]?.decompress).toBe(false)
+  })
+
+  test('never lets axiosOptions override the runtime-owned fields', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/pet/{petId}', path: { petId: 7 }, axiosOptions: { url: '/evil', method: 'DELETE' } })
+    expect(calls[0]?.url).toBe('/pet/7')
+    expect(calls[0]?.method).toBe('GET')
+  })
+
   test('maps querySerializer onto axios paramsSerializer', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance })

@@ -115,6 +115,17 @@ export type AuthToken = string | undefined
 export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<AuthToken>)
 
 /**
+ * Extra axios config the runtime spreads onto every request, an escape hatch for the per-call fields
+ * it does not set itself, such as `timeout`, `proxy`, `maxRedirects`, `decompress`, and the
+ * `onUploadProgress` / `onDownloadProgress` callbacks. The runtime-owned fields (`url`, `baseURL`,
+ * `method`, `headers`, `params`, `paramsSerializer`, `data`, `transformRequest`, `signal`,
+ * `responseType`, `validateStatus`) always win over anything set here. This is the per-request analog
+ * of the `transport` instance, which stays the place for cross-cutting concerns like retries and
+ * interceptors. It mirrors `fetchOptions` in `@kubb/plugin-fetch`.
+ */
+export type AxiosOptions = AxiosRequestConfig
+
+/**
  * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` come
  * from the grouped options; everything else is plain request configuration. `transport` carries an
  * axios instance and `validateStatus` rides axios's own contract.
@@ -129,6 +140,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   body?: TBody
   headers?: HeadersInit
   signal?: AbortSignal
+  axiosOptions?: AxiosOptions
   contentType?: string
   responseType?: ResponseType
   throwOnError?: boolean
@@ -162,6 +174,7 @@ export type Options<TData extends DataShape, ThrowOnError extends boolean = true
 export type ClientConfig = {
   baseURL?: string
   headers?: HeadersInit
+  axiosOptions?: AxiosOptions
   throwOnError?: boolean
   validateStatus?: (status: number) => boolean
   transport?: AxiosInstance
@@ -471,7 +484,10 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
     const validateStatus = requestConfig.validateStatus ?? config.validateStatus ?? (throwOnError ? undefined : () => true)
 
+    const axiosOptions = config.axiosOptions || requestConfig.axiosOptions ? { ...config.axiosOptions, ...requestConfig.axiosOptions } : undefined
+
     const axiosConfig: AxiosRequestConfig = {
+      ...axiosOptions, // timeout, proxy, maxRedirects, decompress, onUploadProgress, …
       url,
       baseURL,
       method: requestConfig.method ?? 'GET',
