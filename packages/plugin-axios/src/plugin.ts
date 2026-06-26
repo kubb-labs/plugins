@@ -5,7 +5,7 @@ import { definePlugin } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
-import { axiosClientTemplatePath } from './templates.ts'
+import { axiosClientTemplatePath, axiosSerializersTemplatePath } from './templates.ts'
 import type { PluginAxios, ResolvedOptions } from './types.ts'
 
 /**
@@ -78,6 +78,12 @@ export const pluginAxios = definePlugin<PluginAxios>((options) => {
         ctx.addGenerator(...selectedGenerators)
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
+
+        ctx.injectFile({
+          baseName: 'serializers.ts',
+          path: path.resolve(root, '.kubb/serializers.ts'),
+          copy: axiosSerializersTemplatePath,
+        })
 
         ctx.injectFile({
           baseName: 'client.ts',

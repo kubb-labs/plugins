@@ -6,3 +6,9 @@ import { fileURLToPath } from 'node:url'
  * field to emit the runtime into the generated `.kubb/client.ts` verbatim.
  */
 export const axiosClientTemplatePath = fileURLToPath(new URL('../templates/axios.ts', import.meta.url))
+
+/**
+ * Absolute path to the axios serializers template, emitted alongside the client runtime into
+ * `.kubb/serializers.ts`. The generated `.kubb/client.ts` imports its default serializers from here.
+ */
+export const axiosSerializersTemplatePath = fileURLToPath(new URL('../templates/serializers.ts', import.meta.url))

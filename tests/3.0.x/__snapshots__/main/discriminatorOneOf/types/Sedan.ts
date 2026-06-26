@@ -3,10 +3,18 @@
 * Do not edit manually.
 */
 
-import type { SedanTypeEnumKey } from './SedanTypeEnum.ts'
 import type { Vehicle } from './Vehicle.ts'
 
+export const sedanTypeEnum = {
+    Sedan: "Sedan"
+} as const;
+
+export type SedanTypeEnumKey = (typeof sedanTypeEnum)[keyof typeof sedanTypeEnum];
+
 export type Sedan = (Vehicle & {
+    /**
+     * @type string | undefined
+    */
     type?: SedanTypeEnumKey;
     /**
      * @description Number of seats

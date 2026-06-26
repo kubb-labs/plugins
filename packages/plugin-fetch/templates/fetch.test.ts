@@ -3,16 +3,13 @@ import {
   type CallResult,
   createClientCore,
   createInterceptorStack,
-  defaultBodySerializer,
-  defaultPathSerializer,
-  defaultQuerySerializer,
   type ResolvedRequest,
-  serializeCookies,
   ResponseError,
   resolveAuth,
   type Transport,
   type TransportResult,
 } from './fetch.ts'
+import { defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type FakeResult = Partial<Pick<TransportResult, 'data' | 'status' | 'statusText'>>
 

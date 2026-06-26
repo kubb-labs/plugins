@@ -3,7 +3,11 @@
 * Do not edit manually.
 */
 
-import type { VariantTypeEnumKey } from './VariantTypeEnum.ts'
+export const variantTypeEnum = {
+    uppercase: "uppercase"
+} as const;
+
+export type VariantTypeEnumKey = (typeof variantTypeEnum)[keyof typeof variantTypeEnum];
 
 /**
  * @type object
@@ -17,5 +21,8 @@ export type Variant = {
      * @type string | undefined
     */
     name?: string;
+    /**
+     * @type string | undefined
+    */
     type?: VariantTypeEnumKey;
 };

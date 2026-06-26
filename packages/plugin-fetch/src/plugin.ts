@@ -5,7 +5,7 @@ import { definePlugin } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
-import { fetchClientTemplatePath } from './templates.ts'
+import { fetchClientTemplatePath, fetchSerializersTemplatePath } from './templates.ts'
 import type { PluginFetch, ResolvedOptions } from './types.ts'
 
 /**
@@ -78,6 +78,12 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
         ctx.addGenerator(...selectedGenerators)
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
+
+        ctx.injectFile({
+          baseName: 'serializers.ts',
+          path: path.resolve(root, '.kubb/serializers.ts'),
+          copy: fetchSerializersTemplatePath,
+        })
 
         ctx.injectFile({
           baseName: 'client.ts',

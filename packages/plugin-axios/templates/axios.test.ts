@@ -1,15 +1,7 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import {
-  type CallResult,
-  createClientCore,
-  defaultBodySerializer,
-  defaultPathSerializer,
-  defaultQuerySerializer,
-  ResponseError,
-  resolveAuth,
-  serializeCookies,
-} from './axios.ts'
+import { type CallResult, createClientCore, ResponseError, resolveAuth } from './axios.ts'
+import { defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
 
