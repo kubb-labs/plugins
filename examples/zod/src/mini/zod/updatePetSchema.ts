@@ -20,6 +20,8 @@ export const updatePetStatus405Schema = z.any()
 
 export const updatePetResponseSchema = updatePetStatus200Schema
 
+export const updatePetErrorSchema = z.union([updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema])
+
 export const updatePetDataSchemaJson = z.lazy(() => petSchema)
 
 export const updatePetDataSchemaXml = z.lazy(() => petSchema)

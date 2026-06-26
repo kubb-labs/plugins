@@ -12,6 +12,8 @@ export const placeOrderStatus405Schema = z.any()
 
 export const placeOrderResponseSchema = placeOrderStatus200Schema
 
+export const placeOrderErrorSchema = placeOrderStatus405Schema
+
 export const placeOrderDataSchemaJson = orderSchema.optional()
 
 export const placeOrderDataSchemaXml = orderSchema.optional()

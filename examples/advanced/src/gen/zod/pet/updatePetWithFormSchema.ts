@@ -19,3 +19,7 @@ export type UpdatePetWithFormStatus405SchemaType = z.infer<typeof updatePetWithF
 export const updatePetWithFormResponseSchema = z.unknown()
 
 export type UpdatePetWithFormResponseSchemaType = z.infer<typeof updatePetWithFormResponseSchema>
+
+export const updatePetWithFormErrorSchema = updatePetWithFormStatus405Schema
+
+export type UpdatePetWithFormErrorSchemaType = z.infer<typeof updatePetWithFormErrorSchema>

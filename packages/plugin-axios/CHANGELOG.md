@@ -1,5 +1,39 @@
 # @kubb/plugin-axios
 
+## 5.0.0-beta.77
+
+### Minor Changes
+
+- [#530](https://github.com/kubb-labs/plugins/pull/530) [`fb55ca5`](https://github.com/kubb-labs/plugins/commit/fb55ca5908cd3da664c432d001af3d4f73a203c5) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add an arbitrary request-options escape hatch to the fetch and axios client runtimes.
+
+  `@kubb/plugin-fetch` gains a `fetchOptions` field. The transport previously built a fixed init (`method`, `headers`, `body`, `signal`, `credentials`), leaving no way to set `cache`, `mode`, `redirect`, `keepalive`, `duplex`, or Next.js's non-standard `next: { revalidate, tags }`.
+
+  `@kubb/plugin-axios` gains the symmetric `axiosOptions` field (typed as `AxiosRequestConfig`) for per-call fields the runtime does not set itself, such as `timeout`, `proxy`, `maxRedirects`, `decompress`, and the `onUploadProgress` / `onDownloadProgress` callbacks. The pre-configured `transport` instance stays the place for cross-cutting concerns like retries and interceptors.
+
+  Both fields are accepted on `ClientConfig` and `RequestConfig` (a per-request value wins over the client-level one) and are spread into the request before the runtime-owned fields, so they can never override what the runtime controls (URL, method, headers, body, serialization, and `throwOnError` handling).
+
+  ```ts
+  // fetch
+  client.setConfig({ fetchOptions: { cache: "no-store" } });
+  await getPetById({
+    path: { petId: 1 },
+    fetchOptions: { cache: "force-cache", next: { revalidate: 60 } },
+  });
+
+  // axios
+  client.setConfig({ axiosOptions: { timeout: 10_000 } });
+  await getPetById({
+    path: { petId: 1 },
+    axiosOptions: { timeout: 2_000, onUploadProgress: (e) => console.log(e) },
+  });
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`fae9f47`](https://github.com/kubb-labs/plugins/commit/fae9f470468870ed7015f2c910fd817c7e7daeef), [`455e6f1`](https://github.com/kubb-labs/plugins/commit/455e6f1c1f9047fb5cb7d4d12038dc2b5eb4422a)]:
+  - @kubb/plugin-ts@5.0.0-beta.77
+  - @kubb/plugin-zod@5.0.0-beta.77
+
 ## 5.0.0-beta.76
 
 ### Minor Changes

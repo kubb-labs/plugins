@@ -123,6 +123,14 @@ export type RequestMeta = {
 }
 
 /**
+ * Extra `fetch` init the transport spreads onto every `Request`, an escape hatch for the fields the
+ * runtime does not set itself: `cache`, `mode`, `redirect`, `keepalive`, `duplex`, and Next.js's
+ * non-standard `next` (`{ revalidate, tags }`). `method`, `headers`, `body`, `signal`, and
+ * `credentials` are always controlled by the runtime and override anything set here.
+ */
+export type FetchOptions = RequestInit & { next?: Record<string, unknown> }
+
+/**
  * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` /
  * `cookie` come from the grouped options; everything else is plain request configuration.
  */
@@ -138,6 +146,7 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   headers?: HeadersInit
   signal?: AbortSignal
   credentials?: RequestCredentials
+  options?: FetchOptions
   contentType?: string
   responseType?: ResponseType
   throwOnError?: boolean
@@ -183,6 +192,7 @@ export type ClientConfig<TRequest = Request, TResponse = Response> = {
   baseURL?: string
   headers?: HeadersInit
   credentials?: RequestCredentials
+  options?: FetchOptions
   throwOnError?: boolean
   transport?: Transport<TRequest, TResponse>
   querySerializer?: QuerySerializer
@@ -222,6 +232,7 @@ export type ResolvedRequest = {
   body?: BodyInit
   signal?: AbortSignal
   credentials?: RequestCredentials
+  options?: FetchOptions
   responseType?: ResponseType
   /**
    * Operation context, populated by the runtime and never sent over the wire.
@@ -596,6 +607,8 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     }
     const url = serializeUrl([config.baseURL, requestConfig.baseURL, requestConfig.url], requestConfig.path ?? {}, querySerializer(query))
 
+    const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
+
     const resolvedRequest: ResolvedRequest = {
       url,
       method: (requestConfig.method ?? 'GET').toUpperCase(),
@@ -603,6 +616,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
       body,
       signal: requestConfig.signal,
       credentials: requestConfig.credentials,
+      options,
       responseType: requestConfig.responseType,
       meta: {
         operationId: requestConfig.meta?.operationId,
@@ -734,6 +748,7 @@ async function parseResponse(response: Response, responseType?: ResponseType): P
  */
 const defaultTransport: Transport = async (request: ResolvedRequest): Promise<TransportResult> => {
   const init: RequestInit = {
+    ...request.options, // cache, mode, redirect, keepalive, duplex, next, …
     method: request.method,
     headers: request.headers,
     body: request.body,

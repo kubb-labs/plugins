@@ -6,7 +6,7 @@ import type ts from 'typescript'
 import { ENUM_TYPES_WITH_KEY_SUFFIX, OPTIONAL_ADDS_QUESTION_TOKEN, OPTIONAL_ADDS_UNDEFINED } from '../constants.ts'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
-import { buildPropertyJSDocComments } from '../utils.ts'
+import { buildPropertyJSDocComments, isInlineConstEnum } from '../utils.ts'
 
 const { isNonNullable } = factory
 
@@ -179,7 +179,9 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       enum(node) {
         const values = node.namedEnumValues?.map((v) => v.value) ?? node.enumValues ?? []
 
-        if (this.options.enum.type === 'inlineLiteral' || !node.name) {
+        // A `const` (single-value enum) the adapter did not register as a named enum emits the bare
+        // literal regardless of `enum.type`, matching how its references resolve.
+        if (this.options.enum.type === 'inlineLiteral' || !node.name || isInlineConstEnum(node, this.options.enumSchemaNames)) {
           const literalNodes = values
             .filter((v): v is string | number | boolean => v !== null && v !== undefined)
             .map((value) => factory.constToTypeNode(value, typeof value as 'string' | 'number' | 'boolean'))
