@@ -16,7 +16,6 @@ export function getPetById<ThrowOnError extends boolean = true>(
     method: 'GET',
     url: '/pet/{petId}',
     security: [{ type: 'oauth2' }, { type: 'apiKey', name: 'api_key', in: 'header' }],
-    meta: { operationId: 'getPetById', schemaPath: '/pet/{petId}' },
     ...config,
   }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
 }

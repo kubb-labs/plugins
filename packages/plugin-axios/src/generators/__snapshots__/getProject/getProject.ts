@@ -12,10 +12,5 @@ export function getProject<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<GetProjectResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({
-    method: 'GET',
-    url: '/projects/{projectId}',
-    meta: { operationId: 'getProject', schemaPath: '/projects/{project_id}' },
-    ...config,
-  }) as Promise<RequestResult<GetProjectResponses, ThrowOnError>>
+  return request({ method: 'GET', url: '/projects/{projectId}', ...config }) as Promise<RequestResult<GetProjectResponses, ThrowOnError>>
 }

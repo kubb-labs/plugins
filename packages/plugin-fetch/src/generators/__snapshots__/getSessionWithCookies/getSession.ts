@@ -12,7 +12,5 @@ export function getSession<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<GetSessionResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/session', meta: { operationId: 'getSession', schemaPath: '/session' }, ...config }) as Promise<
-    RequestResult<GetSessionResponses, ThrowOnError>
-  >
+  return request({ method: 'GET', url: '/session', ...config }) as Promise<RequestResult<GetSessionResponses, ThrowOnError>>
 }

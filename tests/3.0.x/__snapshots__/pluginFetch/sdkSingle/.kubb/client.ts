@@ -113,16 +113,6 @@ export type AuthToken = string | undefined
 export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<AuthToken>)
 
 /**
- * Operation context known at generation time. The generated call config carries it under `meta`, and
- * the runtime forwards it onto the resolved request so interceptors can read which operation they are
- * handling.
- */
-export type RequestMeta = {
-  operationId?: string
-  schemaPath?: string
-}
-
-/**
  * Extra `fetch` init the transport spreads onto every `Request`, an escape hatch for the fields the
  * runtime does not set itself: `cache`, `mode`, `redirect`, `keepalive`, `duplex`, and Next.js's
  * non-standard `next` (`{ revalidate, tags }`). `method`, `headers`, `body`, `signal`, and
@@ -157,10 +147,6 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   parser?: { request?: Parser; response?: Parser; error?: Parser }
   security?: Array<Auth>
   auth?: AuthResolver
-  /**
-   * Operation context the generated call config supplies; merged into the resolved request's `meta`.
-   */
-  meta?: RequestMeta
   /**
    * Per-call interceptors, run after the instance-level stacks for this request only.
    */
@@ -205,23 +191,6 @@ export type ClientConfig<TRequest = Request, TResponse = Response> = {
 }
 
 /**
- * The read-only operation context carried on the resolved request. `operationId` and `schemaPath`
- * come from generation time, `params` holds the structured request parameters, and `id` is a unique
- * identifier for correlating this request across interceptors and logs.
- */
-export type ResolvedRequestMeta = {
-  readonly operationId?: string
-  readonly schemaPath?: string
-  readonly params: Readonly<{
-    path?: Record<string, unknown>
-    query?: unknown
-    headers?: HeadersInit
-    cookie?: Record<string, unknown>
-  }>
-  readonly id: string
-}
-
-/**
  * The normalized request the transport receives. The shared core does all serialization, auth, and
  * header work; the transport only performs the send.
  */
@@ -234,10 +203,6 @@ export type ResolvedRequest = {
   credentials?: RequestCredentials
   options?: FetchOptions
   responseType?: ResponseType
-  /**
-   * Operation context, populated by the runtime and never sent over the wire.
-   */
-  readonly meta?: ResolvedRequestMeta
   /**
    * The `Request` constructor the default transport should use, when overridden per call or instance.
    */
@@ -511,14 +476,6 @@ function serializeCookies(cookies: Record<string, unknown> | undefined): string 
 }
 
 /**
- * A unique id for a single request, used to correlate it across interceptors and logs. Prefers
- * `crypto.randomUUID` and falls back to a random base36 string on runtimes without it.
- */
-function createRequestId(): string {
-  return globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)
-}
-
-/**
  * Walks the per-operation security in order and places the first resolved token on the request,
  * mutating `headers` / `query` in place. Bearer (and oauth2 / openIdConnect) tokens become a `Bearer`
  * Authorization header, basic credentials are base64-encoded, and an apiKey is placed under its
@@ -618,17 +575,6 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
       credentials: requestConfig.credentials,
       options,
       responseType: requestConfig.responseType,
-      meta: {
-        operationId: requestConfig.meta?.operationId,
-        schemaPath: requestConfig.meta?.schemaPath,
-        params: {
-          path: requestConfig.path,
-          query: requestConfig.query ?? requestConfig.params,
-          headers: requestConfig.headers,
-          cookie: requestConfig.cookie,
-        },
-        id: createRequestId(),
-      },
       Request: requestConfig.Request ?? config.Request,
     }
 

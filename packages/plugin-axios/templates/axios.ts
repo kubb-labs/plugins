@@ -115,16 +115,6 @@ export type AuthToken = string | undefined
 export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<AuthToken>)
 
 /**
- * Operation context known at generation time. The generated call config carries it under `meta`, and
- * the runtime forwards it onto the axios request config so interceptors can read which operation they
- * are handling.
- */
-export type RequestMeta = {
-  operationId?: string
-  schemaPath?: string
-}
-
-/**
  * Extra axios config the runtime spreads onto every request, an escape hatch for the per-call fields
  * it does not set itself, such as `timeout`, `proxy`, `maxRedirects`, `decompress`, and the
  * `onUploadProgress` / `onDownloadProgress` callbacks. The runtime-owned fields (`url`, `baseURL`,
@@ -163,10 +153,6 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   parser?: { request?: Parser; response?: Parser; error?: Parser }
   security?: Array<Auth>
   auth?: AuthResolver
-  /**
-   * Operation context the generated call config supplies; forwarded onto the axios request config.
-   */
-  meta?: RequestMeta
 }
 
 /**

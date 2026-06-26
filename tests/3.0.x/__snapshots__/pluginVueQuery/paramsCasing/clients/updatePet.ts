@@ -13,5 +13,5 @@ import { client } from '../.kubb/client.ts'
 export function updatePet<ThrowOnError extends boolean = true>(options: Options<UpdatePetRequestConfig, ThrowOnError>): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pets/{petId}', meta: { operationId: 'updatePet', schemaPath: '/pets/{pet_id}' }, ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
+  return request({ method: 'POST', url: '/pets/{petId}', ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
 }

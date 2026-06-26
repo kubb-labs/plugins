@@ -269,21 +269,6 @@ describe('createClientCore', () => {
     expect(calls[0]?.headers.Cookie).toBe('sid=secret; theme=dark')
   })
 
-  test('threads operation context onto the resolved request meta', async () => {
-    const { client, calls } = createClient()
-    await client({
-      method: 'GET',
-      url: '/pet/{petId}',
-      path: { petId: 7 },
-      query: { sort: 'name' },
-      meta: { operationId: 'getPet', schemaPath: '/pet/{petId}' },
-    })
-    expect(calls[0]?.meta?.operationId).toBe('getPet')
-    expect(calls[0]?.meta?.schemaPath).toBe('/pet/{petId}')
-    expect(calls[0]?.meta?.params).toStrictEqual({ path: { petId: 7 }, query: { sort: 'name' }, headers: undefined, cookie: undefined })
-    expect(typeof calls[0]?.meta?.id).toBe('string')
-  })
-
   test('a request interceptor returning a transport result short-circuits the send', async () => {
     const { client, calls } = createClient()
     client.interceptors.request.use(() => ({ data: { cached: true }, status: 200, statusText: 'OK', headers: new Headers(), request: 'REQ', response: 'RES' }))

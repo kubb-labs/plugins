@@ -12,7 +12,5 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/pet/findByTags', meta: { operationId: 'findPetsByTags', schemaPath: '/pet/findByTags' }, ...config }) as Promise<
-    RequestResult<FindPetsByTagsResponses, ThrowOnError>
-  >
+  return request({ method: 'GET', url: '/pet/findByTags', ...config }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
 }
