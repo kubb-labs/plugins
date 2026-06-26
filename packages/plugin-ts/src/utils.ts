@@ -7,11 +7,23 @@ import type { ResolverTs } from './types.ts'
 /**
  * Tells whether an enum node is an OAS 3.1 `const`: a schema constrained to exactly one value.
  *
- * The parser folds `const` into a single-value enum node, so the printer renders it as a bare
- * literal type (`'active'`) instead of a named enum reference or a runtime enum declaration.
+ * The parser folds `const` into a single-value enum node.
  */
 export function isConstEnum(node: ast.EnumSchemaNode): boolean {
   return (node.namedEnumValues ?? node.enumValues ?? []).length === 1
+}
+
+/**
+ * Tells whether a `const` (single-value enum) should render as a bare literal type (`'active'`)
+ * rather than a named enum reference or a runtime enum declaration.
+ *
+ * The adapter decides which schemas are named enums and lists them in `enumSchemaNames`; references
+ * to those names get suffixed (e.g. `StatusKey`). A const renders as a literal only when the adapter
+ * has not registered it as a named enum, which keeps the declaration and its references in sync
+ * regardless of the adapter version.
+ */
+export function isInlineConstEnum(node: ast.EnumSchemaNode, enumSchemaNames?: ReadonlySet<string>): boolean {
+  return isConstEnum(node) && !(node.name && enumSchemaNames?.has(node.name))
 }
 
 /**
