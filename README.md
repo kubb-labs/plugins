@@ -109,7 +109,7 @@ Want to contribute to an existing plugin or add a new one, official or community
 
 ## Star history
 
-![Star history chart](https://shieldcn.dev/chart/github/stars/kubb-labs/plugins.svg?theme=orange)
+<img alt="Star history chart" src="https://shieldcn.dev/chart/github/stars/kubb-labs/plugins.svg?theme=orange" width="100%" />
 
 <!-- Badges -->
 
