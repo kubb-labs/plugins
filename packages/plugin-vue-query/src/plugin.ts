@@ -1,6 +1,6 @@
 import { createGroupConfig } from '@internals/shared'
 import { definePlugin } from '@kubb/core'
-import { isParserEnabled } from '@internals/client'
+import { isValidatorEnabled } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mutationKeyTransformer } from '@internals/tanstack-query'
@@ -47,7 +47,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     exclude = [],
     include,
     override = [],
-    parser = false,
+    validator = false,
     infinite = false,
     mutation = {},
     query = {},
@@ -67,7 +67,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
   return {
     name: pluginVueQueryName,
     options,
-    dependencies: [pluginTsName, isParserEnabled(parser) ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
+    dependencies: [pluginTsName, isValidatorEnabled(validator) ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverVueQuery, ...userResolver } : resolverVueQuery
@@ -113,7 +113,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
                 ...infinite,
               }
             : false,
-          parser,
+          validator,
           group: groupConfig,
           exclude,
           include,

@@ -27,7 +27,7 @@ const defaultOptions: PluginFetch['resolvedOptions'] = {
   override: [],
   group: null,
   baseURL: undefined,
-  parser: false,
+  validator: false,
   sdk: undefined,
   resolver: resolverClient,
 }
@@ -171,7 +171,7 @@ describe('clientGenerator operation', () => {
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
     // multipart/form-data request body bakes a `contentType` into the call config.
     { name: 'uploadFileMultipart', node: uploadFileNode, options: {} },
-    { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { parser: 'zod' as const } },
+    { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { validator: 'zod' as const } },
     // Operation-level security overriding the global default, oauth2 reduced to bearer.
     { name: 'addPetWithSecurity', node: createPetNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
     // No operation-level security: falls back to the document's global `bearerAuth`.

@@ -15,7 +15,7 @@ export function createPets<ThrowOnError extends boolean = true>(
   return request({
     method: 'POST',
     url: '/pets/{uuid}',
-    parser: { response: (data: unknown) => createPetsResponseSchema.parse(data), error: (data: unknown) => createPetsErrorSchema.parse(data) },
+    validator: { response: createPetsResponseSchema, error: createPetsErrorSchema },
     ...config,
   }) as Promise<RequestResult<CreatePetsResponses, ThrowOnError>>
 }

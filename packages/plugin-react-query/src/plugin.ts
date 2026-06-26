@@ -1,6 +1,6 @@
 import { createGroupConfig } from '@internals/shared'
 import { definePlugin } from '@kubb/core'
-import { isParserEnabled, resolveClient } from '@internals/client'
+import { isValidatorEnabled, resolveClient } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
@@ -54,7 +54,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     exclude = [],
     include,
     override = [],
-    parser = false,
+    validator = false,
     suspense = {},
     infinite = false,
     mutation = {},
@@ -82,7 +82,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
   return {
     name: pluginReactQueryName,
     options,
-    dependencies: [pluginTsName, isParserEnabled(parser) ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
+    dependencies: [pluginTsName, isValidatorEnabled(validator) ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverReactQuery, ...userResolver } : resolverReactQuery
@@ -130,7 +130,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
             : false,
           suspense,
           customOptions: customOptions ? { name: 'useCustomHookOptions', ...customOptions } : null,
-          parser,
+          validator,
           group: groupConfig,
           exclude,
           include,

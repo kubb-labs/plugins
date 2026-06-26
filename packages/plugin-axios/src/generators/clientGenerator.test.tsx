@@ -27,7 +27,7 @@ const defaultOptions: PluginAxios['resolvedOptions'] = {
   override: [],
   group: null,
   baseURL: undefined,
-  parser: false,
+  validator: false,
   sdk: undefined,
   resolver: resolverClient,
 }
@@ -140,7 +140,7 @@ describe('clientGenerator operation', () => {
     { name: 'getProject', node: getProjectNode, options: {} },
     { name: 'deletePetNoContent', node: deletePetNode, options: {} },
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
-    { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { parser: 'zod' as const } },
+    { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { validator: 'zod' as const } },
     // Two requirements referencing two schemes (oauth2 bearer + apiKey header).
     { name: 'getPetByIdWithSecurity', node: getPetByIdNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginAxios['resolvedOptions']>; adapter?: Adapter }>

@@ -1,5 +1,6 @@
 import axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import { type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
 
 /**
  * HTTP status codes treated as a success. A resolved call only ever carries a body from one of
@@ -85,11 +86,12 @@ export type QuerySerializer = (params: Record<string, unknown>) => string
 export type BodySerializer = (body: unknown, contentType?: string) => unknown
 
 /**
- * Parses a value before it is sent or after it is received, returning the parsed (and optionally
- * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` /
- * `parser.error` hooks (`error` runs on the error body when a non-2xx call does not throw).
+ * A Standard Schema validator (zod, valibot, arktype) that parses a value before it is sent or after
+ * it is received. `runValidator` runs it through `validateStandardSchema`. Wired through the per-call
+ * `validator.request` / `validator.response` / `validator.error` hooks (`error` runs on the error body when a
+ * non-2xx call does not throw).
  */
-export type Parser<T = unknown> = (value: T) => T | Promise<T>
+export type Validator<T = unknown> = StandardSchemaValidator<T>
 
 /**
  * A resolved security scheme carried on each generated call's `security` array. The runtime passes it
@@ -149,7 +151,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   transport?: AxiosInstance
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
-  parser?: { request?: Parser; response?: Parser; error?: Parser }
+  validator?: { request?: Validator; response?: Validator; error?: Validator }
   security?: Array<Auth>
   auth?: AuthResolver
 }
@@ -384,9 +386,9 @@ export async function resolveAuth(params: {
   }
 }
 
-async function runParser<T>(parser: Parser | undefined, value: T): Promise<T> {
-  if (!parser) return value
-  return (await parser(value)) as T
+async function runValidator<T>(validator: Validator<T> | undefined, value: T): Promise<T> {
+  if (!validator) return value
+  return validateStandardSchema(validator, value)
 }
 
 /**
@@ -468,7 +470,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       query,
     })
 
-    const validatedBody = await runParser(requestConfig.parser?.request, requestConfig.body)
+    const validatedBody = await runValidator(requestConfig.validator?.request, requestConfig.body)
     const body = bodySerializer(validatedBody, requestContentType)
     // A FormData body must keep its Content-Type unset so axios appends the multipart boundary.
     if (body instanceof FormData) {
@@ -504,8 +506,8 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     try {
       const response = await activeInstance.request<unknown, AxiosResponse>(axiosConfig)
       const isSuccess = response.status >= 200 && response.status < 300
-      const data = isSuccess ? await runParser(requestConfig.parser?.response, response.data) : undefined
-      const error = isSuccess ? undefined : await runParser(requestConfig.parser?.error, response.data)
+      const data = isSuccess ? await runValidator(requestConfig.validator?.response, response.data) : undefined
+      const error = isSuccess ? undefined : await runValidator(requestConfig.validator?.error, response.data)
       return {
         status: response.status,
         data,

@@ -1,11 +1,11 @@
 import path from 'node:path'
-import { createSdkGenerator, defaultMacros, isParserEnabled, resolverClient } from '@internals/client'
+import { createSdkGenerator, defaultMacros, isValidatorEnabled, resolverClient } from '@internals/client'
 import { createGroupConfig } from '@internals/shared'
 import { definePlugin } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
-import { fetchClientTemplatePath } from './templates.ts'
+import { fetchClientTemplatePath, standardSchemaTemplatePath } from './templates.ts'
 import type { PluginFetch, ResolvedOptions } from './types.ts'
 
 /**
@@ -43,7 +43,7 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
     include,
     override = [],
     baseURL,
-    parser = false,
+    validator = false,
     group,
     sdk,
     resolver: userResolver,
@@ -56,7 +56,7 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
     override,
     group: createGroupConfig(group),
     baseURL,
-    parser,
+    validator,
     sdk: sdk ? { mode: sdk.mode ?? 'tag', name: sdk.name } : undefined,
     resolver: userResolver ? { ...resolverClient, ...userResolver } : resolverClient,
   }
@@ -68,7 +68,9 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
   return {
     name: pluginFetchName,
     options,
-    dependencies: [pluginTsName, isParserEnabled(resolved.parser) ? pluginZodName : null].filter((dependency): dependency is string => Boolean(dependency)),
+    dependencies: [pluginTsName, isValidatorEnabled(resolved.validator) ? pluginZodName : null].filter((dependency): dependency is string =>
+      Boolean(dependency),
+    ),
     hooks: {
       'kubb:plugin:setup'(ctx) {
         ctx.setOptions(resolved)
@@ -84,6 +86,12 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
           path: path.resolve(root, '.kubb/client.ts'),
           copy: fetchClientTemplatePath,
           footer: baseURL ? `client.setConfig({ baseURL: ${JSON.stringify(baseURL)} })` : undefined,
+        })
+
+        ctx.injectFile({
+          baseName: 'standardSchema.ts',
+          path: path.resolve(root, '.kubb/standardSchema.ts'),
+          copy: standardSchemaTemplatePath,
         })
       },
     },

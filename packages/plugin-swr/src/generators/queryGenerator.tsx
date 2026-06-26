@@ -2,7 +2,7 @@ import { resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { resolveZodSchemaNames } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/core'
-import { isParserEnabled } from '@internals/client'
+import { isValidatorEnabled } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -15,7 +15,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, parser, client, group } = ctx.options
+    const { output, query, mutation, validator, client, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -58,7 +58,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
       }),
     ].filter((name): name is string => Boolean(name))
 
-    const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : undefined
+    const pluginZod = isValidatorEnabled(validator) ? driver.getPlugin(pluginZodName) : undefined
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
     const fileZod = zodResolver
       ? zodResolver.resolveFile(
@@ -66,7 +66,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
           { root, output: pluginZod?.options?.output ?? output, group: pluginZod?.options?.group },
         )
       : undefined
-    const zodSchemaNames = resolveZodSchemaNames(node, zodResolver, parser)
+    const zodSchemaNames = resolveZodSchemaNames(node, zodResolver, validator)
 
     const calledClientName = contractOp.name
 

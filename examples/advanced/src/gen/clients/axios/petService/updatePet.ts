@@ -17,7 +17,7 @@ export function updatePet<ThrowOnError extends boolean = true>(
     method: 'PUT',
     url: '/pet',
     security: [{ type: 'oauth2' }],
-    parser: { response: (data: unknown) => updatePetResponseSchema.parse(data), error: (data: unknown) => updatePetErrorSchema.parse(data) },
+    validator: { response: updatePetResponseSchema, error: updatePetErrorSchema },
     ...config,
   }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
 }

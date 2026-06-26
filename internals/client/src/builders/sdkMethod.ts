@@ -5,38 +5,41 @@ import { buildJSDoc } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
-import type { ParserOptions } from '../types.ts'
+import type { ValidatorOptions } from '../types.ts'
 import { buildReturnStatement } from './returnStatement.ts'
 import { type Auth, buildSecurityMetadata } from './security.ts'
 import { buildGroupedOptionsSignature } from './signature.ts'
-import { buildParserHooks } from './validator.ts'
+import { buildValidatorHooks } from './validator.ts'
 
 /**
  * Builds the call config literal forwarded to the contract client, mirroring the shared `Operation`
- * component: `{ method, url, security?, parser?, ...config }`. The `...config` spread carries every
+ * component: `{ method, url, security?, validator?, ...config }`. The `...config` spread carries every
  * per-call field (including `throwOnError`), so the method stays a thin wrapper over the contract.
  */
 function buildCallConfig({
   node,
-  parser,
+  validator,
   zodResolver,
   security,
 }: {
   node: HttpOperationNode
-  parser: ParserOptions | undefined
+  validator: ValidatorOptions | undefined
   zodResolver?: ResolverZod | null
   security?: Array<Auth>
 }): string {
-  const parsers = buildParserHooks({ node, parser, zodResolver })
-  const parserEntries = [parsers.request ? `request: ${parsers.request}` : null, parsers.response ? `response: ${parsers.response}` : null].filter(Boolean)
-  const parserLiteral = parserEntries.length ? `parser: { ${parserEntries.join(', ')} }` : null
+  const validators = buildValidatorHooks({ node, validator, zodResolver })
+  const validatorEntries = [
+    validators.request ? `request: ${validators.request}` : null,
+    validators.response ? `response: ${validators.response}` : null,
+  ].filter(Boolean)
+  const validatorLiteral = validatorEntries.length ? `validator: { ${validatorEntries.join(', ')} }` : null
   const securityLiteral = buildSecurityMetadata({ security })
 
   return `{ ${[
     `method: '${node.method.toUpperCase()}'`,
     `url: '${Url.toCasedTemplate(node.path, { casing: 'camelcase' })}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
-    parserLiteral,
+    validatorLiteral,
     '...config',
   ]
     .filter(Boolean)
@@ -54,20 +57,20 @@ export function buildSdkMethod({
   name,
   tsResolver,
   zodResolver,
-  parser,
+  validator,
   security,
 }: {
   node: ast.OperationNode
   name: string
   tsResolver: ResolverTs
   zodResolver?: ResolverZod | null
-  parser: ParserOptions | undefined
+  validator: ValidatorOptions | undefined
   security?: Array<Auth>
 }): string {
   if (!ast.isHttpOperationNode(node)) return ''
 
   const signature = buildGroupedOptionsSignature({ node, tsResolver })
-  const callConfig = buildCallConfig({ node, parser, zodResolver, security })
+  const callConfig = buildCallConfig({ node, validator, zodResolver, security })
   const returnStatement = buildReturnStatement({ node, tsResolver, callConfig })
   const generics = signature.generics.length ? `<${signature.generics.join(', ')}>` : ''
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))

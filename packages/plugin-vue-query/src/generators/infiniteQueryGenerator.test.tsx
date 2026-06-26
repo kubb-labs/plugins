@@ -25,7 +25,7 @@ const testConfig: Config = {
 
 const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  parser: 'zod',
+  validator: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
