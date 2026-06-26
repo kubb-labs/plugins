@@ -258,13 +258,18 @@ export type Options = OutputOptions & {
    * Macros applied to each schema or operation node before printing.
    * Callbacks you omit fall back to the preset behavior.
    *
-   * @example Drop writeOnly properties from response types
+   * Direction filtering already happens without a macro: the request type omits `readOnly`
+   * properties and every response type omits `writeOnly` properties, so a write-only field such as
+   * a password never leaks into a response. Reach for a macro when you need a rewrite the built-in
+   * behavior does not cover.
+   *
+   * @example Prefix every operation id
    * ```ts
    * macros: [
    *   {
-   *     name: 'drop-write-only',
-   *     property(node) {
-   *       if (node.schema.writeOnly) return undefined
+   *     name: 'prefix-operation-id',
+   *     operation(node) {
+   *       return { ...node, operationId: `api_${node.operationId}` }
    *     },
    *   },
    * ]

@@ -430,6 +430,56 @@ describe('typeGenerator — Operation', () => {
         ],
       }),
     },
+    {
+      // The adapter-oas parser fills `keysToOmit` per content entry: readOnly keys for the request
+      // body, writeOnly keys for responses. plugin-ts wraps the type in `Omit<…>` so a readOnly
+      // field never appears on the request type and a writeOnly field (such as `password`) never
+      // leaks into the response type.
+      name: 'createUser — POST drops readOnly from request and writeOnly from response',
+      node: ast.factory.createOperation({
+        operationId: 'createUser',
+        method: 'POST',
+        path: '/users',
+        tags: ['user'],
+        requestBody: {
+          description: 'The user to create',
+          content: [
+            ast.factory.createContent({
+              contentType: 'application/json',
+              schema: ast.factory.createSchema({
+                type: 'object',
+                properties: [
+                  ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string', readOnly: true }) }),
+                  ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+                  ast.factory.createProperty({ name: 'password', required: true, schema: ast.factory.createSchema({ type: 'string', writeOnly: true }) }),
+                ],
+              }),
+              keysToOmit: ['id'],
+            }),
+          ],
+        },
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            description: 'The created user',
+            content: [
+              ast.factory.createContent({
+                contentType: 'application/json',
+                schema: ast.factory.createSchema({
+                  type: 'object',
+                  properties: [
+                    ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string', readOnly: true }) }),
+                    ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+                    ast.factory.createProperty({ name: 'password', required: true, schema: ast.factory.createSchema({ type: 'string', writeOnly: true }) }),
+                  ],
+                }),
+                keysToOmit: ['password'],
+              }),
+            ],
+          }),
+        ],
+      }),
+    },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode }>
 
   test.each(operations)('$name', async (props) => {
