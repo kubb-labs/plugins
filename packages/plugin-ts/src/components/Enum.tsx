@@ -11,8 +11,9 @@ import type { PluginTs, ResolverTs } from '../types.ts'
 type EnumOptions = PluginTs['resolvedOptions']['enum']
 
 /**
- * A single `namedEnumValues` entry, widened with the optional per-member `description`
- * sourced from the `x-enumDescriptions` / `x-enum-descriptions` vendor extension.
+ * Widens a `namedEnumValues` entry with the optional per-member `description` that the
+ * `x-enumDescriptions` / `x-enum-descriptions` vendor extensions provide. The intersection
+ * keeps the field readable against published `@kubb/ast` versions that predate it.
  */
 type NamedEnumValue = NonNullable<ast.EnumSchemaNode['namedEnumValues']>[number] & { description?: string }
 
