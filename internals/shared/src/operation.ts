@@ -228,7 +228,7 @@ export function buildRequestConfigType(node: ast.OperationNode): string {
   const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
   // The request groups come from the grouped params, so `config` drops the data-shape keys to stay
   // assignable to `Options`, which omits them from `RequestConfig`.
-  const configType = `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`
+  const configType = `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>`
   const contentTypeProp = isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : null
 
   return contentTypeProp ? `${configType} & { ${contentTypeProp} }` : configType
@@ -241,7 +241,7 @@ export function buildRequestConfigType(node: ast.OperationNode): string {
  * content type for.
  */
 export function buildClientOptionType(): string {
-  return `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`
+  return `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>`
 }
 
 export type RequestGroups = {
@@ -249,18 +249,20 @@ export type RequestGroups = {
   query: boolean
   body: boolean
   headers: boolean
+  cookie: boolean
 }
 
 /**
  * Which of the grouped request options an operation carries.
  */
 export function getRequestGroups(node: ast.OperationNode): RequestGroups {
-  const { path, query, header } = getOperationParameters(node)
+  const { path, query, header, cookie } = getOperationParameters(node)
   return {
     path: path.length > 0,
     query: query.length > 0,
     body: Boolean(node.requestBody?.content?.[0]?.schema),
     headers: header.length > 0,
+    cookie: cookie.length > 0,
   }
 }
 
@@ -269,6 +271,7 @@ export type RequestGroupOptionality = {
   hasRequiredPath: boolean
   hasRequiredQuery: boolean
   hasRequiredHeader: boolean
+  hasRequiredCookie: boolean
   /**
    * Whether the grouped request parameter can default to `{}`. True only when no group carries a
    * required member, so every member is safe to omit.
@@ -283,17 +286,19 @@ export type RequestGroupOptionality = {
  */
 export function getRequestGroupOptionality(node: ast.OperationNode): RequestGroupOptionality {
   const groups = getRequestGroups(node)
-  const { path, query, header } = getOperationParameters(node)
+  const { path, query, header, cookie } = getOperationParameters(node)
   const hasRequiredPath = path.some((param) => param.required)
   const hasRequiredQuery = query.some((param) => param.required)
   const hasRequiredHeader = header.some((param) => param.required)
+  const hasRequiredCookie = cookie.some((param) => param.required)
 
   return {
     groups,
     hasRequiredPath,
     hasRequiredQuery,
     hasRequiredHeader,
-    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !groups.body,
+    hasRequiredCookie,
+    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !hasRequiredCookie && !groups.body,
   }
 }
 
@@ -315,7 +320,7 @@ export function buildRequestParamsSignature(
   const { isConfigurable = true } = options
   const { groups, isOptional } = getRequestGroupOptionality(node)
 
-  const names = (['path', 'query', 'body', 'headers'] as const).filter((key) => groups[key])
+  const names = (['path', 'query', 'body', 'headers', 'cookie'] as const).filter((key) => groups[key])
 
   const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: ${resolver.resolveRequestConfigName(node)}${isOptional ? ' = {}' : ''}` : null
   const configParam = isConfigurable ? `config: ${buildRequestConfigType(node)} = {}` : null

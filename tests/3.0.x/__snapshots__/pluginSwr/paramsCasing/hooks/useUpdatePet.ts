@@ -20,7 +20,7 @@ export type UpdatePetMutationArg = UpdatePetRequestConfig
  */
 export function useUpdatePet(options: {
   mutation?: SWRMutationConfiguration<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetMutationKey | null, UpdatePetMutationArg> & { throwOnError?: boolean },
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>,
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}

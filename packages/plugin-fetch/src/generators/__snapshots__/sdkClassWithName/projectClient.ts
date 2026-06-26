@@ -19,6 +19,11 @@ export class ProjectClient {
   ): Promise<RequestResult<GetProjectResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/projects/{projectId}', ...config }) as Promise<RequestResult<GetProjectResponses, ThrowOnError>>
+    return request({
+      method: 'GET',
+      url: '/projects/{projectId}',
+      meta: { operationId: 'getProject', schemaPath: '/projects/{project_id}' },
+      ...config,
+    }) as Promise<RequestResult<GetProjectResponses, ThrowOnError>>
   }
 }

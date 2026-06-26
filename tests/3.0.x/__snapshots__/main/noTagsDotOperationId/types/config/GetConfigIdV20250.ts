@@ -28,6 +28,7 @@ export type GetConfigIdV20250RequestConfig = {
     };
     query?: never;
     headers?: never;
+    cookie?: never;
 };
 
 /**

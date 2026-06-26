@@ -12,5 +12,7 @@ export function addPet<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
+  return request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], meta: { operationId: 'addPet', schemaPath: '/pet' }, ...config }) as Promise<
+    RequestResult<AddPetResponses, ThrowOnError>
+  >
 }

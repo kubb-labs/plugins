@@ -19,6 +19,7 @@ export type GetNotificationsRequestConfig = {
     path?: never;
     query?: never;
     headers?: never;
+    cookie?: never;
 };
 
 /**

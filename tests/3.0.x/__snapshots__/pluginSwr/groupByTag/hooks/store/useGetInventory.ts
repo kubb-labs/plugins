@@ -13,7 +13,7 @@ export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
 type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
-export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {}) {
   return {
     fetcher: async () => {
       const { data } = await getInventory({ ...config, throwOnError: true })
@@ -29,7 +29,7 @@ export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'pa
  */
 export function useGetInventory(options: {
   query?: SWRConfiguration<GetInventoryResponse, ResponseErrorConfig<Error>>,
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>,
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {

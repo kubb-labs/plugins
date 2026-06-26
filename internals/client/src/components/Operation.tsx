@@ -64,12 +64,17 @@ export function Operation({ name, node, tsResolver, zodResolver, parser, securit
   ].filter(Boolean)
   const parserLiteral = parserEntries.length ? `parser: { ${parserEntries.join(', ')} }` : null
 
+  // Operation context known at generation time, read off the resolved request's `meta` by interceptors.
+  const escape = (value: string) => value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
+  const metaLiteral = `meta: { operationId: '${escape(node.operationId)}', schemaPath: '${escape(node.path)}' }`
+
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
     `url: '${Url.toCasedTemplate(node.path, { casing: 'camelcase' })}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
     parserLiteral,
     contentTypeLiteral,
+    metaLiteral,
     '...config',
   ]
     .filter(Boolean)

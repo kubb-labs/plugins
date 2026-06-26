@@ -16,7 +16,7 @@ type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
 export function findPetsByStatusQueryOptions(
   { query }: FindPetsByStatusRequestConfig = {},
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {},
 ) {
   const queryKey = findPetsByStatusQueryKey({ query })
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<Error>, FindPetsByStatusStatus200, typeof queryKey>({
@@ -39,7 +39,7 @@ export function useFindPetsByStatus<
   { query }: FindPetsByStatusRequestConfig = {},
   options: {
     query?: Partial<QueryObserverOptions<FindPetsByStatusStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

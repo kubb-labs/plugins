@@ -13,7 +13,7 @@ import { buildParserHooks } from './validator.ts'
 
 /**
  * Builds the call config literal forwarded to the contract client, mirroring the shared `Operation`
- * component: `{ method, url, security?, parser?, ...config }`. The `...config` spread carries every
+ * component: `{ method, url, security?, parser?, meta, ...config }`. The `...config` spread carries every
  * per-call field (including `throwOnError`), so the method stays a thin wrapper over the contract.
  */
 function buildCallConfig({
@@ -32,11 +32,15 @@ function buildCallConfig({
   const parserLiteral = parserEntries.length ? `parser: { ${parserEntries.join(', ')} }` : null
   const securityLiteral = buildSecurityMetadata({ security })
 
+  const escape = (value: string) => value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
+  const metaLiteral = `meta: { operationId: '${escape(node.operationId)}', schemaPath: '${escape(node.path)}' }`
+
   return `{ ${[
     `method: '${node.method.toUpperCase()}'`,
     `url: '${Url.toCasedTemplate(node.path, { casing: 'camelcase' })}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
     parserLiteral,
+    metaLiteral,
     '...config',
   ]
     .filter(Boolean)

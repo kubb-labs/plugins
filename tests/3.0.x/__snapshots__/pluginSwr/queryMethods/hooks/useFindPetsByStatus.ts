@@ -13,7 +13,7 @@ export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequest
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
-export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {}) {
   return {
     fetcher: async () => {
       const { data } = await findPetsByStatus({ ...config, query, throwOnError: true })
@@ -29,7 +29,7 @@ export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestC
  */
 export function useFindPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, options: {
   query?: SWRConfiguration<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>>,
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>,
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {

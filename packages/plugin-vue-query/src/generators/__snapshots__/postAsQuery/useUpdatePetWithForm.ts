@@ -33,7 +33,7 @@ export function updatePetWithFormQueryOptions(
     body: MaybeRefOrGetter<UpdatePetWithFormRequestConfig['body']>
     query?: MaybeRefOrGetter<UpdatePetWithFormRequestConfig['query']>
   },
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {},
 ) {
   const queryKey = updatePetWithFormQueryKey({ path, body, query })
   return queryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormStatus200>({
@@ -71,7 +71,7 @@ export function useUpdatePetWithForm<
   },
   options: {
     query?: Partial<UseQueryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

@@ -95,14 +95,14 @@ describe('buildRequestConfigType', () => {
     })
 
     expect(buildRequestConfigType(node)).toBe(
-      `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: "application/json" | "application/xml" }`,
+      `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> & { contentType?: "application/json" | "application/xml" }`,
     )
   })
 
   test('uses the untyped request config when no request schema exists', () => {
     const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
-    expect(buildRequestConfigType(node)).toBe(`Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`)
+    expect(buildRequestConfigType(node)).toBe(`Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>`)
   })
 })
 

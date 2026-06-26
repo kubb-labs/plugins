@@ -26,6 +26,7 @@ export type GetEnterpriseConfigurationsIdV20250RequestConfig = {
   }
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

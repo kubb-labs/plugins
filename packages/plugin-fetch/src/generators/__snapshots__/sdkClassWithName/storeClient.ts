@@ -19,6 +19,8 @@ export class StoreClient {
   ): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/store/inventory', ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
+    return request({ method: 'GET', url: '/store/inventory', meta: { operationId: 'getInventory', schemaPath: '/store/inventory' }, ...config }) as Promise<
+      RequestResult<GetInventoryResponses, ThrowOnError>
+    >
   }
 }

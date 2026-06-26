@@ -26,6 +26,7 @@ export type CustomGetItemRequestConfig = {
     };
     query?: never;
     headers?: never;
+    cookie?: never;
 };
 
 /**

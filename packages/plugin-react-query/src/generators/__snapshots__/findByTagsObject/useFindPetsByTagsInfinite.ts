@@ -16,7 +16,7 @@ type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInfiniteQu
 
 export function findPetsByTagsInfiniteQueryOptions(
   { query }: FindPetsByTagsRequestConfig,
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey({ query })
   return infiniteQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, InfiniteData<FindPetsByTagsStatus200>, typeof queryKey, number>({
@@ -44,7 +44,7 @@ export function useFindPetsByTagsInfinite<
   { query }: FindPetsByTagsRequestConfig,
   options: {
     query?: Partial<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

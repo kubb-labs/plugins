@@ -48,6 +48,7 @@ export type UploadFileRequestConfig = {
   }
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

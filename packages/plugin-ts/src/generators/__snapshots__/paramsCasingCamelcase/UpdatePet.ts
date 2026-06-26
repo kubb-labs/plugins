@@ -52,6 +52,7 @@ export type UpdatePetRequestConfig = {
     requestSource?: UpdatePetQueryRequestSource
   }
   headers?: never
+  cookie?: never
 }
 
 /**

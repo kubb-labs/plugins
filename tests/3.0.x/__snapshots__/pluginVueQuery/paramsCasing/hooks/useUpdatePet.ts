@@ -17,7 +17,7 @@ export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
  */
 export function useUpdatePet<TContext>(options: {
   mutation?: MutationObserverOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext> & { client?: QueryClient },
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

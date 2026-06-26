@@ -42,6 +42,7 @@ export type FindPetsByStatusRequestConfig = {
         status?: FindPetsByStatusQueryStatus;
     };
     headers?: never;
+    cookie?: never;
 };
 
 /**

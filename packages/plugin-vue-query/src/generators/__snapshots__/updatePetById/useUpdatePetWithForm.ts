@@ -20,7 +20,7 @@ export function useUpdatePetWithForm<TContext>(
     mutation?: MutationObserverOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormRequestConfig, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

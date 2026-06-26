@@ -31,6 +31,7 @@ export type ListPetsRequestConfig = {
     limit?: ListPetsQueryLimit
   }
   headers?: never
+  cookie?: never
 }
 
 /**

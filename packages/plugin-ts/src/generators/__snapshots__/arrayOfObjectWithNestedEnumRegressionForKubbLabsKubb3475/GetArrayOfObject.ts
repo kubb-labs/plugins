@@ -32,6 +32,7 @@ export type GetArrayOfObjectRequestConfig = {
   path?: never
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

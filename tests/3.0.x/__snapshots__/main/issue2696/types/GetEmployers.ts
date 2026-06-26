@@ -18,6 +18,7 @@ export type GetEmployersRequestConfig = {
     path?: never;
     query?: never;
     headers?: never;
+    cookie?: never;
 };
 
 /**

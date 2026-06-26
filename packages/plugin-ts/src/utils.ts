@@ -78,11 +78,12 @@ export function buildParams(node: ast.OperationNode, { params, resolver }: Build
 }
 
 export function buildData(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode {
-  const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing: 'original' })
+  const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = getOperationParameters(node, { paramsCasing: 'original' })
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const hasRequiredPath = pathParams.some((param) => param.required)
   const hasRequiredQuery = queryParams.some((param) => param.required)
   const hasRequiredHeader = headerParams.some((param) => param.required)
+  const hasRequiredCookie = cookieParams.some((param) => param.required)
 
   // NOTE(v5-stable): the fields were renamed from the legacy beta shape
   // (`data`/`pathParams`/`queryParams`/`headerParams`) to `body`/`path`/`query`/`headers` so the
@@ -120,6 +121,14 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
         schema:
           headerParams.length > 0
             ? ast.factory.createSchema({ ...buildParams(node, { params: headerParams, resolver }), optional: !hasRequiredHeader })
+            : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
+      }),
+      ast.factory.createProperty({
+        name: 'cookie',
+        required: hasRequiredCookie,
+        schema:
+          cookieParams.length > 0
+            ? ast.factory.createSchema({ ...buildParams(node, { params: cookieParams, resolver }), optional: !hasRequiredCookie })
             : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
     ],

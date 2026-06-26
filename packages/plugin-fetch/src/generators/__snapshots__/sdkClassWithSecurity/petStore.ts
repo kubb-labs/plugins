@@ -26,6 +26,7 @@ export class PetStore {
       method: 'GET',
       url: '/pet/{petId}',
       security: [{ type: 'oauth2' }, { type: 'apiKey', name: 'api_key', in: 'header' }],
+      meta: { operationId: 'getPetById', schemaPath: '/pet/{petId}' },
       ...config,
     }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
   }
@@ -38,7 +39,9 @@ export class PetStore {
   ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'DELETE', url: '/pet/{petId}', ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
+    return request({ method: 'DELETE', url: '/pet/{petId}', meta: { operationId: 'deletePet', schemaPath: '/pet/{petId}' }, ...config }) as Promise<
+      RequestResult<DeletePetResponses, ThrowOnError>
+    >
   }
 
   /**
@@ -49,7 +52,9 @@ export class PetStore {
   ): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/store/inventory', ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
+    return request({ method: 'GET', url: '/store/inventory', meta: { operationId: 'getInventory', schemaPath: '/store/inventory' }, ...config }) as Promise<
+      RequestResult<GetInventoryResponses, ThrowOnError>
+    >
   }
 
   /**
@@ -60,6 +65,11 @@ export class PetStore {
   ): Promise<RequestResult<GetProjectResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/projects/{projectId}', ...config }) as Promise<RequestResult<GetProjectResponses, ThrowOnError>>
+    return request({
+      method: 'GET',
+      url: '/projects/{projectId}',
+      meta: { operationId: 'getProject', schemaPath: '/projects/{project_id}' },
+      ...config,
+    }) as Promise<RequestResult<GetProjectResponses, ThrowOnError>>
   }
 }

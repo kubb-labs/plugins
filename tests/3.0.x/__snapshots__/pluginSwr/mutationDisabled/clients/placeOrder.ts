@@ -15,5 +15,5 @@ import { client } from '../.kubb/client.ts'
 export function placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderRequestConfig, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>
+  return request({ method: 'POST', url: '/store/order', meta: { operationId: 'placeOrder', schemaPath: '/store/order' }, ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>
 }

@@ -11,7 +11,7 @@ export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequest
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
-export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {}) {
   return {
     fetcher: async () => {
       const { data } = await findPetsByStatus({ ...config, query, throwOnError: true })

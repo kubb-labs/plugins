@@ -24,6 +24,7 @@ export type CreateConfigV20250RequestConfig = {
     path?: never;
     query?: never;
     headers?: never;
+    cookie?: never;
 };
 
 /**

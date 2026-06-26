@@ -30,6 +30,7 @@ export type GetItemRequestConfig = {
     };
     query?: never;
     headers?: never;
+    cookie?: never;
 };
 
 /**

@@ -26,6 +26,7 @@ export type AddPetRequestConfig = {
   path?: never
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

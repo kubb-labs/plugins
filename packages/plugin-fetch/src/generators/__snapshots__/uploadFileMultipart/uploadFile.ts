@@ -12,7 +12,11 @@ export function uploadFile<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet/{petId}/uploadImage', contentType: 'multipart/form-data', ...config }) as Promise<
-    RequestResult<UploadFileResponses, ThrowOnError>
-  >
+  return request({
+    method: 'POST',
+    url: '/pet/{petId}/uploadImage',
+    contentType: 'multipart/form-data',
+    meta: { operationId: 'uploadFile', schemaPath: '/pet/{petId}/uploadImage' },
+    ...config,
+  }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
 }

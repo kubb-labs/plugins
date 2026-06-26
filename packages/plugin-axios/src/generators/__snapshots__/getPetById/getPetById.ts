@@ -12,5 +12,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/pet/{petId}', ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
+  return request({ method: 'GET', url: '/pet/{petId}', meta: { operationId: 'getPetById', schemaPath: '/pet/{petId}' }, ...config }) as Promise<
+    RequestResult<GetPetByIdResponses, ThrowOnError>
+  >
 }

@@ -18,7 +18,7 @@ export type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInf
 
 export function findPetsByTagsInfiniteQueryOptions(
   { query }: { query: MaybeRefOrGetter<FindPetsByTagsRequestConfig['query']> },
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey({ query })
   return infiniteQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, InfiniteData<FindPetsByTagsStatus200>, QueryKey, number>({
@@ -44,7 +44,7 @@ export function useFindPetsByTagsInfinite<
   { query }: { query: MaybeRefOrGetter<FindPetsByTagsRequestConfig['query']> },
   options: {
     query?: Partial<UseInfiniteQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TQueryData, TQueryKey, TQueryData>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

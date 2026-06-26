@@ -13,7 +13,7 @@ export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'head
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
-export function getPetByIdQueryOptions({ path }: GetPetByIdRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function getPetByIdQueryOptions({ path }: GetPetByIdRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {}) {
   return {
     fetcher: async () => {
       const { data } = await getPetById({ ...config, path, throwOnError: true })
@@ -29,7 +29,7 @@ export function getPetByIdQueryOptions({ path }: GetPetByIdRequestConfig, config
  */
 export function useGetPetById({ path }: GetPetByIdRequestConfig, options: {
   query?: SWRConfiguration<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>>,
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>,
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {

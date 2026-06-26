@@ -11,7 +11,7 @@ export const placeOrderQueryKey = ({ body }: Omit<PlaceOrderRequestConfig, 'head
 
 type PlaceOrderQueryKey = ReturnType<typeof placeOrderQueryKey>
 
-export function placeOrderQueryOptions({ body }: PlaceOrderRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function placeOrderQueryOptions({ body }: PlaceOrderRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {}) {
   return {
     fetcher: async () => {
       const { data } = await placeOrder({ ...config, body, throwOnError: true })

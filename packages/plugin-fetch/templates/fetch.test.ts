@@ -231,6 +231,73 @@ describe('createClientCore', () => {
     expect(onError).toHaveBeenCalledTimes(1)
   })
 
+  test('serializes cookie params into the Cookie header', async () => {
+    const { client, calls } = createClient()
+    await client({ method: 'GET', url: '/pet', cookie: { sessionId: 'abc', tracking: 1, skip: undefined } })
+    expect(calls[0]?.headers.Cookie).toBe('sessionId=abc; tracking=1')
+  })
+
+  test('appends cookie params after an auth-written cookie', async () => {
+    const { client, calls } = createClient()
+    await client({
+      method: 'GET',
+      url: '/pet',
+      cookie: { theme: 'dark' },
+      security: [{ type: 'apiKey', name: 'sid', in: 'cookie' }],
+      auth: 'secret',
+    })
+    expect(calls[0]?.headers.Cookie).toBe('sid=secret; theme=dark')
+  })
+
+  test('threads operation context onto the resolved request meta', async () => {
+    const { client, calls } = createClient()
+    await client({
+      method: 'GET',
+      url: '/pet/{petId}',
+      path: { petId: 7 },
+      query: { sort: 'name' },
+      meta: { operationId: 'getPet', schemaPath: '/pet/{petId}' },
+    })
+    expect(calls[0]?.meta?.operationId).toBe('getPet')
+    expect(calls[0]?.meta?.schemaPath).toBe('/pet/{petId}')
+    expect(calls[0]?.meta?.params).toStrictEqual({ path: { petId: 7 }, query: { sort: 'name' }, headers: undefined, cookie: undefined })
+    expect(typeof calls[0]?.meta?.id).toBe('string')
+  })
+
+  test('a request interceptor returning a transport result short-circuits the send', async () => {
+    const { client, calls } = createClient()
+    client.interceptors.request.use(() => ({ data: { cached: true }, status: 200, statusText: 'OK', headers: new Headers(), request: 'REQ', response: 'RES' }))
+    const result = (await client({ method: 'GET', url: '/pet' })) as CallResult<string, string>
+    expect(calls).toHaveLength(0)
+    expect(result.data).toStrictEqual({ cached: true })
+  })
+
+  test('an error interceptor returning a transport result recovers into a success', async () => {
+    const { client } = createClient({ status: 500 })
+    client.interceptors.error.use(() => ({ data: { recovered: true }, status: 200, statusText: 'OK', headers: new Headers(), request: 'REQ', response: 'RES' }))
+    const result = (await client({ method: 'GET', url: '/pet' })) as CallResult<string, string>
+    expect(result).toStrictEqual({ status: 200, data: { recovered: true }, error: undefined, request: 'REQ', response: 'RES' })
+  })
+
+  test('runs per-request interceptors alongside the instance stacks', async () => {
+    const { client, calls } = createClient()
+    client.interceptors.request.use((request) => ({ ...request, headers: { ...request.headers, 'X-Instance': '1' } }))
+    await client({
+      method: 'GET',
+      url: '/pet',
+      interceptors: { request: [(request) => ({ ...request, headers: { ...request.headers, 'X-Call': '1' } })] },
+    })
+    expect(calls[0]?.headers['X-Instance']).toBe('1')
+    expect(calls[0]?.headers['X-Call']).toBe('1')
+  })
+
+  test('uses a per-call Request constructor override', async () => {
+    const { client, calls } = createClient()
+    const CustomRequest = vi.fn() as unknown as typeof globalThis.Request
+    await client({ method: 'GET', url: '/pet', Request: CustomRequest })
+    expect(calls[0]?.Request).toBe(CustomRequest)
+  })
+
   test('setConfig merges and getConfig reflects it', () => {
     const { client } = createClient()
     client.setConfig({ baseURL: 'https://example.com' })

@@ -16,7 +16,7 @@ type CreateUsersWithListInputQueryKey = ReturnType<typeof createUsersWithListInp
 
 export function createUsersWithListInputQueryOptions(
   { body }: CreateUsersWithListInputRequestConfig,
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {},
 ) {
   const queryKey = createUsersWithListInputQueryKey({ body })
   return queryOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputStatus200, typeof queryKey>({
@@ -41,7 +41,7 @@ export function useCreateUsersWithListInput<
     query?: Partial<QueryObserverOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
     }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

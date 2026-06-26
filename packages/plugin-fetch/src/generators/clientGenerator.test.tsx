@@ -138,6 +138,24 @@ const uploadFileNode = ast.factory.createOperation({
   ],
 })
 
+const getSessionNode = ast.factory.createOperation({
+  operationId: 'getSession',
+  method: 'GET',
+  path: '/session',
+  tags: ['session'],
+  parameters: [
+    ast.factory.createParameter({ name: 'sessionId', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+    ast.factory.createParameter({ name: 'tracking', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }) }),
+  ],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
+})
+
 const securityDocument: SecurityDocument = {
   security: [{ bearerAuth: [] }],
   components: {
@@ -171,6 +189,8 @@ describe('clientGenerator operation', () => {
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
     // multipart/form-data request body bakes a `contentType` into the call config.
     { name: 'uploadFileMultipart', node: uploadFileNode, options: {} },
+    // Cookie params land in the grouped `cookie` option and serialize into the Cookie header at runtime.
+    { name: 'getSessionWithCookies', node: getSessionNode, options: {} },
     { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { parser: 'zod' as const } },
     // Operation-level security overriding the global default, oauth2 reduced to bearer.
     { name: 'addPetWithSecurity', node: createPetNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },

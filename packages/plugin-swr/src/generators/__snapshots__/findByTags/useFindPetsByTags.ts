@@ -16,7 +16,7 @@ type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 export function findPetsByTagsQueryOptions(
   { query }: FindPetsByTagsRequestConfig,
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {},
 ) {
   return {
     fetcher: async () => {
@@ -33,7 +33,7 @@ export function useFindPetsByTags(
   { query }: FindPetsByTagsRequestConfig,
   options: {
     query?: SWRConfiguration<FindPetsByTagsResponse, ResponseErrorConfig<Error>>
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
     shouldFetch?: boolean
     immutable?: boolean
   } = {},

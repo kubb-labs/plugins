@@ -23,7 +23,7 @@ export function useFindPetsByTags(
     mutation?: SWRMutationConfiguration<FindPetsByTagsResponse, ResponseErrorConfig<Error>, FindPetsByTagsMutationKey | null, FindPetsByTagsMutationArg> & {
       throwOnError?: boolean
     }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
     shouldFetch?: boolean
   } = {},
 ) {

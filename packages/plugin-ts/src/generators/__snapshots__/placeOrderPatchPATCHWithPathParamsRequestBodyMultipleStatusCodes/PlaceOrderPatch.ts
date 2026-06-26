@@ -37,6 +37,7 @@ export type PlaceOrderPatchRequestConfig = {
   }
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

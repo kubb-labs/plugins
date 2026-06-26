@@ -58,6 +58,7 @@ describe('buildData', () => {
           path?: never;
           query?: never;
           headers?: never;
+          cookie?: never;
       }"
     `)
   })
@@ -76,6 +77,7 @@ describe('buildData', () => {
           path?: never;
           query?: never;
           headers?: never;
+          cookie?: never;
       }"
     `)
   })
@@ -99,6 +101,7 @@ describe('buildData', () => {
           };
           query?: never;
           headers?: never;
+          cookie?: never;
       }"
     `)
   })
@@ -121,6 +124,7 @@ describe('buildData', () => {
               limit?: ListPetsQueryLimit;
           };
           headers?: never;
+          cookie?: never;
       }"
     `)
   })
@@ -150,6 +154,7 @@ describe('buildData', () => {
               limit?: ListPetsQueryLimit;
           };
           headers?: never;
+          cookie?: never;
       }"
     `)
   })

@@ -33,6 +33,7 @@ export type CreateOrderRequestConfig = {
     path?: never;
     query?: never;
     headers?: never;
+    cookie?: never;
 };
 
 /**

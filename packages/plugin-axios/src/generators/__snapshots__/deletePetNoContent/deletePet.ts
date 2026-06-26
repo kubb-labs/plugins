@@ -12,5 +12,7 @@ export function deletePet<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'DELETE', url: '/pet/{petId}', ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
+  return request({ method: 'DELETE', url: '/pet/{petId}', meta: { operationId: 'deletePet', schemaPath: '/pet/{petId}' }, ...config }) as Promise<
+    RequestResult<DeletePetResponses, ThrowOnError>
+  >
 }

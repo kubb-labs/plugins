@@ -1,4 +1,4 @@
-import { getOperationParameters, getRequestGroupOptionality } from '@internals/shared'
+import { buildClientOptionType, getOperationParameters, getRequestGroupOptionality } from '@internals/shared'
 import type { ast } from '@kubb/core'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
@@ -94,7 +94,7 @@ export function buildQueryOptionsParams(
 
   const configParam = createFunctionParameter({
     name: 'config',
-    type: `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`,
+    type: buildClientOptionType(),
     default: '{}',
   })
 

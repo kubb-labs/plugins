@@ -38,6 +38,7 @@ export type FindArtifactsRequestConfig = {
     sort?: FindArtifactsQuerySort
   }
   headers?: never
+  cookie?: never
 }
 
 /**

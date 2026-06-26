@@ -26,6 +26,7 @@ export type DeletePetRequestConfig = {
   }
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**
