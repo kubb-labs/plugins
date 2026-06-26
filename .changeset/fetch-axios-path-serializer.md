@@ -3,9 +3,9 @@
 "@kubb/plugin-axios": minor
 ---
 
-Serialize array and object path parameters instead of emitting `[object Object]`, group the client serializers under a single `serializer` option, and support the OpenAPI `simple` / `label` / `matrix` path styles.
+Fix the `[object Object]` path-parameter bug and bring the generated fetch and axios client in line with the OpenAPI serialization spec for path, query, header, and cookie parameters, plus urlencoded request bodies.
 
-**Path parameter fix.** The runtime client interpolated each `{placeholder}` with `String(value)`, so an array or object path param produced a broken URL (`/pet/[object Object]`). The generated client now has a `defaultPathSerializer` that defaults to the OpenAPI `simple` style with `explode: false`: arrays join their URL-encoded members with commas (`/pet/3,4,5`) and objects flatten to comma-separated `key,value` pairs; primitives stay URL-encoded as before.
+**Path parameter fix.** The runtime client interpolated each `{placeholder}` with `String(value)`, so an array or object path param produced a broken URL (`/pet/[object Object]`). The generated client now has a `defaultPathSerializer` that defaults to the OpenAPI `simple` style with `explode: false`: arrays join their URL-encoded members with commas (`/pet/3,4,5`) and objects flatten to comma-separated `key,value` pairs. Primitives stay URL-encoded as before.
 
 **Style / explode support.** `defaultPathSerializer` honors per-parameter OpenAPI serialization metadata:
 
@@ -17,7 +17,7 @@ A request carries this metadata in a new `pathStyles` field, `Record<string, { s
 
 **Query style / explode / allowReserved support.** `defaultQuerySerializer` now honors per-parameter OpenAPI query metadata: `form` (default), `spaceDelimited`, `pipeDelimited`, and `deepObject`, each with `explode`, plus `allowReserved` to keep RFC 3986 reserved characters unencoded. The metadata rides a new `queryStyles` field, `Record<string, { style?, explode?, allowReserved? }>`, and the `QuerySerializer` signature is now `(params, options?) => string`. Members without metadata keep the previous defaults (arrays explode into repeated keys, nested objects use `deepObject`), so existing output is unchanged.
 
-**Header parameters.** Array and object header params serialize with the OpenAPI `simple` style (`explode` honored, not URL-encoded) via a new `headerStyles` field; headers without metadata pass through unchanged.
+**Header parameters.** Array and object header params serialize with the OpenAPI `simple` style (`explode` honored, not URL-encoded) via a new `headerStyles` field. Headers without metadata pass through unchanged.
 
 **Cookie parameters.** Cookie params serialize into the `Cookie` header using the OpenAPI `form` style (URL-encoded, `; `-joined, `explode` honored). A request carries them in a new `cookies` field with optional `cookieStyles` metadata, and `cookies` is part of the grouped `DataShape`.
 

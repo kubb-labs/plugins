@@ -513,7 +513,7 @@ function serializeDefaultQueryParam(key: string, value: unknown): Array<string> 
 
 /**
  * Default query serializer. Members with `options` metadata follow their OpenAPI `style` / `explode`
- * / `allowReserved`; members without it keep the defaults — arrays explode into repeated keys and
+ * / `allowReserved`. Members without it keep the defaults: arrays explode into repeated keys and
  * nested objects use the `deepObject` style (`key[prop]=value`).
  */
 export const defaultQuerySerializer: QuerySerializer = (params, options) => {
