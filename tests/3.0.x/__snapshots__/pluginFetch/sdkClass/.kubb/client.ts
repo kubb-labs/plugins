@@ -241,15 +241,15 @@ export type CallResult<TRequest = Request, TResponse = Response> = {
 
 /**
  * An interceptor function. It receives the channel value and returns it (optionally transformed), or
- * a `TShortCircuit` value to break the chain early — a transport result from a request interceptor
- * (short-circuit) or from an error interceptor (recover).
+ * a `TShortCircuit` value to break the chain early. That short-circuit value is a transport result,
+ * returned from a request interceptor to skip the send or from an error interceptor to recover.
  */
 export type InterceptorFn<TIn, TShortCircuit = never> = (value: TIn) => TIn | TShortCircuit | Promise<TIn | TShortCircuit>
 
 /**
- * A single interceptor channel — request, response, or error — with a transport-agnostic
+ * A single interceptor channel (request, response, or error) with a transport-agnostic
  * `use` / `eject` / `update` API. `TShortCircuit` is the value an interceptor may return to break the
- * chain early; it stays `never` for channels that always run to completion.
+ * chain early. It stays `never` for channels that always run to completion.
  */
 export type InterceptorStack<TIn, TShortCircuit = never> = {
   use: (fn: InterceptorFn<TIn, TShortCircuit>) => number
