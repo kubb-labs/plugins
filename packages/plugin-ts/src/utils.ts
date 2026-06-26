@@ -8,10 +8,10 @@ import type { ResolverTs } from './types.ts'
  * Tells whether an enum holds a single value and should render as a bare literal type (`'active'`)
  * rather than a named enum reference or a runtime enum declaration.
  *
- * A single-value enum is a constant: an OAS 3.1 `const`, or a one-member enum such as a
- * discriminator constant. It always renders as a literal, ignoring the `enum.type` option and
- * whether the adapter registered its name as a named enum. The declaration, the inline reference,
- * and the suffix-naming all key off this helper, so they stay consistent.
+ * A one-member enum is really a constant: an OAS 3.1 `const`, or a discriminator value. It always
+ * renders as a literal, no matter the `enum.type` option or whether the adapter registered its
+ * name. The declaration, the inline reference, and the suffix-naming all key off this helper, so
+ * they stay consistent.
  */
 export function isInlineConstEnum(node: ast.EnumSchemaNode): boolean {
   return (node.namedEnumValues ?? node.enumValues ?? []).length === 1
