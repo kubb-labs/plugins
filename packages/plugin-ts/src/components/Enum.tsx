@@ -10,6 +10,13 @@ import type { PluginTs, ResolverTs } from '../types.ts'
 
 type EnumOptions = PluginTs['resolvedOptions']['enum']
 
+/**
+ * Widens a `namedEnumValues` entry with the optional per-member `description` that the
+ * `x-enumDescriptions` / `x-enum-descriptions` vendor extensions provide. The intersection
+ * keeps the field readable against published `@kubb/ast` versions that predate it.
+ */
+type NamedEnumValue = NonNullable<ast.EnumSchemaNode['namedEnumValues']>[number] & { description?: string }
+
 type Props = {
   node: ast.EnumSchemaNode
   enum: EnumOptions
@@ -55,9 +62,9 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
   const [nameNode, typeNode] = factory.createEnumDeclaration({
     name: enumName,
     typeName,
-    enums: (node.namedEnumValues?.map((v) => [trimQuotes(v.name.toString()), v.value]) ??
+    enums: ((node.namedEnumValues as Array<NamedEnumValue> | undefined)?.map((v) => [trimQuotes(v.name.toString()), v.value, v.description]) ??
       node.enumValues?.filter((v): v is NonNullable<typeof v> => v !== null && v !== undefined).map((v) => [trimQuotes(v.toString()), v]) ??
-      []) as Array<[string | number, string | number | boolean]>,
+      []) as Array<[string | number, string | number | boolean, string?]>,
     type: enumOptions.type,
     enumKeyCasing: enumOptions.keyCasing,
   })
