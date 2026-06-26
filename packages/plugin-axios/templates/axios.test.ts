@@ -162,7 +162,12 @@ describe('createClientCore', () => {
   test('honors per-parameter pathStyles metadata', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance })
-    await client({ method: 'GET', url: '/pet/{id}{filter}', path: { id: 5, filter: ['a', 'b'] }, pathStyles: { id: { style: 'matrix' }, filter: { style: 'label' } } })
+    await client({
+      method: 'GET',
+      url: '/pet/{id}{filter}',
+      path: { id: 5, filter: ['a', 'b'] },
+      pathStyles: { id: { style: 'matrix' }, filter: { style: 'label' } },
+    })
     expect(calls[0]?.url).toBe('/pet/;id=5.a,b')
   })
 
