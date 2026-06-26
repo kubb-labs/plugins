@@ -1,5 +1,17 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.77
+
+### Minor Changes
+
+- [#522](https://github.com/kubb-labs/plugins/pull/522) [`fae9f47`](https://github.com/kubb-labs/plugins/commit/fae9f470468870ed7015f2c910fd817c7e7daeef) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Render enum member descriptions as per-member JSDoc.
+
+  Enum schemas can document each value through the `x-enumDescriptions` / `x-enum-descriptions` vendor extensions. When `adapter-oas` supplies those labels on `namedEnumValues`, the generated `enum`, `const enum`, and `as const` declarations now carry each one as JSDoc on the matching member, so the per-value docs from the spec end up in the generated code. Members without a description are left untouched.
+
+- [#528](https://github.com/kubb-labs/plugins/pull/528) [`455e6f1`](https://github.com/kubb-labs/plugins/commit/455e6f1c1f9047fb5cb7d4d12038dc2b5eb4422a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Render an OpenAPI 3.1 `const` as a literal type.
+
+  A `const` is parsed into a single-value enum, so `Status: { const: "active" }` used to generate an `as const` object and a `StatusKey` reference under the default `enum.type`. It now renders the bare literal `export type Status = "active"`, the same way an inline `const` on a property already did. Multi-value enums keep their existing output.
+
 ## 5.0.0-beta.76
 
 ### Minor Changes
