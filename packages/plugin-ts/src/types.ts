@@ -260,8 +260,8 @@ export type Options = OutputOptions & {
    *
    * Direction filtering already happens without a macro: the request type omits `readOnly`
    * properties and every response type omits `writeOnly` properties, so a write-only field such as
-   * a password never leaks into a response. Reach for a macro when you need a rewrite the built-in
-   * behavior does not cover.
+   * a password never leaks into a response. Reach for a macro when you need a rewrite that the
+   * built-in behavior does not cover.
    *
    * @example Prefix every operation id
    * ```ts
