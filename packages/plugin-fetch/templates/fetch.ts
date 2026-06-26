@@ -103,6 +103,14 @@ export type CookieParamStyle = {
 }
 
 /**
+ * The per-parameter header serialization metadata carried by the generated request. Headers use the
+ * OpenAPI `simple` style, so only `explode` is configurable.
+ */
+export type HeaderParamStyle = {
+  explode?: boolean
+}
+
+/**
  * The per-property `encoding` metadata for an `application/x-www-form-urlencoded` or
  * `multipart/form-data` request body. `contentType` overrides the part's media type; `style` /
  * `explode` / `allowReserved` follow the OpenAPI query rules for urlencoded bodies.
@@ -201,6 +209,7 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   body?: TBody
   bodyEncoding?: Record<string, BodyEncoding>
   headers?: HeadersInit
+  headerStyles?: Record<string, HeaderParamStyle>
   signal?: AbortSignal
   credentials?: RequestCredentials
   contentType?: string
@@ -572,6 +581,31 @@ function mergeHeaders(...sources: Array<HeadersInit | undefined>): Record<string
   return Object.assign({}, ...sources.map(serializeHeaders))
 }
 
+function serializeHeaderValue(value: unknown, explode: boolean): string {
+  if (Array.isArray(value)) return value.filter(notNullish).map(String).join(',')
+  const entries = Object.entries(value as Record<string, unknown>).filter(([, item]) => notNullish(item))
+  if (explode) return entries.map(([key, item]) => `${key}=${item}`).join(',')
+  return entries
+    .flatMap(([key, item]) => [key, item])
+    .map(String)
+    .join(',')
+}
+
+/**
+ * Serializes array and object header parameters with the OpenAPI `simple` style before they are
+ * merged. Header values are not URL-encoded. Primitive values and headers without metadata pass
+ * through untouched.
+ */
+function applyHeaderStyles(headers: HeadersInit | undefined, styles: Record<string, HeaderParamStyle> | undefined): HeadersInit | undefined {
+  if (!headers || !styles) return headers
+  const entries = Array.isArray(headers) ? headers : Object.entries(headers)
+  return entries.map(([key, value]) => {
+    const style = styles[key]
+    if (!style || value === undefined || value === null || typeof value !== 'object') return [key, value] as [string, HeaderValue]
+    return [key, serializeHeaderValue(value, style.explode ?? false)] as [string, HeaderValue]
+  })
+}
+
 /**
  * Joins the base and request URL parts, interpolates `{param}` segments from the path params
  * (URL-encoded), and appends the serialized query. Shared by the send path and `getUrl` so both
@@ -685,7 +719,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     const bodySerializer = requestConfig.serializer?.body ?? config.serializer?.body ?? defaultBodySerializer
     const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
 
-    const headers = mergeHeaders(config.headers, requestConfig.headers)
+    const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.headerStyles))
     const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
 
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }

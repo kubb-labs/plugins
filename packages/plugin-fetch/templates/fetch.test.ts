@@ -254,6 +254,18 @@ describe('createClientCore', () => {
     expect(calls[0]?.headers.Cookie).toBe('session=abc; ids=1,2')
   })
 
+  test('serializes array and object header params with the simple style', async () => {
+    const { client, calls } = createClient()
+    await client({
+      method: 'GET',
+      url: '/pet',
+      headers: { 'X-Ids': [3, 4], 'X-Filter': { role: 'admin' } },
+      headerStyles: { 'X-Ids': {}, 'X-Filter': { explode: true } },
+    })
+    expect(calls[0]?.headers['X-Ids']).toBe('3,4')
+    expect(calls[0]?.headers['X-Filter']).toBe('role=admin')
+  })
+
   test('builds FormData and omits Content-Type for multipart/form-data', async () => {
     const { client, calls } = createClient()
     await client({ method: 'POST', url: '/pet', body: { field: 'x' }, contentType: 'multipart/form-data' })

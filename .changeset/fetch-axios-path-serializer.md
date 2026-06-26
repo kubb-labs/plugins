@@ -17,6 +17,8 @@ A request carries this metadata in a new `pathStyles` field, `Record<string, { s
 
 **Query style / explode / allowReserved support.** `defaultQuerySerializer` now honors per-parameter OpenAPI query metadata: `form` (default), `spaceDelimited`, `pipeDelimited`, and `deepObject`, each with `explode`, plus `allowReserved` to keep RFC 3986 reserved characters unencoded. The metadata rides a new `queryStyles` field, `Record<string, { style?, explode?, allowReserved? }>`, and the `QuerySerializer` signature is now `(params, options?) => string`. Members without metadata keep the previous defaults (arrays explode into repeated keys, nested objects use `deepObject`), so existing output is unchanged.
 
+**Header parameters.** Array and object header params serialize with the OpenAPI `simple` style (`explode` honored, not URL-encoded) via a new `headerStyles` field; headers without metadata pass through unchanged.
+
 **Cookie parameters.** Cookie params serialize into the `Cookie` header using the OpenAPI `form` style (URL-encoded, `; `-joined, `explode` honored). A request carries them in a new `cookies` field with optional `cookieStyles` metadata, and `cookies` is part of the grouped `DataShape`.
 
 **Request-body `encoding`.** `defaultBodySerializer` accepts per-property `encoding` for `application/x-www-form-urlencoded` bodies, honoring each property's `style` / `explode` / `allowReserved` (reusing the query rules). The metadata rides a new `bodyEncoding` field.
