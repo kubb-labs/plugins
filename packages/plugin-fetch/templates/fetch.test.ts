@@ -4,6 +4,7 @@ import {
   createClientCore,
   createInterceptorStack,
   defaultBodySerializer,
+  defaultPathSerializer,
   defaultQuerySerializer,
   type ResolvedRequest,
   ResponseError,
@@ -75,6 +76,25 @@ describe('defaultQuerySerializer', () => {
   })
 })
 
+describe('defaultPathSerializer', () => {
+  test('URL-encodes a primitive value', () => {
+    expect(defaultPathSerializer('id', 'a b')).toBe('a%20b')
+  })
+
+  test('joins array members with commas (simple style)', () => {
+    expect(defaultPathSerializer('ids', [3, 4, 5])).toBe('3,4,5')
+  })
+
+  test('renders objects as comma-separated key=value pairs', () => {
+    expect(defaultPathSerializer('point', { x: 1, y: 2 })).toBe('x=1,y=2')
+  })
+
+  test('serializes undefined and null to an empty string', () => {
+    expect(defaultPathSerializer('id', undefined)).toBe('')
+    expect(defaultPathSerializer('id', null)).toBe('')
+  })
+})
+
 describe('defaultBodySerializer', () => {
   test('JSON-serializes plain objects', () => {
     expect(defaultBodySerializer({ name: 'odie' })).toBe('{"name":"odie"}')
@@ -120,6 +140,12 @@ describe('createClientCore', () => {
     await client({ method: 'GET', url: '/pet/{petId}', path: { petId: 7 }, query: { sort: 'name' } })
     expect(calls[0]?.url).toBe('/pet/7?sort=name')
     expect(calls[0]?.method).toBe('GET')
+  })
+
+  test('serializes array and object path params instead of [object Object]', async () => {
+    const { client, calls } = createClient()
+    await client({ method: 'GET', url: '/pet/{ids}/{point}', path: { ids: [3, 4], point: { x: 1, y: 2 } } })
+    expect(calls[0]?.url).toBe('/pet/3,4/x=1,y=2')
   })
 
   test('serializes the body and sets Content-Type', async () => {
@@ -265,6 +291,11 @@ describe('getUrl', () => {
   test('uses a per-call querySerializer override', () => {
     const { client } = createClient()
     expect(client.getUrl({ url: '/pet', query: { a: 1 }, querySerializer: () => 'custom=1' })).toBe('/pet?custom=1')
+  })
+
+  test('uses a per-call pathSerializer override', () => {
+    const { client } = createClient()
+    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, pathSerializer: (_name, value) => `id-${value as string}` })).toBe('/pet/id-7')
   })
 })
 

@@ -1,6 +1,6 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import { type CallResult, createClientCore, defaultBodySerializer, defaultQuerySerializer, ResponseError, resolveAuth } from './axios.ts'
+import { type CallResult, createClientCore, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, ResponseError, resolveAuth } from './axios.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
 
@@ -52,6 +52,25 @@ describe('defaultQuerySerializer', () => {
 
   test('skips undefined and null members', () => {
     expect(defaultQuerySerializer({ a: 1, b: undefined, c: null })).toBe('a=1')
+  })
+})
+
+describe('defaultPathSerializer', () => {
+  test('URL-encodes a primitive value', () => {
+    expect(defaultPathSerializer('id', 'a b')).toBe('a%20b')
+  })
+
+  test('joins array members with commas (simple style)', () => {
+    expect(defaultPathSerializer('ids', [3, 4, 5])).toBe('3,4,5')
+  })
+
+  test('renders objects as comma-separated key=value pairs', () => {
+    expect(defaultPathSerializer('point', { x: 1, y: 2 })).toBe('x=1,y=2')
+  })
+
+  test('serializes undefined and null to an empty string', () => {
+    expect(defaultPathSerializer('id', undefined)).toBe('')
+    expect(defaultPathSerializer('id', null)).toBe('')
   })
 })
 
@@ -113,6 +132,13 @@ describe('createClientCore', () => {
     expect(calls[0]?.url).toBe('/pet/7')
     expect(calls[0]?.params).toStrictEqual({ sort: 'name' })
     expect(calls[0]?.method).toBe('GET')
+  })
+
+  test('serializes array and object path params instead of [object Object]', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/pet/{ids}/{point}', path: { ids: [3, 4], point: { x: 1, y: 2 } } })
+    expect(calls[0]?.url).toBe('/pet/3,4/x=1,y=2')
   })
 
   test('forwards the merged baseURL to axios', async () => {
@@ -302,6 +328,12 @@ describe('getUrl', () => {
     const { instance } = fakeAxios()
     const client = createClientCore({ transport: instance })
     expect(client.getUrl({ url: '/pet', query: { a: 1 }, querySerializer: () => 'custom=1' })).toBe('/pet?custom=1')
+  })
+
+  test('uses a per-call pathSerializer override', () => {
+    const { instance } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, pathSerializer: (_name, value) => `id-${value as string}` })).toBe('/pet/id-7')
   })
 })
 
