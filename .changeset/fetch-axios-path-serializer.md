@@ -3,7 +3,7 @@
 "@kubb/plugin-axios": minor
 ---
 
-Serialize path, query, header, and cookie parameters plus urlencoded bodies by their `style` / `explode`, and fix array and object path params rendering as `[object Object]`.
+Serialize path, query, header, and cookie parameters plus urlencoded bodies by their `style` / `explode`, and fix array and object path params rendering as `[object Object]`. The generator reads each parameter's `style` / `explode` straight from the OpenAPI document and emits it on the call, so the right serialization applies without extra configuration (needs `@kubb/core` 5.0.0-beta.76 or later).
 
 ```ts
 defaultPathSerializer({ name: 'id', value: [3, 4, 5] }) // '3,4,5'
