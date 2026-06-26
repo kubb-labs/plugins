@@ -13,6 +13,7 @@ export type GetInventoryRequestConfig = {
   path?: never
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

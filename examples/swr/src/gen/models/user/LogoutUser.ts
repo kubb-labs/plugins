@@ -16,6 +16,7 @@ export type LogoutUserRequestConfig = {
   path?: never
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

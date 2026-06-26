@@ -38,6 +38,7 @@ export type AddFilesRequestConfig = {
   path?: never
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

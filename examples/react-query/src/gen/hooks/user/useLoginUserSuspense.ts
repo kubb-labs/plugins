@@ -16,7 +16,7 @@ type LoginUserSuspenseQueryKey = ReturnType<typeof loginUserSuspenseQueryKey>
 
 export function loginUserSuspenseQueryOptions(
   { query }: LoginUserRequestConfig = {},
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {},
 ) {
   const queryKey = loginUserSuspenseQueryKey({ query })
   return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200, typeof queryKey>({
@@ -36,7 +36,7 @@ export function useLoginUserSuspense<TData = LoginUserStatus200, TQueryKey exten
   { query }: LoginUserRequestConfig = {},
   options: {
     query?: Partial<UseSuspenseQueryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

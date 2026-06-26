@@ -35,6 +35,7 @@ export type CreateUsersWithListInputRequestConfig = {
   path?: never
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

@@ -14,7 +14,7 @@ export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 
 export type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 
-export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {}) {
   const queryKey = logoutUserQueryKey()
   return queryOptions<LogoutUserResponse, ResponseErrorConfig<Error>, LogoutUserResponse>({
     queryKey,
@@ -32,7 +32,7 @@ export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path
 export function useLogoutUser<TData = LogoutUserResponse, TQueryData = LogoutUserResponse, TQueryKey extends QueryKey = LogoutUserQueryKey>(
   options: {
     query?: Partial<UseQueryOptions<LogoutUserResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

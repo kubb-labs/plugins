@@ -47,6 +47,7 @@ export type UpdatePetWithFormRequestConfig = {
     status?: UpdatePetWithFormQueryStatus
   }
   headers?: never
+  cookie?: never
 }
 
 /**

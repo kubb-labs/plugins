@@ -29,6 +29,7 @@ export type DeleteOrderRequestConfig = {
   }
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

@@ -70,6 +70,7 @@ export type CreatePetsRequestConfig = {
   headers: {
     xEXAMPLE: CreatePetsHeaderXEXAMPLE
   }
+  cookie?: never
 }
 
 /**

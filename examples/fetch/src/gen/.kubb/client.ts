@@ -63,7 +63,7 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequ
  * The data-shaped keys of the grouped options object. `Options` subtracts these from the runtime
  * `RequestConfig` and adds them back, typed per operation, from the generated `<Name>Request` type.
  */
-export type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown }
+export type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown; cookie?: unknown }
 
 export type HeaderValue = string | number | boolean | null | undefined | object
 export type HeadersInit = Array<[string, HeaderValue]> | Record<string, HeaderValue>
@@ -121,8 +121,8 @@ export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<Auth
 export type FetchOptions = RequestInit & { next?: Record<string, unknown> }
 
 /**
- * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` come
- * from the grouped options; everything else is plain request configuration.
+ * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` /
+ * `cookie` come from the grouped options; everything else is plain request configuration.
  */
 export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Response> = {
   baseURL?: string
@@ -131,6 +131,7 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   path?: Record<string, unknown>
   query?: unknown
   params?: unknown
+  cookie?: Record<string, unknown>
   body?: TBody
   headers?: HeadersInit
   signal?: AbortSignal
@@ -146,6 +147,14 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   parser?: { request?: Parser; response?: Parser; error?: Parser }
   security?: Array<Auth>
   auth?: AuthResolver
+  /**
+   * Per-call interceptors, run after the instance-level stacks for this request only.
+   */
+  interceptors?: RequestInterceptors<TRequest, TResponse>
+  /**
+   * Overrides the `Request` constructor the default transport uses, for non-standard runtimes.
+   */
+  Request?: typeof globalThis.Request
 }
 
 /**
@@ -175,6 +184,10 @@ export type ClientConfig<TRequest = Request, TResponse = Response> = {
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
   auth?: AuthResolver
+  /**
+   * Overrides the `Request` constructor the default transport uses, for non-standard runtimes.
+   */
+  Request?: typeof globalThis.Request
 }
 
 /**
@@ -190,6 +203,10 @@ export type ResolvedRequest = {
   credentials?: RequestCredentials
   options?: FetchOptions
   responseType?: ResponseType
+  /**
+   * The `Request` constructor the default transport should use, when overridden per call or instance.
+   */
+  Request?: typeof globalThis.Request
 }
 
 /**
@@ -223,28 +240,43 @@ export type CallResult<TRequest = Request, TResponse = Response> = {
 }
 
 /**
- * A registered interceptor with its ejection id.
+ * An interceptor function. It receives the channel value and returns it (optionally transformed), or
+ * a `TShortCircuit` value to break the chain early. That short-circuit value is a transport result,
+ * returned from a request interceptor to skip the send or from an error interceptor to recover.
  */
-export type InterceptorFn<T> = (value: T) => T | Promise<T>
+export type InterceptorFn<TIn, TShortCircuit = never> = (value: TIn) => TIn | TShortCircuit | Promise<TIn | TShortCircuit>
 
 /**
- * A single interceptor channel — request, response, or error — with a transport-agnostic
- * `use` / `eject` / `update` API.
+ * A single interceptor channel (request, response, or error) with a transport-agnostic
+ * `use` / `eject` / `update` API. `TShortCircuit` is the value an interceptor may return to break the
+ * chain early. It stays `never` for channels that always run to completion.
  */
-export type InterceptorStack<T> = {
-  use: (fn: InterceptorFn<T>) => number
+export type InterceptorStack<TIn, TShortCircuit = never> = {
+  use: (fn: InterceptorFn<TIn, TShortCircuit>) => number
   eject: (id: number) => void
-  update: (id: number, fn: InterceptorFn<T>) => void
-  run: (value: T) => Promise<T>
+  update: (id: number, fn: InterceptorFn<TIn, TShortCircuit>) => void
+  run: (value: TIn) => Promise<TIn | TShortCircuit>
 }
 
 /**
- * The three interceptor channels every client instance exposes.
+ * The three interceptor channels every client instance exposes. A request interceptor may return a
+ * transport result to short-circuit the send, and an error interceptor may return one to recover a
+ * failed call into a success.
  */
 export type Interceptors<TRequest = Request, TResponse = Response> = {
-  request: InterceptorStack<ResolvedRequest>
+  request: InterceptorStack<ResolvedRequest, TransportResult<unknown, TRequest, TResponse>>
   response: InterceptorStack<TransportResult<unknown, TRequest, TResponse>>
-  error: InterceptorStack<ResponseError<unknown, TRequest, TResponse>>
+  error: InterceptorStack<ResponseError<unknown, TRequest, TResponse>, TransportResult<unknown, TRequest, TResponse>>
+}
+
+/**
+ * Per-call interceptors supplied on `RequestConfig.interceptors`, run after the instance-level stacks
+ * for that single request. Each channel mirrors the matching instance stack's short-circuit contract.
+ */
+export type RequestInterceptors<TRequest = Request, TResponse = Response> = {
+  request?: Array<InterceptorFn<ResolvedRequest, TransportResult<unknown, TRequest, TResponse>>>
+  response?: Array<InterceptorFn<TransportResult<unknown, TRequest, TResponse>>>
+  error?: Array<InterceptorFn<ResponseError<unknown, TRequest, TResponse>, TransportResult<unknown, TRequest, TResponse>>>
 }
 
 /**
@@ -381,11 +413,32 @@ function serializeUrl(parts: Array<string | undefined>, pathParams: Record<strin
 }
 
 /**
- * Creates a transport-agnostic interceptor channel. Interceptors run in registration order; `eject`
- * removes one by id and `update` swaps its function in place without reordering.
+ * Runs a list of interceptors in order, threading each result into the next. When `isDone` reports a
+ * value as a short-circuit result, the chain stops and returns it without calling the rest.
  */
-export function createInterceptorStack<T>(): InterceptorStack<T> {
-  let entries: Array<{ id: number; fn: InterceptorFn<T> }> = []
+export async function runInterceptors<TIn, TShortCircuit = never>(
+  fns: Array<InterceptorFn<TIn, TShortCircuit>>,
+  value: TIn,
+  isDone?: (value: TIn | TShortCircuit) => boolean,
+): Promise<TIn | TShortCircuit> {
+  let result: TIn | TShortCircuit = value
+  for (const fn of fns) {
+    if (isDone?.(result)) break
+    // A non-short-circuited result is still `TIn`, the only input an interceptor accepts.
+    result = await fn(result as TIn)
+  }
+  return result
+}
+
+/**
+ * Creates a transport-agnostic interceptor channel. Interceptors run in registration order; `eject`
+ * removes one by id and `update` swaps its function in place without reordering. `isDone` lets a
+ * channel break the chain early when an interceptor returns a short-circuit value.
+ */
+export function createInterceptorStack<TIn, TShortCircuit = never>(
+  options: { isDone?: (value: TIn | TShortCircuit) => boolean } = {},
+): InterceptorStack<TIn, TShortCircuit> {
+  let entries: Array<{ id: number; fn: InterceptorFn<TIn, TShortCircuit> }> = []
   let counter = 0
   return {
     use(fn) {
@@ -400,14 +453,26 @@ export function createInterceptorStack<T>(): InterceptorStack<T> {
       const entry = entries.find((item) => item.id === id)
       if (entry) entry.fn = fn
     },
-    async run(value) {
-      let result = value
-      for (const entry of entries) {
-        result = await entry.fn(result)
-      }
-      return result
+    run(value) {
+      return runInterceptors(
+        entries.map((entry) => entry.fn),
+        value,
+        options.isDone,
+      )
     },
   }
+}
+
+/**
+ * Serializes a cookie params object into a `key=value; key2=value2` string for the `Cookie` header,
+ * skipping `undefined` and `null` members. Returns `undefined` when nothing is left to send.
+ */
+function serializeCookies(cookies: Record<string, unknown> | undefined): string | undefined {
+  if (!cookies) return undefined
+  const pairs = Object.entries(cookies)
+    .filter(([, value]) => value !== undefined && value !== null)
+    .map(([key, value]) => `${key}=${value}`)
+  return pairs.length ? pairs.join('; ') : undefined
 }
 
 /**
@@ -456,10 +521,15 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
   const { defaultTransport, ...initialConfig } = options
   let config: ClientConfig<TRequest, TResponse> = { ...initialConfig }
 
+  // A transport result has a numeric `status` and is not an `Error`, which separates it both from a
+  // `ResolvedRequest` (no `status`) and from a `ResponseError` (an `Error`).
+  const isTransportResult = (value: unknown): value is TransportResult<unknown, TRequest, TResponse> =>
+    typeof value === 'object' && value !== null && !(value instanceof Error) && typeof (value as { status?: unknown }).status === 'number'
+
   const interceptors: Interceptors<TRequest, TResponse> = {
-    request: createInterceptorStack<ResolvedRequest>(),
+    request: createInterceptorStack<ResolvedRequest, TransportResult<unknown, TRequest, TResponse>>({ isDone: isTransportResult }),
     response: createInterceptorStack<TransportResult<unknown, TRequest, TResponse>>(),
-    error: createInterceptorStack<ResponseError<unknown, TRequest, TResponse>>(),
+    error: createInterceptorStack<ResponseError<unknown, TRequest, TResponse>, TransportResult<unknown, TRequest, TResponse>>({ isDone: isTransportResult }),
   }
 
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
@@ -479,6 +549,9 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
       query,
     })
 
+    const cookie = serializeCookies(requestConfig.cookie)
+    if (cookie) headers.Cookie = [headers.Cookie, cookie].filter(Boolean).join('; ')
+
     const rawBody = requestConfig.body
     const validatedBody = await runParser(requestConfig.parser?.request, rawBody)
     const body = bodySerializer(validatedBody, requestContentType)
@@ -493,7 +566,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
 
     const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
 
-    let resolvedRequest: ResolvedRequest = {
+    const resolvedRequest: ResolvedRequest = {
       url,
       method: (requestConfig.method ?? 'GET').toUpperCase(),
       headers,
@@ -502,13 +575,23 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
       credentials: requestConfig.credentials,
       options,
       responseType: requestConfig.responseType,
+      Request: requestConfig.Request ?? config.Request,
     }
-    resolvedRequest = await interceptors.request.run(resolvedRequest)
 
-    let result = await transport(resolvedRequest)
+    let requestOutcome = await interceptors.request.run(resolvedRequest)
+    if (!isTransportResult(requestOutcome) && requestConfig.interceptors?.request?.length) {
+      requestOutcome = await runInterceptors(requestConfig.interceptors.request, requestOutcome, isTransportResult)
+    }
+
+    // A request interceptor can return a transport result to short-circuit the send.
+    let result = isTransportResult(requestOutcome) ? requestOutcome : await transport(requestOutcome)
+
     result = await interceptors.response.run(result)
+    if (requestConfig.interceptors?.response?.length) {
+      result = await runInterceptors(requestConfig.interceptors.response, result)
+    }
 
-    const isSuccess = result.status >= 200 && result.status < 300
+    let isSuccess = result.status >= 200 && result.status < 300
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
 
     if (!isSuccess && throwOnError) {
@@ -519,8 +602,15 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
         request: result.request,
         response: result.response,
       })
-      await interceptors.error.run(error)
-      throw error
+      let errorOutcome = await interceptors.error.run(error)
+      if (!isTransportResult(errorOutcome) && requestConfig.interceptors?.error?.length) {
+        errorOutcome = await runInterceptors(requestConfig.interceptors.error, errorOutcome, isTransportResult)
+      }
+
+      // An error interceptor can return a transport result to recover the call into a success.
+      if (!isTransportResult(errorOutcome)) throw errorOutcome
+      result = errorOutcome
+      isSuccess = result.status >= 200 && result.status < 300
     }
 
     const data = isSuccess ? await runParser(requestConfig.parser?.response, result.data) : undefined
@@ -612,7 +702,8 @@ const defaultTransport: Transport = async (request: ResolvedRequest): Promise<Tr
   }
   if (request.credentials) init.credentials = request.credentials
 
-  const nativeRequest = new Request(request.url, init)
+  const RequestCtor = request.Request ?? globalThis.Request
+  const nativeRequest = new RequestCtor(request.url, init)
   const response = await globalThis.fetch(nativeRequest)
   const data = await parseResponse(response, request.responseType)
 

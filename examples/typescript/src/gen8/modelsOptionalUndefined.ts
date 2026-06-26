@@ -460,6 +460,7 @@ export type UpdatePetRequestConfig = {
   path: never | undefined
   query: never | undefined
   headers: never | undefined
+  cookie: never | undefined
 }
 
 /**
@@ -525,6 +526,7 @@ export type AddPetRequestConfig = {
   path: never | undefined
   query: never | undefined
   headers: never | undefined
+  cookie: never | undefined
 }
 
 /**
@@ -578,6 +580,7 @@ export type FindPetsByStatusRequestConfig = {
       }
     | undefined
   headers: never | undefined
+  cookie: never | undefined
 }
 
 /**
@@ -645,6 +648,7 @@ export type FindPetsByTagsRequestConfig = {
       }
     | undefined
   headers: never | undefined
+  cookie: never | undefined
 }
 
 /**
@@ -697,6 +701,7 @@ export type GetPetByIdRequestConfig = {
   }
   query: never | undefined
   headers: never | undefined
+  cookie: never | undefined
 }
 
 /**
@@ -759,6 +764,7 @@ export type UpdatePetWithFormRequestConfig = {
       }
     | undefined
   headers: never | undefined
+  cookie: never | undefined
 }
 
 /**
@@ -816,6 +822,7 @@ export type DeletePetRequestConfig = {
         apiKey: DeletePetHeaderApiKey | undefined
       }
     | undefined
+  cookie: never | undefined
 }
 
 /**
@@ -877,6 +884,7 @@ export type UploadFileRequestConfig = {
       }
     | undefined
   headers: never | undefined
+  cookie: never | undefined
 }
 
 /**
@@ -906,6 +914,7 @@ export type GetInventoryRequestConfig = {
   path: never | undefined
   query: never | undefined
   headers: never | undefined
+  cookie: never | undefined
 }
 
 /**
@@ -956,6 +965,7 @@ export type PlaceOrderRequestConfig = {
   path: never | undefined
   query: never | undefined
   headers: never | undefined
+  cookie: never | undefined
 }
 
 /**
@@ -1006,6 +1016,7 @@ export type PlaceOrderPatchRequestConfig = {
   path: never | undefined
   query: never | undefined
   headers: never | undefined
+  cookie: never | undefined
 }
 
 /**
@@ -1064,6 +1075,7 @@ export type GetOrderByIdRequestConfig = {
   }
   query: never | undefined
   headers: never | undefined
+  cookie: never | undefined
 }
 
 /**
@@ -1111,6 +1123,7 @@ export type DeleteOrderRequestConfig = {
   }
   query: never | undefined
   headers: never | undefined
+  cookie: never | undefined
 }
 
 /**

@@ -46,6 +46,7 @@ export type LoginUserRequestConfig = {
     password?: LoginUserQueryPassword
   }
   headers?: never
+  cookie?: never
 }
 
 /**

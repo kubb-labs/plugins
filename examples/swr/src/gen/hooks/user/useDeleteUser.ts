@@ -28,7 +28,7 @@ export function useDeleteUser(
       DeleteUserMutationKey | null,
       DeleteUserMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
     shouldFetch?: boolean
   } = {},
 ) {

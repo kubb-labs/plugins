@@ -46,6 +46,7 @@ export type GetUserByNameRequestConfig = {
   }
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

@@ -28,7 +28,7 @@ export function useUpdatePet(
       UpdatePetMutationKey | null,
       UpdatePetMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> & {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     }
     shouldFetch?: boolean

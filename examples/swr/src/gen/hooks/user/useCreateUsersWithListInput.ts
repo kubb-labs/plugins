@@ -28,7 +28,7 @@ export function useCreateUsersWithListInput(
       CreateUsersWithListInputMutationKey | null,
       CreateUsersWithListInputMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
     shouldFetch?: boolean
   } = {},
 ) {

@@ -11,7 +11,9 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 
-export function deleteUserMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function deleteUserMutationOptions<TContext = unknown>(
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {},
+) {
   const mutationKey = deleteUserMutationKey()
   return mutationOptions<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, DeleteUserRequestConfig, TContext>({
     mutationKey,
@@ -32,7 +34,7 @@ export function useDeleteUser<TContext>(
     mutation?: UseMutationOptions<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, DeleteUserRequestConfig, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

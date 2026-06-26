@@ -6,7 +6,9 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const createPetsMutationKey = () => [{ url: '/pets/:uuid' }] as const
 
-export function createPetsMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function createPetsMutationOptions<TContext = unknown>(
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {},
+) {
   const mutationKey = createPetsMutationKey()
   return mutationOptions<CreatePetsStatus201, ResponseErrorConfig<Error>, CreatePetsRequestConfig, TContext>({
     mutationKey,
@@ -24,7 +26,7 @@ export function createPetsMutationOptions<TContext = unknown>(config: Partial<Om
 export function useCreatePets<TContext>(
   options: {
     mutation?: UseMutationOptions<CreatePetsStatus201, ResponseErrorConfig<Error>, CreatePetsRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

@@ -66,7 +66,7 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequ
  * The data-shaped keys of the grouped options object. `Options` subtracts these from the runtime
  * `RequestConfig` and adds them back, typed per operation, from the generated `<Name>Request` type.
  */
-export type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown }
+export type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown; cookie?: unknown }
 
 export type HeaderValue = string | number | boolean | null | undefined | object
 export type HeadersInit = Array<[string, HeaderValue]> | Record<string, HeaderValue>
@@ -126,9 +126,9 @@ export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<Auth
 export type AxiosOptions = AxiosRequestConfig
 
 /**
- * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` come
- * from the grouped options; everything else is plain request configuration. `transport` carries an
- * axios instance and `validateStatus` rides axios's own contract.
+ * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` /
+ * `cookie` come from the grouped options; everything else is plain request configuration. `transport`
+ * carries an axios instance and `validateStatus` rides axios's own contract.
  */
 export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TResponse = AxiosResponse> = {
   baseURL?: string
@@ -137,6 +137,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   path?: Record<string, unknown>
   query?: unknown
   params?: unknown
+  cookie?: Record<string, unknown>
   body?: TBody
   headers?: HeadersInit
   signal?: AbortSignal
@@ -384,6 +385,18 @@ export async function resolveAuth(params: {
   }
 }
 
+/**
+ * Serializes a cookie params object into a `key=value; key2=value2` string for the `Cookie` header,
+ * skipping `undefined` and `null` members. Returns `undefined` when nothing is left to send.
+ */
+function serializeCookies(cookies: Record<string, unknown> | undefined): string | undefined {
+  if (!cookies) return undefined
+  const pairs = Object.entries(cookies)
+    .filter(([, value]) => value !== undefined && value !== null)
+    .map(([key, value]) => `${key}=${value}`)
+  return pairs.length ? pairs.join('; ') : undefined
+}
+
 async function runParser<T>(parser: Parser | undefined, value: T): Promise<T> {
   if (!parser) return value
   return (await parser(value)) as T
@@ -467,6 +480,9 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       headers,
       query,
     })
+
+    const cookie = serializeCookies(requestConfig.cookie)
+    if (cookie) headers.Cookie = [headers.Cookie, cookie].filter(Boolean).join('; ')
 
     const validatedBody = await runParser(requestConfig.parser?.request, requestConfig.body)
     const body = bodySerializer(validatedBody, requestContentType)

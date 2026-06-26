@@ -28,7 +28,7 @@ export function useDeleteOrder(
       DeleteOrderMutationKey | null,
       DeleteOrderMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
     shouldFetch?: boolean
   } = {},
 ) {

@@ -12,7 +12,9 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
 export function uploadFileMutationOptions<TContext = unknown>(
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: 'application/json' | 'multipart/form-data' } = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> & {
+    contentType?: 'application/json' | 'multipart/form-data'
+  } = {},
 ) {
   const mutationKey = uploadFileMutationKey()
   return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>({
@@ -31,7 +33,9 @@ export function uploadFileMutationOptions<TContext = unknown>(
 export function useUploadFile<TContext>(
   options: {
     mutation?: UseMutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: 'application/json' | 'multipart/form-data' }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> & {
+      contentType?: 'application/json' | 'multipart/form-data'
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

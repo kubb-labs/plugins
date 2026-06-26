@@ -42,6 +42,7 @@ export type UploadFileRequestConfig = {
     additionalMetadata?: UploadFileQueryAdditionalMetadata
   }
   headers?: never
+  cookie?: never
 }
 
 /**

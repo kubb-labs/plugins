@@ -43,6 +43,7 @@ export type GetOrderByIdRequestConfig = {
   }
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

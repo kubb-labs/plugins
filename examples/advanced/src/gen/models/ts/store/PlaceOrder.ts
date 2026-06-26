@@ -35,6 +35,7 @@ export type PlaceOrderRequestConfig = {
   path?: never
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

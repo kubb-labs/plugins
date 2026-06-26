@@ -15,7 +15,7 @@ type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 export function loginUserQueryOptions(
   { query }: LoginUserRequestConfig = {},
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {},
 ) {
   const queryKey = loginUserQueryKey({ query })
   return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200, typeof queryKey>({
@@ -35,7 +35,7 @@ export function useLoginUser<TData = LoginUserStatus200, TQueryData = LoginUserS
   { query }: LoginUserRequestConfig = {},
   options: {
     query?: Partial<QueryObserverOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
