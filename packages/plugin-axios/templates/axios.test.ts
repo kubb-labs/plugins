@@ -260,7 +260,7 @@ describe('createClientCore', () => {
       method: 'GET',
       url: '/pet/{id}{filter}',
       path: { id: 5, filter: ['a', 'b'] },
-      styles: { path: { id: { style: 'matrix' }, filter: { style: 'label' } } },
+      serialization: { path: { id: { style: 'matrix' }, filter: { style: 'label' } } },
     })
     expect(calls[0]?.url).toBe('/pet/;id=5.a,b')
   })
@@ -283,7 +283,7 @@ describe('createClientCore', () => {
   test('passes styles.query through the axios paramsSerializer', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance })
-    await client({ method: 'GET', url: '/pet', query: { id: [3, 4, 5] }, styles: { query: { id: { style: 'pipeDelimited', explode: false } } } })
+    await client({ method: 'GET', url: '/pet', query: { id: [3, 4, 5] }, serialization: { query: { id: { style: 'pipeDelimited', explode: false } } } })
     const serializer = calls[0]?.paramsSerializer as (params: Record<string, unknown>) => string
     expect(serializer({ id: [3, 4, 5] })).toBe('id=3|4|5')
   })
@@ -312,7 +312,7 @@ describe('createClientCore', () => {
       method: 'GET',
       url: '/pet',
       headers: { 'X-Ids': [3, 4], 'X-Filter': { role: 'admin' } },
-      styles: { header: { 'X-Ids': {}, 'X-Filter': { explode: true } } },
+      serialization: { header: { 'X-Ids': {}, 'X-Filter': { explode: true } } },
     })
     const headers = calls[0]?.headers as Record<string, string>
     expect(headers['X-Ids']).toBe('3,4')
@@ -493,13 +493,13 @@ describe('getUrl', () => {
   test('applies styles.path metadata to the matching placeholders', () => {
     const { instance } = fakeAxios()
     const client = createClientCore({ transport: instance })
-    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, styles: { path: { petId: { style: 'matrix' } } } })).toBe('/pet/;petId=7')
+    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, serialization: { path: { petId: { style: 'matrix' } } } })).toBe('/pet/;petId=7')
   })
 
   test('applies styles.query metadata to the query string', () => {
     const { instance } = fakeAxios()
     const client = createClientCore({ transport: instance })
-    expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, styles: { query: { id: { style: 'pipeDelimited', explode: false } } } })).toBe(
+    expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, serialization: { query: { id: { style: 'pipeDelimited', explode: false } } } })).toBe(
       '/pets?id=3|4|5',
     )
   })

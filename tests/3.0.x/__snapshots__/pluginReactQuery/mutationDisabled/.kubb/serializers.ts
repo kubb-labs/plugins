@@ -102,7 +102,7 @@ export type Serializers = {
  * The per-parameter serialization metadata a generated request carries, grouped by location. Each
  * map is keyed by parameter name, mirroring the `serializer` grouping.
  */
-export type RequestStyles = {
+export type RequestSerialization = {
   path?: Record<string, PathParamStyle>
   query?: Record<string, QueryParamStyle>
   header?: Record<string, HeaderParamStyle>

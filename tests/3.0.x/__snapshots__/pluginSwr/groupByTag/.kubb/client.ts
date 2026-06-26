@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers'
-import type { HeadersInit, PathParamStyle, PathSerializer, RequestStyles, Serializers } from './serializers'
+import type { HeadersInit, PathParamStyle, PathSerializer, RequestSerialization, Serializers } from './serializers'
 
 /**
  * HTTP status codes treated as a success. A resolved call only ever carries a body from one of
@@ -117,7 +117,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   cookies?: Record<string, unknown>
   body?: TBody
   headers?: HeadersInit
-  styles?: RequestStyles
+  serialization?: RequestSerialization
   signal?: AbortSignal
   contentType?: string
   responseType?: ResponseType
@@ -376,7 +376,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     const bodySerializer = requestConfig.serializer?.body ?? config.serializer?.body ?? defaultBodySerializer
     const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
 
-    const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.styles?.header))
+    const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.serialization?.header))
     const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
 
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
@@ -389,12 +389,12 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     })
 
     if (requestConfig.cookies) {
-      const cookie = serializeCookies(requestConfig.cookies, requestConfig.styles?.cookie)
+      const cookie = serializeCookies(requestConfig.cookies, requestConfig.serialization?.cookie)
       if (cookie) headers.Cookie = [headers.Cookie, cookie].filter(Boolean).join('; ')
     }
 
     const validatedBody = await runParser(requestConfig.parser?.request, requestConfig.body)
-    const body = bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.styles?.body })
+    const body = bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.serialization?.body })
     // A FormData body must keep its Content-Type unset so axios appends the multipart boundary.
     if (body instanceof FormData) {
       delete headers['Content-Type']
@@ -404,7 +404,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     }
     const pathParams = requestConfig.path ?? {}
     const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) =>
-      pathSerializer({ name: key, value: pathParams[key], options: requestConfig.styles?.path?.[key] }),
+      pathSerializer({ name: key, value: pathParams[key], options: requestConfig.serialization?.path?.[key] }),
     )
     const baseURL = [config.baseURL, requestConfig.baseURL].filter(Boolean).join('') || undefined
 
@@ -417,7 +417,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       method: requestConfig.method ?? 'GET',
       headers,
       params: query,
-      paramsSerializer: (params) => querySerializer(params as Record<string, unknown>, requestConfig.styles?.query),
+      paramsSerializer: (params) => querySerializer(params as Record<string, unknown>, requestConfig.serialization?.query),
       data: body,
       transformRequest: (data) => data,
       signal: requestConfig.signal,
@@ -464,9 +464,9 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     return serializeUrl({
       parts: [config.baseURL, requestConfig.baseURL, requestConfig.url],
       pathParams: requestConfig.path ?? {},
-      search: querySerializer(query, requestConfig.styles?.query),
+      search: querySerializer(query, requestConfig.serialization?.query),
       pathSerializer,
-      pathStyles: requestConfig.styles?.path,
+      pathStyles: requestConfig.serialization?.path,
     })
   }
   client.interceptors = interceptors
