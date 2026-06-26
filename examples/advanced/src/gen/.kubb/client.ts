@@ -73,10 +73,28 @@ export type HeadersInit = Array<[string, HeaderValue]> | Record<string, HeaderVa
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream' | 'formdata'
 
 /**
- * Serializes the query object into a search string. Array and object members follow the configured
- * style (`form` with `explode` by default; `deepObject` for nested objects).
+ * The OpenAPI query-parameter serialization style. `form` is the default; `spaceDelimited` and
+ * `pipeDelimited` join arrays with a space or pipe, and `deepObject` renders objects as
+ * `key[prop]=value`.
  */
-export type QuerySerializer = (params: Record<string, unknown>) => string
+export type QueryStyle = 'form' | 'spaceDelimited' | 'pipeDelimited' | 'deepObject'
+
+/**
+ * The per-parameter query serialization metadata carried by the generated request. `style` and
+ * `explode` follow OpenAPI, and `allowReserved` keeps RFC 3986 reserved characters unencoded.
+ */
+export type QueryParamStyle = {
+  style?: QueryStyle
+  explode?: boolean
+  allowReserved?: boolean
+}
+
+/**
+ * Serializes the query object into a search string. The optional second argument carries the
+ * per-parameter OpenAPI `style` / `explode` / `allowReserved` metadata; without it arrays explode
+ * into repeated keys and nested objects use the `deepObject` style.
+ */
+export type QuerySerializer = (params: Record<string, unknown>, options?: Record<string, QueryParamStyle>) => string
 
 /**
  * Serializes the request body. JSON by default; `FormData`, `URLSearchParams`, `Blob`,
@@ -85,8 +103,41 @@ export type QuerySerializer = (params: Record<string, unknown>) => string
 export type BodySerializer = (body: unknown, contentType?: string) => unknown
 
 /**
+ * The OpenAPI path-parameter serialization style. `simple` is the default and emits the bare value;
+ * `label` prefixes a `.` and `matrix` prefixes a `;name=` segment.
+ */
+export type PathStyle = 'simple' | 'label' | 'matrix'
+
+/**
+ * The per-parameter serialization metadata carried by the generated request. `style` selects the
+ * OpenAPI style and `explode` controls how arrays and objects expand.
+ */
+export type PathParamStyle = {
+  style?: PathStyle
+  explode?: boolean
+}
+
+/**
+ * Serializes a single path parameter for interpolation into the URL, honoring the OpenAPI `style` /
+ * `explode` passed as `options`. Defaults to `simple` style with `explode: false`: primitives are
+ * URL-encoded, arrays join their members with commas, and objects flatten to `key,value` pairs.
+ */
+export type PathSerializer = (name: string, value: unknown, options?: PathParamStyle) => string
+
+/**
+ * The per-concern serializers, grouped so they can be set in one place and overridden per client or
+ * per call. Each field falls back to the matching `default*Serializer` when omitted.
+ */
+export type Serializers = {
+  query?: QuerySerializer
+  body?: BodySerializer
+  path?: PathSerializer
+}
+
+/**
  * Parses a value before it is sent or after it is received, returning the parsed (and optionally
- * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` hooks.
+ * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` /
+ * `parser.error` hooks (`error` runs on the error body when a non-2xx call does not throw).
  */
 export type Parser<T = unknown> = (value: T) => T | Promise<T>
 
@@ -123,7 +174,9 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   url?: string
   method?: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD'
   path?: Record<string, unknown>
+  pathStyles?: Record<string, PathParamStyle>
   query?: unknown
+  queryStyles?: Record<string, QueryParamStyle>
   params?: unknown
   body?: TBody
   headers?: HeadersInit
@@ -134,9 +187,8 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   validateStatus?: (status: number) => boolean
   client?: ClientInstance<TRequest, TResponse>
   transport?: AxiosInstance
-  querySerializer?: QuerySerializer
-  bodySerializer?: BodySerializer
-  parser?: { request?: Parser; response?: Parser }
+  serializer?: Serializers
+  parser?: { request?: Parser; response?: Parser; error?: Parser }
   security?: Array<Auth>
   auth?: AuthResolver
 }
@@ -164,8 +216,7 @@ export type ClientConfig = {
   throwOnError?: boolean
   validateStatus?: (status: number) => boolean
   transport?: AxiosInstance
-  querySerializer?: QuerySerializer
-  bodySerializer?: BodySerializer
+  serializer?: Serializers
   auth?: AuthResolver
 }
 
@@ -254,13 +305,30 @@ function isFormBody(body: unknown): boolean {
   )
 }
 
+function appendFormDataValue(formData: FormData, key: string, value: unknown): void {
+  if (value === undefined || value === null) return
+  if (value instanceof Blob) formData.append(key, value)
+  else if (value instanceof Date) formData.append(key, value.toISOString())
+  else if (typeof value === 'object') formData.append(key, JSON.stringify(value))
+  else formData.append(key, String(value))
+}
+
 /**
  * Default body serializer: passes binary/form bodies through and JSON-serializes everything else.
- * For `application/x-www-form-urlencoded` plain objects become `URLSearchParams`.
+ * For `multipart/form-data` plain objects become `FormData` and for
+ * `application/x-www-form-urlencoded` they become `URLSearchParams`.
  */
 export const defaultBodySerializer: BodySerializer = (body, contentType) => {
   if (body === undefined || body === null) return undefined
   if (isFormBody(body)) return body
+  if (contentType?.includes('multipart/form-data')) {
+    const formData = new FormData()
+    for (const [key, value] of Object.entries(body as Record<string, unknown>)) {
+      if (Array.isArray(value)) for (const item of value) appendFormDataValue(formData, key, item)
+      else appendFormDataValue(formData, key, value)
+    }
+    return formData
+  }
   if (contentType?.includes('application/x-www-form-urlencoded')) {
     return new URLSearchParams(body as Record<string, string>)
   }
@@ -282,16 +350,98 @@ function appendQueryValue(search: URLSearchParams, key: string, value: unknown):
   search.append(key, String(value))
 }
 
-/**
- * Default query serializer: arrays explode into repeated keys and nested objects use the
- * `deepObject` style (`key[prop]=value`).
- */
-export const defaultQuerySerializer: QuerySerializer = (params) => {
+const queryDelimiters: Record<QueryStyle, string> = { form: ',', spaceDelimited: '%20', pipeDelimited: '|', deepObject: ',' }
+
+function notNullish(value: unknown): boolean {
+  return value !== undefined && value !== null
+}
+
+function serializeStyledQueryArray(key: string, value: Array<unknown>, options: QueryParamStyle, encode: (value: unknown) => string): Array<string> {
+  const items = value.filter(notNullish)
+  if (options.explode ?? true) return items.map((item) => `${encode(key)}=${encode(item)}`)
+  return [`${encode(key)}=${items.map(encode).join(queryDelimiters[options.style ?? 'form'])}`]
+}
+
+function serializeStyledQueryObject(key: string, value: Record<string, unknown>, options: QueryParamStyle, encode: (value: unknown) => string): Array<string> {
+  const entries = Object.entries(value).filter(([, item]) => notNullish(item))
+  if ((options.style ?? 'form') === 'deepObject') return entries.map(([prop, item]) => `${encode(`${key}[${prop}]`)}=${encode(item)}`)
+  if (options.explode ?? true) return entries.map(([prop, item]) => `${encode(prop)}=${encode(item)}`)
+  return [
+    `${encode(key)}=${entries
+      .flatMap(([prop, item]) => [prop, item])
+      .map(encode)
+      .join(',')}`,
+  ]
+}
+
+function serializeStyledQueryParam(key: string, value: unknown, options: QueryParamStyle): Array<string> {
+  if (value === undefined || value === null) return []
+  const encode = options.allowReserved ? (input: unknown) => encodeURI(String(input)) : (input: unknown) => encodeURIComponent(String(input))
+  if (Array.isArray(value)) return serializeStyledQueryArray(key, value, options, encode)
+  if (typeof value === 'object') return serializeStyledQueryObject(key, value as Record<string, unknown>, options, encode)
+  return [`${encode(key)}=${encode(value)}`]
+}
+
+function serializeDefaultQueryParam(key: string, value: unknown): Array<string> {
   const search = new URLSearchParams()
+  appendQueryValue(search, key, value)
+  const result = search.toString()
+  return result ? [result] : []
+}
+
+/**
+ * Default query serializer. Members with `options` metadata follow their OpenAPI `style` / `explode`
+ * / `allowReserved`; members without it keep the defaults — arrays explode into repeated keys and
+ * nested objects use the `deepObject` style (`key[prop]=value`).
+ */
+export const defaultQuerySerializer: QuerySerializer = (params, options) => {
+  const parts: Array<string> = []
   for (const [key, value] of Object.entries(params)) {
-    appendQueryValue(search, key, value)
+    const paramOptions = options?.[key]
+    parts.push(...(paramOptions ? serializeStyledQueryParam(key, value, paramOptions) : serializeDefaultQueryParam(key, value)))
   }
-  return search.toString()
+  return parts.join('&')
+}
+
+function encodePathValue(value: unknown): string {
+  return encodeURIComponent(String(value))
+}
+
+function serializePathPrimitive(name: string, value: unknown, style: PathStyle): string {
+  const encoded = encodePathValue(value)
+  if (style === 'label') return `.${encoded}`
+  if (style === 'matrix') return `;${name}=${encoded}`
+  return encoded
+}
+
+function serializePathArray(name: string, value: Array<unknown>, style: PathStyle, explode: boolean): string {
+  const items = value.map(encodePathValue)
+  if (style === 'label') return `.${items.join(explode ? '.' : ',')}`
+  if (style === 'matrix') return explode ? items.map((item) => `;${name}=${item}`).join('') : `;${name}=${items.join(',')}`
+  return items.join(',')
+}
+
+function serializePathObject(name: string, value: Record<string, unknown>, style: PathStyle, explode: boolean): string {
+  const entries = Object.entries(value)
+  const pairs = entries.map(([key, item]) => `${encodePathValue(key)}=${encodePathValue(item)}`)
+  const flat = entries.map(([key, item]) => `${encodePathValue(key)},${encodePathValue(item)}`)
+  if (style === 'label') return `.${explode ? pairs.join('.') : flat.join(',')}`
+  if (style === 'matrix') return explode ? pairs.map((pair) => `;${pair}`).join('') : `;${name}=${flat.join(',')}`
+  return (explode ? pairs : flat).join(',')
+}
+
+/**
+ * Default path serializer honoring the OpenAPI `style` / `explode` metadata. Without metadata it
+ * falls back to `simple` style with `explode: false`. Replaces the previous `String(value)`
+ * interpolation, which emitted `[object Object]` for object path params.
+ */
+export const defaultPathSerializer: PathSerializer = (name, value, options) => {
+  if (value === undefined || value === null) return ''
+  const style = options?.style ?? 'simple'
+  const explode = options?.explode ?? false
+  if (Array.isArray(value)) return serializePathArray(name, value, style, explode)
+  if (typeof value === 'object') return serializePathObject(name, value as Record<string, unknown>, style, explode)
+  return serializePathPrimitive(name, value, style)
 }
 
 function serializeHeaders(headers: HeadersInit | undefined): Record<string, string> {
@@ -314,11 +464,17 @@ function mergeHeaders(...sources: Array<HeadersInit | undefined>): Record<string
  * (URL-encoded), and appends the serialized query. Backs `getUrl` so a URL can be constructed
  * without sending the request.
  */
-function serializeUrl(parts: Array<string | undefined>, pathParams: Record<string, unknown>, search: string): string {
+function serializeUrl(
+  parts: Array<string | undefined>,
+  pathParams: Record<string, unknown>,
+  search: string,
+  pathSerializer: PathSerializer = defaultPathSerializer,
+  pathStyles?: Record<string, PathParamStyle>,
+): string {
   const path = parts
     .filter(Boolean)
     .join('')
-    .replace(/\{([^{}]+)\}/g, (_, key: string) => encodeURIComponent(String(pathParams[key] ?? '')))
+    .replace(/\{([^{}]+)\}/g, (_, key: string) => pathSerializer(key, pathParams[key], pathStyles?.[key]))
   return path + (search ? `?${search}` : '')
 }
 
@@ -422,14 +578,12 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
 
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
     const activeInstance = requestConfig.transport ?? config.transport ?? instance
-    const querySerializer = requestConfig.querySerializer ?? config.querySerializer ?? defaultQuerySerializer
-    const bodySerializer = requestConfig.bodySerializer ?? config.bodySerializer ?? defaultBodySerializer
+    const querySerializer = requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer
+    const bodySerializer = requestConfig.serializer?.body ?? config.serializer?.body ?? defaultBodySerializer
+    const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
 
     const headers = mergeHeaders(config.headers, requestConfig.headers)
-    if (requestConfig.contentType && requestConfig.contentType !== 'multipart/form-data') {
-      headers['Content-Type'] = requestConfig.contentType
-    }
-    const contentType = headers['Content-Type'] ?? headers['content-type']
+    const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
 
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
 
@@ -441,8 +595,16 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     })
 
     const validatedBody = await runParser(requestConfig.parser?.request, requestConfig.body)
+    const body = bodySerializer(validatedBody, requestContentType)
+    // A FormData body must keep its Content-Type unset so axios appends the multipart boundary.
+    if (body instanceof FormData) {
+      delete headers['Content-Type']
+      delete headers['content-type']
+    } else if (requestConfig.contentType) {
+      headers['Content-Type'] = requestConfig.contentType
+    }
     const pathParams = requestConfig.path ?? {}
-    const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) => encodeURIComponent(String(pathParams[key] ?? '')))
+    const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) => pathSerializer(key, pathParams[key], requestConfig.pathStyles?.[key]))
     const baseURL = [config.baseURL, requestConfig.baseURL].filter(Boolean).join('') || undefined
 
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
@@ -454,9 +616,9 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       method: requestConfig.method ?? 'GET',
       headers,
       params: query,
-      paramsSerializer: (params) => querySerializer(params as Record<string, unknown>),
-      data: validatedBody,
-      transformRequest: (data) => bodySerializer(data, contentType),
+      paramsSerializer: (params) => querySerializer(params as Record<string, unknown>, requestConfig.queryStyles),
+      data: body,
+      transformRequest: (data) => data,
       signal: requestConfig.signal,
       responseType: requestConfig.responseType,
       validateStatus,
@@ -466,10 +628,11 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       const response = await activeInstance.request<unknown, AxiosResponse>(axiosConfig)
       const isSuccess = response.status >= 200 && response.status < 300
       const data = isSuccess ? await runParser(requestConfig.parser?.response, response.data) : undefined
+      const error = isSuccess ? undefined : await runParser(requestConfig.parser?.error, response.data)
       return {
         status: response.status,
         data,
-        error: isSuccess ? undefined : response.data,
+        error,
         request: response.config as TRequest,
         response: response as TResponse,
       }
@@ -494,9 +657,16 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     return config
   }
   client.getUrl = (requestConfig) => {
-    const querySerializer = requestConfig.querySerializer ?? config.querySerializer ?? defaultQuerySerializer
+    const querySerializer = requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer
+    const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
-    return serializeUrl([config.baseURL, requestConfig.baseURL, requestConfig.url], requestConfig.path ?? {}, querySerializer(query))
+    return serializeUrl(
+      [config.baseURL, requestConfig.baseURL, requestConfig.url],
+      requestConfig.path ?? {},
+      querySerializer(query, requestConfig.queryStyles),
+      pathSerializer,
+      requestConfig.pathStyles,
+    )
   }
   client.interceptors = interceptors
   client.createClient = (next) => createClientCore<TRequest, TResponse>({ ...config, ...next })

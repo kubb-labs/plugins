@@ -19,6 +19,8 @@ export const createPetsStatusDefaultSchema = petNotFoundSchema.describe('Pet not
 
 export const createPetsResponseSchema = createPetsStatus201Schema
 
+export const createPetsErrorSchema = createPetsStatusDefaultSchema
+
 export const createPetsDataSchema = z.object({
   name: z.string(),
   tag: z.string(),

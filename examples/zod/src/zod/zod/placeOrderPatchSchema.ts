@@ -18,6 +18,10 @@ export const placeOrderPatchResponseSchema = placeOrderPatchStatus200Schema
 
 export type PlaceOrderPatchResponseSchemaType = z.infer<typeof placeOrderPatchResponseSchema>
 
+export const placeOrderPatchErrorSchema = placeOrderPatchStatus405Schema
+
+export type PlaceOrderPatchErrorSchemaType = z.infer<typeof placeOrderPatchErrorSchema>
+
 export const placeOrderPatchDataSchemaJson = orderSchema.optional()
 
 export type PlaceOrderPatchDataSchemaJsonType = z.infer<typeof placeOrderPatchDataSchemaJson>

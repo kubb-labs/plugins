@@ -12,6 +12,8 @@ export const addFilesStatus405Schema = z.any()
 
 export const addFilesResponseSchema = addFilesStatus200Schema
 
+export const addFilesErrorSchema = addFilesStatus405Schema
+
 export const addFilesDataSchemaJson = z
   .object({
     url: z.url().describe('URL of the image to upload'),
