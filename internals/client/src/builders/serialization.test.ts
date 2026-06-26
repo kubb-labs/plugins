@@ -41,7 +41,7 @@ describe('buildSerializationMetadata', () => {
 
   test('quotes a key whose camelCased name is not a bare identifier', () => {
     const node = createOperation([{ name: '2fa', in: 'query', schema: stringSchema(), explode: true }])
-    expect(buildStylesMetadata({ node })).toBe('{ query: { "2Fa": { explode: true } } }')
+    expect(buildSerializationMetadata({ node })).toBe('{ query: { "2Fa": { explode: true } } }')
   })
 
   test('groups multiple locations together', () => {

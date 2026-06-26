@@ -3,7 +3,7 @@
 "@kubb/plugin-axios": patch
 ---
 
-Serialize `Date` values as ISO-8601 across path, query, cookie, and header parameters, recurse into nested objects for the `deepObject` query style, and apply a per-part content type from `multipart/form-data` encoding. Per-parameter `styles` keys whose camelCased name is not a bare identifier are now quoted so the generated literal stays valid.
+Serialize `Date` values as ISO-8601 across path, query, cookie, and header parameters, recurse into nested objects for the `deepObject` query style, and apply a per-part content type from `multipart/form-data` encoding. Per-parameter `serialization` keys whose camelCased name is not a bare identifier are now quoted so the generated literal stays valid.
 
 ```ts
 defaultPathSerializer({ name: 'since', value: new Date('2020-01-02T03:04:05.000Z') }) // '2020-01-02T03%3A04%3A05.000Z'
