@@ -1,5 +1,12 @@
 # @kubb/plugin-faker
 
+## 5.0.0-beta.78
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.78
+
 ## 5.0.0-beta.77
 
 ### Patch Changes

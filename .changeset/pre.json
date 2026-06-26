@@ -149,6 +149,7 @@
     "simplify-function-printer",
     "single-quote-output-spacing",
     "spread-generators-into-add-generator",
+    "standard-schema-runtime",
     "standardize-client-runtime-symbol",
     "swr-enabled-params-client-alignment",
     "tanstack-query-optional-enabled-params",

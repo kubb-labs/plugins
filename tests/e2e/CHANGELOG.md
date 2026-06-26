@@ -1,5 +1,18 @@
 # e2e
 
+## 0.0.1-beta.22
+
+### Patch Changes
+
+- Updated dependencies [[`b66aeb7`](https://github.com/kubb-labs/plugins/commit/b66aeb79c9df5691ad75626e8125f8bf33e83e78)]:
+  - @kubb/plugin-axios@5.0.0-beta.78
+  - @kubb/plugin-react-query@5.0.0-beta.78
+  - @kubb/plugin-cypress@5.0.0-beta.78
+  - @kubb/plugin-faker@5.0.0-beta.78
+  - @kubb/plugin-msw@5.0.0-beta.78
+  - @kubb/plugin-ts@5.0.0-beta.78
+  - @kubb/plugin-zod@5.0.0-beta.78
+
 ## 0.0.1-beta.21
 
 ### Patch Changes

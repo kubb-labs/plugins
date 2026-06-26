@@ -1,5 +1,7 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.78
+
 ## 5.0.0-beta.77
 
 ### Minor Changes
