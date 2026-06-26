@@ -39,6 +39,11 @@ describe('buildStylesMetadata', () => {
     expect(buildStylesMetadata({ node })).toBe('{ header: { xIds: { explode: true } }, cookie: { sessionId: { explode: false } } }')
   })
 
+  test('quotes a key whose camelCased name is not a bare identifier', () => {
+    const node = createOperation([{ name: '2fa', in: 'query', schema: stringSchema(), explode: true }])
+    expect(buildStylesMetadata({ node })).toBe('{ query: { "2Fa": { explode: true } } }')
+  })
+
   test('groups multiple locations together', () => {
     const node = createOperation([
       { name: 'id', in: 'path', schema: stringSchema(), style: 'label', explode: false },

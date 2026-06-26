@@ -288,8 +288,8 @@ function serializeStyledQueryObject({
   options: QueryParamStyle
   encode: (value: unknown) => string
 }): Array<string> {
-  const entries = Object.entries(value).filter(([, item]) => notNullish(item))
   if ((options.style ?? 'form') === 'deepObject') return serializeDeepObject({ key, value, encode })
+  const entries = Object.entries(value).filter(([, item]) => notNullish(item))
   if (options.explode ?? true) return entries.map(([prop, item]) => `${encode(prop)}=${encode(item)}`)
   return [
     `${encode(key)}=${entries
@@ -389,7 +389,8 @@ export const defaultPathSerializer: PathSerializer = ({ name, value, options }) 
 
 function serializeHeaderValue(value: unknown, explode: boolean): string {
   if (Array.isArray(value)) return value.filter(notNullish).map(toValue).join(',')
-  const entries = Object.entries(value as Record<string, unknown>).filter(([, item]) => notNullish(item))
+  if (!isRecord(value)) return toValue(value)
+  const entries = Object.entries(value).filter(([, item]) => notNullish(item))
   if (explode) return entries.map(([key, item]) => `${key}=${toValue(item)}`).join(',')
   return entries
     .flatMap(([key, item]) => [key, item])

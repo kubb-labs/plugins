@@ -9,7 +9,7 @@ import {
   type Transport,
   type TransportResult,
 } from './fetch.ts'
-import { defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
+import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type FakeResult = Partial<Pick<TransportResult, 'data' | 'status' | 'statusText'>>
 
@@ -223,6 +223,23 @@ describe('serializeCookies', () => {
 
   test('skips undefined and null members', () => {
     expect(serializeCookies({ a: 'x', b: undefined, c: null })).toBe('a=x')
+  })
+})
+
+describe('applyHeaderStyles', () => {
+  test('serializes array and object headers with the simple style', () => {
+    const result = applyHeaderStyles({ 'X-Ids': [3, 4], 'X-Filter': { role: 'admin' } }, { 'X-Ids': { explode: false }, 'X-Filter': { explode: true } })
+    expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-Ids': '3,4', 'X-Filter': 'role=admin' })
+  })
+
+  test('serializes a Date header value as ISO-8601', () => {
+    const result = applyHeaderStyles({ 'X-Since': new Date('2020-01-02T03:04:05.000Z') }, { 'X-Since': {} })
+    expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-Since': '2020-01-02T03:04:05.000Z' })
+  })
+
+  test('passes through primitives and headers without metadata untouched', () => {
+    const result = applyHeaderStyles({ Authorization: 'Bearer x', 'X-Raw': [1, 2] }, { Authorization: { explode: true } })
+    expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ Authorization: 'Bearer x', 'X-Raw': [1, 2] })
   })
 })
 

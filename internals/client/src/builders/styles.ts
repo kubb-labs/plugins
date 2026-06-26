@@ -4,6 +4,15 @@ import { ast } from '@kubb/core'
 type StyledLocation = 'path' | 'query' | 'header' | 'cookie'
 
 /**
+ * Renders a parameter name as an object-literal key, quoting it when the camelCased name is not a
+ * bare identifier (for example a name that starts with a digit) so the emitted literal stays valid.
+ */
+function toKey(name: string): string {
+  const cased = camelCase(name)
+  return /^[A-Za-z_$][\w$]*$/.test(cased) ? cased : JSON.stringify(cased)
+}
+
+/**
  * Serializes one parameter's metadata into a `{ style, explode }` literal. Path and query carry the
  * serialization `style`; header and cookie use a fixed style (`simple` and `form`), so only `explode`
  * is emitted for them.
@@ -36,7 +45,7 @@ export function buildStylesMetadata({ node }: { node: ast.OperationNode }): stri
   for (const parameter of node.parameters) {
     const carriesStyle = (parameter.in === 'path' || parameter.in === 'query') && parameter.style !== undefined
     if (!carriesStyle && parameter.explode === undefined) continue
-    groups[parameter.in].push(`${camelCase(parameter.name)}: ${serializeParameter(parameter)}`)
+    groups[parameter.in].push(`${toKey(parameter.name)}: ${serializeParameter(parameter)}`)
   }
 
   const locations = (['path', 'query', 'header', 'cookie'] as const).filter((location) => groups[location].length > 0)
