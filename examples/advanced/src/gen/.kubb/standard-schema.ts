@@ -12,9 +12,7 @@ export type StandardSchemaValidator<TOutput = unknown> = {
  * The two possible outcomes of a Standard Schema `validate` call. A successful result carries
  * `value`; a failed result carries `issues`.
  */
-export type StandardSchemaResult<TOutput> =
-  | { readonly value: TOutput; readonly issues?: undefined }
-  | { readonly issues: ReadonlyArray<StandardSchemaIssue> }
+export type StandardSchemaResult<TOutput> = { readonly value: TOutput; readonly issues?: undefined } | { readonly issues: ReadonlyArray<StandardSchemaIssue> }
 
 /**
  * One validation issue from a Standard Schema `validate` call.

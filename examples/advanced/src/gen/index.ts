@@ -1,4 +1,5 @@
 export * from './.kubb/client.ts'
+export * from './.kubb/standard-schema.ts'
 export type { AddPetRequest } from './models/ts/AddPetRequest.ts'
 export type { AddPetRequestStatusEnumKey } from './models/ts/AddPetRequestStatusEnum.ts'
 export type { Animal } from './models/ts/Animal.ts'

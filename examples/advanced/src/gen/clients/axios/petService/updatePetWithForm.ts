@@ -1,6 +1,7 @@
 import type { Options, RequestResult } from '../../../.kubb/client.ts'
 import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses } from '../../../models/ts/pet/UpdatePetWithForm.ts'
 import { client } from '../../../.kubb/client.ts'
+import { validateStandardSchema } from '../../../.kubb/standard-schema.ts'
 import { updatePetWithFormResponseSchema, updatePetWithFormErrorSchema } from '../../../zod/pet/updatePetWithFormSchema.ts'
 
 /**
@@ -16,7 +17,10 @@ export function updatePetWithForm<ThrowOnError extends boolean = true>(
     method: 'POST',
     url: '/pet/{petId}:search',
     security: [{ type: 'oauth2' }],
-    parser: { response: (data: unknown) => updatePetWithFormResponseSchema.parse(data), error: (data: unknown) => updatePetWithFormErrorSchema.parse(data) },
+    parser: {
+      response: (data: unknown) => validateStandardSchema(updatePetWithFormResponseSchema, data),
+      error: (data: unknown) => validateStandardSchema(updatePetWithFormErrorSchema, data),
+    },
     ...config,
   }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>
 }

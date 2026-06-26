@@ -1,72 +1,19 @@
 import type { z } from '../../zod.ts'
 import { addPetDataSchema, addPetStatus200Schema, addPetStatus405Schema, addPetResponseSchema } from './addPetSchema.ts'
-import {
-  createPetsDataSchema,
-  createPetsStatus201Schema,
-  createPetsResponseSchema,
-  createPetsPathUuidSchema,
-  createPetsQueryOffsetSchema,
-  createPetsHeaderXEXAMPLESchema,
-} from './createPetsSchema.ts'
+import { createPetsDataSchema, createPetsStatus201Schema, createPetsResponseSchema, createPetsPathUuidSchema, createPetsQueryOffsetSchema, createPetsHeaderXEXAMPLESchema } from './createPetsSchema.ts'
 import { deleteOrderStatus400Schema, deleteOrderStatus404Schema, deleteOrderResponseSchema, deleteOrderPathOrderIdSchema } from './deleteOrderSchema.ts'
 import { deletePetStatus400Schema, deletePetResponseSchema, deletePetPathPetIdSchema, deletePetHeaderApiKeySchema } from './deletePetSchema.ts'
-import {
-  findPetsByStatusStatus200Schema,
-  findPetsByStatusStatus400Schema,
-  findPetsByStatusResponseSchema,
-  findPetsByStatusQueryStatusSchema,
-} from './findPetsByStatusSchema.ts'
-import {
-  findPetsByTagsStatus200Schema,
-  findPetsByTagsStatus400Schema,
-  findPetsByTagsResponseSchema,
-  findPetsByTagsQueryTagsSchema,
-  findPetsByTagsHeaderXEXAMPLESchema,
-} from './findPetsByTagsSchema.ts'
+import { findPetsByStatusStatus200Schema, findPetsByStatusStatus400Schema, findPetsByStatusResponseSchema, findPetsByStatusQueryStatusSchema } from './findPetsByStatusSchema.ts'
+import { findPetsByTagsStatus200Schema, findPetsByTagsStatus400Schema, findPetsByTagsResponseSchema, findPetsByTagsQueryTagsSchema, findPetsByTagsHeaderXEXAMPLESchema } from './findPetsByTagsSchema.ts'
 import { getInventoryStatus200Schema, getInventoryResponseSchema } from './getInventorySchema.ts'
-import {
-  getOrderByIdStatus200Schema,
-  getOrderByIdStatus400Schema,
-  getOrderByIdStatus404Schema,
-  getOrderByIdResponseSchema,
-  getOrderByIdPathOrderIdSchema,
-} from './getOrderByIdSchema.ts'
-import {
-  getPetByIdStatus200Schema,
-  getPetByIdStatus400Schema,
-  getPetByIdStatus404Schema,
-  getPetByIdResponseSchema,
-  getPetByIdPathPetIdSchema,
-} from './getPetByIdSchema.ts'
+import { getOrderByIdStatus200Schema, getOrderByIdStatus400Schema, getOrderByIdStatus404Schema, getOrderByIdResponseSchema, getOrderByIdPathOrderIdSchema } from './getOrderByIdSchema.ts'
+import { getPetByIdStatus200Schema, getPetByIdStatus400Schema, getPetByIdStatus404Schema, getPetByIdResponseSchema, getPetByIdPathPetIdSchema } from './getPetByIdSchema.ts'
 import { getThingsStatus201Schema, getThingsResponseSchema, getThingsQueryLimitSchema } from './getThingsSchema.ts'
-import {
-  placeOrderPatchDataSchema,
-  placeOrderPatchStatus200Schema,
-  placeOrderPatchStatus405Schema,
-  placeOrderPatchResponseSchema,
-} from './placeOrderPatchSchema.ts'
+import { placeOrderPatchDataSchema, placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema, placeOrderPatchResponseSchema } from './placeOrderPatchSchema.ts'
 import { placeOrderDataSchema, placeOrderStatus200Schema, placeOrderStatus405Schema, placeOrderResponseSchema } from './placeOrderSchema.ts'
-import {
-  updatePetDataSchema,
-  updatePetStatus200Schema,
-  updatePetStatus400Schema,
-  updatePetStatus404Schema,
-  updatePetStatus405Schema,
-  updatePetResponseSchema,
-} from './updatePetSchema.ts'
-import {
-  updatePetWithFormStatus405Schema,
-  updatePetWithFormResponseSchema,
-  updatePetWithFormPathPetIdSchema,
-  updatePetWithFormQueryNameSchema,
-} from './updatePetWithFormSchema.ts'
-import {
-  uploadFileDataSchema,
-  uploadFileStatus200Schema,
-  uploadFileResponseSchema,
-  uploadFilePathPetIdSchema,
-  uploadFileQueryAdditionalMetadataSchema,
-} from './uploadFileSchema.ts'
+import { updatePetDataSchema, updatePetStatus200Schema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema, updatePetResponseSchema } from './updatePetSchema.ts'
+import { updatePetWithFormStatus405Schema, updatePetWithFormResponseSchema, updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema } from './updatePetWithFormSchema.ts'
+import { uploadFileDataSchema, uploadFileStatus200Schema, uploadFileResponseSchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema } from './uploadFileSchema.ts'
 
 export type OperationSchema = {
   readonly request: z.ZodTypeAny | undefined
@@ -92,270 +39,270 @@ export const operations = {
     parameters: {
       path: null,
       query: getThingsQueryLimitSchema,
-      header: null,
+      header: null
     },
     responses: {
       201: getThingsStatus201Schema,
-      default: getThingsResponseSchema,
+      default: getThingsResponseSchema
     },
-    errors: {},
+    errors: {}
   },
   createPets: {
     request: createPetsDataSchema,
     parameters: {
       path: createPetsPathUuidSchema,
       query: createPetsQueryOffsetSchema,
-      header: createPetsHeaderXEXAMPLESchema,
+      header: createPetsHeaderXEXAMPLESchema
     },
     responses: {
       201: createPetsStatus201Schema,
-      default: createPetsResponseSchema,
+      default: createPetsResponseSchema
     },
-    errors: {},
+    errors: {}
   },
   updatePet: {
     request: updatePetDataSchema,
     parameters: {
       path: null,
       query: null,
-      header: null,
+      header: null
     },
     responses: {
       200: updatePetStatus200Schema,
       400: updatePetStatus400Schema,
       404: updatePetStatus404Schema,
       405: updatePetStatus405Schema,
-      default: updatePetResponseSchema,
+      default: updatePetResponseSchema
     },
     errors: {
       400: updatePetStatus400Schema,
       404: updatePetStatus404Schema,
-      405: updatePetStatus405Schema,
-    },
+      405: updatePetStatus405Schema
+    }
   },
   addPet: {
     request: addPetDataSchema,
     parameters: {
       path: null,
       query: null,
-      header: null,
+      header: null
     },
     responses: {
       200: addPetStatus200Schema,
       405: addPetStatus405Schema,
-      default: addPetResponseSchema,
+      default: addPetResponseSchema
     },
     errors: {
-      405: addPetStatus405Schema,
-    },
+      405: addPetStatus405Schema
+    }
   },
   findPetsByStatus: {
     request: null,
     parameters: {
       path: null,
       query: findPetsByStatusQueryStatusSchema,
-      header: null,
+      header: null
     },
     responses: {
       200: findPetsByStatusStatus200Schema,
       400: findPetsByStatusStatus400Schema,
-      default: findPetsByStatusResponseSchema,
+      default: findPetsByStatusResponseSchema
     },
     errors: {
-      400: findPetsByStatusStatus400Schema,
-    },
+      400: findPetsByStatusStatus400Schema
+    }
   },
   findPetsByTags: {
     request: null,
     parameters: {
       path: null,
       query: findPetsByTagsQueryTagsSchema,
-      header: findPetsByTagsHeaderXEXAMPLESchema,
+      header: findPetsByTagsHeaderXEXAMPLESchema
     },
     responses: {
       200: findPetsByTagsStatus200Schema,
       400: findPetsByTagsStatus400Schema,
-      default: findPetsByTagsResponseSchema,
+      default: findPetsByTagsResponseSchema
     },
     errors: {
-      400: findPetsByTagsStatus400Schema,
-    },
+      400: findPetsByTagsStatus400Schema
+    }
   },
   getPetById: {
     request: null,
     parameters: {
       path: getPetByIdPathPetIdSchema,
       query: null,
-      header: null,
+      header: null
     },
     responses: {
       200: getPetByIdStatus200Schema,
       400: getPetByIdStatus400Schema,
       404: getPetByIdStatus404Schema,
-      default: getPetByIdResponseSchema,
+      default: getPetByIdResponseSchema
     },
     errors: {
       400: getPetByIdStatus400Schema,
-      404: getPetByIdStatus404Schema,
-    },
+      404: getPetByIdStatus404Schema
+    }
   },
   updatePetWithForm: {
     request: null,
     parameters: {
       path: updatePetWithFormPathPetIdSchema,
       query: updatePetWithFormQueryNameSchema,
-      header: null,
+      header: null
     },
     responses: {
       405: updatePetWithFormStatus405Schema,
-      default: updatePetWithFormResponseSchema,
+      default: updatePetWithFormResponseSchema
     },
     errors: {
-      405: updatePetWithFormStatus405Schema,
-    },
+      405: updatePetWithFormStatus405Schema
+    }
   },
   deletePet: {
     request: null,
     parameters: {
       path: deletePetPathPetIdSchema,
       query: null,
-      header: deletePetHeaderApiKeySchema,
+      header: deletePetHeaderApiKeySchema
     },
     responses: {
       400: deletePetStatus400Schema,
-      default: deletePetResponseSchema,
+      default: deletePetResponseSchema
     },
     errors: {
-      400: deletePetStatus400Schema,
-    },
+      400: deletePetStatus400Schema
+    }
   },
   uploadFile: {
     request: uploadFileDataSchema,
     parameters: {
       path: uploadFilePathPetIdSchema,
       query: uploadFileQueryAdditionalMetadataSchema,
-      header: null,
+      header: null
     },
     responses: {
       200: uploadFileStatus200Schema,
-      default: uploadFileResponseSchema,
+      default: uploadFileResponseSchema
     },
-    errors: {},
+    errors: {}
   },
   getInventory: {
     request: null,
     parameters: {
       path: null,
       query: null,
-      header: null,
+      header: null
     },
     responses: {
       200: getInventoryStatus200Schema,
-      default: getInventoryResponseSchema,
+      default: getInventoryResponseSchema
     },
-    errors: {},
+    errors: {}
   },
   placeOrder: {
     request: placeOrderDataSchema,
     parameters: {
       path: null,
       query: null,
-      header: null,
+      header: null
     },
     responses: {
       200: placeOrderStatus200Schema,
       405: placeOrderStatus405Schema,
-      default: placeOrderResponseSchema,
+      default: placeOrderResponseSchema
     },
     errors: {
-      405: placeOrderStatus405Schema,
-    },
+      405: placeOrderStatus405Schema
+    }
   },
   placeOrderPatch: {
     request: placeOrderPatchDataSchema,
     parameters: {
       path: null,
       query: null,
-      header: null,
+      header: null
     },
     responses: {
       200: placeOrderPatchStatus200Schema,
       405: placeOrderPatchStatus405Schema,
-      default: placeOrderPatchResponseSchema,
+      default: placeOrderPatchResponseSchema
     },
     errors: {
-      405: placeOrderPatchStatus405Schema,
-    },
+      405: placeOrderPatchStatus405Schema
+    }
   },
   getOrderById: {
     request: null,
     parameters: {
       path: getOrderByIdPathOrderIdSchema,
       query: null,
-      header: null,
+      header: null
     },
     responses: {
       200: getOrderByIdStatus200Schema,
       400: getOrderByIdStatus400Schema,
       404: getOrderByIdStatus404Schema,
-      default: getOrderByIdResponseSchema,
+      default: getOrderByIdResponseSchema
     },
     errors: {
       400: getOrderByIdStatus400Schema,
-      404: getOrderByIdStatus404Schema,
-    },
+      404: getOrderByIdStatus404Schema
+    }
   },
   deleteOrder: {
     request: null,
     parameters: {
       path: deleteOrderPathOrderIdSchema,
       query: null,
-      header: null,
+      header: null
     },
     responses: {
       400: deleteOrderStatus400Schema,
       404: deleteOrderStatus404Schema,
-      default: deleteOrderResponseSchema,
+      default: deleteOrderResponseSchema
     },
     errors: {
       400: deleteOrderStatus400Schema,
-      404: deleteOrderStatus404Schema,
-    },
-  },
+      404: deleteOrderStatus404Schema
+    }
+  }
 } as const
 
 export const paths = {
-  '/pets/{uuid}': {
-    GET: operations['getThings'],
-    POST: operations['createPets'],
+  "/pets/{uuid}": {
+    GET: operations["getThings"],
+    POST: operations["createPets"]
   },
-  '/pet': {
-    PUT: operations['updatePet'],
-    POST: operations['addPet'],
+  "/pet": {
+    PUT: operations["updatePet"],
+    POST: operations["addPet"]
   },
-  '/pet/findByStatus': {
-    GET: operations['findPetsByStatus'],
+  "/pet/findByStatus": {
+    GET: operations["findPetsByStatus"]
   },
-  '/pet/findByTags': {
-    GET: operations['findPetsByTags'],
+  "/pet/findByTags": {
+    GET: operations["findPetsByTags"]
   },
-  '/pet/{petId}': {
-    GET: operations['getPetById'],
-    POST: operations['updatePetWithForm'],
-    DELETE: operations['deletePet'],
+  "/pet/{petId}": {
+    GET: operations["getPetById"],
+    POST: operations["updatePetWithForm"],
+    DELETE: operations["deletePet"]
   },
-  '/pet/{petId}/uploadImage': {
-    POST: operations['uploadFile'],
+  "/pet/{petId}/uploadImage": {
+    POST: operations["uploadFile"]
   },
-  '/store/inventory': {
-    GET: operations['getInventory'],
+  "/store/inventory": {
+    GET: operations["getInventory"]
   },
-  '/store/order': {
-    POST: operations['placeOrder'],
-    PATCH: operations['placeOrderPatch'],
+  "/store/order": {
+    POST: operations["placeOrder"],
+    PATCH: operations["placeOrderPatch"]
   },
-  '/store/order/{orderId}': {
-    GET: operations['getOrderById'],
-    DELETE: operations['deleteOrder'],
-  },
+  "/store/order/{orderId}": {
+    GET: operations["getOrderById"],
+    DELETE: operations["deleteOrder"]
+  }
 } as const

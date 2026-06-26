@@ -1,6 +1,7 @@
 import type { Options, RequestResult } from '../../../.kubb/client.ts'
 import type { CreatePetsRequestConfig, CreatePetsResponses } from '../../../models/ts/pets/CreatePets.ts'
 import { client } from '../../../.kubb/client.ts'
+import { validateStandardSchema } from '../../../.kubb/standard-schema.ts'
 import { createPetsResponseSchema, createPetsErrorSchema } from '../../../zod/pets/createPetsSchema.ts'
 
 /**
@@ -15,7 +16,10 @@ export function createPets<ThrowOnError extends boolean = true>(
   return request({
     method: 'POST',
     url: '/pets/{uuid}',
-    parser: { response: (data: unknown) => createPetsResponseSchema.parse(data), error: (data: unknown) => createPetsErrorSchema.parse(data) },
+    parser: {
+      response: (data: unknown) => validateStandardSchema(createPetsResponseSchema, data),
+      error: (data: unknown) => validateStandardSchema(createPetsErrorSchema, data),
+    },
     ...config,
   }) as Promise<RequestResult<CreatePetsResponses, ThrowOnError>>
 }

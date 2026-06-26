@@ -14,14 +14,14 @@ export type StandardSchemaValidator<TOutput = unknown> = {
  */
 export type StandardSchemaResult<TOutput> =
   | { readonly value: TOutput; readonly issues?: undefined }
-  | { readonly value?: undefined; readonly issues: ReadonlyArray<StandardSchemaIssue> }
+  | { readonly issues: ReadonlyArray<StandardSchemaIssue> }
 
 /**
  * One validation issue from a Standard Schema `validate` call.
  */
 export type StandardSchemaIssue = {
   readonly message?: string
-  readonly path?: ReadonlyArray<string | number | { readonly key: string | number }>
+  readonly path?: ReadonlyArray<PropertyKey | { readonly key: PropertyKey }>
 }
 
 /**

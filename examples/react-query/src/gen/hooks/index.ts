@@ -17,11 +17,7 @@ export { getOrderByIdSuspenseQueryKey, getOrderByIdSuspenseQueryOptions, useGetO
 export { placeOrderMutationKey, placeOrderMutationOptions, usePlaceOrder } from './store/usePlaceOrder.ts'
 export { placeOrderPatchMutationKey, placeOrderPatchMutationOptions, usePlaceOrderPatch } from './store/usePlaceOrderPatch.ts'
 export { createUserMutationKey, createUserMutationOptions, useCreateUser } from './user/useCreateUser.ts'
-export {
-  createUsersWithListInputMutationKey,
-  createUsersWithListInputMutationOptions,
-  useCreateUsersWithListInput,
-} from './user/useCreateUsersWithListInput.ts'
+export { createUsersWithListInputMutationKey, createUsersWithListInputMutationOptions, useCreateUsersWithListInput } from './user/useCreateUsersWithListInput.ts'
 export { deleteUserMutationKey, deleteUserMutationOptions, useDeleteUser } from './user/useDeleteUser.ts'
 export { getUserByNameQueryKey, getUserByNameQueryOptions, useGetUserByName } from './user/useGetUserByName.ts'
 export { getUserByNameSuspenseQueryKey, getUserByNameSuspenseQueryOptions, useGetUserByNameSuspense } from './user/useGetUserByNameSuspense.ts'
