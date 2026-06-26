@@ -1,6 +1,6 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import { type CallResult, createClientCore, defaultBodySerializer, defaultQuerySerializer, ResponseError, resolveAuth } from './axios.ts'
+import { type CallResult, createClientCore, createQuerySerializer, defaultBodySerializer, defaultQuerySerializer, ResponseError, resolveAuth } from './axios.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
 
@@ -52,6 +52,51 @@ describe('defaultQuerySerializer', () => {
 
   test('skips undefined and null members', () => {
     expect(defaultQuerySerializer({ a: 1, b: undefined, c: null })).toBe('a=1')
+  })
+})
+
+describe('createQuerySerializer', () => {
+  test('with no options matches the default serializer', () => {
+    const serializer = createQuerySerializer()
+    expect(serializer({ tags: ['a', 'b'], filter: { name: 'odie' } })).toBe('tags=a&tags=b&filter%5Bname%5D=odie')
+  })
+
+  test('joins arrays with a comma for form style without explode', () => {
+    const serializer = createQuerySerializer({ array: { style: 'form', explode: false } })
+    expect(serializer({ tags: ['a', 'b'] })).toBe('tags=a,b')
+  })
+
+  test('joins arrays with %20 for spaceDelimited style', () => {
+    const serializer = createQuerySerializer({ array: { style: 'spaceDelimited', explode: false } })
+    expect(serializer({ tags: ['a', 'b'] })).toBe('tags=a%20b')
+  })
+
+  test('joins arrays with a pipe for pipeDelimited style', () => {
+    const serializer = createQuerySerializer({ array: { style: 'pipeDelimited', explode: false } })
+    expect(serializer({ tags: ['a', 'b'] })).toBe('tags=a|b')
+  })
+
+  test('explodes objects into top-level keys for form style', () => {
+    const serializer = createQuerySerializer({ object: { style: 'form', explode: true } })
+    expect(serializer({ filter: { name: 'odie', age: 3 } })).toBe('name=odie&age=3')
+  })
+
+  test('joins object entries for form style without explode', () => {
+    const serializer = createQuerySerializer({ object: { style: 'form', explode: false } })
+    expect(serializer({ filter: { name: 'odie', age: 3 } })).toBe('filter=name,odie,age,3')
+  })
+
+  test('leaves reserved characters unencoded when allowReserved is set', () => {
+    const serializer = createQuerySerializer({ allowReserved: true })
+    expect(serializer({ path: '/pets/1' })).toBe('path=/pets/1')
+  })
+
+  test('encodes reserved characters by default', () => {
+    expect(defaultQuerySerializer({ path: '/pets/1' })).toBe('path=%2Fpets%2F1')
+  })
+
+  test('skips empty arrays', () => {
+    expect(defaultQuerySerializer({ tags: [], a: 1 })).toBe('a=1')
   })
 })
 
@@ -302,6 +347,14 @@ describe('getUrl', () => {
     const { instance } = fakeAxios()
     const client = createClientCore({ transport: instance })
     expect(client.getUrl({ url: '/pet', query: { a: 1 }, querySerializer: () => 'custom=1' })).toBe('/pet?custom=1')
+  })
+
+  test('builds a serializer from a querySerializer options object', () => {
+    const { instance } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    expect(client.getUrl({ url: '/pet', query: { tags: ['a', 'b'] }, querySerializer: { array: { style: 'pipeDelimited', explode: false } } })).toBe(
+      '/pet?tags=a|b',
+    )
   })
 })
 
