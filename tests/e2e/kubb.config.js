@@ -63,6 +63,25 @@ const schemas = [
   { name: 'webhook-example', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.1/webhook-example.yaml' },
   { name: 'non-oauth-scopes', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.1/non-oauth-scopes.yaml' },
   { name: 'swagger-petstore', path: 'https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml' },
+  // Real-world specs from the APIs-guru aggregator (cloud, payments, comms, media). Machine-converted
+  // to OpenAPI 3.0, so `strict: false` like the other loose real-world specs.
+  { name: 'slack', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/slack.com/1.7.0/openapi.yaml', strict: false },
+  { name: 'notion', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/notion.com/1.0.0/openapi.yaml', strict: false },
+  { name: 'google-calendar', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/calendar/v3/openapi.yaml', strict: false },
+  { name: 'google-drive', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/drive/v2/openapi.yaml', strict: false },
+  { name: 'google-sheets', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/sheets/v4/openapi.yaml', strict: false },
+  { name: 'gmail', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/gmail/v1/openapi.yaml', strict: false },
+  { name: 'youtube', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/youtube/v3/openapi.yaml', strict: false },
+  { name: 'bigquery', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/bigquery/v2/openapi.yaml', strict: false },
+  { name: 'aws-s3', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/amazonaws.com/s3/2006-03-01/openapi.yaml', strict: false },
+  { name: 'aws-lambda', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/amazonaws.com/lambda/2014-11-11/openapi.yaml', strict: false },
+  { name: 'aws-dynamodb', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/amazonaws.com/dynamodb/2011-12-05/openapi.yaml', strict: false },
+  { name: 'aws-ec2', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/amazonaws.com/ec2/2016-11-15/openapi.yaml', strict: false },
+  { name: 'zoom', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/zoom.us/2.0.0/openapi.yaml', strict: false },
+  { name: 'sendgrid', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/sendgrid.com/1.0.0/openapi.yaml', strict: false },
+  { name: 'giphy', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/giphy.com/1.0/openapi.yaml', strict: false },
+  { name: 'nasa-apod', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/nasa.gov/apod/1.0.0/openapi.yaml', strict: false },
+  { name: 'nytimes-books', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/nytimes.com/books_api/3.0.0/openapi.yaml', strict: false },
 ]
 
 /** @type {import('@kubb/core').UserConfig} */
