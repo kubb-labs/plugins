@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest'
 import {
   applyMiniModifiers,
   applyModifiers,
+  buildEnum,
   buildGroupedParamsSchema,
   formatDefault,
   formatLiteral,
@@ -57,6 +58,28 @@ describe('formatLiteral', () => {
 
   test('boolean false is raw', () => {
     expect(formatLiteral(false)).toBe('false')
+  })
+})
+
+describe('buildEnum', () => {
+  test('all-string set uses z.enum', () => {
+    expect(buildEnum(['a', 'b', 'c'])).toBe("z.enum(['a', 'b', 'c'])")
+  })
+
+  test('single non-string value uses z.literal', () => {
+    expect(buildEnum([42])).toBe('z.literal(42)')
+  })
+
+  test('numeric set uses z.union of literals', () => {
+    expect(buildEnum([200, 400, 500])).toBe('z.union([z.literal(200), z.literal(400), z.literal(500)])')
+  })
+
+  test('boolean set uses z.union of literals', () => {
+    expect(buildEnum([true, false])).toBe('z.union([z.literal(true), z.literal(false)])')
+  })
+
+  test('mixed set uses z.union of literals', () => {
+    expect(buildEnum(['a', 1, true])).toBe("z.union([z.literal('a'), z.literal(1), z.literal(true)])")
   })
 })
 

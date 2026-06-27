@@ -15,6 +15,7 @@ import { containsCircularRef, syncSchemaRef } from '@kubb/ast/utils'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyModifiers,
+  buildEnum,
   containsCodec,
   formatLiteral,
   getCodec,
@@ -226,8 +227,8 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           return `z.union([${literals.join(', ')}])`
         }
 
-        // Regular enum: use z.enum([…])
-        return `z.enum([${nonNullValues.map(formatLiteral).join(', ')}])`
+        // Regular enum: z.enum for all-string sets, z.literal/z.union otherwise
+        return buildEnum(nonNullValues)
       },
       ref(node) {
         if (!node.name) return null

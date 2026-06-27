@@ -138,6 +138,22 @@ export function formatLiteral(v: string | number | boolean): string {
 }
 
 /**
+ * Build the Zod schema for a set of literal enum values.
+ * `z.enum()` only accepts string members in Zod v4, so a numeric, boolean, or
+ * mixed set is emitted as a single `z.literal(…)` or a `z.union([z.literal(…), …])`.
+ * An all-string set keeps the more compact `z.enum([…])`.
+ */
+export function buildEnum(values: Array<string | number | boolean>): string {
+  const allStrings = values.every((v) => typeof v === 'string')
+  if (allStrings) return `z.enum([${values.map(formatLiteral).join(', ')}])`
+
+  const literals = values.map((v) => `z.literal(${formatLiteral(v)})`)
+  if (literals.length === 1) return literals[0]!
+
+  return `z.union([${literals.join(', ')}])`
+}
+
+/**
  * Numeric constraint limits for Zod schemas (min, max, and exclusive bounds).
  */
 export type NumericConstraints = {
