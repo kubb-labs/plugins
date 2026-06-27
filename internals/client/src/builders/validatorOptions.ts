@@ -1,43 +1,43 @@
 import { isSuccessStatusCode } from '@internals/shared'
 import type { ast } from '@kubb/core'
 import type { ResolverZod } from '@kubb/plugin-zod'
-import type { ParserOptions } from '../types.ts'
+import type { ValidatorOptions } from '../types.ts'
 
 /**
- * Returns `true` when any direction of the parser uses zod (used for dependency checks).
+ * Returns `true` when any direction of the validator uses zod (used for dependency checks).
  */
-export function isParserEnabled(parser: ParserOptions | undefined): boolean {
-  if (!parser) return false
-  if (parser === 'zod') return true
-  return Boolean(parser.request || parser.response)
+export function isValidatorEnabled(validator: ValidatorOptions | undefined): boolean {
+  if (!validator) return false
+  if (validator === 'zod') return true
+  return Boolean(validator.request || validator.response)
 }
 
 /**
  * Returns `'zod'` when request body parsing is enabled, `null` otherwise. The string shorthand
  * `'zod'` validates the response only, so it does not enable request parsing.
  */
-export function resolveRequestParser(parser: ParserOptions | undefined): 'zod' | null {
-  if (!parser || parser === 'zod') return null
-  return parser.request ?? null
+export function resolveRequestValidator(validator: ValidatorOptions | undefined): 'zod' | null {
+  if (!validator || validator === 'zod') return null
+  return validator.request ?? null
 }
 
 /**
  * Returns `'zod'` when query-parameters parsing is enabled, `null` otherwise. Only the object form
  * `{ request: 'zod' }` enables it.
  */
-export function resolveQueryParamsParser(parser: ParserOptions | undefined): 'zod' | null {
-  if (!parser || parser === 'zod') return null
-  return parser.request ?? null
+export function resolveQueryParamsValidator(validator: ValidatorOptions | undefined): 'zod' | null {
+  if (!validator || validator === 'zod') return null
+  return validator.request ?? null
 }
 
 /**
  * Returns `'zod'` when response parsing is enabled, `null` otherwise. The string shorthand `'zod'`
  * maps to response parsing.
  */
-export function resolveResponseParser(parser: ParserOptions | undefined): 'zod' | null {
-  if (!parser) return null
-  if (parser === 'zod') return 'zod'
-  return parser.response ?? null
+export function resolveResponseValidator(validator: ValidatorOptions | undefined): 'zod' | null {
+  if (!validator) return null
+  if (validator === 'zod') return 'zod'
+  return validator.response ?? null
 }
 
 /**

@@ -1,7 +1,7 @@
 import type { Options, RequestResult } from '../../../.kubb/client.ts'
 import type { UpdatePetRequestConfig, UpdatePetResponses } from '../../../models/ts/pet/UpdatePet.ts'
 import { client } from '../../../.kubb/client.ts'
-import { updatePetResponseSchema } from '../../../zod/pet/updatePetSchema.ts'
+import { updatePetResponseSchema, updatePetErrorSchema } from '../../../zod/pet/updatePetSchema.ts'
 
 /**
  * @description Update an existing pet by Id
@@ -17,7 +17,7 @@ export function updatePet<ThrowOnError extends boolean = true>(
     method: 'PUT',
     url: '/pet',
     security: [{ type: 'oauth2' }],
-    parser: { response: (data: unknown) => updatePetResponseSchema.parse(data) },
+    validator: { response: updatePetResponseSchema, error: updatePetErrorSchema },
     ...config,
   }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
 }

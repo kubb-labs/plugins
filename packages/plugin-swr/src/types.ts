@@ -145,7 +145,7 @@ export type Options = OutputOptions & {
   /**
    * Parser to use for validating response data.
    */
-  parser?: ClientOptions['parser']
+  validator?: ClientOptions['validator']
   /**
    * Override naming conventions for function names and types.
    */
@@ -172,7 +172,7 @@ type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedClient
-  parser: NonNullable<Options['parser']>
+  validator: NonNullable<Options['validator']>
   queryKey: QueryKey | undefined
   query: NonNullable<Required<Query>> | false
   mutationKey: MutationKey | undefined

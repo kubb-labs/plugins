@@ -20,7 +20,7 @@
   "dependencies": {
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
-    "axios": "^1.18.0",
+    "axios": "^1.18.1",
     "kubb": "catalog:",
     "react": "^19.2.7",
     "typescript": "catalog:",

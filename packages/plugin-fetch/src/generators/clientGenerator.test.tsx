@@ -27,7 +27,7 @@ const defaultOptions: PluginFetch['resolvedOptions'] = {
   override: [],
   group: null,
   baseURL: undefined,
-  parser: false,
+  validator: false,
   sdk: undefined,
   resolver: resolverClient,
 }
@@ -170,6 +170,21 @@ const listPetsStyledNode = ast.factory.createOperation({
   ],
 })
 
+const streamEventsNode = ast.factory.createOperation({
+  operationId: 'streamEvents',
+  method: 'GET',
+  path: '/events',
+  tags: ['events'],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      mediaType: 'text/event-stream',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'event stream',
+    }),
+  ],
+})
+
 const securityDocument: SecurityDocument = {
   security: [{ bearerAuth: [] }],
   components: {
@@ -203,9 +218,11 @@ describe('clientGenerator operation', () => {
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
     // multipart/form-data request body bakes a `contentType` into the call config.
     { name: 'uploadFileMultipart', node: uploadFileNode, options: {} },
-    // Parameter style/explode flows from the ParameterNode into a `styles` call-config entry.
+    // Parameter style/explode flows from the ParameterNode into a `serialization` call-config entry.
     { name: 'listPetsWithStyles', node: listPetsStyledNode, options: {} },
-    { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { parser: 'zod' as const } },
+    // text/event-stream response returns a typed event stream instead of a one-shot result.
+    { name: 'streamEventsSse', node: streamEventsNode, options: {} },
+    { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { validator: 'zod' as const } },
     // Operation-level security overriding the global default, oauth2 reduced to bearer.
     { name: 'addPetWithSecurity', node: createPetNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
     // No operation-level security: falls back to the document's global `bearerAuth`.

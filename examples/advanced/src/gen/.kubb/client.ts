@@ -1,5 +1,6 @@
 import axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import { type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
 
 /**
  * HTTP status codes treated as a success. A resolved call only ever carries a body from one of
@@ -85,10 +86,12 @@ export type QuerySerializer = (params: Record<string, unknown>) => string
 export type BodySerializer = (body: unknown, contentType?: string) => unknown
 
 /**
- * Parses a value before it is sent or after it is received, returning the parsed (and optionally
- * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` hooks.
+ * A Standard Schema validator (zod, valibot, arktype) that parses a value before it is sent or after
+ * it is received. `runValidator` runs it through `validateStandardSchema`. Wired through the per-call
+ * `validator.request` / `validator.response` / `validator.error` hooks (`error` runs on the error body when a
+ * non-2xx call does not throw).
  */
-export type Parser<T = unknown> = (value: T) => T | Promise<T>
+export type Validator<T = unknown> = StandardSchemaValidator<T>
 
 /**
  * A resolved security scheme carried on each generated call's `security` array. The runtime passes it
@@ -114,6 +117,17 @@ export type AuthToken = string | undefined
 export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<AuthToken>)
 
 /**
+ * Extra axios config the runtime spreads onto every request, an escape hatch for the per-call fields
+ * it does not set itself, such as `timeout`, `proxy`, `maxRedirects`, `decompress`, and the
+ * `onUploadProgress` / `onDownloadProgress` callbacks. The runtime-owned fields (`url`, `baseURL`,
+ * `method`, `headers`, `params`, `paramsSerializer`, `data`, `transformRequest`, `signal`,
+ * `responseType`, `validateStatus`) always win over anything set here. This is the per-request analog
+ * of the `transport` instance, which stays the place for cross-cutting concerns like retries and
+ * interceptors. It mirrors `options` in `@kubb/plugin-fetch`.
+ */
+export type AxiosOptions = AxiosRequestConfig
+
+/**
  * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` come
  * from the grouped options; everything else is plain request configuration. `transport` carries an
  * axios instance and `validateStatus` rides axios's own contract.
@@ -128,6 +142,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   body?: TBody
   headers?: HeadersInit
   signal?: AbortSignal
+  options?: AxiosOptions
   contentType?: string
   responseType?: ResponseType
   throwOnError?: boolean
@@ -136,7 +151,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   transport?: AxiosInstance
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
-  parser?: { request?: Parser; response?: Parser }
+  validator?: { request?: Validator; response?: Validator; error?: Validator }
   security?: Array<Auth>
   auth?: AuthResolver
 }
@@ -161,6 +176,7 @@ export type Options<TData extends DataShape, ThrowOnError extends boolean = true
 export type ClientConfig = {
   baseURL?: string
   headers?: HeadersInit
+  options?: AxiosOptions
   throwOnError?: boolean
   validateStatus?: (status: number) => boolean
   transport?: AxiosInstance
@@ -223,6 +239,112 @@ export type ClientInstance<TRequest = AxiosRequestConfig, TResponse = AxiosRespo
  * Thrown for responses outside the 2xx range, so a resolved call always means success. The parsed
  * error body and the native request config / response stay reachable on the error.
  */
+/**
+ * One decoded Server-Sent Event. `data` is `JSON.parse`d into `TData` when it is valid JSON, and
+ * kept as the raw string otherwise. `event`, `id`, and `retry` carry the matching SSE fields.
+ */
+export type ServerSentEvent<TData = unknown> = {
+  data: TData
+  event?: string
+  id?: string
+  retry?: number
+}
+
+async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>): AsyncGenerator<Uint8Array> {
+  if (!('getReader' in stream)) {
+    yield* stream
+    return
+  }
+
+  const reader = stream.getReader()
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) return
+      yield value
+    }
+  } finally {
+    await reader.cancel().catch(() => {})
+  }
+}
+
+function parseEvent<TData>(raw: string): ServerSentEvent<TData> | undefined {
+  const data: Array<string> = []
+  const event: ServerSentEvent<TData> = { data: undefined as TData }
+  let seen = false
+
+  for (const line of raw.split('\n')) {
+    if (!line || line.startsWith(':')) continue
+    seen = true
+    const index = line.indexOf(':')
+    const field = index === -1 ? line : line.slice(0, index)
+    const value = index === -1 ? '' : line.slice(index + 1).replace(/^ /, '')
+    if (field === 'data') data.push(value)
+    else if (field === 'event') event.event = value
+    else if (field === 'id') event.id = value
+    else if (field === 'retry' && Number.isFinite(Number(value))) event.retry = Number(value)
+  }
+
+  if (!seen) return undefined
+
+  if (data.length) {
+    const joined = data.join('\n')
+    try {
+      event.data = JSON.parse(joined) as TData
+    } catch {
+      event.data = joined as TData
+    }
+  }
+  return event
+}
+
+/**
+ * Parses a `text/event-stream` body into typed Server-Sent Events. Consume it with `for await`. It
+ * accepts either a web `ReadableStream` or any async iterable of byte chunks (the axios stream
+ * response), normalizes `\r\n`/`\r` to `\n`, splits events on a blank line, and ignores comment and
+ * heartbeat lines. Break out of the `for await` to stop early and cancel the underlying body.
+ */
+export async function* parseEventStream<TData = unknown>(
+  stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>,
+): AsyncGenerator<ServerSentEvent<TData>> {
+  const decoder = new TextDecoder()
+  const normalize = (text: string) => text.replace(/\r\n|\r/g, '\n')
+  let buffer = ''
+
+  for await (const chunk of readBytes(stream)) {
+    const blocks = normalize(buffer + decoder.decode(chunk, { stream: true })).split('\n\n')
+    buffer = blocks.pop() ?? ''
+    for (const block of blocks) {
+      const event = parseEvent<TData>(block)
+      if (event) yield event
+    }
+  }
+
+  const event = parseEvent<TData>(normalize(buffer + decoder.decode()))
+  if (event) yield event
+}
+
+/**
+ * The resolved shape returned by a generated `text/event-stream` operation: the typed event
+ * `stream` plus the native `response`.
+ */
+export type EventStreamResult<TData = unknown, TResponse = AxiosResponse> = {
+  stream: AsyncGenerator<ServerSentEvent<TData>>
+  response: TResponse
+}
+
+/**
+ * Wraps a transport result whose `data` is a streaming body into an `EventStreamResult`, exposing
+ * the parsed events as a typed async iterator. Generated SSE operations call this.
+ */
+export async function toEventStream<TData = unknown>(result: Promise<{ data: unknown; response: AxiosResponse }>): Promise<EventStreamResult<TData>> {
+  const { data, response } = await result
+  return {
+    response,
+    stream: parseEventStream<TData>(data as ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>),
+  }
+}
+
 export class ResponseError<TError = unknown, TRequest = AxiosRequestConfig, TResponse = AxiosResponse> extends Error {
   data: TError
   status: number
@@ -254,13 +376,30 @@ function isFormBody(body: unknown): boolean {
   )
 }
 
+function appendFormDataValue(formData: FormData, key: string, value: unknown): void {
+  if (value === undefined || value === null) return
+  if (value instanceof Blob) formData.append(key, value)
+  else if (value instanceof Date) formData.append(key, value.toISOString())
+  else if (typeof value === 'object') formData.append(key, JSON.stringify(value))
+  else formData.append(key, String(value))
+}
+
 /**
  * Default body serializer: passes binary/form bodies through and JSON-serializes everything else.
- * For `application/x-www-form-urlencoded` plain objects become `URLSearchParams`.
+ * For `multipart/form-data` plain objects become `FormData` and for
+ * `application/x-www-form-urlencoded` they become `URLSearchParams`.
  */
 export const defaultBodySerializer: BodySerializer = (body, contentType) => {
   if (body === undefined || body === null) return undefined
   if (isFormBody(body)) return body
+  if (contentType?.includes('multipart/form-data')) {
+    const formData = new FormData()
+    for (const [key, value] of Object.entries(body as Record<string, unknown>)) {
+      if (Array.isArray(value)) for (const item of value) appendFormDataValue(formData, key, item)
+      else appendFormDataValue(formData, key, value)
+    }
+    return formData
+  }
   if (contentType?.includes('application/x-www-form-urlencoded')) {
     return new URLSearchParams(body as Record<string, string>)
   }
@@ -353,9 +492,9 @@ export async function resolveAuth(params: {
   }
 }
 
-async function runParser<T>(parser: Parser | undefined, value: T): Promise<T> {
-  if (!parser) return value
-  return (await parser(value)) as T
+async function runValidator<T>(validator: Validator<T> | undefined, value: T): Promise<T> {
+  if (!validator) return value
+  return validateStandardSchema(validator, value)
 }
 
 /**
@@ -426,10 +565,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     const bodySerializer = requestConfig.bodySerializer ?? config.bodySerializer ?? defaultBodySerializer
 
     const headers = mergeHeaders(config.headers, requestConfig.headers)
-    if (requestConfig.contentType && requestConfig.contentType !== 'multipart/form-data') {
-      headers['Content-Type'] = requestConfig.contentType
-    }
-    const contentType = headers['Content-Type'] ?? headers['content-type']
+    const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
 
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
 
@@ -440,7 +576,15 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       query,
     })
 
-    const validatedBody = await runParser(requestConfig.parser?.request, requestConfig.body)
+    const validatedBody = await runValidator(requestConfig.validator?.request, requestConfig.body)
+    const body = bodySerializer(validatedBody, requestContentType)
+    // A FormData body must keep its Content-Type unset so axios appends the multipart boundary.
+    if (body instanceof FormData) {
+      delete headers['Content-Type']
+      delete headers['content-type']
+    } else if (requestConfig.contentType) {
+      headers['Content-Type'] = requestConfig.contentType
+    }
     const pathParams = requestConfig.path ?? {}
     const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) => encodeURIComponent(String(pathParams[key] ?? '')))
     const baseURL = [config.baseURL, requestConfig.baseURL].filter(Boolean).join('') || undefined
@@ -448,28 +592,38 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
     const validateStatus = requestConfig.validateStatus ?? config.validateStatus ?? (throwOnError ? undefined : () => true)
 
+    const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
+
     const axiosConfig: AxiosRequestConfig = {
+      ...options, // timeout, proxy, maxRedirects, decompress, onUploadProgress, …
       url,
       baseURL,
       method: requestConfig.method ?? 'GET',
       headers,
       params: query,
       paramsSerializer: (params) => querySerializer(params as Record<string, unknown>),
-      data: validatedBody,
-      transformRequest: (data) => bodySerializer(data, contentType),
+      data: body,
+      transformRequest: (data) => data,
       signal: requestConfig.signal,
       responseType: requestConfig.responseType,
       validateStatus,
     }
 
+    // Only the fetch adapter exposes a streaming `response.data` (a ReadableStream) in the browser;
+    // the default XHR adapter buffers the whole body. Default streams to it, but respect an explicit adapter.
+    if (requestConfig.responseType === 'stream' && !axiosConfig.adapter) {
+      axiosConfig.adapter = 'fetch'
+    }
+
     try {
       const response = await activeInstance.request<unknown, AxiosResponse>(axiosConfig)
       const isSuccess = response.status >= 200 && response.status < 300
-      const data = isSuccess ? await runParser(requestConfig.parser?.response, response.data) : undefined
+      const data = isSuccess ? await runValidator(requestConfig.validator?.response, response.data) : undefined
+      const error = isSuccess ? undefined : await runValidator(requestConfig.validator?.error, response.data)
       return {
         status: response.status,
         data,
-        error: isSuccess ? undefined : response.data,
+        error,
         request: response.config as TRequest,
         response: response as TResponse,
       }

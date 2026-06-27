@@ -209,7 +209,7 @@ export type Options = OutputOptions & {
    * - `'client'` — no validation.
    * - `'zod'` — pipes responses through schemas from `@kubb/plugin-zod`.
    */
-  parser?: ClientOptions['parser']
+  validator?: ClientOptions['validator']
   /**
    * Override how composable names and file paths are built.
    */
@@ -236,7 +236,7 @@ type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedClient
-  parser: NonNullable<Options['parser']>
+  validator: NonNullable<Options['validator']>
   /**
    * Only used for infinite
    */

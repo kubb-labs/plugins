@@ -14,6 +14,7 @@ export {
   getResponseType,
   getSuccessResponses,
   isErrorStatusCode,
+  isEventStream,
   isSuccessStatusCode,
   operationFileEntry,
   resolveContentTypeVariants,

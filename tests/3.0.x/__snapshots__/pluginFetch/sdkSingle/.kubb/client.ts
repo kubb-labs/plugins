@@ -1,5 +1,6 @@
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers'
 import type { HeadersInit, PathParamStyle, PathSerializer, RequestSerialization, Serializers } from './serializers'
+import { type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
 
 /**
  * HTTP status codes treated as a success. A resolved call only ever carries a body from one of
@@ -72,11 +73,12 @@ export type RequestCredentials = 'omit' | 'same-origin' | 'include'
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
 
 /**
- * Parses a value before it is sent or after it is received, returning the parsed (and optionally
- * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` /
- * `parser.error` hooks (`error` runs on the error body when a non-2xx call does not throw).
+ * A Standard Schema validator (zod, valibot, arktype) that parses a value before it is sent or after
+ * it is received. `runValidator` runs it through `validateStandardSchema`. Wired through the per-call
+ * `validator.request` / `validator.response` / `validator.error` hooks (`error` runs on the error body when a
+ * non-2xx call does not throw).
  */
-export type Parser<T = unknown> = (value: T) => T | Promise<T>
+export type Validator<T = unknown> = StandardSchemaValidator<T>
 
 /**
  * A resolved security scheme carried on each generated call's `security` array. The runtime passes it
@@ -102,6 +104,14 @@ export type AuthToken = string | undefined
 export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<AuthToken>)
 
 /**
+ * Extra `fetch` init the transport spreads onto every `Request`, an escape hatch for the fields the
+ * runtime does not set itself: `cache`, `mode`, `redirect`, `keepalive`, `duplex`, and Next.js's
+ * non-standard `next` (`{ revalidate, tags }`). `method`, `headers`, `body`, `signal`, and
+ * `credentials` are always controlled by the runtime and override anything set here.
+ */
+export type FetchOptions = RequestInit & { next?: Record<string, unknown> }
+
+/**
  * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` come
  * from the grouped options; everything else is plain request configuration.
  */
@@ -118,13 +128,14 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   serialization?: RequestSerialization
   signal?: AbortSignal
   credentials?: RequestCredentials
+  options?: FetchOptions
   contentType?: string
   responseType?: ResponseType
   throwOnError?: boolean
   client?: ClientInstance<TRequest, TResponse>
   transport?: Transport<TRequest, TResponse>
   serializer?: Serializers
-  parser?: { request?: Parser; response?: Parser; error?: Parser }
+  validator?: { request?: Validator; response?: Validator; error?: Validator }
   security?: Array<Auth>
   auth?: AuthResolver
 }
@@ -150,6 +161,7 @@ export type ClientConfig<TRequest = Request, TResponse = Response> = {
   baseURL?: string
   headers?: HeadersInit
   credentials?: RequestCredentials
+  options?: FetchOptions
   throwOnError?: boolean
   transport?: Transport<TRequest, TResponse>
   serializer?: Serializers
@@ -167,6 +179,7 @@ export type ResolvedRequest = {
   body?: BodyInit
   signal?: AbortSignal
   credentials?: RequestCredentials
+  options?: FetchOptions
   responseType?: ResponseType
 }
 
@@ -363,9 +376,9 @@ export async function resolveAuth(params: {
   }
 }
 
-async function runParser<T>(parser: Parser | undefined, value: T): Promise<T> {
-  if (!parser) return value
-  return (await parser(value)) as T
+async function runValidator<T>(validator: Validator<T> | undefined, value: T): Promise<T> {
+  if (!validator) return value
+  return validateStandardSchema(validator, value)
 }
 
 /**
@@ -408,7 +421,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     }
 
     const rawBody = requestConfig.body
-    const validatedBody = await runParser(requestConfig.parser?.request, rawBody)
+    const validatedBody = await runValidator(requestConfig.validator?.request, rawBody)
     const body = bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.serialization?.body })
     // A FormData body must keep its Content-Type unset so the runtime appends the multipart boundary.
     if (body instanceof FormData) {
@@ -425,6 +438,8 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
       pathStyles: requestConfig.serialization?.path,
     })
 
+    const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
+
     let resolvedRequest: ResolvedRequest = {
       url,
       method: (requestConfig.method ?? 'GET').toUpperCase(),
@@ -432,6 +447,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
       body,
       signal: requestConfig.signal,
       credentials: requestConfig.credentials,
+      options,
       responseType: requestConfig.responseType,
     }
     resolvedRequest = await interceptors.request.run(resolvedRequest)
@@ -442,9 +458,11 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     const isSuccess = result.status >= 200 && result.status < 300
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
 
+    const parsedErrorData = !isSuccess ? await runValidator(requestConfig.validator?.error, result.data) : undefined
+
     if (!isSuccess && throwOnError) {
       const error = new ResponseError({
-        data: result.data,
+        data: parsedErrorData,
         status: result.status,
         statusText: result.statusText,
         request: result.request,
@@ -454,8 +472,8 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
       throw error
     }
 
-    const data = isSuccess ? await runParser(requestConfig.parser?.response, result.data) : undefined
-    const error = isSuccess ? undefined : await runParser(requestConfig.parser?.error, result.data)
+    const data = isSuccess ? await runValidator(requestConfig.validator?.response, result.data) : undefined
+    const error = isSuccess ? undefined : parsedErrorData
 
     return {
       status: result.status,
@@ -494,6 +512,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
  */
 function detectResponseType(contentType: string | null): ResponseType | undefined {
   if (!contentType) return undefined
+  if (contentType.includes('text/event-stream')) return 'stream'
   if (contentType.includes('application/json') || contentType.includes('text/json')) return 'json'
   if (contentType.includes('text/')) return 'text'
   if (contentType.includes('image/') || contentType.includes('application/octet-stream')) return 'blob'
@@ -537,11 +556,118 @@ async function parseResponse(response: Response, responseType?: ResponseType): P
 }
 
 /**
+ * One decoded Server-Sent Event. `data` is `JSON.parse`d into `TData` when it is valid JSON, and
+ * kept as the raw string otherwise. `event`, `id`, and `retry` carry the matching SSE fields.
+ */
+export type ServerSentEvent<TData = unknown> = {
+  data: TData
+  event?: string
+  id?: string
+  retry?: number
+}
+
+async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>): AsyncGenerator<Uint8Array> {
+  if (!('getReader' in stream)) {
+    yield* stream
+    return
+  }
+
+  const reader = stream.getReader()
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) return
+      yield value
+    }
+  } finally {
+    await reader.cancel().catch(() => {})
+  }
+}
+
+function parseEvent<TData>(raw: string): ServerSentEvent<TData> | undefined {
+  const data: Array<string> = []
+  const event: ServerSentEvent<TData> = { data: undefined as TData }
+  let seen = false
+
+  for (const line of raw.split('\n')) {
+    if (!line || line.startsWith(':')) continue
+    seen = true
+    const index = line.indexOf(':')
+    const field = index === -1 ? line : line.slice(0, index)
+    const value = index === -1 ? '' : line.slice(index + 1).replace(/^ /, '')
+    if (field === 'data') data.push(value)
+    else if (field === 'event') event.event = value
+    else if (field === 'id') event.id = value
+    else if (field === 'retry' && Number.isFinite(Number(value))) event.retry = Number(value)
+  }
+
+  if (!seen) return undefined
+
+  if (data.length) {
+    const joined = data.join('\n')
+    try {
+      event.data = JSON.parse(joined) as TData
+    } catch {
+      event.data = joined as TData
+    }
+  }
+  return event
+}
+
+/**
+ * Parses a `text/event-stream` body into typed Server-Sent Events. Consume it with `for await`. It
+ * accepts either a web `ReadableStream` (the fetch transport's `response.body`) or any async iterable
+ * of byte chunks, normalizes `\r\n`/`\r` to `\n`, splits events on a blank line, and ignores comment
+ * and heartbeat lines. Break out of the `for await` to stop early and cancel the underlying body.
+ */
+export async function* parseEventStream<TData = unknown>(
+  stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>,
+): AsyncGenerator<ServerSentEvent<TData>> {
+  const decoder = new TextDecoder()
+  const normalize = (text: string) => text.replace(/\r\n|\r/g, '\n')
+  let buffer = ''
+
+  for await (const chunk of readBytes(stream)) {
+    const blocks = normalize(buffer + decoder.decode(chunk, { stream: true })).split('\n\n')
+    buffer = blocks.pop() ?? ''
+    for (const block of blocks) {
+      const event = parseEvent<TData>(block)
+      if (event) yield event
+    }
+  }
+
+  const event = parseEvent<TData>(normalize(buffer + decoder.decode()))
+  if (event) yield event
+}
+
+/**
+ * The resolved shape returned by a generated `text/event-stream` operation: the typed event
+ * `stream` plus the native `response`.
+ */
+export type EventStreamResult<TData = unknown, TResponse = Response> = {
+  stream: AsyncGenerator<ServerSentEvent<TData>>
+  response: TResponse
+}
+
+/**
+ * Wraps a transport result whose `data` is a streaming body into an `EventStreamResult`, exposing
+ * the parsed events as a typed async iterator. Generated SSE operations call this.
+ */
+export async function toEventStream<TData = unknown>(result: Promise<{ data: unknown; response: Response }>): Promise<EventStreamResult<TData>> {
+  const { data, response } = await result
+  return {
+    response,
+    stream: parseEventStream<TData>(data as ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>),
+  }
+}
+
+/**
  * The default transport: builds a native `Request` from the resolved request, sends it through
  * `globalThis.fetch`, and returns the parsed body alongside the native request/response objects.
  */
 const defaultTransport: Transport = async (request: ResolvedRequest): Promise<TransportResult> => {
   const init: RequestInit = {
+    ...request.options, // cache, mode, redirect, keepalive, duplex, next, …
     method: request.method,
     headers: request.headers,
     body: request.body,

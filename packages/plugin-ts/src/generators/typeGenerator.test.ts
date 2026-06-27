@@ -638,6 +638,36 @@ describe('typeGenerator — enumType', () => {
   })
 })
 
+describe('typeGenerator — const (single-value enum)', () => {
+  // OAS 3.1 `const` is parsed into a single-value enum node. It must render as a bare literal
+  // type with no runtime enum declaration, regardless of the configured enum.type.
+  const constSchema = ast.factory.createSchema({
+    type: 'enum',
+    name: 'Status',
+    primitive: 'string',
+    enumValues: ['active'],
+  })
+
+  const enumTypes = ['asConst', 'enum', 'constEnum', 'literal', 'inlineLiteral'] as const
+
+  test.each(enumTypes.map((t) => ({ enumType: t })))('enumType $enumType — const renders a literal type without a runtime enum', async ({ enumType }) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: enumType } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: `const ${enumType}` })
+
+    await renderGeneratorSchema(typeGenerator, constSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    await matchFiles(driver.fileManager.files, `const ${enumType}`)
+  })
+})
+
 describe('typeGenerator — enumType — empty string value', () => {
   const emptyStringEnumSchema = ast.factory.createSchema({
     type: 'enum',

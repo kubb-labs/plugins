@@ -8,9 +8,11 @@ import {
   getOperationParameters,
   getOperationSuccessResponses,
   getPrimarySuccessResponse,
+  getResponseType,
   getStatusCodeNumber,
   getSuccessResponses,
   isErrorStatusCode,
+  isEventStream,
   isSuccessStatusCode,
   resolveErrorNames,
   resolveOperationTypeNames,
@@ -258,5 +260,37 @@ describe('resolveOperationTypeNames', () => {
     })
 
     expect(resolveOperationTypeNames(node, resolver, { responseStatusNames: 'error' })).toStrictEqual(['showPetResponse', 'Status404'])
+  })
+})
+
+describe('getResponseType / isEventStream', () => {
+  function nodeWithResponseContentType(mediaType: string): ast.OperationNode {
+    return ast.factory.createOperation({
+      operationId: 'streamEvents',
+      method: 'GET',
+      path: '/events',
+      responses: [ast.factory.createResponse({ statusCode: '200', mediaType, schema: ast.factory.createSchema({ type: 'object' }) })],
+    })
+  }
+
+  test('maps text/event-stream to a stream responseType', () => {
+    expect(getResponseType(nodeWithResponseContentType('text/event-stream'))).toBe('stream')
+    expect(isEventStream(nodeWithResponseContentType('text/event-stream'))).toBe(true)
+  })
+
+  test('ignores a charset suffix on the content type', () => {
+    expect(getResponseType(nodeWithResponseContentType('text/event-stream; charset=utf-8'))).toBe('stream')
+    expect(isEventStream(nodeWithResponseContentType('text/event-stream; charset=utf-8'))).toBe(true)
+  })
+
+  test('leaves JSON responses to the runtime auto-detection', () => {
+    expect(getResponseType(nodeWithResponseContentType('application/json'))).toBeUndefined()
+    expect(isEventStream(nodeWithResponseContentType('application/json'))).toBe(false)
+  })
+
+  test('maps other non-JSON content types to text or blob', () => {
+    expect(getResponseType(nodeWithResponseContentType('text/plain'))).toBe('text')
+    expect(getResponseType(nodeWithResponseContentType('application/octet-stream'))).toBe('blob')
+    expect(isEventStream(nodeWithResponseContentType('application/octet-stream'))).toBe(false)
   })
 })

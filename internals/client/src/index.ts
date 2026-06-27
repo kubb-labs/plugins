@@ -1,10 +1,16 @@
 export { buildSdkMethod } from './builders/sdkMethod.ts'
-export { buildZodErrorParse, isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from './builders/parser.ts'
+export {
+  buildZodErrorParse,
+  isValidatorEnabled,
+  resolveQueryParamsValidator,
+  resolveRequestValidator,
+  resolveResponseValidator,
+} from './builders/validatorOptions.ts'
 export { buildReturnStatement } from './builders/returnStatement.ts'
 export { buildSecurityMetadata, getOperationSecurity, resolveSecurityScheme } from './builders/security.ts'
 export type { Auth, SecurityDocument } from './builders/security.ts'
 export { buildGroupedOptionsSignature } from './builders/signature.ts'
-export { buildParserHooks } from './builders/validator.ts'
+export { buildValidatorHooks } from './builders/validator.ts'
 export { Operation } from './components/Operation.tsx'
 export { SdkClient } from './components/SdkClient.tsx'
 export { createSdkGenerator } from './generators/sdkGenerator.tsx'
@@ -14,4 +20,4 @@ export type { ClientSelector, ResolveClientResult } from './resolveClient.ts'
 export { resolveClientOperation } from './resolveClientOperation.ts'
 export type { ClientOperation } from './resolveClientOperation.ts'
 export { resolverClient } from './resolver.ts'
-export type { Mode, Options, ParserOptions, ResolvedOptions, ResolverClient } from './types.ts'
+export type { Mode, Options, ValidatorOptions, ResolvedOptions, ResolverClient } from './types.ts'

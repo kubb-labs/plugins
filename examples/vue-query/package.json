@@ -23,7 +23,7 @@
     "@kubb/plugin-fetch": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-vue-query": "workspace:*",
-    "@tanstack/vue-query": "^5.101.0",
+    "@tanstack/vue-query": "^5.101.1",
     "kubb": "catalog:",
     "vue": "^3.5.38"
   },

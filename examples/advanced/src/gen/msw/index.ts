@@ -16,3 +16,4 @@ export {
 export { updatePetWithFormHandler, updatePetWithFormHandlerResponse405 } from './pet/updatePetWithFormHandler.ts'
 export { uploadFileHandler, uploadFileHandlerResponse200 } from './pet/uploadFileHandler.ts'
 export { createPetsHandler, createPetsHandlerResponse201 } from './pets/createPetsHandler.ts'
+export { streamPetEventsHandler, streamPetEventsHandlerResponse200 } from './stream/streamPetEventsHandler.ts'

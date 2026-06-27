@@ -20,3 +20,7 @@ export type DeleteOrderStatus404SchemaType = z.infer<typeof deleteOrderStatus404
 export const deleteOrderResponseSchema = z.unknown()
 
 export type DeleteOrderResponseSchemaType = z.infer<typeof deleteOrderResponseSchema>
+
+export const deleteOrderErrorSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])
+
+export type DeleteOrderErrorSchemaType = z.infer<typeof deleteOrderErrorSchema>
