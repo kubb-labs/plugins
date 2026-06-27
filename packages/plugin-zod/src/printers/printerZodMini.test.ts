@@ -135,14 +135,24 @@ describe('printerZodMini', () => {
       expect(result).toMatchInlineSnapshot(`"z.enum(['a', 'b', 'c'])"`)
     })
 
-    test('number enum', () => {
+    test('number enum uses z.union of literals', () => {
       const result = printer.print(ast.factory.createSchema({ type: 'enum', enumValues: [200, 400, 500] }))
-      expect(result).toBe('z.enum([200, 400, 500])')
+      expect(result).toBe('z.union([z.literal(200), z.literal(400), z.literal(500)])')
     })
 
-    test('boolean enum', () => {
+    test('single number enum uses z.literal', () => {
+      const result = printer.print(ast.factory.createSchema({ type: 'enum', enumValues: [42] }))
+      expect(result).toBe('z.literal(42)')
+    })
+
+    test('boolean enum uses z.union of literals', () => {
       const result = printer.print(ast.factory.createSchema({ type: 'enum', enumValues: [true, false] }))
-      expect(result).toBe('z.enum([true, false])')
+      expect(result).toBe('z.union([z.literal(true), z.literal(false)])')
+    })
+
+    test('mixed value enum uses z.union of literals', () => {
+      const result = printer.print(ast.factory.createSchema({ type: 'enum', enumValues: ['active', 1, true] }))
+      expect(result).toBe("z.union([z.literal('active'), z.literal(1), z.literal(true)])")
     })
 
     test('number literals (namedEnumValues)', () => {
