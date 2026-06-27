@@ -167,12 +167,23 @@ describe('buildResponses', () => {
       ],
     })
 
-    expect(printSchema(buildResponses(node, { resolver: resolverTs })!)).toMatchInlineSnapshot(`
+    expect(printSchema(buildResponses(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
       "{
           "200": ListPetsStatus200;
           default: ListPetsStatusDefault;
       }"
     `)
+  })
+
+  it('emits an empty object type for an operation with no responses', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'noResponses',
+      method: 'GET',
+      path: '/pets',
+      responses: [],
+    })
+
+    expect(printSchema(buildResponses(node, { resolver: resolverTs }))).toBe('object')
   })
 })
 
