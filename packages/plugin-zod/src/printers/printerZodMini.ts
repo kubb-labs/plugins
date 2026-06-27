@@ -13,7 +13,7 @@ import {
 import { ast } from '@kubb/core'
 import { containsCircularRef, syncSchemaRef } from '@kubb/ast/utils'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { applyMiniModifiers, formatLiteral, lengthChecksMini, numberChecksMini, patternKeySchemaMini } from '../utils.ts'
+import { applyMiniModifiers, buildEnum, formatLiteral, lengthChecksMini, numberChecksMini, patternKeySchemaMini } from '../utils.ts'
 
 /**
  * Partial map of node-type overrides for the Zod Mini printer.
@@ -173,8 +173,8 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           return `z.union([${literals.join(', ')}])`
         }
 
-        // Regular enum: use z.enum([…])
-        return `z.enum([${nonNullValues.map(formatLiteral).join(', ')}])`
+        // Regular enum: z.enum for all-string sets, z.literal/z.union otherwise
+        return buildEnum(nonNullValues)
       },
 
       ref(node) {

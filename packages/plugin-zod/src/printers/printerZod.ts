@@ -13,7 +13,7 @@ import {
 import { ast } from '@kubb/core'
 import { containsCircularRef, syncSchemaRef } from '@kubb/ast/utils'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { applyModifiers, containsCodec, formatLiteral, getCodec, lengthConstraints, numberConstraints, patternKeySchema, shouldCoerce } from '../utils.ts'
+import { applyModifiers, buildEnum, containsCodec, formatLiteral, getCodec, lengthConstraints, numberConstraints, patternKeySchema, shouldCoerce } from '../utils.ts'
 import type { AdapterOas } from '@kubb/adapter-oas'
 
 /**
@@ -216,8 +216,8 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           return `z.union([${literals.join(', ')}])`
         }
 
-        // Regular enum: use z.enum([…])
-        return `z.enum([${nonNullValues.map(formatLiteral).join(', ')}])`
+        // Regular enum: z.enum for all-string sets, z.literal/z.union otherwise
+        return buildEnum(nonNullValues)
       },
       ref(node) {
         if (!node.name) return null
