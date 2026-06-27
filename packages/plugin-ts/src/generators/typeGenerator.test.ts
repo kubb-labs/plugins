@@ -613,6 +613,38 @@ describe('typeGenerator — params casing', () => {
 
     await matchFiles(driver.fileManager.files, 'paramsCasing camelcase')
   })
+
+  test('query params that collide after casing are de-duplicated in the request config', async () => {
+    const operationWithCollidingParams: ast.OperationNode = ast.factory.createOperation({
+      operationId: 'listUploads',
+      method: 'GET',
+      path: '/uploads',
+      tags: ['uploads'],
+      parameters: [
+        ast.factory.createParameter({ name: 'max-uploads', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
+        ast.factory.createParameter({ name: 'prefix', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({ name: 'MaxUploads', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
+      ],
+      responses: [
+        ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Success' }),
+      ],
+    })
+
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'paramsCasing collision' })
+
+    await renderGeneratorOperation(typeGenerator, operationWithCollidingParams, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'paramsCasing collision')
+  })
 })
 
 describe('typeGenerator — enumType', () => {
