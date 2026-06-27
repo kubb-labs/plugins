@@ -35,6 +35,34 @@ const schemas = [
   { name: 'dataset_api', path: '../../schemas/3.0.x/dataset_api.yaml' },
   { name: 'openai', path: 'https://raw.githubusercontent.com/openai/openai-openapi/refs/heads/manual_spec/openapi.yaml', strict: false },
   { name: 'stripe', path: 'https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json', strict: false },
+  // Real-world APIs (remote, raw.githubusercontent.com so CI is not blocked by bot-unfriendly hosts).
+  // These exercise large, deeply-nested specs with discriminators, oneOf/anyOf and webhooks/callbacks;
+  // `strict: false` mirrors the loose real-world specs above.
+  { name: 'github', path: 'https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.json', strict: false },
+  { name: 'asana', path: 'https://raw.githubusercontent.com/Asana/openapi/master/defs/asana_oas.yaml', strict: false },
+  { name: 'box', path: 'https://raw.githubusercontent.com/box/box-openapi/main/openapi.json', strict: false },
+  { name: 'plaid', path: 'https://raw.githubusercontent.com/plaid/plaid-openapi/master/2020-09-14.yml', strict: false },
+  { name: 'twilio-api', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_api_v2010.json', strict: false },
+  { name: 'twilio-messaging', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_messaging_v1.json', strict: false },
+  { name: 'twilio-verify', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_verify_v2.json', strict: false },
+  { name: 'twilio-lookups', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_lookups_v2.json', strict: false },
+  { name: 'twilio-video', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_video_v1.json', strict: false },
+  { name: 'twilio-studio', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_studio_v2.json', strict: false },
+  { name: 'twilio-conversations', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_conversations_v1.json', strict: false },
+  { name: 'adyen-checkout', path: 'https://raw.githubusercontent.com/Adyen/adyen-openapi/main/json/CheckoutService-v71.json', strict: false },
+  { name: 'discord', path: 'https://raw.githubusercontent.com/discord/discord-api-spec/main/specs/openapi.json', strict: false },
+  { name: 'pokeapi', path: 'https://raw.githubusercontent.com/PokeAPI/pokeapi/master/openapi.yml', strict: false },
+  // Small official specs from the OpenAPI Initiative — clean fixtures that cover 3.0/3.1 features
+  // (links, callbacks, webhooks, examples) without needing a `strict: false` escape hatch.
+  { name: 'tictactoe', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.1/tictactoe.yaml' },
+  { name: 'oai-petstore', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.0/petstore.yaml' },
+  { name: 'uspto', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.0/uspto.yaml' },
+  { name: 'api-with-examples', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.0/api-with-examples.yaml' },
+  { name: 'link-example', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.0/link-example.yaml' },
+  { name: 'callback-example', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.0/callback-example.yaml' },
+  { name: 'webhook-example', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.1/webhook-example.yaml' },
+  { name: 'non-oauth-scopes', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.1/non-oauth-scopes.yaml' },
+  { name: 'swagger-petstore', path: 'https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml' },
 ]
 
 /** @type {import('@kubb/core').UserConfig} */
