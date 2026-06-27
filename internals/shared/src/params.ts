@@ -21,6 +21,25 @@ export function caseParams(params: Array<ParameterNode>, casing: 'camelcase' | u
   return result
 }
 
+/**
+ * Drops parameters that collapse to the same property identity once camelCased, keeping the first.
+ *
+ * Some specs declare the same parameter twice under different casings (for example AWS S3 lists both
+ * `max-uploads` and `MaxUploads`). Both resolve to one output property, so emitting both would yield
+ * an object type with a duplicate member, which TypeScript rejects. De-duplicate by the camelCased
+ * identity so the resulting group is collision-free regardless of the names each caller carries.
+ */
+export function dedupeByCasedName(params: Array<ParameterNode>): Array<ParameterNode> {
+  const seen = new Set<string>()
+
+  return params.filter((param) => {
+    const key = camelCase(param.name)
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
 export function buildParamsMapping<TParam extends { name: string }>(
   originalParams: ReadonlyArray<TParam>,
   mappedParams: ReadonlyArray<TParam>,
