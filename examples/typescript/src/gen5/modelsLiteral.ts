@@ -5,8 +5,6 @@
 
 export type OrderParamsStatusEnum = 'placed' | 'approved' | 'delivered'
 
-export type OrderStatus = 'accepted'
-
 export type OrderHttpStatusEnum = 200 | 400 | 500
 
 export type CustomerParamsStatusEnum = 'placed' | 'approved' | 'delivered'
@@ -69,7 +67,7 @@ export type Order = {
   /**
    * @description Order Status
    */
-  status?: OrderStatus | string
+  status?: 'accepted' | (string & {})
   /**
    * @description HTTP Status
    * @example 200
@@ -228,6 +226,24 @@ export type Cat = {
   name?: string
 }
 
+/**
+ * @type object
+ */
+export type Category1 = {
+  /**
+   * @description
+   * Format: `int64`
+   * @example 1
+   * @type integer | undefined
+   */
+  id?: bigint
+  /**
+   * @example Dogs
+   * @type string | undefined
+   */
+  name?: string
+}
+
 export type Pet = (
   | (Dog & {
       /**
@@ -255,7 +271,10 @@ export type Pet = (
    * @type string
    */
   name: string
-  category?: Category
+  /**
+   * @type object | undefined
+   */
+  category?: Category1
   /**
    * @type array
    */
