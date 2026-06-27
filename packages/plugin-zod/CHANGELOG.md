@@ -1,5 +1,11 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.78
+
+### Patch Changes
+
+- [#569](https://github.com/kubb-labs/plugins/pull/569) [`62cae59`](https://github.com/kubb-labs/plugins/commit/62cae5965912a17533dbf3a2ade1c64f1b305e95) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Emit `z.literal`/`z.union` instead of `z.enum` for non-string `const`/enum values. `z.enum()` only accepts string members in Zod v4, so a numeric, boolean, or mixed set produced a type error (TS2769). All-string sets keep the compact `z.enum([…])`.
+
 ## 5.0.0-beta.77
 
 ## 5.0.0-beta.76

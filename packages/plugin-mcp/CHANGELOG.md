@@ -1,5 +1,13 @@
 # @kubb/plugin-mcp
 
+## 5.0.0-beta.78
+
+### Patch Changes
+
+- Updated dependencies [[`4309b83`](https://github.com/kubb-labs/plugins/commit/4309b83abcbe322bad76fedd466396ba32bdcd4f), [`3992fde`](https://github.com/kubb-labs/plugins/commit/3992fde9273c175148dd3286161eb22338256f7d), [`62cae59`](https://github.com/kubb-labs/plugins/commit/62cae5965912a17533dbf3a2ade1c64f1b305e95)]:
+  - @kubb/plugin-ts@5.0.0-beta.78
+  - @kubb/plugin-zod@5.0.0-beta.78
+
 ## 5.0.0-beta.77
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @kubb/plugin-cypress
 
+## 5.0.0-beta.78
+
+### Patch Changes
+
+- [#562](https://github.com/kubb-labs/plugins/pull/562) [`d9198fd`](https://github.com/kubb-labs/plugins/commit/d9198fd40005befe9f461cc4902c805a1843e187) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Quote query-parameter keys in the generated `qs` object. Parameter names that are not valid JavaScript identifiers (for example `age-group`, `list.name`, or `x-amz-*`) were emitted as bare object keys, producing a syntax error in the generated Cypress request. The keys are now quoted, matching how header parameters were already handled.
+
+- Updated dependencies [[`4309b83`](https://github.com/kubb-labs/plugins/commit/4309b83abcbe322bad76fedd466396ba32bdcd4f), [`3992fde`](https://github.com/kubb-labs/plugins/commit/3992fde9273c175148dd3286161eb22338256f7d)]:
+  - @kubb/plugin-ts@5.0.0-beta.78
+
 ## 5.0.0-beta.77
 
 ### Patch Changes

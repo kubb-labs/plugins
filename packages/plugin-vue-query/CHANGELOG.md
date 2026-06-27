@@ -1,5 +1,23 @@
 # @kubb/plugin-vue-query
 
+## 5.0.0-beta.78
+
+### Minor Changes
+
+- [#541](https://github.com/kubb-labs/plugins/pull/541) [`b66aeb7`](https://github.com/kubb-labs/plugins/commit/b66aeb79c9df5691ad75626e8125f8bf33e83e78) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - The `parser` option is renamed to `validator` across the client and query plugins. Set `validator: 'zod'` (or `{ request: 'zod', response: 'zod' }`) where you previously set `parser`. The accepted values are unchanged.
+
+  Generated clients pass the schema straight to the `validator` slot instead of wrapping it in a `.parse(data)` call. The slot takes a Standard Schema validator, and only `client.ts` calls `validateStandardSchema`, so the helper stays in one place instead of being imported into every operation file.
+
+  A `validateStandardSchema` helper is injected into `.kubb/standardSchema.ts` next to the client. It handles sync and async `validate()` results and throws `ParseError({ issues })` on failure, so callers get a consistent `{ issues }` array instead of a raw `ZodError`. Any schema that exposes `~standard.validate` works, including zod, valibot, and arktype.
+
+  Error-body validation now runs on the throwing path too. `validator.error` executes before `ResponseError` is constructed, so `error.data` always holds the validated body regardless of the `throwOnError` setting.
+
+### Patch Changes
+
+- Updated dependencies [[`4309b83`](https://github.com/kubb-labs/plugins/commit/4309b83abcbe322bad76fedd466396ba32bdcd4f), [`3992fde`](https://github.com/kubb-labs/plugins/commit/3992fde9273c175148dd3286161eb22338256f7d), [`62cae59`](https://github.com/kubb-labs/plugins/commit/62cae5965912a17533dbf3a2ade1c64f1b305e95)]:
+  - @kubb/plugin-ts@5.0.0-beta.78
+  - @kubb/plugin-zod@5.0.0-beta.78
+
 ## 5.0.0-beta.77
 
 ### Patch Changes

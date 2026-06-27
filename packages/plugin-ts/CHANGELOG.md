@@ -1,5 +1,13 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.78
+
+### Patch Changes
+
+- [#565](https://github.com/kubb-labs/plugins/pull/565) [`4309b83`](https://github.com/kubb-labs/plugins/commit/4309b83abcbe322bad76fedd466396ba32bdcd4f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - De-duplicate operation parameters that collapse to the same property name after casing. Some specs declare the same parameter twice under different casings (for example AWS S3 lists both `max-uploads` and `MaxUploads`), which Kubb camelCased to a single property and then emitted twice, producing an object type with a duplicate member that TypeScript rejects (`TS2300`). Parameters are now de-duplicated by their camelCased identity per location, keeping the first occurrence.
+
+- [#570](https://github.com/kubb-labs/plugins/pull/570) [`3992fde`](https://github.com/kubb-labs/plugins/commit/3992fde9273c175148dd3286161eb22338256f7d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Always emit a `*Responses` type for every operation, even when it declares no responses. The type now renders as an empty `object` instead of being skipped, so consumers that import it unconditionally (such as the axios SDK's `RequestResult<XResponses>`) keep resolving instead of failing strict typecheck with `TS2305: Module has no exported member 'XResponses'`. Reported in kubb-labs/plugins#567.
+
 ## 5.0.0-beta.77
 
 ### Minor Changes
