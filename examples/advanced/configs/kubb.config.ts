@@ -78,6 +78,10 @@ export default defineConfig({
           type: 'tag',
           pattern: 'store',
         },
+        {
+          type: 'tag',
+          pattern: 'stream',
+        },
       ],
       override: [
         {
@@ -131,6 +135,13 @@ export default defineConfig({
             validator: false,
           },
         },
+        {
+          type: 'tag',
+          pattern: 'stream',
+          options: {
+            validator: false,
+          },
+        },
       ],
     }),
     pluginMcp({
@@ -142,6 +153,10 @@ export default defineConfig({
         {
           type: 'tag',
           pattern: 'store',
+        },
+        {
+          type: 'tag',
+          pattern: 'stream',
         },
       ],
       group: { type: 'tag' },

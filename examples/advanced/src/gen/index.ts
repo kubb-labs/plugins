@@ -18,6 +18,8 @@ export type { OrderOrderTypeEnumKey } from './models/ts/OrderOrderTypeEnum.ts'
 export type { OrderParamsStatusEnumKey } from './models/ts/OrderParamsStatusEnum.ts'
 export type { OrderStatusEnumKey } from './models/ts/OrderStatusEnum.ts'
 export type { Pet } from './models/ts/Pet.ts'
+export type { PetEvent } from './models/ts/PetEvent.ts'
+export type { PetEventTypeEnumKey } from './models/ts/PetEventTypeEnum.ts'
 export type { PetNotFound } from './models/ts/PetNotFound.ts'
 export type { PetStatusEnumKey } from './models/ts/PetStatusEnum.ts'
 export type {
@@ -173,6 +175,13 @@ export type {
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './models/ts/store/PlaceOrderPatch.ts'
+export type {
+  StreamPetEventsPathPetId,
+  StreamPetEventsRequestConfig,
+  StreamPetEventsResponse,
+  StreamPetEventsResponses,
+  StreamPetEventsStatus200,
+} from './models/ts/stream/StreamPetEvents.ts'
 export type { TagTag } from './models/ts/tag/Tag.ts'
 export type { AddPetRequestSchemaType } from './zod/addPetRequestSchema.ts'
 export type { AddPetRequestStatusEnumSchemaType } from './zod/addPetRequestStatusEnumSchema.ts'
@@ -280,6 +289,8 @@ export type {
   UploadFileResponseSchemaType,
   UploadFileStatus200SchemaType,
 } from './zod/pet/uploadFileSchema.ts'
+export type { PetEventSchemaType } from './zod/petEventSchema.ts'
+export type { PetEventTypeEnumSchemaType } from './zod/petEventTypeEnumSchema.ts'
 export type { PetNotFoundSchemaType } from './zod/petNotFoundSchema.ts'
 export type { PetSchemaType } from './zod/petSchema.ts'
 export type { PetStatusEnumSchemaType } from './zod/petStatusEnumSchema.ts'
@@ -294,6 +305,11 @@ export type {
   CreatePetsStatus201SchemaType,
   CreatePetsStatusDefaultSchemaType,
 } from './zod/pets/createPetsSchema.ts'
+export type {
+  StreamPetEventsPathPetIdSchemaType,
+  StreamPetEventsResponseSchemaType,
+  StreamPetEventsStatus200SchemaType,
+} from './zod/stream/streamPetEventsSchema.ts'
 export type { TagTagSchemaType } from './zod/tag/tagSchema.ts'
 export { addFiles } from './clients/axios/petService/addFiles.ts'
 export { addPet } from './clients/axios/petService/addPet.ts'
@@ -305,6 +321,7 @@ export { updatePet } from './clients/axios/petService/updatePet.ts'
 export { updatePetWithForm } from './clients/axios/petService/updatePetWithForm.ts'
 export { uploadFile } from './clients/axios/petService/uploadFile.ts'
 export { createPets } from './clients/axios/petsService/createPets.ts'
+export { streamPetEvents } from './clients/axios/streamService/streamPetEvents.ts'
 export { addFilesMutationKey, addFilesMutationOptions, useAddFiles } from './clients/hooks/pet/useAddFiles.ts'
 export { addPetMutationKey, addPetMutationOptions, useAddPet } from './clients/hooks/pet/useAddPet.ts'
 export { deletePetMutationKey, deletePetMutationOptions, useDeletePet } from './clients/hooks/pet/useDeletePet.ts'
@@ -333,6 +350,8 @@ export { createOrderHttpStatusEnumFaker } from './mocks/createOrderHttpStatusEnu
 export { createOrderOrderTypeEnumFaker } from './mocks/createOrderOrderTypeEnumFaker.ts'
 export { createOrderParamsStatusEnumFaker } from './mocks/createOrderParamsStatusEnumFaker.ts'
 export { createOrderStatusEnumFaker } from './mocks/createOrderStatusEnumFaker.ts'
+export { createPetEventFaker } from './mocks/createPetEventFaker.ts'
+export { createPetEventTypeEnumFaker } from './mocks/createPetEventTypeEnumFaker.ts'
 export { createPetFaker } from './mocks/createPetFaker.ts'
 export { createPetNotFoundFaker } from './mocks/createPetNotFoundFaker.ts'
 export { createPetStatusEnumFaker } from './mocks/createPetStatusEnumFaker.ts'
@@ -427,6 +446,11 @@ export {
   createCreatePetsStatus201Faker,
   createCreatePetsStatusDefaultFaker,
 } from './mocks/pets/createCreatePetsFaker.ts'
+export {
+  createStreamPetEventsPathPetIdFaker,
+  createStreamPetEventsResponseFaker,
+  createStreamPetEventsStatus200Faker,
+} from './mocks/stream/createStreamPetEventsFaker.ts'
 export { createTagTagFaker } from './mocks/tag/createTagFaker.ts'
 export { addPetRequestStatusEnum } from './models/ts/AddPetRequestStatusEnum.ts'
 export { animalTypeEnum } from './models/ts/AnimalTypeEnum.ts'
@@ -437,6 +461,7 @@ export { orderHttpStatusEnum } from './models/ts/OrderHttpStatusEnum.ts'
 export { orderOrderTypeEnum } from './models/ts/OrderOrderTypeEnum.ts'
 export { orderParamsStatusEnum } from './models/ts/OrderParamsStatusEnum.ts'
 export { orderStatusEnum } from './models/ts/OrderStatusEnum.ts'
+export { petEventTypeEnum } from './models/ts/PetEventTypeEnum.ts'
 export { petStatusEnum } from './models/ts/PetStatusEnum.ts'
 export { handlers } from './msw/handlers.ts'
 export { addFilesHandler, addFilesHandlerResponse200, addFilesHandlerResponse405 } from './msw/pet/addFilesHandler.ts'
@@ -456,6 +481,7 @@ export {
 export { updatePetWithFormHandler, updatePetWithFormHandlerResponse405 } from './msw/pet/updatePetWithFormHandler.ts'
 export { uploadFileHandler, uploadFileHandlerResponse200 } from './msw/pet/uploadFileHandler.ts'
 export { createPetsHandler, createPetsHandlerResponse201 } from './msw/pets/createPetsHandler.ts'
+export { streamPetEventsHandler, streamPetEventsHandlerResponse200 } from './msw/stream/streamPetEventsHandler.ts'
 export { addPetRequestSchema } from './zod/addPetRequestSchema.ts'
 export { addPetRequestStatusEnumSchema } from './zod/addPetRequestStatusEnumSchema.ts'
 export { animalSchema } from './zod/animalSchema.ts'
@@ -562,6 +588,8 @@ export {
   uploadFileResponseSchema,
   uploadFileStatus200Schema,
 } from './zod/pet/uploadFileSchema.ts'
+export { petEventSchema } from './zod/petEventSchema.ts'
+export { petEventTypeEnumSchema } from './zod/petEventTypeEnumSchema.ts'
 export { petNotFoundSchema } from './zod/petNotFoundSchema.ts'
 export { petSchema } from './zod/petSchema.ts'
 export { petStatusEnumSchema } from './zod/petStatusEnumSchema.ts'
@@ -576,4 +604,5 @@ export {
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
 } from './zod/pets/createPetsSchema.ts'
+export { streamPetEventsPathPetIdSchema, streamPetEventsResponseSchema, streamPetEventsStatus200Schema } from './zod/stream/streamPetEventsSchema.ts'
 export { tagTagSchema } from './zod/tag/tagSchema.ts'
