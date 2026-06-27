@@ -615,18 +615,15 @@ export type ServerSentEvent<TData = unknown> = {
   retry?: number
 }
 
-async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>, signal?: AbortSignal): AsyncGenerator<Uint8Array> {
+async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>): AsyncGenerator<Uint8Array> {
   if (!('getReader' in stream)) {
-    for await (const value of stream) {
-      if (signal?.aborted) return
-      yield value
-    }
+    yield* stream
     return
   }
 
   const reader = stream.getReader()
   try {
-    while (!signal?.aborted) {
+    while (true) {
       const { done, value } = await reader.read()
       if (done) return
       yield value
@@ -669,18 +666,18 @@ function parseEvent<TData>(raw: string): ServerSentEvent<TData> | undefined {
 /**
  * Parses a `text/event-stream` body into typed Server-Sent Events. Consume it with `for await`. It
  * accepts either a web `ReadableStream` (the fetch transport's `response.body`) or any async iterable
- * of byte chunks, normalizes `\r\n`/`\r` to `\n`, splits events on a blank line, ignores comment and
- * heartbeat lines, and stops early when `signal` aborts.
+ * of byte chunks, normalizes `\r\n`/`\r` to `\n`, splits events on a blank line, and ignores comment
+ * and heartbeat lines. Break out of the `for await` to stop early and cancel the underlying body.
  */
 export async function* parseEventStream<TData = unknown>(
   stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>,
-  signal?: AbortSignal,
 ): AsyncGenerator<ServerSentEvent<TData>> {
   const decoder = new TextDecoder()
+  const normalize = (text: string) => text.replace(/\r\n|\r/g, '\n')
   let buffer = ''
 
-  for await (const chunk of readBytes(stream, signal)) {
-    const blocks = (buffer + decoder.decode(chunk, { stream: true })).replace(/\r\n|\r/g, '\n').split('\n\n')
+  for await (const chunk of readBytes(stream)) {
+    const blocks = normalize(buffer + decoder.decode(chunk, { stream: true })).split('\n\n')
     buffer = blocks.pop() ?? ''
     for (const block of blocks) {
       const event = parseEvent<TData>(block)
@@ -688,7 +685,7 @@ export async function* parseEventStream<TData = unknown>(
     }
   }
 
-  const event = parseEvent<TData>((buffer + decoder.decode()).replace(/\r\n|\r/g, '\n'))
+  const event = parseEvent<TData>(normalize(buffer + decoder.decode()))
   if (event) yield event
 }
 
@@ -705,14 +702,11 @@ export type EventStreamResult<TData = unknown, TResponse = Response> = {
  * Wraps a transport result whose `data` is a streaming body into an `EventStreamResult`, exposing
  * the parsed events as a typed async iterator. Generated SSE operations call this.
  */
-export async function toEventStream<TData = unknown>(
-  result: Promise<{ data: unknown; response: Response }>,
-  signal?: AbortSignal,
-): Promise<EventStreamResult<TData>> {
+export async function toEventStream<TData = unknown>(result: Promise<{ data: unknown; response: Response }>): Promise<EventStreamResult<TData>> {
   const { data, response } = await result
   return {
     response,
-    stream: parseEventStream<TData>(data as ReadableStream<Uint8Array>, signal),
+    stream: parseEventStream<TData>(data as ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>),
   }
 }
 

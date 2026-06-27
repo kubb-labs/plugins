@@ -465,11 +465,4 @@ describe('parseEventStream', () => {
     const events = await collect(parseEventStream(asyncIterableOf(['data: {"n":1}\n\n'])))
     expect(events).toStrictEqual([{ data: { n: 1 } }])
   })
-
-  test('stops early once the signal aborts', async () => {
-    const controller = new AbortController()
-    controller.abort()
-    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n']), controller.signal))
-    expect(events).toStrictEqual([])
-  })
 })
