@@ -158,6 +158,27 @@ describe('createClientCore', () => {
     expect(serializer({ tags: ['a', 'b'] })).toBe('tags=a&tags=b')
   })
 
+  test('defaults stream responses to the fetch adapter so the browser streams the body', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/events', responseType: 'stream' })
+    expect(calls[0]?.adapter).toBe('fetch')
+  })
+
+  test('respects an explicit adapter on a stream request', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/events', responseType: 'stream', options: { adapter: 'http' } })
+    expect(calls[0]?.adapter).toBe('http')
+  })
+
+  test('leaves non-stream requests on the default adapter', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/pet/1' })
+    expect(calls[0]?.adapter).toBeUndefined()
+  })
+
   test('serializes the body before axios and sets Content-Type', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance })

@@ -615,6 +615,12 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       validateStatus,
     }
 
+    // Only the fetch adapter exposes a streaming `response.data` (a ReadableStream) in the browser;
+    // the default XHR adapter buffers the whole body. Default streams to it, but respect an explicit adapter.
+    if (requestConfig.responseType === 'stream' && !axiosConfig.adapter) {
+      axiosConfig.adapter = 'fetch'
+    }
+
     try {
       const response = await activeInstance.request<unknown, AxiosResponse>(axiosConfig)
       const isSuccess = response.status >= 200 && response.status < 300
