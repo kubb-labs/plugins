@@ -505,7 +505,7 @@ function applyEnumKeyCasing(key: string, casing: 'screamingSnakeCase' | 'snakeCa
  *   type: 'enum',
  *   name: 'petType',
  *   typeName: 'PetType',
- *   enums: [['cat', 'cat'], ['dog', 'dog']],
+ *   enums: [['cat', 'cat', 'A cat'], ['dog', 'dog']],
  * })
  * ```
  */
@@ -533,7 +533,7 @@ export function createEnumDeclaration({
    * Enum name in PascalCase.
    */
   typeName: string
-  enums: Array<[key: string | number, value: string | number | boolean]>
+  enums: Array<[key: string | number, value: string | number | boolean, description?: string]>
   /**
    * Choose the casing for enum key names.
    * @default 'none'
@@ -583,7 +583,7 @@ export function createEnumDeclaration({
         ),
         factory.createIdentifier(typeName),
         enums
-          .map(([key, value]) => {
+          .map(([key, value, description]) => {
             let initializer: ts.Expression = factory.createStringLiteral(value?.toString())
             const isExactNumber = Number.parseInt(value.toString(), 10) === value
 
@@ -601,12 +601,12 @@ export function createEnumDeclaration({
 
             if (isNumber(Number.parseInt(key.toString(), 10))) {
               const casingKey = applyEnumKeyCasing(`${typeName}_${key}`, enumKeyCasing)
-              return factory.createEnumMember(propertyName(casingKey), initializer)
+              return appendJSDocToNode({ node: factory.createEnumMember(propertyName(casingKey), initializer), comments: [description] })
             }
 
             if (key !== null && key !== undefined) {
               const casingKey = applyEnumKeyCasing(key.toString(), enumKeyCasing)
-              return factory.createEnumMember(propertyName(casingKey), initializer)
+              return appendJSDocToNode({ node: factory.createEnumMember(propertyName(casingKey), initializer), comments: [description] })
             }
 
             return undefined
@@ -648,7 +648,7 @@ export function createEnumDeclaration({
             factory.createAsExpression(
               factory.createObjectLiteralExpression(
                 enums
-                  .map(([key, value]) => {
+                  .map(([key, value, description]) => {
                     let initializer: ts.Expression = factory.createStringLiteral(value?.toString())
 
                     if (isNumber(value)) {
@@ -669,7 +669,7 @@ export function createEnumDeclaration({
 
                     if (key !== null && key !== undefined) {
                       const casingKey = applyEnumKeyCasing(key.toString(), enumKeyCasing)
-                      return factory.createPropertyAssignment(propertyName(casingKey), initializer)
+                      return appendJSDocToNode({ node: factory.createPropertyAssignment(propertyName(casingKey), initializer), comments: [description] })
                     }
 
                     return undefined

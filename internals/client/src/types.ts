@@ -9,7 +9,7 @@ import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, Plu
  *   body and query parameters before the call; `response` validates the success response body and,
  *   on the non-throw path, the error body.
  */
-export type ParserOptions = false | 'zod' | { request?: 'zod'; response?: 'zod' }
+export type ValidatorOptions = false | 'zod' | { request?: 'zod'; response?: 'zod' }
 
 /**
  * How the class-based SDK groups operations.
@@ -81,7 +81,7 @@ export type Options = OutputOptions & {
    *
    * @default false
    */
-  parser?: ParserOptions
+  validator?: ValidatorOptions
   /**
    * Generates a class-based SDK instead of the standalone functions. Each tag client is an instance
    * class whose constructor takes a client config and builds its own client, so every environment is
@@ -148,7 +148,7 @@ export type ResolvedOptions = {
   override: Array<Override<ResolvedOptions>>
   group: Group | null
   baseURL: Options['baseURL']
-  parser: NonNullable<Options['parser']>
+  validator: NonNullable<Options['validator']>
   sdk:
     | {
         mode: Mode

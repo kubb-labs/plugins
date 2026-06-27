@@ -101,7 +101,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginReactQuery({
           output: { path: './hooks', barrel: false },
-          parser: 'zod',
+          validator: 'zod',
         }),
       ],
     },

@@ -1,6 +1,13 @@
 import path from 'node:path'
-import { buildZodErrorParse, getOperationSecurity, Operation, resolveRequestParser, resolveResponseParser, type SecurityDocument } from '@internals/client'
-import { operationFileEntry } from '@internals/shared'
+import {
+  buildZodErrorParse,
+  getOperationSecurity,
+  Operation,
+  resolveRequestValidator,
+  resolveResponseValidator,
+  type SecurityDocument,
+} from '@internals/client'
+import { isEventStream, operationFileEntry } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -19,15 +26,15 @@ export const clientGenerator = defineGenerator<PluginAxios>({
     if (!ast.isHttpOperationNode(node)) return null
 
     const { config, driver, resolver, root } = ctx
-    const { output, parser, group } = ctx.options
+    const { output, validator, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const parserEnabled = resolveResponseParser(parser) === 'zod' || resolveRequestParser(parser) === 'zod'
-    const pluginZod = parserEnabled ? driver.getPlugin(pluginZodName) : null
+    const validatorEnabled = resolveResponseValidator(validator) === 'zod' || resolveRequestValidator(validator) === 'zod'
+    const pluginZod = validatorEnabled ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
     const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
@@ -35,9 +42,9 @@ export const clientGenerator = defineGenerator<PluginAxios>({
 
     const importedZodNames = zodResolver
       ? [
-          resolveResponseParser(parser) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
-          resolveResponseParser(parser) === 'zod' ? (buildZodErrorParse(node, zodResolver)?.expression ?? null) : null,
-          resolveRequestParser(parser) === 'zod' && hasRequestBody ? zodResolver.resolveDataName?.(node) : null,
+          resolveResponseValidator(validator) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
+          resolveResponseValidator(validator) === 'zod' ? (buildZodErrorParse(node, zodResolver)?.expression ?? null) : null,
+          resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.resolveDataName?.(node) : null,
         ].filter((name): name is string => Boolean(name))
       : []
 
@@ -66,6 +73,7 @@ export const clientGenerator = defineGenerator<PluginAxios>({
     })
 
     const clientPath = path.resolve(root, '.kubb/client.ts')
+    const eventStream = isEventStream(node)
 
     return (
       <File
@@ -75,8 +83,13 @@ export const clientGenerator = defineGenerator<PluginAxios>({
         banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
-        <File.Import name={['client']} root={meta.file.path} path={clientPath} />
-        <File.Import name={['Options', 'RequestResult']} root={meta.file.path} path={clientPath} isTypeOnly />
+        <File.Import name={eventStream ? ['client', 'toEventStream'] : ['client']} root={meta.file.path} path={clientPath} />
+        <File.Import
+          name={eventStream ? ['Options', 'EventStreamResult', 'SuccessOf'] : ['Options', 'RequestResult']}
+          root={meta.file.path}
+          path={clientPath}
+          isTypeOnly
+        />
 
         {meta.fileTs && importedTypeNames.length > 0 && (
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
@@ -84,7 +97,7 @@ export const clientGenerator = defineGenerator<PluginAxios>({
 
         {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames} root={meta.file.path} path={meta.fileZod.path} />}
 
-        <Operation name={meta.name} node={node} tsResolver={tsResolver} zodResolver={zodResolver} parser={parser} security={security} />
+        <Operation name={meta.name} node={node} tsResolver={tsResolver} zodResolver={zodResolver} validator={validator} security={security} />
       </File>
     )
   },

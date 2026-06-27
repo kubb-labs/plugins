@@ -8,11 +8,17 @@ import { pluginTsName } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
-import { buildZodErrorParse, isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../builders/parser.ts'
+import {
+  buildZodErrorParse,
+  isValidatorEnabled,
+  resolveQueryParamsValidator,
+  resolveRequestValidator,
+  resolveResponseValidator,
+} from '../builders/validatorOptions.ts'
 import { type Auth, getOperationSecurity, type SecurityDocument } from '../builders/security.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
 import { SdkFacade } from '../components/SdkFacade.tsx'
-import type { Options, ParserOptions, ResolvedOptions, ResolverClient } from '../types.ts'
+import type { Options, ValidatorOptions, ResolvedOptions, ResolverClient } from '../types.ts'
 
 /**
  * The shape any client plugin (plugin-fetch, plugin-axios) must satisfy to reuse the shared SDK
@@ -44,13 +50,13 @@ function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs)
   return [tsResolver.resolveRequestConfigName(node), tsResolver.resolveResponsesName(node)]
 }
 
-function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod, parser: ParserOptions): Array<string> {
+function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod, validator: ValidatorOptions): Array<string> {
   const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'original' })
   const names: Array<string | null | undefined> = [
-    resolveResponseParser(parser) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
-    resolveResponseParser(parser) === 'zod' ? (buildZodErrorParse(node, zodResolver)?.expression ?? null) : null,
-    resolveRequestParser(parser) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,
-    resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null,
+    resolveResponseValidator(validator) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
+    resolveResponseValidator(validator) === 'zod' ? (buildZodErrorParse(node, zodResolver)?.expression ?? null) : null,
+    resolveRequestValidator(validator) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,
+    resolveQueryParamsValidator(validator) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null,
   ]
   return names.filter((n): n is string => Boolean(n))
 }
@@ -61,12 +67,12 @@ function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod
  */
 function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: GeneratorContext): Array<Controller> {
   const { driver, resolver, root } = ctx
-  const { output, group, parser } = ctx.options
+  const { output, group, validator } = ctx.options
 
   const pluginTs = driver.getPlugin(pluginTsName)!
   const tsResolver = driver.getResolver(pluginTsName)
   const tsPluginOptions = pluginTs.options
-  const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null
+  const pluginZod = isValidatorEnabled(validator) ? driver.getPlugin(pluginZodName) : null
   const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
   const document = ctx.adapter.document as SecurityDocument | null | undefined
 
@@ -141,7 +147,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
     renderer: jsxRenderer,
     operations(nodes, ctx) {
       const { config, resolver, root } = ctx
-      const { output, group, parser, sdk } = ctx.options
+      const { output, group, validator, sdk } = ctx.options
 
       const pluginTs = ctx.driver.getPlugin(pluginTsName)
       if (!pluginTs || !sdk) return null
@@ -157,8 +163,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
           file: op.typeFile,
           names: resolveTypeImportNames(op.node, op.tsResolver),
         }))
-        const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = isParserEnabled(parser)
-          ? collectImportsByFile(ops, (op) => ({ file: op.zodFile, names: op.zodResolver ? resolveZodImportNames(op.node, op.zodResolver, parser) : [] }))
+        const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = isValidatorEnabled(validator)
+          ? collectImportsByFile(ops, (op) => ({ file: op.zodFile, names: op.zodResolver ? resolveZodImportNames(op.node, op.zodResolver, validator) : [] }))
           : { namesByPath: new Map<string, Set<string>>(), filesByPath: new Map<string, ast.FileNode>() }
 
         return (
@@ -166,18 +172,18 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
             <File.Import name={['createClient']} root={file.path} path={clientPath} />
             <File.Import name={['ClientConfig', 'ClientInstance', 'Options', 'RequestResult']} root={file.path} path={clientPath} isTypeOnly />
 
-            {parser === 'zod' && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
+            {validator === 'zod' && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
 
             {Array.from(typeNamesByPath.entries()).map(([filePath, set]) => (
               <File.Import key={filePath} name={Array.from(set)} root={file.path} path={typeFilesByPath.get(filePath)!.path} isTypeOnly />
             ))}
 
-            {isParserEnabled(parser) &&
+            {isValidatorEnabled(validator) &&
               Array.from(zodNamesByPath.entries()).map(([filePath, set]) => (
                 <File.Import key={filePath} name={Array.from(set)} root={file.path} path={zodFilesByPath.get(filePath)!.path} />
               ))}
 
-            <SdkClient name={className} operations={ops} parser={parser} />
+            <SdkClient name={className} operations={ops} validator={validator} />
           </File>
         )
       }

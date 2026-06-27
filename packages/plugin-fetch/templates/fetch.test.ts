@@ -3,9 +3,11 @@ import {
   type CallResult,
   createClientCore,
   createInterceptorStack,
+  parseEventStream,
   type ResolvedRequest,
   ResponseError,
   resolveAuth,
+  type ServerSentEvent,
   type Transport,
   type TransportResult,
 } from './fetch.ts'
@@ -33,6 +35,10 @@ function createClient(result?: FakeResult) {
   const { transport, calls } = fakeTransport(result)
   const client = createClientCore<string, string>({ defaultTransport: transport })
   return { client, calls }
+}
+
+function toSchema<T>(transform: (value: unknown) => T) {
+  return { '~standard': { validate: (value: unknown) => ({ value: transform(value) }) } }
 }
 
 describe('createInterceptorStack', () => {
@@ -216,7 +222,7 @@ describe('createClientCore', () => {
     expect(calls[0]?.url).toBe('/pet/3,4/x,1,y,2')
   })
 
-  test('honors per-parameter styles.path metadata', async () => {
+  test('honors per-parameter serialization.path metadata', async () => {
     const { client, calls } = createClient()
     await client({
       method: 'GET',
@@ -227,7 +233,7 @@ describe('createClientCore', () => {
     expect(calls[0]?.url).toBe('/pet/;id=5.a,b')
   })
 
-  test('honors per-parameter styles.query metadata', async () => {
+  test('honors per-parameter serialization.query metadata', async () => {
     const { client, calls } = createClient()
     await client({
       method: 'GET',
@@ -304,6 +310,26 @@ describe('createClientCore', () => {
     expect(result).toStrictEqual({ status: 405, data: undefined, error: { message: 'invalid' }, request: 'REQ', response: 'RES' })
   })
 
+  test('passes client-level options to the transport', async () => {
+    const { transport, calls } = fakeTransport()
+    const client = createClientCore<string, string>({ defaultTransport: transport, options: { cache: 'no-store' } })
+    await client({ method: 'GET', url: '/pet' })
+    expect(calls[0]?.options).toStrictEqual({ cache: 'no-store' })
+  })
+
+  test('merges request-level options over client-level', async () => {
+    const { transport, calls } = fakeTransport()
+    const client = createClientCore<string, string>({ defaultTransport: transport, options: { cache: 'no-store', mode: 'cors' } })
+    await client({ method: 'GET', url: '/pet', options: { cache: 'force-cache', next: { revalidate: 60 } } })
+    expect(calls[0]?.options).toStrictEqual({ cache: 'force-cache', mode: 'cors', next: { revalidate: 60 } })
+  })
+
+  test('leaves options undefined when neither level sets it', async () => {
+    const { client, calls } = createClient()
+    await client({ method: 'GET', url: '/pet' })
+    expect(calls[0]?.options).toBeUndefined()
+  })
+
   test('resolves the per-call transport over the default', async () => {
     const { client } = createClient()
     const override = fakeTransport({ data: { from: 'override' } })
@@ -316,7 +342,12 @@ describe('createClientCore', () => {
     const { client, calls } = createClient({ data: { raw: true }, status: 200 })
     const request = vi.fn((body: unknown) => ({ ...(body as object), validated: true }))
     const response = vi.fn(() => ({ parsed: true }))
-    const result = (await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, parser: { request, response } })) as CallResult<string, string>
+    const result = (await client({
+      method: 'POST',
+      url: '/pet',
+      body: { name: 'odie' },
+      validator: { request: toSchema(request), response: toSchema(response) },
+    })) as CallResult<string, string>
     expect(request).toHaveBeenCalledTimes(1)
     expect(calls[0]?.body).toBe('{"name":"odie","validated":true}')
     expect(result.data).toStrictEqual({ parsed: true })
@@ -325,14 +356,14 @@ describe('createClientCore', () => {
   test('skips the response parser on a non-2xx body', async () => {
     const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
     const response = vi.fn((value: unknown) => value)
-    await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { response } })
+    await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { response: toSchema(response) } })
     expect(response).not.toHaveBeenCalled()
   })
 
   test('runs the error parser on a non-2xx body when throwOnError is false', async () => {
     const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
     const error = vi.fn(() => ({ parsed: true }))
-    const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { error } })) as CallResult<string, string>
+    const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { error: toSchema(error) } })) as CallResult<string, string>
     expect(error).toHaveBeenCalledTimes(1)
     expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, request: 'REQ', response: 'RES' })
   })
@@ -340,7 +371,7 @@ describe('createClientCore', () => {
   test('skips the error parser on a success body', async () => {
     const { client } = createClient({ data: { id: 1 }, status: 200 })
     const error = vi.fn((value: unknown) => value)
-    await client({ method: 'GET', url: '/pet/1', throwOnError: false, parser: { error } })
+    await client({ method: 'GET', url: '/pet/1', throwOnError: false, validator: { error: toSchema(error) } })
     expect(error).not.toHaveBeenCalled()
   })
 
@@ -406,12 +437,12 @@ describe('getUrl', () => {
     expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, serializer: { path: ({ value }) => `id-${value as string}` } })).toBe('/pet/id-7')
   })
 
-  test('applies styles.path metadata to the matching placeholders', () => {
+  test('applies serialization.path metadata to the matching placeholders', () => {
     const { client } = createClient()
     expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, serialization: { path: { petId: { style: 'matrix' } } } })).toBe('/pet/;petId=7')
   })
 
-  test('applies styles.query metadata to the query string', () => {
+  test('applies serialization.query metadata to the query string', () => {
     const { client } = createClient()
     expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, serialization: { query: { id: { style: 'spaceDelimited', explode: false } } } })).toBe(
       '/pets?id=3%204%205',
@@ -488,5 +519,78 @@ describe('resolveAuth', () => {
     const headers: Record<string, string> = {}
     await resolveAuth({ security: [{ type: 'http', scheme: 'bearer' }], auth: undefined, headers, query: {} })
     expect(headers).toStrictEqual({})
+  })
+})
+
+describe('parseEventStream', () => {
+  function streamOf(chunks: Array<string>): ReadableStream<Uint8Array> {
+    const encoder = new TextEncoder()
+    return new ReadableStream({
+      start(controller) {
+        for (const chunk of chunks) controller.enqueue(encoder.encode(chunk))
+        controller.close()
+      },
+    })
+  }
+
+  async function* asyncIterableOf(chunks: Array<string>): AsyncGenerator<Uint8Array> {
+    const encoder = new TextEncoder()
+    for (const chunk of chunks) yield encoder.encode(chunk)
+  }
+
+  async function collect<TData>(stream: AsyncIterable<TData>): Promise<Array<TData>> {
+    const events: Array<TData> = []
+    for await (const event of stream) events.push(event)
+    return events
+  }
+
+  test('parses JSON data events split on a blank line', async () => {
+    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n', 'data: {"n":2}\n\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
+  })
+
+  test('concatenates multi-line data with a newline', async () => {
+    const events = await collect(parseEventStream<string>(streamOf(['data: line one\ndata: line two\n\n'])))
+    expect(events).toStrictEqual([{ data: 'line one\nline two' }])
+  })
+
+  test('reads event, id, and retry fields', async () => {
+    const events = await collect(parseEventStream(streamOf(['event: ping\nid: 42\nretry: 3000\ndata: {"ok":true}\n\n'])))
+    expect(events).toStrictEqual([{ event: 'ping', id: '42', retry: 3000, data: { ok: true } }])
+  })
+
+  test('ignores comment and heartbeat lines', async () => {
+    const events = await collect(parseEventStream(streamOf([': keep-alive\n\n', 'data: {"n":1}\n\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }])
+  })
+
+  test('keeps non-JSON data as a string', async () => {
+    const events = await collect(parseEventStream<string>(streamOf(['data: hello world\n\n'])))
+    expect(events).toStrictEqual([{ data: 'hello world' }])
+  })
+
+  test('normalizes CRLF line endings and flushes a trailing event', async () => {
+    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\r\n\r\ndata: {"n":2}\r\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
+  })
+
+  test('reassembles events split across chunks', async () => {
+    const events = await collect(parseEventStream(streamOf(['data: {"hal', 'f":true}\n\n'])))
+    expect(events).toStrictEqual([{ data: { half: true } }])
+  })
+
+  test('consumes an async iterable of byte chunks', async () => {
+    const events = await collect(parseEventStream(asyncIterableOf(['data: {"n":1}\n\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }])
+  })
+
+  test('ignores a comment-only trailer without a blank-line terminator', async () => {
+    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n: keep-alive\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }])
+  })
+
+  test('skips a blank trailing event', async () => {
+    const events: Array<ServerSentEvent> = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n\n\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }])
   })
 })

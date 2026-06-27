@@ -14,7 +14,7 @@ export const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
  * Generates Zod v4 schemas from an OpenAPI spec. Use them to validate API
  * responses at runtime, build form schemas, or feed back into router libraries
  * that consume Zod (tRPC, Hono, Elysia). Pair with `@kubb/plugin-axios` or
- * `@kubb/plugin-fetch` and set the client's `parser: 'zod'` to validate every response
+ * `@kubb/plugin-fetch` and set the client's `validator: 'zod'` to validate every response
  * automatically.
  *
  * @example

@@ -1,6 +1,6 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import { type CallResult, createClientCore, ResponseError, resolveAuth } from './axios.ts'
+import { type CallResult, createClientCore, parseEventStream, ResponseError, resolveAuth } from './axios.ts'
 import { defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
@@ -40,6 +40,10 @@ function fakeAxios(result: Programmed = {}) {
     },
   } as unknown as AxiosInstance
   return { instance, calls, request, requestUse, responseUse, requestEject, responseEject }
+}
+
+function toSchema<T>(transform: (value: unknown) => T) {
+  return { '~standard': { validate: (value: unknown) => ({ value: transform(value) }) } }
 }
 
 describe('defaultQuerySerializer', () => {
@@ -212,7 +216,7 @@ describe('createClientCore', () => {
     expect(calls[0]?.url).toBe('/pet/3,4/x,1,y,2')
   })
 
-  test('honors per-parameter styles.path metadata', async () => {
+  test('honors per-parameter serialization.path metadata', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance })
     await client({
@@ -231,6 +235,30 @@ describe('createClientCore', () => {
     expect(calls[0]?.baseURL).toBe('https://api.test')
   })
 
+  test('passes client-level axiosOptions to axios', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance, options: { timeout: 1000 } })
+    await client({ method: 'GET', url: '/pet' })
+    expect(calls[0]?.timeout).toBe(1000)
+  })
+
+  test('merges request-level axiosOptions over client-level', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance, options: { timeout: 1000, maxRedirects: 5 } })
+    await client({ method: 'GET', url: '/pet', options: { timeout: 2000, decompress: false } })
+    expect(calls[0]?.timeout).toBe(2000)
+    expect(calls[0]?.maxRedirects).toBe(5)
+    expect(calls[0]?.decompress).toBe(false)
+  })
+
+  test('never lets options override the runtime-owned fields', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/pet/{petId}', path: { petId: 7 }, options: { url: '/evil', method: 'DELETE' } })
+    expect(calls[0]?.url).toBe('/pet/7')
+    expect(calls[0]?.method).toBe('GET')
+  })
+
   test('maps querySerializer onto axios paramsSerializer', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance })
@@ -239,12 +267,33 @@ describe('createClientCore', () => {
     expect(serializer({ tags: ['a', 'b'] })).toBe('tags=a&tags=b')
   })
 
-  test('passes styles.query through the axios paramsSerializer', async () => {
+  test('passes serialization.query through the axios paramsSerializer', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance })
     await client({ method: 'GET', url: '/pet', query: { id: [3, 4, 5] }, serialization: { query: { id: { style: 'pipeDelimited', explode: false } } } })
     const serializer = calls[0]?.paramsSerializer as (params: Record<string, unknown>) => string
     expect(serializer({ id: [3, 4, 5] })).toBe('id=3|4|5')
+  })
+
+  test('defaults stream responses to the fetch adapter so the browser streams the body', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/events', responseType: 'stream' })
+    expect(calls[0]?.adapter).toBe('fetch')
+  })
+
+  test('respects an explicit adapter on a stream request', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/events', responseType: 'stream', options: { adapter: 'http' } })
+    expect(calls[0]?.adapter).toBe('http')
+  })
+
+  test('leaves non-stream requests on the default adapter', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/pet/1' })
+    expect(calls[0]?.adapter).toBeUndefined()
   })
 
   test('serializes the body before axios and sets Content-Type', async () => {
@@ -352,7 +401,12 @@ describe('createClientCore', () => {
     const client = createClientCore({ transport: instance })
     const request = vi.fn((body: unknown) => ({ ...(body as object), validated: true }))
     const response = vi.fn(() => ({ parsed: true }))
-    const result = (await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, parser: { request, response } })) as CallResult
+    const result = (await client({
+      method: 'POST',
+      url: '/pet',
+      body: { name: 'odie' },
+      validator: { request: toSchema(request), response: toSchema(response) },
+    })) as CallResult
     expect(request).toHaveBeenCalledTimes(1)
     expect(calls[0]?.data).toBe('{"name":"odie","validated":true}')
     expect(result.data).toStrictEqual({ parsed: true })
@@ -362,7 +416,7 @@ describe('createClientCore', () => {
     const { instance } = fakeAxios({ data: { message: 'invalid' }, status: 405 })
     const client = createClientCore({ transport: instance })
     const response = vi.fn((value: unknown) => value)
-    await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { response } })
+    await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { response: toSchema(response) } })
     expect(response).not.toHaveBeenCalled()
   })
 
@@ -370,7 +424,7 @@ describe('createClientCore', () => {
     const { instance } = fakeAxios({ data: { message: 'invalid' }, status: 405 })
     const client = createClientCore({ transport: instance })
     const error = vi.fn(() => ({ parsed: true }))
-    const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { error } })) as CallResult
+    const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { error: toSchema(error) } })) as CallResult
     expect(error).toHaveBeenCalledTimes(1)
     expect(result.error).toStrictEqual({ parsed: true })
   })
@@ -379,7 +433,7 @@ describe('createClientCore', () => {
     const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
     const client = createClientCore({ transport: instance })
     const error = vi.fn((value: unknown) => value)
-    await client({ method: 'GET', url: '/pet/1', throwOnError: false, parser: { error } })
+    await client({ method: 'GET', url: '/pet/1', throwOnError: false, validator: { error: toSchema(error) } })
     expect(error).not.toHaveBeenCalled()
   })
 
@@ -449,13 +503,13 @@ describe('getUrl', () => {
     expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, serializer: { path: ({ value }) => `id-${value as string}` } })).toBe('/pet/id-7')
   })
 
-  test('applies styles.path metadata to the matching placeholders', () => {
+  test('applies serialization.path metadata to the matching placeholders', () => {
     const { instance } = fakeAxios()
     const client = createClientCore({ transport: instance })
     expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, serialization: { path: { petId: { style: 'matrix' } } } })).toBe('/pet/;petId=7')
   })
 
-  test('applies styles.query metadata to the query string', () => {
+  test('applies serialization.query metadata to the query string', () => {
     const { instance } = fakeAxios()
     const client = createClientCore({ transport: instance })
     expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, serialization: { query: { id: { style: 'pipeDelimited', explode: false } } } })).toBe(
@@ -521,5 +575,53 @@ describe('resolveAuth', () => {
     const headers: Record<string, string> = {}
     await resolveAuth({ security: [{ type: 'http', scheme: 'bearer' }], auth: undefined, headers, query: {} })
     expect(headers).toStrictEqual({})
+  })
+})
+
+describe('parseEventStream', () => {
+  function streamOf(chunks: Array<string>): ReadableStream<Uint8Array> {
+    const encoder = new TextEncoder()
+    return new ReadableStream({
+      start(controller) {
+        for (const chunk of chunks) controller.enqueue(encoder.encode(chunk))
+        controller.close()
+      },
+    })
+  }
+
+  async function* asyncIterableOf(chunks: Array<string>): AsyncGenerator<Uint8Array> {
+    const encoder = new TextEncoder()
+    for (const chunk of chunks) yield encoder.encode(chunk)
+  }
+
+  async function collect<TData>(stream: AsyncIterable<TData>): Promise<Array<TData>> {
+    const events: Array<TData> = []
+    for await (const event of stream) events.push(event)
+    return events
+  }
+
+  test('parses JSON data events split on a blank line', async () => {
+    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n', 'data: {"n":2}\n\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
+  })
+
+  test('concatenates multi-line data and reads event/id/retry fields', async () => {
+    const events = await collect(parseEventStream(streamOf(['event: ping\nid: 42\nretry: 3000\ndata: line one\ndata: line two\n\n'])))
+    expect(events).toStrictEqual([{ event: 'ping', id: '42', retry: 3000, data: 'line one\nline two' }])
+  })
+
+  test('ignores comment lines and keeps non-JSON data as a string', async () => {
+    const events = await collect(parseEventStream<string>(streamOf([': keep-alive\n\n', 'data: hello world\n\n'])))
+    expect(events).toStrictEqual([{ data: 'hello world' }])
+  })
+
+  test('normalizes CRLF endings and flushes a trailing event', async () => {
+    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\r\n\r\ndata: {"n":2}\r\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
+  })
+
+  test('consumes an async iterable of byte chunks, as the axios stream response yields', async () => {
+    const events = await collect(parseEventStream(asyncIterableOf(['data: {"n":1}\n\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }])
   })
 })

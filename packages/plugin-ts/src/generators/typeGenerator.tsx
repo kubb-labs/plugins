@@ -5,7 +5,7 @@ import { Type } from '../components/Type.tsx'
 import { ENUM_TYPES_WITH_KEY_SUFFIX } from '../constants.ts'
 import { printerTs } from '../printers/printerTs.ts'
 import type { PluginTs } from '../types'
-import { buildData, buildResponses, buildResponseUnion } from '../utils.ts'
+import { buildData, buildResponses, buildResponseUnion, isInlineConstEnum } from '../utils.ts'
 
 /**
  * Built-in generator for `@kubb/plugin-ts`. Emits one TypeScript file per
@@ -39,7 +39,10 @@ export const typeGenerator = defineGenerator<PluginTs>({
       path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
     }))
 
-    const isEnumSchema = !!ast.narrowSchema(node, ast.schemaTypes.enum)
+    const enumNode = ast.narrowSchema(node, ast.schemaTypes.enum)
+    // An inline `const` (single-value enum the adapter did not register) renders as a literal type,
+    // so it keeps its plain name instead of the suffixed enum-key name.
+    const isEnumSchema = !!enumNode && !isInlineConstEnum(enumNode, enumSchemaNames)
 
     const meta = {
       name:

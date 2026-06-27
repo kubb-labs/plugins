@@ -8,6 +8,7 @@ import { updatePetHandler } from './pet/updatePetHandler.ts'
 import { updatePetWithFormHandler } from './pet/updatePetWithFormHandler.ts'
 import { uploadFileHandler } from './pet/uploadFileHandler.ts'
 import { createPetsHandler } from './pets/createPetsHandler.ts'
+import { streamPetEventsHandler } from './stream/streamPetEventsHandler.ts'
 
 export const handlers = [
   createPetsHandler(),
@@ -20,4 +21,5 @@ export const handlers = [
   deletePetHandler(),
   addFilesHandler(),
   uploadFileHandler(),
+  streamPetEventsHandler(),
 ] as const
