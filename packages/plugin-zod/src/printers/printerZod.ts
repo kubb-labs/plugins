@@ -13,7 +13,17 @@ import {
 import { ast } from '@kubb/core'
 import { containsCircularRef, syncSchemaRef } from '@kubb/ast/utils'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { applyModifiers, containsCodec, formatLiteral, getCodec, lengthConstraints, numberConstraints, omitUnwrapChain, patternKeySchema, shouldCoerce } from '../utils.ts'
+import {
+  applyModifiers,
+  containsCodec,
+  formatLiteral,
+  getCodec,
+  lengthConstraints,
+  numberConstraints,
+  omitUnwrapChain,
+  patternKeySchema,
+  shouldCoerce,
+} from '../utils.ts'
 import type { AdapterOas } from '@kubb/adapter-oas'
 
 /**
