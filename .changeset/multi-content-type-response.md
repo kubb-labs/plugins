@@ -1,17 +1,41 @@
 ---
+"@kubb/plugin-react-query": minor
+"@kubb/plugin-vue-query": minor
+"@kubb/plugin-axios": minor
+"@kubb/plugin-fetch": minor
+"@kubb/plugin-faker": minor
+"@kubb/plugin-swr": minor
+"@kubb/plugin-msw": minor
 "@kubb/plugin-ts": minor
 "@kubb/plugin-zod": minor
-"@kubb/plugin-faker": minor
-"@kubb/plugin-msw": minor
 ---
 
-Support multiple content types on requests and responses.
+Negotiate and discriminate multiple response content types.
 
-- `plugin-ts` now emits a union of per-content-type variants for responses that declare more than one content type (e.g. `GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml`), mirroring the existing request-body behaviour. Single-content-type responses are unchanged.
-- `plugin-zod` and `plugin-faker` mirror this: they emit one schema/mock per content type plus a union alias for both responses and request bodies (e.g. `addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])`, and a `createAddPetStatus200` factory that picks between the per-content-type factories). Variant names line up across the three plugins via shared naming helpers.
-- `plugin-msw` prefers the `application/json` content type for the mocked response's `Content-Type` header when a response declares several.
-- The generated fetch client parses the response body based on the `Content-Type` header (JSON, text, blob) instead of always calling `res.json()`, honours an explicit `responseType` override, and serializes `application/x-www-form-urlencoded` bodies as `URLSearchParams`. Operations whose success response is a single binary/text content type now default `responseType` (e.g. `'blob'`), so file downloads work out of the box.
+A generated call now takes a `contentType: { request, response }` object. The `request` key picks the body format and the `response` key sets the `Accept` header. Both default to what the spec declares and stay overridable, and a bare `contentType: 'application/json'` string still selects the request type, so existing calls keep working.
 
-Single-content-type operations are backwards-compatible — generated output is unchanged.
+When a status documents more than one content type, the result reports the type the server actually returned on `result.parsed`, so a caller can narrow `data` by it.
 
-Requires `@kubb/adapter-oas` and `@kubb/ast` with response `content` support.
+```ts
+const result = await getPetById({ path: { petId: '1' }, contentType: { response: 'application/xml' } })
+
+if (result.status === 200) {
+  const { data, contentType } = result.parsed
+  switch (contentType) {
+    case 'application/json':
+      console.log('JSON pet:', data.name)
+      break
+    case 'application/xml':
+      console.log('XML pet:', data.id)
+      break
+  }
+}
+```
+
+- `plugin-ts` emits a status with several content types as a discriminated union `{ contentType; data }` instead of a tagless union, so `result.parsed.contentType` narrows `result.parsed.data`. It keeps the individual per-content-type variant types (`GetPetByIdStatus200Json`, `GetPetByIdStatus200Xml`).
+- `plugin-fetch` and `plugin-axios` add `deserializers` and `bodySerializers` maps to `RequestConfig` and `ClientConfig`, keyed by content type and matched with the charset stripped, for formats the runtime does not decode itself such as `application/xml`. The negotiated content type rides on `result.parsed` and on `ResponseError`.
+- `plugin-react-query`, `plugin-vue-query`, and `plugin-swr` thread the `contentType` option through as the `{ request?, response? }` object.
+- `plugin-zod` and `plugin-faker` emit one schema or mock per response content type plus a union alias, with variant names that line up across the plugins through the shared naming helpers.
+- `plugin-msw` prefers the `application/json` content type for the mocked response when a status declares several.
+
+Single-content-type operations generate the same output as before. The one breaking change is the shape of a multi-content-type status type. The plain body still lives on `result.data` for callers that do not need to discriminate.

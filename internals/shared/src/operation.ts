@@ -150,6 +150,23 @@ export function getContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
   }
 }
 
+/**
+ * The request-body counterpart for the primary success response: the content types it documents and
+ * whether several are present, so the client can let a caller pick which one to accept.
+ */
+export function getResponseContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
+  const contentTypes = getPrimarySuccessResponse(node)?.content?.map((e) => e.contentType) ?? []
+  const isMultipleContentTypes = contentTypes.length > 1
+
+  return {
+    contentTypes,
+    isMultipleContentTypes,
+    contentTypeUnion: isMultipleContentTypes ? contentTypes.map((ct) => JSON.stringify(ct)).join(' | ') : '',
+    defaultContentType: contentTypes[0] ?? 'application/json',
+    hasFormData: contentTypes.some((ct) => ct === 'multipart/form-data'),
+  }
+}
+
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
 
 /**
@@ -245,13 +262,20 @@ export function resolveContentTypeVariants(entries: Array<ContentVariantInput>, 
 }
 
 export function buildRequestConfigType(node: ast.OperationNode): string {
-  const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
+  const request = getContentTypeInfo(node)
+  const response = getResponseContentTypeInfo(node)
   // The request groups come from the grouped params, so `config` drops the data-shape keys to stay
   // assignable to `Options`, which omits them from `RequestConfig`.
   const configType = `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`
-  const contentTypeProp = isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : null
 
-  return contentTypeProp ? `${configType} & { ${contentTypeProp} }` : configType
+  // Only the ambiguous side is offered: a single-type side has nothing to pick, so it stays baked in
+  // the generated call.
+  const members = [
+    request.isMultipleContentTypes ? `request?: ${request.contentTypeUnion}` : null,
+    response.isMultipleContentTypes ? `response?: ${response.contentTypeUnion}` : null,
+  ].filter(Boolean)
+
+  return members.length ? `${configType} & { contentType?: { ${members.join('; ')} } }` : configType
 }
 
 /**

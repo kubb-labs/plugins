@@ -16,7 +16,13 @@ export type AddPetStatus200Json = Pet;
 */
 export type AddPetStatus200Xml = Pet;
 
-export type AddPetStatus200 = (AddPetStatus200Json | AddPetStatus200Xml);
+export type AddPetStatus200 = ({
+    contentType: "application/json";
+    data: AddPetStatus200Json;
+} | {
+    contentType: "application/xml";
+    data: AddPetStatus200Xml;
+});
 
 /**
  * @type any

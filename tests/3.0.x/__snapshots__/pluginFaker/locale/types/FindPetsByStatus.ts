@@ -22,7 +22,13 @@ export type FindPetsByStatusStatus200Json = Pet[];
 */
 export type FindPetsByStatusStatus200Xml = Pet[];
 
-export type FindPetsByStatusStatus200 = (FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml);
+export type FindPetsByStatusStatus200 = ({
+    contentType: "application/json";
+    data: FindPetsByStatusStatus200Json;
+} | {
+    contentType: "application/xml";
+    data: FindPetsByStatusStatus200Xml;
+});
 
 /**
  * @type any

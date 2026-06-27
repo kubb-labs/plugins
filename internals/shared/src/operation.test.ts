@@ -83,7 +83,7 @@ describe('getContentTypeInfo', () => {
 })
 
 describe('buildRequestConfigType', () => {
-  test('adds the content type option when an operation has multiple content types', () => {
+  test('offers a request content type when the request body has multiple', () => {
     const node = ast.factory.createOperation({
       operationId: 'createPet',
       method: 'POST',
@@ -97,7 +97,55 @@ describe('buildRequestConfigType', () => {
     })
 
     expect(buildRequestConfigType(node)).toBe(
-      `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: "application/json" | "application/xml" }`,
+      `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: { request?: "application/json" | "application/xml" } }`,
+    )
+  })
+
+  test('offers a response content type when the success response has multiple', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'getPet',
+      method: 'GET',
+      path: '/pets/{petId}',
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [
+            ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) }),
+            ast.factory.createContent({ contentType: 'application/xml', schema: ast.factory.createSchema({ type: 'object' }) }),
+          ],
+        }),
+      ],
+    })
+
+    expect(buildRequestConfigType(node)).toBe(
+      `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: { response?: "application/json" | "application/xml" } }`,
+    )
+  })
+
+  test('offers both request and response content types when both are ambiguous', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'updatePet',
+      method: 'PUT',
+      path: '/pets',
+      requestBody: {
+        content: [
+          ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) }),
+          ast.factory.createContent({ contentType: 'application/xml', schema: ast.factory.createSchema({ type: 'object' }) }),
+        ],
+      },
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [
+            ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) }),
+            ast.factory.createContent({ contentType: 'application/xml', schema: ast.factory.createSchema({ type: 'object' }) }),
+          ],
+        }),
+      ],
+    })
+
+    expect(buildRequestConfigType(node)).toBe(
+      `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: { request?: "application/json" | "application/xml"; response?: "application/json" | "application/xml" } }`,
     )
   })
 

@@ -23,13 +23,30 @@ export type ErrorOf<TResponses> = TResponses[Exclude<keyof TResponses, SuccessSt
 export type ToStatusNumber<TStatus> = TStatus extends `${infer TNumber extends number}` ? TNumber : number
 
 /**
+ * The plain body of a per-status response. A status that documents several content types is generated
+ * as a `{ contentType; data }` union, so this pulls out the `data` members to keep `result.data` the
+ * bare body union. A single-content-type status is already its own body.
+ */
+export type DataOf<T> = T extends { contentType: string; data: infer TData } ? TData : T
+
+/**
+ * The content-type-discriminated view of a per-status response carried on `result.parsed`. A
+ * multi-content-type status is already a `{ contentType; data }` union, so
+ * `switch (result.parsed.contentType)` narrows `result.parsed.data`. A single-content-type status is
+ * wrapped with the content type the runtime reports.
+ */
+export type ParsedOf<T> = T extends { contentType: string; data: unknown } ? T : { contentType: string | undefined; data: T }
+
+/**
  * One result variant for a single documented status. `status` is the numeric literal at the top
  * level, so a `switch (result.status)` narrows `data` (a 2xx status) or `error` (everything else) to
- * that status's payload.
+ * that status's payload. On a success variant `parsed` carries the same body tagged with the
+ * negotiated content type, so `switch (result.parsed.contentType)` narrows it further when the status
+ * documents several types.
  */
 export type ResultByStatus<TResponses, TStatus extends keyof TResponses, TRequest, TResponse> = TStatus extends SuccessStatusCode
-  ? { status: ToStatusNumber<TStatus>; data: TResponses[TStatus]; error: undefined; request: TRequest; response: TResponse }
-  : { status: ToStatusNumber<TStatus>; data: undefined; error: TResponses[TStatus]; request: TRequest; response: TResponse }
+  ? { status: ToStatusNumber<TStatus>; data: DataOf<TResponses[TStatus]>; error: undefined; parsed: ParsedOf<TResponses[TStatus]>; request: TRequest; response: TResponse }
+  : { status: ToStatusNumber<TStatus>; data: undefined; error: DataOf<TResponses[TStatus]>; parsed: undefined; request: TRequest; response: TResponse }
 
 /**
  * The union of every documented status' result variant.
@@ -55,10 +72,10 @@ export type SuccessResultUnion<TResponses, TRequest, TResponse> = {
  */
 export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = Request, TResponse = Response> = ThrowOnError extends true
   ? [SuccessResultUnion<TResponses, TRequest, TResponse>] extends [never]
-    ? { status: number; data: SuccessOf<TResponses>; error: undefined; request: TRequest; response: TResponse }
+    ? { status: number; data: SuccessOf<TResponses>; error: undefined; parsed: { contentType: string | undefined; data: SuccessOf<TResponses> }; request: TRequest; response: TResponse }
     : SuccessResultUnion<TResponses, TRequest, TResponse>
   : [ResultUnion<TResponses, TRequest, TResponse>] extends [never]
-    ? { status: number; data: undefined; error: undefined; request: TRequest; response: TResponse }
+    ? { status: number; data: undefined; error: undefined; parsed: undefined; request: TRequest; response: TResponse }
     : ResultUnion<TResponses, TRequest, TResponse>
 
 /**
@@ -83,6 +100,20 @@ export type QuerySerializer = (params: Record<string, unknown>) => string
  * `ArrayBuffer`, and string bodies pass through untouched.
  */
 export type BodySerializer = (body: unknown, contentType?: string) => BodyInit | undefined
+
+/**
+ * Turns a raw response body into a parsed value for a given content type. Registered per media type
+ * on `deserializers` to handle formats the runtime does not decode itself, such as `application/xml`
+ * or `text/csv`. Runs before the `validator.response` hook.
+ */
+export type Deserializer<T = unknown> = (raw: unknown, contentType: string) => T | Promise<T>
+
+/**
+ * The per-call content type selection. A bare string selects the request content type (the legacy
+ * shape). The object form selects the request body format and the preferred response format, which
+ * the runtime sends as `Accept`.
+ */
+export type ContentType = string | { request?: string; response?: string }
 
 /**
  * A Standard Schema validator (zod, valibot, arktype) that parses a value before it is sent or after
@@ -139,13 +170,15 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   signal?: AbortSignal
   credentials?: RequestCredentials
   options?: FetchOptions
-  contentType?: string
+  contentType?: ContentType
   responseType?: ResponseType
   throwOnError?: boolean
   client?: ClientInstance<TRequest, TResponse>
   transport?: Transport<TRequest, TResponse>
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
+  bodySerializers?: Record<string, BodySerializer>
+  deserializers?: Record<string, Deserializer>
   validator?: { request?: Validator; response?: Validator; error?: Validator }
   security?: Array<Auth>
   auth?: AuthResolver
@@ -177,6 +210,8 @@ export type ClientConfig<TRequest = Request, TResponse = Response> = {
   transport?: Transport<TRequest, TResponse>
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
+  bodySerializers?: Record<string, BodySerializer>
+  deserializers?: Record<string, Deserializer>
   auth?: AuthResolver
 }
 
@@ -204,6 +239,7 @@ export type TransportResult<TData = unknown, TRequest = Request, TResponse = Res
   status: number
   statusText: string
   headers: Headers
+  contentType?: string
   request: TRequest
   response: TResponse
 }
@@ -221,6 +257,7 @@ export type CallResult<TRequest = Request, TResponse = Response> = {
   status: number
   data: unknown
   error: unknown
+  parsed: { data: unknown; contentType: string | undefined } | undefined
   request: TRequest
   response: TResponse
 }
@@ -271,15 +308,17 @@ export class ResponseError<TError = unknown, TRequest = Request, TResponse = Res
   data: TError
   status: number
   statusText: string
+  contentType: string | undefined
   request: TRequest
   response: TResponse
 
-  constructor(config: { data: TError; status: number; statusText: string; request: TRequest; response: TResponse }) {
+  constructor(config: { data: TError; status: number; statusText: string; contentType?: string; request: TRequest; response: TResponse }) {
     super(`Request failed with status ${config.status}${config.statusText ? ` ${config.statusText}` : ''}`)
     this.name = 'ResponseError'
     this.data = config.data
     this.status = config.status
     this.statusText = config.statusText
+    this.contentType = config.contentType
     this.request = config.request
     this.response = config.response
   }
@@ -450,6 +489,33 @@ async function runValidator<T>(validator: Validator<T> | undefined, value: T): P
 }
 
 /**
+ * The base media type of a `Content-Type` value: lowercased and stripped of any `; charset=...`
+ * parameters (`application/json; charset=utf-8` becomes `application/json`). `undefined` when empty.
+ */
+function baseContentType(value: string | null | undefined): string | undefined {
+  if (!value) return undefined
+  return value.split(';')[0]!.trim().toLowerCase() || undefined
+}
+
+/**
+ * Reads the negotiated response content type from the response headers as a base media type.
+ */
+function getResponseContentType(headers: Headers | Record<string, string> | undefined): string | undefined {
+  if (!headers) return undefined
+  const value = headers instanceof Headers ? headers.get('Content-Type') : (headers['Content-Type'] ?? headers['content-type'])
+  return baseContentType(value)
+}
+
+/**
+ * Normalizes the `contentType` option to its `{ request, response }` form. A bare string is the
+ * request content type.
+ */
+function resolveContentType(contentType: ContentType | undefined): { request?: string; response?: string } {
+  if (typeof contentType === 'string') return { request: contentType }
+  return contentType ?? {}
+}
+
+/**
  * Builds the shared client core bound to a transport. Each plugin calls this with its
  * `defaultTransport` and exports the resulting instance as `client`, plus a `createClient` factory.
  */
@@ -468,10 +534,15 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
     const transport = requestConfig.transport ?? config.transport ?? defaultTransport
     const querySerializer = requestConfig.querySerializer ?? config.querySerializer ?? defaultQuerySerializer
-    const bodySerializer = requestConfig.bodySerializer ?? config.bodySerializer ?? defaultBodySerializer
+    const bodySerializers = { ...config.bodySerializers, ...requestConfig.bodySerializers }
+    const deserializers = { ...config.deserializers, ...requestConfig.deserializers }
 
     const headers = mergeHeaders(config.headers, requestConfig.headers)
-    const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
+    const { request: requestContentTypeOption, response: responseContentType } = resolveContentType(requestConfig.contentType)
+    const requestContentType = requestContentTypeOption ?? headers['Content-Type'] ?? headers['content-type']
+    if (responseContentType && headers['Accept'] === undefined && headers['accept'] === undefined) {
+      headers['Accept'] = responseContentType
+    }
 
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
 
@@ -484,13 +555,16 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
 
     const rawBody = requestConfig.body
     const validatedBody = await runValidator(requestConfig.validator?.request, rawBody)
+    const requestContentTypeBase = baseContentType(requestContentType)
+    const bodySerializer =
+      (requestContentTypeBase && bodySerializers[requestContentTypeBase]) || requestConfig.bodySerializer || config.bodySerializer || defaultBodySerializer
     const body = bodySerializer(validatedBody, requestContentType)
     // A FormData body must keep its Content-Type unset so the runtime appends the multipart boundary.
     if (body instanceof FormData) {
       delete headers['Content-Type']
       delete headers['content-type']
-    } else if (requestConfig.contentType) {
-      headers['Content-Type'] = requestConfig.contentType
+    } else if (requestContentTypeOption) {
+      headers['Content-Type'] = requestContentTypeOption
     }
     const url = serializeUrl([config.baseURL, requestConfig.baseURL, requestConfig.url], requestConfig.path ?? {}, querySerializer(query))
 
@@ -514,13 +588,21 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     const isSuccess = result.status >= 200 && result.status < 300
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
 
-    const parsedErrorData = !isSuccess ? await runValidator(requestConfig.validator?.error, result.data) : undefined
+    const contentType = result.contentType ?? getResponseContentType(result.headers)
+    let decoded = result.data
+    if (contentType) {
+      const deserialize = deserializers[contentType]
+      if (deserialize) decoded = await deserialize(result.data, contentType)
+    }
+
+    const parsedErrorData = !isSuccess ? await runValidator(requestConfig.validator?.error, decoded) : undefined
 
     if (!isSuccess && throwOnError) {
       const error = new ResponseError({
         data: parsedErrorData,
         status: result.status,
         statusText: result.statusText,
+        contentType,
         request: result.request,
         response: result.response,
       })
@@ -528,13 +610,14 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
       throw error
     }
 
-    const data = isSuccess ? await runValidator(requestConfig.validator?.response, result.data) : undefined
+    const data = isSuccess ? await runValidator(requestConfig.validator?.response, decoded) : undefined
     const error = isSuccess ? undefined : parsedErrorData
 
     return {
       status: result.status,
       data,
       error,
+      parsed: isSuccess ? { data, contentType } : undefined,
       request: result.request,
       response: result.response,
     }
@@ -733,6 +816,7 @@ const defaultTransport: Transport = async (request: ResolvedRequest): Promise<Tr
     status: response.status,
     statusText: response.statusText,
     headers: response.headers,
+    contentType: getResponseContentType(response.headers),
     request: nativeRequest,
     response,
   }

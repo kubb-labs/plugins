@@ -22,7 +22,7 @@ export type PlaceOrderMutationArg = PlaceOrderRequestConfig
  */
 export function usePlaceOrder(options: {
   mutation?: SWRMutationConfiguration<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg> & { throwOnError?: boolean },
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: { request?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } },
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
