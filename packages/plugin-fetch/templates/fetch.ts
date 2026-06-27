@@ -45,7 +45,14 @@ export type ParsedOf<T> = T extends { contentType: string; data: unknown } ? T :
  * documents several types.
  */
 export type ResultByStatus<TResponses, TStatus extends keyof TResponses, TRequest, TResponse> = TStatus extends SuccessStatusCode
-  ? { status: ToStatusNumber<TStatus>; data: DataOf<TResponses[TStatus]>; error: undefined; parsed: ParsedOf<TResponses[TStatus]>; request: TRequest; response: TResponse }
+  ? {
+      status: ToStatusNumber<TStatus>
+      data: DataOf<TResponses[TStatus]>
+      error: undefined
+      parsed: ParsedOf<TResponses[TStatus]>
+      request: TRequest
+      response: TResponse
+    }
   : { status: ToStatusNumber<TStatus>; data: undefined; error: DataOf<TResponses[TStatus]>; parsed: undefined; request: TRequest; response: TResponse }
 
 /**
@@ -72,7 +79,14 @@ export type SuccessResultUnion<TResponses, TRequest, TResponse> = {
  */
 export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = Request, TResponse = Response> = ThrowOnError extends true
   ? [SuccessResultUnion<TResponses, TRequest, TResponse>] extends [never]
-    ? { status: number; data: SuccessOf<TResponses>; error: undefined; parsed: { contentType: string | undefined; data: SuccessOf<TResponses> }; request: TRequest; response: TResponse }
+    ? {
+        status: number
+        data: SuccessOf<TResponses>
+        error: undefined
+        parsed: { contentType: string | undefined; data: SuccessOf<TResponses> }
+        request: TRequest
+        response: TResponse
+      }
     : SuccessResultUnion<TResponses, TRequest, TResponse>
   : [ResultUnion<TResponses, TRequest, TResponse>] extends [never]
     ? { status: number; data: undefined; error: undefined; parsed: undefined; request: TRequest; response: TResponse }
