@@ -16,6 +16,8 @@ export type { OrderOrderTypeEnumKey } from './OrderOrderTypeEnum.ts'
 export type { OrderParamsStatusEnumKey } from './OrderParamsStatusEnum.ts'
 export type { OrderStatusEnumKey } from './OrderStatusEnum.ts'
 export type { Pet } from './Pet.ts'
+export type { PetEvent } from './PetEvent.ts'
+export type { PetEventTypeEnumKey } from './PetEventTypeEnum.ts'
 export type { PetNotFound } from './PetNotFound.ts'
 export type { PetStatusEnumKey } from './PetStatusEnum.ts'
 export type {
@@ -171,6 +173,13 @@ export type {
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './store/PlaceOrderPatch.ts'
+export type {
+  StreamPetEventsPathPetId,
+  StreamPetEventsRequestConfig,
+  StreamPetEventsResponse,
+  StreamPetEventsResponses,
+  StreamPetEventsStatus200,
+} from './stream/StreamPetEvents.ts'
 export type { TagTag } from './tag/Tag.ts'
 export { addPetRequestStatusEnum } from './AddPetRequestStatusEnum.ts'
 export { animalTypeEnum } from './AnimalTypeEnum.ts'
@@ -181,4 +190,5 @@ export { orderHttpStatusEnum } from './OrderHttpStatusEnum.ts'
 export { orderOrderTypeEnum } from './OrderOrderTypeEnum.ts'
 export { orderParamsStatusEnum } from './OrderParamsStatusEnum.ts'
 export { orderStatusEnum } from './OrderStatusEnum.ts'
+export { petEventTypeEnum } from './PetEventTypeEnum.ts'
 export { petStatusEnum } from './PetStatusEnum.ts'

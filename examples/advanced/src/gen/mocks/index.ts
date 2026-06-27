@@ -15,6 +15,8 @@ export { createOrderHttpStatusEnumFaker } from './createOrderHttpStatusEnumFaker
 export { createOrderOrderTypeEnumFaker } from './createOrderOrderTypeEnumFaker.ts'
 export { createOrderParamsStatusEnumFaker } from './createOrderParamsStatusEnumFaker.ts'
 export { createOrderStatusEnumFaker } from './createOrderStatusEnumFaker.ts'
+export { createPetEventFaker } from './createPetEventFaker.ts'
+export { createPetEventTypeEnumFaker } from './createPetEventTypeEnumFaker.ts'
 export { createPetFaker } from './createPetFaker.ts'
 export { createPetNotFoundFaker } from './createPetNotFoundFaker.ts'
 export { createPetStatusEnumFaker } from './createPetStatusEnumFaker.ts'
@@ -109,4 +111,9 @@ export {
   createCreatePetsStatus201Faker,
   createCreatePetsStatusDefaultFaker,
 } from './pets/createCreatePetsFaker.ts'
+export {
+  createStreamPetEventsPathPetIdFaker,
+  createStreamPetEventsResponseFaker,
+  createStreamPetEventsStatus200Faker,
+} from './stream/createStreamPetEventsFaker.ts'
 export { createTagTagFaker } from './tag/createTagFaker.ts'

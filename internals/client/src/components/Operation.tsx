@@ -1,4 +1,4 @@
-import { buildOperationComments, getContentTypeInfo } from '@internals/shared'
+import { buildOperationComments, getContentTypeInfo, getResponseType, isEventStream } from '@internals/shared'
 import { Url } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -57,6 +57,10 @@ export function Operation({ name, node, tsResolver, zodResolver, validator, secu
   const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const contentTypeLiteral = hasRequestBody && defaultContentType !== 'application/json' ? `contentType: '${defaultContentType}'` : null
 
+  const eventStream = isEventStream(node)
+  const responseType = getResponseType(node)
+  const responseTypeLiteral = responseType ? `responseType: '${responseType}'` : null
+
   const validatorEntries = [
     validators.request ? `request: ${validators.request}` : null,
     validators.response ? `response: ${validators.response}` : null,
@@ -70,10 +74,15 @@ export function Operation({ name, node, tsResolver, zodResolver, validator, secu
     securityLiteral ? `security: ${securityLiteral}` : null,
     validatorLiteral,
     contentTypeLiteral,
+    responseTypeLiteral,
     '...config',
   ]
     .filter(Boolean)
     .join(', ')} }`
+
+  const eventType = `SuccessOf<${tsResolver.resolveResponsesName(node)}>`
+  const returnType = eventStream ? `Promise<EventStreamResult<${eventType}>>` : signature.returnType
+  const returnStatement = eventStream ? `return toEventStream<${eventType}>(request(${callConfig}))` : buildReturnStatement({ node, tsResolver, callConfig })
 
   return (
     <File.Source name={name} isExportable={isExportable} isIndexable={isIndexable}>
@@ -82,12 +91,12 @@ export function Operation({ name, node, tsResolver, zodResolver, validator, secu
         export={isExportable}
         generics={signature.generics}
         params={signature.paramsSignature}
-        returnType={signature.returnType}
+        returnType={returnType}
         JSDoc={{ comments: buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }) }}
       >
         {'const { client: request = client, ...config } = options'}
         <br />
-        {buildReturnStatement({ node, tsResolver, callConfig })}
+        {returnStatement}
       </Function>
     </File.Source>
   )

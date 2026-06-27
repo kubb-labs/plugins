@@ -104,6 +104,8 @@ export type {
   UploadFileResponseSchemaType,
   UploadFileStatus200SchemaType,
 } from './pet/uploadFileSchema.ts'
+export type { PetEventSchemaType } from './petEventSchema.ts'
+export type { PetEventTypeEnumSchemaType } from './petEventTypeEnumSchema.ts'
 export type { PetNotFoundSchemaType } from './petNotFoundSchema.ts'
 export type { PetSchemaType } from './petSchema.ts'
 export type { PetStatusEnumSchemaType } from './petStatusEnumSchema.ts'
@@ -118,6 +120,11 @@ export type {
   CreatePetsStatus201SchemaType,
   CreatePetsStatusDefaultSchemaType,
 } from './pets/createPetsSchema.ts'
+export type {
+  StreamPetEventsPathPetIdSchemaType,
+  StreamPetEventsResponseSchemaType,
+  StreamPetEventsStatus200SchemaType,
+} from './stream/streamPetEventsSchema.ts'
 export type { TagTagSchemaType } from './tag/tagSchema.ts'
 export { addPetRequestSchema } from './addPetRequestSchema.ts'
 export { addPetRequestStatusEnumSchema } from './addPetRequestStatusEnumSchema.ts'
@@ -225,6 +232,8 @@ export {
   uploadFileResponseSchema,
   uploadFileStatus200Schema,
 } from './pet/uploadFileSchema.ts'
+export { petEventSchema } from './petEventSchema.ts'
+export { petEventTypeEnumSchema } from './petEventTypeEnumSchema.ts'
 export { petNotFoundSchema } from './petNotFoundSchema.ts'
 export { petSchema } from './petSchema.ts'
 export { petStatusEnumSchema } from './petStatusEnumSchema.ts'
@@ -239,4 +248,5 @@ export {
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
 } from './pets/createPetsSchema.ts'
+export { streamPetEventsPathPetIdSchema, streamPetEventsResponseSchema, streamPetEventsStatus200Schema } from './stream/streamPetEventsSchema.ts'
 export { tagTagSchema } from './tag/tagSchema.ts'

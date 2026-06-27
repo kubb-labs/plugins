@@ -59,6 +59,10 @@
               url: 'http://swagger.io',
             },
           },
+          {
+            name: 'stream',
+            description: 'Server-Sent Events streams',
+          },
         ],
         paths: {
           '/pets/{uuid}': {
@@ -815,9 +819,70 @@
               },
             },
           },
+          '/pet/{petId}/events': {
+            get: {
+              tags: ['stream'],
+              summary: 'Stream pet changes',
+              description: 'Server-Sent Events stream of changes for a single pet',
+              operationId: 'streamPetEvents',
+              parameters: [
+                {
+                  name: 'petId',
+                  in: 'path',
+                  description: 'ID of pet to stream events for',
+                  required: true,
+                  schema: {
+                    type: 'integer',
+                    format: 'int64',
+                  },
+                },
+              ],
+              responses: {
+                200: {
+                  description: 'Server-Sent Events stream of pet changes',
+                  content: {
+                    'text/event-stream': {
+                      schema: {
+                        $ref: '#/components/schemas/PetEvent',
+                      },
+                    },
+                  },
+                },
+              },
+              security: [
+                {
+                  api_key: [],
+                },
+                {
+                  petstore_auth: ['read:pets'],
+                },
+              ],
+            },
+          },
         },
         components: {
           schemas: {
+            PetEvent: {
+              type: 'object',
+              required: ['type', 'pet'],
+              properties: {
+                type: {
+                  type: 'string',
+                  description: 'The kind of change that occurred',
+                  enum: ['created', 'updated', 'deleted'],
+                },
+                pet: {
+                  $ref: '#/components/schemas/Pet',
+                },
+                timestamp: {
+                  type: 'string',
+                  format: 'date-time',
+                },
+              },
+              xml: {
+                name: 'petEvent',
+              },
+            },
             Order: {
               type: 'object',
               properties: {
