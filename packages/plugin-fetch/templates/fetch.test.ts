@@ -5,6 +5,7 @@ import {
   createInterceptorStack,
   defaultBodySerializer,
   defaultQuerySerializer,
+  parseEventStream,
   type ResolvedRequest,
   ResponseError,
   resolveAuth,
@@ -366,5 +367,80 @@ describe('resolveAuth', () => {
     const headers: Record<string, string> = {}
     await resolveAuth({ security: [{ type: 'http', scheme: 'bearer' }], auth: undefined, headers, query: {} })
     expect(headers).toStrictEqual({})
+  })
+})
+
+describe('parseEventStream', () => {
+  function streamOf(chunks: Array<string>): ReadableStream<Uint8Array> {
+    const encoder = new TextEncoder()
+    return new ReadableStream({
+      start(controller) {
+        for (const chunk of chunks) controller.enqueue(encoder.encode(chunk))
+        controller.close()
+      },
+    })
+  }
+
+  async function* asyncIterableOf(chunks: Array<string>): AsyncGenerator<Uint8Array> {
+    const encoder = new TextEncoder()
+    for (const chunk of chunks) yield encoder.encode(chunk)
+  }
+
+  async function collect<TData>(stream: AsyncIterable<TData>): Promise<Array<TData>> {
+    const events: Array<TData> = []
+    for await (const event of stream) events.push(event)
+    return events
+  }
+
+  test('parses JSON data events split on a blank line', async () => {
+    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n', 'data: {"n":2}\n\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
+  })
+
+  test('concatenates multi-line data with a newline', async () => {
+    const events = await collect(parseEventStream<string>(streamOf(['data: line one\ndata: line two\n\n'])))
+    expect(events).toStrictEqual([{ data: 'line one\nline two' }])
+  })
+
+  test('reads event, id, and retry fields', async () => {
+    const events = await collect(parseEventStream(streamOf(['event: ping\nid: 42\nretry: 3000\ndata: {"ok":true}\n\n'])))
+    expect(events).toStrictEqual([{ event: 'ping', id: '42', retry: 3000, data: { ok: true } }])
+  })
+
+  test('ignores comment and heartbeat lines', async () => {
+    const events = await collect(parseEventStream(streamOf([': keep-alive\n\n', 'data: {"n":1}\n\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }])
+  })
+
+  test('keeps non-JSON data as a string', async () => {
+    const events = await collect(parseEventStream<string>(streamOf(['data: hello world\n\n'])))
+    expect(events).toStrictEqual([{ data: 'hello world' }])
+  })
+
+  test('normalizes CRLF line endings and flushes a trailing event', async () => {
+    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\r\n\r\ndata: {"n":2}\r\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
+  })
+
+  test('reassembles events split across chunks', async () => {
+    const events = await collect(parseEventStream(streamOf(['data: {"hal', 'f":true}\n\n'])))
+    expect(events).toStrictEqual([{ data: { half: true } }])
+  })
+
+  test('consumes an async iterable of byte chunks', async () => {
+    const events = await collect(parseEventStream(asyncIterableOf(['data: {"n":1}\n\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }])
+  })
+
+  test('stops early once the signal aborts', async () => {
+    const controller = new AbortController()
+    controller.abort()
+    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n']), controller.signal))
+    expect(events).toStrictEqual([])
+  })
+
+  test('skips a blank trailing event', async () => {
+    const events: Array<ServerSentEvent> = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n\n\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }])
   })
 })

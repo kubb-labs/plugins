@@ -114,6 +114,21 @@ const createPetNode = ast.factory.createOperation({
   ],
 })
 
+const streamEventsNode = ast.factory.createOperation({
+  operationId: 'streamEvents',
+  method: 'GET',
+  path: '/events',
+  tags: ['events'],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      mediaType: 'text/event-stream',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'event stream',
+    }),
+  ],
+})
+
 const securityDocument: SecurityDocument = {
   components: {
     securitySchemes: {
@@ -140,6 +155,8 @@ describe('clientGenerator operation', () => {
     { name: 'getProject', node: getProjectNode, options: {} },
     { name: 'deletePetNoContent', node: deletePetNode, options: {} },
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
+    // text/event-stream response returns a typed event stream instead of a one-shot result.
+    { name: 'streamEventsSse', node: streamEventsNode, options: {} },
     { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { validator: 'zod' as const } },
     // Two requirements referencing two schemes (oauth2 bearer + apiKey header).
     { name: 'getPetByIdWithSecurity', node: getPetByIdNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },

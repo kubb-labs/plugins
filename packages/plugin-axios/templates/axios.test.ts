@@ -1,6 +1,6 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import { type CallResult, createClientCore, defaultBodySerializer, defaultQuerySerializer, ResponseError, resolveAuth } from './axios.ts'
+import { type CallResult, createClientCore, defaultBodySerializer, defaultQuerySerializer, parseEventStream, ResponseError, resolveAuth } from './axios.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
 
@@ -395,5 +395,60 @@ describe('resolveAuth', () => {
     const headers: Record<string, string> = {}
     await resolveAuth({ security: [{ type: 'http', scheme: 'bearer' }], auth: undefined, headers, query: {} })
     expect(headers).toStrictEqual({})
+  })
+})
+
+describe('parseEventStream', () => {
+  function streamOf(chunks: Array<string>): ReadableStream<Uint8Array> {
+    const encoder = new TextEncoder()
+    return new ReadableStream({
+      start(controller) {
+        for (const chunk of chunks) controller.enqueue(encoder.encode(chunk))
+        controller.close()
+      },
+    })
+  }
+
+  async function* asyncIterableOf(chunks: Array<string>): AsyncGenerator<Uint8Array> {
+    const encoder = new TextEncoder()
+    for (const chunk of chunks) yield encoder.encode(chunk)
+  }
+
+  async function collect<TData>(stream: AsyncIterable<TData>): Promise<Array<TData>> {
+    const events: Array<TData> = []
+    for await (const event of stream) events.push(event)
+    return events
+  }
+
+  test('parses JSON data events split on a blank line', async () => {
+    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n', 'data: {"n":2}\n\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
+  })
+
+  test('concatenates multi-line data and reads event/id/retry fields', async () => {
+    const events = await collect(parseEventStream(streamOf(['event: ping\nid: 42\nretry: 3000\ndata: line one\ndata: line two\n\n'])))
+    expect(events).toStrictEqual([{ event: 'ping', id: '42', retry: 3000, data: 'line one\nline two' }])
+  })
+
+  test('ignores comment lines and keeps non-JSON data as a string', async () => {
+    const events = await collect(parseEventStream<string>(streamOf([': keep-alive\n\n', 'data: hello world\n\n'])))
+    expect(events).toStrictEqual([{ data: 'hello world' }])
+  })
+
+  test('normalizes CRLF endings and flushes a trailing event', async () => {
+    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\r\n\r\ndata: {"n":2}\r\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
+  })
+
+  test('consumes an async iterable of byte chunks, as the axios stream response yields', async () => {
+    const events = await collect(parseEventStream(asyncIterableOf(['data: {"n":1}\n\n'])))
+    expect(events).toStrictEqual([{ data: { n: 1 } }])
+  })
+
+  test('stops early once the signal aborts', async () => {
+    const controller = new AbortController()
+    controller.abort()
+    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n']), controller.signal))
+    expect(events).toStrictEqual([])
   })
 })

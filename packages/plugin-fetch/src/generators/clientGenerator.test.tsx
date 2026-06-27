@@ -138,6 +138,21 @@ const uploadFileNode = ast.factory.createOperation({
   ],
 })
 
+const streamEventsNode = ast.factory.createOperation({
+  operationId: 'streamEvents',
+  method: 'GET',
+  path: '/events',
+  tags: ['events'],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      mediaType: 'text/event-stream',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'event stream',
+    }),
+  ],
+})
+
 const securityDocument: SecurityDocument = {
   security: [{ bearerAuth: [] }],
   components: {
@@ -171,6 +186,8 @@ describe('clientGenerator operation', () => {
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
     // multipart/form-data request body bakes a `contentType` into the call config.
     { name: 'uploadFileMultipart', node: uploadFileNode, options: {} },
+    // text/event-stream response returns a typed event stream instead of a one-shot result.
+    { name: 'streamEventsSse', node: streamEventsNode, options: {} },
     { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { validator: 'zod' as const } },
     // Operation-level security overriding the global default, oauth2 reduced to bearer.
     { name: 'addPetWithSecurity', node: createPetNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },

@@ -7,7 +7,7 @@ import {
   resolveResponseValidator,
   type SecurityDocument,
 } from '@internals/client'
-import { operationFileEntry } from '@internals/shared'
+import { isEventStream, operationFileEntry } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -73,6 +73,7 @@ export const clientGenerator = defineGenerator<PluginAxios>({
     })
 
     const clientPath = path.resolve(root, '.kubb/client.ts')
+    const eventStream = isEventStream(node)
 
     return (
       <File
@@ -82,8 +83,13 @@ export const clientGenerator = defineGenerator<PluginAxios>({
         banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
-        <File.Import name={['client']} root={meta.file.path} path={clientPath} />
-        <File.Import name={['Options', 'RequestResult']} root={meta.file.path} path={clientPath} isTypeOnly />
+        <File.Import name={eventStream ? ['client', 'toEventStream'] : ['client']} root={meta.file.path} path={clientPath} />
+        <File.Import
+          name={eventStream ? ['Options', 'EventStreamResult', 'SuccessOf'] : ['Options', 'RequestResult']}
+          root={meta.file.path}
+          path={clientPath}
+          isTypeOnly
+        />
 
         {meta.fileTs && importedTypeNames.length > 0 && (
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />

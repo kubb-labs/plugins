@@ -153,19 +153,39 @@ export function getContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
 
 /**
- * Derives the default `responseType` for an operation from its primary success response.
- *
- * Returns a value only when that response declares a single non-JSON content type — a binary type
- * (`application/octet-stream`, `application/pdf`, `image/*`, `audio/*`, `video/*`) maps to `'blob'`
- * and other `text/*` maps to `'text'`. Otherwise `undefined`, leaving the runtime client's
- * `Content-Type` auto-detection in charge.
+ * Reads the single base content type of an operation's primary success response, lowercased and
+ * stripped of any `; charset=...` suffix. Returns `undefined` when the response declares zero or
+ * more than one content type, since neither case has a single type to act on.
  */
-export function getResponseType(node: ast.OperationNode): ResponseType | undefined {
+function getPrimarySuccessContentType(node: ast.OperationNode): string | undefined {
   const contentTypes = getPrimarySuccessResponse(node)?.content?.map((entry) => entry.contentType) ?? []
   if (contentTypes.length !== 1) return undefined
+  return contentTypes[0]!.split(';')[0]!.trim().toLowerCase()
+}
 
-  const baseType = contentTypes[0]!.split(';')[0]!.trim().toLowerCase()
+/**
+ * Whether an operation streams its primary success response as Server-Sent Events
+ * (`text/event-stream`). The client generator uses this to return a typed event stream instead of a
+ * one-shot `RequestResult`.
+ */
+export function isEventStream(node: ast.OperationNode): boolean {
+  return getPrimarySuccessContentType(node) === 'text/event-stream'
+}
+
+/**
+ * Derives the default `responseType` for an operation from its primary success response.
+ *
+ * Returns a value only when that response declares a single non-JSON content type. `text/event-stream`
+ * and other binary types (`application/octet-stream`, `application/pdf`, `image/*`, `audio/*`,
+ * `video/*`) map to a stream or `'blob'`, and other `text/*` maps to `'text'`. Otherwise `undefined`,
+ * leaving the runtime client's `Content-Type` auto-detection in charge.
+ */
+export function getResponseType(node: ast.OperationNode): ResponseType | undefined {
+  const baseType = getPrimarySuccessContentType(node)
+  if (!baseType) return undefined
+
   if (baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json') return undefined
+  if (baseType === 'text/event-stream') return 'stream'
   if (baseType.startsWith('text/')) return 'text'
   if (baseType === 'application/octet-stream' || baseType === 'application/pdf' || /^(image|audio|video)\//.test(baseType)) return 'blob'
   return undefined

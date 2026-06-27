@@ -239,6 +239,125 @@ export type ClientInstance<TRequest = AxiosRequestConfig, TResponse = AxiosRespo
  * Thrown for responses outside the 2xx range, so a resolved call always means success. The parsed
  * error body and the native request config / response stay reachable on the error.
  */
+/**
+ * One decoded Server-Sent Event. `data` is `JSON.parse`d into `TData` when it is valid JSON, and
+ * kept as the raw string otherwise. `event`, `id`, and `retry` carry the matching SSE fields.
+ */
+export type ServerSentEvent<TData = unknown> = {
+  data: TData
+  event?: string
+  id?: string
+  retry?: number
+}
+
+async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>, signal?: AbortSignal): AsyncGenerator<Uint8Array> {
+  if ('getReader' in stream && typeof stream.getReader === 'function') {
+    const reader = stream.getReader()
+    try {
+      while (true) {
+        if (signal?.aborted) return
+        const { done, value } = await reader.read()
+        if (done) return
+        if (value) yield value
+      }
+    } finally {
+      reader.releaseLock()
+    }
+    return
+  }
+
+  for await (const value of stream) {
+    if (signal?.aborted) return
+    yield value
+  }
+}
+
+function parseEvent<TData>(raw: string): ServerSentEvent<TData> | undefined {
+  const data: Array<string> = []
+  const event: ServerSentEvent<TData> = { data: undefined as TData }
+  let seen = false
+
+  for (const line of raw.split('\n')) {
+    if (!line || line.startsWith(':')) continue
+    seen = true
+    const index = line.indexOf(':')
+    const field = index === -1 ? line : line.slice(0, index)
+    const value = index === -1 ? '' : line.slice(index + 1).replace(/^ /, '')
+    if (field === 'data') data.push(value)
+    else if (field === 'event') event.event = value
+    else if (field === 'id') event.id = value
+    else if (field === 'retry') event.retry = Number(value)
+  }
+
+  if (!seen) return undefined
+
+  if (data.length) {
+    const joined = data.join('\n')
+    try {
+      event.data = JSON.parse(joined) as TData
+    } catch {
+      event.data = joined as TData
+    }
+  }
+  return event
+}
+
+/**
+ * Parses a `text/event-stream` body into typed Server-Sent Events. Consume it with `for await`. It
+ * accepts either a web `ReadableStream` or any async iterable of byte chunks (the axios stream
+ * response), normalizes `\r\n`/`\r` to `\n`, splits events on a blank line, ignores comment and
+ * heartbeat lines, and stops early when `signal` aborts.
+ */
+export async function* parseEventStream<TData = unknown>(
+  stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>,
+  signal?: AbortSignal,
+): AsyncGenerator<ServerSentEvent<TData>> {
+  const decoder = new TextDecoder()
+  let buffer = ''
+
+  for await (const chunk of readBytes(stream, signal)) {
+    buffer += decoder.decode(chunk, { stream: true })
+    buffer = buffer.replace(/\r\n|\r/g, '\n')
+    if (buffer.charCodeAt(0) === 0xfeff) buffer = buffer.slice(1)
+
+    let index = buffer.indexOf('\n\n')
+    while (index !== -1) {
+      const event = parseEvent<TData>(buffer.slice(0, index))
+      buffer = buffer.slice(index + 2)
+      if (event) yield event
+      index = buffer.indexOf('\n\n')
+    }
+  }
+
+  buffer += decoder.decode()
+  const event = buffer.trim() ? parseEvent<TData>(buffer.replace(/\r\n|\r/g, '\n')) : undefined
+  if (event) yield event
+}
+
+/**
+ * The resolved shape returned by a generated `text/event-stream` operation: the typed event
+ * `stream` plus the native `response`.
+ */
+export type EventStreamResult<TData = unknown, TResponse = AxiosResponse> = {
+  stream: AsyncGenerator<ServerSentEvent<TData>>
+  response: TResponse
+}
+
+/**
+ * Wraps a transport result whose `data` is a streaming body into an `EventStreamResult`, exposing
+ * the parsed events as a typed async iterator. Generated SSE operations call this.
+ */
+export async function toEventStream<TData = unknown>(
+  result: Promise<{ data: unknown; response: AxiosResponse }>,
+  signal?: AbortSignal,
+): Promise<EventStreamResult<TData>> {
+  const { data, response } = await result
+  return {
+    response,
+    stream: parseEventStream<TData>(data as ReadableStream<Uint8Array>, signal),
+  }
+}
+
 export class ResponseError<TError = unknown, TRequest = AxiosRequestConfig, TResponse = AxiosResponse> extends Error {
   data: TError
   status: number
