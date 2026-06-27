@@ -13,6 +13,7 @@ import {
   lengthConstraints,
   numberChecksMini,
   numberConstraints,
+  omitUnwrapChain,
   shouldCoerce,
 } from './utils.ts'
 
@@ -390,5 +391,43 @@ describe('codec', () => {
     expect(hasCodec(ast.factory.createSchema({ type: 'bigint' }))).toBe(false)
     expect(hasCodec(ast.factory.createSchema({ type: 'string' }))).toBe(false)
     expect(hasCodec(undefined)).toBe(false)
+  })
+})
+
+describe('omitUnwrapChain', () => {
+  test('non-ref schema needs no unwrap', () => {
+    expect(omitUnwrapChain(ast.factory.createSchema({ type: 'object', nullable: true }))).toBe('')
+  })
+
+  test('plain ref needs no unwrap', () => {
+    expect(omitUnwrapChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }))).toBe('')
+  })
+
+  test('nullable ref unwraps once', () => {
+    expect(omitUnwrapChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet', nullable: true }))).toBe('.unwrap()')
+  })
+
+  test('optional ref unwraps once', () => {
+    expect(omitUnwrapChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet', optional: true }))).toBe('.unwrap()')
+  })
+
+  test('nullish ref unwraps twice', () => {
+    expect(omitUnwrapChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet', nullish: true }))).toBe('.unwrap().unwrap()')
+  })
+
+  test('nullable ref with a default unwraps twice', () => {
+    expect(omitUnwrapChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet', nullable: true, default: {} }))).toBe(
+      '.unwrap().unwrap()',
+    )
+  })
+
+  test('reads modifiers from the resolved ref target, not the usage site', () => {
+    const node = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Pet',
+      ref: '#/components/schemas/Pet',
+      schema: ast.factory.createSchema({ type: 'object', nullable: true }),
+    })
+    expect(omitUnwrapChain(node)).toBe('.unwrap()')
   })
 })

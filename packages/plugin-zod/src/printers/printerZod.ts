@@ -21,6 +21,7 @@ import {
   getCodec,
   lengthConstraints,
   numberConstraints,
+  omitUnwrapChain,
   patternKeySchema,
   shouldCoerce,
 } from '../utils.ts'
@@ -377,14 +378,18 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
 
       const base = (() => {
         if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed
-        // Mirror printerTs `nonNullable: true`: when omitting keys, the resulting
-        // schema is a new non-nullable object type — skip optional/nullable/nullish.
         // Discriminated unions (z.discriminatedUnion) do not support .omit(), so skip them.
+
+        // A nullable/optional ref resolves to a ZodNullable/ZodOptional variable; .omit() lives on
+        // the inner ZodObject, so unwrap down to it first (mirrors printerTs `Omit<NonNullable<T>, …>`).
+        // applyModifiers re-applies the nullable/optional wrapper after the omit.
+        const unwrap = omitUnwrapChain(node)
+        const omit = `.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} })`
 
         // If this is a lazy reference, apply omit inside the lazy function
         const lazyMatch = transformed.match(/^z\.lazy\(\(\)\s*=>\s*(.+)\)$/)
-        if (lazyMatch) return `z.lazy(() => ${lazyMatch[1]}.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} }))`
-        return `${transformed}.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} })`
+        if (lazyMatch) return `z.lazy(() => ${lazyMatch[1]}${unwrap}${omit})`
+        return `${transformed}${unwrap}${omit}`
       })()
 
       return applyModifiers({

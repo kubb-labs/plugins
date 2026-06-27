@@ -287,6 +287,30 @@ export function applyModifiers({ value, nullable, optional, nullish, defaultValu
   return examples?.length ? `${withDescription}.meta({ examples: [${examples.map(formatDefault).join(', ')}] })` : withDescription
 }
 
+function modifierDepth(schema: ast.SchemaNode): number {
+  if (schema.nullish || (schema.nullable && schema.optional)) return 2
+  if (schema.nullable || schema.optional) return 1
+  return 0
+}
+
+/**
+ * Build the `.unwrap()` chain to insert before `.omit()` when the schema is a `$ref`.
+ *
+ * A `$ref` resolves to a named schema variable that already carries its own `.nullable()` /
+ * `.optional()` / `.nullish()` / `.default()` wrappers. `.omit()` lives on the inner `ZodObject`,
+ * not on those `ZodNullable` / `ZodOptional` / `ZodDefault` wrappers, so the omit has to unwrap
+ * down to the object first. This mirrors plugin-ts emitting `Omit<NonNullable<T>, …>`. Inline
+ * objects need no unwrap because the printer adds their modifiers after `.omit()`.
+ */
+export function omitUnwrapChain(node: ast.SchemaNode): string {
+  const ref = ast.narrowSchema(node, 'ref')
+  if (!ref) return ''
+
+  const target = ref.schema ?? ref
+  const depth = modifierDepth(target) + (target.default !== undefined ? 1 : 0)
+  return '.unwrap()'.repeat(depth)
+}
+
 /**
  * Apply nullable / optional / nullish modifiers using the functional `zod/mini` API
  * (`z.nullable()`, `z.optional()`, `z.nullish()`).

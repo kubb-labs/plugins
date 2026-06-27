@@ -782,6 +782,39 @@ describe('printerZod', () => {
       })
       expect(p.print(node)).toMatchInlineSnapshot(`"z.discriminatedUnion('petType', [Cat, Dog])"`)
     })
+
+    test('unwraps a nullable ref before omit so .omit() targets the ZodObject', () => {
+      // https://github.com/kubb-labs/plugins/issues/567 (bug 4): a $ref to a nullable schema
+      // resolves to a ZodNullable variable, and .omit() only exists on the inner ZodObject.
+      const p = printerZod({ keysToOmit: ['pending'] })
+      const node = ast.factory.createSchema({
+        type: 'ref',
+        name: 'maintenanceWindow',
+        ref: '#/components/schemas/maintenance_window',
+        nullable: true,
+        primitive: 'object',
+      })
+      expect(p.print(node)).toBe('maintenance_window.unwrap().omit({ "pending": true }).nullable()')
+    })
+
+    test('does not unwrap an inline nullable object before omit', () => {
+      const p = printerZod({ keysToOmit: ['pending'] })
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        nullable: true,
+        properties: [
+          ast.factory.createProperty({ name: 'day', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+          ast.factory.createProperty({ name: 'pending', required: false, schema: ast.factory.createSchema({ type: 'boolean' }) }),
+        ],
+      })
+      expect(p.print(node)).toMatchInlineSnapshot(`
+        "z.object({
+          day: z.string(),
+          pending: z.boolean().optional(),
+        }).omit({ "pending": true }).nullable()"
+      `)
+    })
   })
 
   describe('discriminator properties with external refs', () => {
