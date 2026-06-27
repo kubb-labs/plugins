@@ -667,6 +667,20 @@ describe('printerZodMini', () => {
       })
       expect(p.print(node)).toMatchInlineSnapshot(`"z.discriminatedUnion('petType', [Cat, Dog])"`)
     })
+
+    test('unwraps a nullable ref before omit so .omit() targets the inner object', () => {
+      // https://github.com/kubb-labs/plugins/issues/567 (bug 4): a $ref to a nullable schema
+      // resolves to a ZodMiniNullable variable, and .omit() only exists on the inner object.
+      const p = printerZodMini({ keysToOmit: ['pending'] })
+      const node = ast.factory.createSchema({
+        type: 'ref',
+        name: 'maintenanceWindow',
+        ref: '#/components/schemas/maintenance_window',
+        nullable: true,
+        primitive: 'object',
+      })
+      expect(p.print(node)).toBe('z.nullable(maintenance_window.unwrap().omit({ "pending": true }))')
+    })
   })
 
   describe('nodes override', () => {
