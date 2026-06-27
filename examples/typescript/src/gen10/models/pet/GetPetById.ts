@@ -48,7 +48,15 @@ export type GetPetByIdRequestConfig = {
  * @type object
  */
 export type GetPetByIdResponses = {
-  '200': GetPetByIdStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: GetPetByIdStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: GetPetByIdStatus200Xml
+      }
   '400': GetPetByIdStatus400
   '404': GetPetByIdStatus404
 }

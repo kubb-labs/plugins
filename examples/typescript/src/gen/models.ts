@@ -456,7 +456,15 @@ export interface UpdatePetRequestConfig {
  * @type object
  */
 export interface UpdatePetResponses {
-  '200': UpdatePetStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: UpdatePetStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: UpdatePetStatus200Xml
+      }
   '400': UpdatePetStatus400
   '404': UpdatePetStatus404
   '405': UpdatePetStatus405
@@ -521,7 +529,15 @@ export interface AddPetRequestConfig {
  * @type object
  */
 export interface AddPetResponses {
-  '200': AddPetStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: AddPetStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: AddPetStatus200Xml
+      }
   '405': AddPetStatus405
 }
 
@@ -572,7 +588,15 @@ export interface FindPetsByStatusRequestConfig {
  * @type object
  */
 export interface FindPetsByStatusResponses {
-  '200': FindPetsByStatusStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: FindPetsByStatusStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: FindPetsByStatusStatus200Xml
+      }
   '400': FindPetsByStatusStatus400
 }
 
@@ -637,7 +661,15 @@ export interface FindPetsByTagsRequestConfig {
  * @type object
  */
 export interface FindPetsByTagsResponses {
-  '200': FindPetsByTagsStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: FindPetsByTagsStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: FindPetsByTagsStatus200Xml
+      }
   '400': FindPetsByTagsStatus400
 }
 
@@ -689,7 +721,15 @@ export interface GetPetByIdRequestConfig {
  * @type object
  */
 export interface GetPetByIdResponses {
-  '200': GetPetByIdStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: GetPetByIdStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: GetPetByIdStatus200Xml
+      }
   '400': GetPetByIdStatus400
   '404': GetPetByIdStatus404
 }
@@ -1050,7 +1090,15 @@ export interface GetOrderByIdRequestConfig {
  * @type object
  */
 export interface GetOrderByIdResponses {
-  '200': GetOrderByIdStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: GetOrderByIdStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: GetOrderByIdStatus200Xml
+      }
   '400': GetOrderByIdStatus400
   '404': GetOrderByIdStatus404
 }

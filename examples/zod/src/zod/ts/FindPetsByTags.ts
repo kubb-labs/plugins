@@ -80,7 +80,15 @@ export type FindPetsByTagsRequestConfig = {
  * @type object
  */
 export type FindPetsByTagsResponses = {
-  '200': FindPetsByTagsStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: FindPetsByTagsStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: FindPetsByTagsStatus200Xml
+      }
   '400': FindPetsByTagsStatus400
 }
 

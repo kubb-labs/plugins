@@ -28,15 +28,7 @@ export type GetPetByIdStatus200Xml = {
   id: number
 }
 
-export type GetPetByIdStatus200 =
-  | {
-      contentType: 'application/json'
-      data: GetPetByIdStatus200Json
-    }
-  | {
-      contentType: 'application/xml'
-      data: GetPetByIdStatus200Xml
-    }
+export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml
 
 /**
  * @type object
@@ -57,7 +49,15 @@ export type GetPetByIdRequestConfig = {
  * @type object
  */
 export type GetPetByIdResponses = {
-  '200': GetPetByIdStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: GetPetByIdStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: GetPetByIdStatus200Xml
+      }
 }
 
 /**

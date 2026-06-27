@@ -41,7 +41,15 @@ export type CreateUsersWithListInputRequestConfig = {
  * @type object
  */
 export type CreateUsersWithListInputResponses = {
-  '200': CreateUsersWithListInputStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: CreateUsersWithListInputStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: CreateUsersWithListInputStatus200Xml
+      }
   default: CreateUsersWithListInputStatusDefault
 }
 

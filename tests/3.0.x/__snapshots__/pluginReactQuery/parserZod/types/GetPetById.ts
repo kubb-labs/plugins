@@ -23,13 +23,7 @@ export type GetPetByIdStatus200Json = Pet;
 */
 export type GetPetByIdStatus200Xml = Pet;
 
-export type GetPetByIdStatus200 = ({
-    contentType: "application/json";
-    data: GetPetByIdStatus200Json;
-} | {
-    contentType: "application/xml";
-    data: GetPetByIdStatus200Xml;
-});
+export type GetPetByIdStatus200 = (GetPetByIdStatus200Json | GetPetByIdStatus200Xml);
 
 /**
  * @type any
@@ -60,7 +54,13 @@ export type GetPetByIdRequestConfig = {
  * @type object
 */
 export type GetPetByIdResponses = {
-    "200": GetPetByIdStatus200;
+    "200": ({
+        contentType: "application/json";
+        data: GetPetByIdStatus200Json;
+    } | {
+        contentType: "application/xml";
+        data: GetPetByIdStatus200Xml;
+    });
     "400": GetPetByIdStatus400;
     "404": GetPetByIdStatus404;
 };

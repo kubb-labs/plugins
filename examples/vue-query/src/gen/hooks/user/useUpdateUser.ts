@@ -21,7 +21,7 @@ export function useUpdateUser<TContext>(
   options: {
     mutation?: MutationObserverOptions<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
     }
   } = {},
 ) {

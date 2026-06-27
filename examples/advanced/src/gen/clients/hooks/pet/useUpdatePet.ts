@@ -15,7 +15,7 @@ export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 
 export function updatePetMutationOptions<TContext = unknown>(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'; response?: 'application/json' | 'application/xml' }
   } = {},
 ) {
   const mutationKey = updatePetMutationKey()
@@ -47,7 +47,10 @@ export function useUpdatePet<TContext>(
       TContext
     > & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+      contentType?: {
+        request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+        response?: 'application/json' | 'application/xml'
+      }
     }
   } = {},
 ) {

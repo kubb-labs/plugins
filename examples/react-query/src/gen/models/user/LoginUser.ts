@@ -52,7 +52,15 @@ export type LoginUserRequestConfig = {
  * @type object
  */
 export type LoginUserResponses = {
-  '200': LoginUserStatus200
+  '200':
+    | {
+        contentType: 'application/xml'
+        data: LoginUserStatus200Xml
+      }
+    | {
+        contentType: 'application/json'
+        data: LoginUserStatus200Json
+      }
   '400': LoginUserStatus400
 }
 

@@ -135,39 +135,20 @@ export const typeGenerator = defineGenerator<PluginTs>({
     }
 
     /**
-     * Emits an individual type per content type plus an alias under `baseName`. The request body
-     * collapses to a plain union of the variants. A response sets `discriminated`, so the alias is a
-     * union of `{ contentType; data }` members instead, letting a caller narrow `data` by the content
-     * type the server returned.
+     * Emits an individual type per content type plus a plain union alias under `baseName`. Shared by
+     * the request body and multi-content-type responses. The response record discriminates these
+     * variants by content type in {@link buildResponses}; the standalone alias stays a plain union so
+     * query hooks and `result.data` keep the bare body.
      */
     function buildContentTypeVariants(
       entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
       baseName: string,
-      options: { decorate?: (schema: ast.SchemaNode) => ast.SchemaNode; discriminated?: boolean } = {},
+      decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
     ) {
-      const { decorate, discriminated } = options
       const variants = resolveContentTypeVariants(entries, baseName)
       const unionSchema = ast.factory.createSchema({
         type: 'union',
-        members: variants.map((variant) =>
-          discriminated
-            ? ast.factory.createSchema({
-                type: 'object',
-                properties: [
-                  ast.factory.createProperty({
-                    name: 'contentType',
-                    required: true,
-                    schema: ast.factory.createSchema({ type: 'enum', enumValues: [variant.contentType] }),
-                  }),
-                  ast.factory.createProperty({
-                    name: 'data',
-                    required: true,
-                    schema: ast.factory.createSchema({ type: 'ref', name: variant.name }),
-                  }),
-                ],
-              })
-            : ast.factory.createSchema({ type: 'ref', name: variant.name }),
-        ),
+        members: variants.map((variant) => ast.factory.createSchema({ type: 'ref', name: variant.name })),
       })
       return (
         <>
@@ -207,21 +188,20 @@ export const typeGenerator = defineGenerator<PluginTs>({
         })
       }
       // Multiple content types — generate individual types + union alias
-      return buildContentTypeVariants(requestBodyContent, resolver.resolveDataName(node), {
-        decorate: (schema) => ({
-          ...schema,
-          description: node.requestBody!.description ?? schema.description,
-        }),
-      })
+      return buildContentTypeVariants(requestBodyContent, resolver.resolveDataName(node), (schema) => ({
+        ...schema,
+        description: node.requestBody!.description ?? schema.description,
+      }))
     }
 
     const requestType = buildRequestType()
 
     const responseTypes = node.responses.map((res) => {
       const variants = (res.content ?? []).filter((entry) => entry.schema)
-      // Multiple content types for a single status code — generate a content-type-discriminated union.
+      // Multiple content types for a single status code — generate per-variant types + a plain union.
+      // The `<Name>Responses` record discriminates them by content type (see buildResponses).
       if (variants.length > 1) {
-        return buildContentTypeVariants(variants, resolver.resolveResponseStatusName(node, res.statusCode), { discriminated: true })
+        return buildContentTypeVariants(variants, resolver.resolveResponseStatusName(node, res.statusCode))
       }
       const primary = variants[0] ?? res.content?.[0]
       return renderSchemaType({

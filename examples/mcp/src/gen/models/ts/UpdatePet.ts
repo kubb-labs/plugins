@@ -79,7 +79,15 @@ export type UpdatePetRequestConfig = {
  * @type object
  */
 export type UpdatePetResponses = {
-  '200': UpdatePetStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: UpdatePetStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: UpdatePetStatus200Xml
+      }
   '202': UpdatePetStatus202
   '400': UpdatePetStatus400
   '404': UpdatePetStatus404

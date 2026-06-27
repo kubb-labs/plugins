@@ -1,5 +1,5 @@
 import { jsStringEscape, stringify } from '@kubb/ast/utils'
-import { getOperationParameters } from '@internals/shared'
+import { getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
 import { ast } from '@kubb/core'
 import { syncSchemaRef } from '@kubb/ast/utils'
 import type { ResolverTs } from './types.ts'
@@ -140,6 +140,41 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
   })
 }
 
+/**
+ * The schema a status occupies in the `<Name>Responses` record. A status that documents several
+ * content types becomes a `{ contentType; data }` union so the runtime can surface the negotiated type
+ * on `result.parsed`, while the standalone `<Name>StatusNNN` alias stays the plain body union that the
+ * query hooks and `result.data` use.
+ */
+function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode, resolver: ResolverTs): ast.SchemaNode {
+  const statusName = resolver.resolveResponseStatusName(node, res.statusCode)
+  const variants = (res.content ?? []).filter((entry) => entry.schema)
+  if (variants.length <= 1) {
+    return ast.factory.createSchema({ type: 'ref', name: statusName })
+  }
+
+  return ast.factory.createSchema({
+    type: 'union',
+    members: resolveContentTypeVariants(variants, statusName).map((variant) =>
+      ast.factory.createSchema({
+        type: 'object',
+        properties: [
+          ast.factory.createProperty({
+            name: 'contentType',
+            required: true,
+            schema: ast.factory.createSchema({ type: 'enum', enumValues: [variant.contentType] }),
+          }),
+          ast.factory.createProperty({
+            name: 'data',
+            required: true,
+            schema: ast.factory.createSchema({ type: 'ref', name: variant.name }),
+          }),
+        ],
+      }),
+    ),
+  })
+}
+
 export function buildResponses(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode | null {
   if (node.responses.length === 0) {
     return null
@@ -151,7 +186,7 @@ export function buildResponses(node: ast.OperationNode, { resolver }: BuildOpera
       ast.factory.createProperty({
         name: String(res.statusCode),
         required: true,
-        schema: ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }),
+        schema: buildResponseRecordEntry(node, res, resolver),
       }),
     ),
   })
