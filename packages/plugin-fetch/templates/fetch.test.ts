@@ -9,6 +9,7 @@ import {
   type ResolvedRequest,
   ResponseError,
   resolveAuth,
+  type ServerSentEvent,
   type Transport,
   type TransportResult,
 } from './fetch.ts'

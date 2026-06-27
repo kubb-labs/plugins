@@ -616,24 +616,23 @@ export type ServerSentEvent<TData = unknown> = {
 }
 
 async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>, signal?: AbortSignal): AsyncGenerator<Uint8Array> {
-  if ('getReader' in stream && typeof stream.getReader === 'function') {
-    const reader = stream.getReader()
-    try {
-      while (true) {
-        if (signal?.aborted) return
-        const { done, value } = await reader.read()
-        if (done) return
-        if (value) yield value
-      }
-    } finally {
-      reader.releaseLock()
+  if (!('getReader' in stream)) {
+    for await (const value of stream) {
+      if (signal?.aborted) return
+      yield value
     }
     return
   }
 
-  for await (const value of stream) {
-    if (signal?.aborted) return
-    yield value
+  const reader = stream.getReader()
+  try {
+    while (!signal?.aborted) {
+      const { done, value } = await reader.read()
+      if (done) return
+      yield value
+    }
+  } finally {
+    await reader.cancel().catch(() => {})
   }
 }
 
@@ -651,7 +650,7 @@ function parseEvent<TData>(raw: string): ServerSentEvent<TData> | undefined {
     if (field === 'data') data.push(value)
     else if (field === 'event') event.event = value
     else if (field === 'id') event.id = value
-    else if (field === 'retry') event.retry = Number(value)
+    else if (field === 'retry' && Number.isFinite(Number(value))) event.retry = Number(value)
   }
 
   if (!seen) return undefined
@@ -681,21 +680,15 @@ export async function* parseEventStream<TData = unknown>(
   let buffer = ''
 
   for await (const chunk of readBytes(stream, signal)) {
-    buffer += decoder.decode(chunk, { stream: true })
-    buffer = buffer.replace(/\r\n|\r/g, '\n')
-    if (buffer.charCodeAt(0) === 0xfeff) buffer = buffer.slice(1)
-
-    let index = buffer.indexOf('\n\n')
-    while (index !== -1) {
-      const event = parseEvent<TData>(buffer.slice(0, index))
-      buffer = buffer.slice(index + 2)
+    const blocks = (buffer + decoder.decode(chunk, { stream: true })).replace(/\r\n|\r/g, '\n').split('\n\n')
+    buffer = blocks.pop() ?? ''
+    for (const block of blocks) {
+      const event = parseEvent<TData>(block)
       if (event) yield event
-      index = buffer.indexOf('\n\n')
     }
   }
 
-  buffer += decoder.decode()
-  const event = buffer.trim() ? parseEvent<TData>(buffer.replace(/\r\n|\r/g, '\n')) : undefined
+  const event = parseEvent<TData>((buffer + decoder.decode()).replace(/\r\n|\r/g, '\n'))
   if (event) yield event
 }
 
