@@ -184,14 +184,24 @@ describe('printerZod', () => {
       expect(result).toMatchInlineSnapshot(`"z.enum(['a', 'b', 'c'])"`)
     })
 
-    test('number enum', () => {
+    test('number enum uses z.union of literals', () => {
       const result = printer.print(ast.factory.createSchema({ type: 'enum', enumValues: [200, 400, 500] }))
-      expect(result).toBe('z.enum([200, 400, 500])')
+      expect(result).toBe('z.union([z.literal(200), z.literal(400), z.literal(500)])')
     })
 
-    test('boolean enum', () => {
+    test('single number enum uses z.literal', () => {
+      const result = printer.print(ast.factory.createSchema({ type: 'enum', enumValues: [42] }))
+      expect(result).toBe('z.literal(42)')
+    })
+
+    test('boolean enum uses z.union of literals', () => {
       const result = printer.print(ast.factory.createSchema({ type: 'enum', enumValues: [true, false] }))
-      expect(result).toBe('z.enum([true, false])')
+      expect(result).toBe('z.union([z.literal(true), z.literal(false)])')
+    })
+
+    test('mixed value enum uses z.union of literals', () => {
+      const result = printer.print(ast.factory.createSchema({ type: 'enum', enumValues: ['active', 1, true] }))
+      expect(result).toBe("z.union([z.literal('active'), z.literal(1), z.literal(true)])")
     })
 
     test('number literals (namedEnumValues)', () => {
@@ -771,6 +781,39 @@ describe('printerZod', () => {
         ],
       })
       expect(p.print(node)).toMatchInlineSnapshot(`"z.discriminatedUnion('petType', [Cat, Dog])"`)
+    })
+
+    test('unwraps a nullable ref before omit so .omit() targets the ZodObject', () => {
+      // https://github.com/kubb-labs/plugins/issues/567 (bug 4): a $ref to a nullable schema
+      // resolves to a ZodNullable variable, and .omit() only exists on the inner ZodObject.
+      const p = printerZod({ keysToOmit: ['pending'] })
+      const node = ast.factory.createSchema({
+        type: 'ref',
+        name: 'maintenanceWindow',
+        ref: '#/components/schemas/maintenance_window',
+        nullable: true,
+        primitive: 'object',
+      })
+      expect(p.print(node)).toBe('maintenance_window.unwrap().omit({ "pending": true }).nullable()')
+    })
+
+    test('does not unwrap an inline nullable object before omit', () => {
+      const p = printerZod({ keysToOmit: ['pending'] })
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        nullable: true,
+        properties: [
+          ast.factory.createProperty({ name: 'day', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+          ast.factory.createProperty({ name: 'pending', required: false, schema: ast.factory.createSchema({ type: 'boolean' }) }),
+        ],
+      })
+      expect(p.print(node)).toMatchInlineSnapshot(`
+        "z.object({
+          day: z.string(),
+          pending: z.boolean().optional(),
+        }).omit({ "pending": true }).nullable()"
+      `)
     })
   })
 

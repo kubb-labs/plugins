@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest'
 import {
   applyMiniModifiers,
   applyModifiers,
+  buildEnum,
   buildGroupedParamsSchema,
   formatDefault,
   formatLiteral,
@@ -12,6 +13,7 @@ import {
   lengthConstraints,
   numberChecksMini,
   numberConstraints,
+  omitUnwrapChain,
   shouldCoerce,
 } from './utils.ts'
 
@@ -56,6 +58,28 @@ describe('formatLiteral', () => {
 
   test('boolean false is raw', () => {
     expect(formatLiteral(false)).toBe('false')
+  })
+})
+
+describe('buildEnum', () => {
+  test('all-string set uses z.enum', () => {
+    expect(buildEnum(['a', 'b', 'c'])).toBe("z.enum(['a', 'b', 'c'])")
+  })
+
+  test('single non-string value uses z.literal', () => {
+    expect(buildEnum([42])).toBe('z.literal(42)')
+  })
+
+  test('numeric set uses z.union of literals', () => {
+    expect(buildEnum([200, 400, 500])).toBe('z.union([z.literal(200), z.literal(400), z.literal(500)])')
+  })
+
+  test('boolean set uses z.union of literals', () => {
+    expect(buildEnum([true, false])).toBe('z.union([z.literal(true), z.literal(false)])')
+  })
+
+  test('mixed set uses z.union of literals', () => {
+    expect(buildEnum(['a', 1, true])).toBe("z.union([z.literal('a'), z.literal(1), z.literal(true)])")
   })
 })
 
@@ -367,5 +391,43 @@ describe('codec', () => {
     expect(hasCodec(ast.factory.createSchema({ type: 'bigint' }))).toBe(false)
     expect(hasCodec(ast.factory.createSchema({ type: 'string' }))).toBe(false)
     expect(hasCodec(undefined)).toBe(false)
+  })
+})
+
+describe('omitUnwrapChain', () => {
+  test('non-ref schema needs no unwrap', () => {
+    expect(omitUnwrapChain(ast.factory.createSchema({ type: 'object', nullable: true }))).toBe('')
+  })
+
+  test('plain ref needs no unwrap', () => {
+    expect(omitUnwrapChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }))).toBe('')
+  })
+
+  test('nullable ref unwraps once', () => {
+    expect(omitUnwrapChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet', nullable: true }))).toBe('.unwrap()')
+  })
+
+  test('optional ref unwraps once', () => {
+    expect(omitUnwrapChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet', optional: true }))).toBe('.unwrap()')
+  })
+
+  test('nullish ref unwraps twice', () => {
+    expect(omitUnwrapChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet', nullish: true }))).toBe('.unwrap().unwrap()')
+  })
+
+  test('nullable ref with a default unwraps twice', () => {
+    expect(omitUnwrapChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet', nullable: true, default: {} }))).toBe(
+      '.unwrap().unwrap()',
+    )
+  })
+
+  test('reads modifiers from the resolved ref target, not the usage site', () => {
+    const node = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Pet',
+      ref: '#/components/schemas/Pet',
+      schema: ast.factory.createSchema({ type: 'object', nullable: true }),
+    })
+    expect(omitUnwrapChain(node)).toBe('.unwrap()')
   })
 })
