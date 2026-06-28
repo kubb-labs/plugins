@@ -109,7 +109,9 @@ describe('printerFaker', () => {
         resolver: resolverFaker,
         typeName: `NonNullable<Address>["identifier"]`,
       }).print(node),
-    ).toMatchInlineSnapshot(`"[faker.number.int(), faker.string.alpha(), faker.helpers.arrayElement<NonNullable<NonNullable<Address>["identifier"]>[2]>(['NW', 'NE', 'SW', 'SE'])]"`)
+    ).toMatchInlineSnapshot(
+      `"[faker.number.int(), faker.string.alpha(), faker.helpers.arrayElement<NonNullable<NonNullable<Address>["identifier"]>[2]>(['NW', 'NE', 'SW', 'SE'])]"`,
+    )
   })
 
   test('narrows discriminated oneOf variants to their own branch', () => {
