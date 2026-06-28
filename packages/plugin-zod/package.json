@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-zod",
-  "version": "5.0.0-beta.77",
+  "version": "5.0.0-beta.78",
   "description": "Generate Zod validation schemas with Kubb for runtime data parsing and type safety. Pairs with @kubb/plugin-ts for end-to-end type coverage.",
   "keywords": [
     "code-generation",

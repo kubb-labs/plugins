@@ -46,6 +46,9 @@
     "client-templates-copy-real-files",
     "consolidate-jsx-renderer",
     "consume-ast-utils",
+    "curly-areas-sit",
+    "cypress-quote-non-identifier-query-params",
+    "dedupe-params-colliding-after-casing",
     "dull-areas-happen",
     "empty-string-enum-typescript",
     "enforce-array-type-syntax",
@@ -100,6 +103,7 @@
     "plugin-msw-v5-migration",
     "plugin-redoc-direct-adapter",
     "plugin-resolver-naming",
+    "plugin-ts-always-emit-responses",
     "plugin-ts-compatibility-presets",
     "plugin-ts-enum-type-suffix",
     "plugin-ts-examples-array",
@@ -149,6 +153,8 @@
     "simplify-function-printer",
     "single-quote-output-spacing",
     "spread-generators-into-add-generator",
+    "sse-event-stream-responses",
+    "standard-schema-runtime",
     "standardize-client-runtime-symbol",
     "swr-enabled-params-client-alignment",
     "tanstack-query-optional-enabled-params",
@@ -161,8 +167,11 @@
     "use-add-generator-array",
     "zod-collect-codec-refs",
     "zod-date-roundtrip",
+    "zod-default-type-mismatch",
+    "zod-enum-non-string-literals",
     "zod-faker-object-builder",
     "zod-inferred-type-suffix",
+    "zod-omit-unwrap-nullable-ref",
     "zod-pattern-properties"
   ]
 }
