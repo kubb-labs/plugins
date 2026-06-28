@@ -8,7 +8,7 @@ import type { Order } from './Order.ts'
 /**
  * @type object
 */
-export type CreateOrderStatus201 = Order;
+export type CreateOrderStatus201 = OrderSchema;
 
 /**
  * @description Order request body
