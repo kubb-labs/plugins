@@ -13,8 +13,8 @@ export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
   })
 }
 
-export function createPetsHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, CreatePetsData, any>) {
-  return http.post<Record<string, string>, CreatePetsData, any>(`/pets`, function handler(info) {
+export function createPetsHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, CreatePetsData>) {
+  return http.post<Record<string, string>, CreatePetsData>(`/pets`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

@@ -10,7 +10,7 @@ export const placeOrderPatchStatus200Schema = orderSchema
 
 export type PlaceOrderPatchStatus200SchemaType = z.infer<typeof placeOrderPatchStatus200Schema>
 
-export const placeOrderPatchStatus405Schema = z.any()
+export const placeOrderPatchStatus405Schema = z.unknown()
 
 export type PlaceOrderPatchStatus405SchemaType = z.infer<typeof placeOrderPatchStatus405Schema>
 

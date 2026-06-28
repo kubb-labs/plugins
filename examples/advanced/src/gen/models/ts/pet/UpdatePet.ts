@@ -26,19 +26,19 @@ export type UpdatePetStatus202 = {
 }
 
 /**
- * @type any
+ * @type unknown
  */
-export type UpdatePetStatus400 = any
+export type UpdatePetStatus400 = unknown
 
 /**
- * @type any
+ * @type unknown
  */
-export type UpdatePetStatus404 = any
+export type UpdatePetStatus404 = unknown
 
 /**
- * @type any
+ * @type unknown
  */
-export type UpdatePetStatus405 = any
+export type UpdatePetStatus405 = unknown
 
 /**
  * @description Update an existent pet in the store

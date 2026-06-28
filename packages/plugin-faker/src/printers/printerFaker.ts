@@ -132,8 +132,9 @@ const fakerKeywordMapper = {
     return `faker.helpers.multiple(() => (${item}))`
   },
   tuple: (items: Array<string> = []) => `[${items.join(', ')}]`,
-  enum: (items: Array<string | number | boolean | undefined> = [], type = 'any') => `faker.helpers.arrayElement<${type}>([${items.join(', ')}])`,
-  union: (items: Array<string> = []) => `faker.helpers.arrayElement<any>([${items.join(', ')}])`,
+  enum: (items: Array<string | number | boolean | undefined> = [], type?: string) =>
+    `faker.helpers.arrayElement${type ? `<${type}>` : ''}([${items.join(', ')}])`,
+  union: (items: Array<string> = []) => `faker.helpers.arrayElement([${items.join(', ')}])`,
   datetime: () => 'faker.date.anytime().toISOString()',
   date: (representation: 'date' | 'string' = 'string', parser: PluginFaker['resolvedOptions']['dateParser'] = 'faker') => {
     if (representation === 'string') {
@@ -292,7 +293,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         }
 
         if (this.options.schemaName && refName === this.options.schemaName) {
-          return 'undefined as any'
+          return this.options.typeName ? `undefined as unknown as ${this.options.typeName}` : 'undefined as unknown'
         }
 
         // Internal helper refs (for generated response/data helpers) are already

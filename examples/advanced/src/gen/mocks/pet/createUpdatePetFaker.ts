@@ -33,7 +33,7 @@ export function createUpdatePetStatus200FakerXml(data?: Partial<UpdatePetStatus2
  * @description Successful operation
  */
 export function createUpdatePetStatus200Faker(_data?: UpdatePetStatus200): UpdatePetStatus200 {
-  return faker.helpers.arrayElement<any>([createUpdatePetStatus200FakerJson(), createUpdatePetStatus200FakerXml()])
+  return faker.helpers.arrayElement([createUpdatePetStatus200FakerJson(), createUpdatePetStatus200FakerXml()])
 }
 
 /**
@@ -95,11 +95,11 @@ export function createUpdatePetDataFakerFormUrlEncoded(data?: Partial<UpdatePetF
  * @description Update an existent pet in the store
  */
 export function createUpdatePetDataFaker(_data?: UpdatePetData): UpdatePetData {
-  return faker.helpers.arrayElement<any>([createUpdatePetDataFakerJson(), createUpdatePetDataFakerXml(), createUpdatePetDataFakerFormUrlEncoded()])
+  return faker.helpers.arrayElement([createUpdatePetDataFakerJson(), createUpdatePetDataFakerXml(), createUpdatePetDataFakerFormUrlEncoded()])
 }
 
 export function createUpdatePetResponseFaker(_data?: UpdatePetResponse): UpdatePetResponse {
-  return faker.helpers.arrayElement<any>([
+  return faker.helpers.arrayElement([
     createUpdatePetStatus200Faker(),
     createUpdatePetStatus202Faker(),
     createUpdatePetStatus400Faker(),

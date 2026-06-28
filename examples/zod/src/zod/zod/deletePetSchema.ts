@@ -13,7 +13,7 @@ export const deletePetPathPetIdSchema = z.bigint().describe('Pet id to delete')
 
 export type DeletePetPathPetIdSchemaType = z.infer<typeof deletePetPathPetIdSchema>
 
-export const deletePetStatus400Schema = z.any()
+export const deletePetStatus400Schema = z.unknown()
 
 export type DeletePetStatus400SchemaType = z.infer<typeof deletePetStatus400Schema>
 

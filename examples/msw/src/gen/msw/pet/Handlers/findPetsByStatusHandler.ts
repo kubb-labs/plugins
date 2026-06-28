@@ -15,9 +15,12 @@ export function findPetsByStatusHandlerResponse200(data: FindPetsByStatusRespons
   })
 }
 
-export function findPetsByStatusHandlerResponse400(data?: FindPetsByStatusStatus400) {
+export function findPetsByStatusHandlerResponse400(data: FindPetsByStatusStatus400) {
   return new Response(JSON.stringify(data), {
     status: 400,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 

@@ -11,9 +11,9 @@ import type { Order } from './Order.ts'
 export type PlaceOrderPatchStatus200 = Order
 
 /**
- * @type any
+ * @type unknown
  */
-export type PlaceOrderPatchStatus405 = any
+export type PlaceOrderPatchStatus405 = unknown
 
 /**
  * @type object | undefined

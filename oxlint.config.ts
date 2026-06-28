@@ -44,12 +44,5 @@ export default defineConfig({
         'no-unused-vars': 'off',
       },
     },
-    {
-      // Generated output mirrors the OpenAPI document, so a schema typed `any` stays `any`.
-      files: ['examples/**'],
-      rules: {
-        'typescript/no-explicit-any': 'off',
-      },
-    },
   ],
 })

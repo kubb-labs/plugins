@@ -10,14 +10,14 @@
 export type DeleteUserPathUsername = string
 
 /**
- * @type any
+ * @type unknown
  */
-export type DeleteUserStatus400 = any
+export type DeleteUserStatus400 = unknown
 
 /**
- * @type any
+ * @type unknown
  */
-export type DeleteUserStatus404 = any
+export type DeleteUserStatus404 = unknown
 
 /**
  * @type object

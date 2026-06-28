@@ -8,7 +8,7 @@ import { orderSchema } from './orderSchema.ts'
 
 export const placeOrderStatus200Schema = orderSchema
 
-export const placeOrderStatus405Schema = z.any()
+export const placeOrderStatus405Schema = z.unknown()
 
 export const placeOrderResponseSchema = placeOrderStatus200Schema
 

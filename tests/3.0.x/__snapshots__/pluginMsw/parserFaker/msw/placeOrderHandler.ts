@@ -24,8 +24,8 @@ export function placeOrderHandlerResponse405(data?: PlaceOrderStatus405) {
   })
 }
 
-export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolver<Record<string, string>, PlaceOrderData, any>) {
-  return http.post<Record<string, string>, PlaceOrderData, any>('/store/order', function handler(info) {
+export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolver<Record<string, string>, PlaceOrderData>) {
+  return http.post<Record<string, string>, PlaceOrderData>('/store/order', function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return new Response(JSON.stringify(data || createPlaceOrderResponse(data)), {
