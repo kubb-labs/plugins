@@ -30,6 +30,7 @@ export default defineConfig({
     'prefer-exponentiation-operator': 'error',
     'typescript/array-type': ['error', { default: 'generic' }],
     'typescript/consistent-type-imports': ['error', { disallowTypeAnnotations: false }],
+    'typescript/no-explicit-any': 'error',
     'typescript/no-inferrable-types': 'error',
     'typescript/prefer-function-type': 'error',
     'react/self-closing-comp': 'error',
@@ -41,6 +42,13 @@ export default defineConfig({
       rules: {
         'typescript/array-type': 'off',
         'no-unused-vars': 'off',
+      },
+    },
+    {
+      // Generated output mirrors the OpenAPI document, so a schema typed `any` stays `any`.
+      files: ['examples/**'],
+      rules: {
+        'typescript/no-explicit-any': 'off',
       },
     },
   ],
