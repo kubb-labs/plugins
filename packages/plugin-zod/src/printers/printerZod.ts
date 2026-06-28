@@ -276,6 +276,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
 
           const value = applyModifiers({
             value: wrappedOutput,
+            schema,
             nullable: meta.nullable,
             optional: schema.optional || property.required === false,
             nullish: schema.nullish,
@@ -394,6 +395,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
 
       return applyModifiers({
         value: base,
+        schema: node,
         nullable: meta.nullable,
         optional: meta.optional,
         nullish: meta.nullish,
