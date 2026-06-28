@@ -22,6 +22,7 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@kubb/adapter-oas": "catalog:",
     "@kubb/plugin-cypress": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "kubb": "catalog:",

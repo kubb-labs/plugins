@@ -24,9 +24,9 @@ export type FindPetsByTagsStatus200Xml = Pet[]
 export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
 
 /**
- * @type any
+ * @type unknown
  */
-export type FindPetsByTagsStatus400 = any
+export type FindPetsByTagsStatus400 = unknown
 
 /**
  * @type object

@@ -12,9 +12,9 @@ export type DeletePetHeaderApiKey = string | undefined
 export type DeletePetPathPetId = number
 
 /**
- * @type any
+ * @type unknown
  */
-export type DeletePetStatus400 = any
+export type DeletePetStatus400 = unknown
 
 /**
  * @type object

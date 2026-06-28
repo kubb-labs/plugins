@@ -32,13 +32,13 @@ export type CreatePetsXEXAMPLEKey = (typeof createPetsXEXAMPLE)[keyof typeof cre
 export type CreatePetsHeaderXEXAMPLE = CreatePetsXEXAMPLEKey
 
 /**
- * @type any
+ * @type unknown
  */
-export type CreatePetsStatus201 = any
+export type CreatePetsStatus201 = unknown
 
 /**
  * @description Pet not found
- * @type any
+ * @type unknown
  */
 export type CreatePetsStatusDefault = PetNotFound
 

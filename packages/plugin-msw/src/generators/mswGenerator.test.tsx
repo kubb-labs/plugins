@@ -2,6 +2,7 @@
 import type { Config } from '@kubb/core'
 import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
+import type { PluginFaker } from '@kubb/plugin-faker'
 import { pluginFakerName, resolverFaker } from '@kubb/plugin-faker'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
@@ -40,9 +41,9 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
   resolver: resolverTs,
 })
 
-const mockedFakerPlugin = createMockedPlugin<any>({
+const mockedFakerPlugin = createMockedPlugin<PluginFaker>({
   name: pluginFakerName,
-  options: { output: { path: '.' }, group: null },
+  options: { output: { path: '.' }, group: null } as PluginFaker['resolvedOptions'],
   resolver: resolverFaker,
 })
 
@@ -137,17 +138,17 @@ describe('mswGenerator operation', () => {
     const plugin = createMockedPlugin<PluginMsw>({ name: 'plugin-msw', options, resolver: resolverMsw })
     const driver = createMockedPluginDriver({ name: props.name })
 
-    driver.getPlugin = (pluginName: string) => {
-      if (pluginName === 'plugin-ts') return mockedTsPlugin as any
+    driver.getPlugin = ((pluginName: string) => {
+      if (pluginName === 'plugin-ts') return mockedTsPlugin
       if (pluginName === pluginFakerName) return mockedFakerPlugin
       return undefined
-    }
+    }) as typeof driver.getPlugin
 
-    driver.getResolver = (pluginName: string) => {
-      if (pluginName === 'plugin-ts') return mockedTsPlugin.resolver as any
+    driver.getResolver = ((pluginName: string) => {
+      if (pluginName === 'plugin-ts') return mockedTsPlugin.resolver
       if (pluginName === pluginFakerName) return mockedFakerPlugin.resolver
       return undefined
-    }
+    }) as typeof driver.getResolver
 
     await renderGeneratorOperation(mswGenerator, props.node, {
       config: testConfig,

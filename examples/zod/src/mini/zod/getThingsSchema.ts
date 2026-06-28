@@ -10,7 +10,7 @@ export const getThingsQueryLimitSchema = z._default(z.optional(z.int().check(z.m
 
 export const getThingsQuerySkipSchema = z._default(z.optional(z.int().check(z.minimum(0))), 0)
 
-export const getThingsStatus201Schema = z.any()
+export const getThingsStatus201Schema = z.unknown()
 
 export const getThingsStatusDefaultSchema = petNotFoundSchema
 

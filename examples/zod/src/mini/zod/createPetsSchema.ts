@@ -12,7 +12,7 @@ export const createPetsQueryOffsetSchema = z.optional(z.int())
 
 export const createPetsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE'])
 
-export const createPetsStatus201Schema = z.any()
+export const createPetsStatus201Schema = z.unknown()
 
 export const createPetsStatusDefaultSchema = petNotFoundSchema
 

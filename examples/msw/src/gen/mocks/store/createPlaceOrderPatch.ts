@@ -54,11 +54,11 @@ export function createPlaceOrderPatchFormUrlEncodedData(data?: Partial<PlaceOrde
 export function createPlaceOrderPatchData(_data?: PlaceOrderPatchData): PlaceOrderPatchData {
   faker.seed([220])
 
-  return faker.helpers.arrayElement<any>([createPlaceOrderPatchJsonData(), createPlaceOrderPatchXmlData(), createPlaceOrderPatchFormUrlEncodedData()])
+  return faker.helpers.arrayElement([createPlaceOrderPatchJsonData(), createPlaceOrderPatchXmlData(), createPlaceOrderPatchFormUrlEncodedData()])
 }
 
 export function createPlaceOrderPatchResponse(_data?: PlaceOrderPatchResponse): PlaceOrderPatchResponse {
   faker.seed([220])
 
-  return faker.helpers.arrayElement<any>([createPlaceOrderPatchStatus200(), createPlaceOrderPatchStatus405()])
+  return faker.helpers.arrayElement([createPlaceOrderPatchStatus200(), createPlaceOrderPatchStatus405()])
 }

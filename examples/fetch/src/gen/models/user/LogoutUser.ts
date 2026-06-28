@@ -4,9 +4,9 @@
  */
 
 /**
- * @type any
+ * @type unknown
  */
-export type LogoutUserStatusDefault = any
+export type LogoutUserStatusDefault = unknown
 
 /**
  * @type object

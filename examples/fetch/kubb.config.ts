@@ -19,7 +19,7 @@ export default defineConfig(() => {
       format: false,
       lint: false,
     },
-    adapter: adapterOas({ server: { index: 0 } }),
+    adapter: adapterOas({ unknownType: 'unknown', server: { index: 0 } }),
     plugins: [
       pluginTs({
         output: { path: 'models', barrel: { type: 'named' } },

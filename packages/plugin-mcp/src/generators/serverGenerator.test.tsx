@@ -70,15 +70,15 @@ describe('serverGenerator — Operations', () => {
     })
     // Also register zod plugin — serverGenerator needs it for zod schema imports
     const originalGetPlugin = driver.getPlugin.bind(driver)
-    driver.getPlugin = (pluginName: string) => {
-      if (pluginName === 'plugin-zod') return mockedZodPlugin as any
+    driver.getPlugin = ((pluginName: string) => {
+      if (pluginName === 'plugin-zod') return mockedZodPlugin
       return originalGetPlugin(pluginName)
-    }
+    }) as typeof driver.getPlugin
 
-    driver.getResolver = (pluginName: string) => {
-      if (pluginName === 'plugin-zod') return mockedZodPlugin.resolver as any
-      return mockedTsPlugin.resolver as any
-    }
+    driver.getResolver = ((pluginName: string) => {
+      if (pluginName === 'plugin-zod') return mockedZodPlugin.resolver
+      return mockedTsPlugin.resolver
+    }) as typeof driver.getResolver
 
     await renderGeneratorOperations(serverGenerator, nodes, {
       config: testConfig,

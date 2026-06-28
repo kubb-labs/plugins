@@ -17,11 +17,11 @@ export const getPetByIdStatus200Schema = z.union([getPetByIdStatus200SchemaJson,
 
 export type GetPetByIdStatus200SchemaType = z.infer<typeof getPetByIdStatus200Schema>
 
-export const getPetByIdStatus400Schema = z.any()
+export const getPetByIdStatus400Schema = z.unknown()
 
 export type GetPetByIdStatus400SchemaType = z.infer<typeof getPetByIdStatus400Schema>
 
-export const getPetByIdStatus404Schema = z.any()
+export const getPetByIdStatus404Schema = z.unknown()
 
 export type GetPetByIdStatus404SchemaType = z.infer<typeof getPetByIdStatus404Schema>
 

@@ -31,7 +31,7 @@ export function createGetPetByIdStatus200FakerXml(data?: Partial<GetPetByIdStatu
  * @description successful operation
  */
 export function createGetPetByIdStatus200Faker(_data?: GetPetByIdStatus200): GetPetByIdStatus200 {
-  return faker.helpers.arrayElement<any>([createGetPetByIdStatus200FakerJson(), createGetPetByIdStatus200FakerXml()])
+  return faker.helpers.arrayElement([createGetPetByIdStatus200FakerJson(), createGetPetByIdStatus200FakerXml()])
 }
 
 /**
@@ -49,5 +49,5 @@ export function createGetPetByIdStatus404Faker() {
 }
 
 export function createGetPetByIdResponseFaker(_data?: GetPetByIdResponse): GetPetByIdResponse {
-  return faker.helpers.arrayElement<any>([createGetPetByIdStatus200Faker(), createGetPetByIdStatus400Faker(), createGetPetByIdStatus404Faker()])
+  return faker.helpers.arrayElement([createGetPetByIdStatus200Faker(), createGetPetByIdStatus400Faker(), createGetPetByIdStatus404Faker()])
 }

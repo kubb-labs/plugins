@@ -14,7 +14,7 @@ export const getThingsQuerySkipSchema = z.int().min(0).optional().default(0).des
 
 export type GetThingsQuerySkipSchemaType = z.infer<typeof getThingsQuerySkipSchema>
 
-export const getThingsStatus201Schema = z.any()
+export const getThingsStatus201Schema = z.unknown()
 
 export type GetThingsStatus201SchemaType = z.infer<typeof getThingsStatus201Schema>
 
