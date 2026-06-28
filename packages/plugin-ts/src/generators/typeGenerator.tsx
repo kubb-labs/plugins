@@ -1,4 +1,6 @@
 import { caseParams, resolveContentTypeVariants } from '@internals/shared'
+import type { AdapterOas } from '@kubb/adapter-oas'
+import type { Adapter } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
@@ -61,7 +63,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       description: node.description,
       resolver,
       enumSchemaNames,
-      nameMapping: ctx.meta.nameMapping,
+      nameMapping: (adapter as Adapter<AdapterOas>).options.nameMapping,
       nodes: printer?.nodes,
     })
 
@@ -122,7 +124,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         keysToOmit,
         resolver,
         enumSchemaNames,
-        nameMapping: ctx.meta.nameMapping,
+        nameMapping: (adapter as Adapter<AdapterOas>).options.nameMapping,
         nodes: printer?.nodes,
       })
 

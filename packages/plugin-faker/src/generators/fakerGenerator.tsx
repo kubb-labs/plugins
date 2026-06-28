@@ -1,5 +1,7 @@
 import { caseParams, getPerContentTypeName, resolveContentTypeVariants } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
+import type { AdapterOas } from '@kubb/adapter-oas'
+import type { Adapter } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -54,7 +56,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       mapper,
       nodes: printer?.nodes,
       cyclicSchemas,
-      nameMapping: ctx.meta.nameMapping,
+      nameMapping: (adapter as Adapter<AdapterOas>).options.nameMapping,
     })
     const fakerText = printerInstance.print(node) ?? 'undefined'
     const typeReference = resolveTypeReference({
@@ -230,7 +232,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         mapper,
         nodes: printer?.nodes,
         cyclicSchemas,
-        nameMapping: ctx.meta.nameMapping,
+        nameMapping: (adapter as Adapter<AdapterOas>).options.nameMapping,
       })
       const fakerText = printerInstance.print(schema) ?? 'undefined'
       const usedImports = filterUsedImports(resolveMockImports(schema), fakerText, skipImportNames)

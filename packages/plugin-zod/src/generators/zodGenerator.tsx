@@ -128,7 +128,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const inferTypeName = inferred ? resolver.resolveSchemaTypeName(node.name) : null
 
-    const nameMapping = ctx.meta.nameMapping
+    const nameMapping = (adapter as Adapter<AdapterOas>).options.nameMapping
     const stdPrinters = mini
       ? null
       : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, wrapOutput, cyclicSchemas, nameMapping, nodes: printer?.nodes })
@@ -179,7 +179,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     } as const
 
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
-    const nameMapping = ctx.meta.nameMapping
+    const nameMapping = (adapter as Adapter<AdapterOas>).options.nameMapping
 
     function renderSchemaEntry({
       schema,
