@@ -54,6 +54,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       mapper,
       nodes: printer?.nodes,
       cyclicSchemas,
+      nameMapping: ctx.meta.nameMapping,
     })
     const fakerText = printerInstance.print(node) ?? 'undefined'
     const typeReference = resolveTypeReference({
@@ -229,6 +230,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         mapper,
         nodes: printer?.nodes,
         cyclicSchemas,
+        nameMapping: ctx.meta.nameMapping,
       })
       const fakerText = printerInstance.print(schema) ?? 'undefined'
       const usedImports = filterUsedImports(resolveMockImports(schema), fakerText, skipImportNames)

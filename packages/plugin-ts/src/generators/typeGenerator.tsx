@@ -61,6 +61,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       description: node.description,
       resolver,
       enumSchemaNames,
+      nameMapping: ctx.meta.nameMapping,
       nodes: printer?.nodes,
     })
 
@@ -121,6 +122,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         keysToOmit,
         resolver,
         enumSchemaNames,
+        nameMapping: ctx.meta.nameMapping,
         nodes: printer?.nodes,
       })
 

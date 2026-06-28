@@ -25,6 +25,7 @@ type StdPrinterParams = {
   dateType: unknown
   wrapOutput: unknown
   cyclicSchemas: ReadonlySet<string>
+  nameMapping?: ReadonlyMap<string, string>
   nodes: unknown
 }
 
@@ -60,7 +61,7 @@ function getStdPrinters(resolver: ResolverZod, params: StdPrinterParams): StdPri
 
 function getMiniPrinter(
   resolver: ResolverZod,
-  params: { guidType: unknown; regexType: unknown; wrapOutput: unknown; cyclicSchemas: ReadonlySet<string>; nodes: unknown },
+  params: { guidType: unknown; regexType: unknown; wrapOutput: unknown; cyclicSchemas: ReadonlySet<string>; nameMapping?: ReadonlyMap<string, string>; nodes: unknown },
 ) {
   const cached = zodMiniPrinterCache.get(resolver)
   if (cached && cached.guidType === params.guidType && cached.regexType === params.regexType) return cached.printer
@@ -120,8 +121,9 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const inferTypeName = inferred ? resolver.resolveSchemaTypeName(node.name) : null
 
-    const stdPrinters = mini ? null : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, wrapOutput, cyclicSchemas, nodes: printer?.nodes })
-    const schemaPrinter = mini ? getMiniPrinter(resolver, { guidType, regexType, wrapOutput, cyclicSchemas, nodes: printer?.nodes }) : stdPrinters!.output
+    const nameMapping = ctx.meta.nameMapping
+    const stdPrinters = mini ? null : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, wrapOutput, cyclicSchemas, nameMapping, nodes: printer?.nodes })
+    const schemaPrinter = mini ? getMiniPrinter(resolver, { guidType, regexType, wrapOutput, cyclicSchemas, nameMapping, nodes: printer?.nodes }) : stdPrinters!.output
 
     return (
       <File
@@ -166,6 +168,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     } as const
 
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
+    const nameMapping = ctx.meta.nameMapping
 
     function renderSchemaEntry({
       schema,
@@ -191,11 +194,11 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
       const schemaPrinter = mini
         ? keysToOmit?.length
-          ? printerZodMini({ guidType, regexType, wrapOutput, resolver, keysToOmit, cyclicSchemas, nodes: printer?.nodes })
-          : getMiniPrinter(resolver, { guidType, regexType, wrapOutput, cyclicSchemas, nodes: printer?.nodes })
+          ? printerZodMini({ guidType, regexType, wrapOutput, resolver, keysToOmit, cyclicSchemas, nameMapping, nodes: printer?.nodes })
+          : getMiniPrinter(resolver, { guidType, regexType, wrapOutput, cyclicSchemas, nameMapping, nodes: printer?.nodes })
         : keysToOmit?.length
-          ? printerZod({ coercion, guidType, regexType, dateType, wrapOutput, resolver, keysToOmit, cyclicSchemas, nodes: printer?.nodes, direction })
-          : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, wrapOutput, cyclicSchemas, nodes: printer?.nodes })[direction]
+          ? printerZod({ coercion, guidType, regexType, dateType, wrapOutput, resolver, keysToOmit, cyclicSchemas, nameMapping, nodes: printer?.nodes, direction })
+          : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, wrapOutput, cyclicSchemas, nameMapping, nodes: printer?.nodes })[direction]
 
       return (
         <>

@@ -186,6 +186,34 @@ describe('printerTs', () => {
 
       expect(await formatTS(result)).toBe('FallbackType')
     })
+
+    it('ref resolves a collided component to its renamed name via nameMapping', async () => {
+      // When `#/components/schemas/Order` collides with `#/components/requestBodies/Order`,
+      // the adapter renames it to `OrderSchema`; the printer must emit the renamed type.
+      const mappedPrinter = printerTs({
+        resolver: resolverTs,
+        optionalType: 'questionToken',
+        arrayType: 'array',
+        enum: inlineLiteralEnum,
+        nameMapping: new Map([['#/components/schemas/Order', 'OrderSchema']]),
+      })
+      const result = mappedPrinter.transform(ast.factory.createSchema({ type: 'ref', name: 'Order', ref: '#/components/schemas/Order' }))
+
+      expect(await formatTS(result)).toBe('OrderSchema')
+    })
+
+    it('ref ignores nameMapping for refs that were not renamed', async () => {
+      const mappedPrinter = printerTs({
+        resolver: resolverTs,
+        optionalType: 'questionToken',
+        arrayType: 'array',
+        enum: inlineLiteralEnum,
+        nameMapping: new Map([['#/components/schemas/Order', 'OrderSchema']]),
+      })
+      const result = mappedPrinter.transform(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }))
+
+      expect(await formatTS(result)).toBe('Pet')
+    })
   })
 
   describe('enum', () => {
