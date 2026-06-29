@@ -1,4 +1,5 @@
 export * from './.kubb/client.js'
+export * from './.kubb/serializers.js'
 export * from './.kubb/standardSchema.js'
 export * from './clients/addFiles.js'
 export * from './clients/addPet.js'

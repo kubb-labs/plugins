@@ -8,6 +8,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildReturnStatement } from '../builders/returnStatement.ts'
 import { type Auth, buildSecurityMetadata } from '../builders/security.ts'
 import { buildGroupedOptionsSignature } from '../builders/signature.ts'
+import { buildSerializationMetadata } from '../builders/serialization.ts'
 import { buildValidatorHooks } from '../builders/validator.ts'
 import type { ValidatorOptions } from '../types.ts'
 
@@ -52,6 +53,7 @@ export function Operation({ name, node, tsResolver, zodResolver, validator, secu
   const signature = buildGroupedOptionsSignature({ node, tsResolver })
   const validators = buildValidatorHooks({ node, validator, zodResolver })
   const securityLiteral = buildSecurityMetadata({ security })
+  const serializationLiteral = buildSerializationMetadata({ node })
 
   const { defaultContentType } = getContentTypeInfo(node)
   const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
@@ -82,6 +84,7 @@ export function Operation({ name, node, tsResolver, zodResolver, validator, secu
     `method: '${node.method.toUpperCase()}'`,
     `url: '${Url.toCasedTemplate(node.path, { casing: 'camelcase' })}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
+    serializationLiteral ? `serialization: ${serializationLiteral}` : null,
     validatorLiteral,
     contentTypeLiteral,
     responseTypeLiteral,
