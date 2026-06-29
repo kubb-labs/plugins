@@ -5,7 +5,7 @@ export const addFilesStatus200Schema = z.lazy(() => petSchema.omit({ name: true 
 
 export type AddFilesStatus200SchemaType = z.infer<typeof addFilesStatus200Schema>
 
-export const addFilesStatus405Schema = z.any()
+export const addFilesStatus405Schema = z.unknown()
 
 export type AddFilesStatus405SchemaType = z.infer<typeof addFilesStatus405Schema>
 

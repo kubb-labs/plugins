@@ -19,7 +19,7 @@ export const createPetsHeaderXEXAMPLESchema = createPetsXEXAMPLESchema.describe(
 
 export type CreatePetsHeaderXEXAMPLESchemaType = z.infer<typeof createPetsHeaderXEXAMPLESchema>
 
-export const createPetsStatus201Schema = z.any()
+export const createPetsStatus201Schema = z.unknown()
 
 export type CreatePetsStatus201SchemaType = z.infer<typeof createPetsStatus201Schema>
 

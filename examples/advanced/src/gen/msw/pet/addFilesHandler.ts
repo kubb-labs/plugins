@@ -11,14 +11,17 @@ export function addFilesHandlerResponse200(data: AddFilesResponse) {
   })
 }
 
-export function addFilesHandlerResponse405(data?: AddFilesStatus405) {
+export function addFilesHandlerResponse405(data: AddFilesStatus405) {
   return new Response(JSON.stringify(data), {
     status: 405,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
-export function addFilesHandler(data?: AddFilesResponse | HttpResponseResolver<Record<string, string>, AddFilesData, any>) {
-  return http.post<Record<string, string>, AddFilesData, any>(`/pet/files`, function handler(info) {
+export function addFilesHandler(data?: AddFilesResponse | HttpResponseResolver<Record<string, string>, AddFilesData>) {
+  return http.post<Record<string, string>, AddFilesData>(`/pet/files`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

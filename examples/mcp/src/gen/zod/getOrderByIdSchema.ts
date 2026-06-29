@@ -14,9 +14,9 @@ export const getOrderByIdStatus200SchemaXml = orderSchema
 
 export const getOrderByIdStatus200Schema = z.union([getOrderByIdStatus200SchemaJson, getOrderByIdStatus200SchemaXml])
 
-export const getOrderByIdStatus400Schema = z.any()
+export const getOrderByIdStatus400Schema = z.unknown()
 
-export const getOrderByIdStatus404Schema = z.any()
+export const getOrderByIdStatus404Schema = z.unknown()
 
 export const getOrderByIdResponseSchema = getOrderByIdStatus200Schema
 

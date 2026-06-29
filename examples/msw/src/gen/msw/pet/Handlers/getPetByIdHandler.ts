@@ -15,15 +15,21 @@ export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
   })
 }
 
-export function getPetByIdHandlerResponse400(data?: GetPetByIdStatus400) {
+export function getPetByIdHandlerResponse400(data: GetPetByIdStatus400) {
   return new Response(JSON.stringify(data), {
     status: 400,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
-export function getPetByIdHandlerResponse404(data?: GetPetByIdStatus404) {
+export function getPetByIdHandlerResponse404(data: GetPetByIdStatus404) {
   return new Response(JSON.stringify(data), {
     status: 404,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 

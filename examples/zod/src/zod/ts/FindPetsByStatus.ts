@@ -33,9 +33,9 @@ export type FindPetsByStatusStatus200Xml = Array<Pet>
 export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
 
 /**
- * @type any
+ * @type unknown
  */
-export type FindPetsByStatusStatus400 = any
+export type FindPetsByStatusStatus400 = unknown
 
 /**
  * @type object

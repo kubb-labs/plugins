@@ -5,7 +5,7 @@ import type { Config, Group } from '@kubb/core'
 import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
 import { describe, expect, test } from 'vitest'
-import { matchFiles } from '#mocks'
+import { matchFiles, rawSources } from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'
 import type { PluginTs } from '../types.ts'
 import { typeGenerator } from './typeGenerator.tsx'
@@ -81,6 +81,72 @@ const operationWithSnakeCaseParams: ast.OperationNode = ast.factory.createOperat
     ],
   },
   responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Success' })],
+})
+
+const apiResolver = {
+  ...resolverTs,
+  resolveTypeName(name: string) {
+    return `Api${resolverTs.default(name, 'type')}`
+  },
+}
+
+describe('typeGenerator — custom resolver', () => {
+  test('uses resolveTypeName consistently for imported schema refs', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: apiResolver })
+    const driver = createMockedPluginDriver({ name: 'custom resolver' })
+    const node = ast.factory.createOperation({
+      operationId: 'createPet',
+      method: 'POST',
+      path: '/pets',
+      tags: ['pets'],
+      requestBody: {
+        content: [
+          ast.factory.createContent({
+            contentType: 'application/json',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'NewPet', ref: '#/components/schemas/NewPet' }),
+          }),
+        ],
+      },
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '201',
+          schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          description: 'Created',
+        }),
+        ast.factory.createResponse({
+          statusCode: '400',
+          schema: ast.factory.createSchema({ type: 'ref', name: 'ErrorResponse', ref: '#/components/schemas/ErrorResponse' }),
+          description: 'Bad request',
+        }),
+      ],
+    })
+    const adapter = createMockedAdapter({
+      getImports: (_node, resolve) =>
+        ['Pet', 'ErrorResponse', 'NewPet'].map((name) => {
+          const imported = resolve(name)
+          return ast.factory.createImport({ name: [imported.name], path: imported.path })
+        }),
+    })
+
+    await renderGeneratorOperation(typeGenerator, node, {
+      config: testConfig,
+      adapter,
+      driver,
+      plugin,
+      options,
+      resolver: apiResolver,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+
+    expect(source).toContain('export type ApiCreatePetStatus201 = ApiPet')
+    expect(source).toContain('export type ApiCreatePetStatus400 = ApiErrorResponse')
+    expect(source).toContain('export type ApiCreatePetData = ApiNewPet')
+    expect(source).toContain("import type { ApiPet } from './Pet.ts'")
+    expect(source).toContain("import type { ApiErrorResponse } from './ErrorResponse.ts'")
+    expect(source).toContain("import type { ApiNewPet } from './NewPet.ts'")
+  })
 })
 
 describe('typeGenerator — Operation', () => {

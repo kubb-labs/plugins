@@ -17,7 +17,7 @@ export default defineConfig({
     format: false,
     lint: false,
   },
-  adapter: adapterOas({ enums: 'root' }),
+  adapter: adapterOas({ unknownType: 'unknown', enums: 'root' }),
   plugins: [
     pluginTs({
       output: { path: 'models' },

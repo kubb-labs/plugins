@@ -18,9 +18,9 @@ export type AddPetStatus200Xml = Pet
 export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
 /**
- * @type any
+ * @type unknown
  */
-export type AddPetStatus405 = any
+export type AddPetStatus405 = unknown
 
 /**
  * @description Create a new pet in the store

@@ -9,8 +9,8 @@ import { faker } from '@faker-js/faker'
 export function createTreeNode<TData extends Partial<TreeNode> = object>(data?: TData) {
   const defaultFakeData = {
     value: faker.string.alpha(),
-    left: undefined as any,
-    right: undefined as any,
+    left: undefined as unknown as NonNullable<TreeNode>['left'],
+    right: undefined as unknown as NonNullable<TreeNode>['right'],
   }
   return {
     ...defaultFakeData,

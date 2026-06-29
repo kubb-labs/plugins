@@ -36,7 +36,7 @@ export function createFindPetsByStatusStatus200Xml(data?: FindPetsByStatusStatus
  * @description successful operation
  */
 export function createFindPetsByStatusStatus200(_data?: FindPetsByStatusStatus200): FindPetsByStatusStatus200 {
-  return faker.helpers.arrayElement<any>([createFindPetsByStatusStatus200Json(), createFindPetsByStatusStatus200Xml()])
+  return faker.helpers.arrayElement([createFindPetsByStatusStatus200Json(), createFindPetsByStatusStatus200Xml()])
 }
 
 /**
@@ -47,5 +47,5 @@ export function createFindPetsByStatusStatus400() {
 }
 
 export function createFindPetsByStatusResponse(_data?: FindPetsByStatusResponse): FindPetsByStatusResponse {
-  return faker.helpers.arrayElement<any>([createFindPetsByStatusStatus200(), createFindPetsByStatusStatus400()])
+  return faker.helpers.arrayElement([createFindPetsByStatusStatus200(), createFindPetsByStatusStatus400()])
 }
