@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "target": "ES2021",
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true
+  },
+  "include": ["models/ts/**/*.ts", "zod/**/*.ts"]
+}

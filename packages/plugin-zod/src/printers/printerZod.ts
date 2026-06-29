@@ -114,7 +114,7 @@ export type PrinterZodOptions = {
  */
 export type PrinterZodFactory = ast.PrinterFactoryOptions<'zod', PrinterZodOptions, string, string>
 
-function strictOneOfMember(member: string, node: ast.SchemaNode): string {
+function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): string {
   if (node.type === 'object' && node.additionalProperties === undefined) {
     return `${member}.strict()`
   }
@@ -124,7 +124,19 @@ function strictOneOfMember(member: string, node: ast.SchemaNode): string {
       return member
     }
 
+    // A cyclic ref is annotated `z.ZodType`, and a nullable/optional ref is wrapped in
+    // ZodNullable/ZodOptional — neither exposes `.strict()`. Only a bare `ZodObject` ref takes it.
+    // A union member ref may carry only `node.name` (no `node.ref`), so fall back to it like `ref()`.
+    const refName = (node.ref ? extractRefName(node.ref) : undefined) ?? node.name
+    if (refName && cyclicSchemas?.has(refName)) {
+      return member
+    }
+
     const schema = syncSchemaRef(node)
+
+    if (schema.nullable || schema.optional || node.nullable || node.optional) {
+      return member
+    }
 
     if (schema.type === 'object' && (schema.additionalProperties === undefined || schema.additionalProperties === false)) {
       return `${member}.strict()`
@@ -154,6 +166,10 @@ function getMemberConstraint({ member, regexType }: { member: ast.SchemaNode; re
  * ```
  */
 export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
+  // The object handler temporarily reassigns `options.cyclicSchemas` to `undefined` while rendering a
+  // getter body (to suppress nested `z.lazy()`), so capture a stable reference for the `.strict()`
+  // skip decision, which must still see cyclic members inside those getter bodies.
+  const cyclicSchemaNames = options.cyclicSchemas
   return {
     name: 'zod',
     options,
@@ -346,13 +362,15 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       union(node) {
         const nodeMembers = node.members ?? []
         const members = mapSchemaMembers(node, (memberNode) => this.transform(memberNode))
-          .map(({ schema, output }) => (output && node.strategy === 'one' ? strictOneOfMember(output, schema) : output))
+          .map(({ schema, output }) => (output && node.strategy === 'one' ? strictOneOfMember(output, schema, cyclicSchemaNames) : output))
           .filter(Boolean)
         if (members.length === 0) return ''
         if (members.length === 1) return members[0]!
-        if (node.discriminatorPropertyName && !nodeMembers.some((m) => m.type === 'intersection')) {
-          // z.discriminatedUnion requires ZodObject members; intersections (ZodIntersection) are not
-          // assignable to $ZodDiscriminant, so fall back to z.union when any member is an intersection.
+        // z.discriminatedUnion requires discriminable ZodObject members; an intersection
+        // (ZodIntersection) — including a `$ref` whose target is an `allOf` — is not assignable to
+        // $ZodDiscriminant, so fall back to z.union when any member resolves to an intersection.
+        const allDiscriminable = nodeMembers.every((m) => (m.type === 'ref' ? syncSchemaRef(m) : m).type !== 'intersection')
+        if (node.discriminatorPropertyName && allDiscriminable) {
           return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
         }
 

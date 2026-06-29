@@ -603,6 +603,30 @@ describe('printerZod', () => {
       expect(printer.print(node)).toMatchInlineSnapshot(`"z.discriminatedUnion('petType', [Cat, Dog])"`)
     })
 
+    test('discriminated union falls back to z.union when a member is an intersection', () => {
+      const node = ast.factory.createSchema({
+        type: 'union',
+        discriminatorPropertyName: 'type',
+        members: [
+          ast.factory.createSchema({
+            type: 'intersection',
+            members: [
+              ast.factory.createSchema({ type: 'ref', name: 'Base', ref: '#/components/schemas/Base' }),
+              ast.factory.createSchema({
+                type: 'object',
+                primitive: 'object',
+                properties: [ast.factory.createProperty({ name: 'text', required: false, schema: ast.factory.createSchema({ type: 'string' }) })],
+              }),
+            ],
+          }),
+          ast.factory.createSchema({ type: 'ref', name: 'Other', ref: '#/components/schemas/Other' }),
+        ],
+      })
+      // z.discriminatedUnion rejects a ZodIntersection member, so fall back to z.union.
+      expect(printer.print(node)).toContain('z.union(')
+      expect(printer.print(node)).not.toContain('z.discriminatedUnion(')
+    })
+
     test('discriminated union with single member', () => {
       const node = ast.factory.createSchema({
         type: 'union',

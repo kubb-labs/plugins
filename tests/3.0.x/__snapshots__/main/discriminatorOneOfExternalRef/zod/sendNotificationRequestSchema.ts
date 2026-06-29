@@ -7,7 +7,7 @@ import * as z from 'zod'
 import { orderCreatedNotificationDTOSchema } from './orderCreatedNotificationDTOSchema.ts'
 import { pingNotificationDTOSchema } from './pingNotificationDTOSchema.ts'
 
-export const sendNotificationRequestSchema = z.union([
+export const sendNotificationRequestSchema: z.ZodType = z.union([
   z.lazy(() => pingNotificationDTOSchema).and(z.object({
     notificationType: z.enum(['PING']),
   })),

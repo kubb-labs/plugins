@@ -149,13 +149,14 @@ export const zodGenerator = defineGenerator<PluginZod>({
           <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
         ))}
 
-        <Zod name={meta.name} node={node} printer={schemaPrinter} inferTypeName={inferTypeName} />
+        <Zod name={meta.name} node={node} printer={schemaPrinter} inferTypeName={inferTypeName} cyclic={cyclicSchemas.has(node.name)} />
         {hasCodec && stdPrinters && (
           <Zod
             name={resolver.resolveInputSchemaName(node.name)}
             node={node}
             printer={stdPrinters.input}
             inferTypeName={inferred ? resolver.resolveInputSchemaTypeName(node.name) : null}
+            cyclic={cyclicSchemas.has(node.name)}
           />
         )}
       </File>
@@ -228,7 +229,11 @@ export const zodGenerator = defineGenerator<PluginZod>({
           {imports.map((imp) => (
             <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
           ))}
-          <Zod name={name} node={schema} printer={schemaPrinter} inferTypeName={inferTypeName} />
+          {/* Operation schemas reference (and import) the component schemas, which carry the
+              `z.ZodType` annotation at their own definition when cyclic. Annotating the operation
+              schema too would only erase its inferred type to `unknown`, breaking typed consumers
+              (e.g. the MCP server's request types), so it is never marked cyclic here. */}
+          <Zod name={name} node={schema} printer={schemaPrinter} inferTypeName={inferTypeName} cyclic={false} />
         </>
       )
     }
