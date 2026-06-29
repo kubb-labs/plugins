@@ -14,12 +14,10 @@ if (!name) {
 }
 
 // Specs whose generated output cannot strict-compile for reasons outside the generator. Skipping
-// keeps the gate honest: it asserts "every generated spec compiles" without pretending these two do.
-//   - square: the input OpenAPI is malformed — it $refs `AppFeeAllocation`/`CurrencyExchange`
-//     without defining them as components, so the output has dangling imports (TS2307).
+// keeps the gate honest: it asserts "every generated spec compiles" without pretending this one does.
 //   - stripe: `z.infer` over its enormous composed schema graph exceeds TypeScript's instantiation
 //     depth ceiling (TS2589). The schema is valid and runs; only static inference hits the limit.
-const skip = new Set(['square', 'stripe'])
+const skip = new Set(['stripe'])
 if (skip.has(name)) {
   process.exit(0)
 }

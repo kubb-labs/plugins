@@ -20,6 +20,10 @@ const schemas = [
   // Note: developer.atlassian.com, petstore3.swagger.io, and openapi.vercel.sh are omitted here.
   // They block CI/bot traffic with 403s and flake the e2e run; the local fixtures plus the
   // raw.githubusercontent.com specs below give equivalent coverage.
+  // square (connect-api-specification) is also omitted: its spec $refs AppFeeAllocation and
+  // CurrencyExchange without defining them, which kubb reports as KUBB_REF_NOT_FOUND errors that
+  // fail generation. @kubb/adapter-oas now emits `unknown` for such refs so the output compiles,
+  // but the malformed-input diagnostics still fail the run.
   { name: 'optionalParameters', path: '../../schemas/3.0.x/optionalParameters.json' },
   { name: 'allOf', path: '../../schemas/3.0.x/allOf.json' },
   { name: 'anyOf', path: '../../schemas/3.0.x/anyOf.json' },
