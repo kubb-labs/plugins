@@ -1,5 +1,7 @@
 import axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers'
+import type { HeadersInit, PathParamStyle, PathSerializer, RequestSerialization, Serializers } from './serializers'
 import { type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
 
 /**
@@ -67,23 +69,9 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequ
  * The data-shaped keys of the grouped options object. `Options` subtracts these from the runtime
  * `RequestConfig` and adds them back, typed per operation, from the generated `<Name>Request` type.
  */
-export type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown }
+export type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; path?: unknown; query?: unknown }
 
-export type HeaderValue = string | number | boolean | null | undefined | object
-export type HeadersInit = Array<[string, HeaderValue]> | Record<string, HeaderValue>
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream' | 'formdata'
-
-/**
- * Serializes the query object into a search string. Array and object members follow the configured
- * style (`form` with `explode` by default; `deepObject` for nested objects).
- */
-export type QuerySerializer = (params: Record<string, unknown>) => string
-
-/**
- * Serializes the request body. JSON by default; `FormData`, `URLSearchParams`, `Blob`,
- * `ArrayBuffer`, and string bodies pass through untouched.
- */
-export type BodySerializer = (body: unknown, contentType?: string) => unknown
 
 /**
  * A Standard Schema validator (zod, valibot, arktype) that parses a value before it is sent or after
@@ -139,8 +127,10 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   path?: Record<string, unknown>
   query?: unknown
   params?: unknown
+  cookies?: Record<string, unknown>
   body?: TBody
   headers?: HeadersInit
+  serialization?: RequestSerialization
   signal?: AbortSignal
   options?: AxiosOptions
   contentType?: string
@@ -149,8 +139,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   validateStatus?: (status: number) => boolean
   client?: ClientInstance<TRequest, TResponse>
   transport?: AxiosInstance
-  querySerializer?: QuerySerializer
-  bodySerializer?: BodySerializer
+  serializer?: Serializers
   validator?: { request?: Validator; response?: Validator; error?: Validator }
   security?: Array<Auth>
   auth?: AuthResolver
@@ -180,8 +169,7 @@ export type ClientConfig = {
   throwOnError?: boolean
   validateStatus?: (status: number) => boolean
   transport?: AxiosInstance
-  querySerializer?: QuerySerializer
-  bodySerializer?: BodySerializer
+  serializer?: Serializers
   auth?: AuthResolver
 }
 
@@ -365,74 +353,6 @@ export class ResponseError<TError = unknown, TRequest = AxiosRequestConfig, TRes
 
 export type ResponseErrorConfig<TError = unknown> = ResponseError<TError>
 
-function isFormBody(body: unknown): boolean {
-  return (
-    body instanceof FormData ||
-    body instanceof URLSearchParams ||
-    body instanceof Blob ||
-    body instanceof ArrayBuffer ||
-    ArrayBuffer.isView(body) ||
-    typeof body === 'string'
-  )
-}
-
-function appendFormDataValue(formData: FormData, key: string, value: unknown): void {
-  if (value === undefined || value === null) return
-  if (value instanceof Blob) formData.append(key, value)
-  else if (value instanceof Date) formData.append(key, value.toISOString())
-  else if (typeof value === 'object') formData.append(key, JSON.stringify(value))
-  else formData.append(key, String(value))
-}
-
-/**
- * Default body serializer: passes binary/form bodies through and JSON-serializes everything else.
- * For `multipart/form-data` plain objects become `FormData` and for
- * `application/x-www-form-urlencoded` they become `URLSearchParams`.
- */
-export const defaultBodySerializer: BodySerializer = (body, contentType) => {
-  if (body === undefined || body === null) return undefined
-  if (isFormBody(body)) return body
-  if (contentType?.includes('multipart/form-data')) {
-    const formData = new FormData()
-    for (const [key, value] of Object.entries(body as Record<string, unknown>)) {
-      if (Array.isArray(value)) for (const item of value) appendFormDataValue(formData, key, item)
-      else appendFormDataValue(formData, key, value)
-    }
-    return formData
-  }
-  if (contentType?.includes('application/x-www-form-urlencoded')) {
-    return new URLSearchParams(body as Record<string, string>)
-  }
-  return JSON.stringify(body)
-}
-
-function appendQueryValue(search: URLSearchParams, key: string, value: unknown): void {
-  if (value === undefined || value === null) return
-  if (Array.isArray(value)) {
-    for (const item of value) appendQueryValue(search, key, item)
-    return
-  }
-  if (typeof value === 'object') {
-    for (const [prop, propValue] of Object.entries(value as Record<string, unknown>)) {
-      appendQueryValue(search, `${key}[${prop}]`, propValue)
-    }
-    return
-  }
-  search.append(key, String(value))
-}
-
-/**
- * Default query serializer: arrays explode into repeated keys and nested objects use the
- * `deepObject` style (`key[prop]=value`).
- */
-export const defaultQuerySerializer: QuerySerializer = (params) => {
-  const search = new URLSearchParams()
-  for (const [key, value] of Object.entries(params)) {
-    appendQueryValue(search, key, value)
-  }
-  return search.toString()
-}
-
 function serializeHeaders(headers: HeadersInit | undefined): Record<string, string> {
   if (!headers) return {}
   const entries = Array.isArray(headers) ? headers : Object.entries(headers)
@@ -453,11 +373,23 @@ function mergeHeaders(...sources: Array<HeadersInit | undefined>): Record<string
  * (URL-encoded), and appends the serialized query. Backs `getUrl` so a URL can be constructed
  * without sending the request.
  */
-function serializeUrl(parts: Array<string | undefined>, pathParams: Record<string, unknown>, search: string): string {
+function serializeUrl({
+  parts,
+  pathParams,
+  search,
+  pathSerializer = defaultPathSerializer,
+  pathStyles,
+}: {
+  parts: Array<string | undefined>
+  pathParams: Record<string, unknown>
+  search: string
+  pathSerializer?: PathSerializer
+  pathStyles?: Record<string, PathParamStyle>
+}): string {
   const path = parts
     .filter(Boolean)
     .join('')
-    .replace(/\{([^{}]+)\}/g, (_, key: string) => encodeURIComponent(String(pathParams[key] ?? '')))
+    .replace(/\{([^{}]+)\}/g, (_, key: string) => pathSerializer({ name: key, value: pathParams[key], options: pathStyles?.[key] }))
   return path + (search ? `?${search}` : '')
 }
 
@@ -561,10 +493,11 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
 
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
     const activeInstance = requestConfig.transport ?? config.transport ?? instance
-    const querySerializer = requestConfig.querySerializer ?? config.querySerializer ?? defaultQuerySerializer
-    const bodySerializer = requestConfig.bodySerializer ?? config.bodySerializer ?? defaultBodySerializer
+    const querySerializer = requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer
+    const bodySerializer = requestConfig.serializer?.body ?? config.serializer?.body ?? defaultBodySerializer
+    const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
 
-    const headers = mergeHeaders(config.headers, requestConfig.headers)
+    const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.serialization?.header))
     const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
 
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
@@ -576,8 +509,13 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       query,
     })
 
+    if (requestConfig.cookies) {
+      const cookie = serializeCookies(requestConfig.cookies, requestConfig.serialization?.cookie)
+      if (cookie) headers.Cookie = [headers.Cookie, cookie].filter(Boolean).join('; ')
+    }
+
     const validatedBody = await runValidator(requestConfig.validator?.request, requestConfig.body)
-    const body = bodySerializer(validatedBody, requestContentType)
+    const body = bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.serialization?.body })
     // A FormData body must keep its Content-Type unset so axios appends the multipart boundary.
     if (body instanceof FormData) {
       delete headers['Content-Type']
@@ -586,7 +524,9 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       headers['Content-Type'] = requestConfig.contentType
     }
     const pathParams = requestConfig.path ?? {}
-    const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) => encodeURIComponent(String(pathParams[key] ?? '')))
+    const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) =>
+      pathSerializer({ name: key, value: pathParams[key], options: requestConfig.serialization?.path?.[key] }),
+    )
     const baseURL = [config.baseURL, requestConfig.baseURL].filter(Boolean).join('') || undefined
 
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
@@ -601,7 +541,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       method: requestConfig.method ?? 'GET',
       headers,
       params: query,
-      paramsSerializer: (params) => querySerializer(params as Record<string, unknown>),
+      paramsSerializer: (params) => querySerializer(params as Record<string, unknown>, requestConfig.serialization?.query),
       data: body,
       transformRequest: (data) => data,
       signal: requestConfig.signal,
@@ -648,9 +588,16 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     return config
   }
   client.getUrl = (requestConfig) => {
-    const querySerializer = requestConfig.querySerializer ?? config.querySerializer ?? defaultQuerySerializer
+    const querySerializer = requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer
+    const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
-    return serializeUrl([config.baseURL, requestConfig.baseURL, requestConfig.url], requestConfig.path ?? {}, querySerializer(query))
+    return serializeUrl({
+      parts: [config.baseURL, requestConfig.baseURL, requestConfig.url],
+      pathParams: requestConfig.path ?? {},
+      search: querySerializer(query, requestConfig.serialization?.query),
+      pathSerializer,
+      pathStyles: requestConfig.serialization?.path,
+    })
   }
   client.interceptors = interceptors
   client.createClient = (next) => createClientCore<TRequest, TResponse>({ ...config, ...next })

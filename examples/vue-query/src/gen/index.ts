@@ -1,4 +1,5 @@
 export * from './.kubb/client.ts'
+export * from './.kubb/serializers.ts'
 export * from './.kubb/standardSchema.ts'
 export type { FindPetsByStatusQueryKey } from './hooks/pet/useFindPetsByStatus.ts'
 export type { FindPetsByTagsQueryKey } from './hooks/pet/useFindPetsByTags.ts'
