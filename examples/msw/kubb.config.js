@@ -19,7 +19,7 @@ export default defineConfig(() => {
     hooks: {
       done: ['npm run typecheck'],
     },
-    adapter: adapterOas({ collisionDetection: false, enums: 'root' }),
+    adapter: adapterOas({ unknownType: 'unknown', collisionDetection: false, enums: 'root' }),
     plugins: [
       pluginTs({
         output: {

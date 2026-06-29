@@ -58,7 +58,7 @@ describe('printerFaker', () => {
   test('guards self refs', () => {
     const node = ast.factory.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' })
 
-    expect(printerFaker({ resolver: resolverFaker, schemaName: 'TreeNode' }).print(node)).toMatchInlineSnapshot(`"undefined as any"`)
+    expect(printerFaker({ resolver: resolverFaker, schemaName: 'TreeNode' }).print(node)).toMatchInlineSnapshot(`"undefined as unknown"`)
   })
 
   test('does not re-resolve internal helper refs', () => {
@@ -88,6 +88,13 @@ describe('printerFaker', () => {
     })
 
     expect(printerFaker({ resolver: resolverFaker }).print(node)).toMatchInlineSnapshot(`"createEpisodeBase(data)"`)
+  })
+
+  test('resolves a collided ref to its renamed name via nameMapping', () => {
+    const node = ast.factory.createSchema({ type: 'ref', name: 'Order', ref: '#/components/schemas/Order' })
+    const nameMapping = new Map([['#/components/schemas/Order', 'OrderSchema']])
+
+    expect(printerFaker({ resolver: resolverFaker, nameMapping }).print(node)).toMatchInlineSnapshot(`"createOrderSchema(data)"`)
   })
 
   test('uses tuple item types for nested enum members', () => {
@@ -166,7 +173,7 @@ describe('printerFaker', () => {
 
     expect(printerFaker({ resolver: resolverFaker, typeName: 'Filter', schemaName: 'Filter' }).print(node)).toMatchInlineSnapshot(
       `
-      "faker.helpers.arrayElement<any>([{}, {
+      "faker.helpers.arrayElement([{}, {
         '+order': faker.helpers.arrayElement<(NonNullable<Filter> & Record<"+order", unknown>)["+order"]>(['asc', 'desc']),
       }])"
     `,

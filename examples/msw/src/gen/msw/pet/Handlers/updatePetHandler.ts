@@ -16,26 +16,35 @@ export function updatePetHandlerResponse200(data: UpdatePetResponse) {
   })
 }
 
-export function updatePetHandlerResponse400(data?: UpdatePetStatus400) {
+export function updatePetHandlerResponse400(data: UpdatePetStatus400) {
   return new Response(JSON.stringify(data), {
     status: 400,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
-export function updatePetHandlerResponse404(data?: UpdatePetStatus404) {
+export function updatePetHandlerResponse404(data: UpdatePetStatus404) {
   return new Response(JSON.stringify(data), {
     status: 404,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
-export function updatePetHandlerResponse405(data?: UpdatePetStatus405) {
+export function updatePetHandlerResponse405(data: UpdatePetStatus405) {
   return new Response(JSON.stringify(data), {
     status: 405,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
-export function updatePetHandler(data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, UpdatePetData, any>) {
-  return http.put<Record<string, string>, UpdatePetData, any>(`http://localhost:3000/pet`, function handler(info) {
+export function updatePetHandler(data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, UpdatePetData>) {
+  return http.put<Record<string, string>, UpdatePetData>(`http://localhost:3000/pet`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

@@ -21,14 +21,14 @@ export type GetPetByIdStatus200Xml = Omit<NonNullable<Pet>, 'name'>
 export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml
 
 /**
- * @type any
+ * @type unknown
  */
-export type GetPetByIdStatus400 = any
+export type GetPetByIdStatus400 = unknown
 
 /**
- * @type any
+ * @type unknown
  */
-export type GetPetByIdStatus404 = any
+export type GetPetByIdStatus404 = unknown
 
 /**
  * @type object

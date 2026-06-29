@@ -28,9 +28,9 @@ export type LoginUserStatus200Json = string
 export type LoginUserStatus200 = LoginUserStatus200Xml | LoginUserStatus200Json
 
 /**
- * @type any
+ * @type unknown
  */
-export type LoginUserStatus400 = any
+export type LoginUserStatus400 = unknown
 
 /**
  * @type object

@@ -1,6 +1,6 @@
 import { Url } from '@internals/utils'
 import { ast, type ResolverFileParams } from '@kubb/core'
-import { caseParams } from './params.ts'
+import { caseParams, dedupeByCasedName } from './params.ts'
 
 /**
  * Builds the `ResolverFileParams` every operation generator passes to
@@ -391,10 +391,10 @@ export function getOperationParameters(node: ast.OperationNode, options: { param
   const params = caseParams(node.parameters, options.paramsCasing === 'original' ? undefined : 'camelcase')
 
   return {
-    path: params.filter((param) => param.in === 'path'),
-    query: params.filter((param) => param.in === 'query'),
-    header: params.filter((param) => param.in === 'header'),
-    cookie: params.filter((param) => param.in === 'cookie'),
+    path: dedupeByCasedName(params.filter((param) => param.in === 'path')),
+    query: dedupeByCasedName(params.filter((param) => param.in === 'query')),
+    header: dedupeByCasedName(params.filter((param) => param.in === 'header')),
+    cookie: dedupeByCasedName(params.filter((param) => param.in === 'cookie')),
   }
 }
 

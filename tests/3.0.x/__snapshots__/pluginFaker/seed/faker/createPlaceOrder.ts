@@ -46,11 +46,11 @@ export function createPlaceOrderFormUrlEncodedData(data?: Partial<PlaceOrderForm
 export function createPlaceOrderData(_data?: PlaceOrderData): PlaceOrderData {
   faker.seed([42])
 
-  return faker.helpers.arrayElement<any>([createPlaceOrderJsonData(), createPlaceOrderXmlData(), createPlaceOrderFormUrlEncodedData()])
+  return faker.helpers.arrayElement([createPlaceOrderJsonData(), createPlaceOrderXmlData(), createPlaceOrderFormUrlEncodedData()])
 }
 
 export function createPlaceOrderResponse(_data?: PlaceOrderResponse): PlaceOrderResponse {
   faker.seed([42])
 
-  return faker.helpers.arrayElement<any>([createPlaceOrderStatus200(), createPlaceOrderStatus405()])
+  return faker.helpers.arrayElement([createPlaceOrderStatus200(), createPlaceOrderStatus405()])
 }

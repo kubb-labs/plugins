@@ -13,7 +13,7 @@ import {
 import { ast } from '@kubb/core'
 import { containsCircularRef, syncSchemaRef } from '@kubb/ast/utils'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { applyMiniModifiers, formatLiteral, lengthChecksMini, numberChecksMini, patternKeySchemaMini } from '../utils.ts'
+import { applyMiniModifiers, buildEnum, formatLiteral, lengthChecksMini, numberChecksMini, omitUnwrapChain, patternKeySchemaMini } from '../utils.ts'
 
 /**
  * Partial map of node-type overrides for the Zod Mini printer.
@@ -69,6 +69,12 @@ export type PrinterZodMiniOptions = {
    * Properties referencing these emit lazy getters wrapping refs in `z.lazy(() => …)`.
    */
   cyclicSchemas?: ReadonlySet<string>
+  /**
+   * Maps a component `$ref` path to its collision-resolved name. When two components collide
+   * (across sections or by case), the adapter renames one of them; the `ref()` handler resolves
+   * the referenced name through this map so the emitted schema reference matches the renamed component.
+   */
+  nameMapping?: ReadonlyMap<string, string>
   /**
    * Custom handler map for node type overrides.
    */
@@ -173,13 +179,15 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           return `z.union([${literals.join(', ')}])`
         }
 
-        // Regular enum: use z.enum([…])
-        return `z.enum([${nonNullValues.map(formatLiteral).join(', ')}])`
+        // Regular enum: z.enum for all-string sets, z.literal/z.union otherwise
+        return buildEnum(nonNullValues)
       },
 
       ref(node) {
         if (!node.name) return null
-        const refName = node.ref ? (extractRefName(node.ref) ?? node.name) : node.name
+        // `nameMapping` (keyed by the full $ref) carries the collision-resolved name when the
+        // referenced component was renamed; otherwise fall back to the short ref name.
+        const refName = node.ref ? (this.options.nameMapping?.get(node.ref) ?? extractRefName(node.ref) ?? node.name) : node.name
         const resolvedName = node.ref ? (this.options.resolver?.default(refName, 'function') ?? refName) : node.name
 
         if (node.ref && this.options.cyclicSchemas?.has(refName)) {
@@ -210,6 +218,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
 
           const value = applyMiniModifiers({
             value: wrappedOutput,
+            schema,
             nullable: meta.nullable,
             optional: schema.optional || property.required === false,
             nullish: schema.nullish,
@@ -304,18 +313,23 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
 
       const base = (() => {
         if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed
-        // Mirror printerTs `nonNullable: true`: when omitting keys, the resulting
-        // schema is a new non-nullable object type — skip optional/nullable/nullish.
         // Discriminated unions (z.discriminatedUnion) do not support .omit(), so skip them.
+
+        // A nullable/optional ref resolves to a ZodMiniNullable/ZodMiniOptional variable; .omit() lives
+        // on the inner object, so unwrap down to it first (mirrors printerTs `Omit<NonNullable<T>, …>`).
+        // applyMiniModifiers re-applies the nullable/optional wrapper after the omit.
+        const unwrap = omitUnwrapChain(node)
+        const omit = `.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} })`
 
         // If this is a lazy reference, apply omit inside the lazy function
         const lazyMatch = transformed.match(/^z\.lazy\(\(\)\s*=>\s*(.+)\)$/)
-        if (lazyMatch) return `z.lazy(() => ${lazyMatch[1]}.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} }))`
-        return `${transformed}.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} })`
+        if (lazyMatch) return `z.lazy(() => ${lazyMatch[1]}${unwrap}${omit})`
+        return `${transformed}${unwrap}${omit}`
       })()
 
       return applyMiniModifiers({
         value: base,
+        schema: node,
         nullable: meta.nullable,
         optional: meta.optional,
         nullish: meta.nullish,

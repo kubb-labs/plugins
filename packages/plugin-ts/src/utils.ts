@@ -175,11 +175,10 @@ function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode
   })
 }
 
-export function buildResponses(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode | null {
-  if (node.responses.length === 0) {
-    return null
-  }
-
+export function buildResponses(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode {
+  // Always emit the keyed responses map, even when an operation declares no responses. An operation
+  // with no responses renders as an empty `object`, which keeps every consumer's import (for example
+  // the axios SDK's `RequestResult<XResponses>`) resolvable instead of pointing at a missing export.
   return ast.factory.createSchema({
     type: 'object',
     properties: node.responses.map((res) =>

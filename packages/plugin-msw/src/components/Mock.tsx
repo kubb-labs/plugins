@@ -28,7 +28,7 @@ export function Mock({ baseURL = '', name, typeName, requestTypeName, node }: Pr
   const dataType = responseHasSchema ? typeName : 'string | number | boolean | null | object'
 
   const callbackType = requestTypeName
-    ? `HttpResponseResolver<Record<string, string>, ${requestTypeName}, any>`
+    ? `HttpResponseResolver<Record<string, string>, ${requestTypeName}>`
     : `((info: Parameters<Parameters<typeof http.${method}>[1]>[0]) => Response | Promise<Response>)`
 
   const params = declarationPrinter.print(
@@ -43,7 +43,7 @@ export function Mock({ baseURL = '', name, typeName, requestTypeName, node }: Pr
     }),
   )
 
-  const httpCall = requestTypeName ? `http.${method}<Record<string, string>, ${requestTypeName}, any>` : `http.${method}`
+  const httpCall = requestTypeName ? `http.${method}<Record<string, string>, ${requestTypeName}>` : `http.${method}`
 
   return (
     <File.Source name={name} isIndexable isExportable>

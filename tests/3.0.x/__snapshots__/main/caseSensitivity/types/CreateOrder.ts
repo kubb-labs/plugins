@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import type { Order } from './Order.ts'
+import type { OrderSchema } from './OrderSchema.ts'
 
 /**
  * @type object
 */
-export type CreateOrderStatus201 = Order;
+export type CreateOrderStatus201 = OrderSchema;
 
 /**
  * @description Order request body

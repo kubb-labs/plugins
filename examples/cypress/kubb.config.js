@@ -1,3 +1,4 @@
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginCypress } from '@kubb/plugin-cypress'
 import { pluginTs } from '@kubb/plugin-ts'
 import { defineConfig } from 'kubb'
@@ -7,6 +8,7 @@ export default defineConfig([
   {
     root: '.',
     input,
+    adapter: adapterOas({ unknownType: 'unknown' }),
     output: {
       path: './src/gen',
       clean: true,
@@ -38,6 +40,7 @@ export default defineConfig([
   {
     root: '.',
     input,
+    adapter: adapterOas({ unknownType: 'unknown' }),
     output: { path: './src/gen-v4', clean: true },
     plugins: [
       pluginTs({

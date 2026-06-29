@@ -51,6 +51,12 @@ export type PrinterFakerOptions = {
    * the recursive faker call from ever executing (avoiding stack overflow).
    */
   cyclicSchemas?: ReadonlySet<string>
+  /**
+   * Maps a component `$ref` path to its collision-resolved name. When two components collide
+   * (across sections or by case), the adapter renames one of them; the `ref()` handler resolves
+   * the referenced name through this map so the emitted faker reference matches the renamed component.
+   */
+  nameMapping?: ReadonlyMap<string, string>
 }
 
 /**
@@ -132,8 +138,9 @@ const fakerKeywordMapper = {
     return `faker.helpers.multiple(() => (${item}))`
   },
   tuple: (items: Array<string> = []) => `[${items.join(', ')}]`,
-  enum: (items: Array<string | number | boolean | undefined> = [], type = 'any') => `faker.helpers.arrayElement<${type}>([${items.join(', ')}])`,
-  union: (items: Array<string> = []) => `faker.helpers.arrayElement<any>([${items.join(', ')}])`,
+  enum: (items: Array<string | number | boolean | undefined> = [], type?: string) =>
+    `faker.helpers.arrayElement${type ? `<${type}>` : ''}([${items.join(', ')}])`,
+  union: (items: Array<string> = []) => `faker.helpers.arrayElement([${items.join(', ')}])`,
   datetime: () => 'faker.date.anytime().toISOString()',
   date: (representation: 'date' | 'string' = 'string', parser: PluginFaker['resolvedOptions']['dateParser'] = 'faker') => {
     if (representation === 'string') {
@@ -285,14 +292,18 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // Use the canonical name from the $ref path — node.name may have been overridden
         // (e.g. by single-member allOf flatten using the property-derived child name).
         // Inline refs (without $ref) from faker utils already carry resolved helper names.
-        const refName = node.ref ? (extractRefName(node.ref) ?? node.name ?? node.schema?.name) : (node.name ?? node.schema?.name)
+        // `nameMapping` (keyed by the full $ref) carries the collision-resolved name when the
+        // referenced component was renamed; otherwise fall back to the short ref name.
+        const refName = node.ref
+          ? (this.options.nameMapping?.get(node.ref) ?? extractRefName(node.ref) ?? node.name ?? node.schema?.name)
+          : (node.name ?? node.schema?.name)
 
         if (!refName) {
           throw new Error('Name not defined for ref node')
         }
 
         if (this.options.schemaName && refName === this.options.schemaName) {
-          return 'undefined as any'
+          return this.options.typeName ? `undefined as unknown as ${this.options.typeName}` : 'undefined as unknown'
         }
 
         // Internal helper refs (for generated response/data helpers) are already

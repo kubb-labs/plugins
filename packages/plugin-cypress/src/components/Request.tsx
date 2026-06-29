@@ -46,7 +46,7 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
       // When paramsCasing renames query params (e.g. page_size → pageSize), we must remap
       // the camelCase keys back to the original API names before passing them to `qs`.
       const pairs = Object.entries(queryParamsMapping)
-        .map(([originalName, camelCaseName]) => `${originalName}: query.${camelCaseName}`)
+        .map(([originalName, camelCaseName]) => `'${originalName}': query.${camelCaseName}`)
         .join(', ')
       requestOptions.push(`qs: query ? { ${pairs} } : undefined`)
     } else {

@@ -20,6 +20,7 @@ export default defineConfig(() => {
       lint: false,
     },
     adapter: adapterOas({
+      unknownType: 'unknown',
       server: {
         index: 0,
       },

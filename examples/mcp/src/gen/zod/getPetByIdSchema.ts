@@ -14,9 +14,9 @@ export const getPetByIdStatus200SchemaXml = petSchema.omit({ name: true })
 
 export const getPetByIdStatus200Schema = z.union([getPetByIdStatus200SchemaJson, getPetByIdStatus200SchemaXml])
 
-export const getPetByIdStatus400Schema = z.any()
+export const getPetByIdStatus400Schema = z.unknown()
 
-export const getPetByIdStatus404Schema = z.any()
+export const getPetByIdStatus404Schema = z.unknown()
 
 export const getPetByIdResponseSchema = getPetByIdStatus200Schema
 

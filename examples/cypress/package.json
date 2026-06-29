@@ -22,13 +22,14 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@kubb/adapter-oas": "catalog:",
     "@kubb/plugin-cypress": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "kubb": "catalog:",
     "react": "^19.2.7"
   },
   "devDependencies": {
-    "cypress": "^15.17.0",
+    "cypress": "^15.18.0",
     "typescript": "catalog:"
   },
   "engines": {

@@ -18,9 +18,9 @@ export type CreateUsersWithListInputStatus200Xml = User
 export type CreateUsersWithListInputStatus200 = CreateUsersWithListInputStatus200Json | CreateUsersWithListInputStatus200Xml
 
 /**
- * @type any
+ * @type unknown
  */
-export type CreateUsersWithListInputStatusDefault = any
+export type CreateUsersWithListInputStatusDefault = unknown
 
 /**
  * @type array | undefined
