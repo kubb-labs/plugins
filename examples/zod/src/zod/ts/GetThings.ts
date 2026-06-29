@@ -23,13 +23,13 @@ export type GetThingsQueryLimit = number | undefined
 export type GetThingsQuerySkip = number | undefined
 
 /**
- * @type any
+ * @type unknown
  */
-export type GetThingsStatus201 = any
+export type GetThingsStatus201 = unknown
 
 /**
  * @description Pet not found
- * @type any
+ * @type unknown
  */
 export type GetThingsStatusDefault = PetNotFound
 

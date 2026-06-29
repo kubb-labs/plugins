@@ -19,11 +19,11 @@ export const updatePetStatus202Schema = z.object({
     .meta({ examples: [10] }),
 })
 
-export const updatePetStatus400Schema = z.any()
+export const updatePetStatus400Schema = z.unknown()
 
-export const updatePetStatus404Schema = z.any()
+export const updatePetStatus404Schema = z.unknown()
 
-export const updatePetStatus405Schema = z.any()
+export const updatePetStatus405Schema = z.unknown()
 
 export const updatePetResponseSchema = z.union([updatePetStatus200Schema, updatePetStatus202Schema])
 

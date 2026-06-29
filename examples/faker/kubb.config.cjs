@@ -17,7 +17,7 @@ module.exports = defineConfig(() => {
         format: false,
         clean: true,
       },
-      adapter: adapterOas(),
+      adapter: adapterOas({ unknownType: 'unknown' }),
       hooks: {
         done: ['npm run typecheck'],
       },
@@ -52,7 +52,7 @@ module.exports = defineConfig(() => {
         lint: false,
         format: false,
       },
-      adapter: adapterOas(),
+      adapter: adapterOas({ unknownType: 'unknown' }),
       hooks: {
         done: ['npm run typecheck'],
       },

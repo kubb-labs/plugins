@@ -1,5 +1,7 @@
 // Custom banner
 
+import type { CustomItem } from './Item.ts'
+
 /**
  * @description
  * Format: `int64`
@@ -11,7 +13,7 @@ export type CustomGetItemPathId = bigint;
  * @description A simple item
  * @type object
 */
-export type CustomGetItemStatus200 = Item;
+export type CustomGetItemStatus200 = CustomItem;
 
 /**
  * @type object

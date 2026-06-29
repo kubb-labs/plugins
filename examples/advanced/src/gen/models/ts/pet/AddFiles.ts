@@ -6,9 +6,9 @@ import type { Pet } from '../Pet.ts'
 export type AddFilesStatus200 = Omit<NonNullable<Pet>, 'name'>
 
 /**
- * @type any
+ * @type unknown
  */
-export type AddFilesStatus405 = any
+export type AddFilesStatus405 = unknown
 
 /**
  * @type object

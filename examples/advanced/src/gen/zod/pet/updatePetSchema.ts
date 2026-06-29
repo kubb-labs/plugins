@@ -22,15 +22,15 @@ export const updatePetStatus202Schema = z.object({
 
 export type UpdatePetStatus202SchemaType = z.infer<typeof updatePetStatus202Schema>
 
-export const updatePetStatus400Schema = z.any()
+export const updatePetStatus400Schema = z.unknown()
 
 export type UpdatePetStatus400SchemaType = z.infer<typeof updatePetStatus400Schema>
 
-export const updatePetStatus404Schema = z.any()
+export const updatePetStatus404Schema = z.unknown()
 
 export type UpdatePetStatus404SchemaType = z.infer<typeof updatePetStatus404Schema>
 
-export const updatePetStatus405Schema = z.any()
+export const updatePetStatus405Schema = z.unknown()
 
 export type UpdatePetStatus405SchemaType = z.infer<typeof updatePetStatus405Schema>
 

@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from 'vitest'
 import { ast } from '@kubb/core'
-import { buildParamsMapping, buildTransformedParamsMapping, caseParams } from './params.ts'
+import { buildParamsMapping, buildTransformedParamsMapping, caseParams, dedupeByCasedName } from './params.ts'
 
 const { createParameter, createSchema } = ast.factory
 
@@ -11,6 +11,24 @@ const param = (name: string) =>
     required: false,
     schema: createSchema({ type: 'string' }),
   })
+
+describe('dedupeByCasedName', () => {
+  it('drops params that collapse to the same camelCased name, keeping the first', () => {
+    const result = dedupeByCasedName([param('max-uploads'), param('prefix'), param('MaxUploads')])
+
+    expect(result.map((p) => p.name)).toStrictEqual(['max-uploads', 'prefix'])
+  })
+
+  it('keeps params whose camelCased names are distinct', () => {
+    const result = dedupeByCasedName([param('key-marker'), param('upload-id-marker')])
+
+    expect(result.map((p) => p.name)).toStrictEqual(['key-marker', 'upload-id-marker'])
+  })
+
+  it('handles an empty params array', () => {
+    expect(dedupeByCasedName([])).toStrictEqual([])
+  })
+})
 
 describe('buildParamsMapping', () => {
   test('returns undefined when names did not change', () => {

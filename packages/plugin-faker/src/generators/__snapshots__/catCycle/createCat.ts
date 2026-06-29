@@ -10,7 +10,7 @@ export function createCat<TData extends Partial<Cat> = object>(data?: TData) {
   const defaultFakeData = {
     id: faker.number.int(),
     get archEnemy() {
-      const _value = faker.helpers.arrayElement<any>([null, createPet()])
+      const _value = faker.helpers.arrayElement([null, createPet()])
       Object.defineProperty(this, 'archEnemy', { value: _value, configurable: true, writable: true, enumerable: true })
       return _value
     },

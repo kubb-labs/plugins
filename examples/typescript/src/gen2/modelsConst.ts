@@ -307,6 +307,9 @@ export type Pet = (
    * @type string
    */
   name: string
+  /**
+   * @type object | undefined
+   */
   category?: Category
   /**
    * @type array
@@ -411,19 +414,19 @@ export type UpdatePetStatus200Xml = Pet
 export type UpdatePetStatus200 = UpdatePetStatus200Json | UpdatePetStatus200Xml
 
 /**
- * @type any
+ * @type unknown
  */
-export type UpdatePetStatus400 = any
+export type UpdatePetStatus400 = unknown
 
 /**
- * @type any
+ * @type unknown
  */
-export type UpdatePetStatus404 = any
+export type UpdatePetStatus404 = unknown
 
 /**
- * @type any
+ * @type unknown
  */
-export type UpdatePetStatus405 = any
+export type UpdatePetStatus405 = unknown
 
 /**
  * @description Update an existent pet in the store
@@ -549,9 +552,9 @@ export type FindPetsByStatusStatus200Xml = Array<Pet>
 export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
 
 /**
- * @type any
+ * @type unknown
  */
-export type FindPetsByStatusStatus400 = any
+export type FindPetsByStatusStatus400 = unknown
 
 /**
  * @type object
@@ -612,9 +615,9 @@ export type FindPetsByTagsStatus200Xml = Array<Pet>
 export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
 
 /**
- * @type any
+ * @type unknown
  */
-export type FindPetsByTagsStatus400 = any
+export type FindPetsByTagsStatus400 = unknown
 
 /**
  * @type object
@@ -661,14 +664,14 @@ export type GetPetByIdStatus200Xml = Pet
 export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml
 
 /**
- * @type any
+ * @type unknown
  */
-export type GetPetByIdStatus400 = any
+export type GetPetByIdStatus400 = unknown
 
 /**
- * @type any
+ * @type unknown
  */
-export type GetPetByIdStatus404 = any
+export type GetPetByIdStatus404 = unknown
 
 /**
  * @type object
@@ -720,9 +723,9 @@ export type UpdatePetWithFormQueryName = string | undefined
 export type UpdatePetWithFormQueryStatus = string | undefined
 
 /**
- * @type any
+ * @type unknown
  */
-export type UpdatePetWithFormStatus405 = any
+export type UpdatePetWithFormStatus405 = unknown
 
 /**
  * @type object
@@ -776,9 +779,9 @@ export type DeletePetPathPetId = bigint
 export type DeletePetStatus200 = Array<DeletePetStatus200EnumenumType>
 
 /**
- * @type any
+ * @type unknown
  */
-export type DeletePetStatus400 = any
+export type DeletePetStatus400 = unknown
 
 /**
  * @type object
@@ -906,9 +909,9 @@ export type GetInventoryResponse = GetInventoryStatus200
 export type PlaceOrderStatus200 = Order
 
 /**
- * @type any
+ * @type unknown
  */
-export type PlaceOrderStatus405 = any
+export type PlaceOrderStatus405 = unknown
 
 /**
  * @description Order description
@@ -957,9 +960,9 @@ export type PlaceOrderResponse = PlaceOrderStatus200 | PlaceOrderStatus405
 export type PlaceOrderPatchStatus200 = Order
 
 /**
- * @type any
+ * @type unknown
  */
-export type PlaceOrderPatchStatus405 = any
+export type PlaceOrderPatchStatus405 = unknown
 
 /**
  * @type object | undefined
@@ -1022,14 +1025,14 @@ export type GetOrderByIdStatus200Xml = Order
 export type GetOrderByIdStatus200 = GetOrderByIdStatus200Json | GetOrderByIdStatus200Xml
 
 /**
- * @type any
+ * @type unknown
  */
-export type GetOrderByIdStatus400 = any
+export type GetOrderByIdStatus400 = unknown
 
 /**
- * @type any
+ * @type unknown
  */
-export type GetOrderByIdStatus404 = any
+export type GetOrderByIdStatus404 = unknown
 
 /**
  * @type object
@@ -1069,14 +1072,14 @@ export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400
 export type DeleteOrderPathOrderId = bigint
 
 /**
- * @type any
+ * @type unknown
  */
-export type DeleteOrderStatus400 = any
+export type DeleteOrderStatus400 = unknown
 
 /**
- * @type any
+ * @type unknown
  */
-export type DeleteOrderStatus404 = any
+export type DeleteOrderStatus404 = unknown
 
 /**
  * @type object

@@ -17,12 +17,7 @@ export default defineConfig({
   input: {
     path: './petStore.yaml',
   },
-  adapter: adapterOas({
-    validate: true,
-    discriminator: 'preserve',
-    integerType: 'number',
-    enums: 'root',
-  }),
+  adapter: adapterOas({ unknownType: 'unknown', validate: true, discriminator: 'preserve', integerType: 'number', enums: 'root' }),
   output: {
     path: './src/gen',
     clean: true,

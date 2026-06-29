@@ -214,6 +214,45 @@ describe('cypressGenerator — params casing headers', () => {
   })
 })
 
+describe('cypressGenerator — non-identifier query param names', () => {
+  const node = ast.factory.createOperation({
+    operationId: 'getBestSellers',
+    method: 'GET',
+    path: '/lists/best-sellers',
+    tags: ['lists'],
+    parameters: [
+      ast.factory.createParameter({ name: 'age-group', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
+      ast.factory.createParameter({ name: 'list.name', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
+    ],
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '200',
+        schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+        description: 'A list of best sellers',
+      }),
+    ],
+  })
+
+  test('query param names that are not valid identifiers are quoted in qs', async () => {
+    const options: PluginCypress['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
+    const driver = createMockedPluginDriver({
+      name: 'non-identifier query params',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorOperation(cypressGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverCypress,
+    })
+    await matchFiles(driver.fileManager.files, 'non-identifier query params')
+  })
+})
+
 describe('cypressGenerator — baseURL', () => {
   const node = ast.factory.createOperation({
     operationId: 'getPets',

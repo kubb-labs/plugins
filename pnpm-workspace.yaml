@@ -12,23 +12,23 @@ allowBuilds:
   vue-demi: true
 
 catalog:
-  '@kubb/adapter-oas': 5.0.0-beta.76
-  '@kubb/ast': 5.0.0-beta.76
-  '@kubb/core': 5.0.0-beta.76
-  '@kubb/plugin-barrel': 5.0.0-beta.76
-  '@kubb/parser-ts': 5.0.0-beta.76
-  '@kubb/renderer-jsx': 5.0.0-beta.76
-  '@types/node': ^22.20.0
-  '@types/react': ^19.2.17
-  '@vitest/coverage-v8': ^4.1.9
-  '@vitest/ui': ^4.1.9
-  kubb: 5.0.0-beta.76
-  oxfmt: ^0.47.0
+  "@kubb/adapter-oas": 5.0.0-beta.77
+  "@kubb/ast": 5.0.0-beta.77
+  "@kubb/core": 5.0.0-beta.77
+  "@kubb/plugin-barrel": 5.0.0-beta.77
+  "@kubb/parser-ts": 5.0.0-beta.77
+  "@kubb/renderer-jsx": 5.0.0-beta.77
+  "@types/node": ^22.20.0
+  "@types/react": ^19.2.17
+  "@vitest/coverage-v8": ^4.1.9
+  "@vitest/ui": ^4.1.9
+  kubb: 5.0.0-beta.77
+  oxfmt: ^0.56.0
   oxlint: ^1.71.0
   prettier: ^3.8.4
   tsdown: ^0.22.3
   typescript: ^6.0.3
-  unplugin-kubb: 5.0.0-beta.76
+  unplugin-kubb: 5.0.0-beta.77
   vitest: ^4.1.9
 #
 #overrides:
@@ -47,10 +47,10 @@ catalog:
 
 minimumReleaseAge: 4320 # 72 hours, matches .npmrc min-package-age
 minimumReleaseAgeExclude:
-  - '@kubb/*'
-  - 'kubb'
-  - 'unplugin-kubb'
-  - '@types/*'
-  - '@clack/core'
+  - "@kubb/*"
+  - "kubb"
+  - "unplugin-kubb"
+  - "@types/*"
+  - "@clack/core"
 pmOnFail: warn
 resolutionMode: highest

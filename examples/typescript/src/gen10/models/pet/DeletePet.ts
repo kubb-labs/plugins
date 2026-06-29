@@ -24,9 +24,9 @@ export type DeletePetPathPetId = bigint
 export type DeletePetStatus200 = Array<DeletePetStatus200Enum>
 
 /**
- * @type any
+ * @type unknown
  */
-export type DeletePetStatus400 = any
+export type DeletePetStatus400 = unknown
 
 /**
  * @type object

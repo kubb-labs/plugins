@@ -22,11 +22,11 @@ export const getOrderByIdStatus200Schema = z.union([getOrderByIdStatus200SchemaJ
 
 export type GetOrderByIdStatus200SchemaType = z.infer<typeof getOrderByIdStatus200Schema>
 
-export const getOrderByIdStatus400Schema = z.any()
+export const getOrderByIdStatus400Schema = z.unknown()
 
 export type GetOrderByIdStatus400SchemaType = z.infer<typeof getOrderByIdStatus400Schema>
 
-export const getOrderByIdStatus404Schema = z.any()
+export const getOrderByIdStatus404Schema = z.unknown()
 
 export type GetOrderByIdStatus404SchemaType = z.infer<typeof getOrderByIdStatus404Schema>
 

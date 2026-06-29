@@ -128,6 +128,27 @@ export function formatDefault(value: unknown): string {
 }
 
 /**
+ * Format a default for `.default(...)` so the literal matches the generated schema's type.
+ *
+ * An OpenAPI `default` does not always agree with the schema it sits on: a `bigint` field
+ * (`format: int64`) carries a `number` default, and a spec may put `default: {}` on an `array`.
+ * Emitting those verbatim produces a Zod schema that does not typecheck, so coerce the bigint case
+ * to a `BigInt(...)` literal and emit an array literal for arrays (dropping a non-array default).
+ * Returns `null` when no `.default(...)` should be emitted. Keys off the schema node's type.
+ */
+export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown): string | null {
+  if (node && ast.narrowSchema(node, 'bigint')) {
+    if (typeof value === 'bigint') return `BigInt(${value})`
+    if (typeof value === 'number' && Number.isInteger(value)) return `BigInt(${value})`
+    return null
+  }
+  if (node && ast.narrowSchema(node, 'array')) {
+    return Array.isArray(value) ? JSON.stringify(value) : null
+  }
+  return formatDefault(value)
+}
+
+/**
  * Format a primitive enum/literal value.
  * Strings are quoted; numbers and booleans are emitted raw.
  */
@@ -135,6 +156,22 @@ export function formatLiteral(v: string | number | boolean): string {
   if (typeof v === 'string') return stringify(v)
 
   return String(v)
+}
+
+/**
+ * Build the Zod schema for a set of literal enum values.
+ * `z.enum()` only accepts string members in Zod v4, so a numeric, boolean, or
+ * mixed set is emitted as a single `z.literal(…)` or a `z.union([z.literal(…), …])`.
+ * An all-string set keeps the more compact `z.enum([…])`.
+ */
+export function buildEnum(values: Array<string | number | boolean>): string {
+  const allStrings = values.every((v) => typeof v === 'string')
+  if (allStrings) return `z.enum([${values.map(formatLiteral).join(', ')}])`
+
+  const literals = values.map((v) => `z.literal(${formatLiteral(v)})`)
+  if (literals.length === 1) return literals[0]!
+
+  return `z.union([${literals.join(', ')}])`
 }
 
 /**
@@ -197,6 +234,7 @@ function patternKeySource({ patterns, regexType }: { patterns: Array<string>; re
  */
 export type ModifierOptions = {
   value: string
+  schema?: ast.SchemaNode
   nullable?: boolean
   optional?: boolean
   nullish?: boolean
@@ -259,29 +297,55 @@ export function lengthChecksMini({ min, max, pattern, regexType }: LengthConstra
  * Apply nullable / optional / nullish modifiers, an optional `.describe()` call, and an
  * optional `.meta({ examples })` call to a schema value string using the chainable Zod v4 API.
  */
-export function applyModifiers({ value, nullable, optional, nullish, defaultValue, description, examples }: ModifierOptions): string {
+export function applyModifiers({ value, schema, nullable, optional, nullish, defaultValue, description, examples }: ModifierOptions): string {
   const withModifier = (() => {
     if (nullish || (nullable && optional)) return `${value}.nullish()`
     if (optional) return `${value}.optional()`
     if (nullable) return `${value}.nullable()`
     return value
   })()
-  const withDefault = defaultValue !== undefined ? `${withModifier}.default(${formatDefault(defaultValue)})` : withModifier
+  const literal = defaultValue !== undefined ? defaultLiteral(schema, defaultValue) : null
+  const withDefault = literal !== null ? `${withModifier}.default(${literal})` : withModifier
   const withDescription = description ? `${withDefault}.describe(${stringify(description)})` : withDefault
   return examples?.length ? `${withDescription}.meta({ examples: [${examples.map(formatDefault).join(', ')}] })` : withDescription
+}
+
+function modifierDepth(schema: ast.SchemaNode): number {
+  if (schema.nullish || (schema.nullable && schema.optional)) return 2
+  if (schema.nullable || schema.optional) return 1
+  return 0
+}
+
+/**
+ * Build the `.unwrap()` chain to insert before `.omit()` when the schema is a `$ref`.
+ *
+ * A `$ref` resolves to a named schema variable that already carries its own `.nullable()` /
+ * `.optional()` / `.nullish()` / `.default()` wrappers. `.omit()` lives on the inner `ZodObject`,
+ * not on those `ZodNullable` / `ZodOptional` / `ZodDefault` wrappers, so the omit has to unwrap
+ * down to the object first. This mirrors plugin-ts emitting `Omit<NonNullable<T>, …>`. Inline
+ * objects need no unwrap because the printer adds their modifiers after `.omit()`.
+ */
+export function omitUnwrapChain(node: ast.SchemaNode): string {
+  const ref = ast.narrowSchema(node, 'ref')
+  if (!ref) return ''
+
+  const target = ref.schema ?? ref
+  const depth = modifierDepth(target) + (target.default !== undefined ? 1 : 0)
+  return '.unwrap()'.repeat(depth)
 }
 
 /**
  * Apply nullable / optional / nullish modifiers using the functional `zod/mini` API
  * (`z.nullable()`, `z.optional()`, `z.nullish()`).
  */
-export function applyMiniModifiers({ value, nullable, optional, nullish, defaultValue }: Omit<ModifierOptions, 'description'>): string {
+export function applyMiniModifiers({ value, schema, nullable, optional, nullish, defaultValue }: Omit<ModifierOptions, 'description'>): string {
   const withModifier = (() => {
     if (nullish) return `z.nullish(${value})`
     const withNullable = nullable ? `z.nullable(${value})` : value
     return optional ? `z.optional(${withNullable})` : withNullable
   })()
-  return defaultValue !== undefined ? `z._default(${withModifier}, ${formatDefault(defaultValue)})` : withModifier
+  const literal = defaultValue !== undefined ? defaultLiteral(schema, defaultValue) : null
+  return literal !== null ? `z._default(${withModifier}, ${literal})` : withModifier
 }
 
 type BuildGroupedParamsSchemaOptions = {
