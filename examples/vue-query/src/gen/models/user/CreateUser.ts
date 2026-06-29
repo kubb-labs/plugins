@@ -51,7 +51,15 @@ export type CreateUserRequestConfig = {
  * @type object
  */
 export type CreateUserResponses = {
-  default: CreateUserStatusDefault
+  default:
+    | {
+        contentType: 'application/json'
+        data: CreateUserStatusDefaultJson
+      }
+    | {
+        contentType: 'application/xml'
+        data: CreateUserStatusDefaultXml
+      }
 }
 
 /**

@@ -13,7 +13,7 @@ export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 
 export function updateUserMutationOptions<TContext = unknown>(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
   } = {},
 ) {
   const mutationKey = updateUserMutationKey()
@@ -35,7 +35,7 @@ export function useUpdateUser<TContext>(
   options: {
     mutation?: UseMutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
     }
   } = {},
 ) {

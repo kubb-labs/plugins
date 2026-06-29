@@ -7,7 +7,9 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 export const addFilesMutationKey = () => [{ url: '/pet/files' }] as const
 
 export function addFilesMutationOptions<TContext = unknown>(
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: 'application/json' | 'multipart/form-data' } = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
+    contentType?: { request?: 'application/json' | 'multipart/form-data' }
+  } = {},
 ) {
   const mutationKey = addFilesMutationKey()
   return mutationOptions<AddFilesStatus200, ResponseErrorConfig<AddFilesStatus405>, AddFilesRequestConfig, TContext>({
@@ -27,7 +29,9 @@ export function addFilesMutationOptions<TContext = unknown>(
 export function useAddFiles<TContext>(
   options: {
     mutation?: UseMutationOptions<AddFilesStatus200, ResponseErrorConfig<AddFilesStatus405>, AddFilesRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: 'application/json' | 'multipart/form-data' }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
+      contentType?: { request?: 'application/json' | 'multipart/form-data' }
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

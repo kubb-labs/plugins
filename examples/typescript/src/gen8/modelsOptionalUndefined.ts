@@ -448,7 +448,15 @@ export type UpdatePetRequestConfig = {
  * @type object
  */
 export type UpdatePetResponses = {
-  '200': UpdatePetStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: UpdatePetStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: UpdatePetStatus200Xml
+      }
   '400': UpdatePetStatus400
   '404': UpdatePetStatus404
   '405': UpdatePetStatus405
@@ -513,7 +521,15 @@ export type AddPetRequestConfig = {
  * @type object
  */
 export type AddPetResponses = {
-  '200': AddPetStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: AddPetStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: AddPetStatus200Xml
+      }
   '405': AddPetStatus405
 }
 
@@ -566,7 +582,15 @@ export type FindPetsByStatusRequestConfig = {
  * @type object
  */
 export type FindPetsByStatusResponses = {
-  '200': FindPetsByStatusStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: FindPetsByStatusStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: FindPetsByStatusStatus200Xml
+      }
   '400': FindPetsByStatusStatus400
 }
 
@@ -633,7 +657,15 @@ export type FindPetsByTagsRequestConfig = {
  * @type object
  */
 export type FindPetsByTagsResponses = {
-  '200': FindPetsByTagsStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: FindPetsByTagsStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: FindPetsByTagsStatus200Xml
+      }
   '400': FindPetsByTagsStatus400
 }
 
@@ -685,7 +717,15 @@ export type GetPetByIdRequestConfig = {
  * @type object
  */
 export type GetPetByIdResponses = {
-  '200': GetPetByIdStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: GetPetByIdStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: GetPetByIdStatus200Xml
+      }
   '400': GetPetByIdStatus400
   '404': GetPetByIdStatus404
 }
@@ -1052,7 +1092,15 @@ export type GetOrderByIdRequestConfig = {
  * @type object
  */
 export type GetOrderByIdResponses = {
-  '200': GetOrderByIdStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: GetOrderByIdStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: GetOrderByIdStatus200Xml
+      }
   '400': GetOrderByIdStatus400
   '404': GetOrderByIdStatus404
 }

@@ -1,4 +1,4 @@
-import { buildOperationComments, getContentTypeInfo, getResponseType, isEventStream } from '@internals/shared'
+import { buildOperationComments, getContentTypeInfo, getResponseContentTypeInfo, getResponseType, isEventStream } from '@internals/shared'
 import { Url } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -55,7 +55,17 @@ export function Operation({ name, node, tsResolver, zodResolver, validator, secu
 
   const { defaultContentType } = getContentTypeInfo(node)
   const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
-  const contentTypeLiteral = hasRequestBody && defaultContentType !== 'application/json' ? `contentType: '${defaultContentType}'` : null
+  // Bake the request body content type only when it is not the JSON default. The first declared type is
+  // the default for an operation with several request types; the caller overrides it on `contentType`.
+  const bakedRequestContentType = hasRequestBody && defaultContentType !== 'application/json' ? defaultContentType : null
+  // When the caller can also pick a response content type, a partial `{ response }` would replace the
+  // baked request default through `...config`, so merge the caller's choice over it instead.
+  const mergeContentType = Boolean(bakedRequestContentType) && getResponseContentTypeInfo(node).isMultipleContentTypes
+  const contentTypeLiteral = !bakedRequestContentType
+    ? null
+    : mergeContentType
+      ? `contentType: { request: '${bakedRequestContentType}', ...(typeof contentType === 'string' ? { request: contentType } : contentType) }`
+      : `contentType: { request: '${bakedRequestContentType}' }`
 
   const eventStream = isEventStream(node)
   const responseType = getResponseType(node)
@@ -94,7 +104,7 @@ export function Operation({ name, node, tsResolver, zodResolver, validator, secu
         returnType={returnType}
         JSDoc={{ comments: buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }) }}
       >
-        {'const { client: request = client, ...config } = options'}
+        {mergeContentType ? 'const { client: request = client, contentType, ...config } = options' : 'const { client: request = client, ...config } = options'}
         <br />
         {returnStatement}
       </Function>

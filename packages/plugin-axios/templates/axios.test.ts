@@ -333,6 +333,81 @@ describe('createClientCore', () => {
   })
 })
 
+describe('content type negotiation', () => {
+  function fakeAxiosWith(result: Programmed & { contentType?: string }) {
+    const calls: Array<AxiosRequestConfig> = []
+    const request = vi.fn(async (config: AxiosRequestConfig) => {
+      calls.push(config)
+      const status = result.status ?? 200
+      const response = {
+        data: result.data ?? { ok: true },
+        status,
+        statusText: result.statusText ?? 'OK',
+        headers: result.contentType ? { 'content-type': result.contentType } : {},
+        config,
+      } as unknown as AxiosResponse
+      const validate = config.validateStatus ?? ((s: number) => s >= 200 && s < 300)
+      if (!validate(status)) {
+        throw Object.assign(new Error(`Request failed with status code ${status}`), { isAxiosError: true, name: 'AxiosError', config, response }) as AxiosError
+      }
+      return response
+    })
+    const instance = {
+      request,
+      interceptors: { request: { use: vi.fn(() => 1), eject: vi.fn() }, response: { use: vi.fn(() => 2), eject: vi.fn() } },
+    } as unknown as AxiosInstance
+    return { instance, calls }
+  }
+
+  test('object-form contentType sets the request Content-Type and the Accept header', async () => {
+    const { instance, calls } = fakeAxiosWith({})
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, contentType: { request: 'application/json', response: 'application/xml' } })
+    expect(calls[0]?.headers?.['Content-Type']).toBe('application/json')
+    expect(calls[0]?.headers?.['Accept']).toBe('application/xml')
+  })
+
+  test('does not override a caller-set Accept header', async () => {
+    const { instance, calls } = fakeAxiosWith({})
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/pet', headers: { Accept: 'application/json' }, contentType: { response: 'application/xml' } })
+    expect(calls[0]?.headers?.['Accept']).toBe('application/json')
+  })
+
+  test('carries the negotiated content type onto result.contentType, charset stripped', async () => {
+    const { instance } = fakeAxiosWith({ data: { id: 1 }, contentType: 'application/xml; charset=utf-8' })
+    const client = createClientCore({ transport: instance })
+    const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<AxiosRequestConfig, AxiosResponse>
+    expect(result.contentType).toBe('application/xml')
+    expect(result.data).toStrictEqual({ id: 1 })
+  })
+
+  test('runs the matching deserializer before validation and feeds result.data', async () => {
+    const { instance } = fakeAxiosWith({ data: '<pet><id>1</id></pet>', contentType: 'application/xml' })
+    const parseXml = vi.fn(() => ({ id: 1 }))
+    const client = createClientCore({ transport: instance, deserializers: { 'application/xml': parseXml } })
+    const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<AxiosRequestConfig, AxiosResponse>
+    expect(parseXml).toHaveBeenCalledWith('<pet><id>1</id></pet>', 'application/xml')
+    expect(result.data).toStrictEqual({ id: 1 })
+    expect(result.contentType).toBe('application/xml')
+  })
+
+  test('uses a per-content-type bodySerializer for the request body', async () => {
+    const { instance, calls } = fakeAxiosWith({})
+    const toXml = vi.fn(() => '<pet/>')
+    const client = createClientCore({ transport: instance, bodySerializers: { 'application/xml': toXml } })
+    await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, contentType: 'application/xml' })
+    expect(toXml).toHaveBeenCalledWith({ name: 'odie' }, 'application/xml')
+    expect(calls[0]?.data).toBe('<pet/>')
+  })
+
+  test('carries the negotiated content type onto a thrown ResponseError', async () => {
+    const { instance } = fakeAxiosWith({ data: { message: 'bad' }, status: 422, contentType: 'application/xml' })
+    const client = createClientCore({ transport: instance })
+    await expect(client({ method: 'POST', url: '/pet' })).rejects.toMatchObject({ status: 422, contentType: 'application/xml' })
+  })
+})
+
 describe('getUrl', () => {
   test('interpolates path params and serializes the query', () => {
     const { instance } = fakeAxios()
