@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Order } from './Order.ts'
+import type { OrderSchema } from './OrderSchema.ts'
 
 /**
  * @type object
