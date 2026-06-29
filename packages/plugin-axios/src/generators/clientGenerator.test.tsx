@@ -114,6 +114,38 @@ const createPetNode = ast.factory.createOperation({
   ],
 })
 
+const listPetsStyledNode = ast.factory.createOperation({
+  operationId: 'listPetsStyled',
+  method: 'GET',
+  path: '/pets/{petId}',
+  tags: ['pet'],
+  parameters: [
+    ast.factory.createParameter({
+      name: 'petId',
+      in: 'path',
+      schema: ast.factory.createSchema({ type: 'integer' }),
+      required: true,
+      style: 'matrix',
+      explode: true,
+    }),
+    ast.factory.createParameter({
+      name: 'tags',
+      in: 'query',
+      schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
+      required: false,
+      style: 'pipeDelimited',
+      explode: false,
+    }),
+  ],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
+})
+
 const streamEventsNode = ast.factory.createOperation({
   operationId: 'streamEvents',
   method: 'GET',
@@ -155,6 +187,8 @@ describe('clientGenerator operation', () => {
     { name: 'getProject', node: getProjectNode, options: {} },
     { name: 'deletePetNoContent', node: deletePetNode, options: {} },
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
+    // Parameter style/explode flows from the ParameterNode into a `serialization` call-config entry.
+    { name: 'listPetsWithStyles', node: listPetsStyledNode, options: {} },
     // text/event-stream response returns a typed event stream instead of a one-shot result.
     { name: 'streamEventsSse', node: streamEventsNode, options: {} },
     { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { validator: 'zod' as const } },

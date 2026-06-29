@@ -1,18 +1,27 @@
-import { camelCase } from '@internals/utils'
+import { camelCase, isValidVarName } from '@internals/utils'
 import { ast } from '@kubb/core'
 
 type StyledLocation = 'path' | 'query' | 'header' | 'cookie'
 
 /**
- * Serializes one parameter's metadata into a `{ style, explode }` literal. Path and query carry the
- * serialization `style`; header and cookie use a fixed style (`simple` and `form`), so only `explode`
- * is emitted for them.
+ * Renders a parameter name as an object-literal key, quoting it when the camelCased name is not a
+ * bare identifier (for example a name that starts with a digit) so the emitted literal stays valid.
  */
-function serializeParameter(parameter: ast.ParameterNode): string {
+function toKey(name: string): string {
+  const cased = camelCase(name)
+  return isValidVarName(cased) ? cased : JSON.stringify(cased)
+}
+
+/**
+ * Serializes one parameter's metadata into a `{ style, explode }` literal, or `null` when the
+ * parameter carries neither. Path and query carry the serialization `style`; header and cookie use a
+ * fixed style (`simple` and `form`), so only `explode` is emitted for them.
+ */
+function serializeParameter(parameter: ast.ParameterNode): string | null {
   const parts: Array<string> = []
   if ((parameter.in === 'path' || parameter.in === 'query') && parameter.style) parts.push(`style: '${parameter.style}'`)
   if (parameter.explode !== undefined) parts.push(`explode: ${parameter.explode}`)
-  return `{ ${parts.join(', ')} }`
+  return parts.length > 0 ? `{ ${parts.join(', ')} }` : null
 }
 
 /**
@@ -34,12 +43,12 @@ export function buildSerializationMetadata({ node }: { node: ast.OperationNode }
   const groups: Record<StyledLocation, Array<string>> = { path: [], query: [], header: [], cookie: [] }
 
   for (const parameter of node.parameters) {
-    const carriesStyle = (parameter.in === 'path' || parameter.in === 'query') && parameter.style !== undefined
-    if (!carriesStyle && parameter.explode === undefined) continue
-    groups[parameter.in].push(`${camelCase(parameter.name)}: ${serializeParameter(parameter)}`)
+    const literal = serializeParameter(parameter)
+    if (!literal) continue
+    groups[parameter.in].push(`${toKey(parameter.name)}: ${literal}`)
   }
 
-  const locations = (['path', 'query', 'header', 'cookie'] as const).filter((location) => groups[location].length > 0)
+  const locations = (Object.keys(groups) as Array<StyledLocation>).filter((location) => groups[location].length > 0)
   if (locations.length === 0) return null
 
   return `{ ${locations.map((location) => `${location}: { ${groups[location].join(', ')} }`).join(', ')} }`

@@ -1,7 +1,7 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
 import { type CallResult, createClientCore, parseEventStream, ResponseError, resolveAuth } from './axios.ts'
-import { defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
+import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
 
@@ -82,6 +82,14 @@ describe('defaultQuerySerializer', () => {
     expect(defaultQuerySerializer({ filter: { role: 'admin' } }, { filter: { style: 'deepObject' } })).toBe('filter%5Brole%5D=admin')
   })
 
+  test('deepObject style recurses into nested objects', () => {
+    expect(defaultQuerySerializer({ a: { b: { c: 1 } } }, { a: { style: 'deepObject' } })).toBe('a%5Bb%5D%5Bc%5D=1')
+  })
+
+  test('serializes Date values as ISO-8601', () => {
+    expect(defaultQuerySerializer({ since: new Date('2020-01-02T03:04:05.000Z') })).toBe('since=2020-01-02T03%3A04%3A05.000Z')
+  })
+
   test('allowReserved leaves reserved characters unencoded', () => {
     expect(defaultQuerySerializer({ path: '/a/b' }, { path: { allowReserved: true } })).toBe('path=/a/b')
     expect(defaultQuerySerializer({ path: '/a/b' })).toBe('path=%2Fa%2Fb')
@@ -122,6 +130,10 @@ describe('defaultPathSerializer', () => {
   test('serializes undefined and null to an empty string', () => {
     expect(defaultPathSerializer({ name: 'id', value: undefined })).toBe('')
     expect(defaultPathSerializer({ name: 'id', value: null })).toBe('')
+  })
+
+  test('serializes a Date value as ISO-8601', () => {
+    expect(defaultPathSerializer({ name: 'since', value: new Date('2020-01-02T03:04:05.000Z') })).toBe('2020-01-02T03%3A04%3A05.000Z')
   })
 })
 
@@ -171,6 +183,18 @@ describe('defaultBodySerializer', () => {
     })
     expect(body).toBe('tags=a,b&filter%5Bx%5D=1')
   })
+
+  test('applies a per-part content type from multipart encoding via a typed Blob', async () => {
+    const body = defaultBodySerializer({
+      body: { meta: { a: 1 } },
+      contentType: 'multipart/form-data',
+      encoding: { meta: { contentType: 'application/json' } },
+    }) as FormData
+    const part = body.get('meta')
+    expect(part).toBeInstanceOf(Blob)
+    expect((part as Blob).type).toBe('application/json')
+    expect(await (part as Blob).text()).toBe('{"a":1}')
+  })
 })
 
 describe('serializeCookies', () => {
@@ -185,6 +209,23 @@ describe('serializeCookies', () => {
 
   test('skips undefined and null members', () => {
     expect(serializeCookies({ a: 'x', b: undefined, c: null })).toBe('a=x')
+  })
+})
+
+describe('applyHeaderStyles', () => {
+  test('serializes array and object headers with the simple style', () => {
+    const result = applyHeaderStyles({ 'X-Ids': [3, 4], 'X-Filter': { role: 'admin' } }, { 'X-Ids': { explode: false }, 'X-Filter': { explode: true } })
+    expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-Ids': '3,4', 'X-Filter': 'role=admin' })
+  })
+
+  test('serializes a Date header value as ISO-8601', () => {
+    const result = applyHeaderStyles({ 'X-Since': new Date('2020-01-02T03:04:05.000Z') }, { 'X-Since': {} })
+    expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-Since': '2020-01-02T03:04:05.000Z' })
+  })
+
+  test('passes through primitives and headers without metadata untouched', () => {
+    const result = applyHeaderStyles({ Authorization: 'Bearer x', 'X-Raw': [1, 2] }, { Authorization: { explode: true } })
+    expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ Authorization: 'Bearer x', 'X-Raw': [1, 2] })
   })
 })
 
