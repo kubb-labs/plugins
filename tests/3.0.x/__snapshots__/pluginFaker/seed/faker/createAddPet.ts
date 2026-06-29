@@ -32,7 +32,7 @@ export function createAddPetStatus200Xml(data?: Partial<AddPetStatus200Xml>): Ad
 export function createAddPetStatus200(_data?: AddPetStatus200): AddPetStatus200 {
   faker.seed([42])
 
-  return faker.helpers.arrayElement<any>([createAddPetStatus200Json(), createAddPetStatus200Xml()])
+  return faker.helpers.arrayElement([createAddPetStatus200Json(), createAddPetStatus200Xml()])
 }
 
 /**
@@ -77,11 +77,11 @@ export function createAddPetFormUrlEncodedData(data?: Partial<AddPetFormUrlEncod
 export function createAddPetData(_data?: AddPetData): AddPetData {
   faker.seed([42])
 
-  return faker.helpers.arrayElement<any>([createAddPetJsonData(), createAddPetXmlData(), createAddPetFormUrlEncodedData()])
+  return faker.helpers.arrayElement([createAddPetJsonData(), createAddPetXmlData(), createAddPetFormUrlEncodedData()])
 }
 
 export function createAddPetResponse(_data?: AddPetResponse): AddPetResponse {
   faker.seed([42])
 
-  return faker.helpers.arrayElement<any>([createAddPetStatus200(), createAddPetStatus405()])
+  return faker.helpers.arrayElement([createAddPetStatus200(), createAddPetStatus405()])
 }

@@ -6,7 +6,7 @@ import { fakerEN as faker } from '@faker-js/faker'
 
 export function createAnimalFaker<TData extends Partial<Animal> = object>(data?: TData) {
   const defaultFakeData = {
-    ...faker.helpers.arrayElement<any>([
+    ...faker.helpers.arrayElement([
       {
         ...createCatFaker(),
         ...{

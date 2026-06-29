@@ -12,7 +12,7 @@ export const updatePetWithFormQueryStatusSchema = z.string().optional().describe
 
 export type UpdatePetWithFormQueryStatusSchemaType = z.infer<typeof updatePetWithFormQueryStatusSchema>
 
-export const updatePetWithFormStatus405Schema = z.any()
+export const updatePetWithFormStatus405Schema = z.unknown()
 
 export type UpdatePetWithFormStatus405SchemaType = z.infer<typeof updatePetWithFormStatus405Schema>
 

@@ -12,14 +12,14 @@
 export type DeleteOrderPathOrderId = number
 
 /**
- * @type any
+ * @type unknown
  */
-export type DeleteOrderStatus400 = any
+export type DeleteOrderStatus400 = unknown
 
 /**
- * @type any
+ * @type unknown
  */
-export type DeleteOrderStatus404 = any
+export type DeleteOrderStatus404 = unknown
 
 /**
  * @type object

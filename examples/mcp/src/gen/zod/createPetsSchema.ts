@@ -13,7 +13,7 @@ export const createPetsQueryOffsetSchema = z.int().optional().describe('Offset *
 
 export const createPetsHeaderXEXAMPLESchema = createPetsXEXAMPLESchema.describe('Header parameters')
 
-export const createPetsStatus201Schema = z.any()
+export const createPetsStatus201Schema = z.unknown()
 
 export const createPetsStatusDefaultSchema = petNotFoundSchema.describe('Pet not found')
 

@@ -26,14 +26,14 @@ export type GetOrderByIdStatus200Xml = Order
 export type GetOrderByIdStatus200 = GetOrderByIdStatus200Json | GetOrderByIdStatus200Xml
 
 /**
- * @type any
+ * @type unknown
  */
-export type GetOrderByIdStatus400 = any
+export type GetOrderByIdStatus400 = unknown
 
 /**
- * @type any
+ * @type unknown
  */
-export type GetOrderByIdStatus404 = any
+export type GetOrderByIdStatus404 = unknown
 
 /**
  * @type object

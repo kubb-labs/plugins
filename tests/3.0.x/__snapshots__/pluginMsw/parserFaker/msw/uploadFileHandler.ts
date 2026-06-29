@@ -17,8 +17,8 @@ export function uploadFileHandlerResponse200(data: UploadFileResponse) {
   })
 }
 
-export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, UploadFileData, any>) {
-  return http.post<Record<string, string>, UploadFileData, any>('/pet/:petId/uploadImage', function handler(info) {
+export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, UploadFileData>) {
+  return http.post<Record<string, string>, UploadFileData>('/pet/:petId/uploadImage', function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return new Response(JSON.stringify(data || createUploadFileResponse(data)), {

@@ -19,9 +19,9 @@ export type UpdatePetWithFormQueryName = string | undefined
 export type UpdatePetWithFormQueryStatus = string | undefined
 
 /**
- * @type any
+ * @type unknown
  */
-export type UpdatePetWithFormStatus405 = any
+export type UpdatePetWithFormStatus405 = unknown
 
 /**
  * @type object

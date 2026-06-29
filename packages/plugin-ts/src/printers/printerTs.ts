@@ -87,6 +87,11 @@ export type PrinterTsOptions = {
    */
   enumSchemaNames?: Set<string>
   /**
+   * Maps a component `$ref` path to its collision-resolved name, so a reference to a renamed
+   * component (e.g. `#/components/schemas/Order` → `OrderSchema`) emits the renamed name.
+   */
+  nameMapping?: ReadonlyMap<string, string>
+  /**
    * Custom handler map for node type overrides.
    */
   nodes?: PrinterTsNodes
@@ -158,10 +163,12 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
           return null
         }
         // Parser-generated refs (with $ref) carry raw schema names that need resolving.
-        // Use the canonical name from the $ref path — node.name may have been overridden
-        // (e.g. by single-member allOf flatten using the property-derived child name).
+        // Resolve the referenced name from the $ref path — `node.name` may have been overridden
+        // (e.g. by single-member allOf flatten using the property-derived child name). When the
+        // referenced component was renamed to resolve a name collision, `nameMapping` (keyed by the
+        // full $ref) carries the renamed name; otherwise fall back to the short ref name.
         // Inline refs (without $ref) from utils already carry resolved type names.
-        const refName = node.ref ? (extractRefName(node.ref) ?? node.name) : node.name
+        const refName = node.ref ? (this.options.nameMapping?.get(node.ref) ?? extractRefName(node.ref) ?? node.name) : node.name
 
         // When a Key suffix is configured, enum refs must use the suffixed name (e.g. `StatusKey`)
         // so the reference matches what the enum file actually exports.
@@ -171,7 +178,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         const name = isEnumRef
           ? this.options.resolver.resolveEnumKeyName({ name: refName }, this.options.enum.typeSuffix)
           : node.ref
-            ? this.options.resolver.default(refName, 'type')
+            ? this.options.resolver.resolveTypeName(refName)
             : refName
 
         return factory.createTypeReferenceNode(name, undefined)
@@ -193,7 +200,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         const resolvedName =
           ENUM_TYPES_WITH_KEY_SUFFIX.has(this.options.enum.type) && this.options.enum.typeSuffix
             ? this.options.resolver.resolveEnumKeyName(node, this.options.enum.typeSuffix)
-            : this.options.resolver.default(node.name, 'type')
+            : this.options.resolver.resolveTypeName(node.name)
 
         return factory.createTypeReferenceNode(resolvedName, undefined)
       },

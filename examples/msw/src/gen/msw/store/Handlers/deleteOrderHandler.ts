@@ -6,15 +6,21 @@
 import type { DeleteOrderStatus400, DeleteOrderStatus404 } from '../../../models/DeleteOrder.ts'
 import { http } from 'msw'
 
-export function deleteOrderHandlerResponse400(data?: DeleteOrderStatus400) {
+export function deleteOrderHandlerResponse400(data: DeleteOrderStatus400) {
   return new Response(JSON.stringify(data), {
     status: 400,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
-export function deleteOrderHandlerResponse404(data?: DeleteOrderStatus404) {
+export function deleteOrderHandlerResponse404(data: DeleteOrderStatus404) {
   return new Response(JSON.stringify(data), {
     status: 404,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 

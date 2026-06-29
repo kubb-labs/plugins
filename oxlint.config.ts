@@ -30,6 +30,7 @@ export default defineConfig({
     'prefer-exponentiation-operator': 'error',
     'typescript/array-type': ['error', { default: 'generic' }],
     'typescript/consistent-type-imports': ['error', { disallowTypeAnnotations: false }],
+    'typescript/no-explicit-any': 'error',
     'typescript/no-inferrable-types': 'error',
     'typescript/prefer-function-type': 'error',
     'react/self-closing-comp': 'error',

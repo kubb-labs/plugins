@@ -3,13 +3,11 @@
 * Do not edit manually.
 */
 
+import type { TypeEnumKey } from './TypeEnum.ts'
 import type { Vehicle } from './Vehicle.ts'
 
 export type SUV = (Vehicle & {
-    /**
-     * @type string | undefined
-    */
-    type?: "SUV";
+    type?: TypeEnumKey;
     /**
      * @description Can handle offroad terrain
      * @type boolean | undefined

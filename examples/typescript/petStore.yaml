@@ -630,7 +630,7 @@ components:
           type: string
           example: doggie
         category:
-          $ref: 'https://petstore3.swagger.io/api/v3/openapi.json#/components/schemas/Category'
+          $ref: '#/components/schemas/Category'
         photoUrls:
           type: array
           xml:

@@ -42,9 +42,9 @@ export function createPlaceOrderFormUrlEncodedData(data?: Partial<PlaceOrderForm
 }
 
 export function createPlaceOrderData(_data?: PlaceOrderData): PlaceOrderData {
-  return faker.helpers.arrayElement<any>([createPlaceOrderJsonData(), createPlaceOrderXmlData(), createPlaceOrderFormUrlEncodedData()])
+  return faker.helpers.arrayElement([createPlaceOrderJsonData(), createPlaceOrderXmlData(), createPlaceOrderFormUrlEncodedData()])
 }
 
 export function createPlaceOrderResponse(_data?: PlaceOrderResponse): PlaceOrderResponse {
-  return faker.helpers.arrayElement<any>([createPlaceOrderStatus200(), createPlaceOrderStatus405()])
+  return faker.helpers.arrayElement([createPlaceOrderStatus200(), createPlaceOrderStatus405()])
 }

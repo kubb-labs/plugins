@@ -24,14 +24,14 @@ export type GetUserByNameStatus200Xml = User
 export type GetUserByNameStatus200 = GetUserByNameStatus200Json | GetUserByNameStatus200Xml
 
 /**
- * @type any
+ * @type unknown
  */
-export type GetUserByNameStatus400 = any
+export type GetUserByNameStatus400 = unknown
 
 /**
- * @type any
+ * @type unknown
  */
-export type GetUserByNameStatus404 = any
+export type GetUserByNameStatus404 = unknown
 
 /**
  * @type object

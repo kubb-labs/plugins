@@ -18,7 +18,7 @@ export const findPetsByStatusStatus200SchemaXml = z.array(petSchema)
 
 export const findPetsByStatusStatus200Schema = z.union([findPetsByStatusStatus200SchemaJson, findPetsByStatusStatus200SchemaXml])
 
-export const findPetsByStatusStatus400Schema = z.any()
+export const findPetsByStatusStatus400Schema = z.unknown()
 
 export const findPetsByStatusResponseSchema = findPetsByStatusStatus200Schema
 

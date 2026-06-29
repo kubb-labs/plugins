@@ -14,10 +14,7 @@ export default defineConfig([
       format: false,
       lint: false,
     },
-    adapter: adapterOas({
-      validate: false,
-      enums: 'root',
-    }),
+    adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
         output: {
@@ -47,10 +44,7 @@ export default defineConfig([
       format: false,
       lint: false,
     },
-    adapter: adapterOas({
-      validate: false,
-      enums: 'root',
-    }),
+    adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
         output: {
@@ -68,10 +62,7 @@ export default defineConfig([
     root: '.',
     input,
     output: { path: './src/gen2', clean: true, format: false, lint: false },
-    adapter: adapterOas({
-      validate: false,
-      enums: 'root',
-    }),
+    adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
         output: {
@@ -87,10 +78,7 @@ export default defineConfig([
     root: '.',
     input,
     output: { path: './src/gen3', clean: true, format: false, lint: false },
-    adapter: adapterOas({
-      validate: false,
-      enums: 'root',
-    }),
+    adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
         output: {
@@ -106,10 +94,7 @@ export default defineConfig([
     root: '.',
     input,
     output: { path: './src/gen4', clean: true, format: false, lint: false },
-    adapter: adapterOas({
-      validate: false,
-      enums: 'root',
-    }),
+    adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
         output: {
@@ -125,10 +110,7 @@ export default defineConfig([
     root: '.',
     input,
     output: { path: './src/gen5', clean: true, format: false, lint: false },
-    adapter: adapterOas({
-      validate: false,
-      enums: 'root',
-    }),
+    adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
         output: {
@@ -147,10 +129,7 @@ export default defineConfig([
     hooks: {
       done: ['npm run typecheck'],
     },
-    adapter: adapterOas({
-      validate: false,
-      enums: 'root',
-    }),
+    adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
         output: {
@@ -163,7 +142,7 @@ export default defineConfig([
     root: '.',
     input,
     output: { path: './src/gen7', clean: true, format: false, lint: false },
-    adapter: adapterOas({ validate: false, enums: 'root' }),
+    adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
         output: { path: 'modelsInlineLiteral.ts', mode: 'file', barrel: false },
@@ -175,7 +154,7 @@ export default defineConfig([
     root: '.',
     input,
     output: { path: './src/gen8', clean: true, format: false, lint: false },
-    adapter: adapterOas({ validate: false, enums: 'root' }),
+    adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
         output: { path: 'modelsOptionalUndefined.ts', mode: 'file', barrel: false },
@@ -188,7 +167,7 @@ export default defineConfig([
     root: '.',
     input,
     output: { path: './src/gen9', clean: true, format: false, lint: false },
-    adapter: adapterOas({ validate: false, enums: 'root' }),
+    adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
         output: { path: 'modelsOptionalBoth.ts', mode: 'file', barrel: false },
@@ -201,7 +180,7 @@ export default defineConfig([
     root: '.',
     input,
     output: { path: './src/gen10', clean: true, format: false, lint: false },
-    adapter: adapterOas({ validate: false, enums: 'root' }),
+    adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
         output: { path: 'models' },
@@ -214,7 +193,7 @@ export default defineConfig([
     root: '.',
     input,
     output: { path: './src/gen11', clean: true, format: false, lint: false },
-    adapter: adapterOas({ validate: false, enums: 'root' }),
+    adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
         output: { path: 'modelsPascalCaseKeys.ts', mode: 'file', barrel: false },
@@ -229,7 +208,7 @@ export default defineConfig([
     hooks: {
       done: ['npm run typecheck'],
     },
-    adapter: adapterOas({ validate: false, enums: 'root' }),
+    adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
         output: { path: 'modelsCamelCaseKeys.ts', mode: 'file', barrel: false },

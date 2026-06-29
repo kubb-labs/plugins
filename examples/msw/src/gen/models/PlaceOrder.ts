@@ -11,9 +11,9 @@ import type { Order } from './Order.ts'
 export type PlaceOrderStatus200 = Order
 
 /**
- * @type any
+ * @type unknown
  */
-export type PlaceOrderStatus405 = any
+export type PlaceOrderStatus405 = unknown
 
 /**
  * @type object | undefined

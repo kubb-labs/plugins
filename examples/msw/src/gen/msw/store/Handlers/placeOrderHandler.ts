@@ -16,14 +16,17 @@ export function placeOrderHandlerResponse200(data: PlaceOrderResponse) {
   })
 }
 
-export function placeOrderHandlerResponse405(data?: PlaceOrderStatus405) {
+export function placeOrderHandlerResponse405(data: PlaceOrderStatus405) {
   return new Response(JSON.stringify(data), {
     status: 405,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
-export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolver<Record<string, string>, PlaceOrderData, any>) {
-  return http.post<Record<string, string>, PlaceOrderData, any>(`http://localhost:3000/store/order`, function handler(info) {
+export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolver<Record<string, string>, PlaceOrderData>) {
+  return http.post<Record<string, string>, PlaceOrderData>(`http://localhost:3000/store/order`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

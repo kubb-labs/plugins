@@ -3,6 +3,8 @@
 * Do not edit manually.
 */
 
+import type { Variant2CategoryEnumKey } from './Variant2CategoryEnum.ts'
+
 /**
  * @type object
 */
@@ -15,8 +17,5 @@ export type Variant2 = {
      * @type string | undefined
     */
     label?: string;
-    /**
-     * @type string | undefined
-    */
-    category?: "lowercase";
+    category?: Variant2CategoryEnumKey;
 };
