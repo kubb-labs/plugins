@@ -13,10 +13,10 @@ const schemas = [
   // OpenAPI 3.1
   { name: 'train-travel', path: '../../schemas/3.0.x/train-travel.yaml' },
   { name: 'Figma', path: 'https://raw.githubusercontent.com/figma/rest-api-spec/refs/heads/main/openapi/openapi.yaml' },
-  { name: 'spotify', path: 'https://raw.githubusercontent.com/sonallux/spotify-web-api/refs/heads/main/official-spotify-open-api.yml', strict: false },
+  { name: 'spotify', path: 'https://raw.githubusercontent.com/sonallux/spotify-web-api/refs/heads/main/official-spotify-open-api.yml' },
   // OpenAPI 3.0
   { name: 'discriminator', path: '../../schemas/3.0.x/discriminator.yaml' },
-  { name: 'bunq.com', path: '../../schemas/3.0.x/bunq.com.json', strict: false },
+  { name: 'bunq.com', path: '../../schemas/3.0.x/bunq.com.json' },
   // Note: developer.atlassian.com, petstore3.swagger.io, and openapi.vercel.sh are omitted here.
   // They block CI/bot traffic with 403s and flake the e2e run; the local fixtures plus the
   // raw.githubusercontent.com specs below give equivalent coverage.
@@ -33,25 +33,25 @@ const schemas = [
   { name: 'box', path: '../../schemas/3.0.x/box.json' },
   { name: 'enums', path: '../../schemas/3.0.x/enums.yaml' },
   { name: 'dataset_api', path: '../../schemas/3.0.x/dataset_api.yaml' },
-  { name: 'openai', path: 'https://raw.githubusercontent.com/openai/openai-openapi/refs/heads/manual_spec/openapi.yaml', strict: false },
-  { name: 'stripe', path: 'https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json', strict: false },
+  { name: 'openai', path: 'https://raw.githubusercontent.com/openai/openai-openapi/refs/heads/manual_spec/openapi.yaml' },
+  { name: 'stripe', path: 'https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json' },
   // Real-world APIs (remote, raw.githubusercontent.com so CI is not blocked by bot-unfriendly hosts).
   // These exercise large, deeply-nested specs with discriminators, oneOf/anyOf and webhooks/callbacks;
   // `strict: false` mirrors the loose real-world specs above.
-  { name: 'github', path: 'https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.json', strict: false },
-  { name: 'asana', path: 'https://raw.githubusercontent.com/Asana/openapi/master/defs/asana_oas.yaml', strict: false },
-  { name: 'box', path: 'https://raw.githubusercontent.com/box/box-openapi/main/openapi.json', strict: false },
-  { name: 'plaid', path: 'https://raw.githubusercontent.com/plaid/plaid-openapi/master/2020-09-14.yml', strict: false },
-  { name: 'twilio-api', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_api_v2010.json', strict: false },
-  { name: 'twilio-messaging', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_messaging_v1.json', strict: false },
-  { name: 'twilio-verify', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_verify_v2.json', strict: false },
-  { name: 'twilio-lookups', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_lookups_v2.json', strict: false },
-  { name: 'twilio-video', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_video_v1.json', strict: false },
-  { name: 'twilio-studio', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_studio_v2.json', strict: false },
-  { name: 'twilio-conversations', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_conversations_v1.json', strict: false },
-  { name: 'adyen-checkout', path: 'https://raw.githubusercontent.com/Adyen/adyen-openapi/main/json/CheckoutService-v71.json', strict: false },
-  { name: 'discord', path: 'https://raw.githubusercontent.com/discord/discord-api-spec/main/specs/openapi.json', strict: false },
-  { name: 'pokeapi', path: 'https://raw.githubusercontent.com/PokeAPI/pokeapi/master/openapi.yml', strict: false },
+  { name: 'github', path: 'https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.json' },
+  { name: 'asana', path: 'https://raw.githubusercontent.com/Asana/openapi/master/defs/asana_oas.yaml' },
+  { name: 'box', path: 'https://raw.githubusercontent.com/box/box-openapi/main/openapi.json' },
+  { name: 'plaid', path: 'https://raw.githubusercontent.com/plaid/plaid-openapi/master/2020-09-14.yml' },
+  { name: 'twilio-api', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_api_v2010.json' },
+  { name: 'twilio-messaging', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_messaging_v1.json' },
+  { name: 'twilio-verify', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_verify_v2.json' },
+  { name: 'twilio-lookups', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_lookups_v2.json' },
+  { name: 'twilio-video', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_video_v1.json' },
+  { name: 'twilio-studio', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_studio_v2.json' },
+  { name: 'twilio-conversations', path: 'https://raw.githubusercontent.com/twilio/twilio-oai/main/spec/json/twilio_conversations_v1.json' },
+  { name: 'adyen-checkout', path: 'https://raw.githubusercontent.com/Adyen/adyen-openapi/main/json/CheckoutService-v71.json' },
+  { name: 'discord', path: 'https://raw.githubusercontent.com/discord/discord-api-spec/main/specs/openapi.json' },
+  { name: 'pokeapi', path: 'https://raw.githubusercontent.com/PokeAPI/pokeapi/master/openapi.yml' },
   // Small official specs from the OpenAPI Initiative — clean fixtures that cover 3.0/3.1 features
   // (links, callbacks, webhooks, examples) without needing a `strict: false` escape hatch.
   { name: 'tictactoe', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.1/tictactoe.yaml' },
@@ -65,23 +65,23 @@ const schemas = [
   { name: 'swagger-petstore', path: 'https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml' },
   // Real-world specs from the APIs-guru aggregator (cloud, payments, comms, media). Machine-converted
   // to OpenAPI 3.0, so `strict: false` like the other loose real-world specs.
-  { name: 'slack', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/slack.com/1.7.0/openapi.yaml', strict: false },
-  { name: 'notion', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/notion.com/1.0.0/openapi.yaml', strict: false },
-  { name: 'google-calendar', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/calendar/v3/openapi.yaml', strict: false },
-  { name: 'google-drive', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/drive/v2/openapi.yaml', strict: false },
-  { name: 'google-sheets', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/sheets/v4/openapi.yaml', strict: false },
-  { name: 'gmail', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/gmail/v1/openapi.yaml', strict: false },
-  { name: 'youtube', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/youtube/v3/openapi.yaml', strict: false },
-  { name: 'bigquery', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/bigquery/v2/openapi.yaml', strict: false },
-  { name: 'aws-s3', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/amazonaws.com/s3/2006-03-01/openapi.yaml', strict: false },
-  { name: 'aws-lambda', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/amazonaws.com/lambda/2014-11-11/openapi.yaml', strict: false },
-  { name: 'aws-dynamodb', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/amazonaws.com/dynamodb/2011-12-05/openapi.yaml', strict: false },
-  { name: 'aws-ec2', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/amazonaws.com/ec2/2016-11-15/openapi.yaml', strict: false },
-  { name: 'zoom', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/zoom.us/2.0.0/openapi.yaml', strict: false },
-  { name: 'sendgrid', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/sendgrid.com/1.0.0/openapi.yaml', strict: false },
-  { name: 'giphy', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/giphy.com/1.0/openapi.yaml', strict: false },
-  { name: 'nasa-apod', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/nasa.gov/apod/1.0.0/openapi.yaml', strict: false },
-  { name: 'nytimes-books', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/nytimes.com/books_api/3.0.0/openapi.yaml', strict: false },
+  { name: 'slack', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/slack.com/1.7.0/openapi.yaml' },
+  { name: 'notion', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/notion.com/1.0.0/openapi.yaml' },
+  { name: 'google-calendar', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/calendar/v3/openapi.yaml' },
+  { name: 'google-drive', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/drive/v2/openapi.yaml' },
+  { name: 'google-sheets', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/sheets/v4/openapi.yaml' },
+  { name: 'gmail', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/gmail/v1/openapi.yaml' },
+  { name: 'youtube', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/youtube/v3/openapi.yaml' },
+  { name: 'bigquery', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/bigquery/v2/openapi.yaml' },
+  { name: 'aws-s3', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/amazonaws.com/s3/2006-03-01/openapi.yaml' },
+  { name: 'aws-lambda', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/amazonaws.com/lambda/2014-11-11/openapi.yaml' },
+  { name: 'aws-dynamodb', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/amazonaws.com/dynamodb/2011-12-05/openapi.yaml' },
+  { name: 'aws-ec2', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/amazonaws.com/ec2/2016-11-15/openapi.yaml' },
+  { name: 'zoom', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/zoom.us/2.0.0/openapi.yaml' },
+  { name: 'sendgrid', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/sendgrid.com/1.0.0/openapi.yaml' },
+  { name: 'giphy', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/giphy.com/1.0/openapi.yaml' },
+  { name: 'nasa-apod', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/nasa.gov/apod/1.0.0/openapi.yaml' },
+  { name: 'nytimes-books', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/nytimes.com/books_api/3.0.0/openapi.yaml' },
 ]
 
 /** @type {import('@kubb/core').UserConfig} */
@@ -167,7 +167,7 @@ const baseConfig = {
 }
 
 export default defineConfig(() => {
-  return schemas.map(({ name, path, strict, typecheck }) => {
+  return schemas.map(({ name, path }) => {
     return {
       ...baseConfig,
       name,
@@ -179,7 +179,10 @@ export default defineConfig(() => {
         path,
       },
       hooks: {
-        done: [typecheck ? (strict ? 'npm run typecheck -- --strict' : 'npm run typecheck') : undefined].filter(Boolean),
+        // Strict-typecheck the generated models + zod for every spec, so invalid generated output (a
+        // type that does not compile) fails the run. The script handles the file discovery and a
+        // per-spec tsconfig — kubb spawns hooks without a shell, so the logic cannot be inline.
+        done: [`node ./typecheckGen.mjs ${name}`],
       },
     }
   })
