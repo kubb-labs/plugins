@@ -39,13 +39,13 @@
     "@tanstack/vue-query": "^5.101.1",
     "@types/react": "catalog:",
     "axios": "^1.18.1",
-    "cypress": "^15.17.0",
+    "cypress": "^15.18.0",
     "msw": "^2.14.6",
     "react": "^19.2.7",
     "solid-js": "^1.9.13",
-    "svelte": "^5.56.3",
+    "svelte": "^5.56.4",
     "swr": "^2.4.2",
-    "vue": "^3.5.38",
+    "vue": "^3.5.39",
     "zod": "^4.4.3"
   },
   "devDependencies": {
