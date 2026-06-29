@@ -324,6 +324,13 @@ describe('printerZodMini', () => {
       expect(printer.print(node)).toBe('PhoneNumber')
     })
 
+    test('collided ref resolves to its renamed name via nameMapping', () => {
+      const p = printerZodMini({ nameMapping: new Map([['#/components/schemas/Order', 'OrderSchema']]) })
+      const node = ast.factory.createSchema({ type: 'ref', name: 'Order', ref: '#/components/schemas/Order' })
+
+      expect(p.print(node)).toBe('OrderSchema')
+    })
+
     test('self-ref wraps in z.lazy()', () => {
       const p = printerZodMini({ cyclicSchemas: new Set(['TreeNode']) })
       const node = ast.factory.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' })

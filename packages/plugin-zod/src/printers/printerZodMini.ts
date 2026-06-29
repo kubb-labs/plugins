@@ -70,6 +70,12 @@ export type PrinterZodMiniOptions = {
    */
   cyclicSchemas?: ReadonlySet<string>
   /**
+   * Maps a component `$ref` path to its collision-resolved name. When two components collide
+   * (across sections or by case), the adapter renames one of them; the `ref()` handler resolves
+   * the referenced name through this map so the emitted schema reference matches the renamed component.
+   */
+  nameMapping?: ReadonlyMap<string, string>
+  /**
    * Custom handler map for node type overrides.
    */
   nodes?: PrinterZodMiniNodes
@@ -179,7 +185,9 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
 
       ref(node) {
         if (!node.name) return null
-        const refName = node.ref ? (extractRefName(node.ref) ?? node.name) : node.name
+        // `nameMapping` (keyed by the full $ref) carries the collision-resolved name when the
+        // referenced component was renamed; otherwise fall back to the short ref name.
+        const refName = node.ref ? (this.options.nameMapping?.get(node.ref) ?? extractRefName(node.ref) ?? node.name) : node.name
         const resolvedName = node.ref ? (this.options.resolver?.default(refName, 'function') ?? refName) : node.name
 
         if (node.ref && this.options.cyclicSchemas?.has(refName)) {
