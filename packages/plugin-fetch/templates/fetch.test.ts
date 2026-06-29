@@ -165,7 +165,7 @@ describe('createClientCore', () => {
       status: 200,
       data: { id: 1 },
       error: undefined,
-      parsed: { data: { id: 1 }, contentType: undefined },
+      contentType: undefined,
       request: 'REQ',
       response: 'RES',
     })
@@ -180,7 +180,7 @@ describe('createClientCore', () => {
   test('surfaces a non-2xx body as an error value when throwOnError is false', async () => {
     const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
     const result = (await client({ method: 'POST', url: '/pet', throwOnError: false })) as CallResult<string, string>
-    expect(result).toStrictEqual({ status: 405, data: undefined, error: { message: 'invalid' }, parsed: undefined, request: 'REQ', response: 'RES' })
+    expect(result).toStrictEqual({ status: 405, data: undefined, error: { message: 'invalid' }, contentType: undefined, request: 'REQ', response: 'RES' })
   })
 
   test('passes client-level options to the transport', async () => {
@@ -238,7 +238,7 @@ describe('createClientCore', () => {
     const error = vi.fn(() => ({ parsed: true }))
     const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { error: toSchema(error) } })) as CallResult<string, string>
     expect(error).toHaveBeenCalledTimes(1)
-    expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, parsed: undefined, request: 'REQ', response: 'RES' })
+    expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, contentType: undefined, request: 'REQ', response: 'RES' })
   })
 
   test('skips the error parser on a success body', async () => {
@@ -316,21 +316,22 @@ describe('content type negotiation', () => {
     expect(calls[0]?.headers['Accept']).toBe('application/json')
   })
 
-  test('carries the negotiated content type onto result.parsed, charset stripped', async () => {
+  test('carries the negotiated content type onto result.contentType, charset stripped', async () => {
     const { transport } = transportWith({ data: { id: 1 }, contentType: 'application/xml; charset=utf-8' })
     const client = createClientCore<string, string>({ defaultTransport: transport })
     const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<string, string>
-    expect(result.parsed).toStrictEqual({ data: { id: 1 }, contentType: 'application/xml' })
+    expect(result.contentType).toBe('application/xml')
+    expect(result.data).toStrictEqual({ id: 1 })
   })
 
-  test('runs the matching deserializer before validation and feeds parsed.data', async () => {
+  test('runs the matching deserializer before validation and feeds result.data', async () => {
     const { transport } = transportWith({ data: '<pet><id>1</id></pet>', contentType: 'application/xml' })
     const parseXml = vi.fn(() => ({ id: 1 }))
     const client = createClientCore<string, string>({ defaultTransport: transport, deserializers: { 'application/xml': parseXml } })
     const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<string, string>
     expect(parseXml).toHaveBeenCalledWith('<pet><id>1</id></pet>', 'application/xml')
     expect(result.data).toStrictEqual({ id: 1 })
-    expect(result.parsed).toStrictEqual({ data: { id: 1 }, contentType: 'application/xml' })
+    expect(result.contentType).toBe('application/xml')
   })
 
   test('matches a per-call deserializer over the client-level one, charset stripped', async () => {

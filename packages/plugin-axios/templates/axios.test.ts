@@ -374,21 +374,22 @@ describe('content type negotiation', () => {
     expect(calls[0]?.headers?.['Accept']).toBe('application/json')
   })
 
-  test('carries the negotiated content type onto result.parsed, charset stripped', async () => {
+  test('carries the negotiated content type onto result.contentType, charset stripped', async () => {
     const { instance } = fakeAxiosWith({ data: { id: 1 }, contentType: 'application/xml; charset=utf-8' })
     const client = createClientCore({ transport: instance })
     const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<AxiosRequestConfig, AxiosResponse>
-    expect(result.parsed).toStrictEqual({ data: { id: 1 }, contentType: 'application/xml' })
+    expect(result.contentType).toBe('application/xml')
+    expect(result.data).toStrictEqual({ id: 1 })
   })
 
-  test('runs the matching deserializer before validation and feeds parsed.data', async () => {
+  test('runs the matching deserializer before validation and feeds result.data', async () => {
     const { instance } = fakeAxiosWith({ data: '<pet><id>1</id></pet>', contentType: 'application/xml' })
     const parseXml = vi.fn(() => ({ id: 1 }))
     const client = createClientCore({ transport: instance, deserializers: { 'application/xml': parseXml } })
     const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<AxiosRequestConfig, AxiosResponse>
     expect(parseXml).toHaveBeenCalledWith('<pet><id>1</id></pet>', 'application/xml')
     expect(result.data).toStrictEqual({ id: 1 })
-    expect(result.parsed).toStrictEqual({ data: { id: 1 }, contentType: 'application/xml' })
+    expect(result.contentType).toBe('application/xml')
   })
 
   test('uses a per-content-type bodySerializer for the request body', async () => {
