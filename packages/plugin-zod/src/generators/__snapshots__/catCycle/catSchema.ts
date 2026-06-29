@@ -5,7 +5,7 @@
 
 import * as z from 'zod'
 
-export const catSchema: z.ZodType = z.object({
+export const catSchema = z.object({
   id: z.int(),
   archEnemy: z.union([z.null(), petSchema]).optional(),
   friends: z.array(petSchema).optional(),

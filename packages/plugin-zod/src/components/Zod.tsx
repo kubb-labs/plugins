@@ -29,10 +29,16 @@ export function Zod({ name, node, printer, inferTypeName, cyclic }: Props): Kubb
     return
   }
 
+  // A cyclic object emits its self-references as deferred getters (`get prop() { … }`), so its
+  // initializer never references itself directly and TypeScript infers it fine — annotating it would
+  // only strip the `ZodObject` methods (`.omit()`, `.strict()`). Only non-object cyclic schemas (a
+  // union/array with a top-level `z.lazy(() => self)`) are implicitly `any` and need the annotation.
+  const needsAnnotation = cyclic && node.type !== 'object'
+
   return (
     <>
       <File.Source name={name} isExportable isIndexable>
-        <Const export name={name} type={cyclic ? 'z.ZodType' : undefined}>
+        <Const export name={name} type={needsAnnotation ? 'z.ZodType' : undefined}>
           {output}
         </Const>
       </File.Source>
