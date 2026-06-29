@@ -17,7 +17,6 @@ export type { Address } from './ts/models/Address.ts'
 export type { ApiResponse } from './ts/models/ApiResponse.ts'
 export type { Cat } from './ts/models/Cat.ts'
 export type { Category } from './ts/models/Category.ts'
-export type { Category1 } from './ts/models/Category1.ts'
 export type { Customer } from './ts/models/Customer.ts'
 export type { CustomerParamsStatusEnumKey } from './ts/models/CustomerParamsStatusEnum.ts'
 export type {

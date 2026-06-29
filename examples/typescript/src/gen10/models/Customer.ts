@@ -39,5 +39,5 @@ export type Customer = {
   /**
    * @type array | undefined
    */
-  address?: Array<Address>
+  address?: Address[]
 }

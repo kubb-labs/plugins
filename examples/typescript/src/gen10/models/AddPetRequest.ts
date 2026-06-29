@@ -30,11 +30,11 @@ export type AddPetRequest = {
   /**
    * @type array
    */
-  photoUrls: Array<string>
+  photoUrls: string[]
   /**
    * @type array | undefined
    */
-  tags?: Array<Tag>
+  tags?: Tag[]
   /**
    * @description pet status in the store
    */
