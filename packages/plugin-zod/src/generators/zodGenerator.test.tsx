@@ -6,7 +6,7 @@ import { ast, memoryStorage } from '@kubb/core'
 import { findCircularSchemas } from '@kubb/ast/utils'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
 import { describe, expect, test } from 'vitest'
-import { matchFiles } from '#mocks'
+import { matchFiles, rawSources } from '#mocks'
 import { resolverZod } from '../resolvers/resolverZod.ts'
 import type { PluginZod } from '../types.ts'
 import { zodGenerator } from './zodGenerator.tsx'
@@ -350,6 +350,39 @@ describe('zodGenerator — Schema', () => {
     })
 
     await matchFiles(driver.fileManager.files, 'catCycle')
+  })
+
+  // A directly self-referential schema (its own initializer references itself, like discord's
+  // errorDetailsSchema) is implicitly `any` under strict (TS7022), so it must be annotated
+  // `: z.ZodType`. This is the inverse of catCycle, whose object getters defer the self-reference.
+  const errorDetailsSchema = ast.factory.createSchema({
+    type: 'union',
+    name: 'ErrorDetails',
+    members: [
+      ast.factory.createSchema({ type: 'ref', name: 'ErrorDetails', ref: '#/components/schemas/ErrorDetails' }),
+      ast.factory.createSchema({ type: 'string' }),
+    ],
+  })
+
+  test('selfRefCycle — directly self-referential schema is annotated z.ZodType', async () => {
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'selfRefCycle' })
+
+    await renderGeneratorSchema(zodGenerator, errorDetailsSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      meta: {
+        circularNames: [...findCircularSchemas([errorDetailsSchema])],
+        enumNames: [],
+      },
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('export const errorDetailsSchema: z.ZodType')
   })
 })
 
