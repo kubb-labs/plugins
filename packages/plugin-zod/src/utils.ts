@@ -137,6 +137,9 @@ export function formatDefault(value: unknown): string {
  * Returns `null` when no `.default(...)` should be emitted. Keys off the schema node's type.
  */
 export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown): string | null {
+  // A `null` default is invalid on a non-nullable schema and redundant on a nullish one, and emitting
+  // it produces a bare `.default()` (no argument). Drop it.
+  if (value === null) return null
   if (node && ast.narrowSchema(node, 'bigint')) {
     if (typeof value === 'bigint') return `BigInt(${value})`
     if (typeof value === 'number' && Number.isInteger(value)) return `BigInt(${value})`
@@ -144,6 +147,17 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
   }
   if (node && ast.narrowSchema(node, 'array')) {
     return Array.isArray(value) ? JSON.stringify(value) : null
+  }
+  // An enum/literal schema narrows to its members (e.g. `1 | 3`), but the spec default may not match
+  // that type (`default: '1'` on a numeric enum). Emit the matching member's typed literal so the
+  // default agrees with the schema, or drop a default that matches no member.
+  const enumNode = node ? ast.narrowSchema(node, 'enum') : undefined
+  if (enumNode) {
+    const values = enumNode.namedEnumValues?.map((member) => member.value) ?? enumNode.enumValues ?? []
+    if (values.length) {
+      const match = values.find((member) => member === value || String(member) === String(value))
+      return match != null ? formatLiteral(match) : null
+    }
   }
   return formatDefault(value)
 }

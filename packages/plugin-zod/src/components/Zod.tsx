@@ -14,9 +14,15 @@ type Props = {
    */
   printer: ast.Printer<PrinterZodFactory> | ast.Printer<PrinterZodMiniFactory>
   inferTypeName?: string | null
+  /**
+   * Set when the schema references itself. A self-referential initializer (e.g. a `z.lazy(() => …)`
+   * back to the same const) is implicitly `any` under `strict`, so the const is annotated with an
+   * explicit `z.ZodType` to break the inference cycle.
+   */
+  cyclic?: boolean
 }
 
-export function Zod({ name, node, printer, inferTypeName }: Props): KubbReactNode {
+export function Zod({ name, node, printer, inferTypeName, cyclic }: Props): KubbReactNode {
   const output = printer.print(node)
 
   if (!output) {
@@ -26,7 +32,7 @@ export function Zod({ name, node, printer, inferTypeName }: Props): KubbReactNod
   return (
     <>
       <File.Source name={name} isExportable isIndexable>
-        <Const export name={name}>
+        <Const export name={name} type={cyclic ? 'z.ZodType' : undefined}>
           {output}
         </Const>
       </File.Source>

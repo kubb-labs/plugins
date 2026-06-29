@@ -5,6 +5,7 @@ import {
   applyModifiers,
   buildEnum,
   buildGroupedParamsSchema,
+  defaultLiteral,
   formatDefault,
   formatLiteral,
   getCodec,
@@ -40,6 +41,31 @@ describe('formatDefault', () => {
 
   test('undefined value becomes empty string', () => {
     expect(formatDefault(undefined)).toBe('')
+  })
+})
+
+describe('defaultLiteral', () => {
+  test('a null default is dropped so no bare .default() is emitted', () => {
+    expect(defaultLiteral(ast.factory.createSchema({ type: 'object', primitive: 'object' }), null)).toBeNull()
+  })
+
+  test('a string default on a numeric enum is coerced to the matching member literal', () => {
+    const node = ast.factory.createSchema({ type: 'enum', enumValues: [1, 3] })
+    expect(defaultLiteral(node, '1')).toBe('1')
+  })
+
+  test('an enum default that matches no member is dropped', () => {
+    const node = ast.factory.createSchema({ type: 'enum', enumValues: [1, 3] })
+    expect(defaultLiteral(node, '2')).toBeNull()
+  })
+
+  test('a string-enum default keeps its quoted literal', () => {
+    const node = ast.factory.createSchema({ type: 'enum', enumValues: ['a', 'b'] })
+    expect(defaultLiteral(node, 'a')).toBe("'a'")
+  })
+
+  test('a plain string default is quoted', () => {
+    expect(defaultLiteral(ast.factory.createSchema({ type: 'string' }), 'x')).toBe("'x'")
   })
 })
 

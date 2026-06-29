@@ -276,9 +276,11 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           .filter(Boolean)
         if (members.length === 0) return ''
         if (members.length === 1) return members[0]!
-        if (node.discriminatorPropertyName && !nodeMembers.some((m) => m.type === 'intersection')) {
-          // z.discriminatedUnion requires ZodObject members; intersections (ZodIntersection) are not
-          // assignable to $ZodDiscriminant, so fall back to z.union when any member is an intersection.
+        // z.discriminatedUnion requires discriminable ZodObject members; an intersection
+        // (ZodIntersection) — including a `$ref` whose target is an `allOf` — is not assignable to
+        // $ZodDiscriminant, so fall back to z.union when any member resolves to an intersection.
+        const allDiscriminable = nodeMembers.every((m) => (m.type === 'ref' ? syncSchemaRef(m) : m).type !== 'intersection')
+        if (node.discriminatorPropertyName && allDiscriminable) {
           return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
         }
 
