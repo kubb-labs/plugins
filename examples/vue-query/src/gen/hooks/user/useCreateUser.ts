@@ -21,7 +21,7 @@ export function useCreateUser<TContext>(
   options: {
     mutation?: MutationObserverOptions<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
     }
   } = {},
 ) {

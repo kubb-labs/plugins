@@ -20,7 +20,7 @@ export function uploadFile<ThrowOnError extends boolean = true>(
     method: 'POST',
     url: '/pet/{petId}/uploadImage',
     security: [{ type: 'oauth2' }],
-    contentType: 'application/octet-stream',
+    contentType: { request: 'application/octet-stream' },
     ...config,
   }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
 }

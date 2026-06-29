@@ -54,7 +54,15 @@ export type GetOrderByIdRequestConfig = {
  * @type object
  */
 export type GetOrderByIdResponses = {
-  '200': GetOrderByIdStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: GetOrderByIdStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: GetOrderByIdStatus200Xml
+      }
   '400': GetOrderByIdStatus400
   '404': GetOrderByIdStatus404
 }

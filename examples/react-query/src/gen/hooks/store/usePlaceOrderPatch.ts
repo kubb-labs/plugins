@@ -13,7 +13,7 @@ export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as con
 
 export function placeOrderPatchMutationOptions<TContext = unknown>(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
   } = {},
 ) {
   const mutationKey = placeOrderPatchMutationKey()
@@ -37,7 +37,7 @@ export function usePlaceOrderPatch<TContext>(
       client?: QueryClient
     }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
     }
   } = {},
 ) {

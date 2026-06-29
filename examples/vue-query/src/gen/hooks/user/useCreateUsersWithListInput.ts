@@ -22,7 +22,9 @@ export function useCreateUsersWithListInput<TContext>(
     mutation?: MutationObserverOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputRequestConfig, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
+      contentType?: { response?: 'application/json' | 'application/xml' }
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

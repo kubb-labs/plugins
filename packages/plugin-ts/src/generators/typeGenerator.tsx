@@ -139,8 +139,10 @@ export const typeGenerator = defineGenerator<PluginTs>({
     }
 
     /**
-     * Emits an individual type per content type plus a union alias under `baseName`.
-     * Shared by the request body and multi-content-type responses.
+     * Emits an individual type per content type plus a plain union alias under `baseName`. Shared by
+     * the request body and multi-content-type responses. The response record discriminates these
+     * variants by content type in {@link buildResponses}; the standalone alias stays a plain union so
+     * query hooks and `result.data` keep the bare body.
      */
     function buildContentTypeVariants(
       entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
@@ -200,7 +202,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const responseTypes = node.responses.map((res) => {
       const variants = (res.content ?? []).filter((entry) => entry.schema)
-      // Multiple content types for a single status code — generate a union of the variants.
+      // Multiple content types for a single status code — generate per-variant types + a plain union.
+      // The `<Name>Responses` record discriminates them by content type (see buildResponses).
       if (variants.length > 1) {
         return buildContentTypeVariants(variants, resolver.resolveResponseStatusName(node, res.statusCode))
       }
