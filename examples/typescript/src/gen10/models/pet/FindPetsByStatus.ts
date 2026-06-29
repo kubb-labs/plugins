@@ -15,12 +15,12 @@ export type FindPetsByStatusQueryStatus = FindPetsByStatusStatus | undefined
 /**
  * @type array
  */
-export type FindPetsByStatusStatus200Json = Pet[]
+export type FindPetsByStatusStatus200Json = Array<Pet>
 
 /**
  * @type array
  */
-export type FindPetsByStatusStatus200Xml = Pet[]
+export type FindPetsByStatusStatus200Xml = Array<Pet>
 
 export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
 
