@@ -1,5 +1,60 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.78
+
+### Minor Changes
+
+- [#558](https://github.com/kubb-labs/plugins/pull/558) [`4e0906b`](https://github.com/kubb-labs/plugins/commit/4e0906b93bcb3d37441857380e119204264afb3a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Negotiate and discriminate multiple response content types.
+
+  A generated call now takes a `contentType: { request, response }` object. The `request` key picks the body format and the `response` key sets the `Accept` header. Both default to what the spec declares and stay overridable, and a bare `contentType: 'application/json'` string still selects the request type, so existing calls keep working.
+
+  When a status documents more than one content type, the result reports the type the server returned on `result.contentType`, next to `status` and `data`, so a caller can narrow `data` by it.
+
+  ```ts
+  const result = await getPetById({
+    path: { petId: "1" },
+    contentType: { response: "application/xml" },
+  });
+
+  if (result.status === 200) {
+    const { data, contentType } = result;
+    switch (contentType) {
+      case "application/json":
+        console.log("JSON pet:", data.name);
+        break;
+      case "application/xml":
+        console.log("XML pet:", data.id);
+        break;
+    }
+  }
+  ```
+
+  - `plugin-ts` discriminates a status that documents several content types by content type in the `<Name>Responses` record, so `result.contentType` narrows `result.data`. The standalone `<Name>StatusNNN` alias stays the plain body union, and the individual per-content-type variant types (`GetPetByIdStatus200Json`, `GetPetByIdStatus200Xml`) are kept.
+  - `plugin-fetch` and `plugin-axios` add `deserializers` and `bodySerializers` maps to `RequestConfig` and `ClientConfig`, keyed by content type and matched with the charset stripped, for formats the runtime does not decode itself such as `application/xml`. The negotiated content type rides on `result.contentType` and on `ResponseError`.
+  - `plugin-react-query`, `plugin-vue-query`, and `plugin-swr` thread the `contentType` option through as the `{ request?, response? }` object.
+  - `plugin-zod` and `plugin-faker` emit one schema or mock per response content type plus a union alias, with variant names that line up across the plugins through the shared naming helpers.
+  - `plugin-msw` prefers the `application/json` content type for the mocked response when a status declares several.
+
+  Single-content-type operations generate the same output as before. The breaking change is that the result now carries `contentType`, and the per-status responses record shape changes for a status with several content types.
+
+### Patch Changes
+
+- [#579](https://github.com/kubb-labs/plugins/pull/579) [`ba80c04`](https://github.com/kubb-labs/plugins/commit/ba80c0427d6a42ce3131323b3f48fa16f2965aad) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Resolve type/schema references to their renamed target when a component name collides.
+
+  When two components share a name across sections or by case (e.g. `#/components/schemas/Order` and `#/components/requestBodies/Order`, or `Variant`/`variant`), the adapter disambiguates the emitted files (`OrderSchema`, `OrderRequest`, `Variant2`) and records the rename in a `nameMapping` keyed by the full `$ref` path. The printers previously emitted the un-disambiguated short name for the reference, producing a dangling reference such as `CreateOrderStatus201 = Order` with an `import { Order } from './Order.ts'` that no file satisfies (`TS2307`).
+
+  Each printer's `ref()` handler now resolves the referenced name through `nameMapping` (keyed by `node.ref`) before falling back to the short ref name, so the type reference and the generated component match. The generators plumb `nameMapping` from `ctx.meta`. This is a no-op for specs without colliding component names.
+
+  Requires `@kubb/adapter-oas` to expose `nameMapping` on `InputMeta` and resolve collision-renamed imports.
+
+- [#575](https://github.com/kubb-labs/plugins/pull/575) [`a0fe6bd`](https://github.com/kubb-labs/plugins/commit/a0fe6bdcb1e619957c1e797218ba2adc774c7ec0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Emit `.default(...)` values that match the generated schema's type. A `bigint` field (`format: int64`) carries a numeric default and some specs put `default: {}` on an array, both of which produced a Zod schema that did not typecheck. Numeric defaults on `bigint` schemas are now emitted as `BigInt(...)` literals, array defaults are emitted as array literals (a non-array default is dropped), and array defaults are no longer collapsed to `{}`.
+
+- [#569](https://github.com/kubb-labs/plugins/pull/569) [`62cae59`](https://github.com/kubb-labs/plugins/commit/62cae5965912a17533dbf3a2ade1c64f1b305e95) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Emit `z.literal`/`z.union` instead of `z.enum` for non-string `const`/enum values. `z.enum()` only accepts string members in Zod v4, so a numeric, boolean, or mixed set produced a type error (TS2769). All-string sets keep the compact `z.enum([…])`.
+
+- [#573](https://github.com/kubb-labs/plugins/pull/573) [`8a6dce0`](https://github.com/kubb-labs/plugins/commit/8a6dce03ba62fc6b180cc870487556927024ffff) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix `.omit()` being called on a `ZodNullable`/`ZodOptional` wrapper for request schemas built from a `$ref` to a nullable (or optional) component (kubb-labs/plugins#567, bug 4).
+
+  A `$ref` resolves to a named schema variable that already carries its own `.nullable()` / `.optional()` modifiers, but `.omit()` only exists on the inner `ZodObject`. When readonly keys were stripped from such a ref the printer emitted `mySchema.omit({ … })`, which fails strict typecheck with `Property 'omit' does not exist on type 'ZodNullable<…>'`. The printer now unwraps down to the object first and re-applies the modifier — `mySchema.unwrap().omit({ … }).nullable()` — mirroring plugin-ts emitting `Omit<NonNullable<T>, …>`. The same fix applies to the `zod/mini` printer.
+
 ## 5.0.0-beta.77
 
 ## 5.0.0-beta.76

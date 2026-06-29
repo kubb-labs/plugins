@@ -1,5 +1,11 @@
 # @kubb/plugin-redoc
 
+## 5.0.0-beta.78
+
+### Patch Changes
+
+- [#577](https://github.com/kubb-labs/plugins/pull/577) [`190f5a2`](https://github.com/kubb-labs/plugins/commit/190f5a2ede0394606fc1144f8ae3505ad4a16519) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Type `templateOptions` on `getPageHTML` as `Record<string, unknown>` instead of `any`, so the runtime and plugin source stay free of explicit `any`. Generated output is unchanged: a schema typed `any` still emits `any`.
+
 ## 5.0.0-beta.77
 
 ## 5.0.0-beta.76
