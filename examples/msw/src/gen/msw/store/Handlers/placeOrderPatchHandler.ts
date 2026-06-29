@@ -16,14 +16,17 @@ export function placeOrderPatchHandlerResponse200(data: PlaceOrderPatchResponse)
   })
 }
 
-export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatchStatus405) {
+export function placeOrderPatchHandlerResponse405(data: PlaceOrderPatchStatus405) {
   return new Response(JSON.stringify(data), {
     status: 405,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
-export function placeOrderPatchHandler(data?: PlaceOrderPatchResponse | HttpResponseResolver<Record<string, string>, PlaceOrderPatchData, any>) {
-  return http.patch<Record<string, string>, PlaceOrderPatchData, any>(`http://localhost:3000/store/order`, function handler(info) {
+export function placeOrderPatchHandler(data?: PlaceOrderPatchResponse | HttpResponseResolver<Record<string, string>, PlaceOrderPatchData>) {
+  return http.patch<Record<string, string>, PlaceOrderPatchData>(`http://localhost:3000/store/order`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

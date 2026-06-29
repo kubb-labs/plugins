@@ -15,15 +15,21 @@ export function getOrderByIdHandlerResponse200(data: GetOrderByIdResponse) {
   })
 }
 
-export function getOrderByIdHandlerResponse400(data?: GetOrderByIdStatus400) {
+export function getOrderByIdHandlerResponse400(data: GetOrderByIdStatus400) {
   return new Response(JSON.stringify(data), {
     status: 400,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
-export function getOrderByIdHandlerResponse404(data?: GetOrderByIdStatus404) {
+export function getOrderByIdHandlerResponse404(data: GetOrderByIdStatus404) {
   return new Response(JSON.stringify(data), {
     status: 404,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 

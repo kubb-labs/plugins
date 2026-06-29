@@ -3,7 +3,7 @@ import type { AdapterOas } from '@kubb/adapter-oas'
 type BuildDocsOptions = {
   title?: string
   disableGoogleFont?: boolean
-  templateOptions?: any
+  templateOptions?: Record<string, unknown>
 }
 
 const htmlEscapes: Record<string, string> = {

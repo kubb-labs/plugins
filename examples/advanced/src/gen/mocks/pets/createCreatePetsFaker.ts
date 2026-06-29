@@ -53,5 +53,5 @@ export function createCreatePetsDataFaker<TData extends Partial<CreatePetsData> 
 }
 
 export function createCreatePetsResponseFaker(_data?: CreatePetsResponse): CreatePetsResponse {
-  return faker.helpers.arrayElement<any>([createCreatePetsStatus201Faker(), createCreatePetsStatusDefaultFaker()])
+  return faker.helpers.arrayElement([createCreatePetsStatus201Faker(), createCreatePetsStatusDefaultFaker()])
 }

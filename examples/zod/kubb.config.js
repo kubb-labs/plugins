@@ -1,3 +1,4 @@
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
 import { defineConfig } from 'kubb'
@@ -10,6 +11,7 @@ export default defineConfig([
     input: {
       path: './petStore.yaml',
     },
+    adapter: adapterOas({ unknownType: 'unknown' }),
     output: {
       path: './src/zod',
       clean: true,
@@ -37,6 +39,7 @@ export default defineConfig([
     input: {
       path: './petStore.yaml',
     },
+    adapter: adapterOas({ unknownType: 'unknown' }),
     output: {
       path: './src/mini',
       clean: true,
@@ -56,6 +59,7 @@ export default defineConfig([
     input: {
       path: './unionWithReadOnly.yaml',
     },
+    adapter: adapterOas({ unknownType: 'unknown' }),
     output: {
       path: './src/gen3',
       clean: true,

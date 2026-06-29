@@ -10,9 +10,12 @@ export function findPetsByTagsHandlerResponse200(data: FindPetsByTagsResponse) {
   })
 }
 
-export function findPetsByTagsHandlerResponse400(data?: FindPetsByTagsStatus400) {
+export function findPetsByTagsHandlerResponse400(data: FindPetsByTagsStatus400) {
   return new Response(JSON.stringify(data), {
     status: 400,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 

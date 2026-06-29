@@ -258,6 +258,21 @@ describe('applyModifiers', () => {
     expect(applyModifiers({ value: 'z.object({})', defaultValue: {} })).toBe('z.object({}).default({})')
   })
 
+  test('bigint schema coerces a numeric default to a BigInt literal', () => {
+    const schema = ast.factory.createSchema({ type: 'bigint' })
+    expect(applyModifiers({ value: 'z.bigint()', schema, defaultValue: 1 })).toBe('z.bigint().default(BigInt(1))')
+  })
+
+  test('array schema emits an array-literal default', () => {
+    const schema = ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] })
+    expect(applyModifiers({ value: 'z.array(z.string())', schema, defaultValue: ['a', 'b'] })).toBe('z.array(z.string()).default(["a","b"])')
+  })
+
+  test('array schema drops a non-array default', () => {
+    const schema = ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] })
+    expect(applyModifiers({ value: 'z.array(z.string())', schema, defaultValue: {} })).toBe('z.array(z.string())')
+  })
+
   test('description', () => {
     expect(applyModifiers({ value: 'z.string()', description: 'A name' })).toMatchInlineSnapshot(`"z.string().describe('A name')"`)
   })

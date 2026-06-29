@@ -12,11 +12,11 @@ export const updatePetStatus200SchemaXml = z.lazy(() => petSchema)
 
 export const updatePetStatus200Schema = z.union([updatePetStatus200SchemaJson, updatePetStatus200SchemaXml])
 
-export const updatePetStatus400Schema = z.any()
+export const updatePetStatus400Schema = z.unknown()
 
-export const updatePetStatus404Schema = z.any()
+export const updatePetStatus404Schema = z.unknown()
 
-export const updatePetStatus405Schema = z.any()
+export const updatePetStatus405Schema = z.unknown()
 
 export const updatePetResponseSchema = updatePetStatus200Schema
 

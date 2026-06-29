@@ -9,11 +9,11 @@ export const deleteOrderPathOrderIdSchema = z.bigint().describe('ID of the order
 
 export type DeleteOrderPathOrderIdSchemaType = z.infer<typeof deleteOrderPathOrderIdSchema>
 
-export const deleteOrderStatus400Schema = z.any()
+export const deleteOrderStatus400Schema = z.unknown()
 
 export type DeleteOrderStatus400SchemaType = z.infer<typeof deleteOrderStatus400Schema>
 
-export const deleteOrderStatus404Schema = z.any()
+export const deleteOrderStatus404Schema = z.unknown()
 
 export type DeleteOrderStatus404SchemaType = z.infer<typeof deleteOrderStatus404Schema>
 

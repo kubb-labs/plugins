@@ -8,7 +8,7 @@ import { petSchema } from './petSchema.js'
 
 export const addFilesStatus200Schema = petSchema.omit({ name: true })
 
-export const addFilesStatus405Schema = z.any()
+export const addFilesStatus405Schema = z.unknown()
 
 export const addFilesResponseSchema = addFilesStatus200Schema
 
