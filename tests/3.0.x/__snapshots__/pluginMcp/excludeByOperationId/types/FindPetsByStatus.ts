@@ -48,7 +48,13 @@ export type FindPetsByStatusRequestConfig = {
  * @type object
 */
 export type FindPetsByStatusResponses = {
-    "200": FindPetsByStatusStatus200;
+    "200": ({
+        contentType: "application/json";
+        data: FindPetsByStatusStatus200Json;
+    } | {
+        contentType: "application/xml";
+        data: FindPetsByStatusStatus200Xml;
+    });
     "400": FindPetsByStatusStatus400;
 };
 

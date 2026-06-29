@@ -64,7 +64,15 @@ export type AddPetRequestConfig = {
  */
 export type AddPetResponses = {
   '405': AddPetStatus405
-  default: AddPetStatusDefault
+  default:
+    | {
+        contentType: 'application/json'
+        data: AddPetStatusDefaultJson
+      }
+    | {
+        contentType: 'application/xml'
+        data: AddPetStatusDefaultXml
+      }
 }
 
 /**

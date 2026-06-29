@@ -5,35 +5,52 @@ import type { HeadersInit, PathParamStyle, PathSerializer, RequestSerialization,
 import { type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
 
 /**
- * HTTP status codes treated as a success. A resolved call only ever carries a body from one of
- * these; everything else is an error (thrown by default, or surfaced on `error`).
+ * HTTP status codes treated as a success, everything else is an error.
  */
 export type SuccessStatusCode = '200' | '201' | '202' | '203' | '204' | '205' | '206' | '207' | '208' | '226'
 
 /**
- * The success members of a per-status responses record (`{ '200': ...; '404': ... }`).
+ * The success members of a per-status responses record.
  */
 export type SuccessOf<TResponses> = TResponses[Extract<keyof TResponses, SuccessStatusCode>]
 
 /**
- * The error members of a per-status responses record — every documented status that is not a 2xx.
+ * The error members of a per-status responses record, every documented status that is not a 2xx.
  */
 export type ErrorOf<TResponses> = TResponses[Exclude<keyof TResponses, SuccessStatusCode>]
 
 /**
- * Converts a response record's string status key to its numeric literal (`'200'` becomes `200`).
- * Non-numeric keys such as the OpenAPI `default` response stay `number`.
+ * Converts a response record's string status key to its numeric literal, leaving non-numeric keys like `default` as `number`.
  */
 export type ToStatusNumber<TStatus> = TStatus extends `${infer TNumber extends number}` ? TNumber : number
 
 /**
- * One result variant for a single documented status. `status` is the numeric literal at the top
- * level, so a `switch (result.status)` narrows `data` (a 2xx status) or `error` (everything else) to
- * that status's payload.
+ * The plain body of a per-status response, unwrapping the `{ contentType; data }` union so an error result keeps the bare body union on `error`.
+ */
+export type DataOf<T> = T extends { contentType: string; data: infer TData } ? TData : T
+
+/**
+ * The success variant for a single status, flattened so the negotiated `contentType` sits next to `data` and `switch (result.contentType)` narrows it.
+ */
+export type SuccessVariant<TStatus, TEntry, TRequest, TResponse> = TEntry extends { contentType: string; data: unknown }
+  ? TEntry extends { contentType: infer TContentType; data: infer TData }
+    ? { status: ToStatusNumber<TStatus>; data: TData; error: undefined; contentType: TContentType; request: TRequest; response: TResponse }
+    : never
+  : { status: ToStatusNumber<TStatus>; data: TEntry; error: undefined; contentType: string | undefined; request: TRequest; response: TResponse }
+
+/**
+ * One result variant for a single documented status, keyed by the numeric `status` so a `switch (result.status)` narrows `data` or `error`.
  */
 export type ResultByStatus<TResponses, TStatus extends keyof TResponses, TRequest, TResponse> = TStatus extends SuccessStatusCode
-  ? { status: ToStatusNumber<TStatus>; data: TResponses[TStatus]; error: undefined; request: TRequest; response: TResponse }
-  : { status: ToStatusNumber<TStatus>; data: undefined; error: TResponses[TStatus]; request: TRequest; response: TResponse }
+  ? SuccessVariant<TStatus, TResponses[TStatus], TRequest, TResponse>
+  : {
+      status: ToStatusNumber<TStatus>
+      data: undefined
+      error: DataOf<TResponses[TStatus]>
+      contentType: string | undefined
+      request: TRequest
+      response: TResponse
+    }
 
 /**
  * The union of every documented status' result variant.
@@ -43,35 +60,51 @@ export type ResultUnion<TResponses, TRequest, TResponse> = {
 }[keyof TResponses]
 
 /**
- * The union of just the success (2xx) status variants. Selected by status code, not by `error`, so an
- * untyped (`any`) error payload can never widen a success result's `data`.
+ * The union of just the success (2xx) status variants, selected by status code so an untyped error payload can never widen `data`.
  */
 export type SuccessResultUnion<TResponses, TRequest, TResponse> = {
   [TStatus in Extract<keyof TResponses, SuccessStatusCode>]: ResultByStatus<TResponses, TStatus, TRequest, TResponse>
 }[Extract<keyof TResponses, SuccessStatusCode>]
 
 /**
- * The shape every generated function returns, discriminated by the top-level `status`. With
- * `throwOnError` (the default) a resolved call always means success, so the result is the union of the
- * 2xx variants and `error` is `undefined`; without it every documented status is a variant, so a
- * `switch (result.status)` (or narrowing on `error`) narrows `data` and `error` to that status's
- * payload. Operations with no typed responses fall back to a `status`/`request`/`response`-only result.
+ * The shape every generated function returns, discriminated by the top-level `status`, narrowing to the 2xx variants under `throwOnError` and to every documented status without it.
  */
 export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = AxiosRequestConfig, TResponse = AxiosResponse> = ThrowOnError extends true
   ? [SuccessResultUnion<TResponses, TRequest, TResponse>] extends [never]
-    ? { status: number; data: SuccessOf<TResponses>; error: undefined; request: TRequest; response: TResponse }
+    ? {
+        status: number
+        data: SuccessOf<TResponses>
+        error: undefined
+        contentType: string | undefined
+        request: TRequest
+        response: TResponse
+      }
     : SuccessResultUnion<TResponses, TRequest, TResponse>
   : [ResultUnion<TResponses, TRequest, TResponse>] extends [never]
-    ? { status: number; data: undefined; error: undefined; request: TRequest; response: TResponse }
+    ? { status: number; data: undefined; error: undefined; contentType: string | undefined; request: TRequest; response: TResponse }
     : ResultUnion<TResponses, TRequest, TResponse>
 
 /**
- * The data-shaped keys of the grouped options object. `Options` subtracts these from the runtime
- * `RequestConfig` and adds them back, typed per operation, from the generated `<Name>Request` type.
+ * The data-shaped keys of the grouped options object, which `Options` re-adds typed per operation.
  */
 export type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; path?: unknown; query?: unknown }
 
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream' | 'formdata'
+
+/**
+ * Turns a raw response body into a parsed value, registered per media type on `deserializers` to handle formats the runtime does not decode itself.
+ */
+export type Deserializer<T = unknown> = (raw: unknown, contentType: string) => T | Promise<T>
+
+/**
+ * Serializes a request body for a single media type, registered per content type on `bodySerializers` to encode formats the default serializer does not handle.
+ */
+export type ContentBodySerializer = (body: unknown, contentType?: string) => unknown
+
+/**
+ * The per-call content type selection, where a bare string sets the request content type and the object form also sets the response format sent as `Accept`.
+ */
+export type ContentType = string | { request?: string; response?: string }
 
 /**
  * A Standard Schema validator (zod, valibot, arktype) that parses a value before it is sent or after
@@ -82,8 +115,7 @@ export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text'
 export type Validator<T = unknown> = StandardSchemaValidator<T>
 
 /**
- * A resolved security scheme carried on each generated call's `security` array. The runtime passes it
- * to the configured `auth` resolver and places the returned token accordingly.
+ * A resolved security scheme carried on each generated call's `security` array and passed to the `auth` resolver.
  */
 export type Auth = {
   type: 'http' | 'apiKey' | 'oauth2' | 'openIdConnect'
@@ -93,32 +125,22 @@ export type Auth = {
 }
 
 /**
- * The token a consumer returns for a scheme, or `undefined` to skip it. Bearer and basic schemes are
- * prefixed by the runtime (basic is base64-encoded), so return the raw token or `user:password`.
+ * The raw token a consumer returns for a scheme (or `user:password` for basic), or `undefined` to skip it.
  */
 export type AuthToken = string | undefined
 
 /**
- * Resolves the token for a security scheme: either a static token used for every scheme, or a
- * callback called once per scheme on a guarded operation until one returns a token.
+ * Resolves the token for a security scheme, either a static token or a callback called per scheme until one returns a token.
  */
 export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<AuthToken>)
 
 /**
- * Extra axios config the runtime spreads onto every request, an escape hatch for the per-call fields
- * it does not set itself, such as `timeout`, `proxy`, `maxRedirects`, `decompress`, and the
- * `onUploadProgress` / `onDownloadProgress` callbacks. The runtime-owned fields (`url`, `baseURL`,
- * `method`, `headers`, `params`, `paramsSerializer`, `data`, `transformRequest`, `signal`,
- * `responseType`, `validateStatus`) always win over anything set here. This is the per-request analog
- * of the `transport` instance, which stays the place for cross-cutting concerns like retries and
- * interceptors. It mirrors `options` in `@kubb/plugin-fetch`.
+ * Extra axios config the runtime spreads onto every request, an escape hatch for per-call fields it does not set itself such as `timeout`, `proxy`, and the progress callbacks.
  */
 export type AxiosOptions = AxiosRequestConfig
 
 /**
- * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` come
- * from the grouped options; everything else is plain request configuration. `transport` carries an
- * axios instance and `validateStatus` rides axios's own contract.
+ * The request a generated function hands to the runtime, with `body` / `headers` / `path` / `query` from the grouped options.
  */
 export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TResponse = AxiosResponse> = {
   baseURL?: string
@@ -133,13 +155,15 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   serialization?: RequestSerialization
   signal?: AbortSignal
   options?: AxiosOptions
-  contentType?: string
+  contentType?: ContentType
   responseType?: ResponseType
   throwOnError?: boolean
   validateStatus?: (status: number) => boolean
   client?: ClientInstance<TRequest, TResponse>
   transport?: AxiosInstance
   serializer?: Serializers
+  bodySerializers?: Record<string, ContentBodySerializer>
+  deserializers?: Record<string, Deserializer>
   validator?: { request?: Validator; response?: Validator; error?: Validator }
   security?: Array<Auth>
   auth?: AuthResolver
@@ -159,8 +183,7 @@ export type Options<TData extends DataShape, ThrowOnError extends boolean = true
   }
 
 /**
- * Client-level configuration shared by every call an instance makes. Per-call `RequestConfig`
- * overrides these. `transport` is the axios instance the client sends through.
+ * Client-level configuration shared by every call an instance makes, overridden by the per-call `RequestConfig`.
  */
 export type ClientConfig = {
   baseURL?: string
@@ -170,6 +193,8 @@ export type ClientConfig = {
   validateStatus?: (status: number) => boolean
   transport?: AxiosInstance
   serializer?: Serializers
+  bodySerializers?: Record<string, ContentBodySerializer>
+  deserializers?: Record<string, Deserializer>
   auth?: AuthResolver
 }
 
@@ -180,18 +205,15 @@ export type CallResult<TRequest = AxiosRequestConfig, TResponse = AxiosResponse>
   status: number
   data: unknown
   error: unknown
+  contentType: string | undefined
   request: TRequest
   response: TResponse
 }
 
-/**
- * An interceptor function for a channel value.
- */
 export type InterceptorFn<T> = (value: T) => T | Promise<T>
 
 /**
- * A single interceptor channel (request, response, or error) exposing the `use` / `eject` / `update`
- * API shared with the fetch and ky runtimes, backed by axios's native interceptor managers.
+ * A single interceptor channel with a transport-agnostic `use` / `eject` / `update` API, backed by axios's native interceptor managers.
  */
 export type InterceptorChannel<T> = {
   use: (fn: InterceptorFn<T>) => number
@@ -200,9 +222,7 @@ export type InterceptorChannel<T> = {
 }
 
 /**
- * The three interceptor channels every client instance exposes, wrapping axios's native
- * `interceptors.request` / `interceptors.response`. The `error` channel maps onto the response
- * manager's rejection handler.
+ * The three interceptor channels every client instance exposes, wrapping axios's native managers with `error` mapped onto the response rejection handler.
  */
 export type Interceptors = {
   request: InterceptorChannel<InternalAxiosRequestConfig>
@@ -224,12 +244,10 @@ export type ClientInstance<TRequest = AxiosRequestConfig, TResponse = AxiosRespo
 }
 
 /**
- * Thrown for responses outside the 2xx range, so a resolved call always means success. The parsed
- * error body and the native request config / response stay reachable on the error.
+ * Thrown for a non-2xx response, so a resolved call always means success.
  */
 /**
- * One decoded Server-Sent Event. `data` is `JSON.parse`d into `TData` when it is valid JSON, and
- * kept as the raw string otherwise. `event`, `id`, and `retry` carry the matching SSE fields.
+ * One decoded Server-Sent Event, with `data` parsed as JSON when valid and kept as the raw string otherwise.
  */
 export type ServerSentEvent<TData = unknown> = {
   data: TData
@@ -287,10 +305,7 @@ function parseEvent<TData>(raw: string): ServerSentEvent<TData> | undefined {
 }
 
 /**
- * Parses a `text/event-stream` body into typed Server-Sent Events. Consume it with `for await`. It
- * accepts either a web `ReadableStream` or any async iterable of byte chunks (the axios stream
- * response), normalizes `\r\n`/`\r` to `\n`, splits events on a blank line, and ignores comment and
- * heartbeat lines. Break out of the `for await` to stop early and cancel the underlying body.
+ * Parses a `text/event-stream` body into typed Server-Sent Events, consumed with `for await` and stopped early by breaking the loop.
  */
 export async function* parseEventStream<TData = unknown>(
   stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>,
@@ -337,15 +352,17 @@ export class ResponseError<TError = unknown, TRequest = AxiosRequestConfig, TRes
   data: TError
   status: number
   statusText: string
+  contentType: string | undefined
   request: TRequest
   response: TResponse
 
-  constructor(config: { data: TError; status: number; statusText: string; request: TRequest; response: TResponse }) {
+  constructor(config: { data: TError; status: number; statusText: string; contentType?: string; request: TRequest; response: TResponse }) {
     super(`Request failed with status ${config.status}${config.statusText ? ` ${config.statusText}` : ''}`)
     this.name = 'ResponseError'
     this.data = config.data
     this.status = config.status
     this.statusText = config.statusText
+    this.contentType = config.contentType
     this.request = config.request
     this.response = config.response
   }
@@ -369,9 +386,7 @@ function mergeHeaders(...sources: Array<HeadersInit | undefined>): Record<string
 }
 
 /**
- * Joins the base and request URL parts, interpolates `{param}` segments from the path params
- * (URL-encoded), and appends the serialized query. Backs `getUrl` so a URL can be constructed
- * without sending the request.
+ * Joins the URL parts, interpolates URL-encoded `{param}` segments, and appends the serialized query, backing `getUrl`.
  */
 function serializeUrl({
   parts,
@@ -394,10 +409,7 @@ function serializeUrl({
 }
 
 /**
- * Walks the per-operation security in order and places the first resolved token on the request,
- * mutating `headers` / `query` in place. Bearer (and oauth2 / openIdConnect) tokens become a `Bearer`
- * Authorization header, basic credentials are base64-encoded, and an apiKey is placed under its
- * `name` in the header, query, or cookie.
+ * Walks the per-operation security in order and places the first resolved token on the request, mutating `headers` / `query` in place.
  */
 export async function resolveAuth(params: {
   security: Array<Auth> | undefined
@@ -430,9 +442,7 @@ async function runValidator<T>(validator: Validator<T> | undefined, value: T): P
 }
 
 /**
- * Wraps an axios interceptor registration behind the shared `use` / `eject` / `update` API. A stable
- * external id is mapped onto axios's own id so `update` can swap a handler in place even though axios
- * has no native update.
+ * Wraps an axios interceptor registration behind the shared `use` / `eject` / `update` API, mapping a stable external id onto axios's own so `update` can swap a handler in place.
  */
 function createInterceptorChannel<T>(register: (fn: InterceptorFn<T>) => number, ejectNative: (id: number) => void): InterceptorChannel<T> {
   const ids = new Map<number, number>()
@@ -458,13 +468,32 @@ function createInterceptorChannel<T>(register: (fn: InterceptorFn<T>) => number,
 }
 
 /**
- * Builds the shared client core bound to an axios instance (defaulting to `axios.create()`). The
- * interceptor channels delegate to the instance's native managers, and `querySerializer` /
- * `bodySerializer` map onto `paramsSerializer` / `transformRequest`.
- *
- * `throwOnError` rides `validateStatus`. With it on, axios rejects a non-2xx status and the runtime
- * normalizes the error to `ResponseError`. With it off, an internal `validateStatus: () => true`
- * resolves every status into `{ data, error, request, response }`.
+ * The base media type of a `Content-Type` value, lowercased and stripped of any `; charset=...` parameters.
+ */
+function baseContentType(value: string | null | undefined): string | undefined {
+  if (!value) return undefined
+  return value.split(';')[0]!.trim().toLowerCase() || undefined
+}
+
+/**
+ * Reads the negotiated response content type from the response headers as a base media type.
+ */
+function getResponseContentType(headers: Record<string, unknown> | undefined): string | undefined {
+  if (!headers) return undefined
+  const value = headers['content-type'] ?? headers['Content-Type']
+  return baseContentType(typeof value === 'string' ? value : undefined)
+}
+
+/**
+ * Normalizes the `contentType` option to its `{ request, response }` form, treating a bare string as the request content type.
+ */
+function resolveContentType(contentType: ContentType | undefined): { request?: string; response?: string } {
+  if (typeof contentType === 'string') return { request: contentType }
+  return contentType ?? {}
+}
+
+/**
+ * Builds the shared client core bound to an axios instance (defaulting to `axios.create()`), with `throwOnError` riding axios's `validateStatus`.
  */
 export function createClientCore<TRequest = AxiosRequestConfig, TResponse = AxiosResponse>(options: ClientConfig = {}): ClientInstance<TRequest, TResponse> {
   let config: ClientConfig = { ...options }
@@ -496,9 +525,15 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     const querySerializer = requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer
     const bodySerializer = requestConfig.serializer?.body ?? config.serializer?.body ?? defaultBodySerializer
     const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
+    const bodySerializers = { ...config.bodySerializers, ...requestConfig.bodySerializers }
+    const deserializers = { ...config.deserializers, ...requestConfig.deserializers }
 
     const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.serialization?.header))
-    const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
+    const { request: requestContentTypeOption, response: responseContentType } = resolveContentType(requestConfig.contentType)
+    const requestContentType = requestContentTypeOption ?? headers['Content-Type'] ?? headers['content-type']
+    if (responseContentType && headers['Accept'] === undefined && headers['accept'] === undefined) {
+      headers['Accept'] = responseContentType
+    }
 
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
 
@@ -515,13 +550,17 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     }
 
     const validatedBody = await runValidator(requestConfig.validator?.request, requestConfig.body)
-    const body = bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.serialization?.body })
+    const requestContentTypeBase = baseContentType(requestContentType)
+    const contentBodySerializer = requestContentTypeBase ? bodySerializers[requestContentTypeBase] : undefined
+    const body = contentBodySerializer
+      ? contentBodySerializer(validatedBody, requestContentType)
+      : bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.serialization?.body })
     // A FormData body must keep its Content-Type unset so axios appends the multipart boundary.
     if (body instanceof FormData) {
       delete headers['Content-Type']
       delete headers['content-type']
-    } else if (requestConfig.contentType) {
-      headers['Content-Type'] = requestConfig.contentType
+    } else if (requestContentTypeOption) {
+      headers['Content-Type'] = requestContentTypeOption
     }
     const pathParams = requestConfig.path ?? {}
     const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) =>
@@ -558,12 +597,19 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     try {
       const response = await activeInstance.request<unknown, AxiosResponse>(axiosConfig)
       const isSuccess = response.status >= 200 && response.status < 300
-      const data = isSuccess ? await runValidator(requestConfig.validator?.response, response.data) : undefined
-      const error = isSuccess ? undefined : await runValidator(requestConfig.validator?.error, response.data)
+      const contentType = getResponseContentType(response.headers as Record<string, unknown>)
+      let decoded: unknown = response.data
+      if (contentType) {
+        const deserialize = deserializers[contentType]
+        if (deserialize) decoded = await deserialize(response.data, contentType)
+      }
+      const data = isSuccess ? await runValidator(requestConfig.validator?.response, decoded) : undefined
+      const error = isSuccess ? undefined : await runValidator(requestConfig.validator?.error, decoded)
       return {
         status: response.status,
         data,
         error,
+        contentType,
         request: response.config as TRequest,
         response: response as TResponse,
       }
@@ -574,6 +620,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
           data: axiosError.response.data,
           status: axiosError.response.status,
           statusText: axiosError.response.statusText,
+          contentType: getResponseContentType(axiosError.response.headers as Record<string, unknown>),
           request: axiosError.config as TRequest,
           response: axiosError.response as TResponse,
         })

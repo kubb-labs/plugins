@@ -336,7 +336,14 @@ describe('createClientCore', () => {
   test('returns the success shape with data and an undefined error', async () => {
     const { client } = createClient({ data: { id: 1 }, status: 200 })
     const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<string, string>
-    expect(result).toStrictEqual({ status: 200, data: { id: 1 }, error: undefined, request: 'REQ', response: 'RES' })
+    expect(result).toStrictEqual({
+      status: 200,
+      data: { id: 1 },
+      error: undefined,
+      contentType: undefined,
+      request: 'REQ',
+      response: 'RES',
+    })
   })
 
   test('throws a ResponseError for a non-2xx status by default', async () => {
@@ -348,7 +355,7 @@ describe('createClientCore', () => {
   test('surfaces a non-2xx body as an error value when throwOnError is false', async () => {
     const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
     const result = (await client({ method: 'POST', url: '/pet', throwOnError: false })) as CallResult<string, string>
-    expect(result).toStrictEqual({ status: 405, data: undefined, error: { message: 'invalid' }, request: 'REQ', response: 'RES' })
+    expect(result).toStrictEqual({ status: 405, data: undefined, error: { message: 'invalid' }, contentType: undefined, request: 'REQ', response: 'RES' })
   })
 
   test('passes client-level options to the transport', async () => {
@@ -406,7 +413,7 @@ describe('createClientCore', () => {
     const error = vi.fn(() => ({ parsed: true }))
     const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { error: toSchema(error) } })) as CallResult<string, string>
     expect(error).toHaveBeenCalledTimes(1)
-    expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, request: 'REQ', response: 'RES' })
+    expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, contentType: undefined, request: 'REQ', response: 'RES' })
   })
 
   test('skips the error parser on a success body', async () => {
@@ -448,6 +455,85 @@ describe('createClientCore', () => {
     const child = client.createClient()
     child.interceptors.request.use((request) => request)
     expect(child).not.toBe(client)
+  })
+})
+
+describe('content type negotiation', () => {
+  function transportWith(result: FakeResult & { contentType?: string }) {
+    const calls: Array<ResolvedRequest> = []
+    const headers = new Headers(result.contentType ? { 'Content-Type': result.contentType } : {})
+    const transport: Transport<string, string> = async (request) => {
+      calls.push(request)
+      return {
+        data: result.data ?? { ok: true },
+        status: result.status ?? 200,
+        statusText: result.statusText ?? 'OK',
+        headers,
+        request: 'REQ',
+        response: 'RES',
+      }
+    }
+    return { transport, calls }
+  }
+
+  test('object-form contentType sets the request Content-Type and the Accept header', async () => {
+    const { transport, calls } = transportWith({})
+    const client = createClientCore<string, string>({ defaultTransport: transport })
+    await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, contentType: { request: 'application/json', response: 'application/xml' } })
+    expect(calls[0]?.headers['Content-Type']).toBe('application/json')
+    expect(calls[0]?.headers['Accept']).toBe('application/xml')
+  })
+
+  test('does not override a caller-set Accept header', async () => {
+    const { transport, calls } = transportWith({})
+    const client = createClientCore<string, string>({ defaultTransport: transport })
+    await client({ method: 'GET', url: '/pet', headers: { Accept: 'application/json' }, contentType: { response: 'application/xml' } })
+    expect(calls[0]?.headers['Accept']).toBe('application/json')
+  })
+
+  test('carries the negotiated content type onto result.contentType, charset stripped', async () => {
+    const { transport } = transportWith({ data: { id: 1 }, contentType: 'application/xml; charset=utf-8' })
+    const client = createClientCore<string, string>({ defaultTransport: transport })
+    const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<string, string>
+    expect(result.contentType).toBe('application/xml')
+    expect(result.data).toStrictEqual({ id: 1 })
+  })
+
+  test('runs the matching deserializer before validation and feeds result.data', async () => {
+    const { transport } = transportWith({ data: '<pet><id>1</id></pet>', contentType: 'application/xml' })
+    const parseXml = vi.fn(() => ({ id: 1 }))
+    const client = createClientCore<string, string>({ defaultTransport: transport, deserializers: { 'application/xml': parseXml } })
+    const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<string, string>
+    expect(parseXml).toHaveBeenCalledWith('<pet><id>1</id></pet>', 'application/xml')
+    expect(result.data).toStrictEqual({ id: 1 })
+    expect(result.contentType).toBe('application/xml')
+  })
+
+  test('matches a per-call deserializer over the client-level one, charset stripped', async () => {
+    const { transport } = transportWith({ data: 'raw', contentType: 'application/xml; charset=utf-8' })
+    const clientLevel = vi.fn(() => ({ from: 'client' }))
+    const perCall = vi.fn(() => ({ from: 'call' }))
+    const client = createClientCore<string, string>({ defaultTransport: transport, deserializers: { 'application/xml': clientLevel } })
+    const result = (await client({ method: 'GET', url: '/pet/1', deserializers: { 'application/xml': perCall } })) as CallResult<string, string>
+    expect(clientLevel).not.toHaveBeenCalled()
+    expect(perCall).toHaveBeenCalledTimes(1)
+    expect(result.data).toStrictEqual({ from: 'call' })
+  })
+
+  test('uses a per-content-type bodySerializer for the request body', async () => {
+    const { transport, calls } = transportWith({})
+    const toXml = vi.fn(() => '<pet/>')
+    const client = createClientCore<string, string>({ defaultTransport: transport, bodySerializers: { 'application/xml': toXml } })
+    await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, contentType: 'application/xml' })
+    expect(toXml).toHaveBeenCalledWith({ name: 'odie' }, 'application/xml')
+    expect(calls[0]?.body).toBe('<pet/>')
+    expect(calls[0]?.headers['Content-Type']).toBe('application/xml')
+  })
+
+  test('carries the negotiated content type onto a thrown ResponseError', async () => {
+    const { transport } = transportWith({ data: { message: 'bad' }, status: 422, contentType: 'application/xml' })
+    const client = createClientCore<string, string>({ defaultTransport: transport })
+    await expect(client({ method: 'POST', url: '/pet' })).rejects.toMatchObject({ status: 422, contentType: 'application/xml' })
   })
 })
 

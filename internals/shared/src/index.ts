@@ -11,6 +11,7 @@ export {
   getPrimarySuccessResponse,
   getRequestGroupOptionality,
   getRequestGroups,
+  getResponseContentTypeInfo,
   getResponseType,
   getSuccessResponses,
   isErrorStatusCode,

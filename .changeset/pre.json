@@ -70,7 +70,6 @@
     "modernize-node-22-natives",
     "move-function-params-to-plugin-ts",
     "multi-content-type-request-body",
-    "multi-content-type-response",
     "multipart-form-data-serializer",
     "oas-ts-resolve-options",
     "open-pianos-create",

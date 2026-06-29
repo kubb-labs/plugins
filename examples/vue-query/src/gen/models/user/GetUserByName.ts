@@ -52,7 +52,15 @@ export type GetUserByNameRequestConfig = {
  * @type object
  */
 export type GetUserByNameResponses = {
-  '200': GetUserByNameStatus200
+  '200':
+    | {
+        contentType: 'application/json'
+        data: GetUserByNameStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: GetUserByNameStatus200Xml
+      }
   '400': GetUserByNameStatus400
   '404': GetUserByNameStatus404
 }
