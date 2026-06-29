@@ -36,8 +36,7 @@ const schemas = [
   { name: 'openai', path: 'https://raw.githubusercontent.com/openai/openai-openapi/refs/heads/manual_spec/openapi.yaml' },
   { name: 'stripe', path: 'https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json' },
   // Real-world APIs (remote, raw.githubusercontent.com so CI is not blocked by bot-unfriendly hosts).
-  // These exercise large, deeply-nested specs with discriminators, oneOf/anyOf and webhooks/callbacks;
-  // `strict: false` mirrors the loose real-world specs above.
+  // These exercise large, deeply-nested specs with discriminators, oneOf/anyOf and webhooks/callbacks.
   { name: 'github', path: 'https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.json' },
   { name: 'asana', path: 'https://raw.githubusercontent.com/Asana/openapi/master/defs/asana_oas.yaml' },
   { name: 'box', path: 'https://raw.githubusercontent.com/box/box-openapi/main/openapi.json' },
@@ -53,7 +52,7 @@ const schemas = [
   { name: 'discord', path: 'https://raw.githubusercontent.com/discord/discord-api-spec/main/specs/openapi.json' },
   { name: 'pokeapi', path: 'https://raw.githubusercontent.com/PokeAPI/pokeapi/master/openapi.yml' },
   // Small official specs from the OpenAPI Initiative — clean fixtures that cover 3.0/3.1 features
-  // (links, callbacks, webhooks, examples) without needing a `strict: false` escape hatch.
+  // (links, callbacks, webhooks, examples).
   { name: 'tictactoe', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.1/tictactoe.yaml' },
   { name: 'oai-petstore', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.0/petstore.yaml' },
   { name: 'uspto', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.0/uspto.yaml' },
@@ -64,7 +63,7 @@ const schemas = [
   { name: 'non-oauth-scopes', path: 'https://raw.githubusercontent.com/OAI/learn.openapis.org/main/examples/v3.1/non-oauth-scopes.yaml' },
   { name: 'swagger-petstore', path: 'https://raw.githubusercontent.com/swagger-api/swagger-petstore/master/src/main/resources/openapi.yaml' },
   // Real-world specs from the APIs-guru aggregator (cloud, payments, comms, media). Machine-converted
-  // to OpenAPI 3.0, so `strict: false` like the other loose real-world specs.
+  // to OpenAPI 3.0.
   { name: 'slack', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/slack.com/1.7.0/openapi.yaml' },
   { name: 'notion', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/notion.com/1.0.0/openapi.yaml' },
   { name: 'google-calendar', path: 'https://raw.githubusercontent.com/APIs-guru/openapi-directory/main/APIs/googleapis.com/calendar/v3/openapi.yaml' },
