@@ -14,7 +14,9 @@
   "sideEffects": false,
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
-    "format": "echo 'empty'",
+    "format": "oxfmt -c ../../oxfmt.config.ts .",
+    "lint": "oxlint -c ../../oxlint.config.ts .",
+    "lint:fix": "oxlint -c ../../oxlint.config.ts --fix .",
     "generate": "kubb generate",
     "generate:petstore": "kubb generate --config kubb-petstore.config.js",
     "generate:debug": "KUBB_DISABLE_TELEMETRY=1 NODE_OPTIONS='--inspect-brk' kubb generate",
