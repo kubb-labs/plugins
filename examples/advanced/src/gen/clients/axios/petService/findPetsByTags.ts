@@ -17,7 +17,7 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
     method: 'GET',
     url: '/pet/findByTags',
     security: [{ type: 'oauth2' }],
-    serialization: { query: { tags: { explode: true } } },
+    styles: { query: { tags: { explode: true } } },
     validator: { response: findPetsByTagsResponseSchema, error: findPetsByTagsErrorSchema },
     ...config,
   }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
