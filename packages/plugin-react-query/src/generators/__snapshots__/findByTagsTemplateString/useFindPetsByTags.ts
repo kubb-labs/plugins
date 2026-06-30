@@ -32,7 +32,7 @@ export function findPetsByTagsQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
-  { query }: FindPetsByTagsRequestConfig,
+  { query }: { query: FindPetsByTagsRequestConfig['query'] | (() => FindPetsByTagsRequestConfig['query']) },
   options: {
     query?: Partial<QueryObserverOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
@@ -40,11 +40,12 @@ export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = 
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsQueryKey({ query })
+  const resolvedParams = { query: typeof query === 'function' ? query() : query }
+  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsQueryKey(resolvedParams)
 
   const queryResult = useQuery(
     {
-      ...findPetsByTagsQueryOptions({ query }, config),
+      ...findPetsByTagsQueryOptions(resolvedParams, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as QueryObserverOptions,
