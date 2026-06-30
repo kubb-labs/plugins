@@ -310,7 +310,7 @@ export type Options = OutputOptions & {
    * (`queryOptions`, `infiniteQueryOptions`, `mutationOptions`) that are
    * adapter-portable across React, Vue, Solid, and Svelte.
    *
-   * @default true
+   * @default false
    */
   hooks?: boolean
   /**

@@ -98,6 +98,7 @@ export default defineConfig({
       query: {
         importPath: '../../../../tanstack-query-hook',
       },
+      hooks: true,
       infinite: false,
       suspense: false,
       validator: 'zod',

@@ -42,6 +42,7 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   exclude: [],
   include: undefined,
   override: [],
+  hooks: true,
   resolver: resolverVueQuery,
 }
 

@@ -215,6 +215,13 @@ export type Options = OutputOptions & {
    */
   resolver?: Partial<ResolverVueQuery> & ThisType<ResolverVueQuery>
   /**
+   * Set to `false` to skip generating `use*` composable functions. `queryOptions`,
+   * `mutationOptions`, `queryKey`, and `mutationKey` helpers are still emitted.
+   *
+   * @default false
+   */
+  hooks?: boolean
+  /**
    * Macros applied to each operation node before printing.
    */
   macros?: Array<ast.Macro>
@@ -245,6 +252,7 @@ type ResolvedOptions = {
   query: NonNullable<Required<Query>> | false
   mutationKey: MutationKey | null
   mutation: NonNullable<Required<Mutation>> | false
+  hooks: boolean
   resolver: ResolverVueQuery
 }
 

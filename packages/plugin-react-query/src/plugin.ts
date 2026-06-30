@@ -62,7 +62,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     mutationKey = mutationKeyTransformer,
     queryKey = queryKeyTransformer,
     customOptions,
-    hooks = true,
+    hooks = false,
     client,
     resolver: userResolver,
     macros: userMacros,

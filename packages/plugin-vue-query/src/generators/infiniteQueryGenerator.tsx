@@ -21,7 +21,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, infinite, validator, client, group } = ctx.options
+    const { output, query, mutation, infinite, validator, client, group, hooks } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -133,19 +133,23 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           queryParam={infiniteOptions.queryParam}
         />
 
-        <File.Import name={['useInfiniteQuery']} path={importPath} />
-        <File.Import name={['QueryKey', 'QueryClient', 'UseInfiniteQueryOptions', 'UseInfiniteQueryReturnType']} path={importPath} isTypeOnly />
+        {hooks && (
+          <>
+            <File.Import name={['useInfiniteQuery']} path={importPath} />
+            <File.Import name={['QueryKey', 'QueryClient', 'UseInfiniteQueryOptions', 'UseInfiniteQueryReturnType']} path={importPath} isTypeOnly />
 
-        <InfiniteQuery
-          name={queryName}
-          queryOptionsName={queryOptionsName}
-          queryKeyName={queryKeyName}
-          queryKeyTypeName={queryKeyTypeName}
-          node={node}
-          tsResolver={tsResolver}
-          initialPageParam={infiniteOptions.initialPageParam}
-          queryParam={infiniteOptions.queryParam}
-        />
+            <InfiniteQuery
+              name={queryName}
+              queryOptionsName={queryOptionsName}
+              queryKeyName={queryKeyName}
+              queryKeyTypeName={queryKeyTypeName}
+              node={node}
+              tsResolver={tsResolver}
+              initialPageParam={infiniteOptions.initialPageParam}
+              queryParam={infiniteOptions.queryParam}
+            />
+          </>
+        )}
       </File>
     )
   },
