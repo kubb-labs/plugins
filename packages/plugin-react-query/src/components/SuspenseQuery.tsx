@@ -5,8 +5,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
-import { buildClientOptionType, buildQueryKeyParams, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
-import { getQueryOptionsParams } from './QueryOptions.tsx'
+import { buildClientOptionType, buildResolvedRequestParams, getComments, maybeValueOrGetter, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 
 type Props = {
   name: string
@@ -19,7 +18,6 @@ type Props = {
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
-const callPrinter = functionPrinter({ mode: 'call' })
 
 function buildSuspenseQueryParamsNode(
   node: ast.OperationNode,
@@ -44,7 +42,7 @@ function buildSuspenseQueryParamsNode(
     default: '{}',
   })
 
-  const groupedParam = buildGroupedRequestParam(node, { resolver })
+  const groupedParam = buildGroupedRequestParam(node, { resolver, memberTypeWrapper: maybeValueOrGetter })
 
   return createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is FunctionParameterNode => param !== null) })
 }
@@ -59,11 +57,9 @@ export function SuspenseQuery({ name, queryKeyTypeName, queryOptionsName, queryK
   const returnType = `UseSuspenseQueryResult<${'TData'}, ${TError}> & { queryKey: TQueryKey }`
   const generics = [`TData = ${TData}`, `TQueryKey extends QueryKey = ${queryKeyTypeName}`]
 
-  const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
-  const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
-
-  const queryOptionsParamsNode = getQueryOptionsParams(node, { resolver: tsResolver })
-  const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
+  const resolvedParams = buildResolvedRequestParams(node)
+  const queryKeyArgs = resolvedParams ? 'resolvedParams' : ''
+  const queryOptionsArgs = resolvedParams ? 'resolvedParams, config' : 'config'
 
   const paramsNode = buildSuspenseQueryParamsNode(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
@@ -73,11 +69,11 @@ export function SuspenseQuery({ name, queryKeyTypeName, queryOptionsName, queryK
       <Function name={name} export generics={generics.join(', ')} params={paramsSignature} returnType={undefined} JSDoc={{ comments: getComments(node) }}>
         {`
        const { query: queryConfig = {}, client: config = {} } = options ?? {}
-       const { client: queryClient, ...resolvedOptions } = queryConfig
-       const queryKey = resolvedOptions?.queryKey ?? ${queryKeyName}(${queryKeyParamsCall})${customOptions ? `\n       const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${node.operationId}' })` : ''}
+       const { client: queryClient, ...resolvedOptions } = queryConfig${resolvedParams ? `\n       const resolvedParams = ${resolvedParams}` : ''}
+       const queryKey = resolvedOptions?.queryKey ?? ${queryKeyName}(${queryKeyArgs})${customOptions ? `\n       const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${node.operationId}' })` : ''}
 
        const queryResult = useSuspenseQuery({
-        ...${queryOptionsName}(${queryOptionsParamsCall}),${customOptions ? '\n        ...customOptions,' : ''}
+        ...${queryOptionsName}(${queryOptionsArgs}),${customOptions ? '\n        ...customOptions,' : ''}
         ...resolvedOptions,
         queryKey,
        } as unknown as UseSuspenseQueryOptions, queryClient) as ${returnType}

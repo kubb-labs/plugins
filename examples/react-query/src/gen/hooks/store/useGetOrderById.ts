@@ -33,7 +33,7 @@ export function getOrderByIdQueryOptions(
  * {@link /store/order/:orderId}
  */
 export function useGetOrderById<TData = GetOrderByIdStatus200, TQueryData = GetOrderByIdStatus200, TQueryKey extends QueryKey = GetOrderByIdQueryKey>(
-  { path }: GetOrderByIdRequestConfig,
+  { path }: { path: GetOrderByIdRequestConfig['path'] | (() => GetOrderByIdRequestConfig['path']) },
   options: {
     query?: Partial<
       QueryObserverOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, TData, TQueryData, TQueryKey>
@@ -43,11 +43,12 @@ export function useGetOrderById<TData = GetOrderByIdStatus200, TQueryData = GetO
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? getOrderByIdQueryKey({ path })
+  const resolvedParams = { path: typeof path === 'function' ? path() : path }
+  const queryKey = resolvedOptions?.queryKey ?? getOrderByIdQueryKey(resolvedParams)
 
   const queryResult = useQuery(
     {
-      ...getOrderByIdQueryOptions({ path }, config),
+      ...getOrderByIdQueryOptions(resolvedParams, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as QueryObserverOptions,

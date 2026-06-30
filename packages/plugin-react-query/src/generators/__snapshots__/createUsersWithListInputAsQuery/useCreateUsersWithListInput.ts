@@ -36,7 +36,7 @@ export function useCreateUsersWithListInput<
   TQueryData = CreateUsersWithListInputStatus200,
   TQueryKey extends QueryKey = CreateUsersWithListInputQueryKey,
 >(
-  { body }: CreateUsersWithListInputRequestConfig,
+  { body }: { body: CreateUsersWithListInputRequestConfig['body'] | (() => CreateUsersWithListInputRequestConfig['body']) },
   options: {
     query?: Partial<QueryObserverOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
@@ -46,11 +46,12 @@ export function useCreateUsersWithListInput<
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? createUsersWithListInputQueryKey({ body })
+  const resolvedParams = { body: typeof body === 'function' ? body() : body }
+  const queryKey = resolvedOptions?.queryKey ?? createUsersWithListInputQueryKey(resolvedParams)
 
   const queryResult = useQuery(
     {
-      ...createUsersWithListInputQueryOptions({ body }, config),
+      ...createUsersWithListInputQueryOptions(resolvedParams, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as QueryObserverOptions,

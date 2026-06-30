@@ -33,7 +33,7 @@ export function getPetByIdSuspenseQueryOptions(
  * {@link /pet/:petId}
  */
 export function useGetPetByIdSuspense<TData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdSuspenseQueryKey>(
-  { path }: GetPetByIdRequestConfig,
+  { path }: { path: GetPetByIdRequestConfig['path'] | (() => GetPetByIdRequestConfig['path']) },
   options: {
     query?: Partial<UseSuspenseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryKey>> & {
       client?: QueryClient
@@ -43,11 +43,12 @@ export function useGetPetByIdSuspense<TData = GetPetByIdStatus200, TQueryKey ext
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? getPetByIdSuspenseQueryKey({ path })
+  const resolvedParams = { path: typeof path === 'function' ? path() : path }
+  const queryKey = resolvedOptions?.queryKey ?? getPetByIdSuspenseQueryKey(resolvedParams)
 
   const queryResult = useSuspenseQuery(
     {
-      ...getPetByIdSuspenseQueryOptions({ path }, config),
+      ...getPetByIdSuspenseQueryOptions(resolvedParams, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as UseSuspenseQueryOptions,

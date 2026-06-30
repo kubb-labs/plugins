@@ -32,7 +32,7 @@ export function findPetsByTagsSuspenseQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsSuspense<TData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey>(
-  { query }: FindPetsByTagsRequestConfig,
+  { query }: { query: FindPetsByTagsRequestConfig['query'] | (() => FindPetsByTagsRequestConfig['query']) },
   options: {
     query?: Partial<UseSuspenseQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
@@ -40,11 +40,12 @@ export function useFindPetsByTagsSuspense<TData = FindPetsByTagsStatus200, TQuer
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsSuspenseQueryKey({ query })
+  const resolvedParams = { query: typeof query === 'function' ? query() : query }
+  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsSuspenseQueryKey(resolvedParams)
 
   const queryResult = useSuspenseQuery(
     {
-      ...findPetsByTagsSuspenseQueryOptions({ query }, config),
+      ...findPetsByTagsSuspenseQueryOptions(resolvedParams, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as UseSuspenseQueryOptions,

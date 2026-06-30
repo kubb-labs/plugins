@@ -32,7 +32,7 @@ export function getUserByNameSuspenseQueryOptions(
  * {@link /user/:username}
  */
 export function useGetUserByNameSuspense<TData = GetUserByNameStatus200, TQueryKey extends QueryKey = GetUserByNameSuspenseQueryKey>(
-  { path }: GetUserByNameRequestConfig,
+  { path }: { path: GetUserByNameRequestConfig['path'] | (() => GetUserByNameRequestConfig['path']) },
   options: {
     query?: Partial<UseSuspenseQueryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, TData, TQueryKey>> & {
       client?: QueryClient
@@ -42,11 +42,12 @@ export function useGetUserByNameSuspense<TData = GetUserByNameStatus200, TQueryK
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? getUserByNameSuspenseQueryKey({ path })
+  const resolvedParams = { path: typeof path === 'function' ? path() : path }
+  const queryKey = resolvedOptions?.queryKey ?? getUserByNameSuspenseQueryKey(resolvedParams)
 
   const queryResult = useSuspenseQuery(
     {
-      ...getUserByNameSuspenseQueryOptions({ path }, config),
+      ...getUserByNameSuspenseQueryOptions(resolvedParams, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as UseSuspenseQueryOptions,
