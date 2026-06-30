@@ -12,6 +12,24 @@ const requestGroupOrder = ['path', 'query', 'body', 'headers'] as const
 type RequestGroupKey = (typeof requestGroupOrder)[number]
 
 /**
+ * Widens a request-group member type so a generated TanStack hook accepts either the value or a
+ * deferred value. Both plugins apply this through the `memberTypeWrapper` of `buildGroupedRequestParam`;
+ * they only differ in how the deferred form is later resolved.
+ *
+ * `maybeRefOrGetter` is used by vue-query, which keeps the ref/getter live and unwraps it lazily with
+ * `toValue` because vue-query keys are reactive. `maybeValueOrGetter` is used by react-query, which
+ * resolves the getter once at the hook boundary and forwards a plain value because React Query hashes
+ * keys structurally and cannot hold a function.
+ */
+export function maybeRefOrGetter(type: string): string {
+  return `MaybeRefOrGetter<${type}>`
+}
+
+export function maybeValueOrGetter(type: string): string {
+  return `${type} | (() => ${type})`
+}
+
+/**
  * Builds the grouped `{ path, query, body, headers }` parameter that mirrors the client
  * function signature. Only the groups the operation carries are emitted, typed from the
  * operation's `RequestConfig`. `keys` narrows the emitted groups, used by the query key which

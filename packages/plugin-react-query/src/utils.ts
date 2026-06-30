@@ -1,19 +1,10 @@
 import { getRequestGroups } from '@internals/shared'
 import type { ast } from '@kubb/core'
 
-export { buildQueryKeyParams, resolveOperationOverrides, resolveZodSchemaNames } from '@internals/tanstack-query'
+export { buildQueryKeyParams, maybeValueOrGetter, resolveOperationOverrides, resolveZodSchemaNames } from '@internals/tanstack-query'
 export { buildClientOptionType, buildOperationComments as getComments, buildRequestConfigType, resolveErrorNames, resolveSuccessNames } from '@internals/shared'
 
 const requestGroupOrder = ['path', 'query', 'body', 'headers'] as const
-
-/**
- * Widens a type string to `T | (() => T)` so a generated hook signature accepts either the value or a
- * zero-arg getter. React has no `MaybeRefOrGetter`/`toValue` runtime to import, so the union is inlined
- * rather than referencing a named type.
- */
-export function maybeValueOrGetter(type: string): string {
-  return `${type} | (() => ${type})`
-}
 
 /**
  * Builds the object literal that resolves each request group to a concrete value, unwrapping a getter

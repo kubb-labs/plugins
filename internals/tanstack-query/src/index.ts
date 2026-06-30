@@ -6,6 +6,8 @@ export {
   buildQueryKeyParams,
   buildQueryOptionsParams,
   buildClientCall,
+  maybeRefOrGetter,
+  maybeValueOrGetter,
   resolveOperationOverrides,
   resolveQueryParamsParser,
   resolveRequestParser,
