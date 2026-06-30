@@ -263,24 +263,24 @@ describe('createClientCore', () => {
     expect(calls[0]?.url).toBe('/pet/3,4/x,1,y,2')
   })
 
-  test('honors per-parameter serialization.path metadata', async () => {
+  test('honors per-parameter styles.path metadata', async () => {
     const { client, calls } = createClient()
     await client({
       method: 'GET',
       url: '/pet/{id}{filter}',
       path: { id: 5, filter: ['a', 'b'] },
-      serialization: { path: { id: { style: 'matrix' }, filter: { style: 'label' } } },
+      styles: { path: { id: { style: 'matrix' }, filter: { style: 'label' } } },
     })
     expect(calls[0]?.url).toBe('/pet/;id=5.a,b')
   })
 
-  test('honors per-parameter serialization.query metadata', async () => {
+  test('honors per-parameter styles.query metadata', async () => {
     const { client, calls } = createClient()
     await client({
       method: 'GET',
       url: '/pets',
       query: { id: [3, 4], filter: { a: 1 } },
-      serialization: { query: { id: { style: 'pipeDelimited', explode: false }, filter: { style: 'deepObject' } } },
+      styles: { query: { id: { style: 'pipeDelimited', explode: false }, filter: { style: 'deepObject' } } },
     })
     expect(calls[0]?.url).toBe('/pets?id=3|4&filter%5Ba%5D=1')
   })
@@ -304,7 +304,7 @@ describe('createClientCore', () => {
       method: 'GET',
       url: '/pet',
       headers: { 'X-Ids': [3, 4], 'X-Filter': { role: 'admin' } },
-      serialization: { header: { 'X-Ids': {}, 'X-Filter': { explode: true } } },
+      styles: { header: { 'X-Ids': {}, 'X-Filter': { explode: true } } },
     })
     expect(calls[0]?.headers['X-Ids']).toBe('3,4')
     expect(calls[0]?.headers['X-Filter']).toBe('role=admin')
@@ -502,7 +502,7 @@ describe('content type negotiation', () => {
   test('runs the matching deserializer before validation and feeds result.data', async () => {
     const { transport } = transportWith({ data: '<pet><id>1</id></pet>', contentType: 'application/xml' })
     const parseXml = vi.fn(() => ({ id: 1 }))
-    const client = createClientCore<string, string>({ defaultTransport: transport, deserializers: { 'application/xml': parseXml } })
+    const client = createClientCore<string, string>({ defaultTransport: transport, codecs: { 'application/xml': { deserialize: parseXml } } })
     const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<string, string>
     expect(parseXml).toHaveBeenCalledWith('<pet><id>1</id></pet>', 'application/xml')
     expect(result.data).toStrictEqual({ id: 1 })
@@ -513,8 +513,8 @@ describe('content type negotiation', () => {
     const { transport } = transportWith({ data: 'raw', contentType: 'application/xml; charset=utf-8' })
     const clientLevel = vi.fn(() => ({ from: 'client' }))
     const perCall = vi.fn(() => ({ from: 'call' }))
-    const client = createClientCore<string, string>({ defaultTransport: transport, deserializers: { 'application/xml': clientLevel } })
-    const result = (await client({ method: 'GET', url: '/pet/1', deserializers: { 'application/xml': perCall } })) as CallResult<string, string>
+    const client = createClientCore<string, string>({ defaultTransport: transport, codecs: { 'application/xml': { deserialize: clientLevel } } })
+    const result = (await client({ method: 'GET', url: '/pet/1', codecs: { 'application/xml': { deserialize: perCall } } })) as CallResult<string, string>
     expect(clientLevel).not.toHaveBeenCalled()
     expect(perCall).toHaveBeenCalledTimes(1)
     expect(result.data).toStrictEqual({ from: 'call' })
@@ -523,7 +523,7 @@ describe('content type negotiation', () => {
   test('uses a per-content-type bodySerializer for the request body', async () => {
     const { transport, calls } = transportWith({})
     const toXml = vi.fn(() => '<pet/>')
-    const client = createClientCore<string, string>({ defaultTransport: transport, bodySerializers: { 'application/xml': toXml } })
+    const client = createClientCore<string, string>({ defaultTransport: transport, codecs: { 'application/xml': { serialize: toXml } } })
     await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, contentType: 'application/xml' })
     expect(toXml).toHaveBeenCalledWith({ name: 'odie' }, 'application/xml')
     expect(calls[0]?.body).toBe('<pet/>')
@@ -564,14 +564,14 @@ describe('getUrl', () => {
     expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, serializer: { path: ({ value }) => `id-${value as string}` } })).toBe('/pet/id-7')
   })
 
-  test('applies serialization.path metadata to the matching placeholders', () => {
+  test('applies styles.path metadata to the matching placeholders', () => {
     const { client } = createClient()
-    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, serialization: { path: { petId: { style: 'matrix' } } } })).toBe('/pet/;petId=7')
+    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, styles: { path: { petId: { style: 'matrix' } } } })).toBe('/pet/;petId=7')
   })
 
-  test('applies serialization.query metadata to the query string', () => {
+  test('applies styles.query metadata to the query string', () => {
     const { client } = createClient()
-    expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, serialization: { query: { id: { style: 'spaceDelimited', explode: false } } } })).toBe(
+    expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, styles: { query: { id: { style: 'spaceDelimited', explode: false } } } })).toBe(
       '/pets?id=3%204%205',
     )
   })

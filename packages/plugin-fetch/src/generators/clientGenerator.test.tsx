@@ -218,7 +218,7 @@ describe('clientGenerator operation', () => {
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
     // multipart/form-data request body bakes a `contentType` into the call config.
     { name: 'uploadFileMultipart', node: uploadFileNode, options: {} },
-    // Parameter style/explode flows from the ParameterNode into a `serialization` call-config entry.
+    // Parameter style/explode flows from the ParameterNode into a `styles` call-config entry.
     { name: 'listPetsWithStyles', node: listPetsStyledNode, options: {} },
     // text/event-stream response returns a typed event stream instead of a one-shot result.
     { name: 'streamEventsSse', node: streamEventsNode, options: {} },

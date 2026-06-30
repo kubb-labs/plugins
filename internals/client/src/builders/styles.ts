@@ -34,10 +34,10 @@ function serializeParameter(parameter: ast.ParameterNode): string | null {
  * @example
  * ```ts
  * // a path param with { style: 'matrix', explode: true } and a query param with { explode: false }
- * buildSerializationMetadata({ node }) // "{ path: { id: { style: 'matrix', explode: true } }, query: { tags: { explode: false } } }"
+ * buildStyles({ node }) // "{ path: { id: { style: 'matrix', explode: true } }, query: { tags: { explode: false } } }"
  * ```
  */
-export function buildSerializationMetadata({ node }: { node: ast.OperationNode }): string | null {
+export function buildStyles({ node }: { node: ast.OperationNode }): string | null {
   if (!ast.isHttpOperationNode(node)) return null
 
   const groups: Record<StyledLocation, Array<string>> = { path: [], query: [], header: [], cookie: [] }
