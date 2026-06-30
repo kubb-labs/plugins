@@ -5,7 +5,7 @@
 
 Add `hooks` option and change the default to `false` for both `pluginReactQuery` and `pluginVueQuery`.
 
-`hooks: false` (the new default) emits only `queryOptions`, `mutationOptions`, `queryKey`, and `mutationKey` helpers — no `useQuery`, `useInfiniteQuery`, `useSuspenseQuery`, `useSuspenseInfiniteQuery`, or `useMutation` functions. The output imports only the framework-portable factory functions (`queryOptions`, `infiniteQueryOptions`, `mutationOptions`) that work across all TanStack Query adapters.
+`hooks: false` (the new default) emits only `queryOptions`, `mutationOptions`, `queryKey`, and `mutationKey` helpers. The `useQuery`, `useInfiniteQuery`, `useSuspenseQuery`, `useSuspenseInfiniteQuery`, and `useMutation` functions are not generated. The factory functions (`queryOptions`, `infiniteQueryOptions`, `mutationOptions`) work across all TanStack Query adapters.
 
 Set `hooks: true` to restore the previous behavior and generate `use*` hook/composable functions alongside the helpers.
 
