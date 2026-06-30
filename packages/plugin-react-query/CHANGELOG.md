@@ -1,5 +1,19 @@
 # @kubb/plugin-react-query
 
+## 5.0.0-beta.80
+
+### Minor Changes
+
+- [#597](https://github.com/kubb-labs/plugins/pull/597) [`5ad2bd3`](https://github.com/kubb-labs/plugins/commit/5ad2bd3f75d3f0be7255ce7aafd6a16978be43b2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Generated query hooks (`useQuery`, `useSuspenseQuery`, `useInfiniteQuery`, `useSuspenseInfiniteQuery`) now accept a value **or** a zero-arg getter for each request group by default, so the path/query/body type widens to `T | (() => T)`. This mirrors `@kubb/plugin-vue-query`'s `MaybeRefOrGetter` and lets signal-based libraries (Preact Signals, MobX, Jotai, Legend State, …) pass `useGetPetById(() => petId.value)` without flattening reactivity at hook-call time.
+
+  The getter is resolved once inside the hook before the value reaches `queryKey`/`queryOptions`, so query keys stay plain and hash correctly. Output is unchanged for operations without a request group. No new option — this is the default. Resolves [#140](https://github.com/kubb-labs/plugins/issues/140).
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.80
+  - @kubb/plugin-zod@5.0.0-beta.80
+
 ## 5.0.0-beta.79
 
 ### Minor Changes

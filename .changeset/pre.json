@@ -139,6 +139,7 @@
     "query-plugins-client",
     "rare-birds-beg",
     "react-query-suspense-no-enabled",
+    "react-query-value-or-getter-params",
     "redoc-template-options-unknown",
     "refresh-package-descriptions",
     "remove-extension-yaml-manifests",
