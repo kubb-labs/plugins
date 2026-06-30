@@ -34,6 +34,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginReactQuery({
+          hooks: true,
           output: { path: './hooks', barrel: false },
         }),
       ],
@@ -54,6 +55,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginReactQuery({
+          hooks: true,
           output: { path: './hooks', barrel: false },
           suspense: {},
         }),
@@ -75,6 +77,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginReactQuery({
+          hooks: true,
           output: { path: './hooks', barrel: false },
           infinite: {
             queryParam: 'page',
@@ -100,6 +103,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginZod({ output: { path: './zod', barrel: false } }),
         pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginReactQuery({
+          hooks: true,
           output: { path: './hooks', barrel: false },
           validator: 'zod',
         }),
@@ -121,6 +125,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginReactQuery({
+          hooks: true,
           output: { path: './hooks', barrel: false },
           query: {
             methods: ['get'],
@@ -148,6 +153,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginReactQuery({
+          hooks: true,
           output: { path: './hooks', barrel: false },
           mutation: false,
         }),
@@ -169,6 +175,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginReactQuery({
+          hooks: true,
           output: { path: './hooks', barrel: false },
         }),
       ],
@@ -189,6 +196,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginReactQuery({
+          hooks: true,
           output: { path: './hooks', barrel: false },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
@@ -211,6 +219,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginReactQuery({
+          hooks: true,
           output: { path: './hooks', barrel: false },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
@@ -232,6 +241,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginReactQuery({
+          hooks: true,
           output: { path: './hooks', barrel: false },
           group: { type: 'tag' },
         }),
@@ -253,6 +263,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginReactQuery({
+          hooks: true,
           output: { path: './hooks', barrel: false },
         }),
       ],

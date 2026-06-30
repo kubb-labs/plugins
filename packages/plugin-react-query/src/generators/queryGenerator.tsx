@@ -20,7 +20,7 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, validator, client, group, customOptions } = ctx.options
+    const { output, query, mutation, validator, client, group, customOptions, hooks } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -102,7 +102,7 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
 
         <QueryOptions name={queryOptionsName} clientName={calledClientName} queryKeyName={queryKeyName} node={node} tsResolver={tsResolver} />
 
-        {query && (
+        {query && hooks && (
           <>
             <File.Import name={['useQuery']} path={importPath} />
             <File.Import name={['QueryKey', 'QueryClient', 'QueryObserverOptions', 'UseQueryResult']} path={importPath} isTypeOnly />

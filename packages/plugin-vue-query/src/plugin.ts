@@ -53,6 +53,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     query = {},
     mutationKey = mutationKeyTransformer,
     queryKey = queryKeyTransformer,
+    hooks = false,
     client,
     resolver: userResolver,
     macros: userMacros,
@@ -113,6 +114,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
                 ...infinite,
               }
             : false,
+          hooks,
           validator,
           group: groupConfig,
           exclude,

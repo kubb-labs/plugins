@@ -21,7 +21,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, infinite, suspense, validator, client, group, customOptions } = ctx.options
+    const { output, query, mutation, infinite, suspense, validator, client, group, customOptions, hooks } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -127,20 +127,24 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
           queryParam={infiniteOptions.queryParam}
         />
 
-        <File.Import name={['useSuspenseInfiniteQuery']} path={importPath} />
-        <File.Import name={['QueryKey', 'QueryClient', 'UseSuspenseInfiniteQueryOptions', 'UseSuspenseInfiniteQueryResult']} path={importPath} isTypeOnly />
+        {hooks && (
+          <>
+            <File.Import name={['useSuspenseInfiniteQuery']} path={importPath} />
+            <File.Import name={['QueryKey', 'QueryClient', 'UseSuspenseInfiniteQueryOptions', 'UseSuspenseInfiniteQueryResult']} path={importPath} isTypeOnly />
 
-        <SuspenseInfiniteQuery
-          name={queryName}
-          queryOptionsName={queryOptionsName}
-          queryKeyName={queryKeyName}
-          queryKeyTypeName={queryKeyTypeName}
-          node={node}
-          tsResolver={tsResolver}
-          initialPageParam={infiniteOptions.initialPageParam}
-          queryParam={infiniteOptions.queryParam}
-          customOptions={customOptions}
-        />
+            <SuspenseInfiniteQuery
+              name={queryName}
+              queryOptionsName={queryOptionsName}
+              queryKeyName={queryKeyName}
+              queryKeyTypeName={queryKeyTypeName}
+              node={node}
+              tsResolver={tsResolver}
+              initialPageParam={infiniteOptions.initialPageParam}
+              queryParam={infiniteOptions.queryParam}
+              customOptions={customOptions}
+            />
+          </>
+        )}
       </File>
     )
   },
