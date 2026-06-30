@@ -5,9 +5,8 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { LogoutUserResponse } from '../../models/user/LogoutUser.ts'
-import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { logoutUser } from '../../clients/user/logoutUser.ts'
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 
 export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 
@@ -22,32 +21,4 @@ export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path
       return data
     },
   })
-}
-
-/**
- * @summary Logs out current logged in user session
- * {@link /user/logout}
- */
-export function useLogoutUser<TData = LogoutUserResponse, TQueryData = LogoutUserResponse, TQueryKey extends QueryKey = LogoutUserQueryKey>(
-  options: {
-    query?: Partial<QueryObserverOptions<LogoutUserResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? logoutUserQueryKey()
-
-  const queryResult = useQuery(
-    {
-      ...logoutUserQueryOptions(config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as QueryObserverOptions,
-    queryClient,
-  ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }

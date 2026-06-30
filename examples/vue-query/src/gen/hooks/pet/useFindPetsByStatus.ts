@@ -5,10 +5,9 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../models/pet/FindPetsByStatus.ts'
-import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { findPetsByStatus } from '../../clients/pet/findPetsByStatus.ts'
-import { queryOptions, useQuery } from '@tanstack/vue-query'
+import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
 export const findPetsByStatusQueryKey = ({ query }: { query?: MaybeRefOrGetter<Omit<FindPetsByStatusRequestConfig, 'headers'>['query']> } = {}) =>
@@ -28,40 +27,4 @@ export function findPetsByStatusQueryOptions(
       return data
     },
   })
-}
-
-/**
- * @description Multiple status values can be provided with comma separated strings
- * @summary Finds Pets by status
- * {@link /pet/findByStatus}
- */
-export function useFindPetsByStatus<
-  TData = FindPetsByStatusStatus200,
-  TQueryData = FindPetsByStatusStatus200,
-  TQueryKey extends QueryKey = FindPetsByStatusQueryKey,
->(
-  { query }: { query?: MaybeRefOrGetter<FindPetsByStatusRequestConfig['query']> } = {},
-  options: {
-    query?: Partial<UseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? findPetsByStatusQueryKey({ query })
-
-  const queryResult = useQuery(
-    {
-      ...findPetsByStatusQueryOptions({ query }, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as UseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, FindPetsByStatusStatus200, TQueryKey>,
-    toValue(queryClient),
-  ) as UseQueryReturnType<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }

@@ -5,10 +5,9 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { GetUserByNameRequestConfig, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName.ts'
-import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { getUserByName } from '../../clients/user/getUserByName.ts'
-import { queryOptions, useQuery } from '@tanstack/vue-query'
+import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
 export const getUserByNameQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetUserByNameRequestConfig, 'headers'>['path']> }) =>
@@ -28,41 +27,4 @@ export function getUserByNameQueryOptions(
       return data
     },
   })
-}
-
-/**
- * @summary Get user by user name
- * {@link /user/:username}
- */
-export function useGetUserByName<TData = GetUserByNameStatus200, TQueryData = GetUserByNameStatus200, TQueryKey extends QueryKey = GetUserByNameQueryKey>(
-  { path }: { path: MaybeRefOrGetter<GetUserByNameRequestConfig['path']> },
-  options: {
-    query?: Partial<
-      UseQueryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, TData, TQueryData, TQueryKey>
-    > & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? getUserByNameQueryKey({ path })
-
-  const queryResult = useQuery(
-    {
-      ...getUserByNameQueryOptions({ path }, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as UseQueryOptions<
-      GetUserByNameStatus200,
-      ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>,
-      TData,
-      GetUserByNameStatus200,
-      TQueryKey
-    >,
-    toValue(queryClient),
-  ) as UseQueryReturnType<TData, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }

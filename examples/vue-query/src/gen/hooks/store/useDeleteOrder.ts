@@ -3,44 +3,4 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { DeleteOrderRequestConfig, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/store/DeleteOrder.ts'
-import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import { deleteOrder } from '../../clients/store/deleteOrder.ts'
-import { useMutation } from '@tanstack/vue-query'
-import { toValue } from 'vue'
-
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
-
-/**
- * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
- * @summary Delete purchase order by ID
- * {@link /store/order/:orderId}
- */
-export function useDeleteOrder<TContext>(
-  options: {
-    mutation?: MutationObserverOptions<
-      DeleteOrderResponse,
-      ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>,
-      DeleteOrderRequestConfig,
-      TContext
-    > & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions?.mutationKey ?? deleteOrderMutationKey()
-
-  return useMutation<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderRequestConfig, TContext>(
-    {
-      mutationFn: async ({ path }) => {
-        const { data } = await deleteOrder({ ...config, path: toValue(path), throwOnError: true })
-        return data
-      },
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  )
-}

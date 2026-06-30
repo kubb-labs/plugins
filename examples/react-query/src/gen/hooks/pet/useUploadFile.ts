@@ -5,9 +5,8 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { UploadFileRequestConfig, UploadFileStatus200 } from '../../models/pet/UploadFile.ts'
-import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { uploadFile } from '../../clients/pet/uploadFile.ts'
-import { mutationOptions, useMutation } from '@tanstack/react-query'
+import { mutationOptions } from '@tanstack/react-query'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
@@ -24,37 +23,4 @@ export function uploadFileMutationOptions<TContext = unknown>(
       return data
     },
   })
-}
-
-/**
- * @summary uploads an image
- * {@link /pet/:petId/uploadImage}
- */
-export function useUploadFile<TContext>(
-  options: {
-    mutation?: UseMutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: { request?: 'application/json' | 'multipart/form-data' }
-    }
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions.mutationKey ?? uploadFileMutationKey()
-
-  const baseOptions = uploadFileMutationOptions(config) as UseMutationOptions<
-    UploadFileStatus200,
-    ResponseErrorConfig<Error>,
-    UploadFileRequestConfig,
-    TContext
-  >
-
-  return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>(
-    {
-      ...baseOptions,
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  ) as UseMutationResult<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>
 }

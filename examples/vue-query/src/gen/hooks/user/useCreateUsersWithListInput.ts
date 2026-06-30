@@ -3,43 +3,4 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { CreateUsersWithListInputRequestConfig, CreateUsersWithListInputStatus200 } from '../../models/user/CreateUsersWithListInput.ts'
-import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import { createUsersWithListInput } from '../../clients/user/createUsersWithListInput.ts'
-import { useMutation } from '@tanstack/vue-query'
-import { toValue } from 'vue'
-
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
-
-/**
- * @description Creates list of users with given input array
- * @summary Creates list of users with given input array
- * {@link /user/createWithList}
- */
-export function useCreateUsersWithListInput<TContext>(
-  options: {
-    mutation?: MutationObserverOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputRequestConfig, TContext> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: { response?: 'application/json' | 'application/xml' }
-    }
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions?.mutationKey ?? createUsersWithListInputMutationKey()
-
-  return useMutation<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputRequestConfig, TContext>(
-    {
-      mutationFn: async ({ body }) => {
-        const { data } = await createUsersWithListInput({ ...config, body: toValue(body), throwOnError: true })
-        return data
-      },
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  )
-}

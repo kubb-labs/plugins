@@ -5,9 +5,8 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { GetUserByNameRequestConfig, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName.ts'
-import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { getUserByName } from '../../clients/user/getUserByName.ts'
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 
 export const getUserByNameQueryKey = ({ path }: Omit<GetUserByNameRequestConfig, 'headers'>) => [{ url: '/user/:username', params: path }] as const
 
@@ -25,36 +24,4 @@ export function getUserByNameQueryOptions(
       return data
     },
   })
-}
-
-/**
- * @summary Get user by user name
- * {@link /user/:username}
- */
-export function useGetUserByName<TData = GetUserByNameStatus200, TQueryData = GetUserByNameStatus200, TQueryKey extends QueryKey = GetUserByNameQueryKey>(
-  { path }: { path: GetUserByNameRequestConfig['path'] | (() => GetUserByNameRequestConfig['path']) },
-  options: {
-    query?: Partial<
-      QueryObserverOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, TData, TQueryData, TQueryKey>
-    > & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const resolvedParams = { path: typeof path === 'function' ? path() : path }
-  const queryKey = resolvedOptions?.queryKey ?? getUserByNameQueryKey(resolvedParams)
-
-  const queryResult = useQuery(
-    {
-      ...getUserByNameQueryOptions(resolvedParams, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as QueryObserverOptions,
-    queryClient,
-  ) as UseQueryResult<TData, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }

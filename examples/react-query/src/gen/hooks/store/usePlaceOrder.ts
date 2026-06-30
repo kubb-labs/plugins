@@ -5,9 +5,8 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { PlaceOrderRequestConfig, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../models/store/PlaceOrder.ts'
-import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { placeOrder } from '../../clients/store/placeOrder.ts'
-import { mutationOptions, useMutation } from '@tanstack/react-query'
+import { mutationOptions } from '@tanstack/react-query'
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
@@ -24,38 +23,4 @@ export function placeOrderMutationOptions<TContext = unknown>(
       return data
     },
   })
-}
-
-/**
- * @description Place a new order in the store
- * @summary Place an order for a pet
- * {@link /store/order}
- */
-export function usePlaceOrder<TContext>(
-  options: {
-    mutation?: UseMutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-    }
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions.mutationKey ?? placeOrderMutationKey()
-
-  const baseOptions = placeOrderMutationOptions(config) as UseMutationOptions<
-    PlaceOrderStatus200,
-    ResponseErrorConfig<PlaceOrderStatus405>,
-    PlaceOrderRequestConfig,
-    TContext
-  >
-
-  return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>(
-    {
-      ...baseOptions,
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  ) as UseMutationResult<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>
 }

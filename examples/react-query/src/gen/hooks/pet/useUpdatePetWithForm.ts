@@ -5,9 +5,8 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../../models/pet/UpdatePetWithForm.ts'
-import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { updatePetWithForm } from '../../clients/pet/updatePetWithForm.ts'
-import { mutationOptions, useMutation } from '@tanstack/react-query'
+import { mutationOptions } from '@tanstack/react-query'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
 
@@ -20,37 +19,4 @@ export function updatePetWithFormMutationOptions<TContext = unknown>(config: Par
       return data
     },
   })
-}
-
-/**
- * @summary Updates a pet in the store with form data
- * {@link /pet/:petId}
- */
-export function useUpdatePetWithForm<TContext>(
-  options: {
-    mutation?: UseMutationOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormRequestConfig, TContext> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions.mutationKey ?? updatePetWithFormMutationKey()
-
-  const baseOptions = updatePetWithFormMutationOptions(config) as UseMutationOptions<
-    UpdatePetWithFormResponse,
-    ResponseErrorConfig<UpdatePetWithFormStatus405>,
-    UpdatePetWithFormRequestConfig,
-    TContext
-  >
-
-  return useMutation<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormRequestConfig, TContext>(
-    {
-      ...baseOptions,
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  ) as UseMutationResult<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormRequestConfig, TContext>
 }

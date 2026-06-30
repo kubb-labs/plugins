@@ -5,10 +5,9 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { GetPetByIdRequestConfig, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById.ts'
-import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { getPetById } from '../../clients/pet/getPetById.ts'
-import { queryOptions, useQuery } from '@tanstack/vue-query'
+import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
 export const getPetByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetPetByIdRequestConfig, 'headers'>['path']> }) =>
@@ -28,36 +27,4 @@ export function getPetByIdQueryOptions(
       return data
     },
   })
-}
-
-/**
- * @description Returns a single pet
- * @summary Find pet by ID
- * {@link /pet/:petId}
- */
-export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdQueryKey>(
-  { path }: { path: MaybeRefOrGetter<GetPetByIdRequestConfig['path']> },
-  options: {
-    query?: Partial<UseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? getPetByIdQueryKey({ path })
-
-  const queryResult = useQuery(
-    {
-      ...getPetByIdQueryOptions({ path }, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as UseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, GetPetByIdStatus200, TQueryKey>,
-    toValue(queryClient),
-  ) as UseQueryReturnType<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }

@@ -47,16 +47,6 @@ import type {
   DeleteOrderStatus400,
   DeleteOrderStatus404,
 } from './models'
-import type {
-  QueryKey,
-  QueryClient,
-  QueryObserverOptions,
-  UseQueryResult,
-  UseMutationOptions,
-  UseMutationResult,
-  UseSuspenseQueryOptions,
-  UseSuspenseQueryResult,
-} from '@tanstack/react-query'
 import { addPet } from './clients/addPet'
 import { deleteOrder } from './clients/deleteOrder'
 import { deletePet } from './clients/deletePet'
@@ -70,7 +60,7 @@ import { placeOrderPatch } from './clients/placeOrderPatch'
 import { updatePet } from './clients/updatePet'
 import { updatePetWithForm } from './clients/updatePetWithForm'
 import { uploadFile } from './clients/uploadFile'
-import { mutationOptions, useMutation, queryOptions, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { mutationOptions, queryOptions } from '@tanstack/react-query'
 
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 
@@ -94,53 +84,6 @@ export function updatePetMutationOptions<TContext = unknown>(
   })
 }
 
-/**
- * @description Update an existing pet by Id
- * @summary Update an existing pet
- * {@link /pet}
- */
-export function useUpdatePet<TContext>(
-  options: {
-    mutation?: UseMutationOptions<
-      UpdatePetStatus200,
-      ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-      UpdatePetRequestConfig,
-      TContext
-    > & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: {
-        request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-        response?: 'application/json' | 'application/xml'
-      }
-    }
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions.mutationKey ?? updatePetMutationKey()
-
-  const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<
-    UpdatePetStatus200,
-    ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    UpdatePetRequestConfig,
-    TContext
-  >
-
-  return useMutation<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetRequestConfig, TContext>(
-    {
-      ...baseOptions,
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  ) as UseMutationResult<
-    UpdatePetStatus200,
-    ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    UpdatePetRequestConfig,
-    TContext
-  >
-}
-
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
 export function addPetMutationOptions<TContext = unknown>(
@@ -156,38 +99,6 @@ export function addPetMutationOptions<TContext = unknown>(
       return data
     },
   })
-}
-
-/**
- * @description Add a new pet to the store
- * @summary Add a new pet to the store
- * {@link /pet}
- */
-export function useAddPet<TContext>(
-  options: {
-    mutation?: UseMutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: {
-        request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-        response?: 'application/json' | 'application/xml'
-      }
-    }
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions.mutationKey ?? addPetMutationKey()
-
-  const baseOptions = addPetMutationOptions(config) as UseMutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>
-
-  return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>(
-    {
-      ...baseOptions,
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  ) as UseMutationResult<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>
 }
 
 export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'headers'> = {}) =>
@@ -209,43 +120,6 @@ export function findPetsByStatusQueryOptions(
   })
 }
 
-/**
- * @description Multiple status values can be provided with comma separated strings
- * @summary Finds Pets by status
- * {@link /pet/findByStatus}
- */
-export function useFindPetsByStatus<
-  TData = FindPetsByStatusStatus200,
-  TQueryData = FindPetsByStatusStatus200,
-  TQueryKey extends QueryKey = FindPetsByStatusQueryKey,
->(
-  { query }: { query?: FindPetsByStatusRequestConfig['query'] | (() => FindPetsByStatusRequestConfig['query']) } = {},
-  options: {
-    query?: Partial<QueryObserverOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const resolvedParams = { query: typeof query === 'function' ? query() : query }
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusQueryKey(resolvedParams)
-
-  const queryResult = useQuery(
-    {
-      ...findPetsByStatusQueryOptions(resolvedParams, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as QueryObserverOptions,
-    queryClient,
-  ) as UseQueryResult<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
-}
-
 export const findPetsByStatusSuspenseQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'headers'> = {}) =>
   [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
@@ -263,39 +137,6 @@ export function findPetsByStatusSuspenseQueryOptions(
       return data
     },
   })
-}
-
-/**
- * @description Multiple status values can be provided with comma separated strings
- * @summary Finds Pets by status
- * {@link /pet/findByStatus}
- */
-export function useFindPetsByStatusSuspense<TData = FindPetsByStatusStatus200, TQueryKey extends QueryKey = FindPetsByStatusSuspenseQueryKey>(
-  { query }: { query?: FindPetsByStatusRequestConfig['query'] | (() => FindPetsByStatusRequestConfig['query']) } = {},
-  options: {
-    query?: Partial<UseSuspenseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryKey>> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const resolvedParams = { query: typeof query === 'function' ? query() : query }
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusSuspenseQueryKey(resolvedParams)
-
-  const queryResult = useSuspenseQuery(
-    {
-      ...findPetsByStatusSuspenseQueryOptions(resolvedParams, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as UseSuspenseQueryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }
 
 export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'> = {}) =>
@@ -317,39 +158,6 @@ export function findPetsByTagsQueryOptions(
   })
 }
 
-/**
- * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
- * @summary Finds Pets by tags
- * {@link /pet/findByTags}
- */
-export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
-  { query }: { query?: FindPetsByTagsRequestConfig['query'] | (() => FindPetsByTagsRequestConfig['query']) } = {},
-  options: {
-    query?: Partial<QueryObserverOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryData, TQueryKey>> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const resolvedParams = { query: typeof query === 'function' ? query() : query }
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsQueryKey(resolvedParams)
-
-  const queryResult = useQuery(
-    {
-      ...findPetsByTagsQueryOptions(resolvedParams, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as QueryObserverOptions,
-    queryClient,
-  ) as UseQueryResult<TData, ResponseErrorConfig<FindPetsByTagsStatus400>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
-}
-
 export const findPetsByTagsSuspenseQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'> = {}) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
@@ -367,37 +175,6 @@ export function findPetsByTagsSuspenseQueryOptions(
       return data
     },
   })
-}
-
-/**
- * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
- * @summary Finds Pets by tags
- * {@link /pet/findByTags}
- */
-export function useFindPetsByTagsSuspense<TData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey>(
-  { query }: { query?: FindPetsByTagsRequestConfig['query'] | (() => FindPetsByTagsRequestConfig['query']) } = {},
-  options: {
-    query?: Partial<UseSuspenseQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const resolvedParams = { query: typeof query === 'function' ? query() : query }
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsSuspenseQueryKey(resolvedParams)
-
-  const queryResult = useSuspenseQuery(
-    {
-      ...findPetsByTagsSuspenseQueryOptions(resolvedParams, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as UseSuspenseQueryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<FindPetsByTagsStatus400>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }
 
 export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
@@ -418,39 +195,6 @@ export function getPetByIdQueryOptions(
   })
 }
 
-/**
- * @description Returns a single pet
- * @summary Find pet by ID
- * {@link /pet/:petId}
- */
-export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdQueryKey>(
-  { path }: { path: GetPetByIdRequestConfig['path'] | (() => GetPetByIdRequestConfig['path']) },
-  options: {
-    query?: Partial<QueryObserverOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const resolvedParams = { path: typeof path === 'function' ? path() : path }
-  const queryKey = resolvedOptions?.queryKey ?? getPetByIdQueryKey(resolvedParams)
-
-  const queryResult = useQuery(
-    {
-      ...getPetByIdQueryOptions(resolvedParams, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as QueryObserverOptions,
-    queryClient,
-  ) as UseQueryResult<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
-}
-
 export const getPetByIdSuspenseQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
@@ -469,39 +213,6 @@ export function getPetByIdSuspenseQueryOptions(
   })
 }
 
-/**
- * @description Returns a single pet
- * @summary Find pet by ID
- * {@link /pet/:petId}
- */
-export function useGetPetByIdSuspense<TData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdSuspenseQueryKey>(
-  { path }: { path: GetPetByIdRequestConfig['path'] | (() => GetPetByIdRequestConfig['path']) },
-  options: {
-    query?: Partial<UseSuspenseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryKey>> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const resolvedParams = { path: typeof path === 'function' ? path() : path }
-  const queryKey = resolvedOptions?.queryKey ?? getPetByIdSuspenseQueryKey(resolvedParams)
-
-  const queryResult = useSuspenseQuery(
-    {
-      ...getPetByIdSuspenseQueryOptions(resolvedParams, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as UseSuspenseQueryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
-}
-
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
 
 export function updatePetWithFormMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
@@ -513,39 +224,6 @@ export function updatePetWithFormMutationOptions<TContext = unknown>(config: Par
       return data
     },
   })
-}
-
-/**
- * @summary Updates a pet in the store with form data
- * {@link /pet/:petId}
- */
-export function useUpdatePetWithForm<TContext>(
-  options: {
-    mutation?: UseMutationOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormRequestConfig, TContext> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions.mutationKey ?? updatePetWithFormMutationKey()
-
-  const baseOptions = updatePetWithFormMutationOptions(config) as UseMutationOptions<
-    UpdatePetWithFormResponse,
-    ResponseErrorConfig<UpdatePetWithFormStatus405>,
-    UpdatePetWithFormRequestConfig,
-    TContext
-  >
-
-  return useMutation<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormRequestConfig, TContext>(
-    {
-      ...baseOptions,
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  ) as UseMutationResult<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormRequestConfig, TContext>
 }
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
@@ -561,38 +239,6 @@ export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omi
   })
 }
 
-/**
- * @description delete a pet
- * @summary Deletes a pet
- * {@link /pet/:petId}
- */
-export function useDeletePet<TContext>(
-  options: {
-    mutation?: UseMutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions.mutationKey ?? deletePetMutationKey()
-
-  const baseOptions = deletePetMutationOptions(config) as UseMutationOptions<
-    DeletePetResponse,
-    ResponseErrorConfig<DeletePetStatus400>,
-    DeletePetRequestConfig,
-    TContext
-  >
-
-  return useMutation<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext>(
-    {
-      ...baseOptions,
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  ) as UseMutationResult<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext>
-}
-
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
 export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
@@ -604,37 +250,6 @@ export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Om
       return data
     },
   })
-}
-
-/**
- * @summary uploads an image
- * {@link /pet/:petId/uploadImage}
- */
-export function useUploadFile<TContext>(
-  options: {
-    mutation?: UseMutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions.mutationKey ?? uploadFileMutationKey()
-
-  const baseOptions = uploadFileMutationOptions(config) as UseMutationOptions<
-    UploadFileStatus200,
-    ResponseErrorConfig<Error>,
-    UploadFileRequestConfig,
-    TContext
-  >
-
-  return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>(
-    {
-      ...baseOptions,
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  ) as UseMutationResult<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>
 }
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
@@ -652,35 +267,6 @@ export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'pa
   })
 }
 
-/**
- * @description Returns a map of status codes to quantities
- * @summary Returns pet inventories by status
- * {@link /store/inventory}
- */
-export function useGetInventory<TData = GetInventoryStatus200, TQueryData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventoryQueryKey>(
-  options: {
-    query?: Partial<QueryObserverOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? getInventoryQueryKey()
-
-  const queryResult = useQuery(
-    {
-      ...getInventoryQueryOptions(config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as QueryObserverOptions,
-    queryClient,
-  ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
-}
-
 export const getInventorySuspenseQueryKey = () => [{ url: '/store/inventory' }] as const
 
 type GetInventorySuspenseQueryKey = ReturnType<typeof getInventorySuspenseQueryKey>
@@ -694,35 +280,6 @@ export function getInventorySuspenseQueryOptions(config: Partial<Omit<RequestCon
       return data
     },
   })
-}
-
-/**
- * @description Returns a map of status codes to quantities
- * @summary Returns pet inventories by status
- * {@link /store/inventory}
- */
-export function useGetInventorySuspense<TData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventorySuspenseQueryKey>(
-  options: {
-    query?: Partial<UseSuspenseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? getInventorySuspenseQueryKey()
-
-  const queryResult = useSuspenseQuery(
-    {
-      ...getInventorySuspenseQueryOptions(config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as UseSuspenseQueryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
@@ -742,40 +299,6 @@ export function placeOrderMutationOptions<TContext = unknown>(
   })
 }
 
-/**
- * @description Place a new order in the store
- * @summary Place an order for a pet
- * {@link /store/order}
- */
-export function usePlaceOrder<TContext>(
-  options: {
-    mutation?: UseMutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-    }
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions.mutationKey ?? placeOrderMutationKey()
-
-  const baseOptions = placeOrderMutationOptions(config) as UseMutationOptions<
-    PlaceOrderStatus200,
-    ResponseErrorConfig<PlaceOrderStatus405>,
-    PlaceOrderRequestConfig,
-    TContext
-  >
-
-  return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>(
-    {
-      ...baseOptions,
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  ) as UseMutationResult<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>
-}
-
 export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as const
 
 export function placeOrderPatchMutationOptions<TContext = unknown>(
@@ -791,42 +314,6 @@ export function placeOrderPatchMutationOptions<TContext = unknown>(
       return data
     },
   })
-}
-
-/**
- * @description Place a new order in the store with patch
- * @summary Place an order for a pet with patch
- * {@link /store/order}
- */
-export function usePlaceOrderPatch<TContext>(
-  options: {
-    mutation?: UseMutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-    }
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions.mutationKey ?? placeOrderPatchMutationKey()
-
-  const baseOptions = placeOrderPatchMutationOptions(config) as UseMutationOptions<
-    PlaceOrderPatchStatus200,
-    ResponseErrorConfig<PlaceOrderPatchStatus405>,
-    PlaceOrderPatchRequestConfig,
-    TContext
-  >
-
-  return useMutation<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>(
-    {
-      ...baseOptions,
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  ) as UseMutationResult<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>
 }
 
 export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
@@ -847,39 +334,6 @@ export function getOrderByIdQueryOptions(
   })
 }
 
-/**
- * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
- * @summary Find purchase order by ID
- * {@link /store/order/:orderId}
- */
-export function useGetOrderById<TData = GetOrderByIdStatus200, TQueryData = GetOrderByIdStatus200, TQueryKey extends QueryKey = GetOrderByIdQueryKey>(
-  { path }: { path: GetOrderByIdRequestConfig['path'] | (() => GetOrderByIdRequestConfig['path']) },
-  options: {
-    query?: Partial<
-      QueryObserverOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, TData, TQueryData, TQueryKey>
-    > & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const resolvedParams = { path: typeof path === 'function' ? path() : path }
-  const queryKey = resolvedOptions?.queryKey ?? getOrderByIdQueryKey(resolvedParams)
-
-  const queryResult = useQuery(
-    {
-      ...getOrderByIdQueryOptions(resolvedParams, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as QueryObserverOptions,
-    queryClient,
-  ) as UseQueryResult<TData, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
-}
-
 export const getOrderByIdSuspenseQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdSuspenseQueryKey = ReturnType<typeof getOrderByIdSuspenseQueryKey>
@@ -898,39 +352,6 @@ export function getOrderByIdSuspenseQueryOptions(
   })
 }
 
-/**
- * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
- * @summary Find purchase order by ID
- * {@link /store/order/:orderId}
- */
-export function useGetOrderByIdSuspense<TData = GetOrderByIdStatus200, TQueryKey extends QueryKey = GetOrderByIdSuspenseQueryKey>(
-  { path }: { path: GetOrderByIdRequestConfig['path'] | (() => GetOrderByIdRequestConfig['path']) },
-  options: {
-    query?: Partial<UseSuspenseQueryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, TData, TQueryKey>> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const resolvedParams = { path: typeof path === 'function' ? path() : path }
-  const queryKey = resolvedOptions?.queryKey ?? getOrderByIdSuspenseQueryKey(resolvedParams)
-
-  const queryResult = useSuspenseQuery(
-    {
-      ...getOrderByIdSuspenseQueryOptions(resolvedParams, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as UseSuspenseQueryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
-}
-
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
 
 export function deleteOrderMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
@@ -942,38 +363,4 @@ export function deleteOrderMutationOptions<TContext = unknown>(config: Partial<O
       return data
     },
   })
-}
-
-/**
- * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
- * @summary Delete purchase order by ID
- * {@link /store/order/:orderId}
- */
-export function useDeleteOrder<TContext>(
-  options: {
-    mutation?: UseMutationOptions<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderRequestConfig, TContext> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions.mutationKey ?? deleteOrderMutationKey()
-
-  const baseOptions = deleteOrderMutationOptions(config) as UseMutationOptions<
-    DeleteOrderResponse,
-    ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>,
-    DeleteOrderRequestConfig,
-    TContext
-  >
-
-  return useMutation<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderRequestConfig, TContext>(
-    {
-      ...baseOptions,
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  ) as UseMutationResult<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderRequestConfig, TContext>
 }

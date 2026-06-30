@@ -5,9 +5,8 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { LoginUserRequestConfig, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser.ts'
-import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { loginUser } from '../../clients/user/loginUser.ts'
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 
 export const loginUserSuspenseQueryKey = ({ query }: Omit<LoginUserRequestConfig, 'headers'> = {}) =>
   [{ url: '/user/login' }, ...(query ? [query] : [])] as const
@@ -26,34 +25,4 @@ export function loginUserSuspenseQueryOptions(
       return data
     },
   })
-}
-
-/**
- * @summary Logs user into the system
- * {@link /user/login}
- */
-export function useLoginUserSuspense<TData = LoginUserStatus200, TQueryKey extends QueryKey = LoginUserSuspenseQueryKey>(
-  { query }: { query?: LoginUserRequestConfig['query'] | (() => LoginUserRequestConfig['query']) } = {},
-  options: {
-    query?: Partial<UseSuspenseQueryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const resolvedParams = { query: typeof query === 'function' ? query() : query }
-  const queryKey = resolvedOptions?.queryKey ?? loginUserSuspenseQueryKey(resolvedParams)
-
-  const queryResult = useSuspenseQuery(
-    {
-      ...loginUserSuspenseQueryOptions(resolvedParams, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as UseSuspenseQueryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<LoginUserStatus400>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }

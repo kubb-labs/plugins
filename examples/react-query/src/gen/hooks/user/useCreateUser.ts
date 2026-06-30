@@ -5,9 +5,8 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { CreateUserRequestConfig, CreateUserResponse } from '../../models/user/CreateUser.ts'
-import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { createUser } from '../../clients/user/createUser.ts'
-import { mutationOptions, useMutation } from '@tanstack/react-query'
+import { mutationOptions } from '@tanstack/react-query'
 
 export const createUserMutationKey = () => [{ url: '/user' }] as const
 
@@ -24,33 +23,4 @@ export function createUserMutationOptions<TContext = unknown>(
       return data
     },
   })
-}
-
-/**
- * @description This can only be done by the logged in user.
- * @summary Create user
- * {@link /user}
- */
-export function useCreateUser<TContext>(
-  options: {
-    mutation?: UseMutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-    }
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions.mutationKey ?? createUserMutationKey()
-
-  const baseOptions = createUserMutationOptions(config) as UseMutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserRequestConfig, TContext>
-
-  return useMutation<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserRequestConfig, TContext>(
-    {
-      ...baseOptions,
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  ) as UseMutationResult<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserRequestConfig, TContext>
 }

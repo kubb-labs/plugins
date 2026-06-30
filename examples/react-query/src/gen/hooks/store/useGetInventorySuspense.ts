@@ -5,9 +5,8 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { GetInventoryStatus200 } from '../../models/store/GetInventory.ts'
-import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { getInventory } from '../../clients/store/getInventory.ts'
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 
 export const getInventorySuspenseQueryKey = () => [{ url: '/store/inventory' }] as const
 
@@ -22,33 +21,4 @@ export function getInventorySuspenseQueryOptions(config: Partial<Omit<RequestCon
       return data
     },
   })
-}
-
-/**
- * @description Returns a map of status codes to quantities
- * @summary Returns pet inventories by status
- * {@link /store/inventory}
- */
-export function useGetInventorySuspense<TData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventorySuspenseQueryKey>(
-  options: {
-    query?: Partial<UseSuspenseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? getInventorySuspenseQueryKey()
-
-  const queryResult = useSuspenseQuery(
-    {
-      ...getInventorySuspenseQueryOptions(config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as UseSuspenseQueryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }

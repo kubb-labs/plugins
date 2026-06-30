@@ -5,10 +5,9 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { GetOrderByIdRequestConfig, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById.ts'
-import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { getOrderById } from '../../clients/store/getOrderById.ts'
-import { queryOptions, useQuery } from '@tanstack/vue-query'
+import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
 export const getOrderByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetOrderByIdRequestConfig, 'headers'>['path']> }) =>
@@ -28,42 +27,4 @@ export function getOrderByIdQueryOptions(
       return data
     },
   })
-}
-
-/**
- * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
- * @summary Find purchase order by ID
- * {@link /store/order/:orderId}
- */
-export function useGetOrderById<TData = GetOrderByIdStatus200, TQueryData = GetOrderByIdStatus200, TQueryKey extends QueryKey = GetOrderByIdQueryKey>(
-  { path }: { path: MaybeRefOrGetter<GetOrderByIdRequestConfig['path']> },
-  options: {
-    query?: Partial<
-      UseQueryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, TData, TQueryData, TQueryKey>
-    > & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? getOrderByIdQueryKey({ path })
-
-  const queryResult = useQuery(
-    {
-      ...getOrderByIdQueryOptions({ path }, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as UseQueryOptions<
-      GetOrderByIdStatus200,
-      ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>,
-      TData,
-      GetOrderByIdStatus200,
-      TQueryKey
-    >,
-    toValue(queryClient),
-  ) as UseQueryReturnType<TData, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }
