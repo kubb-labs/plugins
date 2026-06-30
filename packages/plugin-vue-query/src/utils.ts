@@ -1,15 +1,8 @@
 import { getRequestGroups } from '@internals/shared'
 import type { ast } from '@kubb/core'
 
-export { buildQueryKeyParams, resolveOperationOverrides, resolveZodSchemaNames } from '@internals/tanstack-query'
+export { buildQueryKeyParams, maybeRefOrGetter, resolveOperationOverrides, resolveZodSchemaNames } from '@internals/tanstack-query'
 export { buildClientOptionType, buildOperationComments as getComments, buildRequestConfigType, resolveErrorNames, resolveSuccessNames } from '@internals/shared'
-
-/**
- * Wraps a type string in `MaybeRefOrGetter<…>` so a vue-query signature accepts refs or getters.
- */
-export function maybeRefOrGetter(type: string): string {
-  return `MaybeRefOrGetter<${type}>`
-}
 
 const requestGroupOrder = ['path', 'query', 'body', 'headers'] as const
 
