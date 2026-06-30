@@ -38,6 +38,7 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   suspense: false,
   infinite: false,
   customOptions: null,
+  hooks: true,
   exclude: [],
   include: undefined,
   override: [],

@@ -19,9 +19,9 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
   renderer: jsxRenderer,
   operations(nodes, ctx) {
     const { resolver, config, root } = ctx
-    const { output, customOptions, query, mutation, suspense, infinite, group, override } = ctx.options
+    const { output, customOptions, query, mutation, suspense, infinite, group, override, hooks } = ctx.options
 
-    if (!customOptions) return null
+    if (!customOptions || !hooks) return null
 
     const name = resolver.resolveHookOptionsName()
     const resolvedFile = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group: group ?? undefined })

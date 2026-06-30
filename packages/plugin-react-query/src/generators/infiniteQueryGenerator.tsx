@@ -21,7 +21,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, infinite, validator, client, group, customOptions } = ctx.options
+    const { output, query, mutation, infinite, validator, client, group, customOptions, hooks } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -131,20 +131,24 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
           queryParam={infiniteOptions.queryParam}
         />
 
-        <File.Import name={['useInfiniteQuery']} path={importPath} />
-        <File.Import name={['QueryKey', 'QueryClient', 'InfiniteQueryObserverOptions', 'UseInfiniteQueryResult']} path={importPath} isTypeOnly />
+        {hooks && (
+          <>
+            <File.Import name={['useInfiniteQuery']} path={importPath} />
+            <File.Import name={['QueryKey', 'QueryClient', 'InfiniteQueryObserverOptions', 'UseInfiniteQueryResult']} path={importPath} isTypeOnly />
 
-        <InfiniteQuery
-          name={queryName}
-          queryOptionsName={queryOptionsName}
-          queryKeyName={queryKeyName}
-          queryKeyTypeName={queryKeyTypeName}
-          node={node}
-          tsResolver={tsResolver}
-          initialPageParam={infiniteOptions.initialPageParam}
-          queryParam={infiniteOptions.queryParam}
-          customOptions={customOptions}
-        />
+            <InfiniteQuery
+              name={queryName}
+              queryOptionsName={queryOptionsName}
+              queryKeyName={queryKeyName}
+              queryKeyTypeName={queryKeyTypeName}
+              node={node}
+              tsResolver={tsResolver}
+              initialPageParam={infiniteOptions.initialPageParam}
+              queryParam={infiniteOptions.queryParam}
+              customOptions={customOptions}
+            />
+          </>
+        )}
       </File>
     )
   },

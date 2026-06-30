@@ -21,7 +21,7 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, suspense, validator, client, group, customOptions } = ctx.options
+    const { output, query, mutation, suspense, validator, client, group, customOptions, hooks } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -104,7 +104,7 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
 
         <QueryOptions name={queryOptionsName} clientName={calledClientName} queryKeyName={queryKeyName} node={node} tsResolver={tsResolver} />
 
-        {suspense && (
+        {suspense && hooks && (
           <>
             <File.Import name={['useSuspenseQuery']} path={importPath} />
             <File.Import name={['QueryKey', 'QueryClient', 'UseSuspenseQueryOptions', 'UseSuspenseQueryResult']} path={importPath} isTypeOnly />

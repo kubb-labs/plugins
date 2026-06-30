@@ -20,7 +20,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, validator, client, group, customOptions } = ctx.options
+    const { output, query, mutation, validator, client, group, customOptions, hooks } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -97,7 +97,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
 
         <MutationOptions name={mutationOptionsName} clientName={calledClientName} mutationKeyName={mutationKeyName} node={node} tsResolver={tsResolver} />
 
-        {mutation && (
+        {mutation && hooks && (
           <>
             <File.Import name={['useMutation']} path={importPath} />
             <File.Import name={['UseMutationOptions', 'UseMutationResult', 'QueryClient']} path={importPath} isTypeOnly />

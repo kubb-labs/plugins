@@ -304,6 +304,16 @@ export type Options = OutputOptions & {
    */
   resolver?: Partial<ResolverReactQuery> & ThisType<ResolverReactQuery>
   /**
+   * Set to `false` to skip generating `use*` hook functions. `queryOptions`,
+   * `mutationOptions`, `queryKey`, and `mutationKey` helpers are still emitted.
+   * The resulting output uses only `@tanstack/react-query` factory imports
+   * (`queryOptions`, `infiniteQueryOptions`, `mutationOptions`) that are
+   * adapter-portable across React, Vue, Solid, and Svelte.
+   *
+   * @default true
+   */
+  hooks?: boolean
+  /**
    * Macros applied to each operation node before printing.
    */
   macros?: Array<ast.Macro>
@@ -336,6 +346,7 @@ type ResolvedOptions = {
   mutationKey: MutationKey | null
   mutation: NonNullable<Required<Mutation>> | false
   customOptions: NonNullable<Required<CustomOptions>> | null
+  hooks: boolean
   resolver: ResolverReactQuery
 }
 
