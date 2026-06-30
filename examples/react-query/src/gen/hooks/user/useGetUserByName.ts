@@ -32,7 +32,7 @@ export function getUserByNameQueryOptions(
  * {@link /user/:username}
  */
 export function useGetUserByName<TData = GetUserByNameStatus200, TQueryData = GetUserByNameStatus200, TQueryKey extends QueryKey = GetUserByNameQueryKey>(
-  { path }: GetUserByNameRequestConfig,
+  { path }: { path: GetUserByNameRequestConfig['path'] | (() => GetUserByNameRequestConfig['path']) },
   options: {
     query?: Partial<
       QueryObserverOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, TData, TQueryData, TQueryKey>
@@ -42,11 +42,12 @@ export function useGetUserByName<TData = GetUserByNameStatus200, TQueryData = Ge
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? getUserByNameQueryKey({ path })
+  const resolvedParams = { path: typeof path === 'function' ? path() : path }
+  const queryKey = resolvedOptions?.queryKey ?? getUserByNameQueryKey(resolvedParams)
 
   const queryResult = useQuery(
     {
-      ...getUserByNameQueryOptions({ path }, config),
+      ...getUserByNameQueryOptions(resolvedParams, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as QueryObserverOptions,

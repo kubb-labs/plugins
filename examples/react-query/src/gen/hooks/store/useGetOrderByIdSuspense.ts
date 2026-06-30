@@ -33,7 +33,7 @@ export function getOrderByIdSuspenseQueryOptions(
  * {@link /store/order/:orderId}
  */
 export function useGetOrderByIdSuspense<TData = GetOrderByIdStatus200, TQueryKey extends QueryKey = GetOrderByIdSuspenseQueryKey>(
-  { path }: GetOrderByIdRequestConfig,
+  { path }: { path: GetOrderByIdRequestConfig['path'] | (() => GetOrderByIdRequestConfig['path']) },
   options: {
     query?: Partial<UseSuspenseQueryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, TData, TQueryKey>> & {
       client?: QueryClient
@@ -43,11 +43,12 @@ export function useGetOrderByIdSuspense<TData = GetOrderByIdStatus200, TQueryKey
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? getOrderByIdSuspenseQueryKey({ path })
+  const resolvedParams = { path: typeof path === 'function' ? path() : path }
+  const queryKey = resolvedOptions?.queryKey ?? getOrderByIdSuspenseQueryKey(resolvedParams)
 
   const queryResult = useSuspenseQuery(
     {
-      ...getOrderByIdSuspenseQueryOptions({ path }, config),
+      ...getOrderByIdSuspenseQueryOptions(resolvedParams, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as UseSuspenseQueryOptions,
