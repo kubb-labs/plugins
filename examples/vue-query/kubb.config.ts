@@ -34,7 +34,7 @@ export default defineConfig(() => {
       }),
       pluginVueQuery({
         output: { path: './hooks', barrel: { type: 'named' } },
-        group: { type: 'tag' }
+        group: { type: 'tag' },
       }),
     ],
   }
