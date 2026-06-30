@@ -15,7 +15,7 @@ export function listPetsStyled<ThrowOnError extends boolean = true>(
   return request({
     method: 'GET',
     url: '/pets/{petId}',
-    serialization: { path: { petId: { style: 'matrix', explode: true } }, query: { tags: { style: 'pipeDelimited', explode: false } } },
+    styles: { path: { petId: { style: 'matrix', explode: true } }, query: { tags: { style: 'pipeDelimited', explode: false } } },
     ...config,
   }) as Promise<RequestResult<ListPetsStyledResponses, ThrowOnError>>
 }

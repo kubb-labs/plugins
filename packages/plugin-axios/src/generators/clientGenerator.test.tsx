@@ -187,7 +187,7 @@ describe('clientGenerator operation', () => {
     { name: 'getProject', node: getProjectNode, options: {} },
     { name: 'deletePetNoContent', node: deletePetNode, options: {} },
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
-    // Parameter style/explode flows from the ParameterNode into a `serialization` call-config entry.
+    // Parameter style/explode flows from the ParameterNode into a `styles` call-config entry.
     { name: 'listPetsWithStyles', node: listPetsStyledNode, options: {} },
     // text/event-stream response returns a typed event stream instead of a one-shot result.
     { name: 'streamEventsSse', node: streamEventsNode, options: {} },

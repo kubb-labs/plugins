@@ -99,10 +99,11 @@ export type Serializers = {
 }
 
 /**
- * The per-parameter serialization metadata a generated request carries, grouped by location. Each
- * map is keyed by parameter name, mirroring the `serializer` grouping.
+ * The per-parameter OpenAPI `style` / `explode` metadata a generated request carries, grouped by
+ * location and keyed by parameter name. Mirrors the `serializer` grouping and feeds the default
+ * serializers; `body` carries the form `encoding` for a urlencoded or multipart body.
  */
-export type RequestSerialization = {
+export type Styles = {
   path?: Record<string, PathParamStyle>
   query?: Record<string, QueryParamStyle>
   header?: Record<string, HeaderParamStyle>
