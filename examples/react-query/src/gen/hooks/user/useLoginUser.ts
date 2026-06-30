@@ -32,7 +32,7 @@ export function loginUserQueryOptions(
  * {@link /user/login}
  */
 export function useLoginUser<TData = LoginUserStatus200, TQueryData = LoginUserStatus200, TQueryKey extends QueryKey = LoginUserQueryKey>(
-  { query }: LoginUserRequestConfig = {},
+  { query }: { query?: LoginUserRequestConfig['query'] | (() => LoginUserRequestConfig['query']) } = {},
   options: {
     query?: Partial<QueryObserverOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
@@ -40,11 +40,12 @@ export function useLoginUser<TData = LoginUserStatus200, TQueryData = LoginUserS
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? loginUserQueryKey({ query })
+  const resolvedParams = { query: typeof query === 'function' ? query() : query }
+  const queryKey = resolvedOptions?.queryKey ?? loginUserQueryKey(resolvedParams)
 
   const queryResult = useQuery(
     {
-      ...loginUserQueryOptions({ query }, config),
+      ...loginUserQueryOptions(resolvedParams, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as QueryObserverOptions,

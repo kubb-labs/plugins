@@ -33,7 +33,7 @@ export function useFindPetsByStatus<
   TQueryData = FindPetsByStatusStatus200,
   TQueryKey extends QueryKey = FindPetsByStatusQueryKey,
 >(
-  { path }: FindPetsByStatusRequestConfig,
+  { path }: { path: FindPetsByStatusRequestConfig['path'] | (() => FindPetsByStatusRequestConfig['path']) },
   options: {
     query?: Partial<QueryObserverOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
@@ -43,11 +43,12 @@ export function useFindPetsByStatus<
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusQueryKey({ path })
+  const resolvedParams = { path: typeof path === 'function' ? path() : path }
+  const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusQueryKey(resolvedParams)
 
   const queryResult = useQuery(
     {
-      ...findPetsByStatusQueryOptions({ path }, config),
+      ...findPetsByStatusQueryOptions(resolvedParams, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as QueryObserverOptions,

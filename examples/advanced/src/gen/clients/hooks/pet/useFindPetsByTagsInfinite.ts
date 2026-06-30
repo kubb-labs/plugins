@@ -44,7 +44,13 @@ export function useFindPetsByTagsInfinite<
   TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,
   TPageParam = number,
 >(
-  { query, headers }: FindPetsByTagsRequestConfig,
+  {
+    headers,
+    query,
+  }: {
+    headers: FindPetsByTagsRequestConfig['headers'] | (() => FindPetsByTagsRequestConfig['headers'])
+    query?: FindPetsByTagsRequestConfig['query'] | (() => FindPetsByTagsRequestConfig['query'])
+  },
   options: {
     query?: Partial<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
@@ -52,11 +58,12 @@ export function useFindPetsByTagsInfinite<
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsInfiniteQueryKey({ query })
+  const resolvedParams = { query: typeof query === 'function' ? query() : query, headers: typeof headers === 'function' ? headers() : headers }
+  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsInfiniteQueryKey(resolvedParams)
 
   const queryResult = useInfiniteQuery(
     {
-      ...findPetsByTagsInfiniteQueryOptions({ query, headers }, config),
+      ...findPetsByTagsInfiniteQueryOptions(resolvedParams, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>,

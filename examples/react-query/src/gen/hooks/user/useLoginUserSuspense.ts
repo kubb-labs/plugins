@@ -33,7 +33,7 @@ export function loginUserSuspenseQueryOptions(
  * {@link /user/login}
  */
 export function useLoginUserSuspense<TData = LoginUserStatus200, TQueryKey extends QueryKey = LoginUserSuspenseQueryKey>(
-  { query }: LoginUserRequestConfig = {},
+  { query }: { query?: LoginUserRequestConfig['query'] | (() => LoginUserRequestConfig['query']) } = {},
   options: {
     query?: Partial<UseSuspenseQueryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
@@ -41,11 +41,12 @@ export function useLoginUserSuspense<TData = LoginUserStatus200, TQueryKey exten
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? loginUserSuspenseQueryKey({ query })
+  const resolvedParams = { query: typeof query === 'function' ? query() : query }
+  const queryKey = resolvedOptions?.queryKey ?? loginUserSuspenseQueryKey(resolvedParams)
 
   const queryResult = useSuspenseQuery(
     {
-      ...loginUserSuspenseQueryOptions({ query }, config),
+      ...loginUserSuspenseQueryOptions(resolvedParams, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as UseSuspenseQueryOptions,
