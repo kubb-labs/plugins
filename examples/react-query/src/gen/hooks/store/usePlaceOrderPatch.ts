@@ -5,9 +5,8 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/store/PlaceOrderPatch.ts'
-import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { placeOrderPatch } from '../../clients/store/placeOrderPatch.ts'
-import { mutationOptions, useMutation } from '@tanstack/react-query'
+import { mutationOptions } from '@tanstack/react-query'
 
 export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as const
 
@@ -24,40 +23,4 @@ export function placeOrderPatchMutationOptions<TContext = unknown>(
       return data
     },
   })
-}
-
-/**
- * @description Place a new order in the store with patch
- * @summary Place an order for a pet with patch
- * {@link /store/order}
- */
-export function usePlaceOrderPatch<TContext>(
-  options: {
-    mutation?: UseMutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-    }
-  } = {},
-) {
-  const { mutation = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...mutationOptions } = mutation
-  const mutationKey = mutationOptions.mutationKey ?? placeOrderPatchMutationKey()
-
-  const baseOptions = placeOrderPatchMutationOptions(config) as UseMutationOptions<
-    PlaceOrderPatchStatus200,
-    ResponseErrorConfig<PlaceOrderPatchStatus405>,
-    PlaceOrderPatchRequestConfig,
-    TContext
-  >
-
-  return useMutation<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>(
-    {
-      ...baseOptions,
-      mutationKey,
-      ...mutationOptions,
-    },
-    queryClient,
-  ) as UseMutationResult<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>
 }

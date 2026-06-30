@@ -5,9 +5,8 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../models/pet/FindPetsByTags.ts'
-import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { findPetsByTags } from '../../clients/pet/findPetsByTags.ts'
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 
 export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'> = {}) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
@@ -26,37 +25,4 @@ export function findPetsByTagsQueryOptions(
       return data
     },
   })
-}
-
-/**
- * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
- * @summary Finds Pets by tags
- * {@link /pet/findByTags}
- */
-export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
-  { query }: { query?: FindPetsByTagsRequestConfig['query'] | (() => FindPetsByTagsRequestConfig['query']) } = {},
-  options: {
-    query?: Partial<QueryObserverOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryData, TQueryKey>> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const resolvedParams = { query: typeof query === 'function' ? query() : query }
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsQueryKey(resolvedParams)
-
-  const queryResult = useQuery(
-    {
-      ...findPetsByTagsQueryOptions(resolvedParams, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as QueryObserverOptions,
-    queryClient,
-  ) as UseQueryResult<TData, ResponseErrorConfig<FindPetsByTagsStatus400>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }

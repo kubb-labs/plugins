@@ -5,9 +5,8 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { GetInventoryStatus200 } from '../../models/store/GetInventory.ts'
-import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { getInventory } from '../../clients/store/getInventory.ts'
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
@@ -22,33 +21,4 @@ export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'pa
       return data
     },
   })
-}
-
-/**
- * @description Returns a map of status codes to quantities
- * @summary Returns pet inventories by status
- * {@link /store/inventory}
- */
-export function useGetInventory<TData = GetInventoryStatus200, TQueryData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventoryQueryKey>(
-  options: {
-    query?: Partial<QueryObserverOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? getInventoryQueryKey()
-
-  const queryResult = useQuery(
-    {
-      ...getInventoryQueryOptions(config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as QueryObserverOptions,
-    queryClient,
-  ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }

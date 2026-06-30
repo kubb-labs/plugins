@@ -5,9 +5,8 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { GetPetByIdRequestConfig, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById.ts'
-import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { getPetById } from '../../clients/pet/getPetById.ts'
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 
 export const getPetByIdSuspenseQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
@@ -25,37 +24,4 @@ export function getPetByIdSuspenseQueryOptions(
       return data
     },
   })
-}
-
-/**
- * @description Returns a single pet
- * @summary Find pet by ID
- * {@link /pet/:petId}
- */
-export function useGetPetByIdSuspense<TData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdSuspenseQueryKey>(
-  { path }: { path: GetPetByIdRequestConfig['path'] | (() => GetPetByIdRequestConfig['path']) },
-  options: {
-    query?: Partial<UseSuspenseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryKey>> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const resolvedParams = { path: typeof path === 'function' ? path() : path }
-  const queryKey = resolvedOptions?.queryKey ?? getPetByIdSuspenseQueryKey(resolvedParams)
-
-  const queryResult = useSuspenseQuery(
-    {
-      ...getPetByIdSuspenseQueryOptions(resolvedParams, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as UseSuspenseQueryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }

@@ -5,10 +5,9 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { LoginUserRequestConfig, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser.ts'
-import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { loginUser } from '../../clients/user/loginUser.ts'
-import { queryOptions, useQuery } from '@tanstack/vue-query'
+import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
 export const loginUserQueryKey = ({ query }: { query?: MaybeRefOrGetter<Omit<LoginUserRequestConfig, 'headers'>['query']> } = {}) =>
@@ -28,33 +27,4 @@ export function loginUserQueryOptions(
       return data
     },
   })
-}
-
-/**
- * @summary Logs user into the system
- * {@link /user/login}
- */
-export function useLoginUser<TData = LoginUserStatus200, TQueryData = LoginUserStatus200, TQueryKey extends QueryKey = LoginUserQueryKey>(
-  { query }: { query?: MaybeRefOrGetter<LoginUserRequestConfig['query']> } = {},
-  options: {
-    query?: Partial<UseQueryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? loginUserQueryKey({ query })
-
-  const queryResult = useQuery(
-    {
-      ...loginUserQueryOptions({ query }, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as UseQueryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, TData, LoginUserStatus200, TQueryKey>,
-    toValue(queryClient),
-  ) as UseQueryReturnType<TData, ResponseErrorConfig<LoginUserStatus400>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }

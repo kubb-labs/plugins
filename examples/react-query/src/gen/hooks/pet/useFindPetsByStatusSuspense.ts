@@ -5,9 +5,8 @@
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../models/pet/FindPetsByStatus.ts'
-import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { findPetsByStatus } from '../../clients/pet/findPetsByStatus.ts'
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 
 export const findPetsByStatusSuspenseQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'headers'> = {}) =>
   [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
@@ -26,37 +25,4 @@ export function findPetsByStatusSuspenseQueryOptions(
       return data
     },
   })
-}
-
-/**
- * @description Multiple status values can be provided with comma separated strings
- * @summary Finds Pets by status
- * {@link /pet/findByStatus}
- */
-export function useFindPetsByStatusSuspense<TData = FindPetsByStatusStatus200, TQueryKey extends QueryKey = FindPetsByStatusSuspenseQueryKey>(
-  { query }: { query?: FindPetsByStatusRequestConfig['query'] | (() => FindPetsByStatusRequestConfig['query']) } = {},
-  options: {
-    query?: Partial<UseSuspenseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryKey>> & {
-      client?: QueryClient
-    }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const resolvedParams = { query: typeof query === 'function' ? query() : query }
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusSuspenseQueryKey(resolvedParams)
-
-  const queryResult = useSuspenseQuery(
-    {
-      ...findPetsByStatusSuspenseQueryOptions(resolvedParams, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as UseSuspenseQueryOptions,
-    queryClient,
-  ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
-
-  queryResult.queryKey = queryKey as TQueryKey
-
-  return queryResult
 }
