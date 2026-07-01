@@ -8,7 +8,7 @@ import { client, toEventStream } from './.kubb/client'
  * {@link /events}
  */
 export function streamEvents<ThrowOnError extends boolean = true>(
-  options: Options<StreamEventsRequestConfig, ThrowOnError>,
+  options: Options<StreamEventsRequestConfig, ThrowOnError> = {},
 ): Promise<EventStreamResult<SuccessOf<StreamEventsResponses>>> {
   const { client: request = client, ...config } = options
 
