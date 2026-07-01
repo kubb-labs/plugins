@@ -1,5 +1,15 @@
 # @kubb/plugin-fetch
 
+## 5.0.0-beta.80
+
+### Patch Changes
+
+- [#603](https://github.com/kubb-labs/plugins/pull/603) [`5fcf721`](https://github.com/kubb-labs/plugins/commit/5fcf72130d48c6cfb5bd7cb287585e6403b81bb4) Thanks [@Ericlm](https://github.com/Ericlm)! - Default generated `options` parameters to `{}` when an operation has no required request data, allowing calls like `getInventory()` without passing an empty object.
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.80
+  - @kubb/plugin-zod@5.0.0-beta.80
+
 ## 5.0.0-beta.79
 
 ### Minor Changes

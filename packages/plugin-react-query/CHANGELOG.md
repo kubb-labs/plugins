@@ -1,5 +1,37 @@
 # @kubb/plugin-react-query
 
+## 5.0.0-beta.80
+
+### Major Changes
+
+- [#601](https://github.com/kubb-labs/plugins/pull/601) [`7768c1f`](https://github.com/kubb-labs/plugins/commit/7768c1f7ecb2e676eb00c51c73e27afc527d892d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add `hooks` option and change the default to `false` for both `pluginReactQuery` and `pluginVueQuery`.
+
+  `hooks: false` (the new default) emits only `queryOptions`, `mutationOptions`, `queryKey`, and `mutationKey` helpers. The `useQuery`, `useInfiniteQuery`, `useSuspenseQuery`, `useSuspenseInfiniteQuery`, and `useMutation` functions are not generated. The factory functions (`queryOptions`, `infiniteQueryOptions`, `mutationOptions`) work across all TanStack Query adapters.
+
+  Set `hooks: true` to restore the previous behavior and generate `use*` hook/composable functions alongside the helpers.
+
+  ```ts
+  // generate queryOptions/mutationOptions/key factories only (new default)
+  pluginReactQuery({ output: { path: "queries" } });
+
+  // generate use* hooks as well (opt-in)
+  pluginReactQuery({ output: { path: "hooks" }, hooks: true });
+  ```
+
+  **Breaking change:** existing configs that rely on generated `use*` hooks must add `hooks: true`.
+
+### Minor Changes
+
+- [#597](https://github.com/kubb-labs/plugins/pull/597) [`5ad2bd3`](https://github.com/kubb-labs/plugins/commit/5ad2bd3f75d3f0be7255ce7aafd6a16978be43b2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Generated query hooks (`useQuery`, `useSuspenseQuery`, `useInfiniteQuery`, `useSuspenseInfiniteQuery`) now accept a value **or** a zero-arg getter for each request group by default, so the path/query/body type widens to `T | (() => T)`. This mirrors `@kubb/plugin-vue-query`'s `MaybeRefOrGetter` and lets signal-based libraries (Preact Signals, MobX, Jotai, Legend State, …) pass `useGetPetById(() => petId.value)` without flattening reactivity at hook-call time.
+
+  The getter is resolved once inside the hook before the value reaches `queryKey`/`queryOptions`, so query keys stay plain and hash correctly. Output is unchanged for operations without a request group. No new option — this is the default. Resolves [#140](https://github.com/kubb-labs/plugins/issues/140).
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.80
+  - @kubb/plugin-zod@5.0.0-beta.80
+
 ## 5.0.0-beta.79
 
 ### Minor Changes

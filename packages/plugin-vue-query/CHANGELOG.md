@@ -1,5 +1,31 @@
 # @kubb/plugin-vue-query
 
+## 5.0.0-beta.80
+
+### Major Changes
+
+- [#601](https://github.com/kubb-labs/plugins/pull/601) [`7768c1f`](https://github.com/kubb-labs/plugins/commit/7768c1f7ecb2e676eb00c51c73e27afc527d892d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add `hooks` option and change the default to `false` for both `pluginReactQuery` and `pluginVueQuery`.
+
+  `hooks: false` (the new default) emits only `queryOptions`, `mutationOptions`, `queryKey`, and `mutationKey` helpers. The `useQuery`, `useInfiniteQuery`, `useSuspenseQuery`, `useSuspenseInfiniteQuery`, and `useMutation` functions are not generated. The factory functions (`queryOptions`, `infiniteQueryOptions`, `mutationOptions`) work across all TanStack Query adapters.
+
+  Set `hooks: true` to restore the previous behavior and generate `use*` hook/composable functions alongside the helpers.
+
+  ```ts
+  // generate queryOptions/mutationOptions/key factories only (new default)
+  pluginReactQuery({ output: { path: "queries" } });
+
+  // generate use* hooks as well (opt-in)
+  pluginReactQuery({ output: { path: "hooks" }, hooks: true });
+  ```
+
+  **Breaking change:** existing configs that rely on generated `use*` hooks must add `hooks: true`.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.80
+  - @kubb/plugin-zod@5.0.0-beta.80
+
 ## 5.0.0-beta.79
 
 ### Minor Changes
