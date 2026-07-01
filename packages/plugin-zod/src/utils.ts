@@ -117,15 +117,6 @@ export function collectCodecRefNames(node: ast.SchemaNode): Array<string> {
 }
 
 /**
- * Context shared by the object-composition helpers: the schema names that form circular
- * dependency chains, so refs into them (rendered as `z.lazy(() => …)`) are not treated as
- * bare, extendable objects.
- */
-export type ObjectComposeContext = {
-  cyclicSchemas?: ReadonlySet<string>
-}
-
-/**
  * Returns `true` when the node is a plain inline object whose property shape can be lifted into an
  * `.extend({ … })` argument. A catchall (`additionalProperties`) or `patternProperties` cannot be
  * expressed through a bare shape, and a nullable/optional object is a wrapper rather than a shape,
@@ -139,38 +130,32 @@ function isPlainInlineObject(node: ast.SchemaNode): boolean {
  * Returns `true` when a schema node renders as a bare Zod object at the value level — one that
  * accepts `.extend(…)` and can serve as a `z.discriminatedUnion` option.
  *
- * True for object nodes, `$ref`s that resolve to objects (or are as-yet unresolved), single-member
+ * True for object nodes, `$ref`s that resolve to objects (or are still unresolved), single-member
  * unions of an object, and object-composable `allOf` intersections. False for cyclic refs (rendered
  * as `z.lazy(…)`), nullable/optional wrappers, multi-member unions, and non-object primitives.
+ *
+ * `cyclicSchemas` bounds the recursion: a ref into a cycle renders as `z.lazy(…)` rather than an
+ * object, so it returns early instead of following the ref back into itself.
  */
-export function isObjectSchemaNode(node: ast.SchemaNode, ctx: ObjectComposeContext = {}, seen: Set<string> = new Set()): boolean {
+export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
   if (node.nullable || node.optional || node.nullish) return false
   if (node.type === 'object') return true
 
   if (node.type === 'ref') {
-    const refName = (node.ref ? extractRefName(node.ref) : undefined) ?? node.name ?? undefined
-    if (refName && ctx.cyclicSchemas?.has(refName)) return false
-    if (refName) {
-      if (seen.has(refName)) return false
-      seen.add(refName)
-    }
+    const refName = (node.ref ? extractRefName(node.ref) : undefined) ?? node.name
+    if (refName && cyclicSchemas?.has(refName)) return false
     const resolved = syncSchemaRef(node)
     // An unresolved ref keeps its `ref` type; assume it resolves to an object (matches the printer's
     // prior optimism that only a resolved intersection blocks a discriminated union).
-    if (resolved.type === 'ref') return true
-    return isObjectSchemaNode(resolved, ctx, seen)
+    return resolved.type === 'ref' || isObjectSchemaNode(resolved, cyclicSchemas)
   }
 
   if (node.type === 'union') {
     const members = node.members ?? []
-    return members.length === 1 && !!members[0] && isObjectSchemaNode(members[0], ctx, seen)
+    return members.length === 1 && isObjectSchemaNode(members[0]!, cyclicSchemas)
   }
 
-  if (node.type === 'intersection') {
-    return isObjectComposableIntersection(node, ctx, seen)
-  }
-
-  return false
+  return isObjectComposableIntersection(node, cyclicSchemas)
 }
 
 /**
@@ -180,13 +165,10 @@ export function isObjectSchemaNode(node: ast.SchemaNode, ctx: ObjectComposeConte
  * Rendering these with `.extend(…)` keeps the result a Zod object (discriminable, correct merge
  * semantics) instead of a `ZodIntersection`, which `z.discriminatedUnion` rejects.
  */
-export function isObjectComposableIntersection(node: ast.SchemaNode, ctx: ObjectComposeContext = {}, seen: Set<string> = new Set()): boolean {
+export function isObjectComposableIntersection(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
   if (node.type !== 'intersection') return false
-  const members = node.members ?? []
-  const [first, ...rest] = members
-  if (!first || !isObjectSchemaNode(first, ctx, seen)) return false
-
-  return rest.every((member) => isPlainInlineObject(member))
+  const [first, ...rest] = node.members ?? []
+  return !!first && isObjectSchemaNode(first, cyclicSchemas) && rest.every(isPlainInlineObject)
 }
 
 /**

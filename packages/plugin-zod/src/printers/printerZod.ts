@@ -393,7 +393,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         // object-composable `allOf` variants (rendered via `.extend(…)`) qualify; a member that
         // stays a ZodIntersection (`.and(…)`), a cyclic `z.lazy(…)` ref, or a non-object does not,
         // so fall back to z.union then.
-        const allDiscriminable = nodeMembers.every((m) => isObjectSchemaNode(m, { cyclicSchemas: cyclicSchemaNames }))
+        const allDiscriminable = nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemaNames))
         if (node.discriminatorPropertyName && allDiscriminable) {
           return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
         }
@@ -414,7 +414,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         // `.extend({ … })` so the result stays a ZodObject (correct merge semantics, and usable as a
         // `z.discriminatedUnion` option) instead of the non-discriminable ZodIntersection `.and(…)`
         // produces.
-        if (rest.length > 0 && isObjectComposableIntersection(node, { cyclicSchemas: cyclicSchemaNames })) {
+        if (rest.length > 0 && isObjectComposableIntersection(node, cyclicSchemaNames)) {
           return rest.reduce((acc, member) => `${acc}.extend(${buildZodObjectShape(this, member)})`, firstBase)
         }
 
