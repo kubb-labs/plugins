@@ -14,11 +14,31 @@ const addPet = ast.factory.createOperation({
   responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'ok' })],
 })
 
+const listPets = ast.factory.createOperation({
+  operationId: 'listPets',
+  method: 'GET',
+  path: '/pets',
+  parameters: [
+    ast.factory.createParameter({
+      name: 'limit',
+      in: 'query',
+      required: false,
+      schema: ast.factory.createSchema({ type: 'integer' }),
+    }),
+  ],
+  responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'ok' })],
+})
+
 describe('buildGroupedOptionsSignature', () => {
   test('emits a single grouped options parameter with a ThrowOnError generic', () => {
     const signature = buildGroupedOptionsSignature({ node: addPet, tsResolver: resolverTs })
     expect(signature.paramsSignature).toBe('options: Options<AddPetRequestConfig, ThrowOnError>')
     expect(signature.generics).toStrictEqual(['ThrowOnError extends boolean = true'])
+  })
+
+  test('defaults the options parameter when the operation has no required request data', () => {
+    const signature = buildGroupedOptionsSignature({ node: listPets, tsResolver: resolverTs })
+    expect(signature.paramsSignature).toBe('options: Options<ListPetsRequestConfig, ThrowOnError> = {}')
   })
 
   test('keys the return type on the plugin-ts per-status responses record', () => {

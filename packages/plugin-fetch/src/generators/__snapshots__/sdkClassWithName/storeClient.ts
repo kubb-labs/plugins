@@ -15,7 +15,7 @@ export class StoreClient {
    * {@link /store/inventory}
    */
   public getInventory<ThrowOnError extends boolean = true>(
-    options: Options<GetInventoryRequestConfig, ThrowOnError>,
+    options: Options<GetInventoryRequestConfig, ThrowOnError> = {},
   ): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 

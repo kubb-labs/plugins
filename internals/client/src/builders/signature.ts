@@ -1,4 +1,5 @@
 import type { ast } from '@kubb/core'
+import { getRequestGroupOptionality } from '@internals/shared'
 import { createFunctionParameter, createFunctionParameters, functionPrinter, type ResolverTs } from '@kubb/plugin-ts'
 import { buildRequestResultGenerics } from './generics.ts'
 
@@ -43,11 +44,12 @@ export function buildGroupedOptionsSignature({ node, tsResolver }: { node: ast.O
   const requestConfigName = tsResolver.resolveRequestConfigName(node)
   const responsesName = tsResolver.resolveResponsesName(node)
   const resultGenerics = buildRequestResultGenerics({ node, tsResolver })
+  const { isOptional } = getRequestGroupOptionality(node)
 
   const paramsSignature =
     declarationPrinter.print(
       createFunctionParameters({
-        params: [createFunctionParameter({ name: 'options', type: `Options<${requestConfigName}, ThrowOnError>` })],
+        params: [createFunctionParameter({ name: 'options', type: `Options<${requestConfigName}, ThrowOnError>`, ...(isOptional ? { default: '{}' } : {}) })],
       }),
     ) ?? ''
 
