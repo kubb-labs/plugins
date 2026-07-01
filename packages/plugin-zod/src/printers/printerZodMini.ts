@@ -112,8 +112,7 @@ function getMemberConstraintMini({ member, regexType }: { member: ast.SchemaNode
 }
 
 /**
- * Runtime slice of the Mini printer needed to render an object's property shape: the recursive
- * `transform` dispatcher and the resolved printer options.
+ * The Mini printer slice `buildZodMiniObjectShape` needs: the recursive `transform` and the options.
  */
 type ZodMiniPrinterContext = {
   transform: (node: ast.SchemaNode) => string | null
@@ -121,8 +120,8 @@ type ZodMiniPrinterContext = {
 }
 
 /**
- * Builds the `{ key: value, … }` shape literal for an object node's properties using the functional
- * `zod/mini` modifiers. Shared so the `z.object(...)` and `z.extend(...)` renderings stay in lockstep.
+ * Builds the `{ key: value, … }` shape for an object node with the functional `zod/mini` modifiers,
+ * shared by the `z.object(...)` and `z.extend(...)` renderings so they stay in lockstep.
  */
 function buildZodMiniObjectShape(ctx: ZodMiniPrinterContext, node: ast.SchemaNode): string {
   const objectNode = ast.narrowSchema(node, 'object')
@@ -307,10 +306,9 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           .filter(Boolean)
         if (members.length === 0) return ''
         if (members.length === 1) return members[0]!
-        // z.discriminatedUnion needs every option to render as a Zod object. Object refs and
-        // object-composable `allOf` variants (rendered via `z.extend(…)`) qualify; a member that
-        // stays a `z.intersection(…)`, a cyclic `z.lazy(…)` ref, or a non-object does not, so fall
-        // back to z.union then.
+        // z.discriminatedUnion needs every option to be a Zod object. Object variants (refs or
+        // `z.extend(…)`-composed `allOf`) qualify; intersections, cyclic `z.lazy(…)` refs, and
+        // non-objects fall back to z.union.
         const allDiscriminable = nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemaNames))
         if (node.discriminatorPropertyName && allDiscriminable) {
           return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
@@ -328,9 +326,8 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         const firstBase = this.transform(first)
         if (!firstBase) return ''
 
-        // An `allOf` of plain objects is a merge, not a runtime intersection: render it with
-        // `z.extend(base, { … })` so the result stays a Zod object (correct merge semantics, and
-        // usable as a `z.discriminatedUnion` option) instead of a non-discriminable `z.intersection`.
+        // An object `allOf` is a merge, not a runtime intersection: `z.extend(base, { … })` keeps it
+        // a Zod object (usable in z.discriminatedUnion) instead of a non-discriminable `z.intersection`.
         if (rest.length > 0 && isObjectComposableIntersection(node, cyclicSchemaNames)) {
           return rest.reduce((acc, member) => `z.extend(${acc}, ${buildZodMiniObjectShape(this, member)})`, firstBase)
         }

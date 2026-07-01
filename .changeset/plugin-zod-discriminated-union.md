@@ -2,8 +2,6 @@
 "@kubb/plugin-zod": minor
 ---
 
-Emit `z.discriminatedUnion` for `oneOf`/`anyOf` schemas that carry a `discriminator` (kubb-labs/plugins#335).
+Emit `z.discriminatedUnion` for `oneOf`/`anyOf` schemas with a `discriminator` (kubb-labs/plugins#335).
 
-Discriminated variants are commonly defined through `allOf` inheritance, which the printer rendered as a `ZodIntersection` (`base.and(…)`). `z.discriminatedUnion` rejects intersection options, so the output fell back to a plain `z.union` that tries every branch on parse.
-
-An object-composable `allOf` is now rendered with `.extend({ … })` (zod) / `z.extend(base, { … })` (zod/mini) instead of `.and(…)`, keeping each variant a Zod object. When every variant resolves to a discriminable object, the union emits `z.discriminatedUnion('<propertyName>', [ … ])`, which dispatches on the discriminator, reports single-branch errors, and parses in constant time over the variant count. Variants that cannot flatten to an object — non-object members or a cyclic `z.lazy(…)` ref — keep the `z.union` fallback.
+Variants defined through `allOf` used to render as intersections (`base.and(…)`), which `z.discriminatedUnion` rejects, so the output fell back to a plain `z.union`. Object `allOf` variants now render with `.extend({ … })` (zod) or `z.extend(base, { … })` (zod/mini), so each stays a Zod object and the union discriminates on the property. Variants that can't flatten to an object, like a cyclic `z.lazy(…)` ref, keep the `z.union` fallback.

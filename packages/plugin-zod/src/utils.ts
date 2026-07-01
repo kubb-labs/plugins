@@ -117,25 +117,20 @@ export function collectCodecRefNames(node: ast.SchemaNode): Array<string> {
 }
 
 /**
- * Returns `true` when the node is a plain inline object whose property shape can be lifted into an
- * `.extend({ … })` argument. A catchall (`additionalProperties`) or `patternProperties` cannot be
- * expressed through a bare shape, and a nullable/optional object is a wrapper rather than a shape,
- * so those stay on the `.and(…)` path.
+ * Whether the node is a plain inline object whose shape can be lifted into an `.extend({ … })`
+ * argument. A catchall, `patternProperties`, or a nullable/optional wrapper cannot, so those stay
+ * on `.and(…)`.
  */
 function isPlainInlineObject(node: ast.SchemaNode): boolean {
   return node.type === 'object' && !node.nullable && !node.optional && !node.nullish && node.additionalProperties === undefined && !node.patternProperties
 }
 
 /**
- * Returns `true` when a schema node renders as a bare Zod object at the value level — one that
- * accepts `.extend(…)` and can serve as a `z.discriminatedUnion` option.
+ * Whether a node renders as a bare Zod object — one that accepts `.extend(…)` and can be a
+ * `z.discriminatedUnion` option. Covers object nodes, `$ref`s that resolve to (or are still
+ * unresolved) objects, single-member unions of an object, and object-composable `allOf`.
  *
- * True for object nodes, `$ref`s that resolve to objects (or are still unresolved), single-member
- * unions of an object, and object-composable `allOf` intersections. False for cyclic refs (rendered
- * as `z.lazy(…)`), nullable/optional wrappers, multi-member unions, and non-object primitives.
- *
- * `cyclicSchemas` bounds the recursion: a ref into a cycle renders as `z.lazy(…)` rather than an
- * object, so it returns early instead of following the ref back into itself.
+ * `cyclicSchemas` bounds the recursion: a ref into a cycle renders as `z.lazy(…)`, not an object.
  */
 export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
   if (node.nullable || node.optional || node.nullish) return false
@@ -159,11 +154,9 @@ export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: Readonl
 }
 
 /**
- * Returns `true` when an `allOf` intersection is a pure object composition — a base that itself
- * resolves to an object plus inline object members whose shapes can be merged with `.extend(…)`.
- *
- * Rendering these with `.extend(…)` keeps the result a Zod object (discriminable, correct merge
- * semantics) instead of a `ZodIntersection`, which `z.discriminatedUnion` rejects.
+ * Whether an `allOf` is a pure object composition — an object base plus inline object members whose
+ * shapes merge with `.extend(…)`. These stay a Zod object instead of a `ZodIntersection`, which
+ * `z.discriminatedUnion` rejects.
  */
 export function isObjectComposableIntersection(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
   if (node.type !== 'intersection') return false
