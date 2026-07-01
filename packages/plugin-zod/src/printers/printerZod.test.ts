@@ -624,14 +624,12 @@ describe('printerZod', () => {
       })
       // An object-composable allOf variant renders via `.extend(...)`, which stays a ZodObject, so the
       // whole union can use z.discriminatedUnion instead of a plain z.union.
-      expect(printer.print(node)).toMatchInlineSnapshot(`
-        "z.discriminatedUnion('type', [
-          Base.extend({
-            text: z.string().optional(),
-          }),
-          Other,
-        ])"
-      `)
+      expect(printer.print(node)).toBe(`z.discriminatedUnion('type', [
+  Base.extend({
+    text: z.string().optional(),
+  }),
+  Other,
+])`)
     })
 
     test('discriminated union with single member', () => {
@@ -702,14 +700,12 @@ describe('printerZod', () => {
       })
       // A cyclic ref renders as `z.lazy(...)`, which is not a ZodObject and cannot take `.extend(...)`,
       // so the variant stays a ZodIntersection and the union falls back to z.union.
-      expect(cyclicPrinter.print(node)).toMatchInlineSnapshot(`
-        "z.union([
-          Cat,
-          z.lazy(() => BasePet).and(z.object({
-            petType: z.string(),
-          })),
-        ])"
-      `)
+      expect(cyclicPrinter.print(node)).toBe(`z.union([
+  Cat,
+  z.lazy(() => BasePet).and(z.object({
+    petType: z.string(),
+  })),
+])`)
     })
 
     test('discriminated union with three or more ref members', () => {
