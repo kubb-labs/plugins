@@ -106,7 +106,7 @@ type Mutation = {
   /**
    * HTTP methods treated as mutations.
    *
-   * @default ['post', 'put', 'delete']
+   * @default ['post', 'put', 'patch', 'delete']
    */
   methods?: Array<string>
   /**

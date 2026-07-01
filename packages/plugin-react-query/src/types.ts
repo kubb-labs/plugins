@@ -167,7 +167,7 @@ type Mutation = {
    * HTTP methods treated as mutations. Operations using these methods produce
    * `useMutation`-style hooks.
    *
-   * @default ['post', 'put', 'delete']
+   * @default ['post', 'put', 'patch', 'delete']
    */
   methods?: Array<string>
   /**
