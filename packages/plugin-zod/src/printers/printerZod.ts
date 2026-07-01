@@ -19,6 +19,8 @@ import {
   containsCodec,
   formatLiteral,
   getCodec,
+  isObjectComposableIntersection,
+  isObjectSchemaNode,
   lengthConstraints,
   numberConstraints,
   omitUnwrapChain,
@@ -154,6 +156,64 @@ function getMemberConstraint({ member, regexType }: { member: ast.SchemaNode; re
 }
 
 /**
+ * Runtime slice of the printer needed to render an object's property shape: the recursive
+ * `transform` dispatcher and the resolved printer options.
+ */
+type ZodPrinterContext = {
+  transform: (node: ast.SchemaNode) => string | null
+  options: PrinterZodOptions
+}
+
+/**
+ * Builds the `{ key: value, … }` shape literal for an object node's properties, applying the same
+ * cyclic-ref handling, `wrapOutput` hook, and per-property modifiers as the `object` handler. Shared
+ * so the `.object(...)` and `.extend(...)` renderings stay in lockstep.
+ */
+function buildZodObjectShape(ctx: ZodPrinterContext, node: ast.SchemaNode): string {
+  const objectNode = ast.narrowSchema(node, 'object')
+  if (!objectNode) return '{}'
+
+  const isCyclic = (schema: ast.SchemaNode): boolean =>
+    ctx.options.cyclicSchemas != null && containsCircularRef(schema, { circularSchemas: ctx.options.cyclicSchemas })
+
+  const entries = mapSchemaProperties(objectNode, (schema) => {
+    // Inside a getter the getter itself defers evaluation, so suppress z.lazy() wrapping on
+    // nested refs by temporarily clearing cyclicSchemas.
+    const hasSelfRef = isCyclic(schema)
+    const savedCyclicSchemas = ctx.options.cyclicSchemas
+    if (hasSelfRef) ctx.options.cyclicSchemas = undefined
+    const baseOutput = ctx.transform(schema) ?? ctx.transform(ast.factory.createSchema({ type: 'unknown' }))!
+    if (hasSelfRef) ctx.options.cyclicSchemas = savedCyclicSchemas
+    return baseOutput
+  }).map(({ name: propName, property, output: baseOutput }) => {
+    const { schema } = property
+    const meta = syncSchemaRef(schema)
+
+    const wrappedOutput = ctx.options.wrapOutput ? ctx.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
+
+    // When a property schema is not a ref but the metadata is from a ref (e.g., discriminator
+    // property override), skip applying the description from the ref target to avoid applying
+    // metadata from a replaced schema.
+    const descriptionToApply = schema.type !== 'ref' && meta.type === 'ref' ? undefined : meta.description
+
+    const value = applyModifiers({
+      value: wrappedOutput,
+      schema,
+      nullable: meta.nullable,
+      optional: schema.optional || property.required === false,
+      nullish: schema.nullish,
+      defaultValue: meta.default,
+      description: descriptionToApply,
+      examples: meta.examples,
+    })
+
+    return isCyclic(schema) ? lazyGetter({ name: propName, body: value }) : `${objectKey(propName)}: ${value}`
+  })
+
+  return buildObject(entries)
+}
+
+/**
  * Zod v4 printer built with `definePrinter`.
  *
  * Converts a `SchemaNode` AST into a Zod v4 code string using the chainable API
@@ -274,45 +334,8 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         return resolvedName
       },
       object(node) {
-        const isCyclic = (schema: ast.SchemaNode): boolean =>
-          this.options.cyclicSchemas != null && containsCircularRef(schema, { circularSchemas: this.options.cyclicSchemas })
-
-        const entries = mapSchemaProperties(node, (schema) => {
-          // Inside a getter the getter itself defers evaluation, so suppress z.lazy() wrapping on
-          // nested refs by temporarily clearing cyclicSchemas. Save before clearing: this.options
-          // === options (same reference via definePrinter), so reading it after mutation returns undefined.
-          const hasSelfRef = isCyclic(schema)
-          const savedCyclicSchemas = this.options.cyclicSchemas
-          if (hasSelfRef) this.options.cyclicSchemas = undefined
-          const baseOutput = this.transform(schema) ?? this.transform(ast.factory.createSchema({ type: 'unknown' }))!
-          if (hasSelfRef) this.options.cyclicSchemas = savedCyclicSchemas
-          return baseOutput
-        }).map(({ name: propName, property, output: baseOutput }) => {
-          const { schema } = property
-          const meta = syncSchemaRef(schema)
-
-          const wrappedOutput = this.options.wrapOutput ? this.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
-
-          // When a property schema is not a ref but the metadata is from a ref (e.g., discriminator
-          // property override), skip applying the description from the ref target to avoid applying
-          // metadata from a replaced schema.
-          const descriptionToApply = schema.type !== 'ref' && meta.type === 'ref' ? undefined : meta.description
-
-          const value = applyModifiers({
-            value: wrappedOutput,
-            schema,
-            nullable: meta.nullable,
-            optional: schema.optional || property.required === false,
-            nullish: schema.nullish,
-            defaultValue: meta.default,
-            description: descriptionToApply,
-            examples: meta.examples,
-          })
-
-          return isCyclic(schema) ? lazyGetter({ name: propName, body: value }) : `${objectKey(propName)}: ${value}`
-        })
-
-        const objectBase = `z.object(${buildObject(entries)})`
+        const entries = node.properties ?? []
+        const objectBase = `z.object(${buildZodObjectShape(this, node)})`
 
         const result = (() => {
           const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
@@ -366,10 +389,11 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           .filter(Boolean)
         if (members.length === 0) return ''
         if (members.length === 1) return members[0]!
-        // z.discriminatedUnion requires discriminable ZodObject members; an intersection
-        // (ZodIntersection) — including a `$ref` whose target is an `allOf` — is not assignable to
-        // $ZodDiscriminant, so fall back to z.union when any member resolves to an intersection.
-        const allDiscriminable = nodeMembers.every((m) => (m.type === 'ref' ? syncSchemaRef(m) : m).type !== 'intersection')
+        // z.discriminatedUnion needs every option to render as a ZodObject. Object refs and
+        // object-composable `allOf` variants (rendered via `.extend(…)`) qualify; a member that
+        // stays a ZodIntersection (`.and(…)`), a cyclic `z.lazy(…)` ref, or a non-object does not,
+        // so fall back to z.union then.
+        const allDiscriminable = nodeMembers.every((m) => isObjectSchemaNode(m, { cyclicSchemas: cyclicSchemaNames }))
         if (node.discriminatorPropertyName && allDiscriminable) {
           return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
         }
@@ -385,6 +409,14 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
 
         const firstBase = this.transform(first)
         if (!firstBase) return ''
+
+        // An `allOf` of plain objects is a merge, not a runtime intersection: render it with
+        // `.extend({ … })` so the result stays a ZodObject (correct merge semantics, and usable as a
+        // `z.discriminatedUnion` option) instead of the non-discriminable ZodIntersection `.and(…)`
+        // produces.
+        if (rest.length > 0 && isObjectComposableIntersection(node, { cyclicSchemas: cyclicSchemaNames })) {
+          return rest.reduce((acc, member) => `${acc}.extend(${buildZodObjectShape(this, member)})`, firstBase)
+        }
 
         return rest.reduce((acc, member) => {
           const constraint = getMemberConstraint({ member, regexType: this.options.regexType })

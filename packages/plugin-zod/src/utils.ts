@@ -117,6 +117,86 @@ export function collectCodecRefNames(node: ast.SchemaNode): Array<string> {
 }
 
 /**
+ * Context shared by the object-composition helpers: the schema names that form circular
+ * dependency chains, so refs into them (rendered as `z.lazy(() => …)`) are not treated as
+ * bare, extendable objects.
+ */
+export type ObjectComposeContext = {
+  cyclicSchemas?: ReadonlySet<string>
+}
+
+/**
+ * Returns `true` when the node is a plain inline object whose property shape can be lifted into an
+ * `.extend({ … })` argument. A catchall (`additionalProperties`) or `patternProperties` cannot be
+ * expressed through a bare shape, and a nullable/optional object is a wrapper rather than a shape,
+ * so those stay on the `.and(…)` path.
+ */
+function isPlainInlineObject(node: ast.SchemaNode): boolean {
+  return (
+    node.type === 'object' &&
+    !node.nullable &&
+    !node.optional &&
+    !node.nullish &&
+    node.additionalProperties === undefined &&
+    !node.patternProperties
+  )
+}
+
+/**
+ * Returns `true` when a schema node renders as a bare Zod object at the value level — one that
+ * accepts `.extend(…)` and can serve as a `z.discriminatedUnion` option.
+ *
+ * True for object nodes, `$ref`s that resolve to objects (or are as-yet unresolved), single-member
+ * unions of an object, and object-composable `allOf` intersections. False for cyclic refs (rendered
+ * as `z.lazy(…)`), nullable/optional wrappers, multi-member unions, and non-object primitives.
+ */
+export function isObjectSchemaNode(node: ast.SchemaNode, ctx: ObjectComposeContext = {}, seen: Set<string> = new Set()): boolean {
+  if (node.nullable || node.optional || node.nullish) return false
+  if (node.type === 'object') return true
+
+  if (node.type === 'ref') {
+    const refName = (node.ref ? extractRefName(node.ref) : undefined) ?? node.name ?? undefined
+    if (refName && ctx.cyclicSchemas?.has(refName)) return false
+    if (refName) {
+      if (seen.has(refName)) return false
+      seen.add(refName)
+    }
+    const resolved = syncSchemaRef(node)
+    // An unresolved ref keeps its `ref` type; assume it resolves to an object (matches the printer's
+    // prior optimism that only a resolved intersection blocks a discriminated union).
+    if (resolved.type === 'ref') return true
+    return isObjectSchemaNode(resolved, ctx, seen)
+  }
+
+  if (node.type === 'union') {
+    const members = node.members ?? []
+    return members.length === 1 && !!members[0] && isObjectSchemaNode(members[0], ctx, seen)
+  }
+
+  if (node.type === 'intersection') {
+    return isObjectComposableIntersection(node, ctx, seen)
+  }
+
+  return false
+}
+
+/**
+ * Returns `true` when an `allOf` intersection is a pure object composition — a base that itself
+ * resolves to an object plus inline object members whose shapes can be merged with `.extend(…)`.
+ *
+ * Rendering these with `.extend(…)` keeps the result a Zod object (discriminable, correct merge
+ * semantics) instead of a `ZodIntersection`, which `z.discriminatedUnion` rejects.
+ */
+export function isObjectComposableIntersection(node: ast.SchemaNode, ctx: ObjectComposeContext = {}, seen: Set<string> = new Set()): boolean {
+  if (node.type !== 'intersection') return false
+  const members = node.members ?? []
+  const [first, ...rest] = members
+  if (!first || !isObjectSchemaNode(first, ctx, seen)) return false
+
+  return rest.every((member) => isPlainInlineObject(member))
+}
+
+/**
  * Format a default value as a code-level literal.
  * Objects become `{}`, primitives become their string representation, strings are quoted.
  */

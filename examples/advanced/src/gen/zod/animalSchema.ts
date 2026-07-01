@@ -4,17 +4,13 @@ import { catSchema } from './catSchema.ts'
 import { dogSchema } from './dogSchema.ts'
 
 export const animalSchema = z
-  .union([
-    catSchema.and(
-      z.object({
-        type: z.enum(['cat']),
-      }),
-    ),
-    dogSchema.and(
-      z.object({
-        type: z.enum(['dog']),
-      }),
-    ),
+  .discriminatedUnion('type', [
+    catSchema.extend({
+      type: z.enum(['cat']),
+    }),
+    dogSchema.extend({
+      type: z.enum(['dog']),
+    }),
   ])
   .and(
     z

@@ -1,0 +1,39 @@
+openapi: 3.0.3
+info:
+  title: Discriminator without mapping
+  version: 1.0.0
+components:
+  schemas:
+    # Base type carrying the discriminator property
+    Animal:
+      type: object
+      required:
+        - petType
+      properties:
+        petType:
+          type: string
+
+    # Variants inherit the base through allOf and do not pin the discriminator themselves
+    Cat:
+      allOf:
+        - $ref: '#/components/schemas/Animal'
+        - type: object
+          properties:
+            huntingSkill:
+              type: string
+
+    Dog:
+      allOf:
+        - $ref: '#/components/schemas/Animal'
+        - type: object
+          properties:
+            packSize:
+              type: integer
+
+    # oneOf with a discriminator but NO mapping — the value is implied by each ref name
+    Pet:
+      oneOf:
+        - $ref: '#/components/schemas/Cat'
+        - $ref: '#/components/schemas/Dog'
+      discriminator:
+        propertyName: petType

@@ -603,7 +603,7 @@ describe('printerZod', () => {
       expect(printer.print(node)).toMatchInlineSnapshot(`"z.discriminatedUnion('petType', [Cat, Dog])"`)
     })
 
-    test('discriminated union falls back to z.union when a member is an intersection', () => {
+    test('discriminated union flattens allOf variants with .extend() so they discriminate', () => {
       const node = ast.factory.createSchema({
         type: 'union',
         discriminatorPropertyName: 'type',
@@ -622,9 +622,16 @@ describe('printerZod', () => {
           ast.factory.createSchema({ type: 'ref', name: 'Other', ref: '#/components/schemas/Other' }),
         ],
       })
-      // z.discriminatedUnion rejects a ZodIntersection member, so fall back to z.union.
-      expect(printer.print(node)).toContain('z.union(')
-      expect(printer.print(node)).not.toContain('z.discriminatedUnion(')
+      // An object-composable allOf variant renders via `.extend(...)`, which stays a ZodObject, so the
+      // whole union can use z.discriminatedUnion instead of a plain z.union.
+      expect(printer.print(node)).toMatchInlineSnapshot(`
+        "z.discriminatedUnion('type', [
+          Base.extend({
+            text: z.string().optional(),
+          }),
+          Other,
+        ])"
+      `)
     })
 
     test('discriminated union with single member', () => {
@@ -673,7 +680,8 @@ describe('printerZod', () => {
       `)
     })
 
-    test('falls back to z.union when a member is an intersection', () => {
+    test('falls back to z.union when a cyclic variant cannot flatten to an object', () => {
+      const cyclicPrinter = printerZod({ cyclicSchemas: new Set(['BasePet']) })
       const node = ast.factory.createSchema({
         type: 'union',
         discriminatorPropertyName: 'petType',
@@ -692,10 +700,12 @@ describe('printerZod', () => {
           }),
         ],
       })
-      expect(printer.print(node)).toMatchInlineSnapshot(`
+      // A cyclic ref renders as `z.lazy(...)`, which is not a ZodObject and cannot take `.extend(...)`,
+      // so the variant stays a ZodIntersection and the union falls back to z.union.
+      expect(cyclicPrinter.print(node)).toMatchInlineSnapshot(`
         "z.union([
           Cat,
-          BasePet.and(z.object({
+          z.lazy(() => BasePet).and(z.object({
             petType: z.string(),
           })),
         ])"

@@ -575,7 +575,7 @@ describe('printerZodMini', () => {
       `)
     })
 
-    test('falls back to z.union when a member is an intersection', () => {
+    test('discriminated union flattens allOf variants with z.extend() so they discriminate', () => {
       const node = ast.factory.createSchema({
         type: 'union',
         discriminatorPropertyName: 'petType',
@@ -594,10 +594,44 @@ describe('printerZodMini', () => {
           }),
         ],
       })
+      // An object-composable allOf variant renders via `z.extend(...)`, which stays a Zod object, so
+      // the union can use z.discriminatedUnion instead of z.union.
       expect(printer.print(node)).toMatchInlineSnapshot(`
+        "z.discriminatedUnion('petType', [
+          Cat,
+          z.extend(BasePet, {
+            petType: z.string(),
+          }),
+        ])"
+      `)
+    })
+
+    test('falls back to z.union when a cyclic variant cannot flatten to an object', () => {
+      const cyclicPrinter = printerZodMini({ cyclicSchemas: new Set(['BasePet']) })
+      const node = ast.factory.createSchema({
+        type: 'union',
+        discriminatorPropertyName: 'petType',
+        members: [
+          ast.factory.createSchema({ type: 'ref', name: 'Cat', ref: '#/components/schemas/Cat' }),
+          ast.factory.createSchema({
+            type: 'intersection',
+            members: [
+              ast.factory.createSchema({ type: 'ref', name: 'BasePet', ref: '#/components/schemas/BasePet' }),
+              ast.factory.createSchema({
+                type: 'object',
+                primitive: 'object',
+                properties: [ast.factory.createProperty({ name: 'petType', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+              }),
+            ],
+          }),
+        ],
+      })
+      // A cyclic ref renders as `z.lazy(...)`, which is not a Zod object and cannot take `z.extend(...)`,
+      // so the variant stays a z.intersection and the union falls back to z.union.
+      expect(cyclicPrinter.print(node)).toMatchInlineSnapshot(`
         "z.union([
           Cat,
-          z.intersection(BasePet, z.object({
+          z.intersection(z.lazy(() => BasePet), z.object({
             petType: z.string(),
           })),
         ])"
