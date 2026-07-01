@@ -1,5 +1,13 @@
 # @kubb/plugin-msw
 
+## 5.0.0-beta.80
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-faker@5.0.0-beta.80
+  - @kubb/plugin-ts@5.0.0-beta.80
+
 ## 5.0.0-beta.79
 
 ### Minor Changes
