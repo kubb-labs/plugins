@@ -132,14 +132,7 @@ export type ObjectComposeContext = {
  * so those stay on the `.and(…)` path.
  */
 function isPlainInlineObject(node: ast.SchemaNode): boolean {
-  return (
-    node.type === 'object' &&
-    !node.nullable &&
-    !node.optional &&
-    !node.nullish &&
-    node.additionalProperties === undefined &&
-    !node.patternProperties
-  )
+  return node.type === 'object' && !node.nullable && !node.optional && !node.nullish && node.additionalProperties === undefined && !node.patternProperties
 }
 
 /**
