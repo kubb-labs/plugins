@@ -13,7 +13,17 @@ import {
 import { ast } from '@kubb/core'
 import { containsCircularRef, syncSchemaRef } from '@kubb/ast/utils'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { applyMiniModifiers, buildEnum, formatLiteral, lengthChecksMini, numberChecksMini, omitUnwrapChain, patternKeySchemaMini } from '../utils.ts'
+import {
+  applyMiniModifiers,
+  buildEnum,
+  formatLiteral,
+  isObjectComposableIntersection,
+  isObjectSchemaNode,
+  lengthChecksMini,
+  numberChecksMini,
+  omitUnwrapChain,
+  patternKeySchemaMini,
+} from '../utils.ts'
 
 /**
  * Partial map of node-type overrides for the Zod Mini printer.
@@ -102,6 +112,53 @@ function getMemberConstraintMini({ member, regexType }: { member: ast.SchemaNode
 }
 
 /**
+ * The Mini printer slice `buildZodMiniObjectShape` needs: the recursive `transform` and the options.
+ */
+type ZodMiniPrinterContext = {
+  transform: (node: ast.SchemaNode) => string | null
+  options: PrinterZodMiniOptions
+}
+
+/**
+ * Builds the `{ key: value, … }` shape for an object node with the functional `zod/mini` modifiers,
+ * shared by the `z.object(...)` and `z.extend(...)` renderings so they stay in lockstep.
+ */
+function buildZodMiniObjectShape(ctx: ZodMiniPrinterContext, node: ast.SchemaNode): string {
+  const objectNode = ast.narrowSchema(node, 'object')
+  if (!objectNode) return '{}'
+
+  const isCyclic = (schema: ast.SchemaNode): boolean =>
+    ctx.options.cyclicSchemas != null && containsCircularRef(schema, { circularSchemas: ctx.options.cyclicSchemas })
+
+  const entries = mapSchemaProperties(objectNode, (schema) => {
+    const hasSelfRef = isCyclic(schema)
+    const savedCyclicSchemas = ctx.options.cyclicSchemas
+    if (hasSelfRef) ctx.options.cyclicSchemas = undefined
+    const baseOutput = ctx.transform(schema) ?? ctx.transform(ast.factory.createSchema({ type: 'unknown' }))!
+    if (hasSelfRef) ctx.options.cyclicSchemas = savedCyclicSchemas
+    return baseOutput
+  }).map(({ name: propName, property, output: baseOutput }) => {
+    const { schema } = property
+    const meta = syncSchemaRef(schema)
+
+    const wrappedOutput = ctx.options.wrapOutput ? ctx.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
+
+    const value = applyMiniModifiers({
+      value: wrappedOutput,
+      schema,
+      nullable: meta.nullable,
+      optional: schema.optional || property.required === false,
+      nullish: schema.nullish,
+      defaultValue: meta.default,
+    })
+
+    return isCyclic(schema) ? lazyGetter({ name: propName, body: value }) : `${objectKey(propName)}: ${value}`
+  })
+
+  return buildObject(entries)
+}
+
+/**
  * Zod v4 **Mini** printer built with `definePrinter`.
  *
  * Converts a `SchemaNode` AST into a Zod v4 code string using the functional API
@@ -114,6 +171,9 @@ function getMemberConstraintMini({ member, regexType }: { member: ast.SchemaNode
  * ```
  */
 export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options) => {
+  // The object handler temporarily clears `options.cyclicSchemas` while rendering a getter body, so
+  // capture a stable reference for the intersection/union discriminability decisions.
+  const cyclicSchemaNames = options.cyclicSchemas
   return {
     name: 'zod-mini',
     options,
@@ -197,38 +257,8 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         return resolvedName
       },
       object(node) {
-        const isCyclic = (schema: ast.SchemaNode): boolean =>
-          this.options.cyclicSchemas != null && containsCircularRef(schema, { circularSchemas: this.options.cyclicSchemas })
-
-        const entries = mapSchemaProperties(node, (schema) => {
-          // Inside a getter the getter itself defers evaluation, so suppress z.lazy() wrapping on
-          // nested refs by temporarily clearing cyclicSchemas. Save before clearing: this.options
-          // === options (same reference via definePrinter), so reading it after mutation returns undefined.
-          const hasSelfRef = isCyclic(schema)
-          const savedCyclicSchemas = this.options.cyclicSchemas
-          if (hasSelfRef) this.options.cyclicSchemas = undefined
-          const baseOutput = this.transform(schema) ?? this.transform(ast.factory.createSchema({ type: 'unknown' }))!
-          if (hasSelfRef) this.options.cyclicSchemas = savedCyclicSchemas
-          return baseOutput
-        }).map(({ name: propName, property, output: baseOutput }) => {
-          const { schema } = property
-          const meta = syncSchemaRef(schema)
-
-          const wrappedOutput = this.options.wrapOutput ? this.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
-
-          const value = applyMiniModifiers({
-            value: wrappedOutput,
-            schema,
-            nullable: meta.nullable,
-            optional: schema.optional || property.required === false,
-            nullish: schema.nullish,
-            defaultValue: meta.default,
-          })
-
-          return isCyclic(schema) ? lazyGetter({ name: propName, body: value }) : `${objectKey(propName)}: ${value}`
-        })
-
-        const objectBase = `z.object(${buildObject(entries)})`
+        const entries = node.properties ?? []
+        const objectBase = `z.object(${buildZodMiniObjectShape(this, node)})`
 
         // zod/mini has no chainable `.catchall()`/`.strict()`, so route through the functional forms.
         const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
@@ -276,10 +306,10 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           .filter(Boolean)
         if (members.length === 0) return ''
         if (members.length === 1) return members[0]!
-        // z.discriminatedUnion requires discriminable ZodObject members; an intersection
-        // (ZodIntersection) — including a `$ref` whose target is an `allOf` — is not assignable to
-        // $ZodDiscriminant, so fall back to z.union when any member resolves to an intersection.
-        const allDiscriminable = nodeMembers.every((m) => (m.type === 'ref' ? syncSchemaRef(m) : m).type !== 'intersection')
+        // z.discriminatedUnion needs every option to be a Zod object. Object variants (refs or
+        // `z.extend(…)`-composed `allOf`) qualify; intersections, cyclic `z.lazy(…)` refs, and
+        // non-objects fall back to z.union.
+        const allDiscriminable = nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemaNames))
         if (node.discriminatorPropertyName && allDiscriminable) {
           return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
         }
@@ -295,6 +325,12 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
 
         const firstBase = this.transform(first)
         if (!firstBase) return ''
+
+        // An object `allOf` is a merge, not a runtime intersection: `z.extend(base, { … })` keeps it
+        // a Zod object (usable in z.discriminatedUnion) instead of a non-discriminable `z.intersection`.
+        if (rest.length > 0 && isObjectComposableIntersection(node, cyclicSchemaNames)) {
+          return rest.reduce((acc, member) => `z.extend(${acc}, ${buildZodMiniObjectShape(this, member)})`, firstBase)
+        }
 
         return rest.reduce((acc, member) => {
           const constraint = getMemberConstraintMini({ member, regexType: this.options.regexType })

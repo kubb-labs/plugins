@@ -9,8 +9,6 @@ export const petAndOwnerSchema = z
   .object({
     petName: z.string(),
   })
-  .and(
-    z.object({
-      ownerName: z.string(),
-    }),
-  )
+  .extend({
+    ownerName: z.string(),
+  })

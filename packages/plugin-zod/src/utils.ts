@@ -117,6 +117,54 @@ export function collectCodecRefNames(node: ast.SchemaNode): Array<string> {
 }
 
 /**
+ * Whether the node is a plain inline object whose shape can be lifted into an `.extend({ … })`
+ * argument. A catchall, `patternProperties`, or a nullable/optional wrapper cannot, so those stay
+ * on `.and(…)`.
+ */
+function isPlainInlineObject(node: ast.SchemaNode): boolean {
+  return node.type === 'object' && !node.nullable && !node.optional && !node.nullish && node.additionalProperties === undefined && !node.patternProperties
+}
+
+/**
+ * Whether a node renders as a bare Zod object — one that accepts `.extend(…)` and can be a
+ * `z.discriminatedUnion` option. Covers object nodes, `$ref`s that resolve to (or are still
+ * unresolved) objects, single-member unions of an object, and object-composable `allOf`.
+ *
+ * `cyclicSchemas` bounds the recursion: a ref into a cycle renders as `z.lazy(…)`, not an object.
+ */
+export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
+  if (node.nullable || node.optional || node.nullish) return false
+  if (node.type === 'object') return true
+
+  if (node.type === 'ref') {
+    const refName = (node.ref ? extractRefName(node.ref) : undefined) ?? node.name
+    if (refName && cyclicSchemas?.has(refName)) return false
+    const resolved = syncSchemaRef(node)
+    // An unresolved ref keeps its `ref` type; assume it resolves to an object (matches the printer's
+    // prior optimism that only a resolved intersection blocks a discriminated union).
+    return resolved.type === 'ref' || isObjectSchemaNode(resolved, cyclicSchemas)
+  }
+
+  if (node.type === 'union') {
+    const members = node.members ?? []
+    return members.length === 1 && isObjectSchemaNode(members[0]!, cyclicSchemas)
+  }
+
+  return isObjectComposableIntersection(node, cyclicSchemas)
+}
+
+/**
+ * Whether an `allOf` is a pure object composition — an object base plus inline object members whose
+ * shapes merge with `.extend(…)`. These stay a Zod object instead of a `ZodIntersection`, which
+ * `z.discriminatedUnion` rejects.
+ */
+export function isObjectComposableIntersection(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
+  if (node.type !== 'intersection') return false
+  const [first, ...rest] = node.members ?? []
+  return !!first && isObjectSchemaNode(first, cyclicSchemas) && rest.every(isPlainInlineObject)
+}
+
+/**
  * Format a default value as a code-level literal.
  * Objects become `{}`, primitives become their string representation, strings are quoted.
  */

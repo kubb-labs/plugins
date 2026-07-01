@@ -13,7 +13,7 @@ import { client } from '../../.kubb/client.ts'
  * {@link /store/inventory}
  */
 export function getInventory<ThrowOnError extends boolean = true>(
-  options: Options<GetInventoryRequestConfig, ThrowOnError>,
+  options: Options<GetInventoryRequestConfig, ThrowOnError> = {},
 ): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

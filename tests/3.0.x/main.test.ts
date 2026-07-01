@@ -82,6 +82,12 @@ const configs = [
             barrel: false,
           },
         }),
+        pluginZod({
+          output: {
+            path: './zod',
+            barrel: false,
+          },
+        }),
       ],
     },
   },
@@ -99,7 +105,15 @@ const configs = [
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
-      plugins: [pluginTs({})],
+      plugins: [
+        pluginTs({}),
+        pluginZod({
+          output: {
+            path: './zod',
+            barrel: false,
+          },
+        }),
+      ],
     },
   },
   {
@@ -119,6 +133,64 @@ const configs = [
         pluginTs({
           output: {
             path: './types',
+            barrel: false,
+          },
+        }),
+        pluginZod({
+          output: {
+            path: './zod',
+            barrel: false,
+          },
+        }),
+      ],
+    },
+  },
+  {
+    /**
+     * A `oneOf` discriminator with no `mapping`: the discriminant value for each variant is implied
+     * by its ref name (Cat → 'Cat', Dog → 'Dog'). The variants inherit a shared base through
+     * `allOf`, so they flatten to objects and the union emits z.discriminatedUnion.
+     */
+    name: 'discriminatorImplicit',
+    config: {
+      root: __dirname,
+      input: {
+        path: '../../schemas/3.0.x/discriminatorImplicit.yaml',
+      },
+      output: {
+        path: './gen',
+        barrel: false,
+      },
+      adapter: adapterOas({ validate: false, enums: 'root' }),
+      parsers: [parserTs],
+      plugins: [
+        pluginZod({
+          output: {
+            path: './zod',
+            barrel: false,
+          },
+        }),
+      ],
+    },
+  },
+  {
+    name: 'discriminatorOneOfMini',
+    config: {
+      root: __dirname,
+      input: {
+        path: '../../schemas/3.0.x/discriminatorOneOf.yaml',
+      },
+      output: {
+        path: './gen',
+        barrel: false,
+      },
+      adapter: adapterOas({ validate: false, enums: 'root' }),
+      parsers: [parserTs],
+      plugins: [
+        pluginZod({
+          mini: true,
+          output: {
+            path: './zod',
             barrel: false,
           },
         }),
