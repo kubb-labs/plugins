@@ -228,7 +228,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
 
 describe(`plugin-swr options ${version}`, () => {
   test.each(configs)('config testing with config as $name', async ({ name, config }) => {
-    const tmpDir = path.join(os.tmpdir(), `kubb-test-${name}-${Date.now()}`)
+    const tmpDir = path.join(os.tmpdir(), `kubb-test-swr-${name}-${Date.now()}`)
     const output = path.join(tmpDir, name)
     const { files, diagnostics } = await createKubb(
       {
