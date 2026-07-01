@@ -36,7 +36,7 @@ export class PetStore {
    * @summary Finds Pets by status
    * {@link /pet/findByStatus}
    */
-    public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusRequestConfig, ThrowOnError>): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+    public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusRequestConfig, ThrowOnError> = {}): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
@@ -79,7 +79,7 @@ export class PetStore {
    * @summary Returns pet inventories by status
    * {@link /store/inventory}
    */
-    public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryRequestConfig, ThrowOnError>): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
+    public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryRequestConfig, ThrowOnError> = {}): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
