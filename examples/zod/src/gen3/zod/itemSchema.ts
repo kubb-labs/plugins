@@ -8,17 +8,13 @@ import { itemTypeASchema } from './itemTypeASchema.ts'
 import { itemTypeBSchema } from './itemTypeBSchema.ts'
 
 export const itemSchema = z
-  .union([
-    itemTypeASchema.and(
-      z.object({
-        type: z.enum(['typeA']),
-      }),
-    ),
-    itemTypeBSchema.and(
-      z.object({
-        type: z.enum(['typeB']),
-      }),
-    ),
+  .discriminatedUnion('type', [
+    itemTypeASchema.extend({
+      type: z.enum(['typeA']),
+    }),
+    itemTypeBSchema.extend({
+      type: z.enum(['typeB']),
+    }),
   ])
   .and(
     z.object({

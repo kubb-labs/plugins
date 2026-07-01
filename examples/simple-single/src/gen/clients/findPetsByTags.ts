@@ -13,7 +13,7 @@ import { client } from '../.kubb/client'
  * {@link /pet/findByTags}
  */
 export function findPetsByTags<ThrowOnError extends boolean = true>(
-  options: Options<FindPetsByTagsRequestConfig, ThrowOnError>,
+  options: Options<FindPetsByTagsRequestConfig, ThrowOnError> = {},
 ): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

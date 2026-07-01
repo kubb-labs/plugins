@@ -53,7 +53,7 @@ export class pet {
    * {@link /pet/findByStatus}
    */
   public findPetsByStatus<ThrowOnError extends boolean = true>(
-    options: Options<FindPetsByStatusRequestConfig, ThrowOnError>,
+    options: Options<FindPetsByStatusRequestConfig, ThrowOnError> = {},
   ): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -68,7 +68,7 @@ export class pet {
    * {@link /pet/findByTags}
    */
   public findPetsByTags<ThrowOnError extends boolean = true>(
-    options: Options<FindPetsByTagsRequestConfig, ThrowOnError>,
+    options: Options<FindPetsByTagsRequestConfig, ThrowOnError> = {},
   ): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 

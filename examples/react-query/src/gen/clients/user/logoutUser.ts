@@ -12,7 +12,7 @@ import { client } from '../../.kubb/client.ts'
  * {@link /user/logout}
  */
 export function logoutUser<ThrowOnError extends boolean = true>(
-  options: Options<LogoutUserRequestConfig, ThrowOnError>,
+  options: Options<LogoutUserRequestConfig, ThrowOnError> = {},
 ): Promise<RequestResult<LogoutUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
