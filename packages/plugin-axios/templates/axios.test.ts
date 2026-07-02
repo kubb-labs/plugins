@@ -361,6 +361,15 @@ describe('createClientCore', () => {
     expect(headers['Content-Type']).toBe('application/json')
   })
 
+  test('serializes JSON body without explicit contentType and sets Content-Type', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'POST', url: '/v3/jwt/token/', body: { email: 'test@example.com', password: 'secret' } })
+    expect(calls[0]?.data).toBe('{"email":"test@example.com","password":"secret"}')
+    const headers = calls[0]?.headers as Record<string, string>
+    expect(headers['Content-Type']).toBe('application/json')
+  })
+
   test('serializes cookie params into the Cookie header', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance })

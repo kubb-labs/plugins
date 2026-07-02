@@ -313,6 +313,13 @@ describe('createClientCore', () => {
     expect(calls[0]?.headers['Content-Type']).toBe('application/json')
   })
 
+  test('serializes JSON body without explicit contentType and sets Content-Type', async () => {
+    const { client, calls } = createClient()
+    await client({ method: 'POST', url: '/v3/jwt/token/', body: { email: 'test@example.com', password: 'secret' } })
+    expect(calls[0]?.body).toBe('{"email":"test@example.com","password":"secret"}')
+    expect(calls[0]?.headers['Content-Type']).toBe('application/json')
+  })
+
   test('serializes cookie params into the Cookie header', async () => {
     const { client, calls } = createClient()
     await client({ method: 'GET', url: '/pet', cookies: { session: 'abc', ids: [1, 2] } })
