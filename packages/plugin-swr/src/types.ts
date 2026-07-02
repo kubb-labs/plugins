@@ -78,7 +78,7 @@ type Query = {
    * Path to the useSWR hook for useSWR functionality.
    * Used as `import useSWR from '${importPath}'`.
    * Accepts relative and absolute paths.
-   * Path is used as-is; relative paths are based on the generated file location.
+   * Path is used as-is. Relative paths are based on the generated file location.
    * @default 'swr'
    */
   importPath?: string
@@ -95,7 +95,7 @@ type Mutation = {
    * Path to the useSWRMutation hook for useSWRMutation functionality.
    * Used as `import useSWRMutation from '${importPath}'`.
    * Accepts relative and absolute paths.
-   * Path is used as-is; relative paths are based on the generated file location.
+   * Path is used as-is. Relative paths are based on the generated file location.
    * @default 'swr/mutation'
    */
   importPath?: string
@@ -131,11 +131,19 @@ export type Options = OutputOptions & {
    * Override options for specific tags, operations, or paths.
    */
   override?: Array<Override<ResolvedOptions>>
+  /**
+   * Custom `queryKey` builder. Use to add a version namespace, swap to
+   * operation IDs, or shape keys to match an existing invalidation strategy.
+   */
   queryKey?: QueryKey
   /**
    * Configure useSWR behavior.
    */
   query?: Partial<Query> | false
+  /**
+   * Custom `mutationKey` builder. Useful when you match keys from SWR's
+   * global `mutate` for cache updates.
+   */
   mutationKey?: MutationKey
   /**
    * Configure useSWRMutation behavior.

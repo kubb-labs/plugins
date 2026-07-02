@@ -211,7 +211,9 @@ function parseEnumValue(value: string | number | boolean | undefined) {
   return value
 }
 
-/** Reads the discriminator literal off a variant, or `undefined` when it can't be determined. */
+/**
+ * Reads the discriminator literal off a variant, or `undefined` when it can't be determined.
+ */
 function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string) {
   const prop = ast.narrowSchema(member, 'object')?.properties?.find((p) => p.name === discriminatorPropertyName)
   const enumNode = prop ? ast.narrowSchema(prop.schema, 'enum') : null
@@ -288,7 +290,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       ref(node) {
         // Parser-generated refs (with $ref) carry raw schema names that need resolving.
-        // Use the canonical name from the $ref path — node.name may have been overridden
+        // Use the canonical name from the $ref path, since node.name may have been overridden
         // (e.g. by single-member allOf flatten using the property-derived child name).
         // Inline refs (without $ref) from faker utils already carry resolved helper names.
         // `nameMapping` (keyed by the full $ref) carries the collision-resolved name when the
@@ -393,7 +395,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           // part of a circular dependency (other than the current schema itself),
           // emit a memoizing lazy getter. On first access it computes the value,
           // replaces itself with a plain data property via Object.defineProperty,
-          // and returns the cached value – so every subsequent read is stable.
+          // and returns the cached value, so every subsequent read is stable.
           if (cyclicSchemas && containsCircularRef(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
             return `get ${objectKey(property.name)}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
           }

@@ -658,7 +658,7 @@ async function parseResponse(response: Response, responseType?: ResponseType): P
     case 'stream':
       return response.body ?? undefined
     case 'json': {
-      // An empty body with a JSON content-type would make response.json() throw; treat it as no data.
+      // An empty body with a JSON content-type would make response.json() throw, so treat it as no data.
       const body = await response.text()
       return body ? JSON.parse(body) : undefined
     }

@@ -492,8 +492,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     validateStatus,
   }
 
-  // Only the fetch adapter exposes a streaming `response.data` (a ReadableStream) in the browser;
-  // the default XHR adapter buffers the whole body. Default streams to it, but respect an explicit adapter.
+  // Only the fetch adapter exposes a streaming `response.data` (a ReadableStream) in the browser.
+  // The default XHR adapter buffers the whole body. Default streams to it, but respect an explicit adapter.
   if (requestConfig.responseType === 'stream' && !axiosConfig.adapter) {
     axiosConfig.adapter = 'fetch'
   }

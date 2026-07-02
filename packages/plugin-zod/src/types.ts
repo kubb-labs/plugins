@@ -144,16 +144,16 @@ export type Options = OutputOptions & {
   coercion?: boolean | { dates?: boolean; strings?: boolean; numbers?: boolean }
   /**
    * Validator for `format: uuid` properties.
-   * - `'uuid'` — `z.uuid()`. Standard RFC 4122.
-   * - `'guid'` — `z.guid()`. Accepts Microsoft-style GUIDs.
+   * - `'uuid'`: `z.uuid()`. Standard RFC 4122.
+   * - `'guid'`: `z.guid()`. Accepts Microsoft-style GUIDs.
    *
    * @default 'uuid'
    */
   guidType?: 'uuid' | 'guid'
   /**
    * Output form for an OpenAPI `pattern` inside `.regex(...)`.
-   * - `'literal'` — a regex literal: `.regex(/^[a-z]+$/)`.
-   * - `'constructor'` — the `RegExp` constructor: `.regex(new RegExp("^[a-z]+$"))`.
+   * - `'literal'`: a regex literal, `.regex(/^[a-z]+$/)`.
+   * - `'constructor'`: the `RegExp` constructor, `.regex(new RegExp("^[a-z]+$"))`.
    *
    * @default 'literal'
    */

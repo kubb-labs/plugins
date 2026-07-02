@@ -256,7 +256,7 @@ export type Options = OutputOptions & {
   override?: Array<Override<ResolvedOptions>>
   /**
    * Enables `useInfiniteQuery` hooks for cursor- or page-based pagination.
-   * Pass an object to configure how the cursor is read; pass `false` to skip.
+   * Pass an object to configure how the cursor is read, or pass `false` to skip.
    *
    * @default false
    */
@@ -329,7 +329,7 @@ type ResolvedOptions = {
    */
   client: ResolvedClient
   /**
-   * Only used for infinite
+   * Resolved infinite query configuration, or `false` when infinite queries are disabled.
    */
   infinite: NonNullable<Infinite> | false
   suspense: Suspense | false

@@ -102,8 +102,8 @@ export type PrinterZodOptions = {
   cyclicSchemas?: ReadonlySet<string>
   /**
    * Print direction for `dateType: 'date'` fields (`Date` in TypeScript):
-   * - `'output'` (default) — decode the wire `string` into a `Date` (response bodies).
-   * - `'input'` — encode a `Date` back into the wire `string` (request bodies/params).
+   * - `'output'` (default): decode the wire `string` into a `Date` (response bodies).
+   * - `'input'`: encode a `Date` back into the wire `string` (request bodies/params).
    *
    * Diverging the directions requires the generator to emit an `${name}InputSchema`
    * variant for each date-bearing component.
@@ -137,7 +137,7 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
     }
 
     // A cyclic ref is annotated `z.ZodType`, and a nullable/optional ref is wrapped in
-    // ZodNullable/ZodOptional — neither exposes `.strict()`. Only a bare `ZodObject` ref takes it.
+    // ZodNullable/ZodOptional, and neither exposes `.strict()`. Only a bare `ZodObject` ref takes it.
     // A union member ref may carry only `node.name` (no `node.ref`), so fall back to it like `ref()`.
     const refName = (node.ref ? extractRefName(node.ref) : undefined) ?? node.name
     if (refName && cyclicSchemas?.has(refName)) {
@@ -265,7 +265,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         return shouldCoerce(this.options.coercion, 'numbers') ? 'z.coerce.bigint()' : 'z.bigint()'
       },
       date(node) {
-        // representation: 'date' → typed as `Date`; decode/encode at the boundary.
+        // representation: 'date' fields are typed as `Date`, so decode/encode at the boundary.
         const codec = getCodec(node)
         if (codec) {
           if (this.options.direction === 'input') return codec.encode(node)

@@ -6,6 +6,10 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Query, QueryKey, QueryOptions } from '../components'
 import type { PluginSwr } from '../types'
 
+/**
+ * Built-in generator for `useSWR` hooks. Emits one `useFoo` hook per read operation plus the
+ * matching `fooQueryKey` helper and `fooQueryOptions` factory.
+ */
 export const queryGenerator = defineGenerator<PluginSwr>({
   name: 'swr-query',
   renderer: jsxRenderer,

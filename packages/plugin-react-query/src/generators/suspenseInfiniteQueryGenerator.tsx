@@ -9,7 +9,7 @@ import type { PluginReactQuery } from '../types'
 /**
  * Built-in generator for `useSuspenseInfiniteQuery` hooks. Enabled when both
  * `suspense` and `infinite` are configured. Combines suspense semantics with
- * cursor-based pagination — handlers throw promises while loading and pull
+ * cursor-based pagination. Handlers throw promises while loading and pull
  * additional pages on demand.
  */
 export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>({

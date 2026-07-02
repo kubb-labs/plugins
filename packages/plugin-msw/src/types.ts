@@ -63,8 +63,8 @@ export type Options = OutputOptions & {
   handlers?: boolean
   /**
    * Source of the response body returned by each generated handler.
-   * - `'data'` — typed empty/example payload, ready for you to fill in from tests.
-   * - `'faker'` — value produced by `@kubb/plugin-faker`.
+   * - `'data'`: typed empty/example payload, ready for you to fill in from tests.
+   * - `'faker'`: value produced by `@kubb/plugin-faker`.
    *
    * @default 'data'
    */

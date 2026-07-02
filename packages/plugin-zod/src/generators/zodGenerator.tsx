@@ -30,7 +30,7 @@ type StdPrinterParams = {
 
 /**
  * Returns the cached `output`/`input` direction printers for a resolver, building them on
- * first use. The `input` printer encodes `Date → string` for request bodies; `output` decodes
+ * first use. The `input` printer encodes `Date → string` for request bodies, and `output` decodes
  * `string → Date` for responses. Schemas without `dateType: 'date'` fields print identically.
  */
 function getStdPrinters(resolver: ResolverZod, params: StdPrinterParams): StdPrinters {
@@ -233,7 +233,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       )
     }
 
-    // Multiple content types for a single name — emit one schema per content type plus a union alias.
+    // Multiple content types for a single name: emit one schema per content type plus a union alias.
     function buildContentTypeVariants(
       entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
       baseName: string,

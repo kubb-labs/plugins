@@ -7,8 +7,33 @@ import { mutationGenerator, queryGenerator } from './generators'
 import { resolverSwr } from './resolvers/resolverSwr.ts'
 import type { PluginSwr } from './types.ts'
 
+/**
+ * Canonical plugin name for `@kubb/plugin-swr`. Used for driver lookups and cross-plugin
+ * dependency references.
+ */
 export const pluginSwrName = 'plugin-swr' satisfies PluginSwr['name']
 
+/**
+ * Generates SWR hooks from OpenAPI operations. Read operations become `useFoo` hooks built on
+ * `useSWR` and write operations become `useFoo` hooks built on `useSWRMutation`, wrapping the
+ * client functions from `@kubb/plugin-axios` or `@kubb/plugin-fetch`.
+ *
+ * @example
+ * ```ts
+ * import { defineConfig } from 'kubb'
+ * import { pluginTs } from '@kubb/plugin-ts'
+ * import { pluginSwr } from '@kubb/plugin-swr'
+ *
+ * export default defineConfig({
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginTs(),
+ *     pluginSwr({ output: { path: './hooks' } }),
+ *   ],
+ * })
+ * ```
+ */
 export const pluginSwr = definePlugin<PluginSwr>((options) => {
   const {
     output = { path: 'hooks', barrel: { type: 'named' } },

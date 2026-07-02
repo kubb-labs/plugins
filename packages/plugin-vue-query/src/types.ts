@@ -1,6 +1,10 @@
 import type { ClientSelector } from '@internals/client'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 
+/**
+ * Builds the parts of a query or mutation key for one operation. Receives the operation node and
+ * the resolved `paramsCasing` setting and returns the key elements in order.
+ */
 export type Transformer = (props: { node: ast.OperationNode; casing: 'camelcase' | undefined }) => Array<unknown>
 
 /**
@@ -181,7 +185,7 @@ export type Options = OutputOptions & {
   override?: Array<Override<ResolvedOptions>>
   /**
    * Enables `useInfiniteQuery` composables for cursor- or page-based pagination.
-   * Pass an object to configure how the cursor is read; pass `false` to skip.
+   * Pass an object to configure how the cursor is read, or pass `false` to skip.
    *
    * @default false
    */
@@ -237,7 +241,7 @@ type ResolvedOptions = {
    */
   client: ResolvedClient
   /**
-   * Only used for infinite
+   * Resolved infinite query configuration, or `false` when infinite queries are disabled.
    */
   infinite: NonNullable<Infinite> | false
   queryKey: QueryKey | null
