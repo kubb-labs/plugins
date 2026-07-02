@@ -74,6 +74,8 @@ export type Options = OutputOptions & {
   override?: Array<Override<ResolvedOptions>>
   /**
    * Base URL prepended to every request. When omitted, falls back to the adapter's server URL.
+   * Values containing a `${...}` interpolation are emitted as template literals in the generated
+   * client config, which keeps runtime environment reads dynamic.
    */
   baseURL?: string
   /**
