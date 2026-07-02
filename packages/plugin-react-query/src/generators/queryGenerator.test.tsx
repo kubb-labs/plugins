@@ -30,10 +30,10 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   mutationKey: mutationKeyTransformer,
   query: {
     importPath: '@tanstack/react-query',
-    methods: ['get'],
+    methods: ['GET'],
   },
   mutation: {
-    methods: ['post', 'put', 'patch', 'delete'],
+    methods: ['POST', 'PUT', 'PATCH', 'DELETE'],
     importPath: '@tanstack/react-query',
   },
   suspense: false,

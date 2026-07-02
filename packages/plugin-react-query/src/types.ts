@@ -148,7 +148,7 @@ type Query = {
    * HTTP methods treated as queries. Operations using these methods produce
    * `useQuery`-style hooks.
    *
-   * @default ['get']
+   * @default ['GET']
    */
   methods?: Array<string>
   /**
@@ -166,7 +166,7 @@ type Mutation = {
    * HTTP methods treated as mutations. Operations using these methods produce
    * `useMutation`-style hooks.
    *
-   * @default ['post', 'put', 'patch', 'delete']
+   * @default ['POST', 'PUT', 'PATCH', 'DELETE']
    */
   methods?: Array<string>
   /**

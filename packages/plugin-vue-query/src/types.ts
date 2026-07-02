@@ -93,7 +93,7 @@ type Query = {
   /**
    * HTTP methods treated as queries.
    *
-   * @default ['get']
+   * @default ['GET']
    */
   methods?: Array<string>
   /**
@@ -109,7 +109,7 @@ type Mutation = {
   /**
    * HTTP methods treated as mutations.
    *
-   * @default ['post', 'put', 'patch', 'delete']
+   * @default ['POST', 'PUT', 'PATCH', 'DELETE']
    */
   methods?: Array<string>
   /**

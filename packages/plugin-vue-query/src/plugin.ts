@@ -89,7 +89,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
               ? false
               : {
                   importPath: '@tanstack/vue-query',
-                  methods: ['get'],
+                  methods: ['GET'],
                   ...query,
                 },
           mutationKey,
@@ -98,7 +98,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
               ? false
               : {
                   importPath: '@tanstack/vue-query',
-                  methods: ['post', 'put', 'patch', 'delete'],
+                  methods: ['POST', 'PUT', 'PATCH', 'DELETE'],
                   ...mutation,
                 },
           infinite: infinite
