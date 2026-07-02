@@ -16,8 +16,8 @@ export const pluginVueQueryName = 'plugin-vue-query' satisfies PluginVueQuery['n
 
 /**
  * Generates one TanStack Query composable per OpenAPI operation for Vue's
- * Composition API. Queries become `useFooQuery` (and optionally
- * `useFooInfiniteQuery`). Mutations become `useFooMutation`. Each composable
+ * Composition API. Queries become `useFoo` (and optionally
+ * `useFooInfinite`). Mutations become `useFoo` as well. Each composable
  * is fully typed end to end.
  *
  * @example

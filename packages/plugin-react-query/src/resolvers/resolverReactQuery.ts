@@ -8,8 +8,8 @@ function capitalize(name: string): string {
 
 /**
  * Default resolver used by `@kubb/plugin-react-query`. Decides the names and
- * file paths for every generated TanStack Query hook (`useFooQuery`,
- * `useFooMutation`, `useFooInfiniteQuery`, ...) and its companion helpers
+ * file paths for every generated TanStack Query hook (`useFoo`,
+ * `useFooSuspense`, `useFooInfinite`, ...) and its companion helpers
  * (`fooQueryKey`, `fooQueryOptions`).
  *
  * Functions and files use camelCase; hooks get the `use` prefix; suspense and
