@@ -1,5 +1,22 @@
 # @kubb/plugin-vue-query
 
+## 5.0.0-beta.81
+
+### Minor Changes
+
+- [#608](https://github.com/kubb-labs/plugins/pull/608) [`f609914`](https://github.com/kubb-labs/plugins/commit/f609914d1799d90d31f752786e54901b716ce4fe) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the inert `validator` option. It never generated validation code: the hooks call the client operation, and the client plugin bakes validation into that operation. Set `validator` on `pluginAxios` or `pluginFetch` instead.
+
+  Migration: delete `validator` from `pluginReactQuery`, `pluginVueQuery`, and `pluginSwr`, and set it on the client plugin.
+
+### Patch Changes
+
+- [#607](https://github.com/kubb-labs/plugins/pull/607) [`6478657`](https://github.com/kubb-labs/plugins/commit/64786578b8b3b631bac36c79ff3b6105fe32e24e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Correct the documented `mutation.methods` default so the JSDoc matches the runtime. The query plugins already treat `patch` as a mutation method, so the default reads `['post', 'put', 'patch', 'delete']`.
+
+- [#608](https://github.com/kubb-labs/plugins/pull/608) [`d29cfe2`](https://github.com/kubb-labs/plugins/commit/d29cfe2bf7eebaabc5a295853ed8575e634b8dd6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Correct stale JSDoc: hook names carry no `Query`/`Mutation` suffix (`useFoo`, `useFooSuspense`, `useFooInfinite`), `customOptions.importPath` is a named import, and the `validator` docs describe the real `false | 'zod' | { request?, response? }` behavior instead of the removed `'client'` value.
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.81
+
 ## 5.0.0-beta.80
 
 ### Major Changes

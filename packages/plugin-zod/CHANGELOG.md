@@ -1,5 +1,35 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.81
+
+### Minor Changes
+
+- [#605](https://github.com/kubb-labs/plugins/pull/605) [`9126149`](https://github.com/kubb-labs/plugins/commit/9126149b997970d336c1fcf2789576966270c86e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Emit `z.discriminatedUnion` for `oneOf`/`anyOf` schemas with a `discriminator` (kubb-labs/plugins#335).
+
+  Variants defined through `allOf` used to render as intersections (`base.and(…)`), which `z.discriminatedUnion` rejects, so the output fell back to a plain `z.union`. Object `allOf` variants now render with `.extend({ … })` (zod) or `z.extend(base, { … })` (zod/mini), so each stays a Zod object and the union discriminates on the property. Variants that can't flatten to an object, like a cyclic `z.lazy(…)` ref, keep the `z.union` fallback.
+
+- [#608](https://github.com/kubb-labs/plugins/pull/608) [`238d48c`](https://github.com/kubb-labs/plugins/commit/238d48cb0169d79e0a86d5cd7625575dde5bf9dd) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Make `coercion.dates` effective for `Date`-typed fields. With `dateType: 'date'` on the adapter, a date field now validates with `z.coerce.date()` instead of the `z.iso.datetime().transform(...)` decode codec when `coercion: true` or `coercion: { dates: true }` is set. The request-direction `InputSchema` variant keeps encoding `Date` back to a wire string. Fields kept as ISO strings (`z.iso.date()`, `z.iso.datetime()`) are never coerced.
+
+- [#608](https://github.com/kubb-labs/plugins/pull/608) [`238d48c`](https://github.com/kubb-labs/plugins/commit/238d48cb0169d79e0a86d5cd7625575dde5bf9dd) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the `typed` option. It has been a silent no-op since the v5 rewrite: the generator never read it or emitted a `ToZod` annotation, and output with `typed: true` was identical to output without it. Use `inferred: true` to export a `z.infer` type alias next to each schema.
+
+  Migration: delete `typed` from your `pluginZod` options.
+
+- [#608](https://github.com/kubb-labs/plugins/pull/608) [`238d48c`](https://github.com/kubb-labs/plugins/commit/238d48cb0169d79e0a86d5cd7625575dde5bf9dd) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the `wrapOutput` option in favor of printer overrides. `wrapOutput` only fired on object property values, so it never wrapped top-level schemas (strings, enums, unions). A printer override with `this.base(node)` wraps any node type, including the whole schema (needs `@kubb/ast` 5.0.0-beta.80 or later).
+
+  Migration: move the wrapping into `printer.nodes` and call `this.base(node)` for the built-in output.
+
+  ```ts
+  pluginZod({
+    printer: {
+      nodes: {
+        object(node) {
+          return `${this.base(node)}.openapi(${JSON.stringify({ description: node.description })})`;
+        },
+      },
+    },
+  });
+  ```
+
 ## 5.0.0-beta.80
 
 ## 5.0.0-beta.79

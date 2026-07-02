@@ -1,5 +1,15 @@
 # performance
 
+## 0.0.1-beta.31
+
+### Patch Changes
+
+- Updated dependencies [[`40632ef`](https://github.com/kubb-labs/plugins/commit/40632efe9f4697f7adddbc5e3563f6ac85ce64b0), [`d3ad51c`](https://github.com/kubb-labs/plugins/commit/d3ad51cc2ac9d6f1b971c659744048ebd971b1f7), [`65f0793`](https://github.com/kubb-labs/plugins/commit/65f07934de4cabf16ee1bebde3f22773ad97ea44), [`9126149`](https://github.com/kubb-labs/plugins/commit/9126149b997970d336c1fcf2789576966270c86e), [`4a89343`](https://github.com/kubb-labs/plugins/commit/4a89343dc828e85cc20bcaddb3bf36bb088054a9), [`238d48c`](https://github.com/kubb-labs/plugins/commit/238d48cb0169d79e0a86d5cd7625575dde5bf9dd), [`238d48c`](https://github.com/kubb-labs/plugins/commit/238d48cb0169d79e0a86d5cd7625575dde5bf9dd), [`238d48c`](https://github.com/kubb-labs/plugins/commit/238d48cb0169d79e0a86d5cd7625575dde5bf9dd)]:
+  - @kubb/plugin-axios@5.0.0-beta.81
+  - @kubb/plugin-faker@5.0.0-beta.81
+  - @kubb/plugin-zod@5.0.0-beta.81
+  - @kubb/plugin-ts@5.0.0-beta.81
+
 ## 0.0.1-beta.30
 
 ### Patch Changes

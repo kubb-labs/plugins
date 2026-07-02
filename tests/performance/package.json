@@ -1,6 +1,6 @@
 {
   "name": "performance",
-  "version": "0.0.1-beta.30",
+  "version": "0.0.1-beta.31",
   "private": true,
   "description": "Performance benchmarks for Kubb plugin generation",
   "license": "MIT",
