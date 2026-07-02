@@ -75,6 +75,7 @@
     "typescript": "catalog:"
   },
   "peerDependencies": {
+    "@kubb/core": "catalog:",
     "@kubb/renderer-jsx": "catalog:",
     "axios": "^1.7.2"
   },

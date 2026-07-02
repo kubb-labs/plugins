@@ -83,6 +83,7 @@
     "@internals/utils": "workspace:*"
   },
   "peerDependencies": {
+    "@kubb/core": "catalog:",
     "@kubb/renderer-jsx": "catalog:"
   },
   "engines": {
