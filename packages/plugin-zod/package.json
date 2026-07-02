@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "@kubb/ast": "catalog:",
+    "@kubb/core": "catalog:",
     "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {

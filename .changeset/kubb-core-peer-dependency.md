@@ -13,4 +13,4 @@
 "@kubb/plugin-zod": minor
 ---
 
-Move `@kubb/core` from `dependencies` to `peerDependencies`, matching the existing `@kubb/renderer-jsx` peer setup and the pattern used by Vite/Vue plugin ecosystems. Plugins run against a single shared `@kubb/core` instance owned by the host CLI, so bundling a second copy risks version drift and `instanceof` mismatches across plugin boundaries. Consumers now resolve `@kubb/core` against the version installed alongside `kubb` instead of each plugin pulling in its own copy.
+Add `@kubb/core` as a `peerDependency`, alongside its existing `dependencies` entry, matching the pattern used by Vite and Vue plugin ecosystems. Plugins run against a single shared `@kubb/core` instance owned by the host CLI, so a mismatched version risks `instanceof` errors and other subtle bugs across plugin boundaries. The peer range signals that constraint to package managers, while keeping `@kubb/core` in `dependencies` too keeps install working out of the box across npm, Yarn, and pnpm without requiring consumers to install `@kubb/core` themselves.

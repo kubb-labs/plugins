@@ -58,7 +58,8 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@kubb/adapter-oas": "catalog:"
+    "@kubb/adapter-oas": "catalog:",
+    "@kubb/core": "catalog:"
   },
   "devDependencies": {
     "@internals/utils": "workspace:*"
