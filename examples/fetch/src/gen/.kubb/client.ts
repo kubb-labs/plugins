@@ -387,16 +387,23 @@ export async function resolveAuth(params: {
   const { security, auth, headers, query } = params
   if (!security?.length || auth === undefined) return
 
+  // An explicit caller-set header wins over the resolved token.
+  const hasHeader = (name: string) => Object.keys(headers).some((key) => key.toLowerCase() === name.toLowerCase())
+
   for (const scheme of security) {
     const token = typeof auth === 'function' ? await auth(scheme) : auth
     if (token === undefined) continue
 
     if (scheme.type === 'apiKey') {
       const name = scheme.name ?? 'Authorization'
-      if (scheme.in === 'query') query[name] = token
-      else if (scheme.in === 'cookie') headers.Cookie = [headers.Cookie, `${name}=${token}`].filter(Boolean).join('; ')
-      else headers[name] = token
-    } else {
+      if (scheme.in === 'query') {
+        if (query[name] === undefined) query[name] = token
+      } else if (scheme.in === 'cookie') {
+        headers.Cookie = [headers.Cookie, `${name}=${token}`].filter(Boolean).join('; ')
+      } else if (!hasHeader(name)) {
+        headers[name] = token
+      }
+    } else if (!hasHeader('Authorization')) {
       headers.Authorization = scheme.scheme === 'basic' ? `Basic ${btoa(token)}` : `Bearer ${token}`
     }
     return
@@ -434,6 +441,140 @@ function resolveContentType(contentType: ContentType | undefined): { request?: s
 }
 
 /**
+ * The per-concern serializers for a call, the per-call serializer winning over the client's and
+ * falling back to the defaults.
+ */
+function resolveSerializers({ config, requestConfig }: { config: { serializer?: Serializers }; requestConfig: { serializer?: Serializers } }) {
+  return {
+    querySerializer: requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer,
+    bodySerializer: requestConfig.serializer?.body ?? config.serializer?.body ?? defaultBodySerializer,
+    pathSerializer: requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer,
+  }
+}
+
+/**
+ * Resolves everything a call needs before it touches the transport: merged headers with the
+ * negotiated content type, auth on headers or query, serialized cookies, the validated and
+ * serialized body, and the full URL.
+ */
+async function resolveRequest<TBody, TRequest, TResponse>({
+  config,
+  requestConfig,
+}: {
+  config: ClientConfig<TRequest, TResponse>
+  requestConfig: RequestConfig<TBody, TRequest, TResponse>
+}): Promise<{ request: ResolvedRequest; codecs: Record<string, Codec> }> {
+  const { querySerializer, bodySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
+  const codecs = { ...config.codecs, ...requestConfig.codecs }
+
+  const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.styles?.header))
+  const { request: requestContentTypeOption, response: responseContentType } = resolveContentType(requestConfig.contentType)
+  const requestContentType = requestContentTypeOption ?? headers['Content-Type'] ?? headers['content-type']
+  if (responseContentType && headers['Accept'] === undefined && headers['accept'] === undefined) {
+    headers['Accept'] = responseContentType
+  }
+
+  const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
+
+  await resolveAuth({
+    security: requestConfig.security,
+    auth: requestConfig.auth ?? config.auth,
+    headers,
+    query,
+  })
+
+  if (requestConfig.cookies) {
+    const cookie = serializeCookies(requestConfig.cookies, requestConfig.styles?.cookie)
+    if (cookie) headers.Cookie = [headers.Cookie, cookie].filter(Boolean).join('; ')
+  }
+
+  const validatedBody = await runValidator(requestConfig.validator?.request, requestConfig.body)
+  const requestContentTypeBase = baseContentType(requestContentType)
+  const contentCodec = requestContentTypeBase ? codecs[requestContentTypeBase] : undefined
+  const body = contentCodec?.serialize
+    ? contentCodec.serialize(validatedBody, requestContentType)
+    : bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.styles?.body })
+  // A FormData body must keep its Content-Type unset so the runtime appends the multipart boundary.
+  if (body instanceof FormData) {
+    delete headers['Content-Type']
+    delete headers['content-type']
+  } else if (requestContentTypeOption) {
+    headers['Content-Type'] = requestContentTypeOption
+  }
+
+  const url = serializeUrl({
+    parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
+    pathParams: requestConfig.path ?? {},
+    search: querySerializer(query, requestConfig.styles?.query),
+    pathSerializer,
+    pathStyles: requestConfig.styles?.path,
+  })
+
+  const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
+
+  return {
+    codecs,
+    request: {
+      url,
+      method: (requestConfig.method ?? 'GET').toUpperCase(),
+      headers,
+      body,
+      signal: requestConfig.signal,
+      credentials: requestConfig.credentials,
+      options,
+      responseType: requestConfig.responseType,
+    },
+  }
+}
+
+/**
+ * Turns a transport result into the call result: decodes the body through the matching codec,
+ * validates it, and throws a `ResponseError` (after running the error interceptors) for a non-2xx
+ * response under `throwOnError`.
+ */
+async function settleResult<TRequest, TResponse>({
+  result,
+  codecs,
+  throwOnError,
+  validator,
+  errorInterceptors,
+}: {
+  result: TransportResult<unknown, TRequest, TResponse>
+  codecs: Record<string, Codec>
+  throwOnError: boolean
+  validator: { response?: Validator; error?: Validator } | undefined
+  errorInterceptors: InterceptorStack<ResponseError<unknown, TRequest, TResponse>>
+}): Promise<CallResult<TRequest, TResponse>> {
+  const isSuccess = result.status >= 200 && result.status < 300
+  const contentType = result.contentType ?? getResponseContentType(result.headers)
+  let decoded = result.data
+  if (contentType) {
+    const codec = codecs[contentType]
+    if (codec?.deserialize) decoded = await codec.deserialize(result.data, contentType)
+  }
+
+  if (isSuccess) {
+    const data = await runValidator(validator?.response, decoded)
+    return { status: result.status, data, error: undefined, contentType, request: result.request, response: result.response }
+  }
+
+  const error = await runValidator(validator?.error, decoded)
+  if (throwOnError) {
+    const responseError = new ResponseError({
+      data: error,
+      status: result.status,
+      statusText: result.statusText,
+      contentType,
+      request: result.request,
+      response: result.response,
+    })
+    await errorInterceptors.run(responseError)
+    throw responseError
+  }
+  return { status: result.status, data: undefined, error, contentType, request: result.request, response: result.response }
+}
+
+/**
  * Builds the shared client core bound to a transport, exported by each plugin as `client` plus a `createClient` factory.
  */
 export function createClientCore<TRequest = Request, TResponse = Response>(
@@ -450,107 +591,18 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
 
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
     const transport = requestConfig.transport ?? config.transport ?? defaultTransport
-    const querySerializer = requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer
-    const bodySerializer = requestConfig.serializer?.body ?? config.serializer?.body ?? defaultBodySerializer
-    const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
-    const codecs = { ...config.codecs, ...requestConfig.codecs }
+    const { request, codecs } = await resolveRequest({ config, requestConfig })
 
-    const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.styles?.header))
-    const { request: requestContentTypeOption, response: responseContentType } = resolveContentType(requestConfig.contentType)
-    const requestContentType = requestContentTypeOption ?? headers['Content-Type'] ?? headers['content-type']
-    if (responseContentType && headers['Accept'] === undefined && headers['accept'] === undefined) {
-      headers['Accept'] = responseContentType
-    }
+    const resolvedRequest = await interceptors.request.run(request)
+    const result = await interceptors.response.run(await transport(resolvedRequest))
 
-    const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
-
-    await resolveAuth({
-      security: requestConfig.security,
-      auth: requestConfig.auth ?? config.auth,
-      headers,
-      query,
+    return settleResult({
+      result,
+      codecs,
+      throwOnError: requestConfig.throwOnError ?? config.throwOnError ?? true,
+      validator: requestConfig.validator,
+      errorInterceptors: interceptors.error,
     })
-
-    if (requestConfig.cookies) {
-      const cookie = serializeCookies(requestConfig.cookies, requestConfig.styles?.cookie)
-      if (cookie) headers.Cookie = [headers.Cookie, cookie].filter(Boolean).join('; ')
-    }
-
-    const rawBody = requestConfig.body
-    const validatedBody = await runValidator(requestConfig.validator?.request, rawBody)
-    const requestContentTypeBase = baseContentType(requestContentType)
-    const contentCodec = requestContentTypeBase ? codecs[requestContentTypeBase] : undefined
-    const body = contentCodec?.serialize
-      ? contentCodec.serialize(validatedBody, requestContentType)
-      : bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.styles?.body })
-    // A FormData body must keep its Content-Type unset so the runtime appends the multipart boundary.
-    if (body instanceof FormData) {
-      delete headers['Content-Type']
-      delete headers['content-type']
-    } else if (requestContentTypeOption) {
-      headers['Content-Type'] = requestContentTypeOption
-    }
-    const url = serializeUrl({
-      parts: [config.baseURL, requestConfig.baseURL, requestConfig.url],
-      pathParams: requestConfig.path ?? {},
-      search: querySerializer(query, requestConfig.styles?.query),
-      pathSerializer,
-      pathStyles: requestConfig.styles?.path,
-    })
-
-    const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
-
-    let resolvedRequest: ResolvedRequest = {
-      url,
-      method: (requestConfig.method ?? 'GET').toUpperCase(),
-      headers,
-      body,
-      signal: requestConfig.signal,
-      credentials: requestConfig.credentials,
-      options,
-      responseType: requestConfig.responseType,
-    }
-    resolvedRequest = await interceptors.request.run(resolvedRequest)
-
-    let result = await transport(resolvedRequest)
-    result = await interceptors.response.run(result)
-
-    const isSuccess = result.status >= 200 && result.status < 300
-    const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
-
-    const contentType = result.contentType ?? getResponseContentType(result.headers)
-    let decoded = result.data
-    if (contentType) {
-      const codec = codecs[contentType]
-      if (codec?.deserialize) decoded = await codec.deserialize(result.data, contentType)
-    }
-
-    const parsedErrorData = !isSuccess ? await runValidator(requestConfig.validator?.error, decoded) : undefined
-
-    if (!isSuccess && throwOnError) {
-      const error = new ResponseError({
-        data: parsedErrorData,
-        status: result.status,
-        statusText: result.statusText,
-        contentType,
-        request: result.request,
-        response: result.response,
-      })
-      await interceptors.error.run(error)
-      throw error
-    }
-
-    const data = isSuccess ? await runValidator(requestConfig.validator?.response, decoded) : undefined
-    const error = isSuccess ? undefined : parsedErrorData
-
-    return {
-      status: result.status,
-      data,
-      error,
-      contentType,
-      request: result.request,
-      response: result.response,
-    }
   }) as ClientInstance<TRequest, TResponse>
 
   client.getConfig = () => config
@@ -559,11 +611,10 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     return config
   }
   client.getUrl = (requestConfig) => {
-    const querySerializer = requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer
-    const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
+    const { querySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
     return serializeUrl({
-      parts: [config.baseURL, requestConfig.baseURL, requestConfig.url],
+      parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
       pathParams: requestConfig.path ?? {},
       search: querySerializer(query, requestConfig.styles?.query),
       pathSerializer,
