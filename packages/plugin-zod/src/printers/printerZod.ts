@@ -43,7 +43,7 @@ import type { AdapterOas } from '@kubb/adapter-oas'
  *   printer: {
  *     nodes: {
  *       date(node) {
- *         return 'z.string().date()'
+ *         return 'z.iso.date()'
  *       },
  *     },
  *   },
