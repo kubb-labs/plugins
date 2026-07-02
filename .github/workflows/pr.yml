@@ -28,7 +28,7 @@ jobs:
       - name: Setup Tools
         uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
-          node-version: '22'
+          node-version: '22.22.3'
 
       - name: Build
         run: pnpm build
@@ -48,7 +48,7 @@ jobs:
       - name: Setup Tools
         uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
-          node-version: '22'
+          node-version: '22.22.3'
 
       - name: Build
         run: pnpm build
@@ -76,7 +76,7 @@ jobs:
       - name: Setup Tools
         uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
-          node-version: '22'
+          node-version: '22.22.3'
 
       - name: Test
         run: pnpm run test --coverage
@@ -101,7 +101,7 @@ jobs:
       - name: Setup Tools
         uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
-          node-version: '22'
+          node-version: '22.22.3'
 
       - name: Linting
         env:
@@ -123,7 +123,7 @@ jobs:
       - name: Setup Tools
         uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
-          node-version: '22'
+          node-version: '22.22.3'
 
       - name: Build
         run: pnpm build
@@ -146,7 +146,7 @@ jobs:
       - name: Setup Tools
         uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
-          node-version: '22'
+          node-version: '22.22.3'
 
       - name: Build
         run: pnpm run build
@@ -186,7 +186,7 @@ jobs:
       - name: Setup Tools
         uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
-          node-version: '22'
+          node-version: '22.22.3'
 
       - name: Report compressed bundle size
         uses: preactjs/compressed-size-action@66325aad6443cb7cf89c4bfcd414aea2367cda94 # v2
@@ -215,7 +215,7 @@ jobs:
       - name: Setup Tools
         uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
-          node-version: '22'
+          node-version: '22.22.3'
 
       - name: Build
         run: pnpm run build
@@ -259,7 +259,7 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-latest, windows-latest]
-        node-version: [22]
+        node-version: ['22.22.3']
 
     runs-on: ${{ matrix.os }}
 
@@ -272,7 +272,7 @@ jobs:
       - name: Setup Tools
         uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
-          node-version: '22'
+          node-version: '22.22.3'
 
       - name: Build
         run: pnpm run build
