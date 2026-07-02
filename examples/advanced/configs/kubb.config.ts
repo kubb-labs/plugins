@@ -169,14 +169,14 @@ export default defineConfig({
       group: { type: 'tag' },
       macros: [
         {
-          name: 'status-values',
+          name: 'pet-status-values',
           schema(node) {
-            if ('properties' in node) {
+            if (node.name === 'Pet' && 'properties' in node) {
               return {
                 ...node,
                 properties: node.properties.map((property) =>
                   property.name === 'status'
-                    ? { ...property, schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['working', 'idle'] }) }
+                    ? { ...property, schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['available', 'pending'] }) }
                     : property,
                 ),
               }

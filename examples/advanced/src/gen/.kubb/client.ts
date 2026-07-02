@@ -428,16 +428,23 @@ export async function resolveAuth(params: {
   const { security, auth, headers, query } = params
   if (!security?.length || auth === undefined) return
 
+  // An explicit caller-set header wins over the resolved token.
+  const hasHeader = (name: string) => Object.keys(headers).some((key) => key.toLowerCase() === name.toLowerCase())
+
   for (const scheme of security) {
     const token = typeof auth === 'function' ? await auth(scheme) : auth
     if (token === undefined) continue
 
     if (scheme.type === 'apiKey') {
       const name = scheme.name ?? 'Authorization'
-      if (scheme.in === 'query') query[name] = token
-      else if (scheme.in === 'cookie') headers.Cookie = [headers.Cookie, `${name}=${token}`].filter(Boolean).join('; ')
-      else headers[name] = token
-    } else {
+      if (scheme.in === 'query') {
+        if (query[name] === undefined) query[name] = token
+      } else if (scheme.in === 'cookie') {
+        headers.Cookie = [headers.Cookie, `${name}=${token}`].filter(Boolean).join('; ')
+      } else if (!hasHeader(name)) {
+        headers[name] = token
+      }
+    } else if (!hasHeader('Authorization')) {
       headers.Authorization = scheme.scheme === 'basic' ? `Basic ${btoa(token)}` : `Bearer ${token}`
     }
     return
@@ -573,7 +580,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) =>
       pathSerializer({ name: key, value: pathParams[key], options: requestConfig.styles?.path?.[key] }),
     )
-    const baseURL = [config.baseURL, requestConfig.baseURL].filter(Boolean).join('') || undefined
+    const baseURL = requestConfig.baseURL ?? config.baseURL
 
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
     const validateStatus = requestConfig.validateStatus ?? config.validateStatus ?? (throwOnError ? undefined : () => true)
@@ -646,7 +653,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
     return serializeUrl({
-      parts: [config.baseURL, requestConfig.baseURL, requestConfig.url],
+      parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
       pathParams: requestConfig.path ?? {},
       search: querySerializer(query, requestConfig.styles?.query),
       pathSerializer,

@@ -13,7 +13,7 @@ export function createPetFaker<TData extends Partial<Pet> = object>(data?: TData
     category: createCategoryFaker(),
     photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
     tags: faker.helpers.multiple(() => createTagTagFaker()),
-    status: faker.helpers.arrayElement<any>(['working', 'idle']),
+    status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending']),
   }
   return {
     ...defaultFakeData,
