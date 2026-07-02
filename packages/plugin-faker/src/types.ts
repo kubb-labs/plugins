@@ -107,8 +107,9 @@ export type Options = OutputOptions & {
    */
   regexGenerator?: 'faker' | 'randexp'
   /**
-   * Map a schema name to a custom Faker expression. Use this when the schema name
-   * does not give Faker enough context (`'email'`, `'avatarUrl'`, `'phoneNumber'`).
+   * Map an object property name to a custom Faker expression. Use this when the
+   * property name does not give Faker enough context (`'email'`, `'avatarUrl'`,
+   * `'phoneNumber'`).
    */
   mapper?: Record<string, string>
   /**
