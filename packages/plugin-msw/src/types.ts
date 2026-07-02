@@ -55,7 +55,7 @@ export type Options = OutputOptions & {
    */
   macros?: Array<ast.Macro>
   /**
-   * Emit a `handlers.ts` file that re-exports every handler grouped by HTTP method.
+   * Emit a `handlers.ts` file that re-exports every handler in operation order.
    * Drop the file into `setupServer(...handlers)` or `setupWorker(...handlers)`.
    *
    * @default false
