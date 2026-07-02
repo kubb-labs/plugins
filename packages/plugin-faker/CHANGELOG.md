@@ -1,5 +1,16 @@
 # @kubb/plugin-faker
 
+## 5.0.0-beta.82
+
+### Minor Changes
+
+- [#613](https://github.com/kubb-labs/plugins/pull/613) [`756830d`](https://github.com/kubb-labs/plugins/commit/756830d28ec98fde78e63e397d0214fed7b46a34) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add `@kubb/core` as a `peerDependency`, alongside its existing `dependencies` entry, matching the pattern used by Vite and Vue plugin ecosystems. Plugins run against a single shared `@kubb/core` instance owned by the host CLI, so a mismatched version risks `instanceof` errors and other subtle bugs across plugin boundaries. The peer range signals that constraint to package managers, while keeping `@kubb/core` in `dependencies` too keeps install working out of the box across npm, Yarn, and pnpm without requiring consumers to install `@kubb/core` themselves.
+
+### Patch Changes
+
+- Updated dependencies [[`756830d`](https://github.com/kubb-labs/plugins/commit/756830d28ec98fde78e63e397d0214fed7b46a34)]:
+  - @kubb/plugin-ts@5.0.0-beta.82
+
 ## 5.0.0-beta.81
 
 ### Minor Changes

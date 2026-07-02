@@ -1,5 +1,20 @@
 # @kubb/plugin-react-query
 
+## 5.0.0-beta.82
+
+### Minor Changes
+
+- [#613](https://github.com/kubb-labs/plugins/pull/613) [`756830d`](https://github.com/kubb-labs/plugins/commit/756830d28ec98fde78e63e397d0214fed7b46a34) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add `@kubb/core` as a `peerDependency`, alongside its existing `dependencies` entry, matching the pattern used by Vite and Vue plugin ecosystems. Plugins run against a single shared `@kubb/core` instance owned by the host CLI, so a mismatched version risks `instanceof` errors and other subtle bugs across plugin boundaries. The peer range signals that constraint to package managers, while keeping `@kubb/core` in `dependencies` too keeps install working out of the box across npm, Yarn, and pnpm without requiring consumers to install `@kubb/core` themselves.
+
+### Patch Changes
+
+- [#615](https://github.com/kubb-labs/plugins/pull/615) [`5bdd839`](https://github.com/kubb-labs/plugins/commit/5bdd839d6508ff3c4dad63abc0dc57036011f9d4) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Correct stale JSDoc descriptions so they match the generated output. The vue-query plugin and both query resolvers now describe hooks as `useFoo`/`useFooInfinite` instead of the old `useFooQuery`/`useFooMutation` names, and the MSW handlers generator states that `handlers.ts` re-exports handlers in operation order, not grouped by HTTP method.
+
+- [#616](https://github.com/kubb-labs/plugins/pull/616) [`bc3c364`](https://github.com/kubb-labs/plugins/commit/bc3c3643702cbd7a6eb7797c837c81ac332e2e87) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Change the default `query.methods`/`mutation.methods` values from lowercase (`['get']`, `['post', 'put', 'patch', 'delete']`) to uppercase (`['GET']`, `['POST', 'PUT', 'PATCH', 'DELETE']`), matching the HTTP method token casing defined in RFC 7231 (and RFC 2616 before it). Matching against the operation's method was already case-insensitive, so this doesn't change generated output, only the documented and default casing.
+
+- Updated dependencies [[`756830d`](https://github.com/kubb-labs/plugins/commit/756830d28ec98fde78e63e397d0214fed7b46a34)]:
+  - @kubb/plugin-ts@5.0.0-beta.82
+
 ## 5.0.0-beta.81
 
 ### Minor Changes
