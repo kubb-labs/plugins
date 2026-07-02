@@ -80,6 +80,7 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
         ctx.addGenerator(...selectedGenerators)
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
+        const baseURLExpression = baseURL ? (baseURL.includes('${') ? `\`${baseURL.replaceAll('`', '\\`')}\`` : JSON.stringify(baseURL)) : undefined
 
         ctx.injectFile({
           baseName: 'serializers.ts',
@@ -91,7 +92,7 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
           baseName: 'client.ts',
           path: path.resolve(root, '.kubb/client.ts'),
           copy: fetchClientTemplatePath,
-          footer: baseURL ? `client.setConfig({ baseURL: ${JSON.stringify(baseURL)} })` : undefined,
+          footer: baseURLExpression ? `client.setConfig({ baseURL: ${baseURLExpression} })` : undefined,
         })
 
         ctx.injectFile({

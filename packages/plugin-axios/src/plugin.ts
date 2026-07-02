@@ -80,6 +80,7 @@ export const pluginAxios = definePlugin<PluginAxios>((options) => {
         ctx.addGenerator(...selectedGenerators)
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
+        const baseURLExpression = baseURL ? (baseURL.includes('${') ? `\`${baseURL.replaceAll('`', '\\`')}\`` : JSON.stringify(baseURL)) : undefined
 
         ctx.injectFile({
           baseName: 'serializers.ts',
@@ -91,7 +92,7 @@ export const pluginAxios = definePlugin<PluginAxios>((options) => {
           baseName: 'client.ts',
           path: path.resolve(root, '.kubb/client.ts'),
           copy: axiosClientTemplatePath,
-          footer: baseURL ? `client.setConfig({ baseURL: ${JSON.stringify(baseURL)} })` : undefined,
+          footer: baseURLExpression ? `client.setConfig({ baseURL: ${baseURLExpression} })` : undefined,
         })
 
         ctx.injectFile({

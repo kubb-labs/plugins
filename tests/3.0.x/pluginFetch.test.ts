@@ -114,6 +114,42 @@ describe(`plugin-fetch options ${version}`, () => {
     await fs.rm(tmpDir, { recursive: true, force: true })
   })
 
+  test('emits template baseURL as a runtime expression in the client config', async () => {
+    const tmpDir = path.join(os.tmpdir(), `kubb-test-fetch-base-url-template-${Date.now()}`)
+    const output = path.join(tmpDir, 'gen')
+    const { files, diagnostics } = await createKubb(
+      {
+        root: __dirname,
+        input: { path: '../../schemas/3.0.x/petStore.yaml' },
+        output: { path: output, barrel: false },
+        adapter: adapterOas({ validate: false, enums: 'root' }),
+        parsers: [parserTs],
+        reporters: [],
+        storage: fsStorage(),
+        plugins: [
+          pluginTs({ output: { path: './types', barrel: false } }),
+          pluginFetch({
+            output: { path: './clients', barrel: false },
+            baseURL: '${import.meta.env.VITE_API_SERVER}',
+          }),
+        ],
+      } as Config,
+      { hooks: new AsyncEventEmitter<KubbHooks>() },
+    ).safeBuild()
+
+    expect(files.length).toBeGreaterThan(0)
+    expect(Diagnostics.hasError(diagnostics)).toBe(false)
+
+    const clientRuntime = files.find((file) => file.path === path.join(output, '.kubb/client.ts'))
+    expect(clientRuntime).toBeDefined()
+
+    const source = await fs.readFile(clientRuntime!.path, 'utf-8')
+    expect(source).toContain('client.setConfig({ baseURL: `${import.meta.env.VITE_API_SERVER}` })')
+    expect(source).not.toContain('baseURL: "${import.meta.env.VITE_API_SERVER}"')
+
+    await fs.rm(tmpDir, { recursive: true, force: true })
+  })
+
   // The petstore tag `pet` and schema `Pet` share a name. With the barrel middleware active, the
   // root `index.ts` re-exports both, so the generated sdk class must be `PetClient` to avoid a
   // TS2300 duplicate-identifier error. Asserted on the barrel string so it stays robust across
