@@ -34,7 +34,8 @@ import type { AdapterOas } from '@kubb/adapter-oas'
  *
  * Each key is a `SchemaType` string (e.g. `'date'`, `'string'`). The function
  * replaces the built-in handler for that node type. Use `this.transform` to
- * recurse into nested schema nodes, and `this.options` to read printer options.
+ * recurse into nested schema nodes, `this.base` to reuse the output of the
+ * handler being replaced, and `this.options` to read printer options.
  *
  * @example Override the `date` handler
  * ```ts
@@ -43,6 +44,19 @@ import type { AdapterOas } from '@kubb/adapter-oas'
  *     nodes: {
  *       date(node) {
  *         return 'z.string().date()'
+ *       },
+ *     },
+ *   },
+ * })
+ * ```
+ *
+ * @example Wrap the built-in output
+ * ```ts
+ * pluginZod({
+ *   printer: {
+ *     nodes: {
+ *       object(node) {
+ *         return `${this.base(node)}.openapi(${JSON.stringify({ description: node.description })})`
  *       },
  *     },
  *   },
@@ -73,10 +87,6 @@ export type PrinterZodOptions = {
    * Date format in the OpenAPI spec (`'date'` or `'date-time'`).
    */
   dateType?: AdapterOas['resolvedOptions']['dateType']
-  /**
-   * Hook to transform generated Zod schema before output.
-   */
-  wrapOutput?: PluginZod['resolvedOptions']['wrapOutput']
   /**
    * Transforms raw schema names into valid JavaScript identifiers.
    */
@@ -187,15 +197,13 @@ function buildZodObjectShape(ctx: ZodPrinterContext, node: ast.SchemaNode): stri
     const { schema } = property
     const meta = syncSchemaRef(schema)
 
-    const wrappedOutput = ctx.options.wrapOutput ? ctx.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
-
     // When a property schema is not a ref but the metadata is from a ref (e.g., discriminator
     // property override), skip applying the description from the ref target to avoid applying
     // metadata from a replaced schema.
     const descriptionToApply = schema.type !== 'ref' && meta.type === 'ref' ? undefined : meta.description
 
     const value = applyModifiers({
-      value: wrappedOutput,
+      value: baseOutput,
       schema,
       nullable: meta.nullable,
       optional: schema.optional || property.required === false,
@@ -260,7 +268,8 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         // representation: 'date' → typed as `Date`; decode/encode at the boundary.
         const codec = getCodec(node)
         if (codec) {
-          return this.options.direction === 'input' ? codec.encode(node) : codec.decode(node)
+          if (this.options.direction === 'input') return codec.encode(node)
+          return shouldCoerce(this.options.coercion, 'dates') ? 'z.coerce.date()' : codec.decode(node)
         }
 
         return 'z.iso.date()'
@@ -420,8 +429,8 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           return transformed ? `${acc}.and(${transformed})` : acc
         }, firstBase)
       },
-      ...options.nodes,
     },
+    overrides: options.nodes,
     print(node) {
       const { keysToOmit } = this.options
 

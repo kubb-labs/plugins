@@ -5,6 +5,6 @@
 
 import * as z from 'zod'
 
-export const dateFieldSchema = z.iso.datetime().transform((value) => new Date(value))
+export const dateFieldSchema = z.coerce.date()
 
 export const dateFieldInputSchema = z.date().transform((value) => value.toISOString())
