@@ -1,5 +1,21 @@
 # @kubb/plugin-axios
 
+## 5.0.0-beta.81
+
+### Minor Changes
+
+- [#608](https://github.com/kubb-labs/plugins/pull/608) [`40632ef`](https://github.com/kubb-labs/plugins/commit/40632efe9f4697f7adddbc5e3563f6ac85ce64b0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix two precedence bugs in the client runtime. A `baseURL` passed on a single call now replaces the client-level `baseURL` instead of being concatenated onto it. An explicit header set on a call (such as `Authorization`) now wins over the token the `auth` resolver produces, so per-call overrides behave as documented.
+
+### Patch Changes
+
+- [#608](https://github.com/kubb-labs/plugins/pull/608) [`d3ad51c`](https://github.com/kubb-labs/plugins/commit/d3ad51cc2ac9d6f1b971c659744048ebd971b1f7) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Restructure the bundled client runtime so the send path reads as a short pipeline. Request resolution (headers, content type, auth, cookies, body) and response settlement (codec decode, validation, `throwOnError`) now live in focused helpers instead of one long closure, and `getUrl` shares the serializer resolution with the send path. Behavior and the public surface of `.kubb/client.ts` are unchanged, and a new test keeps the shared `serializers.ts` and `standardSchema.ts` templates byte-identical across both plugins.
+
+- [#610](https://github.com/kubb-labs/plugins/pull/610) [`4a89343`](https://github.com/kubb-labs/plugins/commit/4a89343dc828e85cc20bcaddb3bf36bb088054a9) Thanks [@Ericlm](https://github.com/Ericlm)! - Fix generated client config for interpolated `baseURL` values. A config such as `baseURL: '${import.meta.env.VITE_API_SERVER}'` now emits a runtime template literal in `.kubb/client.ts` instead of a fixed string, so environment-based base URLs stay dynamic.
+
+- Updated dependencies [[`9126149`](https://github.com/kubb-labs/plugins/commit/9126149b997970d336c1fcf2789576966270c86e), [`238d48c`](https://github.com/kubb-labs/plugins/commit/238d48cb0169d79e0a86d5cd7625575dde5bf9dd), [`238d48c`](https://github.com/kubb-labs/plugins/commit/238d48cb0169d79e0a86d5cd7625575dde5bf9dd), [`238d48c`](https://github.com/kubb-labs/plugins/commit/238d48cb0169d79e0a86d5cd7625575dde5bf9dd)]:
+  - @kubb/plugin-zod@5.0.0-beta.81
+  - @kubb/plugin-ts@5.0.0-beta.81
+
 ## 5.0.0-beta.80
 
 ### Patch Changes

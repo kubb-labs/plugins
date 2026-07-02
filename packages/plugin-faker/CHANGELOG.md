@@ -1,5 +1,18 @@
 # @kubb/plugin-faker
 
+## 5.0.0-beta.81
+
+### Minor Changes
+
+- [#608](https://github.com/kubb-labs/plugins/pull/608) [`65f0793`](https://github.com/kubb-labs/plugins/commit/65f07934de4cabf16ee1bebde3f22773ad97ea44) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the `mapper` option, matching the v5 removal on the other plugins. Use a macro to rewrite the property's schema before printing, or a printer override to change how a schema type renders.
+
+  Migration: replace a `mapper` entry with a macro that rewrites the property's schema, such as turning `status` into an enum of a subset of its spec values. The default printer then emits the same `faker.helpers.arrayElement([...])` call, typed against the plugin-ts output, so pick values the type allows.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.81
+
 ## 5.0.0-beta.80
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @kubb/plugin-msw
 
+## 5.0.0-beta.81
+
+### Patch Changes
+
+- [#608](https://github.com/kubb-labs/plugins/pull/608) [`71eeb05`](https://github.com/kubb-labs/plugins/commit/71eeb05fea2df081ce75a1f5f460c84b40b1e072) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Correct the `handlers` JSDoc: the `handlers.ts` file re-exports handlers in operation order, not grouped by HTTP method.
+
+- Updated dependencies [[`65f0793`](https://github.com/kubb-labs/plugins/commit/65f07934de4cabf16ee1bebde3f22773ad97ea44)]:
+  - @kubb/plugin-faker@5.0.0-beta.81
+  - @kubb/plugin-ts@5.0.0-beta.81
+
 ## 5.0.0-beta.80
 
 ### Patch Changes
