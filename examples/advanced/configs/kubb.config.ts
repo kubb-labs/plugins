@@ -100,7 +100,6 @@ export default defineConfig({
       hooks: true,
       infinite: false,
       suspense: false,
-      validator: 'zod',
     }),
     pluginAxios({
       output: {

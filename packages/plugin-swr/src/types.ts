@@ -1,7 +1,6 @@
 import type { ClientSelector } from '@internals/client'
 import type { Transformer } from '@internals/tanstack-query'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
-import type { Options as ClientOptions } from '@internals/client'
 
 export type { Transformer } from '@internals/tanstack-query'
 
@@ -143,10 +142,6 @@ export type Options = OutputOptions & {
    */
   mutation?: Partial<Mutation> | false
   /**
-   * Parser to use for validating response data.
-   */
-  validator?: ClientOptions['validator']
-  /**
    * Override naming conventions for function names and types.
    */
   resolver?: Partial<ResolverSwr> & ThisType<ResolverSwr>
@@ -172,7 +167,6 @@ type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedClient
-  validator: NonNullable<Options['validator']>
   queryKey: QueryKey | undefined
   query: NonNullable<Required<Query>> | false
   mutationKey: MutationKey | undefined

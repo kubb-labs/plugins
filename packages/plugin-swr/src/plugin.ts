@@ -1,8 +1,6 @@
 import { createGroupConfig } from '@internals/shared'
 import { definePlugin } from '@kubb/core'
-import { isValidatorEnabled } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { pluginZodName } from '@kubb/plugin-zod'
 import { resolveClient } from '@internals/client'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { mutationGenerator, queryGenerator } from './generators'
@@ -18,7 +16,6 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
     exclude = [],
     include,
     override = [],
-    validator = false,
     mutation = {},
     query = {},
     mutationKey = mutationKeyTransformer,
@@ -35,7 +32,7 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
   return {
     name: pluginSwrName,
     options,
-    dependencies: [pluginTsName, isValidatorEnabled(validator) ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
+    dependencies: [pluginTsName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverSwr, ...userResolver } : resolverSwr
@@ -71,7 +68,6 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
                   methods: ['post', 'put', 'patch', 'delete'],
                   ...mutation,
                 },
-          validator,
           group: groupConfig,
           exclude,
           include,

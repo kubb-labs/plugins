@@ -24,7 +24,6 @@ const testConfig: Config = {
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  validator: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -118,7 +117,6 @@ const getPetByIdNode = ast.factory.createOperation({
 describe('suspenseQueryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: { suspense: {} } },
-    { name: 'findByTagsWithZod', node: findByTagsNode, options: { suspense: {}, validator: 'zod' as const } },
     {
       name: 'clientPostImportPath',
       node: findByTagsNode,

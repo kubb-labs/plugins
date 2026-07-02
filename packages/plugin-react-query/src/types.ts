@@ -1,7 +1,6 @@
 import type { ClientSelector } from '@internals/client'
 import type { Transformer } from '@internals/tanstack-query'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
-import type { Options as ClientOptions } from '@internals/client'
 
 export type { Transformer } from '@internals/tanstack-query'
 
@@ -293,17 +292,6 @@ export type Options = OutputOptions & {
    */
   customOptions?: CustomOptions
   /**
-   * Runtime validation with schemas from `@kubb/plugin-zod`.
-   * - `false` — no validation.
-   * - `'zod'` — validates the success response body, and the error body when a
-   *   non-2xx call does not throw.
-   * - Object form opts in per direction (`request` covers the request body and
-   *   query params).
-   *
-   * @default false
-   */
-  validator?: ClientOptions['validator']
-  /**
    * Override how hook names and file paths are built. Methods you omit fall
    * back to the default `resolverReactQuery`.
    */
@@ -340,7 +328,6 @@ type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedClient
-  validator: NonNullable<Options['validator']>
   /**
    * Only used for infinite
    */

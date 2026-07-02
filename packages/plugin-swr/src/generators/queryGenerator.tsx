@@ -1,10 +1,7 @@
 import { resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
-import { resolveZodSchemaNames } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/core'
-import { isValidatorEnabled } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Query, QueryKey, QueryOptions } from '../components'
 import type { PluginSwr } from '../types'
@@ -15,7 +12,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, validator, client, group } = ctx.options
+    const { output, query, mutation, client, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -58,16 +55,6 @@ export const queryGenerator = defineGenerator<PluginSwr>({
       }),
     ].filter((name): name is string => Boolean(name))
 
-    const pluginZod = isValidatorEnabled(validator) ? driver.getPlugin(pluginZodName) : undefined
-    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
-    const fileZod = zodResolver
-      ? zodResolver.resolveFile(
-          { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-          { root, output: pluginZod?.options?.output ?? output, group: pluginZod?.options?.group },
-        )
-      : undefined
-    const zodSchemaNames = resolveZodSchemaNames(node, zodResolver, validator)
-
     const calledClientName = contractOp.name
 
     return (
@@ -78,8 +65,6 @@ export const queryGenerator = defineGenerator<PluginSwr>({
         banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
-        {fileZod && zodSchemaNames.length > 0 && <File.Import name={zodSchemaNames} root={meta.file.path} path={fileZod.path} />}
-
         <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
         <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
 

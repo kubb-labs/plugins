@@ -1,6 +1,5 @@
 import type { ClientSelector } from '@internals/client'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
-import type { Options as ClientOptions } from '@internals/client'
 
 export type Transformer = (props: { node: ast.OperationNode; casing: 'camelcase' | undefined }) => Array<unknown>
 
@@ -205,23 +204,12 @@ export type Options = OutputOptions & {
    */
   mutation?: Partial<Mutation> | false
   /**
-   * Runtime validation with schemas from `@kubb/plugin-zod`.
-   * - `false` — no validation.
-   * - `'zod'` — validates the success response body, and the error body when a
-   *   non-2xx call does not throw.
-   * - Object form opts in per direction (`request` covers the request body and
-   *   query params).
-   *
-   * @default false
-   */
-  validator?: ClientOptions['validator']
-  /**
    * Override how composable names and file paths are built.
    */
   resolver?: Partial<ResolverVueQuery> & ThisType<ResolverVueQuery>
   /**
    * Set to `false` to skip generating `use*` composable functions. `queryOptions`,
-   * `mutationOptions`, `queryKey`, and `mutationKey` helpers are still emitted.
+   * `queryKey`, and `mutationKey` helpers are still emitted.
    *
    * @default false
    */
@@ -248,7 +236,6 @@ type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedClient
-  validator: NonNullable<Options['validator']>
   /**
    * Only used for infinite
    */
