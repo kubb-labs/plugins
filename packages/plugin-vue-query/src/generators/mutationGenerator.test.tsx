@@ -29,10 +29,10 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   mutationKey: mutationKeyTransformer,
   query: {
     importPath: '@tanstack/vue-query',
-    methods: ['get'],
+    methods: ['GET'],
   },
   mutation: {
-    methods: ['post'],
+    methods: ['POST'],
     importPath: '@tanstack/vue-query',
   },
   infinite: false,
