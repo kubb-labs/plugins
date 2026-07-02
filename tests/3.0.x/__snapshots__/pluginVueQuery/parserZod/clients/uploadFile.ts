@@ -6,6 +6,7 @@
 import type { Options, RequestResult } from '../.kubb/client.ts'
 import type { UploadFileRequestConfig, UploadFileResponses } from '../types/UploadFile.ts'
 import { client } from '../.kubb/client.ts'
+import { uploadFileResponseSchema } from '../zod/uploadFileSchema.ts'
 
 /**
  * @summary uploads an image
@@ -14,5 +15,5 @@ import { client } from '../.kubb/client.ts'
 export function uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileRequestConfig, ThrowOnError>): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], contentType: { request: 'application/octet-stream' }, ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
+  return request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], validator: { response: uploadFileResponseSchema }, contentType: { request: 'application/octet-stream' }, ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
 }

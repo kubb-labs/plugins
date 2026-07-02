@@ -6,6 +6,7 @@
 import type { Options, RequestResult } from '../.kubb/client.ts'
 import type { DeletePetRequestConfig, DeletePetResponses } from '../types/DeletePet.ts'
 import { client } from '../.kubb/client.ts'
+import { deletePetResponseSchema, deletePetErrorSchema } from '../zod/deletePetSchema.ts'
 
 /**
  * @description delete a pet
@@ -15,5 +16,5 @@ import { client } from '../.kubb/client.ts'
 export function deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetRequestConfig, ThrowOnError>): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
+  return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], validator: { response: deletePetResponseSchema, error: deletePetErrorSchema }, ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
 }

@@ -6,6 +6,7 @@
 import type { Options, RequestResult } from '../.kubb/client.ts'
 import type { GetPetByIdRequestConfig, GetPetByIdResponses } from '../types/GetPetById.ts'
 import { client } from '../.kubb/client.ts'
+import { getPetByIdResponseSchema, getPetByIdErrorSchema } from '../zod/getPetByIdSchema.ts'
 
 /**
  * @description Returns a single pet
@@ -15,5 +16,5 @@ import { client } from '../.kubb/client.ts'
 export function getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdRequestConfig, ThrowOnError>): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
+  return request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], validator: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema }, ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
 }

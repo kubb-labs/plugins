@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { AsyncEventEmitter, type Config, createKubb, Diagnostics, type KubbHooks, fsStorage } from '@kubb/core'
+import { AsyncEventEmitter, ast, type Config, createKubb, Diagnostics, type KubbHooks, fsStorage } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -77,9 +77,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
-  // ─── mapper ─────────────────────────────────────────────────────────────
+  // ─── macros (property values) ───────────────────────────────────────────
   {
-    name: 'mapper',
+    name: 'macros',
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
@@ -91,9 +91,24 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginFaker({
           output: { path: './faker', barrel: false },
-          mapper: {
-            status: "'active'",
-          },
+          macros: [
+            {
+              name: 'pet-status-values',
+              schema(node) {
+                if (node.name === 'Pet' && 'properties' in node) {
+                  return {
+                    ...node,
+                    properties: node.properties.map((property) =>
+                      property.name === 'status'
+                        ? { ...property, schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['pending'] }) }
+                        : property,
+                    ),
+                  }
+                }
+                return node
+              },
+            },
+          ],
         }),
       ],
     },
