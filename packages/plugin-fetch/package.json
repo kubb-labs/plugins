@@ -62,7 +62,6 @@
   },
   "dependencies": {
     "@kubb/ast": "catalog:",
-    "@kubb/core": "catalog:",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
     "@kubb/renderer-jsx": "catalog:"
@@ -74,6 +73,7 @@
     "typescript": "catalog:"
   },
   "peerDependencies": {
+    "@kubb/core": "catalog:",
     "@kubb/renderer-jsx": "catalog:"
   },
   "engines": {

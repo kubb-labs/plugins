@@ -56,7 +56,6 @@
   },
   "dependencies": {
     "@kubb/ast": "catalog:",
-    "@kubb/core": "catalog:",
     "@kubb/parser-ts": "catalog:",
     "@kubb/renderer-jsx": "catalog:",
     "typescript": "catalog:"
@@ -66,6 +65,7 @@
     "@internals/utils": "workspace:*"
   },
   "peerDependencies": {
+    "@kubb/core": "catalog:",
     "@kubb/renderer-jsx": "catalog:"
   },
   "engines": {
