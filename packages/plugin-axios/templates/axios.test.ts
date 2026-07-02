@@ -269,11 +269,26 @@ describe('createClientCore', () => {
     expect(calls[0]?.url).toBe('/pet/;id=5.a,b')
   })
 
-  test('forwards the merged baseURL to axios', async () => {
+  test('forwards the client-level baseURL to axios', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance, baseURL: 'https://api.test' })
     await client({ method: 'GET', url: '/pet' })
     expect(calls[0]?.baseURL).toBe('https://api.test')
+  })
+
+  test('a per-call baseURL replaces the client-level baseURL', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance, baseURL: 'https://api.test' })
+    await client({ method: 'GET', url: '/pet', baseURL: 'https://override.test' })
+    expect(calls[0]?.baseURL).toBe('https://override.test')
+  })
+
+  test('an explicit Authorization header on the call wins over the auth resolver', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance, auth: () => 'token-123' })
+    await client({ method: 'GET', url: '/pet', security: [{ type: 'http', scheme: 'bearer' }], headers: { Authorization: 'Bearer explicit' } })
+    const headers = calls[0]?.headers as Record<string, string>
+    expect(headers.Authorization).toBe('Bearer explicit')
   })
 
   test('passes client-level axiosOptions to axios', async () => {
@@ -601,6 +616,12 @@ describe('getUrl', () => {
     expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 1 } })).toBe('https://example.com/pet/1')
   })
 
+  test('a per-call baseURL replaces the configured baseURL', () => {
+    const { instance } = fakeAxios()
+    const client = createClientCore({ transport: instance, baseURL: 'https://example.com' })
+    expect(client.getUrl({ baseURL: 'https://override.test', url: '/pet' })).toBe('https://override.test/pet')
+  })
+
   test('prefixes a per-call baseURL', () => {
     const { instance } = fakeAxios()
     const client = createClientCore({ transport: instance })
@@ -691,6 +712,30 @@ describe('resolveAuth', () => {
     const headers: Record<string, string> = {}
     await resolveAuth({ security: [{ type: 'http', scheme: 'bearer' }], auth: undefined, headers, query: {} })
     expect(headers).toStrictEqual({})
+  })
+
+  test('keeps an explicit Authorization header over the resolved bearer token', async () => {
+    const headers: Record<string, string> = { Authorization: 'Bearer explicit' }
+    await resolveAuth({ security: [{ type: 'http', scheme: 'bearer' }], auth: () => 'token-123', headers, query: {} })
+    expect(headers).toStrictEqual({ Authorization: 'Bearer explicit' })
+  })
+
+  test('keeps an explicit lowercase authorization header over the resolved token', async () => {
+    const headers: Record<string, string> = { authorization: 'Bearer explicit' }
+    await resolveAuth({ security: [{ type: 'oauth2' }], auth: () => 'token-123', headers, query: {} })
+    expect(headers).toStrictEqual({ authorization: 'Bearer explicit' })
+  })
+
+  test('keeps an explicit apiKey header over the resolved token', async () => {
+    const headers: Record<string, string> = { 'x-api-key': 'explicit' }
+    await resolveAuth({ security: [{ type: 'apiKey', name: 'X-API-Key', in: 'header' }], auth: () => 'secret', headers, query: {} })
+    expect(headers).toStrictEqual({ 'x-api-key': 'explicit' })
+  })
+
+  test('keeps an explicit apiKey query value over the resolved token', async () => {
+    const query: Record<string, unknown> = { api_key: 'explicit' }
+    await resolveAuth({ security: [{ type: 'apiKey', name: 'api_key', in: 'query' }], auth: () => 'secret', headers: {}, query })
+    expect(query).toStrictEqual({ api_key: 'explicit' })
   })
 })
 
