@@ -107,12 +107,6 @@ export type Options = OutputOptions & {
    */
   regexGenerator?: 'faker' | 'randexp'
   /**
-   * Map an object property name to a custom Faker expression. Use this when the
-   * property name does not give Faker enough context (`'email'`, `'avatarUrl'`,
-   * `'phoneNumber'`).
-   */
-  mapper?: Record<string, string>
-  /**
    * Faker locale code. Switches the named import to `fakerXX` from `@faker-js/faker`
    * so names, addresses, and phone numbers reflect the target region.
    *
@@ -155,7 +149,6 @@ type ResolvedOptions = {
   override: NonNullable<Options['override']>
   dateParser: NonNullable<Options['dateParser']>
   regexGenerator: NonNullable<Options['regexGenerator']>
-  mapper: NonNullable<Options['mapper']>
   seed: NonNullable<Options['seed']> | undefined
   locale: Options['locale']
   printer: Options['printer']

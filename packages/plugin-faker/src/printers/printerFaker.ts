@@ -26,13 +26,12 @@ export type PrinterFakerNodes = ast.PrinterPartial<string, PrinterFakerOptions>
 
 /**
  * Options passed to the Faker printer at instantiation: the parser library
- * for date strings, the regex generator, the user-supplied schema-name
- * mapper, and the resolver used to compute identifiers.
+ * for date strings, the regex generator, and the resolver used to compute
+ * identifiers.
  */
 export type PrinterFakerOptions = {
   dateParser?: PluginFaker['resolvedOptions']['dateParser']
   regexGenerator?: PluginFaker['resolvedOptions']['regexGenerator']
-  mapper?: PluginFaker['resolvedOptions']['mapper']
   resolver: ResolverFaker
   typeName?: string
   schemaName?: string
@@ -384,10 +383,6 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       object(node): string {
         const cyclicSchemas = this.options.cyclicSchemas
         const entries = (node.properties ?? []).map((property): string => {
-          if (this.options.mapper && Object.hasOwn(this.options.mapper, property.name)) {
-            return `${objectKey(property.name)}: ${this.options.mapper[property.name]}`
-          }
-
           const value: string =
             printNested(property.schema, {
               typeName: this.options.typeName ? indexedTypeName(this.options.typeName, property.name, this.options.nestedInUnion) : undefined,
