@@ -254,108 +254,6 @@ export type ClientInstance<TRequest = AxiosRequestConfig, TResponse = AxiosRespo
 /**
  * Thrown for a non-2xx response, so a resolved call always means success.
  */
-/**
- * One decoded Server-Sent Event, with `data` parsed as JSON when valid and kept as the raw string otherwise.
- */
-export type ServerSentEvent<TData = unknown> = {
-  data: TData
-  event?: string
-  id?: string
-  retry?: number
-}
-
-async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>): AsyncGenerator<Uint8Array> {
-  if (!('getReader' in stream)) {
-    yield* stream
-    return
-  }
-
-  const reader = stream.getReader()
-  try {
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) return
-      yield value
-    }
-  } finally {
-    await reader.cancel().catch(() => {})
-  }
-}
-
-function parseEvent<TData>(raw: string): ServerSentEvent<TData> | undefined {
-  const data: Array<string> = []
-  const event: ServerSentEvent<TData> = { data: undefined as TData }
-  let seen = false
-
-  for (const line of raw.split('\n')) {
-    if (!line || line.startsWith(':')) continue
-    seen = true
-    const index = line.indexOf(':')
-    const field = index === -1 ? line : line.slice(0, index)
-    const value = index === -1 ? '' : line.slice(index + 1).replace(/^ /, '')
-    if (field === 'data') data.push(value)
-    else if (field === 'event') event.event = value
-    else if (field === 'id') event.id = value
-    else if (field === 'retry' && Number.isFinite(Number(value))) event.retry = Number(value)
-  }
-
-  if (!seen) return undefined
-
-  if (data.length) {
-    const joined = data.join('\n')
-    try {
-      event.data = JSON.parse(joined) as TData
-    } catch {
-      event.data = joined as TData
-    }
-  }
-  return event
-}
-
-/**
- * Parses a `text/event-stream` body into typed Server-Sent Events, consumed with `for await` and stopped early by breaking the loop.
- */
-export async function* parseEventStream<TData = unknown>(
-  stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>,
-): AsyncGenerator<ServerSentEvent<TData>> {
-  const decoder = new TextDecoder()
-  const normalize = (text: string) => text.replace(/\r\n|\r/g, '\n')
-  let buffer = ''
-
-  for await (const chunk of readBytes(stream)) {
-    const blocks = normalize(buffer + decoder.decode(chunk, { stream: true })).split('\n\n')
-    buffer = blocks.pop() ?? ''
-    for (const block of blocks) {
-      const event = parseEvent<TData>(block)
-      if (event) yield event
-    }
-  }
-
-  const event = parseEvent<TData>(normalize(buffer + decoder.decode()))
-  if (event) yield event
-}
-
-/**
- * The resolved shape returned by a generated `text/event-stream` operation: the typed event
- * `stream` plus the native `response`.
- */
-export type EventStreamResult<TData = unknown, TResponse = AxiosResponse> = {
-  stream: AsyncGenerator<ServerSentEvent<TData>>
-  response: TResponse
-}
-
-/**
- * Wraps a transport result whose `data` is a streaming body into an `EventStreamResult`, exposing
- * the parsed events as a typed async iterator. Generated SSE operations call this.
- */
-export async function toEventStream<TData = unknown>(result: Promise<{ data: unknown; response: AxiosResponse }>): Promise<EventStreamResult<TData>> {
-  const { data, response } = await result
-  return {
-    response,
-    stream: parseEventStream<TData>(data as ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>),
-  }
-}
-
 export class ResponseError<TError = unknown, TRequest = AxiosRequestConfig, TResponse = AxiosResponse> extends Error {
   data: TError
   status: number
@@ -417,6 +315,32 @@ function serializeUrl({
 }
 
 /**
+ * Wraps an axios interceptor registration behind the shared `use` / `eject` / `update` API, mapping a stable external id onto axios's own so `update` can swap a handler in place.
+ */
+function createInterceptorChannel<T>(register: (fn: InterceptorFn<T>) => number, ejectNative: (id: number) => void): InterceptorChannel<T> {
+  const ids = new Map<number, number>()
+  let counter = 0
+  return {
+    use(fn) {
+      const id = ++counter
+      ids.set(id, register(fn))
+      return id
+    },
+    eject(id) {
+      const nativeId = ids.get(id)
+      if (nativeId === undefined) return
+      ejectNative(nativeId)
+      ids.delete(id)
+    },
+    update(id, fn) {
+      const nativeId = ids.get(id)
+      if (nativeId !== undefined) ejectNative(nativeId)
+      ids.set(id, register(fn))
+    },
+  }
+}
+
+/**
  * Walks the per-operation security in order and places the first resolved token on the request, mutating `headers` / `query` in place.
  */
 export async function resolveAuth(params: {
@@ -454,32 +378,6 @@ export async function resolveAuth(params: {
 async function runValidator<T>(validator: Validator<T> | undefined, value: T): Promise<T> {
   if (!validator) return value
   return validateStandardSchema(validator, value)
-}
-
-/**
- * Wraps an axios interceptor registration behind the shared `use` / `eject` / `update` API, mapping a stable external id onto axios's own so `update` can swap a handler in place.
- */
-function createInterceptorChannel<T>(register: (fn: InterceptorFn<T>) => number, ejectNative: (id: number) => void): InterceptorChannel<T> {
-  const ids = new Map<number, number>()
-  let counter = 0
-  return {
-    use(fn) {
-      const id = ++counter
-      ids.set(id, register(fn))
-      return id
-    },
-    eject(id) {
-      const nativeId = ids.get(id)
-      if (nativeId === undefined) return
-      ejectNative(nativeId)
-      ids.delete(id)
-    },
-    update(id, fn) {
-      const nativeId = ids.get(id)
-      if (nativeId !== undefined) ejectNative(nativeId)
-      ids.set(id, register(fn))
-    },
-  }
 }
 
 /**
@@ -707,6 +605,108 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
   client.createClient = (next) => createClientCore<TRequest, TResponse>({ ...config, ...next })
 
   return client
+}
+
+/**
+ * One decoded Server-Sent Event, with `data` parsed as JSON when valid and kept as the raw string otherwise.
+ */
+export type ServerSentEvent<TData = unknown> = {
+  data: TData
+  event?: string
+  id?: string
+  retry?: number
+}
+
+async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>): AsyncGenerator<Uint8Array> {
+  if (!('getReader' in stream)) {
+    yield* stream
+    return
+  }
+
+  const reader = stream.getReader()
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) return
+      yield value
+    }
+  } finally {
+    await reader.cancel().catch(() => {})
+  }
+}
+
+function parseEvent<TData>(raw: string): ServerSentEvent<TData> | undefined {
+  const data: Array<string> = []
+  const event: ServerSentEvent<TData> = { data: undefined as TData }
+  let seen = false
+
+  for (const line of raw.split('\n')) {
+    if (!line || line.startsWith(':')) continue
+    seen = true
+    const index = line.indexOf(':')
+    const field = index === -1 ? line : line.slice(0, index)
+    const value = index === -1 ? '' : line.slice(index + 1).replace(/^ /, '')
+    if (field === 'data') data.push(value)
+    else if (field === 'event') event.event = value
+    else if (field === 'id') event.id = value
+    else if (field === 'retry' && Number.isFinite(Number(value))) event.retry = Number(value)
+  }
+
+  if (!seen) return undefined
+
+  if (data.length) {
+    const joined = data.join('\n')
+    try {
+      event.data = JSON.parse(joined) as TData
+    } catch {
+      event.data = joined as TData
+    }
+  }
+  return event
+}
+
+/**
+ * Parses a `text/event-stream` body into typed Server-Sent Events, consumed with `for await` and stopped early by breaking the loop.
+ */
+export async function* parseEventStream<TData = unknown>(
+  stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>,
+): AsyncGenerator<ServerSentEvent<TData>> {
+  const decoder = new TextDecoder()
+  const normalize = (text: string) => text.replace(/\r\n|\r/g, '\n')
+  let buffer = ''
+
+  for await (const chunk of readBytes(stream)) {
+    const blocks = normalize(buffer + decoder.decode(chunk, { stream: true })).split('\n\n')
+    buffer = blocks.pop() ?? ''
+    for (const block of blocks) {
+      const event = parseEvent<TData>(block)
+      if (event) yield event
+    }
+  }
+
+  const event = parseEvent<TData>(normalize(buffer + decoder.decode()))
+  if (event) yield event
+}
+
+/**
+ * The resolved shape returned by a generated `text/event-stream` operation: the typed event
+ * `stream` plus the native `response`.
+ */
+export type EventStreamResult<TData = unknown, TResponse = AxiosResponse> = {
+  stream: AsyncGenerator<ServerSentEvent<TData>>
+  response: TResponse
+}
+
+/**
+ * Wraps a transport result whose `data` is a streaming body into an `EventStreamResult`, exposing
+ * the parsed events as a typed async iterator. Generated SSE operations call this.
+ */
+export async function toEventStream<TData = unknown>(result: Promise<{ data: unknown; response: AxiosResponse }>): Promise<EventStreamResult<TData>> {
+  const { data, response } = await result
+  return {
+    response,
+    stream: parseEventStream<TData>(data as ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>),
+  }
 }
 
 export const client = createClientCore()

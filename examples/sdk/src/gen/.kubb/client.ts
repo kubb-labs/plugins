@@ -674,6 +674,34 @@ async function parseResponse(response: Response, responseType?: ResponseType): P
 }
 
 /**
+ * The default transport that sends the resolved request through `globalThis.fetch` and returns the parsed body with the native request and response.
+ */
+const defaultTransport: Transport = async (request: ResolvedRequest): Promise<TransportResult> => {
+  const init: RequestInit = {
+    ...request.options, // cache, mode, redirect, keepalive, duplex, next, …
+    method: request.method,
+    headers: request.headers,
+    body: request.body,
+    signal: request.signal,
+  }
+  if (request.credentials) init.credentials = request.credentials
+
+  const nativeRequest = new Request(request.url, init)
+  const response = await globalThis.fetch(nativeRequest)
+  const data = await parseResponse(response, request.responseType)
+
+  return {
+    data,
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+    contentType: getResponseContentType(response.headers),
+    request: nativeRequest,
+    response,
+  }
+}
+
+/**
  * One decoded Server-Sent Event, with `data` parsed as JSON when valid and kept as the raw string otherwise.
  */
 export type ServerSentEvent<TData = unknown> = {
@@ -772,34 +800,6 @@ export async function toEventStream<TData = unknown>(result: Promise<{ data: unk
   return {
     response,
     stream: parseEventStream<TData>(data as ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>),
-  }
-}
-
-/**
- * The default transport that sends the resolved request through `globalThis.fetch` and returns the parsed body with the native request and response.
- */
-const defaultTransport: Transport = async (request: ResolvedRequest): Promise<TransportResult> => {
-  const init: RequestInit = {
-    ...request.options, // cache, mode, redirect, keepalive, duplex, next, …
-    method: request.method,
-    headers: request.headers,
-    body: request.body,
-    signal: request.signal,
-  }
-  if (request.credentials) init.credentials = request.credentials
-
-  const nativeRequest = new Request(request.url, init)
-  const response = await globalThis.fetch(nativeRequest)
-  const data = await parseResponse(response, request.responseType)
-
-  return {
-    data,
-    status: response.status,
-    statusText: response.statusText,
-    headers: response.headers,
-    contentType: getResponseContentType(response.headers),
-    request: nativeRequest,
-    response,
   }
 }
 

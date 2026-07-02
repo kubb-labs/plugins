@@ -17,3 +17,22 @@ describe('shared client templates', () => {
     expect(axiosCopy).toBe(fetchCopy)
   })
 })
+
+function declarationNames(source: string): Array<string> {
+  return [...source.matchAll(/^(?:export )?(?:async )?(?:function\*? |const |class |type )([A-Za-z_]\w*)/gm)].map((match) => match[1]!)
+}
+
+/**
+ * fetch.ts and axios.ts mirror each other section by section, differing only in transport-specific
+ * members. Comparing the order of the declarations both files share keeps that structure aligned,
+ * so the two clients stay reviewable side by side.
+ */
+describe('client template structure', () => {
+  test('fetch.ts and axios.ts declare their shared members in the same order', () => {
+    const fetchNames = declarationNames(readFileSync(path.join(fetchTemplates, 'fetch.ts'), 'utf8'))
+    const axiosNames = declarationNames(readFileSync(path.join(axiosTemplates, 'axios.ts'), 'utf8'))
+
+    const shared = new Set(fetchNames.filter((name) => axiosNames.includes(name)))
+    expect(fetchNames.filter((name) => shared.has(name))).toStrictEqual(axiosNames.filter((name) => shared.has(name)))
+  })
+})
