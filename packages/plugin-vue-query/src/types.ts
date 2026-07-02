@@ -1,7 +1,10 @@
 import type { ClientSelector } from '@internals/client'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
-import type { Options as ClientOptions } from '@internals/client'
 
+/**
+ * Builds the parts of a query or mutation key for one operation. Receives the operation node and
+ * the resolved `paramsCasing` setting and returns the key elements in order.
+ */
 export type Transformer = (props: { node: ast.OperationNode; casing: 'camelcase' | undefined }) => Array<unknown>
 
 /**
@@ -182,7 +185,7 @@ export type Options = OutputOptions & {
   override?: Array<Override<ResolvedOptions>>
   /**
    * Enables `useInfiniteQuery` composables for cursor- or page-based pagination.
-   * Pass an object to configure how the cursor is read; pass `false` to skip.
+   * Pass an object to configure how the cursor is read, or pass `false` to skip.
    *
    * @default false
    */
@@ -205,18 +208,12 @@ export type Options = OutputOptions & {
    */
   mutation?: Partial<Mutation> | false
   /**
-   * Validator applied to response bodies before they reach the caller.
-   * - `'client'` — no validation.
-   * - `'zod'` — pipes responses through schemas from `@kubb/plugin-zod`.
-   */
-  validator?: ClientOptions['validator']
-  /**
    * Override how composable names and file paths are built.
    */
   resolver?: Partial<ResolverVueQuery> & ThisType<ResolverVueQuery>
   /**
    * Set to `false` to skip generating `use*` composable functions. `queryOptions`,
-   * `mutationOptions`, `queryKey`, and `mutationKey` helpers are still emitted.
+   * `queryKey`, and `mutationKey` helpers are still emitted.
    *
    * @default false
    */
@@ -243,9 +240,8 @@ type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedClient
-  validator: NonNullable<Options['validator']>
   /**
-   * Only used for infinite
+   * Resolved infinite query configuration, or `false` when infinite queries are disabled.
    */
   infinite: NonNullable<Infinite> | false
   queryKey: QueryKey | null

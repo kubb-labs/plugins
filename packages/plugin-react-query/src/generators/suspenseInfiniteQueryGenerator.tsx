@@ -1,10 +1,7 @@
 import { getOperationParameters, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
-import { resolveZodSchemaNames } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/core'
-import { isValidatorEnabled } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { QueryKey, SuspenseInfiniteQuery, SuspenseInfiniteQueryOptions } from '../components'
 import type { PluginReactQuery } from '../types'
@@ -12,7 +9,7 @@ import type { PluginReactQuery } from '../types'
 /**
  * Built-in generator for `useSuspenseInfiniteQuery` hooks. Enabled when both
  * `suspense` and `infinite` are configured. Combines suspense semantics with
- * cursor-based pagination — handlers throw promises while loading and pull
+ * cursor-based pagination. Handlers throw promises while loading and pull
  * additional pages on demand.
  */
 export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>({
@@ -21,7 +18,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, infinite, suspense, validator, client, group, customOptions, hooks } = ctx.options
+    const { output, query, mutation, infinite, suspense, client, group, customOptions, hooks } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -78,17 +75,6 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
       ...resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first', includeParams: false }),
     ].filter((name): name is string => Boolean(name))
 
-    const pluginZod = isValidatorEnabled(validator) ? driver.getPlugin(pluginZodName) : null
-    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
-    const fileZod = zodResolver
-      ? zodResolver.resolveFile(operationFileEntry(node, node.operationId), {
-          root,
-          output: pluginZod?.options?.output ?? output,
-          group: pluginZod?.options?.group ?? undefined,
-        })
-      : null
-    const zodSchemaNames = resolveZodSchemaNames(node, zodResolver, validator)
-
     const calledClientName = contractOp.name
 
     return (
@@ -99,8 +85,6 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
         banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
-        {fileZod && zodSchemaNames.length > 0 && <File.Import name={zodSchemaNames} root={meta.file.path} path={fileZod.path} />}
-
         <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
         <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
 

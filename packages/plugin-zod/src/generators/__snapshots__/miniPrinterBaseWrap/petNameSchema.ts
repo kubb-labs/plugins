@@ -5,4 +5,4 @@
 
 import * as z from 'zod/mini'
 
-export const petNameSchema = z.string()
+export const petNameSchema = z.string().openapi('test')

@@ -23,14 +23,12 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginZod['resolvedOptions'] = {
-  typed: false,
   inferred: false,
   importPath: 'zod',
   coercion: false,
   guidType: 'uuid',
   regexType: 'literal',
   mini: false,
-  wrapOutput: undefined,
   output: { path: '.' },
   exclude: [],
   include: undefined,
@@ -216,16 +214,6 @@ describe('zodGenerator — Schema', () => {
       }),
       options: { inferred: true },
     },
-    {
-      name: 'typed inferred all-uppercase',
-      node: ast.factory.createSchema({
-        type: 'object',
-        primitive: 'object',
-        name: 'SUV',
-        properties: [ast.factory.createProperty({ name: 'offroadCapability', schema: ast.factory.createSchema({ type: 'boolean', optional: true }) })],
-      }),
-      options: { typed: true, inferred: true },
-    },
     // mini mode
     { name: 'mini', node: objectSchema, options: { mini: true, importPath: 'zod/mini' } },
     { name: 'mini nullable', node: nullableSchema, options: { mini: true, importPath: 'zod/mini' } },
@@ -239,11 +227,9 @@ describe('zodGenerator — Schema', () => {
     { name: 'bigint', node: ast.factory.createSchema({ type: 'bigint', name: 'PetId', primitive: 'integer' }) },
     // importPath custom
     { name: 'importPath custom', node: stringSchema, options: { importPath: '@acme/zod' } },
-    // typed
-    { name: 'typed', node: objectSchema, options: { typed: true } },
-    // wrapOutput (applied to object property values)
+    // printer override wrapping the built-in handler via this.base
     {
-      name: 'wrapOutput',
+      name: 'printer base wrap',
       node: ast.factory.createSchema({
         type: 'object',
         primitive: 'object',
@@ -253,7 +239,15 @@ describe('zodGenerator — Schema', () => {
           ast.factory.createProperty({ name: 'age', schema: ast.factory.createSchema({ type: 'integer', optional: true }) }),
         ],
       }),
-      options: { wrapOutput: ({ output }) => `${output}.openapi('WrappedPet')` },
+      options: {
+        printer: {
+          nodes: {
+            object(node) {
+              return `${this.base(node)}.openapi('WrappedPet')`
+            },
+          },
+        },
+      },
     },
     // nullish (nullable + optional)
     { name: 'nullish', node: nullishSchema },
@@ -277,7 +271,21 @@ describe('zodGenerator — Schema', () => {
     // mini — additional schema types
     { name: 'mini union', node: unionSchema, options: { mini: true, importPath: 'zod/mini' } },
     { name: 'mini discriminatedUnion', node: discriminatedUnionSchema, options: { mini: true, importPath: 'zod/mini' } },
-    { name: 'mini wrapOutput', node: stringSchema, options: { mini: true, importPath: 'zod/mini', wrapOutput: ({ output }) => `${output}.openapi('test')` } },
+    {
+      name: 'mini printer base wrap',
+      node: stringSchema,
+      options: {
+        mini: true,
+        importPath: 'zod/mini',
+        printer: {
+          nodes: {
+            string(node) {
+              return `${this.base(node)}.openapi('test')`
+            },
+          },
+        },
+      },
+    },
   ]
 
   // Indirect/polymorphic circular reference scenario from issue #3172:

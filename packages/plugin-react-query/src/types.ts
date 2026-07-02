@@ -1,7 +1,6 @@
 import type { ClientSelector } from '@internals/client'
 import type { Transformer } from '@internals/tanstack-query'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
-import type { Options as ClientOptions } from '@internals/client'
 
 export type { Transformer } from '@internals/tanstack-query'
 
@@ -213,8 +212,8 @@ export type Infinite = {
 
 type CustomOptions = {
   /**
-   * Module specifier of your custom-options hook. Imported as
-   * `import ${name} from '${importPath}'`.
+   * Module specifier of your custom-options hook. Imported as a named import,
+   * `import { ${name} } from '${importPath}'`.
    */
   importPath: string
   /**
@@ -257,7 +256,7 @@ export type Options = OutputOptions & {
   override?: Array<Override<ResolvedOptions>>
   /**
    * Enables `useInfiniteQuery` hooks for cursor- or page-based pagination.
-   * Pass an object to configure how the cursor is read; pass `false` to skip.
+   * Pass an object to configure how the cursor is read, or pass `false` to skip.
    *
    * @default false
    */
@@ -292,12 +291,6 @@ export type Options = OutputOptions & {
    * `HookOptions` type so the wrapper stays in sync with generated hooks.
    */
   customOptions?: CustomOptions
-  /**
-   * Validator applied to response bodies before they reach the caller.
-   * - `'client'` — no validation. Trusts the API.
-   * - `'zod'` — pipes responses through schemas from `@kubb/plugin-zod`.
-   */
-  validator?: ClientOptions['validator']
   /**
    * Override how hook names and file paths are built. Methods you omit fall
    * back to the default `resolverReactQuery`.
@@ -335,9 +328,8 @@ type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedClient
-  validator: NonNullable<Options['validator']>
   /**
-   * Only used for infinite
+   * Resolved infinite query configuration, or `false` when infinite queries are disabled.
    */
   infinite: NonNullable<Infinite> | false
   suspense: Suspense | false

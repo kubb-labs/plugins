@@ -51,10 +51,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginZod({ output: { path: './zod', barrel: false } }),
-        pluginAxios({ output: { path: './clients', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false }, validator: 'zod' }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
-          validator: 'zod',
         }),
       ],
     },

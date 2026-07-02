@@ -30,7 +30,8 @@ import {
  *
  * Each key is a `SchemaType` string (e.g. `'date'`, `'string'`). The function
  * replaces the built-in handler for that node type. Use `this.transform` to
- * recurse into nested schema nodes, and `this.options` to read printer options.
+ * recurse into nested schema nodes, `this.base` to reuse the output of the
+ * handler being replaced, and `this.options` to read printer options.
  *
  * @example Override the `date` handler
  * ```ts
@@ -62,10 +63,6 @@ export type PrinterZodMiniOptions = {
    * @default 'literal'
    */
   regexType?: PluginZod['resolvedOptions']['regexType']
-  /**
-   * Hook to transform generated Zod schema before output.
-   */
-  wrapOutput?: PluginZod['resolvedOptions']['wrapOutput']
   /**
    * Transforms raw schema names into valid JavaScript identifiers.
    */
@@ -141,10 +138,8 @@ function buildZodMiniObjectShape(ctx: ZodMiniPrinterContext, node: ast.SchemaNod
     const { schema } = property
     const meta = syncSchemaRef(schema)
 
-    const wrappedOutput = ctx.options.wrapOutput ? ctx.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
-
     const value = applyMiniModifiers({
-      value: wrappedOutput,
+      value: baseOutput,
       schema,
       nullable: meta.nullable,
       optional: schema.optional || property.required === false,
@@ -159,7 +154,7 @@ function buildZodMiniObjectShape(ctx: ZodMiniPrinterContext, node: ast.SchemaNod
 }
 
 /**
- * Zod v4 **Mini** printer built with `definePrinter`.
+ * Zod v4 Mini printer built with `definePrinter`.
  *
  * Converts a `SchemaNode` AST into a Zod v4 code string using the functional API
  * (`z.optional(z.string())`) for improved tree-shaking. See {@link printerZod} for the chainable API.
@@ -339,8 +334,8 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           return transformed ? `z.intersection(${acc}, ${transformed})` : acc
         }, firstBase)
       },
-      ...options.nodes,
     },
+    overrides: options.nodes,
     print(node) {
       const { keysToOmit } = this.options
 

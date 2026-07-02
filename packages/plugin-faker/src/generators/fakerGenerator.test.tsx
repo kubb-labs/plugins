@@ -141,7 +141,6 @@ const defaultOptions: PluginFaker['resolvedOptions'] = {
   include: undefined,
   override: [],
   group: null,
-  mapper: {},
   dateParser: 'faker',
   regexGenerator: 'faker',
   seed: undefined,
@@ -160,15 +159,6 @@ describe('fakerGenerator — schema', () => {
     { name: 'pet', node: petSchema, options: {} },
     { name: 'petWithDayjs', node: petSchema, options: { dateParser: 'dayjs' as const } },
     { name: 'petWithRandExp', node: petSchema, options: { regexGenerator: 'randexp' as const } },
-    {
-      name: 'petWithMapper',
-      node: petSchema,
-      options: {
-        mapper: {
-          name: `faker.string.fromCharacters('abc')`,
-        },
-      },
-    },
     { name: 'treeNode', node: treeNodeSchema, options: {} },
     { name: 'catCycle', node: catSchema, options: {} },
     { name: 'petWithLocale', node: petSchema, options: { locale: 'de' as const } },
@@ -194,6 +184,42 @@ describe('fakerGenerator — schema', () => {
     })
 
     await matchFiles(driver.fileManager.files, name)
+  })
+
+  test('macro rewrites a property to fixed enum values (mapper replacement)', async () => {
+    const propertyValues: ast.Macro = {
+      name: 'property-values',
+      schema(node) {
+        if ('properties' in node) {
+          return {
+            ...node,
+            properties: node.properties.map((property) =>
+              property.name === 'name'
+                ? { ...property, schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['working', 'idle'] }) }
+                : property,
+            ),
+          }
+        }
+        return node
+      },
+    }
+    const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker, macros: [propertyValues] })
+    const driver = createMockedPluginDriver({
+      name: 'petWithMacroValues',
+      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorSchema(fakerGenerator, petSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: resolvedOptions,
+      resolver: resolverFaker,
+    })
+
+    await matchFiles(driver.fileManager.files, 'petWithMacroValues')
   })
 
   test('named string schema omits unused type import', async () => {

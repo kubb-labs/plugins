@@ -1,8 +1,7 @@
 import { createGroupConfig } from '@internals/shared'
 import { definePlugin } from '@kubb/core'
-import { isValidatorEnabled, resolveClient } from '@internals/client'
+import { resolveClient } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { pluginZodName } from '@kubb/plugin-zod'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import {
   customHookOptionsFileGenerator,
@@ -24,8 +23,8 @@ export const pluginReactQueryName = 'plugin-react-query' satisfies PluginReactQu
 
 /**
  * Generates one TanStack Query hook per OpenAPI operation for React. Queries
- * become `useFooQuery`/`useFooSuspenseQuery`/`useFooInfiniteQuery`; mutations
- * become `useFooMutation`. Each hook is fully typed: query keys, input
+ * become `useFoo`, with `useFooSuspense` and `useFooInfinite` variants.
+ * Mutations become `useFoo`. Each hook is fully typed: query keys, input
  * variables, response data, and error shape all come from the spec.
  *
  * @example
@@ -54,7 +53,6 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     exclude = [],
     include,
     override = [],
-    validator = false,
     suspense = {},
     infinite = false,
     mutation = {},
@@ -83,7 +81,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
   return {
     name: pluginReactQueryName,
     options,
-    dependencies: [pluginTsName, isValidatorEnabled(validator) ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
+    dependencies: [pluginTsName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverReactQuery, ...userResolver } : resolverReactQuery
@@ -132,7 +130,6 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
           suspense,
           customOptions: customOptions ? { name: 'useCustomHookOptions', ...customOptions } : null,
           hooks,
-          validator,
           group: groupConfig,
           exclude,
           include,

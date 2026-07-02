@@ -1,7 +1,6 @@
 import type { ClientSelector } from '@internals/client'
 import type { Transformer } from '@internals/tanstack-query'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
-import type { Options as ClientOptions } from '@internals/client'
 
 export type { Transformer } from '@internals/tanstack-query'
 
@@ -79,7 +78,7 @@ type Query = {
    * Path to the useSWR hook for useSWR functionality.
    * Used as `import useSWR from '${importPath}'`.
    * Accepts relative and absolute paths.
-   * Path is used as-is; relative paths are based on the generated file location.
+   * Path is used as-is. Relative paths are based on the generated file location.
    * @default 'swr'
    */
   importPath?: string
@@ -96,7 +95,7 @@ type Mutation = {
    * Path to the useSWRMutation hook for useSWRMutation functionality.
    * Used as `import useSWRMutation from '${importPath}'`.
    * Accepts relative and absolute paths.
-   * Path is used as-is; relative paths are based on the generated file location.
+   * Path is used as-is. Relative paths are based on the generated file location.
    * @default 'swr/mutation'
    */
   importPath?: string
@@ -132,20 +131,24 @@ export type Options = OutputOptions & {
    * Override options for specific tags, operations, or paths.
    */
   override?: Array<Override<ResolvedOptions>>
+  /**
+   * Custom `queryKey` builder. Use to add a version namespace, swap to
+   * operation IDs, or shape keys to match an existing invalidation strategy.
+   */
   queryKey?: QueryKey
   /**
    * Configure useSWR behavior.
    */
   query?: Partial<Query> | false
+  /**
+   * Custom `mutationKey` builder. Useful when you match keys from SWR's
+   * global `mutate` for cache updates.
+   */
   mutationKey?: MutationKey
   /**
    * Configure useSWRMutation behavior.
    */
   mutation?: Partial<Mutation> | false
-  /**
-   * Parser to use for validating response data.
-   */
-  validator?: ClientOptions['validator']
   /**
    * Override naming conventions for function names and types.
    */
@@ -172,7 +175,6 @@ type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedClient
-  validator: NonNullable<Options['validator']>
   queryKey: QueryKey | undefined
   query: NonNullable<Required<Query>> | false
   mutationKey: MutationKey | undefined

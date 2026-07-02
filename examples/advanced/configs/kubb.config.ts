@@ -1,4 +1,5 @@
 import { adapterOas } from '@kubb/adapter-oas'
+import { ast } from '@kubb/core'
 import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginCypress } from '@kubb/plugin-cypress'
 import { pluginFaker } from '@kubb/plugin-faker'
@@ -62,7 +63,6 @@ export default defineConfig({
       ],
       group: { type: 'tag' },
       inferred: true,
-      typed: true,
     }),
     pluginReactQuery({
       output: {
@@ -101,7 +101,6 @@ export default defineConfig({
       hooks: true,
       infinite: false,
       suspense: false,
-      validator: 'zod',
     }),
     pluginAxios({
       output: {
@@ -168,9 +167,24 @@ export default defineConfig({
         },
       ],
       group: { type: 'tag' },
-      mapper: {
-        status: `faker.helpers.arrayElement<any>(['working', 'idle'])`,
-      },
+      macros: [
+        {
+          name: 'pet-status-values',
+          schema(node) {
+            if (node.name === 'Pet' && 'properties' in node) {
+              return {
+                ...node,
+                properties: node.properties.map((property) =>
+                  property.name === 'status'
+                    ? { ...property, schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['available', 'pending'] }) }
+                    : property,
+                ),
+              }
+            }
+            return node
+          },
+        },
+      ],
       resolver: {
         resolveName(name, type) {
           return `${this.default(name, type)}Faker`

@@ -26,7 +26,6 @@ const testConfig: Config = {
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  validator: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -153,7 +152,6 @@ describe('queryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
     { name: 'findByTagsTemplateString', node: findByTagsNode, options: {}, baseURL: '${123456}' },
-    { name: 'findByTagsWithZod', node: findByTagsNode, options: { validator: 'zod' as const } },
     {
       name: 'clientPostImportPath',
       node: findByTagsNode,

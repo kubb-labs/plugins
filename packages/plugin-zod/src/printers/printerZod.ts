@@ -34,7 +34,8 @@ import type { AdapterOas } from '@kubb/adapter-oas'
  *
  * Each key is a `SchemaType` string (e.g. `'date'`, `'string'`). The function
  * replaces the built-in handler for that node type. Use `this.transform` to
- * recurse into nested schema nodes, and `this.options` to read printer options.
+ * recurse into nested schema nodes, `this.base` to reuse the output of the
+ * handler being replaced, and `this.options` to read printer options.
  *
  * @example Override the `date` handler
  * ```ts
@@ -42,7 +43,20 @@ import type { AdapterOas } from '@kubb/adapter-oas'
  *   printer: {
  *     nodes: {
  *       date(node) {
- *         return 'z.string().date()'
+ *         return 'z.iso.date()'
+ *       },
+ *     },
+ *   },
+ * })
+ * ```
+ *
+ * @example Wrap the built-in output
+ * ```ts
+ * pluginZod({
+ *   printer: {
+ *     nodes: {
+ *       object(node) {
+ *         return `${this.base(node)}.openapi(${JSON.stringify({ description: node.description })})`
  *       },
  *     },
  *   },
@@ -74,10 +88,6 @@ export type PrinterZodOptions = {
    */
   dateType?: AdapterOas['resolvedOptions']['dateType']
   /**
-   * Hook to transform generated Zod schema before output.
-   */
-  wrapOutput?: PluginZod['resolvedOptions']['wrapOutput']
-  /**
    * Transforms raw schema names into valid JavaScript identifiers.
    */
   resolver?: ResolverZod
@@ -92,8 +102,8 @@ export type PrinterZodOptions = {
   cyclicSchemas?: ReadonlySet<string>
   /**
    * Print direction for `dateType: 'date'` fields (`Date` in TypeScript):
-   * - `'output'` (default) — decode the wire `string` into a `Date` (response bodies).
-   * - `'input'` — encode a `Date` back into the wire `string` (request bodies/params).
+   * - `'output'` (default): decode the wire `string` into a `Date` (response bodies).
+   * - `'input'`: encode a `Date` back into the wire `string` (request bodies/params).
    *
    * Diverging the directions requires the generator to emit an `${name}InputSchema`
    * variant for each date-bearing component.
@@ -127,7 +137,7 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
     }
 
     // A cyclic ref is annotated `z.ZodType`, and a nullable/optional ref is wrapped in
-    // ZodNullable/ZodOptional — neither exposes `.strict()`. Only a bare `ZodObject` ref takes it.
+    // ZodNullable/ZodOptional, and neither exposes `.strict()`. Only a bare `ZodObject` ref takes it.
     // A union member ref may carry only `node.name` (no `node.ref`), so fall back to it like `ref()`.
     const refName = (node.ref ? extractRefName(node.ref) : undefined) ?? node.name
     if (refName && cyclicSchemas?.has(refName)) {
@@ -187,15 +197,13 @@ function buildZodObjectShape(ctx: ZodPrinterContext, node: ast.SchemaNode): stri
     const { schema } = property
     const meta = syncSchemaRef(schema)
 
-    const wrappedOutput = ctx.options.wrapOutput ? ctx.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
-
     // When a property schema is not a ref but the metadata is from a ref (e.g., discriminator
     // property override), skip applying the description from the ref target to avoid applying
     // metadata from a replaced schema.
     const descriptionToApply = schema.type !== 'ref' && meta.type === 'ref' ? undefined : meta.description
 
     const value = applyModifiers({
-      value: wrappedOutput,
+      value: baseOutput,
       schema,
       nullable: meta.nullable,
       optional: schema.optional || property.required === false,
@@ -257,10 +265,11 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         return shouldCoerce(this.options.coercion, 'numbers') ? 'z.coerce.bigint()' : 'z.bigint()'
       },
       date(node) {
-        // representation: 'date' → typed as `Date`; decode/encode at the boundary.
+        // representation: 'date' fields are typed as `Date`, so decode/encode at the boundary.
         const codec = getCodec(node)
         if (codec) {
-          return this.options.direction === 'input' ? codec.encode(node) : codec.decode(node)
+          if (this.options.direction === 'input') return codec.encode(node)
+          return shouldCoerce(this.options.coercion, 'dates') ? 'z.coerce.date()' : codec.decode(node)
         }
 
         return 'z.iso.date()'
@@ -420,8 +429,8 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           return transformed ? `${acc}.and(${transformed})` : acc
         }, firstBase)
       },
-      ...options.nodes,
     },
+    overrides: options.nodes,
     print(node) {
       const { keysToOmit } = this.options
 

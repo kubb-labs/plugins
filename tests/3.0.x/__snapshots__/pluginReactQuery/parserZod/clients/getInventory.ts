@@ -6,6 +6,7 @@
 import type { Options, RequestResult } from '../.kubb/client.ts'
 import type { GetInventoryRequestConfig, GetInventoryResponses } from '../types/GetInventory.ts'
 import { client } from '../.kubb/client.ts'
+import { getInventoryResponseSchema } from '../zod/getInventorySchema.ts'
 
 /**
  * @description Returns a map of status codes to quantities
@@ -15,5 +16,5 @@ import { client } from '../.kubb/client.ts'
 export function getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryRequestConfig, ThrowOnError> = {}): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
+  return request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], validator: { response: getInventoryResponseSchema }, ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
 }

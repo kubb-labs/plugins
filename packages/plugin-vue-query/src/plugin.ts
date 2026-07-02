@@ -1,8 +1,6 @@
 import { createGroupConfig } from '@internals/shared'
 import { definePlugin } from '@kubb/core'
-import { isValidatorEnabled } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { pluginZodName } from '@kubb/plugin-zod'
 import { mutationKeyTransformer } from '@internals/tanstack-query'
 import { queryKeyTransformer } from '@internals/tanstack-query'
 import { resolveClient } from '@internals/client'
@@ -19,7 +17,7 @@ export const pluginVueQueryName = 'plugin-vue-query' satisfies PluginVueQuery['n
 /**
  * Generates one TanStack Query composable per OpenAPI operation for Vue's
  * Composition API. Queries become `useFooQuery` (and optionally
- * `useFooInfiniteQuery`); mutations become `useFooMutation`. Each composable
+ * `useFooInfiniteQuery`). Mutations become `useFooMutation`. Each composable
  * is fully typed end to end.
  *
  * @example
@@ -47,7 +45,6 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     exclude = [],
     include,
     override = [],
-    validator = false,
     infinite = false,
     mutation = {},
     query = {},
@@ -68,7 +65,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
   return {
     name: pluginVueQueryName,
     options,
-    dependencies: [pluginTsName, isValidatorEnabled(validator) ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
+    dependencies: [pluginTsName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverVueQuery, ...userResolver } : resolverVueQuery
@@ -115,7 +112,6 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
               }
             : false,
           hooks,
-          validator,
           group: groupConfig,
           exclude,
           include,

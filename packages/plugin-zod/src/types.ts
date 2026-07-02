@@ -124,12 +124,6 @@ export type Options = OutputOptions & {
    */
   importPath?: 'zod' | 'zod/mini' | (string & {})
   /**
-   * Tie each Zod schema to its TypeScript type from `@kubb/plugin-ts`. Requires
-   * `@kubb/plugin-ts` in the plugins list. TypeScript fails compilation when the
-   * schema drifts from the type.
-   */
-  typed?: boolean
-  /**
    * Export a `z.infer<typeof schema>` type alias next to every generated schema.
    * Lets the Zod schema act as the single source of truth.
    */
@@ -140,22 +134,26 @@ export type Options = OutputOptions & {
    * - `true` coerces strings, numbers, and dates.
    * - Object form picks per-primitive coercion.
    *
+   * `dates` applies to fields typed as `Date` (adapter `dateType: 'date'`): they
+   * validate with `z.coerce.date()` instead of the string-to-Date codec. Fields
+   * kept as ISO strings (`z.iso.date()`, `z.iso.datetime()`) are never coerced.
+   *
    * @default false
    * @see https://zod.dev/?id=coercion-for-primitives
    */
   coercion?: boolean | { dates?: boolean; strings?: boolean; numbers?: boolean }
   /**
    * Validator for `format: uuid` properties.
-   * - `'uuid'` — `z.uuid()`. Standard RFC 4122.
-   * - `'guid'` — `z.guid()`. Accepts Microsoft-style GUIDs.
+   * - `'uuid'`: `z.uuid()`. Standard RFC 4122.
+   * - `'guid'`: `z.guid()`. Accepts Microsoft-style GUIDs.
    *
    * @default 'uuid'
    */
   guidType?: 'uuid' | 'guid'
   /**
    * Output form for an OpenAPI `pattern` inside `.regex(...)`.
-   * - `'literal'` — a regex literal: `.regex(/^[a-z]+$/)`.
-   * - `'constructor'` — the `RegExp` constructor: `.regex(new RegExp("^[a-z]+$"))`.
+   * - `'literal'`: a regex literal, `.regex(/^[a-z]+$/)`.
+   * - `'constructor'`: the `RegExp` constructor, `.regex(new RegExp("^[a-z]+$"))`.
    *
    * @default 'literal'
    */
@@ -168,12 +166,6 @@ export type Options = OutputOptions & {
    * @beta
    */
   mini?: boolean
-  /**
-   * Wrap the generated Zod schema string with extra calls. Receives the raw output
-   * and the originating `SchemaNode`. Useful for round-tripping OpenAPI metadata
-   * back into Zod (e.g. `.openapi(...)`).
-   */
-  wrapOutput?: (arg: { output: string; schema: ast.SchemaNode }) => string | undefined
   /**
    * Override how schema and operation names are built. Methods you omit fall back
    * to the default `resolverZod`.
@@ -198,14 +190,12 @@ type ResolvedOptions = {
   include: Array<Include> | undefined
   override: Array<Override<ResolvedOptions>>
   group: Group | null
-  typed: NonNullable<Options['typed']>
   inferred: NonNullable<Options['inferred']>
   importPath: NonNullable<Options['importPath']>
   coercion: NonNullable<Options['coercion']>
   guidType: NonNullable<Options['guidType']>
   regexType: NonNullable<Options['regexType']>
   mini: NonNullable<Options['mini']>
-  wrapOutput: Options['wrapOutput']
   printer: Options['printer']
 }
 

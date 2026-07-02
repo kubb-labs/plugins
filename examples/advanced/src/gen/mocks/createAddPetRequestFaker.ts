@@ -1,4 +1,5 @@
 import type { AddPetRequest } from '../models/ts/AddPetRequest.ts'
+import { createAddPetRequestStatusEnumFaker } from './createAddPetRequestStatusEnumFaker.ts'
 import { createCategoryFaker } from './createCategoryFaker.ts'
 import { createTagTagFaker } from './tag/createTagFaker.ts'
 import { fakerEN as faker } from '@faker-js/faker'
@@ -10,7 +11,7 @@ export function createAddPetRequestFaker<TData extends Partial<AddPetRequest> = 
     category: createCategoryFaker(),
     photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
     tags: faker.helpers.multiple(() => createTagTagFaker()),
-    status: faker.helpers.arrayElement<any>(['working', 'idle']),
+    status: createAddPetRequestStatusEnumFaker(),
   }
   return {
     ...defaultFakeData,

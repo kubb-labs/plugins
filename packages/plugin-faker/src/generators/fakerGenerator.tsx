@@ -21,7 +21,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, group, dateParser, regexGenerator, mapper, seed, locale, printer } = ctx.options
+    const { output, group, dateParser, regexGenerator, seed, locale, printer } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
     if (!node.name || !pluginTs) {
@@ -53,7 +53,6 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       typeName: meta.typeName,
       dateParser,
       regexGenerator,
-      mapper,
       nodes: printer?.nodes,
       cyclicSchemas,
       nameMapping: (adapter as Adapter<AdapterOas>).options.nameMapping,
@@ -103,7 +102,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   },
   operation(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, group, dateParser, regexGenerator, mapper, seed, locale, printer } = ctx.options
+    const { output, group, dateParser, regexGenerator, seed, locale, printer } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
     if (!pluginTs) {
@@ -229,7 +228,6 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         typeName,
         dateParser,
         regexGenerator,
-        mapper,
         nodes: printer?.nodes,
         cyclicSchemas,
         nameMapping: (adapter as Adapter<AdapterOas>).options.nameMapping,

@@ -30,7 +30,7 @@ export const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
  *     pluginTs(),
  *     pluginZod({
  *       output: { path: './zod' },
- *       typed: true,
+ *       inferred: true,
  *     }),
  *   ],
  * })
@@ -43,14 +43,12 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
     exclude = [],
     include,
     override = [],
-    typed = false,
     mini = false,
     guidType = 'uuid',
     regexType = 'literal',
     importPath = mini ? 'zod/mini' : 'zod',
     coercion = false,
     inferred = false,
-    wrapOutput = undefined,
     printer,
     resolver: userResolver,
     macros: userMacros,
@@ -69,14 +67,12 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
           include,
           override,
           group: groupConfig,
-          typed,
           importPath,
           coercion,
           inferred,
           guidType,
           regexType,
           mini,
-          wrapOutput,
           printer,
         })
         ctx.setResolver(userResolver ? { ...resolverZod, ...userResolver } : resolverZod)

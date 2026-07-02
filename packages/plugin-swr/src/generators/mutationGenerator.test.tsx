@@ -24,7 +24,6 @@ const testConfig: Config = {
 
 const defaultOptions: PluginSwr['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  validator: false,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {

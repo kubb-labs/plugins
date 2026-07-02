@@ -254,6 +254,359 @@ export type ClientInstance<TRequest = AxiosRequestConfig, TResponse = AxiosRespo
 /**
  * Thrown for a non-2xx response, so a resolved call always means success.
  */
+export class ResponseError<TError = unknown, TRequest = AxiosRequestConfig, TResponse = AxiosResponse> extends Error {
+  data: TError
+  status: number
+  statusText: string
+  contentType: string | undefined
+  request: TRequest
+  response: TResponse
+
+  constructor(config: { data: TError; status: number; statusText: string; contentType?: string; request: TRequest; response: TResponse }) {
+    super(`Request failed with status ${config.status}${config.statusText ? ` ${config.statusText}` : ''}`)
+    this.name = 'ResponseError'
+    this.data = config.data
+    this.status = config.status
+    this.statusText = config.statusText
+    this.contentType = config.contentType
+    this.request = config.request
+    this.response = config.response
+  }
+}
+
+export type ResponseErrorConfig<TError = unknown> = ResponseError<TError>
+
+function serializeHeaders(headers: HeadersInit | undefined): Record<string, string> {
+  if (!headers) return {}
+  const entries = Array.isArray(headers) ? headers : Object.entries(headers)
+  const result: Record<string, string> = {}
+  for (const [key, value] of entries) {
+    if (value === undefined || value === null) continue
+    result[key] = typeof value === 'string' ? value : typeof value === 'object' ? JSON.stringify(value) : String(value)
+  }
+  return result
+}
+
+function mergeHeaders(...sources: Array<HeadersInit | undefined>): Record<string, string> {
+  return Object.assign({}, ...sources.map(serializeHeaders))
+}
+
+/**
+ * Joins the URL parts, interpolates URL-encoded `{param}` segments, and appends the serialized query, backing `getUrl`.
+ */
+function serializeUrl({
+  parts,
+  pathParams,
+  search,
+  pathSerializer = defaultPathSerializer,
+  pathStyles,
+}: {
+  parts: Array<string | undefined>
+  pathParams: Record<string, unknown>
+  search: string
+  pathSerializer?: PathSerializer
+  pathStyles?: Record<string, PathParamStyle>
+}): string {
+  const path = parts
+    .filter(Boolean)
+    .join('')
+    .replace(/\{([^{}]+)\}/g, (_, key: string) => pathSerializer({ name: key, value: pathParams[key], options: pathStyles?.[key] }))
+  return path + (search ? `?${search}` : '')
+}
+
+/**
+ * Wraps an axios interceptor registration behind the shared `use` / `eject` / `update` API, mapping a stable external id onto axios's own so `update` can swap a handler in place.
+ */
+function createInterceptorChannel<T>(register: (fn: InterceptorFn<T>) => number, ejectNative: (id: number) => void): InterceptorChannel<T> {
+  const ids = new Map<number, number>()
+  let counter = 0
+  return {
+    use(fn) {
+      const id = ++counter
+      ids.set(id, register(fn))
+      return id
+    },
+    eject(id) {
+      const nativeId = ids.get(id)
+      if (nativeId === undefined) return
+      ejectNative(nativeId)
+      ids.delete(id)
+    },
+    update(id, fn) {
+      const nativeId = ids.get(id)
+      if (nativeId !== undefined) ejectNative(nativeId)
+      ids.set(id, register(fn))
+    },
+  }
+}
+
+/**
+ * Walks the per-operation security in order and places the first resolved token on the request, mutating `headers` / `query` in place.
+ */
+export async function resolveAuth(params: {
+  security: Array<Auth> | undefined
+  auth: AuthResolver | undefined
+  headers: Record<string, string>
+  query: Record<string, unknown>
+}): Promise<void> {
+  const { security, auth, headers, query } = params
+  if (!security?.length || auth === undefined) return
+
+  // An explicit caller-set header wins over the resolved token.
+  const hasHeader = (name: string) => Object.keys(headers).some((key) => key.toLowerCase() === name.toLowerCase())
+
+  for (const scheme of security) {
+    const token = typeof auth === 'function' ? await auth(scheme) : auth
+    if (token === undefined) continue
+
+    if (scheme.type === 'apiKey') {
+      const name = scheme.name ?? 'Authorization'
+      if (scheme.in === 'query') {
+        if (query[name] === undefined) query[name] = token
+      } else if (scheme.in === 'cookie') {
+        headers.Cookie = [headers.Cookie, `${name}=${token}`].filter(Boolean).join('; ')
+      } else if (!hasHeader(name)) {
+        headers[name] = token
+      }
+    } else if (!hasHeader('Authorization')) {
+      headers.Authorization = scheme.scheme === 'basic' ? `Basic ${btoa(token)}` : `Bearer ${token}`
+    }
+    return
+  }
+}
+
+async function runValidator<T>(validator: Validator<T> | undefined, value: T): Promise<T> {
+  if (!validator) return value
+  return validateStandardSchema(validator, value)
+}
+
+/**
+ * The base media type of a `Content-Type` value, lowercased and stripped of any `; charset=...` parameters.
+ */
+function baseContentType(value: string | null | undefined): string | undefined {
+  if (!value) return undefined
+  return value.split(';')[0]!.trim().toLowerCase() || undefined
+}
+
+/**
+ * Reads the negotiated response content type from the response headers as a base media type.
+ */
+function getResponseContentType(headers: Record<string, unknown> | undefined): string | undefined {
+  if (!headers) return undefined
+  const value = headers['content-type'] ?? headers['Content-Type']
+  return baseContentType(typeof value === 'string' ? value : undefined)
+}
+
+/**
+ * Normalizes the `contentType` option to its `{ request, response }` form, treating a bare string as the request content type.
+ */
+function resolveContentType(contentType: ContentType | undefined): { request?: string; response?: string } {
+  if (typeof contentType === 'string') return { request: contentType }
+  return contentType ?? {}
+}
+
+/**
+ * The per-concern serializers for a call, the per-call serializer winning over the client's and
+ * falling back to the defaults.
+ */
+function resolveSerializers({ config, requestConfig }: { config: { serializer?: Serializers }; requestConfig: { serializer?: Serializers } }) {
+  return {
+    querySerializer: requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer,
+    bodySerializer: requestConfig.serializer?.body ?? config.serializer?.body ?? defaultBodySerializer,
+    pathSerializer: requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer,
+  }
+}
+
+/**
+ * Resolves everything a call needs before it touches axios: merged headers with the negotiated
+ * content type, auth on headers or query, serialized cookies, the validated and serialized body,
+ * and the final axios request config with `throwOnError` riding `validateStatus`.
+ */
+async function resolveRequest<TBody, TRequest, TResponse>({
+  config,
+  requestConfig,
+}: {
+  config: ClientConfig
+  requestConfig: RequestConfig<TBody, TRequest, TResponse>
+}): Promise<{ axiosConfig: AxiosRequestConfig; codecs: Record<string, Codec>; throwOnError: boolean }> {
+  const { querySerializer, bodySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
+  const codecs = { ...config.codecs, ...requestConfig.codecs }
+
+  const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.styles?.header))
+  const { request: requestContentTypeOption, response: responseContentType } = resolveContentType(requestConfig.contentType)
+  const requestContentType = requestContentTypeOption ?? headers['Content-Type'] ?? headers['content-type']
+  if (responseContentType && headers['Accept'] === undefined && headers['accept'] === undefined) {
+    headers['Accept'] = responseContentType
+  }
+
+  const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
+
+  await resolveAuth({
+    security: requestConfig.security,
+    auth: requestConfig.auth ?? config.auth,
+    headers,
+    query,
+  })
+
+  if (requestConfig.cookies) {
+    const cookie = serializeCookies(requestConfig.cookies, requestConfig.styles?.cookie)
+    if (cookie) headers.Cookie = [headers.Cookie, cookie].filter(Boolean).join('; ')
+  }
+
+  const validatedBody = await runValidator(requestConfig.validator?.request, requestConfig.body)
+  const requestContentTypeBase = baseContentType(requestContentType)
+  const contentCodec = requestContentTypeBase ? codecs[requestContentTypeBase] : undefined
+  const body = contentCodec?.serialize
+    ? contentCodec.serialize(validatedBody, requestContentType)
+    : bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.styles?.body })
+  // A FormData body must keep its Content-Type unset so axios appends the multipart boundary.
+  if (body instanceof FormData) {
+    delete headers['Content-Type']
+    delete headers['content-type']
+  } else if (requestContentTypeOption) {
+    headers['Content-Type'] = requestContentTypeOption
+  }
+
+  const pathParams = requestConfig.path ?? {}
+  const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) =>
+    pathSerializer({ name: key, value: pathParams[key], options: requestConfig.styles?.path?.[key] }),
+  )
+
+  const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
+  const validateStatus = requestConfig.validateStatus ?? config.validateStatus ?? (throwOnError ? undefined : () => true)
+
+  const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
+
+  const axiosConfig: AxiosRequestConfig = {
+    ...options, // timeout, proxy, maxRedirects, decompress, onUploadProgress, …
+    url,
+    baseURL: requestConfig.baseURL ?? config.baseURL,
+    method: requestConfig.method ?? 'GET',
+    headers,
+    params: query,
+    paramsSerializer: (params) => querySerializer(params as Record<string, unknown>, requestConfig.styles?.query),
+    data: body,
+    transformRequest: (data) => data,
+    signal: requestConfig.signal,
+    responseType: requestConfig.responseType,
+    validateStatus,
+  }
+
+  // Only the fetch adapter exposes a streaming `response.data` (a ReadableStream) in the browser.
+  // The default XHR adapter buffers the whole body. Default streams to it, but respect an explicit adapter.
+  if (requestConfig.responseType === 'stream' && !axiosConfig.adapter) {
+    axiosConfig.adapter = 'fetch'
+  }
+
+  return { axiosConfig, codecs, throwOnError }
+}
+
+/**
+ * Turns an axios response into the call result: decodes the body through the matching codec and
+ * validates the success or error body. A thrown axios error never reaches this, so `error` here is
+ * always the body of a non-2xx response that `validateStatus` let through.
+ */
+async function settleResponse<TRequest, TResponse>({
+  response,
+  codecs,
+  validator,
+}: {
+  response: AxiosResponse
+  codecs: Record<string, Codec>
+  validator: { response?: Validator; error?: Validator } | undefined
+}): Promise<CallResult<TRequest, TResponse>> {
+  const isSuccess = response.status >= 200 && response.status < 300
+  const contentType = getResponseContentType(response.headers as Record<string, unknown>)
+  let decoded: unknown = response.data
+  if (contentType) {
+    const codec = codecs[contentType]
+    if (codec?.deserialize) decoded = await codec.deserialize(response.data, contentType)
+  }
+  const data = isSuccess ? await runValidator(validator?.response, decoded) : undefined
+  const error = isSuccess ? undefined : await runValidator(validator?.error, decoded)
+  return {
+    status: response.status,
+    data,
+    error,
+    contentType,
+    request: response.config as TRequest,
+    response: response as TResponse,
+  }
+}
+
+/**
+ * Builds the shared client core bound to an axios instance (defaulting to `axios.create()`), with `throwOnError` riding axios's `validateStatus`.
+ */
+export function createClientCore<TRequest = AxiosRequestConfig, TResponse = AxiosResponse>(options: ClientConfig = {}): ClientInstance<TRequest, TResponse> {
+  let config: ClientConfig = { ...options }
+  const instance = config.transport ?? axios.create()
+
+  const requestManager = instance.interceptors.request
+  const responseManager = instance.interceptors.response
+  const interceptors: Interceptors = {
+    request: createInterceptorChannel<InternalAxiosRequestConfig>(
+      (fn) => requestManager.use(fn),
+      (id) => requestManager.eject(id),
+    ),
+    response: createInterceptorChannel<AxiosResponse>(
+      (fn) => responseManager.use(fn),
+      (id) => responseManager.eject(id),
+    ),
+    error: createInterceptorChannel<AxiosError>(
+      (fn) =>
+        responseManager.use(undefined, async (error: unknown) => {
+          await fn(error as AxiosError)
+          return Promise.reject(error)
+        }),
+      (id) => responseManager.eject(id),
+    ),
+  }
+
+  const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
+    const activeInstance = requestConfig.transport ?? config.transport ?? instance
+    const { axiosConfig, codecs, throwOnError } = await resolveRequest({ config, requestConfig })
+
+    try {
+      const response = await activeInstance.request<unknown, AxiosResponse>(axiosConfig)
+      return await settleResponse({ response, codecs, validator: requestConfig.validator })
+    } catch (error) {
+      const axiosError = error as AxiosError
+      if (throwOnError && axiosError.response) {
+        throw new ResponseError({
+          data: axiosError.response.data,
+          status: axiosError.response.status,
+          statusText: axiosError.response.statusText,
+          contentType: getResponseContentType(axiosError.response.headers as Record<string, unknown>),
+          request: axiosError.config as TRequest,
+          response: axiosError.response as TResponse,
+        })
+      }
+      throw error
+    }
+  }) as ClientInstance<TRequest, TResponse>
+
+  client.getConfig = () => config
+  client.setConfig = (next) => {
+    config = { ...config, ...next, headers: { ...serializeHeaders(config.headers), ...serializeHeaders(next.headers) } }
+    return config
+  }
+  client.getUrl = (requestConfig) => {
+    const { querySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
+    const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
+    return serializeUrl({
+      parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
+      pathParams: requestConfig.path ?? {},
+      search: querySerializer(query, requestConfig.styles?.query),
+      pathSerializer,
+      pathStyles: requestConfig.styles?.path,
+    })
+  }
+  client.interceptors = interceptors
+  client.createClient = (next) => createClientCore<TRequest, TResponse>({ ...config, ...next })
+
+  return client
+}
+
 /**
  * One decoded Server-Sent Event, with `data` parsed as JSON when valid and kept as the raw string otherwise.
  */
@@ -354,309 +707,6 @@ export async function toEventStream<TData = unknown>(result: Promise<{ data: unk
     response,
     stream: parseEventStream<TData>(data as ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>),
   }
-}
-
-export class ResponseError<TError = unknown, TRequest = AxiosRequestConfig, TResponse = AxiosResponse> extends Error {
-  data: TError
-  status: number
-  statusText: string
-  contentType: string | undefined
-  request: TRequest
-  response: TResponse
-
-  constructor(config: { data: TError; status: number; statusText: string; contentType?: string; request: TRequest; response: TResponse }) {
-    super(`Request failed with status ${config.status}${config.statusText ? ` ${config.statusText}` : ''}`)
-    this.name = 'ResponseError'
-    this.data = config.data
-    this.status = config.status
-    this.statusText = config.statusText
-    this.contentType = config.contentType
-    this.request = config.request
-    this.response = config.response
-  }
-}
-
-export type ResponseErrorConfig<TError = unknown> = ResponseError<TError>
-
-function serializeHeaders(headers: HeadersInit | undefined): Record<string, string> {
-  if (!headers) return {}
-  const entries = Array.isArray(headers) ? headers : Object.entries(headers)
-  const result: Record<string, string> = {}
-  for (const [key, value] of entries) {
-    if (value === undefined || value === null) continue
-    result[key] = typeof value === 'string' ? value : typeof value === 'object' ? JSON.stringify(value) : String(value)
-  }
-  return result
-}
-
-function mergeHeaders(...sources: Array<HeadersInit | undefined>): Record<string, string> {
-  return Object.assign({}, ...sources.map(serializeHeaders))
-}
-
-/**
- * Joins the URL parts, interpolates URL-encoded `{param}` segments, and appends the serialized query, backing `getUrl`.
- */
-function serializeUrl({
-  parts,
-  pathParams,
-  search,
-  pathSerializer = defaultPathSerializer,
-  pathStyles,
-}: {
-  parts: Array<string | undefined>
-  pathParams: Record<string, unknown>
-  search: string
-  pathSerializer?: PathSerializer
-  pathStyles?: Record<string, PathParamStyle>
-}): string {
-  const path = parts
-    .filter(Boolean)
-    .join('')
-    .replace(/\{([^{}]+)\}/g, (_, key: string) => pathSerializer({ name: key, value: pathParams[key], options: pathStyles?.[key] }))
-  return path + (search ? `?${search}` : '')
-}
-
-/**
- * Walks the per-operation security in order and places the first resolved token on the request, mutating `headers` / `query` in place.
- */
-export async function resolveAuth(params: {
-  security: Array<Auth> | undefined
-  auth: AuthResolver | undefined
-  headers: Record<string, string>
-  query: Record<string, unknown>
-}): Promise<void> {
-  const { security, auth, headers, query } = params
-  if (!security?.length || auth === undefined) return
-
-  for (const scheme of security) {
-    const token = typeof auth === 'function' ? await auth(scheme) : auth
-    if (token === undefined) continue
-
-    if (scheme.type === 'apiKey') {
-      const name = scheme.name ?? 'Authorization'
-      if (scheme.in === 'query') query[name] = token
-      else if (scheme.in === 'cookie') headers.Cookie = [headers.Cookie, `${name}=${token}`].filter(Boolean).join('; ')
-      else headers[name] = token
-    } else {
-      headers.Authorization = scheme.scheme === 'basic' ? `Basic ${btoa(token)}` : `Bearer ${token}`
-    }
-    return
-  }
-}
-
-async function runValidator<T>(validator: Validator<T> | undefined, value: T): Promise<T> {
-  if (!validator) return value
-  return validateStandardSchema(validator, value)
-}
-
-/**
- * Wraps an axios interceptor registration behind the shared `use` / `eject` / `update` API, mapping a stable external id onto axios's own so `update` can swap a handler in place.
- */
-function createInterceptorChannel<T>(register: (fn: InterceptorFn<T>) => number, ejectNative: (id: number) => void): InterceptorChannel<T> {
-  const ids = new Map<number, number>()
-  let counter = 0
-  return {
-    use(fn) {
-      const id = ++counter
-      ids.set(id, register(fn))
-      return id
-    },
-    eject(id) {
-      const nativeId = ids.get(id)
-      if (nativeId === undefined) return
-      ejectNative(nativeId)
-      ids.delete(id)
-    },
-    update(id, fn) {
-      const nativeId = ids.get(id)
-      if (nativeId !== undefined) ejectNative(nativeId)
-      ids.set(id, register(fn))
-    },
-  }
-}
-
-/**
- * The base media type of a `Content-Type` value, lowercased and stripped of any `; charset=...` parameters.
- */
-function baseContentType(value: string | null | undefined): string | undefined {
-  if (!value) return undefined
-  return value.split(';')[0]!.trim().toLowerCase() || undefined
-}
-
-/**
- * Reads the negotiated response content type from the response headers as a base media type.
- */
-function getResponseContentType(headers: Record<string, unknown> | undefined): string | undefined {
-  if (!headers) return undefined
-  const value = headers['content-type'] ?? headers['Content-Type']
-  return baseContentType(typeof value === 'string' ? value : undefined)
-}
-
-/**
- * Normalizes the `contentType` option to its `{ request, response }` form, treating a bare string as the request content type.
- */
-function resolveContentType(contentType: ContentType | undefined): { request?: string; response?: string } {
-  if (typeof contentType === 'string') return { request: contentType }
-  return contentType ?? {}
-}
-
-/**
- * Builds the shared client core bound to an axios instance (defaulting to `axios.create()`), with `throwOnError` riding axios's `validateStatus`.
- */
-export function createClientCore<TRequest = AxiosRequestConfig, TResponse = AxiosResponse>(options: ClientConfig = {}): ClientInstance<TRequest, TResponse> {
-  let config: ClientConfig = { ...options }
-  const instance = config.transport ?? axios.create()
-
-  const requestManager = instance.interceptors.request
-  const responseManager = instance.interceptors.response
-  const interceptors: Interceptors = {
-    request: createInterceptorChannel<InternalAxiosRequestConfig>(
-      (fn) => requestManager.use(fn),
-      (id) => requestManager.eject(id),
-    ),
-    response: createInterceptorChannel<AxiosResponse>(
-      (fn) => responseManager.use(fn),
-      (id) => responseManager.eject(id),
-    ),
-    error: createInterceptorChannel<AxiosError>(
-      (fn) =>
-        responseManager.use(undefined, async (error: unknown) => {
-          await fn(error as AxiosError)
-          return Promise.reject(error)
-        }),
-      (id) => responseManager.eject(id),
-    ),
-  }
-
-  const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
-    const activeInstance = requestConfig.transport ?? config.transport ?? instance
-    const querySerializer = requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer
-    const bodySerializer = requestConfig.serializer?.body ?? config.serializer?.body ?? defaultBodySerializer
-    const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
-    const codecs = { ...config.codecs, ...requestConfig.codecs }
-
-    const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.styles?.header))
-    const { request: requestContentTypeOption, response: responseContentType } = resolveContentType(requestConfig.contentType)
-    const requestContentType = requestContentTypeOption ?? headers['Content-Type'] ?? headers['content-type']
-    if (responseContentType && headers['Accept'] === undefined && headers['accept'] === undefined) {
-      headers['Accept'] = responseContentType
-    }
-
-    const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
-
-    await resolveAuth({
-      security: requestConfig.security,
-      auth: requestConfig.auth ?? config.auth,
-      headers,
-      query,
-    })
-
-    if (requestConfig.cookies) {
-      const cookie = serializeCookies(requestConfig.cookies, requestConfig.styles?.cookie)
-      if (cookie) headers.Cookie = [headers.Cookie, cookie].filter(Boolean).join('; ')
-    }
-
-    const validatedBody = await runValidator(requestConfig.validator?.request, requestConfig.body)
-    const requestContentTypeBase = baseContentType(requestContentType)
-    const contentCodec = requestContentTypeBase ? codecs[requestContentTypeBase] : undefined
-    const body = contentCodec?.serialize
-      ? contentCodec.serialize(validatedBody, requestContentType)
-      : bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.styles?.body })
-    // A FormData body must keep its Content-Type unset so axios appends the multipart boundary.
-    if (body instanceof FormData) {
-      delete headers['Content-Type']
-      delete headers['content-type']
-    } else if (requestContentTypeOption) {
-      headers['Content-Type'] = requestContentTypeOption
-    }
-    const pathParams = requestConfig.path ?? {}
-    const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) =>
-      pathSerializer({ name: key, value: pathParams[key], options: requestConfig.styles?.path?.[key] }),
-    )
-    const baseURL = [config.baseURL, requestConfig.baseURL].filter(Boolean).join('') || undefined
-
-    const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
-    const validateStatus = requestConfig.validateStatus ?? config.validateStatus ?? (throwOnError ? undefined : () => true)
-
-    const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
-
-    const axiosConfig: AxiosRequestConfig = {
-      ...options, // timeout, proxy, maxRedirects, decompress, onUploadProgress, …
-      url,
-      baseURL,
-      method: requestConfig.method ?? 'GET',
-      headers,
-      params: query,
-      paramsSerializer: (params) => querySerializer(params as Record<string, unknown>, requestConfig.styles?.query),
-      data: body,
-      transformRequest: (data) => data,
-      signal: requestConfig.signal,
-      responseType: requestConfig.responseType,
-      validateStatus,
-    }
-
-    // Only the fetch adapter exposes a streaming `response.data` (a ReadableStream) in the browser;
-    // the default XHR adapter buffers the whole body. Default streams to it, but respect an explicit adapter.
-    if (requestConfig.responseType === 'stream' && !axiosConfig.adapter) {
-      axiosConfig.adapter = 'fetch'
-    }
-
-    try {
-      const response = await activeInstance.request<unknown, AxiosResponse>(axiosConfig)
-      const isSuccess = response.status >= 200 && response.status < 300
-      const contentType = getResponseContentType(response.headers as Record<string, unknown>)
-      let decoded: unknown = response.data
-      if (contentType) {
-        const codec = codecs[contentType]
-        if (codec?.deserialize) decoded = await codec.deserialize(response.data, contentType)
-      }
-      const data = isSuccess ? await runValidator(requestConfig.validator?.response, decoded) : undefined
-      const error = isSuccess ? undefined : await runValidator(requestConfig.validator?.error, decoded)
-      return {
-        status: response.status,
-        data,
-        error,
-        contentType,
-        request: response.config as TRequest,
-        response: response as TResponse,
-      }
-    } catch (error) {
-      const axiosError = error as AxiosError
-      if (throwOnError && axiosError.response) {
-        throw new ResponseError({
-          data: axiosError.response.data,
-          status: axiosError.response.status,
-          statusText: axiosError.response.statusText,
-          contentType: getResponseContentType(axiosError.response.headers as Record<string, unknown>),
-          request: axiosError.config as TRequest,
-          response: axiosError.response as TResponse,
-        })
-      }
-      throw error
-    }
-  }) as ClientInstance<TRequest, TResponse>
-
-  client.getConfig = () => config
-  client.setConfig = (next) => {
-    config = { ...config, ...next, headers: { ...serializeHeaders(config.headers), ...serializeHeaders(next.headers) } }
-    return config
-  }
-  client.getUrl = (requestConfig) => {
-    const querySerializer = requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer
-    const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
-    const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
-    return serializeUrl({
-      parts: [config.baseURL, requestConfig.baseURL, requestConfig.url],
-      pathParams: requestConfig.path ?? {},
-      search: querySerializer(query, requestConfig.styles?.query),
-      pathSerializer,
-      pathStyles: requestConfig.styles?.path,
-    })
-  }
-  client.interceptors = interceptors
-  client.createClient = (next) => createClientCore<TRequest, TResponse>({ ...config, ...next })
-
-  return client
 }
 
 export const client = createClientCore()
