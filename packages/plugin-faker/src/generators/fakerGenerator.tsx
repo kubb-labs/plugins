@@ -228,7 +228,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         typeName,
         dateParser,
         regexGenerator,
-          nodes: printer?.nodes,
+        nodes: printer?.nodes,
         cyclicSchemas,
         nameMapping: (adapter as Adapter<AdapterOas>).options.nameMapping,
       })
