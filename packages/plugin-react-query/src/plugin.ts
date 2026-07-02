@@ -24,8 +24,8 @@ export const pluginReactQueryName = 'plugin-react-query' satisfies PluginReactQu
 
 /**
  * Generates one TanStack Query hook per OpenAPI operation for React. Queries
- * become `useFooQuery`/`useFooSuspenseQuery`/`useFooInfiniteQuery`; mutations
- * become `useFooMutation`. Each hook is fully typed: query keys, input
+ * become `useFoo`, with `useFooSuspense` and `useFooInfinite` variants;
+ * mutations become `useFoo`. Each hook is fully typed: query keys, input
  * variables, response data, and error shape all come from the spec.
  *
  * @example

@@ -205,9 +205,14 @@ export type Options = OutputOptions & {
    */
   mutation?: Partial<Mutation> | false
   /**
-   * Validator applied to response bodies before they reach the caller.
-   * - `'client'` — no validation.
-   * - `'zod'` — pipes responses through schemas from `@kubb/plugin-zod`.
+   * Runtime validation with schemas from `@kubb/plugin-zod`.
+   * - `false` — no validation.
+   * - `'zod'` — validates the success response body, and the error body when a
+   *   non-2xx call does not throw.
+   * - Object form opts in per direction (`request` covers the request body and
+   *   query params).
+   *
+   * @default false
    */
   validator?: ClientOptions['validator']
   /**

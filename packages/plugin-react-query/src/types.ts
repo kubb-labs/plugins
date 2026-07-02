@@ -213,8 +213,8 @@ export type Infinite = {
 
 type CustomOptions = {
   /**
-   * Module specifier of your custom-options hook. Imported as
-   * `import ${name} from '${importPath}'`.
+   * Module specifier of your custom-options hook. Imported as a named import,
+   * `import { ${name} } from '${importPath}'`.
    */
   importPath: string
   /**
@@ -293,9 +293,14 @@ export type Options = OutputOptions & {
    */
   customOptions?: CustomOptions
   /**
-   * Validator applied to response bodies before they reach the caller.
-   * - `'client'` — no validation. Trusts the API.
-   * - `'zod'` — pipes responses through schemas from `@kubb/plugin-zod`.
+   * Runtime validation with schemas from `@kubb/plugin-zod`.
+   * - `false` — no validation.
+   * - `'zod'` — validates the success response body, and the error body when a
+   *   non-2xx call does not throw.
+   * - Object form opts in per direction (`request` covers the request body and
+   *   query params).
+   *
+   * @default false
    */
   validator?: ClientOptions['validator']
   /**
