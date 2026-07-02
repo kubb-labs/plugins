@@ -8,8 +8,8 @@ function capitalize(name: string): string {
 
 /**
  * Default resolver used by `@kubb/plugin-vue-query`. Decides the names and
- * file paths for every generated TanStack Query composable (`useFooQuery`,
- * `useFooMutation`, `useFooInfiniteQuery`) and its companion helpers.
+ * file paths for every generated TanStack Query composable (`useFoo`,
+ * `useFooInfinite`) and its companion helpers.
  *
  * Functions and files use camelCase; composables get the `use` prefix.
  *
