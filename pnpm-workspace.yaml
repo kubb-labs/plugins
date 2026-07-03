@@ -5,6 +5,7 @@ packages:
   - tests/**
 
 allowBuilds:
+  cypress: false
   es5-ext: true
   esbuild: true
   msw: true
