@@ -1,6 +1,6 @@
 import { caseParams } from '@internals/shared'
 import type { OperationParamsResolver } from '@internals/shared'
-import type { OperationNode, ParameterNode } from 'kubb/ast'
+import type { ast } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createIndexedAccessType, createTypeLiteral } from './functionParams.ts'
 import type { FunctionParameterNode, FunctionParametersNode, TypeExpression, TypeLiteralNode } from './functionParams.ts'
 
@@ -119,8 +119,8 @@ function resolveParamType({
   param,
   resolver,
 }: {
-  node: OperationNode
-  param: ParameterNode
+  node: ast.OperationNode
+  param: ast.ParameterNode
   resolver: OperationParamsResolver | undefined
 }): TypeExpression {
   if (!resolver) {
@@ -158,8 +158,8 @@ function resolveGroupType({
   group,
   resolver,
 }: {
-  node: OperationNode
-  params: Array<ParameterNode>
+  node: ast.OperationNode
+  params: Array<ast.ParameterNode>
   group: 'query' | 'header'
   resolver: OperationParamsResolver | undefined
 }): ParamGroupType | null {
@@ -183,7 +183,7 @@ function resolveGroupType({
  * `pathParamsType` controls how path params render in inline mode. Provide a `resolver` for type
  * name resolution and `extraParams` for plugin-specific trailing parameters such as an `options` object.
  */
-export function createOperationParams(node: OperationNode, options: CreateOperationParamsOptions): FunctionParametersNode {
+export function createOperationParams(node: ast.OperationNode, options: CreateOperationParamsOptions): FunctionParametersNode {
   const { paramsType, pathParamsType, paramsCasing, resolver, pathParamsDefault, extraParams = [], paramNames, typeWrapper } = options
 
   const dataName = paramNames?.data ?? 'data'
@@ -201,7 +201,7 @@ export function createOperationParams(node: OperationNode, options: CreateOperat
   const queryParams = casedParams.filter((p) => p.in === 'query')
   const headerParams = casedParams.filter((p) => p.in === 'header')
 
-  const toProperty = (param: ParameterNode): GroupProperty => ({
+  const toProperty = (param: ast.ParameterNode): GroupProperty => ({
     name: param.name,
     type: wrapTypeExpression(resolveParamType({ node, param, resolver })),
     optional: !param.required,
@@ -255,8 +255,8 @@ export function createOperationParams(node: OperationNode, options: CreateOperat
  */
 type BuildGroupArgs = {
   name: string
-  node: OperationNode
-  params: Array<ParameterNode>
+  node: ast.OperationNode
+  params: Array<ast.ParameterNode>
   groupType: ParamGroupType | null
   resolver: OperationParamsResolver | undefined
   wrapType: (type: string) => string
@@ -298,8 +298,8 @@ function buildTypeLiteral({
   params,
   resolver,
 }: {
-  node: OperationNode
-  params: Array<ParameterNode>
+  node: ast.OperationNode
+  params: Array<ast.ParameterNode>
   resolver: OperationParamsResolver | undefined
 }): TypeLiteralNode {
   return createTypeLiteral({

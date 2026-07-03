@@ -1,6 +1,4 @@
-import { extractRefName, stringify, toRegExpString } from 'kubb/ast'
 import { ast } from 'kubb/kit'
-import { syncSchemaRef } from 'kubb/ast'
 import type { PluginZod } from './types.ts'
 
 /**
@@ -87,12 +85,12 @@ export function containsCodec(node: ast.SchemaNode | undefined, seen: Set<string
 
   if (node.type === 'ref') {
     if (!node.ref) return false
-    const refName = extractRefName(node.ref)
+    const refName = ast.extractRefName(node.ref)
     if (refName) {
       if (seen.has(refName)) return false
       seen.add(refName)
     }
-    const resolved = syncSchemaRef(node)
+    const resolved = ast.syncSchemaRef(node)
     if (resolved.type === 'ref') return false
     return containsCodec(resolved, seen)
   }
@@ -112,7 +110,7 @@ export function containsCodec(node: ast.SchemaNode | undefined, seen: Set<string
  */
 export function collectCodecRefNames(node: ast.SchemaNode): Array<string> {
   return ast.collect<string>(node, {
-    schema: (n) => (n.type === 'ref' && n.ref && containsCodec(n) ? (extractRefName(n.ref) ?? undefined) : undefined),
+    schema: (n) => (n.type === 'ref' && n.ref && containsCodec(n) ? (ast.extractRefName(n.ref) ?? undefined) : undefined),
   })
 }
 
@@ -137,9 +135,9 @@ export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: Readonl
   if (node.type === 'object') return true
 
   if (node.type === 'ref') {
-    const refName = (node.ref ? extractRefName(node.ref) : undefined) ?? node.name
+    const refName = (node.ref ? ast.extractRefName(node.ref) : undefined) ?? node.name
     if (refName && cyclicSchemas?.has(refName)) return false
-    const resolved = syncSchemaRef(node)
+    const resolved = ast.syncSchemaRef(node)
     // An unresolved ref keeps its `ref` type; assume it resolves to an object (matches the printer's
     // prior optimism that only a resolved intersection blocks a discriminated union).
     return resolved.type === 'ref' || isObjectSchemaNode(resolved, cyclicSchemas)
@@ -169,7 +167,7 @@ export function isObjectComposableIntersection(node: ast.SchemaNode, cyclicSchem
  * Objects become `{}`, primitives become their string representation, strings are quoted.
  */
 export function formatDefault(value: unknown): string {
-  if (typeof value === 'string') return stringify(value)
+  if (typeof value === 'string') return ast.stringify(value)
   if (typeof value === 'object' && value !== null) return '{}'
 
   return String(value ?? '')
@@ -215,7 +213,7 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
  * Strings are quoted; numbers and booleans are emitted raw.
  */
 export function formatLiteral(v: string | number | boolean): string {
-  if (typeof v === 'string') return stringify(v)
+  if (typeof v === 'string') return ast.stringify(v)
 
   return String(v)
 }
@@ -288,7 +286,7 @@ export function patternKeySchemaMini({ patterns, regexType }: { patterns: Array<
 
 function patternKeySource({ patterns, regexType }: { patterns: Array<string>; regexType?: PluginZod['resolvedOptions']['regexType'] }): string {
   const source = patterns.length === 1 ? patterns[0]! : patterns.map((pattern) => `(${pattern})`).join('|')
-  return toRegExpString(source, regexFunc(regexType))
+  return ast.toRegExpString(source, regexFunc(regexType))
 }
 
 /**
@@ -327,7 +325,7 @@ export function lengthConstraints({ min, max, pattern, regexType }: LengthConstr
   return [
     min !== undefined ? `.min(${min})` : '',
     max !== undefined ? `.max(${max})` : '',
-    pattern !== undefined ? `.regex(${toRegExpString(pattern, regexFunc(regexType))})` : '',
+    pattern !== undefined ? `.regex(${ast.toRegExpString(pattern, regexFunc(regexType))})` : '',
   ].join('')
 }
 
@@ -351,7 +349,7 @@ export function lengthChecksMini({ min, max, pattern, regexType }: LengthConstra
   const checks: Array<string> = []
   if (min !== undefined) checks.push(`z.minLength(${min})`)
   if (max !== undefined) checks.push(`z.maxLength(${max})`)
-  if (pattern !== undefined) checks.push(`z.regex(${toRegExpString(pattern, regexFunc(regexType))})`)
+  if (pattern !== undefined) checks.push(`z.regex(${ast.toRegExpString(pattern, regexFunc(regexType))})`)
   return checks.length ? `.check(${checks.join(', ')})` : ''
 }
 
@@ -368,7 +366,7 @@ export function applyModifiers({ value, schema, nullable, optional, nullish, def
   })()
   const literal = defaultValue !== undefined ? defaultLiteral(schema, defaultValue) : null
   const withDefault = literal !== null ? `${withModifier}.default(${literal})` : withModifier
-  const withDescription = description ? `${withDefault}.describe(${stringify(description)})` : withDefault
+  const withDescription = description ? `${withDefault}.describe(${ast.stringify(description)})` : withDefault
   return examples?.length ? `${withDescription}.meta({ examples: [${examples.map(formatDefault).join(', ')}] })` : withDescription
 }
 

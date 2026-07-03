@@ -1,7 +1,4 @@
-import { buildList, buildObject, extractRefName, lazyGetter, mapSchemaItems, mapSchemaMembers, mapSchemaProperties, objectKey, stringify } from 'kubb/ast'
-
 import { ast } from 'kubb/kit'
-import { containsCircularRef, syncSchemaRef } from 'kubb/ast'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyModifiers,
@@ -129,12 +126,12 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
     // A cyclic ref is annotated `z.ZodType`, and a nullable/optional ref is wrapped in
     // ZodNullable/ZodOptional, and neither exposes `.strict()`. Only a bare `ZodObject` ref takes it.
     // A union member ref may carry only `node.name` (no `node.ref`), so fall back to it like `ref()`.
-    const refName = (node.ref ? extractRefName(node.ref) : undefined) ?? node.name
+    const refName = (node.ref ? ast.extractRefName(node.ref) : undefined) ?? node.name
     if (refName && cyclicSchemas?.has(refName)) {
       return member
     }
 
-    const schema = syncSchemaRef(node)
+    const schema = ast.syncSchemaRef(node)
 
     if (schema.nullable || schema.optional || node.nullable || node.optional) {
       return member
@@ -172,41 +169,43 @@ function buildZodObjectShape(ctx: ZodPrinterContext, node: ast.SchemaNode): stri
   if (!objectNode) return '{}'
 
   const isCyclic = (schema: ast.SchemaNode): boolean =>
-    ctx.options.cyclicSchemas != null && containsCircularRef(schema, { circularSchemas: ctx.options.cyclicSchemas })
+    ctx.options.cyclicSchemas != null && ast.containsCircularRef(schema, { circularSchemas: ctx.options.cyclicSchemas })
 
-  const entries = mapSchemaProperties(objectNode, (schema) => {
-    // Inside a getter the getter itself defers evaluation, so suppress z.lazy() wrapping on
-    // nested refs by temporarily clearing cyclicSchemas.
-    const hasSelfRef = isCyclic(schema)
-    const savedCyclicSchemas = ctx.options.cyclicSchemas
-    if (hasSelfRef) ctx.options.cyclicSchemas = undefined
-    const baseOutput = ctx.transform(schema) ?? ctx.transform(ast.factory.createSchema({ type: 'unknown' }))!
-    if (hasSelfRef) ctx.options.cyclicSchemas = savedCyclicSchemas
-    return baseOutput
-  }).map(({ name: propName, property, output: baseOutput }) => {
-    const { schema } = property
-    const meta = syncSchemaRef(schema)
+  const entries = ast
+    .mapSchemaProperties(objectNode, (schema) => {
+      // Inside a getter the getter itself defers evaluation, so suppress z.lazy() wrapping on
+      // nested refs by temporarily clearing cyclicSchemas.
+      const hasSelfRef = isCyclic(schema)
+      const savedCyclicSchemas = ctx.options.cyclicSchemas
+      if (hasSelfRef) ctx.options.cyclicSchemas = undefined
+      const baseOutput = ctx.transform(schema) ?? ctx.transform(ast.factory.createSchema({ type: 'unknown' }))!
+      if (hasSelfRef) ctx.options.cyclicSchemas = savedCyclicSchemas
+      return baseOutput
+    })
+    .map(({ name: propName, property, output: baseOutput }) => {
+      const { schema } = property
+      const meta = ast.syncSchemaRef(schema)
 
-    // When a property schema is not a ref but the metadata is from a ref (e.g., discriminator
-    // property override), skip applying the description from the ref target to avoid applying
-    // metadata from a replaced schema.
-    const descriptionToApply = schema.type !== 'ref' && meta.type === 'ref' ? undefined : meta.description
+      // When a property schema is not a ref but the metadata is from a ref (e.g., discriminator
+      // property override), skip applying the description from the ref target to avoid applying
+      // metadata from a replaced schema.
+      const descriptionToApply = schema.type !== 'ref' && meta.type === 'ref' ? undefined : meta.description
 
-    const value = applyModifiers({
-      value: baseOutput,
-      schema,
-      nullable: meta.nullable,
-      optional: schema.optional || property.required === false,
-      nullish: schema.nullish,
-      defaultValue: meta.default,
-      description: descriptionToApply,
-      examples: meta.examples,
+      const value = applyModifiers({
+        value: baseOutput,
+        schema,
+        nullable: meta.nullable,
+        optional: schema.optional || property.required === false,
+        nullish: schema.nullish,
+        defaultValue: meta.default,
+        description: descriptionToApply,
+        examples: meta.examples,
+      })
+
+      return isCyclic(schema) ? ast.lazyGetter({ name: propName, body: value }) : `${ast.objectKey(propName)}: ${value}`
     })
 
-    return isCyclic(schema) ? lazyGetter({ name: propName, body: value }) : `${objectKey(propName)}: ${value}`
-  })
-
-  return buildObject(entries)
+  return ast.buildObject(entries)
 }
 
 /**
@@ -313,7 +312,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         if (!node.name) return null
         // `nameMapping` (keyed by the full $ref) carries the collision-resolved name when the
         // referenced component was renamed; otherwise fall back to the short ref name.
-        const refName = node.ref ? (this.options.nameMapping?.get(node.ref) ?? extractRefName(node.ref) ?? node.name) : node.name
+        const refName = node.ref ? (this.options.nameMapping?.get(node.ref) ?? ast.extractRefName(node.ref) ?? node.name) : node.name
 
         // In the input direction, a date-bearing component resolves to its `${name}InputSchema`
         // variant so request bodies encode `Date → string` instead of decoding.
@@ -364,7 +363,8 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         return result
       },
       array(node) {
-        const items = mapSchemaItems(node, (item) => this.transform(item))
+        const items = ast
+          .mapSchemaItems(node, (item) => this.transform(item))
           .map(({ output }) => output)
           .filter(Boolean)
         const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: 'unknown' }))!
@@ -373,15 +373,17 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         return node.unique ? `${base}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })` : base
       },
       tuple(node) {
-        const items = mapSchemaItems(node, (item) => this.transform(item))
+        const items = ast
+          .mapSchemaItems(node, (item) => this.transform(item))
           .map(({ output }) => output)
           .filter(Boolean)
 
-        return `z.tuple(${buildList(items)})`
+        return `z.tuple(${ast.buildList(items)})`
       },
       union(node) {
         const nodeMembers = node.members ?? []
-        const members = mapSchemaMembers(node, (memberNode) => this.transform(memberNode))
+        const members = ast
+          .mapSchemaMembers(node, (memberNode) => this.transform(memberNode))
           .map(({ schema, output }) => (output && node.strategy === 'one' ? strictOneOfMember(output, schema, cyclicSchemaNames) : output))
           .filter(Boolean)
         if (members.length === 0) return ''
@@ -391,10 +393,10 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         // non-objects fall back to z.union.
         const allDiscriminable = nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemaNames))
         if (node.discriminatorPropertyName && allDiscriminable) {
-          return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
+          return `z.discriminatedUnion(${ast.stringify(node.discriminatorPropertyName)}, ${ast.buildList(members)})`
         }
 
-        return `z.union(${buildList(members)})`
+        return `z.union(${ast.buildList(members)})`
       },
       intersection(node) {
         const members = node.members ?? []
@@ -427,7 +429,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       const transformed = this.transform(node)
       if (!transformed) return null
 
-      const meta = syncSchemaRef(node)
+      const meta = ast.syncSchemaRef(node)
 
       const base = (() => {
         if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed

@@ -1,6 +1,4 @@
-import { jsStringEscape } from 'kubb/ast'
-import type { ast } from 'kubb/kit'
-import { containsCircularRef } from 'kubb/ast'
+import { ast } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
@@ -80,7 +78,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
         <Function
           export
           name={name}
-          JSDoc={{ comments: description ? [`@description ${jsStringEscape(description)}`] : [] }}
+          JSDoc={{ comments: description ? [`@description ${ast.jsStringEscape(description)}`] : [] }}
           params={canOverride ? paramsSignature : undefined}
           returnType={returnType ?? undefined}
         >
@@ -97,7 +95,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   }
 
   // Generate function with defaultFakeData structure
-  const jsdoc = description ? `/**\n   * @description ${jsStringEscape(description)}\n   */\n  ` : ''
+  const jsdoc = description ? `/**\n   * @description ${ast.jsStringEscape(description)}\n   */\n  ` : ''
   const functionSignature = `${jsdoc}export function ${name}<TData extends Partial<${typeName}> = object>(data?: TData)`
 
   const seedCode = seed ? `faker.seed(${JSON.stringify(seed)})\n  ` : ''
@@ -111,7 +109,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   const hasGetters =
     node.type === 'object' &&
     !!cyclicSchemas &&
-    (node.properties ?? []).some((p) => containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
+    (node.properties ?? []).some((p) => ast.containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
 
   const functionBody = hasGetters
     ? `{

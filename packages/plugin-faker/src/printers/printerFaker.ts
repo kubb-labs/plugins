@@ -1,6 +1,4 @@
-import { buildObject, extractRefName, mapSchemaItems, mapSchemaMembers, objectKey, stringify, toRegExpString } from 'kubb/ast'
 import { ast } from 'kubb/kit'
-import { containsCircularRef } from 'kubb/ast'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 
 /**
@@ -186,7 +184,7 @@ const fakerKeywordMapper = {
   },
   matches: (value = '', regexGenerator: 'faker' | 'randexp' = 'faker') => {
     if (regexGenerator === 'randexp') {
-      return `${toRegExpString(value, 'RandExp')}.gen()`
+      return `${ast.toRegExpString(value, 'RandExp')}.gen()`
     }
 
     return `faker.helpers.fromRegExp("${value}")`
@@ -205,7 +203,7 @@ function getEnumValues(node: ast.EnumSchemaNode): Array<string | number | boolea
 
 function parseEnumValue(value: string | number | boolean | undefined) {
   if (typeof value === 'string') {
-    return stringify(value)
+    return ast.stringify(value)
   }
 
   return value
@@ -296,7 +294,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // `nameMapping` (keyed by the full $ref) carries the collision-resolved name when the
         // referenced component was renamed; otherwise fall back to the short ref name.
         const refName = node.ref
-          ? (this.options.nameMapping?.get(node.ref) ?? extractRefName(node.ref) ?? node.name ?? node.schema?.name)
+          ? (this.options.nameMapping?.get(node.ref) ?? ast.extractRefName(node.ref) ?? node.name ?? node.schema?.name)
           : (node.name ?? node.schema?.name)
 
         if (!refName) {
@@ -324,33 +322,35 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const { discriminatorPropertyName } = node
         const baseTypeName = this.options.typeName
 
-        const items: Array<string> = mapSchemaMembers(node, (member) => {
-          // For a discriminated union, narrow each variant to its own branch so nested
-          // `NonNullable<T>[K]` indexes resolve against that branch instead of the whole union.
-          const value = discriminatorPropertyName ? getDiscriminatorValue(member, discriminatorPropertyName) : undefined
+        const items: Array<string> = ast
+          .mapSchemaMembers(node, (member) => {
+            // For a discriminated union, narrow each variant to its own branch so nested
+            // `NonNullable<T>[K]` indexes resolve against that branch instead of the whole union.
+            const value = discriminatorPropertyName ? getDiscriminatorValue(member, discriminatorPropertyName) : undefined
 
-          if (baseTypeName && value !== undefined) {
-            const typeName = `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
+            if (baseTypeName && value !== undefined) {
+              const typeName = `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
 
-            return printNested(member, { typeName, nestedInObject: true })
-          }
+              return printNested(member, { typeName, nestedInObject: true })
+            }
 
-          // Without a discriminator, keep the union type but guard each indexed access (see
-          // `indexedTypeName`) so a key carried by only some branches resolves to `unknown`
-          // rather than erroring with TS2339.
-          return printNested(member, { typeName: baseTypeName, nestedInObject: true, nestedInUnion: true })
-        })
+            // Without a discriminator, keep the union type but guard each indexed access (see
+            // `indexedTypeName`) so a key carried by only some branches resolves to `unknown`
+            // rather than erroring with TS2339.
+            return printNested(member, { typeName: baseTypeName, nestedInObject: true, nestedInUnion: true })
+          })
           .map(({ output }) => output)
           .filter((item): item is string => Boolean(item))
 
         return fakerKeywordMapper.union(items)
       },
       intersection(node): string {
-        const items: Array<string> = mapSchemaMembers(node, (member) =>
-          printNested(member, {
-            nestedInObject: true,
-          }),
-        )
+        const items: Array<string> = ast
+          .mapSchemaMembers(node, (member) =>
+            printNested(member, {
+              nestedInObject: true,
+            }),
+          )
           .map(({ output }) => output)
           // An `allOf` member with no shape (any/unknown/void → 'undefined') adds no
           // constraint. Keeping it would spread `...undefined` into the merged object.
@@ -359,12 +359,13 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.and(items)
       },
       array(node): string {
-        const items: Array<string> = mapSchemaItems(node, (member) =>
-          printNested(member, {
-            typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[number]` : undefined,
-            nestedInObject: true,
-          }),
-        )
+        const items: Array<string> = ast
+          .mapSchemaItems(node, (member) =>
+            printNested(member, {
+              typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[number]` : undefined,
+              nestedInObject: true,
+            }),
+          )
           .map(({ output }) => output)
           .filter((item): item is string => Boolean(item))
 
@@ -396,14 +397,14 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           // emit a memoizing lazy getter. On first access it computes the value,
           // replaces itself with a plain data property via Object.defineProperty,
           // and returns the cached value, so every subsequent read is stable.
-          if (cyclicSchemas && containsCircularRef(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
-            return `get ${objectKey(property.name)}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
+          if (cyclicSchemas && ast.containsCircularRef(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
+            return `get ${ast.objectKey(property.name)}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
           }
 
-          return `${objectKey(property.name)}: ${value}`
+          return `${ast.objectKey(property.name)}: ${value}`
         })
 
-        return buildObject(entries)
+        return ast.buildObject(entries)
       },
       ...options.nodes,
     },

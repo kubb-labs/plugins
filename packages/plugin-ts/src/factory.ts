@@ -1,6 +1,5 @@
 import { camelCase, pascalCase, screamingSnakeCase, snakeCase } from '@internals/utils'
-import { syncSchemaRef } from 'kubb/ast'
-import type { ast } from 'kubb/kit'
+import { ast } from 'kubb/kit'
 import ts from 'typescript'
 import { OPTIONAL_ADDS_UNDEFINED } from './constants.ts'
 
@@ -923,7 +922,7 @@ export function buildPropertyType(
   optional?: boolean,
 ): ts.TypeNode {
   const addsUndefined = OPTIONAL_ADDS_UNDEFINED.has(optionalType)
-  const meta = syncSchemaRef(schema)
+  const meta = ast.syncSchemaRef(schema)
 
   let type = baseType
 

@@ -3,7 +3,6 @@ import { camelCase } from '@internals/utils'
 
 import type { Config, Group } from 'kubb/kit'
 import { ast, memoryStorage } from 'kubb/kit'
-import { findCircularSchemas } from 'kubb/ast'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from 'kubb/kit/testing'
 import { describe, expect, test } from 'vitest'
 import { matchFiles, rawSources } from '#mocks'
@@ -348,7 +347,7 @@ describe('zodGenerator — Schema', () => {
         resolvedOptions: { dateType: 'string' },
       }),
       meta: {
-        circularNames: [...findCircularSchemas([petPolySchema, catCycleSchema])],
+        circularNames: [...ast.findCircularSchemas([petPolySchema, catCycleSchema])],
         enumNames: [],
       },
       driver,
@@ -380,7 +379,7 @@ describe('zodGenerator — Schema', () => {
       config: testConfig,
       adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
       meta: {
-        circularNames: [...findCircularSchemas([errorDetailsSchema])],
+        circularNames: [...ast.findCircularSchemas([errorDetailsSchema])],
         enumNames: [],
       },
       driver,
