@@ -5,7 +5,7 @@ export function deletePet({ path, headers }: DeletePetRequestConfig, options: Pa
     .request<DeletePetResponse>({
       method: 'DELETE',
       url: `/pet/${path.petId}:search`,
-      headers: headers ? { api_key: headers.apiKey } : undefined,
+      headers: headers ? { api_key: headers.apiKey } : headers,
       ...options,
     })
     .then((res) => res.body)
