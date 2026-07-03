@@ -16,7 +16,7 @@ export type Options = {
   }
 }
 
-type ResolveOptions = {
+export type ResolveOptions = {
   output: Output<never>
   name: string
   exclude: Array<Exclude>
