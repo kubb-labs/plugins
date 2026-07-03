@@ -1,5 +1,11 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.84
+
+### Patch Changes
+
+- [#623](https://github.com/kubb-labs/plugins/pull/623) [`b85a648`](https://github.com/kubb-labs/plugins/commit/b85a6483ac7aa08743200bba6abfbee7fa0c9722) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Reach the AST helpers through the `ast` namespace from `kubb/kit` instead of the removed `kubb/ast` subpath. Generated output is unchanged.
+
 ## 5.0.0-beta.82
 
 ### Major Changes
