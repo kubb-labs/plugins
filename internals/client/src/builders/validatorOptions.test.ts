@@ -1,4 +1,4 @@
-import { ast } from '@kubb/core'
+import { ast } from 'kubb/kit'
 import { resolverZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
 import {

@@ -1,4 +1,4 @@
-import { ast } from '@kubb/core'
+import { ast } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'

@@ -1,4 +1,4 @@
-import type { Exclude, Include, Output, Override, PluginFactoryOptions } from '@kubb/core'
+import type { Exclude, Include, Output, Override, PluginFactoryOptions } from 'kubb/kit'
 
 export type Options = {
   /**

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ast } from '@kubb/core'
+import { ast } from 'kubb/kit'
 import type { OperationParamsResolver } from '@internals/shared'
 import { createFunctionParameter } from './functionParams.ts'
 import { createOperationParams } from './operationParams.ts'

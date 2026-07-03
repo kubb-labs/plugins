@@ -1,4 +1,4 @@
-import type { ast } from '@kubb/core'
+import type { ast } from 'kubb/kit'
 
 export type ZodParam = {
   name: string

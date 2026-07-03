@@ -1,4 +1,4 @@
-import { ast, defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from 'kubb/kit'
 import type { PluginMsw } from '../types'
 
 /**

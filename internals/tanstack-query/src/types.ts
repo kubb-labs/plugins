@@ -1,4 +1,4 @@
-import type { ast } from '@kubb/core'
+import type { ast } from 'kubb/kit'
 
 export type ParamsCasing = 'camelcase' | undefined
 export type PathParamsType = 'object' | 'inline'

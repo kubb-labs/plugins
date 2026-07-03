@@ -61,23 +61,20 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@kubb/ast": "catalog:",
-    "@kubb/core": "catalog:",
     "@kubb/plugin-ts": "workspace:*",
-    "@kubb/plugin-zod": "workspace:*",
-    "@kubb/renderer-jsx": "catalog:"
+    "@kubb/plugin-zod": "workspace:*"
   },
   "devDependencies": {
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
     "axios": "^1.18.1",
+    "kubb": "catalog:",
     "typescript": "catalog:"
   },
   "peerDependencies": {
-    "@kubb/core": "catalog:",
-    "@kubb/renderer-jsx": "catalog:",
-    "axios": "^1.7.2"
+    "axios": "^1.7.2",
+    "kubb": "catalog:"
   },
   "peerDependenciesMeta": {
     "axios": {

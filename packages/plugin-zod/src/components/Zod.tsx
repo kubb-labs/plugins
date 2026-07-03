@@ -1,6 +1,6 @@
-import type { ast } from '@kubb/core'
-import { Const, File, Type } from '@kubb/renderer-jsx'
-import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import type { ast } from 'kubb/kit'
+import { Const, File, Type } from 'kubb/jsx'
+import type { KubbReactNode } from 'kubb/jsx'
 import type { PrinterZodFactory } from '../printers/printerZod.ts'
 import type { PrinterZodMiniFactory } from '../printers/printerZodMini.ts'
 

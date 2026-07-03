@@ -1,5 +1,5 @@
 import type { ClientSelector } from '@internals/client'
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 /**
  * Builds the parts of a query or mutation key for one operation. Receives the operation node and

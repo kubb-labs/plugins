@@ -1,7 +1,7 @@
-import { jsStringEscape, stringify } from '@kubb/ast/utils'
+import { jsStringEscape, stringify } from 'kubb/ast'
 import { getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
-import { ast } from '@kubb/core'
-import { syncSchemaRef } from '@kubb/ast/utils'
+import { ast } from 'kubb/kit'
+import { syncSchemaRef } from 'kubb/ast'
 import type { ResolverTs } from './types.ts'
 
 /**

@@ -1,8 +1,8 @@
 import type { Transformer } from '@internals/tanstack-query'
 import { MutationKey as SharedMutationKey } from '@internals/tanstack-query'
-import type { ast } from '@kubb/core'
-import { File, Type } from '@kubb/renderer-jsx'
-import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import type { ast } from 'kubb/kit'
+import { File, Type } from 'kubb/jsx'
+import type { KubbReactNode } from 'kubb/jsx'
 
 type Props = {
   name: string

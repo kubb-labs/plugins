@@ -1,7 +1,7 @@
 import { createGroupConfig } from '@internals/shared'
 
 import { resolveClient } from '@internals/client'
-import { definePlugin } from '@kubb/core'
+import { definePlugin } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mcpGenerator } from './generators/mcpGenerator.tsx'

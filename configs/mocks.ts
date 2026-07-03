@@ -1,5 +1,5 @@
-import type { ast } from '@kubb/core'
-import { createMockedPluginDriver, matchFiles as matchFilesBase } from '@kubb/core/mocks'
+import type { ast } from 'kubb/kit'
+import { createMockedPluginDriver, matchFiles as matchFilesBase } from 'kubb/kit/testing'
 import { parserTs } from '@kubb/parser-ts'
 import type { Options } from 'prettier'
 import { format as prettierFormat } from 'prettier'

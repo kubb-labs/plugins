@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import path from 'node:path'
 import { camelCase, ensureValidVarName, toFilePath } from '@internals/utils'
-import { defineResolver } from '@kubb/core'
+import { defineResolver } from 'kubb/kit'
 import type { PluginFaker } from '../types.ts'
 
 /**

@@ -1,5 +1,5 @@
 import { adapterOas } from '@kubb/adapter-oas'
-import { ast } from '@kubb/core'
+import { ast } from 'kubb/kit'
 import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginCypress } from '@kubb/plugin-cypress'
 import { pluginFaker } from '@kubb/plugin-faker'

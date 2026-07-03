@@ -12,38 +12,37 @@ allowBuilds:
   vue-demi: true
 
 catalog:
-  '@kubb/adapter-oas': 5.0.0-beta.80
-  '@kubb/ast': 5.0.0-beta.80
-  '@kubb/core': 5.0.0-beta.80
-  '@kubb/plugin-barrel': 5.0.0-beta.80
-  '@kubb/parser-ts': 5.0.0-beta.80
-  '@kubb/renderer-jsx': 5.0.0-beta.80
+  '@kubb/adapter-oas': 5.0.0-beta.81
+  '@kubb/core': 5.0.0-beta.81
+  '@kubb/plugin-barrel': 5.0.0-beta.81
+  '@kubb/parser-ts': 5.0.0-beta.81
   '@types/node': ^22.20.0
   '@types/react': ^19.2.17
   '@vitest/coverage-v8': ^4.1.9
   '@vitest/ui': ^4.1.9
-  kubb: 5.0.0-beta.80
+  kubb: 5.0.0-beta.81
   oxfmt: ^0.56.0
   oxlint: ^1.71.0
   prettier: ^3.9.1
   tsdown: ^0.22.3
   typescript: ^6.0.3
-  unplugin-kubb: 5.0.0-beta.80
+  unplugin-kubb: 5.0.0-beta.81
   vitest: ^4.1.9
 #
-#overrides:
-#  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
-#  '@kubb/ast': link:../kubb/packages/ast
-#  '@kubb/cli': link:../kubb/packages/cli
-#  '@kubb/core': link:../kubb/packages/core
-#  '@kubb/mcp': link:../kubb/packages/mcp
-#  '@kubb/plugin-barrel': link:../kubb/packages/plugin-barrel
-#  '@kubb/parser-md': link:../kubb/packages/parser-md
-#  '@kubb/parser-ts': link:../kubb/packages/parser-ts
-#  '@kubb/renderer-jsx': link:../kubb/packages/renderer-jsx
-#  '@kubb/tui': link:../kubb/packages/tui
-#  kubb: link:../kubb/packages/kubb
-#  unplugin-kubb: link:../kubb/packages/unplugin-kubb
+overrides:
+  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
+  '@kubb/ast': link:../kubb/packages/ast
+  '@kubb/cli': link:../kubb/packages/cli
+  '@kubb/core': link:../kubb/packages/core
+  '@kubb/kit': link:../kubb/packages/kit
+  '@kubb/mcp': link:../kubb/packages/mcp
+  '@kubb/plugin-barrel': link:../kubb/packages/plugin-barrel
+  '@kubb/parser-md': link:../kubb/packages/parser-md
+  '@kubb/parser-ts': link:../kubb/packages/parser-ts
+  '@kubb/renderer-jsx': link:../kubb/packages/renderer-jsx
+  '@kubb/tui': link:../kubb/packages/tui
+  kubb: link:../kubb/packages/kubb
+  unplugin-kubb: link:../kubb/packages/unplugin-kubb
 
 minimumReleaseAge: 4320 # 72 hours, matches .npmrc min-package-age
 minimumReleaseAgeExclude:

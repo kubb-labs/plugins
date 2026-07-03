@@ -1,4 +1,4 @@
-import type { PluginFactoryOptions } from '@kubb/core'
+import type { PluginFactoryOptions } from 'kubb/kit'
 import type { Options, ResolvedOptions, ResolverClient } from '@internals/client'
 
 export type { Options, ResolvedOptions, ResolverClient } from '@internals/client'
