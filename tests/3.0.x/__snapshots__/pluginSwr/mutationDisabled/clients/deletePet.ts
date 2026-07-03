@@ -15,5 +15,5 @@ import { client } from '../.kubb/client.ts'
 export function deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetRequestConfig, ThrowOnError>): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
+  return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config, headers: config.headers ? { "api_key": config.headers.apiKey } : config.headers }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
 }

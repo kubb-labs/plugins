@@ -3,8 +3,8 @@ info:
   title: Params Casing Test
   description: |
     Minimal spec to test the paramsCasing option.
-    The POST endpoint has snake_case path and query params
-    so that 'camelcase' conversion can be verified.
+    The POST endpoint has snake_case path and query params plus a hyphenated
+    header param so that 'camelcase' conversion can be verified.
   version: 1.0.0
 paths:
   /pets/{pet_id}:
@@ -23,6 +23,11 @@ paths:
             type: boolean
         - name: request_source
           in: query
+          required: false
+          schema:
+            type: string
+        - name: X-Request-ID
+          in: header
           required: false
           schema:
             type: string

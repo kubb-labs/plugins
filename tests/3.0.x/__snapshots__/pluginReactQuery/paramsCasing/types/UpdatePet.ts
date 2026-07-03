@@ -22,6 +22,11 @@ export type UpdatePetQueryIncludeDeleted = boolean | undefined;
 export type UpdatePetQueryRequestSource = string | undefined;
 
 /**
+ * @type string | undefined
+*/
+export type UpdatePetHeaderXRequestID = string | undefined;
+
+/**
  * @type object
 */
 export type UpdatePetStatus200 = Pet;
@@ -49,7 +54,12 @@ export type UpdatePetRequestConfig = {
         includeDeleted?: UpdatePetQueryIncludeDeleted;
         requestSource?: UpdatePetQueryRequestSource;
     };
-    headers?: never;
+    /**
+     * @type object | undefined
+    */
+    headers?: {
+        xRequestID?: UpdatePetHeaderXRequestID;
+    };
 };
 
 /**

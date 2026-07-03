@@ -80,6 +80,19 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       ],
     },
   },
+
+  // ─── paramsCasing (camelCase types, spec names on the wire) ──────────────
+  {
+    name: 'paramsCasing',
+    config: {
+      root: __dirname,
+      input: { path: '../../schemas/3.0.x/paramsCasing.yaml' },
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false, enums: 'root' }),
+      parsers: [parserTs],
+      plugins: [pluginTs({ output: { path: './types', barrel: false } }), pluginFetch({ output: { path: './clients', barrel: false } })],
+    },
+  },
 ]
 
 describe(`plugin-fetch options ${version}`, () => {

@@ -6,8 +6,8 @@ import { updatePet } from '../clients/updatePet.ts'
 /**
  * {@link /pets/:pet_id}
  */
-export async function updatePetHandler({ path, query, body }: UpdatePetRequestConfig, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-  const res = await updatePet({ path, query, body })
+export async function updatePetHandler({ path, query, body, headers }: UpdatePetRequestConfig, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
+  const res = await updatePet({ path, query, headers, body })
 
   return {
     content: [
