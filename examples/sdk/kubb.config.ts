@@ -1,7 +1,7 @@
 import { adapterOas } from '@kubb/adapter-oas'
 import { pluginFetch } from '@kubb/plugin-fetch'
 import { pluginTs } from '@kubb/plugin-ts'
-import { defineConfig } from 'kubb'
+import { defineConfig } from 'kubb/config'
 
 export default defineConfig({
   root: '.',

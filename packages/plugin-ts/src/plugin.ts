@@ -18,7 +18,7 @@ export const pluginTsName = 'plugin-ts' satisfies PluginTs['name']
  *
  * @example
  * ```ts
- * import { defineConfig } from 'kubb'
+ * import { defineConfig } from 'kubb/config'
  * import { pluginTs } from '@kubb/plugin-ts'
  *
  * export default defineConfig({

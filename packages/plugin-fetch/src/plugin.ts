@@ -22,7 +22,7 @@ export const pluginFetchName = 'plugin-fetch' satisfies PluginFetch['name']
  *
  * @example
  * ```ts
- * import { defineConfig } from 'kubb'
+ * import { defineConfig } from 'kubb/config'
  * import { pluginTs } from '@kubb/plugin-ts'
  * import { pluginFetch } from '@kubb/plugin-fetch'
  *

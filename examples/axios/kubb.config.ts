@@ -1,7 +1,7 @@
 import { adapterOas } from '@kubb/adapter-oas'
 import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginTs } from '@kubb/plugin-ts'
-import { defineConfig } from 'kubb'
+import { defineConfig } from 'kubb/config'
 
 export default defineConfig(() => {
   return {

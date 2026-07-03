@@ -7,7 +7,7 @@ import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
-import { defineConfig } from 'kubb'
+import { defineConfig } from 'kubb/config'
 import { bench, describe } from 'vitest'
 
 /**

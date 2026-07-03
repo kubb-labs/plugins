@@ -1,7 +1,7 @@
 import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
-import { defineConfig } from 'kubb'
+import { defineConfig } from 'kubb/config'
 import { pluginZodOperations } from './operationsPlugin.ts'
 
 export default defineConfig([

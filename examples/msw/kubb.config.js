@@ -2,7 +2,7 @@ import { adapterOas } from '@kubb/adapter-oas'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginMsw } from '@kubb/plugin-msw'
 import { pluginTs } from '@kubb/plugin-ts'
-import { defineConfig } from 'kubb'
+import { defineConfig } from 'kubb/config'
 
 export default defineConfig(() => {
   return {

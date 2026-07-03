@@ -18,7 +18,7 @@ export const pluginCypressName = 'plugin-cypress' satisfies PluginCypress['name'
  *
  * @example
  * ```ts
- * import { defineConfig } from 'kubb'
+ * import { defineConfig } from 'kubb/config'
  * import { pluginTs } from '@kubb/plugin-ts'
  * import { pluginCypress } from '@kubb/plugin-cypress'
  *

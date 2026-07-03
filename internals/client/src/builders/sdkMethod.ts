@@ -1,7 +1,5 @@
 import { buildOperationComments } from '@internals/shared'
 import { Url } from '@internals/utils'
-import type { HttpOperationNode } from 'kubb/ast'
-import { buildJSDoc } from 'kubb/ast'
 import { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -22,7 +20,7 @@ function buildCallConfig({
   zodResolver,
   security,
 }: {
-  node: HttpOperationNode
+  node: ast.HttpOperationNode
   validator: ValidatorOptions | undefined
   zodResolver?: ResolverZod | null
   security?: Array<Auth>
@@ -73,7 +71,7 @@ export function buildSdkMethod({
   const callConfig = buildCallConfig({ node, validator, zodResolver, security })
   const returnStatement = buildReturnStatement({ node, tsResolver, callConfig })
   const generics = signature.generics.length ? `<${signature.generics.join(', ')}>` : ''
-  const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
+  const jsdoc = ast.buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
   const methodBody = ['const { client: request = this.client, ...config } = options', '', returnStatement].map((line) => (line ? `    ${line}` : '')).join('\n')
 
