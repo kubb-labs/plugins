@@ -114,28 +114,30 @@ function buildZodMiniObjectShape(ctx: ZodMiniPrinterContext, node: ast.SchemaNod
   const isCyclic = (schema: ast.SchemaNode): boolean =>
     ctx.options.cyclicSchemas != null && ast.containsCircularRef(schema, { circularSchemas: ctx.options.cyclicSchemas })
 
-  const entries = ast.mapSchemaProperties(objectNode, (schema) => {
-    const hasSelfRef = isCyclic(schema)
-    const savedCyclicSchemas = ctx.options.cyclicSchemas
-    if (hasSelfRef) ctx.options.cyclicSchemas = undefined
-    const baseOutput = ctx.transform(schema) ?? ctx.transform(ast.factory.createSchema({ type: 'unknown' }))!
-    if (hasSelfRef) ctx.options.cyclicSchemas = savedCyclicSchemas
-    return baseOutput
-  }).map(({ name: propName, property, output: baseOutput }) => {
-    const { schema } = property
-    const meta = ast.syncSchemaRef(schema)
-
-    const value = applyMiniModifiers({
-      value: baseOutput,
-      schema,
-      nullable: meta.nullable,
-      optional: schema.optional || property.required === false,
-      nullish: schema.nullish,
-      defaultValue: meta.default,
+  const entries = ast
+    .mapSchemaProperties(objectNode, (schema) => {
+      const hasSelfRef = isCyclic(schema)
+      const savedCyclicSchemas = ctx.options.cyclicSchemas
+      if (hasSelfRef) ctx.options.cyclicSchemas = undefined
+      const baseOutput = ctx.transform(schema) ?? ctx.transform(ast.factory.createSchema({ type: 'unknown' }))!
+      if (hasSelfRef) ctx.options.cyclicSchemas = savedCyclicSchemas
+      return baseOutput
     })
+    .map(({ name: propName, property, output: baseOutput }) => {
+      const { schema } = property
+      const meta = ast.syncSchemaRef(schema)
 
-    return isCyclic(schema) ? ast.lazyGetter({ name: propName, body: value }) : `${ast.objectKey(propName)}: ${value}`
-  })
+      const value = applyMiniModifiers({
+        value: baseOutput,
+        schema,
+        nullable: meta.nullable,
+        optional: schema.optional || property.required === false,
+        nullish: schema.nullish,
+        defaultValue: meta.default,
+      })
+
+      return isCyclic(schema) ? ast.lazyGetter({ name: propName, body: value }) : `${ast.objectKey(propName)}: ${value}`
+    })
 
   return ast.buildObject(entries)
 }
@@ -266,7 +268,8 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         return objectBase
       },
       array(node) {
-        const items = ast.mapSchemaItems(node, (item) => this.transform(item))
+        const items = ast
+          .mapSchemaItems(node, (item) => this.transform(item))
           .map(({ output }) => output)
           .filter(Boolean)
         const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: 'unknown' }))!
@@ -275,7 +278,8 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         return node.unique ? `${base}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })` : base
       },
       tuple(node) {
-        const items = ast.mapSchemaItems(node, (item) => this.transform(item))
+        const items = ast
+          .mapSchemaItems(node, (item) => this.transform(item))
           .map(({ output }) => output)
           .filter(Boolean)
 
@@ -283,7 +287,8 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
       },
       union(node) {
         const nodeMembers = node.members ?? []
-        const members = ast.mapSchemaMembers(node, (memberNode) => this.transform(memberNode))
+        const members = ast
+          .mapSchemaMembers(node, (memberNode) => this.transform(memberNode))
           .map(({ schema, output }) => (output && node.strategy === 'one' ? strictOneOfMember(output, schema) : output))
           .filter(Boolean)
         if (members.length === 0) return ''

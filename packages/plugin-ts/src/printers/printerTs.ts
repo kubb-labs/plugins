@@ -234,7 +234,8 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         return factory.createIntersectionDeclaration({ withParentheses: true, nodes: factory.buildMemberNodes(node.members, this.transform) }) ?? null
       },
       array(node) {
-        const itemNodes = ast.mapSchemaItems(node, (item) => this.transform(item))
+        const itemNodes = ast
+          .mapSchemaItems(node, (item) => this.transform(item))
           .map(({ output }) => output)
           .filter(isNonNullable)
 
@@ -248,21 +249,23 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
 
         const addsQuestionToken = OPTIONAL_ADDS_QUESTION_TOKEN.has(options.optionalType)
 
-        const propertyNodes: Array<ts.TypeElement> = ast.mapSchemaProperties(node, (schema) => transform(schema)).map(({ name, property, output }) => {
-          const baseType = output ?? factory.keywordTypeNodes.unknown
-          const optional = !property.required || !!property.schema.optional || !!property.schema.nullish
-          const type = factory.buildPropertyType(property.schema, baseType, options.optionalType, optional)
-          const propMeta = ast.syncSchemaRef(property.schema)
+        const propertyNodes: Array<ts.TypeElement> = ast
+          .mapSchemaProperties(node, (schema) => transform(schema))
+          .map(({ name, property, output }) => {
+            const baseType = output ?? factory.keywordTypeNodes.unknown
+            const optional = !property.required || !!property.schema.optional || !!property.schema.nullish
+            const type = factory.buildPropertyType(property.schema, baseType, options.optionalType, optional)
+            const propMeta = ast.syncSchemaRef(property.schema)
 
-          const propertyNode = factory.createPropertySignature({
-            questionToken: optional ? addsQuestionToken : false,
-            name,
-            type,
-            readOnly: propMeta?.readOnly,
+            const propertyNode = factory.createPropertySignature({
+              questionToken: optional ? addsQuestionToken : false,
+              name,
+              type,
+              readOnly: propMeta?.readOnly,
+            })
+
+            return factory.appendJSDocToNode({ node: propertyNode, comments: buildPropertyJSDocComments(property.schema, optional) })
           })
-
-          return factory.appendJSDocToNode({ node: propertyNode, comments: buildPropertyJSDocComments(property.schema, optional) })
-        })
 
         const allElements = [...propertyNodes, ...factory.buildIndexSignatures(node, propertyNodes.length, transform)]
 
