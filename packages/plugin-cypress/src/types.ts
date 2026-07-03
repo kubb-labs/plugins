@@ -51,7 +51,7 @@ export type Options = OutputOptions & {
   macros?: Array<ast.Macro>
 }
 
-type ResolvedOptions = {
+export type ResolvedOptions = {
   output: Output
   exclude: Array<Exclude>
   include: Array<Include> | undefined

@@ -165,7 +165,7 @@ export type Options = OutputOptions & {
  */
 export type ResolvedClient = { kind: 'contract'; pluginName: string }
 
-type ResolvedOptions = {
+export type ResolvedOptions = {
   output: Output
   group: Group | undefined
   exclude: NonNullable<Options['exclude']>

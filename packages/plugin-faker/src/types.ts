@@ -141,7 +141,7 @@ export type Options = OutputOptions & {
   }
 }
 
-type ResolvedOptions = {
+export type ResolvedOptions = {
   output: Output
   group: Group | null
   exclude: NonNullable<Options['exclude']>

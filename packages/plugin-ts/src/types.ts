@@ -299,14 +299,14 @@ export type Options = OutputOptions & {
   enum?: EnumOptions
 }
 
-type ResolvedEnumOptions = {
+export type ResolvedEnumOptions = {
   type: NonNullable<EnumOptions['type']>
   constCasing: EnumConstCasing
   typeSuffix: string
   keyCasing: EnumKeyCasing
 }
 
-type ResolvedOptions = {
+export type ResolvedOptions = {
   output: Output
   exclude: Array<Exclude>
   include: Array<Include> | undefined

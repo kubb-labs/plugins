@@ -71,7 +71,7 @@ export type Options = OutputOptions & {
   parser?: 'data' | 'faker'
 }
 
-type ResolvedOptions = {
+export type ResolvedOptions = {
   output: Output
   group: Group | null
   exclude: NonNullable<Options['exclude']>

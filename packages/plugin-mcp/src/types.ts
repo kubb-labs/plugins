@@ -69,7 +69,7 @@ export type Options = OutputOptions & {
  */
 export type ResolvedClient = { kind: 'contract'; pluginName: string }
 
-type ResolvedOptions = {
+export type ResolvedOptions = {
   output: Output
   exclude: Array<Exclude>
   include: Array<Include> | undefined
