@@ -1,5 +1,6 @@
 ---
 "@kubb/plugin-axios": patch
+"@kubb/plugin-cypress": patch
 "@kubb/plugin-fetch": patch
 "@kubb/plugin-mcp": patch
 "@kubb/plugin-react-query": patch
@@ -16,3 +17,5 @@ return request({ method: 'POST', url: '/pets/{petId}', ...config, query: config.
 ```
 
 The remap is only emitted for operations where a name actually changes. Path parameters were already correct, since the URL template placeholders are renamed in sync with the `path` keys. Per-parameter `styles` for query, header, and cookie are now keyed by the spec name to match the serialized keys.
+
+`@kubb/plugin-cypress` shares the same remap rendering now, which also fixes its generated `cy.request` calls for renamed params whose camelCased name is not a bare identifier (for example `2fa-token`).

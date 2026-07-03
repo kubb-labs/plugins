@@ -41,4 +41,4 @@ export {
   type ResolveOperationTypeNameOptions,
 } from './operation.ts'
 export { createGroupConfig } from './group.ts'
-export { buildParamsMapping, buildTransformedParamsMapping, caseParams } from './params.ts'
+export { buildParamsMapping, buildParamsRemapExpression, buildTransformedParamsMapping, caseParams } from './params.ts'

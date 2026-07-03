@@ -13,7 +13,7 @@ export function getBestSellers(
     .request<GetBestSellersResponse>({
       method: 'GET',
       url: `/lists/best-sellers`,
-      qs: query ? { 'age-group': query.ageGroup, 'list.name': query.listName } : undefined,
+      qs: query ? { 'age-group': query.ageGroup, 'list.name': query.listName } : query,
       ...options,
     })
     .then((res) => res.body)
