@@ -5,7 +5,8 @@ import { ast } from 'kubb/kit'
  * Builds the call-config entries that rename the camelCased `query` and `headers` keys back to the
  * names the OpenAPI document declares, so the wire format follows the spec while the generated
  * types keep camelCase keys. Returns an empty array when no name changes. Path parameters need no
- * remap because the URL template placeholders are renamed in sync with the `path` keys.
+ * remap because the URL template placeholders are renamed in sync with the `path` keys. Emit the
+ * entries after the `...config` spread so they override the camelCased groups the caller passes in.
  *
  * @example
  * ```ts

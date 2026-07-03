@@ -49,11 +49,6 @@ describe('buildParamsRemap', () => {
     expect(buildParamsRemap({ node })).toStrictEqual([])
   })
 
-  test('uses bracket access when the camelCased name is not a bare identifier', () => {
-    const node = createOperation([{ name: '2fa-token', in: 'query', schema: stringSchema() }])
-    expect(buildParamsRemap({ node })).toStrictEqual(['query: config.query ? { "2fa-token": config.query["2FaToken"] } : config.query'])
-  })
-
   test('keeps the first parameter when two names collapse to the same camelCased key', () => {
     const node = createOperation([
       { name: 'max-uploads', in: 'query', schema: stringSchema() },

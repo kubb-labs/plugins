@@ -34,7 +34,6 @@ function buildCallConfig({
   const validatorLiteral = validatorEntries.length ? `validator: { ${validatorEntries.join(', ')} }` : null
   const securityLiteral = buildSecurityMetadata({ security })
 
-  // The remap entries sit after `...config` so they override the camelCased groups the caller passes in.
   return `{ ${[
     `method: '${node.method.toUpperCase()}'`,
     `url: '${Url.toCasedTemplate(node.path, { casing: 'camelcase' })}'`,
