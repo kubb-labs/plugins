@@ -1,5 +1,13 @@
 # @kubb/plugin-fetch
 
+## 5.0.0-beta.83
+
+### Patch Changes
+
+- Updated dependencies [[`b85a648`](https://github.com/kubb-labs/plugins/commit/b85a6483ac7aa08743200bba6abfbee7fa0c9722)]:
+  - @kubb/plugin-ts@5.0.0-beta.83
+  - @kubb/plugin-zod@5.0.0-beta.83
+
 ## 5.0.0-beta.82
 
 ### Major Changes
