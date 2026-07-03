@@ -177,6 +177,7 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     if: github.actor != 'github-actions[bot]' && github.event_name == 'pull_request'
+    needs: build
     steps:
       - name: Check out code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -255,6 +256,7 @@ jobs:
     name: Build and test on ${{ matrix.os }}
     timeout-minutes: 30
     if: github.actor != 'github-actions[bot]'
+    needs: build
     strategy:
       fail-fast: true
       matrix:
