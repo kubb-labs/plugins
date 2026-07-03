@@ -145,6 +145,7 @@
     "plugin-zod-strict-typecheck",
     "plugin-zod-success-only-response",
     "plugin-zod-v5-rewrite",
+    "plugins-ast-via-kit",
     "plugins-macros-option",
     "printer-options-api",
     "printer-shared-traversal",
