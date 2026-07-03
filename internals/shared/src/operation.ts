@@ -1,5 +1,5 @@
 import { Url } from '@internals/utils'
-import { ast, type ResolverFileParams } from '@kubb/core'
+import { ast, type ResolverFileParams } from 'kubb/kit'
 import { caseParams, dedupeByCasedName } from './params.ts'
 
 /**

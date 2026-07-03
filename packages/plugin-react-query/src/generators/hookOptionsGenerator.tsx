@@ -1,7 +1,7 @@
 import { getOperationParameters, operationFileEntry } from '@internals/shared'
-import { ast, defineGenerator } from '@kubb/core'
-import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
-import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { ast, defineGenerator } from 'kubb/kit'
+import { File, jsxRenderer, Type } from 'kubb/jsx'
+import type { KubbReactNode } from 'kubb/jsx'
 import type { PluginReactQuery } from '../types'
 import { resolveOperationOverrides } from '../utils.ts'
 

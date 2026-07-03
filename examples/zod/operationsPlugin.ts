@@ -1,4 +1,4 @@
-import { ast, defineGenerator, definePlugin } from '@kubb/core'
+import { ast, defineGenerator, definePlugin } from 'kubb/kit'
 import { pluginZodName, type ResolverZod } from '@kubb/plugin-zod'
 
 const operationSchemaType = `{

@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { operationFileEntry } from '@internals/shared'
-import type { ast, Group, Output } from '@kubb/core'
+import type { ast, Group, Output } from 'kubb/kit'
 
 /**
  * The resolved contract `<op>` for one operation: the generated function name, the file it lives in,

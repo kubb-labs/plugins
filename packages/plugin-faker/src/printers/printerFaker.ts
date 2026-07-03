@@ -1,6 +1,6 @@
-import { buildObject, extractRefName, mapSchemaItems, mapSchemaMembers, objectKey, stringify, toRegExpString } from '@kubb/ast/utils'
-import { ast } from '@kubb/core'
-import { containsCircularRef } from '@kubb/ast/utils'
+import { buildObject, extractRefName, mapSchemaItems, mapSchemaMembers, objectKey, stringify, toRegExpString } from 'kubb/ast'
+import { ast } from 'kubb/kit'
+import { containsCircularRef } from 'kubb/ast'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 
 /**

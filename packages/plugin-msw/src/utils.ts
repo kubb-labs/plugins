@@ -1,4 +1,4 @@
-import { ast } from '@kubb/core'
+import { ast } from 'kubb/kit'
 import type { ResolverFaker } from '@kubb/plugin-faker'
 import type { PluginMsw } from './types.ts'
 

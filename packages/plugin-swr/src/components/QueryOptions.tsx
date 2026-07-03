@@ -1,8 +1,8 @@
-import type { ast } from '@kubb/core'
+import type { ast } from 'kubb/kit'
 import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
-import { File, Function } from '@kubb/renderer-jsx'
-import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { File, Function } from 'kubb/jsx'
+import type { KubbReactNode } from 'kubb/jsx'
 import { buildQueryOptionsParams, buildClientCall } from '@internals/tanstack-query'
 
 type Props = {

@@ -1,6 +1,6 @@
 import { caseParams } from '@internals/shared'
 import type { OperationParamsResolver } from '@internals/shared'
-import type { OperationNode, ParameterNode } from '@kubb/ast'
+import type { OperationNode, ParameterNode } from 'kubb/ast'
 import { createFunctionParameter, createFunctionParameters, createIndexedAccessType, createTypeLiteral } from './functionParams.ts'
 import type { FunctionParameterNode, FunctionParametersNode, TypeExpression, TypeLiteralNode } from './functionParams.ts'
 

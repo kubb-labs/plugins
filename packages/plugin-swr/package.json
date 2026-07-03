@@ -67,20 +67,17 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@kubb/ast": "catalog:",
-    "@kubb/core": "catalog:",
-    "@kubb/plugin-ts": "workspace:*",
-    "@kubb/renderer-jsx": "catalog:"
+    "@kubb/plugin-ts": "workspace:*"
   },
   "devDependencies": {
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
-    "@internals/utils": "workspace:*"
+    "@internals/utils": "workspace:*",
+    "kubb": "catalog:"
   },
   "peerDependencies": {
-    "@kubb/core": "catalog:",
-    "@kubb/renderer-jsx": "catalog:"
+    "kubb": "catalog:"
   },
   "engines": {
     "node": ">=22"

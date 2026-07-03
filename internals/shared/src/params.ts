@@ -1,5 +1,5 @@
 import { camelCase } from '@internals/utils'
-import type { ParameterNode } from '@kubb/ast'
+import type { ParameterNode } from 'kubb/ast'
 
 const caseParamsCache = new WeakMap<Array<ParameterNode>, Array<ParameterNode>>()
 

@@ -1,5 +1,5 @@
 import type { OperationParamsResolver } from '@internals/shared'
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 import type { PrinterTsNodes } from './printers/printerTs.ts'
 /**
  * The concrete resolver type for `@kubb/plugin-ts`.
@@ -299,14 +299,14 @@ export type Options = OutputOptions & {
   enum?: EnumOptions
 }
 
-type ResolvedEnumOptions = {
+export type ResolvedEnumOptions = {
   type: NonNullable<EnumOptions['type']>
   constCasing: EnumConstCasing
   typeSuffix: string
   keyCasing: EnumKeyCasing
 }
 
-type ResolvedOptions = {
+export type ResolvedOptions = {
   output: Output
   exclude: Array<Exclude>
   include: Array<Include> | undefined

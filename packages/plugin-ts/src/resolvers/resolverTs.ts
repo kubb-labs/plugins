@@ -1,5 +1,5 @@
 import { ensureValidVarName, pascalCase, toFilePath } from '@internals/utils'
-import { defineResolver } from '@kubb/core'
+import { defineResolver } from 'kubb/kit'
 import type { PluginTs } from '../types.ts'
 
 /**

@@ -1,13 +1,13 @@
 import path from 'node:path'
 import { getOperationParameters, operationFileEntry } from '@internals/shared'
 import { camelCase } from '@internals/utils'
-import { ast, defineGenerator } from '@kubb/core'
-import type { Generator, PluginFactoryOptions } from '@kubb/core'
+import { ast, defineGenerator } from 'kubb/kit'
+import type { Generator, PluginFactoryOptions } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRenderer } from 'kubb/jsx'
 import {
   buildZodErrorParse,
   isValidatorEnabled,

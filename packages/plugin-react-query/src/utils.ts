@@ -1,5 +1,5 @@
 import { getRequestGroups } from '@internals/shared'
-import type { ast } from '@kubb/core'
+import type { ast } from 'kubb/kit'
 
 export { buildQueryKeyParams, maybeValueOrGetter, resolveOperationOverrides } from '@internals/tanstack-query'
 export { buildClientOptionType, buildOperationComments as getComments, buildRequestConfigType, resolveErrorNames, resolveSuccessNames } from '@internals/shared'
