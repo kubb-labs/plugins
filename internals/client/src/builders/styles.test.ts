@@ -31,17 +31,17 @@ describe('buildStyles', () => {
     expect(buildStyles({ node })).toBe("{ query: { tags: { style: 'pipeDelimited', explode: false } } }")
   })
 
-  test('emits only explode for header and cookie parameters', () => {
+  test('keeps the spec name for header and cookie parameters, quoted when not a bare identifier', () => {
     const node = createOperation([
       { name: 'X-Ids', in: 'header', schema: stringSchema(), style: 'simple', explode: true },
       { name: 'session_id', in: 'cookie', schema: stringSchema(), explode: false },
     ])
-    expect(buildStyles({ node })).toBe('{ header: { xIds: { explode: true } }, cookie: { sessionId: { explode: false } } }')
+    expect(buildStyles({ node })).toBe('{ header: { "X-Ids": { explode: true } }, cookie: { session_id: { explode: false } } }')
   })
 
-  test('quotes a key whose camelCased name is not a bare identifier', () => {
+  test('quotes a query key that is not a bare identifier', () => {
     const node = createOperation([{ name: '2fa', in: 'query', schema: stringSchema(), explode: true }])
-    expect(buildStyles({ node })).toBe('{ query: { "2Fa": { explode: true } } }')
+    expect(buildStyles({ node })).toBe('{ query: { "2fa": { explode: true } } }')
   })
 
   test('groups multiple locations together', () => {

@@ -4,12 +4,13 @@ import { ast } from 'kubb/kit'
 type StyledLocation = 'path' | 'query' | 'header' | 'cookie'
 
 /**
- * Renders a parameter name as an object-literal key, quoting it when the camelCased name is not a
- * bare identifier (for example a name that starts with a digit) so the emitted literal stays valid.
+ * Renders a parameter name as an object-literal key, quoted when it is not a bare identifier.
+ * Path keys are camelCased to match the URL template placeholders. Query, header, and cookie keys
+ * keep the spec name, matching the remapped keys the runtime serializes.
  */
-function toKey(name: string): string {
-  const cased = camelCase(name)
-  return isValidVarName(cased) ? cased : JSON.stringify(cased)
+function toKey(name: string, location: StyledLocation): string {
+  const key = location === 'path' ? camelCase(name) : name
+  return isValidVarName(key) ? key : JSON.stringify(key)
 }
 
 /**
@@ -25,8 +26,9 @@ function serializeParameter(parameter: ast.ParameterNode): string | null {
 }
 
 /**
- * Builds the per-operation `styles` literal from the operation's parameters, grouped by location and
- * keyed by the camelCased parameter name to match the generated `path` / `query` / `headers` keys.
+ * Builds the per-operation `styles` literal from the operation's parameters, grouped by location.
+ * Path entries are keyed by the camelCased name to match the URL template placeholders; query,
+ * header, and cookie entries keep the spec name to match the keys the runtime serializes.
  * Only parameters whose source defines `style` or `explode` are emitted, so calls without
  * serialization metadata keep the runtime defaults and existing output is unchanged. Returns `null`
  * when no parameter carries metadata.
@@ -45,7 +47,7 @@ export function buildStyles({ node }: { node: ast.OperationNode }): string | nul
   for (const parameter of node.parameters) {
     const literal = serializeParameter(parameter)
     if (!literal) continue
-    groups[parameter.in].push(`${toKey(parameter.name)}: ${literal}`)
+    groups[parameter.in].push(`${toKey(parameter.name, parameter.in)}: ${literal}`)
   }
 
   const locations = (Object.keys(groups) as Array<StyledLocation>).filter((location) => groups[location].length > 0)

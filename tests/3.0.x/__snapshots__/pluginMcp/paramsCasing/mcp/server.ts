@@ -4,7 +4,7 @@
 */
 
 import { updatePetHandler } from './updatePet.ts'
-import { updatePetDataSchema, updatePetPathPetIdSchema, updatePetQueryIncludeDeletedSchema, updatePetQueryRequestSourceSchema, updatePetStatus200Schema } from '../zod/updatePetSchema.ts'
+import { updatePetDataSchema, updatePetHeaderXRequestIDSchema, updatePetPathPetIdSchema, updatePetQueryIncludeDeletedSchema, updatePetQueryRequestSourceSchema, updatePetStatus200Schema } from '../zod/updatePetSchema.ts'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
 import { z } from 'zod'
@@ -18,9 +18,9 @@ export function getServer() {
   server.registerTool("updatePet", {
     description: "Make a POST request to /pets/{pet_id}",
     outputSchema: { data: updatePetStatus200Schema },
-    inputSchema: { path: z.object({ "petId": updatePetPathPetIdSchema }), query: z.object({ "includeDeleted": updatePetQueryIncludeDeletedSchema, "requestSource": updatePetQueryRequestSourceSchema }), body: updatePetDataSchema },
-  }, async ({ path, query, body }, request) => {
-    return updatePetHandler({ path, query, body }, request)
+    inputSchema: { path: z.object({ "petId": updatePetPathPetIdSchema }), query: z.object({ "includeDeleted": updatePetQueryIncludeDeletedSchema, "requestSource": updatePetQueryRequestSourceSchema }), headers: z.object({ "xRequestID": updatePetHeaderXRequestIDSchema }), body: updatePetDataSchema },
+  }, async ({ path, query, headers, body }, request) => {
+    return updatePetHandler({ path, query, headers, body }, request)
   })
 
   return server

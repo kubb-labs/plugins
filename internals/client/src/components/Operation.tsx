@@ -5,6 +5,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
+import { buildParamsRemap } from '../builders/paramsRemap.ts'
 import { buildReturnStatement } from '../builders/returnStatement.ts'
 import { type Auth, buildSecurityMetadata } from '../builders/security.ts'
 import { buildGroupedOptionsSignature } from '../builders/signature.ts'
@@ -80,6 +81,7 @@ export function Operation({ name, node, tsResolver, zodResolver, validator, secu
   ].filter(Boolean)
   const validatorLiteral = validatorEntries.length ? `validator: { ${validatorEntries.join(', ')} }` : null
 
+  // The remap entries sit after `...config` so they override the camelCased groups the caller passes in.
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
     `url: '${Url.toCasedTemplate(node.path, { casing: 'camelcase' })}'`,
@@ -89,6 +91,7 @@ export function Operation({ name, node, tsResolver, zodResolver, validator, secu
     contentTypeLiteral,
     responseTypeLiteral,
     '...config',
+    ...buildParamsRemap({ node }),
   ]
     .filter(Boolean)
     .join(', ')} }`

@@ -20,6 +20,10 @@ export function createUpdatePetQueryRequestSource(data?: string): string {
   return data ?? faker.string.alpha()
 }
 
+export function createUpdatePetHeaderXRequestID(data?: string): string {
+  return data ?? faker.string.alpha()
+}
+
 /**
  * @description Success
  */
