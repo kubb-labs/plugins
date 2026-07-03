@@ -320,6 +320,30 @@ describe('createClientCore', () => {
     expect(calls[0]?.headers['Content-Type']).toBe('application/json')
   })
 
+  test('does not override a caller-set Content-Type header', async () => {
+    const { client, calls } = createClient()
+    await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, headers: { 'content-type': 'application/vnd.api+json' } })
+    expect(calls[0]?.headers['content-type']).toBe('application/vnd.api+json')
+    expect(calls[0]?.headers['Content-Type']).toBeUndefined()
+  })
+
+  test('does not duplicate Content-Type when a mixed-case header is set', async () => {
+    const { client, calls } = createClient()
+    await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, headers: { 'Content-type': 'application/vnd.api+json' } })
+    const headers = calls[0]?.headers as Record<string, string>
+    const contentTypeKeys = Object.keys(headers).filter((k) => k.toLowerCase() === 'content-type')
+    expect(contentTypeKeys).toHaveLength(1)
+    expect(headers['Content-type']).toBe('application/vnd.api+json')
+  })
+
+  test('does not auto-inject Content-Type when a custom bodySerializer is used', async () => {
+    const { transport, calls } = fakeTransport()
+    const client = createClientCore<string, string>({ defaultTransport: transport, serializer: { body: ({ body }) => `custom:${JSON.stringify(body)}` } })
+    await client({ method: 'POST', url: '/pet', body: { name: 'odie' } })
+    expect(calls[0]?.body).toBe('custom:{"name":"odie"}')
+    expect(calls[0]?.headers['Content-Type']).toBeUndefined()
+  })
+
   test('serializes cookie params into the Cookie header', async () => {
     const { client, calls } = createClient()
     await client({ method: 'GET', url: '/pet', cookies: { session: 'abc', ids: [1, 2] } })
