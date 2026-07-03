@@ -361,6 +361,43 @@ describe('createClientCore', () => {
     expect(headers['Content-Type']).toBe('application/json')
   })
 
+  test('serializes JSON body without explicit contentType and sets Content-Type', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'POST', url: '/v3/jwt/token/', body: { email: 'test@example.com', password: 'secret' } })
+    expect(calls[0]?.data).toBe('{"email":"test@example.com","password":"secret"}')
+    const headers = calls[0]?.headers as Record<string, string>
+    expect(headers['Content-Type']).toBe('application/json')
+  })
+
+  test('does not override a caller-set Content-Type header', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, headers: { 'content-type': 'application/vnd.api+json' } })
+    const headers = calls[0]?.headers as Record<string, string>
+    expect(headers['content-type']).toBe('application/vnd.api+json')
+    expect(headers['Content-Type']).toBeUndefined()
+  })
+
+  test('does not duplicate Content-Type when a mixed-case header is set', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, headers: { 'Content-type': 'application/vnd.api+json' } })
+    const headers = calls[0]?.headers as Record<string, string>
+    const contentTypeKeys = Object.keys(headers).filter((k) => k.toLowerCase() === 'content-type')
+    expect(contentTypeKeys).toHaveLength(1)
+    expect(headers['Content-type']).toBe('application/vnd.api+json')
+  })
+
+  test('does not auto-inject Content-Type when a custom bodySerializer is used', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance, serializer: { body: ({ body }) => `custom:${JSON.stringify(body)}` } })
+    await client({ method: 'POST', url: '/pet', body: { name: 'odie' } })
+    expect(calls[0]?.data).toBe('custom:{"name":"odie"}')
+    const headers = calls[0]?.headers as Record<string, string>
+    expect(headers['Content-Type']).toBeUndefined()
+  })
+
   test('serializes cookie params into the Cookie header', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance })
