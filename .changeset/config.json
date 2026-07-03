@@ -7,7 +7,7 @@
     }
   ],
   "commit": false,
-  "fixed": [["@kubb/plugin-*"]],
+  "fixed": [],
   "linked": [],
   "access": "restricted",
   "baseBranch": "main",
