@@ -1,4 +1,4 @@
-import { buildParamsMapping, buildRequestParamsSignature, getOperationParameters } from '@internals/shared'
+import { buildParamsMapping, buildParamsRemapExpression, buildRequestParamsSignature, getOperationParameters } from '@internals/shared'
 import { Url } from '@internals/utils'
 import { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -42,29 +42,11 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   const requestOptions: Array<string> = [`method: '${node.method}'`, `url: ${urlTemplate}`]
 
   if (groups.query) {
-    if (queryParamsMapping) {
-      // When paramsCasing renames query params (e.g. page_size → pageSize), we must remap
-      // the camelCase keys back to the original API names before passing them to `qs`.
-      const pairs = Object.entries(queryParamsMapping)
-        .map(([originalName, camelCaseName]) => `'${originalName}': query.${camelCaseName}`)
-        .join(', ')
-      requestOptions.push(`qs: query ? { ${pairs} } : undefined`)
-    } else {
-      requestOptions.push('qs: query')
-    }
+    requestOptions.push(queryParamsMapping ? `qs: ${buildParamsRemapExpression({ source: 'query', mapping: queryParamsMapping })}` : 'qs: query')
   }
 
   if (groups.headers) {
-    if (headerParamsMapping) {
-      // When paramsCasing renames header params (e.g. x-api-key → xApiKey), we must remap
-      // the camelCase keys back to the original API names before passing them to `headers`.
-      const pairs = Object.entries(headerParamsMapping)
-        .map(([originalName, camelCaseName]) => `'${originalName}': headers.${camelCaseName}`)
-        .join(', ')
-      requestOptions.push(`headers: headers ? { ${pairs} } : undefined`)
-    } else {
-      requestOptions.push('headers')
-    }
+    requestOptions.push(headerParamsMapping ? `headers: ${buildParamsRemapExpression({ source: 'headers', mapping: headerParamsMapping })}` : 'headers')
   }
 
   if (groups.body) {

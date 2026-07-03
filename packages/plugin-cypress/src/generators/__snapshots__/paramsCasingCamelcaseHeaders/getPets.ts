@@ -10,8 +10,8 @@ export function getPets({ query, headers }: GetPetsRequestConfig, options: Parti
     .request<GetPetsResponse>({
       method: 'GET',
       url: `/pets`,
-      qs: query ? { page_size: query.pageSize } : undefined,
-      headers: headers ? { 'x-api-key': headers.xApiKey } : undefined,
+      qs: query ? { page_size: query.pageSize } : query,
+      headers: headers ? { 'x-api-key': headers.xApiKey } : headers,
       ...options,
     })
     .then((res) => res.body)

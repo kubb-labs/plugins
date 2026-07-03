@@ -1,4 +1,4 @@
-import { camelCase } from '@internals/utils'
+import { camelCase, isValidVarName } from '@internals/utils'
 import type { ast } from 'kubb/kit'
 
 const caseParamsCache = new WeakMap<Array<ast.ParameterNode>, Array<ast.ParameterNode>>()
@@ -71,4 +71,28 @@ export function buildTransformedParamsMapping<TParam extends { name: string }>(
     params,
     params.map((param) => ({ ...param, name: transformName(param.name) })),
   )
+}
+
+function toAccess(object: string, name: string): string {
+  return isValidVarName(name) ? `${object}.${name}` : `${object}[${JSON.stringify(name)}]`
+}
+
+/**
+ * Renders the object-literal expression that renames the camelCased keys of a grouped request
+ * option back to the names the OpenAPI document declares, guarded so an omitted optional group
+ * stays omitted. Shared by the client and cypress generators, which pass a `buildParamsMapping`
+ * result and the source expression to read the keys from.
+ *
+ * @example
+ * ```ts
+ * buildParamsRemapExpression({ source: 'config.query', mapping: { include_deleted: 'includeDeleted' } })
+ * // 'config.query ? { "include_deleted": config.query.includeDeleted } : config.query'
+ * ```
+ */
+export function buildParamsRemapExpression({ source, mapping }: { source: string; mapping: Record<string, string> }): string {
+  const pairs = Object.entries(mapping)
+    .map(([originalName, casedName]) => `${JSON.stringify(originalName)}: ${toAccess(source, casedName)}`)
+    .join(', ')
+
+  return `${source} ? { ${pairs} } : ${source}`
 }

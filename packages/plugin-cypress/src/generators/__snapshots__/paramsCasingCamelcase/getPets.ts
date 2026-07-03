@@ -10,7 +10,7 @@ export function getPets({ query }: GetPetsRequestConfig = {}, options: Partial<C
     .request<GetPetsResponse>({
       method: 'GET',
       url: `/pets`,
-      qs: query ? { page_size: query.pageSize } : undefined,
+      qs: query ? { page_size: query.pageSize } : query,
       ...options,
     })
     .then((res) => res.body)

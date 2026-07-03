@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from 'vitest'
 import { ast } from 'kubb/kit'
-import { buildParamsMapping, buildTransformedParamsMapping, caseParams, dedupeByCasedName } from './params.ts'
+import { buildParamsMapping, buildParamsRemapExpression, buildTransformedParamsMapping, caseParams, dedupeByCasedName } from './params.ts'
 
 const { createParameter, createSchema } = ast.factory
 
@@ -52,6 +52,18 @@ describe('buildTransformedParamsMapping', () => {
     expect(buildTransformedParamsMapping([{ name: 'pet-id' }], (name) => name.replace('-', ''))).toStrictEqual({
       'pet-id': 'petid',
     })
+  })
+})
+
+describe('buildParamsRemapExpression', () => {
+  test('renders the guarded remap literal for a renamed param', () => {
+    expect(buildParamsRemapExpression({ source: 'config.query', mapping: { include_deleted: 'includeDeleted' } })).toBe(
+      'config.query ? { "include_deleted": config.query.includeDeleted } : config.query',
+    )
+  })
+
+  test('uses bracket access when the cased name is not a bare identifier', () => {
+    expect(buildParamsRemapExpression({ source: 'query', mapping: { '2fa-token': '2FaToken' } })).toBe('query ? { "2fa-token": query["2FaToken"] } : query')
   })
 })
 

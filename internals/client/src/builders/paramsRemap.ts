@@ -1,19 +1,5 @@
-import { buildParamsMapping, getOperationParameters } from '@internals/shared'
-import { isValidVarName } from '@internals/utils'
+import { buildParamsMapping, buildParamsRemapExpression, getOperationParameters } from '@internals/shared'
 import { ast } from 'kubb/kit'
-
-function toAccess(object: string, name: string): string {
-  return isValidVarName(name) ? `${object}.${name}` : `${object}[${JSON.stringify(name)}]`
-}
-
-function toRemapEntry(group: 'query' | 'headers', mapping: Record<string, string>): string {
-  const source = `config.${group}`
-  const pairs = Object.entries(mapping)
-    .map(([originalName, casedName]) => `${JSON.stringify(originalName)}: ${toAccess(source, casedName)}`)
-    .join(', ')
-
-  return `${group}: ${source} ? { ${pairs} } : ${source}`
-}
 
 /**
  * Builds the call-config entries that rename the camelCased `query` and `headers` keys back to the
@@ -36,7 +22,8 @@ export function buildParamsRemap({ node }: { node: ast.OperationNode }): Array<s
   const queryMapping = buildParamsMapping(original.query, cased.query)
   const headerMapping = buildParamsMapping(original.header, cased.header)
 
-  return [queryMapping ? toRemapEntry('query', queryMapping) : null, headerMapping ? toRemapEntry('headers', headerMapping) : null].filter(
-    (entry): entry is string => Boolean(entry),
-  )
+  const entries: Array<string> = []
+  if (queryMapping) entries.push(`query: ${buildParamsRemapExpression({ source: 'config.query', mapping: queryMapping })}`)
+  if (headerMapping) entries.push(`headers: ${buildParamsRemapExpression({ source: 'config.headers', mapping: headerMapping })}`)
+  return entries
 }
