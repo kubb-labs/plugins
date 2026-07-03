@@ -1,5 +1,14 @@
 # e2e
 
+## 0.0.1-beta.27
+
+### Patch Changes
+
+- Updated dependencies [[`c374262`](https://github.com/kubb-labs/plugins/commit/c3742623da739018d9610a0cbb274ab8e9e30322)]:
+  - @kubb/plugin-axios@5.0.0-beta.85
+  - @kubb/plugin-cypress@5.0.0-beta.85
+  - @kubb/plugin-react-query@5.0.0-beta.85
+
 ## 0.0.1-beta.26
 
 ### Patch Changes
