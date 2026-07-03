@@ -1,6 +1,6 @@
 {
   "name": "tests-3.0.x",
-  "version": "0.0.1-beta.33",
+  "version": "0.0.1-beta.34",
   "private": true,
   "description": "Integration tests for OpenAPI 3.0.x",
   "license": "MIT",

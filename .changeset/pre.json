@@ -149,6 +149,7 @@
     "plugins-macros-option",
     "printer-options-api",
     "printer-shared-traversal",
+    "query-header-params-keep-spec-names",
     "query-mutation-methods-default-patch",
     "query-plugins-client",
     "query-plugins-jsdoc",

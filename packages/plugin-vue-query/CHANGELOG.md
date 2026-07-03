@@ -1,5 +1,28 @@
 # @kubb/plugin-vue-query
 
+## 5.0.0-beta.85
+
+### Patch Changes
+
+- [#633](https://github.com/kubb-labs/plugins/pull/633) [`c374262`](https://github.com/kubb-labs/plugins/commit/c3742623da739018d9610a0cbb274ab8e9e30322) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Send query and header parameters with the names the OpenAPI document declares (kubb-labs/plugins#631).
+
+  The generated types keep camelCase keys (`include_deleted` becomes `includeDeleted`), but the client used to serialize those camelCased keys straight onto the request, so an API expecting `include_deleted` or `X-API-Key` never received them. Generated clients and SDK methods now remap the keys back to the spec names before the request goes out:
+
+  ```ts
+  return request({
+    method: "POST",
+    url: "/pets/{petId}",
+    ...config,
+    query: config.query
+      ? { include_deleted: config.query.includeDeleted }
+      : config.query,
+  });
+  ```
+
+  The remap is only emitted for operations where a name actually changes. Path parameters were already correct, since the URL template placeholders are renamed in sync with the `path` keys. Per-parameter `styles` for query, header, and cookie are now keyed by the spec name to match the serialized keys.
+
+  `@kubb/plugin-cypress` shares the same remap rendering now, which also fixes its generated `cy.request` calls for renamed params whose camelCased name is not a bare identifier (for example `2fa-token`).
+
 ## 5.0.0-beta.84
 
 ### Patch Changes
