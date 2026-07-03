@@ -1,4 +1,4 @@
-import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers'
+import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers'
 import type { HeadersInit, PathParamStyle, PathSerializer, Serializers, Styles } from './serializers'
 import { type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
 
@@ -323,6 +323,15 @@ function mergeHeaders(...sources: Array<HeadersInit | undefined>): Record<string
   return Object.assign({}, ...sources.map(serializeHeaders))
 }
 
+function getHeader(headers: Record<string, string>, name: string): string | undefined {
+  const key = Object.keys(headers).find((k) => k.toLowerCase() === name.toLowerCase())
+  return key ? headers[key] : undefined
+}
+
+function hasHeader(headers: Record<string, string>, name: string): boolean {
+  return Object.keys(headers).some((k) => k.toLowerCase() === name.toLowerCase())
+}
+
 /**
  * Joins the URL parts, interpolates URL-encoded `{param}` segments, and appends the serialized query, shared by the send path and `getUrl`.
  */
@@ -387,9 +396,6 @@ export async function resolveAuth(params: {
   const { security, auth, headers, query } = params
   if (!security?.length || auth === undefined) return
 
-  // An explicit caller-set header wins over the resolved token.
-  const hasHeader = (name: string) => Object.keys(headers).some((key) => key.toLowerCase() === name.toLowerCase())
-
   for (const scheme of security) {
     const token = typeof auth === 'function' ? await auth(scheme) : auth
     if (token === undefined) continue
@@ -400,10 +406,10 @@ export async function resolveAuth(params: {
         if (query[name] === undefined) query[name] = token
       } else if (scheme.in === 'cookie') {
         headers.Cookie = [headers.Cookie, `${name}=${token}`].filter(Boolean).join('; ')
-      } else if (!hasHeader(name)) {
+      } else if (!hasHeader(headers, name)) {
         headers[name] = token
       }
-    } else if (!hasHeader('Authorization')) {
+    } else if (!hasHeader(headers, 'Authorization')) {
       headers.Authorization = scheme.scheme === 'basic' ? `Basic ${btoa(token)}` : `Bearer ${token}`
     }
     return
@@ -469,8 +475,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 
   const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.styles?.header))
   const { request: requestContentTypeOption, response: responseContentType } = resolveContentType(requestConfig.contentType)
-  const requestContentType = requestContentTypeOption ?? headers['Content-Type'] ?? headers['content-type']
-  if (responseContentType && headers['Accept'] === undefined && headers['accept'] === undefined) {
+  const requestContentType = requestContentTypeOption ?? getHeader(headers, 'content-type')
+  if (responseContentType && !hasHeader(headers, 'accept')) {
     headers['Accept'] = responseContentType
   }
 
@@ -491,15 +497,19 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   const validatedBody = await runValidator(requestConfig.validator?.request, requestConfig.body)
   const requestContentTypeBase = baseContentType(requestContentType)
   const contentCodec = requestContentTypeBase ? codecs[requestContentTypeBase] : undefined
+  const usesDefaultBodySerializer = !contentCodec?.serialize && bodySerializer === defaultBodySerializer
   const body = contentCodec?.serialize
     ? contentCodec.serialize(validatedBody, requestContentType)
     : bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.styles?.body })
   // A FormData body must keep its Content-Type unset so the runtime appends the multipart boundary.
   if (body instanceof FormData) {
-    delete headers['Content-Type']
-    delete headers['content-type']
+    for (const key of Object.keys(headers)) {
+      if (key.toLowerCase() === 'content-type') delete headers[key]
+    }
   } else if (requestContentTypeOption) {
     headers['Content-Type'] = requestContentTypeOption
+  } else if (usesDefaultBodySerializer && isDefaultJsonBody(validatedBody) && !hasHeader(headers, 'content-type')) {
+    headers['Content-Type'] = 'application/json'
   }
 
   const url = serializeUrl({

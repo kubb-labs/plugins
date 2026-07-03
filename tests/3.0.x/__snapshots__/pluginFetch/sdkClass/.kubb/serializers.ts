@@ -122,6 +122,10 @@ function isFormBody(body: unknown): body is BodyInit {
   )
 }
 
+export function isDefaultJsonBody(body: unknown): boolean {
+  return body !== undefined && body !== null && !isFormBody(body)
+}
+
 function appendFormDataValue({ formData, key, value, contentType }: { formData: FormData; key: string; value: unknown; contentType?: string }): void {
   if (value === undefined || value === null) return
   if (value instanceof Blob) formData.append(key, value)
