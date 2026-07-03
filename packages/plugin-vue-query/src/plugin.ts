@@ -22,7 +22,7 @@ export const pluginVueQueryName = 'plugin-vue-query' satisfies PluginVueQuery['n
  *
  * @example
  * ```ts
- * import { defineConfig } from 'kubb'
+ * import { defineConfig } from 'kubb/config'
  * import { pluginTs } from '@kubb/plugin-ts'
  * import { pluginVueQuery } from '@kubb/plugin-vue-query'
  *

@@ -20,7 +20,7 @@ export const pluginSwrName = 'plugin-swr' satisfies PluginSwr['name']
  *
  * @example
  * ```ts
- * import { defineConfig } from 'kubb'
+ * import { defineConfig } from 'kubb/config'
  * import { pluginTs } from '@kubb/plugin-ts'
  * import { pluginSwr } from '@kubb/plugin-swr'
  *

@@ -20,7 +20,7 @@ export const pluginRedocName = 'plugin-redoc' satisfies PluginRedoc['name']
  *
  * @example
  * ```ts
- * import { defineConfig } from 'kubb'
+ * import { defineConfig } from 'kubb/config'
  * import { pluginRedoc } from '@kubb/plugin-redoc'
  *
  * export default defineConfig({

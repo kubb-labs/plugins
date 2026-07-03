@@ -10,7 +10,7 @@ import { pluginRedoc } from '@kubb/plugin-redoc'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
 
-import { defineConfig } from 'kubb'
+import { defineConfig } from 'kubb/config'
 
 export default defineConfig({
   name: 'gen',

@@ -29,7 +29,7 @@ export const pluginReactQueryName = 'plugin-react-query' satisfies PluginReactQu
  *
  * @example
  * ```ts
- * import { defineConfig } from 'kubb'
+ * import { defineConfig } from 'kubb/config'
  * import { pluginTs } from '@kubb/plugin-ts'
  * import { pluginReactQuery } from '@kubb/plugin-react-query'
  *

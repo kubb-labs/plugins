@@ -18,7 +18,7 @@ export const pluginFakerName = 'plugin-faker' satisfies PluginFaker['name']
  *
  * @example
  * ```ts
- * import { defineConfig } from 'kubb'
+ * import { defineConfig } from 'kubb/config'
  * import { pluginTs } from '@kubb/plugin-ts'
  * import { pluginFaker } from '@kubb/plugin-faker'
  *

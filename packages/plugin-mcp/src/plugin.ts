@@ -23,7 +23,7 @@ export const pluginMcpName = 'plugin-mcp' satisfies PluginMcp['name']
  *
  * @example
  * ```ts
- * import { defineConfig } from 'kubb'
+ * import { defineConfig } from 'kubb/config'
  * import { pluginTs } from '@kubb/plugin-ts'
  * import { pluginZod } from '@kubb/plugin-zod'
  * import { pluginMcp } from '@kubb/plugin-mcp'

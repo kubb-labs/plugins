@@ -19,7 +19,7 @@ export const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
  *
  * @example
  * ```ts
- * import { defineConfig } from 'kubb'
+ * import { defineConfig } from 'kubb/config'
  * import { pluginTs } from '@kubb/plugin-ts'
  * import { pluginZod } from '@kubb/plugin-zod'
  *

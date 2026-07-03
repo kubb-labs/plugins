@@ -1,7 +1,7 @@
 import { camelCase } from '@internals/utils'
-import type { ParameterNode } from 'kubb/ast'
+import type { ast } from 'kubb/kit'
 
-const caseParamsCache = new WeakMap<Array<ParameterNode>, Array<ParameterNode>>()
+const caseParamsCache = new WeakMap<Array<ast.ParameterNode>, Array<ast.ParameterNode>>()
 
 /**
  * Applies camelCase to parameter names and returns a new array without mutating the input.
@@ -10,7 +10,7 @@ const caseParamsCache = new WeakMap<Array<ParameterNode>, Array<ParameterNode>>(
  * while `OperationNode.parameters` stays intact for other consumers. When `casing` is unset, the
  * original array is returned unchanged. Results are cached per input array.
  */
-export function caseParams(params: Array<ParameterNode>, casing: 'camelcase' | undefined): Array<ParameterNode> {
+export function caseParams(params: Array<ast.ParameterNode>, casing: 'camelcase' | undefined): Array<ast.ParameterNode> {
   if (!casing) return params
 
   const cached = caseParamsCache.get(params)
@@ -29,7 +29,7 @@ export function caseParams(params: Array<ParameterNode>, casing: 'camelcase' | u
  * an object type with a duplicate member, which TypeScript rejects. De-duplicate by the camelCased
  * identity so the resulting group is collision-free regardless of the names each caller carries.
  */
-export function dedupeByCasedName(params: Array<ParameterNode>): Array<ParameterNode> {
+export function dedupeByCasedName(params: Array<ast.ParameterNode>): Array<ast.ParameterNode> {
   const seen = new Set<string>()
 
   return params.filter((param) => {

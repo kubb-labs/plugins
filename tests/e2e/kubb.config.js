@@ -6,7 +6,7 @@ import { pluginMsw } from '@kubb/plugin-msw'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
-import { defineConfig } from 'kubb'
+import { defineConfig } from 'kubb/config'
 
 const schemas = [
   // { name: 'test', path: '../../schemas/3.0.x/test.json' },
