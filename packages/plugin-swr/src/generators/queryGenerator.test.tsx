@@ -30,10 +30,10 @@ const defaultOptions: PluginSwr['resolvedOptions'] = {
   mutationKey: mutationKeyTransformer,
   query: {
     importPath: 'swr',
-    methods: ['get'],
+    methods: ['GET'],
   },
   mutation: {
-    methods: ['post', 'put', 'patch', 'delete'],
+    methods: ['POST', 'PUT', 'PATCH', 'DELETE'],
     importPath: 'swr/mutation',
   },
   exclude: [],

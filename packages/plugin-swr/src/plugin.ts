@@ -81,7 +81,7 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
               ? false
               : {
                   importPath: 'swr',
-                  methods: ['get'],
+                  methods: ['GET'],
                   ...query,
                 },
           mutationKey,
@@ -90,7 +90,7 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
               ? false
               : {
                   importPath: 'swr/mutation',
-                  methods: ['post', 'put', 'patch', 'delete'],
+                  methods: ['POST', 'PUT', 'PATCH', 'DELETE'],
                   ...mutation,
                 },
           group: groupConfig,
