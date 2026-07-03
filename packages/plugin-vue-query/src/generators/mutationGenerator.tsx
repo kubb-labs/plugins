@@ -1,8 +1,8 @@
 import { getRequestGroups, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
-import { ast, defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRenderer } from 'kubb/jsx'
 import { Mutation, MutationKey } from '../components'
 import type { PluginVueQuery } from '../types'
 

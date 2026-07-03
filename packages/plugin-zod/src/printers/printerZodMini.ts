@@ -1,17 +1,7 @@
-import {
-  buildList,
-  buildObject,
-  extractRefName,
-  lazyGetter,
-  mapSchemaItems,
-  mapSchemaMembers,
-  mapSchemaProperties,
-  objectKey,
-  stringify,
-} from '@kubb/ast/utils'
+import { buildList, buildObject, extractRefName, lazyGetter, mapSchemaItems, mapSchemaMembers, mapSchemaProperties, objectKey, stringify } from 'kubb/ast'
 
-import { ast } from '@kubb/core'
-import { containsCircularRef, syncSchemaRef } from '@kubb/ast/utils'
+import { ast } from 'kubb/kit'
+import { containsCircularRef, syncSchemaRef } from 'kubb/ast'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyMiniModifiers,

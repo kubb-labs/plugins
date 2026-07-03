@@ -1,5 +1,5 @@
 import { camelCase } from '@internals/utils'
-import type { Group } from '@kubb/core'
+import type { Group } from 'kubb/kit'
 
 /**
  * Builds the `group` config a Kubb plugin passes to `ctx.setOptions`, applying the

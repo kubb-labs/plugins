@@ -1,5 +1,5 @@
 import { describe, expect, it, test } from 'vitest'
-import { ast } from '@kubb/core'
+import { ast } from 'kubb/kit'
 import { buildParamsMapping, buildTransformedParamsMapping, caseParams, dedupeByCasedName } from './params.ts'
 
 const { createParameter, createSchema } = ast.factory

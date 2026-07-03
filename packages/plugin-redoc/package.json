@@ -58,14 +58,14 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@kubb/adapter-oas": "catalog:",
-    "@kubb/core": "catalog:"
+    "@kubb/adapter-oas": "catalog:"
   },
   "devDependencies": {
-    "@internals/utils": "workspace:*"
+    "@internals/utils": "workspace:*",
+    "kubb": "catalog:"
   },
   "peerDependencies": {
-    "@kubb/core": "catalog:"
+    "kubb": "catalog:"
   },
   "engines": {
     "node": ">=22"

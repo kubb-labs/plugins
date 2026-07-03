@@ -1,4 +1,4 @@
-import { ast } from '@kubb/core'
+import { ast } from 'kubb/kit'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
 import { buildReturnStatement } from './returnStatement.ts'

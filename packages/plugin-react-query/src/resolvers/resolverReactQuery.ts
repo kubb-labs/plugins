@@ -1,5 +1,5 @@
 import { camelCase, toFilePath } from '@internals/utils'
-import { defineResolver } from '@kubb/core'
+import { defineResolver } from 'kubb/kit'
 import type { PluginReactQuery } from '../types.ts'
 
 function capitalize(name: string): string {

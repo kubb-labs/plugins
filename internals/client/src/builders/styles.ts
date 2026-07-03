@@ -1,5 +1,5 @@
 import { camelCase, isValidVarName } from '@internals/utils'
-import { ast } from '@kubb/core'
+import { ast } from 'kubb/kit'
 
 type StyledLocation = 'path' | 'query' | 'header' | 'cookie'
 

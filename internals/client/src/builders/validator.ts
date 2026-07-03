@@ -1,4 +1,4 @@
-import type { ast } from '@kubb/core'
+import type { ast } from 'kubb/kit'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import type { ValidatorOptions } from '../types.ts'
 import { buildZodErrorParse, buildZodResponseParse, resolveRequestValidator, resolveResponseValidator } from './validatorOptions.ts'

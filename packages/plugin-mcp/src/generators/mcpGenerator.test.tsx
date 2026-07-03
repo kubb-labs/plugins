@@ -1,9 +1,9 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
 
-import type { Config } from '@kubb/core'
-import { ast, memoryStorage } from '@kubb/core'
+import type { Config } from 'kubb/kit'
+import { ast, memoryStorage } from 'kubb/kit'
 import { resolverClient } from '@internals/client'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from 'kubb/kit/testing'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'

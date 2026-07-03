@@ -1,8 +1,8 @@
 import path from 'node:path'
 import { findSuccessStatusCode, getOperationParameters } from '@internals/shared'
-import { ast, defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from 'kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRenderer } from 'kubb/jsx'
 import { Server } from '../components/Server.tsx'
 import type { PluginMcp } from '../types.ts'
 

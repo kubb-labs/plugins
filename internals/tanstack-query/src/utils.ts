@@ -1,5 +1,5 @@
 import { getOperationParameters, getRequestGroupOptionality } from '@internals/shared'
-import type { ast } from '@kubb/core'
+import type { ast } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
 

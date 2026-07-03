@@ -1,4 +1,4 @@
-import { ast } from '@kubb/core'
+import { ast } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
 import { zodExprFromSchemaNode } from './utils.ts'
 

@@ -1,5 +1,5 @@
-import type { ast } from '@kubb/core'
-import { macroSimplifyUnion } from '@kubb/ast/macros'
+import type { ast } from 'kubb/kit'
+import { macroSimplifyUnion } from 'kubb/ast'
 
 /**
  * Macros the client plugins apply by default, ahead of any user macros. `macroSimplifyUnion`

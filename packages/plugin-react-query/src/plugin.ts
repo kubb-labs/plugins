@@ -1,5 +1,5 @@
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin } from '@kubb/core'
+import { definePlugin } from 'kubb/kit'
 import { resolveClient } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'

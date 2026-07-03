@@ -1,5 +1,5 @@
 import type { ClientSelector } from '@internals/client'
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 /**
  * Builds the parts of a query or mutation key for one operation. Receives the operation node and
@@ -230,7 +230,7 @@ export type Options = OutputOptions & {
  */
 export type ResolvedClient = { kind: 'contract'; pluginName: string }
 
-type ResolvedOptions = {
+export type ResolvedOptions = {
   output: Output
   group: Group | null
   exclude: NonNullable<Options['exclude']>

@@ -8,10 +8,10 @@ import {
   type SecurityDocument,
 } from '@internals/client'
 import { isEventStream, operationFileEntry } from '@internals/shared'
-import { ast, defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRenderer } from 'kubb/jsx'
 import type { PluginAxios } from '../types.ts'
 
 /**

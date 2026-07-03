@@ -1,7 +1,7 @@
 import { resolveClientOperation } from '@internals/client'
-import { ast, defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRenderer } from 'kubb/jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
 import type { PluginMcp } from '../types.ts'
 

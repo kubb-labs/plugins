@@ -1,5 +1,5 @@
 import type { OperationParamsResolver } from '@internals/shared'
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 import type { PrinterFakerNodes } from './printers/printerFaker.ts'
 
 /**
@@ -141,7 +141,7 @@ export type Options = OutputOptions & {
   }
 }
 
-type ResolvedOptions = {
+export type ResolvedOptions = {
   output: Output
   group: Group | null
   exclude: NonNullable<Options['exclude']>

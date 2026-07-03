@@ -1,4 +1,4 @@
-import type { Exclude, Include, Output, Override, PluginFactoryOptions } from '@kubb/core'
+import type { Exclude, Include, Output, Override, PluginFactoryOptions } from 'kubb/kit'
 
 export type Options = {
   /**
@@ -16,7 +16,7 @@ export type Options = {
   }
 }
 
-type ResolveOptions = {
+export type ResolveOptions = {
   output: Output<never>
   name: string
   exclude: Array<Exclude>

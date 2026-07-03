@@ -1,5 +1,5 @@
-import { File } from '@kubb/renderer-jsx'
-import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { File } from 'kubb/jsx'
+import type { KubbReactNode } from 'kubb/jsx'
 
 type Member = {
   className: string

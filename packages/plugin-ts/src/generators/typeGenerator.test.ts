@@ -1,9 +1,9 @@
 import path from 'node:path'
 import { camelCase } from '@internals/utils'
 
-import type { Config, Group } from '@kubb/core'
-import { ast, memoryStorage } from '@kubb/core'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
+import type { Config, Group } from 'kubb/kit'
+import { ast, memoryStorage } from 'kubb/kit'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from 'kubb/kit/testing'
 import { describe, expect, test } from 'vitest'
 import { matchFiles, rawSources } from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'

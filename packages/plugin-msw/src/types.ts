@@ -1,4 +1,4 @@
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 /**
  * Resolver for MSW that provides naming methods for handler functions.
@@ -71,7 +71,7 @@ export type Options = OutputOptions & {
   parser?: 'data' | 'faker'
 }
 
-type ResolvedOptions = {
+export type ResolvedOptions = {
   output: Output
   group: Group | null
   exclude: NonNullable<Options['exclude']>

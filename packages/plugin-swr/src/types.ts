@@ -1,6 +1,6 @@
 import type { ClientSelector } from '@internals/client'
 import type { Transformer } from '@internals/tanstack-query'
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 export type { Transformer } from '@internals/tanstack-query'
 
@@ -165,7 +165,7 @@ export type Options = OutputOptions & {
  */
 export type ResolvedClient = { kind: 'contract'; pluginName: string }
 
-type ResolvedOptions = {
+export type ResolvedOptions = {
   output: Output
   group: Group | undefined
   exclude: NonNullable<Options['exclude']>

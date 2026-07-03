@@ -56,18 +56,13 @@
     "test": "vitest --passWithNoTests",
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
-  "dependencies": {
-    "@kubb/ast": "catalog:",
-    "@kubb/core": "catalog:",
-    "@kubb/renderer-jsx": "catalog:"
-  },
   "devDependencies": {
     "@internals/shared": "workspace:*",
-    "@internals/utils": "workspace:*"
+    "@internals/utils": "workspace:*",
+    "kubb": "catalog:"
   },
   "peerDependencies": {
-    "@kubb/core": "catalog:",
-    "@kubb/renderer-jsx": "catalog:"
+    "kubb": "catalog:"
   },
   "engines": {
     "node": ">=22"

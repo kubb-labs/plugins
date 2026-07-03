@@ -1,6 +1,6 @@
-import { extractRefName, stringify, toRegExpString } from '@kubb/ast/utils'
-import { ast } from '@kubb/core'
-import { syncSchemaRef } from '@kubb/ast/utils'
+import { extractRefName, stringify, toRegExpString } from 'kubb/ast'
+import { ast } from 'kubb/kit'
+import { syncSchemaRef } from 'kubb/ast'
 import type { PluginZod } from './types.ts'
 
 /**
