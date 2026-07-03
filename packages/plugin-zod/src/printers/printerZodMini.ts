@@ -1,7 +1,4 @@
-import { buildList, buildObject, extractRefName, lazyGetter, mapSchemaItems, mapSchemaMembers, mapSchemaProperties, objectKey, stringify } from 'kubb/ast'
-
 import { ast } from 'kubb/kit'
-import { containsCircularRef, syncSchemaRef } from 'kubb/ast'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyMiniModifiers,
@@ -115,9 +112,9 @@ function buildZodMiniObjectShape(ctx: ZodMiniPrinterContext, node: ast.SchemaNod
   if (!objectNode) return '{}'
 
   const isCyclic = (schema: ast.SchemaNode): boolean =>
-    ctx.options.cyclicSchemas != null && containsCircularRef(schema, { circularSchemas: ctx.options.cyclicSchemas })
+    ctx.options.cyclicSchemas != null && ast.containsCircularRef(schema, { circularSchemas: ctx.options.cyclicSchemas })
 
-  const entries = mapSchemaProperties(objectNode, (schema) => {
+  const entries = ast.mapSchemaProperties(objectNode, (schema) => {
     const hasSelfRef = isCyclic(schema)
     const savedCyclicSchemas = ctx.options.cyclicSchemas
     if (hasSelfRef) ctx.options.cyclicSchemas = undefined
@@ -126,7 +123,7 @@ function buildZodMiniObjectShape(ctx: ZodMiniPrinterContext, node: ast.SchemaNod
     return baseOutput
   }).map(({ name: propName, property, output: baseOutput }) => {
     const { schema } = property
-    const meta = syncSchemaRef(schema)
+    const meta = ast.syncSchemaRef(schema)
 
     const value = applyMiniModifiers({
       value: baseOutput,
@@ -137,10 +134,10 @@ function buildZodMiniObjectShape(ctx: ZodMiniPrinterContext, node: ast.SchemaNod
       defaultValue: meta.default,
     })
 
-    return isCyclic(schema) ? lazyGetter({ name: propName, body: value }) : `${objectKey(propName)}: ${value}`
+    return isCyclic(schema) ? ast.lazyGetter({ name: propName, body: value }) : `${ast.objectKey(propName)}: ${value}`
   })
 
-  return buildObject(entries)
+  return ast.buildObject(entries)
 }
 
 /**
@@ -232,7 +229,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         if (!node.name) return null
         // `nameMapping` (keyed by the full $ref) carries the collision-resolved name when the
         // referenced component was renamed; otherwise fall back to the short ref name.
-        const refName = node.ref ? (this.options.nameMapping?.get(node.ref) ?? extractRefName(node.ref) ?? node.name) : node.name
+        const refName = node.ref ? (this.options.nameMapping?.get(node.ref) ?? ast.extractRefName(node.ref) ?? node.name) : node.name
         const resolvedName = node.ref ? (this.options.resolver?.default(refName, 'function') ?? refName) : node.name
 
         if (node.ref && this.options.cyclicSchemas?.has(refName)) {
@@ -269,7 +266,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         return objectBase
       },
       array(node) {
-        const items = mapSchemaItems(node, (item) => this.transform(item))
+        const items = ast.mapSchemaItems(node, (item) => this.transform(item))
           .map(({ output }) => output)
           .filter(Boolean)
         const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: 'unknown' }))!
@@ -278,15 +275,15 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         return node.unique ? `${base}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })` : base
       },
       tuple(node) {
-        const items = mapSchemaItems(node, (item) => this.transform(item))
+        const items = ast.mapSchemaItems(node, (item) => this.transform(item))
           .map(({ output }) => output)
           .filter(Boolean)
 
-        return `z.tuple(${buildList(items)})`
+        return `z.tuple(${ast.buildList(items)})`
       },
       union(node) {
         const nodeMembers = node.members ?? []
-        const members = mapSchemaMembers(node, (memberNode) => this.transform(memberNode))
+        const members = ast.mapSchemaMembers(node, (memberNode) => this.transform(memberNode))
           .map(({ schema, output }) => (output && node.strategy === 'one' ? strictOneOfMember(output, schema) : output))
           .filter(Boolean)
         if (members.length === 0) return ''
@@ -296,10 +293,10 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         // non-objects fall back to z.union.
         const allDiscriminable = nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemaNames))
         if (node.discriminatorPropertyName && allDiscriminable) {
-          return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
+          return `z.discriminatedUnion(${ast.stringify(node.discriminatorPropertyName)}, ${ast.buildList(members)})`
         }
 
-        return `z.union(${buildList(members)})`
+        return `z.union(${ast.buildList(members)})`
       },
       intersection(node) {
         const members = node.members ?? []
@@ -332,7 +329,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
       const transformed = this.transform(node)
       if (!transformed) return null
 
-      const meta = syncSchemaRef(node)
+      const meta = ast.syncSchemaRef(node)
 
       const base = (() => {
         if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed
