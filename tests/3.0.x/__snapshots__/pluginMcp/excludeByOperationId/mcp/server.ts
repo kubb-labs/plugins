@@ -11,8 +11,8 @@ import { uploadFileHandler } from './uploadFile.ts'
 import { findPetsByStatusQueryStatusSchema, findPetsByStatusStatus200Schema } from '../zod/findPetsByStatusSchema.ts'
 import { getInventoryStatus200Schema } from '../zod/getInventorySchema.ts'
 import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema.ts'
-import { placeOrderDataSchema, placeOrderStatus200Schema } from '../zod/placeOrderSchema.ts'
-import { uploadFileDataSchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from '../zod/uploadFileSchema.ts'
+import { placeOrderBodySchema, placeOrderStatus200Schema } from '../zod/placeOrderSchema.ts'
+import { uploadFileBodySchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from '../zod/uploadFileSchema.ts'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
 import { z } from 'zod'
@@ -47,7 +47,7 @@ export function getServer() {
     title: "uploads an image",
     description: "Make a POST request to /pet/{petId}/uploadImage",
     outputSchema: { data: uploadFileStatus200Schema },
-    inputSchema: { path: z.object({ "petId": uploadFilePathPetIdSchema }), query: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }), body: uploadFileDataSchema },
+    inputSchema: { path: z.object({ "petId": uploadFilePathPetIdSchema }), query: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }), body: uploadFileBodySchema },
   }, async ({ path, query, body }, request) => {
     return uploadFileHandler({ path, query, body }, request)
   })
@@ -66,7 +66,7 @@ export function getServer() {
     title: "Place an order for a pet",
     description: "Place a new order in the store",
     outputSchema: { data: placeOrderStatus200Schema },
-    inputSchema: { body: placeOrderDataSchema },
+    inputSchema: { body: placeOrderBodySchema },
   }, async ({ body }, request) => {
     return placeOrderHandler({ body }, request)
   })

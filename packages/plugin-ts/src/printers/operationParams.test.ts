@@ -48,10 +48,10 @@ function makeResolver(overrides: Partial<OperationParamsResolver> = {}): Operati
   const resolveParamName = overrides.resolveParamName ?? ((_node: OperationNode, param: ParameterNode) => param.name)
   return {
     resolveParamName,
-    resolveDataName: () => 'unknown',
-    resolvePathParamsName: resolveParamName,
-    resolveQueryParamsName: resolveParamName,
-    resolveHeaderParamsName: resolveParamName,
+    resolveBodyName: () => 'unknown',
+    resolvePathName: resolveParamName,
+    resolveQueryName: resolveParamName,
+    resolveHeadersName: resolveParamName,
     ...overrides,
   }
 }
@@ -98,7 +98,7 @@ describe('createOperationParams', () => {
         pathParamsType: 'inline',
         resolver: makeResolver({
           resolveParamName: (_node, param) => `Types["${param.name}"]`,
-          resolveDataName: () => 'CreatePetRequest',
+          resolveBodyName: () => 'CreatePetRequest',
         }),
         extraParams: [
           createFunctionParameter({
@@ -245,7 +245,7 @@ describe('createOperationParams', () => {
         pathParamsType: 'inline',
         resolver: makeResolver({
           resolveParamName: (_node, param) => `Types["${param.name}"]`,
-          resolveDataName: () => 'UpdatePetBody',
+          resolveBodyName: () => 'UpdatePetBody',
         }),
         extraParams: [
           createFunctionParameter({
@@ -448,7 +448,7 @@ describe('createOperationParams', () => {
         pathParamsType: 'inline',
         resolver: makeResolver({
           resolveParamName: () => 'unknown',
-          resolveDataName: () => 'CreatePetRequest',
+          resolveBodyName: () => 'CreatePetRequest',
         }),
       })
 
@@ -478,7 +478,7 @@ describe('createOperationParams', () => {
         pathParamsType: 'inline',
         resolver: makeResolver({
           resolveParamName: () => 'unknown',
-          resolveDataName: () => 'UpdatePetRequest',
+          resolveBodyName: () => 'UpdatePetRequest',
         }),
       })
 
@@ -497,7 +497,7 @@ describe('createOperationParams', () => {
   })
 
   describe('resolver with group methods (named group types)', () => {
-    it('uses resolveQueryParamsName for query params in inline mode', () => {
+    it('uses resolveQueryName for query params in inline mode', () => {
       const node = makeOperation({
         parameters: [makePathParam('petId'), makeQueryParam('filter')],
       })
@@ -507,7 +507,7 @@ describe('createOperationParams', () => {
         pathParamsType: 'inline',
         resolver: makeResolver({
           resolveParamName: (_node, param) => `Types["${param.name}"]`,
-          resolveQueryParamsName: () => 'FindPetsQueryParams',
+          resolveQueryName: () => 'FindPetsQueryParams',
         }),
       })
 
@@ -520,7 +520,7 @@ describe('createOperationParams', () => {
       })
     })
 
-    it('uses resolveQueryParamsName for query params in object mode', () => {
+    it('uses resolveQueryName for query params in object mode', () => {
       const node = makeOperation({
         parameters: [makePathParam('petId'), makeQueryParam('status', { required: true })],
       })
@@ -530,7 +530,7 @@ describe('createOperationParams', () => {
         pathParamsType: 'inline',
         resolver: makeResolver({
           resolveParamName: (_node, param) => `Types["${param.name}"]`,
-          resolveQueryParamsName: () => 'FindPetsQueryParams',
+          resolveQueryName: () => 'FindPetsQueryParams',
         }),
       })
 
@@ -546,7 +546,7 @@ describe('createOperationParams', () => {
       }
     })
 
-    it('falls back to inline types when resolveQueryParamsName is not provided', () => {
+    it('falls back to inline types when resolveQueryName is not provided', () => {
       const node = makeOperation({
         parameters: [makeQueryParam('filter')],
       })
@@ -566,7 +566,7 @@ describe('createOperationParams', () => {
       })
     })
 
-    it('uses resolveHeaderParamsName for header params in inline mode', () => {
+    it('uses resolveHeadersName for header params in inline mode', () => {
       const node = makeOperation({
         parameters: [makeHeaderParam('x-api-key', { required: true })],
       })
@@ -576,7 +576,7 @@ describe('createOperationParams', () => {
         pathParamsType: 'inline',
         resolver: makeResolver({
           resolveParamName: () => 'string',
-          resolveHeaderParamsName: () => 'FindPetsHeaderParams',
+          resolveHeadersName: () => 'FindPetsHeaderParams',
         }),
       })
 
@@ -593,7 +593,7 @@ describe('createOperationParams', () => {
       })
     })
 
-    it('uses resolveHeaderParamsName for headers in object mode', () => {
+    it('uses resolveHeadersName for headers in object mode', () => {
       const node = makeOperation({
         parameters: [makePathParam('petId'), makeHeaderParam('x-api-key')],
       })
@@ -603,7 +603,7 @@ describe('createOperationParams', () => {
         pathParamsType: 'inline',
         resolver: makeResolver({
           resolveParamName: () => 'string',
-          resolveHeaderParamsName: () => 'HeaderParams',
+          resolveHeadersName: () => 'HeaderParams',
         }),
       })
 
@@ -619,7 +619,7 @@ describe('createOperationParams', () => {
       }
     })
 
-    it('uses resolvePathParamsName for indexed access types on path params', () => {
+    it('uses resolvePathName for indexed access types on path params', () => {
       const node = makeOperation({
         parameters: [makePathParam('petId'), makePathParam('name', { required: false })],
       })
@@ -629,7 +629,7 @@ describe('createOperationParams', () => {
         pathParamsType: 'inline',
         resolver: makeResolver({
           resolveParamName: (_node, param) => `DeletePetPath${param.name}`,
-          resolvePathParamsName: () => 'DeletePetPathParams',
+          resolvePathName: () => 'DeletePetPathParams',
         }),
       })
 
@@ -709,8 +709,8 @@ describe('createOperationParams', () => {
         pathParamsType: 'inline',
         resolver: makeResolver({
           resolveParamName: (_node, param) => `MaybeRefOrGetter<Types["${param.name}"]>`,
-          resolveDataName: () => 'MaybeRefOrGetter<CreatePetRequest>',
-          resolveQueryParamsName: () => 'MaybeRefOrGetter<FindPetsQueryParams>',
+          resolveBodyName: () => 'MaybeRefOrGetter<CreatePetRequest>',
+          resolveQueryName: () => 'MaybeRefOrGetter<FindPetsQueryParams>',
         }),
       })
 
@@ -815,9 +815,9 @@ describe('createOperationParams', () => {
         pathParamsType: 'inline',
         resolver: makeResolver({
           resolveParamName: (_node, param) => `Types["${param.name}"]`,
-          resolveDataName: () => 'CreatePetRequest',
-          resolveQueryParamsName: () => 'GetPetQueryParams',
-          resolveHeaderParamsName: () => 'GetPetHeaderParams',
+          resolveBodyName: () => 'CreatePetRequest',
+          resolveQueryName: () => 'GetPetQueryParams',
+          resolveHeadersName: () => 'GetPetHeaderParams',
         }),
       })
 
@@ -866,9 +866,9 @@ describe('createOperationParams', () => {
         pathParamsType: 'inline',
         resolver: makeResolver({
           resolveParamName: (_node, param) => `Types["${param.name}"]`,
-          resolveDataName: () => 'CreatePetRequest',
-          resolveQueryParamsName: () => 'GetPetQueryParams',
-          resolveHeaderParamsName: () => 'GetPetHeaderParams',
+          resolveBodyName: () => 'CreatePetRequest',
+          resolveQueryName: () => 'GetPetQueryParams',
+          resolveHeadersName: () => 'GetPetHeaderParams',
         }),
       })
 
@@ -896,8 +896,8 @@ describe('createOperationParams', () => {
         pathParamsType: 'object',
         resolver: makeResolver({
           resolveParamName: (_node, param) => `GetPetByIdPathParams["${param.name}"]`,
-          resolvePathParamsName: () => 'GetPetByIdPathParams',
-          resolveQueryParamsName: () => 'GetPetByIdQueryParams',
+          resolvePathName: () => 'GetPetByIdPathParams',
+          resolveQueryName: () => 'GetPetByIdQueryParams',
         }),
       })
 
@@ -947,7 +947,7 @@ describe('createOperationParams', () => {
         paramsCasing: 'camelcase',
         resolver: makeResolver({
           resolveParamName: (_node, param) => `Types["${param.name}"]`,
-          resolveQueryParamsName: () => 'ListPetsQueryParams',
+          resolveQueryName: () => 'ListPetsQueryParams',
         }),
       })
 
@@ -984,7 +984,7 @@ describe('typeWrapper option', () => {
     const params = createOperationParams(node, {
       paramsType: 'inline',
       pathParamsType: 'inline',
-      resolver: makeResolver({ resolveDataName: () => 'CreatePetRequest' }),
+      resolver: makeResolver({ resolveBodyName: () => 'CreatePetRequest' }),
       typeWrapper: (t) => `MaybeRefOrGetter<${t}>`,
     })
 
@@ -1001,7 +1001,7 @@ describe('typeWrapper option', () => {
       paramsType: 'inline',
       pathParamsType: 'inline',
       resolver: makeResolver({
-        resolveQueryParamsName: () => 'ListPetsQueryParams',
+        resolveQueryName: () => 'ListPetsQueryParams',
       }),
       typeWrapper: (t) => `MaybeRefOrGetter<${t}>`,
     })
@@ -1036,7 +1036,7 @@ describe('pathParamsType: inlineSpread', () => {
       paramsType: 'inline',
       pathParamsType: 'inlineSpread',
       resolver: makeResolver({
-        resolvePathParamsName: () => 'GetPetByIdPathParams',
+        resolvePathName: () => 'GetPetByIdPathParams',
       }),
     })
 
@@ -1060,7 +1060,7 @@ describe('pathParamsType: inlineSpread', () => {
       pathParamsType: 'inlineSpread',
       paramNames: { path: 'args' },
       resolver: makeResolver({
-        resolvePathParamsName: () => 'GetPetByIdPathParams',
+        resolvePathName: () => 'GetPetByIdPathParams',
       }),
     })
 
@@ -1079,7 +1079,7 @@ describe('pathParamsType: inlineSpread', () => {
       paramsType: 'inline',
       pathParamsType: 'inlineSpread',
       resolver: makeResolver({
-        resolvePathParamsName: () => 'GetPetByIdPathParams',
+        resolvePathName: () => 'GetPetByIdPathParams',
       }),
       typeWrapper: (t) => `MaybeRefOrGetter<${t}>`,
     })

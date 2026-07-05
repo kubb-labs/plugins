@@ -16,17 +16,6 @@ export type ResolverTs = Resolver &
      * `resolver.resolveName('list pets status 200') // → 'ListPetsStatus200'`
      */
     resolveTypeName(name: string): string
-    /**
-     * Resolves the file/path name for a given identifier using PascalCase.
-     *
-     * @example Resolving path names
-     * `resolver.resolvePathName('list pets', 'file') // → 'ListPets'`
-     */
-    resolvePathName(name: string, type?: 'file' | 'function' | 'type' | 'const'): string
-    /**
-     * Resolves the request body type name for an operation (required on ResolverTs).
-     */
-    resolveDataName(node: ast.OperationNode): string
 
     /**
      * Resolves the name for an operation response by status code.
@@ -76,23 +65,23 @@ export type ResolverTs = Resolver &
      * Resolves the name for an operation's grouped path parameters type.
      *
      * @example Path parameters names
-     * `resolver.resolvePathParamsName(node, param) // → 'GetPetByIdPathParams'`
+     * `resolver.resolvePathName(node, param) // → 'GetPetByIdPath'`
      */
-    resolvePathParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
+    resolvePathName(node: ast.OperationNode, param: ast.ParameterNode): string
     /**
      * Resolves the name for an operation's grouped query parameters type.
      *
      * @example Query parameters names
-     * `resolver.resolveQueryParamsName(node, param) // → 'FindPetsByStatusQueryParams'`
+     * `resolver.resolveQueryName(node, param) // → 'FindPetsByStatusQuery'`
      */
-    resolveQueryParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
+    resolveQueryName(node: ast.OperationNode, param: ast.ParameterNode): string
     /**
      * Resolves the name for an operation's grouped header parameters type.
      *
      * @example Header parameters names
-     * `resolver.resolveHeaderParamsName(node, param) // → 'DeletePetHeaderParams'`
+     * `resolver.resolveHeadersName(node, param) // → 'DeletePetHeaders'`
      */
-    resolveHeaderParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
+    resolveHeadersName(node: ast.OperationNode, param: ast.ParameterNode): string
   }
 
 type EnumKeyCasing = 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'

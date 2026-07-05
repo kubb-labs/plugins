@@ -16,10 +16,6 @@ export type ResolverSwr = Resolver & {
    */
   resolveName(this: ResolverSwr, name: string): string
   /**
-   * Resolves the output file name for a hook module.
-   */
-  resolvePathName(this: ResolverSwr, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
-  /**
    * Resolves a query hook function name.
    */
   resolveQueryName(this: ResolverSwr, node: ast.OperationNode): string

@@ -9,7 +9,7 @@ export const createPetStatus201Schema = z.object({})
 
 export const createPetResponseSchema = createPetStatus201Schema
 
-export const createPetDataSchema = z.object({
+export const createPetBodySchema = z.object({
   age: z.coerce.number(),
   name: z.coerce.string(),
 })

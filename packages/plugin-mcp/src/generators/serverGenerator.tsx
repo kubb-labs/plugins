@@ -60,7 +60,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         },
       )
 
-      const requestName = node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName(node) : null
+      const requestName = node.requestBody?.content?.[0]?.schema ? zodResolver.resolveBodyName(node) : null
       const successStatus = findSuccessStatusCode(node.responses)
       const responseName = successStatus ? zodResolver.resolveResponseStatusName(node, successStatus) : null
 

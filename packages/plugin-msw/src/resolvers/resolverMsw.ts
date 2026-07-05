@@ -23,9 +23,6 @@ export const resolverMsw = defineResolver<PluginMsw>(() => ({
   resolveName(name) {
     return camelCase(name, { suffix: 'handler' })
   },
-  resolvePathName(name, type) {
-    return this.default(name, type)
-  },
   resolveHandlerName(node) {
     return this.resolveName(node.operationId)
   },

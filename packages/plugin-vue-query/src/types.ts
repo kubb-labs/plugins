@@ -16,10 +16,6 @@ export type ResolverVueQuery = Resolver & {
    */
   resolveName(this: ResolverVueQuery, name: string): string
   /**
-   * Resolves the output file name for a hook module.
-   */
-  resolvePathName(this: ResolverVueQuery, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
-  /**
    * Resolves a query hook function name.
    */
   resolveQueryName(this: ResolverVueQuery, node: ast.OperationNode): string

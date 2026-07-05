@@ -9,10 +9,6 @@ export type ResolverMsw = Resolver & {
    */
   resolveName(this: ResolverMsw, name: string): string
   /**
-   * Resolves the output file name for an MSW handler module.
-   */
-  resolvePathName(this: ResolverMsw, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
-  /**
    * Resolves the handler function name for an operation.
    */
   resolveHandlerName(this: ResolverMsw, node: ast.OperationNode): string

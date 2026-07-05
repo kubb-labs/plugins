@@ -187,12 +187,12 @@ export const typeGenerator = defineGenerator<PluginTs>({
             ...entry.schema,
             description: node.requestBody!.description ?? entry.schema.description,
           },
-          name: resolver.resolveDataName(node),
+          name: resolver.resolveBodyName(node),
           keysToOmit: entry.keysToOmit,
         })
       }
       // Multiple content types — generate individual types + union alias
-      return buildContentTypeVariants(requestBodyContent, resolver.resolveDataName(node), (schema) => ({
+      return buildContentTypeVariants(requestBodyContent, resolver.resolveBodyName(node), (schema) => ({
         ...schema,
         description: node.requestBody!.description ?? schema.description,
       }))

@@ -14,4 +14,4 @@ export const uploadFileStatus200Schema = apiResponseSchema
 
 export const uploadFileResponseSchema = uploadFileStatus200Schema
 
-export const uploadFileDataSchema = z.instanceof(File).optional()
+export const uploadFileBodySchema = z.instanceof(File).optional()

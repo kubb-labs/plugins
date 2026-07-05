@@ -40,17 +40,14 @@ export const resolverZod = defineResolver<PluginZod>(() => {
     resolveTypeName(name) {
       return ensureValidVarName(pascalCase(name, { suffix: 'type' }))
     },
-    resolvePathName(name, type) {
-      return this.default(name, type)
-    },
     resolveParamName(node, param) {
       return this.resolveSchemaName(`${node.operationId} ${param.in} ${param.name}`)
     },
     resolveResponseStatusName(node, statusCode) {
       return this.resolveSchemaName(`${node.operationId} Status ${statusCode}`)
     },
-    resolveDataName(node) {
-      return this.resolveSchemaName(`${node.operationId} Data`)
+    resolveBodyName(node) {
+      return this.resolveSchemaName(`${node.operationId} Body`)
     },
     resolveResponsesName(node) {
       return this.resolveSchemaName(`${node.operationId} Responses`)
@@ -61,13 +58,13 @@ export const resolverZod = defineResolver<PluginZod>(() => {
     resolveErrorName(node) {
       return this.resolveSchemaName(`${node.operationId} Error`)
     },
-    resolvePathParamsName(node, param) {
+    resolvePathName(node, param) {
       return this.resolveParamName(node, param)
     },
-    resolveQueryParamsName(node, param) {
+    resolveQueryName(node, param) {
       return this.resolveParamName(node, param)
     },
-    resolveHeaderParamsName(node, param) {
+    resolveHeadersName(node, param) {
       return this.resolveParamName(node, param)
     },
   }

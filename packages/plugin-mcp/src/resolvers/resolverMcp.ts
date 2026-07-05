@@ -26,9 +26,6 @@ export const resolverMcp = defineResolver<PluginMcp>(() => ({
   resolveName(name) {
     return this.default(name, 'function')
   },
-  resolvePathName(name, type) {
-    return this.default(name, type)
-  },
   resolveHandlerName(node) {
     return this.resolveName(node.operationId)
   },

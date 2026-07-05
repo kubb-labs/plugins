@@ -57,7 +57,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const successResponses = getOperationSuccessResponses(node)
     const hasSuccessSchema = successResponses.some((response) => !!response.content?.[0]?.schema)
 
-    const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
+    const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveBodyName(node) : null
 
     return (
       <File

@@ -13,4 +13,4 @@ export const addPetResponseSchema = addPetStatus200Schema
 
 export const addPetErrorSchema = addPetStatus405Schema
 
-export const addPetDataSchema = z.object({})
+export const addPetBodySchema = z.object({})

@@ -15,19 +15,12 @@ export type ResolverFaker = Resolver &
      */
     resolveName(this: ResolverFaker, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
     /**
-     * Resolves the output file name for a faker module.
-     *
-     * @example Resolving faker file names
-     * `resolver.resolvePathName('show pet by id', 'file') // -> 'showPetById'`
-     */
-    resolvePathName(this: ResolverFaker, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
-    /**
      * Resolves the faker function name for a request body.
      *
      * @example Resolving data function names
-     * `resolver.resolveDataName(node) // -> 'createPetsData'`
+     * `resolver.resolveBodyName(node) // -> 'createPetsBody'`
      */
-    resolveDataName(this: ResolverFaker, node: ast.OperationNode): string
+    resolveBodyName(this: ResolverFaker, node: ast.OperationNode): string
     /**
      * Resolves the faker function name for a response by status code.
      *
@@ -53,23 +46,23 @@ export type ResolverFaker = Resolver &
      * Resolves the faker function name for path parameters.
      *
      * @example Path parameters names
-     * `resolver.resolvePathParamsName(node, param) // -> 'showPetByIdPathPetId'`
+     * `resolver.resolvePathName(node, param) // -> 'showPetByIdPathPetId'`
      */
-    resolvePathParamsName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
+    resolvePathName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
     /**
      * Resolves the faker function name for query parameters.
      *
      * @example Query parameters names
-     * `resolver.resolveQueryParamsName(node, param) // -> 'listPetsQueryLimit'`
+     * `resolver.resolveQueryName(node, param) // -> 'listPetsQueryLimit'`
      */
-    resolveQueryParamsName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
+    resolveQueryName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
     /**
      * Resolves the faker function name for header parameters.
      *
      * @example Header parameters names
-     * `resolver.resolveHeaderParamsName(node, param) // -> 'deletePetHeaderApiKey'`
+     * `resolver.resolveHeadersName(node, param) // -> 'deletePetHeaderApiKey'`
      */
-    resolveHeaderParamsName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
+    resolveHeadersName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
   }
 
 /**

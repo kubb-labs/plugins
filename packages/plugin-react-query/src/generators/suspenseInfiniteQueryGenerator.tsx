@@ -65,8 +65,8 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
 
     const rawQueryParams = getOperationParameters(node, { paramsCasing: 'original' }).query
     const queryParamsTypeName =
-      rawQueryParams.length > 0 && tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!) !== tsResolver.resolveParamName(node, rawQueryParams[0]!)
-        ? tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
+      rawQueryParams.length > 0 && tsResolver.resolveQueryName(node, rawQueryParams[0]!) !== tsResolver.resolveParamName(node, rawQueryParams[0]!)
+        ? tsResolver.resolveQueryName(node, rawQueryParams[0]!)
         : null
 
     const importedTypeNames = [

@@ -15,4 +15,4 @@ export const placeOrderPatchResponseSchema = placeOrderPatchStatus200Schema
 
 export const placeOrderPatchErrorSchema = placeOrderPatchStatus405Schema
 
-export const placeOrderPatchDataSchema = z.object({}).describe('Order payload')
+export const placeOrderPatchBodySchema = z.object({}).describe('Order payload')

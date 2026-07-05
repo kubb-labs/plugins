@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { CreatePetsResponse, CreatePetsData } from './CreatePets'
+import type { CreatePetsResponse, CreatePetsBody } from './CreatePets'
 import type { HttpResponseResolver } from 'msw'
 import { createCreatePetsResponse } from './createCreatePets'
 import { http } from 'msw'
@@ -14,8 +14,8 @@ export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
   })
 }
 
-export function createPetsHandler(data?: CreatePetsResponse | HttpResponseResolver<Record<string, string>, CreatePetsData>) {
-  return http.post<Record<string, string>, CreatePetsData>('/pets', function handler(info) {
+export function createPetsHandler(data?: CreatePetsResponse | HttpResponseResolver<Record<string, string>, CreatePetsBody>) {
+  return http.post<Record<string, string>, CreatePetsBody>('/pets', function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data || createCreatePetsResponse(data)), {

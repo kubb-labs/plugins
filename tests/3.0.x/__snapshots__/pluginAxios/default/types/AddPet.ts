@@ -27,27 +27,27 @@ export type AddPetStatus405 = any;
  * @description Create a new pet in the store
  * @type object
 */
-export type AddPetJsonData = AddPetRequest;
+export type AddPetBodyJson = AddPetRequest;
 
 /**
  * @description Create a new pet in the store
  * @type object
 */
-export type AddPetXmlData = Pet;
+export type AddPetBodyXml = Pet;
 
 /**
  * @description Create a new pet in the store
  * @type object
 */
-export type AddPetFormUrlEncodedData = Pet;
+export type AddPetBodyFormUrlEncoded = Pet;
 
-export type AddPetData = (AddPetJsonData | AddPetXmlData | AddPetFormUrlEncodedData);
+export type AddPetBody = (AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded);
 
 /**
  * @type object
 */
 export type AddPetRequestConfig = {
-    body: AddPetData;
+    body: AddPetBody;
     path?: never;
     query?: never;
     headers?: never;

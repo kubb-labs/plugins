@@ -178,8 +178,8 @@ export function resolveOperationOverrides<TOptions>(node: ast.OperationNode, ove
 
 type ZodSchemaNameResolverLike = {
   resolveResponseName?: (node: ast.OperationNode) => string | undefined
-  resolveDataName?: (node: ast.OperationNode) => string | undefined
-  resolveQueryParamsName?: (node: ast.OperationNode, param: ast.ParameterNode) => string | undefined
+  resolveBodyName?: (node: ast.OperationNode) => string | undefined
+  resolveQueryName?: (node: ast.OperationNode, param: ast.ParameterNode) => string | undefined
 }
 
 type ParserOption = false | 'zod' | { request?: 'zod'; response?: 'zod' } | undefined
@@ -228,8 +228,8 @@ export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodS
   const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'original' })
   return [
     resolveResponseParser(parser) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
-    resolveRequestParser(parser) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,
-    resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null,
+    resolveRequestParser(parser) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveBodyName?.(node) : null,
+    resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryName?.(node, queryParams[0]!) : null,
   ].filter((n): n is string => Boolean(n))
 }
 

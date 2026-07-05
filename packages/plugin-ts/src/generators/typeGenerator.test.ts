@@ -142,7 +142,7 @@ describe('typeGenerator — custom resolver', () => {
 
     expect(source).toContain('export type ApiCreatePetStatus201 = ApiPet')
     expect(source).toContain('export type ApiCreatePetStatus400 = ApiErrorResponse')
-    expect(source).toContain('export type ApiCreatePetData = ApiNewPet')
+    expect(source).toContain('export type ApiCreatePetBody = ApiNewPet')
     expect(source).toContain("import type { ApiPet } from './Pet.ts'")
     expect(source).toContain("import type { ApiErrorResponse } from './ErrorResponse.ts'")
     expect(source).toContain("import type { ApiNewPet } from './NewPet.ts'")

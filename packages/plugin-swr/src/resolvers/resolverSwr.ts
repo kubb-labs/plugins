@@ -23,9 +23,6 @@ export const resolverSwr = defineResolver<PluginSwr>(() => ({
   resolveName(name) {
     return this.default(name, 'function')
   },
-  resolvePathName(name, type) {
-    return this.default(name, type)
-  },
   resolveQueryName(node) {
     return `use${capitalize(this.resolveName(node.operationId))}`
   },
