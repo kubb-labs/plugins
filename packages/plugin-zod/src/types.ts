@@ -1,5 +1,5 @@
 import type { OperationParamsResolver } from '@internals/shared'
-import type { ast, DeepPartial, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, ResolverOverride, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 import type { PrinterZodNodes } from './printers/printerZod.ts'
 import type { PrinterZodMiniNodes } from './printers/printerZodMini.ts'
 
@@ -166,7 +166,7 @@ export type Options = OutputOptions & {
    * Override how schema and operation names are built. Methods you omit fall back
    * to the default `resolverZod`.
    */
-  resolver?: DeepPartial<ResolverZod> & ThisType<ResolverZod>
+  resolver?: ResolverOverride<ResolverZod> & ThisType<ResolverZod>
   /**
    * Replace the Zod handler for a specific schema type (`'integer'`, `'date'`, ...).
    * When `mini: true`, overrides target the Zod Mini printer instead.

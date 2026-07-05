@@ -1,4 +1,4 @@
-import type { ast, DeepPartial, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, ResolverOverride, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 /**
  * Resolver for Cypress that provides naming methods for test functions.
@@ -40,7 +40,7 @@ export type Options = OutputOptions & {
   /**
    * Override how helper names and file paths are built.
    */
-  resolver?: DeepPartial<ResolverCypress> & ThisType<ResolverCypress>
+  resolver?: ResolverOverride<ResolverCypress> & ThisType<ResolverCypress>
   /**
    * Macros applied to each operation node before printing.
    */

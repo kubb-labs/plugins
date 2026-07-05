@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import path from 'node:path'
 import { camelCase, ensureValidVarName, toFilePath } from '@internals/utils'
 import { defineResolver } from 'kubb/kit'
-import type { PluginFaker, ResolverFaker } from '../types.ts'
+import type { PluginFaker } from '../types.ts'
 
 /**
  * Default resolver used by `@kubb/plugin-faker`. Decides the names and file
@@ -27,10 +27,10 @@ export const resolverFaker = defineResolver<PluginFaker>(() => {
       fileName(name) {
         return toFilePath(name, (part) => camelCase(part, { prefix: 'create' }))
       },
-      file(this: ResolverFaker, { name, extname, tag, path: groupPath }, context) {
-        const resolvedName = context.output.mode === 'file' ? '' : this.core.fileName(name)
+      file(resolver, { name, extname, tag, path: groupPath }, context) {
+        const resolvedName = context.output.mode === 'file' ? '' : resolver.core.fileName(name)
         const inputBaseName = `${resolvedName}${extname}` as `${string}.${string}`
-        const filePath = this.core.path(
+        const filePath = resolver.core.path(
           {
             baseName: inputBaseName,
             tag,
@@ -47,7 +47,7 @@ export const resolverFaker = defineResolver<PluginFaker>(() => {
           path: filePath,
           baseName,
           extname,
-          meta: { pluginName: this.pluginName },
+          meta: { pluginName: resolver.pluginName },
           sources: [],
           imports: [],
           exports: [],

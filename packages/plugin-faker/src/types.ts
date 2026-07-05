@@ -1,5 +1,5 @@
 import type { OperationParamsResolver } from '@internals/shared'
-import type { ast, DeepPartial, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, ResolverOverride, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 import type { PrinterFakerNodes } from './printers/printerFaker.ts'
 
 /**
@@ -120,7 +120,7 @@ export type Options = OutputOptions & {
    * Override the naming of generated factory helpers. Common use: append `Mock` or
    * `Factory` so helpers do not clash with imported types.
    */
-  resolver?: DeepPartial<ResolverFaker> & ThisType<ResolverFaker>
+  resolver?: ResolverOverride<ResolverFaker> & ThisType<ResolverFaker>
   /**
    * Macros applied to schema and operation nodes before printing.
    */
