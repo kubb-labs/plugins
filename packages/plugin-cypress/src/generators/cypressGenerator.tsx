@@ -26,15 +26,15 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const importedTypeNames = [tsResolver.resolveRequestConfigName(node), ...resolveOperationTypeNames(node, tsResolver, { includeParams: false })]
+    const importedTypeNames = [tsResolver.response.config(node), ...resolveOperationTypeNames(node, tsResolver, { includeParams: false })]
 
     const meta = {
-      name: resolver.resolveName(node.operationId),
-      file: resolver.core.file(
+      name: resolver.name(node.operationId),
+      file: resolver.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output, group: group ?? undefined },
       ),
-      fileTs: tsResolver.core.file(
+      fileTs: tsResolver.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
@@ -49,8 +49,8 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.core.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.core.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {meta.fileTs && importedTypeNames.length > 0 && <File.Import name={importedTypeNames} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
         <Request name={meta.name} node={node} resolver={tsResolver} baseURL={baseURL} />

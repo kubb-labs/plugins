@@ -8,64 +8,63 @@ import type { PluginTs } from '../types.ts'
  * to reference the exact names `plugin-ts` produces without duplicating the
  * casing/file-layout rules.
  *
- * The `core` helpers are supplied by `defineResolver`. This plugin overrides them to use PascalCase
- * for value and type names and PascalCase file paths (dotted names become `/`-joined) for files.
+ * The `default` helpers are supplied by `defineResolver`. This plugin overrides the top-level `name`
+ * to use PascalCase for value and type names and `file` to write PascalCase file paths (dotted names
+ * become `/`-joined), and groups the operation-specific naming under the `param`, `response`, and
+ * `enum` namespaces.
  *
  * @example Resolve a type and file name
  * ```ts
  * import { resolverTs } from '@kubb/plugin-ts'
  *
- * resolverTs.core.name('list pets')                // 'ListPets'
- * resolverTs.core.fileName('list pets')            // 'ListPets'
- * resolverTs.resolveResponseStatusName(node, 200)  // 'ListPetsStatus200'
+ * resolverTs.name('list pets')                     // 'ListPets'
+ * resolverTs.response.status(node, 200)            // 'ListPetsStatus200'
  * ```
  */
-export const resolverTs = defineResolver<PluginTs>(() => {
-  return {
-    name: 'default',
-    pluginName: 'plugin-ts',
-    core: {
-      name(name) {
-        return ensureValidVarName(pascalCase(name))
-      },
-      fileName(name) {
-        return toFilePath(name, pascalCase)
-      },
+export const resolverTs = defineResolver<PluginTs>(() => ({
+  pluginName: 'plugin-ts',
+  name(name) {
+    return ensureValidVarName(pascalCase(name))
+  },
+  file(params, context) {
+    return this.default.file({ ...params, resolveName: (name) => toFilePath(name, pascalCase) }, context)
+  },
+  param: {
+    name(node, param) {
+      return this.name(`${node.operationId} ${param.in} ${param.name}`)
     },
-    resolveTypeName(name) {
-      return this.core.name(name)
+    path(node, param) {
+      return this.param.name(node, param)
     },
-    resolveParamName(node, param) {
-      return this.resolveTypeName(`${node.operationId} ${param.in} ${param.name}`)
+    query(node, param) {
+      return this.param.name(node, param)
     },
-    resolveResponseStatusName(node, statusCode) {
-      return this.resolveTypeName(`${node.operationId} Status ${statusCode}`)
+    headers(node, param) {
+      return this.param.name(node, param)
     },
-    resolveBodyName(node) {
-      return this.resolveTypeName(`${node.operationId} Body`)
+  },
+  response: {
+    status(node, statusCode) {
+      return this.name(`${node.operationId} Status ${statusCode}`)
     },
-    resolveRequestConfigName(node) {
-      // NOTE(v5-stable): the `RequestConfig` suffix is kept through the beta to avoid churn, but it
-      // overlaps with the runtime client's `RequestConfig`. Revisit renaming to `Request` before stable.
-      return this.resolveTypeName(`${node.operationId} RequestConfig`)
+    // NOTE(v5-stable): the `RequestConfig` suffix is kept through the beta to avoid churn, but it
+    // overlaps with the runtime client's `RequestConfig`. Revisit renaming to `Request` before stable.
+    config(node) {
+      return this.name(`${node.operationId} RequestConfig`)
     },
-    resolveResponsesName(node) {
-      return this.resolveTypeName(`${node.operationId} Responses`)
+    responses(node) {
+      return this.name(`${node.operationId} Responses`)
     },
-    resolveResponseName(node) {
-      return this.resolveTypeName(`${node.operationId} Response`)
+    response(node) {
+      return this.name(`${node.operationId} Response`)
     },
-    resolveEnumKeyName(node, enumTypeSuffix = 'key') {
-      return `${this.resolveTypeName(node.name ?? '')}${enumTypeSuffix}`
+    body(node) {
+      return this.name(`${node.operationId} Body`)
     },
-    resolvePathName(node, param) {
-      return this.resolveParamName(node, param)
+  },
+  enum: {
+    keyName(node, enumTypeSuffix = 'key') {
+      return `${this.name(node.name ?? '')}${enumTypeSuffix}`
     },
-    resolveQueryName(node, param) {
-      return this.resolveParamName(node, param)
-    },
-    resolveHeadersName(node, param) {
-      return this.resolveParamName(node, param)
-    },
-  }
-})
+  },
+}))

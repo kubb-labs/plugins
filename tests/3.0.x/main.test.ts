@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { getRelativePath } from '@internals/utils'
+import { ensureValidVarName, getRelativePath, pascalCase } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
 import { AsyncEventEmitter, createKubb } from '@kubb/core'
 import { type Config, Diagnostics, type KubbHooks } from 'kubb/kit'
@@ -388,7 +388,7 @@ const configs = [
   },
   {
     /**
-     * Verifies that `resolver.resolveName` override is applied.
+     * Verifies that `resolver.name` override is applied.
      * Every operation-derived name (params, responses, etc.) gets a `Custom` prefix
      * while schema type names (which use `default(name, 'type')`) are unaffected.
      * Returning `null`/`undefined` from any method falls back to the preset resolver.
@@ -404,13 +404,13 @@ const configs = [
         pluginTs({
           output: { path: './types', barrel: false },
           resolver: {
-            core: {
+            default: {
               banner() {
                 return '// Custom banner'
               },
             },
-            resolveTypeName(name) {
-              return `Custom${this.core.name(name)}`
+            name(name) {
+              return `Custom${ensureValidVarName(pascalCase(name))}`
             },
           },
         }),

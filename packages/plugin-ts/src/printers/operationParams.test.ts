@@ -44,15 +44,26 @@ function makeHeaderParam(name: string, opts: { required?: boolean } = {}) {
   })
 }
 
-function makeResolver(overrides: Partial<OperationParamsResolver> = {}): OperationParamsResolver {
-  const resolveParamName = overrides.resolveParamName ?? ((_node: OperationNode, param: ParameterNode) => param.name)
+type ResolverOverrides = {
+  resolveParamName?: (node: OperationNode, param: ParameterNode) => string
+  resolveBodyName?: (node: OperationNode) => string
+  resolvePathName?: (node: OperationNode, param: ParameterNode) => string
+  resolveQueryName?: (node: OperationNode, param: ParameterNode) => string
+  resolveHeadersName?: (node: OperationNode, param: ParameterNode) => string
+}
+
+function makeResolver(overrides: ResolverOverrides = {}): OperationParamsResolver {
+  const name = overrides.resolveParamName ?? ((_node: OperationNode, param: ParameterNode) => param.name)
   return {
-    resolveParamName,
-    resolveBodyName: () => 'unknown',
-    resolvePathName: resolveParamName,
-    resolveQueryName: resolveParamName,
-    resolveHeadersName: resolveParamName,
-    ...overrides,
+    param: {
+      name,
+      path: overrides.resolvePathName ?? name,
+      query: overrides.resolveQueryName ?? name,
+      headers: overrides.resolveHeadersName ?? name,
+    },
+    response: {
+      body: overrides.resolveBodyName ?? (() => 'unknown'),
+    },
   }
 }
 

@@ -69,7 +69,7 @@ export function buildGroupedRequestParam(
 
   // Drop the groups this binding never destructures (the query key omits `headers`), so a group
   // that is required elsewhere does not leak into a binding that does not carry it.
-  const requestConfigName = resolver.resolveRequestConfigName(node)
+  const requestConfigName = resolver.response.config(node)
   const omittedKeys = requestGroupOrder.filter((key) => !keys.includes(key))
   const requestConfigType = omittedKeys.length > 0 ? `Omit<${requestConfigName}, ${omittedKeys.map((key) => `'${key}'`).join(' | ')}>` : requestConfigName
 
@@ -177,9 +177,13 @@ export function resolveOperationOverrides<TOptions>(node: ast.OperationNode, ove
 }
 
 type ZodSchemaNameResolverLike = {
-  resolveResponseName?: (node: ast.OperationNode) => string | undefined
-  resolveBodyName?: (node: ast.OperationNode) => string | undefined
-  resolveQueryName?: (node: ast.OperationNode, param: ast.ParameterNode) => string | undefined
+  response?: {
+    response?: (node: ast.OperationNode) => string | undefined
+    body?: (node: ast.OperationNode) => string | undefined
+  }
+  param?: {
+    query?: (node: ast.OperationNode, param: ast.ParameterNode) => string | undefined
+  }
 }
 
 type ParserOption = false | 'zod' | { request?: 'zod'; response?: 'zod' } | undefined
@@ -227,9 +231,9 @@ export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodS
   if (!zodResolver || !parser) return []
   const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'original' })
   return [
-    resolveResponseParser(parser) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
-    resolveRequestParser(parser) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveBodyName?.(node) : null,
-    resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryName?.(node, queryParams[0]!) : null,
+    resolveResponseParser(parser) === 'zod' ? zodResolver.response?.response?.(node) : null,
+    resolveRequestParser(parser) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.response?.body?.(node) : null,
+    resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.param?.query?.(node, queryParams[0]!) : null,
   ].filter((n): n is string => Boolean(n))
 }
 

@@ -49,14 +49,14 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
     const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output })
     if (!contractOp) return null
 
-    const queryName = resolver.resolveSuspenseInfiniteQueryName(node)
-    const queryOptionsName = resolver.resolveSuspenseInfiniteQueryOptionsName(node)
-    const queryKeyName = resolver.resolveSuspenseInfiniteQueryKeyName(node)
-    const queryKeyTypeName = resolver.resolveSuspenseInfiniteQueryKeyTypeName(node)
+    const queryName = resolver.suspenseInfiniteQuery.name(node)
+    const queryOptionsName = resolver.suspenseInfiniteQuery.optionsName(node)
+    const queryKeyName = resolver.suspenseInfiniteQuery.keyName(node)
+    const queryKeyTypeName = resolver.suspenseInfiniteQuery.keyTypeName(node)
 
     const meta = {
-      file: resolver.core.file(operationFileEntry(node, queryName), { root, output, group: group ?? undefined }),
-      fileTs: tsResolver.core.file(operationFileEntry(node, node.operationId), {
+      file: resolver.file(operationFileEntry(node, queryName), { root, output, group: group ?? undefined }),
+      fileTs: tsResolver.file(operationFileEntry(node, node.operationId), {
         root,
         output: pluginTs.options?.output ?? output,
         group: pluginTs.options?.group ?? undefined,
@@ -65,12 +65,12 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
 
     const rawQueryParams = getOperationParameters(node, { paramsCasing: 'original' }).query
     const queryParamsTypeName =
-      rawQueryParams.length > 0 && tsResolver.resolveQueryName(node, rawQueryParams[0]!) !== tsResolver.resolveParamName(node, rawQueryParams[0]!)
-        ? tsResolver.resolveQueryName(node, rawQueryParams[0]!)
+      rawQueryParams.length > 0 && tsResolver.param.query(node, rawQueryParams[0]!) !== tsResolver.param.name(node, rawQueryParams[0]!)
+        ? tsResolver.param.query(node, rawQueryParams[0]!)
         : null
 
     const importedTypeNames = [
-      tsResolver.resolveRequestConfigName(node),
+      tsResolver.response.config(node),
       queryParamsTypeName,
       ...resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first', includeParams: false }),
     ].filter((name): name is string => Boolean(name))
@@ -82,8 +82,8 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.core.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.core.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
         <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />

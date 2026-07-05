@@ -3,15 +3,7 @@ import type { ast, ResolverOverride, Exclude, Group, Include, Output, OutputOpti
 /**
  * Resolver for Cypress that provides naming methods for test functions.
  */
-export type ResolverCypress = Resolver & {
-  /**
-   * Resolves the function name for an operation.
-   *
-   * @example Resolving function names
-   * `resolver.resolveName('show pet by id') // -> 'showPetById'`
-   */
-  resolveName(this: ResolverCypress, name: string): string
-}
+export type ResolverCypress = Resolver
 
 /**
  * Where the generated Cypress helpers are written and how they are exported, plus the optional

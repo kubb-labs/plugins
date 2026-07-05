@@ -57,20 +57,16 @@ export function canOverrideSchema(node: ast.SchemaNode): boolean {
 /**
  * Resolves a parameter name based on its location (path, query, header, etc.) using the provided resolver.
  */
-export function resolveParamNameByLocation(
-  resolver: Pick<ResolverFaker, 'resolvePathName' | 'resolveQueryName' | 'resolveHeadersName' | 'resolveParamName'>,
-  node: ast.OperationNode,
-  param: ast.ParameterNode,
-): string {
-  switch (param.in) {
+export function resolveParamNameByLocation(param: ResolverFaker['param'], node: ast.OperationNode, paramNode: ast.ParameterNode): string {
+  switch (paramNode.in) {
     case 'path':
-      return resolver.resolvePathName(node, param)
+      return param.path(node, paramNode)
     case 'query':
-      return resolver.resolveQueryName(node, param)
+      return param.query(node, paramNode)
     case 'header':
-      return resolver.resolveHeadersName(node, param)
+      return param.headers(node, paramNode)
     default:
-      return resolver.resolveParamName(node, param)
+      return param.name(node, paramNode)
   }
 }
 
@@ -116,12 +112,12 @@ export function buildResponseUnionSchema(node: ast.OperationNode, resolver: Reso
       return schema
     }
 
-    return ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, responses[0]!.statusCode) })
+    return ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, responses[0]!.statusCode) })
   }
 
   return ast.factory.createSchema({
     type: 'union',
-    members: responses.map((response) => ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, response.statusCode) })),
+    members: responses.map((response) => ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, response.statusCode) })),
   })
 }
 

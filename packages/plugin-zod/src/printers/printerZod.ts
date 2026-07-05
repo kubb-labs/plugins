@@ -319,8 +319,8 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         const useInputVariant = node.ref != null && this.options.direction === 'input' && containsCodec(node)
         const resolvedName = node.ref
           ? useInputVariant
-            ? (this.options.resolver?.resolveInputSchemaName(refName) ?? refName)
-            : (this.options.resolver?.core.name(refName) ?? refName)
+            ? (this.options.resolver?.schema.inputName(refName) ?? refName)
+            : (this.options.resolver?.name(refName) ?? refName)
           : node.name
 
         if (node.ref && this.options.cyclicSchemas?.has(refName)) {

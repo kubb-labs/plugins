@@ -5,17 +5,18 @@ import type { ast, ResolverOverride, Exclude, Group, Include, Output, OutputOpti
  */
 export type ResolverMsw = Resolver & {
   /**
-   * Resolves the base handler function name for an operation.
+   * Naming for generated MSW handlers.
    */
-  resolveName(this: ResolverMsw, name: string): string
-  /**
-   * Resolves the handler function name for an operation.
-   */
-  resolveHandlerName(this: ResolverMsw, node: ast.OperationNode): string
-  /**
-   * Resolves the exported handlers collection name.
-   */
-  resolveHandlersName(this: ResolverMsw): string
+  handler: {
+    /**
+     * Resolves the handler function name for an operation.
+     */
+    name(node: ast.OperationNode): string
+    /**
+     * Resolves the exported handlers collection name.
+     */
+    listName(): string
+  }
 }
 
 /**

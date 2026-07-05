@@ -26,23 +26,27 @@ import {
 } from './operation.ts'
 
 const resolver: RequestConfigResolver & ResponseNameResolver & ResponseStatusNameResolver & OperationTypeNameResolver = {
-  resolveBodyName(node) {
-    return `${node.operationId}Data`
+  param: {
+    path(_node, param) {
+      return `${param.name}PathParams`
+    },
+    query(_node, param) {
+      return `${param.name}QueryParams`
+    },
+    headers(_node, param) {
+      return `${param.name}HeaderParams`
+    },
   },
-  resolvePathName(_node, param) {
-    return `${param.name}PathParams`
-  },
-  resolveQueryName(_node, param) {
-    return `${param.name}QueryParams`
-  },
-  resolveHeadersName(_node, param) {
-    return `${param.name}HeaderParams`
-  },
-  resolveResponseName(node) {
-    return `${node.operationId}Response`
-  },
-  resolveResponseStatusName(_node, statusCode) {
-    return `Status${statusCode}`
+  response: {
+    body(node) {
+      return `${node.operationId}Data`
+    },
+    response(node) {
+      return `${node.operationId}Response`
+    },
+    status(_node, statusCode) {
+      return `Status${statusCode}`
+    },
   },
 }
 

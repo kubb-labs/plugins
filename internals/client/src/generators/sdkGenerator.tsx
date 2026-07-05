@@ -47,16 +47,16 @@ type Controller = {
 }
 
 function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
-  return [tsResolver.resolveRequestConfigName(node), tsResolver.resolveResponsesName(node)]
+  return [tsResolver.response.config(node), tsResolver.response.responses(node)]
 }
 
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod, validator: ValidatorOptions): Array<string> {
   const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'original' })
   const names: Array<string | null | undefined> = [
-    resolveResponseValidator(validator) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
+    resolveResponseValidator(validator) === 'zod' ? zodResolver.response.response(node) : null,
     resolveResponseValidator(validator) === 'zod' ? (buildZodErrorParse(node, zodResolver)?.expression ?? null) : null,
-    resolveRequestValidator(validator) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveBodyName?.(node) : null,
-    resolveQueryParamsValidator(validator) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryName?.(node, queryParams[0]!) : null,
+    resolveRequestValidator(validator) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.response.body(node) : null,
+    resolveQueryParamsValidator(validator) === 'zod' && queryParams.length > 0 ? zodResolver.param.query(node, queryParams[0]!) : null,
   ]
   return names.filter((n): n is string => Boolean(n))
 }
@@ -77,14 +77,14 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
   const document = ctx.adapter.document as SecurityDocument | null | undefined
 
   function buildOperationData(node: ast.OperationNode): OperationData {
-    const typeFile = tsResolver.core.file(operationFileEntry(node, node.operationId), {
+    const typeFile = tsResolver.file(operationFileEntry(node, node.operationId), {
       root,
       output: tsPluginOptions?.output ?? output,
       group: tsPluginOptions?.group,
     })
     const zodFile =
       zodResolver && pluginZod?.options
-        ? zodResolver.core.file(operationFileEntry(node, node.operationId), {
+        ? zodResolver.file(operationFileEntry(node, node.operationId), {
             root,
             output: pluginZod.options?.output ?? output,
             group: pluginZod.options?.group ?? undefined,
@@ -93,14 +93,14 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
 
     const security = ast.isHttpOperationNode(node) ? getOperationSecurity({ document, method: node.method, path: node.path }) : undefined
 
-    return { node, name: resolver.resolveName(node.operationId), tsResolver, zodResolver, typeFile, zodFile, security }
+    return { node, name: resolver.name(node.operationId), tsResolver, zodResolver, typeFile, zodFile, security }
   }
 
   return nodes.reduce((acc, operationNode) => {
     if (!ast.isHttpOperationNode(operationNode)) return acc
     const tag = operationNode.tags[0]
-    const name = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.resolveGroupName(tag)) : resolver.resolveClassName('ApiClient')
-    const file = resolver.core.file({ name, extname: '.ts', tag }, { root, output, group: group ?? undefined })
+    const name = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.groupName(tag)) : resolver.className('ApiClient')
+    const file = resolver.file({ name, extname: '.ts', tag }, { root, output, group: group ?? undefined })
     const operationData = buildOperationData(operationNode)
     const previous = acc.find((item) => item.file.path === file.path)
 
@@ -155,8 +155,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
       const controllers = buildControllers(nodes, ctx)
       const clientPath = path.resolve(root, '.kubb/client.ts')
 
-      const banner = (file: ast.FileNode) => resolver.core.banner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
-      const footer = (file: ast.FileNode) => resolver.core.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
+      const banner = (file: ast.FileNode) => resolver.default.banner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
+      const footer = (file: ast.FileNode) => resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
 
       const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
         const { namesByPath: typeNamesByPath, filesByPath: typeFilesByPath } = collectImportsByFile(ops, (op) => ({
@@ -191,8 +191,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
       // `flat` collapses every operation into one class named by `sdk.name`, so callers reach
       // an operation as `new PetStore(config).getPetById(...)` without a per-tag sub-client.
       if (sdk.mode === 'flat') {
-        const flatName = resolver.resolveClassName(sdk.name ?? 'sdk')
-        const flatFile = resolver.core.file({ name: sdk.name ?? 'sdk', extname: '.ts' }, { root, output, group: group ?? undefined })
+        const flatName = resolver.className(sdk.name ?? 'sdk')
+        const flatFile = resolver.file({ name: sdk.name ?? 'sdk', extname: '.ts' }, { root, output, group: group ?? undefined })
         const allOps = controllers.flatMap((controller) => controller.operations)
 
         return renderClassFile(flatName, flatFile, allOps)
@@ -202,9 +202,9 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
 
       if (!sdk.name) return <>{classFiles}</>
 
-      const sdkFile = resolver.core.file({ name: sdk.name, extname: '.ts' }, { root, output, group: group ?? undefined })
-      const facadeName = resolver.resolveClassName(sdk.name)
-      const members = controllers.map(({ name, tag }) => ({ className: name, propName: resolver.resolveClientPropertyName(tag ?? name) }))
+      const sdkFile = resolver.file({ name: sdk.name, extname: '.ts' }, { root, output, group: group ?? undefined })
+      const facadeName = resolver.className(sdk.name)
+      const members = controllers.map(({ name, tag }) => ({ className: name, propName: resolver.propertyName(tag ?? name) }))
 
       return (
         <>

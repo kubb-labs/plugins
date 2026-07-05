@@ -13,63 +13,63 @@ import type { PluginZod } from '../types.ts'
  * ```ts
  * import { resolverZod } from '@kubb/plugin-zod'
  *
- * resolverZod.core.name('list pets') // 'listPetsSchema'
- * resolverZod.resolveSchemaTypeName('pet')     // 'PetSchemaType'
+ * resolverZod.name('list pets')          // 'listPetsSchema'
+ * resolverZod.schema.typeName('pet')     // 'PetSchemaType'
  * ```
  */
 export const resolverZod = defineResolver<PluginZod>(() => {
   return {
-    name: 'default',
     pluginName: 'plugin-zod',
-    core: {
-      name(name) {
-        return ensureValidVarName(camelCase(name, { suffix: 'schema' }))
-      },
-      fileName(name) {
-        return toFilePath(name, (part) => camelCase(part, { suffix: 'schema' }))
-      },
-    },
-    resolveSchemaName(name) {
+    name(name) {
       return ensureValidVarName(camelCase(name, { suffix: 'schema' }))
     },
-    resolveSchemaTypeName(name) {
-      return ensureValidVarName(pascalCase(name, { suffix: 'schema type' }))
+    file(params, context) {
+      return this.default.file({ ...params, resolveName: (name) => toFilePath(name, (part) => camelCase(part, { suffix: 'schema' })) }, context)
     },
-    resolveInputSchemaName(name) {
-      return this.resolveSchemaName(`${name} input`)
+    schema: {
+      typeName(name) {
+        return ensureValidVarName(pascalCase(name, { suffix: 'schema type' }))
+      },
+      type(name) {
+        return ensureValidVarName(pascalCase(name, { suffix: 'type' }))
+      },
+      inputName(name) {
+        return this.name(`${name} input`)
+      },
+      inputTypeName(name) {
+        return this.schema.typeName(`${name} input`)
+      },
     },
-    resolveInputSchemaTypeName(name) {
-      return this.resolveSchemaTypeName(`${name} input`)
+    param: {
+      name(node, param) {
+        return this.name(`${node.operationId} ${param.in} ${param.name}`)
+      },
+      path(node, param) {
+        return this.param.name(node, param)
+      },
+      query(node, param) {
+        return this.param.name(node, param)
+      },
+      headers(node, param) {
+        return this.param.name(node, param)
+      },
     },
-    resolveTypeName(name) {
-      return ensureValidVarName(pascalCase(name, { suffix: 'type' }))
-    },
-    resolveParamName(node, param) {
-      return this.resolveSchemaName(`${node.operationId} ${param.in} ${param.name}`)
-    },
-    resolveResponseStatusName(node, statusCode) {
-      return this.resolveSchemaName(`${node.operationId} Status ${statusCode}`)
-    },
-    resolveBodyName(node) {
-      return this.resolveSchemaName(`${node.operationId} Body`)
-    },
-    resolveResponsesName(node) {
-      return this.resolveSchemaName(`${node.operationId} Responses`)
-    },
-    resolveResponseName(node) {
-      return this.resolveSchemaName(`${node.operationId} Response`)
-    },
-    resolveErrorName(node) {
-      return this.resolveSchemaName(`${node.operationId} Error`)
-    },
-    resolvePathName(node, param) {
-      return this.resolveParamName(node, param)
-    },
-    resolveQueryName(node, param) {
-      return this.resolveParamName(node, param)
-    },
-    resolveHeadersName(node, param) {
-      return this.resolveParamName(node, param)
+    response: {
+      status(node, statusCode) {
+        return this.name(`${node.operationId} Status ${statusCode}`)
+      },
+      body(node) {
+        return this.name(`${node.operationId} Body`)
+      },
+      responses(node) {
+        return this.name(`${node.operationId} Responses`)
+      },
+      response(node) {
+        return this.name(`${node.operationId} Response`)
+      },
+      error(node) {
+        return this.name(`${node.operationId} Error`)
+      },
     },
   }
 })

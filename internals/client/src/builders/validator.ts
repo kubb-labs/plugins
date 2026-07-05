@@ -47,7 +47,7 @@ export function buildValidatorHooks({
   const importedZodNames: Array<string> = []
 
   const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
-  const zodRequestName = zodResolver && resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.resolveBodyName?.(node) : null
+  const zodRequestName = zodResolver && resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.response.body(node) : null
   const request = zodRequestName ?? null
   if (zodRequestName) importedZodNames.push(zodRequestName)
 

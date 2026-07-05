@@ -31,7 +31,7 @@ export function buildMutationConfigParamsNode(node: ast.OperationNode): Function
 
 export function MutationOptions({ name, clientName, node, tsResolver, mutationKeyName }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.response.response(node)
   const TData = responseName
   const errorNames = resolveErrorNames(node, tsResolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -43,7 +43,7 @@ export function MutationOptions({ name, clientName, node, tsResolver, mutationKe
   const hasMutationParams = groupedParam !== null
 
   const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
-  const TRequest = hasMutationParams ? tsResolver.resolveRequestConfigName(node) : 'undefined'
+  const TRequest = hasMutationParams ? tsResolver.response.config(node) : 'undefined'
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : '_'
   const mutationFnBody = `const { data } = await ${buildClientCall(node, { clientName, signal: false })}
           return data`

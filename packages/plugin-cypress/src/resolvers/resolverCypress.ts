@@ -1,4 +1,3 @@
-import { camelCase, toFilePath } from '@internals/utils'
 import { defineResolver } from 'kubb/kit'
 import type { PluginCypress } from '../types.ts'
 
@@ -11,21 +10,9 @@ import type { PluginCypress } from '../types.ts'
  * ```ts
  * import { resolverCypress } from '@kubb/plugin-cypress'
  *
- * resolverCypress.core.name('list pets') // 'listPets'
+ * resolverCypress.name('list pets') // 'listPets'
  * ```
  */
 export const resolverCypress = defineResolver<PluginCypress>(() => ({
-  name: 'default',
   pluginName: 'plugin-cypress',
-  core: {
-    name(name) {
-      return camelCase(name)
-    },
-    fileName(name) {
-      return toFilePath(name)
-    },
-  },
-  resolveName(name) {
-    return this.core.name(name)
-  },
 }))

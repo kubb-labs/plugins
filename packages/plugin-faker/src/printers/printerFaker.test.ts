@@ -68,8 +68,8 @@ describe('printerFaker', () => {
       printerFaker({
         resolver: {
           ...resolverFaker,
-          resolveName(name) {
-            return `${this.core.name(name)}Faker`
+          name(name) {
+            return `${this.name(name)}Faker`
           },
         },
       }).print(node),

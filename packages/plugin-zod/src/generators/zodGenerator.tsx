@@ -104,13 +104,13 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const codecRefNames = new Set(hasCodec ? collectCodecRefNames(node) : [])
     const importEntries = adapter.getImports(node, (schemaName) => ({
-      name: resolver.resolveSchemaName(schemaName),
-      path: resolver.core.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+      name: resolver.name(schemaName),
+      path: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
     }))
     const inputImportEntries = hasCodec
       ? [...codecRefNames].map((schemaName) => ({
-          name: [resolver.resolveInputSchemaName(schemaName)],
-          path: resolver.core.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+          name: [resolver.schema.inputName(schemaName)],
+          path: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
         }))
       : []
     const seenImports = new Set<string>()
@@ -122,11 +122,11 @@ export const zodGenerator = defineGenerator<PluginZod>({
     })
 
     const meta = {
-      name: resolver.resolveSchemaName(node.name),
-      file: resolver.core.file({ name: node.name, extname: '.ts' }, { root, output, group: group ?? undefined }),
+      name: resolver.name(node.name),
+      file: resolver.file({ name: node.name, extname: '.ts' }, { root, output, group: group ?? undefined }),
     } as const
 
-    const inferTypeName = inferred ? resolver.resolveSchemaTypeName(node.name) : null
+    const inferTypeName = inferred ? resolver.schema.typeName(node.name) : null
 
     const nameMapping = (adapter as Adapter<AdapterOas>).options.nameMapping
     const stdPrinters = mini ? null : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, cyclicSchemas, nameMapping, nodes: printer?.nodes })
@@ -137,8 +137,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.core.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.core.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
         {imports.map((imp) => (
@@ -148,10 +148,10 @@ export const zodGenerator = defineGenerator<PluginZod>({
         <Zod name={meta.name} node={node} printer={schemaPrinter} inferTypeName={inferTypeName} cyclic={cyclicSchemas.has(node.name)} />
         {hasCodec && stdPrinters && (
           <Zod
-            name={resolver.resolveInputSchemaName(node.name)}
+            name={resolver.schema.inputName(node.name)}
             node={node}
             printer={stdPrinters.input}
-            inferTypeName={inferred ? resolver.resolveInputSchemaTypeName(node.name) : null}
+            inferTypeName={inferred ? resolver.schema.inputTypeName(node.name) : null}
             cyclic={cyclicSchemas.has(node.name)}
           />
         )}
@@ -169,7 +169,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const params = caseParams(node.parameters, 'camelcase')
 
     const meta = {
-      file: resolver.core.file(
+      file: resolver.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output, group: group ?? undefined },
       ),
@@ -191,13 +191,13 @@ export const zodGenerator = defineGenerator<PluginZod>({
     }) {
       if (!schema) return null
 
-      const inferTypeName = inferred ? resolver.resolveTypeName(name) : null
+      const inferTypeName = inferred ? resolver.schema.type(name) : null
 
       // In the input direction, refs to codec components resolve to their input variant.
       const codecRefNames = direction === 'input' && !mini ? new Set(collectCodecRefNames(schema)) : null
       const imports = adapter.getImports(schema, (schemaName) => ({
-        name: codecRefNames?.has(schemaName) ? resolver.resolveInputSchemaName(schemaName) : resolver.resolveSchemaName(schemaName),
-        path: resolver.core.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+        name: codecRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName),
+        path: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
       }))
 
       const schemaPrinter = mini
@@ -260,17 +260,17 @@ export const zodGenerator = defineGenerator<PluginZod>({
       )
     }
 
-    const paramSchemas = params.map((param) => renderSchemaEntry({ schema: param.schema, name: resolver.resolveParamName(node, param), direction: 'input' }))
+    const paramSchemas = params.map((param) => renderSchemaEntry({ schema: param.schema, name: resolver.param.name(node, param), direction: 'input' }))
 
     const responseSchemas = node.responses.map((res) => {
       const variants = (res.content ?? []).filter((entry) => entry.schema)
       if (variants.length > 1) {
-        return buildContentTypeVariants(res.content!, resolver.resolveResponseStatusName(node, res.statusCode))
+        return buildContentTypeVariants(res.content!, resolver.response.status(node, res.statusCode))
       }
       const primary = variants[0] ?? res.content?.[0]
       return renderSchemaEntry({
         schema: primary?.schema ?? null,
-        name: resolver.resolveResponseStatusName(node, res.statusCode),
+        name: resolver.response.status(node, res.statusCode),
         keysToOmit: primary?.keysToOmit,
       })
     })
@@ -281,7 +281,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const responseUnionSchema =
       responsesWithSchema.length > 0
         ? (() => {
-            const responseUnionName = resolver.resolveResponseName(node)
+            const responseUnionName = resolver.response.response(node)
 
             // Collect import names from the success response schemas to detect naming collisions.
             // When a 2xx response is a $ref to a component schema whose resolved name matches the
@@ -292,7 +292,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
                   entry.schema
                     ? adapter
                         .getImports(entry.schema, (schemaName) => ({
-                          name: resolver.resolveSchemaName(schemaName),
+                          name: resolver.name(schemaName),
                           path: '',
                         }))
                         .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
@@ -306,7 +306,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
             }
 
             const members = successResponsesWithSchema.map((res) =>
-              ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }),
+              ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, res.statusCode) }),
             )
 
             // No documented 2xx schema: fall back to an unknown schema so the response name still
@@ -330,7 +330,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const errorUnionSchema =
       errorResponsesWithSchema.length > 0
         ? (() => {
-            const errorUnionName = resolver.resolveErrorName(node)
+            const errorUnionName = resolver.response.error(node)
 
             const importedNames = new Set(
               errorResponsesWithSchema.flatMap((res) =>
@@ -338,7 +338,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
                   entry.schema
                     ? adapter
                         .getImports(entry.schema, (schemaName) => ({
-                          name: resolver.resolveSchemaName(schemaName),
+                          name: resolver.name(schemaName),
                           path: '',
                         }))
                         .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
@@ -352,7 +352,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
             }
 
             const members = errorResponsesWithSchema.map((res) =>
-              ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }),
+              ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, res.statusCode) }),
             )
 
             const unionNode = members.length === 1 ? members[0]! : ast.factory.createSchema({ type: 'union', members })
@@ -372,14 +372,14 @@ export const zodGenerator = defineGenerator<PluginZod>({
         if (!entry.schema) return null
         return renderSchemaEntry({
           schema: { ...entry.schema, description: node.requestBody!.description ?? entry.schema.description },
-          name: resolver.resolveBodyName(node),
+          name: resolver.response.body(node),
           keysToOmit: entry.keysToOmit,
           direction: 'input',
         })
       }
       return buildContentTypeVariants(
         requestBodyContent,
-        resolver.resolveBodyName(node),
+        resolver.response.body(node),
         (schema) => ({
           ...schema,
           description: node.requestBody!.description ?? schema.description,
@@ -393,8 +393,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.core.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.core.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
         {paramSchemas}

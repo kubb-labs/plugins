@@ -1,4 +1,3 @@
-import { camelCase, toFilePath } from '@internals/utils'
 import { defineResolver } from 'kubb/kit'
 import type { PluginVueQuery } from '../types.ts'
 
@@ -11,68 +10,64 @@ function capitalize(name: string): string {
  * file paths for every generated TanStack Query composable (`useFoo`,
  * `useFooInfinite`) and its companion helpers.
  *
- * Functions and files use camelCase; composables get the `use` prefix.
+ * The `default` helpers are supplied by `defineResolver`. Functions and files use camelCase;
+ * composables get the `use` prefix. Operation-specific naming is grouped under the `query`,
+ * `infiniteQuery`, and `mutation` namespaces.
  *
  * @example Resolve composable and helper names
  * ```ts
  * import { resolverVueQuery } from '@kubb/plugin-vue-query'
  *
- * resolverVueQuery.resolveQueryName(operationNode)       // 'useGetPetById'
- * resolverVueQuery.resolveQueryKeyName(operationNode)    // 'getPetByIdQueryKey'
- * resolverVueQuery.resolveQueryOptionsName(operationNode) // 'getPetByIdQueryOptions'
+ * resolverVueQuery.query.name(operationNode)        // 'useGetPetById'
+ * resolverVueQuery.query.keyName(operationNode)     // 'getPetByIdQueryKey'
+ * resolverVueQuery.query.optionsName(operationNode) // 'getPetByIdQueryOptions'
  * ```
  */
 export const resolverVueQuery = defineResolver<PluginVueQuery>(() => ({
-  name: 'default',
   pluginName: 'plugin-vue-query',
-  core: {
-    name(name) {
-      return camelCase(name)
+  query: {
+    name(node) {
+      return `use${capitalize(this.name(node.operationId))}`
     },
-    fileName(name) {
-      return toFilePath(name)
+    keyName(node) {
+      return `${this.name(node.operationId)}QueryKey`
+    },
+    keyTypeName(node) {
+      return `${capitalize(this.name(node.operationId))}QueryKey`
+    },
+    optionsName(node) {
+      return `${this.name(node.operationId)}QueryOptions`
+    },
+    clientName(node) {
+      return this.name(node.operationId)
     },
   },
-  resolveName(name) {
-    return this.core.name(name)
+  infiniteQuery: {
+    name(node) {
+      return `use${capitalize(this.name(node.operationId))}Infinite`
+    },
+    keyName(node) {
+      return `${this.name(node.operationId)}InfiniteQueryKey`
+    },
+    keyTypeName(node) {
+      return `${capitalize(this.name(node.operationId))}InfiniteQueryKey`
+    },
+    optionsName(node) {
+      return `${this.name(node.operationId)}InfiniteQueryOptions`
+    },
+    clientName(node) {
+      return `${this.name(node.operationId)}Infinite`
+    },
   },
-  resolveQueryName(node) {
-    return `use${capitalize(this.resolveName(node.operationId))}`
-  },
-  resolveInfiniteQueryName(node) {
-    return `use${capitalize(this.resolveName(node.operationId))}Infinite`
-  },
-  resolveMutationName(node) {
-    return `use${capitalize(this.resolveName(node.operationId))}`
-  },
-  resolveQueryOptionsName(node) {
-    return `${this.resolveName(node.operationId)}QueryOptions`
-  },
-  resolveInfiniteQueryOptionsName(node) {
-    return `${this.resolveName(node.operationId)}InfiniteQueryOptions`
-  },
-  resolveQueryKeyName(node) {
-    return `${this.resolveName(node.operationId)}QueryKey`
-  },
-  resolveInfiniteQueryKeyName(node) {
-    return `${this.resolveName(node.operationId)}InfiniteQueryKey`
-  },
-  resolveMutationKeyName(node) {
-    return `${this.resolveName(node.operationId)}MutationKey`
-  },
-  resolveQueryKeyTypeName(node) {
-    return `${capitalize(this.resolveName(node.operationId))}QueryKey`
-  },
-  resolveInfiniteQueryKeyTypeName(node) {
-    return `${capitalize(this.resolveName(node.operationId))}InfiniteQueryKey`
-  },
-  resolveMutationTypeName(node) {
-    return capitalize(this.resolveName(node.operationId))
-  },
-  resolveClientName(node) {
-    return this.resolveName(node.operationId)
-  },
-  resolveInfiniteClientName(node) {
-    return `${this.resolveName(node.operationId)}Infinite`
+  mutation: {
+    name(node) {
+      return `use${capitalize(this.name(node.operationId))}`
+    },
+    keyName(node) {
+      return `${this.name(node.operationId)}MutationKey`
+    },
+    typeName(node) {
+      return capitalize(this.name(node.operationId))
+    },
   },
 }))

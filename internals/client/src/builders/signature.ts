@@ -41,8 +41,8 @@ export type GroupedOptionsSignature = {
  * per-operation input type has to be emitted.
  */
 export function buildGroupedOptionsSignature({ node, tsResolver }: { node: ast.OperationNode; tsResolver: ResolverTs }): GroupedOptionsSignature {
-  const requestConfigName = tsResolver.resolveRequestConfigName(node)
-  const responsesName = tsResolver.resolveResponsesName(node)
+  const requestConfigName = tsResolver.response.config(node)
+  const responsesName = tsResolver.response.responses(node)
   const resultGenerics = buildRequestResultGenerics({ node, tsResolver })
   const { isOptional } = getRequestGroupOptionality(node)
 

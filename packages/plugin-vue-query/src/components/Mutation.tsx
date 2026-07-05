@@ -20,7 +20,7 @@ const callPrinter = functionPrinter({ mode: 'call' })
 
 function resolveMutationRequestType(node: ast.OperationNode, resolver: ResolverTs): string {
   const groupedParam = buildGroupedRequestParam(node, { resolver })
-  return groupedParam ? resolver.resolveRequestConfigName(node) : 'undefined'
+  return groupedParam ? resolver.response.config(node) : 'undefined'
 }
 
 function buildMutationParamsNode(
@@ -31,7 +31,7 @@ function buildMutationParamsNode(
 ): FunctionParametersNode {
   const { resolver } = options
   const successNames = resolveSuccessNames(node, resolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
   const errorNames = resolveErrorNames(node, resolver)
 
   const TData = responseName
@@ -55,7 +55,7 @@ function buildMutationParamsNode(
 
 export function Mutation({ name, clientName, node, tsResolver, mutationKeyName }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.response.response(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
   const TData = responseName

@@ -21,16 +21,16 @@ export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>(
     if (!customOptions) return null
 
     const { importPath, name } = customOptions
-    const hookOptionsName = resolver.resolveHookOptionsName()
-    const customHookOptionsName = resolver.resolveCustomHookOptionsName()
+    const hookOptionsName = resolver.hook.optionsName()
+    const customHookOptionsName = resolver.hook.customOptionsName()
 
     const reactQueryImportPath = query ? query.importPath : '@tanstack/react-query'
 
     let hookFilePath: string
     const firstNode = nodes[0]
     if (firstNode) {
-      const hookName = resolver.resolveQueryName(firstNode)
-      const hookFile = resolver.core.file(
+      const hookName = resolver.query.name(firstNode)
+      const hookFile = resolver.file(
         { name: hookName, extname: '.ts', tag: firstNode.tags[0] ?? 'default', path: firstNode.path },
         { root, output, group: group ?? undefined },
       )

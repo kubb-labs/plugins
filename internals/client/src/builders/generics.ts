@@ -10,5 +10,5 @@ import type { ResolverTs } from '@kubb/plugin-ts'
  * `buildRequestResultGenerics({ node, tsResolver }) // 'AddPetResponses, ThrowOnError'`
  */
 export function buildRequestResultGenerics({ node, tsResolver }: { node: ast.OperationNode; tsResolver: ResolverTs }): string {
-  return `${tsResolver.resolveResponsesName(node)}, ThrowOnError`
+  return `${tsResolver.response.responses(node)}, ThrowOnError`
 }

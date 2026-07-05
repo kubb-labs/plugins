@@ -6,16 +6,17 @@ import type { ast, ResolverOverride, Exclude, Group, Include, Output, OutputOpti
  */
 export type ResolverMcp = Resolver & {
   /**
-   * Resolves the base handler function name for an operation.
-   *
-   * @example Resolving handler function names
-   * `resolver.resolveName('show pet by id') // -> 'showPetByIdHandler'`
+   * Naming for the generated MCP tool handler functions.
    */
-  resolveName(this: ResolverMcp, name: string): string
-  /**
-   * Resolves the handler function name for an operation.
-   */
-  resolveHandlerName(this: ResolverMcp, node: ast.OperationNode): string
+  handler: {
+    /**
+     * Resolves the handler function name for an operation.
+     *
+     * @example Resolving handler function names
+     * `resolver.handler.name(operationNode) // -> 'showPetByIdHandler'`
+     */
+    name(node: ast.OperationNode): string
+  }
 }
 
 /**
