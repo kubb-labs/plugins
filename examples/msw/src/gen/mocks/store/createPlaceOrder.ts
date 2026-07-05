@@ -4,13 +4,13 @@
  */
 
 import type {
-  PlaceOrderData,
-  PlaceOrderFormUrlEncodedData,
-  PlaceOrderJsonData,
+  PlaceOrderBody,
+  PlaceOrderBodyFormUrlEncoded,
+  PlaceOrderBodyJson,
+  PlaceOrderBodyXml,
   PlaceOrderResponse,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-  PlaceOrderXmlData,
 } from '../../models/PlaceOrder.ts'
 import { createOrder } from '../createOrder.ts'
 import { fakerEN as faker } from '@faker-js/faker'
@@ -33,28 +33,28 @@ export function createPlaceOrderStatus405() {
   return undefined
 }
 
-export function createPlaceOrderJsonData(data?: Partial<PlaceOrderJsonData>): PlaceOrderJsonData {
+export function createPlaceOrderBodyJson(data?: Partial<PlaceOrderBodyJson>): PlaceOrderBodyJson {
   faker.seed([220])
 
-  return createOrder(data) as PlaceOrderJsonData
+  return createOrder(data) as PlaceOrderBodyJson
 }
 
-export function createPlaceOrderXmlData(data?: Partial<PlaceOrderXmlData>): PlaceOrderXmlData {
+export function createPlaceOrderBodyXml(data?: Partial<PlaceOrderBodyXml>): PlaceOrderBodyXml {
   faker.seed([220])
 
-  return createOrder(data) as PlaceOrderXmlData
+  return createOrder(data) as PlaceOrderBodyXml
 }
 
-export function createPlaceOrderFormUrlEncodedData(data?: Partial<PlaceOrderFormUrlEncodedData>): PlaceOrderFormUrlEncodedData {
+export function createPlaceOrderBodyFormUrlEncoded(data?: Partial<PlaceOrderBodyFormUrlEncoded>): PlaceOrderBodyFormUrlEncoded {
   faker.seed([220])
 
-  return createOrder(data) as PlaceOrderFormUrlEncodedData
+  return createOrder(data) as PlaceOrderBodyFormUrlEncoded
 }
 
-export function createPlaceOrderData(_data?: PlaceOrderData): PlaceOrderData {
+export function createPlaceOrderBody(_data?: PlaceOrderBody): PlaceOrderBody {
   faker.seed([220])
 
-  return faker.helpers.arrayElement([createPlaceOrderJsonData(), createPlaceOrderXmlData(), createPlaceOrderFormUrlEncodedData()])
+  return faker.helpers.arrayElement([createPlaceOrderBodyJson(), createPlaceOrderBodyXml(), createPlaceOrderBodyFormUrlEncoded()])
 }
 
 export function createPlaceOrderResponse(_data?: PlaceOrderResponse): PlaceOrderResponse {

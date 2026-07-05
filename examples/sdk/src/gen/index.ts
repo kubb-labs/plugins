@@ -14,9 +14,10 @@ export type { PetNotFound } from './models/PetNotFound.ts'
 export type { PetStatusEnumKey } from './models/PetStatusEnum.ts'
 export type { Tag } from './models/Tag.ts'
 export type {
-  AddPetData,
-  AddPetFormUrlEncodedData,
-  AddPetJsonData,
+  AddPetBody,
+  AddPetBodyFormUrlEncoded,
+  AddPetBodyJson,
+  AddPetBodyXml,
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
@@ -24,7 +25,6 @@ export type {
   AddPetStatus200Json,
   AddPetStatus200Xml,
   AddPetStatus405,
-  AddPetXmlData,
 } from './models/pet/AddPet.ts'
 export type {
   DeletePetHeaderApiKey,
@@ -68,9 +68,10 @@ export type {
   GetPetByIdStatus404,
 } from './models/pet/GetPetById.ts'
 export type {
-  UpdatePetData,
-  UpdatePetFormUrlEncodedData,
-  UpdatePetJsonData,
+  UpdatePetBody,
+  UpdatePetBodyFormUrlEncoded,
+  UpdatePetBodyJson,
+  UpdatePetBodyXml,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -80,7 +81,6 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-  UpdatePetXmlData,
 } from './models/pet/UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
@@ -92,9 +92,9 @@ export type {
   UpdatePetWithFormStatus405,
 } from './models/pet/UpdatePetWithForm.ts'
 export type {
-  UploadFileData,
-  UploadFileFormData,
-  UploadFileJsonData,
+  UploadFileBody,
+  UploadFileBodyFormData,
+  UploadFileBodyJson,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
@@ -123,26 +123,26 @@ export type {
   GetOrderByIdStatus404,
 } from './models/store/GetOrderById.ts'
 export type {
-  PlaceOrderData,
-  PlaceOrderFormUrlEncodedData,
-  PlaceOrderJsonData,
+  PlaceOrderBody,
+  PlaceOrderBodyFormUrlEncoded,
+  PlaceOrderBodyJson,
+  PlaceOrderBodyXml,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-  PlaceOrderXmlData,
 } from './models/store/PlaceOrder.ts'
 export type {
-  PlaceOrderPatchData,
-  PlaceOrderPatchFormUrlEncodedData,
-  PlaceOrderPatchJsonData,
+  PlaceOrderPatchBody,
+  PlaceOrderPatchBodyFormUrlEncoded,
+  PlaceOrderPatchBodyJson,
+  PlaceOrderPatchBodyXml,
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
-  PlaceOrderPatchXmlData,
 } from './models/store/PlaceOrderPatch.ts'
 export { addPetRequestStatusEnum } from './models/AddPetRequestStatusEnum.ts'
 export { findPetsByStatusStatus } from './models/FindPetsByStatusStatus.ts'

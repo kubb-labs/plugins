@@ -10,20 +10,20 @@ export {
   createGetOrderByIdStatus404,
 } from './createGetOrderById.ts'
 export {
-  createPlaceOrderData,
-  createPlaceOrderFormUrlEncodedData,
-  createPlaceOrderJsonData,
+  createPlaceOrderBody,
+  createPlaceOrderBodyFormUrlEncoded,
+  createPlaceOrderBodyJson,
+  createPlaceOrderBodyXml,
   createPlaceOrderResponse,
   createPlaceOrderStatus200,
   createPlaceOrderStatus405,
-  createPlaceOrderXmlData,
 } from './createPlaceOrder.ts'
 export {
-  createPlaceOrderPatchData,
-  createPlaceOrderPatchFormUrlEncodedData,
-  createPlaceOrderPatchJsonData,
+  createPlaceOrderPatchBody,
+  createPlaceOrderPatchBodyFormUrlEncoded,
+  createPlaceOrderPatchBodyJson,
+  createPlaceOrderPatchBodyXml,
   createPlaceOrderPatchResponse,
   createPlaceOrderPatchStatus200,
   createPlaceOrderPatchStatus405,
-  createPlaceOrderPatchXmlData,
 } from './createPlaceOrderPatch.ts'

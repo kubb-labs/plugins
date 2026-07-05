@@ -25,13 +25,13 @@ export type CreateUsersWithListInputStatusDefault = unknown
 /**
  * @type array | undefined
  */
-export type CreateUsersWithListInputData = User[] | undefined
+export type CreateUsersWithListInputBody = User[] | undefined
 
 /**
  * @type object
  */
 export type CreateUsersWithListInputRequestConfig = {
-  body: CreateUsersWithListInputData
+  body: CreateUsersWithListInputBody
   path?: never
   query?: never
   headers?: never

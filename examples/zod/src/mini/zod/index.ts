@@ -1,9 +1,9 @@
 export { addPetRequestSchema } from './addPetRequestSchema.ts'
 export {
-  addPetDataSchema,
-  addPetDataSchemaFormUrlEncoded,
-  addPetDataSchemaJson,
-  addPetDataSchemaXml,
+  addPetBodySchema,
+  addPetBodySchemaFormUrlEncoded,
+  addPetBodySchemaJson,
+  addPetBodySchemaXml,
   addPetErrorSchema,
   addPetResponseSchema,
   addPetStatus200Schema,
@@ -14,7 +14,7 @@ export {
 export { apiResponseSchema } from './apiResponseSchema.ts'
 export { categorySchema } from './categorySchema.ts'
 export {
-  createPetsDataSchema,
+  createPetsBodySchema,
   createPetsErrorSchema,
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,
@@ -94,20 +94,20 @@ export { phoneNumberSchema } from './phoneNumberSchema.ts'
 export { phoneWithMaxLengthExplicitSchema } from './phoneWithMaxLengthExplicitSchema.ts'
 export { phoneWithMaxLengthSchema } from './phoneWithMaxLengthSchema.ts'
 export {
-  placeOrderPatchDataSchema,
-  placeOrderPatchDataSchemaFormUrlEncoded,
-  placeOrderPatchDataSchemaJson,
-  placeOrderPatchDataSchemaXml,
+  placeOrderPatchBodySchema,
+  placeOrderPatchBodySchemaFormUrlEncoded,
+  placeOrderPatchBodySchemaJson,
+  placeOrderPatchBodySchemaXml,
   placeOrderPatchErrorSchema,
   placeOrderPatchResponseSchema,
   placeOrderPatchStatus200Schema,
   placeOrderPatchStatus405Schema,
 } from './placeOrderPatchSchema.ts'
 export {
-  placeOrderDataSchema,
-  placeOrderDataSchemaFormUrlEncoded,
-  placeOrderDataSchemaJson,
-  placeOrderDataSchemaXml,
+  placeOrderBodySchema,
+  placeOrderBodySchemaFormUrlEncoded,
+  placeOrderBodySchemaJson,
+  placeOrderBodySchemaXml,
   placeOrderErrorSchema,
   placeOrderResponseSchema,
   placeOrderStatus200Schema,
@@ -115,10 +115,10 @@ export {
 } from './placeOrderSchema.ts'
 export { tagSchema } from './tagSchema.ts'
 export {
-  updatePetDataSchema,
-  updatePetDataSchemaFormUrlEncoded,
-  updatePetDataSchemaJson,
-  updatePetDataSchemaXml,
+  updatePetBodySchema,
+  updatePetBodySchemaFormUrlEncoded,
+  updatePetBodySchemaJson,
+  updatePetBodySchemaXml,
   updatePetErrorSchema,
   updatePetResponseSchema,
   updatePetStatus200Schema,
@@ -137,7 +137,7 @@ export {
   updatePetWithFormStatus405Schema,
 } from './updatePetWithFormSchema.ts'
 export {
-  uploadFileDataSchema,
+  uploadFileBodySchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,

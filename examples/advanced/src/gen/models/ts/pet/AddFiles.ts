@@ -13,7 +13,7 @@ export type AddFilesStatus405 = unknown
 /**
  * @type object
  */
-export type AddFilesJsonData = {
+export type AddFilesBodyJson = {
   /**
    * @description URL of the image to upload
    *
@@ -26,15 +26,15 @@ export type AddFilesJsonData = {
 /**
  * @type object
  */
-export type AddFilesFormData = Omit<NonNullable<Pet>, 'id'>
+export type AddFilesBodyFormData = Omit<NonNullable<Pet>, 'id'>
 
-export type AddFilesData = AddFilesJsonData | AddFilesFormData
+export type AddFilesBody = AddFilesBodyJson | AddFilesBodyFormData
 
 /**
  * @type object
  */
 export type AddFilesRequestConfig = {
-  body: AddFilesData
+  body: AddFilesBody
   path?: never
   query?: never
   headers?: never

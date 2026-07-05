@@ -1,7 +1,7 @@
 export type {
-  AddFilesData,
-  AddFilesFormData,
-  AddFilesJsonData,
+  AddFilesBody,
+  AddFilesBodyFormData,
+  AddFilesBodyJson,
   AddFilesRequestConfig,
   AddFilesResponse,
   AddFilesResponses,
@@ -9,9 +9,10 @@ export type {
   AddFilesStatus405,
 } from './AddFiles.js'
 export type {
-  AddPetData,
-  AddPetFormUrlEncodedData,
-  AddPetJsonData,
+  AddPetBody,
+  AddPetBodyFormUrlEncoded,
+  AddPetBodyJson,
+  AddPetBodyXml,
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
@@ -19,14 +20,13 @@ export type {
   AddPetStatus200Json,
   AddPetStatus200Xml,
   AddPetStatus405,
-  AddPetXmlData,
 } from './AddPet.js'
 export type { AddPetRequest } from './AddPetRequest.js'
 export type { AddPetRequestStatusEnumKey } from './AddPetRequestStatusEnum.js'
 export type { ApiResponse } from './ApiResponse.js'
 export type { Category } from './Category.js'
 export type {
-  CreatePetsData,
+  CreatePetsBody,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsPathUuid,
   CreatePetsQueryOffset,
@@ -108,31 +108,32 @@ export type { Pet } from './Pet.js'
 export type { PetNotFound } from './PetNotFound.js'
 export type { PetStatusEnumKey } from './PetStatusEnum.js'
 export type {
-  PlaceOrderData,
-  PlaceOrderFormUrlEncodedData,
-  PlaceOrderJsonData,
+  PlaceOrderBody,
+  PlaceOrderBodyFormUrlEncoded,
+  PlaceOrderBodyJson,
+  PlaceOrderBodyXml,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-  PlaceOrderXmlData,
 } from './PlaceOrder.js'
 export type {
-  PlaceOrderPatchData,
-  PlaceOrderPatchFormUrlEncodedData,
-  PlaceOrderPatchJsonData,
+  PlaceOrderPatchBody,
+  PlaceOrderPatchBodyFormUrlEncoded,
+  PlaceOrderPatchBodyJson,
+  PlaceOrderPatchBodyXml,
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
-  PlaceOrderPatchXmlData,
 } from './PlaceOrderPatch.js'
 export type {
-  UpdatePetData,
-  UpdatePetFormUrlEncodedData,
-  UpdatePetJsonData,
+  UpdatePetBody,
+  UpdatePetBodyFormUrlEncoded,
+  UpdatePetBodyJson,
+  UpdatePetBodyXml,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -143,7 +144,6 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-  UpdatePetXmlData,
 } from './UpdatePet.js'
 export type {
   UpdatePetWithFormPathPetId,

@@ -22,18 +22,18 @@ export const placeOrderPatchErrorSchema = placeOrderPatchStatus405Schema
 
 export type PlaceOrderPatchErrorSchemaType = z.infer<typeof placeOrderPatchErrorSchema>
 
-export const placeOrderPatchDataSchemaJson = orderSchema.optional()
+export const placeOrderPatchBodySchemaJson = orderSchema.optional()
 
-export type PlaceOrderPatchDataSchemaJsonType = z.infer<typeof placeOrderPatchDataSchemaJson>
+export type PlaceOrderPatchBodySchemaJsonType = z.infer<typeof placeOrderPatchBodySchemaJson>
 
-export const placeOrderPatchDataSchemaXml = orderSchema.optional()
+export const placeOrderPatchBodySchemaXml = orderSchema.optional()
 
-export type PlaceOrderPatchDataSchemaXmlType = z.infer<typeof placeOrderPatchDataSchemaXml>
+export type PlaceOrderPatchBodySchemaXmlType = z.infer<typeof placeOrderPatchBodySchemaXml>
 
-export const placeOrderPatchDataSchemaFormUrlEncoded = orderSchema.optional()
+export const placeOrderPatchBodySchemaFormUrlEncoded = orderSchema.optional()
 
-export type PlaceOrderPatchDataSchemaFormUrlEncodedType = z.infer<typeof placeOrderPatchDataSchemaFormUrlEncoded>
+export type PlaceOrderPatchBodySchemaFormUrlEncodedType = z.infer<typeof placeOrderPatchBodySchemaFormUrlEncoded>
 
-export const placeOrderPatchDataSchema = z.union([placeOrderPatchDataSchemaJson, placeOrderPatchDataSchemaXml, placeOrderPatchDataSchemaFormUrlEncoded])
+export const placeOrderPatchBodySchema = z.union([placeOrderPatchBodySchemaJson, placeOrderPatchBodySchemaXml, placeOrderPatchBodySchemaFormUrlEncoded])
 
-export type PlaceOrderPatchDataSchemaType = z.infer<typeof placeOrderPatchDataSchema>
+export type PlaceOrderPatchBodySchemaType = z.infer<typeof placeOrderPatchBodySchema>

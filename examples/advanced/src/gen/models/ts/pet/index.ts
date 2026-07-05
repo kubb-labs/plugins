@@ -1,7 +1,7 @@
 export type {
-  AddFilesData,
-  AddFilesFormData,
-  AddFilesJsonData,
+  AddFilesBody,
+  AddFilesBodyFormData,
+  AddFilesBodyJson,
   AddFilesRequestConfig,
   AddFilesResponse,
   AddFilesResponses,
@@ -9,9 +9,10 @@ export type {
   AddFilesStatus405,
 } from './AddFiles.ts'
 export type {
-  AddPetData,
-  AddPetFormUrlEncodedData,
-  AddPetJsonData,
+  AddPetBody,
+  AddPetBodyFormUrlEncoded,
+  AddPetBodyJson,
+  AddPetBodyXml,
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
@@ -19,7 +20,6 @@ export type {
   AddPetStatusDefault,
   AddPetStatusDefaultJson,
   AddPetStatusDefaultXml,
-  AddPetXmlData,
 } from './AddPet.ts'
 export type {
   DeletePetHeaderApiKey,
@@ -64,9 +64,10 @@ export type {
   GetPetByIdStatus404,
 } from './GetPetById.ts'
 export type {
-  UpdatePetData,
-  UpdatePetFormUrlEncodedData,
-  UpdatePetJsonData,
+  UpdatePetBody,
+  UpdatePetBodyFormUrlEncoded,
+  UpdatePetBodyJson,
+  UpdatePetBodyXml,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -77,7 +78,6 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-  UpdatePetXmlData,
 } from './UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
@@ -89,7 +89,7 @@ export type {
   UpdatePetWithFormStatus405,
 } from './UpdatePetWithForm.ts'
 export type {
-  UploadFileData,
+  UploadFileBody,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,

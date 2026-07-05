@@ -413,25 +413,25 @@ export type UpdatePetStatus405 = unknown
 /**
  * @description Update an existent pet in the store
  */
-export type UpdatePetJsonData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+export type UpdatePetBodyJson = Omit<NonNullable<Pet>, 'type' | 'tags'>
 
 /**
  * @description Update an existent pet in the store
  */
-export type UpdatePetXmlData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+export type UpdatePetBodyXml = Omit<NonNullable<Pet>, 'type' | 'tags'>
 
 /**
  * @description Update an existent pet in the store
  */
-export type UpdatePetFormUrlEncodedData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+export type UpdatePetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'type' | 'tags'>
 
-export type UpdatePetData = UpdatePetJsonData | UpdatePetXmlData | UpdatePetFormUrlEncodedData
+export type UpdatePetBody = UpdatePetBodyJson | UpdatePetBodyXml | UpdatePetBodyFormUrlEncoded
 
 /**
  * @type object
  */
 export type UpdatePetRequestConfig = {
-  body: UpdatePetData
+  body: UpdatePetBody
   path?: never
   query?: never
   headers?: never
@@ -486,25 +486,25 @@ export type AddPetStatus405 = {
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetJsonData = AddPetRequest
+export type AddPetBodyJson = AddPetRequest
 
 /**
  * @description Create a new pet in the store
  */
-export type AddPetXmlData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+export type AddPetBodyXml = Omit<NonNullable<Pet>, 'type' | 'tags'>
 
 /**
  * @description Create a new pet in the store
  */
-export type AddPetFormUrlEncodedData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+export type AddPetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'type' | 'tags'>
 
-export type AddPetData = AddPetJsonData | AddPetXmlData | AddPetFormUrlEncodedData
+export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded
 
 /**
  * @type object
  */
 export type AddPetRequestConfig = {
-  body: AddPetData
+  body: AddPetBody
   path?: never
   query?: never
   headers?: never
@@ -862,13 +862,13 @@ export type UploadFileStatus200 = ApiResponse
  * Format: `binary`
  * @type string | undefined
  */
-export type UploadFileData = Blob | undefined
+export type UploadFileBody = Blob | undefined
 
 /**
  * @type object
  */
 export type UploadFileRequestConfig = {
-  body: UploadFileData
+  body: UploadFileBody
   /**
    * @type object
    */
@@ -939,25 +939,25 @@ export type PlaceOrderStatus405 = unknown
  * @description Order description
  * @type object | undefined
  */
-export type PlaceOrderJsonData = Order | undefined
+export type PlaceOrderBodyJson = Order | undefined
 
 /**
  * @type object | undefined
  */
-export type PlaceOrderXmlData = Order | undefined
+export type PlaceOrderBodyXml = Order | undefined
 
 /**
  * @type object | undefined
  */
-export type PlaceOrderFormUrlEncodedData = Order | undefined
+export type PlaceOrderBodyFormUrlEncoded = Order | undefined
 
-export type PlaceOrderData = PlaceOrderJsonData | PlaceOrderXmlData | PlaceOrderFormUrlEncodedData
+export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrderBodyFormUrlEncoded
 
 /**
  * @type object
  */
 export type PlaceOrderRequestConfig = {
-  body: PlaceOrderData
+  body: PlaceOrderBody
   path?: never
   query?: never
   headers?: never
@@ -989,25 +989,25 @@ export type PlaceOrderPatchStatus405 = unknown
 /**
  * @type object | undefined
  */
-export type PlaceOrderPatchJsonData = Order | undefined
+export type PlaceOrderPatchBodyJson = Order | undefined
 
 /**
  * @type object | undefined
  */
-export type PlaceOrderPatchXmlData = Order | undefined
+export type PlaceOrderPatchBodyXml = Order | undefined
 
 /**
  * @type object | undefined
  */
-export type PlaceOrderPatchFormUrlEncodedData = Order | undefined
+export type PlaceOrderPatchBodyFormUrlEncoded = Order | undefined
 
-export type PlaceOrderPatchData = PlaceOrderPatchJsonData | PlaceOrderPatchXmlData | PlaceOrderPatchFormUrlEncodedData
+export type PlaceOrderPatchBody = PlaceOrderPatchBodyJson | PlaceOrderPatchBodyXml | PlaceOrderPatchBodyFormUrlEncoded
 
 /**
  * @type object
  */
 export type PlaceOrderPatchRequestConfig = {
-  body: PlaceOrderPatchData
+  body: PlaceOrderPatchBody
   path?: never
   query?: never
   headers?: never

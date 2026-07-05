@@ -1,5 +1,5 @@
 export type {
-  CreatePetsData,
+  CreatePetsBody,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsPathUuid,
   CreatePetsQueryBoolParam,

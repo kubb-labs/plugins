@@ -35,7 +35,7 @@ export type CreatePetsStatusDefault = PetNotFound
 /**
  * @type object
  */
-export type CreatePetsData = {
+export type CreatePetsBody = {
   /**
    * @type string
    */
@@ -50,7 +50,7 @@ export type CreatePetsData = {
  * @type object
  */
 export type CreatePetsRequestConfig = {
-  body: CreatePetsData
+  body: CreatePetsBody
   /**
    * @type object
    */

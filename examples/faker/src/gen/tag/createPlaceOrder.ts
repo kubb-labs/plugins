@@ -4,13 +4,13 @@
  */
 
 import type {
-  PlaceOrderData,
-  PlaceOrderFormUrlEncodedData,
-  PlaceOrderJsonData,
+  PlaceOrderBody,
+  PlaceOrderBodyFormUrlEncoded,
+  PlaceOrderBodyJson,
+  PlaceOrderBodyXml,
   PlaceOrderResponse,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-  PlaceOrderXmlData,
 } from '../models/PlaceOrder.ts'
 import { createOrder } from './createOrder.ts'
 import { fakerEN as faker } from '@faker-js/faker'
@@ -29,20 +29,20 @@ export function createPlaceOrderStatus405() {
   return undefined
 }
 
-export function createPlaceOrderJsonData(data?: Partial<PlaceOrderJsonData>): PlaceOrderJsonData {
-  return createOrder(data) as PlaceOrderJsonData
+export function createPlaceOrderBodyJson(data?: Partial<PlaceOrderBodyJson>): PlaceOrderBodyJson {
+  return createOrder(data) as PlaceOrderBodyJson
 }
 
-export function createPlaceOrderXmlData(data?: Partial<PlaceOrderXmlData>): PlaceOrderXmlData {
-  return createOrder(data) as PlaceOrderXmlData
+export function createPlaceOrderBodyXml(data?: Partial<PlaceOrderBodyXml>): PlaceOrderBodyXml {
+  return createOrder(data) as PlaceOrderBodyXml
 }
 
-export function createPlaceOrderFormUrlEncodedData(data?: Partial<PlaceOrderFormUrlEncodedData>): PlaceOrderFormUrlEncodedData {
-  return createOrder(data) as PlaceOrderFormUrlEncodedData
+export function createPlaceOrderBodyFormUrlEncoded(data?: Partial<PlaceOrderBodyFormUrlEncoded>): PlaceOrderBodyFormUrlEncoded {
+  return createOrder(data) as PlaceOrderBodyFormUrlEncoded
 }
 
-export function createPlaceOrderData(_data?: PlaceOrderData): PlaceOrderData {
-  return faker.helpers.arrayElement([createPlaceOrderJsonData(), createPlaceOrderXmlData(), createPlaceOrderFormUrlEncodedData()])
+export function createPlaceOrderBody(_data?: PlaceOrderBody): PlaceOrderBody {
+  return faker.helpers.arrayElement([createPlaceOrderBodyJson(), createPlaceOrderBodyXml(), createPlaceOrderBodyFormUrlEncoded()])
 }
 
 export function createPlaceOrderResponse(_data?: PlaceOrderResponse): PlaceOrderResponse {

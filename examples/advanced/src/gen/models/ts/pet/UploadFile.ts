@@ -22,13 +22,13 @@ export type UploadFileStatus200 = ApiResponse
 /**
  * @type string
  */
-export type UploadFileData = Blob
+export type UploadFileBody = Blob
 
 /**
  * @type object
  */
 export type UploadFileRequestConfig = {
-  body: UploadFileData
+  body: UploadFileBody
   /**
    * @type object
    */

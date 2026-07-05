@@ -21,9 +21,10 @@ export type { Tag } from './models/Tag.ts'
 export type { User } from './models/User.ts'
 export type { UserArray } from './models/UserArray.ts'
 export type {
-  AddPetData,
-  AddPetFormUrlEncodedData,
-  AddPetJsonData,
+  AddPetBody,
+  AddPetBodyFormUrlEncoded,
+  AddPetBodyJson,
+  AddPetBodyXml,
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
@@ -31,7 +32,6 @@ export type {
   AddPetStatus200Json,
   AddPetStatus200Xml,
   AddPetStatus405,
-  AddPetXmlData,
 } from './models/pet/AddPet.ts'
 export type {
   DeletePetHeaderApiKey,
@@ -76,9 +76,10 @@ export type {
   GetPetByIdStatus404,
 } from './models/pet/GetPetById.ts'
 export type {
-  UpdatePetData,
-  UpdatePetFormUrlEncodedData,
-  UpdatePetJsonData,
+  UpdatePetBody,
+  UpdatePetBodyFormUrlEncoded,
+  UpdatePetBodyJson,
+  UpdatePetBodyXml,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -88,7 +89,6 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-  UpdatePetXmlData,
 } from './models/pet/UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
@@ -100,9 +100,9 @@ export type {
   UpdatePetWithFormStatus405,
 } from './models/pet/UpdatePetWithForm.ts'
 export type {
-  UploadFileData,
-  UploadFileFormData,
-  UploadFileJsonData,
+  UploadFileBody,
+  UploadFileBodyFormData,
+  UploadFileBodyJson,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
@@ -131,41 +131,41 @@ export type {
   GetOrderByIdStatus404,
 } from './models/store/GetOrderById.ts'
 export type {
-  PlaceOrderData,
-  PlaceOrderFormUrlEncodedData,
-  PlaceOrderJsonData,
+  PlaceOrderBody,
+  PlaceOrderBodyFormUrlEncoded,
+  PlaceOrderBodyJson,
+  PlaceOrderBodyXml,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-  PlaceOrderXmlData,
 } from './models/store/PlaceOrder.ts'
 export type {
-  PlaceOrderPatchData,
-  PlaceOrderPatchFormUrlEncodedData,
-  PlaceOrderPatchJsonData,
+  PlaceOrderPatchBody,
+  PlaceOrderPatchBodyFormUrlEncoded,
+  PlaceOrderPatchBodyJson,
+  PlaceOrderPatchBodyXml,
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
-  PlaceOrderPatchXmlData,
 } from './models/store/PlaceOrderPatch.ts'
 export type {
-  CreateUserData,
-  CreateUserFormUrlEncodedData,
-  CreateUserJsonData,
+  CreateUserBody,
+  CreateUserBodyFormUrlEncoded,
+  CreateUserBodyJson,
+  CreateUserBodyXml,
   CreateUserRequestConfig,
   CreateUserResponse,
   CreateUserResponses,
   CreateUserStatusDefault,
   CreateUserStatusDefaultJson,
   CreateUserStatusDefaultXml,
-  CreateUserXmlData,
 } from './models/user/CreateUser.ts'
 export type {
-  CreateUsersWithListInputData,
+  CreateUsersWithListInputBody,
   CreateUsersWithListInputRequestConfig,
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
@@ -206,15 +206,15 @@ export type {
 } from './models/user/LoginUser.ts'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/user/LogoutUser.ts'
 export type {
-  UpdateUserData,
-  UpdateUserFormUrlEncodedData,
-  UpdateUserJsonData,
+  UpdateUserBody,
+  UpdateUserBodyFormUrlEncoded,
+  UpdateUserBodyJson,
+  UpdateUserBodyXml,
   UpdateUserPathUsername,
   UpdateUserRequestConfig,
   UpdateUserResponse,
   UpdateUserResponses,
   UpdateUserStatusDefault,
-  UpdateUserXmlData,
 } from './models/user/UpdateUser.ts'
 export { addPet } from './clients/pet/addPet.ts'
 export { deletePet } from './clients/pet/deletePet.ts'

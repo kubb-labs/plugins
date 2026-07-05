@@ -1,7 +1,7 @@
 import type { z } from '../../zod.ts'
-import { addPetDataSchema, addPetStatus200Schema, addPetStatus405Schema, addPetResponseSchema } from './addPetSchema.ts'
+import { addPetBodySchema, addPetStatus200Schema, addPetStatus405Schema, addPetResponseSchema } from './addPetSchema.ts'
 import {
-  createPetsDataSchema,
+  createPetsBodySchema,
   createPetsStatus201Schema,
   createPetsResponseSchema,
   createPetsPathUuidSchema,
@@ -40,14 +40,14 @@ import {
 } from './getPetByIdSchema.ts'
 import { getThingsStatus201Schema, getThingsResponseSchema, getThingsQueryLimitSchema } from './getThingsSchema.ts'
 import {
-  placeOrderPatchDataSchema,
+  placeOrderPatchBodySchema,
   placeOrderPatchStatus200Schema,
   placeOrderPatchStatus405Schema,
   placeOrderPatchResponseSchema,
 } from './placeOrderPatchSchema.ts'
-import { placeOrderDataSchema, placeOrderStatus200Schema, placeOrderStatus405Schema, placeOrderResponseSchema } from './placeOrderSchema.ts'
+import { placeOrderBodySchema, placeOrderStatus200Schema, placeOrderStatus405Schema, placeOrderResponseSchema } from './placeOrderSchema.ts'
 import {
-  updatePetDataSchema,
+  updatePetBodySchema,
   updatePetStatus200Schema,
   updatePetStatus400Schema,
   updatePetStatus404Schema,
@@ -61,7 +61,7 @@ import {
   updatePetWithFormQueryNameSchema,
 } from './updatePetWithFormSchema.ts'
 import {
-  uploadFileDataSchema,
+  uploadFileBodySchema,
   uploadFileStatus200Schema,
   uploadFileResponseSchema,
   uploadFilePathPetIdSchema,
@@ -101,7 +101,7 @@ export const operations = {
     errors: {},
   },
   createPets: {
-    request: createPetsDataSchema,
+    request: createPetsBodySchema,
     parameters: {
       path: createPetsPathUuidSchema,
       query: createPetsQueryOffsetSchema,
@@ -114,7 +114,7 @@ export const operations = {
     errors: {},
   },
   updatePet: {
-    request: updatePetDataSchema,
+    request: updatePetBodySchema,
     parameters: {
       path: null,
       query: null,
@@ -134,7 +134,7 @@ export const operations = {
     },
   },
   addPet: {
-    request: addPetDataSchema,
+    request: addPetBodySchema,
     parameters: {
       path: null,
       query: null,
@@ -230,7 +230,7 @@ export const operations = {
     },
   },
   uploadFile: {
-    request: uploadFileDataSchema,
+    request: uploadFileBodySchema,
     parameters: {
       path: uploadFilePathPetIdSchema,
       query: uploadFileQueryAdditionalMetadataSchema,
@@ -256,7 +256,7 @@ export const operations = {
     errors: {},
   },
   placeOrder: {
-    request: placeOrderDataSchema,
+    request: placeOrderBodySchema,
     parameters: {
       path: null,
       query: null,
@@ -272,7 +272,7 @@ export const operations = {
     },
   },
   placeOrderPatch: {
-    request: placeOrderPatchDataSchema,
+    request: placeOrderPatchBodySchema,
     parameters: {
       path: null,
       query: null,

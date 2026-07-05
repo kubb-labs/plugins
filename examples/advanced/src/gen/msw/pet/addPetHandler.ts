@@ -1,4 +1,4 @@
-import type { AddPetStatus405, AddPetData } from '../../models/ts/pet/AddPet.ts'
+import type { AddPetStatus405, AddPetBody } from '../../models/ts/pet/AddPet.ts'
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
@@ -11,8 +11,8 @@ export function addPetHandlerResponse405(data: AddPetStatus405) {
   })
 }
 
-export function addPetHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, AddPetData>) {
-  return http.post<Record<string, string>, AddPetData>(`/pet`, function handler(info) {
+export function addPetHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, AddPetBody>) {
+  return http.post<Record<string, string>, AddPetBody>(`/pet`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

@@ -29,18 +29,18 @@ export const addPetErrorSchema = z.union([addPetStatus405Schema, addPetStatusDef
 
 export type AddPetErrorSchemaType = z.infer<typeof addPetErrorSchema>
 
-export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
+export const addPetBodySchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
 
-export type AddPetDataSchemaJsonType = z.infer<typeof addPetDataSchemaJson>
+export type AddPetBodySchemaJsonType = z.infer<typeof addPetBodySchemaJson>
 
-export const addPetDataSchemaXml = z.lazy(() => petSchema.omit({ id: true })).describe('Create a new pet in the store')
+export const addPetBodySchemaXml = z.lazy(() => petSchema.omit({ id: true })).describe('Create a new pet in the store')
 
-export type AddPetDataSchemaXmlType = z.infer<typeof addPetDataSchemaXml>
+export type AddPetBodySchemaXmlType = z.infer<typeof addPetBodySchemaXml>
 
-export const addPetDataSchemaFormUrlEncoded = z.lazy(() => petSchema.omit({ id: true })).describe('Create a new pet in the store')
+export const addPetBodySchemaFormUrlEncoded = z.lazy(() => petSchema.omit({ id: true })).describe('Create a new pet in the store')
 
-export type AddPetDataSchemaFormUrlEncodedType = z.infer<typeof addPetDataSchemaFormUrlEncoded>
+export type AddPetBodySchemaFormUrlEncodedType = z.infer<typeof addPetBodySchemaFormUrlEncoded>
 
-export const addPetDataSchema = z.union([addPetDataSchemaJson, addPetDataSchemaXml, addPetDataSchemaFormUrlEncoded])
+export const addPetBodySchema = z.union([addPetBodySchemaJson, addPetBodySchemaXml, addPetBodySchemaFormUrlEncoded])
 
-export type AddPetDataSchemaType = z.infer<typeof addPetDataSchema>
+export type AddPetBodySchemaType = z.infer<typeof addPetBodySchema>

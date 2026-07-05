@@ -21,9 +21,9 @@ export type { PetEventTypeEnumKey } from './PetEventTypeEnum.ts'
 export type { PetNotFound } from './PetNotFound.ts'
 export type { PetStatusEnumKey } from './PetStatusEnum.ts'
 export type {
-  AddFilesData,
-  AddFilesFormData,
-  AddFilesJsonData,
+  AddFilesBody,
+  AddFilesBodyFormData,
+  AddFilesBodyJson,
   AddFilesRequestConfig,
   AddFilesResponse,
   AddFilesResponses,
@@ -31,9 +31,10 @@ export type {
   AddFilesStatus405,
 } from './pet/AddFiles.ts'
 export type {
-  AddPetData,
-  AddPetFormUrlEncodedData,
-  AddPetJsonData,
+  AddPetBody,
+  AddPetBodyFormUrlEncoded,
+  AddPetBodyJson,
+  AddPetBodyXml,
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
@@ -41,7 +42,6 @@ export type {
   AddPetStatusDefault,
   AddPetStatusDefaultJson,
   AddPetStatusDefaultXml,
-  AddPetXmlData,
 } from './pet/AddPet.ts'
 export type {
   DeletePetHeaderApiKey,
@@ -86,9 +86,10 @@ export type {
   GetPetByIdStatus404,
 } from './pet/GetPetById.ts'
 export type {
-  UpdatePetData,
-  UpdatePetFormUrlEncodedData,
-  UpdatePetJsonData,
+  UpdatePetBody,
+  UpdatePetBodyFormUrlEncoded,
+  UpdatePetBodyJson,
+  UpdatePetBodyXml,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -99,7 +100,6 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-  UpdatePetXmlData,
 } from './pet/UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
@@ -111,7 +111,7 @@ export type {
   UpdatePetWithFormStatus405,
 } from './pet/UpdatePetWithForm.ts'
 export type {
-  UploadFileData,
+  UploadFileBody,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
@@ -120,7 +120,7 @@ export type {
   UploadFileStatus200,
 } from './pet/UploadFile.ts'
 export type {
-  CreatePetsData,
+  CreatePetsBody,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsPathUuid,
   CreatePetsQueryBoolParam,
@@ -152,26 +152,26 @@ export type {
   GetOrderByIdStatus404,
 } from './store/GetOrderById.ts'
 export type {
-  PlaceOrderData,
-  PlaceOrderFormUrlEncodedData,
-  PlaceOrderJsonData,
+  PlaceOrderBody,
+  PlaceOrderBodyFormUrlEncoded,
+  PlaceOrderBodyJson,
+  PlaceOrderBodyXml,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-  PlaceOrderXmlData,
 } from './store/PlaceOrder.ts'
 export type {
-  PlaceOrderPatchData,
-  PlaceOrderPatchFormUrlEncodedData,
-  PlaceOrderPatchJsonData,
+  PlaceOrderPatchBody,
+  PlaceOrderPatchBodyFormUrlEncoded,
+  PlaceOrderPatchBodyJson,
+  PlaceOrderPatchBodyXml,
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
-  PlaceOrderPatchXmlData,
 } from './store/PlaceOrderPatch.ts'
 export type {
   StreamPetEventsPathPetId,

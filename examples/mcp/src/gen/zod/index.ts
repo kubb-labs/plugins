@@ -1,7 +1,7 @@
 export {
-  addFilesDataSchema,
-  addFilesDataSchemaFormData,
-  addFilesDataSchemaJson,
+  addFilesBodySchema,
+  addFilesBodySchemaFormData,
+  addFilesBodySchemaJson,
   addFilesErrorSchema,
   addFilesResponseSchema,
   addFilesStatus200Schema,
@@ -10,10 +10,10 @@ export {
 export { addPetRequestSchema } from './addPetRequestSchema.js'
 export { addPetRequestStatusEnumSchema } from './addPetRequestStatusEnumSchema.js'
 export {
-  addPetDataSchema,
-  addPetDataSchemaFormUrlEncoded,
-  addPetDataSchemaJson,
-  addPetDataSchemaXml,
+  addPetBodySchema,
+  addPetBodySchemaFormUrlEncoded,
+  addPetBodySchemaJson,
+  addPetBodySchemaXml,
   addPetErrorSchema,
   addPetResponseSchema,
   addPetStatus200Schema,
@@ -24,7 +24,7 @@ export {
 export { apiResponseSchema } from './apiResponseSchema.js'
 export { categorySchema } from './categorySchema.js'
 export {
-  createPetsDataSchema,
+  createPetsBodySchema,
   createPetsErrorSchema,
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,
@@ -99,20 +99,20 @@ export { petNotFoundSchema } from './petNotFoundSchema.js'
 export { petSchema } from './petSchema.js'
 export { petStatusEnumSchema } from './petStatusEnumSchema.js'
 export {
-  placeOrderPatchDataSchema,
-  placeOrderPatchDataSchemaFormUrlEncoded,
-  placeOrderPatchDataSchemaJson,
-  placeOrderPatchDataSchemaXml,
+  placeOrderPatchBodySchema,
+  placeOrderPatchBodySchemaFormUrlEncoded,
+  placeOrderPatchBodySchemaJson,
+  placeOrderPatchBodySchemaXml,
   placeOrderPatchErrorSchema,
   placeOrderPatchResponseSchema,
   placeOrderPatchStatus200Schema,
   placeOrderPatchStatus405Schema,
 } from './placeOrderPatchSchema.js'
 export {
-  placeOrderDataSchema,
-  placeOrderDataSchemaFormUrlEncoded,
-  placeOrderDataSchemaJson,
-  placeOrderDataSchemaXml,
+  placeOrderBodySchema,
+  placeOrderBodySchemaFormUrlEncoded,
+  placeOrderBodySchemaJson,
+  placeOrderBodySchemaXml,
   placeOrderErrorSchema,
   placeOrderResponseSchema,
   placeOrderStatus200Schema,
@@ -120,10 +120,10 @@ export {
 } from './placeOrderSchema.js'
 export { tagTagSchema } from './tag/tagSchema.js'
 export {
-  updatePetDataSchema,
-  updatePetDataSchemaFormUrlEncoded,
-  updatePetDataSchemaJson,
-  updatePetDataSchemaXml,
+  updatePetBodySchema,
+  updatePetBodySchemaFormUrlEncoded,
+  updatePetBodySchemaJson,
+  updatePetBodySchemaXml,
   updatePetErrorSchema,
   updatePetResponseSchema,
   updatePetStatus200Schema,
