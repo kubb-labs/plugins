@@ -176,6 +176,7 @@
     "shared-group-config-helper",
     "shared-operation-file-entry",
     "simplify-function-printer",
+    "simplify-resolver-names",
     "single-quote-output-spacing",
     "six-pigs-scream",
     "spread-generators-into-add-generator",
