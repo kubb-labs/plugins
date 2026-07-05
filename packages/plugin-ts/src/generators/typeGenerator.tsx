@@ -47,10 +47,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const isEnumSchema = !!enumNode && !isInlineConstEnum(enumNode, enumSchemaNames)
 
     const meta = {
-      name:
-        ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) && isEnumSchema
-          ? resolver.enum.keyName(node, enumOptions.typeSuffix)
-          : resolver.name(node.name),
+      name: ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) && isEnumSchema ? resolver.enum.keyName(node, enumOptions.typeSuffix) : resolver.name(node.name),
       file: resolver.file({ name: node.name, extname: '.ts' }, { root, output, group: group ?? undefined }),
     } as const
 

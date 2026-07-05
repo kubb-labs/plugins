@@ -449,15 +449,11 @@ export function getPrimarySuccessResponse(node: ast.OperationNode): ast.Response
 }
 
 export function resolveErrorNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
-  return node.responses
-    .filter((response) => isErrorStatusCode(response.statusCode))
-    .map((response) => resolver.response.status(node, response.statusCode))
+  return node.responses.filter((response) => isErrorStatusCode(response.statusCode)).map((response) => resolver.response.status(node, response.statusCode))
 }
 
 export function resolveSuccessNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
-  return node.responses
-    .filter((response) => isSuccessStatusCode(response.statusCode))
-    .map((response) => resolver.response.status(node, response.statusCode))
+  return node.responses.filter((response) => isSuccessStatusCode(response.statusCode)).map((response) => resolver.response.status(node, response.statusCode))
 }
 
 export function resolveStatusCodeNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
