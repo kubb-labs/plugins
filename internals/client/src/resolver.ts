@@ -22,9 +22,6 @@ export const resolverClient = defineResolver<PluginContractClient>(() => ({
   resolveName(name) {
     return this.default(name, 'function')
   },
-  resolvePathName(name, type) {
-    return this.default(name, type)
-  },
   resolveClassName(name) {
     return ensureValidVarName(pascalCase(name))
   },

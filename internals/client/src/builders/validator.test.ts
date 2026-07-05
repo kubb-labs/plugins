@@ -50,19 +50,19 @@ describe('buildValidatorHooks', () => {
     expect(hooks.importedZodNames).toStrictEqual(['addPetResponseSchema', 'addPetErrorSchema'])
   })
 
-  test('the object form wires the request validator from the data schema', () => {
+  test('the object form wires the request validator from the body schema', () => {
     const hooks = buildValidatorHooks({ node: addPet, validator: { request: 'zod' }, zodResolver: resolverZod })
-    expect(hooks.request).toBe('addPetDataSchema')
+    expect(hooks.request).toBe('addPetBodySchema')
     expect(hooks.response).toBeNull()
     expect(hooks.error).toBeNull()
-    expect(hooks.importedZodNames).toStrictEqual(['addPetDataSchema'])
+    expect(hooks.importedZodNames).toStrictEqual(['addPetBodySchema'])
   })
 
   test('wires both directions when both are enabled', () => {
     const hooks = buildValidatorHooks({ node: addPet, validator: { request: 'zod', response: 'zod' }, zodResolver: resolverZod })
-    expect(hooks.request).toBe('addPetDataSchema')
+    expect(hooks.request).toBe('addPetBodySchema')
     expect(hooks.response).toBe('addPetResponseSchema')
     expect(hooks.error).toBeNull()
-    expect(hooks.importedZodNames).toStrictEqual(['addPetDataSchema', 'addPetResponseSchema'])
+    expect(hooks.importedZodNames).toStrictEqual(['addPetBodySchema', 'addPetResponseSchema'])
   })
 })

@@ -14,7 +14,7 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
     const { output, group } = ctx.options
 
     const handlersName = resolver.resolveHandlersName()
-    const file = resolver.resolveFile({ name: resolver.resolvePathName(handlersName, 'file'), extname: '.ts' }, { root, output, group: group ?? undefined })
+    const file = resolver.resolveFile({ name: resolver.default(handlersName, 'file'), extname: '.ts' }, { root, output, group: group ?? undefined })
 
     const imports = nodes.map((node) => {
       const operationName = resolver.resolveHandlerName(node)

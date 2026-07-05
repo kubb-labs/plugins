@@ -44,7 +44,7 @@ export const clientGenerator = defineGenerator<PluginFetch>({
       ? [
           resolveResponseValidator(validator) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
           resolveResponseValidator(validator) === 'zod' ? (buildZodErrorParse(node, zodResolver)?.expression ?? null) : null,
-          resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.resolveDataName?.(node) : null,
+          resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.resolveBodyName?.(node) : null,
         ].filter((name): name is string => Boolean(name))
       : []
 

@@ -8,11 +8,11 @@ import { deletePetHandler } from './deletePet.ts'
 import { findPetsByStatusHandler } from './findPetsByStatus.ts'
 import { getPetByIdHandler } from './getPetById.ts'
 import { uploadFileHandler } from './uploadFile.ts'
-import { addPetDataSchema, addPetStatus200Schema } from '../zod/addPetSchema.ts'
+import { addPetBodySchema, addPetStatus200Schema } from '../zod/addPetSchema.ts'
 import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/deletePetSchema.ts'
 import { findPetsByStatusQueryStatusSchema, findPetsByStatusStatus200Schema } from '../zod/findPetsByStatusSchema.ts'
 import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema.ts'
-import { uploadFileDataSchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from '../zod/uploadFileSchema.ts'
+import { uploadFileBodySchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from '../zod/uploadFileSchema.ts'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
 import { z } from 'zod'
@@ -27,7 +27,7 @@ export function getServer() {
     title: "Add a new pet to the store",
     description: "Add a new pet to the store",
     outputSchema: { data: addPetStatus200Schema },
-    inputSchema: { body: addPetDataSchema },
+    inputSchema: { body: addPetBodySchema },
   }, async ({ body }, request) => {
     return addPetHandler({ body }, request)
   })
@@ -66,7 +66,7 @@ export function getServer() {
     title: "uploads an image",
     description: "Make a POST request to /pet/{petId}/uploadImage",
     outputSchema: { data: uploadFileStatus200Schema },
-    inputSchema: { path: z.object({ "petId": uploadFilePathPetIdSchema }), query: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }), body: uploadFileDataSchema },
+    inputSchema: { path: z.object({ "petId": uploadFilePathPetIdSchema }), query: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }), body: uploadFileBodySchema },
   }, async ({ path, query, body }, request) => {
     return uploadFileHandler({ path, query, body }, request)
   })

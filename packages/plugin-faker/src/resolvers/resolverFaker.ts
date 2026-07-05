@@ -27,9 +27,6 @@ export const resolverFaker = defineResolver<PluginFaker>(() => {
     resolveName(name, type) {
       return this.default(name, type)
     },
-    resolvePathName(name, type) {
-      return this.default(name, type)
-    },
     resolveFile({ name, extname, tag, path: groupPath }, context) {
       const resolvedName = context.output.mode === 'file' ? '' : this.resolveName(name, 'file')
       const inputBaseName = `${resolvedName}${extname}` as `${string}.${string}`
@@ -59,8 +56,8 @@ export const resolverFaker = defineResolver<PluginFaker>(() => {
     resolveParamName(node, param) {
       return this.resolveName(`${node.operationId} ${param.in} ${param.name}`)
     },
-    resolveDataName(node) {
-      return this.resolveName(`${node.operationId} Data`)
+    resolveBodyName(node) {
+      return this.resolveName(`${node.operationId} Body`)
     },
     resolveResponseStatusName(node, statusCode) {
       return this.resolveName(`${node.operationId} Status ${statusCode}`)
@@ -71,13 +68,13 @@ export const resolverFaker = defineResolver<PluginFaker>(() => {
     resolveResponsesName(node) {
       return this.resolveName(`${node.operationId} Responses`)
     },
-    resolvePathParamsName(node, param) {
+    resolvePathName(node, param) {
       return this.resolveParamName(node, param)
     },
-    resolveQueryParamsName(node, param) {
+    resolveQueryName(node, param) {
       return this.resolveParamName(node, param)
     },
-    resolveHeaderParamsName(node, param) {
+    resolveHeadersName(node, param) {
       return this.resolveParamName(node, param)
     },
   }

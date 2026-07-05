@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { CreatePetData, CreatePetResponse, CreatePetStatus201 } from './types/CreatePet'
+import type { CreatePetBody, CreatePetResponse, CreatePetStatus201 } from './types/CreatePet'
 import { faker } from '@faker-js/faker'
 
 /**
@@ -16,7 +16,7 @@ export function createCreatePetStatus201(data?: Partial<CreatePetStatus201>): Cr
 /**
  * @description Pet to add
  */
-export function createCreatePetData<TData extends Partial<CreatePetData> = object>(data?: TData) {
+export function createCreatePetBody<TData extends Partial<CreatePetBody> = object>(data?: TData) {
   const defaultFakeData = {
     name: faker.string.alpha(),
     category: createCategory(),

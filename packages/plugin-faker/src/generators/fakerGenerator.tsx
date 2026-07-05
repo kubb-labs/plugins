@@ -161,8 +161,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     )
     const dataUnits = expandContentUnits(
       node.requestBody?.content ?? [],
-      resolver.resolveDataName(node),
-      tsResolver.resolveDataName(node),
+      resolver.resolveBodyName(node),
+      tsResolver.resolveBodyName(node),
       node.requestBody?.description,
       (schema) => ({ ...schema, description: node.requestBody?.description ?? schema.description }),
     )

@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus200 } from '../types/UpdatePet.ts'
+import type { UpdatePetBody, UpdatePetResponse, UpdatePetStatus200 } from '../types/UpdatePet.ts'
 import { createPet } from './createPet.ts'
 import { createPetUpdate } from './createPetUpdate.ts'
 import { fakerEN as faker } from '@faker-js/faker'
@@ -31,8 +31,8 @@ export function createUpdatePetStatus200(data?: Partial<UpdatePetStatus200>): Up
   return createPet(data) as UpdatePetStatus200
 }
 
-export function createUpdatePetData(data?: Partial<UpdatePetData>): UpdatePetData {
-  return createPetUpdate(data) as UpdatePetData
+export function createUpdatePetBody(data?: Partial<UpdatePetBody>): UpdatePetBody {
+  return createPetUpdate(data) as UpdatePetBody
 }
 
 export function createUpdatePetResponse(data?: Partial<UpdatePetResponse>): UpdatePetResponse {

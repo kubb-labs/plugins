@@ -16,10 +16,6 @@ export type ResolverReactQuery = Resolver & {
    */
   resolveName(this: ResolverReactQuery, name: string): string
   /**
-   * Resolves the output file name for a hook module.
-   */
-  resolvePathName(this: ResolverReactQuery, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
-  /**
    * Resolves a query hook function name.
    */
   resolveQueryName(this: ResolverReactQuery, node: ast.OperationNode): string

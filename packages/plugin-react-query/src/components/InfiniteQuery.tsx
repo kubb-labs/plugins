@@ -82,7 +82,7 @@ export function InfiniteQuery({
   const queryParamsTypeName =
     rawQueryParams.length > 0
       ? (() => {
-          const groupName = tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
+          const groupName = tsResolver.resolveQueryName(node, rawQueryParams[0]!)
           const individualName = tsResolver.resolveParamName(node, rawQueryParams[0]!)
           return groupName !== individualName ? groupName : null
         })()

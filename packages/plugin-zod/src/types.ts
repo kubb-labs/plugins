@@ -42,10 +42,6 @@ export type ResolverZod = Resolver &
      */
     resolveTypeName(this: ResolverZod, name: string): string
     /**
-     * Resolves the output file name for a schema.
-     */
-    resolvePathName(this: ResolverZod, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
-    /**
      * Resolves the name for an operation response by status code.
      *
      * @example Response status names
@@ -78,23 +74,23 @@ export type ResolverZod = Resolver &
      * Resolves the name for an operation's grouped path parameters type.
      *
      * @example Path parameters names
-     * `resolver.resolvePathParamsName(node, param) // → 'deletePetPathPetIdSchema'`
+     * `resolver.resolvePathName(node, param) // → 'deletePetPathPetIdSchema'`
      */
-    resolvePathParamsName(this: ResolverZod, node: ast.OperationNode, param: ast.ParameterNode): string
+    resolvePathName(this: ResolverZod, node: ast.OperationNode, param: ast.ParameterNode): string
     /**
      * Resolves the name for an operation's grouped query parameters type.
      *
      * @example Query parameters names
-     * `resolver.resolveQueryParamsName(node, param) // → 'findPetsByStatusQueryStatusSchema'`
+     * `resolver.resolveQueryName(node, param) // → 'findPetsByStatusQueryStatusSchema'`
      */
-    resolveQueryParamsName(this: ResolverZod, node: ast.OperationNode, param: ast.ParameterNode): string
+    resolveQueryName(this: ResolverZod, node: ast.OperationNode, param: ast.ParameterNode): string
     /**
      * Resolves the name for an operation's grouped header parameters type.
      *
      * @example Header parameters names
-     * `resolver.resolveHeaderParamsName(node, param) // → 'deletePetHeaderApiKeySchema'`
+     * `resolver.resolveHeadersName(node, param) // → 'deletePetHeaderApiKeySchema'`
      */
-    resolveHeaderParamsName(this: ResolverZod, node: ast.OperationNode, param: ast.ParameterNode): string
+    resolveHeadersName(this: ResolverZod, node: ast.OperationNode, param: ast.ParameterNode): string
   }
 
 /**

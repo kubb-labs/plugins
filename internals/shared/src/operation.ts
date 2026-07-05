@@ -31,7 +31,7 @@ export type ContentTypeInfo = {
 }
 
 export type RequestConfigResolver = {
-  resolveDataName(node: ast.OperationNode): string
+  resolveBodyName(node: ast.OperationNode): string
 }
 
 export type ResponseStatusNameResolver = {
@@ -44,9 +44,9 @@ export type ResponseNameResolver = ResponseStatusNameResolver & {
 
 export type OperationTypeNameResolver = RequestConfigResolver &
   ResponseNameResolver & {
-    resolvePathParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
-    resolveQueryParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
-    resolveHeaderParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
+    resolvePathName(node: ast.OperationNode, param: ast.ParameterNode): string
+    resolveQueryName(node: ast.OperationNode, param: ast.ParameterNode): string
+    resolveHeadersName(node: ast.OperationNode, param: ast.ParameterNode): string
   }
 
 /**
@@ -66,33 +66,33 @@ export type OperationParamsResolver = {
    * Resolves the request body type name.
    *
    * @example Request body type name
-   * `resolver.resolveDataName(node) // → 'CreatePetData'`
+   * `resolver.resolveBodyName(node) // → 'CreatePetBody'`
    */
-  resolveDataName(node: ast.OperationNode): string
+  resolveBodyName(node: ast.OperationNode): string
   /**
    * Resolves the grouped path parameters type name.
    * When the return value equals `resolveParamName`, no indexed access is emitted.
    *
    * @example Grouped path params type name
-   * `resolver.resolvePathParamsName(node, param) // → 'DeletePetPathParams'`
+   * `resolver.resolvePathName(node, param) // → 'DeletePetPath'`
    */
-  resolvePathParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
+  resolvePathName(node: ast.OperationNode, param: ast.ParameterNode): string
   /**
    * Resolves the grouped query parameters type name.
    * When the return value equals `resolveParamName`, an inline struct type is emitted instead.
    *
    * @example Grouped query params type name
-   * `resolver.resolveQueryParamsName(node, param) // → 'FindPetsByStatusQueryParams'`
+   * `resolver.resolveQueryName(node, param) // → 'FindPetsByStatusQuery'`
    */
-  resolveQueryParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
+  resolveQueryName(node: ast.OperationNode, param: ast.ParameterNode): string
   /**
    * Resolves the grouped header parameters type name.
    * When the return value equals `resolveParamName`, an inline struct type is emitted instead.
    *
    * @example Grouped header params type name
-   * `resolver.resolveHeaderParamsName(node, param) // → 'DeletePetHeaderParams'`
+   * `resolver.resolveHeadersName(node, param) // → 'DeletePetHeaders'`
    */
-  resolveHeaderParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
+  resolveHeadersName(node: ast.OperationNode, param: ast.ParameterNode): string
 }
 
 export type OperationCommentLink = 'pathTemplate' | 'urlPath' | false | ((node: ast.OperationNode) => string | undefined)
@@ -473,11 +473,11 @@ export function resolveOperationTypeNames(
     options.includeParams === false
       ? []
       : [
-          ...path.map((param) => resolver.resolvePathParamsName(node, param)),
-          ...query.map((param) => resolver.resolveQueryParamsName(node, param)),
-          ...header.map((param) => resolver.resolveHeaderParamsName(node, param)),
+          ...path.map((param) => resolver.resolvePathName(node, param)),
+          ...query.map((param) => resolver.resolveQueryName(node, param)),
+          ...header.map((param) => resolver.resolveHeadersName(node, param)),
         ]
-  const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null, resolver.resolveResponseName(node)]
+  const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.resolveBodyName(node) : null, resolver.resolveResponseName(node)]
   const names =
     options.order === 'body-response-first'
       ? [...bodyAndResponseNames, ...paramNames, ...responseStatusNames]

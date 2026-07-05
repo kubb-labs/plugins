@@ -132,9 +132,9 @@ function resolveParamType({
   const groupLocation = param.in === 'path' || param.in === 'query' || param.in === 'header' ? param.in : undefined
 
   const groupResolvers = {
-    path: resolver.resolvePathParamsName,
-    query: resolver.resolveQueryParamsName,
-    header: resolver.resolveHeaderParamsName,
+    path: resolver.resolvePathName,
+    query: resolver.resolveQueryName,
+    header: resolver.resolveHeadersName,
   } as const
 
   const groupName = groupLocation ? groupResolvers[groupLocation].call(resolver, node, param) : undefined
@@ -167,7 +167,7 @@ function resolveGroupType({
     return null
   }
   const firstParam = params[0]!
-  const groupMethod = group === 'query' ? resolver.resolveQueryParamsName : resolver.resolveHeaderParamsName
+  const groupMethod = group === 'query' ? resolver.resolveQueryName : resolver.resolveHeadersName
   const groupName = groupMethod.call(resolver, node, firstParam)
   if (groupName === resolver.resolveParamName(node, firstParam)) {
     return null
@@ -208,7 +208,7 @@ export function createOperationParams(node: ast.OperationNode, options: CreateOp
   })
   const emptyObjectDefault = (props: Array<GroupProperty>): string | undefined => (props.every((p) => p.optional) ? '{}' : undefined)
 
-  const bodyType = node.requestBody?.content?.[0]?.schema ? wrapType(resolver?.resolveDataName(node) ?? 'unknown') : undefined
+  const bodyType = node.requestBody?.content?.[0]?.schema ? wrapType(resolver?.resolveBodyName(node) ?? 'unknown') : undefined
   const bodyProperty: Array<GroupProperty> = bodyType ? [{ name: dataName, type: bodyType, optional: !(node.requestBody?.required ?? false) }] : []
 
   const trailingGroups: Array<BuildGroupArgs> = [
@@ -232,7 +232,7 @@ export function createOperationParams(node: ast.OperationNode, options: CreateOp
     }
   } else {
     if (pathParamsType === 'inlineSpread' && pathParams.length) {
-      const spreadType = resolver?.resolvePathParamsName(node, pathParams[0]!)
+      const spreadType = resolver?.resolvePathName(node, pathParams[0]!)
       params.push(createFunctionParameter({ name: pathName, type: spreadType ? wrapType(spreadType) : undefined, rest: true }))
     } else if (pathParamsType === 'inline') {
       params.push(...pathParams.map((p) => createFunctionParameter(toProperty(p))))

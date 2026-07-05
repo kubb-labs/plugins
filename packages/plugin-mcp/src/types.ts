@@ -13,10 +13,6 @@ export type ResolverMcp = Resolver & {
    */
   resolveName(this: ResolverMcp, name: string): string
   /**
-   * Resolves the output file name for an MCP module.
-   */
-  resolvePathName(this: ResolverMcp, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
-  /**
    * Resolves the handler function name for an operation.
    */
   resolveHandlerName(this: ResolverMcp, node: ast.OperationNode): string

@@ -26,16 +26,16 @@ import {
 } from './operation.ts'
 
 const resolver: RequestConfigResolver & ResponseNameResolver & ResponseStatusNameResolver & OperationTypeNameResolver = {
-  resolveDataName(node) {
+  resolveBodyName(node) {
     return `${node.operationId}Data`
   },
-  resolvePathParamsName(_node, param) {
+  resolvePathName(_node, param) {
     return `${param.name}PathParams`
   },
-  resolveQueryParamsName(_node, param) {
+  resolveQueryName(_node, param) {
     return `${param.name}QueryParams`
   },
-  resolveHeaderParamsName(_node, param) {
+  resolveHeadersName(_node, param) {
     return `${param.name}HeaderParams`
   },
   resolveResponseName(node) {

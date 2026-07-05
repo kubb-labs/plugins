@@ -26,7 +26,7 @@ export type UpdatePetStatus200 = object
 /**
  * @type object
  */
-export type UpdatePetData = {
+export type UpdatePetBody = {
   /**
    * @type string
    */
@@ -37,7 +37,7 @@ export type UpdatePetData = {
  * @type object
  */
 export type UpdatePetRequestConfig = {
-  body: UpdatePetData
+  body: UpdatePetBody
   /**
    * @type object
    */

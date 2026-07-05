@@ -14,7 +14,7 @@ export type CreateOrderStatus201 = OrderSchema;
  * @description Order request body
  * @type object | undefined
 */
-export type CreateOrderData = {
+export type CreateOrderBody = {
     /**
      * @type string | undefined
     */
@@ -29,7 +29,7 @@ export type CreateOrderData = {
  * @type object
 */
 export type CreateOrderRequestConfig = {
-    body: CreateOrderData;
+    body: CreateOrderBody;
     path?: never;
     query?: never;
     headers?: never;

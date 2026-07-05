@@ -16,13 +16,13 @@ export type AddPetStatus405 = object
 /**
  * @type object
  */
-export type AddPetData = object
+export type AddPetBody = object
 
 /**
  * @type object
  */
 export type AddPetRequestConfig = {
-  body: AddPetData
+  body: AddPetBody
   path?: never
   query?: never
   headers?: never

@@ -16,7 +16,7 @@ export type UploadFileStatus200 = object
 /**
  * @type object
  */
-export type UploadFileJsonData = {
+export type UploadFileBodyJson = {
   /**
    * @type string
    */
@@ -26,20 +26,20 @@ export type UploadFileJsonData = {
 /**
  * @type object
  */
-export type UploadFileFormData = {
+export type UploadFileBodyFormData = {
   /**
    * @type string
    */
   file: string
 }
 
-export type UploadFileData = UploadFileJsonData | UploadFileFormData
+export type UploadFileBody = UploadFileBodyJson | UploadFileBodyFormData
 
 /**
  * @type object
  */
 export type UploadFileRequestConfig = {
-  body: UploadFileData
+  body: UploadFileBody
   /**
    * @type object
    */

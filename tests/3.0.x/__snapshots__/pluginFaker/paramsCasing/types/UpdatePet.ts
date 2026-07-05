@@ -34,13 +34,13 @@ export type UpdatePetStatus200 = Pet;
 /**
  * @type object
 */
-export type UpdatePetData = PetUpdate;
+export type UpdatePetBody = PetUpdate;
 
 /**
  * @type object
 */
 export type UpdatePetRequestConfig = {
-    body: UpdatePetData;
+    body: UpdatePetBody;
     /**
      * @type object
     */

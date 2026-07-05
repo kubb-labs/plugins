@@ -31,10 +31,6 @@ export type ResolverClient = Resolver & {
    */
   resolveName(this: ResolverClient, name: string): string
   /**
-   * Resolves the output file name for a generated client module.
-   */
-  resolvePathName(this: ResolverClient, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
-  /**
    * Resolves the generated class name for class-based clients.
    */
   resolveClassName(this: ResolverClient, name: string): string

@@ -14,13 +14,13 @@ export type CreateConfigV20250Status201 = Config;
 /**
  * @type object
 */
-export type CreateConfigV20250Data = ConfigCreate;
+export type CreateConfigV20250Body = ConfigCreate;
 
 /**
  * @type object
 */
 export type CreateConfigV20250RequestConfig = {
-    body: CreateConfigV20250Data;
+    body: CreateConfigV20250Body;
     path?: never;
     query?: never;
     headers?: never;

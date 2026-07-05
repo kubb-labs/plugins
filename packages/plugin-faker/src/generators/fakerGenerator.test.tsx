@@ -349,6 +349,6 @@ describe('fakerGenerator — operation', () => {
 
   test('default resolver applies create prefix to names', () => {
     expect(resolverFaker.resolveName('Eval')).toBe('createEval')
-    expect(resolverFaker.resolvePathName('Eval', 'file')).toBe('createEval')
+    expect(resolverFaker.default('Eval', 'file')).toBe('createEval')
   })
 })

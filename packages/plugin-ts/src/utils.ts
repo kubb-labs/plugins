@@ -107,7 +107,7 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
         name: 'body',
         required: hasBody,
         schema: hasBody
-          ? ast.factory.createSchema({ type: 'ref', name: resolver.resolveDataName(node) })
+          ? ast.factory.createSchema({ type: 'ref', name: resolver.resolveBodyName(node) })
           : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
       ast.factory.createProperty({

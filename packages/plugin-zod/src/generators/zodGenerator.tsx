@@ -372,14 +372,14 @@ export const zodGenerator = defineGenerator<PluginZod>({
         if (!entry.schema) return null
         return renderSchemaEntry({
           schema: { ...entry.schema, description: node.requestBody!.description ?? entry.schema.description },
-          name: resolver.resolveDataName(node),
+          name: resolver.resolveBodyName(node),
           keysToOmit: entry.keysToOmit,
           direction: 'input',
         })
       }
       return buildContentTypeVariants(
         requestBodyContent,
-        resolver.resolveDataName(node),
+        resolver.resolveBodyName(node),
         (schema) => ({
           ...schema,
           description: node.requestBody!.description ?? schema.description,

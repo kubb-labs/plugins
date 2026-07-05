@@ -16,7 +16,7 @@ import type { PluginTs } from '../types.ts'
  * import { resolverTs } from '@kubb/plugin-ts'
  *
  * resolverTs.default('list pets', 'type')        // 'ListPets'
- * resolverTs.resolvePathName('list pets', 'file') // 'ListPets'
+ * resolverTs.default('list pets', 'file')         // 'ListPets'
  * resolverTs.resolveResponseStatusName(node, 200) // 'ListPetsStatus200'
  * ```
  */
@@ -31,18 +31,14 @@ export const resolverTs = defineResolver<PluginTs>(() => {
     resolveTypeName(name) {
       return ensureValidVarName(pascalCase(name))
     },
-    resolvePathName(name, type) {
-      if (type === 'file') return toFilePath(name, pascalCase)
-      return ensureValidVarName(pascalCase(name))
-    },
     resolveParamName(node, param) {
       return this.resolveTypeName(`${node.operationId} ${param.in} ${param.name}`)
     },
     resolveResponseStatusName(node, statusCode) {
       return this.resolveTypeName(`${node.operationId} Status ${statusCode}`)
     },
-    resolveDataName(node) {
-      return this.resolveTypeName(`${node.operationId} Data`)
+    resolveBodyName(node) {
+      return this.resolveTypeName(`${node.operationId} Body`)
     },
     resolveRequestConfigName(node) {
       // NOTE(v5-stable): the `RequestConfig` suffix is kept through the beta to avoid churn, but it
@@ -58,13 +54,13 @@ export const resolverTs = defineResolver<PluginTs>(() => {
     resolveEnumKeyName(node, enumTypeSuffix = 'key') {
       return `${this.resolveTypeName(node.name ?? '')}${enumTypeSuffix}`
     },
-    resolvePathParamsName(node, param) {
+    resolvePathName(node, param) {
       return this.resolveParamName(node, param)
     },
-    resolveQueryParamsName(node, param) {
+    resolveQueryName(node, param) {
       return this.resolveParamName(node, param)
     },
-    resolveHeaderParamsName(node, param) {
+    resolveHeadersName(node, param) {
       return this.resolveParamName(node, param)
     },
   }

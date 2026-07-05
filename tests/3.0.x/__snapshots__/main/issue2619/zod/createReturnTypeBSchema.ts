@@ -10,4 +10,4 @@ export const createReturnTypeBStatus200Schema = resultSchema
 
 export const createReturnTypeBResponseSchema = createReturnTypeBStatus200Schema
 
-export const createReturnTypeBDataSchema = typeBRequestSchema
+export const createReturnTypeBBodySchema = typeBRequestSchema

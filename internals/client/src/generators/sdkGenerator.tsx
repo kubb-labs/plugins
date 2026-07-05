@@ -55,8 +55,8 @@ function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod
   const names: Array<string | null | undefined> = [
     resolveResponseValidator(validator) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
     resolveResponseValidator(validator) === 'zod' ? (buildZodErrorParse(node, zodResolver)?.expression ?? null) : null,
-    resolveRequestValidator(validator) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,
-    resolveQueryParamsValidator(validator) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null,
+    resolveRequestValidator(validator) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveBodyName?.(node) : null,
+    resolveQueryParamsValidator(validator) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryName?.(node, queryParams[0]!) : null,
   ]
   return names.filter((n): n is string => Boolean(n))
 }

@@ -22,13 +22,13 @@ export type PlaceOrderPatchStatus405 = object
  * @description Order payload
  * @type object
  */
-export type PlaceOrderPatchData = object
+export type PlaceOrderPatchBody = object
 
 /**
  * @type object
  */
 export type PlaceOrderPatchRequestConfig = {
-  body: PlaceOrderPatchData
+  body: PlaceOrderPatchBody
   /**
    * @type object
    */

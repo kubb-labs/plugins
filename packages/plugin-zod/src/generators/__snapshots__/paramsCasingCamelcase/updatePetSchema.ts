@@ -13,6 +13,6 @@ export const updatePetStatus200Schema = z.object({})
 
 export const updatePetResponseSchema = updatePetStatus200Schema
 
-export const updatePetDataSchema = z.object({
+export const updatePetBodySchema = z.object({
   name: z.string(),
 })

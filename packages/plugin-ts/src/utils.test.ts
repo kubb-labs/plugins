@@ -72,7 +72,7 @@ describe('buildData', () => {
 
     expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
       "{
-          body: CreatePetData;
+          body: CreatePetBody;
           path?: never;
           query?: never;
           headers?: never;
