@@ -46,12 +46,12 @@ export const serverGenerator = defineGenerator<PluginMcp>({
     const operationsMapped = nodes.filter(ast.isHttpOperationNode).map((node) => {
       const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
 
-      const mcpFile = resolver.resolveFile(
+      const mcpFile = resolver.core.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output, group: group ?? undefined },
       )
 
-      const zodFile = zodResolver.resolveFile(
+      const zodFile = zodResolver.core.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
@@ -111,8 +111,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           baseName={serverFile.baseName}
           path={serverFile.path}
           meta={serverFile.meta}
-          banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
-          footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
+          banner={resolver.core.banner(ctx.meta, { output, config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
+          footer={resolver.core.footer(ctx.meta, { output, config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
         >
           <File.Import name={['McpServer']} path={'@modelcontextprotocol/sdk/server/mcp'} />
           <File.Import name={['z']} path={'zod'} />

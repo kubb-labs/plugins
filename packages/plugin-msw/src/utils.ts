@@ -66,7 +66,7 @@ export function resolveFakerMeta(
 
   return {
     name: fakerResolver.resolveResponseName(node),
-    file: fakerResolver.resolveFile(
+    file: fakerResolver.core.file(
       { name: node.operationId, extname: '.ts', tag, path: node.path },
       { root, output: fakerOutput, group: fakerGroup ?? undefined },
     ),

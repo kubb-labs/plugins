@@ -38,9 +38,9 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       isEnumSchema && tsEnumType === 'asConst' ? tsResolver.resolveEnumKeyName({ name: schemaName }, tsEnumTypeSuffix) : tsResolver.resolveTypeName(schemaName)
     const meta = {
       name: resolver.resolveName(schemaName),
-      file: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }),
+      file: resolver.core.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }),
       typeName: schemaTypeName,
-      typeFile: tsResolver.resolveFile(
+      typeFile: tsResolver.core.file(
         { name: schemaName, extname: '.ts' },
         { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
       ),
@@ -69,7 +69,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const imports = adapter.getImports(node, (schemaName) => ({
       name: resolver.resolveName(schemaName),
-      path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+      path: resolver.core.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
     }))
     const usedImports = filterUsedImports(imports, fakerText)
 
@@ -78,8 +78,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.core.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.core.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
@@ -176,11 +176,11 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
 
     const meta = {
-      file: resolver.resolveFile(
+      file: resolver.core.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output, group: group ?? undefined },
       ),
-      typeFile: tsResolver.resolveFile(
+      typeFile: tsResolver.core.file(
         {
           name: node.operationId,
           extname: '.ts',
@@ -199,7 +199,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       return adapter
         .getImports(schema, (schemaName) => ({
           name: resolver.resolveName(schemaName),
-          path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+          path: resolver.core.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
         }))
         .filter((entry) => entry.path !== meta.file.path)
     }
@@ -269,8 +269,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.core.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.core.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}

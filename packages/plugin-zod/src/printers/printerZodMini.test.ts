@@ -312,7 +312,7 @@ describe('printerZodMini', () => {
     })
 
     test('cross-file ref with resolver returns resolved bare name', () => {
-      const p = printerZodMini({ resolver: { default: (name: string) => `${name.charAt(0).toLowerCase()}${name.slice(1)}Schema` } as unknown as ResolverZod })
+      const p = printerZodMini({ resolver: { core: { name: (name: string) => `${name.charAt(0).toLowerCase()}${name.slice(1)}Schema` } } as unknown as ResolverZod })
       const node = ast.factory.createSchema({ type: 'ref', name: 'UnsupportedAuthenticationProblem', ref: '#/components/schemas/Problem' })
 
       expect(p.print(node)).toBe('problemSchema')

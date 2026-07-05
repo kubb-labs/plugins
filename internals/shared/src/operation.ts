@@ -10,7 +10,7 @@ import { caseParams, dedupeByCasedName } from './params.ts'
  *
  * @example
  * ```ts
- * resolver.resolveFile(operationFileEntry(node, node.operationId), { root, output, group })
+ * resolver.core.file(operationFileEntry(node, node.operationId), { root, output, group })
  * ```
  */
 export function operationFileEntry(node: ast.OperationNode, name: string, extname: ResolverFileParams['extname'] = '.ts'): ResolverFileParams {

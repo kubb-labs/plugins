@@ -28,11 +28,16 @@ function capitalize(name: string): string {
 export const resolverReactQuery = defineResolver<PluginReactQuery>(() => ({
   name: 'default',
   pluginName: 'plugin-react-query',
-  default(name, type) {
-    return type === 'file' ? toFilePath(name) : camelCase(name)
+  core: {
+    name(name) {
+      return camelCase(name)
+    },
+    fileName(name) {
+      return toFilePath(name)
+    },
   },
   resolveName(name) {
-    return this.default(name, 'function')
+    return this.core.name(name)
   },
   resolveQueryName(node) {
     return `use${capitalize(this.resolveName(node.operationId))}`

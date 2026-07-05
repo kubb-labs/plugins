@@ -86,7 +86,7 @@ const operationWithSnakeCaseParams: ast.OperationNode = ast.factory.createOperat
 const apiResolver = {
   ...resolverTs,
   resolveTypeName(name: string) {
-    return `Api${resolverTs.default(name, 'type')}`
+    return `Api${resolverTs.core.name(name)}`
   },
 }
 

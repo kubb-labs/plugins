@@ -14,11 +14,11 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
     const { output, group } = ctx.options
 
     const handlersName = resolver.resolveHandlersName()
-    const file = resolver.resolveFile({ name: resolver.default(handlersName, 'file'), extname: '.ts' }, { root, output, group: group ?? undefined })
+    const file = resolver.core.file({ name: resolver.core.fileName(handlersName), extname: '.ts' }, { root, output, group: group ?? undefined })
 
     const imports = nodes.map((node) => {
       const operationName = resolver.resolveHandlerName(node)
-      const operationFile = resolver.resolveFile(
+      const operationFile = resolver.core.file(
         { name: resolver.resolveName(node.operationId), extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output, group: group ?? undefined },
       )
@@ -32,8 +32,8 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
         baseName: file.baseName,
         path: file.path,
         meta: file.meta,
-        banner: resolver.resolveBanner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } }),
-        footer: resolver.resolveFooter(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } }),
+        banner: resolver.core.banner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } }),
+        footer: resolver.core.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } }),
         imports,
         sources: [
           ast.factory.createSource({

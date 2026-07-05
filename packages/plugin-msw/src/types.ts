@@ -1,4 +1,4 @@
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, DeepPartial, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 /**
  * Resolver for MSW that provides naming methods for handler functions.
@@ -45,7 +45,7 @@ export type Options = OutputOptions & {
   /**
    * Override how handler names and file paths are built.
    */
-  resolver?: Partial<ResolverMsw> & ThisType<ResolverMsw>
+  resolver?: DeepPartial<ResolverMsw> & ThisType<ResolverMsw>
   /**
    * Macros applied to operation nodes before printing.
    */

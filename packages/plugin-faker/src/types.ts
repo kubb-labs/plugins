@@ -1,5 +1,5 @@
 import type { OperationParamsResolver } from '@internals/shared'
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, DeepPartial, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 import type { PrinterFakerNodes } from './printers/printerFaker.ts'
 
 /**
@@ -13,7 +13,7 @@ export type ResolverFaker = Resolver &
      * @example Resolving faker function names
      * `resolver.resolveName('show pet by id') // -> 'showPetById'`
      */
-    resolveName(this: ResolverFaker, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
+    resolveName(this: ResolverFaker, name: string): string
     /**
      * Resolves the faker function name for a request body.
      *
@@ -120,7 +120,7 @@ export type Options = OutputOptions & {
    * Override the naming of generated factory helpers. Common use: append `Mock` or
    * `Factory` so helpers do not clash with imported types.
    */
-  resolver?: Partial<ResolverFaker> & ThisType<ResolverFaker>
+  resolver?: DeepPartial<ResolverFaker> & ThisType<ResolverFaker>
   /**
    * Macros applied to schema and operation nodes before printing.
    */

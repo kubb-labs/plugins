@@ -105,12 +105,12 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const codecRefNames = new Set(hasCodec ? collectCodecRefNames(node) : [])
     const importEntries = adapter.getImports(node, (schemaName) => ({
       name: resolver.resolveSchemaName(schemaName),
-      path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+      path: resolver.core.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
     }))
     const inputImportEntries = hasCodec
       ? [...codecRefNames].map((schemaName) => ({
           name: [resolver.resolveInputSchemaName(schemaName)],
-          path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+          path: resolver.core.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
         }))
       : []
     const seenImports = new Set<string>()
@@ -123,7 +123,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const meta = {
       name: resolver.resolveSchemaName(node.name),
-      file: resolver.resolveFile({ name: node.name, extname: '.ts' }, { root, output, group: group ?? undefined }),
+      file: resolver.core.file({ name: node.name, extname: '.ts' }, { root, output, group: group ?? undefined }),
     } as const
 
     const inferTypeName = inferred ? resolver.resolveSchemaTypeName(node.name) : null
@@ -137,8 +137,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.core.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.core.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
         {imports.map((imp) => (
@@ -169,7 +169,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const params = caseParams(node.parameters, 'camelcase')
 
     const meta = {
-      file: resolver.resolveFile(
+      file: resolver.core.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output, group: group ?? undefined },
       ),
@@ -197,7 +197,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       const codecRefNames = direction === 'input' && !mini ? new Set(collectCodecRefNames(schema)) : null
       const imports = adapter.getImports(schema, (schemaName) => ({
         name: codecRefNames?.has(schemaName) ? resolver.resolveInputSchemaName(schemaName) : resolver.resolveSchemaName(schemaName),
-        path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+        path: resolver.core.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
       }))
 
       const schemaPrinter = mini
@@ -393,8 +393,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.core.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.core.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
         {paramSchemas}

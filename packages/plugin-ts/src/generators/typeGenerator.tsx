@@ -38,7 +38,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const imports = adapter.getImports(node, (schemaName) => ({
       name: resolveImportName(schemaName),
-      path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+      path: resolver.core.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
     }))
 
     const enumNode = ast.narrowSchema(node, ast.schemaTypes.enum)
@@ -51,7 +51,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) && isEnumSchema
           ? resolver.resolveEnumKeyName(node, enumOptions.typeSuffix)
           : resolver.resolveTypeName(node.name),
-      file: resolver.resolveFile({ name: node.name, extname: '.ts' }, { root, output, group: group ?? undefined }),
+      file: resolver.core.file({ name: node.name, extname: '.ts' }, { root, output, group: group ?? undefined }),
     } as const
 
     const schemaPrinter = printerTs({
@@ -72,8 +72,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.core.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.core.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {imports.map((imp) => (
           <File.Import key={[node.name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
@@ -89,7 +89,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const params = caseParams(node.parameters, 'camelcase')
 
     const meta = {
-      file: resolver.resolveFile(
+      file: resolver.core.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output, group: group ?? undefined },
       ),
@@ -111,7 +111,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
       const imports = adapter.getImports(schema, (schemaName) => ({
         name: resolveImportName(schemaName),
-        path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+        path: resolver.core.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
       }))
 
       const schemaPrinter = printerTs({
@@ -269,8 +269,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.core.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.core.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {paramTypes}
         {responseTypes}

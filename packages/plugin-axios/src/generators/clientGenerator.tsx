@@ -50,15 +50,15 @@ export const clientGenerator = defineGenerator<PluginAxios>({
 
     const meta = {
       name: resolver.resolveName(node.operationId),
-      file: resolver.resolveFile(operationFileEntry(node, node.operationId), { root, output, group: group ?? undefined }),
-      fileTs: tsResolver.resolveFile(operationFileEntry(node, node.operationId), {
+      file: resolver.core.file(operationFileEntry(node, node.operationId), { root, output, group: group ?? undefined }),
+      fileTs: tsResolver.core.file(operationFileEntry(node, node.operationId), {
         root,
         output: pluginTs.options?.output ?? output,
         group: pluginTs.options?.group ?? undefined,
       }),
       fileZod:
         zodResolver && pluginZod?.options
-          ? zodResolver.resolveFile(operationFileEntry(node, node.operationId), {
+          ? zodResolver.core.file(operationFileEntry(node, node.operationId), {
               root,
               output: pluginZod.options.output ?? output,
               group: pluginZod.options?.group ?? undefined,
@@ -80,8 +80,8 @@ export const clientGenerator = defineGenerator<PluginAxios>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.core.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.core.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={eventStream ? ['client', 'toEventStream'] : ['client']} root={meta.file.path} path={clientPath} />
         <File.Import

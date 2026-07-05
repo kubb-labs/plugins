@@ -17,8 +17,13 @@ import type { PluginMsw } from '../types.ts'
 export const resolverMsw = defineResolver<PluginMsw>(() => ({
   name: 'default',
   pluginName: 'plugin-msw',
-  default(name, type) {
-    return type === 'file' ? toFilePath(name) : camelCase(name)
+  core: {
+    name(name) {
+      return camelCase(name)
+    },
+    fileName(name) {
+      return toFilePath(name)
+    },
   },
   resolveName(name) {
     return camelCase(name, { suffix: 'handler' })

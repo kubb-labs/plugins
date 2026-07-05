@@ -1,15 +1,15 @@
 import type { OperationParamsResolver } from '@internals/shared'
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, DeepPartial, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 import type { PrinterTsNodes } from './printers/printerTs.ts'
 /**
  * The concrete resolver type for `@kubb/plugin-ts`.
- * Extends the base `Resolver` (which provides `default` and `resolveOptions`) with
+ * Extends the base `Resolver` (which provides `core` naming and option helpers) with
  * plugin-specific naming helpers for operations, parameters, responses, and schemas.
  */
 export type ResolverTs = Resolver &
   OperationParamsResolver & {
     /**
-     * Resolves the name for a given raw name (equivalent to `default(name, 'function')`).
+     * Resolves the name for a given raw name (equivalent to `core.name(name)`).
      * Since TypeScript only emits types, this is the canonical naming method.
      *
      * @example Resolving type names
@@ -239,10 +239,9 @@ export type Options = OutputOptions & {
   /**
    * Override how names and file paths are built for generated symbols.
    * Methods you omit fall back to the default `resolverTs`. `this` is bound to the
-   * full resolver, so `this.default(name, 'function')` delegates to the built-in
-   * implementation.
+   * full resolver, so `this.core.name(name)` delegates to the built-in implementation.
    */
-  resolver?: Partial<ResolverTs> & ThisType<ResolverTs>
+  resolver?: DeepPartial<ResolverTs> & ThisType<ResolverTs>
   /**
    * Macros applied to each schema or operation node before printing.
    * Callbacks you omit fall back to the preset behavior.

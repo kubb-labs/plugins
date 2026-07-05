@@ -1,6 +1,6 @@
 import type { ClientSelector } from '@internals/client'
 import type { Transformer } from '@internals/tanstack-query'
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, DeepPartial, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 export type { Transformer } from '@internals/tanstack-query'
 
@@ -291,7 +291,7 @@ export type Options = OutputOptions & {
    * Override how hook names and file paths are built. Methods you omit fall
    * back to the default `resolverReactQuery`.
    */
-  resolver?: Partial<ResolverReactQuery> & ThisType<ResolverReactQuery>
+  resolver?: DeepPartial<ResolverReactQuery> & ThisType<ResolverReactQuery>
   /**
    * Set to `false` to skip generating `use*` hook functions. `queryOptions`,
    * `mutationOptions`, `queryKey`, and `mutationKey` helpers are still emitted.

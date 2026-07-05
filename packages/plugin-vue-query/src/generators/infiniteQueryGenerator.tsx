@@ -55,8 +55,8 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
     const queryKeyTypeName = resolver.resolveInfiniteQueryKeyTypeName(node)
 
     const meta = {
-      file: resolver.resolveFile(operationFileEntry(node, queryName), { root, output, group: group ?? undefined }),
-      fileTs: tsResolver.resolveFile(operationFileEntry(node, node.operationId), {
+      file: resolver.core.file(operationFileEntry(node, queryName), { root, output, group: group ?? undefined }),
+      fileTs: tsResolver.core.file(operationFileEntry(node, node.operationId), {
         root,
         output: pluginTs.options?.output ?? output,
         group: pluginTs.options?.group ?? undefined,
@@ -86,8 +86,8 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.core.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.core.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
         <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />

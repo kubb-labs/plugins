@@ -404,11 +404,13 @@ const configs = [
         pluginTs({
           output: { path: './types', barrel: false },
           resolver: {
-            resolveBanner() {
-              return '// Custom banner'
+            core: {
+              banner() {
+                return '// Custom banner'
+              },
             },
             resolveTypeName(name) {
-              return `Custom${this.default(name, 'function')}`
+              return `Custom${this.core.name(name)}`
             },
           },
         }),

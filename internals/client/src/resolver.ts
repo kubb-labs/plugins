@@ -15,12 +15,16 @@ import type { PluginContractClient } from './types.ts'
 export const resolverClient = defineResolver<PluginContractClient>(() => ({
   name: 'default',
   pluginName: 'plugin-contract-client',
-  default(name, type) {
-    if (type === 'file') return toFilePath(name)
-    return ensureValidVarName(camelCase(name))
+  core: {
+    name(name) {
+      return ensureValidVarName(camelCase(name))
+    },
+    fileName(name) {
+      return toFilePath(name)
+    },
   },
   resolveName(name) {
-    return this.default(name, 'function')
+    return this.core.name(name)
   },
   resolveClassName(name) {
     return ensureValidVarName(pascalCase(name))

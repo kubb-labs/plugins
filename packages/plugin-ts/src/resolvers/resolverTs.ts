@@ -8,28 +8,32 @@ import type { PluginTs } from '../types.ts'
  * to reference the exact names `plugin-ts` produces without duplicating the
  * casing/file-layout rules.
  *
- * The `default` method is supplied by `defineResolver`. It uses PascalCase for
- * type names and PascalCase file paths (dotted names become `/`-joined) for files.
+ * The `core` helpers are supplied by `defineResolver`. This plugin overrides them to use PascalCase
+ * for value and type names and PascalCase file paths (dotted names become `/`-joined) for files.
  *
  * @example Resolve a type and file name
  * ```ts
  * import { resolverTs } from '@kubb/plugin-ts'
  *
- * resolverTs.default('list pets', 'type')        // 'ListPets'
- * resolverTs.default('list pets', 'file')         // 'ListPets'
- * resolverTs.resolveResponseStatusName(node, 200) // 'ListPetsStatus200'
+ * resolverTs.core.name('list pets')                // 'ListPets'
+ * resolverTs.core.fileName('list pets')            // 'ListPets'
+ * resolverTs.resolveResponseStatusName(node, 200)  // 'ListPetsStatus200'
  * ```
  */
 export const resolverTs = defineResolver<PluginTs>(() => {
   return {
     name: 'default',
     pluginName: 'plugin-ts',
-    default(name, type) {
-      if (type === 'file') return toFilePath(name, pascalCase)
-      return ensureValidVarName(pascalCase(name))
+    core: {
+      name(name) {
+        return ensureValidVarName(pascalCase(name))
+      },
+      fileName(name) {
+        return toFilePath(name, pascalCase)
+      },
     },
     resolveTypeName(name) {
-      return ensureValidVarName(pascalCase(name))
+      return this.core.name(name)
     },
     resolveParamName(node, param) {
       return this.resolveTypeName(`${node.operationId} ${param.in} ${param.name}`)

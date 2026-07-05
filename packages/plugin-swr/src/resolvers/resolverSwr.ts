@@ -12,16 +12,21 @@ function capitalize(name: string): string {
  * Provides default naming helpers using camelCase for functions and file paths.
  *
  * @example
- * `resolverSwr.default('list pets', 'function')  // → 'listPets'`
+ * `resolverSwr.core.name('list pets')  // → 'listPets'`
  */
 export const resolverSwr = defineResolver<PluginSwr>(() => ({
   name: 'default',
   pluginName: 'plugin-swr',
-  default(name, type) {
-    return type === 'file' ? toFilePath(name) : camelCase(name)
+  core: {
+    name(name) {
+      return camelCase(name)
+    },
+    fileName(name) {
+      return toFilePath(name)
+    },
   },
   resolveName(name) {
-    return this.default(name, 'function')
+    return this.core.name(name)
   },
   resolveQueryName(node) {
     return `use${capitalize(this.resolveName(node.operationId))}`

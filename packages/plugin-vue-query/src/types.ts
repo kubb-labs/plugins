@@ -1,5 +1,5 @@
 import type { ClientSelector } from '@internals/client'
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, DeepPartial, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 /**
  * Builds the parts of a query or mutation key for one operation. Receives the operation node and
@@ -206,7 +206,7 @@ export type Options = OutputOptions & {
   /**
    * Override how composable names and file paths are built.
    */
-  resolver?: Partial<ResolverVueQuery> & ThisType<ResolverVueQuery>
+  resolver?: DeepPartial<ResolverVueQuery> & ThisType<ResolverVueQuery>
   /**
    * Set to `false` to skip generating `use*` composable functions. `queryOptions`,
    * `queryKey`, and `mutationKey` helpers are still emitted.

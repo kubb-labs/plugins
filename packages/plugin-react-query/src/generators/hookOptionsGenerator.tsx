@@ -24,7 +24,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
     if (!customOptions || !hooks) return null
 
     const name = resolver.resolveHookOptionsName()
-    const resolvedFile = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group: group ?? undefined })
+    const resolvedFile = resolver.core.file({ name, extname: '.ts' }, { root, output, group: group ?? undefined })
     const hookOptionsFile = {
       ...resolvedFile,
       baseName: `${name}.ts` as const,
@@ -58,14 +58,14 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       if (isQueryOp) {
         const queryOptionsName = resolver.resolveQueryOptionsName(node)
         const queryHookName = resolver.resolveQueryName(node)
-        const queryHookFile = resolver.resolveFile(operationFileEntry(node, queryHookName), { root, output, group: group ?? undefined })
+        const queryHookFile = resolver.core.file(operationFileEntry(node, queryHookName), { root, output, group: group ?? undefined })
         imports.push(<File.Import name={[queryOptionsName]} root={hookOptionsFile.path} path={queryHookFile.path} />)
         hookOptions[queryHookName] = `Partial<ReturnType<typeof ${queryOptionsName}>>`
 
         if (isSuspenseOp) {
           const suspenseOptionsName = resolver.resolveSuspenseQueryOptionsName(node)
           const suspenseHookName = resolver.resolveSuspenseQueryName(node)
-          const suspenseHookFile = resolver.resolveFile(operationFileEntry(node, suspenseHookName), { root, output, group: group ?? undefined })
+          const suspenseHookFile = resolver.core.file(operationFileEntry(node, suspenseHookName), { root, output, group: group ?? undefined })
           imports.push(<File.Import name={[suspenseOptionsName]} root={hookOptionsFile.path} path={suspenseHookFile.path} />)
           hookOptions[suspenseHookName] = `Partial<ReturnType<typeof ${suspenseOptionsName}>>`
         }
@@ -79,14 +79,14 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
           if (hasQueryParam) {
             const infiniteOptionsName = resolver.resolveInfiniteQueryOptionsName(node)
             const infiniteHookName = resolver.resolveInfiniteQueryName(node)
-            const infiniteHookFile = resolver.resolveFile(operationFileEntry(node, infiniteHookName), { root, output, group: group ?? undefined })
+            const infiniteHookFile = resolver.core.file(operationFileEntry(node, infiniteHookName), { root, output, group: group ?? undefined })
             imports.push(<File.Import name={[infiniteOptionsName]} root={hookOptionsFile.path} path={infiniteHookFile.path} />)
             hookOptions[infiniteHookName] = `Partial<ReturnType<typeof ${infiniteOptionsName}>>`
 
             if (isSuspenseOp) {
               const suspenseInfiniteOptionsName = resolver.resolveSuspenseInfiniteQueryOptionsName(node)
               const suspenseInfiniteHookName = resolver.resolveSuspenseInfiniteQueryName(node)
-              const suspenseInfiniteHookFile = resolver.resolveFile(operationFileEntry(node, suspenseInfiniteHookName), {
+              const suspenseInfiniteHookFile = resolver.core.file(operationFileEntry(node, suspenseInfiniteHookName), {
                 root,
                 output,
                 group: group ?? undefined,
@@ -101,7 +101,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       if (isMutationOp) {
         const mutationOptionsName = resolver.resolveMutationOptionsName(node)
         const mutationHookName = resolver.resolveMutationName(node)
-        const mutationHookFile = resolver.resolveFile(operationFileEntry(node, mutationHookName), { root, output, group: group ?? undefined })
+        const mutationHookFile = resolver.core.file(operationFileEntry(node, mutationHookName), { root, output, group: group ?? undefined })
         imports.push(<File.Import name={[mutationOptionsName]} root={hookOptionsFile.path} path={mutationHookFile.path} />)
         hookOptions[mutationHookName] = `Partial<ReturnType<typeof ${mutationOptionsName}>>`
       }
@@ -112,8 +112,8 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         baseName={hookOptionsFile.baseName}
         path={hookOptionsFile.path}
         meta={hookOptionsFile.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
+        banner={resolver.core.banner(ctx.meta, { output, config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
+        footer={resolver.core.footer(ctx.meta, { output, config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
       >
         {imports}
         <File.Source name={name} isExportable isIndexable isTypeOnly>

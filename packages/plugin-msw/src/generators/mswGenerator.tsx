@@ -24,7 +24,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const fileName = resolver.resolveName(node.operationId)
     const mock = {
       name: resolver.resolveHandlerName(node),
-      file: resolver.resolveFile(
+      file: resolver.core.file(
         { name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output, group: group ?? undefined },
       ),
@@ -46,7 +46,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const tsResolver = driver.getResolver(pluginTsName)
 
     const type = {
-      file: tsResolver.resolveFile(
+      file: tsResolver.core.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
       ),
@@ -64,8 +64,8 @@ export const mswGenerator = defineGenerator<PluginMsw>({
         baseName={mock.file.baseName}
         path={mock.file.path}
         meta={mock.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
+        banner={resolver.core.banner(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
+        footer={resolver.core.footer(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
       >
         <File.Import name={['http']} path="msw" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw" />

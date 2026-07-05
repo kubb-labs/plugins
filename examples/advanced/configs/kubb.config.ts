@@ -186,8 +186,8 @@ export default defineConfig({
         },
       ],
       resolver: {
-        resolveName(name, type) {
-          return `${this.default(name, type)}Faker`
+        resolveName(name) {
+          return `${this.core.name(name)}Faker`
         },
       },
     }),

@@ -13,7 +13,7 @@ import type { PluginZod } from '../types.ts'
  * ```ts
  * import { resolverZod } from '@kubb/plugin-zod'
  *
- * resolverZod.default('list pets', 'function') // 'listPetsSchema'
+ * resolverZod.core.name('list pets') // 'listPetsSchema'
  * resolverZod.resolveSchemaTypeName('pet')     // 'PetSchemaType'
  * ```
  */
@@ -21,9 +21,13 @@ export const resolverZod = defineResolver<PluginZod>(() => {
   return {
     name: 'default',
     pluginName: 'plugin-zod',
-    default(name, type) {
-      if (type === 'file') return toFilePath(name, (part) => camelCase(part, { suffix: 'schema' }))
-      return ensureValidVarName(camelCase(name, { suffix: type ? 'schema' : undefined }))
+    core: {
+      name(name) {
+        return ensureValidVarName(camelCase(name, { suffix: 'schema' }))
+      },
+      fileName(name) {
+        return toFilePath(name, (part) => camelCase(part, { suffix: 'schema' }))
+      },
     },
     resolveSchemaName(name) {
       return ensureValidVarName(camelCase(name, { suffix: 'schema' }))

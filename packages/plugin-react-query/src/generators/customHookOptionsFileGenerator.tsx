@@ -30,7 +30,7 @@ export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>(
     const firstNode = nodes[0]
     if (firstNode) {
       const hookName = resolver.resolveQueryName(firstNode)
-      const hookFile = resolver.resolveFile(
+      const hookFile = resolver.core.file(
         { name: hookName, extname: '.ts', tag: firstNode.tags[0] ?? 'default', path: firstNode.path },
         { root, output, group: group ?? undefined },
       )
