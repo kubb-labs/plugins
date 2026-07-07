@@ -1,5 +1,5 @@
-import { createResolver } from "kubb/kit";
-import type { PluginCypress } from "../types.ts";
+import { createResolver } from 'kubb/kit'
+import type { PluginCypress } from '../types.ts'
 
 /**
  * Default resolver used by `@kubb/plugin-cypress`. Decides the names and file
@@ -14,5 +14,5 @@ import type { PluginCypress } from "../types.ts";
  * ```
  */
 export const resolverCypress = createResolver<PluginCypress>({
-  pluginName: "plugin-cypress",
-});
+  pluginName: 'plugin-cypress',
+})

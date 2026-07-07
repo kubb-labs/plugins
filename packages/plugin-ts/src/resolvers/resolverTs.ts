@@ -1,6 +1,6 @@
-import { ensureValidVarName, pascalCase, toFilePath } from "@internals/utils";
-import { createResolver } from "kubb/kit";
-import type { PluginTs } from "../types.ts";
+import { ensureValidVarName, pascalCase, toFilePath } from '@internals/utils'
+import { createResolver } from 'kubb/kit'
+import type { PluginTs } from '../types.ts'
 
 /**
  * Default resolver used by `@kubb/plugin-ts`. Decides the names and file paths
@@ -22,52 +22,49 @@ import type { PluginTs } from "../types.ts";
  * ```
  */
 export const resolverTs = createResolver<PluginTs>({
-  pluginName: "plugin-ts",
+  pluginName: 'plugin-ts',
   name(name) {
-    return ensureValidVarName(pascalCase(name));
+    return ensureValidVarName(pascalCase(name))
   },
   file(params, context) {
-    return this.default.file(
-      { ...params, resolveName: (name) => toFilePath(name, pascalCase) },
-      context,
-    );
+    return this.default.file({ ...params, resolveName: (name) => toFilePath(name, pascalCase) }, context)
   },
   param: {
     name(node, param) {
-      return this.name(`${node.operationId} ${param.in} ${param.name}`);
+      return this.name(`${node.operationId} ${param.in} ${param.name}`)
     },
     path(node, param) {
-      return this.param.name(node, param);
+      return this.param.name(node, param)
     },
     query(node, param) {
-      return this.param.name(node, param);
+      return this.param.name(node, param)
     },
     headers(node, param) {
-      return this.param.name(node, param);
+      return this.param.name(node, param)
     },
   },
   response: {
     status(node, statusCode) {
-      return this.name(`${node.operationId} Status ${statusCode}`);
+      return this.name(`${node.operationId} Status ${statusCode}`)
     },
     // NOTE(v5-stable): the `RequestConfig` suffix is kept through the beta to avoid churn, but it
     // overlaps with the runtime client's `RequestConfig`. Revisit renaming to `Request` before stable.
     config(node) {
-      return this.name(`${node.operationId} RequestConfig`);
+      return this.name(`${node.operationId} RequestConfig`)
     },
     responses(node) {
-      return this.name(`${node.operationId} Responses`);
+      return this.name(`${node.operationId} Responses`)
     },
     response(node) {
-      return this.name(`${node.operationId} Response`);
+      return this.name(`${node.operationId} Response`)
     },
     body(node) {
-      return this.name(`${node.operationId} Body`);
+      return this.name(`${node.operationId} Body`)
     },
   },
   enum: {
-    keyName(node, enumTypeSuffix = "key") {
-      return `${this.name(node.name ?? "")}${enumTypeSuffix}`;
+    keyName(node, enumTypeSuffix = 'key') {
+      return `${this.name(node.name ?? '')}${enumTypeSuffix}`
     },
   },
-});
+})

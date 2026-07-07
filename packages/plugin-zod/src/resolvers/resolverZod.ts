@@ -1,11 +1,6 @@
-import {
-  camelCase,
-  ensureValidVarName,
-  pascalCase,
-  toFilePath,
-} from "@internals/utils";
-import { createResolver } from "kubb/kit";
-import type { PluginZod } from "../types.ts";
+import { camelCase, ensureValidVarName, pascalCase, toFilePath } from '@internals/utils'
+import { createResolver } from 'kubb/kit'
+import type { PluginZod } from '../types.ts'
 
 /**
  * Default resolver used by `@kubb/plugin-zod`. Decides the names and file
@@ -23,63 +18,62 @@ import type { PluginZod } from "../types.ts";
  * ```
  */
 export const resolverZod = createResolver<PluginZod>({
-  pluginName: "plugin-zod",
+  pluginName: 'plugin-zod',
   name(name) {
-    return ensureValidVarName(camelCase(name, { suffix: "schema" }));
+    return ensureValidVarName(camelCase(name, { suffix: 'schema' }))
   },
   file(params, context) {
     return this.default.file(
       {
         ...params,
-        resolveName: (name) =>
-          toFilePath(name, (part) => camelCase(part, { suffix: "schema" })),
+        resolveName: (name) => toFilePath(name, (part) => camelCase(part, { suffix: 'schema' })),
       },
       context,
-    );
+    )
   },
   schema: {
     typeName(name) {
-      return ensureValidVarName(pascalCase(name, { suffix: "schema type" }));
+      return ensureValidVarName(pascalCase(name, { suffix: 'schema type' }))
     },
     type(name) {
-      return ensureValidVarName(pascalCase(name, { suffix: "type" }));
+      return ensureValidVarName(pascalCase(name, { suffix: 'type' }))
     },
     inputName(name) {
-      return this.name(`${name} input`);
+      return this.name(`${name} input`)
     },
     inputTypeName(name) {
-      return this.schema.typeName(`${name} input`);
+      return this.schema.typeName(`${name} input`)
     },
   },
   param: {
     name(node, param) {
-      return this.name(`${node.operationId} ${param.in} ${param.name}`);
+      return this.name(`${node.operationId} ${param.in} ${param.name}`)
     },
     path(node, param) {
-      return this.param.name(node, param);
+      return this.param.name(node, param)
     },
     query(node, param) {
-      return this.param.name(node, param);
+      return this.param.name(node, param)
     },
     headers(node, param) {
-      return this.param.name(node, param);
+      return this.param.name(node, param)
     },
   },
   response: {
     status(node, statusCode) {
-      return this.name(`${node.operationId} Status ${statusCode}`);
+      return this.name(`${node.operationId} Status ${statusCode}`)
     },
     body(node) {
-      return this.name(`${node.operationId} Body`);
+      return this.name(`${node.operationId} Body`)
     },
     responses(node) {
-      return this.name(`${node.operationId} Responses`);
+      return this.name(`${node.operationId} Responses`)
     },
     response(node) {
-      return this.name(`${node.operationId} Response`);
+      return this.name(`${node.operationId} Response`)
     },
     error(node) {
-      return this.name(`${node.operationId} Error`);
+      return this.name(`${node.operationId} Error`)
     },
   },
-});
+})

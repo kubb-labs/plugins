@@ -1,8 +1,8 @@
-import { createResolver } from "kubb/kit";
-import type { PluginVueQuery } from "../types.ts";
+import { createResolver } from 'kubb/kit'
+import type { PluginVueQuery } from '../types.ts'
 
 function capitalize(name: string): string {
-  return `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
+  return `${name.charAt(0).toUpperCase()}${name.slice(1)}`
 }
 
 /**
@@ -24,50 +24,50 @@ function capitalize(name: string): string {
  * ```
  */
 export const resolverVueQuery = createResolver<PluginVueQuery>({
-  pluginName: "plugin-vue-query",
+  pluginName: 'plugin-vue-query',
   query: {
     name(node) {
-      return `use${capitalize(this.name(node.operationId))}`;
+      return `use${capitalize(this.name(node.operationId))}`
     },
     keyName(node) {
-      return `${this.name(node.operationId)}QueryKey`;
+      return `${this.name(node.operationId)}QueryKey`
     },
     keyTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}QueryKey`;
+      return `${capitalize(this.name(node.operationId))}QueryKey`
     },
     optionsName(node) {
-      return `${this.name(node.operationId)}QueryOptions`;
+      return `${this.name(node.operationId)}QueryOptions`
     },
     clientName(node) {
-      return this.name(node.operationId);
+      return this.name(node.operationId)
     },
   },
   infiniteQuery: {
     name(node) {
-      return `use${capitalize(this.name(node.operationId))}Infinite`;
+      return `use${capitalize(this.name(node.operationId))}Infinite`
     },
     keyName(node) {
-      return `${this.name(node.operationId)}InfiniteQueryKey`;
+      return `${this.name(node.operationId)}InfiniteQueryKey`
     },
     keyTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}InfiniteQueryKey`;
+      return `${capitalize(this.name(node.operationId))}InfiniteQueryKey`
     },
     optionsName(node) {
-      return `${this.name(node.operationId)}InfiniteQueryOptions`;
+      return `${this.name(node.operationId)}InfiniteQueryOptions`
     },
     clientName(node) {
-      return `${this.name(node.operationId)}Infinite`;
+      return `${this.name(node.operationId)}Infinite`
     },
   },
   mutation: {
     name(node) {
-      return `use${capitalize(this.name(node.operationId))}`;
+      return `use${capitalize(this.name(node.operationId))}`
     },
     keyName(node) {
-      return `${this.name(node.operationId)}MutationKey`;
+      return `${this.name(node.operationId)}MutationKey`
     },
     typeName(node) {
-      return capitalize(this.name(node.operationId));
+      return capitalize(this.name(node.operationId))
     },
   },
-});
+})
