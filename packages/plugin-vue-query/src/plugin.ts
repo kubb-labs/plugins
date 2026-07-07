@@ -1,5 +1,5 @@
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin, mergeResolver } from 'kubb/kit'
+import { definePlugin, Resolver } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { mutationKeyTransformer } from '@internals/tanstack-query'
 import { queryKeyTransformer } from '@internals/tanstack-query'
@@ -68,7 +68,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     dependencies: [pluginTsName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
-        const resolver = userResolver ? mergeResolver<ResolverVueQuery>(resolverVueQuery, userResolver) : resolverVueQuery
+        const resolver = userResolver ? Resolver.merge<ResolverVueQuery>(resolverVueQuery, userResolver) : resolverVueQuery
 
         const pluginNames = (ctx.config.plugins ?? []).map((p) => (p as { name?: string }).name).filter((name): name is string => Boolean(name))
         const resolvedClient = resolveClient({ client, pluginNames })

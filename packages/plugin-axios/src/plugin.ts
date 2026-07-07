@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { createSdkGenerator, defaultMacros, isValidatorEnabled, resolverClient } from '@internals/client'
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin, mergeResolver } from 'kubb/kit'
+import { definePlugin, Resolver } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
@@ -58,7 +58,7 @@ export const pluginAxios = definePlugin<PluginAxios>((options) => {
     baseURL,
     validator,
     sdk: sdk ? { mode: sdk.mode ?? 'tag', name: sdk.name } : undefined,
-    resolver: userResolver ? mergeResolver<ResolverClient>(resolverClient, userResolver) : resolverClient,
+    resolver: userResolver ? Resolver.merge<ResolverClient>(resolverClient, userResolver) : resolverClient,
   }
 
   // `sdk` swaps the per-operation functions for the class-based SDK; left unset, the standalone

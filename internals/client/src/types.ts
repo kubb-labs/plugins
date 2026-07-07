@@ -1,4 +1,4 @@
-import type { ast, ResolverOverride, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 /**
  * Validator applied to request and response bodies using schemas from `@kubb/plugin-zod`.
@@ -122,7 +122,7 @@ export type Options = OutputOptions & {
   /**
    * Override how names and file paths are built. Methods you omit fall back to the default resolver.
    */
-  resolver?: ResolverOverride<ResolverClient> & ThisType<ResolverClient>
+  resolver?: ResolverPatch<ResolverClient>
   /**
    * Macros applied to each operation node before code is printed.
    */

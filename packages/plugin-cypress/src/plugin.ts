@@ -1,5 +1,5 @@
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin, mergeResolver } from 'kubb/kit'
+import { definePlugin, Resolver } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { cypressGenerator } from './generators/cypressGenerator.tsx'
 import { resolverCypress } from './resolvers/resolverCypress.ts'
@@ -54,7 +54,7 @@ export const pluginCypress = definePlugin<PluginCypress>((options) => {
     dependencies: [pluginTsName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
-        const resolver = userResolver ? mergeResolver<ResolverCypress>(resolverCypress, userResolver) : resolverCypress
+        const resolver = userResolver ? Resolver.merge<ResolverCypress>(resolverCypress, userResolver) : resolverCypress
 
         ctx.setOptions({
           output,

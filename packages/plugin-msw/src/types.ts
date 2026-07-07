@@ -1,4 +1,4 @@
-import type { ast, ResolverOverride, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 /**
  * Resolver for MSW that provides naming methods for handler functions.
@@ -46,7 +46,7 @@ export type Options = OutputOptions & {
   /**
    * Override how handler names and file paths are built.
    */
-  resolver?: ResolverOverride<ResolverMsw> & ThisType<ResolverMsw>
+  resolver?: ResolverPatch<ResolverMsw>
   /**
    * Macros applied to operation nodes before printing.
    */

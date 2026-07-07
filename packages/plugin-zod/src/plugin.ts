@@ -1,5 +1,5 @@
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin, mergeResolver } from 'kubb/kit'
+import { definePlugin, Resolver } from 'kubb/kit'
 import { zodGenerator } from './generators/zodGenerator.tsx'
 import { resolverZod } from './resolvers/resolverZod.ts'
 import type { PluginZod } from './types.ts'
@@ -75,7 +75,7 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
           mini,
           printer,
         })
-        ctx.setResolver(userResolver ? mergeResolver(resolverZod, userResolver) : resolverZod)
+        ctx.setResolver(userResolver ? Resolver.merge(resolverZod, userResolver) : resolverZod)
         if (userMacros?.length) {
           ctx.setMacros(userMacros)
         }

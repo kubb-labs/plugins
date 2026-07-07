@@ -151,7 +151,7 @@ importers:
         version: link:../../packages/plugin-zod
       '@modelcontextprotocol/sdk':
         specifier: ^1.29.0
-        version: 1.29.0(zod@4.4.3)
+        version: 1.29.0(supports-color@8.1.1)(zod@4.4.3)
       '@tanstack/query-core':
         specifier: ^5.101.2
         version: 5.101.2
@@ -166,7 +166,7 @@ importers:
         version: 19.2.17
       axios:
         specifier: ^1.18.1
-        version: 1.18.1
+        version: 1.18.1(supports-color@8.1.1)
       cypress:
         specifier: ^15.18.0
         version: 15.18.0
@@ -218,7 +218,7 @@ importers:
         version: link:../../packages/plugin-ts
       axios:
         specifier: ^1.18.1
-        version: 1.18.1
+        version: 1.18.1(supports-color@8.1.1)
       kubb:
         specifier: 'catalog:'
         version: 5.0.0-beta.85(openapi-types@12.1.3)(rolldown@1.1.3)(typescript@6.0.3)(vite@8.1.0(@types/node@26.0.1)(jiti@2.7.0)(yaml@2.9.0))
@@ -318,10 +318,10 @@ importers:
         version: link:../../packages/plugin-zod
       '@modelcontextprotocol/sdk':
         specifier: ^1.29.0
-        version: 1.29.0(zod@4.4.3)
+        version: 1.29.0(supports-color@8.1.1)(zod@4.4.3)
       axios:
         specifier: ^1.18.1
-        version: 1.18.1
+        version: 1.18.1(supports-color@8.1.1)
       kubb:
         specifier: 'catalog:'
         version: 5.0.0-beta.85(openapi-types@12.1.3)(rolldown@1.1.3)(typescript@6.0.3)(vite@8.1.0(@types/node@26.0.1)(jiti@2.7.0)(yaml@2.9.0))
@@ -445,7 +445,7 @@ importers:
         version: 5.101.2(react@19.2.7)
       axios:
         specifier: ^1.18.1
-        version: 1.18.1
+        version: 1.18.1(supports-color@8.1.1)
       kubb:
         specifier: 'catalog:'
         version: 5.0.0-beta.85(openapi-types@12.1.3)(rolldown@1.1.3)(typescript@6.0.3)(vite@8.1.0(@types/node@26.0.1)(jiti@2.7.0)(yaml@2.9.0))
@@ -500,7 +500,7 @@ importers:
         version: link:../../packages/plugin-ts
       axios:
         specifier: ^1.18.1
-        version: 1.18.1
+        version: 1.18.1(supports-color@8.1.1)
       kubb:
         specifier: 'catalog:'
         version: 5.0.0-beta.85(openapi-types@12.1.3)(rolldown@1.1.3)(typescript@6.0.3)(vite@8.1.0(@types/node@26.0.1)(jiti@2.7.0)(yaml@2.9.0))
@@ -550,7 +550,7 @@ importers:
         version: link:../../packages/plugin-zod
       axios:
         specifier: ^1.18.1
-        version: 1.18.1
+        version: 1.18.1(supports-color@8.1.1)
       kubb:
         specifier: 'catalog:'
         version: 5.0.0-beta.85(openapi-types@12.1.3)(rolldown@1.1.3)(typescript@6.0.3)(vite@8.1.0(@types/node@26.0.1)(jiti@2.7.0)(yaml@2.9.0))
@@ -639,12 +639,9 @@ importers:
       '@internals/shared':
         specifier: workspace:*
         version: link:../../internals/shared
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:../../internals/utils
       axios:
         specifier: ^1.18.1
-        version: 1.18.1
+        version: 1.18.1(supports-color@8.1.1)
       kubb:
         specifier: 'catalog:'
         version: 5.0.0-beta.85(openapi-types@12.1.3)(rolldown@1.1.3)(typescript@6.0.3)(vite@8.1.0(@types/node@26.0.1)(jiti@2.7.0)(yaml@2.9.0))
@@ -699,9 +696,6 @@ importers:
       '@internals/shared':
         specifier: workspace:*
         version: link:../../internals/shared
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:../../internals/utils
       kubb:
         specifier: 'catalog:'
         version: 5.0.0-beta.85(openapi-types@12.1.3)(rolldown@1.1.3)(typescript@6.0.3)(vite@8.1.0(@types/node@26.0.1)(jiti@2.7.0)(yaml@2.9.0))
@@ -778,9 +772,6 @@ importers:
         specifier: 'catalog:'
         version: 5.0.0-beta.85(openapi-types@12.1.3)
     devDependencies:
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:../../internals/utils
       kubb:
         specifier: 'catalog:'
         version: 5.0.0-beta.85(openapi-types@12.1.3)(rolldown@1.1.3)(typescript@6.0.3)(vite@8.1.0(@types/node@26.0.1)(jiti@2.7.0)(yaml@2.9.0))
@@ -800,9 +791,6 @@ importers:
       '@internals/tanstack-query':
         specifier: workspace:*
         version: link:../../internals/tanstack-query
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:../../internals/utils
       kubb:
         specifier: 'catalog:'
         version: 5.0.0-beta.85(openapi-types@12.1.3)(rolldown@1.1.3)(typescript@6.0.3)(vite@8.1.0(@types/node@26.0.1)(jiti@2.7.0)(yaml@2.9.0))
@@ -958,7 +946,7 @@ importers:
         version: 5.101.2(vue@3.5.39(typescript@6.0.3))
       axios:
         specifier: ^1.18.1
-        version: 1.18.1
+        version: 1.18.1(supports-color@8.1.1)
       cypress:
         specifier: ^15.18.0
         version: 15.18.0
@@ -990,9 +978,6 @@ importers:
 
   tests/performance:
     dependencies:
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:../../internals/utils
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 5.0.0-beta.85(openapi-types@12.1.3)
@@ -4485,7 +4470,7 @@ snapshots:
       globby: 11.1.0
       read-yaml-file: 1.1.0
 
-  '@modelcontextprotocol/sdk@1.29.0(zod@4.4.3)':
+  '@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@4.4.3)':
     dependencies:
       '@hono/node-server': 1.19.14(hono@4.12.27)
       ajv: 8.20.0
@@ -4495,7 +4480,7 @@ snapshots:
       cross-spawn: 7.0.6
       eventsource: 3.0.7
       eventsource-parser: 3.1.0
-      express: 5.2.1
+      express: 5.2.1(supports-color@8.1.1)
       express-rate-limit: 8.5.2(express@5.2.1)
       hono: 4.12.27
       jose: 6.2.3
@@ -5040,7 +5025,7 @@ snapshots:
 
   acorn@8.17.0: {}
 
-  agent-base@6.0.2:
+  agent-base@6.0.2(supports-color@8.1.1):
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
@@ -5125,11 +5110,11 @@ snapshots:
 
   aws4@1.13.2: {}
 
-  axios@1.18.1:
+  axios@1.18.1(supports-color@8.1.1):
     dependencies:
       follow-redirects: 1.16.0
       form-data: 4.0.6
-      https-proxy-agent: 5.0.1
+      https-proxy-agent: 5.0.1(supports-color@8.1.1)
       proxy-from-env: 2.1.0
     transitivePeerDependencies:
       - debug
@@ -5170,7 +5155,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  body-parser@2.3.0:
+  body-parser@2.3.0(supports-color@8.1.1):
     dependencies:
       bytes: 3.1.2
       content-type: 2.0.0
@@ -5502,7 +5487,7 @@ snapshots:
 
   express-rate-limit@8.5.2(express@5.2.1):
     dependencies:
-      express: 5.2.1
+      express: 5.2.1(supports-color@8.1.1)
       ip-address: 10.2.0
 
   express@4.22.2:
@@ -5541,10 +5526,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  express@5.2.1:
+  express@5.2.1(supports-color@8.1.1):
     dependencies:
       accepts: 2.0.0
-      body-parser: 2.3.0
+      body-parser: 2.3.0(supports-color@8.1.1)
       content-disposition: 1.1.0
       content-type: 1.0.5
       cookie: 0.7.2
@@ -5554,7 +5539,7 @@ snapshots:
       encodeurl: 2.0.0
       escape-html: 1.0.3
       etag: 1.8.1
-      finalhandler: 2.1.1
+      finalhandler: 2.1.1(supports-color@8.1.1)
       fresh: 2.0.0
       http-errors: 2.0.1
       merge-descriptors: 2.0.0
@@ -5565,8 +5550,8 @@ snapshots:
       proxy-addr: 2.0.7
       qs: 6.15.3
       range-parser: 1.3.0
-      router: 2.2.0
-      send: 1.2.1
+      router: 2.2.0(supports-color@8.1.1)
+      send: 1.2.1(supports-color@8.1.1)
       serve-static: 2.2.1
       statuses: 2.0.2
       type-is: 2.1.0
@@ -5628,7 +5613,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  finalhandler@2.1.1:
+  finalhandler@2.1.1(supports-color@8.1.1):
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
       encodeurl: 2.0.0
@@ -5791,9 +5776,9 @@ snapshots:
       jsprim: 2.0.2
       sshpk: 1.18.0
 
-  https-proxy-agent@5.0.1:
+  https-proxy-agent@5.0.1(supports-color@8.1.1):
     dependencies:
-      agent-base: 6.0.2
+      agent-base: 6.0.2(supports-color@8.1.1)
       debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
@@ -6478,7 +6463,7 @@ snapshots:
       '@rolldown/binding-win32-arm64-msvc': 1.1.3
       '@rolldown/binding-win32-x64-msvc': 1.1.3
 
-  router@2.2.0:
+  router@2.2.0(supports-color@8.1.1):
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
       depd: 2.0.0
@@ -6516,7 +6501,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  send@1.2.1:
+  send@1.2.1(supports-color@8.1.1):
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
       encodeurl: 2.0.0
@@ -6552,7 +6537,7 @@ snapshots:
       encodeurl: 2.0.0
       escape-html: 1.0.3
       parseurl: 1.3.3
-      send: 1.2.1
+      send: 1.2.1(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 

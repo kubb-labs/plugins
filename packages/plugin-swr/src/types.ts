@@ -1,6 +1,6 @@
 import type { ClientSelector } from '@internals/client'
 import type { Transformer } from '@internals/tanstack-query'
-import type { ast, ResolverOverride, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 export type { Transformer } from '@internals/tanstack-query'
 
@@ -181,7 +181,7 @@ export type Options = OutputOptions & {
   /**
    * Override naming conventions for function names and types.
    */
-  resolver?: ResolverOverride<ResolverSwr> & ThisType<ResolverSwr>
+  resolver?: ResolverPatch<ResolverSwr>
   /**
    * Macros that rewrite generated nodes before printing.
    */

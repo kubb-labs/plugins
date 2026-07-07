@@ -2,7 +2,7 @@ import path from 'node:path'
 import { camelCase } from '@internals/utils'
 
 import type { Config, Group } from 'kubb/kit'
-import { ast, memoryStorage, mergeResolver } from 'kubb/kit'
+import { ast, memoryStorage, Resolver } from 'kubb/kit'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from 'kubb/kit/testing'
 import { describe, expect, test } from 'vitest'
 import { matchFiles, rawSources } from '#mocks'
@@ -83,7 +83,7 @@ const operationWithSnakeCaseParams: ast.OperationNode = ast.factory.createOperat
   responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Success' })],
 })
 
-const apiResolver = mergeResolver(resolverTs, {
+const apiResolver = Resolver.merge(resolverTs, {
   name(name: string) {
     return `Api${resolverTs.name(name)}`
   },

@@ -1,4 +1,4 @@
-import type { ast, ResolverOverride, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 import type { PrinterFakerNodes } from './printers/printerFaker.ts'
 
 /**
@@ -131,7 +131,7 @@ export type Options = OutputOptions & {
    * Override the naming of generated factory helpers. Common use: append `Mock` or
    * `Factory` so helpers do not clash with imported types.
    */
-  resolver?: ResolverOverride<ResolverFaker> & ThisType<ResolverFaker>
+  resolver?: ResolverPatch<ResolverFaker>
   /**
    * Macros applied to schema and operation nodes before printing.
    */

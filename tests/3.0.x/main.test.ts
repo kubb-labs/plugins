@@ -402,14 +402,9 @@ const configs = [
       parsers: [parserTs],
       plugins: [
         pluginTs({
-          output: { path: './types', barrel: false },
+          output: { path: './types', barrel: false, banner: '// Custom banner' },
           resolver: {
-            default: {
-              banner() {
-                return '// Custom banner'
-              },
-            },
-            name(name) {
+            name(name: string) {
               return `Custom${ensureValidVarName(pascalCase(name))}`
             },
           },

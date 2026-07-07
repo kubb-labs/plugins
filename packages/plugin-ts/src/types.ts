@@ -1,4 +1,4 @@
-import type { ast, ResolverOverride, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 import type { PrinterTsNodes } from './printers/printerTs.ts'
 /**
  * The concrete resolver type for `@kubb/plugin-ts`.
@@ -260,7 +260,7 @@ export type Options = OutputOptions & {
    * Methods you omit fall back to the default `resolverTs`. `this` is bound to the
    * full resolver, so `this.default.name(name)` delegates to the built-in implementation.
    */
-  resolver?: ResolverOverride<ResolverTs> & ThisType<ResolverTs>
+  resolver?: ResolverPatch<ResolverTs>
   /**
    * Macros applied to each schema or operation node before printing.
    * Callbacks you omit fall back to the preset behavior.
