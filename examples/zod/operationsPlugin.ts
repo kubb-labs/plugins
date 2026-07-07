@@ -91,7 +91,7 @@ export const pluginZodOperations = definePlugin(() => ({
 
             const imports = transformed.flatMap(({ node, data }) => {
               const names = [data.request, ...Object.values(data.responses), ...Object.values(data.parameters)].filter(Boolean) as Array<string>
-              const opFile = resolver.default.file(
+              const opFile = resolver.file(
                 { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
                 { root: gctx.root, output, group },
               )
