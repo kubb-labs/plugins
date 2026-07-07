@@ -190,8 +190,8 @@ export default defineConfig({
           return `${resolverFaker.name(name)}Faker`
         },
         file: {
-          baseName(name) {
-            return `${resolverFaker.name(name)}Faker`
+          baseName({ name, extname }) {
+            return `${resolverFaker.name(name)}Faker${extname}`
           },
         },
       },
