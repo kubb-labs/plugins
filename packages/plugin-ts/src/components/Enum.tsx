@@ -1,5 +1,5 @@
-import { camelCase } from '@internals/utils'
-import { ast } from 'kubb/kit'
+import { camelCase, trimQuotes } from '@internals/utils'
+import type { ast } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
 import { File } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
@@ -61,8 +61,8 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
   const [nameNode, typeNode] = factory.createEnumDeclaration({
     name: enumName,
     typeName,
-    enums: ((node.namedEnumValues as Array<NamedEnumValue> | undefined)?.map((v) => [ast.trimQuotes(v.name.toString()), v.value, v.description]) ??
-      node.enumValues?.filter((v): v is NonNullable<typeof v> => v !== null && v !== undefined).map((v) => [ast.trimQuotes(v.toString()), v]) ??
+    enums: ((node.namedEnumValues as Array<NamedEnumValue> | undefined)?.map((v) => [trimQuotes(v.name.toString()), v.value, v.description]) ??
+      node.enumValues?.filter((v): v is NonNullable<typeof v> => v !== null && v !== undefined).map((v) => [trimQuotes(v.toString()), v]) ??
       []) as Array<[string | number, string | number | boolean, string?]>,
     type: enumOptions.type,
     enumKeyCasing: enumOptions.keyCasing,

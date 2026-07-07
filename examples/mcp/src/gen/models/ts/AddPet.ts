@@ -38,27 +38,27 @@ export type AddPetStatus405 = {
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetJsonData = AddPetRequest
+export type AddPetBodyJson = AddPetRequest
 
 /**
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetXmlData = Omit<NonNullable<Pet>, 'id'>
+export type AddPetBodyXml = Omit<NonNullable<Pet>, 'id'>
 
 /**
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetFormUrlEncodedData = Omit<NonNullable<Pet>, 'id'>
+export type AddPetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'id'>
 
-export type AddPetData = AddPetJsonData | AddPetXmlData | AddPetFormUrlEncodedData
+export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded
 
 /**
  * @type object
  */
 export type AddPetRequestConfig = {
-  body: AddPetData
+  body: AddPetBody
   path?: never
   query?: never
   headers?: never

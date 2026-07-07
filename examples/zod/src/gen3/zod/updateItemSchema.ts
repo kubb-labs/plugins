@@ -9,4 +9,4 @@ export const updateItemStatus200Schema = itemSchema
 
 export const updateItemResponseSchema = updateItemStatus200Schema
 
-export const updateItemDataSchema = itemSchema.describe('Item to update')
+export const updateItemBodySchema = itemSchema.describe('Item to update')

@@ -29,10 +29,10 @@ export const updatePetResponseSchema = z.union([updatePetStatus200Schema, update
 
 export const updatePetErrorSchema = z.union([updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema])
 
-export const updatePetDataSchemaJson = petSchema.omit({ id: true }).describe('Update an existent pet in the store')
+export const updatePetBodySchemaJson = petSchema.omit({ id: true }).describe('Update an existent pet in the store')
 
-export const updatePetDataSchemaXml = petSchema.omit({ id: true }).describe('Update an existent pet in the store')
+export const updatePetBodySchemaXml = petSchema.omit({ id: true }).describe('Update an existent pet in the store')
 
-export const updatePetDataSchemaFormUrlEncoded = petSchema.omit({ id: true }).describe('Update an existent pet in the store')
+export const updatePetBodySchemaFormUrlEncoded = petSchema.omit({ id: true }).describe('Update an existent pet in the store')
 
-export const updatePetDataSchema = z.union([updatePetDataSchemaJson, updatePetDataSchemaXml, updatePetDataSchemaFormUrlEncoded])
+export const updatePetBodySchema = z.union([updatePetBodySchemaJson, updatePetBodySchemaXml, updatePetBodySchemaFormUrlEncoded])

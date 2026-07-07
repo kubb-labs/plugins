@@ -2,9 +2,10 @@ export { createCategory } from './createCategory.ts'
 export { createPet } from './createPet.ts'
 export { createTag } from './createTag.ts'
 export {
-  createUpdatePetData,
-  createUpdatePetFormUrlEncodedData,
-  createUpdatePetJsonData,
+  createUpdatePetBody,
+  createUpdatePetBodyFormUrlEncoded,
+  createUpdatePetBodyJson,
+  createUpdatePetBodyXml,
   createUpdatePetResponse,
   createUpdatePetStatus200,
   createUpdatePetStatus200Json,
@@ -12,7 +13,6 @@ export {
   createUpdatePetStatus400,
   createUpdatePetStatus404,
   createUpdatePetStatus405,
-  createUpdatePetXmlData,
 } from './createUpdatePet.ts'
 export {
   createUpdatePetWithFormPathPetId,

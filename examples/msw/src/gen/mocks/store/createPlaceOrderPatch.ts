@@ -4,13 +4,13 @@
  */
 
 import type {
-  PlaceOrderPatchData,
-  PlaceOrderPatchFormUrlEncodedData,
-  PlaceOrderPatchJsonData,
+  PlaceOrderPatchBody,
+  PlaceOrderPatchBodyFormUrlEncoded,
+  PlaceOrderPatchBodyJson,
+  PlaceOrderPatchBodyXml,
   PlaceOrderPatchResponse,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
-  PlaceOrderPatchXmlData,
 } from '../../models/PlaceOrderPatch.ts'
 import { createOrder } from '../createOrder.ts'
 import { fakerEN as faker } from '@faker-js/faker'
@@ -33,28 +33,28 @@ export function createPlaceOrderPatchStatus405() {
   return undefined
 }
 
-export function createPlaceOrderPatchJsonData(data?: Partial<PlaceOrderPatchJsonData>): PlaceOrderPatchJsonData {
+export function createPlaceOrderPatchBodyJson(data?: Partial<PlaceOrderPatchBodyJson>): PlaceOrderPatchBodyJson {
   faker.seed([220])
 
-  return createOrder(data) as PlaceOrderPatchJsonData
+  return createOrder(data) as PlaceOrderPatchBodyJson
 }
 
-export function createPlaceOrderPatchXmlData(data?: Partial<PlaceOrderPatchXmlData>): PlaceOrderPatchXmlData {
+export function createPlaceOrderPatchBodyXml(data?: Partial<PlaceOrderPatchBodyXml>): PlaceOrderPatchBodyXml {
   faker.seed([220])
 
-  return createOrder(data) as PlaceOrderPatchXmlData
+  return createOrder(data) as PlaceOrderPatchBodyXml
 }
 
-export function createPlaceOrderPatchFormUrlEncodedData(data?: Partial<PlaceOrderPatchFormUrlEncodedData>): PlaceOrderPatchFormUrlEncodedData {
+export function createPlaceOrderPatchBodyFormUrlEncoded(data?: Partial<PlaceOrderPatchBodyFormUrlEncoded>): PlaceOrderPatchBodyFormUrlEncoded {
   faker.seed([220])
 
-  return createOrder(data) as PlaceOrderPatchFormUrlEncodedData
+  return createOrder(data) as PlaceOrderPatchBodyFormUrlEncoded
 }
 
-export function createPlaceOrderPatchData(_data?: PlaceOrderPatchData): PlaceOrderPatchData {
+export function createPlaceOrderPatchBody(_data?: PlaceOrderPatchBody): PlaceOrderPatchBody {
   faker.seed([220])
 
-  return faker.helpers.arrayElement([createPlaceOrderPatchJsonData(), createPlaceOrderPatchXmlData(), createPlaceOrderPatchFormUrlEncodedData()])
+  return faker.helpers.arrayElement([createPlaceOrderPatchBodyJson(), createPlaceOrderPatchBodyXml(), createPlaceOrderPatchBodyFormUrlEncoded()])
 }
 
 export function createPlaceOrderPatchResponse(_data?: PlaceOrderPatchResponse): PlaceOrderPatchResponse {

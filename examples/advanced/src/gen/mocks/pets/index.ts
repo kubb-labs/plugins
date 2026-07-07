@@ -1,5 +1,5 @@
 export {
-  createCreatePetsDataFaker,
+  createCreatePetsBodyFaker,
   createCreatePetsHeaderXEXAMPLEFaker,
   createCreatePetsPathUuidFaker,
   createCreatePetsQueryBoolParamFaker,

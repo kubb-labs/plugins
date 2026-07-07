@@ -22,10 +22,10 @@ export const addPetResponseSchema = addPetStatus200Schema
 
 export const addPetErrorSchema = addPetStatus405Schema
 
-export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
+export const addPetBodySchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
 
-export const addPetDataSchemaXml = petSchema.omit({ id: true }).describe('Create a new pet in the store')
+export const addPetBodySchemaXml = petSchema.omit({ id: true }).describe('Create a new pet in the store')
 
-export const addPetDataSchemaFormUrlEncoded = petSchema.omit({ id: true }).describe('Create a new pet in the store')
+export const addPetBodySchemaFormUrlEncoded = petSchema.omit({ id: true }).describe('Create a new pet in the store')
 
-export const addPetDataSchema = z.union([addPetDataSchemaJson, addPetDataSchemaXml, addPetDataSchemaFormUrlEncoded])
+export const addPetBodySchema = z.union([addPetBodySchemaJson, addPetBodySchemaXml, addPetBodySchemaFormUrlEncoded])

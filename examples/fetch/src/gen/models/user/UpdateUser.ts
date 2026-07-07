@@ -20,27 +20,27 @@ export type UpdateUserStatusDefault = unknown
  * @description Update an existent user in the store
  * @type object | undefined
  */
-export type UpdateUserJsonData = User | undefined
+export type UpdateUserBodyJson = User | undefined
 
 /**
  * @description Update an existent user in the store
  * @type object | undefined
  */
-export type UpdateUserXmlData = User | undefined
+export type UpdateUserBodyXml = User | undefined
 
 /**
  * @description Update an existent user in the store
  * @type object | undefined
  */
-export type UpdateUserFormUrlEncodedData = User | undefined
+export type UpdateUserBodyFormUrlEncoded = User | undefined
 
-export type UpdateUserData = UpdateUserJsonData | UpdateUserXmlData | UpdateUserFormUrlEncodedData
+export type UpdateUserBody = UpdateUserBodyJson | UpdateUserBodyXml | UpdateUserBodyFormUrlEncoded
 
 /**
  * @type object
  */
 export type UpdateUserRequestConfig = {
-  body: UpdateUserData
+  body: UpdateUserBody
   /**
    * @type object
    */

@@ -1,5 +1,6 @@
 import { getOperationParameters } from '@internals/shared'
-import { ast } from 'kubb/kit'
+import { getNestedAccessor } from '@internals/utils'
+import type { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
@@ -83,8 +84,8 @@ export function InfiniteQueryOptions({
 
   const [getNextPageParamExpr, getPreviousPageParamExpr] = (() => {
     if (hasNewParams) {
-      const nextAccessor = nextParam ? ast.getNestedAccessor(nextParam, 'lastPage') : null
-      const prevAccessor = previousParam ? ast.getNestedAccessor(previousParam, 'firstPage') : null
+      const nextAccessor = nextParam ? getNestedAccessor(nextParam, 'lastPage') : null
+      const prevAccessor = previousParam ? getNestedAccessor(previousParam, 'firstPage') : null
       return [
         nextAccessor ? `getNextPageParam: (lastPage) => ${nextAccessor}` : null,
         prevAccessor ? `getPreviousPageParam: (firstPage) => ${prevAccessor}` : null,

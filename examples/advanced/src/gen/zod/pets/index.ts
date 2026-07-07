@@ -1,5 +1,5 @@
 export type {
-  CreatePetsDataSchemaType,
+  CreatePetsBodySchemaType,
   CreatePetsErrorSchemaType,
   CreatePetsHeaderXEXAMPLESchemaType,
   CreatePetsPathUuidSchemaType,
@@ -10,7 +10,7 @@ export type {
   CreatePetsStatusDefaultSchemaType,
 } from './createPetsSchema.ts'
 export {
-  createPetsDataSchema,
+  createPetsBodySchema,
   createPetsErrorSchema,
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,

@@ -17,16 +17,16 @@ export const addFilesErrorSchema = addFilesStatus405Schema
 
 export type AddFilesErrorSchemaType = z.infer<typeof addFilesErrorSchema>
 
-export const addFilesDataSchemaJson = z.object({
+export const addFilesBodySchemaJson = z.object({
   url: z.url().describe('URL of the image to upload'),
 })
 
-export type AddFilesDataSchemaJsonType = z.infer<typeof addFilesDataSchemaJson>
+export type AddFilesBodySchemaJsonType = z.infer<typeof addFilesBodySchemaJson>
 
-export const addFilesDataSchemaFormData = z.lazy(() => petSchema.omit({ id: true }))
+export const addFilesBodySchemaFormData = z.lazy(() => petSchema.omit({ id: true }))
 
-export type AddFilesDataSchemaFormDataType = z.infer<typeof addFilesDataSchemaFormData>
+export type AddFilesBodySchemaFormDataType = z.infer<typeof addFilesBodySchemaFormData>
 
-export const addFilesDataSchema = z.union([addFilesDataSchemaJson, addFilesDataSchemaFormData])
+export const addFilesBodySchema = z.union([addFilesBodySchemaJson, addFilesBodySchemaFormData])
 
-export type AddFilesDataSchemaType = z.infer<typeof addFilesDataSchema>
+export type AddFilesBodySchemaType = z.infer<typeof addFilesBodySchema>

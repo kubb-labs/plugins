@@ -34,9 +34,9 @@ export const createPetsErrorSchema = createPetsStatusDefaultSchema
 
 export type CreatePetsErrorSchemaType = z.infer<typeof createPetsErrorSchema>
 
-export const createPetsDataSchema = z.object({
+export const createPetsBodySchema = z.object({
   name: z.string(),
   tag: z.string(),
 })
 
-export type CreatePetsDataSchemaType = z.infer<typeof createPetsDataSchema>
+export type CreatePetsBodySchemaType = z.infer<typeof createPetsBodySchema>

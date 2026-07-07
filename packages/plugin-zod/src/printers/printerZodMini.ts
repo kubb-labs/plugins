@@ -1,3 +1,4 @@
+import { buildList, buildObject, lazyGetter, objectKey, stringify } from '@internals/utils'
 import { ast } from 'kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
@@ -136,10 +137,10 @@ function buildZodMiniObjectShape(ctx: ZodMiniPrinterContext, node: ast.SchemaNod
         defaultValue: meta.default,
       })
 
-      return isCyclic(schema) ? ast.lazyGetter({ name: propName, body: value }) : `${ast.objectKey(propName)}: ${value}`
+      return isCyclic(schema) ? lazyGetter({ name: propName, body: value }) : `${objectKey(propName)}: ${value}`
     })
 
-  return ast.buildObject(entries)
+  return buildObject(entries)
 }
 
 /**
@@ -283,7 +284,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           .map(({ output }) => output)
           .filter(Boolean)
 
-        return `z.tuple(${ast.buildList(items)})`
+        return `z.tuple(${buildList(items)})`
       },
       union(node) {
         const nodeMembers = node.members ?? []
@@ -298,10 +299,10 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         // non-objects fall back to z.union.
         const allDiscriminable = nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemaNames))
         if (node.discriminatorPropertyName && allDiscriminable) {
-          return `z.discriminatedUnion(${ast.stringify(node.discriminatorPropertyName)}, ${ast.buildList(members)})`
+          return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
         }
 
-        return `z.union(${ast.buildList(members)})`
+        return `z.union(${buildList(members)})`
       },
       intersection(node) {
         const members = node.members ?? []

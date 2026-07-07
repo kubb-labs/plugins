@@ -38,18 +38,18 @@ export const updatePetErrorSchema = z.union([updatePetStatus400Schema, updatePet
 
 export type UpdatePetErrorSchemaType = z.infer<typeof updatePetErrorSchema>
 
-export const updatePetDataSchemaJson = z.lazy(() => petSchema).describe('Update an existent pet in the store')
+export const updatePetBodySchemaJson = z.lazy(() => petSchema).describe('Update an existent pet in the store')
 
-export type UpdatePetDataSchemaJsonType = z.infer<typeof updatePetDataSchemaJson>
+export type UpdatePetBodySchemaJsonType = z.infer<typeof updatePetBodySchemaJson>
 
-export const updatePetDataSchemaXml = z.lazy(() => petSchema).describe('Update an existent pet in the store')
+export const updatePetBodySchemaXml = z.lazy(() => petSchema).describe('Update an existent pet in the store')
 
-export type UpdatePetDataSchemaXmlType = z.infer<typeof updatePetDataSchemaXml>
+export type UpdatePetBodySchemaXmlType = z.infer<typeof updatePetBodySchemaXml>
 
-export const updatePetDataSchemaFormUrlEncoded = z.lazy(() => petSchema).describe('Update an existent pet in the store')
+export const updatePetBodySchemaFormUrlEncoded = z.lazy(() => petSchema).describe('Update an existent pet in the store')
 
-export type UpdatePetDataSchemaFormUrlEncodedType = z.infer<typeof updatePetDataSchemaFormUrlEncoded>
+export type UpdatePetBodySchemaFormUrlEncodedType = z.infer<typeof updatePetBodySchemaFormUrlEncoded>
 
-export const updatePetDataSchema = z.union([updatePetDataSchemaJson, updatePetDataSchemaXml, updatePetDataSchemaFormUrlEncoded])
+export const updatePetBodySchema = z.union([updatePetBodySchemaJson, updatePetBodySchemaXml, updatePetBodySchemaFormUrlEncoded])
 
-export type UpdatePetDataSchemaType = z.infer<typeof updatePetDataSchema>
+export type UpdatePetBodySchemaType = z.infer<typeof updatePetBodySchema>

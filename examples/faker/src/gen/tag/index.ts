@@ -11,11 +11,11 @@ export {
 } from './createGetOrderById.ts'
 export { createOrder } from './createOrder.ts'
 export {
-  createPlaceOrderData,
-  createPlaceOrderFormUrlEncodedData,
-  createPlaceOrderJsonData,
+  createPlaceOrderBody,
+  createPlaceOrderBodyFormUrlEncoded,
+  createPlaceOrderBodyJson,
+  createPlaceOrderBodyXml,
   createPlaceOrderResponse,
   createPlaceOrderStatus200,
   createPlaceOrderStatus405,
-  createPlaceOrderXmlData,
 } from './createPlaceOrder.ts'

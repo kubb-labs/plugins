@@ -24,9 +24,9 @@ export type { PetEventTypeEnumKey } from './models/ts/PetEventTypeEnum.ts'
 export type { PetNotFound } from './models/ts/PetNotFound.ts'
 export type { PetStatusEnumKey } from './models/ts/PetStatusEnum.ts'
 export type {
-  AddFilesData,
-  AddFilesFormData,
-  AddFilesJsonData,
+  AddFilesBody,
+  AddFilesBodyFormData,
+  AddFilesBodyJson,
   AddFilesRequestConfig,
   AddFilesResponse,
   AddFilesResponses,
@@ -34,9 +34,10 @@ export type {
   AddFilesStatus405,
 } from './models/ts/pet/AddFiles.ts'
 export type {
-  AddPetData,
-  AddPetFormUrlEncodedData,
-  AddPetJsonData,
+  AddPetBody,
+  AddPetBodyFormUrlEncoded,
+  AddPetBodyJson,
+  AddPetBodyXml,
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
@@ -44,7 +45,6 @@ export type {
   AddPetStatusDefault,
   AddPetStatusDefaultJson,
   AddPetStatusDefaultXml,
-  AddPetXmlData,
 } from './models/ts/pet/AddPet.ts'
 export type {
   DeletePetHeaderApiKey,
@@ -89,9 +89,10 @@ export type {
   GetPetByIdStatus404,
 } from './models/ts/pet/GetPetById.ts'
 export type {
-  UpdatePetData,
-  UpdatePetFormUrlEncodedData,
-  UpdatePetJsonData,
+  UpdatePetBody,
+  UpdatePetBodyFormUrlEncoded,
+  UpdatePetBodyJson,
+  UpdatePetBodyXml,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -102,7 +103,6 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-  UpdatePetXmlData,
 } from './models/ts/pet/UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
@@ -114,7 +114,7 @@ export type {
   UpdatePetWithFormStatus405,
 } from './models/ts/pet/UpdatePetWithForm.ts'
 export type {
-  UploadFileData,
+  UploadFileBody,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
@@ -123,7 +123,7 @@ export type {
   UploadFileStatus200,
 } from './models/ts/pet/UploadFile.ts'
 export type {
-  CreatePetsData,
+  CreatePetsBody,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsPathUuid,
   CreatePetsQueryBoolParam,
@@ -155,26 +155,26 @@ export type {
   GetOrderByIdStatus404,
 } from './models/ts/store/GetOrderById.ts'
 export type {
-  PlaceOrderData,
-  PlaceOrderFormUrlEncodedData,
-  PlaceOrderJsonData,
+  PlaceOrderBody,
+  PlaceOrderBodyFormUrlEncoded,
+  PlaceOrderBodyJson,
+  PlaceOrderBodyXml,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-  PlaceOrderXmlData,
 } from './models/ts/store/PlaceOrder.ts'
 export type {
-  PlaceOrderPatchData,
-  PlaceOrderPatchFormUrlEncodedData,
-  PlaceOrderPatchJsonData,
+  PlaceOrderPatchBody,
+  PlaceOrderPatchBodyFormUrlEncoded,
+  PlaceOrderPatchBodyJson,
+  PlaceOrderPatchBodyXml,
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
-  PlaceOrderPatchXmlData,
 } from './models/ts/store/PlaceOrderPatch.ts'
 export type {
   StreamPetEventsPathPetId,
@@ -202,19 +202,19 @@ export type { OrderParamsStatusEnumSchemaType } from './zod/orderParamsStatusEnu
 export type { OrderSchemaType } from './zod/orderSchema.ts'
 export type { OrderStatusEnumSchemaType } from './zod/orderStatusEnumSchema.ts'
 export type {
-  AddFilesDataSchemaFormDataType,
-  AddFilesDataSchemaJsonType,
-  AddFilesDataSchemaType,
+  AddFilesBodySchemaFormDataType,
+  AddFilesBodySchemaJsonType,
+  AddFilesBodySchemaType,
   AddFilesErrorSchemaType,
   AddFilesResponseSchemaType,
   AddFilesStatus200SchemaType,
   AddFilesStatus405SchemaType,
 } from './zod/pet/addFilesSchema.ts'
 export type {
-  AddPetDataSchemaFormUrlEncodedType,
-  AddPetDataSchemaJsonType,
-  AddPetDataSchemaType,
-  AddPetDataSchemaXmlType,
+  AddPetBodySchemaFormUrlEncodedType,
+  AddPetBodySchemaJsonType,
+  AddPetBodySchemaType,
+  AddPetBodySchemaXmlType,
   AddPetErrorSchemaType,
   AddPetResponseSchemaType,
   AddPetStatus405SchemaType,
@@ -261,10 +261,10 @@ export type {
   GetPetByIdStatus404SchemaType,
 } from './zod/pet/getPetByIdSchema.ts'
 export type {
-  UpdatePetDataSchemaFormUrlEncodedType,
-  UpdatePetDataSchemaJsonType,
-  UpdatePetDataSchemaType,
-  UpdatePetDataSchemaXmlType,
+  UpdatePetBodySchemaFormUrlEncodedType,
+  UpdatePetBodySchemaJsonType,
+  UpdatePetBodySchemaType,
+  UpdatePetBodySchemaXmlType,
   UpdatePetErrorSchemaType,
   UpdatePetResponseSchemaType,
   UpdatePetStatus200SchemaJsonType,
@@ -284,7 +284,7 @@ export type {
   UpdatePetWithFormStatus405SchemaType,
 } from './zod/pet/updatePetWithFormSchema.ts'
 export type {
-  UploadFileDataSchemaType,
+  UploadFileBodySchemaType,
   UploadFilePathPetIdSchemaType,
   UploadFileQueryAdditionalMetadataSchemaType,
   UploadFileResponseSchemaType,
@@ -296,7 +296,7 @@ export type { PetNotFoundSchemaType } from './zod/petNotFoundSchema.ts'
 export type { PetSchemaType } from './zod/petSchema.ts'
 export type { PetStatusEnumSchemaType } from './zod/petStatusEnumSchema.ts'
 export type {
-  CreatePetsDataSchemaType,
+  CreatePetsBodySchemaType,
   CreatePetsErrorSchemaType,
   CreatePetsHeaderXEXAMPLESchemaType,
   CreatePetsPathUuidSchemaType,
@@ -357,18 +357,18 @@ export { createPetFaker } from './mocks/createPetFaker.ts'
 export { createPetNotFoundFaker } from './mocks/createPetNotFoundFaker.ts'
 export { createPetStatusEnumFaker } from './mocks/createPetStatusEnumFaker.ts'
 export {
-  createAddFilesDataFaker,
-  createAddFilesDataFakerFormData,
-  createAddFilesDataFakerJson,
+  createAddFilesBodyFaker,
+  createAddFilesBodyFakerFormData,
+  createAddFilesBodyFakerJson,
   createAddFilesResponseFaker,
   createAddFilesStatus200Faker,
   createAddFilesStatus405Faker,
 } from './mocks/pet/createAddFilesFaker.ts'
 export {
-  createAddPetDataFaker,
-  createAddPetDataFakerFormUrlEncoded,
-  createAddPetDataFakerJson,
-  createAddPetDataFakerXml,
+  createAddPetBodyFaker,
+  createAddPetBodyFakerFormUrlEncoded,
+  createAddPetBodyFakerJson,
+  createAddPetBodyFakerXml,
   createAddPetResponseFaker,
   createAddPetStatus405Faker,
   createAddPetStatusDefaultFaker,
@@ -410,10 +410,10 @@ export {
   createGetPetByIdStatus404Faker,
 } from './mocks/pet/createGetPetByIdFaker.ts'
 export {
-  createUpdatePetDataFaker,
-  createUpdatePetDataFakerFormUrlEncoded,
-  createUpdatePetDataFakerJson,
-  createUpdatePetDataFakerXml,
+  createUpdatePetBodyFaker,
+  createUpdatePetBodyFakerFormUrlEncoded,
+  createUpdatePetBodyFakerJson,
+  createUpdatePetBodyFakerXml,
   createUpdatePetResponseFaker,
   createUpdatePetStatus200Faker,
   createUpdatePetStatus200FakerJson,
@@ -431,14 +431,14 @@ export {
   createUpdatePetWithFormStatus405Faker,
 } from './mocks/pet/createUpdatePetWithFormFaker.ts'
 export {
-  createUploadFileDataFaker,
+  createUploadFileBodyFaker,
   createUploadFilePathPetIdFaker,
   createUploadFileQueryAdditionalMetadataFaker,
   createUploadFileResponseFaker,
   createUploadFileStatus200Faker,
 } from './mocks/pet/createUploadFileFaker.ts'
 export {
-  createCreatePetsDataFaker,
+  createCreatePetsBodyFaker,
   createCreatePetsHeaderXEXAMPLEFaker,
   createCreatePetsPathUuidFaker,
   createCreatePetsQueryBoolParamFaker,
@@ -501,19 +501,19 @@ export { orderParamsStatusEnumSchema } from './zod/orderParamsStatusEnumSchema.t
 export { orderSchema } from './zod/orderSchema.ts'
 export { orderStatusEnumSchema } from './zod/orderStatusEnumSchema.ts'
 export {
-  addFilesDataSchema,
-  addFilesDataSchemaFormData,
-  addFilesDataSchemaJson,
+  addFilesBodySchema,
+  addFilesBodySchemaFormData,
+  addFilesBodySchemaJson,
   addFilesErrorSchema,
   addFilesResponseSchema,
   addFilesStatus200Schema,
   addFilesStatus405Schema,
 } from './zod/pet/addFilesSchema.ts'
 export {
-  addPetDataSchema,
-  addPetDataSchemaFormUrlEncoded,
-  addPetDataSchemaJson,
-  addPetDataSchemaXml,
+  addPetBodySchema,
+  addPetBodySchemaFormUrlEncoded,
+  addPetBodySchemaJson,
+  addPetBodySchemaXml,
   addPetErrorSchema,
   addPetResponseSchema,
   addPetStatus405Schema,
@@ -560,10 +560,10 @@ export {
   getPetByIdStatus404Schema,
 } from './zod/pet/getPetByIdSchema.ts'
 export {
-  updatePetDataSchema,
-  updatePetDataSchemaFormUrlEncoded,
-  updatePetDataSchemaJson,
-  updatePetDataSchemaXml,
+  updatePetBodySchema,
+  updatePetBodySchemaFormUrlEncoded,
+  updatePetBodySchemaJson,
+  updatePetBodySchemaXml,
   updatePetErrorSchema,
   updatePetResponseSchema,
   updatePetStatus200Schema,
@@ -583,7 +583,7 @@ export {
   updatePetWithFormStatus405Schema,
 } from './zod/pet/updatePetWithFormSchema.ts'
 export {
-  uploadFileDataSchema,
+  uploadFileBodySchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,
@@ -595,7 +595,7 @@ export { petNotFoundSchema } from './zod/petNotFoundSchema.ts'
 export { petSchema } from './zod/petSchema.ts'
 export { petStatusEnumSchema } from './zod/petStatusEnumSchema.ts'
 export {
-  createPetsDataSchema,
+  createPetsBodySchema,
   createPetsErrorSchema,
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,

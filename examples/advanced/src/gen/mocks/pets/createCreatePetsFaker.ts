@@ -1,5 +1,5 @@
 import type {
-  CreatePetsData,
+  CreatePetsBody,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsQueryBoolParam,
   CreatePetsResponse,
@@ -41,7 +41,7 @@ export function createCreatePetsStatusDefaultFaker(data?: Partial<CreatePetsStat
   return createPetNotFoundFaker(data) as CreatePetsStatusDefault
 }
 
-export function createCreatePetsDataFaker<TData extends Partial<CreatePetsData> = object>(data?: TData) {
+export function createCreatePetsBodyFaker<TData extends Partial<CreatePetsBody> = object>(data?: TData) {
   const defaultFakeData = {
     name: faker.string.alpha(),
     tag: faker.string.alpha(),

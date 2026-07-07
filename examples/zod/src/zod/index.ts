@@ -1,7 +1,8 @@
 export type {
-  AddPetData,
-  AddPetFormUrlEncodedData,
-  AddPetJsonData,
+  AddPetBody,
+  AddPetBodyFormUrlEncoded,
+  AddPetBodyJson,
+  AddPetBodyXml,
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
@@ -9,13 +10,12 @@ export type {
   AddPetStatus200Json,
   AddPetStatus200Xml,
   AddPetStatus405,
-  AddPetXmlData,
 } from './ts/AddPet.ts'
 export type { AddPetRequest, AddPetRequestStatusEnumKey } from './ts/AddPetRequest.ts'
 export type { ApiResponse } from './ts/ApiResponse.ts'
 export type { Category } from './ts/Category.ts'
 export type {
-  CreatePetsData,
+  CreatePetsBody,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsPathUuid,
   CreatePetsQueryOffset,
@@ -106,32 +106,33 @@ export type { PhoneNumber } from './ts/PhoneNumber.ts'
 export type { PhoneWithMaxLength } from './ts/PhoneWithMaxLength.ts'
 export type { PhoneWithMaxLengthExplicit } from './ts/PhoneWithMaxLengthExplicit.ts'
 export type {
-  PlaceOrderData,
-  PlaceOrderFormUrlEncodedData,
-  PlaceOrderJsonData,
+  PlaceOrderBody,
+  PlaceOrderBodyFormUrlEncoded,
+  PlaceOrderBodyJson,
+  PlaceOrderBodyXml,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-  PlaceOrderXmlData,
 } from './ts/PlaceOrder.ts'
 export type {
-  PlaceOrderPatchData,
-  PlaceOrderPatchFormUrlEncodedData,
-  PlaceOrderPatchJsonData,
+  PlaceOrderPatchBody,
+  PlaceOrderPatchBodyFormUrlEncoded,
+  PlaceOrderPatchBodyJson,
+  PlaceOrderPatchBodyXml,
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
-  PlaceOrderPatchXmlData,
 } from './ts/PlaceOrderPatch.ts'
 export type { Tag } from './ts/Tag.ts'
 export type {
-  UpdatePetData,
-  UpdatePetFormUrlEncodedData,
-  UpdatePetJsonData,
+  UpdatePetBody,
+  UpdatePetBodyFormUrlEncoded,
+  UpdatePetBodyJson,
+  UpdatePetBodyXml,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -141,7 +142,6 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-  UpdatePetXmlData,
 } from './ts/UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
@@ -153,7 +153,7 @@ export type {
   UpdatePetWithFormStatus405,
 } from './ts/UpdatePetWithForm.ts'
 export type {
-  UploadFileData,
+  UploadFileBody,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
@@ -163,10 +163,10 @@ export type {
 } from './ts/UploadFile.ts'
 export type { AddPetRequestSchemaType } from './zod/addPetRequestSchema.ts'
 export type {
-  AddPetDataSchemaFormUrlEncodedType,
-  AddPetDataSchemaJsonType,
-  AddPetDataSchemaType,
-  AddPetDataSchemaXmlType,
+  AddPetBodySchemaFormUrlEncodedType,
+  AddPetBodySchemaJsonType,
+  AddPetBodySchemaType,
+  AddPetBodySchemaXmlType,
   AddPetErrorSchemaType,
   AddPetResponseSchemaType,
   AddPetStatus200SchemaJsonType,
@@ -177,7 +177,7 @@ export type {
 export type { ApiResponseSchemaType } from './zod/apiResponseSchema.ts'
 export type { CategorySchemaType } from './zod/categorySchema.ts'
 export type {
-  CreatePetsDataSchemaType,
+  CreatePetsBodySchemaType,
   CreatePetsErrorSchemaType,
   CreatePetsHeaderXEXAMPLESchemaType,
   CreatePetsPathUuidSchemaType,
@@ -257,20 +257,20 @@ export type { PhoneNumberSchemaType } from './zod/phoneNumberSchema.ts'
 export type { PhoneWithMaxLengthExplicitSchemaType } from './zod/phoneWithMaxLengthExplicitSchema.ts'
 export type { PhoneWithMaxLengthSchemaType } from './zod/phoneWithMaxLengthSchema.ts'
 export type {
-  PlaceOrderPatchDataSchemaFormUrlEncodedType,
-  PlaceOrderPatchDataSchemaJsonType,
-  PlaceOrderPatchDataSchemaType,
-  PlaceOrderPatchDataSchemaXmlType,
+  PlaceOrderPatchBodySchemaFormUrlEncodedType,
+  PlaceOrderPatchBodySchemaJsonType,
+  PlaceOrderPatchBodySchemaType,
+  PlaceOrderPatchBodySchemaXmlType,
   PlaceOrderPatchErrorSchemaType,
   PlaceOrderPatchResponseSchemaType,
   PlaceOrderPatchStatus200SchemaType,
   PlaceOrderPatchStatus405SchemaType,
 } from './zod/placeOrderPatchSchema.ts'
 export type {
-  PlaceOrderDataSchemaFormUrlEncodedType,
-  PlaceOrderDataSchemaJsonType,
-  PlaceOrderDataSchemaType,
-  PlaceOrderDataSchemaXmlType,
+  PlaceOrderBodySchemaFormUrlEncodedType,
+  PlaceOrderBodySchemaJsonType,
+  PlaceOrderBodySchemaType,
+  PlaceOrderBodySchemaXmlType,
   PlaceOrderErrorSchemaType,
   PlaceOrderResponseSchemaType,
   PlaceOrderStatus200SchemaType,
@@ -278,10 +278,10 @@ export type {
 } from './zod/placeOrderSchema.ts'
 export type { TagSchemaType } from './zod/tagSchema.ts'
 export type {
-  UpdatePetDataSchemaFormUrlEncodedType,
-  UpdatePetDataSchemaJsonType,
-  UpdatePetDataSchemaType,
-  UpdatePetDataSchemaXmlType,
+  UpdatePetBodySchemaFormUrlEncodedType,
+  UpdatePetBodySchemaJsonType,
+  UpdatePetBodySchemaType,
+  UpdatePetBodySchemaXmlType,
   UpdatePetErrorSchemaType,
   UpdatePetResponseSchemaType,
   UpdatePetStatus200SchemaJsonType,
@@ -300,7 +300,7 @@ export type {
   UpdatePetWithFormStatus405SchemaType,
 } from './zod/updatePetWithFormSchema.ts'
 export type {
-  UploadFileDataSchemaType,
+  UploadFileBodySchemaType,
   UploadFilePathPetIdSchemaType,
   UploadFileQueryAdditionalMetadataSchemaType,
   UploadFileResponseSchemaType,
@@ -314,10 +314,10 @@ export { orderHttpStatusEnum, orderStatusEnum, orderValueEnum } from './ts/Order
 export { petStatusEnum } from './ts/Pet.ts'
 export { addPetRequestSchema } from './zod/addPetRequestSchema.ts'
 export {
-  addPetDataSchema,
-  addPetDataSchemaFormUrlEncoded,
-  addPetDataSchemaJson,
-  addPetDataSchemaXml,
+  addPetBodySchema,
+  addPetBodySchemaFormUrlEncoded,
+  addPetBodySchemaJson,
+  addPetBodySchemaXml,
   addPetErrorSchema,
   addPetResponseSchema,
   addPetStatus200Schema,
@@ -328,7 +328,7 @@ export {
 export { apiResponseSchema } from './zod/apiResponseSchema.ts'
 export { categorySchema } from './zod/categorySchema.ts'
 export {
-  createPetsDataSchema,
+  createPetsBodySchema,
   createPetsErrorSchema,
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,
@@ -409,20 +409,20 @@ export { phoneNumberSchema } from './zod/phoneNumberSchema.ts'
 export { phoneWithMaxLengthExplicitSchema } from './zod/phoneWithMaxLengthExplicitSchema.ts'
 export { phoneWithMaxLengthSchema } from './zod/phoneWithMaxLengthSchema.ts'
 export {
-  placeOrderPatchDataSchema,
-  placeOrderPatchDataSchemaFormUrlEncoded,
-  placeOrderPatchDataSchemaJson,
-  placeOrderPatchDataSchemaXml,
+  placeOrderPatchBodySchema,
+  placeOrderPatchBodySchemaFormUrlEncoded,
+  placeOrderPatchBodySchemaJson,
+  placeOrderPatchBodySchemaXml,
   placeOrderPatchErrorSchema,
   placeOrderPatchResponseSchema,
   placeOrderPatchStatus200Schema,
   placeOrderPatchStatus405Schema,
 } from './zod/placeOrderPatchSchema.ts'
 export {
-  placeOrderDataSchema,
-  placeOrderDataSchemaFormUrlEncoded,
-  placeOrderDataSchemaJson,
-  placeOrderDataSchemaXml,
+  placeOrderBodySchema,
+  placeOrderBodySchemaFormUrlEncoded,
+  placeOrderBodySchemaJson,
+  placeOrderBodySchemaXml,
   placeOrderErrorSchema,
   placeOrderResponseSchema,
   placeOrderStatus200Schema,
@@ -430,10 +430,10 @@ export {
 } from './zod/placeOrderSchema.ts'
 export { tagSchema } from './zod/tagSchema.ts'
 export {
-  updatePetDataSchema,
-  updatePetDataSchemaFormUrlEncoded,
-  updatePetDataSchemaJson,
-  updatePetDataSchemaXml,
+  updatePetBodySchema,
+  updatePetBodySchemaFormUrlEncoded,
+  updatePetBodySchemaJson,
+  updatePetBodySchemaXml,
   updatePetErrorSchema,
   updatePetResponseSchema,
   updatePetStatus200Schema,
@@ -452,7 +452,7 @@ export {
   updatePetWithFormStatus405Schema,
 } from './zod/updatePetWithFormSchema.ts'
 export {
-  uploadFileDataSchema,
+  uploadFileBodySchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,

@@ -14,12 +14,12 @@ export const addFilesResponseSchema = addFilesStatus200Schema
 
 export const addFilesErrorSchema = addFilesStatus405Schema
 
-export const addFilesDataSchemaJson = z
+export const addFilesBodySchemaJson = z
   .object({
     url: z.url().describe('URL of the image to upload'),
   })
   .optional()
 
-export const addFilesDataSchemaFormData = petSchema.omit({ id: true }).optional()
+export const addFilesBodySchemaFormData = petSchema.omit({ id: true }).optional()
 
-export const addFilesDataSchema = z.union([addFilesDataSchemaJson, addFilesDataSchemaFormData])
+export const addFilesBodySchema = z.union([addFilesBodySchemaJson, addFilesBodySchemaFormData])

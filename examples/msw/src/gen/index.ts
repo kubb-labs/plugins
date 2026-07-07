@@ -1,7 +1,8 @@
 export type {
-  AddPetData,
-  AddPetFormUrlEncodedData,
-  AddPetJsonData,
+  AddPetBody,
+  AddPetBodyFormUrlEncoded,
+  AddPetBodyJson,
+  AddPetBodyXml,
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
@@ -9,7 +10,6 @@ export type {
   AddPetStatus200Json,
   AddPetStatus200Xml,
   AddPetStatus405,
-  AddPetXmlData,
 } from './models/AddPet.ts'
 export type { AddPetRequest } from './models/AddPetRequest.ts'
 export type { AddPetRequestStatusEnumKey } from './models/AddPetRequestStatusEnum.ts'
@@ -90,32 +90,33 @@ export type { Pet } from './models/Pet.ts'
 export type { PetNotFound } from './models/PetNotFound.ts'
 export type { PetStatusEnumKey } from './models/PetStatusEnum.ts'
 export type {
-  PlaceOrderData,
-  PlaceOrderFormUrlEncodedData,
-  PlaceOrderJsonData,
+  PlaceOrderBody,
+  PlaceOrderBodyFormUrlEncoded,
+  PlaceOrderBodyJson,
+  PlaceOrderBodyXml,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-  PlaceOrderXmlData,
 } from './models/PlaceOrder.ts'
 export type {
-  PlaceOrderPatchData,
-  PlaceOrderPatchFormUrlEncodedData,
-  PlaceOrderPatchJsonData,
+  PlaceOrderPatchBody,
+  PlaceOrderPatchBodyFormUrlEncoded,
+  PlaceOrderPatchBodyJson,
+  PlaceOrderPatchBodyXml,
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
-  PlaceOrderPatchXmlData,
 } from './models/PlaceOrderPatch.ts'
 export type { Tag } from './models/Tag.ts'
 export type {
-  UpdatePetData,
-  UpdatePetFormUrlEncodedData,
-  UpdatePetJsonData,
+  UpdatePetBody,
+  UpdatePetBodyFormUrlEncoded,
+  UpdatePetBodyJson,
+  UpdatePetBodyXml,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -125,7 +126,6 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-  UpdatePetXmlData,
 } from './models/UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
@@ -137,7 +137,7 @@ export type {
   UpdatePetWithFormStatus405,
 } from './models/UpdatePetWithForm.ts'
 export type {
-  UploadFileData,
+  UploadFileBody,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
@@ -158,15 +158,15 @@ export { createPetNotFound } from './mocks/createPetNotFound.ts'
 export { createPetStatusEnum } from './mocks/createPetStatusEnum.ts'
 export { createTag } from './mocks/createTag.ts'
 export {
-  createAddPetData,
-  createAddPetFormUrlEncodedData,
-  createAddPetJsonData,
+  createAddPetBody,
+  createAddPetBodyFormUrlEncoded,
+  createAddPetBodyJson,
+  createAddPetBodyXml,
   createAddPetResponse,
   createAddPetStatus200,
   createAddPetStatus200Json,
   createAddPetStatus200Xml,
   createAddPetStatus405,
-  createAddPetXmlData,
 } from './mocks/pet/createAddPet.ts'
 export { createDeletePetHeaderApiKey, createDeletePetPathPetId, createDeletePetResponse, createDeletePetStatus400 } from './mocks/pet/createDeletePet.ts'
 export {
@@ -198,9 +198,10 @@ export {
 } from './mocks/pet/createGetPetById.ts'
 export { createOptionsFindPetsByStatusResponse, createOptionsFindPetsByStatusStatus200 } from './mocks/pet/createOptionsFindPetsByStatus.ts'
 export {
-  createUpdatePetData,
-  createUpdatePetFormUrlEncodedData,
-  createUpdatePetJsonData,
+  createUpdatePetBody,
+  createUpdatePetBodyFormUrlEncoded,
+  createUpdatePetBodyJson,
+  createUpdatePetBodyXml,
   createUpdatePetResponse,
   createUpdatePetStatus200,
   createUpdatePetStatus200Json,
@@ -208,7 +209,6 @@ export {
   createUpdatePetStatus400,
   createUpdatePetStatus404,
   createUpdatePetStatus405,
-  createUpdatePetXmlData,
 } from './mocks/pet/createUpdatePet.ts'
 export {
   createUpdatePetWithFormPathPetId,
@@ -218,7 +218,7 @@ export {
   createUpdatePetWithFormStatus405,
 } from './mocks/pet/createUpdatePetWithForm.ts'
 export {
-  createUploadFileData,
+  createUploadFileBody,
   createUploadFilePathPetId,
   createUploadFileQueryAdditionalMetadata,
   createUploadFileResponse,
@@ -241,22 +241,22 @@ export {
   createGetOrderByIdStatus404,
 } from './mocks/store/createGetOrderById.ts'
 export {
-  createPlaceOrderData,
-  createPlaceOrderFormUrlEncodedData,
-  createPlaceOrderJsonData,
+  createPlaceOrderBody,
+  createPlaceOrderBodyFormUrlEncoded,
+  createPlaceOrderBodyJson,
+  createPlaceOrderBodyXml,
   createPlaceOrderResponse,
   createPlaceOrderStatus200,
   createPlaceOrderStatus405,
-  createPlaceOrderXmlData,
 } from './mocks/store/createPlaceOrder.ts'
 export {
-  createPlaceOrderPatchData,
-  createPlaceOrderPatchFormUrlEncodedData,
-  createPlaceOrderPatchJsonData,
+  createPlaceOrderPatchBody,
+  createPlaceOrderPatchBodyFormUrlEncoded,
+  createPlaceOrderPatchBodyJson,
+  createPlaceOrderPatchBodyXml,
   createPlaceOrderPatchResponse,
   createPlaceOrderPatchStatus200,
   createPlaceOrderPatchStatus405,
-  createPlaceOrderPatchXmlData,
 } from './mocks/store/createPlaceOrderPatch.ts'
 export { addPetRequestStatusEnum } from './models/AddPetRequestStatusEnum.ts'
 export { findPetsByStatusStatus } from './models/FindPetsByStatusStatus.ts'

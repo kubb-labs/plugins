@@ -1,4 +1,5 @@
 import { getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
+import { jsStringEscape, stringify } from '@internals/utils'
 import { ast } from 'kubb/kit'
 import type { ResolverTs } from './types.ts'
 
@@ -46,7 +47,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   const exampleValues = meta?.examples ?? []
 
   return [
-    hasDescription ? `@description ${ast.jsStringEscape(meta.description)}` : null,
+    hasDescription ? `@description ${jsStringEscape(meta.description)}` : null,
     ...formatComment,
     meta && 'deprecated' in meta && meta.deprecated ? '@deprecated' : null,
     // minItems/maxItems on arrays should not be emitted as @minLength/@maxLength
@@ -54,7 +55,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
     !isArray && meta && 'max' in meta && meta.max !== undefined ? `@maxLength ${meta.max}` : null,
     meta && 'pattern' in meta && meta.pattern ? `@pattern ${meta.pattern}` : null,
     meta && 'default' in meta && meta.default !== undefined
-      ? `@default ${'primitive' in meta && meta.primitive === 'string' ? ast.stringify(meta.default as string) : meta.default}`
+      ? `@default ${'primitive' in meta && meta.primitive === 'string' ? stringify(meta.default as string) : meta.default}`
       : null,
     ...exampleValues.map((example) => `@example ${example}`),
     meta && 'primitive' in meta && meta.primitive

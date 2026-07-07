@@ -1,5 +1,7 @@
 export { camelCase, pascalCase, screamingSnakeCase, snakeCase } from './casing.ts'
+export { buildJSDoc, buildList, buildObject, lazyGetter, objectKey } from './codegen.ts'
 export { getRelativePath, toFilePath } from './fs.ts'
 export { aliasConflictingImports, filterUsedImports, rewriteAliasedImports, type ImportEntry, type ImportName } from './imports.ts'
-export { ensureValidVarName, isValidVarName } from './reserved.ts'
+export { ensureValidVarName, isIdentifier, isValidVarName } from './reserved.ts'
+export { getNestedAccessor, jsStringEscape, singleQuote, stringify, stringifyObject, toRegExpString, trimQuotes } from './strings.ts'
 export { type PathCasing, type URLObject, Url } from './url.ts'

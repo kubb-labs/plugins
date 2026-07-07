@@ -36,27 +36,27 @@ export type UpdatePetStatus405 = unknown
  * @description Update an existent pet in the store
  * @type object
  */
-export type UpdatePetJsonData = Pet
+export type UpdatePetBodyJson = Pet
 
 /**
  * @description Update an existent pet in the store
  * @type object
  */
-export type UpdatePetXmlData = Pet
+export type UpdatePetBodyXml = Pet
 
 /**
  * @description Update an existent pet in the store
  * @type object
  */
-export type UpdatePetFormUrlEncodedData = Pet
+export type UpdatePetBodyFormUrlEncoded = Pet
 
-export type UpdatePetData = UpdatePetJsonData | UpdatePetXmlData | UpdatePetFormUrlEncodedData
+export type UpdatePetBody = UpdatePetBodyJson | UpdatePetBodyXml | UpdatePetBodyFormUrlEncoded
 
 /**
  * @type object
  */
 export type UpdatePetRequestConfig = {
-  body: UpdatePetData
+  body: UpdatePetBody
   path?: never
   query?: never
   headers?: never

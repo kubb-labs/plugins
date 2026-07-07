@@ -1,7 +1,8 @@
 export type {
-  AddPetData,
-  AddPetFormUrlEncodedData,
-  AddPetJsonData,
+  AddPetBody,
+  AddPetBodyFormUrlEncoded,
+  AddPetBodyJson,
+  AddPetBodyXml,
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
@@ -9,7 +10,6 @@ export type {
   AddPetStatus200Json,
   AddPetStatus200Xml,
   AddPetStatus405,
-  AddPetXmlData,
 } from './models/AddPet.ts'
 export type { ApiResponse } from './models/ApiResponse.ts'
 export type { Category } from './models/Category.ts'
@@ -77,21 +77,22 @@ export type { Item } from './models/Item.ts'
 export type { Order, OrderStatusEnumKey } from './models/Order.ts'
 export type { Pet, PetStatusEnumKey } from './models/Pet.ts'
 export type {
-  PlaceOrderData,
-  PlaceOrderFormUrlEncodedData,
-  PlaceOrderJsonData,
+  PlaceOrderBody,
+  PlaceOrderBodyFormUrlEncoded,
+  PlaceOrderBodyJson,
+  PlaceOrderBodyXml,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-  PlaceOrderXmlData,
 } from './models/PlaceOrder.ts'
 export type { Tag } from './models/Tag.ts'
 export type {
-  UpdatePetData,
-  UpdatePetFormUrlEncodedData,
-  UpdatePetJsonData,
+  UpdatePetBody,
+  UpdatePetBodyFormUrlEncoded,
+  UpdatePetBodyJson,
+  UpdatePetBodyXml,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -101,7 +102,6 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-  UpdatePetXmlData,
 } from './models/UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
@@ -113,7 +113,7 @@ export type {
   UpdatePetWithFormStatus405,
 } from './models/UpdatePetWithForm.ts'
 export type {
-  UploadFileData,
+  UploadFileBody,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
@@ -125,9 +125,10 @@ export { createCategory } from './faker/createCategory.ts'
 export { createPet } from './faker/createPet.ts'
 export { createTag } from './faker/createTag.ts'
 export {
-  createUpdatePetData,
-  createUpdatePetFormUrlEncodedData,
-  createUpdatePetJsonData,
+  createUpdatePetBody,
+  createUpdatePetBodyFormUrlEncoded,
+  createUpdatePetBodyJson,
+  createUpdatePetBodyXml,
   createUpdatePetResponse,
   createUpdatePetStatus200,
   createUpdatePetStatus200Json,
@@ -135,7 +136,6 @@ export {
   createUpdatePetStatus400,
   createUpdatePetStatus404,
   createUpdatePetStatus405,
-  createUpdatePetXmlData,
 } from './faker/createUpdatePet.ts'
 export {
   createUpdatePetWithFormPathPetId,

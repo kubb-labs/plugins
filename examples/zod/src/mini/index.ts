@@ -1,9 +1,9 @@
 export { addPetRequestSchema } from './zod/addPetRequestSchema.ts'
 export {
-  addPetDataSchema,
-  addPetDataSchemaFormUrlEncoded,
-  addPetDataSchemaJson,
-  addPetDataSchemaXml,
+  addPetBodySchema,
+  addPetBodySchemaFormUrlEncoded,
+  addPetBodySchemaJson,
+  addPetBodySchemaXml,
   addPetErrorSchema,
   addPetResponseSchema,
   addPetStatus200Schema,
@@ -14,7 +14,7 @@ export {
 export { apiResponseSchema } from './zod/apiResponseSchema.ts'
 export { categorySchema } from './zod/categorySchema.ts'
 export {
-  createPetsDataSchema,
+  createPetsBodySchema,
   createPetsErrorSchema,
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,
@@ -94,20 +94,20 @@ export { phoneNumberSchema } from './zod/phoneNumberSchema.ts'
 export { phoneWithMaxLengthExplicitSchema } from './zod/phoneWithMaxLengthExplicitSchema.ts'
 export { phoneWithMaxLengthSchema } from './zod/phoneWithMaxLengthSchema.ts'
 export {
-  placeOrderPatchDataSchema,
-  placeOrderPatchDataSchemaFormUrlEncoded,
-  placeOrderPatchDataSchemaJson,
-  placeOrderPatchDataSchemaXml,
+  placeOrderPatchBodySchema,
+  placeOrderPatchBodySchemaFormUrlEncoded,
+  placeOrderPatchBodySchemaJson,
+  placeOrderPatchBodySchemaXml,
   placeOrderPatchErrorSchema,
   placeOrderPatchResponseSchema,
   placeOrderPatchStatus200Schema,
   placeOrderPatchStatus405Schema,
 } from './zod/placeOrderPatchSchema.ts'
 export {
-  placeOrderDataSchema,
-  placeOrderDataSchemaFormUrlEncoded,
-  placeOrderDataSchemaJson,
-  placeOrderDataSchemaXml,
+  placeOrderBodySchema,
+  placeOrderBodySchemaFormUrlEncoded,
+  placeOrderBodySchemaJson,
+  placeOrderBodySchemaXml,
   placeOrderErrorSchema,
   placeOrderResponseSchema,
   placeOrderStatus200Schema,
@@ -115,10 +115,10 @@ export {
 } from './zod/placeOrderSchema.ts'
 export { tagSchema } from './zod/tagSchema.ts'
 export {
-  updatePetDataSchema,
-  updatePetDataSchemaFormUrlEncoded,
-  updatePetDataSchemaJson,
-  updatePetDataSchemaXml,
+  updatePetBodySchema,
+  updatePetBodySchemaFormUrlEncoded,
+  updatePetBodySchemaJson,
+  updatePetBodySchemaXml,
   updatePetErrorSchema,
   updatePetResponseSchema,
   updatePetStatus200Schema,
@@ -137,7 +137,7 @@ export {
   updatePetWithFormStatus405Schema,
 } from './zod/updatePetWithFormSchema.ts'
 export {
-  uploadFileDataSchema,
+  uploadFileBodySchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,
