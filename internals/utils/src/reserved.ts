@@ -125,3 +125,20 @@ export function ensureValidVarName(name: string): string {
   }
   return `_${name}`
 }
+
+/**
+ * Returns `true` when `name` is syntactically a valid identifier, ignoring reserved words.
+ *
+ * Reserved words and globals (`class`, `name`, `Date`, …) are valid as bare object-literal keys
+ * even though they are not valid variable names, so use this (not {@link isValidVarName}) when
+ * deciding whether an object key needs quoting.
+ *
+ * @example
+ * ```ts
+ * isIdentifier('name')   // true
+ * isIdentifier('x-total')// false
+ * ```
+ */
+export function isIdentifier(name: string): boolean {
+  return /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(name)
+}

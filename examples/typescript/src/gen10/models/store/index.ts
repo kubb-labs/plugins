@@ -19,24 +19,24 @@ export type {
   GetOrderByIdStatus404,
 } from './GetOrderById.ts'
 export type {
-  PlaceOrderData,
-  PlaceOrderFormUrlEncodedData,
-  PlaceOrderJsonData,
+  PlaceOrderBody,
+  PlaceOrderBodyFormUrlEncoded,
+  PlaceOrderBodyJson,
+  PlaceOrderBodyXml,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-  PlaceOrderXmlData,
 } from './PlaceOrder.ts'
 export type {
-  PlaceOrderPatchData,
-  PlaceOrderPatchFormUrlEncodedData,
-  PlaceOrderPatchJsonData,
+  PlaceOrderPatchBody,
+  PlaceOrderPatchBodyFormUrlEncoded,
+  PlaceOrderPatchBodyJson,
+  PlaceOrderPatchBodyXml,
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
-  PlaceOrderPatchXmlData,
 } from './PlaceOrderPatch.ts'

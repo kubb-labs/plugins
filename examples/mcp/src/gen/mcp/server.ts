@@ -17,10 +17,10 @@ import { placeOrderHandler } from './placeOrder.js'
 import { placeOrderPatchHandler } from './placeOrderPatch.js'
 import { updatePetHandler } from './updatePet.js'
 import { updatePetWithFormHandler } from './updatePetWithForm.js'
-import { addFilesDataSchema, addFilesStatus200Schema } from '../zod/addFilesSchema.js'
-import { addPetDataSchema, addPetStatus200Schema } from '../zod/addPetSchema.js'
+import { addFilesBodySchema, addFilesStatus200Schema } from '../zod/addFilesSchema.js'
+import { addPetBodySchema, addPetStatus200Schema } from '../zod/addPetSchema.js'
 import {
-  createPetsDataSchema,
+  createPetsBodySchema,
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,
   createPetsQueryOffsetSchema,
@@ -39,9 +39,9 @@ import {
 import { getInventoryStatus200Schema } from '../zod/getInventorySchema.js'
 import { getOrderByIdPathOrderIdSchema, getOrderByIdStatus200Schema } from '../zod/getOrderByIdSchema.js'
 import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema.js'
-import { placeOrderPatchDataSchema, placeOrderPatchStatus200Schema } from '../zod/placeOrderPatchSchema.js'
-import { placeOrderDataSchema, placeOrderStatus200Schema } from '../zod/placeOrderSchema.js'
-import { updatePetDataSchema, updatePetStatus200Schema } from '../zod/updatePetSchema.js'
+import { placeOrderPatchBodySchema, placeOrderPatchStatus200Schema } from '../zod/placeOrderPatchSchema.js'
+import { placeOrderBodySchema, placeOrderStatus200Schema } from '../zod/placeOrderSchema.js'
+import { updatePetBodySchema, updatePetStatus200Schema } from '../zod/updatePetSchema.js'
 import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from '../zod/updatePetWithFormSchema.js'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
@@ -63,7 +63,7 @@ export function getServer() {
         path: z.object({ uuid: createPetsPathUuidSchema }),
         query: z.object({ offset: createPetsQueryOffsetSchema }),
         headers: z.object({ xEXAMPLE: createPetsHeaderXEXAMPLESchema }),
-        body: createPetsDataSchema,
+        body: createPetsBodySchema,
       },
     },
     async ({ path, query, headers, body }, request) => {
@@ -77,7 +77,7 @@ export function getServer() {
       title: 'Update an existing pet',
       description: 'Update an existing pet by Id',
       outputSchema: { data: updatePetStatus200Schema },
-      inputSchema: { body: updatePetDataSchema },
+      inputSchema: { body: updatePetBodySchema },
     },
     async ({ body }, request) => {
       return updatePetHandler({ body }, request)
@@ -90,7 +90,7 @@ export function getServer() {
       title: 'Add a new pet to the store',
       description: 'Add a new pet to the store',
       outputSchema: { data: addPetStatus200Schema },
-      inputSchema: { body: addPetDataSchema },
+      inputSchema: { body: addPetBodySchema },
     },
     async ({ body }, request) => {
       return addPetHandler({ body }, request)
@@ -172,7 +172,7 @@ export function getServer() {
       title: 'Place an file for a pet',
       description: 'Place a new file in the store',
       outputSchema: { data: addFilesStatus200Schema },
-      inputSchema: { body: addFilesDataSchema },
+      inputSchema: { body: addFilesBodySchema },
     },
     async ({ body }, request) => {
       return addFilesHandler({ body }, request)
@@ -197,7 +197,7 @@ export function getServer() {
       title: 'Place an order for a pet',
       description: 'Place a new order in the store',
       outputSchema: { data: placeOrderStatus200Schema },
-      inputSchema: { body: placeOrderDataSchema },
+      inputSchema: { body: placeOrderBodySchema },
     },
     async ({ body }, request) => {
       return placeOrderHandler({ body }, request)
@@ -210,7 +210,7 @@ export function getServer() {
       title: 'Place an order for a pet with patch',
       description: 'Place a new order in the store with patch',
       outputSchema: { data: placeOrderPatchStatus200Schema },
-      inputSchema: { body: placeOrderPatchDataSchema },
+      inputSchema: { body: placeOrderPatchBodySchema },
     },
     async ({ body }, request) => {
       return placeOrderPatchHandler({ body }, request)

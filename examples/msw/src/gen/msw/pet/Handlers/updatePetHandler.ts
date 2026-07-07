@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405, UpdatePetData } from '../../../models/UpdatePet.ts'
+import type { UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405, UpdatePetBody } from '../../../models/UpdatePet.ts'
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
@@ -43,8 +43,8 @@ export function updatePetHandlerResponse405(data: UpdatePetStatus405) {
   })
 }
 
-export function updatePetHandler(data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, UpdatePetData>) {
-  return http.put<Record<string, string>, UpdatePetData>(`http://localhost:3000/pet`, function handler(info) {
+export function updatePetHandler(data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, UpdatePetBody>) {
+  return http.put<Record<string, string>, UpdatePetBody>(`http://localhost:3000/pet`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

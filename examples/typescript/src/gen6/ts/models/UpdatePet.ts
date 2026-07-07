@@ -29,25 +29,25 @@ export type UpdatePetStatus405 = unknown
 /**
  * @description Update an existent pet in the store
  */
-export type UpdatePetJsonData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+export type UpdatePetBodyJson = Omit<NonNullable<Pet>, 'type' | 'tags'>
 
 /**
  * @description Update an existent pet in the store
  */
-export type UpdatePetXmlData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+export type UpdatePetBodyXml = Omit<NonNullable<Pet>, 'type' | 'tags'>
 
 /**
  * @description Update an existent pet in the store
  */
-export type UpdatePetFormUrlEncodedData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+export type UpdatePetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'type' | 'tags'>
 
-export type UpdatePetData = UpdatePetJsonData | UpdatePetXmlData | UpdatePetFormUrlEncodedData
+export type UpdatePetBody = UpdatePetBodyJson | UpdatePetBodyXml | UpdatePetBodyFormUrlEncoded
 
 /**
  * @type object
  */
 export type UpdatePetRequestConfig = {
-  body: UpdatePetData
+  body: UpdatePetBody
   path?: never
   query?: never
   headers?: never

@@ -255,27 +255,27 @@ export type UpdatePetStatus405 = unknown
  * @description Update an existent pet in the store
  * @type object
  */
-export type UpdatePetJsonData = Pet
+export type UpdatePetBodyJson = Pet
 
 /**
  * @description Update an existent pet in the store
  * @type object
  */
-export type UpdatePetXmlData = Pet
+export type UpdatePetBodyXml = Pet
 
 /**
  * @description Update an existent pet in the store
  * @type object
  */
-export type UpdatePetFormUrlEncodedData = Pet
+export type UpdatePetBodyFormUrlEncoded = Pet
 
-export type UpdatePetData = UpdatePetJsonData | UpdatePetXmlData | UpdatePetFormUrlEncodedData
+export type UpdatePetBody = UpdatePetBodyJson | UpdatePetBodyXml | UpdatePetBodyFormUrlEncoded
 
 /**
  * @type object
  */
 export type UpdatePetRequestConfig = {
-  body: UpdatePetData
+  body: UpdatePetBody
   path?: never
   query?: never
   headers?: never
@@ -336,27 +336,27 @@ export type AddPetStatus405 = {
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetJsonData = AddPetRequest
+export type AddPetBodyJson = AddPetRequest
 
 /**
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetXmlData = Pet
+export type AddPetBodyXml = Pet
 
 /**
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetFormUrlEncodedData = Pet
+export type AddPetBodyFormUrlEncoded = Pet
 
-export type AddPetData = AddPetJsonData | AddPetXmlData | AddPetFormUrlEncodedData
+export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded
 
 /**
  * @type object
  */
 export type AddPetRequestConfig = {
-  body: AddPetData
+  body: AddPetBody
   path?: never
   query?: never
   headers?: never
@@ -748,13 +748,13 @@ export type UploadFileStatus200 = ApiResponse
 /**
  * @type string | undefined
  */
-export type UploadFileData = Blob | undefined
+export type UploadFileBody = Blob | undefined
 
 /**
  * @type object
  */
 export type UploadFileRequestConfig = {
-  body: UploadFileData
+  body: UploadFileBody
   /**
    * @type object
    */
@@ -824,25 +824,25 @@ export type PlaceOrderStatus405 = unknown
 /**
  * @type object | undefined
  */
-export type PlaceOrderJsonData = Order | undefined
+export type PlaceOrderBodyJson = Order | undefined
 
 /**
  * @type object | undefined
  */
-export type PlaceOrderXmlData = Order | undefined
+export type PlaceOrderBodyXml = Order | undefined
 
 /**
  * @type object | undefined
  */
-export type PlaceOrderFormUrlEncodedData = Order | undefined
+export type PlaceOrderBodyFormUrlEncoded = Order | undefined
 
-export type PlaceOrderData = PlaceOrderJsonData | PlaceOrderXmlData | PlaceOrderFormUrlEncodedData
+export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrderBodyFormUrlEncoded
 
 /**
  * @type object
  */
 export type PlaceOrderRequestConfig = {
-  body: PlaceOrderData
+  body: PlaceOrderBody
   path?: never
   query?: never
   headers?: never
@@ -874,25 +874,25 @@ export type PlaceOrderPatchStatus405 = unknown
 /**
  * @type object | undefined
  */
-export type PlaceOrderPatchJsonData = Order | undefined
+export type PlaceOrderPatchBodyJson = Order | undefined
 
 /**
  * @type object | undefined
  */
-export type PlaceOrderPatchXmlData = Order | undefined
+export type PlaceOrderPatchBodyXml = Order | undefined
 
 /**
  * @type object | undefined
  */
-export type PlaceOrderPatchFormUrlEncodedData = Order | undefined
+export type PlaceOrderPatchBodyFormUrlEncoded = Order | undefined
 
-export type PlaceOrderPatchData = PlaceOrderPatchJsonData | PlaceOrderPatchXmlData | PlaceOrderPatchFormUrlEncodedData
+export type PlaceOrderPatchBody = PlaceOrderPatchBodyJson | PlaceOrderPatchBodyXml | PlaceOrderPatchBodyFormUrlEncoded
 
 /**
  * @type object
  */
 export type PlaceOrderPatchRequestConfig = {
-  body: PlaceOrderPatchData
+  body: PlaceOrderPatchBody
   path?: never
   query?: never
   headers?: never

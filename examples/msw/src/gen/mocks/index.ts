@@ -11,15 +11,15 @@ export { createPetNotFound } from './createPetNotFound.ts'
 export { createPetStatusEnum } from './createPetStatusEnum.ts'
 export { createTag } from './createTag.ts'
 export {
-  createAddPetData,
-  createAddPetFormUrlEncodedData,
-  createAddPetJsonData,
+  createAddPetBody,
+  createAddPetBodyFormUrlEncoded,
+  createAddPetBodyJson,
+  createAddPetBodyXml,
   createAddPetResponse,
   createAddPetStatus200,
   createAddPetStatus200Json,
   createAddPetStatus200Xml,
   createAddPetStatus405,
-  createAddPetXmlData,
 } from './pet/createAddPet.ts'
 export { createDeletePetHeaderApiKey, createDeletePetPathPetId, createDeletePetResponse, createDeletePetStatus400 } from './pet/createDeletePet.ts'
 export {
@@ -51,9 +51,10 @@ export {
 } from './pet/createGetPetById.ts'
 export { createOptionsFindPetsByStatusResponse, createOptionsFindPetsByStatusStatus200 } from './pet/createOptionsFindPetsByStatus.ts'
 export {
-  createUpdatePetData,
-  createUpdatePetFormUrlEncodedData,
-  createUpdatePetJsonData,
+  createUpdatePetBody,
+  createUpdatePetBodyFormUrlEncoded,
+  createUpdatePetBodyJson,
+  createUpdatePetBodyXml,
   createUpdatePetResponse,
   createUpdatePetStatus200,
   createUpdatePetStatus200Json,
@@ -61,7 +62,6 @@ export {
   createUpdatePetStatus400,
   createUpdatePetStatus404,
   createUpdatePetStatus405,
-  createUpdatePetXmlData,
 } from './pet/createUpdatePet.ts'
 export {
   createUpdatePetWithFormPathPetId,
@@ -71,7 +71,7 @@ export {
   createUpdatePetWithFormStatus405,
 } from './pet/createUpdatePetWithForm.ts'
 export {
-  createUploadFileData,
+  createUploadFileBody,
   createUploadFilePathPetId,
   createUploadFileQueryAdditionalMetadata,
   createUploadFileResponse,
@@ -89,20 +89,20 @@ export {
   createGetOrderByIdStatus404,
 } from './store/createGetOrderById.ts'
 export {
-  createPlaceOrderData,
-  createPlaceOrderFormUrlEncodedData,
-  createPlaceOrderJsonData,
+  createPlaceOrderBody,
+  createPlaceOrderBodyFormUrlEncoded,
+  createPlaceOrderBodyJson,
+  createPlaceOrderBodyXml,
   createPlaceOrderResponse,
   createPlaceOrderStatus200,
   createPlaceOrderStatus405,
-  createPlaceOrderXmlData,
 } from './store/createPlaceOrder.ts'
 export {
-  createPlaceOrderPatchData,
-  createPlaceOrderPatchFormUrlEncodedData,
-  createPlaceOrderPatchJsonData,
+  createPlaceOrderPatchBody,
+  createPlaceOrderPatchBodyFormUrlEncoded,
+  createPlaceOrderPatchBodyJson,
+  createPlaceOrderPatchBodyXml,
   createPlaceOrderPatchResponse,
   createPlaceOrderPatchStatus200,
   createPlaceOrderPatchStatus405,
-  createPlaceOrderPatchXmlData,
 } from './store/createPlaceOrderPatch.ts'

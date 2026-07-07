@@ -8,8 +8,8 @@ import { updatePetHandler } from './pet/updatePet.ts'
 import { updatePetWithFormHandler } from './pet/updatePetWithForm.ts'
 import { uploadFileHandler } from './pet/uploadFile.ts'
 import { createPetsHandler } from './pets/createPets.ts'
-import { addFilesDataSchema, addFilesStatus200Schema } from '../zod/pet/addFilesSchema.ts'
-import { addPetDataSchema } from '../zod/pet/addPetSchema.ts'
+import { addFilesBodySchema, addFilesStatus200Schema } from '../zod/pet/addFilesSchema.ts'
+import { addPetBodySchema } from '../zod/pet/addPetSchema.ts'
 import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/pet/deletePetSchema.ts'
 import { findPetsByStatusPathStepIdSchema, findPetsByStatusStatus200Schema } from '../zod/pet/findPetsByStatusSchema.ts'
 import {
@@ -20,16 +20,16 @@ import {
   findPetsByTagsStatus200Schema,
 } from '../zod/pet/findPetsByTagsSchema.ts'
 import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/pet/getPetByIdSchema.ts'
-import { updatePetDataSchema, updatePetStatus200Schema } from '../zod/pet/updatePetSchema.ts'
+import { updatePetBodySchema, updatePetStatus200Schema } from '../zod/pet/updatePetSchema.ts'
 import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from '../zod/pet/updatePetWithFormSchema.ts'
 import {
-  uploadFileDataSchema,
+  uploadFileBodySchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileStatus200Schema,
 } from '../zod/pet/uploadFileSchema.ts'
 import {
-  createPetsDataSchema,
+  createPetsBodySchema,
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,
   createPetsQueryBoolParamSchema,
@@ -56,7 +56,7 @@ export function getServer() {
         path: z.object({ uuid: createPetsPathUuidSchema }),
         query: z.object({ boolParam: createPetsQueryBoolParamSchema, offset: createPetsQueryOffsetSchema }),
         headers: z.object({ xEXAMPLE: createPetsHeaderXEXAMPLESchema }),
-        body: createPetsDataSchema,
+        body: createPetsBodySchema,
       },
     },
     async ({ path, query, headers, body }, request) => {
@@ -70,7 +70,7 @@ export function getServer() {
       title: 'Update an existing pet',
       description: 'Update an existing pet by Id',
       outputSchema: { data: updatePetStatus200Schema },
-      inputSchema: { body: updatePetDataSchema },
+      inputSchema: { body: updatePetBodySchema },
     },
     async ({ body }, request) => {
       return updatePetHandler({ body }, request)
@@ -82,7 +82,7 @@ export function getServer() {
     {
       title: 'Add a new pet to the store',
       description: 'Add a new pet to the store',
-      inputSchema: { body: addPetDataSchema },
+      inputSchema: { body: addPetBodySchema },
     },
     async ({ body }, request) => {
       return addPetHandler({ body }, request)
@@ -164,7 +164,7 @@ export function getServer() {
       title: 'Place an file for a pet',
       description: 'Place a new file in the store',
       outputSchema: { data: addFilesStatus200Schema },
-      inputSchema: { body: addFilesDataSchema },
+      inputSchema: { body: addFilesBodySchema },
     },
     async ({ body }, request) => {
       return addFilesHandler({ body }, request)
@@ -180,7 +180,7 @@ export function getServer() {
       inputSchema: {
         path: z.object({ petId: uploadFilePathPetIdSchema }),
         query: z.object({ additionalMetadata: uploadFileQueryAdditionalMetadataSchema }),
-        body: uploadFileDataSchema,
+        body: uploadFileBodySchema,
       },
     },
     async ({ path, query, body }, request) => {

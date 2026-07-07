@@ -18,25 +18,25 @@ export type PlaceOrderStatus405 = unknown
 /**
  * @type object | undefined
  */
-export type PlaceOrderJsonData = Order | undefined
+export type PlaceOrderBodyJson = Order | undefined
 
 /**
  * @type object | undefined
  */
-export type PlaceOrderXmlData = Order | undefined
+export type PlaceOrderBodyXml = Order | undefined
 
 /**
  * @type object | undefined
  */
-export type PlaceOrderFormUrlEncodedData = Order | undefined
+export type PlaceOrderBodyFormUrlEncoded = Order | undefined
 
-export type PlaceOrderData = PlaceOrderJsonData | PlaceOrderXmlData | PlaceOrderFormUrlEncodedData
+export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrderBodyFormUrlEncoded
 
 /**
  * @type object
  */
 export type PlaceOrderRequestConfig = {
-  body: PlaceOrderData
+  body: PlaceOrderBody
   path?: never
   query?: never
   headers?: never

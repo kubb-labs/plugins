@@ -14,10 +14,10 @@ export const placeOrderPatchResponseSchema = placeOrderPatchStatus200Schema
 
 export const placeOrderPatchErrorSchema = placeOrderPatchStatus405Schema
 
-export const placeOrderPatchDataSchemaJson = orderSchema.optional()
+export const placeOrderPatchBodySchemaJson = orderSchema.optional()
 
-export const placeOrderPatchDataSchemaXml = orderSchema.optional()
+export const placeOrderPatchBodySchemaXml = orderSchema.optional()
 
-export const placeOrderPatchDataSchemaFormUrlEncoded = orderSchema.optional()
+export const placeOrderPatchBodySchemaFormUrlEncoded = orderSchema.optional()
 
-export const placeOrderPatchDataSchema = z.union([placeOrderPatchDataSchemaJson, placeOrderPatchDataSchemaXml, placeOrderPatchDataSchemaFormUrlEncoded])
+export const placeOrderPatchBodySchema = z.union([placeOrderPatchBodySchemaJson, placeOrderPatchBodySchemaXml, placeOrderPatchBodySchemaFormUrlEncoded])

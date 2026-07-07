@@ -22,10 +22,10 @@ export const addPetResponseSchema = addPetStatus200Schema
 
 export const addPetErrorSchema = addPetStatus405Schema
 
-export const addPetDataSchemaJson = addPetRequestSchema
+export const addPetBodySchemaJson = addPetRequestSchema
 
-export const addPetDataSchemaXml = z.lazy(() => petSchema)
+export const addPetBodySchemaXml = z.lazy(() => petSchema)
 
-export const addPetDataSchemaFormUrlEncoded = z.lazy(() => petSchema)
+export const addPetBodySchemaFormUrlEncoded = z.lazy(() => petSchema)
 
-export const addPetDataSchema = z.union([addPetDataSchemaJson, addPetDataSchemaXml, addPetDataSchemaFormUrlEncoded])
+export const addPetBodySchema = z.union([addPetBodySchemaJson, addPetBodySchemaXml, addPetBodySchemaFormUrlEncoded])

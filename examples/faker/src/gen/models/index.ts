@@ -1,7 +1,8 @@
 export type {
-  AddPetData,
-  AddPetFormUrlEncodedData,
-  AddPetJsonData,
+  AddPetBody,
+  AddPetBodyFormUrlEncoded,
+  AddPetBodyJson,
+  AddPetBodyXml,
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
@@ -9,7 +10,6 @@ export type {
   AddPetStatus200Json,
   AddPetStatus200Xml,
   AddPetStatus405,
-  AddPetXmlData,
 } from './AddPet.ts'
 export type { ApiResponse } from './ApiResponse.ts'
 export type { Category } from './Category.ts'
@@ -77,21 +77,22 @@ export type { Item } from './Item.ts'
 export type { Order, OrderStatusEnumKey } from './Order.ts'
 export type { Pet, PetStatusEnumKey } from './Pet.ts'
 export type {
-  PlaceOrderData,
-  PlaceOrderFormUrlEncodedData,
-  PlaceOrderJsonData,
+  PlaceOrderBody,
+  PlaceOrderBodyFormUrlEncoded,
+  PlaceOrderBodyJson,
+  PlaceOrderBodyXml,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-  PlaceOrderXmlData,
 } from './PlaceOrder.ts'
 export type { Tag } from './Tag.ts'
 export type {
-  UpdatePetData,
-  UpdatePetFormUrlEncodedData,
-  UpdatePetJsonData,
+  UpdatePetBody,
+  UpdatePetBodyFormUrlEncoded,
+  UpdatePetBodyJson,
+  UpdatePetBodyXml,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -101,7 +102,6 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-  UpdatePetXmlData,
 } from './UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
@@ -113,7 +113,7 @@ export type {
   UpdatePetWithFormStatus405,
 } from './UpdatePetWithForm.ts'
 export type {
-  UploadFileData,
+  UploadFileBody,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,

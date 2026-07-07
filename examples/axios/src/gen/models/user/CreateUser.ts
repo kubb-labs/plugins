@@ -21,27 +21,27 @@ export type CreateUserStatusDefault = CreateUserStatusDefaultJson | CreateUserSt
  * @description Created user object
  * @type object | undefined
  */
-export type CreateUserJsonData = User | undefined
+export type CreateUserBodyJson = User | undefined
 
 /**
  * @description Created user object
  * @type object | undefined
  */
-export type CreateUserXmlData = User | undefined
+export type CreateUserBodyXml = User | undefined
 
 /**
  * @description Created user object
  * @type object | undefined
  */
-export type CreateUserFormUrlEncodedData = User | undefined
+export type CreateUserBodyFormUrlEncoded = User | undefined
 
-export type CreateUserData = CreateUserJsonData | CreateUserXmlData | CreateUserFormUrlEncodedData
+export type CreateUserBody = CreateUserBodyJson | CreateUserBodyXml | CreateUserBodyFormUrlEncoded
 
 /**
  * @type object
  */
 export type CreateUserRequestConfig = {
-  body: CreateUserData
+  body: CreateUserBody
   path?: never
   query?: never
   headers?: never

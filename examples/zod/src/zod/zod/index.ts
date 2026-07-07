@@ -1,9 +1,9 @@
 export type { AddPetRequestSchemaType } from './addPetRequestSchema.ts'
 export type {
-  AddPetDataSchemaFormUrlEncodedType,
-  AddPetDataSchemaJsonType,
-  AddPetDataSchemaType,
-  AddPetDataSchemaXmlType,
+  AddPetBodySchemaFormUrlEncodedType,
+  AddPetBodySchemaJsonType,
+  AddPetBodySchemaType,
+  AddPetBodySchemaXmlType,
   AddPetErrorSchemaType,
   AddPetResponseSchemaType,
   AddPetStatus200SchemaJsonType,
@@ -14,7 +14,7 @@ export type {
 export type { ApiResponseSchemaType } from './apiResponseSchema.ts'
 export type { CategorySchemaType } from './categorySchema.ts'
 export type {
-  CreatePetsDataSchemaType,
+  CreatePetsBodySchemaType,
   CreatePetsErrorSchemaType,
   CreatePetsHeaderXEXAMPLESchemaType,
   CreatePetsPathUuidSchemaType,
@@ -94,20 +94,20 @@ export type { PhoneNumberSchemaType } from './phoneNumberSchema.ts'
 export type { PhoneWithMaxLengthExplicitSchemaType } from './phoneWithMaxLengthExplicitSchema.ts'
 export type { PhoneWithMaxLengthSchemaType } from './phoneWithMaxLengthSchema.ts'
 export type {
-  PlaceOrderPatchDataSchemaFormUrlEncodedType,
-  PlaceOrderPatchDataSchemaJsonType,
-  PlaceOrderPatchDataSchemaType,
-  PlaceOrderPatchDataSchemaXmlType,
+  PlaceOrderPatchBodySchemaFormUrlEncodedType,
+  PlaceOrderPatchBodySchemaJsonType,
+  PlaceOrderPatchBodySchemaType,
+  PlaceOrderPatchBodySchemaXmlType,
   PlaceOrderPatchErrorSchemaType,
   PlaceOrderPatchResponseSchemaType,
   PlaceOrderPatchStatus200SchemaType,
   PlaceOrderPatchStatus405SchemaType,
 } from './placeOrderPatchSchema.ts'
 export type {
-  PlaceOrderDataSchemaFormUrlEncodedType,
-  PlaceOrderDataSchemaJsonType,
-  PlaceOrderDataSchemaType,
-  PlaceOrderDataSchemaXmlType,
+  PlaceOrderBodySchemaFormUrlEncodedType,
+  PlaceOrderBodySchemaJsonType,
+  PlaceOrderBodySchemaType,
+  PlaceOrderBodySchemaXmlType,
   PlaceOrderErrorSchemaType,
   PlaceOrderResponseSchemaType,
   PlaceOrderStatus200SchemaType,
@@ -115,10 +115,10 @@ export type {
 } from './placeOrderSchema.ts'
 export type { TagSchemaType } from './tagSchema.ts'
 export type {
-  UpdatePetDataSchemaFormUrlEncodedType,
-  UpdatePetDataSchemaJsonType,
-  UpdatePetDataSchemaType,
-  UpdatePetDataSchemaXmlType,
+  UpdatePetBodySchemaFormUrlEncodedType,
+  UpdatePetBodySchemaJsonType,
+  UpdatePetBodySchemaType,
+  UpdatePetBodySchemaXmlType,
   UpdatePetErrorSchemaType,
   UpdatePetResponseSchemaType,
   UpdatePetStatus200SchemaJsonType,
@@ -137,7 +137,7 @@ export type {
   UpdatePetWithFormStatus405SchemaType,
 } from './updatePetWithFormSchema.ts'
 export type {
-  UploadFileDataSchemaType,
+  UploadFileBodySchemaType,
   UploadFilePathPetIdSchemaType,
   UploadFileQueryAdditionalMetadataSchemaType,
   UploadFileResponseSchemaType,
@@ -145,10 +145,10 @@ export type {
 } from './uploadFileSchema.ts'
 export { addPetRequestSchema } from './addPetRequestSchema.ts'
 export {
-  addPetDataSchema,
-  addPetDataSchemaFormUrlEncoded,
-  addPetDataSchemaJson,
-  addPetDataSchemaXml,
+  addPetBodySchema,
+  addPetBodySchemaFormUrlEncoded,
+  addPetBodySchemaJson,
+  addPetBodySchemaXml,
   addPetErrorSchema,
   addPetResponseSchema,
   addPetStatus200Schema,
@@ -159,7 +159,7 @@ export {
 export { apiResponseSchema } from './apiResponseSchema.ts'
 export { categorySchema } from './categorySchema.ts'
 export {
-  createPetsDataSchema,
+  createPetsBodySchema,
   createPetsErrorSchema,
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,
@@ -240,20 +240,20 @@ export { phoneNumberSchema } from './phoneNumberSchema.ts'
 export { phoneWithMaxLengthExplicitSchema } from './phoneWithMaxLengthExplicitSchema.ts'
 export { phoneWithMaxLengthSchema } from './phoneWithMaxLengthSchema.ts'
 export {
-  placeOrderPatchDataSchema,
-  placeOrderPatchDataSchemaFormUrlEncoded,
-  placeOrderPatchDataSchemaJson,
-  placeOrderPatchDataSchemaXml,
+  placeOrderPatchBodySchema,
+  placeOrderPatchBodySchemaFormUrlEncoded,
+  placeOrderPatchBodySchemaJson,
+  placeOrderPatchBodySchemaXml,
   placeOrderPatchErrorSchema,
   placeOrderPatchResponseSchema,
   placeOrderPatchStatus200Schema,
   placeOrderPatchStatus405Schema,
 } from './placeOrderPatchSchema.ts'
 export {
-  placeOrderDataSchema,
-  placeOrderDataSchemaFormUrlEncoded,
-  placeOrderDataSchemaJson,
-  placeOrderDataSchemaXml,
+  placeOrderBodySchema,
+  placeOrderBodySchemaFormUrlEncoded,
+  placeOrderBodySchemaJson,
+  placeOrderBodySchemaXml,
   placeOrderErrorSchema,
   placeOrderResponseSchema,
   placeOrderStatus200Schema,
@@ -261,10 +261,10 @@ export {
 } from './placeOrderSchema.ts'
 export { tagSchema } from './tagSchema.ts'
 export {
-  updatePetDataSchema,
-  updatePetDataSchemaFormUrlEncoded,
-  updatePetDataSchemaJson,
-  updatePetDataSchemaXml,
+  updatePetBodySchema,
+  updatePetBodySchemaFormUrlEncoded,
+  updatePetBodySchemaJson,
+  updatePetBodySchemaXml,
   updatePetErrorSchema,
   updatePetResponseSchema,
   updatePetStatus200Schema,
@@ -283,7 +283,7 @@ export {
   updatePetWithFormStatus405Schema,
 } from './updatePetWithFormSchema.ts'
 export {
-  uploadFileDataSchema,
+  uploadFileBodySchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,

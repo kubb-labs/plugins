@@ -4,15 +4,15 @@
  */
 
 import type {
-  AddPetData,
-  AddPetFormUrlEncodedData,
-  AddPetJsonData,
+  AddPetBody,
+  AddPetBodyFormUrlEncoded,
+  AddPetBodyJson,
+  AddPetBodyXml,
   AddPetResponse,
   AddPetStatus200,
   AddPetStatus200Json,
   AddPetStatus200Xml,
   AddPetStatus405,
-  AddPetXmlData,
 } from '../../models/AddPet.ts'
 import { createAddPetRequest } from '../createAddPetRequest.ts'
 import { createPet } from '../createPet.ts'
@@ -63,37 +63,37 @@ export function createAddPetStatus405<TData extends Partial<AddPetStatus405> = o
 /**
  * @description Create a new pet in the store
  */
-export function createAddPetJsonData(data?: Partial<AddPetJsonData>): AddPetJsonData {
+export function createAddPetBodyJson(data?: Partial<AddPetBodyJson>): AddPetBodyJson {
   faker.seed([220])
 
-  return createAddPetRequest(data) as AddPetJsonData
+  return createAddPetRequest(data) as AddPetBodyJson
 }
 
 /**
  * @description Create a new pet in the store
  */
-export function createAddPetXmlData(data?: Partial<AddPetXmlData>): AddPetXmlData {
+export function createAddPetBodyXml(data?: Partial<AddPetBodyXml>): AddPetBodyXml {
   faker.seed([220])
 
-  return createPet(data) as AddPetXmlData
+  return createPet(data) as AddPetBodyXml
 }
 
 /**
  * @description Create a new pet in the store
  */
-export function createAddPetFormUrlEncodedData(data?: Partial<AddPetFormUrlEncodedData>): AddPetFormUrlEncodedData {
+export function createAddPetBodyFormUrlEncoded(data?: Partial<AddPetBodyFormUrlEncoded>): AddPetBodyFormUrlEncoded {
   faker.seed([220])
 
-  return createPet(data) as AddPetFormUrlEncodedData
+  return createPet(data) as AddPetBodyFormUrlEncoded
 }
 
 /**
  * @description Create a new pet in the store
  */
-export function createAddPetData(_data?: AddPetData): AddPetData {
+export function createAddPetBody(_data?: AddPetBody): AddPetBody {
   faker.seed([220])
 
-  return faker.helpers.arrayElement([createAddPetJsonData(), createAddPetXmlData(), createAddPetFormUrlEncodedData()])
+  return faker.helpers.arrayElement([createAddPetBodyJson(), createAddPetBodyXml(), createAddPetBodyFormUrlEncoded()])
 }
 
 export function createAddPetResponse(_data?: AddPetResponse): AddPetResponse {

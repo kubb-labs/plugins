@@ -20,7 +20,7 @@ export const createPetsResponseSchema = createPetsStatus201Schema
 
 export const createPetsErrorSchema = createPetsStatusDefaultSchema
 
-export const createPetsDataSchema = z.object({
+export const createPetsBodySchema = z.object({
   name: z.string(),
   tag: z.string(),
 })

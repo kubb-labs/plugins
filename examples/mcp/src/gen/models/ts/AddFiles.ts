@@ -18,7 +18,7 @@ export type AddFilesStatus405 = unknown
 /**
  * @type object | undefined
  */
-export type AddFilesJsonData =
+export type AddFilesBodyJson =
   | {
       /**
        * @description URL of the image to upload
@@ -33,15 +33,15 @@ export type AddFilesJsonData =
 /**
  * @type object | undefined
  */
-export type AddFilesFormData = Omit<NonNullable<Pet>, 'id'> | undefined
+export type AddFilesBodyFormData = Omit<NonNullable<Pet>, 'id'> | undefined
 
-export type AddFilesData = AddFilesJsonData | AddFilesFormData
+export type AddFilesBody = AddFilesBodyJson | AddFilesBodyFormData
 
 /**
  * @type object
  */
 export type AddFilesRequestConfig = {
-  body: AddFilesData
+  body: AddFilesBody
   path?: never
   query?: never
   headers?: never

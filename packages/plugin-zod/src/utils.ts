@@ -1,3 +1,4 @@
+import { stringify, toRegExpString } from '@internals/utils'
 import { ast } from 'kubb/kit'
 import type { PluginZod } from './types.ts'
 
@@ -167,7 +168,7 @@ export function isObjectComposableIntersection(node: ast.SchemaNode, cyclicSchem
  * Objects become `{}`, primitives become their string representation, strings are quoted.
  */
 export function formatDefault(value: unknown): string {
-  if (typeof value === 'string') return ast.stringify(value)
+  if (typeof value === 'string') return stringify(value)
   if (typeof value === 'object' && value !== null) return '{}'
 
   return String(value ?? '')
@@ -213,7 +214,7 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
  * Strings are quoted; numbers and booleans are emitted raw.
  */
 export function formatLiteral(v: string | number | boolean): string {
-  if (typeof v === 'string') return ast.stringify(v)
+  if (typeof v === 'string') return stringify(v)
 
   return String(v)
 }
@@ -286,7 +287,7 @@ export function patternKeySchemaMini({ patterns, regexType }: { patterns: Array<
 
 function patternKeySource({ patterns, regexType }: { patterns: Array<string>; regexType?: PluginZod['resolvedOptions']['regexType'] }): string {
   const source = patterns.length === 1 ? patterns[0]! : patterns.map((pattern) => `(${pattern})`).join('|')
-  return ast.toRegExpString(source, regexFunc(regexType))
+  return toRegExpString(source, regexFunc(regexType))
 }
 
 /**
@@ -325,7 +326,7 @@ export function lengthConstraints({ min, max, pattern, regexType }: LengthConstr
   return [
     min !== undefined ? `.min(${min})` : '',
     max !== undefined ? `.max(${max})` : '',
-    pattern !== undefined ? `.regex(${ast.toRegExpString(pattern, regexFunc(regexType))})` : '',
+    pattern !== undefined ? `.regex(${toRegExpString(pattern, regexFunc(regexType))})` : '',
   ].join('')
 }
 
@@ -349,7 +350,7 @@ export function lengthChecksMini({ min, max, pattern, regexType }: LengthConstra
   const checks: Array<string> = []
   if (min !== undefined) checks.push(`z.minLength(${min})`)
   if (max !== undefined) checks.push(`z.maxLength(${max})`)
-  if (pattern !== undefined) checks.push(`z.regex(${ast.toRegExpString(pattern, regexFunc(regexType))})`)
+  if (pattern !== undefined) checks.push(`z.regex(${toRegExpString(pattern, regexFunc(regexType))})`)
   return checks.length ? `.check(${checks.join(', ')})` : ''
 }
 
@@ -366,7 +367,7 @@ export function applyModifiers({ value, schema, nullable, optional, nullish, def
   })()
   const literal = defaultValue !== undefined ? defaultLiteral(schema, defaultValue) : null
   const withDefault = literal !== null ? `${withModifier}.default(${literal})` : withModifier
-  const withDescription = description ? `${withDefault}.describe(${ast.stringify(description)})` : withDefault
+  const withDescription = description ? `${withDefault}.describe(${stringify(description)})` : withDefault
   return examples?.length ? `${withDescription}.meta({ examples: [${examples.map(formatDefault).join(', ')}] })` : withDescription
 }
 

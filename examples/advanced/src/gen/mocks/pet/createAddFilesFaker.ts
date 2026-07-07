@@ -1,4 +1,11 @@
-import type { AddFilesData, AddFilesFormData, AddFilesJsonData, AddFilesResponse, AddFilesStatus200, AddFilesStatus405 } from '../../models/ts/pet/AddFiles.ts'
+import type {
+  AddFilesBody,
+  AddFilesBodyFormData,
+  AddFilesBodyJson,
+  AddFilesResponse,
+  AddFilesStatus200,
+  AddFilesStatus405,
+} from '../../models/ts/pet/AddFiles.ts'
 import { createPetFaker } from '../createPetFaker.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
@@ -16,7 +23,7 @@ export function createAddFilesStatus405Faker() {
   return undefined
 }
 
-export function createAddFilesDataFakerJson<TData extends Partial<AddFilesJsonData> = object>(data?: TData) {
+export function createAddFilesBodyFakerJson<TData extends Partial<AddFilesBodyJson> = object>(data?: TData) {
   const defaultFakeData = {
     url: faker.internet.url(),
   }
@@ -26,12 +33,12 @@ export function createAddFilesDataFakerJson<TData extends Partial<AddFilesJsonDa
   } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
-export function createAddFilesDataFakerFormData(data?: Partial<AddFilesFormData>): AddFilesFormData {
-  return createPetFaker(data) as AddFilesFormData
+export function createAddFilesBodyFakerFormData(data?: Partial<AddFilesBodyFormData>): AddFilesBodyFormData {
+  return createPetFaker(data) as AddFilesBodyFormData
 }
 
-export function createAddFilesDataFaker(_data?: AddFilesData): AddFilesData {
-  return faker.helpers.arrayElement([createAddFilesDataFakerJson(), createAddFilesDataFakerFormData()])
+export function createAddFilesBodyFaker(_data?: AddFilesBody): AddFilesBody {
+  return faker.helpers.arrayElement([createAddFilesBodyFakerJson(), createAddFilesBodyFakerFormData()])
 }
 
 export function createAddFilesResponseFaker(_data?: AddFilesResponse): AddFilesResponse {

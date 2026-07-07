@@ -1,16 +1,16 @@
 export {
-  createAddFilesDataFaker,
-  createAddFilesDataFakerFormData,
-  createAddFilesDataFakerJson,
+  createAddFilesBodyFaker,
+  createAddFilesBodyFakerFormData,
+  createAddFilesBodyFakerJson,
   createAddFilesResponseFaker,
   createAddFilesStatus200Faker,
   createAddFilesStatus405Faker,
 } from './createAddFilesFaker.ts'
 export {
-  createAddPetDataFaker,
-  createAddPetDataFakerFormUrlEncoded,
-  createAddPetDataFakerJson,
-  createAddPetDataFakerXml,
+  createAddPetBodyFaker,
+  createAddPetBodyFakerFormUrlEncoded,
+  createAddPetBodyFakerJson,
+  createAddPetBodyFakerXml,
   createAddPetResponseFaker,
   createAddPetStatus405Faker,
   createAddPetStatusDefaultFaker,
@@ -52,10 +52,10 @@ export {
   createGetPetByIdStatus404Faker,
 } from './createGetPetByIdFaker.ts'
 export {
-  createUpdatePetDataFaker,
-  createUpdatePetDataFakerFormUrlEncoded,
-  createUpdatePetDataFakerJson,
-  createUpdatePetDataFakerXml,
+  createUpdatePetBodyFaker,
+  createUpdatePetBodyFakerFormUrlEncoded,
+  createUpdatePetBodyFakerJson,
+  createUpdatePetBodyFakerXml,
   createUpdatePetResponseFaker,
   createUpdatePetStatus200Faker,
   createUpdatePetStatus200FakerJson,
@@ -73,7 +73,7 @@ export {
   createUpdatePetWithFormStatus405Faker,
 } from './createUpdatePetWithFormFaker.ts'
 export {
-  createUploadFileDataFaker,
+  createUploadFileBodyFaker,
   createUploadFilePathPetIdFaker,
   createUploadFileQueryAdditionalMetadataFaker,
   createUploadFileResponseFaker,

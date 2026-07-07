@@ -1,3 +1,4 @@
+import { jsStringEscape } from '@internals/utils'
 import { ast } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
@@ -78,7 +79,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
         <Function
           export
           name={name}
-          JSDoc={{ comments: description ? [`@description ${ast.jsStringEscape(description)}`] : [] }}
+          JSDoc={{ comments: description ? [`@description ${jsStringEscape(description)}`] : [] }}
           params={canOverride ? paramsSignature : undefined}
           returnType={returnType ?? undefined}
         >
@@ -95,7 +96,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   }
 
   // Generate function with defaultFakeData structure
-  const jsdoc = description ? `/**\n   * @description ${ast.jsStringEscape(description)}\n   */\n  ` : ''
+  const jsdoc = description ? `/**\n   * @description ${jsStringEscape(description)}\n   */\n  ` : ''
   const functionSignature = `${jsdoc}export function ${name}<TData extends Partial<${typeName}> = object>(data?: TData)`
 
   const seedCode = seed ? `faker.seed(${JSON.stringify(seed)})\n  ` : ''

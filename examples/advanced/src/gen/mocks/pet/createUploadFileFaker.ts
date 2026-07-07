@@ -17,7 +17,7 @@ export function createUploadFileStatus200Faker(data?: Partial<UploadFileStatus20
   return createApiResponseFaker(data) as UploadFileStatus200
 }
 
-export function createUploadFileDataFaker(data?: Blob): Blob {
+export function createUploadFileBodyFaker(data?: Blob): Blob {
   return data ?? (faker.image.url() as unknown as Blob)
 }
 

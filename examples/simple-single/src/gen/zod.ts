@@ -120,13 +120,13 @@ export const updatePetResponseSchema = updatePetStatus200Schema
 
 export const updatePetErrorSchema = z.union([updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema])
 
-export const updatePetDataSchemaJson = petSchema.describe('Update an existent pet in the store')
+export const updatePetBodySchemaJson = petSchema.describe('Update an existent pet in the store')
 
-export const updatePetDataSchemaXml = petSchema.describe('Update an existent pet in the store')
+export const updatePetBodySchemaXml = petSchema.describe('Update an existent pet in the store')
 
-export const updatePetDataSchemaFormUrlEncoded = petSchema.describe('Update an existent pet in the store')
+export const updatePetBodySchemaFormUrlEncoded = petSchema.describe('Update an existent pet in the store')
 
-export const updatePetDataSchema = z.union([updatePetDataSchemaJson, updatePetDataSchemaXml, updatePetDataSchemaFormUrlEncoded])
+export const updatePetBodySchema = z.union([updatePetBodySchemaJson, updatePetBodySchemaXml, updatePetBodySchemaFormUrlEncoded])
 
 export const addPetStatus200SchemaJson = petSchema
 
@@ -143,13 +143,13 @@ export const addPetResponseSchema = addPetStatus200Schema
 
 export const addPetErrorSchema = addPetStatus405Schema
 
-export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
+export const addPetBodySchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
 
-export const addPetDataSchemaXml = petSchema.describe('Create a new pet in the store')
+export const addPetBodySchemaXml = petSchema.describe('Create a new pet in the store')
 
-export const addPetDataSchemaFormUrlEncoded = petSchema.describe('Create a new pet in the store')
+export const addPetBodySchemaFormUrlEncoded = petSchema.describe('Create a new pet in the store')
 
-export const addPetDataSchema = z.union([addPetDataSchemaJson, addPetDataSchemaXml, addPetDataSchemaFormUrlEncoded])
+export const addPetBodySchema = z.union([addPetBodySchemaJson, addPetBodySchemaXml, addPetBodySchemaFormUrlEncoded])
 
 export const findPetsByStatusQueryStatusSchema = findPetsByStatusStatusSchema
   .optional()
@@ -232,7 +232,7 @@ export const uploadFileStatus200Schema = apiResponseSchema
 
 export const uploadFileResponseSchema = uploadFileStatus200Schema
 
-export const uploadFileDataSchema = z.instanceof(File).optional()
+export const uploadFileBodySchema = z.instanceof(File).optional()
 
 export const getInventoryStatus200Schema = z.object({}).catchall(z.int())
 
@@ -246,13 +246,13 @@ export const placeOrderResponseSchema = placeOrderStatus200Schema
 
 export const placeOrderErrorSchema = placeOrderStatus405Schema
 
-export const placeOrderDataSchemaJson = orderSchema.optional()
+export const placeOrderBodySchemaJson = orderSchema.optional()
 
-export const placeOrderDataSchemaXml = orderSchema.optional()
+export const placeOrderBodySchemaXml = orderSchema.optional()
 
-export const placeOrderDataSchemaFormUrlEncoded = orderSchema.optional()
+export const placeOrderBodySchemaFormUrlEncoded = orderSchema.optional()
 
-export const placeOrderDataSchema = z.union([placeOrderDataSchemaJson, placeOrderDataSchemaXml, placeOrderDataSchemaFormUrlEncoded])
+export const placeOrderBodySchema = z.union([placeOrderBodySchemaJson, placeOrderBodySchemaXml, placeOrderBodySchemaFormUrlEncoded])
 
 export const placeOrderPatchStatus200Schema = orderSchema
 
@@ -262,13 +262,13 @@ export const placeOrderPatchResponseSchema = placeOrderPatchStatus200Schema
 
 export const placeOrderPatchErrorSchema = placeOrderPatchStatus405Schema
 
-export const placeOrderPatchDataSchemaJson = orderSchema.optional()
+export const placeOrderPatchBodySchemaJson = orderSchema.optional()
 
-export const placeOrderPatchDataSchemaXml = orderSchema.optional()
+export const placeOrderPatchBodySchemaXml = orderSchema.optional()
 
-export const placeOrderPatchDataSchemaFormUrlEncoded = orderSchema.optional()
+export const placeOrderPatchBodySchemaFormUrlEncoded = orderSchema.optional()
 
-export const placeOrderPatchDataSchema = z.union([placeOrderPatchDataSchemaJson, placeOrderPatchDataSchemaXml, placeOrderPatchDataSchemaFormUrlEncoded])
+export const placeOrderPatchBodySchema = z.union([placeOrderPatchBodySchemaJson, placeOrderPatchBodySchemaXml, placeOrderPatchBodySchemaFormUrlEncoded])
 
 export const getOrderByIdPathOrderIdSchema = z.bigint().describe('ID of order that needs to be fetched')
 
