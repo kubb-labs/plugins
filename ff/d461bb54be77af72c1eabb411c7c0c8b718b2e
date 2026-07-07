@@ -1,0 +1,45 @@
+tests/3.0.x/pluginReactQuery.test.ts
+  s_c2f1fd76c381df::t_3bd3358c282f79 7,287
+tests/3.0.x/main.test.ts
+  s_c2f1fd76c381df::t_3bd3358c282f79 7,485
+tests/3.0.x/pluginRedoc.test.ts
+  s_c2f1fd76c381df::t_3bd3358c282f79 7,53
+tests/3.0.x/pluginAxios.test.ts
+  s_c2f1fd76c381df::t_3bd3358c282f79 7,112,151,189
+tests/3.0.x/cypressPlugin.test.ts
+  s_c2f1fd76c381df::t_3bd3358c282f79 7,92
+tests/3.0.x/pluginFetch.test.ts
+  s_c2f1fd76c381df::t_3bd3358c282f79 7,112,151,189
+tests/3.0.x/pluginMsw.test.ts
+  s_c2f1fd76c381df::t_3bd3358c282f79 7,178
+tests/3.0.x/pluginVueQuery.test.ts
+  s_c2f1fd76c381df::t_3bd3358c282f79 7,237
+tests/3.0.x/pluginFaker.test.ts
+  s_c2f1fd76c381df::t_3bd3358c282f79 7,252
+tests/3.0.x/pluginMcp.test.ts
+  s_c2f1fd76c381df::t_3bd3358c282f79 7,168
+tests/3.0.x/pluginTs.test.ts
+  s_c2f1fd76c381df::t_3bd3358c282f79 7,97
+tests/3.0.x/pluginZod.test.ts
+  s_c2f1fd76c381df::t_3bd3358c282f79 7,179
+tests/performance/main.bench.ts
+  s_c2f1fd76c381df::t_3bd3358c282f79 4,52,90,141
+tests/3.0.x/pluginSwr.test.ts
+  s_c2f1fd76c381df::t_3bd3358c282f79 7,243
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "ffd461bb54be77af72c1eabb411c7c0c8b718b2e",
+  "prompts": {},
+  "sessions": {
+    "s_c2f1fd76c381df": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4ce11fe0-5be5-415b-b356-d2f18c3d8df4",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Stijn Van Hulle <stijn.vanhulle@robovision.eu>"
+    }
+  }
+}
