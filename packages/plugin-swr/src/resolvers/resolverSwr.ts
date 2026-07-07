@@ -1,8 +1,8 @@
-import { defineResolver } from 'kubb/kit'
-import type { PluginSwr } from '../types.ts'
+import { createResolver } from "kubb/kit";
+import type { PluginSwr } from "../types.ts";
 
 function capitalize(name: string): string {
-  return `${name.charAt(0).toUpperCase()}${name.slice(1)}`
+  return `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
 }
 
 /**
@@ -21,37 +21,37 @@ function capitalize(name: string): string {
  * resolverSwr.mutation.name(operationNode)     // 'useUpdatePet'
  * ```
  */
-export const resolverSwr = defineResolver<PluginSwr>(() => ({
-  pluginName: 'plugin-swr',
+export const resolverSwr = createResolver<PluginSwr>({
+  pluginName: "plugin-swr",
   query: {
     name(node) {
-      return `use${capitalize(this.name(node.operationId))}`
+      return `use${capitalize(this.name(node.operationId))}`;
     },
     optionsName(node) {
-      return `${this.name(node.operationId)}QueryOptions`
+      return `${this.name(node.operationId)}QueryOptions`;
     },
     keyName(node) {
-      return `${this.name(node.operationId)}QueryKey`
+      return `${this.name(node.operationId)}QueryKey`;
     },
     keyTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}QueryKey`
+      return `${capitalize(this.name(node.operationId))}QueryKey`;
     },
     clientName(node) {
-      return this.name(node.operationId)
+      return this.name(node.operationId);
     },
   },
   mutation: {
     name(node) {
-      return `use${capitalize(this.name(node.operationId))}`
+      return `use${capitalize(this.name(node.operationId))}`;
     },
     keyName(node) {
-      return `${this.name(node.operationId)}MutationKey`
+      return `${this.name(node.operationId)}MutationKey`;
     },
     keyTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}MutationKey`
+      return `${capitalize(this.name(node.operationId))}MutationKey`;
     },
     argTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}MutationArg`
+      return `${capitalize(this.name(node.operationId))}MutationArg`;
     },
   },
-}))
+});

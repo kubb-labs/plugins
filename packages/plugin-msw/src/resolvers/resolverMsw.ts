@@ -1,6 +1,6 @@
-import { camelCase } from '@internals/utils'
-import { defineResolver } from 'kubb/kit'
-import type { PluginMsw } from '../types.ts'
+import { camelCase } from "@internals/utils";
+import { createResolver } from "kubb/kit";
+import type { PluginMsw } from "../types.ts";
 
 /**
  * Default resolver used by `@kubb/plugin-msw`. Decides the names and file
@@ -17,17 +17,17 @@ import type { PluginMsw } from '../types.ts'
  * resolverMsw.name('addPet') // 'addPetHandler'
  * ```
  */
-export const resolverMsw = defineResolver<PluginMsw>(() => ({
-  pluginName: 'plugin-msw',
+export const resolverMsw = createResolver<PluginMsw>({
+  pluginName: "plugin-msw",
   name(name) {
-    return camelCase(name, { suffix: 'handler' })
+    return camelCase(name, { suffix: "handler" });
   },
   handler: {
     name(node) {
-      return this.name(node.operationId)
+      return this.name(node.operationId);
     },
     listName() {
-      return 'handlers'
+      return "handlers";
     },
   },
-}))
+});

@@ -657,7 +657,7 @@
 ### Patch Changes
 
 - [#2962](https://github.com/kubb-labs/kubb/pull/2962) [`d46e725`](https://github.com/kubb-labs/kubb/commit/d46e7255c2419e412ace2e090205d552a885c6ca) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - ### `@kubb/plugin-mcp`
-  - Migrate to v5 architecture with `defineResolver`, `definePresets`, and `defineGenerator`.
+  - Migrate to v5 architecture with `createResolver`, `definePresets`, and `defineGenerator`.
   - Add `compatibilityPreset` support: `'default'` (v5) and `'kubbV4'` (legacy naming).
   - Add `McpHandler` component using `createOperationParams` from `@kubb/ast` for automatic v5/v4 param handling.
   - Add `Server` component for MCP tool registration with zod schema validation.
@@ -931,7 +931,7 @@
 
 - [#2872](https://github.com/kubb-labs/kubb/pull/2872) [`591977c`](https://github.com/kubb-labs/kubb/commit/591977c5c2f167736d6e43126ed0387a1e5e0ce5) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - ### `@kubb/core`
   - Add `name: string` to the `Resolver` base type. Every resolver now carries a name that identifies it.
-  - `defineResolver` build functions must return a `name` property.
+  - `createResolver` build functions must return a `name` property.
   - Add `mergeResolvers(...resolvers)` helper that merges multiple resolvers into one (last wins).
 
   ### `@kubb/ast`

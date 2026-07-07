@@ -1,8 +1,8 @@
-import { defineResolver } from 'kubb/kit'
-import type { PluginReactQuery } from '../types.ts'
+import { createResolver } from "kubb/kit";
+import type { PluginReactQuery } from "../types.ts";
 
 function capitalize(name: string): string {
-  return `${name.charAt(0).toUpperCase()}${name.slice(1)}`
+  return `${name.charAt(0).toUpperCase()}${name.slice(1)}`;
 }
 
 /**
@@ -24,96 +24,96 @@ function capitalize(name: string): string {
  * resolverReactQuery.query.optionsName(operationNode) // 'getPetByIdQueryOptions'
  * ```
  */
-export const resolverReactQuery = defineResolver<PluginReactQuery>(() => ({
-  pluginName: 'plugin-react-query',
+export const resolverReactQuery = createResolver<PluginReactQuery>({
+  pluginName: "plugin-react-query",
   query: {
     name(node) {
-      return `use${capitalize(this.name(node.operationId))}`
+      return `use${capitalize(this.name(node.operationId))}`;
     },
     optionsName(node) {
-      return `${this.name(node.operationId)}QueryOptions`
+      return `${this.name(node.operationId)}QueryOptions`;
     },
     keyName(node) {
-      return `${this.name(node.operationId)}QueryKey`
+      return `${this.name(node.operationId)}QueryKey`;
     },
     keyTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}QueryKey`
+      return `${capitalize(this.name(node.operationId))}QueryKey`;
     },
     clientName(node) {
-      return this.name(node.operationId)
+      return this.name(node.operationId);
     },
   },
   suspenseQuery: {
     name(node) {
-      return `use${capitalize(this.name(node.operationId))}Suspense`
+      return `use${capitalize(this.name(node.operationId))}Suspense`;
     },
     optionsName(node) {
-      return `${this.name(node.operationId)}SuspenseQueryOptions`
+      return `${this.name(node.operationId)}SuspenseQueryOptions`;
     },
     keyName(node) {
-      return `${this.name(node.operationId)}SuspenseQueryKey`
+      return `${this.name(node.operationId)}SuspenseQueryKey`;
     },
     keyTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}SuspenseQueryKey`
+      return `${capitalize(this.name(node.operationId))}SuspenseQueryKey`;
     },
     clientName(node) {
-      return `${this.name(node.operationId)}Suspense`
+      return `${this.name(node.operationId)}Suspense`;
     },
   },
   infiniteQuery: {
     name(node) {
-      return `use${capitalize(this.name(node.operationId))}Infinite`
+      return `use${capitalize(this.name(node.operationId))}Infinite`;
     },
     optionsName(node) {
-      return `${this.name(node.operationId)}InfiniteQueryOptions`
+      return `${this.name(node.operationId)}InfiniteQueryOptions`;
     },
     keyName(node) {
-      return `${this.name(node.operationId)}InfiniteQueryKey`
+      return `${this.name(node.operationId)}InfiniteQueryKey`;
     },
     keyTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}InfiniteQueryKey`
+      return `${capitalize(this.name(node.operationId))}InfiniteQueryKey`;
     },
     clientName(node) {
-      return `${this.name(node.operationId)}Infinite`
+      return `${this.name(node.operationId)}Infinite`;
     },
   },
   suspenseInfiniteQuery: {
     name(node) {
-      return `use${capitalize(this.name(node.operationId))}SuspenseInfinite`
+      return `use${capitalize(this.name(node.operationId))}SuspenseInfinite`;
     },
     optionsName(node) {
-      return `${this.name(node.operationId)}SuspenseInfiniteQueryOptions`
+      return `${this.name(node.operationId)}SuspenseInfiniteQueryOptions`;
     },
     keyName(node) {
-      return `${this.name(node.operationId)}SuspenseInfiniteQueryKey`
+      return `${this.name(node.operationId)}SuspenseInfiniteQueryKey`;
     },
     keyTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}SuspenseInfiniteQueryKey`
+      return `${capitalize(this.name(node.operationId))}SuspenseInfiniteQueryKey`;
     },
     clientName(node) {
-      return `${this.name(node.operationId)}SuspenseInfinite`
+      return `${this.name(node.operationId)}SuspenseInfinite`;
     },
   },
   mutation: {
     name(node) {
-      return `use${capitalize(this.name(node.operationId))}`
+      return `use${capitalize(this.name(node.operationId))}`;
     },
     optionsName(node) {
-      return `${this.name(node.operationId)}MutationOptions`
+      return `${this.name(node.operationId)}MutationOptions`;
     },
     keyName(node) {
-      return `${this.name(node.operationId)}MutationKey`
+      return `${this.name(node.operationId)}MutationKey`;
     },
     typeName(node) {
-      return capitalize(this.name(node.operationId))
+      return capitalize(this.name(node.operationId));
     },
   },
   hook: {
     optionsName() {
-      return 'HookOptions'
+      return "HookOptions";
     },
     customOptionsName() {
-      return 'getCustomHookOptions'
+      return "getCustomHookOptions";
     },
   },
-}))
+});

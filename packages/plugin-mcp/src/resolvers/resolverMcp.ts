@@ -1,6 +1,6 @@
-import { camelCase } from '@internals/utils'
-import { defineResolver } from 'kubb/kit'
-import type { PluginMcp } from '../types.ts'
+import { camelCase } from "@internals/utils";
+import { createResolver } from "kubb/kit";
+import type { PluginMcp } from "../types.ts";
 
 /**
  * Default resolver used by `@kubb/plugin-mcp`. Decides the names and file
@@ -14,14 +14,14 @@ import type { PluginMcp } from '../types.ts'
  * resolverMcp.name('addPet') // 'addPetHandler'
  * ```
  */
-export const resolverMcp = defineResolver<PluginMcp>(() => ({
-  pluginName: 'plugin-mcp',
+export const resolverMcp = createResolver<PluginMcp>({
+  pluginName: "plugin-mcp",
   name(name) {
-    return camelCase(name, { suffix: 'handler' })
+    return camelCase(name, { suffix: "handler" });
   },
   handler: {
     name(node) {
-      return this.name(node.operationId)
+      return this.name(node.operationId);
     },
   },
-}))
+});

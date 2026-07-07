@@ -1,6 +1,6 @@
-import { camelCase, ensureValidVarName, pascalCase } from '@internals/utils'
-import { defineResolver } from 'kubb/kit'
-import type { PluginContractClient } from './types.ts'
+import { camelCase, ensureValidVarName, pascalCase } from "@internals/utils";
+import { createResolver } from "kubb/kit";
+import type { PluginContractClient } from "./types.ts";
 
 /**
  * Default resolver shared by the client plugins. Functions and files inherit the built-in camelCase
@@ -12,15 +12,15 @@ import type { PluginContractClient } from './types.ts'
  * resolverClient.groupName('pet')        // 'PetClient'
  * ```
  */
-export const resolverClient = defineResolver<PluginContractClient>(() => ({
-  pluginName: 'plugin-contract-client',
+export const resolverClient = createResolver<PluginContractClient>({
+  pluginName: "plugin-contract-client",
   className(name) {
-    return ensureValidVarName(pascalCase(name))
+    return ensureValidVarName(pascalCase(name));
   },
   groupName(name) {
-    return ensureValidVarName(pascalCase(`${name} Client`))
+    return ensureValidVarName(pascalCase(`${name} Client`));
   },
   propertyName(name) {
-    return ensureValidVarName(camelCase(name))
+    return ensureValidVarName(camelCase(name));
   },
-}))
+});
