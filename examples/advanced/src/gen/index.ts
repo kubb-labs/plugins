@@ -356,6 +356,7 @@ export { createPetEventTypeEnumFaker } from './mocks/createPetEventTypeEnumFaker
 export { createPetFaker } from './mocks/createPetFaker.ts'
 export { createPetNotFoundFaker } from './mocks/createPetNotFoundFaker.ts'
 export { createPetStatusEnumFaker } from './mocks/createPetStatusEnumFaker.ts'
+export { createTagTagFaker } from './mocks/createTagTagFaker.ts'
 export {
   createAddFilesBodyFaker,
   createAddFilesBodyFakerFormData,
@@ -452,7 +453,6 @@ export {
   createStreamPetEventsResponseFaker,
   createStreamPetEventsStatus200Faker,
 } from './mocks/stream/createStreamPetEventsFaker.ts'
-export { createTagTagFaker } from './mocks/tag/createTagFaker.ts'
 export { addPetRequestStatusEnum } from './models/ts/AddPetRequestStatusEnum.ts'
 export { animalTypeEnum } from './models/ts/AnimalTypeEnum.ts'
 export { createPetsBoolParam } from './models/ts/CreatePetsBoolParam.ts'

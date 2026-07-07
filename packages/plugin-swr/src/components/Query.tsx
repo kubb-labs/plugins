@@ -26,7 +26,7 @@ function buildQueryParamsNode(
   },
 ): FunctionParametersNode {
   const { resolver } = options
-  const responseName = resolver.resolveResponseName(node)
+  const responseName = resolver.response.response(node)
   const errorNames = resolveErrorNames(node, resolver)
 
   const TData = responseName
@@ -49,7 +49,7 @@ function buildQueryParamsNode(
 }
 
 export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver }: Props): KubbReactNode {
-  const responseName = tsResolver.resolveResponseName(node)
+  const responseName = tsResolver.response.response(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
   const TData = responseName

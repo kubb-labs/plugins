@@ -1,4 +1,4 @@
-import type { TagTag } from '../../models/ts/tag/Tag.ts'
+import type { TagTag } from '../models/ts/tag/Tag.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createTagTagFaker<TData extends Partial<TagTag> = object>(data?: TData) {

@@ -1,5 +1,5 @@
 import type { ClientSelector } from '@internals/client'
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 /**
  * Builds the parts of a query or mutation key for one operation. Receives the operation node and
@@ -12,61 +12,74 @@ export type Transformer = (props: { node: ast.OperationNode; casing: 'camelcase'
  */
 export type ResolverVueQuery = Resolver & {
   /**
-   * Resolves the base function name for an operation.
+   * Names for a query operation: its `useQuery` composable, key helpers, options helper, and the
+   * inline client function it calls.
    */
-  resolveName(this: ResolverVueQuery, name: string): string
+  query: {
+    /**
+     * Resolves a query hook function name.
+     */
+    name(node: ast.OperationNode): string
+    /**
+     * Resolves the query key helper name.
+     */
+    keyName(node: ast.OperationNode): string
+    /**
+     * Resolves the query key type name.
+     */
+    keyTypeName(node: ast.OperationNode): string
+    /**
+     * Resolves the query options helper name.
+     */
+    optionsName(node: ast.OperationNode): string
+    /**
+     * Resolves the client function name generated inline by query hooks.
+     */
+    clientName(node: ast.OperationNode): string
+  }
   /**
-   * Resolves a query hook function name.
+   * Names for an infinite query operation: its `useInfiniteQuery` composable, key helpers, options
+   * helper, and the inline client function it calls.
    */
-  resolveQueryName(this: ResolverVueQuery, node: ast.OperationNode): string
+  infiniteQuery: {
+    /**
+     * Resolves an infinite query hook function name.
+     */
+    name(node: ast.OperationNode): string
+    /**
+     * Resolves the infinite query key helper name.
+     */
+    keyName(node: ast.OperationNode): string
+    /**
+     * Resolves the infinite query key type name.
+     */
+    keyTypeName(node: ast.OperationNode): string
+    /**
+     * Resolves the infinite query options helper name.
+     */
+    optionsName(node: ast.OperationNode): string
+    /**
+     * Resolves the client function name generated inline by infinite query hooks.
+     */
+    clientName(node: ast.OperationNode): string
+  }
   /**
-   * Resolves an infinite query hook function name.
+   * Names for a mutation operation: its `useMutation` composable, key helper, and type name.
    */
-  resolveInfiniteQueryName(this: ResolverVueQuery, node: ast.OperationNode): string
-  /**
-   * Resolves a mutation hook function name.
-   */
-  resolveMutationName(this: ResolverVueQuery, node: ast.OperationNode): string
-  /**
-   * Resolves the query options helper name.
-   */
-  resolveQueryOptionsName(this: ResolverVueQuery, node: ast.OperationNode): string
-  /**
-   * Resolves the infinite query options helper name.
-   */
-  resolveInfiniteQueryOptionsName(this: ResolverVueQuery, node: ast.OperationNode): string
-  /**
-   * Resolves the query key helper name.
-   */
-  resolveQueryKeyName(this: ResolverVueQuery, node: ast.OperationNode): string
-  /**
-   * Resolves the infinite query key helper name.
-   */
-  resolveInfiniteQueryKeyName(this: ResolverVueQuery, node: ast.OperationNode): string
-  /**
-   * Resolves the mutation key helper name.
-   */
-  resolveMutationKeyName(this: ResolverVueQuery, node: ast.OperationNode): string
-  /**
-   * Resolves the query key type name.
-   */
-  resolveQueryKeyTypeName(this: ResolverVueQuery, node: ast.OperationNode): string
-  /**
-   * Resolves the infinite query key type name.
-   */
-  resolveInfiniteQueryKeyTypeName(this: ResolverVueQuery, node: ast.OperationNode): string
-  /**
-   * Resolves the mutation type name.
-   */
-  resolveMutationTypeName(this: ResolverVueQuery, node: ast.OperationNode): string
-  /**
-   * Resolves the client function name generated inline by query hooks.
-   */
-  resolveClientName(this: ResolverVueQuery, node: ast.OperationNode): string
-  /**
-   * Resolves the client function name generated inline by infinite query hooks.
-   */
-  resolveInfiniteClientName(this: ResolverVueQuery, node: ast.OperationNode): string
+  mutation: {
+    /**
+     * Resolves a mutation hook function name.
+     */
+    name(node: ast.OperationNode): string
+    /**
+     * Resolves the mutation key helper name.
+     */
+    keyName(node: ast.OperationNode): string
+    /**
+     * Resolves the mutation type name.
+     */
+    typeName(node: ast.OperationNode): string
+  }
 }
 
 /**
@@ -206,7 +219,7 @@ export type Options = OutputOptions & {
   /**
    * Override how composable names and file paths are built.
    */
-  resolver?: Partial<ResolverVueQuery> & ThisType<ResolverVueQuery>
+  resolver?: ResolverPatch<ResolverVueQuery>
   /**
    * Set to `false` to skip generating `use*` composable functions. `queryOptions`,
    * `queryKey`, and `mutationKey` helpers are still emitted.

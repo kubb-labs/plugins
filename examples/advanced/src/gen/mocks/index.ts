@@ -20,6 +20,7 @@ export { createPetEventTypeEnumFaker } from './createPetEventTypeEnumFaker.ts'
 export { createPetFaker } from './createPetFaker.ts'
 export { createPetNotFoundFaker } from './createPetNotFoundFaker.ts'
 export { createPetStatusEnumFaker } from './createPetStatusEnumFaker.ts'
+export { createTagTagFaker } from './createTagTagFaker.ts'
 export {
   createAddFilesBodyFaker,
   createAddFilesBodyFakerFormData,
@@ -116,4 +117,3 @@ export {
   createStreamPetEventsResponseFaker,
   createStreamPetEventsStatus200Faker,
 } from './stream/createStreamPetEventsFaker.ts'
-export { createTagTagFaker } from './tag/createTagFaker.ts'

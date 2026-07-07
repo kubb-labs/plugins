@@ -1,12 +1,12 @@
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin } from 'kubb/kit'
+import { definePlugin, Resolver } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { mutationKeyTransformer } from '@internals/tanstack-query'
 import { queryKeyTransformer } from '@internals/tanstack-query'
 import { resolveClient } from '@internals/client'
 import { infiniteQueryGenerator, mutationGenerator, queryGenerator } from './generators'
 import { resolverVueQuery } from './resolvers/resolverVueQuery.ts'
-import type { PluginVueQuery } from './types.ts'
+import type { PluginVueQuery, ResolverVueQuery } from './types.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-vue-query`. Used for driver lookups
@@ -68,7 +68,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     dependencies: [pluginTsName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
-        const resolver = userResolver ? { ...resolverVueQuery, ...userResolver } : resolverVueQuery
+        const resolver = userResolver ? Resolver.merge<ResolverVueQuery>(resolverVueQuery, userResolver) : resolverVueQuery
 
         const pluginNames = (ctx.config.plugins ?? []).map((p) => (p as { name?: string }).name).filter((name): name is string => Boolean(name))
         const resolvedClient = resolveClient({ client, pluginNames })

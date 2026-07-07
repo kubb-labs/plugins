@@ -1,4 +1,4 @@
-import { ast } from 'kubb/kit'
+import { ast, Resolver } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import { printerFaker } from './printerFaker.ts'
@@ -66,12 +66,9 @@ describe('printerFaker', () => {
 
     expect(
       printerFaker({
-        resolver: {
-          ...resolverFaker,
-          resolveName(name) {
-            return `${this.default(name)}Faker`
-          },
-        },
+        resolver: Resolver.merge(resolverFaker, {
+          name: (name: string) => `${resolverFaker.name(name)}Faker`,
+        }),
       }).print(node),
     ).toMatchInlineSnapshot(`"showPetByIdResponseFaker(data)"`)
   })

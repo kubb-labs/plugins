@@ -53,19 +53,19 @@ function buildSchemaNames(node: ast.OperationNode, resolver: ResolverZod) {
     const statusNum = Number(res.statusCode)
     if (Number.isNaN(statusNum)) continue
 
-    const name = resolver.resolveResponseStatusName(node, res.statusCode)
+    const name = resolver.response.status(node, res.statusCode)
     responses[statusNum] = name
     if (statusNum >= 400) errors[statusNum] = name
   }
 
-  responses['default'] = resolver.resolveResponseName(node)
+  responses['default'] = resolver.response.response(node)
 
   return {
-    request: node.requestBody?.content?.[0]?.schema ? resolver.resolveBodyName(node) : null,
+    request: node.requestBody?.content?.[0]?.schema ? resolver.response.body(node) : null,
     parameters: {
-      path: pathParam ? resolver.resolvePathName(node, pathParam) : null,
-      query: queryParam ? resolver.resolveQueryName(node, queryParam) : null,
-      header: headerParam ? resolver.resolveHeadersName(node, headerParam) : null,
+      path: pathParam ? resolver.param.path(node, pathParam) : null,
+      query: queryParam ? resolver.param.query(node, queryParam) : null,
+      header: headerParam ? resolver.param.headers(node, headerParam) : null,
     },
     responses,
     errors,
@@ -86,12 +86,12 @@ export const pluginZodOperations = definePlugin(() => ({
             const group = zodOptions.group ?? undefined
             const importPath = zodOptions.importPath ?? 'zod'
 
-            const operationsFile = resolver.resolveFile({ name: 'operations', extname: '.ts' }, { root: gctx.root, output, group })
+            const operationsFile = resolver.default.file({ name: 'operations', extname: '.ts' }, { root: gctx.root, output, group })
             const transformed = nodes.filter(ast.isHttpOperationNode).map((node) => ({ node, data: buildSchemaNames(node, resolver) }))
 
             const imports = transformed.flatMap(({ node, data }) => {
               const names = [data.request, ...Object.values(data.responses), ...Object.values(data.parameters)].filter(Boolean) as Array<string>
-              const opFile = resolver.resolveFile(
+              const opFile = resolver.file(
                 { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
                 { root: gctx.root, output, group },
               )

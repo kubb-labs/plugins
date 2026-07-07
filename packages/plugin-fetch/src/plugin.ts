@@ -1,12 +1,12 @@
 import path from 'node:path'
 import { createSdkGenerator, defaultMacros, isValidatorEnabled, resolverClient } from '@internals/client'
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin } from 'kubb/kit'
+import { definePlugin, Resolver } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
 import { fetchClientTemplatePath, fetchSerializersTemplatePath, standardSchemaTemplatePath } from './templates.ts'
-import type { PluginFetch, ResolvedOptions } from './types.ts'
+import type { PluginFetch, ResolvedOptions, ResolverClient } from './types.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-fetch`. Used for driver lookups and cross-plugin
@@ -58,7 +58,7 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
     baseURL,
     validator,
     sdk: sdk ? { mode: sdk.mode ?? 'tag', name: sdk.name } : undefined,
-    resolver: userResolver ? { ...resolverClient, ...userResolver } : resolverClient,
+    resolver: userResolver ? Resolver.merge<ResolverClient>(resolverClient, userResolver) : resolverClient,
   }
 
   // `sdk` swaps the per-operation functions for the class-based SDK; left unset, the standalone

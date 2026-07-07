@@ -31,14 +31,14 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     function resolveImportName(schemaName: string): string {
       if (ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) && enumOptions.typeSuffix && enumSchemaNames.has(schemaName)) {
-        return resolver.resolveEnumKeyName({ name: schemaName }, enumOptions.typeSuffix)
+        return resolver.enum.keyName({ name: schemaName }, enumOptions.typeSuffix)
       }
-      return resolver.resolveTypeName(schemaName)
+      return resolver.name(schemaName)
     }
 
     const imports = adapter.getImports(node, (schemaName) => ({
       name: resolveImportName(schemaName),
-      path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+      path: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
     }))
 
     const enumNode = ast.narrowSchema(node, ast.schemaTypes.enum)
@@ -47,11 +47,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const isEnumSchema = !!enumNode && !isInlineConstEnum(enumNode, enumSchemaNames)
 
     const meta = {
-      name:
-        ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) && isEnumSchema
-          ? resolver.resolveEnumKeyName(node, enumOptions.typeSuffix)
-          : resolver.resolveTypeName(node.name),
-      file: resolver.resolveFile({ name: node.name, extname: '.ts' }, { root, output, group: group ?? undefined }),
+      name: ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) && isEnumSchema ? resolver.enum.keyName(node, enumOptions.typeSuffix) : resolver.name(node.name),
+      file: resolver.file({ name: node.name, extname: '.ts' }, { root, output, group: group ?? undefined }),
     } as const
 
     const schemaPrinter = printerTs({
@@ -72,8 +69,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {imports.map((imp) => (
           <File.Import key={[node.name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
@@ -89,7 +86,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const params = caseParams(node.parameters, 'camelcase')
 
     const meta = {
-      file: resolver.resolveFile(
+      file: resolver.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output, group: group ?? undefined },
       ),
@@ -101,9 +98,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     function resolveImportName(schemaName: string): string {
       if (ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) && enumOptions.typeSuffix && enumSchemaNames.has(schemaName)) {
-        return resolver.resolveEnumKeyName({ name: schemaName }, enumOptions.typeSuffix)
+        return resolver.enum.keyName({ name: schemaName }, enumOptions.typeSuffix)
       }
-      return resolver.resolveTypeName(schemaName)
+      return resolver.name(schemaName)
     }
 
     function renderSchemaType({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
@@ -111,7 +108,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
       const imports = adapter.getImports(schema, (schemaName) => ({
         name: resolveImportName(schemaName),
-        path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+        path: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
       }))
 
       const schemaPrinter = printerTs({
@@ -171,7 +168,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const paramTypes = params.map((param) =>
       renderSchemaType({
         schema: { ...param.schema, optional: !param.required },
-        name: resolver.resolveParamName(node, param),
+        name: resolver.param.name(node, param),
       }),
     )
 
@@ -187,12 +184,12 @@ export const typeGenerator = defineGenerator<PluginTs>({
             ...entry.schema,
             description: node.requestBody!.description ?? entry.schema.description,
           },
-          name: resolver.resolveBodyName(node),
+          name: resolver.response.body(node),
           keysToOmit: entry.keysToOmit,
         })
       }
       // Multiple content types — generate individual types + union alias
-      return buildContentTypeVariants(requestBodyContent, resolver.resolveBodyName(node), (schema) => ({
+      return buildContentTypeVariants(requestBodyContent, resolver.response.body(node), (schema) => ({
         ...schema,
         description: node.requestBody!.description ?? schema.description,
       }))
@@ -205,24 +202,24 @@ export const typeGenerator = defineGenerator<PluginTs>({
       // Multiple content types for a single status code — generate per-variant types + a plain union.
       // The `<Name>Responses` record discriminates them by content type (see buildResponses).
       if (variants.length > 1) {
-        return buildContentTypeVariants(variants, resolver.resolveResponseStatusName(node, res.statusCode))
+        return buildContentTypeVariants(variants, resolver.response.status(node, res.statusCode))
       }
       const primary = variants[0] ?? res.content?.[0]
       return renderSchemaType({
         schema: primary?.schema ?? null,
-        name: resolver.resolveResponseStatusName(node, res.statusCode),
+        name: resolver.response.status(node, res.statusCode),
         keysToOmit: primary?.keysToOmit,
       })
     })
 
     const dataType = renderSchemaType({
       schema: buildData({ ...node, parameters: params }, { resolver }),
-      name: resolver.resolveRequestConfigName(node),
+      name: resolver.response.config(node),
     })
 
     const responsesType = renderSchemaType({
       schema: buildResponses(node, { resolver }),
-      name: resolver.resolveResponsesName(node),
+      name: resolver.response.responses(node),
     })
 
     function buildResponseType() {
@@ -231,7 +228,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         return null
       }
 
-      const responseName = resolver.resolveResponseName(node)
+      const responseName = resolver.response.response(node)
 
       const responsesWithSchema = node.responses.filter(hasSchema)
       const importedNames = new Set(
@@ -269,8 +266,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {paramTypes}
         {responseTypes}

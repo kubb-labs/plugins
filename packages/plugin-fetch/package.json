@@ -67,7 +67,6 @@
   "devDependencies": {
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
-    "@internals/utils": "workspace:*",
     "kubb": "catalog:",
     "typescript": "catalog:"
   },

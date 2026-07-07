@@ -23,7 +23,7 @@ export function getQueryOptionsParams(node: ast.OperationNode, options: { resolv
 
 export function QueryOptions({ name, clientName, node, tsResolver, queryKeyName }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.response.response(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
   const TData = responseName

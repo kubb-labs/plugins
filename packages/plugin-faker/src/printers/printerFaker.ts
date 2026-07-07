@@ -308,7 +308,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
         // Internal helper refs (for generated response/data helpers) are already
         // emitted with resolver output and should not be transformed twice.
-        const resolvedName = node.ref ? this.options.resolver.resolveName(refName) : refName
+        const resolvedName = node.ref ? this.options.resolver.name(refName) : refName
 
         if (!this.options.nestedInObject) {
           return `${resolvedName}(data)`

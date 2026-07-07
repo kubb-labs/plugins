@@ -4,13 +4,13 @@ import { caseParams, dedupeByCasedName } from './params.ts'
 
 /**
  * Builds the `ResolverFileParams` every operation generator passes to
- * `resolver.resolveFile`: a file named `name`, tagged by the operation's first
+ * `resolver.file`: a file named `name`, tagged by the operation's first
  * tag (or `'default'`), at the operation's path. Centralizes the entry object
  * that was repeated at dozens of call sites across the client and query plugins.
  *
  * @example
  * ```ts
- * resolver.resolveFile(operationFileEntry(node, node.operationId), { root, output, group })
+ * resolver.file(operationFileEntry(node, node.operationId), { root, output, group })
  * ```
  */
 export function operationFileEntry(node: ast.OperationNode, name: string, extname: ResolverFileParams['extname'] = '.ts'): ResolverFileParams {
@@ -31,22 +31,30 @@ export type ContentTypeInfo = {
 }
 
 export type RequestConfigResolver = {
-  resolveBodyName(node: ast.OperationNode): string
+  response: {
+    body(node: ast.OperationNode): string
+  }
 }
 
 export type ResponseStatusNameResolver = {
-  resolveResponseStatusName(node: ast.OperationNode, statusCode: ast.StatusCode): string
+  response: {
+    status(node: ast.OperationNode, statusCode: ast.StatusCode): string
+  }
 }
 
 export type ResponseNameResolver = ResponseStatusNameResolver & {
-  resolveResponseName(node: ast.OperationNode): string
+  response: {
+    response(node: ast.OperationNode): string
+  }
 }
 
 export type OperationTypeNameResolver = RequestConfigResolver &
   ResponseNameResolver & {
-    resolvePathName(node: ast.OperationNode, param: ast.ParameterNode): string
-    resolveQueryName(node: ast.OperationNode, param: ast.ParameterNode): string
-    resolveHeadersName(node: ast.OperationNode, param: ast.ParameterNode): string
+    param: {
+      path(node: ast.OperationNode, param: ast.ParameterNode): string
+      query(node: ast.OperationNode, param: ast.ParameterNode): string
+      headers(node: ast.OperationNode, param: ast.ParameterNode): string
+    }
   }
 
 /**
@@ -56,43 +64,53 @@ export type OperationTypeNameResolver = RequestConfigResolver &
  */
 export type OperationParamsResolver = {
   /**
-   * Resolves the type name for an individual parameter.
-   *
-   * @example Individual path parameter name
-   * `resolver.resolveParamName(node, param) // → 'DeletePetPathPetId'`
+   * Naming for an operation's parameters, grouped by location.
    */
-  resolveParamName(node: ast.OperationNode, param: ast.ParameterNode): string
+  param: {
+    /**
+     * Resolves the type name for an individual parameter.
+     *
+     * @example Individual path parameter name
+     * `resolver.param.name(node, param) // → 'DeletePetPathPetId'`
+     */
+    name(node: ast.OperationNode, param: ast.ParameterNode): string
+    /**
+     * Resolves the grouped path parameters type name.
+     * When the return value equals `resolver.param.name`, no indexed access is emitted.
+     *
+     * @example Grouped path params type name
+     * `resolver.param.path(node, param) // → 'DeletePetPath'`
+     */
+    path(node: ast.OperationNode, param: ast.ParameterNode): string
+    /**
+     * Resolves the grouped query parameters type name.
+     * When the return value equals `resolver.param.name`, an inline struct type is emitted instead.
+     *
+     * @example Grouped query params type name
+     * `resolver.param.query(node, param) // → 'FindPetsByStatusQuery'`
+     */
+    query(node: ast.OperationNode, param: ast.ParameterNode): string
+    /**
+     * Resolves the grouped header parameters type name.
+     * When the return value equals `resolver.param.name`, an inline struct type is emitted instead.
+     *
+     * @example Grouped header params type name
+     * `resolver.param.headers(node, param) // → 'DeletePetHeaders'`
+     */
+    headers(node: ast.OperationNode, param: ast.ParameterNode): string
+  }
   /**
-   * Resolves the request body type name.
-   *
-   * @example Request body type name
-   * `resolver.resolveBodyName(node) // → 'CreatePetBody'`
+   * Naming for an operation's request and response types.
    */
-  resolveBodyName(node: ast.OperationNode): string
-  /**
-   * Resolves the grouped path parameters type name.
-   * When the return value equals `resolveParamName`, no indexed access is emitted.
-   *
-   * @example Grouped path params type name
-   * `resolver.resolvePathName(node, param) // → 'DeletePetPath'`
-   */
-  resolvePathName(node: ast.OperationNode, param: ast.ParameterNode): string
-  /**
-   * Resolves the grouped query parameters type name.
-   * When the return value equals `resolveParamName`, an inline struct type is emitted instead.
-   *
-   * @example Grouped query params type name
-   * `resolver.resolveQueryName(node, param) // → 'FindPetsByStatusQuery'`
-   */
-  resolveQueryName(node: ast.OperationNode, param: ast.ParameterNode): string
-  /**
-   * Resolves the grouped header parameters type name.
-   * When the return value equals `resolveParamName`, an inline struct type is emitted instead.
-   *
-   * @example Grouped header params type name
-   * `resolver.resolveHeadersName(node, param) // → 'DeletePetHeaders'`
-   */
-  resolveHeadersName(node: ast.OperationNode, param: ast.ParameterNode): string
+  response: {
+    /**
+     * Resolves the request body type name.
+     *
+     * @example Request body type name
+     * `resolver.response.body(node) // → 'CreatePetBody'`
+     */
+    body(node: ast.OperationNode): string
+  }
 }
 
 export type OperationCommentLink = 'pathTemplate' | 'urlPath' | false | ((node: ast.OperationNode) => string | undefined)
@@ -342,7 +360,9 @@ export function getRequestGroupOptionality(node: ast.OperationNode): RequestGrou
 }
 
 export type RequestConfigNameResolver = RequestConfigResolver & {
-  resolveRequestConfigName(node: ast.OperationNode): string
+  response: {
+    config(node: ast.OperationNode): string
+  }
 }
 
 /**
@@ -361,7 +381,7 @@ export function buildRequestParamsSignature(
 
   const names = (['path', 'query', 'body', 'headers'] as const).filter((key) => groups[key])
 
-  const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: ${resolver.resolveRequestConfigName(node)}${isOptional ? ' = {}' : ''}` : null
+  const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: ${resolver.response.config(node)}${isOptional ? ' = {}' : ''}` : null
   const configParam = isConfigurable ? `config: ${buildRequestConfigType(node)} = {}` : null
 
   return {
@@ -429,19 +449,15 @@ export function getPrimarySuccessResponse(node: ast.OperationNode): ast.Response
 }
 
 export function resolveErrorNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
-  return node.responses
-    .filter((response) => isErrorStatusCode(response.statusCode))
-    .map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
+  return node.responses.filter((response) => isErrorStatusCode(response.statusCode)).map((response) => resolver.response.status(node, response.statusCode))
 }
 
 export function resolveSuccessNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
-  return node.responses
-    .filter((response) => isSuccessStatusCode(response.statusCode))
-    .map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
+  return node.responses.filter((response) => isSuccessStatusCode(response.statusCode)).map((response) => resolver.response.status(node, response.statusCode))
 }
 
 export function resolveStatusCodeNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
-  return node.responses.map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
+  return node.responses.map((response) => resolver.response.status(node, response.statusCode))
 }
 
 const typeNamesByResolver = new WeakMap<OperationTypeNameResolver, Map<string, string[]>>()
@@ -473,11 +489,11 @@ export function resolveOperationTypeNames(
     options.includeParams === false
       ? []
       : [
-          ...path.map((param) => resolver.resolvePathName(node, param)),
-          ...query.map((param) => resolver.resolveQueryName(node, param)),
-          ...header.map((param) => resolver.resolveHeadersName(node, param)),
+          ...path.map((param) => resolver.param.path(node, param)),
+          ...query.map((param) => resolver.param.query(node, param)),
+          ...header.map((param) => resolver.param.headers(node, param)),
         ]
-  const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.resolveBodyName(node) : null, resolver.resolveResponseName(node)]
+  const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.response.body(node) : null, resolver.response.response(node)]
   const names =
     options.order === 'body-response-first'
       ? [...bodyAndResponseNames, ...paramNames, ...responseStatusNames]
@@ -493,7 +509,7 @@ export function resolveResponseTypes(node: ast.OperationNode, resolver: Response
 
   for (const response of node.responses) {
     if (response.statusCode === 'default') {
-      types.push(['default', resolver.resolveResponseName(node)])
+      types.push(['default', resolver.response.response(node)])
       continue
     }
 
@@ -502,7 +518,7 @@ export function resolveResponseTypes(node: ast.OperationNode, resolver: Response
       continue
     }
 
-    types.push([code, isSuccessStatusCode(code) ? resolver.resolveResponseName(node) : resolver.resolveResponseStatusName(node, response.statusCode)])
+    types.push([code, isSuccessStatusCode(code) ? resolver.response.response(node) : resolver.response.status(node, response.statusCode)])
   }
 
   return types

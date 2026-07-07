@@ -2,7 +2,7 @@ import path from 'node:path'
 import { camelCase } from '@internals/utils'
 
 import type { Config, Group } from 'kubb/kit'
-import { ast, memoryStorage } from 'kubb/kit'
+import { ast, memoryStorage, Resolver } from 'kubb/kit'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from 'kubb/kit/testing'
 import { describe, expect, test } from 'vitest'
 import { matchFiles, rawSources } from '#mocks'
@@ -83,15 +83,14 @@ const operationWithSnakeCaseParams: ast.OperationNode = ast.factory.createOperat
   responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Success' })],
 })
 
-const apiResolver = {
-  ...resolverTs,
-  resolveTypeName(name: string) {
-    return `Api${resolverTs.default(name, 'type')}`
+const apiResolver = Resolver.merge(resolverTs, {
+  name(name: string) {
+    return `Api${resolverTs.name(name)}`
   },
-}
+})
 
 describe('typeGenerator — custom resolver', () => {
-  test('uses resolveTypeName consistently for imported schema refs', async () => {
+  test('uses name consistently for imported schema refs', async () => {
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: apiResolver })
     const driver = createMockedPluginDriver({ name: 'custom resolver' })

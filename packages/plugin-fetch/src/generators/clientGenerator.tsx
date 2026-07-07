@@ -38,27 +38,27 @@ export const clientGenerator = defineGenerator<PluginFetch>({
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
     const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
-    const importedTypeNames = [tsResolver.resolveRequestConfigName(node), tsResolver.resolveResponsesName(node)]
+    const importedTypeNames = [tsResolver.response.config(node), tsResolver.response.responses(node)]
 
     const importedZodNames = zodResolver
       ? [
-          resolveResponseValidator(validator) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
+          resolveResponseValidator(validator) === 'zod' ? zodResolver.response.response?.(node) : null,
           resolveResponseValidator(validator) === 'zod' ? (buildZodErrorParse(node, zodResolver)?.expression ?? null) : null,
-          resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.resolveBodyName?.(node) : null,
+          resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.response.body?.(node) : null,
         ].filter((name): name is string => Boolean(name))
       : []
 
     const meta = {
-      name: resolver.resolveName(node.operationId),
-      file: resolver.resolveFile(operationFileEntry(node, node.operationId), { root, output, group: group ?? undefined }),
-      fileTs: tsResolver.resolveFile(operationFileEntry(node, node.operationId), {
+      name: resolver.name(node.operationId),
+      file: resolver.file(operationFileEntry(node, node.operationId), { root, output, group: group ?? undefined }),
+      fileTs: tsResolver.file(operationFileEntry(node, node.operationId), {
         root,
         output: pluginTs.options?.output ?? output,
         group: pluginTs.options?.group ?? undefined,
       }),
       fileZod:
         zodResolver && pluginZod?.options
-          ? zodResolver.resolveFile(operationFileEntry(node, node.operationId), {
+          ? zodResolver.file(operationFileEntry(node, node.operationId), {
               root,
               output: pluginZod.options.output ?? output,
               group: pluginZod.options?.group ?? undefined,
@@ -80,8 +80,8 @@ export const clientGenerator = defineGenerator<PluginFetch>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={eventStream ? ['client', 'toEventStream'] : ['client']} root={meta.file.path} path={clientPath} />
         <File.Import

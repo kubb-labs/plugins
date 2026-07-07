@@ -1,5 +1,5 @@
-import { camelCase, toFilePath } from '@internals/utils'
-import { defineResolver } from 'kubb/kit'
+import { camelCase } from '@internals/utils'
+import { createResolver } from 'kubb/kit'
 import type { PluginMsw } from '../types.ts'
 
 /**
@@ -7,26 +7,27 @@ import type { PluginMsw } from '../types.ts'
  * paths for every generated MSW handler. Function names get a `Handler`
  * suffix; the aggregate export is always `handlers`.
  *
+ * The top-level `name` applies the `handler` suffix, and `file` falls back to the built-in
+ * `toFilePath` casing. Operation-specific naming is grouped under the `handler` namespace.
+ *
  * @example Resolve a handler name
  * ```ts
  * import { resolverMsw } from '@kubb/plugin-msw'
  *
- * resolverMsw.resolveName('addPet') // 'addPetHandler'
+ * resolverMsw.name('addPet') // 'addPetHandler'
  * ```
  */
-export const resolverMsw = defineResolver<PluginMsw>(() => ({
-  name: 'default',
+export const resolverMsw = createResolver<PluginMsw>({
   pluginName: 'plugin-msw',
-  default(name, type) {
-    return type === 'file' ? toFilePath(name) : camelCase(name)
-  },
-  resolveName(name) {
+  name(name) {
     return camelCase(name, { suffix: 'handler' })
   },
-  resolveHandlerName(node) {
-    return this.resolveName(node.operationId)
+  handler: {
+    name(node) {
+      return this.name(node.operationId)
+    },
+    listName() {
+      return 'handlers'
+    },
   },
-  resolveHandlersName() {
-    return 'handlers'
-  },
-}))
+})

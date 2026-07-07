@@ -348,7 +348,7 @@ describe('fakerGenerator — operation', () => {
   })
 
   test('default resolver applies create prefix to names', () => {
-    expect(resolverFaker.resolveName('Eval')).toBe('createEval')
-    expect(resolverFaker.default('Eval', 'file')).toBe('createEval')
+    expect(resolverFaker.name('Eval')).toBe('createEval')
+    expect(resolverFaker.file({ name: 'Eval', extname: '.ts' }, { root: '.', output: { path: '.' } }).baseName).toBe('createEval.ts')
   })
 })

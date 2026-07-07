@@ -1,4 +1,4 @@
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 /**
  * Validator applied to request and response bodies using schemas from `@kubb/plugin-zod`.
@@ -19,35 +19,28 @@ export type ValidatorOptions = false | 'zod' | { request?: 'zod'; response?: 'zo
 export type Mode = 'tag' | 'flat'
 
 /**
- * The resolver shared by the client plugins. Functions and files use camelCase; URL helpers get
- * a `get<Operation>Url` name.
+ * The resolver shared by the client plugins. Inherits the built-in camelCase `name` and `file`;
+ * classes and tag groups use PascalCase (with a `Client` suffix for groups).
  */
 export type ResolverClient = Resolver & {
   /**
-   * Resolves the function name for a raw operation name.
-   *
-   * @example
-   * `resolver.resolveName('show pet by id') // -> 'showPetById'`
-   */
-  resolveName(this: ResolverClient, name: string): string
-  /**
    * Resolves the generated class name for class-based clients.
    */
-  resolveClassName(this: ResolverClient, name: string): string
+  className(this: ResolverClient, name: string): string
   /**
    * Resolves the generated class name for a tag-based client group. The default appends a
    * `Client` suffix (tag `pet` becomes `PetClient`) so the class never collides with the schema
    * model of the same name in the barrel.
    *
    * @example
-   * `resolver.resolveGroupName('pet') // -> 'PetClient'`
+   * `resolver.groupName('pet') // -> 'PetClient'`
    */
-  resolveGroupName(this: ResolverClient, name: string): string
+  groupName(this: ResolverClient, name: string): string
   /**
    * Resolves the property name a tag client is exposed under on the composed root SDK
    * (`new PetStore(config).pet`).
    */
-  resolveClientPropertyName(this: ResolverClient, name: string): string
+  propertyName(this: ResolverClient, name: string): string
 }
 
 /**
@@ -129,7 +122,7 @@ export type Options = OutputOptions & {
   /**
    * Override how names and file paths are built. Methods you omit fall back to the default resolver.
    */
-  resolver?: Partial<ResolverClient> & ThisType<ResolverClient>
+  resolver?: ResolverPatch<ResolverClient>
   /**
    * Macros applied to each operation node before code is printed.
    */

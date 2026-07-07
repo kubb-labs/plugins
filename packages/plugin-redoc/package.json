@@ -61,7 +61,6 @@
     "@kubb/adapter-oas": "catalog:"
   },
   "devDependencies": {
-    "@internals/utils": "workspace:*",
     "kubb": "catalog:"
   },
   "peerDependencies": {

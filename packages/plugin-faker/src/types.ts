@@ -1,69 +1,80 @@
-import type { OperationParamsResolver } from '@internals/shared'
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 import type { PrinterFakerNodes } from './printers/printerFaker.ts'
 
 /**
  * Resolver for Faker that provides naming methods for mock functions.
+ *
+ * The top-level `name` and `file` apply the plugin's `create` prefix. Composite
+ * operation naming is grouped into the `param` and `response` namespaces.
  */
-export type ResolverFaker = Resolver &
-  OperationParamsResolver & {
+export type ResolverFaker = Resolver & {
+  /**
+   * Naming for operation parameters, keyed by their location.
+   */
+  param: {
     /**
-     * Resolves the faker function name for a schema.
+     * Resolves the faker function name for an individual parameter.
      *
-     * @example Resolving faker function names
-     * `resolver.resolveName('show pet by id') // -> 'showPetById'`
+     * @example Individual parameter name
+     * `resolver.param.name(node, param) // -> 'showPetByIdPathPetId'`
      */
-    resolveName(this: ResolverFaker, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
+    name(node: ast.OperationNode, param: ast.ParameterNode): string
     /**
-     * Resolves the faker function name for a request body.
+     * Resolves the faker function name for a path parameter.
      *
-     * @example Resolving data function names
-     * `resolver.resolveBodyName(node) // -> 'createPetsBody'`
+     * @example Path parameter name
+     * `resolver.param.path(node, param) // -> 'showPetByIdPathPetId'`
      */
-    resolveBodyName(this: ResolverFaker, node: ast.OperationNode): string
+    path(node: ast.OperationNode, param: ast.ParameterNode): string
+    /**
+     * Resolves the faker function name for a query parameter.
+     *
+     * @example Query parameter name
+     * `resolver.param.query(node, param) // -> 'listPetsQueryLimit'`
+     */
+    query(node: ast.OperationNode, param: ast.ParameterNode): string
+    /**
+     * Resolves the faker function name for a header parameter.
+     *
+     * @example Header parameter name
+     * `resolver.param.headers(node, param) // -> 'deletePetHeaderApiKey'`
+     */
+    headers(node: ast.OperationNode, param: ast.ParameterNode): string
+  }
+  /**
+   * Naming for operation request bodies and responses.
+   */
+  response: {
     /**
      * Resolves the faker function name for a response by status code.
      *
-     * @example Response status names
-     * `resolver.resolveResponseStatusName(node, 200) // -> 'listPetsStatus200'`
+     * @example Response status name
+     * `resolver.response.status(node, 200) // -> 'listPetsStatus200'`
      */
-    resolveResponseStatusName(this: ResolverFaker, node: ast.OperationNode, statusCode: ast.StatusCode): string
+    status(node: ast.OperationNode, statusCode: ast.StatusCode): string
+    /**
+     * Resolves the faker function name for a request body.
+     *
+     * @example Request body name
+     * `resolver.response.body(node) // -> 'createPetsBody'`
+     */
+    body(node: ast.OperationNode): string
     /**
      * Resolves the faker function name for the response union.
      *
-     * @example Response union names
-     * `resolver.resolveResponseName(node) // -> 'listPetsResponse'`
+     * @example Response union name
+     * `resolver.response.response(node) // -> 'listPetsResponse'`
      */
-    resolveResponseName(this: ResolverFaker, node: ast.OperationNode): string
+    response(node: ast.OperationNode): string
     /**
      * Resolves the faker function name for the response collection.
      *
-     * @example Responses collection names
-     * `resolver.resolveResponsesName(node) // -> 'listPetsResponses'`
+     * @example Responses collection name
+     * `resolver.response.responses(node) // -> 'listPetsResponses'`
      */
-    resolveResponsesName(this: ResolverFaker, node: ast.OperationNode): string
-    /**
-     * Resolves the faker function name for path parameters.
-     *
-     * @example Path parameters names
-     * `resolver.resolvePathName(node, param) // -> 'showPetByIdPathPetId'`
-     */
-    resolvePathName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
-    /**
-     * Resolves the faker function name for query parameters.
-     *
-     * @example Query parameters names
-     * `resolver.resolveQueryName(node, param) // -> 'listPetsQueryLimit'`
-     */
-    resolveQueryName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
-    /**
-     * Resolves the faker function name for header parameters.
-     *
-     * @example Header parameters names
-     * `resolver.resolveHeadersName(node, param) // -> 'deletePetHeaderApiKey'`
-     */
-    resolveHeadersName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
+    responses(node: ast.OperationNode): string
   }
+}
 
 /**
  * Where the generated mock factories are written and how they are exported, plus the optional
@@ -120,7 +131,7 @@ export type Options = OutputOptions & {
    * Override the naming of generated factory helpers. Common use: append `Mock` or
    * `Factory` so helpers do not clash with imported types.
    */
-  resolver?: Partial<ResolverFaker> & ThisType<ResolverFaker>
+  resolver?: ResolverPatch<ResolverFaker>
   /**
    * Macros applied to schema and operation nodes before printing.
    */

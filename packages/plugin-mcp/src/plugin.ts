@@ -1,13 +1,13 @@
 import { createGroupConfig } from '@internals/shared'
 
 import { resolveClient } from '@internals/client'
-import { definePlugin } from 'kubb/kit'
+import { definePlugin, Resolver } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mcpGenerator } from './generators/mcpGenerator.tsx'
 import { serverGenerator } from './generators/serverGenerator.tsx'
 import { resolverMcp } from './resolvers/resolverMcp.ts'
-import type { PluginMcp } from './types.ts'
+import type { PluginMcp, ResolverMcp } from './types.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-mcp`. Used for driver lookups and
@@ -62,7 +62,7 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
     dependencies: [pluginTsName, pluginZodName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
-        const resolver = userResolver ? { ...resolverMcp, ...userResolver } : resolverMcp
+        const resolver = userResolver ? Resolver.merge<ResolverMcp>(resolverMcp, userResolver) : resolverMcp
 
         const pluginNames = (ctx.config.plugins ?? []).map((p) => (p as { name?: string }).name).filter((name): name is string => Boolean(name))
         const resolvedClient = resolveClient({ client, pluginNames })

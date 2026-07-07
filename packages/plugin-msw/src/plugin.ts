@@ -1,10 +1,10 @@
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin } from 'kubb/kit'
+import { definePlugin, Resolver } from 'kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { handlersGenerator, mswGenerator } from './generators'
 import { resolverMsw } from './resolvers/resolverMsw.ts'
-import type { PluginMsw } from './types.ts'
+import type { PluginMsw, ResolverMsw } from './types.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-msw`. Used for driver lookups and
@@ -60,7 +60,7 @@ export const pluginMsw = definePlugin<PluginMsw>((options) => {
     dependencies: [pluginTsName, parser === 'faker' ? pluginFakerName : null].filter((dependency): dependency is string => Boolean(dependency)),
     hooks: {
       'kubb:plugin:setup'(ctx) {
-        const resolver = userResolver ? { ...resolverMsw, ...userResolver } : resolverMsw
+        const resolver = userResolver ? Resolver.merge<ResolverMsw>(resolverMsw, userResolver) : resolverMsw
 
         ctx.setOptions({
           output,

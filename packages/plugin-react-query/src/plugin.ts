@@ -1,5 +1,5 @@
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin } from 'kubb/kit'
+import { definePlugin, Resolver } from 'kubb/kit'
 import { resolveClient } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
@@ -13,7 +13,7 @@ import {
   suspenseQueryGenerator,
 } from './generators'
 import { resolverReactQuery } from './resolvers/resolverReactQuery.ts'
-import type { PluginReactQuery } from './types.ts'
+import type { PluginReactQuery, ResolverReactQuery } from './types.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-react-query`. Used for driver lookups
@@ -84,7 +84,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     dependencies: [pluginTsName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
-        const resolver = userResolver ? { ...resolverReactQuery, ...userResolver } : resolverReactQuery
+        const resolver = userResolver ? Resolver.merge<ResolverReactQuery>(resolverReactQuery, userResolver) : resolverReactQuery
 
         const pluginNames = (ctx.config.plugins ?? []).map((p) => (p as { name?: string }).name).filter((name): name is string => Boolean(name))
         const resolvedClient = resolveClient({ client, pluginNames })

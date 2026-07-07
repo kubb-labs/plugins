@@ -34,15 +34,15 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     }
 
     // The handler signature references the grouped `<Name>RequestConfig`.
-    const requestConfigName = tsResolver.resolveRequestConfigName(node)
+    const requestConfigName = tsResolver.response.config(node)
 
     const meta = {
-      name: resolver.resolveHandlerName(node),
-      file: resolver.resolveFile(
+      name: resolver.handler.name(node),
+      file: resolver.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output, group: group ?? undefined },
       ),
-      fileTs: tsResolver.resolveFile(
+      fileTs: tsResolver.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,

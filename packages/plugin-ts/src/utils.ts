@@ -82,7 +82,7 @@ export function buildParams(node: ast.OperationNode, { params, resolver }: Build
         required: param.required,
         schema: ast.factory.createSchema({
           type: 'ref',
-          name: resolver.resolveParamName(node, param),
+          name: resolver.param.name(node, param),
           optional: !param.required,
         }),
       }),
@@ -108,7 +108,7 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
         name: 'body',
         required: hasBody,
         schema: hasBody
-          ? ast.factory.createSchema({ type: 'ref', name: resolver.resolveBodyName(node) })
+          ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) })
           : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
       ast.factory.createProperty({
@@ -146,7 +146,7 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
  * query hooks and `result.data` use.
  */
 function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode, resolver: ResolverTs): ast.SchemaNode {
-  const statusName = resolver.resolveResponseStatusName(node, res.statusCode)
+  const statusName = resolver.response.status(node, res.statusCode)
   const variants = (res.content ?? []).filter((entry) => entry.schema)
   if (variants.length <= 1) {
     return ast.factory.createSchema({ type: 'ref', name: statusName })
@@ -199,6 +199,6 @@ export function buildResponseUnion(node: ast.OperationNode, { resolver }: BuildO
 
   return ast.factory.createSchema({
     type: 'union',
-    members: responsesWithSchema.map((res) => ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) })),
+    members: responsesWithSchema.map((res) => ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, res.statusCode) })),
   })
 }

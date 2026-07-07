@@ -33,7 +33,7 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   const { signature, groups } = buildRequestParamsSignature(node, resolver, { isConfigurable: false })
   const paramsSignature = [signature, 'options: Partial<Cypress.RequestOptions> = {}'].filter(Boolean).join(', ')
 
-  const responseType = resolver.resolveResponseName(node)
+  const responseType = resolver.response.response(node)
   const returnType = `Cypress.Chainable<${responseType}>`
 
   // Reference the path object straight in the URL with camelCase placeholders.

@@ -1,56 +1,89 @@
 import type { ClientSelector } from '@internals/client'
 import type { Transformer } from '@internals/tanstack-query'
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 export type { Transformer } from '@internals/tanstack-query'
 
 /**
- * Resolver for SWR that provides naming methods for hook functions.
+ * The concrete resolver type for `@kubb/plugin-swr`.
+ * Extends the base `Resolver` (which provides `default` naming and option helpers, the top-level
+ * `name` casing, and the `file` builder) with plugin-specific naming namespaces for the generated
+ * `useSWR` and `useSWRMutation` hooks and their companion helpers.
  */
 export type ResolverSwr = Resolver & {
   /**
-   * Resolves the base function name for an operation.
-   *
-   * @example Resolving base operation names
-   * `resolver.resolveName('show pet by id') // -> 'showPetById'`
+   * Naming for the generated `useSWR` hook and its companion helpers.
    */
-  resolveName(this: ResolverSwr, name: string): string
+  query: {
+    /**
+     * Resolves a query hook function name.
+     *
+     * @example Query hook names
+     * `resolver.query.name(node) // → 'useGetPetById'`
+     */
+    name(node: ast.OperationNode): string
+    /**
+     * Resolves the query options helper name.
+     *
+     * @example Query options helper names
+     * `resolver.query.optionsName(node) // → 'getPetByIdQueryOptions'`
+     */
+    optionsName(node: ast.OperationNode): string
+    /**
+     * Resolves the query key helper name.
+     *
+     * @example Query key helper names
+     * `resolver.query.keyName(node) // → 'getPetByIdQueryKey'`
+     */
+    keyName(node: ast.OperationNode): string
+    /**
+     * Resolves the query key type name.
+     *
+     * @example Query key type names
+     * `resolver.query.keyTypeName(node) // → 'GetPetByIdQueryKey'`
+     */
+    keyTypeName(node: ast.OperationNode): string
+    /**
+     * Resolves the client function name generated inline by query hooks.
+     *
+     * @example Client function names
+     * `resolver.query.clientName(node) // → 'getPetById'`
+     */
+    clientName(node: ast.OperationNode): string
+  }
   /**
-   * Resolves a query hook function name.
+   * Naming for the generated `useSWRMutation` hook and its companion helpers.
    */
-  resolveQueryName(this: ResolverSwr, node: ast.OperationNode): string
-  /**
-   * Resolves a mutation hook function name.
-   */
-  resolveMutationName(this: ResolverSwr, node: ast.OperationNode): string
-  /**
-   * Resolves the query options helper name.
-   */
-  resolveQueryOptionsName(this: ResolverSwr, node: ast.OperationNode): string
-  /**
-   * Resolves the query key helper name.
-   */
-  resolveQueryKeyName(this: ResolverSwr, node: ast.OperationNode): string
-  /**
-   * Resolves the mutation key helper name.
-   */
-  resolveMutationKeyName(this: ResolverSwr, node: ast.OperationNode): string
-  /**
-   * Resolves the query key type name.
-   */
-  resolveQueryKeyTypeName(this: ResolverSwr, node: ast.OperationNode): string
-  /**
-   * Resolves the mutation key type name.
-   */
-  resolveMutationKeyTypeName(this: ResolverSwr, node: ast.OperationNode): string
-  /**
-   * Resolves the mutation argument type name emitted alongside the mutation hook.
-   */
-  resolveMutationArgTypeName(this: ResolverSwr, node: ast.OperationNode): string
-  /**
-   * Resolves the client function name generated inline by query hooks.
-   */
-  resolveClientName(this: ResolverSwr, node: ast.OperationNode): string
+  mutation: {
+    /**
+     * Resolves a mutation hook function name.
+     *
+     * @example Mutation hook names
+     * `resolver.mutation.name(node) // → 'useUpdatePet'`
+     */
+    name(node: ast.OperationNode): string
+    /**
+     * Resolves the mutation key helper name.
+     *
+     * @example Mutation key helper names
+     * `resolver.mutation.keyName(node) // → 'updatePetMutationKey'`
+     */
+    keyName(node: ast.OperationNode): string
+    /**
+     * Resolves the mutation key type name.
+     *
+     * @example Mutation key type names
+     * `resolver.mutation.keyTypeName(node) // → 'UpdatePetMutationKey'`
+     */
+    keyTypeName(node: ast.OperationNode): string
+    /**
+     * Resolves the mutation argument type name emitted alongside the mutation hook.
+     *
+     * @example Mutation argument type names
+     * `resolver.mutation.argTypeName(node) // → 'UpdatePetMutationArg'`
+     */
+    argTypeName(node: ast.OperationNode): string
+  }
 }
 
 /**
@@ -148,7 +181,7 @@ export type Options = OutputOptions & {
   /**
    * Override naming conventions for function names and types.
    */
-  resolver?: Partial<ResolverSwr> & ThisType<ResolverSwr>
+  resolver?: ResolverPatch<ResolverSwr>
   /**
    * Macros that rewrite generated nodes before printing.
    */

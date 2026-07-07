@@ -21,13 +21,10 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const { driver, resolver, config, root } = ctx
     const { output, parser, baseURL, group } = ctx.options
 
-    const fileName = resolver.resolveName(node.operationId)
+    const fileName = resolver.name(node.operationId)
     const mock = {
-      name: resolver.resolveHandlerName(node),
-      file: resolver.resolveFile(
-        { name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output, group: group ?? undefined },
-      ),
+      name: resolver.handler.name(node),
+      file: resolver.file({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group: group ?? undefined }),
     }
 
     const fakerPlugin = parser === 'faker' ? driver.getPlugin(pluginFakerName) : null
@@ -46,26 +43,26 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const tsResolver = driver.getResolver(pluginTsName)
 
     const type = {
-      file: tsResolver.resolveFile(
+      file: tsResolver.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
       ),
-      responseName: tsResolver.resolveResponseName(node),
+      responseName: tsResolver.response.response(node),
     }
 
     const types = resolveResponseTypes(node, tsResolver)
     const successResponses = getOperationSuccessResponses(node)
     const hasSuccessSchema = successResponses.some((response) => !!response.content?.[0]?.schema)
 
-    const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveBodyName(node) : null
+    const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.response.body(node) : null
 
     return (
       <File
         baseName={mock.file.baseName}
         path={mock.file.path}
         meta={mock.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
+        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
+        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
       >
         <File.Import name={['http']} path="msw" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw" />

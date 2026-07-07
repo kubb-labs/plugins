@@ -35,12 +35,12 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const tsEnumType = pluginTs.options?.enum?.type
     const tsEnumTypeSuffix = pluginTs.options?.enum?.typeSuffix ?? 'Key'
     const schemaTypeName =
-      isEnumSchema && tsEnumType === 'asConst' ? tsResolver.resolveEnumKeyName({ name: schemaName }, tsEnumTypeSuffix) : tsResolver.resolveTypeName(schemaName)
+      isEnumSchema && tsEnumType === 'asConst' ? tsResolver.enum.keyName({ name: schemaName }, tsEnumTypeSuffix) : tsResolver.name(schemaName)
     const meta = {
-      name: resolver.resolveName(schemaName),
-      file: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }),
+      name: resolver.name(schemaName),
+      file: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }),
       typeName: schemaTypeName,
-      typeFile: tsResolver.resolveFile(
+      typeFile: tsResolver.file(
         { name: schemaName, extname: '.ts' },
         { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
       ),
@@ -68,8 +68,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     })
 
     const imports = adapter.getImports(node, (schemaName) => ({
-      name: resolver.resolveName(schemaName),
-      path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+      name: resolver.name(schemaName),
+      path: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
     }))
     const usedImports = filterUsedImports(imports, fakerText)
 
@@ -78,8 +78,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
@@ -114,8 +114,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const params = caseParams(node.parameters, 'camelcase')
     const paramEntries = params.map((param) => ({
       param,
-      name: resolveParamNameByLocation(resolver, node, param),
-      typeName: resolveParamNameByLocation(tsResolver, node, param),
+      name: resolveParamNameByLocation(resolver.param, node, param),
+      typeName: resolveParamNameByLocation(tsResolver.param, node, param),
     }))
     type RenderUnit = { schema: ast.SchemaNode | null; name: string; typeName: string; description?: string; skipImportNames: Array<string> }
 
@@ -154,19 +154,19 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const responseUnits = node.responses.flatMap((response) =>
       expandContentUnits(
         response.content ?? [],
-        resolver.resolveResponseStatusName(node, response.statusCode),
-        tsResolver.resolveResponseStatusName(node, response.statusCode),
+        resolver.response.status(node, response.statusCode),
+        tsResolver.response.status(node, response.statusCode),
         response.description,
       ),
     )
     const dataUnits = expandContentUnits(
       node.requestBody?.content ?? [],
-      resolver.resolveBodyName(node),
-      tsResolver.resolveBodyName(node),
+      resolver.response.body(node),
+      tsResolver.response.body(node),
       node.requestBody?.description,
       (schema) => ({ ...schema, description: node.requestBody?.description ?? schema.description }),
     )
-    const responseName = resolver.resolveResponseName(node)
+    const responseName = resolver.response.response(node)
     const localHelperNames = new Set([
       ...paramEntries.map((entry) => entry.name),
       ...responseUnits.map((unit) => unit.name),
@@ -176,11 +176,11 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
 
     const meta = {
-      file: resolver.resolveFile(
+      file: resolver.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output, group: group ?? undefined },
       ),
-      typeFile: tsResolver.resolveFile(
+      typeFile: tsResolver.file(
         {
           name: node.operationId,
           extname: '.ts',
@@ -198,8 +198,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     function resolveMockImports(schema: ast.SchemaNode) {
       return adapter
         .getImports(schema, (schemaName) => ({
-          name: resolver.resolveName(schemaName),
-          path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+          name: resolver.name(schemaName),
+          path: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
         }))
         .filter((entry) => entry.path !== meta.file.path)
     }
@@ -269,8 +269,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
@@ -303,7 +303,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         {renderEntry({
           schema: buildResponseUnionSchema(node, resolver),
           name: responseName,
-          typeName: tsResolver.resolveResponseName(node),
+          typeName: tsResolver.response.response(node),
           skipImportNames: responseUnits.map((unit) => unit.name),
         })}
       </File>

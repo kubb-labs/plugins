@@ -60,7 +60,7 @@ export type ZodResponseParse = {
  * `<operation>ResponseSchema` is used; error bodies are never zod-parsed.
  */
 export function buildZodResponseParse(node: ast.OperationNode, zodResolver: ResolverZod): ZodResponseParse | null {
-  const name = zodResolver.resolveResponseName?.(node)
+  const name = zodResolver.response.response(node)
   return name ? { expression: name, importNames: [name] } : null
 }
 
@@ -72,6 +72,6 @@ export function buildZodResponseParse(node: ast.OperationNode, zodResolver: Reso
 export function buildZodErrorParse(node: ast.OperationNode, zodResolver: ResolverZod): ZodResponseParse | null {
   const hasErrorResponse = node.responses.some((res) => !isSuccessStatusCode(res.statusCode) && res.content?.some((entry) => entry.schema))
   if (!hasErrorResponse) return null
-  const name = zodResolver.resolveErrorName?.(node)
+  const name = zodResolver.response.error?.(node)
   return name ? { expression: name, importNames: [name] } : null
 }

@@ -2,9 +2,9 @@ import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { getRelativePath } from '@internals/utils'
+import { ensureValidVarName, getRelativePath, pascalCase } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { AsyncEventEmitter, createKubb } from '@kubb/core'
+import { Hookable, createKubb } from '@kubb/core'
 import { type Config, Diagnostics, type KubbHooks } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -388,7 +388,7 @@ const configs = [
   },
   {
     /**
-     * Verifies that `resolver.resolveName` override is applied.
+     * Verifies that `resolver.name` override is applied.
      * Every operation-derived name (params, responses, etc.) gets a `Custom` prefix
      * while schema type names (which use `default(name, 'type')`) are unaffected.
      * Returning `null`/`undefined` from any method falls back to the preset resolver.
@@ -402,13 +402,10 @@ const configs = [
       parsers: [parserTs],
       plugins: [
         pluginTs({
-          output: { path: './types', barrel: false },
+          output: { path: './types', barrel: false, banner: '// Custom banner' },
           resolver: {
-            resolveBanner() {
-              return '// Custom banner'
-            },
-            resolveTypeName(name) {
-              return `Custom${this.default(name, 'function')}`
+            name(name: string) {
+              return `Custom${ensureValidVarName(pascalCase(name))}`
             },
           },
         }),
@@ -485,7 +482,7 @@ describe(`Main OpenAPI ${version}`, () => {
         },
       } as unknown as Config,
       {
-        hooks: new AsyncEventEmitter<KubbHooks>(),
+        hooks: new Hookable<KubbHooks>(),
       },
     ).safeBuild()
 

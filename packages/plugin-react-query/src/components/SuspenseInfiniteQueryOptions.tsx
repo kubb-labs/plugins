@@ -39,7 +39,7 @@ export function SuspenseInfiniteQueryOptions({
   queryKeyName,
 }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.response.response(node)
   const queryFnDataType = responseName
   const errorNames = resolveErrorNames(node, tsResolver)
   const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -63,8 +63,8 @@ export function SuspenseInfiniteQueryOptions({
   const queryParamsTypeName =
     rawQueryParams.length > 0
       ? (() => {
-          const groupName = tsResolver.resolveQueryName(node, rawQueryParams[0]!)
-          const individualName = tsResolver.resolveParamName(node, rawQueryParams[0]!)
+          const groupName = tsResolver.param.query(node, rawQueryParams[0]!)
+          const individualName = tsResolver.param.name(node, rawQueryParams[0]!)
           return groupName !== individualName ? groupName : null
         })()
       : null

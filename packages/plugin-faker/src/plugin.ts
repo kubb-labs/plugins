@@ -1,5 +1,5 @@
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin } from 'kubb/kit'
+import { definePlugin, Resolver } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { fakerGenerator } from './generators/fakerGenerator.tsx'
 import { resolverFaker } from './resolvers/resolverFaker.ts'
@@ -71,7 +71,7 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
           regexGenerator,
           printer,
         })
-        ctx.setResolver(userResolver ? { ...resolverFaker, ...userResolver } : resolverFaker)
+        ctx.setResolver(userResolver ? Resolver.merge(resolverFaker, userResolver) : resolverFaker)
         if (userMacros?.length) {
           ctx.setMacros(userMacros)
         }

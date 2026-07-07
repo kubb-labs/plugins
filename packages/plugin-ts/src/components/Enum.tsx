@@ -37,9 +37,9 @@ export function getEnumNames({ node, enum: enumOptions, resolver }: { node: ast.
   enumName: string
   typeName: string
 } {
-  const resolved = resolver.resolveTypeName(node.name!)
+  const resolved = resolver.name(node.name!)
   const enumName = enumOptions.constCasing === 'pascalCase' ? resolved : camelCase(node.name!)
-  const typeName = ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) ? resolver.resolveEnumKeyName(node, enumOptions.typeSuffix) : resolved
+  const typeName = ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) ? resolver.enum.keyName(node, enumOptions.typeSuffix) : resolved
 
   return { enumName, typeName }
 }

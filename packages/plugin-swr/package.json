@@ -73,7 +73,6 @@
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
-    "@internals/utils": "workspace:*",
     "kubb": "catalog:"
   },
   "peerDependencies": {

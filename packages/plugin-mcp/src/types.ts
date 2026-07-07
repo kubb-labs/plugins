@@ -1,21 +1,22 @@
 import type { ClientSelector } from '@internals/client'
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 /**
  * Resolver for MCP that provides naming methods for handler functions.
  */
 export type ResolverMcp = Resolver & {
   /**
-   * Resolves the base handler function name for an operation.
-   *
-   * @example Resolving handler function names
-   * `resolver.resolveName('show pet by id') // -> 'showPetByIdHandler'`
+   * Naming for the generated MCP tool handler functions.
    */
-  resolveName(this: ResolverMcp, name: string): string
-  /**
-   * Resolves the handler function name for an operation.
-   */
-  resolveHandlerName(this: ResolverMcp, node: ast.OperationNode): string
+  handler: {
+    /**
+     * Resolves the handler function name for an operation.
+     *
+     * @example Resolving handler function names
+     * `resolver.handler.name(operationNode) // -> 'showPetByIdHandler'`
+     */
+    name(node: ast.OperationNode): string
+  }
 }
 
 /**
@@ -52,7 +53,7 @@ export type Options = OutputOptions & {
    * Override how handler names and file paths are built. Methods you omit fall
    * back to the default `resolverMcp`.
    */
-  resolver?: Partial<ResolverMcp> & ThisType<ResolverMcp>
+  resolver?: ResolverPatch<ResolverMcp>
   /**
    * Macros applied to each operation node before printing.
    */

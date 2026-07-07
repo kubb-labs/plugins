@@ -1,21 +1,22 @@
-import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 /**
  * Resolver for MSW that provides naming methods for handler functions.
  */
 export type ResolverMsw = Resolver & {
   /**
-   * Resolves the base handler function name for an operation.
+   * Naming for generated MSW handlers.
    */
-  resolveName(this: ResolverMsw, name: string): string
-  /**
-   * Resolves the handler function name for an operation.
-   */
-  resolveHandlerName(this: ResolverMsw, node: ast.OperationNode): string
-  /**
-   * Resolves the exported handlers collection name.
-   */
-  resolveHandlersName(this: ResolverMsw): string
+  handler: {
+    /**
+     * Resolves the handler function name for an operation.
+     */
+    name(node: ast.OperationNode): string
+    /**
+     * Resolves the exported handlers collection name.
+     */
+    listName(): string
+  }
 }
 
 /**
@@ -45,7 +46,7 @@ export type Options = OutputOptions & {
   /**
    * Override how handler names and file paths are built.
    */
-  resolver?: Partial<ResolverMsw> & ThisType<ResolverMsw>
+  resolver?: ResolverPatch<ResolverMsw>
   /**
    * Macros applied to operation nodes before printing.
    */

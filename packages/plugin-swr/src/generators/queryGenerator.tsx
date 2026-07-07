@@ -37,21 +37,21 @@ export const queryGenerator = defineGenerator<PluginSwr>({
     const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output })
     if (!contractOp) return null
 
-    const queryName = resolver.resolveQueryName(node)
-    const queryOptionsName = resolver.resolveQueryOptionsName(node)
-    const queryKeyName = resolver.resolveQueryKeyName(node)
-    const queryKeyTypeName = resolver.resolveQueryKeyTypeName(node)
+    const queryName = resolver.query.name(node)
+    const queryOptionsName = resolver.query.optionsName(node)
+    const queryKeyName = resolver.query.keyName(node)
+    const queryKeyTypeName = resolver.query.keyTypeName(node)
 
     const meta = {
-      file: resolver.resolveFile({ name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
-      fileTs: tsResolver.resolveFile(
+      file: resolver.file({ name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
+      fileTs: tsResolver.file(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
       ),
     }
 
     const importedTypeNames = [
-      tsResolver.resolveRequestConfigName(node),
+      tsResolver.response.config(node),
       ...resolveOperationTypeNames(node, tsResolver, {
         exclude: [queryKeyTypeName],
         order: 'body-response-first',
@@ -66,8 +66,8 @@ export const queryGenerator = defineGenerator<PluginSwr>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
         <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />

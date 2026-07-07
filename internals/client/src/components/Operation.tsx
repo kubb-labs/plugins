@@ -95,7 +95,7 @@ export function Operation({ name, node, tsResolver, zodResolver, validator, secu
     .filter(Boolean)
     .join(', ')} }`
 
-  const eventType = `SuccessOf<${tsResolver.resolveResponsesName(node)}>`
+  const eventType = `SuccessOf<${tsResolver.response.responses(node)}>`
   const returnType = eventStream ? `Promise<EventStreamResult<${eventType}>>` : signature.returnType
   const returnStatement = eventStream ? `return toEventStream<${eventType}>(request(${callConfig}))` : buildReturnStatement({ node, tsResolver, callConfig })
 

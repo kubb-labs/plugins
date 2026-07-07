@@ -233,7 +233,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         // `nameMapping` (keyed by the full $ref) carries the collision-resolved name when the
         // referenced component was renamed; otherwise fall back to the short ref name.
         const refName = node.ref ? (this.options.nameMapping?.get(node.ref) ?? ast.extractRefName(node.ref) ?? node.name) : node.name
-        const resolvedName = node.ref ? (this.options.resolver?.default(refName, 'function') ?? refName) : node.name
+        const resolvedName = node.ref ? (this.options.resolver?.name(refName) ?? refName) : node.name
 
         if (node.ref && this.options.cyclicSchemas?.has(refName)) {
           return `z.lazy(() => ${resolvedName})`

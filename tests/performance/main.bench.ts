@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { adapterOas } from '@kubb/adapter-oas'
-import { AsyncEventEmitter, createKubb } from '@kubb/core'
+import { Hookable, createKubb } from '@kubb/core'
 import { type Plugin } from 'kubb/kit'
 import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginFaker } from '@kubb/plugin-faker'
@@ -49,7 +49,7 @@ describe('Plugin Generation Performance', () => {
         ] as Plugin[],
       })
 
-      const hooks = new AsyncEventEmitter()
+      const hooks = new Hookable()
       await createKubb(config, { hooks }).build()
     },
     {
@@ -87,7 +87,7 @@ describe('Plugin Generation Performance', () => {
         ] as Plugin[],
       })
 
-      const hooks = new AsyncEventEmitter()
+      const hooks = new Hookable()
       await createKubb(config, { hooks }).build()
     },
     {
@@ -138,7 +138,7 @@ describe('Plugin Generation Performance', () => {
         ] as Plugin[],
       })
 
-      const hooks = new AsyncEventEmitter()
+      const hooks = new Hookable()
       await createKubb(config, { hooks }).build()
     },
     {

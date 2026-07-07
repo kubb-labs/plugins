@@ -1,7 +1,5 @@
-import { createHash } from 'node:crypto'
-import path from 'node:path'
 import { camelCase, ensureValidVarName, toFilePath } from '@internals/utils'
-import { defineResolver } from 'kubb/kit'
+import { createResolver } from 'kubb/kit'
 import type { PluginFaker } from '../types.ts'
 
 /**
@@ -13,69 +11,49 @@ import type { PluginFaker } from '../types.ts'
  * ```ts
  * import { resolverFaker } from '@kubb/plugin-faker'
  *
- * resolverFaker.default('list pets', 'function') // 'createListPets'
+ * resolverFaker.name('list pets') // 'createListPets'
  * ```
  */
-export const resolverFaker = defineResolver<PluginFaker>(() => {
-  return {
-    name: 'default',
-    pluginName: 'plugin-faker',
-    default(name, type) {
-      if (type === 'file') return toFilePath(name, (part) => camelCase(part, { prefix: 'create' }))
-      return ensureValidVarName(camelCase(name, { prefix: 'create' }))
+export const resolverFaker = createResolver<PluginFaker>({
+  pluginName: 'plugin-faker',
+  name(name) {
+    return ensureValidVarName(camelCase(name, { prefix: 'create' }))
+  },
+  file(params, context) {
+    return this.default.file(
+      {
+        ...params,
+        resolveName: (name) => toFilePath(name, (part) => camelCase(part, { prefix: 'create' })),
+      },
+      context,
+    )
+  },
+  param: {
+    name(node, param) {
+      return this.name(`${node.operationId} ${param.in} ${param.name}`)
     },
-    resolveName(name, type) {
-      return this.default(name, type)
+    path(node, param) {
+      return this.param.name(node, param)
     },
-    resolveFile({ name, extname, tag, path: groupPath }, context) {
-      const resolvedName = context.output.mode === 'file' ? '' : this.resolveName(name, 'file')
-      const inputBaseName = `${resolvedName}${extname}` as `${string}.${string}`
-      const filePath = this.resolvePath(
-        {
-          baseName: inputBaseName,
-          tag,
-          path: groupPath,
-        },
-        context,
-      )
-      const baseName = path.basename(filePath) as `${string}.${string}`
-
-      return {
-        kind: 'File',
-        id: createHash('sha256').update(filePath).digest('hex'),
-        name: path.basename(filePath, extname),
-        path: filePath,
-        baseName,
-        extname,
-        meta: { pluginName: this.pluginName },
-        sources: [],
-        imports: [],
-        exports: [],
-      }
+    query(node, param) {
+      return this.param.name(node, param)
     },
-    resolveParamName(node, param) {
-      return this.resolveName(`${node.operationId} ${param.in} ${param.name}`)
+    headers(node, param) {
+      return this.param.name(node, param)
     },
-    resolveBodyName(node) {
-      return this.resolveName(`${node.operationId} Body`)
+  },
+  response: {
+    status(node, statusCode) {
+      return this.name(`${node.operationId} Status ${statusCode}`)
     },
-    resolveResponseStatusName(node, statusCode) {
-      return this.resolveName(`${node.operationId} Status ${statusCode}`)
+    body(node) {
+      return this.name(`${node.operationId} Body`)
     },
-    resolveResponseName(node) {
-      return this.resolveName(`${node.operationId} Response`)
+    response(node) {
+      return this.name(`${node.operationId} Response`)
     },
-    resolveResponsesName(node) {
-      return this.resolveName(`${node.operationId} Responses`)
+    responses(node) {
+      return this.name(`${node.operationId} Responses`)
     },
-    resolvePathName(node, param) {
-      return this.resolveParamName(node, param)
-    },
-    resolveQueryName(node, param) {
-      return this.resolveParamName(node, param)
-    },
-    resolveHeadersName(node, param) {
-      return this.resolveParamName(node, param)
-    },
-  }
+  },
 })

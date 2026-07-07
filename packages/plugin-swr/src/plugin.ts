@@ -1,11 +1,11 @@
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin } from 'kubb/kit'
+import { definePlugin, Resolver } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { resolveClient } from '@internals/client'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { mutationGenerator, queryGenerator } from './generators'
 import { resolverSwr } from './resolvers/resolverSwr.ts'
-import type { PluginSwr } from './types.ts'
+import type { PluginSwr, ResolverSwr } from './types.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-swr`. Used for driver lookups and cross-plugin
@@ -60,7 +60,7 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
     dependencies: [pluginTsName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
-        const resolver = userResolver ? { ...resolverSwr, ...userResolver } : resolverSwr
+        const resolver = userResolver ? Resolver.merge<ResolverSwr>(resolverSwr, userResolver) : resolverSwr
 
         const pluginNames = (ctx.config.plugins ?? []).map((p) => (p as { name?: string }).name).filter((name): name is string => Boolean(name))
         const resolvedClient = resolveClient({ client, pluginNames })
