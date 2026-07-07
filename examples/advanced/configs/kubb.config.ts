@@ -190,7 +190,7 @@ export default defineConfig({
           return `${resolverFaker.name(name)}Faker`
         },
         file: {
-          name(name) {
+          baseName(name) {
             return `${resolverFaker.name(name)}Faker`
           },
         },
