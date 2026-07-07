@@ -1,0 +1,19 @@
+.changeset/knip-remove-unused-internals-utils-deps.md
+  s_0ec2427ac772e6::t_6225a541e9556b 1-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "22f122170dc2330e788d54e9c2278c03f867cfb8",
+  "prompts": {},
+  "sessions": {
+    "s_0ec2427ac772e6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cc212391-94d7-4bfb-919b-3d74d9302904",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Stijn Van Hulle <stijn.vanhulle@robovision.eu>"
+    }
+  }
+}
