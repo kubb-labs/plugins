@@ -189,6 +189,11 @@ export default defineConfig({
         name(name) {
           return `${resolverFaker.name(name)}Faker`
         },
+        file: {
+          name(name) {
+            return `${resolverFaker.name(name)}Faker`
+          },
+        },
       },
     }),
     pluginCypress({
