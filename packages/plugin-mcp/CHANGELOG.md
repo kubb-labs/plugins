@@ -1,5 +1,46 @@
 # @kubb/plugin-mcp
 
+## 5.0.0-beta.86
+
+### Minor Changes
+
+- [#637](https://github.com/kubb-labs/plugins/pull/637) [`55f28f0`](https://github.com/kubb-labs/plugins/commit/55f28f0b3d9b0a070066b8b72ecacb6c8d1ab29a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Simplify the resolver naming API so the request-part resolvers line up with the generated object keys, and drop the redundant `resolvePathName`.
+
+  `resolvePathName(name, type)` duplicated `default(name, type)` on every resolver, so it is removed. Call `default` directly where you previously called `resolvePathName`:
+
+  ```ts
+  // before
+  resolver.resolveFile(
+    { name: resolver.resolvePathName(name, "file"), extname: ".ts" },
+    context,
+  );
+
+  // after
+  resolver.resolveFile(
+    { name: resolver.default(name, "file"), extname: ".ts" },
+    context,
+  );
+  ```
+
+  The request-part resolvers now use the same `body` / `path` / `query` / `headers` vocabulary as the generated `RequestConfig` object:
+
+  | Before                    | After                |
+  | ------------------------- | -------------------- |
+  | `resolveDataName`         | `resolveBodyName`    |
+  | `resolvePathParamsName`   | `resolvePathName`    |
+  | `resolveQueryParamsName`  | `resolveQueryName`   |
+  | `resolveHeaderParamsName` | `resolveHeadersName` |
+
+  The request body type also drops its `Data` suffix in favor of `Body`, so generated names change: `CreatePetData` becomes `CreatePetBody`, and the Zod schema `createPetDataSchema` becomes `createPetBodySchema`. Custom resolvers that override these methods, and code that imports the generated names, need updating.
+
+  Note that `resolvePathName` is reused: the old file-name method of that name is gone, and it now names the grouped path-parameters resolver `resolvePathName(node, param)`.
+
+### Patch Changes
+
+- Updated dependencies [[`55f28f0`](https://github.com/kubb-labs/plugins/commit/55f28f0b3d9b0a070066b8b72ecacb6c8d1ab29a)]:
+  - @kubb/plugin-ts@5.0.0-beta.85
+  - @kubb/plugin-zod@5.0.0-beta.85
+
 ## 5.0.0-beta.85
 
 ### Patch Changes
