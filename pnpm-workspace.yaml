@@ -12,22 +12,22 @@ allowBuilds:
   vue-demi: true
 
 catalog:
-  '@kubb/adapter-oas': 5.0.0-beta.85
-  '@kubb/core': 5.0.0-beta.85
-  '@kubb/kit': 5.0.0-beta.85
-  '@kubb/plugin-barrel': 5.0.0-beta.85
-  '@kubb/parser-ts': 5.0.0-beta.85
+  '@kubb/adapter-oas': 5.0.0-beta.86
+  '@kubb/core': 5.0.0-beta.86
+  '@kubb/kit': 5.0.0-beta.86
+  '@kubb/plugin-barrel': 5.0.0-beta.86
+  '@kubb/parser-ts': 5.0.0-beta.86
   '@types/node': ^22.20.0
   '@types/react': ^19.2.17
   '@vitest/coverage-v8': ^4.1.9
   '@vitest/ui': ^4.1.9
-  kubb: 5.0.0-beta.85
+  kubb: 5.0.0-beta.86
   oxfmt: ^0.56.0
   oxlint: ^1.72.0
   prettier: ^3.9.4
   tsdown: ^0.22.3
   typescript: ^6.0.3
-  unplugin-kubb: 5.0.0-beta.85
+  unplugin-kubb: 5.0.0-beta.86
   vitest: ^4.1.9
 #
 #overrides:
