@@ -6,7 +6,7 @@ import type {
   AddFilesStatus200,
   AddFilesStatus405,
 } from '../../models/ts/pet/AddFiles.ts'
-import { createPetFaker } from '../createPetFaker.ts'
+import { createPetFaker } from '../createPet.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

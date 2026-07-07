@@ -6,9 +6,9 @@ import type {
   CreatePetsStatus201,
   CreatePetsStatusDefault,
 } from '../../models/ts/pets/CreatePets.ts'
-import { createCreatePetsBoolParamFaker } from '../createCreatePetsBoolParamFaker.ts'
-import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLEFaker.ts'
-import { createPetNotFoundFaker } from '../createPetNotFoundFaker.ts'
+import { createCreatePetsBoolParamFaker } from '../createCreatePetsBoolParam.ts'
+import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLE.ts'
+import { createPetNotFoundFaker } from '../createPetNotFound.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createCreatePetsQueryBoolParamFaker(data?: Partial<CreatePetsQueryBoolParam>): CreatePetsQueryBoolParam {

@@ -12,7 +12,7 @@ import type {
   UpdatePetStatus404,
   UpdatePetStatus405,
 } from '../../models/ts/pet/UpdatePet.ts'
-import { createPetFaker } from '../createPetFaker.ts'
+import { createPetFaker } from '../createPet.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

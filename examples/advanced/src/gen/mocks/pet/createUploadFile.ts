@@ -1,5 +1,5 @@
 import type { UploadFileResponse, UploadFileStatus200 } from '../../models/ts/pet/UploadFile.ts'
-import { createApiResponseFaker } from '../createApiResponseFaker.ts'
+import { createApiResponseFaker } from '../createApiResponse.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createUploadFilePathPetIdFaker(data?: number): number {

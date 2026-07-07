@@ -7,8 +7,8 @@ import type {
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
 } from '../../models/ts/pet/FindPetsByTags.ts'
-import { createFindPetsByTagsXEXAMPLEFaker } from '../createFindPetsByTagsXEXAMPLEFaker.ts'
-import { createPetFaker } from '../createPetFaker.ts'
+import { createFindPetsByTagsXEXAMPLEFaker } from '../createFindPetsByTagsXEXAMPLE.ts'
+import { createPetFaker } from '../createPet.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createFindPetsByTagsQueryTagsFaker(data?: FindPetsByTagsQueryTags): FindPetsByTagsQueryTags {
