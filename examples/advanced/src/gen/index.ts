@@ -334,125 +334,116 @@ export { updatePetMutationKey, updatePetMutationOptions, useUpdatePet } from './
 export { updatePetWithFormMutationKey, updatePetWithFormMutationOptions, useUpdatePetWithForm } from './clients/hooks/pet/useUpdatePetWithForm.ts'
 export { uploadFileMutationKey, uploadFileMutationOptions, useUploadFile } from './clients/hooks/pet/useUploadFile.ts'
 export { createPetsMutationKey, createPetsMutationOptions, useCreatePets } from './clients/hooks/pets/useCreatePets.ts'
-export { createAddPetRequestFaker } from './mocks/createAddPetRequestFaker.ts'
-export { createAddPetRequestStatusEnumFaker } from './mocks/createAddPetRequestStatusEnumFaker.ts'
-export { createAnimalFaker } from './mocks/createAnimalFaker.ts'
-export { createAnimalTypeEnumFaker } from './mocks/createAnimalTypeEnumFaker.ts'
-export { createApiResponseFaker } from './mocks/createApiResponseFaker.ts'
-export { createCatFaker } from './mocks/createCatFaker.ts'
-export { createCategoryFaker } from './mocks/createCategoryFaker.ts'
-export { createCreatePetsBoolParamFaker } from './mocks/createCreatePetsBoolParamFaker.ts'
-export { createCreatePetsXEXAMPLEFaker } from './mocks/createCreatePetsXEXAMPLEFaker.ts'
-export { createDogFaker } from './mocks/createDogFaker.ts'
-export { createFindPetsByTagsXEXAMPLEFaker } from './mocks/createFindPetsByTagsXEXAMPLEFaker.ts'
-export { createImageFaker } from './mocks/createImageFaker.ts'
-export { createOrderFaker } from './mocks/createOrderFaker.ts'
-export { createOrderHttpStatusEnumFaker } from './mocks/createOrderHttpStatusEnumFaker.ts'
-export { createOrderOrderTypeEnumFaker } from './mocks/createOrderOrderTypeEnumFaker.ts'
-export { createOrderParamsStatusEnumFaker } from './mocks/createOrderParamsStatusEnumFaker.ts'
-export { createOrderStatusEnumFaker } from './mocks/createOrderStatusEnumFaker.ts'
-export { createPetEventFaker } from './mocks/createPetEventFaker.ts'
-export { createPetEventTypeEnumFaker } from './mocks/createPetEventTypeEnumFaker.ts'
-export { createPetFaker } from './mocks/createPetFaker.ts'
-export { createPetNotFoundFaker } from './mocks/createPetNotFoundFaker.ts'
-export { createPetStatusEnumFaker } from './mocks/createPetStatusEnumFaker.ts'
+export { createAddPetRequest } from './mocks/createAddPetRequest.ts'
+export { createAddPetRequestStatusEnum } from './mocks/createAddPetRequestStatusEnum.ts'
+export { createAnimal } from './mocks/createAnimal.ts'
+export { createAnimalTypeEnum } from './mocks/createAnimalTypeEnum.ts'
+export { createApiResponse } from './mocks/createApiResponse.ts'
+export { createCat } from './mocks/createCat.ts'
+export { createCategory } from './mocks/createCategory.ts'
+export { createCreatePetsBoolParam } from './mocks/createCreatePetsBoolParam.ts'
+export { createCreatePetsXEXAMPLE } from './mocks/createCreatePetsXEXAMPLE.ts'
+export { createDog } from './mocks/createDog.ts'
+export { createFindPetsByTagsXEXAMPLE } from './mocks/createFindPetsByTagsXEXAMPLE.ts'
+export { createImage } from './mocks/createImage.ts'
+export { createOrder } from './mocks/createOrder.ts'
+export { createOrderHttpStatusEnum } from './mocks/createOrderHttpStatusEnum.ts'
+export { createOrderOrderTypeEnum } from './mocks/createOrderOrderTypeEnum.ts'
+export { createOrderParamsStatusEnum } from './mocks/createOrderParamsStatusEnum.ts'
+export { createOrderStatusEnum } from './mocks/createOrderStatusEnum.ts'
+export { createPet } from './mocks/createPet.ts'
+export { createPetEvent } from './mocks/createPetEvent.ts'
+export { createPetEventTypeEnum } from './mocks/createPetEventTypeEnum.ts'
+export { createPetNotFound } from './mocks/createPetNotFound.ts'
+export { createPetStatusEnum } from './mocks/createPetStatusEnum.ts'
 export {
-  createAddFilesBodyFaker,
-  createAddFilesBodyFakerFormData,
-  createAddFilesBodyFakerJson,
-  createAddFilesResponseFaker,
-  createAddFilesStatus200Faker,
-  createAddFilesStatus405Faker,
-} from './mocks/pet/createAddFilesFaker.ts'
+  createAddFilesBody,
+  createAddFilesBodyFormData,
+  createAddFilesBodyJson,
+  createAddFilesResponse,
+  createAddFilesStatus200,
+  createAddFilesStatus405,
+} from './mocks/pet/createAddFiles.ts'
 export {
-  createAddPetBodyFaker,
-  createAddPetBodyFakerFormUrlEncoded,
-  createAddPetBodyFakerJson,
-  createAddPetBodyFakerXml,
-  createAddPetResponseFaker,
-  createAddPetStatus405Faker,
-  createAddPetStatusDefaultFaker,
-  createAddPetStatusDefaultFakerJson,
-  createAddPetStatusDefaultFakerXml,
-} from './mocks/pet/createAddPetFaker.ts'
+  createAddPetBody,
+  createAddPetBodyFormUrlEncoded,
+  createAddPetBodyJson,
+  createAddPetBodyXml,
+  createAddPetResponse,
+  createAddPetStatus405,
+  createAddPetStatusDefault,
+  createAddPetStatusDefaultJson,
+  createAddPetStatusDefaultXml,
+} from './mocks/pet/createAddPet.ts'
+export { createDeletePetHeaderApiKey, createDeletePetPathPetId, createDeletePetResponse, createDeletePetStatus400 } from './mocks/pet/createDeletePet.ts'
 export {
-  createDeletePetHeaderApiKeyFaker,
-  createDeletePetPathPetIdFaker,
-  createDeletePetResponseFaker,
-  createDeletePetStatus400Faker,
-} from './mocks/pet/createDeletePetFaker.ts'
+  createFindPetsByStatusPathStepId,
+  createFindPetsByStatusResponse,
+  createFindPetsByStatusStatus200,
+  createFindPetsByStatusStatus200Json,
+  createFindPetsByStatusStatus200Xml,
+  createFindPetsByStatusStatus400,
+} from './mocks/pet/createFindPetsByStatus.ts'
 export {
-  createFindPetsByStatusPathStepIdFaker,
-  createFindPetsByStatusResponseFaker,
-  createFindPetsByStatusStatus200Faker,
-  createFindPetsByStatusStatus200FakerJson,
-  createFindPetsByStatusStatus200FakerXml,
-  createFindPetsByStatusStatus400Faker,
-} from './mocks/pet/createFindPetsByStatusFaker.ts'
+  createFindPetsByTagsHeaderXEXAMPLE,
+  createFindPetsByTagsQueryPage,
+  createFindPetsByTagsQueryPageSize,
+  createFindPetsByTagsQueryTags,
+  createFindPetsByTagsResponse,
+  createFindPetsByTagsStatus200,
+  createFindPetsByTagsStatus200Json,
+  createFindPetsByTagsStatus200Xml,
+  createFindPetsByTagsStatus400,
+} from './mocks/pet/createFindPetsByTags.ts'
 export {
-  createFindPetsByTagsHeaderXEXAMPLEFaker,
-  createFindPetsByTagsQueryPageFaker,
-  createFindPetsByTagsQueryPageSizeFaker,
-  createFindPetsByTagsQueryTagsFaker,
-  createFindPetsByTagsResponseFaker,
-  createFindPetsByTagsStatus200Faker,
-  createFindPetsByTagsStatus200FakerJson,
-  createFindPetsByTagsStatus200FakerXml,
-  createFindPetsByTagsStatus400Faker,
-} from './mocks/pet/createFindPetsByTagsFaker.ts'
+  createGetPetByIdPathPetId,
+  createGetPetByIdResponse,
+  createGetPetByIdStatus200,
+  createGetPetByIdStatus200Json,
+  createGetPetByIdStatus200Xml,
+  createGetPetByIdStatus400,
+  createGetPetByIdStatus404,
+} from './mocks/pet/createGetPetById.ts'
 export {
-  createGetPetByIdPathPetIdFaker,
-  createGetPetByIdResponseFaker,
-  createGetPetByIdStatus200Faker,
-  createGetPetByIdStatus200FakerJson,
-  createGetPetByIdStatus200FakerXml,
-  createGetPetByIdStatus400Faker,
-  createGetPetByIdStatus404Faker,
-} from './mocks/pet/createGetPetByIdFaker.ts'
+  createUpdatePetBody,
+  createUpdatePetBodyFormUrlEncoded,
+  createUpdatePetBodyJson,
+  createUpdatePetBodyXml,
+  createUpdatePetResponse,
+  createUpdatePetStatus200,
+  createUpdatePetStatus200Json,
+  createUpdatePetStatus200Xml,
+  createUpdatePetStatus202,
+  createUpdatePetStatus400,
+  createUpdatePetStatus404,
+  createUpdatePetStatus405,
+} from './mocks/pet/createUpdatePet.ts'
 export {
-  createUpdatePetBodyFaker,
-  createUpdatePetBodyFakerFormUrlEncoded,
-  createUpdatePetBodyFakerJson,
-  createUpdatePetBodyFakerXml,
-  createUpdatePetResponseFaker,
-  createUpdatePetStatus200Faker,
-  createUpdatePetStatus200FakerJson,
-  createUpdatePetStatus200FakerXml,
-  createUpdatePetStatus202Faker,
-  createUpdatePetStatus400Faker,
-  createUpdatePetStatus404Faker,
-  createUpdatePetStatus405Faker,
-} from './mocks/pet/createUpdatePetFaker.ts'
+  createUpdatePetWithFormPathPetId,
+  createUpdatePetWithFormQueryName,
+  createUpdatePetWithFormQueryStatus,
+  createUpdatePetWithFormResponse,
+  createUpdatePetWithFormStatus405,
+} from './mocks/pet/createUpdatePetWithForm.ts'
 export {
-  createUpdatePetWithFormPathPetIdFaker,
-  createUpdatePetWithFormQueryNameFaker,
-  createUpdatePetWithFormQueryStatusFaker,
-  createUpdatePetWithFormResponseFaker,
-  createUpdatePetWithFormStatus405Faker,
-} from './mocks/pet/createUpdatePetWithFormFaker.ts'
+  createUploadFileBody,
+  createUploadFilePathPetId,
+  createUploadFileQueryAdditionalMetadata,
+  createUploadFileResponse,
+  createUploadFileStatus200,
+} from './mocks/pet/createUploadFile.ts'
 export {
-  createUploadFileBodyFaker,
-  createUploadFilePathPetIdFaker,
-  createUploadFileQueryAdditionalMetadataFaker,
-  createUploadFileResponseFaker,
-  createUploadFileStatus200Faker,
-} from './mocks/pet/createUploadFileFaker.ts'
-export {
-  createCreatePetsBodyFaker,
-  createCreatePetsHeaderXEXAMPLEFaker,
-  createCreatePetsPathUuidFaker,
-  createCreatePetsQueryBoolParamFaker,
-  createCreatePetsQueryOffsetFaker,
-  createCreatePetsResponseFaker,
-  createCreatePetsStatus201Faker,
-  createCreatePetsStatusDefaultFaker,
-} from './mocks/pets/createCreatePetsFaker.ts'
-export {
-  createStreamPetEventsPathPetIdFaker,
-  createStreamPetEventsResponseFaker,
-  createStreamPetEventsStatus200Faker,
-} from './mocks/stream/createStreamPetEventsFaker.ts'
-export { createTagTagFaker } from './mocks/tag/createTagFaker.ts'
+  createCreatePetsBody,
+  createCreatePetsHeaderXEXAMPLE,
+  createCreatePetsPathUuid,
+  createCreatePetsQueryBoolParam,
+  createCreatePetsQueryOffset,
+  createCreatePetsResponse,
+  createCreatePetsStatus201,
+  createCreatePetsStatusDefault,
+} from './mocks/pets/createCreatePets.ts'
+export { createStreamPetEventsPathPetId, createStreamPetEventsResponse, createStreamPetEventsStatus200 } from './mocks/stream/createStreamPetEvents.ts'
+export { createTagTag } from './mocks/tag/createTag.ts'
 export { addPetRequestStatusEnum } from './models/ts/AddPetRequestStatusEnum.ts'
 export { animalTypeEnum } from './models/ts/AnimalTypeEnum.ts'
 export { createPetsBoolParam } from './models/ts/CreatePetsBoolParam.ts'

@@ -1,0 +1,45 @@
+import type {
+  FindPetsByStatusResponse,
+  FindPetsByStatusStatus200,
+  FindPetsByStatusStatus200Json,
+  FindPetsByStatusStatus200Xml,
+  FindPetsByStatusStatus400,
+} from '../../models/ts/pet/FindPetsByStatus.ts'
+import { createPet } from '../createPet.ts'
+import { fakerEN as faker } from '@faker-js/faker'
+
+export function createFindPetsByStatusPathStepId(data?: string): string {
+  return data ?? faker.string.alpha()
+}
+
+/**
+ * @description successful operation
+ */
+export function createFindPetsByStatusStatus200Json(data?: FindPetsByStatusStatus200Json): FindPetsByStatusStatus200Json {
+  return [...faker.helpers.multiple(() => createPet(), { count: { min: 1, max: 3 } }), ...(data || [])]
+}
+
+/**
+ * @description successful operation
+ */
+export function createFindPetsByStatusStatus200Xml(data?: FindPetsByStatusStatus200Xml): FindPetsByStatusStatus200Xml {
+  return [...faker.helpers.multiple(() => createPet()), ...(data || [])]
+}
+
+/**
+ * @description successful operation
+ */
+export function createFindPetsByStatusStatus200(_data?: FindPetsByStatusStatus200): FindPetsByStatusStatus200 {
+  return faker.helpers.arrayElement([createFindPetsByStatusStatus200Json(), createFindPetsByStatusStatus200Xml()])
+}
+
+/**
+ * @description Invalid status value
+ */
+export function createFindPetsByStatusStatus400() {
+  return undefined
+}
+
+export function createFindPetsByStatusResponse(_data?: FindPetsByStatusResponse): FindPetsByStatusResponse {
+  return faker.helpers.arrayElement([createFindPetsByStatusStatus200(), createFindPetsByStatusStatus400()])
+}

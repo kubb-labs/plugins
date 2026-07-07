@@ -401,7 +401,7 @@ export {
   getThingsStatus201Schema,
   getThingsStatusDefaultSchema,
 } from './zod/getThingsSchema.ts'
-export { OperationSchema, OperationsMap, operations, paths } from './zod/operationsSchema.ts'
+export { OperationSchema, OperationsMap, operations, paths } from './zod/operations.ts'
 export { orderSchema } from './zod/orderSchema.ts'
 export { petNotFoundSchema } from './zod/petNotFoundSchema.ts'
 export { petSchema } from './zod/petSchema.ts'

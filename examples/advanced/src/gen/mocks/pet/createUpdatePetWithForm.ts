@@ -1,0 +1,24 @@
+import { fakerEN as faker } from '@faker-js/faker'
+
+export function createUpdatePetWithFormPathPetId(data?: number): number {
+  return data ?? faker.number.int()
+}
+
+export function createUpdatePetWithFormQueryName(data?: string): string {
+  return data ?? faker.string.alpha()
+}
+
+export function createUpdatePetWithFormQueryStatus(data?: string): string {
+  return data ?? faker.string.alpha()
+}
+
+/**
+ * @description Invalid input
+ */
+export function createUpdatePetWithFormStatus405() {
+  return undefined
+}
+
+export function createUpdatePetWithFormResponse() {
+  return undefined
+}
