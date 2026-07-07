@@ -1,0 +1,88 @@
+packages/plugin-swr/src/types.ts
+  s_0ec2427ac772e6::t_48bb9c08f9b04e 3,184
+packages/plugin-faker/src/plugin.ts
+  s_0ec2427ac772e6::t_71f7f815d2fb7a 2
+  s_0ec2427ac772e6::t_710e1dd777c443 74
+examples/advanced/configs/kubb.config.ts
+  s_0ec2427ac772e6::t_e4aaa24ffae138 190
+packages/plugin-mcp/src/plugin.ts
+  s_0ec2427ac772e6::t_e0facdcf4d3147 65
+  s_0ec2427ac772e6::t_71f7f815d2fb7a 4
+packages/plugin-react-query/src/plugin.ts
+  s_0ec2427ac772e6::t_e0facdcf4d3147 87
+  s_0ec2427ac772e6::t_71f7f815d2fb7a 2
+packages/plugin-vue-query/src/plugin.ts
+  s_0ec2427ac772e6::t_71f7f815d2fb7a 2
+  s_0ec2427ac772e6::t_e0facdcf4d3147 71
+packages/plugin-msw/src/plugin.ts
+  s_0ec2427ac772e6::t_e0facdcf4d3147 63
+  s_0ec2427ac772e6::t_71f7f815d2fb7a 2
+packages/plugin-ts/src/plugin.ts
+  s_0ec2427ac772e6::t_71f7f815d2fb7a 2
+  s_0ec2427ac772e6::t_710e1dd777c443 79
+packages/plugin-cypress/src/types.ts
+  s_0ec2427ac772e6::t_48bb9c08f9b04e 1,35
+packages/plugin-faker/src/types.ts
+  s_0ec2427ac772e6::t_48bb9c08f9b04e 1,134
+packages/plugin-msw/src/types.ts
+  s_0ec2427ac772e6::t_48bb9c08f9b04e 1,49
+packages/plugin-ts/src/types.ts
+  s_0ec2427ac772e6::t_48bb9c08f9b04e 1,263
+packages/plugin-mcp/src/types.ts
+  s_0ec2427ac772e6::t_48bb9c08f9b04e 2,56
+packages/plugin-faker/src/printers/printerFaker.test.ts
+  s_0ec2427ac772e6::t_7ae88c5a5283ea 70
+  s_0ec2427ac772e6::t_e03d47ac2a0540 69,71
+  s_0ec2427ac772e6::t_24494e74e5a4c9 1
+examples/zod/operationsPlugin.ts
+  s_0ec2427ac772e6::t_6ad92df2d2038a 89,94
+packages/plugin-cypress/src/plugin.ts
+  s_0ec2427ac772e6::t_71f7f815d2fb7a 2
+  s_0ec2427ac772e6::t_e0facdcf4d3147 57
+packages/plugin-zod/src/types.ts
+  s_0ec2427ac772e6::t_48bb9c08f9b04e 1,199
+packages/plugin-react-query/src/types.ts
+  s_0ec2427ac772e6::t_48bb9c08f9b04e 3,351
+packages/plugin-ts/src/generators/typeGenerator.test.ts
+  s_0ec2427ac772e6::t_3c78d60f90d189 5
+  s_0ec2427ac772e6::t_3eb53541006d74 86
+packages/plugin-redoc/src/types.ts
+  s_0ec2427ac772e6::t_c7ce8b8de82289 20
+packages/plugin-zod/src/plugin.ts
+  s_0ec2427ac772e6::t_71f7f815d2fb7a 2
+  s_0ec2427ac772e6::t_710e1dd777c443 78
+packages/plugin-axios/src/plugin.ts
+  s_0ec2427ac772e6::t_e0facdcf4d3147 61
+  s_0ec2427ac772e6::t_71f7f815d2fb7a 4
+internals/client/src/types.ts
+  s_0ec2427ac772e6::t_48bb9c08f9b04e 1,125
+tests/3.0.x/main.test.ts
+  s_0ec2427ac772e6::t_2cc4387a2927cd 405
+  s_0ec2427ac772e6::t_ef6b1c3ee7a55e 407
+packages/plugin-swr/src/plugin.ts
+  s_0ec2427ac772e6::t_e0facdcf4d3147 63
+  s_0ec2427ac772e6::t_71f7f815d2fb7a 2
+packages/plugin-fetch/src/plugin.ts
+  s_0ec2427ac772e6::t_71f7f815d2fb7a 4
+  s_0ec2427ac772e6::t_e0facdcf4d3147 61
+packages/plugin-vue-query/src/types.ts
+  s_0ec2427ac772e6::t_48bb9c08f9b04e 2,222
+pnpm-lock.yaml
+  s_0ec2427ac772e6::t_345b7954b75ed4 154,169,221,321,324,448,503,553,644,949,4473,4483,5028,5113,5117,5158,5490,5529,5532,5542,5553-5554,5616,5779,5781,6466,6504,6540
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "9ee0df3a680f23f1678929366017153145d02a61",
+  "prompts": {},
+  "sessions": {
+    "s_0ec2427ac772e6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cc212391-94d7-4bfb-919b-3d74d9302904",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Stijn Van Hulle <stijn.vanhulle@robovision.eu>"
+    }
+  }
+}
