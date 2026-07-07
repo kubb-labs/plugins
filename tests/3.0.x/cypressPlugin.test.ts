@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { AsyncEventEmitter, createKubb } from '@kubb/core'
+import { Hookable, createKubb } from '@kubb/core'
 import { type Config, Diagnostics, fsStorage, type KubbHooks } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginCypress } from '@kubb/plugin-cypress'
@@ -89,7 +89,7 @@ describe(`plugin-cypress options ${version}`, () => {
         },
       } as Config,
       {
-        hooks: new AsyncEventEmitter<KubbHooks>(),
+        hooks: new Hookable<KubbHooks>(),
       },
     ).safeBuild()
 

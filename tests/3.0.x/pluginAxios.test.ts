@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { AsyncEventEmitter, createKubb } from '@kubb/core'
+import { Hookable, createKubb } from '@kubb/core'
 import { type Config, Diagnostics, fsStorage, type KubbHooks } from 'kubb/kit'
 import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginBarrel } from '@kubb/plugin-barrel'
@@ -109,7 +109,7 @@ describe(`plugin-axios options ${version}`, () => {
         },
       } as Config,
       {
-        hooks: new AsyncEventEmitter<KubbHooks>(),
+        hooks: new Hookable<KubbHooks>(),
       },
     ).safeBuild()
 
@@ -148,7 +148,7 @@ describe(`plugin-axios options ${version}`, () => {
           }),
         ],
       } as Config,
-      { hooks: new AsyncEventEmitter<KubbHooks>() },
+      { hooks: new Hookable<KubbHooks>() },
     ).safeBuild()
 
     expect(files.length).toBeGreaterThan(0)
@@ -186,7 +186,7 @@ describe(`plugin-axios options ${version}`, () => {
           pluginAxios({ output: { path: './clients', barrel: { type: 'named' } }, sdk: {} }),
         ],
       } as Config,
-      { hooks: new AsyncEventEmitter<KubbHooks>() },
+      { hooks: new Hookable<KubbHooks>() },
     ).safeBuild()
 
     expect(Diagnostics.hasError(diagnostics)).toBe(false)

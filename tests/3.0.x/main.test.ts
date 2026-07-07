@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { ensureValidVarName, getRelativePath, pascalCase } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { AsyncEventEmitter, createKubb } from '@kubb/core'
+import { Hookable, createKubb } from '@kubb/core'
 import { type Config, Diagnostics, type KubbHooks } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -482,7 +482,7 @@ describe(`Main OpenAPI ${version}`, () => {
         },
       } as unknown as Config,
       {
-        hooks: new AsyncEventEmitter<KubbHooks>(),
+        hooks: new Hookable<KubbHooks>(),
       },
     ).safeBuild()
 
