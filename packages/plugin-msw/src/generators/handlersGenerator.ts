@@ -14,14 +14,19 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
     const { output, group } = ctx.options
 
     const handlersName = resolver.handler.listName()
-    const file = resolver.file({ name: handlersName, extname: '.ts' }, { root, output, group: group ?? undefined })
+    const file = resolver.file({ name: handlersName, extname: '.ts', root, output, group: group ?? undefined })
 
     const imports = nodes.map((node) => {
       const operationName = resolver.handler.name(node)
-      const operationFile = resolver.file(
-        { name: resolver.name(node.operationId), extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output, group: group ?? undefined },
-      )
+      const operationFile = resolver.file({
+        name: resolver.name(node.operationId),
+        extname: '.ts',
+        tag: node.tags[0] ?? 'default',
+        path: node.path,
+        root,
+        output,
+        group: group ?? undefined,
+      })
       return ast.factory.createImport({ name: [operationName], root: file.path, path: operationFile.path })
     })
 

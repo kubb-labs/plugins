@@ -22,14 +22,10 @@ export const resolverZod = createResolver<PluginZod>({
   name(name) {
     return ensureValidVarName(camelCase(name, { suffix: 'schema' }))
   },
-  file(params, context) {
-    return this.default.file(
-      {
-        ...params,
-        resolveName: (name) => toFilePath(name, (part) => camelCase(part, { suffix: 'schema' })),
-      },
-      context,
-    )
+  file: {
+    baseName({ name, extname }) {
+      return `${toFilePath(name, (part) => camelCase(part, { suffix: 'schema' }))}${extname}`
+    },
   },
   schema: {
     typeName(name) {

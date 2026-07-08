@@ -189,14 +189,10 @@ export default defineConfig({
         name(name) {
           return `${resolverFaker.name(name)}Faker`
         },
-        file(params, context) {
-          return this.default.file(
-            {
-              ...params,
-              resolveName: (name) => `${resolverFaker.name(name)}Faker`,
-            },
-            context,
-          )
+        file: {
+          baseName({ name, extname }) {
+            return `${resolverFaker.name(name)}Faker${extname}`
+          },
         },
       },
     }),

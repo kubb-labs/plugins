@@ -19,14 +19,10 @@ export const resolverFaker = createResolver<PluginFaker>({
   name(name) {
     return ensureValidVarName(camelCase(name, { prefix: 'create' }))
   },
-  file(params, context) {
-    return this.default.file(
-      {
-        ...params,
-        resolveName: (name) => toFilePath(name, (part) => camelCase(part, { prefix: 'create' })),
-      },
-      context,
-    )
+  file: {
+    baseName({ name, extname }) {
+      return `${toFilePath(name, (part) => camelCase(part, { prefix: 'create' }))}${extname}`
+    },
   },
   param: {
     name(node, param) {

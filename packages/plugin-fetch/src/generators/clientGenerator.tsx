@@ -50,15 +50,17 @@ export const clientGenerator = defineGenerator<PluginFetch>({
 
     const meta = {
       name: resolver.name(node.operationId),
-      file: resolver.file(operationFileEntry(node, node.operationId), { root, output, group: group ?? undefined }),
-      fileTs: tsResolver.file(operationFileEntry(node, node.operationId), {
+      file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
+      fileTs: tsResolver.file({
+        ...operationFileEntry(node, node.operationId),
         root,
         output: pluginTs.options?.output ?? output,
         group: pluginTs.options?.group ?? undefined,
       }),
       fileZod:
         zodResolver && pluginZod?.options
-          ? zodResolver.file(operationFileEntry(node, node.operationId), {
+          ? zodResolver.file({
+              ...operationFileEntry(node, node.operationId),
               root,
               output: pluginZod.options.output ?? output,
               group: pluginZod.options?.group ?? undefined,

@@ -38,7 +38,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const imports = adapter.getImports(node, (schemaName) => ({
       name: resolveImportName(schemaName),
-      path: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+      path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
     }))
 
     const enumNode = ast.narrowSchema(node, ast.schemaTypes.enum)
@@ -48,7 +48,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const meta = {
       name: ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) && isEnumSchema ? resolver.enum.keyName(node, enumOptions.typeSuffix) : resolver.name(node.name),
-      file: resolver.file({ name: node.name, extname: '.ts' }, { root, output, group: group ?? undefined }),
+      file: resolver.file({ name: node.name, extname: '.ts', root, output, group: group ?? undefined }),
     } as const
 
     const schemaPrinter = printerTs({
@@ -86,10 +86,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const params = caseParams(node.parameters, 'camelcase')
 
     const meta = {
-      file: resolver.file(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output, group: group ?? undefined },
-      ),
+      file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
     } as const
 
     // Build a set of schema names that are enums so the ref handler and getImports
@@ -108,7 +105,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
       const imports = adapter.getImports(schema, (schemaName) => ({
         name: resolveImportName(schemaName),
-        path: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+        path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
       }))
 
       const schemaPrinter = printerTs({

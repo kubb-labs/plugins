@@ -43,8 +43,9 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
     const mutationKeyName = resolver.mutation.keyName(node)
 
     const meta = {
-      file: resolver.file(operationFileEntry(node, mutationHookName), { root, output, group: group ?? undefined }),
-      fileTs: tsResolver.file(operationFileEntry(node, node.operationId), {
+      file: resolver.file({ ...operationFileEntry(node, mutationHookName), root, output, group: group ?? undefined }),
+      fileTs: tsResolver.file({
+        ...operationFileEntry(node, node.operationId),
         root,
         output: pluginTs.options?.output ?? output,
         group: pluginTs.options?.group ?? undefined,

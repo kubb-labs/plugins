@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { operationFileEntry } from '@internals/shared'
-import type { ast, Group, Output } from 'kubb/kit'
+import type { ast, Group, Output, Resolver } from 'kubb/kit'
 
 /**
  * The resolved contract `<op>` for one operation: the generated function name, the file it lives in,
@@ -8,11 +8,6 @@ import type { ast, Group, Output } from 'kubb/kit'
  * come from).
  */
 export type ClientOperation = { name: string; path: string; clientPath: string }
-
-type ClientResolver = {
-  name: (name: string) => string
-  file: (entry: ReturnType<typeof operationFileEntry>, options: { root: string; output: Output; group?: Group }) => { path: string }
-}
 
 /**
  * Resolves the contract client `<op>` a consumer (query hook, MCP handler) imports, by looking up
@@ -23,7 +18,10 @@ type ClientResolver = {
  */
 export function resolveClientOperation(options: {
   clientPlugin: { pluginName: string } | null
-  driver: { getPlugin: (name: string) => unknown; getResolver: (name: string) => unknown }
+  driver: {
+    getPlugin: (name: string) => { options?: { output?: Output; group?: Group | null } } | undefined
+    getResolver: (name: string) => Resolver
+  }
   node: ast.OperationNode
   root: string
   output: Output
@@ -31,11 +29,10 @@ export function resolveClientOperation(options: {
   const { clientPlugin, driver, node, root, output } = options
   if (!clientPlugin) return null
 
-  const resolver = driver.getResolver(clientPlugin.pluginName) as ClientResolver | null | undefined
-  if (!resolver) return null
-
-  const plugin = driver.getPlugin(clientPlugin.pluginName) as { options?: { output?: Output; group?: Group | null } } | null | undefined
-  const file = resolver.file(operationFileEntry(node, node.operationId), {
+  const resolver = driver.getResolver(clientPlugin.pluginName)
+  const plugin = driver.getPlugin(clientPlugin.pluginName)
+  const file = resolver.file({
+    ...operationFileEntry(node, node.operationId),
     root,
     output: plugin?.options?.output ?? output,
     group: plugin?.options?.group ?? undefined,

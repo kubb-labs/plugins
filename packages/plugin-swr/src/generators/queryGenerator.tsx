@@ -43,11 +43,16 @@ export const queryGenerator = defineGenerator<PluginSwr>({
     const queryKeyTypeName = resolver.query.keyTypeName(node)
 
     const meta = {
-      file: resolver.file({ name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
-      fileTs: tsResolver.file(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
-      ),
+      file: resolver.file({ name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group }),
+      fileTs: tsResolver.file({
+        name: node.operationId,
+        extname: '.ts',
+        tag: node.tags[0] ?? 'default',
+        path: node.path,
+        root,
+        output: pluginTs.options?.output ?? output,
+        group: pluginTs.options?.group,
+      }),
     }
 
     const importedTypeNames = [

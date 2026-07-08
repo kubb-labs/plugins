@@ -38,12 +38,15 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       isEnumSchema && tsEnumType === 'asConst' ? tsResolver.enum.keyName({ name: schemaName }, tsEnumTypeSuffix) : tsResolver.name(schemaName)
     const meta = {
       name: resolver.name(schemaName),
-      file: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }),
+      file: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }),
       typeName: schemaTypeName,
-      typeFile: tsResolver.file(
-        { name: schemaName, extname: '.ts' },
-        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
-      ),
+      typeFile: tsResolver.file({
+        name: schemaName,
+        extname: '.ts',
+        root,
+        output: pluginTs.options?.output ?? output,
+        group: pluginTs.options?.group ?? undefined,
+      }),
     } as const
     const canOverride = canOverrideSchema(node)
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
@@ -69,7 +72,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const imports = adapter.getImports(node, (schemaName) => ({
       name: resolver.name(schemaName),
-      path: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+      path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
     }))
     const usedImports = filterUsedImports(imports, fakerText)
 
@@ -176,30 +179,23 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
 
     const meta = {
-      file: resolver.file(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output, group: group ?? undefined },
-      ),
-      typeFile: tsResolver.file(
-        {
-          name: node.operationId,
-          extname: '.ts',
-          tag: node.tags[0] ?? 'default',
-          path: node.path,
-        },
-        {
-          root,
-          output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group ?? undefined,
-        },
-      ),
+      file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
+      typeFile: tsResolver.file({
+        name: node.operationId,
+        extname: '.ts',
+        tag: node.tags[0] ?? 'default',
+        path: node.path,
+        root,
+        output: pluginTs.options?.output ?? output,
+        group: pluginTs.options?.group ?? undefined,
+      }),
     } as const
 
     function resolveMockImports(schema: ast.SchemaNode) {
       return adapter
         .getImports(schema, (schemaName) => ({
           name: resolver.name(schemaName),
-          path: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+          path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
         }))
         .filter((entry) => entry.path !== meta.file.path)
     }

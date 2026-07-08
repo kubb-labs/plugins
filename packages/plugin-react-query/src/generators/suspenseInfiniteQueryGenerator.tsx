@@ -55,8 +55,9 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
     const queryKeyTypeName = resolver.suspenseInfiniteQuery.keyTypeName(node)
 
     const meta = {
-      file: resolver.file(operationFileEntry(node, queryName), { root, output, group: group ?? undefined }),
-      fileTs: tsResolver.file(operationFileEntry(node, node.operationId), {
+      file: resolver.file({ ...operationFileEntry(node, queryName), root, output, group: group ?? undefined }),
+      fileTs: tsResolver.file({
+        ...operationFileEntry(node, node.operationId),
         root,
         output: pluginTs.options?.output ?? output,
         group: pluginTs.options?.group ?? undefined,
