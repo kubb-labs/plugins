@@ -28,6 +28,12 @@ type StdPrinterParams = {
   nodes: unknown
 }
 
+type BuildResponseUnionParams = {
+  responses: Array<ast.ResponseNode>
+  name: string
+  fallbackUnknown: boolean
+}
+
 /**
  * Returns the cached `output`/`input` direction printers for a resolver, building them on
  * first use. The `input` printer encodes `Date → string` for request bodies, and `output` decodes
@@ -257,6 +263,46 @@ export const zodGenerator = defineGenerator<PluginZod>({
       )
     }
 
+    // Builds a response/error union schema: one schema per member response, aliased under `name`.
+    function buildResponseUnion({ responses, name, fallbackUnknown }: BuildResponseUnionParams) {
+      // Collect import names from the response schemas to detect naming collisions. When a response
+      // is a $ref to a component schema whose resolved name matches `name`, skip generation to avoid
+      // redeclaration errors.
+      const importedNames = new Set(
+        responses.flatMap((res) =>
+          (res.content ?? []).flatMap((entry) =>
+            entry.schema
+              ? adapter
+                  .getImports(entry.schema, (schemaName) => ({
+                    name: resolver.name(schemaName),
+                    path: '',
+                  }))
+                  .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
+              : [],
+          ),
+        ),
+      )
+
+      if (importedNames.has(name)) {
+        return null
+      }
+
+      const members = responses.map((res) => ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, res.statusCode) }))
+
+      // No documented schema: fall back to an unknown schema so the name still resolves for
+      // consumers that parse those bodies.
+      if (fallbackUnknown && members.length === 0) {
+        return renderSchemaEntry({ schema: ast.factory.createSchema({ type: 'unknown' }), name })
+      }
+
+      const unionNode = members.length === 1 ? members[0]! : ast.factory.createSchema({ type: 'union', members })
+
+      return renderSchemaEntry({
+        schema: unionNode,
+        name,
+      })
+    }
+
     const paramSchemas = params.map((param) => renderSchemaEntry({ schema: param.schema, name: resolver.param.name(node, param), direction: 'input' }))
 
     const responseSchemas = node.responses.map((res) => {
@@ -277,48 +323,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const successResponsesWithSchema = getSuccessResponses(responsesWithSchema)
     const responseUnionSchema =
       responsesWithSchema.length > 0
-        ? (() => {
-            const responseUnionName = resolver.response.response(node)
-
-            // Collect import names from the success response schemas to detect naming collisions.
-            // When a 2xx response is a $ref to a component schema whose resolved name matches the
-            // response union name, skip generation to avoid redeclaration errors.
-            const importedNames = new Set(
-              successResponsesWithSchema.flatMap((res) =>
-                (res.content ?? []).flatMap((entry) =>
-                  entry.schema
-                    ? adapter
-                        .getImports(entry.schema, (schemaName) => ({
-                          name: resolver.name(schemaName),
-                          path: '',
-                        }))
-                        .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
-                    : [],
-                ),
-              ),
-            )
-
-            if (importedNames.has(responseUnionName)) {
-              return null
-            }
-
-            const members = successResponsesWithSchema.map((res) =>
-              ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, res.statusCode) }),
-            )
-
-            // No documented 2xx schema: fall back to an unknown schema so the response name still
-            // resolves for consumers that parse success bodies.
-            if (members.length === 0) {
-              return renderSchemaEntry({ schema: ast.factory.createSchema({ type: 'unknown' }), name: responseUnionName })
-            }
-
-            const unionNode = members.length === 1 ? members[0]! : ast.factory.createSchema({ type: 'union', members })
-
-            return renderSchemaEntry({
-              schema: unionNode,
-              name: responseUnionName,
-            })
-          })()
+        ? buildResponseUnion({ responses: successResponsesWithSchema, name: resolver.response.response(node), fallbackUnknown: true })
         : null
 
     // Validate error bodies on the non-throw path. Mirrors the success union but selects every
@@ -326,39 +331,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const errorResponsesWithSchema = responsesWithSchema.filter((res) => !isSuccessStatusCode(res.statusCode))
     const errorUnionSchema =
       errorResponsesWithSchema.length > 0
-        ? (() => {
-            const errorUnionName = resolver.response.error(node)
-
-            const importedNames = new Set(
-              errorResponsesWithSchema.flatMap((res) =>
-                (res.content ?? []).flatMap((entry) =>
-                  entry.schema
-                    ? adapter
-                        .getImports(entry.schema, (schemaName) => ({
-                          name: resolver.name(schemaName),
-                          path: '',
-                        }))
-                        .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
-                    : [],
-                ),
-              ),
-            )
-
-            if (importedNames.has(errorUnionName)) {
-              return null
-            }
-
-            const members = errorResponsesWithSchema.map((res) =>
-              ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, res.statusCode) }),
-            )
-
-            const unionNode = members.length === 1 ? members[0]! : ast.factory.createSchema({ type: 'union', members })
-
-            return renderSchemaEntry({
-              schema: unionNode,
-              name: errorUnionName,
-            })
-          })()
+        ? buildResponseUnion({ responses: errorResponsesWithSchema, name: resolver.response.error(node), fallbackUnknown: false })
         : null
 
     const requestBodyContent = node.requestBody?.content ?? []

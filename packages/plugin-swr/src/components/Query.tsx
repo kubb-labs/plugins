@@ -3,9 +3,8 @@ import type { FunctionParameterNode, FunctionParametersNode, ResolverTs } from '
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import { buildGroupedRequestParam } from '@internals/tanstack-query'
+import { buildGroupedRequestParam, buildQueryOptionsParams } from '@internals/tanstack-query'
 import { buildClientOptionType, buildQueryKeyParams, getComments, resolveErrorNames } from '../utils.ts'
-import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
   name: string
@@ -59,7 +58,7 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const queryOptionsParamsNode = getQueryOptionsParams(node, { resolver: tsResolver })
+  const queryOptionsParamsNode = buildQueryOptionsParams(node, { resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
   const paramsNode = buildQueryParamsNode(node, { resolver: tsResolver })

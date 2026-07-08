@@ -5,7 +5,7 @@ import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
-import { buildClientOptionType, buildResolvedRequestParams, getComments, maybeValueOrGetter, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { buildClientOptionType, buildResolvedRequestParams, buildResponseTypes, getComments, maybeValueOrGetter } from '../utils.ts'
 
 type Props = {
   name: string
@@ -26,12 +26,7 @@ function buildSuspenseQueryParamsNode(
   },
 ): FunctionParametersNode {
   const { resolver } = options
-  const successNames = resolveSuccessNames(node, resolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
-  const errorNames = resolveErrorNames(node, resolver)
-
-  const TData = responseName
-  const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
+  const { TData, TError } = buildResponseTypes(node, resolver)
 
   const optionsParam = createFunctionParameter({
     name: 'options',
@@ -48,12 +43,7 @@ function buildSuspenseQueryParamsNode(
 }
 
 export function SuspenseQuery({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver, customOptions }: Props): KubbReactNode {
-  const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.response.response(node)
-  const errorNames = resolveErrorNames(node, tsResolver)
-
-  const TData = responseName
-  const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
+  const { TData, TError } = buildResponseTypes(node, tsResolver)
   const returnType = `UseSuspenseQueryResult<${'TData'}, ${TError}> & { queryKey: TQueryKey }`
   const generics = [`TData = ${TData}`, `TQueryKey extends QueryKey = ${queryKeyTypeName}`]
 

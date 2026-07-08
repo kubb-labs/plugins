@@ -4,7 +4,7 @@ import { createFunctionParameter, createFunctionParameters, functionPrinter } fr
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import { buildGroupedRequestParam, buildClientCall } from '@internals/tanstack-query'
-import { buildRequestConfigType, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { buildRequestConfigType, buildResponseTypes } from '../utils.ts'
 
 type Props = {
   name: string
@@ -30,11 +30,7 @@ export function buildMutationConfigParamsNode(node: ast.OperationNode): Function
 }
 
 export function MutationOptions({ name, clientName, node, tsResolver, mutationKeyName }: Props): KubbReactNode {
-  const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.response.response(node)
-  const TData = responseName
-  const errorNames = resolveErrorNames(node, tsResolver)
-  const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
+  const { TData, TError } = buildResponseTypes(node, tsResolver)
 
   const configParamsNode = buildMutationConfigParamsNode(node)
   const paramsSignature = declarationPrinter.print(configParamsNode) ?? ''

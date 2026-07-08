@@ -8,7 +8,6 @@ type Props = {
   typeName: string
   name: string
   response: ast.ResponseNode
-  key?: string | number | null
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })

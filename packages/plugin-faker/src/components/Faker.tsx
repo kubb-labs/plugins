@@ -18,7 +18,6 @@ type Props = {
 }
 
 const OBJECT_TYPES = new Set<ast.SchemaNode['type']>(['object', 'intersection'])
-const ARRAY_TYPES = new Set<ast.SchemaNode['type']>(['array'])
 const SCALAR_TYPES = new Set<ast.SchemaNode['type']>([
   'string',
   'email',
@@ -39,7 +38,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 export function Faker({ node, description, name, typeName, printer, seed, canOverride }: Props): KubbReactNode {
   const fakerText = printer.print(node) ?? 'undefined'
 
-  const isArray = ARRAY_TYPES.has(node.type)
+  const isArray = node.type === 'array'
   const isObject = OBJECT_TYPES.has(node.type)
   const isTuple = node.type === 'tuple'
   const isScalar = SCALAR_TYPES.has(node.type)

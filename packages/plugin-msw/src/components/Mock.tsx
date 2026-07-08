@@ -10,13 +10,14 @@ type Props = {
   name: string
   typeName: string
   requestTypeName?: string | null
+  fakerName?: string
   baseURL: string | null | undefined
   node: ast.OperationNode
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export function Mock({ baseURL = '', name, typeName, requestTypeName, node }: Props): KubbReactNode {
+export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName, node }: Props): KubbReactNode {
   const method = getMswMethod(node)
   const successResponse = getPrimarySuccessResponse(node)
   const statusCode = successResponse ? Number(successResponse.statusCode) : 200
@@ -26,6 +27,7 @@ export function Mock({ baseURL = '', name, typeName, requestTypeName, node }: Pr
   const headers = [contentType ? `'Content-Type': '${contentType}'` : null].filter(Boolean)
   const responseHasSchema = hasResponseSchema(successResponse)
   const dataType = responseHasSchema ? typeName : 'string | number | boolean | null | object'
+  const paramType = fakerName ? typeName : dataType
 
   const callbackType = requestTypeName
     ? `HttpResponseResolver<Record<string, string>, ${requestTypeName}>`
@@ -36,7 +38,7 @@ export function Mock({ baseURL = '', name, typeName, requestTypeName, node }: Pr
       params: [
         createFunctionParameter({
           name: 'data',
-          type: `${dataType} | ${callbackType}`,
+          type: `${paramType} | ${callbackType}`,
           optional: true,
         }),
       ],
@@ -45,13 +47,17 @@ export function Mock({ baseURL = '', name, typeName, requestTypeName, node }: Pr
 
   const httpCall = requestTypeName ? `http.${method}<Record<string, string>, ${requestTypeName}>` : `http.${method}`
 
+  const requestUrl = `${baseURL}${url.replace(/([^/]):/g, '$1\\\\:')}`
+  const urlLiteral = fakerName ? `'${requestUrl}'` : `\`${requestUrl}\``
+  const responseBody = fakerName ? `JSON.stringify(data || ${fakerName}(data))` : 'JSON.stringify(data)'
+
   return (
     <File.Source name={name} isIndexable isExportable>
       <Function name={name} export params={params ?? ''}>
-        {`return ${httpCall}(\`${baseURL}${url.replace(/([^/]):/g, '$1\\\\:')}\`, function handler(info) {
+        {`return ${httpCall}(${urlLiteral}, function handler(info) {
     if(typeof data === 'function') return data(info)
 
-    return new Response(JSON.stringify(data), {
+    return new Response(${responseBody}, {
       status: ${statusCode},
       ${
         headers.length

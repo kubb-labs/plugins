@@ -3,7 +3,7 @@ import { ast, defineGenerator } from 'kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
-import { Mock, MockWithFaker, Response } from '../components'
+import { Mock, Response } from '../components'
 import type { PluginMsw } from '../types'
 import { resolveFakerMeta } from '../utils.ts'
 
@@ -88,7 +88,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
           })}
 
         {parser === 'faker' && faker && hasSuccessSchema ? (
-          <MockWithFaker name={mock.name} typeName={type.responseName} requestTypeName={requestName} fakerName={faker.name} node={node} baseURL={baseURL} />
+          <Mock name={mock.name} typeName={type.responseName} requestTypeName={requestName} fakerName={faker.name} node={node} baseURL={baseURL} />
         ) : (
           <Mock name={mock.name} typeName={type.responseName} requestTypeName={requestName} node={node} baseURL={baseURL} />
         )}

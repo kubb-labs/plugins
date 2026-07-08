@@ -5,7 +5,7 @@ import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
-import { buildRequestConfigType, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { buildRequestConfigType, buildResponseTypes, getComments } from '../utils.ts'
 import { buildMutationConfigParamsNode } from './MutationOptions.tsx'
 
 type Props = {
@@ -33,12 +33,7 @@ function buildMutationParamsNode(
   },
 ): FunctionParametersNode {
   const { resolver } = options
-  const successNames = resolveSuccessNames(node, resolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
-  const errorNames = resolveErrorNames(node, resolver)
-
-  const TData = responseName
-  const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
+  const { TData, TError } = buildResponseTypes(node, resolver)
 
   const TRequest = resolveMutationRequestType(node, resolver)
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')
@@ -58,12 +53,7 @@ function buildMutationParamsNode(
 }
 
 export function Mutation({ name, mutationOptionsName, node, tsResolver, mutationKeyName, customOptions }: Props): KubbReactNode {
-  const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.response.response(node)
-  const errorNames = resolveErrorNames(node, tsResolver)
-
-  const TData = responseName
-  const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
+  const { TData, TError } = buildResponseTypes(node, tsResolver)
 
   const TRequest = resolveMutationRequestType(node, tsResolver)
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')

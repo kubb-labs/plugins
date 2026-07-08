@@ -1,4 +1,3 @@
-import { getOperationParameters } from '@internals/shared'
 import { buildClientCall } from '@internals/tanstack-query'
 import { getNestedAccessor } from '@internals/utils'
 import type { ast } from 'kubb/kit'
@@ -7,7 +6,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { Infinite } from '../types.ts'
-import { buildQueryKeyParams, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { buildQueryKeyParams, buildResponseTypes, resolvePageParamType } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -38,39 +37,9 @@ export function SuspenseInfiniteQueryOptions({
   queryParam,
   queryKeyName,
 }: Props): KubbReactNode {
-  const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.response.response(node)
-  const queryFnDataType = responseName
-  const errorNames = resolveErrorNames(node, tsResolver)
-  const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
+  const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver)
 
-  const isInitialPageParamDefined = initialPageParam !== undefined && initialPageParam !== null
-  const fallbackPageParamType =
-    typeof initialPageParam === 'number'
-      ? 'number'
-      : typeof initialPageParam === 'string'
-        ? initialPageParam.includes(' as ')
-          ? (() => {
-              const parts = initialPageParam.split(' as ')
-              return parts[parts.length - 1] ?? 'unknown'
-            })()
-          : 'string'
-        : typeof initialPageParam === 'boolean'
-          ? 'boolean'
-          : 'unknown'
-
-  const rawQueryParams = getOperationParameters(node, { paramsCasing: 'original' }).query
-  const queryParamsTypeName =
-    rawQueryParams.length > 0
-      ? (() => {
-          const groupName = tsResolver.param.query(node, rawQueryParams[0]!)
-          const individualName = tsResolver.param.name(node, rawQueryParams[0]!)
-          return groupName !== individualName ? groupName : null
-        })()
-      : null
-
-  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
-  const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
+  const { queryParamsTypeName, pageParamType } = resolvePageParamType(node, { resolver: tsResolver, initialPageParam, queryParam })
 
   const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''

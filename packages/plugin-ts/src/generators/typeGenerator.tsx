@@ -6,8 +6,27 @@ import { File, jsxRenderer } from 'kubb/jsx'
 import { Type } from '../components/Type.tsx'
 import { ENUM_TYPES_WITH_KEY_SUFFIX } from '../constants.ts'
 import { printerTs } from '../printers/printerTs.ts'
-import type { PluginTs } from '../types'
+import type { PluginTs, ResolvedEnumOptions, ResolverTs } from '../types'
 import { buildOptions, buildParams, buildResponses, buildResponseUnion, isInlineConstEnum } from '../utils.ts'
+
+type ResolveImportNameParams = {
+  schemaName: string
+  enumOptions: ResolvedEnumOptions
+  enumSchemaNames: Set<string>
+  resolver: ResolverTs
+}
+
+/**
+ * Resolves the imported type name for a referenced schema. An enum schema emitted
+ * as a `const` object imports its suffixed key alias (e.g. `StatusKey`); every other
+ * schema imports its plain resolved name.
+ */
+function resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver }: ResolveImportNameParams): string {
+  if (ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) && enumOptions.typeSuffix && enumSchemaNames.has(schemaName)) {
+    return resolver.enum.keyName({ name: schemaName }, enumOptions.typeSuffix)
+  }
+  return resolver.name(schemaName)
+}
 
 /**
  * Built-in generator for `@kubb/plugin-ts`. Emits one TypeScript file per
@@ -29,15 +48,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
     // callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
     const enumSchemaNames = new Set<string>(ctx.meta.enumNames)
 
-    function resolveImportName(schemaName: string): string {
-      if (ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) && enumOptions.typeSuffix && enumSchemaNames.has(schemaName)) {
-        return resolver.enum.keyName({ name: schemaName }, enumOptions.typeSuffix)
-      }
-      return resolver.name(schemaName)
-    }
-
     const imports = adapter.getImports(node, (schemaName) => ({
-      name: resolveImportName(schemaName),
+      name: resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver }),
       path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
     }))
 
@@ -93,18 +105,11 @@ export const typeGenerator = defineGenerator<PluginTs>({
     // callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
     const enumSchemaNames = new Set<string>(ctx.meta.enumNames)
 
-    function resolveImportName(schemaName: string): string {
-      if (ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) && enumOptions.typeSuffix && enumSchemaNames.has(schemaName)) {
-        return resolver.enum.keyName({ name: schemaName }, enumOptions.typeSuffix)
-      }
-      return resolver.name(schemaName)
-    }
-
     function renderSchemaType({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
       if (!schema) return null
 
       const imports = adapter.getImports(schema, (schemaName) => ({
-        name: resolveImportName(schemaName),
+        name: resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver }),
         path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
       }))
 
@@ -235,7 +240,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
             entry.schema
               ? adapter
                   .getImports(entry.schema, (schemaName) => ({
-                    name: resolveImportName(schemaName),
+                    name: resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver }),
                     path: '',
                   }))
                   .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))

@@ -74,7 +74,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     mutationGenerator,
     hookOptionsGenerator,
     customHookOptionsFileGenerator,
-  ].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
+  ]
 
   const groupConfig = createGroupConfig(group)
 

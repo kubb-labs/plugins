@@ -155,8 +155,11 @@ function getOperationLink(node: ast.OperationNode, link: OperationCommentLink): 
   return node.path ? `{@link ${node.path.replaceAll('{', ':').replaceAll('}', '')}}` : null
 }
 
-export function getContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
-  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
+/**
+ * Derives the shared `ContentTypeInfo` shape from a list of content types, tracking whether several
+ * are present and the union, default, and form-data flags the client uses to pick one.
+ */
+function buildContentTypeInfo(contentTypes: string[]): ContentTypeInfo {
   const isMultipleContentTypes = contentTypes.length > 1
 
   return {
@@ -168,21 +171,16 @@ export function getContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
   }
 }
 
+export function getContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
+  return buildContentTypeInfo(node.requestBody?.content?.map((e) => e.contentType) ?? [])
+}
+
 /**
  * The request-body counterpart for the primary success response: the content types it documents and
  * whether several are present, so the client can let a caller pick which one to accept.
  */
 export function getResponseContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
-  const contentTypes = getPrimarySuccessResponse(node)?.content?.map((e) => e.contentType) ?? []
-  const isMultipleContentTypes = contentTypes.length > 1
-
-  return {
-    contentTypes,
-    isMultipleContentTypes,
-    contentTypeUnion: isMultipleContentTypes ? contentTypes.map((ct) => JSON.stringify(ct)).join(' | ') : '',
-    defaultContentType: contentTypes[0] ?? 'application/json',
-    hasFormData: contentTypes.some((ct) => ct === 'multipart/form-data'),
-  }
+  return buildContentTypeInfo(getPrimarySuccessResponse(node)?.content?.map((e) => e.contentType) ?? [])
 }
 
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'

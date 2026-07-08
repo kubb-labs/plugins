@@ -56,9 +56,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     macros: userMacros,
   } = options
 
-  const selectedGenerators = [queryGenerator, infiniteQueryGenerator, mutationGenerator].filter((generator): generator is NonNullable<typeof generator> =>
-    Boolean(generator),
-  )
+  const selectedGenerators = [queryGenerator, infiniteQueryGenerator, mutationGenerator]
 
   const groupConfig = createGroupConfig(group)
 
