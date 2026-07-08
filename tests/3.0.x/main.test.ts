@@ -29,7 +29,7 @@ const configs = [
         path: './gen',
         barrel: false,
       },
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -52,7 +52,7 @@ const configs = [
         barrel: false,
       },
       adapter: adapterOas({ validate: false, discriminator: 'propagate', enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -75,7 +75,7 @@ const configs = [
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -105,7 +105,7 @@ const configs = [
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({}),
         pluginZod({
@@ -129,7 +129,7 @@ const configs = [
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -163,7 +163,7 @@ const configs = [
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginZod({
           output: {
@@ -186,7 +186,7 @@ const configs = [
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginZod({
           mini: true,
@@ -210,7 +210,7 @@ const configs = [
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginZod({
           output: {
@@ -233,7 +233,7 @@ const configs = [
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -256,7 +256,7 @@ const configs = [
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -286,7 +286,7 @@ const configs = [
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginZod({
           output: {
@@ -318,7 +318,7 @@ const configs = [
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -346,7 +346,7 @@ const configs = [
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -374,7 +374,7 @@ const configs = [
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -399,7 +399,7 @@ const configs = [
       input: { path: '../../schemas/3.0.x/simple.yaml' },
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: { path: './types', barrel: false, banner: '// Custom banner' },
@@ -424,7 +424,7 @@ const configs = [
       input: { path: '../../schemas/3.0.x/simple.yaml' },
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginZod({
           output: { path: './zod', barrel: false },
@@ -451,7 +451,7 @@ const configs = [
       input: { path: '../../schemas/3.0.x/simple.yaml' },
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: { path: './types', barrel: false },
