@@ -181,7 +181,7 @@ export type Options = OutputOptions & {
   /**
    * Override naming conventions for function names and types.
    */
-  resolver?: ResolverPatch<ResolverSwr>
+  resolver?: ResolverPatch<ResolverSwr> | ResolverSwr
   /**
    * Macros that rewrite generated nodes before printing.
    */

@@ -348,7 +348,7 @@ export type Options = OutputOptions & {
    * Override how hook names and file paths are built. Methods you omit fall
    * back to the default `resolverReactQuery`.
    */
-  resolver?: ResolverPatch<ResolverReactQuery>
+  resolver?: ResolverPatch<ResolverReactQuery> | ResolverReactQuery
   /**
    * Set to `false` to skip generating `use*` hook functions. `queryOptions`,
    * `mutationOptions`, `queryKey`, and `mutationKey` helpers are still emitted.

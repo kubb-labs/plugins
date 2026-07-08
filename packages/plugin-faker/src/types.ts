@@ -129,9 +129,10 @@ export type Options = OutputOptions & {
   seed?: number | Array<number>
   /**
    * Override the naming of generated factory helpers. Common use: append `Mock` or
-   * `Factory` so helpers do not clash with imported types.
+   * `Factory` so helpers do not clash with imported types. Pass a resolver built with
+   * `createResolver`, or the plain params object it takes.
    */
-  resolver?: ResolverPatch<ResolverFaker>
+  resolver?: ResolverPatch<ResolverFaker> | ResolverFaker
   /**
    * Macros applied to schema and operation nodes before printing.
    */

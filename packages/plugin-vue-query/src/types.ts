@@ -219,7 +219,7 @@ export type Options = OutputOptions & {
   /**
    * Override how composable names and file paths are built.
    */
-  resolver?: ResolverPatch<ResolverVueQuery>
+  resolver?: ResolverPatch<ResolverVueQuery> | ResolverVueQuery
   /**
    * Set to `false` to skip generating `use*` composable functions. `queryOptions`,
    * `queryKey`, and `mutationKey` helpers are still emitted.

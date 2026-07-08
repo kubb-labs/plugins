@@ -46,7 +46,7 @@ export type Options = OutputOptions & {
   /**
    * Override how handler names and file paths are built.
    */
-  resolver?: ResolverPatch<ResolverMsw>
+  resolver?: ResolverPatch<ResolverMsw> | ResolverMsw
   /**
    * Macros applied to operation nodes before printing.
    */

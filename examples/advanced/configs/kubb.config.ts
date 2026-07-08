@@ -1,8 +1,9 @@
 import { adapterOas } from '@kubb/adapter-oas'
-import { ast } from 'kubb/kit'
+import { ast, createResolver } from 'kubb/kit'
 import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginCypress } from '@kubb/plugin-cypress'
 import { pluginFaker, resolverFaker } from '@kubb/plugin-faker'
+import type { PluginFaker } from '@kubb/plugin-faker'
 import { pluginMcp } from '@kubb/plugin-mcp'
 import { pluginMsw } from '@kubb/plugin-msw'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
@@ -185,7 +186,8 @@ export default defineConfig({
           },
         },
       ],
-      resolver: {
+      resolver: createResolver<PluginFaker>({
+        pluginName: 'plugin-faker',
         name(name) {
           return `${resolverFaker.name(name)}Faker`
         },
@@ -194,7 +196,7 @@ export default defineConfig({
             return `${resolverFaker.name(name)}Faker${extname}`
           },
         },
-      },
+      }),
     }),
     pluginCypress({
       output: {
