@@ -92,16 +92,6 @@ function resolveFallbackPageParamType(initialPageParam: Infinite['initialPagePar
   return initialPageParam.split(' as ').at(-1) ?? 'unknown'
 }
 
-function resolveQueryParamsTypeName(node: ast.OperationNode, resolver: ResolverTs): string | null {
-  const rawQueryParams = getOperationParameters(node, { paramsCasing: 'original' }).query
-  if (rawQueryParams.length === 0) return null
-
-  const groupName = resolver.param.query(node, rawQueryParams[0]!)
-  const individualName = resolver.param.name(node, rawQueryParams[0]!)
-
-  return groupName !== individualName ? groupName : null
-}
-
 /**
  * Resolves the `TPageParam` generic for the infinite-query hooks. Prefers the type read from the
  * configured `queryParam` on the operation's query object, and falls back to the type inferred from
@@ -109,7 +99,11 @@ function resolveQueryParamsTypeName(node: ast.OperationNode, resolver: ResolverT
  * so callers can reuse it when rewriting the paginated request.
  */
 export function resolvePageParamType(node: ast.OperationNode, { resolver, initialPageParam, queryParam }: ResolvePageParamTypeParams): PageParamType {
-  const queryParamsTypeName = resolveQueryParamsTypeName(node, resolver)
+  const firstQueryParam = getOperationParameters(node, { paramsCasing: 'original' }).query[0]
+  const groupName = firstQueryParam ? resolver.param.query(node, firstQueryParam) : null
+  const individualName = firstQueryParam ? resolver.param.name(node, firstQueryParam) : null
+  const queryParamsTypeName = groupName !== individualName ? groupName : null
+
   const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
 
   if (!queryParamType) {
