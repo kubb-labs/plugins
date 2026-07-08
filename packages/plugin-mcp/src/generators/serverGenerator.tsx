@@ -46,19 +46,25 @@ export const serverGenerator = defineGenerator<PluginMcp>({
     const operationsMapped = nodes.filter(ast.isHttpOperationNode).map((node) => {
       const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
 
-      const mcpFile = resolver.file(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output, group: group ?? undefined },
-      )
+      const mcpFile = resolver.file({
+        name: node.operationId,
+        extname: '.ts',
+        tag: node.tags[0] ?? 'default',
+        path: node.path,
+        root,
+        output,
+        group: group ?? undefined,
+      })
 
-      const zodFile = zodResolver.file(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        {
-          root,
-          output: pluginZod.options?.output ?? output,
-          group: pluginZod.options?.group ?? undefined,
-        },
-      )
+      const zodFile = zodResolver.file({
+        name: node.operationId,
+        extname: '.ts',
+        tag: node.tags[0] ?? 'default',
+        path: node.path,
+        root,
+        output: pluginZod.options?.output ?? output,
+        group: pluginZod.options?.group ?? undefined,
+      })
 
       const requestName = node.requestBody?.content?.[0]?.schema ? zodResolver.response.body(node) : null
       const successStatus = findSuccessStatusCode(node.responses)

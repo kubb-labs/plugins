@@ -38,18 +38,16 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     const meta = {
       name: resolver.handler.name(node),
-      file: resolver.file(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output, group: group ?? undefined },
-      ),
-      fileTs: tsResolver.file(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        {
-          root,
-          output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group ?? undefined,
-        },
-      ),
+      file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
+      fileTs: tsResolver.file({
+        name: node.operationId,
+        extname: '.ts',
+        tag: node.tags[0] ?? 'default',
+        path: node.path,
+        root,
+        output: pluginTs.options?.output ?? output,
+        group: pluginTs.options?.group ?? undefined,
+      }),
     } as const
 
     return (

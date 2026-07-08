@@ -105,12 +105,12 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const codecRefNames = new Set(hasCodec ? collectCodecRefNames(node) : [])
     const importEntries = adapter.getImports(node, (schemaName) => ({
       name: resolver.name(schemaName),
-      path: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+      path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
     }))
     const inputImportEntries = hasCodec
       ? [...codecRefNames].map((schemaName) => ({
           name: [resolver.schema.inputName(schemaName)],
-          path: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+          path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
         }))
       : []
     const seenImports = new Set<string>()
@@ -123,7 +123,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const meta = {
       name: resolver.name(node.name),
-      file: resolver.file({ name: node.name, extname: '.ts' }, { root, output, group: group ?? undefined }),
+      file: resolver.file({ name: node.name, extname: '.ts', root, output, group: group ?? undefined }),
     } as const
 
     const inferTypeName = inferred ? resolver.schema.typeName(node.name) : null
@@ -169,10 +169,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const params = caseParams(node.parameters, 'camelcase')
 
     const meta = {
-      file: resolver.file(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output, group: group ?? undefined },
-      ),
+      file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
     } as const
 
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
@@ -197,7 +194,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       const codecRefNames = direction === 'input' && !mini ? new Set(collectCodecRefNames(schema)) : null
       const imports = adapter.getImports(schema, (schemaName) => ({
         name: codecRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName),
-        path: resolver.file({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+        path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
       }))
 
       const schemaPrinter = mini

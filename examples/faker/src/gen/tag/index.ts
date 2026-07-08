@@ -1,5 +1,5 @@
-export { createDeleteOrderPathOrderId, createDeleteOrderResponse, createDeleteOrderStatus400, createDeleteOrderStatus404 } from './createDeleteOrder.ts'
-export { createGetInventoryResponse, createGetInventoryStatus200 } from './createGetInventory.ts'
+export { createDeleteOrderPathOrderId, createDeleteOrderResponse, createDeleteOrderStatus400, createDeleteOrderStatus404 } from './deleteOrder.ts'
+export { createGetInventoryResponse, createGetInventoryStatus200 } from './getInventory.ts'
 export {
   createGetOrderByIdPathOrderId,
   createGetOrderByIdResponse,
@@ -8,8 +8,8 @@ export {
   createGetOrderByIdStatus200Xml,
   createGetOrderByIdStatus400,
   createGetOrderByIdStatus404,
-} from './createGetOrderById.ts'
-export { createOrder } from './createOrder.ts'
+} from './getOrderById.ts'
+export { createOrder } from './order.ts'
 export {
   createPlaceOrderBody,
   createPlaceOrderBodyFormUrlEncoded,
@@ -18,4 +18,4 @@ export {
   createPlaceOrderResponse,
   createPlaceOrderStatus200,
   createPlaceOrderStatus405,
-} from './createPlaceOrder.ts'
+} from './placeOrder.ts'

@@ -26,8 +26,10 @@ export const resolverTs = createResolver<PluginTs>({
   name(name) {
     return ensureValidVarName(pascalCase(name))
   },
-  file(params, context) {
-    return this.default.file({ ...params, resolveName: (name) => toFilePath(name, pascalCase) }, context)
+  file: {
+    baseName({ name, extname }) {
+      return `${toFilePath(name, pascalCase)}${extname}`
+    },
   },
   param: {
     name(node, param) {

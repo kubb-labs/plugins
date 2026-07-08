@@ -77,14 +77,16 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
   const document = ctx.adapter.document as SecurityDocument | null | undefined
 
   function buildOperationData(node: ast.OperationNode): OperationData {
-    const typeFile = tsResolver.file(operationFileEntry(node, node.operationId), {
+    const typeFile = tsResolver.file({
+      ...operationFileEntry(node, node.operationId),
       root,
       output: tsPluginOptions?.output ?? output,
       group: tsPluginOptions?.group,
     })
     const zodFile =
       zodResolver && pluginZod?.options
-        ? zodResolver.file(operationFileEntry(node, node.operationId), {
+        ? zodResolver.file({
+            ...operationFileEntry(node, node.operationId),
             root,
             output: pluginZod.options?.output ?? output,
             group: pluginZod.options?.group ?? undefined,
@@ -100,7 +102,7 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
     if (!ast.isHttpOperationNode(operationNode)) return acc
     const tag = operationNode.tags[0]
     const name = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.groupName(tag)) : resolver.className('ApiClient')
-    const file = resolver.file({ name, extname: '.ts', tag }, { root, output, group: group ?? undefined })
+    const file = resolver.file({ name, extname: '.ts', tag, root, output, group: group ?? undefined })
     const operationData = buildOperationData(operationNode)
     const previous = acc.find((item) => item.file.path === file.path)
 
@@ -192,7 +194,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
       // an operation as `new PetStore(config).getPetById(...)` without a per-tag sub-client.
       if (sdk.mode === 'flat') {
         const flatName = resolver.className(sdk.name ?? 'sdk')
-        const flatFile = resolver.file({ name: sdk.name ?? 'sdk', extname: '.ts' }, { root, output, group: group ?? undefined })
+        const flatFile = resolver.file({ name: sdk.name ?? 'sdk', extname: '.ts', root, output, group: group ?? undefined })
         const allOps = controllers.flatMap((controller) => controller.operations)
 
         return renderClassFile(flatName, flatFile, allOps)
@@ -202,7 +204,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
 
       if (!sdk.name) return <>{classFiles}</>
 
-      const sdkFile = resolver.file({ name: sdk.name, extname: '.ts' }, { root, output, group: group ?? undefined })
+      const sdkFile = resolver.file({ name: sdk.name, extname: '.ts', root, output, group: group ?? undefined })
       const facadeName = resolver.className(sdk.name)
       const members = controllers.map(({ name, tag }) => ({ className: name, propName: resolver.propertyName(tag ?? name) }))
 

@@ -1,25 +1,26 @@
-export { createAddPetRequestFaker } from './createAddPetRequest.ts'
-export { createAddPetRequestStatusEnumFaker } from './createAddPetRequestStatusEnum.ts'
-export { createAnimalFaker } from './createAnimal.ts'
-export { createAnimalTypeEnumFaker } from './createAnimalTypeEnum.ts'
-export { createApiResponseFaker } from './createApiResponse.ts'
-export { createCatFaker } from './createCat.ts'
-export { createCategoryFaker } from './createCategory.ts'
-export { createCreatePetsBoolParamFaker } from './createCreatePetsBoolParam.ts'
-export { createCreatePetsXEXAMPLEFaker } from './createCreatePetsXEXAMPLE.ts'
-export { createDogFaker } from './createDog.ts'
-export { createFindPetsByTagsXEXAMPLEFaker } from './createFindPetsByTagsXEXAMPLE.ts'
-export { createImageFaker } from './createImage.ts'
-export { createOrderFaker } from './createOrder.ts'
-export { createOrderHttpStatusEnumFaker } from './createOrderHttpStatusEnum.ts'
-export { createOrderOrderTypeEnumFaker } from './createOrderOrderTypeEnum.ts'
-export { createOrderParamsStatusEnumFaker } from './createOrderParamsStatusEnum.ts'
-export { createOrderStatusEnumFaker } from './createOrderStatusEnum.ts'
-export { createPetFaker } from './createPet.ts'
-export { createPetEventFaker } from './createPetEvent.ts'
-export { createPetEventTypeEnumFaker } from './createPetEventTypeEnum.ts'
-export { createPetNotFoundFaker } from './createPetNotFound.ts'
-export { createPetStatusEnumFaker } from './createPetStatusEnum.ts'
+export { createAddPetRequestFaker } from './createAddPetRequestFaker.ts'
+export { createAddPetRequestStatusEnumFaker } from './createAddPetRequestStatusEnumFaker.ts'
+export { createAnimalFaker } from './createAnimalFaker.ts'
+export { createAnimalTypeEnumFaker } from './createAnimalTypeEnumFaker.ts'
+export { createApiResponseFaker } from './createApiResponseFaker.ts'
+export { createCatFaker } from './createCatFaker.ts'
+export { createCategoryFaker } from './createCategoryFaker.ts'
+export { createCreatePetsBoolParamFaker } from './createCreatePetsBoolParamFaker.ts'
+export { createCreatePetsXEXAMPLEFaker } from './createCreatePetsXEXAMPLEFaker.ts'
+export { createDogFaker } from './createDogFaker.ts'
+export { createFindPetsByTagsXEXAMPLEFaker } from './createFindPetsByTagsXEXAMPLEFaker.ts'
+export { createImageFaker } from './createImageFaker.ts'
+export { createOrderFaker } from './createOrderFaker.ts'
+export { createOrderHttpStatusEnumFaker } from './createOrderHttpStatusEnumFaker.ts'
+export { createOrderOrderTypeEnumFaker } from './createOrderOrderTypeEnumFaker.ts'
+export { createOrderParamsStatusEnumFaker } from './createOrderParamsStatusEnumFaker.ts'
+export { createOrderStatusEnumFaker } from './createOrderStatusEnumFaker.ts'
+export { createPetEventFaker } from './createPetEventFaker.ts'
+export { createPetEventTypeEnumFaker } from './createPetEventTypeEnumFaker.ts'
+export { createPetFaker } from './createPetFaker.ts'
+export { createPetNotFoundFaker } from './createPetNotFoundFaker.ts'
+export { createPetStatusEnumFaker } from './createPetStatusEnumFaker.ts'
+export { createTagTagFaker } from './createTagTagFaker.ts'
 export {
   createAddFilesBodyFaker,
   createAddFilesBodyFakerFormData,
@@ -27,7 +28,7 @@ export {
   createAddFilesResponseFaker,
   createAddFilesStatus200Faker,
   createAddFilesStatus405Faker,
-} from './pet/createAddFiles.ts'
+} from './pet/createAddFilesFaker.ts'
 export {
   createAddPetBodyFaker,
   createAddPetBodyFakerFormUrlEncoded,
@@ -38,13 +39,13 @@ export {
   createAddPetStatusDefaultFaker,
   createAddPetStatusDefaultFakerJson,
   createAddPetStatusDefaultFakerXml,
-} from './pet/createAddPet.ts'
+} from './pet/createAddPetFaker.ts'
 export {
   createDeletePetHeaderApiKeyFaker,
   createDeletePetPathPetIdFaker,
   createDeletePetResponseFaker,
   createDeletePetStatus400Faker,
-} from './pet/createDeletePet.ts'
+} from './pet/createDeletePetFaker.ts'
 export {
   createFindPetsByStatusPathStepIdFaker,
   createFindPetsByStatusResponseFaker,
@@ -52,7 +53,7 @@ export {
   createFindPetsByStatusStatus200FakerJson,
   createFindPetsByStatusStatus200FakerXml,
   createFindPetsByStatusStatus400Faker,
-} from './pet/createFindPetsByStatus.ts'
+} from './pet/createFindPetsByStatusFaker.ts'
 export {
   createFindPetsByTagsHeaderXEXAMPLEFaker,
   createFindPetsByTagsQueryPageFaker,
@@ -63,7 +64,7 @@ export {
   createFindPetsByTagsStatus200FakerJson,
   createFindPetsByTagsStatus200FakerXml,
   createFindPetsByTagsStatus400Faker,
-} from './pet/createFindPetsByTags.ts'
+} from './pet/createFindPetsByTagsFaker.ts'
 export {
   createGetPetByIdPathPetIdFaker,
   createGetPetByIdResponseFaker,
@@ -72,7 +73,7 @@ export {
   createGetPetByIdStatus200FakerXml,
   createGetPetByIdStatus400Faker,
   createGetPetByIdStatus404Faker,
-} from './pet/createGetPetById.ts'
+} from './pet/createGetPetByIdFaker.ts'
 export {
   createUpdatePetBodyFaker,
   createUpdatePetBodyFakerFormUrlEncoded,
@@ -86,21 +87,21 @@ export {
   createUpdatePetStatus400Faker,
   createUpdatePetStatus404Faker,
   createUpdatePetStatus405Faker,
-} from './pet/createUpdatePet.ts'
+} from './pet/createUpdatePetFaker.ts'
 export {
   createUpdatePetWithFormPathPetIdFaker,
   createUpdatePetWithFormQueryNameFaker,
   createUpdatePetWithFormQueryStatusFaker,
   createUpdatePetWithFormResponseFaker,
   createUpdatePetWithFormStatus405Faker,
-} from './pet/createUpdatePetWithForm.ts'
+} from './pet/createUpdatePetWithFormFaker.ts'
 export {
   createUploadFileBodyFaker,
   createUploadFilePathPetIdFaker,
   createUploadFileQueryAdditionalMetadataFaker,
   createUploadFileResponseFaker,
   createUploadFileStatus200Faker,
-} from './pet/createUploadFile.ts'
+} from './pet/createUploadFileFaker.ts'
 export {
   createCreatePetsBodyFaker,
   createCreatePetsHeaderXEXAMPLEFaker,
@@ -110,6 +111,9 @@ export {
   createCreatePetsResponseFaker,
   createCreatePetsStatus201Faker,
   createCreatePetsStatusDefaultFaker,
-} from './pets/createCreatePets.ts'
-export { createStreamPetEventsPathPetIdFaker, createStreamPetEventsResponseFaker, createStreamPetEventsStatus200Faker } from './stream/createStreamPetEvents.ts'
-export { createTagTagFaker } from './tag/createTag.ts'
+} from './pets/createCreatePetsFaker.ts'
+export {
+  createStreamPetEventsPathPetIdFaker,
+  createStreamPetEventsResponseFaker,
+  createStreamPetEventsStatus200Faker,
+} from './stream/createStreamPetEventsFaker.ts'

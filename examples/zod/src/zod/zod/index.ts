@@ -232,7 +232,7 @@ export {
   getThingsStatus201Schema,
   getThingsStatusDefaultSchema,
 } from './getThingsSchema.ts'
-export { OperationSchema, OperationsMap, operations, paths } from './operations.ts'
+export { OperationSchema, OperationsMap, operations, paths } from './operationsSchema.ts'
 export { orderSchema } from './orderSchema.ts'
 export { petNotFoundSchema } from './petNotFoundSchema.ts'
 export { petSchema } from './petSchema.ts'

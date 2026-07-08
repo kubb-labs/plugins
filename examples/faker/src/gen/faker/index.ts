@@ -1,6 +1,6 @@
-export { createCategory } from './createCategory.ts'
-export { createPet } from './createPet.ts'
-export { createTag } from './createTag.ts'
+export { createCategory } from './category.ts'
+export { createPet } from './pet.ts'
+export { createTag } from './tag.ts'
 export {
   createUpdatePetBody,
   createUpdatePetBodyFormUrlEncoded,
@@ -13,11 +13,11 @@ export {
   createUpdatePetStatus400,
   createUpdatePetStatus404,
   createUpdatePetStatus405,
-} from './createUpdatePet.ts'
+} from './updatePet.ts'
 export {
   createUpdatePetWithFormPathPetId,
   createUpdatePetWithFormQueryName,
   createUpdatePetWithFormQueryStatus,
   createUpdatePetWithFormResponse,
   createUpdatePetWithFormStatus405,
-} from './createUpdatePetWithForm.ts'
+} from './updatePetWithForm.ts'

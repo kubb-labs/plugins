@@ -24,7 +24,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const fileName = resolver.name(node.operationId)
     const mock = {
       name: resolver.handler.name(node),
-      file: resolver.file({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group: group ?? undefined }),
+      file: resolver.file({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
     }
 
     const fakerPlugin = parser === 'faker' ? driver.getPlugin(pluginFakerName) : null
@@ -43,10 +43,15 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const tsResolver = driver.getResolver(pluginTsName)
 
     const type = {
-      file: tsResolver.file(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
-      ),
+      file: tsResolver.file({
+        name: node.operationId,
+        extname: '.ts',
+        tag: node.tags[0] ?? 'default',
+        path: node.path,
+        root,
+        output: pluginTs.options?.output ?? output,
+        group: pluginTs.options?.group ?? undefined,
+      }),
       responseName: tsResolver.response.response(node),
     }
 

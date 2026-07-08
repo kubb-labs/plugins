@@ -11,7 +11,7 @@ export type ClientOperation = { name: string; path: string; clientPath: string }
 
 type ClientResolver = {
   name: (name: string) => string
-  file: (entry: ReturnType<typeof operationFileEntry>, options: { root: string; output: Output; group?: Group }) => { path: string }
+  file: (options: ReturnType<typeof operationFileEntry> & { root: string; output: Output; group?: Group }) => { path: string }
 }
 
 /**
@@ -35,7 +35,8 @@ export function resolveClientOperation(options: {
   if (!resolver) return null
 
   const plugin = driver.getPlugin(clientPlugin.pluginName) as { options?: { output?: Output; group?: Group | null } } | null | undefined
-  const file = resolver.file(operationFileEntry(node, node.operationId), {
+  const file = resolver.file({
+    ...operationFileEntry(node, node.operationId),
     root,
     output: plugin?.options?.output ?? output,
     group: plugin?.options?.group ?? undefined,
