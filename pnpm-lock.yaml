@@ -304,6 +304,9 @@ importers:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 5.0.0-beta.89(openapi-types@12.1.3)
+      '@kubb/parser-ts':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.89
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios

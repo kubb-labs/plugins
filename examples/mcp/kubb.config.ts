@@ -1,4 +1,5 @@
 import { adapterOas } from '@kubb/adapter-oas'
+import { parserTs, parserTsx } from '@kubb/parser-ts'
 import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginMcp } from '@kubb/plugin-mcp'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -19,12 +20,10 @@ export default defineConfig(() => {
       path: './src/gen',
       clean: true,
       barrel: { type: 'all' },
-      extension: {
-        '.ts': '.js',
-      },
       format: false,
       lint: false,
     },
+    parsers: [parserTs({ extension: { '.ts': '.js' } }), parserTsx()],
     plugins: [
       pluginTs({
         output: { path: 'models/ts', barrel: { type: 'named' } },
