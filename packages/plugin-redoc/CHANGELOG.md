@@ -1,5 +1,11 @@
 # @kubb/plugin-redoc
 
+## 5.0.0-beta.85
+
+### Patch Changes
+
+- [#640](https://github.com/kubb-labs/plugins/pull/640) [`22f1221`](https://github.com/kubb-labs/plugins/commit/22f122170dc2330e788d54e9c2278c03f867cfb8) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Drop the unused `@internals/utils` devDependency flagged by knip. None of these packages import from it, they use `@internals/shared`, `ast`, or their own `utils.ts` instead. Runtime behavior is unchanged.
+
 ## 5.0.0-beta.84
 
 ## 5.0.0-beta.82

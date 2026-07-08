@@ -1,5 +1,76 @@
 # @kubb/plugin-vue-query
 
+## 5.0.0-beta.86
+
+### Minor Changes
+
+- [#640](https://github.com/kubb-labs/plugins/pull/640) [`9809c98`](https://github.com/kubb-labs/plugins/commit/9809c98beaa51f59d45de299f55eb21f62afb09d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Move each plugin resolver onto the new `@kubb/core` resolver API.
+
+  The `default(name, type)` discriminator every resolver exported is gone. The built-in machinery now lives under `resolver.default`: `default.name` (the identifier casing primitive), `default.file` (the `FileNode` builder), plus `default.options`, `default.path`, `default.banner`, and `default.footer`. Generators call two injected top-level helpers, `resolver.name(name)` and `resolver.file(params, context)`, that delegate to `resolver.default.*` unless a plugin overrides them.
+
+  ```ts
+  // before
+  resolverZod.default("list pets", "function"); // 'listPetsSchema'
+  resolverTs.core.file({ name, extname: ".ts" }, context);
+  // after
+  resolverZod.name("list pets"); // 'listPetsSchema'
+  resolverTs.file({ name, extname: ".ts" }, context);
+  ```
+
+  Each plugin's composite naming methods are grouped into namespaces and drop the `resolve*Name` prefix. Inside a namespace method `this` is the resolver root, so `this.name(...)` reaches the top-level caser.
+
+  | Before                                                                 | After                                       |
+  | ---------------------------------------------------------------------- | ------------------------------------------- |
+  | `resolver.resolveTypeName`                                             | `resolver.name`                             |
+  | `resolver.resolveResponseStatusName`                                   | `resolver.response.status`                  |
+  | `resolver.resolveResponsesName`                                        | `resolver.response.responses`               |
+  | `resolver.resolveBodyName`                                             | `resolver.response.body`                    |
+  | `resolver.resolvePathName` / `resolveQueryName` / `resolveHeadersName` | `resolver.param.path` / `query` / `headers` |
+  | `resolver.resolveQueryName` (react/vue/swr)                            | `resolver.query.name`                       |
+  | `resolver.resolveClassName`                                            | `resolver.className`                        |
+
+  File-name casing rides on the `file` params. Pass `resolveName` to change how the base name is cased, as in `this.default.file({ ...params, resolveName: (name) => toFilePath(name, pascalCase) }, context)`. A custom resolver overrides the top-level `name`/`file` directly, with no `default:` block, and merges with `mergeResolver`, so a partial override keeps every other built-in helper.
+
+- [#637](https://github.com/kubb-labs/plugins/pull/637) [`55f28f0`](https://github.com/kubb-labs/plugins/commit/55f28f0b3d9b0a070066b8b72ecacb6c8d1ab29a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Simplify the resolver naming API so the request-part resolvers line up with the generated object keys, and drop the redundant `resolvePathName`.
+
+  `resolvePathName(name, type)` duplicated `default(name, type)` on every resolver, so it is removed. Call `default` directly where you previously called `resolvePathName`:
+
+  ```ts
+  // before
+  resolver.resolveFile(
+    { name: resolver.resolvePathName(name, "file"), extname: ".ts" },
+    context,
+  );
+
+  // after
+  resolver.resolveFile(
+    { name: resolver.default(name, "file"), extname: ".ts" },
+    context,
+  );
+  ```
+
+  The request-part resolvers now use the same `body` / `path` / `query` / `headers` vocabulary as the generated `RequestConfig` object:
+
+  | Before                    | After                |
+  | ------------------------- | -------------------- |
+  | `resolveDataName`         | `resolveBodyName`    |
+  | `resolvePathParamsName`   | `resolvePathName`    |
+  | `resolveQueryParamsName`  | `resolveQueryName`   |
+  | `resolveHeaderParamsName` | `resolveHeadersName` |
+
+  The request body type also drops its `Data` suffix in favor of `Body`, so generated names change: `CreatePetData` becomes `CreatePetBody`, and the Zod schema `createPetDataSchema` becomes `createPetBodySchema`. Custom resolvers that override these methods, and code that imports the generated names, need updating.
+
+  Note that `resolvePathName` is reused: the old file-name method of that name is gone, and it now names the grouped path-parameters resolver `resolvePathName(node, param)`.
+
+### Patch Changes
+
+- [#643](https://github.com/kubb-labs/plugins/pull/643) [`bee30b7`](https://github.com/kubb-labs/plugins/commit/bee30b7f0f09eef934a26a768fedd840461a1175) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Update to `@kubb/core` 5.0.0-beta.89 and adopt its single-options resolver API.
+
+  `resolver.file` and `resolver.default.file`/`default.path` take one options object now, so calls pass `{ ...params, root, output, group }` instead of a second `context` argument. The `plugin-faker`, `plugin-ts`, and `plugin-zod` resolvers build file names through `file: { baseName }` in place of the removed `resolveName` hook, which restores the caser-based file names (a faker mock lands in `createPetFaker.ts`).
+
+- Updated dependencies [[`bee30b7`](https://github.com/kubb-labs/plugins/commit/bee30b7f0f09eef934a26a768fedd840461a1175), [`9809c98`](https://github.com/kubb-labs/plugins/commit/9809c98beaa51f59d45de299f55eb21f62afb09d), [`55f28f0`](https://github.com/kubb-labs/plugins/commit/55f28f0b3d9b0a070066b8b72ecacb6c8d1ab29a)]:
+  - @kubb/plugin-ts@5.0.0-beta.85
+
 ## 5.0.0-beta.85
 
 ### Patch Changes
