@@ -15,8 +15,8 @@ import type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-} from '../models/updatePet.ts'
-import { createPet } from './pet.ts'
+} from '../models/UpdatePet.ts'
+import { createPet } from './createPet.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

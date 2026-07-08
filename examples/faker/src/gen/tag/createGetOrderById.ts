@@ -10,8 +10,8 @@ import type {
   GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
-} from '../models/getOrderById.ts'
-import { createOrder } from './order.ts'
+} from '../models/GetOrderById.ts'
+import { createOrder } from './createOrder.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createGetOrderByIdPathOrderId(data?: bigint): bigint {

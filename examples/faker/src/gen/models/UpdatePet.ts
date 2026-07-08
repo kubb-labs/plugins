@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Pet } from './pet.ts'
+import type { Pet } from './Pet.ts'
 
 /**
  * @type object

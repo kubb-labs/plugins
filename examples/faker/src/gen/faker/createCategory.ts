@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { Tag } from '../models/tag.ts'
+import type { Category } from '../models/Category.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createTag<TData extends Partial<Tag> = object>(data?: TData) {
+export function createCategory<TData extends Partial<Category> = object>(data?: TData) {
   const defaultFakeData = {
     id: faker.number.bigInt(),
     name: faker.string.alpha(),
