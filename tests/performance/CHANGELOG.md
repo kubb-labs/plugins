@@ -1,5 +1,15 @@
 # performance
 
+## 0.0.1-beta.36
+
+### Patch Changes
+
+- Updated dependencies [[`e59f005`](https://github.com/kubb-labs/plugins/commit/e59f005535a31a287c3a8faa6a967d69ce7b1dc1), [`e59f005`](https://github.com/kubb-labs/plugins/commit/e59f005535a31a287c3a8faa6a967d69ce7b1dc1)]:
+  - @kubb/plugin-zod@5.0.0-beta.86
+  - @kubb/plugin-ts@5.0.0-beta.86
+  - @kubb/plugin-axios@5.0.0-beta.87
+  - @kubb/plugin-faker@5.0.0-beta.86
+
 ## 0.0.1-beta.35
 
 ### Patch Changes

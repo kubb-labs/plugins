@@ -1,5 +1,18 @@
 # @kubb/plugin-cypress
 
+## 5.0.0-beta.87
+
+### Patch Changes
+
+- [#649](https://github.com/kubb-labs/plugins/pull/649) [`e59f005`](https://github.com/kubb-labs/plugins/commit/e59f005535a31a287c3a8faa6a967d69ce7b1dc1) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove dead code and redundant guards across the plugins. Generated output is unchanged.
+
+  - Drop the always-true `hasCursorParam` guard in the infinite-query generators (react-query, vue-query)
+  - Drop the no-op `.filter(Boolean)` over statically-imported generator lists (react-query, swr, vue-query), and use a conditional spread for the axios dependency list
+  - Inline single-caller wrappers and collapse redundant conditionals (swr `getQueryOptionsParams`, swr operation-classification guard, vue-query mutation-key params, redoc options bag, cypress import guard, faker single-element `Set` lookups)
+
+- Updated dependencies [[`e59f005`](https://github.com/kubb-labs/plugins/commit/e59f005535a31a287c3a8faa6a967d69ce7b1dc1)]:
+  - @kubb/plugin-ts@5.0.0-beta.86
+
 ## 5.0.0-beta.86
 
 ### Minor Changes
