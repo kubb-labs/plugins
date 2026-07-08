@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { operationFileEntry } from '@internals/shared'
-import type { ast, Group, Output } from 'kubb/kit'
+import type { ast, Group, Output, Resolver } from 'kubb/kit'
 
 /**
  * The resolved contract `<op>` for one operation: the generated function name, the file it lives in,
@@ -8,11 +8,6 @@ import type { ast, Group, Output } from 'kubb/kit'
  * come from).
  */
 export type ClientOperation = { name: string; path: string; clientPath: string }
-
-type ClientResolver = {
-  name: (name: string) => string
-  file: (options: ReturnType<typeof operationFileEntry> & { root: string; output: Output; group?: Group }) => { path: string }
-}
 
 /**
  * Resolves the contract client `<op>` a consumer (query hook, MCP handler) imports, by looking up
@@ -31,7 +26,7 @@ export function resolveClientOperation(options: {
   const { clientPlugin, driver, node, root, output } = options
   if (!clientPlugin) return null
 
-  const resolver = driver.getResolver(clientPlugin.pluginName) as ClientResolver | null | undefined
+  const resolver = driver.getResolver(clientPlugin.pluginName) as Resolver | null | undefined
   if (!resolver) return null
 
   const plugin = driver.getPlugin(clientPlugin.pluginName) as { options?: { output?: Output; group?: Group | null } } | null | undefined
