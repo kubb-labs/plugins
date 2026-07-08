@@ -430,7 +430,7 @@ export type UpdatePetBody = UpdatePetBodyJson | UpdatePetBodyXml | UpdatePetBody
 /**
  * @type object
  */
-export interface UpdatePetRequestConfig {
+export interface UpdatePetOptions {
   body: UpdatePetBody
   path?: never
   query?: never
@@ -503,7 +503,7 @@ export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncod
 /**
  * @type object
  */
-export interface AddPetRequestConfig {
+export interface AddPetOptions {
   body: AddPetBody
   path?: never
   query?: never
@@ -532,10 +532,15 @@ export interface AddPetResponses {
 export type AddPetResponse = AddPetStatus200 | AddPetStatus405
 
 /**
- * @description Status values that need to be considered for filter
- * @default available
+ * @type object
  */
-export type FindPetsByStatusQueryStatus = FindPetsByStatusStatus | undefined
+export interface FindPetsByStatusQuery {
+  /**
+   * @description Status values that need to be considered for filter
+   * @default available
+   */
+  status?: FindPetsByStatusStatus
+}
 
 /**
  * @type array
@@ -557,15 +562,10 @@ export type FindPetsByStatusStatus400 = unknown
 /**
  * @type object
  */
-export interface FindPetsByStatusRequestConfig {
+export interface FindPetsByStatusOptions {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    status?: FindPetsByStatusQueryStatus
-  }
+  query?: FindPetsByStatusQuery
   headers?: never
 }
 
@@ -591,22 +591,25 @@ export interface FindPetsByStatusResponses {
 export type FindPetsByStatusResponse = FindPetsByStatusStatus200 | FindPetsByStatusStatus400
 
 /**
- * @description Tags to filter by
- * @type array | undefined
+ * @type object
  */
-export type FindPetsByTagsQueryTags = Array<string> | undefined
-
-/**
- * @description to request with required page number or pagination
- * @type string | undefined
- */
-export type FindPetsByTagsQueryPage = string | undefined
-
-/**
- * @description to request with required page size
- * @type string | undefined
- */
-export type FindPetsByTagsQueryPageSize = string | undefined
+export interface FindPetsByTagsQuery {
+  /**
+   * @description Tags to filter by
+   * @type array | undefined
+   */
+  tags?: Array<string>
+  /**
+   * @description to request with required page number or pagination
+   * @type string | undefined
+   */
+  page?: string
+  /**
+   * @description to request with required page size
+   * @type string | undefined
+   */
+  pageSize?: string
+}
 
 /**
  * @type array
@@ -628,17 +631,10 @@ export type FindPetsByTagsStatus400 = unknown
 /**
  * @type object
  */
-export interface FindPetsByTagsRequestConfig {
+export interface FindPetsByTagsOptions {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    tags?: FindPetsByTagsQueryTags
-    page?: FindPetsByTagsQueryPage
-    pageSize?: FindPetsByTagsQueryPageSize
-  }
+  query?: FindPetsByTagsQuery
   headers?: never
 }
 
@@ -664,12 +660,17 @@ export interface FindPetsByTagsResponses {
 export type FindPetsByTagsResponse = FindPetsByTagsStatus200 | FindPetsByTagsStatus400
 
 /**
- * @description ID of pet to return
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type GetPetByIdPathPetId = bigint
+export interface GetPetByIdPath {
+  /**
+   * @description ID of pet to return
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  petId: bigint
+}
 
 export type GetPetByIdStatus200Json = Pet
 
@@ -690,14 +691,9 @@ export type GetPetByIdStatus404 = unknown
 /**
  * @type object
  */
-export interface GetPetByIdRequestConfig {
+export interface GetPetByIdOptions {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    petId: GetPetByIdPathPetId
-  }
+  path: GetPetByIdPath
   query?: never
   headers?: never
 }
@@ -725,24 +721,33 @@ export interface GetPetByIdResponses {
 export type GetPetByIdResponse = GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404
 
 /**
- * @description ID of pet that needs to be updated
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type UpdatePetWithFormPathPetId = bigint
+export interface UpdatePetWithFormPath {
+  /**
+   * @description ID of pet that needs to be updated
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  petId: bigint
+}
 
 /**
- * @description Name of pet that needs to be updated
- * @type string | undefined
+ * @type object
  */
-export type UpdatePetWithFormQueryName = string | undefined
-
-/**
- * @description Status of pet that needs to be updated
- * @type string | undefined
- */
-export type UpdatePetWithFormQueryStatus = string | undefined
+export interface UpdatePetWithFormQuery {
+  /**
+   * @description Name of pet that needs to be updated
+   * @type string | undefined
+   */
+  name?: string
+  /**
+   * @description Status of pet that needs to be updated
+   * @type string | undefined
+   */
+  status?: string
+}
 
 /**
  * @type unknown
@@ -752,21 +757,10 @@ export type UpdatePetWithFormStatus405 = unknown
 /**
  * @type object
  */
-export interface UpdatePetWithFormRequestConfig {
+export interface UpdatePetWithFormOptions {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    petId: UpdatePetWithFormPathPetId
-  }
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    name?: UpdatePetWithFormQueryName
-    status?: UpdatePetWithFormQueryStatus
-  }
+  path: UpdatePetWithFormPath
+  query?: UpdatePetWithFormQuery
   headers?: never
 }
 
@@ -783,17 +777,27 @@ export interface UpdatePetWithFormResponses {
 export type UpdatePetWithFormResponse = UpdatePetWithFormStatus405
 
 /**
- * @type string | undefined
+ * @type object
  */
-export type DeletePetHeaderApiKey = string | undefined
+export interface DeletePetPath {
+  /**
+   * @description Pet id to delete
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  petId: bigint
+}
 
 /**
- * @description Pet id to delete
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type DeletePetPathPetId = bigint
+export interface DeletePetHeaders {
+  /**
+   * @type string | undefined
+   */
+  apiKey?: string
+}
 
 /**
  * @type array
@@ -808,21 +812,11 @@ export type DeletePetStatus400 = unknown
 /**
  * @type object
  */
-export interface DeletePetRequestConfig {
+export interface DeletePetOptions {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    petId: DeletePetPathPetId
-  }
+  path: DeletePetPath
   query?: never
-  /**
-   * @type object | undefined
-   */
-  headers?: {
-    apiKey?: DeletePetHeaderApiKey
-  }
+  headers?: DeletePetHeaders
 }
 
 /**
@@ -839,18 +833,28 @@ export interface DeletePetResponses {
 export type DeletePetResponse = DeletePetStatus200 | DeletePetStatus400
 
 /**
- * @description ID of pet to update
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type UploadFilePathPetId = bigint
+export interface UploadFilePath {
+  /**
+   * @description ID of pet to update
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  petId: bigint
+}
 
 /**
- * @description Additional Metadata
- * @type string | undefined
+ * @type object
  */
-export type UploadFileQueryAdditionalMetadata = string | undefined
+export interface UploadFileQuery {
+  /**
+   * @description Additional Metadata
+   * @type string | undefined
+   */
+  additionalMetadata?: string
+}
 
 /**
  * @type object
@@ -867,20 +871,10 @@ export type UploadFileBody = Blob | undefined
 /**
  * @type object
  */
-export interface UploadFileRequestConfig {
+export interface UploadFileOptions {
   body: UploadFileBody
-  /**
-   * @type object
-   */
-  path: {
-    petId: UploadFilePathPetId
-  }
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    additionalMetadata?: UploadFileQueryAdditionalMetadata
-  }
+  path: UploadFilePath
+  query?: UploadFileQuery
   headers?: never
 }
 
@@ -906,7 +900,7 @@ export interface GetInventoryStatus200 {
 /**
  * @type object
  */
-export interface GetInventoryRequestConfig {
+export interface GetInventoryOptions {
   body?: never
   path?: never
   query?: never
@@ -956,7 +950,7 @@ export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrder
 /**
  * @type object
  */
-export interface PlaceOrderRequestConfig {
+export interface PlaceOrderOptions {
   body: PlaceOrderBody
   path?: never
   query?: never
@@ -1006,7 +1000,7 @@ export type PlaceOrderPatchBody = PlaceOrderPatchBodyJson | PlaceOrderPatchBodyX
 /**
  * @type object
  */
-export interface PlaceOrderPatchRequestConfig {
+export interface PlaceOrderPatchOptions {
   body: PlaceOrderPatchBody
   path?: never
   query?: never
@@ -1027,12 +1021,17 @@ export interface PlaceOrderPatchResponses {
 export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatchStatus405
 
 /**
- * @description ID of order that needs to be fetched
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type GetOrderByIdPathOrderId = bigint
+export interface GetOrderByIdPath {
+  /**
+   * @description ID of order that needs to be fetched
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  orderId: bigint
+}
 
 /**
  * @type object
@@ -1059,14 +1058,9 @@ export type GetOrderByIdStatus404 = unknown
 /**
  * @type object
  */
-export interface GetOrderByIdRequestConfig {
+export interface GetOrderByIdOptions {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    orderId: GetOrderByIdPathOrderId
-  }
+  path: GetOrderByIdPath
   query?: never
   headers?: never
 }
@@ -1094,12 +1088,17 @@ export interface GetOrderByIdResponses {
 export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400 | GetOrderByIdStatus404
 
 /**
- * @description ID of the order that needs to be deleted
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type DeleteOrderPathOrderId = bigint
+export interface DeleteOrderPath {
+  /**
+   * @description ID of the order that needs to be deleted
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  orderId: bigint
+}
 
 /**
  * @type unknown
@@ -1114,14 +1113,9 @@ export type DeleteOrderStatus404 = unknown
 /**
  * @type object
  */
-export interface DeleteOrderRequestConfig {
+export interface DeleteOrderOptions {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    orderId: DeleteOrderPathOrderId
-  }
+  path: DeleteOrderPath
   query?: never
   headers?: never
 }

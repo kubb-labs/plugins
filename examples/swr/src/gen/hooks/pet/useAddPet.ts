@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { AddPetRequestConfig, AddPetResponse, AddPetStatus405 } from '../../models/pet/AddPet.ts'
+import type { AddPetOptions, AddPetResponse, AddPetStatus405 } from '../../models/pet/AddPet.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { addPet } from '../../clients/pet/addPet.ts'
 
@@ -13,7 +13,7 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
 export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
 
-export type AddPetMutationArg = AddPetRequestConfig
+export type AddPetMutationArg = AddPetOptions
 
 /**
  * @description Add a new pet to the store

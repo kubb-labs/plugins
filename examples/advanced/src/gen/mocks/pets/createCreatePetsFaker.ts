@@ -1,7 +1,8 @@
 import type {
   CreatePetsBody,
-  CreatePetsHeaderXEXAMPLE,
-  CreatePetsQueryBoolParam,
+  CreatePetsHeaders,
+  CreatePetsPath,
+  CreatePetsQuery,
   CreatePetsResponse,
   CreatePetsStatus201,
   CreatePetsStatusDefault,
@@ -11,20 +12,35 @@ import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLEFaker.
 import { createPetNotFoundFaker } from '../createPetNotFoundFaker.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createCreatePetsQueryBoolParamFaker(data?: Partial<CreatePetsQueryBoolParam>): CreatePetsQueryBoolParam {
-  return createCreatePetsBoolParamFaker(data) as CreatePetsQueryBoolParam
+export function createCreatePetsPathFaker<TData extends Partial<CreatePetsPath> = object>(data?: TData) {
+  const defaultFakeData = {
+    uuid: faker.string.alpha(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
-export function createCreatePetsPathUuidFaker(data?: string): string {
-  return data ?? faker.string.alpha()
+export function createCreatePetsQueryFaker<TData extends Partial<CreatePetsQuery> = object>(data?: TData) {
+  const defaultFakeData = {
+    boolParam: createCreatePetsBoolParamFaker(),
+    offset: faker.number.int(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
-export function createCreatePetsQueryOffsetFaker(data?: number): number {
-  return data ?? faker.number.int()
-}
-
-export function createCreatePetsHeaderXEXAMPLEFaker(data?: Partial<CreatePetsHeaderXEXAMPLE>): CreatePetsHeaderXEXAMPLE {
-  return createCreatePetsXEXAMPLEFaker(data) as CreatePetsHeaderXEXAMPLE
+export function createCreatePetsHeadersFaker<TData extends Partial<CreatePetsHeaders> = object>(data?: TData) {
+  const defaultFakeData = {
+    xEXAMPLE: createCreatePetsXEXAMPLEFaker(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**

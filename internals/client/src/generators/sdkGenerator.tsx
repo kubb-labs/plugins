@@ -47,7 +47,7 @@ type Controller = {
 }
 
 function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
-  return [tsResolver.response.config(node), tsResolver.response.responses(node)]
+  return [tsResolver.response.options(node), tsResolver.response.responses(node)]
 }
 
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod, validator: ValidatorOptions): Array<string> {

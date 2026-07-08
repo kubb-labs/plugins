@@ -4,8 +4,8 @@
 */
 
 import type { ClientConfig, ClientInstance, Options, RequestResult } from '../.kubb/client.ts'
-import type { GetInventoryRequestConfig, GetInventoryResponses } from '../types/GetInventory.ts'
-import type { PlaceOrderRequestConfig, PlaceOrderResponses } from '../types/PlaceOrder.ts'
+import type { GetInventoryOptions, GetInventoryResponses } from '../types/GetInventory.ts'
+import type { PlaceOrderOptions, PlaceOrderResponses } from '../types/PlaceOrder.ts'
 import { createClient } from '../.kubb/client.ts'
 
 export class StoreClient {
@@ -20,7 +20,7 @@ export class StoreClient {
    * @summary Returns pet inventories by status
    * {@link /store/inventory}
    */
-    public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryRequestConfig, ThrowOnError> = {}): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
+    public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptions, ThrowOnError> = {}): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
@@ -31,7 +31,7 @@ export class StoreClient {
    * @summary Place an order for a pet
    * {@link /store/order}
    */
-    public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderRequestConfig, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
+    public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptions, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'POST', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>

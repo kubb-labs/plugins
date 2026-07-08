@@ -3,7 +3,7 @@ export type {
   CreateUserBodyFormUrlEncoded,
   CreateUserBodyJson,
   CreateUserBodyXml,
-  CreateUserRequestConfig,
+  CreateUserOptions,
   CreateUserResponse,
   CreateUserResponses,
   CreateUserStatusDefault,
@@ -12,7 +12,7 @@ export type {
 } from './CreateUser.ts'
 export type {
   CreateUsersWithListInputBody,
-  CreateUsersWithListInputRequestConfig,
+  CreateUsersWithListInputOptions,
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
   CreateUsersWithListInputStatus200,
@@ -20,17 +20,10 @@ export type {
   CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
 } from './CreateUsersWithListInput.ts'
+export type { DeleteUserOptions, DeleteUserPath, DeleteUserResponse, DeleteUserResponses, DeleteUserStatus400, DeleteUserStatus404 } from './DeleteUser.ts'
 export type {
-  DeleteUserPathUsername,
-  DeleteUserRequestConfig,
-  DeleteUserResponse,
-  DeleteUserResponses,
-  DeleteUserStatus400,
-  DeleteUserStatus404,
-} from './DeleteUser.ts'
-export type {
-  GetUserByNamePathUsername,
-  GetUserByNameRequestConfig,
+  GetUserByNameOptions,
+  GetUserByNamePath,
   GetUserByNameResponse,
   GetUserByNameResponses,
   GetUserByNameStatus200,
@@ -40,9 +33,8 @@ export type {
   GetUserByNameStatus404,
 } from './GetUserByName.ts'
 export type {
-  LoginUserQueryPassword,
-  LoginUserQueryUsername,
-  LoginUserRequestConfig,
+  LoginUserOptions,
+  LoginUserQuery,
   LoginUserResponse,
   LoginUserResponses,
   LoginUserStatus200,
@@ -50,14 +42,14 @@ export type {
   LoginUserStatus200Xml,
   LoginUserStatus400,
 } from './LoginUser.ts'
-export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.ts'
+export type { LogoutUserOptions, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.ts'
 export type {
   UpdateUserBody,
   UpdateUserBodyFormUrlEncoded,
   UpdateUserBodyJson,
   UpdateUserBodyXml,
-  UpdateUserPathUsername,
-  UpdateUserRequestConfig,
+  UpdateUserOptions,
+  UpdateUserPath,
   UpdateUserResponse,
   UpdateUserResponses,
   UpdateUserStatusDefault,

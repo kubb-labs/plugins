@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse } from './UpdatePetWithForm'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormResponse } from './UpdatePetWithForm'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { updatePetWithForm } from './clients/updatePetWithForm'
 
@@ -13,7 +13,7 @@ export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as co
 
 export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMutationKey>
 
-export type UpdatePetWithFormMutationArg = UpdatePetWithFormRequestConfig
+export type UpdatePetWithFormMutationArg = UpdatePetWithFormOptions
 
 /**
  * {@link /pet/:petId}

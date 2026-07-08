@@ -4,10 +4,15 @@
  */
 
 /**
- * @description The name that needs to be deleted
- * @type string
+ * @type object
  */
-export type DeleteUserPathUsername = string
+export type DeleteUserPath = {
+  /**
+   * @description The name that needs to be deleted
+   * @type string
+   */
+  username: string
+}
 
 /**
  * @type unknown
@@ -22,14 +27,9 @@ export type DeleteUserStatus404 = unknown
 /**
  * @type object
  */
-export type DeleteUserRequestConfig = {
+export type DeleteUserOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    username: DeleteUserPathUsername
-  }
+  path: DeleteUserPath
   query?: never
   headers?: never
 }

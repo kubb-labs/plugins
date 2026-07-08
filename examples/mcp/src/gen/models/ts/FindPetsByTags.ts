@@ -7,27 +7,35 @@ import type { FindPetsByTagsXEXAMPLEKey } from './FindPetsByTagsXEXAMPLE.js'
 import type { Pet } from './Pet.js'
 
 /**
- * @description Tags to filter by
- * @type array | undefined
+ * @type object
  */
-export type FindPetsByTagsQueryTags = string[] | undefined
+export type FindPetsByTagsQuery = {
+  /**
+   * @description Tags to filter by
+   * @type array | undefined
+   */
+  tags?: string[]
+  /**
+   * @description to request with required page number or pagination
+   * @type string | undefined
+   */
+  page?: string
+  /**
+   * @description to request with required page size
+   * @type string | undefined
+   */
+  pageSize?: string
+}
 
 /**
- * @description to request with required page number or pagination
- * @type string | undefined
+ * @type object
  */
-export type FindPetsByTagsQueryPage = string | undefined
-
-/**
- * @description to request with required page size
- * @type string | undefined
- */
-export type FindPetsByTagsQueryPageSize = string | undefined
-
-/**
- * @description Header parameters
- */
-export type FindPetsByTagsHeaderXEXAMPLE = FindPetsByTagsXEXAMPLEKey
+export type FindPetsByTagsHeaders = {
+  /**
+   * @description Header parameters
+   */
+  xEXAMPLE: FindPetsByTagsXEXAMPLEKey
+}
 
 /**
  * @type array
@@ -49,23 +57,11 @@ export type FindPetsByTagsStatus400 = unknown
 /**
  * @type object
  */
-export type FindPetsByTagsRequestConfig = {
+export type FindPetsByTagsOptions = {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    tags?: FindPetsByTagsQueryTags
-    page?: FindPetsByTagsQueryPage
-    pageSize?: FindPetsByTagsQueryPageSize
-  }
-  /**
-   * @type object
-   */
-  headers: {
-    xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE
-  }
+  query?: FindPetsByTagsQuery
+  headers: FindPetsByTagsHeaders
 }
 
 /**

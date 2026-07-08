@@ -4,9 +4,14 @@
  */
 
 /**
- * @type string
+ * @type object
  */
-export type UploadFilePathPetId = string
+export type UploadFilePath = {
+  /**
+   * @type string
+   */
+  petId: string
+}
 
 /**
  * @type object
@@ -38,14 +43,9 @@ export type UploadFileBody = UploadFileBodyJson | UploadFileBodyFormData
 /**
  * @type object
  */
-export type UploadFileRequestConfig = {
+export type UploadFileOptions = {
   body: UploadFileBody
-  /**
-   * @type object
-   */
-  path: {
-    petId: UploadFilePathPetId
-  }
+  path: UploadFilePath
   query?: never
   headers?: never
 }

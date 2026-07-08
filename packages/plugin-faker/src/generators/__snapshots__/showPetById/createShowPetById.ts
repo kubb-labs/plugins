@@ -3,11 +3,17 @@
  * Do not edit manually.
  */
 
-import type { ShowPetByIdResponse, ShowPetByIdStatus200, ShowPetByIdStatusDefault } from './types/ShowPetById'
+import type { ShowPetByIdPath, ShowPetByIdResponse, ShowPetByIdStatus200, ShowPetByIdStatusDefault } from './types/ShowPetById'
 import { faker } from '@faker-js/faker'
 
-export function createShowPetByIdPathPetId(data?: string): string {
-  return data ?? faker.string.alpha()
+export function createShowPetByIdPath<TData extends Partial<ShowPetByIdPath> = object>(data?: TData) {
+  const defaultFakeData = {
+    petId: faker.string.alpha(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**

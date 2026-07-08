@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../../models/pet/DeletePet.ts'
+import type { DeletePetOptions, DeletePetResponse, DeletePetStatus400 } from '../../models/pet/DeletePet.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { deletePet } from '../../clients/pet/deletePet.ts'
 
@@ -13,7 +13,7 @@ export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
 export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
 
-export type DeletePetMutationArg = DeletePetRequestConfig
+export type DeletePetMutationArg = DeletePetOptions
 
 /**
  * @description delete a pet

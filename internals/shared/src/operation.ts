@@ -133,8 +133,8 @@ export type ResolveOperationTypeNameOptions = {
   exclude?: ReadonlyArray<string | undefined>
   order?: 'params-first' | 'body-response-first'
   /**
-   * Include the individual `PathParams`/`QueryParams`/`HeaderParams` type names. Set to `false`
-   * for clients that reference the grouped `RequestConfig` type instead of the per-group types.
+   * Include the individual `Path`/`Query`/`Headers` group type names. Set to `false` for clients
+   * that reference the grouped `Options` type instead of the per-group types.
    */
   includeParams?: boolean
 }
@@ -359,21 +359,21 @@ export function getRequestGroupOptionality(node: ast.OperationNode): RequestGrou
   }
 }
 
-export type RequestConfigNameResolver = RequestConfigResolver & {
+export type RequestOptionsNameResolver = RequestConfigResolver & {
   response: {
-    config(node: ast.OperationNode): string
+    options(node: ast.OperationNode): string
   }
 }
 
 /**
  * Builds the grouped `{ path, query, body, headers }` parameter for a generated client
- * function, typed from the operation's `RequestConfig` (minus `url`). Only the groups the
+ * function, typed from the operation's `Options` (minus `url`). Only the groups the
  * operation actually has are destructured. The trailing `config` parameter carries the
  * runtime `RequestConfig` overrides plus `client`.
  */
 export function buildRequestParamsSignature(
   node: ast.OperationNode,
-  resolver: RequestConfigNameResolver,
+  resolver: RequestOptionsNameResolver,
   options: { isConfigurable?: boolean } = {},
 ): { signature: string; groups: RequestGroups } {
   const { isConfigurable = true } = options
@@ -381,7 +381,7 @@ export function buildRequestParamsSignature(
 
   const names = (['path', 'query', 'body', 'headers'] as const).filter((key) => groups[key])
 
-  const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: ${resolver.response.config(node)}${isOptional ? ' = {}' : ''}` : null
+  const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: ${resolver.response.options(node)}${isOptional ? ' = {}' : ''}` : null
   const configParam = isConfigurable ? `config: ${buildRequestConfigType(node)} = {}` : null
 
   return {

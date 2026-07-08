@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { PlaceOrderRequestConfig, PlaceOrderResponse, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
+import type { PlaceOrderOptions, PlaceOrderResponse, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { placeOrder } from '../clients/placeOrder.ts'
 
@@ -13,7 +13,7 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
 export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
 
-export type PlaceOrderMutationArg = PlaceOrderRequestConfig
+export type PlaceOrderMutationArg = PlaceOrderOptions
 
 /**
  * @description Place a new order in the store

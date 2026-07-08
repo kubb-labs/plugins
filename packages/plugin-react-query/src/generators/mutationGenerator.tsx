@@ -54,7 +54,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
     }
 
     const importedTypeNames = [
-      tsResolver.response.config(node),
+      tsResolver.response.options(node),
       ...resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first', includeParams: false }),
     ].filter((name): name is string => Boolean(name))
 

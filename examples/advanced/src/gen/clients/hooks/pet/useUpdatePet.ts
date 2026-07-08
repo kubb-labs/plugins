@@ -1,6 +1,6 @@
 import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
 import type {
-  UpdatePetRequestConfig,
+  UpdatePetOptions,
   UpdatePetStatus200,
   UpdatePetStatus202,
   UpdatePetStatus400,
@@ -22,7 +22,7 @@ export function updatePetMutationOptions<TContext = unknown>(
   return mutationOptions<
     UpdatePetStatus200 | UpdatePetStatus202,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    UpdatePetRequestConfig,
+    UpdatePetOptions,
     TContext
   >({
     mutationKey,
@@ -43,7 +43,7 @@ export function useUpdatePet<TContext>(
     mutation?: UseMutationOptions<
       UpdatePetStatus200 | UpdatePetStatus202,
       ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-      UpdatePetRequestConfig,
+      UpdatePetOptions,
       TContext
     > & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
@@ -61,14 +61,14 @@ export function useUpdatePet<TContext>(
   const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<
     UpdatePetStatus200 | UpdatePetStatus202,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    UpdatePetRequestConfig,
+    UpdatePetOptions,
     TContext
   >
 
   return useMutation<
     UpdatePetStatus200 | UpdatePetStatus202,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    UpdatePetRequestConfig,
+    UpdatePetOptions,
     TContext
   >(
     {
@@ -80,7 +80,7 @@ export function useUpdatePet<TContext>(
   ) as UseMutationResult<
     UpdatePetStatus200 | UpdatePetStatus202,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    UpdatePetRequestConfig,
+    UpdatePetOptions,
     TContext
   >
 }

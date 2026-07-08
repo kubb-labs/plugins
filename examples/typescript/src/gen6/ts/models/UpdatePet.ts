@@ -46,7 +46,7 @@ export type UpdatePetBody = UpdatePetBodyJson | UpdatePetBodyXml | UpdatePetBody
 /**
  * @type object
  */
-export type UpdatePetRequestConfig = {
+export type UpdatePetOptions = {
   body: UpdatePetBody
   path?: never
   query?: never

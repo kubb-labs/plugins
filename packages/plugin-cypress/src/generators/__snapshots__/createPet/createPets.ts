@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { CreatePetsRequestConfig, CreatePetsResponse } from './CreatePets'
+import type { CreatePetsOptions, CreatePetsResponse } from './CreatePets'
 
-export function createPets({ body }: CreatePetsRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<CreatePetsResponse> {
+export function createPets({ body }: CreatePetsOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<CreatePetsResponse> {
   return cy
     .request<CreatePetsResponse>({
       method: 'POST',

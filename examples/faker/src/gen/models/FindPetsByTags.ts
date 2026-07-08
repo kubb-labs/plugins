@@ -6,10 +6,15 @@
 import type { Pet } from './Pet.ts'
 
 /**
- * @description Tags to filter by
- * @type array | undefined
+ * @type object
  */
-export type FindPetsByTagsQueryTags = string[] | undefined
+export type FindPetsByTagsQuery = {
+  /**
+   * @description Tags to filter by
+   * @type array | undefined
+   */
+  tags?: string[]
+}
 
 /**
  * @type array
@@ -31,15 +36,10 @@ export type FindPetsByTagsStatus400 = unknown
 /**
  * @type object
  */
-export type FindPetsByTagsRequestConfig = {
+export type FindPetsByTagsOptions = {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    tags?: FindPetsByTagsQueryTags
-  }
+  query?: FindPetsByTagsQuery
   headers?: never
 }
 

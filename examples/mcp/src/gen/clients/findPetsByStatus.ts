@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../.kubb/client.js'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../models/ts/FindPetsByStatus.js'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../models/ts/FindPetsByStatus.js'
 import { client } from '../.kubb/client.js'
 
 /**
@@ -13,7 +13,7 @@ import { client } from '../.kubb/client.js'
  * {@link /pet/findByStatus/:step_id}
  */
 export function findPetsByStatus<ThrowOnError extends boolean = true>(
-  options: Options<FindPetsByStatusRequestConfig, ThrowOnError>,
+  options: Options<FindPetsByStatusOptions, ThrowOnError>,
 ): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

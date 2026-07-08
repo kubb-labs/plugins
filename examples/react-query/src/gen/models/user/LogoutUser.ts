@@ -11,7 +11,7 @@ export type LogoutUserStatusDefault = unknown
 /**
  * @type object
  */
-export type LogoutUserRequestConfig = {
+export type LogoutUserOptions = {
   body?: never
   path?: never
   query?: never

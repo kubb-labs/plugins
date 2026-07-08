@@ -4,14 +4,14 @@
 */
 
 import type { RequestConfig } from '../.kubb/client.ts'
-import type { PlaceOrderRequestConfig } from '../types/PlaceOrder.ts'
+import type { PlaceOrderOptions } from '../types/PlaceOrder.ts'
 import { placeOrder } from '../clients/placeOrder.ts'
 
-export const placeOrderQueryKey = ({ body }: Omit<PlaceOrderRequestConfig, 'headers'>) => [{ url: '/store/order' }, ...(body ? [body] : [])] as const
+export const placeOrderQueryKey = ({ body }: Omit<PlaceOrderOptions, 'headers'>) => [{ url: '/store/order' }, ...(body ? [body] : [])] as const
 
 type PlaceOrderQueryKey = ReturnType<typeof placeOrderQueryKey>
 
-export function placeOrderQueryOptions({ body }: PlaceOrderRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function placeOrderQueryOptions({ body }: PlaceOrderOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
       const { data } = await placeOrder({ ...config, body, throwOnError: true })

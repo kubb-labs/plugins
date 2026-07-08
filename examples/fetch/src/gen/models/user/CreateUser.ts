@@ -40,7 +40,7 @@ export type CreateUserBody = CreateUserBodyJson | CreateUserBodyXml | CreateUser
 /**
  * @type object
  */
-export type CreateUserRequestConfig = {
+export type CreateUserOptions = {
   body: CreateUserBody
   path?: never
   query?: never

@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../.kubb/client.js'
-import type { AddPetRequestConfig, AddPetResponses } from '../models/ts/AddPet.js'
+import type { AddPetOptions, AddPetResponses } from '../models/ts/AddPet.js'
 import { client } from '../.kubb/client.js'
 
 /**
@@ -13,7 +13,7 @@ import { client } from '../.kubb/client.js'
  * {@link /pet}
  */
 export function addPet<ThrowOnError extends boolean = true>(
-  options: Options<AddPetRequestConfig, ThrowOnError>,
+  options: Options<AddPetOptions, ThrowOnError>,
 ): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

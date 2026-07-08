@@ -4,9 +4,14 @@
  */
 
 /**
- * @type string
+ * @type object
  */
-export type DeletePetPathPetId = string
+export type DeletePetPath = {
+  /**
+   * @type string
+   */
+  petId: string
+}
 
 /**
  * @type void
@@ -16,14 +21,9 @@ export type DeletePetStatus204 = void
 /**
  * @type object
  */
-export type DeletePetRequestConfig = {
+export type DeletePetOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    petId: DeletePetPathPetId
-  }
+  path: DeletePetPath
   query?: never
   headers?: never
 }

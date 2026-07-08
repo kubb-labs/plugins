@@ -57,7 +57,7 @@ export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncod
 /**
  * @type object
  */
-export type AddPetRequestConfig = {
+export type AddPetOptions = {
   body: AddPetBody
   path?: never
   query?: never

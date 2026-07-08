@@ -2,24 +2,38 @@ import type { CreatePetsBoolParamKey } from '../CreatePetsBoolParam.ts'
 import type { CreatePetsXEXAMPLEKey } from '../CreatePetsXEXAMPLE.ts'
 import type { PetNotFound } from '../PetNotFound.ts'
 
-export type CreatePetsQueryBoolParam = CreatePetsBoolParamKey | undefined
+/**
+ * @type object
+ */
+export type CreatePetsPath = {
+  /**
+   * @description UUID
+   * @type string
+   */
+  uuid: string
+}
 
 /**
- * @description UUID
- * @type string
+ * @type object
  */
-export type CreatePetsPathUuid = string
+export type CreatePetsQuery = {
+  boolParam?: CreatePetsBoolParamKey
+  /**
+   * @description Offset *\/
+   * @type integer | undefined
+   */
+  offset?: number
+}
 
 /**
- * @description Offset *\/
- * @type integer | undefined
+ * @type object
  */
-export type CreatePetsQueryOffset = number | undefined
-
-/**
- * @description Header parameters
- */
-export type CreatePetsHeaderXEXAMPLE = CreatePetsXEXAMPLEKey
+export type CreatePetsHeaders = {
+  /**
+   * @description Header parameters
+   */
+  xEXAMPLE: CreatePetsXEXAMPLEKey
+}
 
 /**
  * @type unknown
@@ -49,27 +63,11 @@ export type CreatePetsBody = {
 /**
  * @type object
  */
-export type CreatePetsRequestConfig = {
+export type CreatePetsOptions = {
   body: CreatePetsBody
-  /**
-   * @type object
-   */
-  path: {
-    uuid: CreatePetsPathUuid
-  }
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    boolParam?: CreatePetsQueryBoolParam
-    offset?: CreatePetsQueryOffset
-  }
-  /**
-   * @type object
-   */
-  headers: {
-    xEXAMPLE: CreatePetsHeaderXEXAMPLE
-  }
+  path: CreatePetsPath
+  query?: CreatePetsQuery
+  headers: CreatePetsHeaders
 }
 
 /**

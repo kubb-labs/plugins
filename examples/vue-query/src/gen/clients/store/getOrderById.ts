@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { GetOrderByIdRequestConfig, GetOrderByIdResponses } from '../../models/store/GetOrderById.ts'
+import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../../models/store/GetOrderById.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**
@@ -13,7 +13,7 @@ import { client } from '../../.kubb/client.ts'
  * {@link /store/order/:orderId}
  */
 export function getOrderById<ThrowOnError extends boolean = true>(
-  options: Options<GetOrderByIdRequestConfig, ThrowOnError>,
+  options: Options<GetOrderByIdOptions, ThrowOnError>,
 ): Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

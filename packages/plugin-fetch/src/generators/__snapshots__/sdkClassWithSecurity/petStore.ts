@@ -1,10 +1,10 @@
 /* eslint-disable no-alert, no-console */
 
 import type { ClientConfig, ClientInstance, Options, RequestResult } from './.kubb/client'
-import type { DeletePetRequestConfig, DeletePetResponses } from './DeletePet'
-import type { GetInventoryRequestConfig, GetInventoryResponses } from './GetInventory'
-import type { GetPetByIdRequestConfig, GetPetByIdResponses } from './GetPetById'
-import type { GetProjectRequestConfig, GetProjectResponses } from './GetProject'
+import type { DeletePetOptions, DeletePetResponses } from './DeletePet'
+import type { GetInventoryOptions, GetInventoryResponses } from './GetInventory'
+import type { GetPetByIdOptions, GetPetByIdResponses } from './GetPetById'
+import type { GetProjectOptions, GetProjectResponses } from './GetProject'
 import { createClient } from './.kubb/client'
 
 export class PetStore {
@@ -18,7 +18,7 @@ export class PetStore {
    * {@link /pet/:petId}
    */
   public getPetById<ThrowOnError extends boolean = true>(
-    options: Options<GetPetByIdRequestConfig, ThrowOnError>,
+    options: Options<GetPetByIdOptions, ThrowOnError>,
   ): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -34,7 +34,7 @@ export class PetStore {
    * {@link /pet/:petId}
    */
   public deletePet<ThrowOnError extends boolean = true>(
-    options: Options<DeletePetRequestConfig, ThrowOnError>,
+    options: Options<DeletePetOptions, ThrowOnError>,
   ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -45,7 +45,7 @@ export class PetStore {
    * {@link /store/inventory}
    */
   public getInventory<ThrowOnError extends boolean = true>(
-    options: Options<GetInventoryRequestConfig, ThrowOnError> = {},
+    options: Options<GetInventoryOptions, ThrowOnError> = {},
   ): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -56,7 +56,7 @@ export class PetStore {
    * {@link /projects/:project_id}
    */
   public getProject<ThrowOnError extends boolean = true>(
-    options: Options<GetProjectRequestConfig, ThrowOnError>,
+    options: Options<GetProjectOptions, ThrowOnError>,
   ): Promise<RequestResult<GetProjectResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 

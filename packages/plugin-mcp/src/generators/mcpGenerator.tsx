@@ -33,8 +33,8 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
       return null
     }
 
-    // The handler signature references the grouped `<Name>RequestConfig`.
-    const requestConfigName = tsResolver.response.config(node)
+    // The handler signature references the grouped `<Name>Options`.
+    const optionsName = tsResolver.response.options(node)
 
     const meta = {
       name: resolver.handler.name(node),
@@ -52,7 +52,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     return (
       <File baseName={meta.file.baseName} path={meta.file.path} meta={meta.file.meta}>
-        {meta.fileTs && requestConfigName && <File.Import name={[requestConfigName]} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
+        {meta.fileTs && optionsName && <File.Import name={[optionsName]} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
         <File.Import name={['CallToolResult', 'ServerNotification', 'ServerRequest']} path={'@modelcontextprotocol/sdk/types'} isTypeOnly />
         <File.Import name={['RequestHandlerExtra']} path={'@modelcontextprotocol/sdk/shared/protocol'} isTypeOnly />
 

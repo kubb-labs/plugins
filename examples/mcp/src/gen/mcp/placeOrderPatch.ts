@@ -1,4 +1,4 @@
-import type { PlaceOrderPatchRequestConfig } from '../models/ts/PlaceOrderPatch.js'
+import type { PlaceOrderPatchOptions } from '../models/ts/PlaceOrderPatch.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { placeOrderPatch } from '../clients/placeOrderPatch.js'
@@ -9,7 +9,7 @@ import { placeOrderPatch } from '../clients/placeOrderPatch.js'
  * {@link /store/order}
  */
 export async function placeOrderPatchHandler(
-  { body }: PlaceOrderPatchRequestConfig,
+  { body }: PlaceOrderPatchOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await placeOrderPatch({ body })

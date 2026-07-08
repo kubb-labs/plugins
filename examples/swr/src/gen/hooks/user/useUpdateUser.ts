@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { UpdateUserRequestConfig, UpdateUserResponse } from '../../models/user/UpdateUser.ts'
+import type { UpdateUserOptions, UpdateUserResponse } from '../../models/user/UpdateUser.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { updateUser } from '../../clients/user/updateUser.ts'
 
@@ -13,7 +13,7 @@ export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 
 export type UpdateUserMutationKey = ReturnType<typeof updateUserMutationKey>
 
-export type UpdateUserMutationArg = UpdateUserRequestConfig
+export type UpdateUserMutationArg = UpdateUserOptions
 
 /**
  * @description This can only be done by the logged in user.

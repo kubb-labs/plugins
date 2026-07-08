@@ -43,7 +43,7 @@ export function MutationOptions({ name, clientName, node, tsResolver, mutationKe
   const hasMutationParams = groupedParam !== null
 
   const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
-  const TRequest = hasMutationParams ? tsResolver.response.config(node) : 'undefined'
+  const TRequest = hasMutationParams ? tsResolver.response.options(node) : 'undefined'
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : '_'
   const mutationFnBody = `const { data } = await ${buildClientCall(node, { clientName, signal: false })}
           return data`

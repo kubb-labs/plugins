@@ -71,7 +71,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
         : null
 
     const importedTypeNames = [
-      tsResolver.response.config(node),
+      tsResolver.response.options(node),
       queryParamsTypeName,
       ...resolveOperationTypeNames(node, tsResolver, {
         exclude: [queryKeyTypeName],

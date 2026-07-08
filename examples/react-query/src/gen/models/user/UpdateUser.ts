@@ -6,10 +6,15 @@
 import type { User } from '../User.ts'
 
 /**
- * @description name that need to be deleted
- * @type string
+ * @type object
  */
-export type UpdateUserPathUsername = string
+export type UpdateUserPath = {
+  /**
+   * @description name that need to be deleted
+   * @type string
+   */
+  username: string
+}
 
 /**
  * @type unknown
@@ -39,14 +44,9 @@ export type UpdateUserBody = UpdateUserBodyJson | UpdateUserBodyXml | UpdateUser
 /**
  * @type object
  */
-export type UpdateUserRequestConfig = {
+export type UpdateUserOptions = {
   body: UpdateUserBody
-  /**
-   * @type object
-   */
-  path: {
-    username: UpdateUserPathUsername
-  }
+  path: UpdateUserPath
   query?: never
   headers?: never
 }

@@ -4,14 +4,14 @@
 */
 
 import type { RequestConfig } from '../.kubb/client.ts'
-import type { UploadFileRequestConfig } from '../types/UploadFile.ts'
+import type { UploadFileOptions } from '../types/UploadFile.ts'
 import { uploadFile } from '../clients/uploadFile.ts'
 
-export const uploadFileQueryKey = ({ path, query, body }: Omit<UploadFileRequestConfig, 'headers'>) => [{ url: '/pet/:petId/uploadImage', params: path }, ...(query ? [query] : []), ...(body ? [body] : [])] as const
+export const uploadFileQueryKey = ({ path, query, body }: Omit<UploadFileOptions, 'headers'>) => [{ url: '/pet/:petId/uploadImage', params: path }, ...(query ? [query] : []), ...(body ? [body] : [])] as const
 
 type UploadFileQueryKey = ReturnType<typeof uploadFileQueryKey>
 
-export function uploadFileQueryOptions({ path, query, body }: UploadFileRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function uploadFileQueryOptions({ path, query, body }: UploadFileOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
       const { data } = await uploadFile({ ...config, path, query, body, throwOnError: true })

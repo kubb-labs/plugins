@@ -14,11 +14,16 @@ export const findPetsByStatusStatus = {
 export type FindPetsByStatusStatusKey = (typeof findPetsByStatusStatus)[keyof typeof findPetsByStatusStatus]
 
 /**
- * @description Status values that need to be considered for filter
- * @default 'available'
- * @type string | undefined
+ * @type object
  */
-export type FindPetsByStatusQueryStatus = FindPetsByStatusStatusKey | undefined
+export type FindPetsByStatusQuery = {
+  /**
+   * @description Status values that need to be considered for filter
+   * @default 'available'
+   * @type string | undefined
+   */
+  status?: FindPetsByStatusStatusKey
+}
 
 /**
  * @type array
@@ -40,15 +45,10 @@ export type FindPetsByStatusStatus400 = unknown
 /**
  * @type object
  */
-export type FindPetsByStatusRequestConfig = {
+export type FindPetsByStatusOptions = {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    status?: FindPetsByStatusQueryStatus
-  }
+  query?: FindPetsByStatusQuery
   headers?: never
 }
 

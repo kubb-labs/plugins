@@ -17,14 +17,9 @@ export {
   createAddPetStatusDefaultFakerJson,
   createAddPetStatusDefaultFakerXml,
 } from './createAddPetFaker.ts'
+export { createDeletePetHeadersFaker, createDeletePetPathFaker, createDeletePetResponseFaker, createDeletePetStatus400Faker } from './createDeletePetFaker.ts'
 export {
-  createDeletePetHeaderApiKeyFaker,
-  createDeletePetPathPetIdFaker,
-  createDeletePetResponseFaker,
-  createDeletePetStatus400Faker,
-} from './createDeletePetFaker.ts'
-export {
-  createFindPetsByStatusPathStepIdFaker,
+  createFindPetsByStatusPathFaker,
   createFindPetsByStatusResponseFaker,
   createFindPetsByStatusStatus200Faker,
   createFindPetsByStatusStatus200FakerJson,
@@ -32,10 +27,8 @@ export {
   createFindPetsByStatusStatus400Faker,
 } from './createFindPetsByStatusFaker.ts'
 export {
-  createFindPetsByTagsHeaderXEXAMPLEFaker,
-  createFindPetsByTagsQueryPageFaker,
-  createFindPetsByTagsQueryPageSizeFaker,
-  createFindPetsByTagsQueryTagsFaker,
+  createFindPetsByTagsHeadersFaker,
+  createFindPetsByTagsQueryFaker,
   createFindPetsByTagsResponseFaker,
   createFindPetsByTagsStatus200Faker,
   createFindPetsByTagsStatus200FakerJson,
@@ -43,7 +36,7 @@ export {
   createFindPetsByTagsStatus400Faker,
 } from './createFindPetsByTagsFaker.ts'
 export {
-  createGetPetByIdPathPetIdFaker,
+  createGetPetByIdPathFaker,
   createGetPetByIdResponseFaker,
   createGetPetByIdStatus200Faker,
   createGetPetByIdStatus200FakerJson,
@@ -66,16 +59,15 @@ export {
   createUpdatePetStatus405Faker,
 } from './createUpdatePetFaker.ts'
 export {
-  createUpdatePetWithFormPathPetIdFaker,
-  createUpdatePetWithFormQueryNameFaker,
-  createUpdatePetWithFormQueryStatusFaker,
+  createUpdatePetWithFormPathFaker,
+  createUpdatePetWithFormQueryFaker,
   createUpdatePetWithFormResponseFaker,
   createUpdatePetWithFormStatus405Faker,
 } from './createUpdatePetWithFormFaker.ts'
 export {
   createUploadFileBodyFaker,
-  createUploadFilePathPetIdFaker,
-  createUploadFileQueryAdditionalMetadataFaker,
+  createUploadFilePathFaker,
+  createUploadFileQueryFaker,
   createUploadFileResponseFaker,
   createUploadFileStatus200Faker,
 } from './createUploadFileFaker.ts'

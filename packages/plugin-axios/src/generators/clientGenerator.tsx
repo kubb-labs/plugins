@@ -38,7 +38,7 @@ export const clientGenerator = defineGenerator<PluginAxios>({
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
     const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
-    const importedTypeNames = [tsResolver.response.config(node), tsResolver.response.responses(node)]
+    const importedTypeNames = [tsResolver.response.options(node), tsResolver.response.responses(node)]
 
     const importedZodNames = zodResolver
       ? [

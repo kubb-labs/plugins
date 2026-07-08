@@ -6,11 +6,16 @@
 import type { Item } from './Item.ts'
 
 /**
- * @description
- * Format: `int64`
- * @type integer
+ * @type object
 */
-export type GetItemPathId = bigint;
+export type GetItemPath = {
+    /**
+     * @description
+     * Format: `int64`
+     * @type integer
+    */
+    id: bigint;
+};
 
 /**
  * @type object
@@ -20,14 +25,9 @@ export type GetItemStatus200 = Item;
 /**
  * @type object
 */
-export type GetItemRequestConfig = {
+export type GetItemOptions = {
     body?: never;
-    /**
-     * @type object
-    */
-    path: {
-        id: GetItemPathId;
-    };
+    path: GetItemPath;
     query?: never;
     headers?: never;
 };

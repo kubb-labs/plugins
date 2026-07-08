@@ -1,4 +1,4 @@
-import type { GetPetByIdRequestConfig } from '../types/GetPetById.ts'
+import type { GetPetByIdOptions } from '../types/GetPetById.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { getPetById } from '../clients/getPetById.ts'
@@ -8,7 +8,7 @@ import { getPetById } from '../clients/getPetById.ts'
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export async function getPetByIdHandler({ path }: GetPetByIdRequestConfig, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
+export async function getPetByIdHandler({ path }: GetPetByIdOptions, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
   const res = await getPetById({ path })
 
   return {

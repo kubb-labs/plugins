@@ -6,22 +6,25 @@
 import type { Pet } from '../Pet.ts'
 
 /**
- * @description Tags to filter by
- * @type array | undefined
+ * @type object
  */
-export type FindPetsByTagsQueryTags = Array<string> | undefined
-
-/**
- * @description to request with required page number or pagination
- * @type string | undefined
- */
-export type FindPetsByTagsQueryPage = string | undefined
-
-/**
- * @description to request with required page size
- * @type string | undefined
- */
-export type FindPetsByTagsQueryPageSize = string | undefined
+export type FindPetsByTagsQuery = {
+  /**
+   * @description Tags to filter by
+   * @type array | undefined
+   */
+  tags?: Array<string>
+  /**
+   * @description to request with required page number or pagination
+   * @type string | undefined
+   */
+  page?: string
+  /**
+   * @description to request with required page size
+   * @type string | undefined
+   */
+  pageSize?: string
+}
 
 /**
  * @type array
@@ -43,17 +46,10 @@ export type FindPetsByTagsStatus400 = unknown
 /**
  * @type object
  */
-export type FindPetsByTagsRequestConfig = {
+export type FindPetsByTagsOptions = {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    tags?: FindPetsByTagsQueryTags
-    page?: FindPetsByTagsQueryPage
-    pageSize?: FindPetsByTagsQueryPageSize
-  }
+  query?: FindPetsByTagsQuery
   headers?: never
 }
 

@@ -5,16 +5,16 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetUserByNameRequestConfig, GetUserByNameResponse, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName.ts'
+import type { GetUserByNameOptions, GetUserByNameResponse, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName.ts'
 import type { SWRConfiguration } from 'swr'
 import { getUserByName } from '../../clients/user/getUserByName.ts'
 
-export const getUserByNameQueryKey = ({ path }: Omit<GetUserByNameRequestConfig, 'headers'>) => [{ url: '/user/:username', params: path }] as const
+export const getUserByNameQueryKey = ({ path }: Omit<GetUserByNameOptions, 'headers'>) => [{ url: '/user/:username', params: path }] as const
 
 type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 
 export function getUserByNameQueryOptions(
-  { path }: GetUserByNameRequestConfig,
+  { path }: GetUserByNameOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   return {
@@ -30,7 +30,7 @@ export function getUserByNameQueryOptions(
  * {@link /user/:username}
  */
 export function useGetUserByName(
-  { path }: GetUserByNameRequestConfig,
+  { path }: GetUserByNameOptions,
   options: {
     query?: SWRConfiguration<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>

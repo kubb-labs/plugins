@@ -1,5 +1,5 @@
 import type { Options, RequestResult } from '../../../.kubb/client.ts'
-import type { DeletePetRequestConfig, DeletePetResponses } from '../../../models/ts/pet/DeletePet.ts'
+import type { DeletePetOptions, DeletePetResponses } from '../../../models/ts/pet/DeletePet.ts'
 import { client } from '../../../.kubb/client.ts'
 import { deletePetResponseSchema, deletePetErrorSchema } from '../../../zod/pet/deletePetSchema.ts'
 
@@ -9,7 +9,7 @@ import { deletePetResponseSchema, deletePetErrorSchema } from '../../../zod/pet/
  * {@link /pet/:petId:search}
  */
 export function deletePet<ThrowOnError extends boolean = true>(
-  options: Options<DeletePetRequestConfig, ThrowOnError>,
+  options: Options<DeletePetOptions, ThrowOnError>,
 ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

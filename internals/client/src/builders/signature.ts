@@ -10,12 +10,12 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
  */
 export type GroupedOptionsSignature = {
   /**
-   * Name of the per-operation grouped data type, the plugin-ts `<Name>RequestConfig` used directly
+   * Name of the per-operation grouped data type, the plugin-ts `<Name>Options` used directly
    * as the function input.
    */
   dataTypeName: string
   /**
-   * The single function parameter: `options: Options<<Name>RequestConfig, ThrowOnError>`.
+   * The single function parameter: `options: Options<<Name>Options, ThrowOnError>`.
    */
   paramsSignature: string
   /**
@@ -34,14 +34,14 @@ export type GroupedOptionsSignature = {
 
 /**
  * Builds the grouped-options signature for one operation: a single `options` object whose `TData`
- * is the plugin-ts `<Name>RequestConfig` (carrying a literal `url`), and a `RequestResult` return type
+ * is the plugin-ts `<Name>Options` (carrying a literal `url`), and a `RequestResult` return type
  * keyed to the plugin-ts per-status responses record. There are no positional arguments.
  *
- * The generated file imports `<Name>RequestConfig` and `<Name>Responses` and uses them directly, so no
+ * The generated file imports `<Name>Options` and `<Name>Responses` and uses them directly, so no
  * per-operation input type has to be emitted.
  */
 export function buildGroupedOptionsSignature({ node, tsResolver }: { node: ast.OperationNode; tsResolver: ResolverTs }): GroupedOptionsSignature {
-  const requestConfigName = tsResolver.response.config(node)
+  const optionsName = tsResolver.response.options(node)
   const responsesName = tsResolver.response.responses(node)
   const resultGenerics = buildRequestResultGenerics({ node, tsResolver })
   const { isOptional } = getRequestGroupOptionality(node)
@@ -49,15 +49,15 @@ export function buildGroupedOptionsSignature({ node, tsResolver }: { node: ast.O
   const paramsSignature =
     declarationPrinter.print(
       createFunctionParameters({
-        params: [createFunctionParameter({ name: 'options', type: `Options<${requestConfigName}, ThrowOnError>`, ...(isOptional ? { default: '{}' } : {}) })],
+        params: [createFunctionParameter({ name: 'options', type: `Options<${optionsName}, ThrowOnError>`, ...(isOptional ? { default: '{}' } : {}) })],
       }),
     ) ?? ''
 
   return {
-    dataTypeName: requestConfigName,
+    dataTypeName: optionsName,
     paramsSignature,
     returnType: `Promise<RequestResult<${resultGenerics}>>`,
     generics: ['ThrowOnError extends boolean = true'],
-    importedTypeNames: [requestConfigName, responsesName],
+    importedTypeNames: [optionsName, responsesName],
   }
 }

@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { UploadFileRequestConfig, UploadFileResponse } from '../types/UploadFile.ts'
+import type { UploadFileOptions, UploadFileResponse } from '../types/UploadFile.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { uploadFile } from '../clients/uploadFile.ts'
 
@@ -13,7 +13,7 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
 
 export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
 
-export type UploadFileMutationArg = UploadFileRequestConfig
+export type UploadFileMutationArg = UploadFileOptions
 
 /**
  * @summary uploads an image

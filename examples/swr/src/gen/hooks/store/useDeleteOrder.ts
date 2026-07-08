@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { DeleteOrderRequestConfig, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/store/DeleteOrder.ts'
+import type { DeleteOrderOptions, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/store/DeleteOrder.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { deleteOrder } from '../../clients/store/deleteOrder.ts'
 
@@ -13,7 +13,7 @@ export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] a
 
 export type DeleteOrderMutationKey = ReturnType<typeof deleteOrderMutationKey>
 
-export type DeleteOrderMutationArg = DeleteOrderRequestConfig
+export type DeleteOrderMutationArg = DeleteOrderOptions
 
 /**
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors

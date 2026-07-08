@@ -32,12 +32,12 @@ export function maybeValueOrGetter(type: string): string {
 /**
  * Builds the grouped `{ path, query, body, headers }` parameter that mirrors the client
  * function signature. Only the groups the operation carries are emitted, typed from the
- * operation's `RequestConfig`. `keys` narrows the emitted groups, used by the query key which
+ * operation's `Options`. `keys` narrows the emitted groups, used by the query key which
  * never carries `headers`.
  *
- * By default the whole group is typed as the single `RequestConfig` reference. When
+ * By default the whole group is typed as the single `Options` reference. When
  * `memberTypeWrapper` is set, each group is emitted as its own member typed from the matching
- * `RequestConfig['<group>']` slice and wrapped, used by vue-query to apply
+ * `Options['<group>']` slice and wrapped, used by vue-query to apply
  * `MaybeRefOrGetter` per group.
  */
 export function buildGroupedRequestParam(
@@ -69,14 +69,14 @@ export function buildGroupedRequestParam(
 
   // Drop the groups this binding never destructures (the query key omits `headers`), so a group
   // that is required elsewhere does not leak into a binding that does not carry it.
-  const requestConfigName = resolver.response.config(node)
+  const optionsName = resolver.response.options(node)
   const omittedKeys = requestGroupOrder.filter((key) => !keys.includes(key))
-  const requestConfigType = omittedKeys.length > 0 ? `Omit<${requestConfigName}, ${omittedKeys.map((key) => `'${key}'`).join(' | ')}>` : requestConfigName
+  const optionsType = omittedKeys.length > 0 ? `Omit<${optionsName}, ${omittedKeys.map((key) => `'${key}'`).join(' | ')}>` : optionsName
 
   if (memberTypeWrapper) {
     const members = names.map((name) => ({
       name,
-      type: memberTypeWrapper(`${requestConfigType}['${name}']`),
+      type: memberTypeWrapper(`${optionsType}['${name}']`),
       optional: !requiredByGroup[name],
     }))
 
@@ -90,7 +90,7 @@ export function buildGroupedRequestParam(
 
   return createFunctionParameter({
     name: createObjectBindingPattern({ elements: names.map((name) => ({ name })) }),
-    type: requestConfigType,
+    type: optionsType,
     optional: false,
     ...(isOptional ? { default: '{}' } : {}),
   })
@@ -239,7 +239,7 @@ export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodS
 
 /**
  * Build QueryKey params as the grouped `{ path, query, body }` object (NO headers, NO config),
- * typed from the operation's `RequestConfig` minus `url`. The query key transformer reads the
+ * typed from the operation's `Options` minus `url`. The query key transformer reads the
  * grouped `path`/`query`/`body` bindings.
  */
 export function buildQueryKeyParams(node: ast.OperationNode, options: { resolver: PluginTs['resolver'] }): FunctionParametersNode {

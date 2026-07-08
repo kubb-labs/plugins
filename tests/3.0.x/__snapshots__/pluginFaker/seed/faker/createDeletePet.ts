@@ -3,18 +3,33 @@
 * Do not edit manually.
 */
 
+import type { DeletePetHeaders, DeletePetPath } from '../types/DeletePet.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createDeletePetHeaderApiKey(data?: string): string {
-  faker.seed([42])
+export function createDeletePetPath<TData extends Partial<DeletePetPath> = object>(data?: TData)
 
-  return data ?? faker.string.alpha()
+{
+  faker.seed([42])
+  const defaultFakeData = {
+  petId: faker.number.bigInt(),
+}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
-export function createDeletePetPathPetId(data?: bigint): bigint {
-  faker.seed([42])
+export function createDeletePetHeaders<TData extends Partial<DeletePetHeaders> = object>(data?: TData)
 
-  return data ?? faker.number.bigInt()
+{
+  faker.seed([42])
+  const defaultFakeData = {
+  apiKey: faker.string.alpha(),
+}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**

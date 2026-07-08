@@ -19,7 +19,7 @@ export type CreateConfigV20250Body = ConfigCreate;
 /**
  * @type object
 */
-export type CreateConfigV20250RequestConfig = {
+export type CreateConfigV20250Options = {
     body: CreateConfigV20250Body;
     path?: never;
     query?: never;

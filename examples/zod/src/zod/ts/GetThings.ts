@@ -6,21 +6,25 @@
 import type { PetNotFound } from './PetNotFound.ts'
 
 /**
- * @description Maximum number of things to return
- * @minLength 1
- * @maxLength 100
- * @default 100
- * @type integer | undefined
+ * @type object
  */
-export type GetThingsQueryLimit = number | undefined
-
-/**
- * @description Number of things to skip
- * @minLength 0
- * @default 0
- * @type integer | undefined
- */
-export type GetThingsQuerySkip = number | undefined
+export type GetThingsQuery = {
+  /**
+   * @description Maximum number of things to return
+   * @minLength 1
+   * @maxLength 100
+   * @default 100
+   * @type integer | undefined
+   */
+  limit?: number
+  /**
+   * @description Number of things to skip
+   * @minLength 0
+   * @default 0
+   * @type integer | undefined
+   */
+  skip?: number
+}
 
 /**
  * @type unknown
@@ -36,16 +40,10 @@ export type GetThingsStatusDefault = PetNotFound
 /**
  * @type object
  */
-export type GetThingsRequestConfig = {
+export type GetThingsOptions = {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    limit?: GetThingsQueryLimit
-    skip?: GetThingsQuerySkip
-  }
+  query?: GetThingsQuery
   headers?: never
 }
 

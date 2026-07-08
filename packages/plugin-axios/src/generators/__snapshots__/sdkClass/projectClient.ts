@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import type { ClientConfig, ClientInstance, Options, RequestResult } from './.kubb/client'
-import type { GetProjectRequestConfig, GetProjectResponses } from './GetProject'
+import type { GetProjectOptions, GetProjectResponses } from './GetProject'
 import { createClient } from './.kubb/client'
 
 export class ProjectClient {
@@ -15,7 +15,7 @@ export class ProjectClient {
    * {@link /projects/:project_id}
    */
   public getProject<ThrowOnError extends boolean = true>(
-    options: Options<GetProjectRequestConfig, ThrowOnError>,
+    options: Options<GetProjectOptions, ThrowOnError>,
   ): Promise<RequestResult<GetProjectResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 

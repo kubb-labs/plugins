@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { PlaceOrderRequestConfig, PlaceOrderResponse } from '../../models.ts'
+import type { PlaceOrderOptions, PlaceOrderResponse } from '../../models.ts'
 
-export function placeOrder({ body }: PlaceOrderRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderResponse> {
+export function placeOrder({ body }: PlaceOrderOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderResponse> {
   return cy
     .request<PlaceOrderResponse>({
       method: 'POST',

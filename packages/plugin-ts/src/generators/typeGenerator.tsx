@@ -1,4 +1,4 @@
-import { caseParams, resolveContentTypeVariants } from '@internals/shared'
+import { caseParams, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
 import type { AdapterOas } from '@kubb/adapter-oas'
 import type { Adapter } from 'kubb/kit'
 import { ast, defineGenerator } from 'kubb/kit'
@@ -7,7 +7,7 @@ import { Type } from '../components/Type.tsx'
 import { ENUM_TYPES_WITH_KEY_SUFFIX } from '../constants.ts'
 import { printerTs } from '../printers/printerTs.ts'
 import type { PluginTs } from '../types'
-import { buildData, buildResponses, buildResponseUnion, isInlineConstEnum } from '../utils.ts'
+import { buildOptions, buildParams, buildResponses, buildResponseUnion, isInlineConstEnum } from '../utils.ts'
 
 /**
  * Built-in generator for `@kubb/plugin-ts`. Emits one TypeScript file per
@@ -162,12 +162,13 @@ export const typeGenerator = defineGenerator<PluginTs>({
       )
     }
 
-    const paramTypes = params.map((param) =>
-      renderSchemaType({
-        schema: { ...param.schema, optional: !param.required },
-        name: resolver.param.name(node, param),
-      }),
-    )
+    const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters({ ...node, parameters: params }, { paramsCasing: 'original' })
+
+    const paramGroupTypes = [
+      pathParams.length > 0 && renderSchemaType({ schema: buildParams({ params: pathParams }), name: resolver.param.path(node, pathParams[0]!) }),
+      queryParams.length > 0 && renderSchemaType({ schema: buildParams({ params: queryParams }), name: resolver.param.query(node, queryParams[0]!) }),
+      headerParams.length > 0 && renderSchemaType({ schema: buildParams({ params: headerParams }), name: resolver.param.headers(node, headerParams[0]!) }),
+    ]
 
     const requestBodyContent = node.requestBody?.content ?? []
 
@@ -209,9 +210,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
       })
     })
 
-    const dataType = renderSchemaType({
-      schema: buildData({ ...node, parameters: params }, { resolver }),
-      name: resolver.response.config(node),
+    const optionsType = renderSchemaType({
+      schema: buildOptions({ ...node, parameters: params }, { resolver }),
+      name: resolver.response.options(node),
     })
 
     const responsesType = renderSchemaType({
@@ -266,10 +267,10 @@ export const typeGenerator = defineGenerator<PluginTs>({
         banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
-        {paramTypes}
+        {paramGroupTypes}
         {responseTypes}
         {requestType}
-        {dataType}
+        {optionsType}
         {responsesType}
         {responseType}
       </File>

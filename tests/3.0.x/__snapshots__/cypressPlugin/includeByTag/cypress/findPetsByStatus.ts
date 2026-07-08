@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponse } from '../types/FindPetsByStatus.ts'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponse } from '../types/FindPetsByStatus.ts'
 
-export function findPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<FindPetsByStatusResponse> {
+export function findPetsByStatus({ query }: FindPetsByStatusOptions = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<FindPetsByStatusResponse> {
   return cy.request<FindPetsByStatusResponse>({
     method: 'GET',
     url: `/pet/findByStatus`,

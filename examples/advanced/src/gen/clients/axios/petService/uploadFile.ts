@@ -1,5 +1,5 @@
 import type { Options, RequestResult } from '../../../.kubb/client.ts'
-import type { UploadFileRequestConfig, UploadFileResponses } from '../../../models/ts/pet/UploadFile.ts'
+import type { UploadFileOptions, UploadFileResponses } from '../../../models/ts/pet/UploadFile.ts'
 import { client } from '../../../.kubb/client.ts'
 
 /**
@@ -7,7 +7,7 @@ import { client } from '../../../.kubb/client.ts'
  * {@link /pet/:petId/uploadImage}
  */
 export function uploadFile<ThrowOnError extends boolean = true>(
-  options: Options<UploadFileRequestConfig, ThrowOnError>,
+  options: Options<UploadFileOptions, ThrowOnError>,
 ): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

@@ -4,7 +4,7 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { CreateUsersWithListInputRequestConfig, CreateUsersWithListInputStatus200 } from '../../models/user/CreateUsersWithListInput.ts'
+import type { CreateUsersWithListInputOptions, CreateUsersWithListInputStatus200 } from '../../models/user/CreateUsersWithListInput.ts'
 import { createUsersWithListInput } from '../../clients/user/createUsersWithListInput.ts'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -16,7 +16,7 @@ export function createUsersWithListInputMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = createUsersWithListInputMutationKey()
-  return mutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputRequestConfig, TContext>({
+  return mutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       const { data } = await createUsersWithListInput({ ...config, body, throwOnError: true })

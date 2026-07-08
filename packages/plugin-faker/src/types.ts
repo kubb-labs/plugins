@@ -20,24 +20,24 @@ export type ResolverFaker = Resolver & {
      */
     name(node: ast.OperationNode, param: ast.ParameterNode): string
     /**
-     * Resolves the faker function name for a path parameter.
+     * Resolves the faker function name for an operation's grouped path parameters.
      *
-     * @example Path parameter name
-     * `resolver.param.path(node, param) // -> 'showPetByIdPathPetId'`
+     * @example Grouped path parameters name
+     * `resolver.param.path(node, param) // -> 'createShowPetByIdPath'`
      */
     path(node: ast.OperationNode, param: ast.ParameterNode): string
     /**
-     * Resolves the faker function name for a query parameter.
+     * Resolves the faker function name for an operation's grouped query parameters.
      *
-     * @example Query parameter name
-     * `resolver.param.query(node, param) // -> 'listPetsQueryLimit'`
+     * @example Grouped query parameters name
+     * `resolver.param.query(node, param) // -> 'createListPetsQuery'`
      */
     query(node: ast.OperationNode, param: ast.ParameterNode): string
     /**
-     * Resolves the faker function name for a header parameter.
+     * Resolves the faker function name for an operation's grouped header parameters.
      *
-     * @example Header parameter name
-     * `resolver.param.headers(node, param) // -> 'deletePetHeaderApiKey'`
+     * @example Grouped header parameters name
+     * `resolver.param.headers(node, param) // -> 'createDeletePetHeaders'`
      */
     headers(node: ast.OperationNode, param: ast.ParameterNode): string
   }

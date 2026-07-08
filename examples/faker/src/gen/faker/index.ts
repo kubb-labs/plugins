@@ -15,9 +15,8 @@ export {
   createUpdatePetStatus405,
 } from './createUpdatePet.ts'
 export {
-  createUpdatePetWithFormPathPetId,
-  createUpdatePetWithFormQueryName,
-  createUpdatePetWithFormQueryStatus,
+  createUpdatePetWithFormPath,
+  createUpdatePetWithFormQuery,
   createUpdatePetWithFormResponse,
   createUpdatePetWithFormStatus405,
 } from './createUpdatePetWithForm.ts'

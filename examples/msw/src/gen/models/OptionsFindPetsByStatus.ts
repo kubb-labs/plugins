@@ -13,7 +13,7 @@ export type OptionsFindPetsByStatusStatus200 = Pet[]
 /**
  * @type object
  */
-export type OptionsFindPetsByStatusRequestConfig = {
+export type OptionsFindPetsByStatusOptions = {
   body?: never
   path?: never
   query?: never

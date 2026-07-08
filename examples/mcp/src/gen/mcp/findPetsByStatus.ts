@@ -1,4 +1,4 @@
-import type { FindPetsByStatusRequestConfig } from '../models/ts/FindPetsByStatus.js'
+import type { FindPetsByStatusOptions } from '../models/ts/FindPetsByStatus.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { findPetsByStatus } from '../clients/findPetsByStatus.js'
@@ -9,7 +9,7 @@ import { findPetsByStatus } from '../clients/findPetsByStatus.js'
  * {@link /pet/findByStatus/:step_id}
  */
 export async function findPetsByStatusHandler(
-  { path }: FindPetsByStatusRequestConfig,
+  { path }: FindPetsByStatusOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await findPetsByStatus({ path })

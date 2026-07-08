@@ -4,7 +4,7 @@
 */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../../types/DeletePet.ts'
+import type { DeletePetOptions, DeletePetResponse, DeletePetStatus400 } from '../../types/DeletePet.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { deletePet } from '../../clients/deletePet.ts'
 import { useMutation } from '@tanstack/vue-query'
@@ -18,14 +18,14 @@ export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
  * {@link /pet/:petId}
  */
 export function useDeletePet<TContext>(options: {
-  mutation?: MutationObserverOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions?.mutationKey ?? deletePetMutationKey()
 
-  return useMutation<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext>({
+  return useMutation<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext>({
     mutationFn: async({ path, headers }) => {
       const { data } = await deletePet({ ...config, path: toValue(path), headers: toValue(headers), throwOnError: true })
       return data

@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { GetBestSellersRequestConfig, GetBestSellersResponse } from './GetBestSellers'
+import type { GetBestSellersOptions, GetBestSellersResponse } from './GetBestSellers'
 
 export function getBestSellers(
-  { query }: GetBestSellersRequestConfig = {},
+  { query }: GetBestSellersOptions = {},
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<GetBestSellersResponse> {
   return cy

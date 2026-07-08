@@ -4,7 +4,7 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { updatePetWithForm } from './clients/updatePetWithForm'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -13,7 +13,7 @@ export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as co
 
 export function updatePetWithFormMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = updatePetWithFormMutationKey()
-  return mutationOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormRequestConfig, TContext>({
+  return mutationOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, body }) => {
       const { data } = await updatePetWithForm({ ...config, path, body, throwOnError: true })
@@ -27,7 +27,7 @@ export function updatePetWithFormMutationOptions<TContext = unknown>(config: Par
  */
 export function useUpdatePetWithForm<TContext>(
   options: {
-    mutation?: UseMutationOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormRequestConfig, TContext> & { client?: QueryClient }
+    mutation?: UseMutationOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormOptions, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
@@ -38,16 +38,16 @@ export function useUpdatePetWithForm<TContext>(
   const baseOptions = updatePetWithFormMutationOptions(config) as UseMutationOptions<
     UpdatePetWithFormStatus200,
     ResponseErrorConfig<Error>,
-    UpdatePetWithFormRequestConfig,
+    UpdatePetWithFormOptions,
     TContext
   >
 
-  return useMutation<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormRequestConfig, TContext>(
+  return useMutation<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormOptions, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormRequestConfig, TContext>
+  ) as UseMutationResult<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormOptions, TContext>
 }

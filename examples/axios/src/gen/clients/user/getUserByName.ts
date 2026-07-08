@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { GetUserByNameRequestConfig, GetUserByNameResponses } from '../../models/user/GetUserByName.ts'
+import type { GetUserByNameOptions, GetUserByNameResponses } from '../../models/user/GetUserByName.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**
@@ -12,7 +12,7 @@ import { client } from '../../.kubb/client.ts'
  * {@link /user/:username}
  */
 export function getUserByName<ThrowOnError extends boolean = true>(
-  options: Options<GetUserByNameRequestConfig, ThrowOnError>,
+  options: Options<GetUserByNameOptions, ThrowOnError>,
 ): Promise<RequestResult<GetUserByNameResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

@@ -1,4 +1,4 @@
-import type { DeletePetRequestConfig } from '../../models/ts/pet/DeletePet.ts'
+import type { DeletePetOptions } from '../../models/ts/pet/DeletePet.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { deletePet } from '../../clients/axios/petService/deletePet.ts'
@@ -9,7 +9,7 @@ import { deletePet } from '../../clients/axios/petService/deletePet.ts'
  * {@link /pet/:petId:search}
  */
 export async function deletePetHandler(
-  { path, headers }: DeletePetRequestConfig,
+  { path, headers }: DeletePetOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await deletePet({ path, headers })

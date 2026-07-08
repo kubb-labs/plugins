@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { DeleteUserRequestConfig, DeleteUserResponses } from '../../models/user/DeleteUser.ts'
+import type { DeleteUserOptions, DeleteUserResponses } from '../../models/user/DeleteUser.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**
@@ -13,7 +13,7 @@ import { client } from '../../.kubb/client.ts'
  * {@link /user/:username}
  */
 export function deleteUser<ThrowOnError extends boolean = true>(
-  options: Options<DeleteUserRequestConfig, ThrowOnError>,
+  options: Options<DeleteUserOptions, ThrowOnError>,
 ): Promise<RequestResult<DeleteUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

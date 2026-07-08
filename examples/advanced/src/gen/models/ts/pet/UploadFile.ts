@@ -1,18 +1,28 @@
 import type { ApiResponse } from '../ApiResponse.ts'
 
 /**
- * @description ID of pet to update
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type UploadFilePathPetId = number
+export type UploadFilePath = {
+  /**
+   * @description ID of pet to update
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  petId: number
+}
 
 /**
- * @description Additional Metadata
- * @type string | undefined
+ * @type object
  */
-export type UploadFileQueryAdditionalMetadata = string | undefined
+export type UploadFileQuery = {
+  /**
+   * @description Additional Metadata
+   * @type string | undefined
+   */
+  additionalMetadata?: string
+}
 
 /**
  * @type object
@@ -27,20 +37,10 @@ export type UploadFileBody = Blob
 /**
  * @type object
  */
-export type UploadFileRequestConfig = {
+export type UploadFileOptions = {
   body: UploadFileBody
-  /**
-   * @type object
-   */
-  path: {
-    petId: UploadFilePathPetId
-  }
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    additionalMetadata?: UploadFileQueryAdditionalMetadata
-  }
+  path: UploadFilePath
+  query?: UploadFileQuery
   headers?: never
 }
 

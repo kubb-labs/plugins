@@ -13,7 +13,7 @@ export type GetVariantsStatus200 = Variant;
 /**
  * @type object
 */
-export type GetVariantsRequestConfig = {
+export type GetVariantsOptions = {
     body?: never;
     path?: never;
     query?: never;

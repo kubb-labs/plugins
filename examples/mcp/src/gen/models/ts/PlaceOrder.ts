@@ -35,7 +35,7 @@ export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrder
 /**
  * @type object
  */
-export type PlaceOrderRequestConfig = {
+export type PlaceOrderOptions = {
   body: PlaceOrderBody
   path?: never
   query?: never

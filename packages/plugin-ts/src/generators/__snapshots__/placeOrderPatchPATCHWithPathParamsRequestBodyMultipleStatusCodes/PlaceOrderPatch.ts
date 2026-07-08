@@ -4,9 +4,14 @@
  */
 
 /**
- * @type integer
+ * @type object
  */
-export type PlaceOrderPatchPathOrderId = number
+export type PlaceOrderPatchPath = {
+  /**
+   * @type integer
+   */
+  orderId: number
+}
 
 /**
  * @type object
@@ -27,14 +32,9 @@ export type PlaceOrderPatchBody = object
 /**
  * @type object
  */
-export type PlaceOrderPatchRequestConfig = {
+export type PlaceOrderPatchOptions = {
   body: PlaceOrderPatchBody
-  /**
-   * @type object
-   */
-  path: {
-    orderId: PlaceOrderPatchPathOrderId
-  }
+  path: PlaceOrderPatchPath
   query?: never
   headers?: never
 }

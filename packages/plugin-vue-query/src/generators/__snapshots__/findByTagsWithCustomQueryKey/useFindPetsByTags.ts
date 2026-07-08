@@ -4,20 +4,20 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200 } from './FindPetsByTags'
+import type { FindPetsByTagsOptions, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/react-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { findPetsByTags } from './clients/findPetsByTags'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { toValue } from 'vue'
 
-export const findPetsByTagsQueryKey = ({ query }: { query: MaybeRefOrGetter<Omit<FindPetsByTagsRequestConfig, 'headers'>['query']> }) =>
+export const findPetsByTagsQueryKey = ({ query }: { query: MaybeRefOrGetter<Omit<FindPetsByTagsOptions, 'headers'>['query']> }) =>
   ['findPetsByTags', { url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 export function findPetsByTagsQueryOptions(
-  { query }: { query: MaybeRefOrGetter<FindPetsByTagsRequestConfig['query']> },
+  { query }: { query: MaybeRefOrGetter<FindPetsByTagsOptions['query']> },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsQueryKey({ query })
@@ -34,7 +34,7 @@ export function findPetsByTagsQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
-  { query }: { query: MaybeRefOrGetter<FindPetsByTagsRequestConfig['query']> },
+  { query }: { query: MaybeRefOrGetter<FindPetsByTagsOptions['query']> },
   options: {
     query?: Partial<UseQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>

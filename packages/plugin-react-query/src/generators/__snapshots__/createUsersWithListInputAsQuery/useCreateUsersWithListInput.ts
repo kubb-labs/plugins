@@ -4,18 +4,18 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { CreateUsersWithListInputRequestConfig, CreateUsersWithListInputStatus200 } from './CreateUsersWithListInput'
+import type { CreateUsersWithListInputOptions, CreateUsersWithListInputStatus200 } from './CreateUsersWithListInput'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { createUsersWithListInput } from './clients/createUsersWithListInput'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const createUsersWithListInputQueryKey = ({ body }: Omit<CreateUsersWithListInputRequestConfig, 'headers'>) =>
+export const createUsersWithListInputQueryKey = ({ body }: Omit<CreateUsersWithListInputOptions, 'headers'>) =>
   [{ url: '/user/createWithList' }, ...(body ? [body] : [])] as const
 
 type CreateUsersWithListInputQueryKey = ReturnType<typeof createUsersWithListInputQueryKey>
 
 export function createUsersWithListInputQueryOptions(
-  { body }: CreateUsersWithListInputRequestConfig,
+  { body }: CreateUsersWithListInputOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = createUsersWithListInputQueryKey({ body })
@@ -36,7 +36,7 @@ export function useCreateUsersWithListInput<
   TQueryData = CreateUsersWithListInputStatus200,
   TQueryKey extends QueryKey = CreateUsersWithListInputQueryKey,
 >(
-  { body }: { body: CreateUsersWithListInputRequestConfig['body'] | (() => CreateUsersWithListInputRequestConfig['body']) },
+  { body }: { body: CreateUsersWithListInputOptions['body'] | (() => CreateUsersWithListInputOptions['body']) },
   options: {
     query?: Partial<QueryObserverOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient

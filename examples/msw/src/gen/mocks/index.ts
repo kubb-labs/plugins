@@ -21,9 +21,9 @@ export {
   createAddPetStatus200Xml,
   createAddPetStatus405,
 } from './pet/createAddPet.ts'
-export { createDeletePetHeaderApiKey, createDeletePetPathPetId, createDeletePetResponse, createDeletePetStatus400 } from './pet/createDeletePet.ts'
+export { createDeletePetHeaders, createDeletePetPath, createDeletePetResponse, createDeletePetStatus400 } from './pet/createDeletePet.ts'
 export {
-  createFindPetsByStatusQueryStatus,
+  createFindPetsByStatusQuery,
   createFindPetsByStatusResponse,
   createFindPetsByStatusStatus200,
   createFindPetsByStatusStatus200Json,
@@ -31,9 +31,7 @@ export {
   createFindPetsByStatusStatus400,
 } from './pet/createFindPetsByStatus.ts'
 export {
-  createFindPetsByTagsQueryPage,
-  createFindPetsByTagsQueryPageSize,
-  createFindPetsByTagsQueryTags,
+  createFindPetsByTagsQuery,
   createFindPetsByTagsResponse,
   createFindPetsByTagsStatus200,
   createFindPetsByTagsStatus200Json,
@@ -41,7 +39,7 @@ export {
   createFindPetsByTagsStatus400,
 } from './pet/createFindPetsByTags.ts'
 export {
-  createGetPetByIdPathPetId,
+  createGetPetByIdPath,
   createGetPetByIdResponse,
   createGetPetByIdStatus200,
   createGetPetByIdStatus200Json,
@@ -64,23 +62,22 @@ export {
   createUpdatePetStatus405,
 } from './pet/createUpdatePet.ts'
 export {
-  createUpdatePetWithFormPathPetId,
-  createUpdatePetWithFormQueryName,
-  createUpdatePetWithFormQueryStatus,
+  createUpdatePetWithFormPath,
+  createUpdatePetWithFormQuery,
   createUpdatePetWithFormResponse,
   createUpdatePetWithFormStatus405,
 } from './pet/createUpdatePetWithForm.ts'
 export {
   createUploadFileBody,
-  createUploadFilePathPetId,
-  createUploadFileQueryAdditionalMetadata,
+  createUploadFilePath,
+  createUploadFileQuery,
   createUploadFileResponse,
   createUploadFileStatus200,
 } from './pet/createUploadFile.ts'
-export { createDeleteOrderPathOrderId, createDeleteOrderResponse, createDeleteOrderStatus400, createDeleteOrderStatus404 } from './store/createDeleteOrder.ts'
+export { createDeleteOrderPath, createDeleteOrderResponse, createDeleteOrderStatus400, createDeleteOrderStatus404 } from './store/createDeleteOrder.ts'
 export { createGetInventoryResponse, createGetInventoryStatus200 } from './store/createGetInventory.ts'
 export {
-  createGetOrderByIdPathOrderId,
+  createGetOrderByIdPath,
   createGetOrderByIdResponse,
   createGetOrderByIdStatus200,
   createGetOrderByIdStatus200Json,

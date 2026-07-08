@@ -1,5 +1,5 @@
 import type { Options, RequestResult } from '../../../.kubb/client.ts'
-import type { CreatePetsRequestConfig, CreatePetsResponses } from '../../../models/ts/pets/CreatePets.ts'
+import type { CreatePetsOptions, CreatePetsResponses } from '../../../models/ts/pets/CreatePets.ts'
 import { client } from '../../../.kubb/client.ts'
 import { createPetsResponseSchema, createPetsErrorSchema } from '../../../zod/pets/createPetsSchema.ts'
 
@@ -8,7 +8,7 @@ import { createPetsResponseSchema, createPetsErrorSchema } from '../../../zod/pe
  * {@link /pets/:uuid}
  */
 export function createPets<ThrowOnError extends boolean = true>(
-  options: Options<CreatePetsRequestConfig, ThrowOnError>,
+  options: Options<CreatePetsOptions, ThrowOnError>,
 ): Promise<RequestResult<CreatePetsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

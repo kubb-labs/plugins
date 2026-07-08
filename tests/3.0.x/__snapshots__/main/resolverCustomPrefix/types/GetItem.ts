@@ -3,11 +3,16 @@
 import type { CustomItem } from './Item.ts'
 
 /**
- * @description
- * Format: `int64`
- * @type integer
+ * @type object
 */
-export type CustomGetItemPathId = bigint;
+export type CustomGetItemPath = {
+    /**
+     * @description
+     * Format: `int64`
+     * @type integer
+    */
+    id: bigint;
+};
 
 /**
  * @description A simple item
@@ -18,14 +23,9 @@ export type CustomGetItemStatus200 = CustomItem;
 /**
  * @type object
 */
-export type CustomGetItemRequestConfig = {
+export type CustomGetItemOptions = {
     body?: never;
-    /**
-     * @type object
-    */
-    path: {
-        id: CustomGetItemPathId;
-    };
+    path: CustomGetItemPath;
     query?: never;
     headers?: never;
 };

@@ -14,7 +14,7 @@ export type GetNotificationsStatus200 = (NotificationTypeA | NotificationTypeB)[
 /**
  * @type object
 */
-export type GetNotificationsRequestConfig = {
+export type GetNotificationsOptions = {
     body?: never;
     path?: never;
     query?: never;

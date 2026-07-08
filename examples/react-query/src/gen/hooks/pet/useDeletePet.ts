@@ -4,7 +4,7 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../../models/pet/DeletePet.ts'
+import type { DeletePetOptions, DeletePetResponse, DeletePetStatus400 } from '../../models/pet/DeletePet.ts'
 import { deletePet } from '../../clients/pet/deletePet.ts'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -12,7 +12,7 @@ export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
 export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = deletePetMutationKey()
-  return mutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext>({
+  return mutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, headers }) => {
       const { data } = await deletePet({ ...config, path, headers, throwOnError: true })

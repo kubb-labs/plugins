@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse } from '../../models.ts'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormResponse } from '../../models.ts'
 
 export function updatePetWithForm(
-  { path, query }: UpdatePetWithFormRequestConfig,
+  { path, query }: UpdatePetWithFormOptions,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<UpdatePetWithFormResponse> {
   return cy

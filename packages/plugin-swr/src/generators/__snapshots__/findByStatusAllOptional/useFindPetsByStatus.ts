@@ -5,17 +5,17 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponse } from './FindPetsByStatus'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponse } from './FindPetsByStatus'
 import type { SWRConfiguration } from 'swr'
 import { findPetsByStatus } from './clients/findPetsByStatus'
 
-export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'headers'> = {}) =>
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusOptions, 'headers'> = {}) =>
   [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
 export function findPetsByStatusQueryOptions(
-  { query }: FindPetsByStatusRequestConfig = {},
+  { query }: FindPetsByStatusOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   return {
@@ -30,7 +30,7 @@ export function findPetsByStatusQueryOptions(
  * {@link /pet/findByStatus}
  */
 export function useFindPetsByStatus(
-  { query }: FindPetsByStatusRequestConfig = {},
+  { query }: FindPetsByStatusOptions = {},
   options: {
     query?: SWRConfiguration<FindPetsByStatusResponse, ResponseErrorConfig<Error>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>

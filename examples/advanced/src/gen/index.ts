@@ -27,7 +27,7 @@ export type {
   AddFilesBody,
   AddFilesBodyFormData,
   AddFilesBodyJson,
-  AddFilesRequestConfig,
+  AddFilesOptions,
   AddFilesResponse,
   AddFilesResponses,
   AddFilesStatus200,
@@ -38,7 +38,7 @@ export type {
   AddPetBodyFormUrlEncoded,
   AddPetBodyJson,
   AddPetBodyXml,
-  AddPetRequestConfig,
+  AddPetOptions,
   AddPetResponse,
   AddPetResponses,
   AddPetStatus405,
@@ -46,17 +46,10 @@ export type {
   AddPetStatusDefaultJson,
   AddPetStatusDefaultXml,
 } from './models/ts/pet/AddPet.ts'
+export type { DeletePetHeaders, DeletePetOptions, DeletePetPath, DeletePetResponse, DeletePetResponses, DeletePetStatus400 } from './models/ts/pet/DeletePet.ts'
 export type {
-  DeletePetHeaderApiKey,
-  DeletePetPathPetId,
-  DeletePetRequestConfig,
-  DeletePetResponse,
-  DeletePetResponses,
-  DeletePetStatus400,
-} from './models/ts/pet/DeletePet.ts'
-export type {
-  FindPetsByStatusPathStepId,
-  FindPetsByStatusRequestConfig,
+  FindPetsByStatusOptions,
+  FindPetsByStatusPath,
   FindPetsByStatusResponse,
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
@@ -65,11 +58,9 @@ export type {
   FindPetsByStatusStatus400,
 } from './models/ts/pet/FindPetsByStatus.ts'
 export type {
-  FindPetsByTagsHeaderXEXAMPLE,
-  FindPetsByTagsQueryPage,
-  FindPetsByTagsQueryPageSize,
-  FindPetsByTagsQueryTags,
-  FindPetsByTagsRequestConfig,
+  FindPetsByTagsHeaders,
+  FindPetsByTagsOptions,
+  FindPetsByTagsQuery,
   FindPetsByTagsResponse,
   FindPetsByTagsResponses,
   FindPetsByTagsStatus200,
@@ -78,8 +69,8 @@ export type {
   FindPetsByTagsStatus400,
 } from './models/ts/pet/FindPetsByTags.ts'
 export type {
-  GetPetByIdPathPetId,
-  GetPetByIdRequestConfig,
+  GetPetByIdOptions,
+  GetPetByIdPath,
   GetPetByIdResponse,
   GetPetByIdResponses,
   GetPetByIdStatus200,
@@ -93,7 +84,7 @@ export type {
   UpdatePetBodyFormUrlEncoded,
   UpdatePetBodyJson,
   UpdatePetBodyXml,
-  UpdatePetRequestConfig,
+  UpdatePetOptions,
   UpdatePetResponse,
   UpdatePetResponses,
   UpdatePetStatus200,
@@ -105,47 +96,45 @@ export type {
   UpdatePetStatus405,
 } from './models/ts/pet/UpdatePet.ts'
 export type {
-  UpdatePetWithFormPathPetId,
-  UpdatePetWithFormQueryName,
-  UpdatePetWithFormQueryStatus,
-  UpdatePetWithFormRequestConfig,
+  UpdatePetWithFormOptions,
+  UpdatePetWithFormPath,
+  UpdatePetWithFormQuery,
   UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
 } from './models/ts/pet/UpdatePetWithForm.ts'
 export type {
   UploadFileBody,
-  UploadFilePathPetId,
-  UploadFileQueryAdditionalMetadata,
-  UploadFileRequestConfig,
+  UploadFileOptions,
+  UploadFilePath,
+  UploadFileQuery,
   UploadFileResponse,
   UploadFileResponses,
   UploadFileStatus200,
 } from './models/ts/pet/UploadFile.ts'
 export type {
   CreatePetsBody,
-  CreatePetsHeaderXEXAMPLE,
-  CreatePetsPathUuid,
-  CreatePetsQueryBoolParam,
-  CreatePetsQueryOffset,
-  CreatePetsRequestConfig,
+  CreatePetsHeaders,
+  CreatePetsOptions,
+  CreatePetsPath,
+  CreatePetsQuery,
   CreatePetsResponse,
   CreatePetsResponses,
   CreatePetsStatus201,
   CreatePetsStatusDefault,
 } from './models/ts/pets/CreatePets.ts'
 export type {
-  DeleteOrderPathOrderId,
-  DeleteOrderRequestConfig,
+  DeleteOrderOptions,
+  DeleteOrderPath,
   DeleteOrderResponse,
   DeleteOrderResponses,
   DeleteOrderStatus400,
   DeleteOrderStatus404,
 } from './models/ts/store/DeleteOrder.ts'
-export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/ts/store/GetInventory.ts'
+export type { GetInventoryOptions, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/ts/store/GetInventory.ts'
 export type {
-  GetOrderByIdPathOrderId,
-  GetOrderByIdRequestConfig,
+  GetOrderByIdOptions,
+  GetOrderByIdPath,
   GetOrderByIdResponse,
   GetOrderByIdResponses,
   GetOrderByIdStatus200,
@@ -159,7 +148,7 @@ export type {
   PlaceOrderBodyFormUrlEncoded,
   PlaceOrderBodyJson,
   PlaceOrderBodyXml,
-  PlaceOrderRequestConfig,
+  PlaceOrderOptions,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
@@ -170,15 +159,15 @@ export type {
   PlaceOrderPatchBodyFormUrlEncoded,
   PlaceOrderPatchBodyJson,
   PlaceOrderPatchBodyXml,
-  PlaceOrderPatchRequestConfig,
+  PlaceOrderPatchOptions,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
 } from './models/ts/store/PlaceOrderPatch.ts'
 export type {
-  StreamPetEventsPathPetId,
-  StreamPetEventsRequestConfig,
+  StreamPetEventsOptions,
+  StreamPetEventsPath,
   StreamPetEventsResponse,
   StreamPetEventsResponses,
   StreamPetEventsStatus200,
@@ -377,13 +366,13 @@ export {
   createAddPetStatusDefaultFakerXml,
 } from './mocks/pet/createAddPetFaker.ts'
 export {
-  createDeletePetHeaderApiKeyFaker,
-  createDeletePetPathPetIdFaker,
+  createDeletePetHeadersFaker,
+  createDeletePetPathFaker,
   createDeletePetResponseFaker,
   createDeletePetStatus400Faker,
 } from './mocks/pet/createDeletePetFaker.ts'
 export {
-  createFindPetsByStatusPathStepIdFaker,
+  createFindPetsByStatusPathFaker,
   createFindPetsByStatusResponseFaker,
   createFindPetsByStatusStatus200Faker,
   createFindPetsByStatusStatus200FakerJson,
@@ -391,10 +380,8 @@ export {
   createFindPetsByStatusStatus400Faker,
 } from './mocks/pet/createFindPetsByStatusFaker.ts'
 export {
-  createFindPetsByTagsHeaderXEXAMPLEFaker,
-  createFindPetsByTagsQueryPageFaker,
-  createFindPetsByTagsQueryPageSizeFaker,
-  createFindPetsByTagsQueryTagsFaker,
+  createFindPetsByTagsHeadersFaker,
+  createFindPetsByTagsQueryFaker,
   createFindPetsByTagsResponseFaker,
   createFindPetsByTagsStatus200Faker,
   createFindPetsByTagsStatus200FakerJson,
@@ -402,7 +389,7 @@ export {
   createFindPetsByTagsStatus400Faker,
 } from './mocks/pet/createFindPetsByTagsFaker.ts'
 export {
-  createGetPetByIdPathPetIdFaker,
+  createGetPetByIdPathFaker,
   createGetPetByIdResponseFaker,
   createGetPetByIdStatus200Faker,
   createGetPetByIdStatus200FakerJson,
@@ -425,31 +412,29 @@ export {
   createUpdatePetStatus405Faker,
 } from './mocks/pet/createUpdatePetFaker.ts'
 export {
-  createUpdatePetWithFormPathPetIdFaker,
-  createUpdatePetWithFormQueryNameFaker,
-  createUpdatePetWithFormQueryStatusFaker,
+  createUpdatePetWithFormPathFaker,
+  createUpdatePetWithFormQueryFaker,
   createUpdatePetWithFormResponseFaker,
   createUpdatePetWithFormStatus405Faker,
 } from './mocks/pet/createUpdatePetWithFormFaker.ts'
 export {
   createUploadFileBodyFaker,
-  createUploadFilePathPetIdFaker,
-  createUploadFileQueryAdditionalMetadataFaker,
+  createUploadFilePathFaker,
+  createUploadFileQueryFaker,
   createUploadFileResponseFaker,
   createUploadFileStatus200Faker,
 } from './mocks/pet/createUploadFileFaker.ts'
 export {
   createCreatePetsBodyFaker,
-  createCreatePetsHeaderXEXAMPLEFaker,
-  createCreatePetsPathUuidFaker,
-  createCreatePetsQueryBoolParamFaker,
-  createCreatePetsQueryOffsetFaker,
+  createCreatePetsHeadersFaker,
+  createCreatePetsPathFaker,
+  createCreatePetsQueryFaker,
   createCreatePetsResponseFaker,
   createCreatePetsStatus201Faker,
   createCreatePetsStatusDefaultFaker,
 } from './mocks/pets/createCreatePetsFaker.ts'
 export {
-  createStreamPetEventsPathPetIdFaker,
+  createStreamPetEventsPathFaker,
   createStreamPetEventsResponseFaker,
   createStreamPetEventsStatus200Faker,
 } from './mocks/stream/createStreamPetEventsFaker.ts'

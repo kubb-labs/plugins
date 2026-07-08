@@ -28,14 +28,14 @@ export const resolverFaker = createResolver<PluginFaker>({
     name(node, param) {
       return this.name(`${node.operationId} ${param.in} ${param.name}`)
     },
-    path(node, param) {
-      return this.param.name(node, param)
+    path(node) {
+      return this.name(`${node.operationId} Path`)
     },
-    query(node, param) {
-      return this.param.name(node, param)
+    query(node) {
+      return this.name(`${node.operationId} Query`)
     },
-    headers(node, param) {
-      return this.param.name(node, param)
+    headers(node) {
+      return this.name(`${node.operationId} Headers`)
     },
   },
   response: {

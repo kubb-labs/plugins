@@ -1,6 +1,6 @@
 import type {
-  FindPetsByTagsHeaderXEXAMPLE,
-  FindPetsByTagsQueryTags,
+  FindPetsByTagsHeaders,
+  FindPetsByTagsQuery,
   FindPetsByTagsResponse,
   FindPetsByTagsStatus200,
   FindPetsByTagsStatus200Json,
@@ -11,20 +11,26 @@ import { createFindPetsByTagsXEXAMPLEFaker } from '../createFindPetsByTagsXEXAMP
 import { createPetFaker } from '../createPetFaker.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createFindPetsByTagsQueryTagsFaker(data?: FindPetsByTagsQueryTags): FindPetsByTagsQueryTags {
-  return [...faker.helpers.multiple(() => faker.string.alpha()), ...(data || [])]
+export function createFindPetsByTagsQueryFaker<TData extends Partial<FindPetsByTagsQuery> = object>(data?: TData) {
+  const defaultFakeData = {
+    tags: faker.helpers.multiple(() => faker.string.alpha()),
+    page: faker.string.alpha(),
+    pageSize: faker.number.float(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
-export function createFindPetsByTagsQueryPageFaker(data?: string): string {
-  return data ?? faker.string.alpha()
-}
-
-export function createFindPetsByTagsQueryPageSizeFaker(data?: number): number {
-  return data ?? faker.number.float()
-}
-
-export function createFindPetsByTagsHeaderXEXAMPLEFaker(data?: Partial<FindPetsByTagsHeaderXEXAMPLE>): FindPetsByTagsHeaderXEXAMPLE {
-  return createFindPetsByTagsXEXAMPLEFaker(data) as FindPetsByTagsHeaderXEXAMPLE
+export function createFindPetsByTagsHeadersFaker<TData extends Partial<FindPetsByTagsHeaders> = object>(data?: TData) {
+  const defaultFakeData = {
+    xEXAMPLE: createFindPetsByTagsXEXAMPLEFaker(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**

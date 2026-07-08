@@ -28,7 +28,7 @@ export type CreateOrderBody = {
 /**
  * @type object
 */
-export type CreateOrderRequestConfig = {
+export type CreateOrderOptions = {
     body: CreateOrderBody;
     path?: never;
     query?: never;

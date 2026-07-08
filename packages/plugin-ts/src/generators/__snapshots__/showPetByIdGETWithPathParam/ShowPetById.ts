@@ -4,9 +4,14 @@
  */
 
 /**
- * @type string
+ * @type object
  */
-export type ShowPetByIdPathPetId = string
+export type ShowPetByIdPath = {
+  /**
+   * @type string
+   */
+  petId: string
+}
 
 /**
  * @type object
@@ -21,14 +26,9 @@ export type ShowPetByIdStatusDefault = object
 /**
  * @type object
  */
-export type ShowPetByIdRequestConfig = {
+export type ShowPetByIdOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    petId: ShowPetByIdPathPetId
-  }
+  path: ShowPetByIdPath
   query?: never
   headers?: never
 }

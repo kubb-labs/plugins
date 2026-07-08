@@ -4,11 +4,11 @@
 */
 
 import type { ClientConfig, ClientInstance, Options, RequestResult } from '../.kubb/client.ts'
-import type { AddPetRequestConfig, AddPetResponses } from '../types/AddPet.ts'
-import type { DeletePetRequestConfig, DeletePetResponses } from '../types/DeletePet.ts'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../types/FindPetsByStatus.ts'
-import type { GetPetByIdRequestConfig, GetPetByIdResponses } from '../types/GetPetById.ts'
-import type { UploadFileRequestConfig, UploadFileResponses } from '../types/UploadFile.ts'
+import type { AddPetOptions, AddPetResponses } from '../types/AddPet.ts'
+import type { DeletePetOptions, DeletePetResponses } from '../types/DeletePet.ts'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../types/FindPetsByStatus.ts'
+import type { GetPetByIdOptions, GetPetByIdResponses } from '../types/GetPetById.ts'
+import type { UploadFileOptions, UploadFileResponses } from '../types/UploadFile.ts'
 import { createClient } from '../.kubb/client.ts'
 
 export class PetClient {
@@ -23,7 +23,7 @@ export class PetClient {
    * @summary Add a new pet to the store
    * {@link /pet}
    */
-    public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetRequestConfig, ThrowOnError>): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
+    public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptions, ThrowOnError>): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
@@ -34,7 +34,7 @@ export class PetClient {
    * @summary Finds Pets by status
    * {@link /pet/findByStatus}
    */
-    public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusRequestConfig, ThrowOnError> = {}): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+    public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptions, ThrowOnError> = {}): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
@@ -45,7 +45,7 @@ export class PetClient {
    * @summary Find pet by ID
    * {@link /pet/:petId}
    */
-    public getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdRequestConfig, ThrowOnError>): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
+    public getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptions, ThrowOnError>): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
@@ -56,7 +56,7 @@ export class PetClient {
    * @summary Deletes a pet
    * {@link /pet/:petId}
    */
-    public deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetRequestConfig, ThrowOnError>): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
+    public deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetOptions, ThrowOnError>): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config, headers: config.headers ? { "api_key": config.headers.apiKey } : config.headers }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
@@ -66,7 +66,7 @@ export class PetClient {
    * @summary uploads an image
    * {@link /pet/:petId/uploadImage}
    */
-    public uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileRequestConfig, ThrowOnError>): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
+    public uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileOptions, ThrowOnError>): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>

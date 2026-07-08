@@ -6,12 +6,17 @@
 import type { Pet } from './Pet.ts'
 
 /**
- * @description ID of pet to return
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type GetPetByIdPathPetId = bigint
+export type GetPetByIdPath = {
+  /**
+   * @description ID of pet to return
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  petId: bigint
+}
 
 /**
  * @type object
@@ -38,14 +43,9 @@ export type GetPetByIdStatus404 = unknown
 /**
  * @type object
  */
-export type GetPetByIdRequestConfig = {
+export type GetPetByIdOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    petId: GetPetByIdPathPetId
-  }
+  path: GetPetByIdPath
   query?: never
   headers?: never
 }

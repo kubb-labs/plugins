@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { DeleteUserRequestConfig, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/user/DeleteUser.ts'
+import type { DeleteUserOptions, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/user/DeleteUser.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { deleteUser } from '../../clients/user/deleteUser.ts'
 
@@ -13,7 +13,7 @@ export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 
 export type DeleteUserMutationKey = ReturnType<typeof deleteUserMutationKey>
 
-export type DeleteUserMutationArg = DeleteUserRequestConfig
+export type DeleteUserMutationArg = DeleteUserOptions
 
 /**
  * @description This can only be done by the logged in user.

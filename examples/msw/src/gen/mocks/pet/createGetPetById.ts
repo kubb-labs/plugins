@@ -4,6 +4,7 @@
  */
 
 import type {
+  GetPetByIdPath,
   GetPetByIdResponse,
   GetPetByIdStatus200,
   GetPetByIdStatus200Json,
@@ -14,10 +15,15 @@ import type {
 import { createPet } from '../createPet.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createGetPetByIdPathPetId(data?: bigint): bigint {
+export function createGetPetByIdPath<TData extends Partial<GetPetByIdPath> = object>(data?: TData) {
   faker.seed([220])
-
-  return data ?? faker.number.bigInt()
+  const defaultFakeData = {
+    petId: faker.number.bigInt(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**

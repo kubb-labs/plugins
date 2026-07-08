@@ -1,4 +1,4 @@
-import type { DeleteOrderRequestConfig } from '../models/ts/DeleteOrder.js'
+import type { DeleteOrderOptions } from '../models/ts/DeleteOrder.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { deleteOrder } from '../clients/deleteOrder.js'
@@ -9,7 +9,7 @@ import { deleteOrder } from '../clients/deleteOrder.js'
  * {@link /store/order/:orderId}
  */
 export async function deleteOrderHandler(
-  { path }: DeleteOrderRequestConfig,
+  { path }: DeleteOrderOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await deleteOrder({ path })

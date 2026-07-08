@@ -57,7 +57,7 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
     }
 
     const importedTypeNames = [
-      tsResolver.response.config(node),
+      tsResolver.response.options(node),
       ...resolveOperationTypeNames(node, tsResolver, {
         exclude: [queryKeyTypeName],
         order: 'body-response-first',

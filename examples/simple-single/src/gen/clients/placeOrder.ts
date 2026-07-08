@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../.kubb/client'
-import type { PlaceOrderRequestConfig, PlaceOrderResponses } from '../models'
+import type { PlaceOrderOptions, PlaceOrderResponses } from '../models'
 import { client } from '../.kubb/client'
 
 /**
@@ -13,7 +13,7 @@ import { client } from '../.kubb/client'
  * {@link /store/order}
  */
 export function placeOrder<ThrowOnError extends boolean = true>(
-  options: Options<PlaceOrderRequestConfig, ThrowOnError>,
+  options: Options<PlaceOrderOptions, ThrowOnError>,
 ): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

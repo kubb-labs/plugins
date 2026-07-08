@@ -20,7 +20,7 @@ const callPrinter = functionPrinter({ mode: 'call' })
 
 function resolveMutationRequestType(node: ast.OperationNode, resolver: ResolverTs): string {
   const groupedParam = buildGroupedRequestParam(node, { resolver })
-  return groupedParam ? resolver.response.config(node) : 'undefined'
+  return groupedParam ? resolver.response.options(node) : 'undefined'
 }
 
 function buildMutationParamsNode(

@@ -30,7 +30,7 @@ export type CreateUsersWithListInputBody = User[] | undefined
 /**
  * @type object
  */
-export type CreateUsersWithListInputRequestConfig = {
+export type CreateUsersWithListInputOptions = {
   body: CreateUsersWithListInputBody
   path?: never
   query?: never

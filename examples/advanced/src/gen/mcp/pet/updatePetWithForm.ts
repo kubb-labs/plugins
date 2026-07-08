@@ -1,4 +1,4 @@
-import type { UpdatePetWithFormRequestConfig } from '../../models/ts/pet/UpdatePetWithForm.ts'
+import type { UpdatePetWithFormOptions } from '../../models/ts/pet/UpdatePetWithForm.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { updatePetWithForm } from '../../clients/axios/petService/updatePetWithForm.ts'
@@ -8,7 +8,7 @@ import { updatePetWithForm } from '../../clients/axios/petService/updatePetWithF
  * {@link /pet/:petId:search}
  */
 export async function updatePetWithFormHandler(
-  { path, query }: UpdatePetWithFormRequestConfig,
+  { path, query }: UpdatePetWithFormOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await updatePetWithForm({ path, query })

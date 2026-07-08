@@ -1,5 +1,5 @@
 import type { Options, RequestResult } from '../../../.kubb/client.ts'
-import type { GetPetByIdRequestConfig, GetPetByIdResponses } from '../../../models/ts/pet/GetPetById.ts'
+import type { GetPetByIdOptions, GetPetByIdResponses } from '../../../models/ts/pet/GetPetById.ts'
 import { client } from '../../../.kubb/client.ts'
 import { getPetByIdResponseSchema, getPetByIdErrorSchema } from '../../../zod/pet/getPetByIdSchema.ts'
 
@@ -9,7 +9,7 @@ import { getPetByIdResponseSchema, getPetByIdErrorSchema } from '../../../zod/pe
  * {@link /pet/:petId:search}
  */
 export function getPetById<ThrowOnError extends boolean = true>(
-  options: Options<GetPetByIdRequestConfig, ThrowOnError>,
+  options: Options<GetPetByIdOptions, ThrowOnError>,
 ): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

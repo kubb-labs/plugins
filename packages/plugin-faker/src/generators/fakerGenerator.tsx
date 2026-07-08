@@ -1,14 +1,14 @@
-import { caseParams, getPerContentTypeName, resolveContentTypeVariants } from '@internals/shared'
+import { caseParams, getOperationParameters, getPerContentTypeName, resolveContentTypeVariants } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import type { AdapterOas } from '@kubb/adapter-oas'
 import type { Adapter } from 'kubb/kit'
 import { ast, defineGenerator } from 'kubb/kit'
-import { pluginTsName } from '@kubb/plugin-ts'
+import { buildParams, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
-import { buildResponseUnionSchema, canOverrideSchema, localeToFakerImport, resolveParamNameByLocation, resolveTypeReference } from '../utils.ts'
+import { buildResponseUnionSchema, canOverrideSchema, localeToFakerImport, resolveTypeReference } from '../utils.ts'
 
 /**
  * Built-in generator for `@kubb/plugin-faker`. Emits one `createX` factory
@@ -115,11 +115,20 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
     const params = caseParams(node.parameters, 'camelcase')
-    const paramEntries = params.map((param) => ({
-      param,
-      name: resolveParamNameByLocation(resolver.param, node, param),
-      typeName: resolveParamNameByLocation(tsResolver.param, node, param),
-    }))
+    const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters({ ...node, parameters: params }, { paramsCasing: 'original' })
+    const paramGroups = (
+      [
+        { params: pathParams, name: resolver.param.path, typeName: tsResolver.param.path },
+        { params: queryParams, name: resolver.param.query, typeName: tsResolver.param.query },
+        { params: headerParams, name: resolver.param.headers, typeName: tsResolver.param.headers },
+      ] as const
+    )
+      .filter((group) => group.params.length > 0)
+      .map((group) => ({
+        schema: buildParams({ params: group.params }),
+        name: group.name(node, group.params[0]!),
+        typeName: group.typeName(node, group.params[0]!),
+      }))
     type RenderUnit = { schema: ast.SchemaNode | null; name: string; typeName: string; description?: string; skipImportNames: Array<string> }
 
     // Expands a content array into render units: one faker per content type plus a union faker
@@ -171,7 +180,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     )
     const responseName = resolver.response.response(node)
     const localHelperNames = new Set([
-      ...paramEntries.map((entry) => entry.name),
+      ...paramGroups.map((group) => group.name),
       ...responseUnits.map((unit) => unit.name),
       ...dataUnits.map((unit) => unit.name),
       responseName,
@@ -271,13 +280,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
-        {paramEntries.map(({ param, name, typeName }) =>
-          renderEntry({
-            schema: param.schema,
-            name,
-            typeName,
-          }),
-        )}
+        {paramGroups.map((group) => renderEntry(group))}
         {responseUnits.map((unit) =>
           renderEntry({
             schema: unit.schema,

@@ -1,4 +1,4 @@
-import type { AddFilesRequestConfig } from '../../models/ts/pet/AddFiles.ts'
+import type { AddFilesOptions } from '../../models/ts/pet/AddFiles.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { addFiles } from '../../clients/axios/petService/addFiles.ts'
@@ -9,7 +9,7 @@ import { addFiles } from '../../clients/axios/petService/addFiles.ts'
  * {@link /pet/files}
  */
 export async function addFilesHandler(
-  { body }: AddFilesRequestConfig,
+  { body }: AddFilesOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await addFiles({ body })

@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponse } from '../models.ts'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponse } from '../models.ts'
 
 export function findPetsByStatus(
-  { query }: FindPetsByStatusRequestConfig = {},
+  { query }: FindPetsByStatusOptions = {},
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<FindPetsByStatusResponse> {
   return cy

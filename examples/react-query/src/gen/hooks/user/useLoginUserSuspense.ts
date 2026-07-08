@@ -4,17 +4,16 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { LoginUserRequestConfig, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser.ts'
+import type { LoginUserOptions, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser.ts'
 import { loginUser } from '../../clients/user/loginUser.ts'
 import { queryOptions } from '@tanstack/react-query'
 
-export const loginUserSuspenseQueryKey = ({ query }: Omit<LoginUserRequestConfig, 'headers'> = {}) =>
-  [{ url: '/user/login' }, ...(query ? [query] : [])] as const
+export const loginUserSuspenseQueryKey = ({ query }: Omit<LoginUserOptions, 'headers'> = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
 
 type LoginUserSuspenseQueryKey = ReturnType<typeof loginUserSuspenseQueryKey>
 
 export function loginUserSuspenseQueryOptions(
-  { query }: LoginUserRequestConfig = {},
+  { query }: LoginUserOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = loginUserSuspenseQueryKey({ query })

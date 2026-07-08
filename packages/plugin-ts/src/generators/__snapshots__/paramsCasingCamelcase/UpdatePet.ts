@@ -4,19 +4,28 @@
  */
 
 /**
- * @type string
+ * @type object
  */
-export type UpdatePetPathPetId = string
+export type UpdatePetPath = {
+  /**
+   * @type string
+   */
+  petId: string
+}
 
 /**
- * @type boolean | undefined
+ * @type object
  */
-export type UpdatePetQueryIncludeDeleted = boolean | undefined
-
-/**
- * @type string | undefined
- */
-export type UpdatePetQueryRequestSource = string | undefined
+export type UpdatePetQuery = {
+  /**
+   * @type boolean | undefined
+   */
+  includeDeleted?: boolean
+  /**
+   * @type string | undefined
+   */
+  requestSource?: string
+}
 
 /**
  * @type object
@@ -36,21 +45,10 @@ export type UpdatePetBody = {
 /**
  * @type object
  */
-export type UpdatePetRequestConfig = {
+export type UpdatePetOptions = {
   body: UpdatePetBody
-  /**
-   * @type object
-   */
-  path: {
-    petId: UpdatePetPathPetId
-  }
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    includeDeleted?: UpdatePetQueryIncludeDeleted
-    requestSource?: UpdatePetQueryRequestSource
-  }
+  path: UpdatePetPath
+  query?: UpdatePetQuery
   headers?: never
 }
 

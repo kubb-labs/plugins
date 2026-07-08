@@ -1,7 +1,7 @@
-export { createDeleteOrderPathOrderId, createDeleteOrderResponse, createDeleteOrderStatus400, createDeleteOrderStatus404 } from './createDeleteOrder.ts'
+export { createDeleteOrderPath, createDeleteOrderResponse, createDeleteOrderStatus400, createDeleteOrderStatus404 } from './createDeleteOrder.ts'
 export { createGetInventoryResponse, createGetInventoryStatus200 } from './createGetInventory.ts'
 export {
-  createGetOrderByIdPathOrderId,
+  createGetOrderByIdPath,
   createGetOrderByIdResponse,
   createGetOrderByIdStatus200,
   createGetOrderByIdStatus200Json,

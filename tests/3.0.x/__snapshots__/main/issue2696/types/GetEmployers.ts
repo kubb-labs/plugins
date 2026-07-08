@@ -13,7 +13,7 @@ export type GetEmployersStatus200 = Employer[];
 /**
  * @type object
 */
-export type GetEmployersRequestConfig = {
+export type GetEmployersOptions = {
     body?: never;
     path?: never;
     query?: never;

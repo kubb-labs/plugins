@@ -27,7 +27,7 @@ export type GetArrayOfObjectStatus200 = {
 /**
  * @type object
  */
-export type GetArrayOfObjectRequestConfig = {
+export type GetArrayOfObjectOptions = {
   body?: never
   path?: never
   query?: never

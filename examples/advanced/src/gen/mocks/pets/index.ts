@@ -1,9 +1,8 @@
 export {
   createCreatePetsBodyFaker,
-  createCreatePetsHeaderXEXAMPLEFaker,
-  createCreatePetsPathUuidFaker,
-  createCreatePetsQueryBoolParamFaker,
-  createCreatePetsQueryOffsetFaker,
+  createCreatePetsHeadersFaker,
+  createCreatePetsPathFaker,
+  createCreatePetsQueryFaker,
   createCreatePetsResponseFaker,
   createCreatePetsStatus201Faker,
   createCreatePetsStatusDefaultFaker,
