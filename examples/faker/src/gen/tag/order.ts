@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Order } from '../models/Order.ts'
+import type { Order } from '../models/order.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createOrder<TData extends Partial<Order> = object>(data?: TData) {

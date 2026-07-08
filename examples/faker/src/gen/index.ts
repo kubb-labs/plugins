@@ -10,9 +10,9 @@ export type {
   AddPetStatus200Json,
   AddPetStatus200Xml,
   AddPetStatus405,
-} from './models/AddPet.ts'
-export type { ApiResponse } from './models/ApiResponse.ts'
-export type { Category } from './models/Category.ts'
+} from './models/addPet.ts'
+export type { ApiResponse } from './models/apiResponse.ts'
+export type { Category } from './models/category.ts'
 export type {
   DeleteOrderPathOrderId,
   DeleteOrderRequestConfig,
@@ -20,7 +20,7 @@ export type {
   DeleteOrderResponses,
   DeleteOrderStatus400,
   DeleteOrderStatus404,
-} from './models/DeleteOrder.ts'
+} from './models/deleteOrder.ts'
 export type {
   DeletePetHeaderApiKey,
   DeletePetPathPetId,
@@ -28,7 +28,7 @@ export type {
   DeletePetResponse,
   DeletePetResponses,
   DeletePetStatus400,
-} from './models/DeletePet.ts'
+} from './models/deletePet.ts'
 export type {
   FindPetsByStatusQueryStatus,
   FindPetsByStatusRequestConfig,
@@ -39,7 +39,7 @@ export type {
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
   FindPetsByStatusStatusKey,
-} from './models/FindPetsByStatus.ts'
+} from './models/findPetsByStatus.ts'
 export type {
   FindPetsByTagsQueryTags,
   FindPetsByTagsRequestConfig,
@@ -49,8 +49,8 @@ export type {
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
-} from './models/FindPetsByTags.ts'
-export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/GetInventory.ts'
+} from './models/findPetsByTags.ts'
+export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/getInventory.ts'
 export type {
   GetOrderByIdPathOrderId,
   GetOrderByIdRequestConfig,
@@ -61,7 +61,7 @@ export type {
   GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
-} from './models/GetOrderById.ts'
+} from './models/getOrderById.ts'
 export type {
   GetPetByIdPathPetId,
   GetPetByIdRequestConfig,
@@ -72,10 +72,10 @@ export type {
   GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
-} from './models/GetPetById.ts'
-export type { Item } from './models/Item.ts'
-export type { Order, OrderStatusEnumKey } from './models/Order.ts'
-export type { Pet, PetStatusEnumKey } from './models/Pet.ts'
+} from './models/getPetById.ts'
+export type { Item } from './models/item.ts'
+export type { Order, OrderStatusEnumKey } from './models/order.ts'
+export type { Pet, PetStatusEnumKey } from './models/pet.ts'
 export type {
   PlaceOrderBody,
   PlaceOrderBodyFormUrlEncoded,
@@ -86,8 +86,8 @@ export type {
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-} from './models/PlaceOrder.ts'
-export type { Tag } from './models/Tag.ts'
+} from './models/placeOrder.ts'
+export type { Tag } from './models/tag.ts'
 export type {
   UpdatePetBody,
   UpdatePetBodyFormUrlEncoded,
@@ -102,7 +102,7 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-} from './models/UpdatePet.ts'
+} from './models/updatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
   UpdatePetWithFormQueryName,
@@ -111,7 +111,7 @@ export type {
   UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
-} from './models/UpdatePetWithForm.ts'
+} from './models/updatePetWithForm.ts'
 export type {
   UploadFileBody,
   UploadFilePathPetId,
@@ -120,10 +120,10 @@ export type {
   UploadFileResponse,
   UploadFileResponses,
   UploadFileStatus200,
-} from './models/UploadFile.ts'
-export { createCategory } from './faker/createCategory.ts'
-export { createPet } from './faker/createPet.ts'
-export { createTag } from './faker/createTag.ts'
+} from './models/uploadFile.ts'
+export { createCategory } from './faker/category.ts'
+export { createPet } from './faker/pet.ts'
+export { createTag } from './faker/tag.ts'
 export {
   createUpdatePetBody,
   createUpdatePetBodyFormUrlEncoded,
@@ -136,14 +136,14 @@ export {
   createUpdatePetStatus400,
   createUpdatePetStatus404,
   createUpdatePetStatus405,
-} from './faker/createUpdatePet.ts'
+} from './faker/updatePet.ts'
 export {
   createUpdatePetWithFormPathPetId,
   createUpdatePetWithFormQueryName,
   createUpdatePetWithFormQueryStatus,
   createUpdatePetWithFormResponse,
   createUpdatePetWithFormStatus405,
-} from './faker/createUpdatePetWithForm.ts'
-export { findPetsByStatusStatus } from './models/FindPetsByStatus.ts'
-export { orderStatusEnum } from './models/Order.ts'
-export { petStatusEnum } from './models/Pet.ts'
+} from './faker/updatePetWithForm.ts'
+export { findPetsByStatusStatus } from './models/findPetsByStatus.ts'
+export { orderStatusEnum } from './models/order.ts'
+export { petStatusEnum } from './models/pet.ts'

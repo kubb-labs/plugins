@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Order } from './Order.ts'
+import type { Order } from './order.ts'
 
 /**
  * @description ID of order that needs to be fetched
