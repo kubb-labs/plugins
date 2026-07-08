@@ -53,7 +53,7 @@ export type Options = OutputOptions & {
    * Override how handler names and file paths are built. Methods you omit fall
    * back to the default `resolverMcp`.
    */
-  resolver?: ResolverPatch<ResolverMcp> | ResolverMcp
+  resolver?: ResolverPatch<ResolverMcp>
   /**
    * Macros applied to each operation node before printing.
    */

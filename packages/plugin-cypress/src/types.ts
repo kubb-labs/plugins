@@ -32,7 +32,7 @@ export type Options = OutputOptions & {
   /**
    * Override how helper names and file paths are built.
    */
-  resolver?: ResolverPatch<ResolverCypress> | ResolverCypress
+  resolver?: ResolverPatch<ResolverCypress>
   /**
    * Macros applied to each operation node before printing.
    */

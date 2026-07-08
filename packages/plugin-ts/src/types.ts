@@ -260,7 +260,7 @@ export type Options = OutputOptions & {
    * Methods you omit fall back to the default `resolverTs`. `this` is bound to the
    * full resolver, so `this.default.name(name)` delegates to the built-in implementation.
    */
-  resolver?: ResolverPatch<ResolverTs> | ResolverTs
+  resolver?: ResolverPatch<ResolverTs>
   /**
    * Macros applied to each schema or operation node before printing.
    * Callbacks you omit fall back to the preset behavior.

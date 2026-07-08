@@ -196,7 +196,7 @@ export type Options = OutputOptions & {
    * Override how schema and operation names are built. Methods you omit fall back
    * to the default `resolverZod`.
    */
-  resolver?: ResolverPatch<ResolverZod> | ResolverZod
+  resolver?: ResolverPatch<ResolverZod>
   /**
    * Replace the Zod handler for a specific schema type (`'integer'`, `'date'`, ...).
    * When `mini: true`, overrides target the Zod Mini printer instead.
