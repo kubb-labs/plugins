@@ -4,6 +4,7 @@ import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { QueryKey, QueryOptions, SuspenseQuery } from '../components'
+import { classifyOperation } from '../utils.ts'
 import type { PluginReactQuery } from '../types'
 
 /**
@@ -24,13 +25,7 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
     if (!pluginTs) return null
     const tsResolver = driver.getResolver(pluginTsName)
 
-    // query: false means "this IS a query op" (suspense hooks still generate)
-    const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
-    const queryMethods = new Set(query ? query.methods : [])
-    const isMutation =
-      mutation !== false &&
-      !isQuery &&
-      (mutation ? mutation.methods : []).some((method) => !queryMethods.has(method) && node.method.toLowerCase() === method.toLowerCase())
+    const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
     const isSuspense = !!suspense
 
     if (!isQuery || isMutation || !isSuspense) return null
