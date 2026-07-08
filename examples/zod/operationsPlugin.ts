@@ -86,7 +86,7 @@ export const pluginZodOperations = definePlugin(() => ({
             const group = zodOptions.group ?? undefined
             const importPath = zodOptions.importPath ?? 'zod'
 
-            const operationsFile = resolver.default.file({ name: 'operations', extname: '.ts', root: gctx.root, output, group })
+            const operationsFile = resolver.file({ name: 'operations', extname: '.ts', root: gctx.root, output, group })
             const transformed = nodes.filter(ast.isHttpOperationNode).map((node) => ({ node, data: buildSchemaNames(node, resolver) }))
 
             const imports = transformed.flatMap(({ node, data }) => {
