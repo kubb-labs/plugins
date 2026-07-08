@@ -24,7 +24,7 @@ export const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
  * import { pluginZod } from '@kubb/plugin-zod'
  *
  * export default defineConfig({
- *   input: { path: './petStore.yaml' },
+ *   input: './petStore.yaml',
  *   output: { path: './src/gen' },
  *   plugins: [
  *     pluginTs(),

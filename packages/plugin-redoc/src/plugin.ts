@@ -24,7 +24,7 @@ export const pluginRedocName = 'plugin-redoc' satisfies PluginRedoc['name']
  * import { pluginRedoc } from '@kubb/plugin-redoc'
  *
  * export default defineConfig({
- *   input: { path: './petStore.yaml' },
+ *   input: './petStore.yaml',
  *   output: { path: './src/gen' },
  *   plugins: [
  *     pluginRedoc({ output: { path: 'docs.html' } }),

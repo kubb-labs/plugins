@@ -26,7 +26,7 @@ export const pluginMswName = 'plugin-msw' satisfies PluginMsw['name']
  * import { pluginMsw } from '@kubb/plugin-msw'
  *
  * export default defineConfig({
- *   input: { path: './petStore.yaml' },
+ *   input: './petStore.yaml',
  *   output: { path: './src/gen' },
  *   plugins: [
  *     pluginTs(),

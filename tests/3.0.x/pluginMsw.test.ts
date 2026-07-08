@@ -25,7 +25,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'petStore',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
@@ -44,7 +44,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'parserFaker',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
@@ -65,7 +65,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'handlers',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
@@ -85,7 +85,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'baseURL',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
@@ -105,7 +105,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'excludeByOperationId',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
@@ -126,7 +126,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'includeByTag',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
@@ -146,7 +146,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'groupByTag',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],

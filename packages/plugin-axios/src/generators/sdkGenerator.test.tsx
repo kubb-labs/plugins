@@ -10,7 +10,7 @@ import type { PluginAxios } from '../types.ts'
 
 const testConfig: Config = {
   root: '.',
-  input: { path: '' },
+  input: '',
   output: { path: 'test' },
   plugins: [],
   parsers: [],

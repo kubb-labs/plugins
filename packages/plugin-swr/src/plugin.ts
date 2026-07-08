@@ -25,7 +25,7 @@ export const pluginSwrName = 'plugin-swr' satisfies PluginSwr['name']
  * import { pluginSwr } from '@kubb/plugin-swr'
  *
  * export default defineConfig({
- *   input: { path: './petStore.yaml' },
+ *   input: './petStore.yaml',
  *   output: { path: './src/gen' },
  *   plugins: [
  *     pluginTs(),

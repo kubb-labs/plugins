@@ -13,7 +13,7 @@ import { infiniteQueryGenerator } from './infiniteQueryGenerator.tsx'
 
 const testConfig: Config = {
   root: '.',
-  input: { path: '' },
+  input: '',
   output: { path: 'test' },
   plugins: [],
   parsers: [],

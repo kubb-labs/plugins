@@ -29,9 +29,7 @@ describe('Plugin Generation Performance', () => {
     async () => {
       const config = defineConfig({
         root: '.',
-        input: {
-          path: petStorePath,
-        },
+        input: petStorePath,
         adapter: adapterOas({ validate: false }),
         output: {
           path: './src/gen',
@@ -62,9 +60,7 @@ describe('Plugin Generation Performance', () => {
     async () => {
       const config = defineConfig({
         root: '.',
-        input: {
-          path: petStorePath,
-        },
+        input: petStorePath,
         adapter: adapterOas({ validate: false }),
         output: {
           path: './src/gen',
@@ -100,9 +96,7 @@ describe('Plugin Generation Performance', () => {
     async () => {
       const config = defineConfig({
         root: '.',
-        input: {
-          path: petStorePath,
-        },
+        input: petStorePath,
         adapter: adapterOas({ validate: false }),
         output: {
           path: './src/gen',

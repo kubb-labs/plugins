@@ -9,7 +9,7 @@ import { handlersGenerator } from './handlersGenerator.ts'
 
 const testConfig: Config = {
   root: '.',
-  input: { path: '' },
+  input: '',
   output: { path: 'test' },
   plugins: [],
   parsers: [],

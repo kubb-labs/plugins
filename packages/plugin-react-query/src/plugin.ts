@@ -34,7 +34,7 @@ export const pluginReactQueryName = 'plugin-react-query' satisfies PluginReactQu
  * import { pluginReactQuery } from '@kubb/plugin-react-query'
  *
  * export default defineConfig({
- *   input: { path: './petStore.yaml' },
+ *   input: './petStore.yaml',
  *   output: { path: './src/gen' },
  *   plugins: [
  *     pluginTs(),
