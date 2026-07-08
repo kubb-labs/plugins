@@ -4,9 +4,14 @@
  */
 
 /**
- * @type string
+ * @type object
  */
-export type GetPetByIdPathPetId = string
+export type GetPetByIdPath = {
+  /**
+   * @type string
+   */
+  petId: string
+}
 
 /**
  * @type object
@@ -33,14 +38,9 @@ export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200X
 /**
  * @type object
  */
-export type GetPetByIdRequestConfig = {
+export type GetPetByIdOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    petId: GetPetByIdPathPetId
-  }
+  path: GetPetByIdPath
   query?: never
   headers?: never
 }

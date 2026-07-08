@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../../models/pet/UpdatePetWithForm.ts'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../../models/pet/UpdatePetWithForm.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { updatePetWithForm } from '../../clients/pet/updatePetWithForm.ts'
 
@@ -13,7 +13,7 @@ export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as co
 
 export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMutationKey>
 
-export type UpdatePetWithFormMutationArg = UpdatePetWithFormRequestConfig
+export type UpdatePetWithFormMutationArg = UpdatePetWithFormOptions
 
 /**
  * @summary Updates a pet in the store with form data

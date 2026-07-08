@@ -4,9 +4,14 @@
  */
 
 /**
- * @type string | undefined
+ * @type object
  */
-export type FindPetsByStatusQueryStatus = ('available' | 'pending' | 'sold') | undefined
+export type FindPetsByStatusQuery = {
+  /**
+   * @type string | undefined
+   */
+  status?: 'available' | 'pending' | 'sold'
+}
 
 /**
  * @type object
@@ -16,15 +21,10 @@ export type FindPetsByStatusStatus200 = object
 /**
  * @type object
  */
-export type FindPetsByStatusRequestConfig = {
+export type FindPetsByStatusOptions = {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    status?: FindPetsByStatusQueryStatus
-  }
+  query?: FindPetsByStatusQuery
   headers?: never
 }
 

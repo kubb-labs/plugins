@@ -4,7 +4,7 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { UploadFileRequestConfig, UploadFileStatus200 } from '../../models/pet/UploadFile.ts'
+import type { UploadFileOptions, UploadFileStatus200 } from '../../models/pet/UploadFile.ts'
 import { uploadFile } from '../../clients/pet/uploadFile.ts'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -16,7 +16,7 @@ export function uploadFileMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = uploadFileMutationKey()
-  return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>({
+  return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, query, body }) => {
       const { data } = await uploadFile({ ...config, path, query, body, throwOnError: true })

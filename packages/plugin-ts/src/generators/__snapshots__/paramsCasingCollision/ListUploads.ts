@@ -4,14 +4,18 @@
  */
 
 /**
- * @type integer | undefined
+ * @type object
  */
-export type ListUploadsQueryMaxUploads = number | undefined
-
-/**
- * @type string | undefined
- */
-export type ListUploadsQueryPrefix = string | undefined
+export type ListUploadsQuery = {
+  /**
+   * @type integer | undefined
+   */
+  maxUploads?: number
+  /**
+   * @type string | undefined
+   */
+  prefix?: string
+}
 
 /**
  * @type object
@@ -21,16 +25,10 @@ export type ListUploadsStatus200 = object
 /**
  * @type object
  */
-export type ListUploadsRequestConfig = {
+export type ListUploadsOptions = {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    maxUploads?: ListUploadsQueryMaxUploads
-    prefix?: ListUploadsQueryPrefix
-  }
+  query?: ListUploadsQuery
   headers?: never
 }
 

@@ -5,15 +5,15 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetPetByIdRequestConfig, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../types/GetPetById.ts'
+import type { GetPetByIdOptions, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../types/GetPetById.ts'
 import type { SWRConfiguration } from 'swr'
 import { getPetById } from '../../clients/getPetById.ts'
 
-export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
-export function getPetByIdQueryOptions({ path }: GetPetByIdRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
       const { data } = await getPetById({ ...config, path, throwOnError: true })
@@ -27,7 +27,7 @@ export function getPetByIdQueryOptions({ path }: GetPetByIdRequestConfig, config
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export function useGetPetById({ path }: GetPetByIdRequestConfig, options: {
+export function useGetPetById({ path }: GetPetByIdOptions, options: {
   query?: SWRConfiguration<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>>,
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
   shouldFetch?: boolean,

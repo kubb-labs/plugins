@@ -4,12 +4,17 @@
  */
 
 /**
- * @description ID of the order that needs to be deleted
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type DeleteOrderPathOrderId = number
+export type DeleteOrderPath = {
+  /**
+   * @description ID of the order that needs to be deleted
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  orderId: number
+}
 
 /**
  * @type unknown
@@ -24,14 +29,9 @@ export type DeleteOrderStatus404 = unknown
 /**
  * @type object
  */
-export type DeleteOrderRequestConfig = {
+export type DeleteOrderOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    orderId: DeleteOrderPathOrderId
-  }
+  path: DeleteOrderPath
   query?: never
   headers?: never
 }

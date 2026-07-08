@@ -13,7 +13,7 @@ export type GetMeStatus200 = User;
 /**
  * @type object
 */
-export type GetMeRequestConfig = {
+export type GetMeOptions = {
     body?: never;
     path?: never;
     query?: never;

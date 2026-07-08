@@ -1,4 +1,4 @@
-import type { ShowPetByIdRequestConfig } from './ShowPetById'
+import type { ShowPetByIdOptions } from './ShowPetById'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { showPetById } from './clients/showPetById'
@@ -7,7 +7,7 @@ import { showPetById } from './clients/showPetById'
  * {@link /pets/:petId}
  */
 export async function showPetByIdHandler(
-  { path }: ShowPetByIdRequestConfig,
+  { path }: ShowPetByIdOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await showPetById({ path })

@@ -35,7 +35,7 @@ export type PlaceOrderPatchBody = PlaceOrderPatchBodyJson | PlaceOrderPatchBodyX
 /**
  * @type object
  */
-export type PlaceOrderPatchRequestConfig = {
+export type PlaceOrderPatchOptions = {
   body: PlaceOrderPatchBody
   path?: never
   query?: never

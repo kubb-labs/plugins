@@ -4,6 +4,7 @@
  */
 
 import type {
+  GetOrderByIdPath,
   GetOrderByIdResponse,
   GetOrderByIdStatus200,
   GetOrderByIdStatus200Json,
@@ -14,8 +15,14 @@ import type {
 import { createOrder } from './createOrder.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createGetOrderByIdPathOrderId(data?: bigint): bigint {
-  return data ?? faker.number.bigInt()
+export function createGetOrderByIdPath<TData extends Partial<GetOrderByIdPath> = object>(data?: TData) {
+  const defaultFakeData = {
+    orderId: faker.number.bigInt(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**

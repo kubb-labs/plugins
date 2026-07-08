@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { CreateUsersWithListInputRequestConfig, CreateUsersWithListInputResponse } from '../../models/user/CreateUsersWithListInput.ts'
+import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponse } from '../../models/user/CreateUsersWithListInput.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { createUsersWithListInput } from '../../clients/user/createUsersWithListInput.ts'
 
@@ -13,7 +13,7 @@ export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWi
 
 export type CreateUsersWithListInputMutationKey = ReturnType<typeof createUsersWithListInputMutationKey>
 
-export type CreateUsersWithListInputMutationArg = CreateUsersWithListInputRequestConfig
+export type CreateUsersWithListInputMutationArg = CreateUsersWithListInputOptions
 
 /**
  * @description Creates list of users with given input array

@@ -3,7 +3,7 @@ import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 import { printerTs } from './printers/printerTs.ts'
 import { resolverTs } from './resolvers/resolverTs.ts'
-import { buildData, buildParams, buildPropertyJSDocComments, buildResponses, buildResponseUnion } from './utils.ts'
+import { buildOptions, buildParams, buildPropertyJSDocComments, buildResponses, buildResponseUnion } from './utils.ts'
 
 const printer = printerTs({
   resolver: resolverTs,
@@ -25,34 +25,59 @@ function printSchema(schema: ReturnType<typeof buildParams>): string {
 describe('buildParams', () => {
   it('builds required params as non-optional properties', () => {
     const params = [ast.factory.createParameter({ name: 'petId', schema: ast.factory.createSchema({ type: 'string' }), in: 'path', required: true })]
-    const node = ast.factory.createOperation({ operationId: 'showPetById', method: 'GET', path: '/pets/{petId}' })
 
-    expect(printSchema(buildParams(node, { params, resolver: resolverTs }))).toMatchInlineSnapshot(`
+    expect(printSchema(buildParams({ params }))).toMatchInlineSnapshot(`
       "{
-          petId: ShowPetByIdPathPetId;
+          /**
+           * @type string
+          */
+          petId: string;
       }"
     `)
   })
 
   it('marks optional params with ?', () => {
     const params = [ast.factory.createParameter({ name: 'limit', schema: ast.factory.createSchema({ type: 'integer' }), in: 'query', required: false })]
-    const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
-    expect(printSchema(buildParams(node, { params, resolver: resolverTs }))).toMatchInlineSnapshot(`
+    expect(printSchema(buildParams({ params }))).toMatchInlineSnapshot(`
       "{
-          limit?: ListPetsQueryLimit;
+          /**
+           * @type integer | undefined
+          */
+          limit?: number;
+      }"
+    `)
+  })
+
+  it('emits JSDoc on properties when parameters have descriptions', () => {
+    const params = [
+      ast.factory.createParameter({
+        name: 'limit',
+        schema: ast.factory.createSchema({ type: 'integer', description: 'Maximum number of results' }),
+        in: 'query',
+        required: false,
+      }),
+    ]
+
+    expect(printSchema(buildParams({ params }))).toMatchInlineSnapshot(`
+      "{
+          /**
+           * @description Maximum number of results
+           * @type integer | undefined
+          */
+          limit?: number;
       }"
     `)
   })
 })
 
-describe('buildData', () => {
+describe('buildOptions', () => {
   const baseNode = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
   it('emits body?: never when no request body', () => {
     const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
-    expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
+    expect(printSchema(buildOptions(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
       "{
           body?: never;
           path?: never;
@@ -62,7 +87,7 @@ describe('buildData', () => {
     `)
   })
 
-  it('emits required body referencing the Data type when body exists', () => {
+  it('emits required body referencing the Body type when body exists', () => {
     const node = ast.factory.createOperation({
       operationId: 'createPet',
       method: 'POST',
@@ -70,7 +95,7 @@ describe('buildData', () => {
       requestBody: { content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) })] },
     })
 
-    expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
+    expect(printSchema(buildOptions(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
       "{
           body: CreatePetBody;
           path?: never;
@@ -80,7 +105,7 @@ describe('buildData', () => {
     `)
   })
 
-  it('emits optional path when path parameters exist', () => {
+  it('emits path referencing the grouped Path type when path parameters exist', () => {
     const node = ast.factory.createOperation({
       operationId: 'showPetById',
       method: 'GET',
@@ -88,67 +113,28 @@ describe('buildData', () => {
       parameters: [ast.factory.createParameter({ name: 'petId', schema: ast.factory.createSchema({ type: 'string' }), in: 'path', required: true })],
     })
 
-    expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
+    expect(printSchema(buildOptions(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
       "{
           body?: never;
-          /**
-           * @type object
-          */
-          path: {
-              petId: ShowPetByIdPathPetId;
-          };
+          path: ShowPetByIdPath;
           query?: never;
           headers?: never;
       }"
     `)
   })
 
-  it('emits optional query when query parameters exist', () => {
+  it('emits query referencing the grouped Query type when query parameters exist', () => {
     const node = ast.factory.createOperation({
       ...baseNode,
       operationId: 'listPets',
       parameters: [ast.factory.createParameter({ name: 'limit', schema: ast.factory.createSchema({ type: 'integer' }), in: 'query', required: false })],
     })
 
-    expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
+    expect(printSchema(buildOptions(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
       "{
           body?: never;
           path?: never;
-          /**
-           * @type object | undefined
-          */
-          query?: {
-              limit?: ListPetsQueryLimit;
-          };
-          headers?: never;
-      }"
-    `)
-  })
-
-  it('emits JSDoc on query properties when parameters have descriptions', () => {
-    const node = ast.factory.createOperation({
-      ...baseNode,
-      operationId: 'listPets',
-      parameters: [
-        ast.factory.createParameter({
-          name: 'limit',
-          schema: ast.factory.createSchema({ type: 'integer', description: 'Maximum number of results' }),
-          in: 'query',
-          required: false,
-        }),
-      ],
-    })
-
-    expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
-      "{
-          body?: never;
-          path?: never;
-          /**
-           * @type object | undefined
-          */
-          query?: {
-              limit?: ListPetsQueryLimit;
-          };
+          query?: ListPetsQuery;
           headers?: never;
       }"
     `)

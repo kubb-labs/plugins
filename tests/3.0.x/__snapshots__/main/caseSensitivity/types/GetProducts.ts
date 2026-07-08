@@ -24,7 +24,7 @@ export type GetProductsStatus200 = {
 /**
  * @type object
 */
-export type GetProductsRequestConfig = {
+export type GetProductsOptions = {
     body?: never;
     path?: never;
     query?: never;

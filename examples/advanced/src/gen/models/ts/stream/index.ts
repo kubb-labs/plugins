@@ -1,6 +1,6 @@
 export type {
-  StreamPetEventsPathPetId,
-  StreamPetEventsRequestConfig,
+  StreamPetEventsOptions,
+  StreamPetEventsPath,
   StreamPetEventsResponse,
   StreamPetEventsResponses,
   StreamPetEventsStatus200,

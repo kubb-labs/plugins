@@ -4,24 +4,34 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200 } from './FindPetsByTags'
+import type { FindPetsByTagsOptions, FindPetsByTagsQuery, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { InfiniteData, QueryKey, QueryClient, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult } from '@tanstack/react-query'
 import { findPetsByTags } from './clients/findPetsByTags'
 import { infiniteQueryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 
-export const findPetsByTagsSuspenseInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'>) =>
+export const findPetsByTagsSuspenseInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'>) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsByTagsSuspenseInfiniteQueryKey>
 
 export function findPetsByTagsSuspenseInfiniteQueryOptions(
-  { query }: FindPetsByTagsRequestConfig,
+  { query }: FindPetsByTagsOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsSuspenseInfiniteQueryKey({ query })
-  return infiniteQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, InfiniteData<FindPetsByTagsStatus200>, typeof queryKey, number>({
+  return infiniteQueryOptions<
+    FindPetsByTagsStatus200,
+    ResponseErrorConfig<Error>,
+    InfiniteData<FindPetsByTagsStatus200>,
+    typeof queryKey,
+    NonNullable<FindPetsByTagsQuery['pageSize']>
+  >({
     queryKey,
-    queryFn: async ({ signal }) => {
+    queryFn: async ({ signal, pageParam }) => {
+      query = {
+        ...(query ?? {}),
+        ['pageSize']: pageParam as unknown as FindPetsByTagsQuery['pageSize'],
+      } as FindPetsByTagsQuery
       const { data } = await findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
       return data
     },
@@ -39,9 +49,9 @@ export function useFindPetsByTagsSuspenseInfinite<
   TError = ResponseErrorConfig<Error>,
   TData = InfiniteData<TQueryFnData>,
   TQueryKey extends QueryKey = FindPetsByTagsSuspenseInfiniteQueryKey,
-  TPageParam = number,
+  TPageParam = NonNullable<FindPetsByTagsQuery['pageSize']>,
 >(
-  { query }: { query: FindPetsByTagsRequestConfig['query'] | (() => FindPetsByTagsRequestConfig['query']) },
+  { query }: { query: FindPetsByTagsOptions['query'] | (() => FindPetsByTagsOptions['query']) },
   options: {
     query?: Partial<UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>

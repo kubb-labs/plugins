@@ -3,15 +3,22 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByStatusQueryStatus, FindPetsByStatusResponse, FindPetsByStatusStatus200, FindPetsByStatusStatus200Json, FindPetsByStatusStatus200Xml, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
+import type { FindPetsByStatusQuery, FindPetsByStatusResponse, FindPetsByStatusStatus200, FindPetsByStatusStatus200Json, FindPetsByStatusStatus200Xml, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
 import { createFindPetsByStatusStatus } from './createFindPetsByStatusStatus.ts'
 import { createPet } from './createPet.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createFindPetsByStatusQueryStatus(data?: Partial<FindPetsByStatusQueryStatus>): FindPetsByStatusQueryStatus {
-  faker.seed([42])
+export function createFindPetsByStatusQuery<TData extends Partial<FindPetsByStatusQuery> = object>(data?: TData)
 
-  return createFindPetsByStatusStatus(data) as FindPetsByStatusQueryStatus
+{
+  faker.seed([42])
+  const defaultFakeData = {
+  status: createFindPetsByStatusStatus(),
+}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**

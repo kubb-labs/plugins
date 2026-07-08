@@ -1,12 +1,17 @@
 import type { PetEvent } from '../PetEvent.ts'
 
 /**
- * @description ID of pet to stream events for
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type StreamPetEventsPathPetId = number
+export type StreamPetEventsPath = {
+  /**
+   * @description ID of pet to stream events for
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  petId: number
+}
 
 /**
  * @type object
@@ -16,14 +21,9 @@ export type StreamPetEventsStatus200 = PetEvent
 /**
  * @type object
  */
-export type StreamPetEventsRequestConfig = {
+export type StreamPetEventsOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    petId: StreamPetEventsPathPetId
-  }
+  path: StreamPetEventsPath
   query?: never
   headers?: never
 }

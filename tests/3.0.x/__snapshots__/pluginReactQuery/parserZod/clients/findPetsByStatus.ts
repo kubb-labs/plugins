@@ -4,7 +4,7 @@
 */
 
 import type { Options, RequestResult } from '../.kubb/client.ts'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../types/FindPetsByStatus.ts'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../types/FindPetsByStatus.ts'
 import { client } from '../.kubb/client.ts'
 import { findPetsByStatusResponseSchema, findPetsByStatusErrorSchema } from '../zod/findPetsByStatusSchema.ts'
 
@@ -13,7 +13,7 @@ import { findPetsByStatusResponseSchema, findPetsByStatusErrorSchema } from '../
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export function findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusRequestConfig, ThrowOnError> = {}): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+export function findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptions, ThrowOnError> = {}): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
   return request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], styles: { query: { status: { explode: true } } }, validator: { response: findPetsByStatusResponseSchema, error: findPetsByStatusErrorSchema }, ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>

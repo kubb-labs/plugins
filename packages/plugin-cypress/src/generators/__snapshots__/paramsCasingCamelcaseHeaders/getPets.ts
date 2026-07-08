@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { GetPetsRequestConfig, GetPetsResponse } from './GetPets'
+import type { GetPetsOptions, GetPetsResponse } from './GetPets'
 
-export function getPets({ query, headers }: GetPetsRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetsResponse> {
+export function getPets({ query, headers }: GetPetsOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetsResponse> {
   return cy
     .request<GetPetsResponse>({
       method: 'GET',

@@ -8,7 +8,7 @@ export type GetInventoryStatus200 = {
 /**
  * @type object
  */
-export type GetInventoryRequestConfig = {
+export type GetInventoryOptions = {
   body?: never
   path?: never
   query?: never

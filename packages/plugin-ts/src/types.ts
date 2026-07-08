@@ -53,15 +53,13 @@ export type ResolverTs = Resolver & {
      */
     status(node: ast.OperationNode, statusCode: ast.StatusCode): string
     /**
-     * Resolves the name for an operation's request config (`RequestConfig`).
+     * Resolves the name for an operation's grouped request options type (`Options`), the
+     * `{ body, path, query, headers }` bag passed to call an operation.
      *
-     * The `RequestConfig` suffix is kept through the v5 beta to avoid churn, but it overlaps with the
-     * runtime client's `RequestConfig`. Renaming to `Request` is on the table before stable.
-     *
-     * @example Request config names
-     * `resolver.response.config(node) // → 'ListPetsRequestConfig'`
+     * @example Options type names
+     * `resolver.response.options(node) // → 'ListPetsOptions'`
      */
-    config(node: ast.OperationNode): string
+    options(node: ast.OperationNode): string
     /**
      * Resolves the name for the collection of all operation responses (`Responses`).
      *

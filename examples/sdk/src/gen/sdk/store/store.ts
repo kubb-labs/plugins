@@ -4,11 +4,11 @@
  */
 
 import type { ClientConfig, ClientInstance, Options, RequestResult } from '../../.kubb/client.ts'
-import type { DeleteOrderRequestConfig, DeleteOrderResponses } from '../../models/store/DeleteOrder.ts'
-import type { GetInventoryRequestConfig, GetInventoryResponses } from '../../models/store/GetInventory.ts'
-import type { GetOrderByIdRequestConfig, GetOrderByIdResponses } from '../../models/store/GetOrderById.ts'
-import type { PlaceOrderRequestConfig, PlaceOrderResponses } from '../../models/store/PlaceOrder.ts'
-import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch.ts'
+import type { DeleteOrderOptions, DeleteOrderResponses } from '../../models/store/DeleteOrder.ts'
+import type { GetInventoryOptions, GetInventoryResponses } from '../../models/store/GetInventory.ts'
+import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../../models/store/GetOrderById.ts'
+import type { PlaceOrderOptions, PlaceOrderResponses } from '../../models/store/PlaceOrder.ts'
+import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch.ts'
 import { createClient } from '../../.kubb/client.ts'
 
 export class store {
@@ -24,7 +24,7 @@ export class store {
    * {@link /store/inventory}
    */
   public getInventory<ThrowOnError extends boolean = true>(
-    options: Options<GetInventoryRequestConfig, ThrowOnError> = {},
+    options: Options<GetInventoryOptions, ThrowOnError> = {},
   ): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -39,7 +39,7 @@ export class store {
    * {@link /store/order}
    */
   public placeOrder<ThrowOnError extends boolean = true>(
-    options: Options<PlaceOrderRequestConfig, ThrowOnError>,
+    options: Options<PlaceOrderOptions, ThrowOnError>,
   ): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -52,7 +52,7 @@ export class store {
    * {@link /store/order}
    */
   public placeOrderPatch<ThrowOnError extends boolean = true>(
-    options: Options<PlaceOrderPatchRequestConfig, ThrowOnError>,
+    options: Options<PlaceOrderPatchOptions, ThrowOnError>,
   ): Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -65,7 +65,7 @@ export class store {
    * {@link /store/order/:orderId}
    */
   public getOrderById<ThrowOnError extends boolean = true>(
-    options: Options<GetOrderByIdRequestConfig, ThrowOnError>,
+    options: Options<GetOrderByIdOptions, ThrowOnError>,
   ): Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -78,7 +78,7 @@ export class store {
    * {@link /store/order/:orderId}
    */
   public deleteOrder<ThrowOnError extends boolean = true>(
-    options: Options<DeleteOrderRequestConfig, ThrowOnError>,
+    options: Options<DeleteOrderOptions, ThrowOnError>,
   ): Promise<RequestResult<DeleteOrderResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 

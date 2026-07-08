@@ -274,7 +274,7 @@ export type UpdatePetBody = UpdatePetBodyJson | UpdatePetBodyXml | UpdatePetBody
 /**
  * @type object
  */
-export type UpdatePetRequestConfig = {
+export type UpdatePetOptions = {
   body: UpdatePetBody
   path?: never
   query?: never
@@ -355,7 +355,7 @@ export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncod
 /**
  * @type object
  */
-export type AddPetRequestConfig = {
+export type AddPetOptions = {
   body: AddPetBody
   path?: never
   query?: never
@@ -391,7 +391,7 @@ export type OptionsFindPetsByStatusStatus200 = Pet[]
 /**
  * @type object
  */
-export type OptionsFindPetsByStatusRequestConfig = {
+export type OptionsFindPetsByStatusOptions = {
   body?: never
   path?: never
   query?: never
@@ -419,11 +419,16 @@ export const findPetsByStatusStatus = {
 export type FindPetsByStatusStatusKey = (typeof findPetsByStatusStatus)[keyof typeof findPetsByStatusStatus]
 
 /**
- * @description Status values that need to be considered for filter
- * @default 'available'
- * @type string | undefined
+ * @type object
  */
-export type FindPetsByStatusQueryStatus = FindPetsByStatusStatusKey | undefined
+export type FindPetsByStatusQuery = {
+  /**
+   * @description Status values that need to be considered for filter
+   * @default 'available'
+   * @type string | undefined
+   */
+  status?: FindPetsByStatusStatusKey
+}
 
 /**
  * @type array
@@ -445,15 +450,10 @@ export type FindPetsByStatusStatus400 = unknown
 /**
  * @type object
  */
-export type FindPetsByStatusRequestConfig = {
+export type FindPetsByStatusOptions = {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    status?: FindPetsByStatusQueryStatus
-  }
+  query?: FindPetsByStatusQuery
   headers?: never
 }
 
@@ -479,22 +479,25 @@ export type FindPetsByStatusResponses = {
 export type FindPetsByStatusResponse = FindPetsByStatusStatus200 | FindPetsByStatusStatus400
 
 /**
- * @description Tags to filter by
- * @type array | undefined
+ * @type object
  */
-export type FindPetsByTagsQueryTags = string[] | undefined
-
-/**
- * @description to request with required page number or pagination
- * @type string | undefined
- */
-export type FindPetsByTagsQueryPage = string | undefined
-
-/**
- * @description to request with required page size
- * @type string | undefined
- */
-export type FindPetsByTagsQueryPageSize = string | undefined
+export type FindPetsByTagsQuery = {
+  /**
+   * @description Tags to filter by
+   * @type array | undefined
+   */
+  tags?: string[]
+  /**
+   * @description to request with required page number or pagination
+   * @type string | undefined
+   */
+  page?: string
+  /**
+   * @description to request with required page size
+   * @type string | undefined
+   */
+  pageSize?: string
+}
 
 /**
  * @type array
@@ -516,17 +519,10 @@ export type FindPetsByTagsStatus400 = unknown
 /**
  * @type object
  */
-export type FindPetsByTagsRequestConfig = {
+export type FindPetsByTagsOptions = {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    tags?: FindPetsByTagsQueryTags
-    page?: FindPetsByTagsQueryPage
-    pageSize?: FindPetsByTagsQueryPageSize
-  }
+  query?: FindPetsByTagsQuery
   headers?: never
 }
 
@@ -552,12 +548,17 @@ export type FindPetsByTagsResponses = {
 export type FindPetsByTagsResponse = FindPetsByTagsStatus200 | FindPetsByTagsStatus400
 
 /**
- * @description ID of pet to return
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type GetPetByIdPathPetId = bigint
+export type GetPetByIdPath = {
+  /**
+   * @description ID of pet to return
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  petId: bigint
+}
 
 /**
  * @type object
@@ -584,14 +585,9 @@ export type GetPetByIdStatus404 = unknown
 /**
  * @type object
  */
-export type GetPetByIdRequestConfig = {
+export type GetPetByIdOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    petId: GetPetByIdPathPetId
-  }
+  path: GetPetByIdPath
   query?: never
   headers?: never
 }
@@ -619,24 +615,33 @@ export type GetPetByIdResponses = {
 export type GetPetByIdResponse = GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404
 
 /**
- * @description ID of pet that needs to be updated
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type UpdatePetWithFormPathPetId = bigint
+export type UpdatePetWithFormPath = {
+  /**
+   * @description ID of pet that needs to be updated
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  petId: bigint
+}
 
 /**
- * @description Name of pet that needs to be updated
- * @type string | undefined
+ * @type object
  */
-export type UpdatePetWithFormQueryName = string | undefined
-
-/**
- * @description Status of pet that needs to be updated
- * @type string | undefined
- */
-export type UpdatePetWithFormQueryStatus = string | undefined
+export type UpdatePetWithFormQuery = {
+  /**
+   * @description Name of pet that needs to be updated
+   * @type string | undefined
+   */
+  name?: string
+  /**
+   * @description Status of pet that needs to be updated
+   * @type string | undefined
+   */
+  status?: string
+}
 
 /**
  * @type unknown
@@ -646,21 +651,10 @@ export type UpdatePetWithFormStatus405 = unknown
 /**
  * @type object
  */
-export type UpdatePetWithFormRequestConfig = {
+export type UpdatePetWithFormOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    petId: UpdatePetWithFormPathPetId
-  }
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    name?: UpdatePetWithFormQueryName
-    status?: UpdatePetWithFormQueryStatus
-  }
+  path: UpdatePetWithFormPath
+  query?: UpdatePetWithFormQuery
   headers?: never
 }
 
@@ -677,17 +671,27 @@ export type UpdatePetWithFormResponses = {
 export type UpdatePetWithFormResponse = UpdatePetWithFormStatus405
 
 /**
- * @type string | undefined
+ * @type object
  */
-export type DeletePetHeaderApiKey = string | undefined
+export type DeletePetPath = {
+  /**
+   * @description Pet id to delete
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  petId: bigint
+}
 
 /**
- * @description Pet id to delete
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type DeletePetPathPetId = bigint
+export type DeletePetHeaders = {
+  /**
+   * @type string | undefined
+   */
+  apiKey?: string
+}
 
 /**
  * @type unknown
@@ -697,21 +701,11 @@ export type DeletePetStatus400 = unknown
 /**
  * @type object
  */
-export type DeletePetRequestConfig = {
+export type DeletePetOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    petId: DeletePetPathPetId
-  }
+  path: DeletePetPath
   query?: never
-  /**
-   * @type object | undefined
-   */
-  headers?: {
-    apiKey?: DeletePetHeaderApiKey
-  }
+  headers?: DeletePetHeaders
 }
 
 /**
@@ -727,18 +721,28 @@ export type DeletePetResponses = {
 export type DeletePetResponse = DeletePetStatus400
 
 /**
- * @description ID of pet to update
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type UploadFilePathPetId = bigint
+export type UploadFilePath = {
+  /**
+   * @description ID of pet to update
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  petId: bigint
+}
 
 /**
- * @description Additional Metadata
- * @type string | undefined
+ * @type object
  */
-export type UploadFileQueryAdditionalMetadata = string | undefined
+export type UploadFileQuery = {
+  /**
+   * @description Additional Metadata
+   * @type string | undefined
+   */
+  additionalMetadata?: string
+}
 
 /**
  * @type object
@@ -753,20 +757,10 @@ export type UploadFileBody = Blob | undefined
 /**
  * @type object
  */
-export type UploadFileRequestConfig = {
+export type UploadFileOptions = {
   body: UploadFileBody
-  /**
-   * @type object
-   */
-  path: {
-    petId: UploadFilePathPetId
-  }
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    additionalMetadata?: UploadFileQueryAdditionalMetadata
-  }
+  path: UploadFilePath
+  query?: UploadFileQuery
   headers?: never
 }
 
@@ -792,7 +786,7 @@ export type GetInventoryStatus200 = {
 /**
  * @type object
  */
-export type GetInventoryRequestConfig = {
+export type GetInventoryOptions = {
   body?: never
   path?: never
   query?: never
@@ -841,7 +835,7 @@ export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrder
 /**
  * @type object
  */
-export type PlaceOrderRequestConfig = {
+export type PlaceOrderOptions = {
   body: PlaceOrderBody
   path?: never
   query?: never
@@ -891,7 +885,7 @@ export type PlaceOrderPatchBody = PlaceOrderPatchBodyJson | PlaceOrderPatchBodyX
 /**
  * @type object
  */
-export type PlaceOrderPatchRequestConfig = {
+export type PlaceOrderPatchOptions = {
   body: PlaceOrderPatchBody
   path?: never
   query?: never
@@ -912,12 +906,17 @@ export type PlaceOrderPatchResponses = {
 export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatchStatus405
 
 /**
- * @description ID of order that needs to be fetched
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type GetOrderByIdPathOrderId = bigint
+export type GetOrderByIdPath = {
+  /**
+   * @description ID of order that needs to be fetched
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  orderId: bigint
+}
 
 /**
  * @type object
@@ -944,14 +943,9 @@ export type GetOrderByIdStatus404 = unknown
 /**
  * @type object
  */
-export type GetOrderByIdRequestConfig = {
+export type GetOrderByIdOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    orderId: GetOrderByIdPathOrderId
-  }
+  path: GetOrderByIdPath
   query?: never
   headers?: never
 }
@@ -979,12 +973,17 @@ export type GetOrderByIdResponses = {
 export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400 | GetOrderByIdStatus404
 
 /**
- * @description ID of the order that needs to be deleted
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type DeleteOrderPathOrderId = bigint
+export type DeleteOrderPath = {
+  /**
+   * @description ID of the order that needs to be deleted
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  orderId: bigint
+}
 
 /**
  * @type unknown
@@ -999,14 +998,9 @@ export type DeleteOrderStatus404 = unknown
 /**
  * @type object
  */
-export type DeleteOrderRequestConfig = {
+export type DeleteOrderOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    orderId: DeleteOrderPathOrderId
-  }
+  path: DeleteOrderPath
   query?: never
   headers?: never
 }

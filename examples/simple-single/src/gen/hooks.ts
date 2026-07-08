@@ -5,44 +5,44 @@
 
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type {
-  AddPetRequestConfig,
+  AddPetOptions,
   AddPetStatus200,
   AddPetStatus405,
-  UpdatePetRequestConfig,
+  UpdatePetOptions,
   UpdatePetStatus200,
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-  FindPetsByStatusRequestConfig,
+  FindPetsByStatusOptions,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
-  FindPetsByTagsRequestConfig,
+  FindPetsByTagsOptions,
   FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
-  GetPetByIdRequestConfig,
+  GetPetByIdOptions,
   GetPetByIdStatus200,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
-  UpdatePetWithFormRequestConfig,
+  UpdatePetWithFormOptions,
   UpdatePetWithFormResponse,
   UpdatePetWithFormStatus405,
-  DeletePetRequestConfig,
+  DeletePetOptions,
   DeletePetResponse,
   DeletePetStatus400,
-  UploadFileRequestConfig,
+  UploadFileOptions,
   UploadFileStatus200,
   GetInventoryStatus200,
-  PlaceOrderRequestConfig,
+  PlaceOrderOptions,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-  PlaceOrderPatchRequestConfig,
+  PlaceOrderPatchOptions,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
-  GetOrderByIdRequestConfig,
+  GetOrderByIdOptions,
   GetOrderByIdStatus200,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
-  DeleteOrderRequestConfig,
+  DeleteOrderOptions,
   DeleteOrderResponse,
   DeleteOrderStatus400,
   DeleteOrderStatus404,
@@ -70,12 +70,7 @@ export function updatePetMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = updatePetMutationKey()
-  return mutationOptions<
-    UpdatePetStatus200,
-    ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    UpdatePetRequestConfig,
-    TContext
-  >({
+  return mutationOptions<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       const { data } = await updatePet({ ...config, body, throwOnError: true })
@@ -92,7 +87,7 @@ export function addPetMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = addPetMutationKey()
-  return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>({
+  return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       const { data } = await addPet({ ...config, body, throwOnError: true })
@@ -101,13 +96,13 @@ export function addPetMutationOptions<TContext = unknown>(
   })
 }
 
-export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'headers'> = {}) =>
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusOptions, 'headers'> = {}) =>
   [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
 export function findPetsByStatusQueryOptions(
-  { query }: FindPetsByStatusRequestConfig = {},
+  { query }: FindPetsByStatusOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByStatusQueryKey({ query })
@@ -120,13 +115,13 @@ export function findPetsByStatusQueryOptions(
   })
 }
 
-export const findPetsByStatusSuspenseQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'headers'> = {}) =>
+export const findPetsByStatusSuspenseQueryKey = ({ query }: Omit<FindPetsByStatusOptions, 'headers'> = {}) =>
   [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusSuspenseQueryKey = ReturnType<typeof findPetsByStatusSuspenseQueryKey>
 
 export function findPetsByStatusSuspenseQueryOptions(
-  { query }: FindPetsByStatusRequestConfig = {},
+  { query }: FindPetsByStatusOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByStatusSuspenseQueryKey({ query })
@@ -139,13 +134,13 @@ export function findPetsByStatusSuspenseQueryOptions(
   })
 }
 
-export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'> = {}) =>
+export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'> = {}) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 export function findPetsByTagsQueryOptions(
-  { query }: FindPetsByTagsRequestConfig = {},
+  { query }: FindPetsByTagsOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsQueryKey({ query })
@@ -158,13 +153,13 @@ export function findPetsByTagsQueryOptions(
   })
 }
 
-export const findPetsByTagsSuspenseQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'> = {}) =>
+export const findPetsByTagsSuspenseQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'> = {}) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsSuspenseQueryKey = ReturnType<typeof findPetsByTagsSuspenseQueryKey>
 
 export function findPetsByTagsSuspenseQueryOptions(
-  { query }: FindPetsByTagsRequestConfig = {},
+  { query }: FindPetsByTagsOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsSuspenseQueryKey({ query })
@@ -177,14 +172,11 @@ export function findPetsByTagsSuspenseQueryOptions(
   })
 }
 
-export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
-export function getPetByIdQueryOptions(
-  { path }: GetPetByIdRequestConfig,
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
-) {
+export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = getPetByIdQueryKey({ path })
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
     queryKey,
@@ -195,12 +187,12 @@ export function getPetByIdQueryOptions(
   })
 }
 
-export const getPetByIdSuspenseQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdSuspenseQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
 
 export function getPetByIdSuspenseQueryOptions(
-  { path }: GetPetByIdRequestConfig,
+  { path }: GetPetByIdOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = getPetByIdSuspenseQueryKey({ path })
@@ -217,7 +209,7 @@ export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as co
 
 export function updatePetWithFormMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = updatePetWithFormMutationKey()
-  return mutationOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormRequestConfig, TContext>({
+  return mutationOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, query }) => {
       const { data } = await updatePetWithForm({ ...config, path, query, throwOnError: true })
@@ -230,7 +222,7 @@ export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
 export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = deletePetMutationKey()
-  return mutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext>({
+  return mutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, headers }) => {
       const { data } = await deletePet({ ...config, path, headers, throwOnError: true })
@@ -243,7 +235,7 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
 
 export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = uploadFileMutationKey()
-  return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>({
+  return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, query, body }) => {
       const { data } = await uploadFile({ ...config, path, query, body, throwOnError: true })
@@ -290,7 +282,7 @@ export function placeOrderMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = placeOrderMutationKey()
-  return mutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>({
+  return mutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       const { data } = await placeOrder({ ...config, body, throwOnError: true })
@@ -307,7 +299,7 @@ export function placeOrderPatchMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = placeOrderPatchMutationKey()
-  return mutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>({
+  return mutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       const { data } = await placeOrderPatch({ ...config, body, throwOnError: true })
@@ -316,12 +308,12 @@ export function placeOrderPatchMutationOptions<TContext = unknown>(
   })
 }
 
-export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
+export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdOptions, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
 export function getOrderByIdQueryOptions(
-  { path }: GetOrderByIdRequestConfig,
+  { path }: GetOrderByIdOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = getOrderByIdQueryKey({ path })
@@ -334,12 +326,12 @@ export function getOrderByIdQueryOptions(
   })
 }
 
-export const getOrderByIdSuspenseQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
+export const getOrderByIdSuspenseQueryKey = ({ path }: Omit<GetOrderByIdOptions, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdSuspenseQueryKey = ReturnType<typeof getOrderByIdSuspenseQueryKey>
 
 export function getOrderByIdSuspenseQueryOptions(
-  { path }: GetOrderByIdRequestConfig,
+  { path }: GetOrderByIdOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = getOrderByIdSuspenseQueryKey({ path })
@@ -356,7 +348,7 @@ export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] a
 
 export function deleteOrderMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = deleteOrderMutationKey()
-  return mutationOptions<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderRequestConfig, TContext>({
+  return mutationOptions<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path }) => {
       const { data } = await deleteOrder({ ...config, path, throwOnError: true })

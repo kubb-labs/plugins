@@ -4,7 +4,7 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { CreateUserRequestConfig, CreateUserResponse } from '../../models/user/CreateUser.ts'
+import type { CreateUserOptions, CreateUserResponse } from '../../models/user/CreateUser.ts'
 import { createUser } from '../../clients/user/createUser.ts'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -16,7 +16,7 @@ export function createUserMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = createUserMutationKey()
-  return mutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserRequestConfig, TContext>({
+  return mutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       const { data } = await createUser({ ...config, body, throwOnError: true })

@@ -4,7 +4,7 @@
  */
 
 import type {
-  FindPetsByTagsQueryTags,
+  FindPetsByTagsQuery,
   FindPetsByTagsResponse,
   FindPetsByTagsStatus200,
   FindPetsByTagsStatus200Json,
@@ -14,22 +14,17 @@ import type {
 import { createPet } from '../createPet.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createFindPetsByTagsQueryTags(data?: FindPetsByTagsQueryTags): FindPetsByTagsQueryTags {
+export function createFindPetsByTagsQuery<TData extends Partial<FindPetsByTagsQuery> = object>(data?: TData) {
   faker.seed([220])
-
-  return [...faker.helpers.multiple(() => faker.string.alpha()), ...(data || [])]
-}
-
-export function createFindPetsByTagsQueryPage(data?: string): string {
-  faker.seed([220])
-
-  return data ?? faker.string.alpha()
-}
-
-export function createFindPetsByTagsQueryPageSize(data?: string): string {
-  faker.seed([220])
-
-  return data ?? faker.string.alpha()
+  const defaultFakeData = {
+    tags: faker.helpers.multiple(() => faker.string.alpha()),
+    page: faker.string.alpha(),
+    pageSize: faker.string.alpha(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**

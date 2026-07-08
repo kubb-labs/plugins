@@ -3,12 +3,9 @@
  * Do not edit manually.
  */
 
-import type { UploadFileRequestConfig, UploadFileResponse } from '../models.ts'
+import type { UploadFileOptions, UploadFileResponse } from '../models.ts'
 
-export function uploadFile(
-  { path, query, body }: UploadFileRequestConfig,
-  options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<UploadFileResponse> {
+export function uploadFile({ path, query, body }: UploadFileOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<UploadFileResponse> {
   return cy
     .request<UploadFileResponse>({
       method: 'POST',

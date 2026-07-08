@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { CreateUserRequestConfig, CreateUserResponse } from '../../models/user/CreateUser.ts'
+import type { CreateUserOptions, CreateUserResponse } from '../../models/user/CreateUser.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { createUser } from '../../clients/user/createUser.ts'
 
@@ -13,7 +13,7 @@ export const createUserMutationKey = () => [{ url: '/user' }] as const
 
 export type CreateUserMutationKey = ReturnType<typeof createUserMutationKey>
 
-export type CreateUserMutationArg = CreateUserRequestConfig
+export type CreateUserMutationArg = CreateUserOptions
 
 /**
  * @description This can only be done by the logged in user.

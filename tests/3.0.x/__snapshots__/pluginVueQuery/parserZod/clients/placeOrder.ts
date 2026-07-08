@@ -4,7 +4,7 @@
 */
 
 import type { Options, RequestResult } from '../.kubb/client.ts'
-import type { PlaceOrderRequestConfig, PlaceOrderResponses } from '../types/PlaceOrder.ts'
+import type { PlaceOrderOptions, PlaceOrderResponses } from '../types/PlaceOrder.ts'
 import { client } from '../.kubb/client.ts'
 import { placeOrderResponseSchema, placeOrderErrorSchema } from '../zod/placeOrderSchema.ts'
 
@@ -13,7 +13,7 @@ import { placeOrderResponseSchema, placeOrderErrorSchema } from '../zod/placeOrd
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export function placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderRequestConfig, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
+export function placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptions, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
   return request({ method: 'POST', url: '/store/order', validator: { response: placeOrderResponseSchema, error: placeOrderErrorSchema }, ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>

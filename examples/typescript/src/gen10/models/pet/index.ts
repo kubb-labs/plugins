@@ -3,7 +3,7 @@ export type {
   AddPetBodyFormUrlEncoded,
   AddPetBodyJson,
   AddPetBodyXml,
-  AddPetRequestConfig,
+  AddPetOptions,
   AddPetResponse,
   AddPetResponses,
   AddPetStatus200,
@@ -12,17 +12,17 @@ export type {
   AddPetStatus405,
 } from './AddPet.ts'
 export type {
-  DeletePetHeaderApiKey,
-  DeletePetPathPetId,
-  DeletePetRequestConfig,
+  DeletePetHeaders,
+  DeletePetOptions,
+  DeletePetPath,
   DeletePetResponse,
   DeletePetResponses,
   DeletePetStatus200,
   DeletePetStatus400,
 } from './DeletePet.ts'
 export type {
-  FindPetsByStatusQueryStatus,
-  FindPetsByStatusRequestConfig,
+  FindPetsByStatusOptions,
+  FindPetsByStatusQuery,
   FindPetsByStatusResponse,
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
@@ -31,10 +31,8 @@ export type {
   FindPetsByStatusStatus400,
 } from './FindPetsByStatus.ts'
 export type {
-  FindPetsByTagsQueryPage,
-  FindPetsByTagsQueryPageSize,
-  FindPetsByTagsQueryTags,
-  FindPetsByTagsRequestConfig,
+  FindPetsByTagsOptions,
+  FindPetsByTagsQuery,
   FindPetsByTagsResponse,
   FindPetsByTagsResponses,
   FindPetsByTagsStatus200,
@@ -43,8 +41,8 @@ export type {
   FindPetsByTagsStatus400,
 } from './FindPetsByTags.ts'
 export type {
-  GetPetByIdPathPetId,
-  GetPetByIdRequestConfig,
+  GetPetByIdOptions,
+  GetPetByIdPath,
   GetPetByIdResponse,
   GetPetByIdResponses,
   GetPetByIdStatus200,
@@ -58,7 +56,7 @@ export type {
   UpdatePetBodyFormUrlEncoded,
   UpdatePetBodyJson,
   UpdatePetBodyXml,
-  UpdatePetRequestConfig,
+  UpdatePetOptions,
   UpdatePetResponse,
   UpdatePetResponses,
   UpdatePetStatus200,
@@ -69,19 +67,18 @@ export type {
   UpdatePetStatus405,
 } from './UpdatePet.ts'
 export type {
-  UpdatePetWithFormPathPetId,
-  UpdatePetWithFormQueryName,
-  UpdatePetWithFormQueryStatus,
-  UpdatePetWithFormRequestConfig,
+  UpdatePetWithFormOptions,
+  UpdatePetWithFormPath,
+  UpdatePetWithFormQuery,
   UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
 } from './UpdatePetWithForm.ts'
 export type {
   UploadFileBody,
-  UploadFilePathPetId,
-  UploadFileQueryAdditionalMetadata,
-  UploadFileRequestConfig,
+  UploadFileOptions,
+  UploadFilePath,
+  UploadFileQuery,
   UploadFileResponse,
   UploadFileResponses,
   UploadFileStatus200,

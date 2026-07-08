@@ -1,4 +1,4 @@
-import type { FindPetsByStatusRequestConfig } from '../../models/ts/pet/FindPetsByStatus.ts'
+import type { FindPetsByStatusOptions } from '../../models/ts/pet/FindPetsByStatus.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { findPetsByStatus } from '../../clients/axios/petService/findPetsByStatus.ts'
@@ -9,7 +9,7 @@ import { findPetsByStatus } from '../../clients/axios/petService/findPetsByStatu
  * {@link /pet/findByStatus/:step_id}
  */
 export async function findPetsByStatusHandler(
-  { path }: FindPetsByStatusRequestConfig,
+  { path }: FindPetsByStatusOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await findPetsByStatus({ path })

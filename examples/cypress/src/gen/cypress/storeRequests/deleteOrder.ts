@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { DeleteOrderRequestConfig, DeleteOrderResponse } from '../../models.ts'
+import type { DeleteOrderOptions, DeleteOrderResponse } from '../../models.ts'
 
-export function deleteOrder({ path }: DeleteOrderRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeleteOrderResponse> {
+export function deleteOrder({ path }: DeleteOrderOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeleteOrderResponse> {
   return cy
     .request<DeleteOrderResponse>({
       method: 'DELETE',

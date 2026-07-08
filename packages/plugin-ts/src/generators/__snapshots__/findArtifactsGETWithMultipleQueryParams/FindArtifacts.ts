@@ -4,19 +4,22 @@
  */
 
 /**
- * @type integer | undefined
+ * @type object
  */
-export type FindArtifactsQueryPage = number | undefined
-
-/**
- * @type integer | undefined
- */
-export type FindArtifactsQueryLimit = number | undefined
-
-/**
- * @type string | undefined
- */
-export type FindArtifactsQuerySort = string | undefined
+export type FindArtifactsQuery = {
+  /**
+   * @type integer | undefined
+   */
+  page?: number
+  /**
+   * @type integer | undefined
+   */
+  limit?: number
+  /**
+   * @type string | undefined
+   */
+  sort?: string
+}
 
 /**
  * @type object
@@ -26,17 +29,10 @@ export type FindArtifactsStatus200 = object
 /**
  * @type object
  */
-export type FindArtifactsRequestConfig = {
+export type FindArtifactsOptions = {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    page?: FindArtifactsQueryPage
-    limit?: FindArtifactsQueryLimit
-    sort?: FindArtifactsQuerySort
-  }
+  query?: FindArtifactsQuery
   headers?: never
 }
 

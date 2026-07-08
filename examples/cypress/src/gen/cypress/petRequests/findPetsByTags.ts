@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse } from '../../models.ts'
+import type { FindPetsByTagsOptions, FindPetsByTagsResponse } from '../../models.ts'
 
 export function findPetsByTags(
-  { query }: FindPetsByTagsRequestConfig = {},
+  { query }: FindPetsByTagsOptions = {},
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<FindPetsByTagsResponse> {
   return cy

@@ -7,24 +7,38 @@ import type { Pet } from './Pet.ts'
 import type { PetUpdate } from './PetUpdate.ts'
 
 /**
- * @type string
+ * @type object
 */
-export type UpdatePetPathPetId = string;
+export type UpdatePetPath = {
+    /**
+     * @type string
+    */
+    petId: string;
+};
 
 /**
- * @type boolean | undefined
+ * @type object
 */
-export type UpdatePetQueryIncludeDeleted = boolean | undefined;
+export type UpdatePetQuery = {
+    /**
+     * @type boolean | undefined
+    */
+    includeDeleted?: boolean;
+    /**
+     * @type string | undefined
+    */
+    requestSource?: string;
+};
 
 /**
- * @type string | undefined
+ * @type object
 */
-export type UpdatePetQueryRequestSource = string | undefined;
-
-/**
- * @type string | undefined
-*/
-export type UpdatePetHeaderXRequestID = string | undefined;
+export type UpdatePetHeaders = {
+    /**
+     * @type string | undefined
+    */
+    xRequestID?: string;
+};
 
 /**
  * @type object
@@ -39,27 +53,11 @@ export type UpdatePetBody = PetUpdate;
 /**
  * @type object
 */
-export type UpdatePetRequestConfig = {
+export type UpdatePetOptions = {
     body: UpdatePetBody;
-    /**
-     * @type object
-    */
-    path: {
-        petId: UpdatePetPathPetId;
-    };
-    /**
-     * @type object | undefined
-    */
-    query?: {
-        includeDeleted?: UpdatePetQueryIncludeDeleted;
-        requestSource?: UpdatePetQueryRequestSource;
-    };
-    /**
-     * @type object | undefined
-    */
-    headers?: {
-        xRequestID?: UpdatePetHeaderXRequestID;
-    };
+    path: UpdatePetPath;
+    query?: UpdatePetQuery;
+    headers?: UpdatePetHeaders;
 };
 
 /**

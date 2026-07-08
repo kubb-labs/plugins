@@ -1,4 +1,4 @@
-import type { PlaceOrderRequestConfig } from '../models/ts/PlaceOrder.js'
+import type { PlaceOrderOptions } from '../models/ts/PlaceOrder.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { placeOrder } from '../clients/placeOrder.js'
@@ -9,7 +9,7 @@ import { placeOrder } from '../clients/placeOrder.js'
  * {@link /store/order}
  */
 export async function placeOrderHandler(
-  { body }: PlaceOrderRequestConfig,
+  { body }: PlaceOrderOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await placeOrder({ body })

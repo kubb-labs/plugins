@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../.kubb/client'
-import type { GetInventoryRequestConfig, GetInventoryResponses } from '../models'
+import type { GetInventoryOptions, GetInventoryResponses } from '../models'
 import { client } from '../.kubb/client'
 
 /**
@@ -13,7 +13,7 @@ import { client } from '../.kubb/client'
  * {@link /store/inventory}
  */
 export function getInventory<ThrowOnError extends boolean = true>(
-  options: Options<GetInventoryRequestConfig, ThrowOnError> = {},
+  options: Options<GetInventoryOptions, ThrowOnError> = {},
 ): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

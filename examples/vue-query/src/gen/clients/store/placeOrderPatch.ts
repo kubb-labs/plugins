@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch.ts'
+import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**
@@ -13,7 +13,7 @@ import { client } from '../../.kubb/client.ts'
  * {@link /store/order}
  */
 export function placeOrderPatch<ThrowOnError extends boolean = true>(
-  options: Options<PlaceOrderPatchRequestConfig, ThrowOnError>,
+  options: Options<PlaceOrderPatchOptions, ThrowOnError>,
 ): Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

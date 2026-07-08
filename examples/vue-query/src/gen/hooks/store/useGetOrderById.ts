@@ -4,19 +4,19 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetOrderByIdRequestConfig, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById.ts'
+import type { GetOrderByIdOptions, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById.ts'
 import type { MaybeRefOrGetter } from 'vue'
 import { getOrderById } from '../../clients/store/getOrderById.ts'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const getOrderByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetOrderByIdRequestConfig, 'headers'>['path']> }) =>
+export const getOrderByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetOrderByIdOptions, 'headers'>['path']> }) =>
   [{ url: '/store/order/:orderId', params: path }] as const
 
 export type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
 export function getOrderByIdQueryOptions(
-  { path }: { path: MaybeRefOrGetter<GetOrderByIdRequestConfig['path']> },
+  { path }: { path: MaybeRefOrGetter<GetOrderByIdOptions['path']> },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = getOrderByIdQueryKey({ path })

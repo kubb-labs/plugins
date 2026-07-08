@@ -54,22 +54,6 @@ export function canOverrideSchema(node: ast.SchemaNode): boolean {
   ]).has(node.type)
 }
 
-/**
- * Resolves a parameter name based on its location (path, query, header, etc.) using the provided resolver.
- */
-export function resolveParamNameByLocation(param: ResolverFaker['param'], node: ast.OperationNode, paramNode: ast.ParameterNode): string {
-  switch (paramNode.in) {
-    case 'path':
-      return param.path(node, paramNode)
-    case 'query':
-      return param.query(node, paramNode)
-    case 'header':
-      return param.headers(node, paramNode)
-    default:
-      return param.name(node, paramNode)
-  }
-}
-
 function shouldInlineSingleResponseSchema(schema: ast.SchemaNode): boolean {
   return new Set<ast.SchemaNode['type']>([
     'any',

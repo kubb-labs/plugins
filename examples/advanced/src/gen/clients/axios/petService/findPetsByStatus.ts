@@ -1,5 +1,5 @@
 import type { Options, RequestResult } from '../../../.kubb/client.ts'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../../../models/ts/pet/FindPetsByStatus.ts'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../../../models/ts/pet/FindPetsByStatus.ts'
 import { client } from '../../../.kubb/client.ts'
 import { findPetsByStatusResponseSchema, findPetsByStatusErrorSchema } from '../../../zod/pet/findPetsByStatusSchema.ts'
 
@@ -9,7 +9,7 @@ import { findPetsByStatusResponseSchema, findPetsByStatusErrorSchema } from '../
  * {@link /pet/findByStatus/:step_id}
  */
 export function findPetsByStatus<ThrowOnError extends boolean = true>(
-  options: Options<FindPetsByStatusRequestConfig, ThrowOnError>,
+  options: Options<FindPetsByStatusOptions, ThrowOnError>,
 ): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

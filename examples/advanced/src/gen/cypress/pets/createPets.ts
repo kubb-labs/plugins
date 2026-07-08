@@ -1,7 +1,7 @@
-import type { CreatePetsRequestConfig, CreatePetsResponse } from '../../models/ts/pets/CreatePets.ts'
+import type { CreatePetsOptions, CreatePetsResponse } from '../../models/ts/pets/CreatePets.ts'
 
 export function createPets(
-  { path, query, body, headers }: CreatePetsRequestConfig,
+  { path, query, body, headers }: CreatePetsOptions,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<CreatePetsResponse> {
   return cy

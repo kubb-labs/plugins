@@ -4,16 +4,16 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetUserByNameRequestConfig, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName.ts'
+import type { GetUserByNameOptions, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName.ts'
 import { getUserByName } from '../../clients/user/getUserByName.ts'
 import { queryOptions } from '@tanstack/react-query'
 
-export const getUserByNameSuspenseQueryKey = ({ path }: Omit<GetUserByNameRequestConfig, 'headers'>) => [{ url: '/user/:username', params: path }] as const
+export const getUserByNameSuspenseQueryKey = ({ path }: Omit<GetUserByNameOptions, 'headers'>) => [{ url: '/user/:username', params: path }] as const
 
 type GetUserByNameSuspenseQueryKey = ReturnType<typeof getUserByNameSuspenseQueryKey>
 
 export function getUserByNameSuspenseQueryOptions(
-  { path }: GetUserByNameRequestConfig,
+  { path }: GetUserByNameOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = getUserByNameSuspenseQueryKey({ path })

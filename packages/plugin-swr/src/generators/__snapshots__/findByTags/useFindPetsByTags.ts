@@ -5,17 +5,16 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse } from './FindPetsByTags'
+import type { FindPetsByTagsOptions, FindPetsByTagsResponse } from './FindPetsByTags'
 import type { SWRConfiguration } from 'swr'
 import { findPetsByTags } from './clients/findPetsByTags'
 
-export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'>) =>
-  [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
+export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'>) => [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 export function findPetsByTagsQueryOptions(
-  { query }: FindPetsByTagsRequestConfig,
+  { query }: FindPetsByTagsOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   return {
@@ -30,7 +29,7 @@ export function findPetsByTagsQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTags(
-  { query }: FindPetsByTagsRequestConfig,
+  { query }: FindPetsByTagsOptions,
   options: {
     query?: SWRConfiguration<FindPetsByTagsResponse, ResponseErrorConfig<Error>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>

@@ -1,15 +1,15 @@
 export type {
-  DeleteOrderPathOrderId,
-  DeleteOrderRequestConfig,
+  DeleteOrderOptions,
+  DeleteOrderPath,
   DeleteOrderResponse,
   DeleteOrderResponses,
   DeleteOrderStatus400,
   DeleteOrderStatus404,
 } from './DeleteOrder.ts'
-export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './GetInventory.ts'
+export type { GetInventoryOptions, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './GetInventory.ts'
 export type {
-  GetOrderByIdPathOrderId,
-  GetOrderByIdRequestConfig,
+  GetOrderByIdOptions,
+  GetOrderByIdPath,
   GetOrderByIdResponse,
   GetOrderByIdResponses,
   GetOrderByIdStatus200,
@@ -23,7 +23,7 @@ export type {
   PlaceOrderBodyFormUrlEncoded,
   PlaceOrderBodyJson,
   PlaceOrderBodyXml,
-  PlaceOrderRequestConfig,
+  PlaceOrderOptions,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
@@ -34,7 +34,7 @@ export type {
   PlaceOrderPatchBodyFormUrlEncoded,
   PlaceOrderPatchBodyJson,
   PlaceOrderPatchBodyXml,
-  PlaceOrderPatchRequestConfig,
+  PlaceOrderPatchOptions,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,

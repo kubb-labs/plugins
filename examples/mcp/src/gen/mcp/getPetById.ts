@@ -1,4 +1,4 @@
-import type { GetPetByIdRequestConfig } from '../models/ts/GetPetById.js'
+import type { GetPetByIdOptions } from '../models/ts/GetPetById.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { getPetById } from '../clients/getPetById.js'
@@ -9,7 +9,7 @@ import { getPetById } from '../clients/getPetById.js'
  * {@link /pet/:petId}
  */
 export async function getPetByIdHandler(
-  { path }: GetPetByIdRequestConfig,
+  { path }: GetPetByIdOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await getPetById({ path })

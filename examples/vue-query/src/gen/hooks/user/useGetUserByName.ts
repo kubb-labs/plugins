@@ -4,19 +4,19 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetUserByNameRequestConfig, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName.ts'
+import type { GetUserByNameOptions, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName.ts'
 import type { MaybeRefOrGetter } from 'vue'
 import { getUserByName } from '../../clients/user/getUserByName.ts'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const getUserByNameQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetUserByNameRequestConfig, 'headers'>['path']> }) =>
+export const getUserByNameQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetUserByNameOptions, 'headers'>['path']> }) =>
   [{ url: '/user/:username', params: path }] as const
 
 export type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 
 export function getUserByNameQueryOptions(
-  { path }: { path: MaybeRefOrGetter<GetUserByNameRequestConfig['path']> },
+  { path }: { path: MaybeRefOrGetter<GetUserByNameOptions['path']> },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = getUserByNameQueryKey({ path })

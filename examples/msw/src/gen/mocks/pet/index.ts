@@ -9,9 +9,9 @@ export {
   createAddPetStatus200Xml,
   createAddPetStatus405,
 } from './createAddPet.ts'
-export { createDeletePetHeaderApiKey, createDeletePetPathPetId, createDeletePetResponse, createDeletePetStatus400 } from './createDeletePet.ts'
+export { createDeletePetHeaders, createDeletePetPath, createDeletePetResponse, createDeletePetStatus400 } from './createDeletePet.ts'
 export {
-  createFindPetsByStatusQueryStatus,
+  createFindPetsByStatusQuery,
   createFindPetsByStatusResponse,
   createFindPetsByStatusStatus200,
   createFindPetsByStatusStatus200Json,
@@ -19,9 +19,7 @@ export {
   createFindPetsByStatusStatus400,
 } from './createFindPetsByStatus.ts'
 export {
-  createFindPetsByTagsQueryPage,
-  createFindPetsByTagsQueryPageSize,
-  createFindPetsByTagsQueryTags,
+  createFindPetsByTagsQuery,
   createFindPetsByTagsResponse,
   createFindPetsByTagsStatus200,
   createFindPetsByTagsStatus200Json,
@@ -29,7 +27,7 @@ export {
   createFindPetsByTagsStatus400,
 } from './createFindPetsByTags.ts'
 export {
-  createGetPetByIdPathPetId,
+  createGetPetByIdPath,
   createGetPetByIdResponse,
   createGetPetByIdStatus200,
   createGetPetByIdStatus200Json,
@@ -52,16 +50,9 @@ export {
   createUpdatePetStatus405,
 } from './createUpdatePet.ts'
 export {
-  createUpdatePetWithFormPathPetId,
-  createUpdatePetWithFormQueryName,
-  createUpdatePetWithFormQueryStatus,
+  createUpdatePetWithFormPath,
+  createUpdatePetWithFormQuery,
   createUpdatePetWithFormResponse,
   createUpdatePetWithFormStatus405,
 } from './createUpdatePetWithForm.ts'
-export {
-  createUploadFileBody,
-  createUploadFilePathPetId,
-  createUploadFileQueryAdditionalMetadata,
-  createUploadFileResponse,
-  createUploadFileStatus200,
-} from './createUploadFile.ts'
+export { createUploadFileBody, createUploadFilePath, createUploadFileQuery, createUploadFileResponse, createUploadFileStatus200 } from './createUploadFile.ts'

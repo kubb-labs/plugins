@@ -4,9 +4,14 @@
  */
 
 /**
- * @type integer | undefined
+ * @type object
  */
-export type ListPetsQueryLimit = number | undefined
+export type ListPetsQuery = {
+  /**
+   * @type integer | undefined
+   */
+  limit?: number
+}
 
 /**
  * @type object
@@ -21,15 +26,10 @@ export type ListPetsStatusDefault = object
 /**
  * @type object
  */
-export type ListPetsRequestConfig = {
+export type ListPetsOptions = {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    limit?: ListPetsQueryLimit
-  }
+  query?: ListPetsQuery
   headers?: never
 }
 

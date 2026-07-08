@@ -66,31 +66,31 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
 
 type BuildParamsSchemaOptions = {
   params: Array<ast.ParameterNode>
-  resolver: ResolverTs
 }
 
 type BuildOperationSchemaOptions = {
   resolver: ResolverTs
 }
 
-export function buildParams(node: ast.OperationNode, { params, resolver }: BuildParamsSchemaOptions): ast.SchemaNode {
+/**
+ * Builds the object schema for a group of parameters sharing one `in` location (path, query, or
+ * header), embedding each param's own schema (and JSDoc) directly rather than referencing a
+ * separate per-param type — the group itself is the only type these params get exported as.
+ */
+export function buildParams({ params }: BuildParamsSchemaOptions): ast.SchemaNode {
   return ast.factory.createSchema({
     type: 'object',
     properties: params.map((param) =>
       ast.factory.createProperty({
         name: param.name,
         required: param.required,
-        schema: ast.factory.createSchema({
-          type: 'ref',
-          name: resolver.param.name(node, param),
-          optional: !param.required,
-        }),
+        schema: ast.factory.createSchema({ ...param.schema, optional: !param.required }),
       }),
     ),
   })
 }
 
-export function buildData(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode {
+export function buildOptions(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode {
   const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing: 'original' })
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const hasRequiredPath = pathParams.some((param) => param.required)
@@ -116,7 +116,7 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
         required: hasRequiredPath,
         schema:
           pathParams.length > 0
-            ? ast.factory.createSchema({ ...buildParams(node, { params: pathParams, resolver }), optional: !hasRequiredPath })
+            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.path(node, pathParams[0]!), optional: !hasRequiredPath })
             : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
       ast.factory.createProperty({
@@ -124,7 +124,7 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
         required: hasRequiredQuery,
         schema:
           queryParams.length > 0
-            ? ast.factory.createSchema({ ...buildParams(node, { params: queryParams, resolver }), optional: !hasRequiredQuery })
+            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.query(node, queryParams[0]!), optional: !hasRequiredQuery })
             : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
       ast.factory.createProperty({
@@ -132,7 +132,7 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
         required: hasRequiredHeader,
         schema:
           headerParams.length > 0
-            ? ast.factory.createSchema({ ...buildParams(node, { params: headerParams, resolver }), optional: !hasRequiredHeader })
+            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.headers(node, headerParams[0]!), optional: !hasRequiredHeader })
             : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
     ],

@@ -4,14 +4,14 @@
 */
 
 import type { RequestConfig } from '../.kubb/client.ts'
-import type { DeletePetRequestConfig } from '../types/DeletePet.ts'
+import type { DeletePetOptions } from '../types/DeletePet.ts'
 import { deletePet } from '../clients/deletePet.ts'
 
-export const deletePetQueryKey = ({ path }: Omit<DeletePetRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
+export const deletePetQueryKey = ({ path }: Omit<DeletePetOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type DeletePetQueryKey = ReturnType<typeof deletePetQueryKey>
 
-export function deletePetQueryOptions({ path, headers }: DeletePetRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function deletePetQueryOptions({ path, headers }: DeletePetOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
       const { data } = await deletePet({ ...config, path, headers, throwOnError: true })

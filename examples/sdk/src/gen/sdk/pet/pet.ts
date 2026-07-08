@@ -4,14 +4,14 @@
  */
 
 import type { ClientConfig, ClientInstance, Options, RequestResult } from '../../.kubb/client.ts'
-import type { AddPetRequestConfig, AddPetResponses } from '../../models/pet/AddPet.ts'
-import type { DeletePetRequestConfig, DeletePetResponses } from '../../models/pet/DeletePet.ts'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../../models/pet/FindPetsByStatus.ts'
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponses } from '../../models/pet/FindPetsByTags.ts'
-import type { GetPetByIdRequestConfig, GetPetByIdResponses } from '../../models/pet/GetPetById.ts'
-import type { UpdatePetRequestConfig, UpdatePetResponses } from '../../models/pet/UpdatePet.ts'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses } from '../../models/pet/UpdatePetWithForm.ts'
-import type { UploadFileRequestConfig, UploadFileResponses } from '../../models/pet/UploadFile.ts'
+import type { AddPetOptions, AddPetResponses } from '../../models/pet/AddPet.ts'
+import type { DeletePetOptions, DeletePetResponses } from '../../models/pet/DeletePet.ts'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../../models/pet/FindPetsByStatus.ts'
+import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from '../../models/pet/FindPetsByTags.ts'
+import type { GetPetByIdOptions, GetPetByIdResponses } from '../../models/pet/GetPetById.ts'
+import type { UpdatePetOptions, UpdatePetResponses } from '../../models/pet/UpdatePet.ts'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from '../../models/pet/UpdatePetWithForm.ts'
+import type { UploadFileOptions, UploadFileResponses } from '../../models/pet/UploadFile.ts'
 import { createClient } from '../../.kubb/client.ts'
 
 export class pet {
@@ -27,7 +27,7 @@ export class pet {
    * {@link /pet}
    */
   public updatePet<ThrowOnError extends boolean = true>(
-    options: Options<UpdatePetRequestConfig, ThrowOnError>,
+    options: Options<UpdatePetOptions, ThrowOnError>,
   ): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -39,9 +39,7 @@ export class pet {
    * @summary Add a new pet to the store
    * {@link /pet}
    */
-  public addPet<ThrowOnError extends boolean = true>(
-    options: Options<AddPetRequestConfig, ThrowOnError>,
-  ): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
+  public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptions, ThrowOnError>): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
@@ -53,7 +51,7 @@ export class pet {
    * {@link /pet/findByStatus}
    */
   public findPetsByStatus<ThrowOnError extends boolean = true>(
-    options: Options<FindPetsByStatusRequestConfig, ThrowOnError> = {},
+    options: Options<FindPetsByStatusOptions, ThrowOnError> = {},
   ): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -68,7 +66,7 @@ export class pet {
    * {@link /pet/findByTags}
    */
   public findPetsByTags<ThrowOnError extends boolean = true>(
-    options: Options<FindPetsByTagsRequestConfig, ThrowOnError> = {},
+    options: Options<FindPetsByTagsOptions, ThrowOnError> = {},
   ): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -83,7 +81,7 @@ export class pet {
    * {@link /pet/:petId}
    */
   public getPetById<ThrowOnError extends boolean = true>(
-    options: Options<GetPetByIdRequestConfig, ThrowOnError>,
+    options: Options<GetPetByIdOptions, ThrowOnError>,
   ): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -100,7 +98,7 @@ export class pet {
    * {@link /pet/:petId}
    */
   public updatePetWithForm<ThrowOnError extends boolean = true>(
-    options: Options<UpdatePetWithFormRequestConfig, ThrowOnError>,
+    options: Options<UpdatePetWithFormOptions, ThrowOnError>,
   ): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -115,7 +113,7 @@ export class pet {
    * {@link /pet/:petId}
    */
   public deletePet<ThrowOnError extends boolean = true>(
-    options: Options<DeletePetRequestConfig, ThrowOnError>,
+    options: Options<DeletePetOptions, ThrowOnError>,
   ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -133,7 +131,7 @@ export class pet {
    * {@link /pet/:petId/uploadImage}
    */
   public uploadFile<ThrowOnError extends boolean = true>(
-    options: Options<UploadFileRequestConfig, ThrowOnError>,
+    options: Options<UploadFileOptions, ThrowOnError>,
   ): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 

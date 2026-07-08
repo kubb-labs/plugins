@@ -4,14 +4,14 @@
 */
 
 import type { RequestConfig } from '../.kubb/client.ts'
-import type { AddPetRequestConfig } from '../types/AddPet.ts'
+import type { AddPetOptions } from '../types/AddPet.ts'
 import { addPet } from '../clients/addPet.ts'
 
-export const addPetQueryKey = ({ body }: Omit<AddPetRequestConfig, 'headers'>) => [{ url: '/pet' }, ...(body ? [body] : [])] as const
+export const addPetQueryKey = ({ body }: Omit<AddPetOptions, 'headers'>) => [{ url: '/pet' }, ...(body ? [body] : [])] as const
 
 type AddPetQueryKey = ReturnType<typeof addPetQueryKey>
 
-export function addPetQueryOptions({ body }: AddPetRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function addPetQueryOptions({ body }: AddPetOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
       const { data } = await addPet({ ...config, body, throwOnError: true })

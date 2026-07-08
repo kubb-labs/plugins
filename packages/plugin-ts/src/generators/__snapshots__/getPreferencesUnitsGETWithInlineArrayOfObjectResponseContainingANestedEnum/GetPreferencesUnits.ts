@@ -32,7 +32,7 @@ export type GetPreferencesUnitsStatus200 = {
 /**
  * @type object
  */
-export type GetPreferencesUnitsRequestConfig = {
+export type GetPreferencesUnitsOptions = {
   body?: never
   path?: never
   query?: never

@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { UploadFileRequestConfig, UploadFileResponse } from '../types/UploadFile.ts'
+import type { UploadFileOptions, UploadFileResponse } from '../types/UploadFile.ts'
 
-export function uploadFile({ path, query, body }: UploadFileRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<UploadFileResponse> {
+export function uploadFile({ path, query, body }: UploadFileOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<UploadFileResponse> {
   return cy.request<UploadFileResponse>({
     method: 'POST',
     url: `/pet/${path.petId}/uploadImage`,

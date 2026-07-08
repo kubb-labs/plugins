@@ -1,4 +1,4 @@
-import type { CreatePetsRequestConfig } from '../../models/ts/pets/CreatePets.ts'
+import type { CreatePetsOptions } from '../../models/ts/pets/CreatePets.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { createPets } from '../../clients/axios/petsService/createPets.ts'
@@ -8,7 +8,7 @@ import { createPets } from '../../clients/axios/petsService/createPets.ts'
  * {@link /pets/:uuid}
  */
 export async function createPetsHandler(
-  { path, query, body, headers }: CreatePetsRequestConfig,
+  { path, query, body, headers }: CreatePetsOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await createPets({ path, query, headers, body })

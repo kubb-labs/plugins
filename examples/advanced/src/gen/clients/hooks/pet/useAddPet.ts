@@ -1,5 +1,5 @@
 import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
-import type { AddPetRequestConfig, AddPetResponse, AddPetStatus405 } from '../../../models/ts/pet/AddPet.ts'
+import type { AddPetOptions, AddPetResponse, AddPetStatus405 } from '../../../models/ts/pet/AddPet.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { addPet } from '../../axios/petService/addPet.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -12,7 +12,7 @@ export function addPetMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = addPetMutationKey()
-  return mutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>({
+  return mutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       const { data } = await addPet({ ...config, body, throwOnError: true })
@@ -28,7 +28,7 @@ export function addPetMutationOptions<TContext = unknown>(
  */
 export function useAddPet<TContext>(
   options: {
-    mutation?: UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext> & { client?: QueryClient }
+    mutation?: UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
     }
@@ -38,14 +38,14 @@ export function useAddPet<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions.mutationKey ?? addPetMutationKey()
 
-  const baseOptions = addPetMutationOptions(config) as UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>
+  const baseOptions = addPetMutationOptions(config) as UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>
 
-  return useMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>(
+  return useMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>
+  ) as UseMutationResult<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>
 }

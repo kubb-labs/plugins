@@ -5,16 +5,16 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { LoginUserRequestConfig, LoginUserResponse, LoginUserStatus400 } from '../../models/user/LoginUser.ts'
+import type { LoginUserOptions, LoginUserResponse, LoginUserStatus400 } from '../../models/user/LoginUser.ts'
 import type { SWRConfiguration } from 'swr'
 import { loginUser } from '../../clients/user/loginUser.ts'
 
-export const loginUserQueryKey = ({ query }: Omit<LoginUserRequestConfig, 'headers'> = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
+export const loginUserQueryKey = ({ query }: Omit<LoginUserOptions, 'headers'> = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
 
 type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 export function loginUserQueryOptions(
-  { query }: LoginUserRequestConfig = {},
+  { query }: LoginUserOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   return {
@@ -30,7 +30,7 @@ export function loginUserQueryOptions(
  * {@link /user/login}
  */
 export function useLoginUser(
-  { query }: LoginUserRequestConfig = {},
+  { query }: LoginUserOptions = {},
   options: {
     query?: SWRConfiguration<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>

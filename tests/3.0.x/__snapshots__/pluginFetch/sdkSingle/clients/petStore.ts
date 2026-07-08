@@ -4,13 +4,13 @@
 */
 
 import type { ClientConfig, ClientInstance, Options, RequestResult } from '../.kubb/client.ts'
-import type { AddPetRequestConfig, AddPetResponses } from '../types/AddPet.ts'
-import type { DeletePetRequestConfig, DeletePetResponses } from '../types/DeletePet.ts'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../types/FindPetsByStatus.ts'
-import type { GetInventoryRequestConfig, GetInventoryResponses } from '../types/GetInventory.ts'
-import type { GetPetByIdRequestConfig, GetPetByIdResponses } from '../types/GetPetById.ts'
-import type { PlaceOrderRequestConfig, PlaceOrderResponses } from '../types/PlaceOrder.ts'
-import type { UploadFileRequestConfig, UploadFileResponses } from '../types/UploadFile.ts'
+import type { AddPetOptions, AddPetResponses } from '../types/AddPet.ts'
+import type { DeletePetOptions, DeletePetResponses } from '../types/DeletePet.ts'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../types/FindPetsByStatus.ts'
+import type { GetInventoryOptions, GetInventoryResponses } from '../types/GetInventory.ts'
+import type { GetPetByIdOptions, GetPetByIdResponses } from '../types/GetPetById.ts'
+import type { PlaceOrderOptions, PlaceOrderResponses } from '../types/PlaceOrder.ts'
+import type { UploadFileOptions, UploadFileResponses } from '../types/UploadFile.ts'
 import { createClient } from '../.kubb/client.ts'
 
 export class PetStore {
@@ -25,7 +25,7 @@ export class PetStore {
    * @summary Add a new pet to the store
    * {@link /pet}
    */
-    public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetRequestConfig, ThrowOnError>): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
+    public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptions, ThrowOnError>): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
@@ -36,7 +36,7 @@ export class PetStore {
    * @summary Finds Pets by status
    * {@link /pet/findByStatus}
    */
-    public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusRequestConfig, ThrowOnError> = {}): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+    public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptions, ThrowOnError> = {}): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
@@ -47,7 +47,7 @@ export class PetStore {
    * @summary Find pet by ID
    * {@link /pet/:petId}
    */
-    public getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdRequestConfig, ThrowOnError>): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
+    public getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptions, ThrowOnError>): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
@@ -58,7 +58,7 @@ export class PetStore {
    * @summary Deletes a pet
    * {@link /pet/:petId}
    */
-    public deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetRequestConfig, ThrowOnError>): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
+    public deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetOptions, ThrowOnError>): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config, headers: config.headers ? { "api_key": config.headers.apiKey } : config.headers }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
@@ -68,7 +68,7 @@ export class PetStore {
    * @summary uploads an image
    * {@link /pet/:petId/uploadImage}
    */
-    public uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileRequestConfig, ThrowOnError>): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
+    public uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileOptions, ThrowOnError>): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
@@ -79,7 +79,7 @@ export class PetStore {
    * @summary Returns pet inventories by status
    * {@link /store/inventory}
    */
-    public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryRequestConfig, ThrowOnError> = {}): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
+    public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptions, ThrowOnError> = {}): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
@@ -90,7 +90,7 @@ export class PetStore {
    * @summary Place an order for a pet
    * {@link /store/order}
    */
-    public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderRequestConfig, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
+    public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptions, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'POST', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>

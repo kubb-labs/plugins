@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { UpdatePetRequestConfig, UpdatePetResponse } from './UpdatePet'
+import type { UpdatePetOptions, UpdatePetResponse } from './UpdatePet'
 
-export function updatePet({ path, body }: UpdatePetRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<UpdatePetResponse> {
+export function updatePet({ path, body }: UpdatePetOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<UpdatePetResponse> {
   return cy
     .request<UpdatePetResponse>({
       method: 'PUT',

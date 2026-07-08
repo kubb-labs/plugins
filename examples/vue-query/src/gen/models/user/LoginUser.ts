@@ -4,16 +4,20 @@
  */
 
 /**
- * @description The user name for login
- * @type string | undefined
+ * @type object
  */
-export type LoginUserQueryUsername = string | undefined
-
-/**
- * @description The password for login in clear text
- * @type string | undefined
- */
-export type LoginUserQueryPassword = string | undefined
+export type LoginUserQuery = {
+  /**
+   * @description The user name for login
+   * @type string | undefined
+   */
+  username?: string
+  /**
+   * @description The password for login in clear text
+   * @type string | undefined
+   */
+  password?: string
+}
 
 /**
  * @type string
@@ -35,16 +39,10 @@ export type LoginUserStatus400 = unknown
 /**
  * @type object
  */
-export type LoginUserRequestConfig = {
+export type LoginUserOptions = {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    username?: LoginUserQueryUsername
-    password?: LoginUserQueryPassword
-  }
+  query?: LoginUserQuery
   headers?: never
 }
 

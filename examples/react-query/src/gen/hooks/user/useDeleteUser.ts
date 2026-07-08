@@ -4,7 +4,7 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { DeleteUserRequestConfig, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/user/DeleteUser.ts'
+import type { DeleteUserOptions, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/user/DeleteUser.ts'
 import { deleteUser } from '../../clients/user/deleteUser.ts'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -12,7 +12,7 @@ export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 
 export function deleteUserMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = deleteUserMutationKey()
-  return mutationOptions<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, DeleteUserRequestConfig, TContext>({
+  return mutationOptions<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, DeleteUserOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path }) => {
       const { data } = await deleteUser({ ...config, path, throwOnError: true })

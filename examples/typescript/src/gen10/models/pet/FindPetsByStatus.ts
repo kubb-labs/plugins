@@ -7,10 +7,15 @@ import type { FindPetsByStatusStatus } from '../FindPetsByStatusStatus.ts'
 import type { Pet } from '../Pet.ts'
 
 /**
- * @description Status values that need to be considered for filter
- * @default available
+ * @type object
  */
-export type FindPetsByStatusQueryStatus = FindPetsByStatusStatus | undefined
+export type FindPetsByStatusQuery = {
+  /**
+   * @description Status values that need to be considered for filter
+   * @default available
+   */
+  status?: FindPetsByStatusStatus
+}
 
 /**
  * @type array
@@ -32,15 +37,10 @@ export type FindPetsByStatusStatus400 = unknown
 /**
  * @type object
  */
-export type FindPetsByStatusRequestConfig = {
+export type FindPetsByStatusOptions = {
   body?: never
   path?: never
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    status?: FindPetsByStatusQueryStatus
-  }
+  query?: FindPetsByStatusQuery
   headers?: never
 }
 

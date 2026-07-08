@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { CreateUsersWithListInputRequestConfig, CreateUsersWithListInputResponses } from '../../models/user/CreateUsersWithListInput.ts'
+import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponses } from '../../models/user/CreateUsersWithListInput.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**
@@ -13,7 +13,7 @@ import { client } from '../../.kubb/client.ts'
  * {@link /user/createWithList}
  */
 export function createUsersWithListInput<ThrowOnError extends boolean = true>(
-  options: Options<CreateUsersWithListInputRequestConfig, ThrowOnError>,
+  options: Options<CreateUsersWithListInputOptions, ThrowOnError>,
 ): Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

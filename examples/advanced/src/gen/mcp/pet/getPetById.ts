@@ -1,4 +1,4 @@
-import type { GetPetByIdRequestConfig } from '../../models/ts/pet/GetPetById.ts'
+import type { GetPetByIdOptions } from '../../models/ts/pet/GetPetById.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { getPetById } from '../../clients/axios/petService/getPetById.ts'
@@ -9,7 +9,7 @@ import { getPetById } from '../../clients/axios/petService/getPetById.ts'
  * {@link /pet/:petId:search}
  */
 export async function getPetByIdHandler(
-  { path }: GetPetByIdRequestConfig,
+  { path }: GetPetByIdOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await getPetById({ path })

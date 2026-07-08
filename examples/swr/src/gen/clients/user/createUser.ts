@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { CreateUserRequestConfig, CreateUserResponses } from '../../models/user/CreateUser.ts'
+import type { CreateUserOptions, CreateUserResponses } from '../../models/user/CreateUser.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**
@@ -13,7 +13,7 @@ import { client } from '../../.kubb/client.ts'
  * {@link /user}
  */
 export function createUser<ThrowOnError extends boolean = true>(
-  options: Options<CreateUserRequestConfig, ThrowOnError>,
+  options: Options<CreateUserOptions, ThrowOnError>,
 ): Promise<RequestResult<CreateUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

@@ -1,4 +1,5 @@
 import type {
+  FindPetsByStatusPath,
   FindPetsByStatusResponse,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus200Json,
@@ -8,8 +9,14 @@ import type {
 import { createPetFaker } from '../createPetFaker.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createFindPetsByStatusPathStepIdFaker(data?: string): string {
-  return data ?? faker.string.alpha()
+export function createFindPetsByStatusPathFaker<TData extends Partial<FindPetsByStatusPath> = object>(data?: TData) {
+  const defaultFakeData = {
+    stepId: faker.string.alpha(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**

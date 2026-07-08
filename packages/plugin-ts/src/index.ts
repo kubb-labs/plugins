@@ -24,3 +24,4 @@ export type { PrinterTsFactory, PrinterTsNodes, PrinterTsOptions } from './print
 export { printerTs } from './printers/printerTs.ts'
 export { resolverTs } from './resolvers/resolverTs.ts'
 export type { PluginTs, ResolverTs } from './types.ts'
+export { buildParams } from './utils.ts'

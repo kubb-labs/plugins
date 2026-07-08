@@ -1,4 +1,4 @@
-import type { GetOrderByIdRequestConfig } from '../models/ts/GetOrderById.js'
+import type { GetOrderByIdOptions } from '../models/ts/GetOrderById.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { getOrderById } from '../clients/getOrderById.js'
@@ -9,7 +9,7 @@ import { getOrderById } from '../clients/getOrderById.js'
  * {@link /store/order/:orderId}
  */
 export async function getOrderByIdHandler(
-  { path }: GetOrderByIdRequestConfig,
+  { path }: GetOrderByIdOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await getOrderById({ path })

@@ -4,9 +4,14 @@
  */
 
 /**
- * @type string
+ * @type object
  */
-export type GetEnterpriseConfigurationsIdV20250PathEnterpriseId = string
+export type GetEnterpriseConfigurationsIdV20250Path = {
+  /**
+   * @type string
+   */
+  enterpriseId: string
+}
 
 /**
  * @type object
@@ -16,14 +21,9 @@ export type GetEnterpriseConfigurationsIdV20250Status200 = object
 /**
  * @type object
  */
-export type GetEnterpriseConfigurationsIdV20250RequestConfig = {
+export type GetEnterpriseConfigurationsIdV20250Options = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    enterpriseId: GetEnterpriseConfigurationsIdV20250PathEnterpriseId
-  }
+  path: GetEnterpriseConfigurationsIdV20250Path
   query?: never
   headers?: never
 }

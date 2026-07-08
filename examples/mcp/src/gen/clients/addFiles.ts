@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../.kubb/client.js'
-import type { AddFilesRequestConfig, AddFilesResponses } from '../models/ts/AddFiles.js'
+import type { AddFilesOptions, AddFilesResponses } from '../models/ts/AddFiles.js'
 import { client } from '../.kubb/client.js'
 
 /**
@@ -13,7 +13,7 @@ import { client } from '../.kubb/client.js'
  * {@link /pet/files}
  */
 export function addFiles<ThrowOnError extends boolean = true>(
-  options: Options<AddFilesRequestConfig, ThrowOnError>,
+  options: Options<AddFilesOptions, ThrowOnError>,
 ): Promise<RequestResult<AddFilesResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

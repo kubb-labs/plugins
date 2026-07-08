@@ -6,12 +6,17 @@
 import type { Order } from './Order.js'
 
 /**
- * @description ID of order that needs to be fetched
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type GetOrderByIdPathOrderId = number
+export type GetOrderByIdPath = {
+  /**
+   * @description ID of order that needs to be fetched
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  orderId: number
+}
 
 /**
  * @type object
@@ -38,14 +43,9 @@ export type GetOrderByIdStatus404 = unknown
 /**
  * @type object
  */
-export type GetOrderByIdRequestConfig = {
+export type GetOrderByIdOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    orderId: GetOrderByIdPathOrderId
-  }
+  path: GetOrderByIdPath
   query?: never
   headers?: never
 }

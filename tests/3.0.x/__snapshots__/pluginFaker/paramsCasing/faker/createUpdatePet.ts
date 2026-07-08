@@ -3,25 +3,46 @@
 * Do not edit manually.
 */
 
-import type { UpdatePetBody, UpdatePetResponse, UpdatePetStatus200 } from '../types/UpdatePet.ts'
+import type { UpdatePetBody, UpdatePetHeaders, UpdatePetPath, UpdatePetQuery, UpdatePetResponse, UpdatePetStatus200 } from '../types/UpdatePet.ts'
 import { createPet } from './createPet.ts'
 import { createPetUpdate } from './createPetUpdate.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createUpdatePetPathPetId(data?: string): string {
-  return data ?? faker.string.alpha()
+export function createUpdatePetPath<TData extends Partial<UpdatePetPath> = object>(data?: TData)
+
+{
+  const defaultFakeData = {
+  petId: faker.string.alpha(),
+}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
-export function createUpdatePetQueryIncludeDeleted(data?: boolean): boolean {
-  return data ?? faker.datatype.boolean()
+export function createUpdatePetQuery<TData extends Partial<UpdatePetQuery> = object>(data?: TData)
+
+{
+  const defaultFakeData = {
+  includeDeleted: faker.datatype.boolean(),
+  requestSource: faker.string.alpha(),
+}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
-export function createUpdatePetQueryRequestSource(data?: string): string {
-  return data ?? faker.string.alpha()
-}
+export function createUpdatePetHeaders<TData extends Partial<UpdatePetHeaders> = object>(data?: TData)
 
-export function createUpdatePetHeaderXRequestID(data?: string): string {
-  return data ?? faker.string.alpha()
+{
+  const defaultFakeData = {
+  xRequestID: faker.string.alpha(),
+}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**

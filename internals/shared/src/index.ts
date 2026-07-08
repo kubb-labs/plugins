@@ -32,7 +32,7 @@ export {
   type OperationParamsResolver,
   type OperationTypeNameResolver,
   type RequestConfigResolver,
-  type RequestConfigNameResolver,
+  type RequestOptionsNameResolver,
   type RequestGroupOptionality,
   type RequestGroups,
   type ResponseNameResolver,

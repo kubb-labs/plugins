@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { DeleteOrderRequestConfig, DeleteOrderResponses } from '../../models/store/DeleteOrder.ts'
+import type { DeleteOrderOptions, DeleteOrderResponses } from '../../models/store/DeleteOrder.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**
@@ -13,7 +13,7 @@ import { client } from '../../.kubb/client.ts'
  * {@link /store/order/:orderId}
  */
 export function deleteOrder<ThrowOnError extends boolean = true>(
-  options: Options<DeleteOrderRequestConfig, ThrowOnError>,
+  options: Options<DeleteOrderOptions, ThrowOnError>,
 ): Promise<RequestResult<DeleteOrderResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

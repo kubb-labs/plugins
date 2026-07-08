@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { UpdateUserRequestConfig, UpdateUserResponses } from '../../models/user/UpdateUser.ts'
+import type { UpdateUserOptions, UpdateUserResponses } from '../../models/user/UpdateUser.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**
@@ -13,7 +13,7 @@ import { client } from '../../.kubb/client.ts'
  * {@link /user/:username}
  */
 export function updateUser<ThrowOnError extends boolean = true>(
-  options: Options<UpdateUserRequestConfig, ThrowOnError>,
+  options: Options<UpdateUserOptions, ThrowOnError>,
 ): Promise<RequestResult<UpdateUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

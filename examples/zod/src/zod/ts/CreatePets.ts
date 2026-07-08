@@ -6,16 +6,26 @@
 import type { PetNotFound } from './PetNotFound.ts'
 
 /**
- * @description UUID
- * @type string
+ * @type object
  */
-export type CreatePetsPathUuid = string
+export type CreatePetsPath = {
+  /**
+   * @description UUID
+   * @type string
+   */
+  uuid: string
+}
 
 /**
- * @description Offset
- * @type integer | undefined
+ * @type object
  */
-export type CreatePetsQueryOffset = number | undefined
+export type CreatePetsQuery = {
+  /**
+   * @description Offset
+   * @type integer | undefined
+   */
+  offset?: number
+}
 
 export const createPetsXEXAMPLE = {
   ONE: 'ONE',
@@ -26,10 +36,15 @@ export const createPetsXEXAMPLE = {
 export type CreatePetsXEXAMPLEKey = (typeof createPetsXEXAMPLE)[keyof typeof createPetsXEXAMPLE]
 
 /**
- * @description Header parameters
- * @type string
+ * @type object
  */
-export type CreatePetsHeaderXEXAMPLE = CreatePetsXEXAMPLEKey
+export type CreatePetsHeaders = {
+  /**
+   * @description Header parameters
+   * @type string
+   */
+  xEXAMPLE: CreatePetsXEXAMPLEKey
+}
 
 /**
  * @type unknown
@@ -59,26 +74,11 @@ export type CreatePetsBody = {
 /**
  * @type object
  */
-export type CreatePetsRequestConfig = {
+export type CreatePetsOptions = {
   body: CreatePetsBody
-  /**
-   * @type object
-   */
-  path: {
-    uuid: CreatePetsPathUuid
-  }
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    offset?: CreatePetsQueryOffset
-  }
-  /**
-   * @type object
-   */
-  headers: {
-    xEXAMPLE: CreatePetsHeaderXEXAMPLE
-  }
+  path: CreatePetsPath
+  query?: CreatePetsQuery
+  headers: CreatePetsHeaders
 }
 
 /**

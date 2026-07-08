@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
 import type { ClientConfig, ClientInstance, Options, RequestResult } from './.kubb/client'
-import type { DeletePetRequestConfig, DeletePetResponses } from './DeletePet'
-import type { GetPetByIdRequestConfig, GetPetByIdResponses } from './GetPetById'
+import type { DeletePetOptions, DeletePetResponses } from './DeletePet'
+import type { GetPetByIdOptions, GetPetByIdResponses } from './GetPetById'
 import { createClient } from './.kubb/client'
 
 export class PetClient {
@@ -16,7 +16,7 @@ export class PetClient {
    * {@link /pet/:petId}
    */
   public getPetById<ThrowOnError extends boolean = true>(
-    options: Options<GetPetByIdRequestConfig, ThrowOnError>,
+    options: Options<GetPetByIdOptions, ThrowOnError>,
   ): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -27,7 +27,7 @@ export class PetClient {
    * {@link /pet/:petId}
    */
   public deletePet<ThrowOnError extends boolean = true>(
-    options: Options<DeletePetRequestConfig, ThrowOnError>,
+    options: Options<DeletePetOptions, ThrowOnError>,
   ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 

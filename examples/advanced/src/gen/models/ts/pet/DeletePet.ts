@@ -1,15 +1,25 @@
 /**
- * @type string | undefined
+ * @type object
  */
-export type DeletePetHeaderApiKey = string | undefined
+export type DeletePetPath = {
+  /**
+   * @description Pet id to delete
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  petId: number
+}
 
 /**
- * @description Pet id to delete
- *
- * Format: `int64`
- * @type integer
+ * @type object
  */
-export type DeletePetPathPetId = number
+export type DeletePetHeaders = {
+  /**
+   * @type string | undefined
+   */
+  apiKey?: string
+}
 
 /**
  * @type unknown
@@ -19,21 +29,11 @@ export type DeletePetStatus400 = unknown
 /**
  * @type object
  */
-export type DeletePetRequestConfig = {
+export type DeletePetOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    petId: DeletePetPathPetId
-  }
+  path: DeletePetPath
   query?: never
-  /**
-   * @type object | undefined
-   */
-  headers?: {
-    apiKey?: DeletePetHeaderApiKey
-  }
+  headers?: DeletePetHeaders
 }
 
 /**

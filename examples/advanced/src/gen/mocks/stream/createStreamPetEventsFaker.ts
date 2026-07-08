@@ -1,9 +1,15 @@
-import type { StreamPetEventsResponse, StreamPetEventsStatus200 } from '../../models/ts/stream/StreamPetEvents.ts'
+import type { StreamPetEventsPath, StreamPetEventsResponse, StreamPetEventsStatus200 } from '../../models/ts/stream/StreamPetEvents.ts'
 import { createPetEventFaker } from '../createPetEventFaker.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createStreamPetEventsPathPetIdFaker(data?: number): number {
-  return data ?? faker.number.int()
+export function createStreamPetEventsPathFaker<TData extends Partial<StreamPetEventsPath> = object>(data?: TData) {
+  const defaultFakeData = {
+    petId: faker.number.int(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**

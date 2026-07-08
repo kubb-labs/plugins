@@ -6,9 +6,14 @@
 import type { Config } from './Config.ts'
 
 /**
- * @type string
+ * @type object
 */
-export type GetConfigIdV20250PathConfigId = string;
+export type GetConfigIdV20250Path = {
+    /**
+     * @type string
+    */
+    configId: string;
+};
 
 /**
  * @type object
@@ -18,14 +23,9 @@ export type GetConfigIdV20250Status200 = Config;
 /**
  * @type object
 */
-export type GetConfigIdV20250RequestConfig = {
+export type GetConfigIdV20250Options = {
     body?: never;
-    /**
-     * @type object
-    */
-    path: {
-        configId: GetConfigIdV20250PathConfigId;
-    };
+    path: GetConfigIdV20250Path;
     query?: never;
     headers?: never;
 };

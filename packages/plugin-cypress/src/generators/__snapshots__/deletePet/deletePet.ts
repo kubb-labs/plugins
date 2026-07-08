@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { DeletePetRequestConfig, DeletePetResponse } from './DeletePet'
+import type { DeletePetOptions, DeletePetResponse } from './DeletePet'
 
-export function deletePet({ path }: DeletePetRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeletePetResponse> {
+export function deletePet({ path }: DeletePetOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeletePetResponse> {
   return cy
     .request<DeletePetResponse>({
       method: 'DELETE',

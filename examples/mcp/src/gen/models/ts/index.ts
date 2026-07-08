@@ -2,7 +2,7 @@ export type {
   AddFilesBody,
   AddFilesBodyFormData,
   AddFilesBodyJson,
-  AddFilesRequestConfig,
+  AddFilesOptions,
   AddFilesResponse,
   AddFilesResponses,
   AddFilesStatus200,
@@ -13,7 +13,7 @@ export type {
   AddPetBodyFormUrlEncoded,
   AddPetBodyJson,
   AddPetBodyXml,
-  AddPetRequestConfig,
+  AddPetOptions,
   AddPetResponse,
   AddPetResponses,
   AddPetStatus200,
@@ -27,10 +27,10 @@ export type { ApiResponse } from './ApiResponse.js'
 export type { Category } from './Category.js'
 export type {
   CreatePetsBody,
-  CreatePetsHeaderXEXAMPLE,
-  CreatePetsPathUuid,
-  CreatePetsQueryOffset,
-  CreatePetsRequestConfig,
+  CreatePetsHeaders,
+  CreatePetsOptions,
+  CreatePetsPath,
+  CreatePetsQuery,
   CreatePetsResponse,
   CreatePetsResponses,
   CreatePetsStatus201,
@@ -38,24 +38,17 @@ export type {
 } from './CreatePets.js'
 export type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE.js'
 export type {
-  DeleteOrderPathOrderId,
-  DeleteOrderRequestConfig,
+  DeleteOrderOptions,
+  DeleteOrderPath,
   DeleteOrderResponse,
   DeleteOrderResponses,
   DeleteOrderStatus400,
   DeleteOrderStatus404,
 } from './DeleteOrder.js'
+export type { DeletePetHeaders, DeletePetOptions, DeletePetPath, DeletePetResponse, DeletePetResponses, DeletePetStatus400 } from './DeletePet.js'
 export type {
-  DeletePetHeaderApiKey,
-  DeletePetPathPetId,
-  DeletePetRequestConfig,
-  DeletePetResponse,
-  DeletePetResponses,
-  DeletePetStatus400,
-} from './DeletePet.js'
-export type {
-  FindPetsByStatusPathStepId,
-  FindPetsByStatusRequestConfig,
+  FindPetsByStatusOptions,
+  FindPetsByStatusPath,
   FindPetsByStatusResponse,
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
@@ -64,11 +57,9 @@ export type {
   FindPetsByStatusStatus400,
 } from './FindPetsByStatus.js'
 export type {
-  FindPetsByTagsHeaderXEXAMPLE,
-  FindPetsByTagsQueryPage,
-  FindPetsByTagsQueryPageSize,
-  FindPetsByTagsQueryTags,
-  FindPetsByTagsRequestConfig,
+  FindPetsByTagsHeaders,
+  FindPetsByTagsOptions,
+  FindPetsByTagsQuery,
   FindPetsByTagsResponse,
   FindPetsByTagsResponses,
   FindPetsByTagsStatus200,
@@ -77,10 +68,10 @@ export type {
   FindPetsByTagsStatus400,
 } from './FindPetsByTags.js'
 export type { FindPetsByTagsXEXAMPLEKey } from './FindPetsByTagsXEXAMPLE.js'
-export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './GetInventory.js'
+export type { GetInventoryOptions, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './GetInventory.js'
 export type {
-  GetOrderByIdPathOrderId,
-  GetOrderByIdRequestConfig,
+  GetOrderByIdOptions,
+  GetOrderByIdPath,
   GetOrderByIdResponse,
   GetOrderByIdResponses,
   GetOrderByIdStatus200,
@@ -90,8 +81,8 @@ export type {
   GetOrderByIdStatus404,
 } from './GetOrderById.js'
 export type {
-  GetPetByIdPathPetId,
-  GetPetByIdRequestConfig,
+  GetPetByIdOptions,
+  GetPetByIdPath,
   GetPetByIdResponse,
   GetPetByIdResponses,
   GetPetByIdStatus200,
@@ -112,7 +103,7 @@ export type {
   PlaceOrderBodyFormUrlEncoded,
   PlaceOrderBodyJson,
   PlaceOrderBodyXml,
-  PlaceOrderRequestConfig,
+  PlaceOrderOptions,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
@@ -123,7 +114,7 @@ export type {
   PlaceOrderPatchBodyFormUrlEncoded,
   PlaceOrderPatchBodyJson,
   PlaceOrderPatchBodyXml,
-  PlaceOrderPatchRequestConfig,
+  PlaceOrderPatchOptions,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
@@ -134,7 +125,7 @@ export type {
   UpdatePetBodyFormUrlEncoded,
   UpdatePetBodyJson,
   UpdatePetBodyXml,
-  UpdatePetRequestConfig,
+  UpdatePetOptions,
   UpdatePetResponse,
   UpdatePetResponses,
   UpdatePetStatus200,
@@ -146,10 +137,9 @@ export type {
   UpdatePetStatus405,
 } from './UpdatePet.js'
 export type {
-  UpdatePetWithFormPathPetId,
-  UpdatePetWithFormQueryName,
-  UpdatePetWithFormQueryStatus,
-  UpdatePetWithFormRequestConfig,
+  UpdatePetWithFormOptions,
+  UpdatePetWithFormPath,
+  UpdatePetWithFormQuery,
   UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,

@@ -4,19 +4,28 @@
  */
 
 /**
- * @type integer
+ * @type object
  */
-export type UpdatePetWithFormPathPetId = number
+export type UpdatePetWithFormPath = {
+  /**
+   * @type integer
+   */
+  petId: number
+}
 
 /**
- * @type string | undefined
+ * @type object
  */
-export type UpdatePetWithFormQueryName = string | undefined
-
-/**
- * @type string | undefined
- */
-export type UpdatePetWithFormQueryStatus = string | undefined
+export type UpdatePetWithFormQuery = {
+  /**
+   * @type string | undefined
+   */
+  name?: string
+  /**
+   * @type string | undefined
+   */
+  status?: string
+}
 
 /**
  * @type void
@@ -31,21 +40,10 @@ export type UpdatePetWithFormStatus405 = object
 /**
  * @type object
  */
-export type UpdatePetWithFormRequestConfig = {
+export type UpdatePetWithFormOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    petId: UpdatePetWithFormPathPetId
-  }
-  /**
-   * @type object | undefined
-   */
-  query?: {
-    name?: UpdatePetWithFormQueryName
-    status?: UpdatePetWithFormQueryStatus
-  }
+  path: UpdatePetWithFormPath
+  query?: UpdatePetWithFormQuery
   headers?: never
 }
 

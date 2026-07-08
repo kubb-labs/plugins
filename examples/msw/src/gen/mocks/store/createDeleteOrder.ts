@@ -3,13 +3,18 @@
  * Do not edit manually.
  */
 
-import type { DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/DeleteOrder.ts'
+import type { DeleteOrderPath, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/DeleteOrder.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createDeleteOrderPathOrderId(data?: bigint): bigint {
+export function createDeleteOrderPath<TData extends Partial<DeleteOrderPath> = object>(data?: TData) {
   faker.seed([220])
-
-  return data ?? faker.number.bigInt()
+  const defaultFakeData = {
+    orderId: faker.number.bigInt(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**

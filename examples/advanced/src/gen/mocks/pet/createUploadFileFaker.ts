@@ -1,13 +1,25 @@
-import type { UploadFileResponse, UploadFileStatus200 } from '../../models/ts/pet/UploadFile.ts'
+import type { UploadFilePath, UploadFileQuery, UploadFileResponse, UploadFileStatus200 } from '../../models/ts/pet/UploadFile.ts'
 import { createApiResponseFaker } from '../createApiResponseFaker.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createUploadFilePathPetIdFaker(data?: number): number {
-  return data ?? faker.number.int()
+export function createUploadFilePathFaker<TData extends Partial<UploadFilePath> = object>(data?: TData) {
+  const defaultFakeData = {
+    petId: faker.number.int(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
-export function createUploadFileQueryAdditionalMetadataFaker(data?: string): string {
-  return data ?? faker.string.alpha()
+export function createUploadFileQueryFaker<TData extends Partial<UploadFileQuery> = object>(data?: TData) {
+  const defaultFakeData = {
+    additionalMetadata: faker.string.alpha(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**

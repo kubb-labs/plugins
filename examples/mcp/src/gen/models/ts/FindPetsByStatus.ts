@@ -6,9 +6,14 @@
 import type { Pet } from './Pet.js'
 
 /**
- * @type string
+ * @type object
  */
-export type FindPetsByStatusPathStepId = string
+export type FindPetsByStatusPath = {
+  /**
+   * @type string
+   */
+  stepId: string
+}
 
 /**
  * @type array
@@ -30,14 +35,9 @@ export type FindPetsByStatusStatus400 = unknown
 /**
  * @type object
  */
-export type FindPetsByStatusRequestConfig = {
+export type FindPetsByStatusOptions = {
   body?: never
-  /**
-   * @type object
-   */
-  path: {
-    stepId: FindPetsByStatusPathStepId
-  }
+  path: FindPetsByStatusPath
   query?: never
   headers?: never
 }

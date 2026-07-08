@@ -29,7 +29,7 @@ export type {
   AddPetBodyFormUrlEncoded,
   AddPetBodyJson,
   AddPetBodyXml,
-  AddPetRequestConfig,
+  AddPetOptions,
   AddPetResponse,
   AddPetResponses,
   AddPetStatus200,
@@ -37,17 +37,10 @@ export type {
   AddPetStatus200Xml,
   AddPetStatus405,
 } from './models/pet/AddPet.ts'
+export type { DeletePetHeaders, DeletePetOptions, DeletePetPath, DeletePetResponse, DeletePetResponses, DeletePetStatus400 } from './models/pet/DeletePet.ts'
 export type {
-  DeletePetHeaderApiKey,
-  DeletePetPathPetId,
-  DeletePetRequestConfig,
-  DeletePetResponse,
-  DeletePetResponses,
-  DeletePetStatus400,
-} from './models/pet/DeletePet.ts'
-export type {
-  FindPetsByStatusQueryStatus,
-  FindPetsByStatusRequestConfig,
+  FindPetsByStatusOptions,
+  FindPetsByStatusQuery,
   FindPetsByStatusResponse,
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
@@ -57,10 +50,8 @@ export type {
   FindPetsByStatusStatusKey,
 } from './models/pet/FindPetsByStatus.ts'
 export type {
-  FindPetsByTagsQueryPage,
-  FindPetsByTagsQueryPageSize,
-  FindPetsByTagsQueryTags,
-  FindPetsByTagsRequestConfig,
+  FindPetsByTagsOptions,
+  FindPetsByTagsQuery,
   FindPetsByTagsResponse,
   FindPetsByTagsResponses,
   FindPetsByTagsStatus200,
@@ -69,8 +60,8 @@ export type {
   FindPetsByTagsStatus400,
 } from './models/pet/FindPetsByTags.ts'
 export type {
-  GetPetByIdPathPetId,
-  GetPetByIdRequestConfig,
+  GetPetByIdOptions,
+  GetPetByIdPath,
   GetPetByIdResponse,
   GetPetByIdResponses,
   GetPetByIdStatus200,
@@ -84,7 +75,7 @@ export type {
   UpdatePetBodyFormUrlEncoded,
   UpdatePetBodyJson,
   UpdatePetBodyXml,
-  UpdatePetRequestConfig,
+  UpdatePetOptions,
   UpdatePetResponse,
   UpdatePetResponses,
   UpdatePetStatus200,
@@ -95,10 +86,9 @@ export type {
   UpdatePetStatus405,
 } from './models/pet/UpdatePet.ts'
 export type {
-  UpdatePetWithFormPathPetId,
-  UpdatePetWithFormQueryName,
-  UpdatePetWithFormQueryStatus,
-  UpdatePetWithFormRequestConfig,
+  UpdatePetWithFormOptions,
+  UpdatePetWithFormPath,
+  UpdatePetWithFormQuery,
   UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
@@ -107,25 +97,25 @@ export type {
   UploadFileBody,
   UploadFileBodyFormData,
   UploadFileBodyJson,
-  UploadFilePathPetId,
-  UploadFileQueryAdditionalMetadata,
-  UploadFileRequestConfig,
+  UploadFileOptions,
+  UploadFilePath,
+  UploadFileQuery,
   UploadFileResponse,
   UploadFileResponses,
   UploadFileStatus200,
 } from './models/pet/UploadFile.ts'
 export type {
-  DeleteOrderPathOrderId,
-  DeleteOrderRequestConfig,
+  DeleteOrderOptions,
+  DeleteOrderPath,
   DeleteOrderResponse,
   DeleteOrderResponses,
   DeleteOrderStatus400,
   DeleteOrderStatus404,
 } from './models/store/DeleteOrder.ts'
-export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/store/GetInventory.ts'
+export type { GetInventoryOptions, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/store/GetInventory.ts'
 export type {
-  GetOrderByIdPathOrderId,
-  GetOrderByIdRequestConfig,
+  GetOrderByIdOptions,
+  GetOrderByIdPath,
   GetOrderByIdResponse,
   GetOrderByIdResponses,
   GetOrderByIdStatus200,
@@ -139,7 +129,7 @@ export type {
   PlaceOrderBodyFormUrlEncoded,
   PlaceOrderBodyJson,
   PlaceOrderBodyXml,
-  PlaceOrderRequestConfig,
+  PlaceOrderOptions,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
@@ -150,7 +140,7 @@ export type {
   PlaceOrderPatchBodyFormUrlEncoded,
   PlaceOrderPatchBodyJson,
   PlaceOrderPatchBodyXml,
-  PlaceOrderPatchRequestConfig,
+  PlaceOrderPatchOptions,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
@@ -161,7 +151,7 @@ export type {
   CreateUserBodyFormUrlEncoded,
   CreateUserBodyJson,
   CreateUserBodyXml,
-  CreateUserRequestConfig,
+  CreateUserOptions,
   CreateUserResponse,
   CreateUserResponses,
   CreateUserStatusDefault,
@@ -170,7 +160,7 @@ export type {
 } from './models/user/CreateUser.ts'
 export type {
   CreateUsersWithListInputBody,
-  CreateUsersWithListInputRequestConfig,
+  CreateUsersWithListInputOptions,
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
   CreateUsersWithListInputStatus200,
@@ -179,16 +169,16 @@ export type {
   CreateUsersWithListInputStatusDefault,
 } from './models/user/CreateUsersWithListInput.ts'
 export type {
-  DeleteUserPathUsername,
-  DeleteUserRequestConfig,
+  DeleteUserOptions,
+  DeleteUserPath,
   DeleteUserResponse,
   DeleteUserResponses,
   DeleteUserStatus400,
   DeleteUserStatus404,
 } from './models/user/DeleteUser.ts'
 export type {
-  GetUserByNamePathUsername,
-  GetUserByNameRequestConfig,
+  GetUserByNameOptions,
+  GetUserByNamePath,
   GetUserByNameResponse,
   GetUserByNameResponses,
   GetUserByNameStatus200,
@@ -198,9 +188,8 @@ export type {
   GetUserByNameStatus404,
 } from './models/user/GetUserByName.ts'
 export type {
-  LoginUserQueryPassword,
-  LoginUserQueryUsername,
-  LoginUserRequestConfig,
+  LoginUserOptions,
+  LoginUserQuery,
   LoginUserResponse,
   LoginUserResponses,
   LoginUserStatus200,
@@ -208,14 +197,14 @@ export type {
   LoginUserStatus200Xml,
   LoginUserStatus400,
 } from './models/user/LoginUser.ts'
-export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/user/LogoutUser.ts'
+export type { LogoutUserOptions, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/user/LogoutUser.ts'
 export type {
   UpdateUserBody,
   UpdateUserBodyFormUrlEncoded,
   UpdateUserBodyJson,
   UpdateUserBodyXml,
-  UpdateUserPathUsername,
-  UpdateUserRequestConfig,
+  UpdateUserOptions,
+  UpdateUserPath,
   UpdateUserResponse,
   UpdateUserResponses,
   UpdateUserStatusDefault,

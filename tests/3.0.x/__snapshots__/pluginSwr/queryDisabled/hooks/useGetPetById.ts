@@ -4,14 +4,14 @@
 */
 
 import type { RequestConfig } from '../.kubb/client.ts'
-import type { GetPetByIdRequestConfig } from '../types/GetPetById.ts'
+import type { GetPetByIdOptions } from '../types/GetPetById.ts'
 import { getPetById } from '../clients/getPetById.ts'
 
-export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
-export function getPetByIdQueryOptions({ path }: GetPetByIdRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
       const { data } = await getPetById({ ...config, path, throwOnError: true })

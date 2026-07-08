@@ -1,4 +1,4 @@
-import type { UpdatePetWithFormRequestConfig } from '../models/ts/UpdatePetWithForm.js'
+import type { UpdatePetWithFormOptions } from '../models/ts/UpdatePetWithForm.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { updatePetWithForm } from '../clients/updatePetWithForm.js'
@@ -8,7 +8,7 @@ import { updatePetWithForm } from '../clients/updatePetWithForm.js'
  * {@link /pet/:petId}
  */
 export async function updatePetWithFormHandler(
-  { path, query }: UpdatePetWithFormRequestConfig,
+  { path, query }: UpdatePetWithFormOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await updatePetWithForm({ path, query })

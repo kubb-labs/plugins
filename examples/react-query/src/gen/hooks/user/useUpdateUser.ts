@@ -4,7 +4,7 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { UpdateUserRequestConfig, UpdateUserResponse } from '../../models/user/UpdateUser.ts'
+import type { UpdateUserOptions, UpdateUserResponse } from '../../models/user/UpdateUser.ts'
 import { updateUser } from '../../clients/user/updateUser.ts'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -16,7 +16,7 @@ export function updateUserMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = updateUserMutationKey()
-  return mutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserRequestConfig, TContext>({
+  return mutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, body }) => {
       const { data } = await updateUser({ ...config, path, body, throwOnError: true })

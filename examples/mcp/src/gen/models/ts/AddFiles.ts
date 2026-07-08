@@ -40,7 +40,7 @@ export type AddFilesBody = AddFilesBodyJson | AddFilesBodyFormData
 /**
  * @type object
  */
-export type AddFilesRequestConfig = {
+export type AddFilesOptions = {
   body: AddFilesBody
   path?: never
   query?: never

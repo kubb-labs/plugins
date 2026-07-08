@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { CreateConfigV20250RequestConfig, CreateConfigV20250Response } from '../../types/CreateConfigV20250.ts'
+import type { CreateConfigV20250Options, CreateConfigV20250Response } from '../../types/CreateConfigV20250.ts'
 
-export function createConfigV20250({ body }: CreateConfigV20250RequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<CreateConfigV20250Response> {
+export function createConfigV20250({ body }: CreateConfigV20250Options, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<CreateConfigV20250Response> {
   return cy.request<CreateConfigV20250Response>({
     method: 'POST',
     url: `/config`,
