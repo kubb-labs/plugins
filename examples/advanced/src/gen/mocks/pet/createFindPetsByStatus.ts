@@ -5,7 +5,7 @@ import type {
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
 } from '../../models/ts/pet/FindPetsByStatus.ts'
-import { createPetFaker } from '../createPetFaker.ts'
+import { createPetFaker } from '../createPet.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createFindPetsByStatusPathStepIdFaker(data?: string): string {

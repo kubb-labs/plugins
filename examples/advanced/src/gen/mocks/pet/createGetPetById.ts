@@ -6,7 +6,7 @@ import type {
   GetPetByIdStatus400,
   GetPetByIdStatus404,
 } from '../../models/ts/pet/GetPetById.ts'
-import { createPetFaker } from '../createPetFaker.ts'
+import { createPetFaker } from '../createPet.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createGetPetByIdPathPetIdFaker(data?: number): number {

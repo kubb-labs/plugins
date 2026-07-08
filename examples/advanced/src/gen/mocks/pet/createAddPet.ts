@@ -9,8 +9,8 @@ import type {
   AddPetStatusDefaultJson,
   AddPetStatusDefaultXml,
 } from '../../models/ts/pet/AddPet.ts'
-import { createAddPetRequestFaker } from '../createAddPetRequestFaker.ts'
-import { createPetFaker } from '../createPetFaker.ts'
+import { createAddPetRequestFaker } from '../createAddPetRequest.ts'
+import { createPetFaker } from '../createPet.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

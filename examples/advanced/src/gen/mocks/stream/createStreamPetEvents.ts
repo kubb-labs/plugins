@@ -1,5 +1,5 @@
 import type { StreamPetEventsResponse, StreamPetEventsStatus200 } from '../../models/ts/stream/StreamPetEvents.ts'
-import { createPetEventFaker } from '../createPetEventFaker.ts'
+import { createPetEventFaker } from '../createPetEvent.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createStreamPetEventsPathPetIdFaker(data?: number): number {
