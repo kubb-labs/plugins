@@ -12,6 +12,6 @@
 "@kubb/plugin-zod": patch
 ---
 
-Update to `@kubb/core` 5.0.0-beta.88 and adopt its single-options resolver API.
+Update to `@kubb/core` 5.0.0-beta.89 and adopt its single-options resolver API.
 
 `resolver.file` and `resolver.default.file`/`default.path` take one options object now, so calls pass `{ ...params, root, output, group }` instead of a second `context` argument. The `plugin-faker`, `plugin-ts`, and `plugin-zod` resolvers build file names through `file: { baseName }` in place of the removed `resolveName` hook, which restores the caser-based file names (a faker mock lands in `createPetFaker.ts`).
