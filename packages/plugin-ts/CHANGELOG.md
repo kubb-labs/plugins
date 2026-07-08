@@ -1,5 +1,16 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.86
+
+### Patch Changes
+
+- [#649](https://github.com/kubb-labs/plugins/pull/649) [`e59f005`](https://github.com/kubb-labs/plugins/commit/e59f005535a31a287c3a8faa6a967d69ce7b1dc1) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Deduplicate generation logic into shared helpers. Generated output is unchanged.
+
+  - react-query: extract `classifyOperation`, `buildResponseTypes`, and `resolvePageParamType` from blocks that were copied across every generator and the query and infinite components
+  - zod: extract `buildResponseUnion` from the near-identical success and error union blocks in the operation generator
+  - plugin-ts: hoist the duplicated `resolveImportName` closure in the type generator to one module-level helper
+  - msw: merge `MockWithFaker` into `Mock` behind an optional `fakerName` prop
+
 ## 5.0.0-beta.85
 
 ### Minor Changes
