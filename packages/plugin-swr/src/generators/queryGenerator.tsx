@@ -16,20 +16,15 @@ export const queryGenerator = defineGenerator<PluginSwr>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, client, group } = ctx.options
+    const { output, query, client, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
     const tsResolver = driver.getResolver(pluginTsName)
 
     const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
-    const queryMethods = new Set(query ? query.methods : [])
-    const isMutation =
-      mutation !== false &&
-      !isQuery &&
-      (mutation ? mutation.methods : []).some((method) => !queryMethods.has(method) && node.method.toLowerCase() === method.toLowerCase())
 
-    if (!isQuery || isMutation) return null
+    if (!isQuery) return null
 
     const importPath = query ? query.importPath : 'swr'
 

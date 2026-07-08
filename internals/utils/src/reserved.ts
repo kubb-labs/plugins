@@ -100,7 +100,7 @@ export function isValidVarName(name: string): boolean {
   if (!name || reservedWords.has(name as 'valueOf')) {
     return false
   }
-  return /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(name)
+  return isIdentifier(name)
 }
 
 /**

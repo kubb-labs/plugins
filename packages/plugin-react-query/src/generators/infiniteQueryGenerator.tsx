@@ -39,9 +39,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
     const queryParamKeys = getOperationParameters(node, { paramsCasing: 'original' }).query.map((p) => p.name)
     const hasQueryParam = infiniteOptions.queryParam ? queryParamKeys.some((k) => normalizeKey(k) === infiniteOptions.queryParam) : false
     // cursorParam validation against response schema keys is skipped in v5 (complex schema inspection)
-    const hasCursorParam = !infiniteOptions.cursorParam || true
-
-    if (!hasQueryParam || !hasCursorParam) return null
+    if (!hasQueryParam) return null
 
     const importPath = query ? query.importPath : '@tanstack/react-query'
 

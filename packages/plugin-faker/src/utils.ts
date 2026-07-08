@@ -120,7 +120,6 @@ const SCALAR_TYPES = new Set<ast.SchemaNode['type']>([
   'blob',
   'enum',
 ])
-const ARRAY_TYPES = new Set<ast.SchemaNode['type']>(['array'])
 
 function toRelativeImportPath(from: string, to: string): string {
   const relativePath = posix.relative(posix.dirname(from), to)
@@ -209,7 +208,7 @@ export function resolveFakerTypeUsage(
   returnType: string | null
   usesTypeName: boolean
 } {
-  const isArray = ARRAY_TYPES.has(node.type)
+  const isArray = node.type === 'array'
   const isTuple = node.type === 'tuple'
   const isScalar = SCALAR_TYPES.has(node.type)
 

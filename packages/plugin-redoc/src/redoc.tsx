@@ -1,11 +1,5 @@
 import type { AdapterOas } from '@kubb/adapter-oas'
 
-type BuildDocsOptions = {
-  title?: string
-  disableGoogleFont?: boolean
-  templateOptions?: Record<string, unknown>
-}
-
 const htmlEscapes: Record<string, string> = {
   '&': '&amp;',
   '<': '&lt;',
@@ -25,11 +19,9 @@ function escapeHtml(value: string) {
  * embeds the spec inline and pulls Redoc's bundle from a CDN at runtime, so
  * the generated file works without further build steps.
  */
-export async function getPageHTML(api: AdapterOas['document'], { title, disableGoogleFont }: BuildDocsOptions = {}) {
-  const pageTitle = escapeHtml(title || api.info.title || 'ReDoc documentation')
-  const googleFont = disableGoogleFont
-    ? ''
-    : `<link href='https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700' rel='stylesheet' />`
+export async function getPageHTML(api: AdapterOas['document']) {
+  const pageTitle = escapeHtml(api.info.title || 'ReDoc documentation')
+  const googleFont = `<link href='https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700' rel='stylesheet' />`
   const redocHTML = `
      <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"> </script>
  <div id="redoc-container"></div>

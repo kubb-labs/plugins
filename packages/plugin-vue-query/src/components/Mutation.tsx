@@ -71,9 +71,6 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName }
   const TRequest = resolveMutationRequestType(node, tsResolver)
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')
 
-  const mutationKeyParamsNode = createFunctionParameters({ params: [] })
-  const mutationKeyParamsCall = callPrinter.print(mutationKeyParamsNode) ?? ''
-
   const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
@@ -83,10 +80,10 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName }
         {`
         const { mutation = {}, client: config = {} } = options ?? {}
         const { client: queryClient, ...mutationOptions } = mutation;
-        const mutationKey = mutationOptions?.mutationKey ?? ${mutationKeyName}(${mutationKeyParamsCall})
+        const mutationKey = mutationOptions?.mutationKey ?? ${mutationKeyName}()
 
         return useMutation<${generics}>({
-          mutationFn: async(${hasMutationParams ? argBindingStr : ''}) => {
+          mutationFn: async(${argBindingStr}) => {
             ${mutationFnBody}
           },
           mutationKey,

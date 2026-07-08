@@ -50,7 +50,7 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
     macros: userMacros,
   } = options
 
-  const selectedGenerators = [queryGenerator, mutationGenerator].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
+  const selectedGenerators = [queryGenerator, mutationGenerator]
 
   const groupConfig = createGroupConfig(group) ?? undefined
 

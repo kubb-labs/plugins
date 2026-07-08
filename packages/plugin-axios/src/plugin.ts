@@ -68,9 +68,7 @@ export const pluginAxios = definePlugin<PluginAxios>((options) => {
   return {
     name: pluginAxiosName,
     options,
-    dependencies: [pluginTsName, isValidatorEnabled(resolved.validator) ? pluginZodName : null].filter((dependency): dependency is string =>
-      Boolean(dependency),
-    ),
+    dependencies: [pluginTsName, ...(isValidatorEnabled(resolved.validator) ? [pluginZodName] : [])],
     hooks: {
       'kubb:plugin:setup'(ctx) {
         ctx.setOptions(resolved)

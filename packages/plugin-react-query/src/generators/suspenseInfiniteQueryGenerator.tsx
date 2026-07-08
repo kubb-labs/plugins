@@ -39,9 +39,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
     const normalizeKey = (key: string) => key.replace(/\?$/, '')
     const queryParamKeys = getOperationParameters(node, { paramsCasing: 'original' }).query.map((p) => p.name)
     const hasQueryParam = infiniteOptions.queryParam ? queryParamKeys.some((k) => normalizeKey(k) === infiniteOptions.queryParam) : false
-    const hasCursorParam = !infiniteOptions.cursorParam || true
-
-    if (!hasQueryParam || !hasCursorParam) return null
+    if (!hasQueryParam) return null
 
     const importPath = query ? query.importPath : '@tanstack/react-query'
 
