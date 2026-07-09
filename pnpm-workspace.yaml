@@ -22,7 +22,7 @@ catalog:
   '@vitest/coverage-v8': ^4.1.10
   '@vitest/ui': ^4.1.10
   kubb: 5.0.0-beta.93
-  oxfmt: ^0.56.0
+  oxfmt: ^0.57.0
   oxlint: ^1.72.0
   prettier: ^3.9.4
   tsdown: ^0.22.3
