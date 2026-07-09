@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client.js'
-import type { AddFilesOptions, AddFilesResponses } from '../models/ts/AddFiles.js'
-import { client } from '../.kubb/client.js'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { AddFilesOptions, AddFilesResponses } from '../models/ts/AddFiles'
+import { client } from '../.kubb/client'
 
 /**
  * @description Place a new file in the store

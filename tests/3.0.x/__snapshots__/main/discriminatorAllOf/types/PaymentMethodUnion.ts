@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { BankTransferPaymentUnion } from './BankTransferPaymentUnion.ts'
-import type { CardPaymentUnion } from './CardPaymentUnion.ts'
+import type { BankTransferPaymentUnion } from './BankTransferPaymentUnion'
+import type { CardPaymentUnion } from './CardPaymentUnion'
 
 export type PaymentMethodUnion = ((CardPaymentUnion & {
     /**

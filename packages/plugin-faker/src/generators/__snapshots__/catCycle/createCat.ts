@@ -4,7 +4,7 @@
  * Source: text content
  */
 
-import type { Cat } from './types/Cat.ts'
+import type { Cat } from './types/Cat'
 import { faker } from '@faker-js/faker'
 
 export function createCat<TData extends Partial<Cat> = object>(data?: TData) {

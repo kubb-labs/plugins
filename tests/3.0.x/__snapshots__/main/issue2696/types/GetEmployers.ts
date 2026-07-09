@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Employer } from './Employer.ts'
+import type { Employer } from './Employer'
 
 /**
  * @type array

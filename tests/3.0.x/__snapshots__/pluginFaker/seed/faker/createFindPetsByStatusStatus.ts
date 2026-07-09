@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByStatusStatusKey } from '../types/FindPetsByStatusStatus.ts'
+import type { FindPetsByStatusStatusKey } from '../types/FindPetsByStatusStatus'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

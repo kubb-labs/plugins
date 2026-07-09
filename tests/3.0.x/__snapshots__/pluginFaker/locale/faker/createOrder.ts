@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { Order } from '../types/Order.ts'
-import { createOrderStatusEnum } from './createOrderStatusEnum.ts'
+import type { Order } from '../types/Order'
+import { createOrderStatusEnum } from './createOrderStatusEnum'
 import { fakerDE as faker } from '@faker-js/faker'
 
 export function createOrder<TData extends Partial<Order> = object>(data?: TData)

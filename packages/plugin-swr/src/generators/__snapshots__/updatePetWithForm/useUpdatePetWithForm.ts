@@ -5,10 +5,10 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
-import type { UpdatePetWithFormOptions, UpdatePetWithFormResponse } from './UpdatePetWithForm.ts'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormResponse } from './UpdatePetWithForm'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { updatePetWithForm } from './clients/updatePetWithForm.ts'
+import { updatePetWithForm } from './clients/updatePetWithForm'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
 

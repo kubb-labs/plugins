@@ -1,9 +1,9 @@
 /* eslint-disable no-alert, no-console */
 
-import type { ClientConfig } from './.kubb/client.ts'
-import { PetClient } from './petClient.ts'
-import { ProjectClient } from './projectClient.ts'
-import { StoreClient } from './storeClient.ts'
+import type { ClientConfig } from './.kubb/client'
+import { PetClient } from './petClient'
+import { ProjectClient } from './projectClient'
+import { StoreClient } from './storeClient'
 
 export class PetStore {
   readonly pet: PetClient

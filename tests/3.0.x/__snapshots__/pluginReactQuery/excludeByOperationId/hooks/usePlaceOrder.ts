@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { PlaceOrderOptions, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { PlaceOrderOptions, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { placeOrder } from '../clients/placeOrder.ts'
+import { placeOrder } from '../clients/placeOrder'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const

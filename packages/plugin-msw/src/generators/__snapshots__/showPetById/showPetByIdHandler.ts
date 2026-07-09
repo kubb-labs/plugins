@@ -4,7 +4,7 @@
  * Source: text content
  */
 
-import type { ShowPetByIdResponse } from './ShowPetById.ts'
+import type { ShowPetByIdResponse } from './ShowPetById'
 import { http } from 'msw'
 
 export function showPetByIdHandlerResponse200(data: ShowPetByIdResponse) {

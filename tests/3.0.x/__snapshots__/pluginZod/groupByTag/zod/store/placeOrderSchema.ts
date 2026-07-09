@@ -4,7 +4,7 @@
 */
 
 import * as z from 'zod'
-import { orderSchema } from '../orderSchema.ts'
+import { orderSchema } from '../orderSchema'
 
 export const placeOrderStatus200Schema = orderSchema
 

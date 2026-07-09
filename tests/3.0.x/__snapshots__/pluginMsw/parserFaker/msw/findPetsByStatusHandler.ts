@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
-import { createFindPetsByStatusResponse } from '../faker/createFindPetsByStatus.ts'
+import type { FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus'
+import { createFindPetsByStatusResponse } from '../faker/createFindPetsByStatus'
 import { http } from 'msw'
 
 export function findPetsByStatusHandlerResponse200(data: FindPetsByStatusResponse) {

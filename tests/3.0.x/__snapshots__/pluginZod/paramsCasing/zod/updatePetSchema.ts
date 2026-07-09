@@ -4,8 +4,8 @@
 */
 
 import * as z from 'zod'
-import { petSchema } from './petSchema.ts'
-import { petUpdateSchema } from './petUpdateSchema.ts'
+import { petSchema } from './petSchema'
+import { petUpdateSchema } from './petUpdateSchema'
 
 export const updatePetPathPetIdSchema = z.string()
 

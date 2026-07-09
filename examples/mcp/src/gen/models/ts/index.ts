@@ -7,7 +7,7 @@ export type {
   AddFilesResponses,
   AddFilesStatus200,
   AddFilesStatus405,
-} from './AddFiles.js'
+} from './AddFiles'
 export type {
   AddPetBody,
   AddPetBodyFormUrlEncoded,
@@ -20,11 +20,11 @@ export type {
   AddPetStatus200Json,
   AddPetStatus200Xml,
   AddPetStatus405,
-} from './AddPet.js'
-export type { AddPetRequest } from './AddPetRequest.js'
-export type { AddPetRequestStatusEnumKey } from './AddPetRequestStatusEnum.js'
-export type { ApiResponse } from './ApiResponse.js'
-export type { Category } from './Category.js'
+} from './AddPet'
+export type { AddPetRequest } from './AddPetRequest'
+export type { AddPetRequestStatusEnumKey } from './AddPetRequestStatusEnum'
+export type { ApiResponse } from './ApiResponse'
+export type { Category } from './Category'
 export type {
   CreatePetsBody,
   CreatePetsHeaders,
@@ -35,17 +35,10 @@ export type {
   CreatePetsResponses,
   CreatePetsStatus201,
   CreatePetsStatusDefault,
-} from './CreatePets.js'
-export type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE.js'
-export type {
-  DeleteOrderOptions,
-  DeleteOrderPath,
-  DeleteOrderResponse,
-  DeleteOrderResponses,
-  DeleteOrderStatus400,
-  DeleteOrderStatus404,
-} from './DeleteOrder.js'
-export type { DeletePetHeaders, DeletePetOptions, DeletePetPath, DeletePetResponse, DeletePetResponses, DeletePetStatus400 } from './DeletePet.js'
+} from './CreatePets'
+export type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE'
+export type { DeleteOrderOptions, DeleteOrderPath, DeleteOrderResponse, DeleteOrderResponses, DeleteOrderStatus400, DeleteOrderStatus404 } from './DeleteOrder'
+export type { DeletePetHeaders, DeletePetOptions, DeletePetPath, DeletePetResponse, DeletePetResponses, DeletePetStatus400 } from './DeletePet'
 export type {
   FindPetsByStatusOptions,
   FindPetsByStatusPath,
@@ -55,7 +48,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-} from './FindPetsByStatus.js'
+} from './FindPetsByStatus'
 export type {
   FindPetsByTagsHeaders,
   FindPetsByTagsOptions,
@@ -66,9 +59,9 @@ export type {
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
-} from './FindPetsByTags.js'
-export type { FindPetsByTagsXEXAMPLEKey } from './FindPetsByTagsXEXAMPLE.js'
-export type { GetInventoryOptions, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './GetInventory.js'
+} from './FindPetsByTags'
+export type { FindPetsByTagsXEXAMPLEKey } from './FindPetsByTagsXEXAMPLE'
+export type { GetInventoryOptions, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './GetInventory'
 export type {
   GetOrderByIdOptions,
   GetOrderByIdPath,
@@ -79,7 +72,7 @@ export type {
   GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
-} from './GetOrderById.js'
+} from './GetOrderById'
 export type {
   GetPetByIdOptions,
   GetPetByIdPath,
@@ -90,14 +83,14 @@ export type {
   GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
-} from './GetPetById.js'
-export type { Order } from './Order.js'
-export type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum.js'
-export type { OrderOrderTypeEnumKey } from './OrderOrderTypeEnum.js'
-export type { OrderStatusEnumKey } from './OrderStatusEnum.js'
-export type { Pet } from './Pet.js'
-export type { PetNotFound } from './PetNotFound.js'
-export type { PetStatusEnumKey } from './PetStatusEnum.js'
+} from './GetPetById'
+export type { Order } from './Order'
+export type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum'
+export type { OrderOrderTypeEnumKey } from './OrderOrderTypeEnum'
+export type { OrderStatusEnumKey } from './OrderStatusEnum'
+export type { Pet } from './Pet'
+export type { PetNotFound } from './PetNotFound'
+export type { PetStatusEnumKey } from './PetStatusEnum'
 export type {
   PlaceOrderBody,
   PlaceOrderBodyFormUrlEncoded,
@@ -108,7 +101,7 @@ export type {
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-} from './PlaceOrder.js'
+} from './PlaceOrder'
 export type {
   PlaceOrderPatchBody,
   PlaceOrderPatchBodyFormUrlEncoded,
@@ -119,7 +112,7 @@ export type {
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
-} from './PlaceOrderPatch.js'
+} from './PlaceOrderPatch'
 export type {
   UpdatePetBody,
   UpdatePetBodyFormUrlEncoded,
@@ -135,7 +128,7 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-} from './UpdatePet.js'
+} from './UpdatePet'
 export type {
   UpdatePetWithFormOptions,
   UpdatePetWithFormPath,
@@ -143,12 +136,12 @@ export type {
   UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
-} from './UpdatePetWithForm.js'
-export type { TagTag } from './tag/Tag.js'
-export { addPetRequestStatusEnum } from './AddPetRequestStatusEnum.js'
-export { createPetsXEXAMPLE } from './CreatePetsXEXAMPLE.js'
-export { findPetsByTagsXEXAMPLE } from './FindPetsByTagsXEXAMPLE.js'
-export { orderHttpStatusEnum } from './OrderHttpStatusEnum.js'
-export { orderOrderTypeEnum } from './OrderOrderTypeEnum.js'
-export { orderStatusEnum } from './OrderStatusEnum.js'
-export { petStatusEnum } from './PetStatusEnum.js'
+} from './UpdatePetWithForm'
+export type { TagTag } from './tag/Tag'
+export { addPetRequestStatusEnum } from './AddPetRequestStatusEnum'
+export { createPetsXEXAMPLE } from './CreatePetsXEXAMPLE'
+export { findPetsByTagsXEXAMPLE } from './FindPetsByTagsXEXAMPLE'
+export { orderHttpStatusEnum } from './OrderHttpStatusEnum'
+export { orderOrderTypeEnum } from './OrderOrderTypeEnum'
+export { orderStatusEnum } from './OrderStatusEnum'
+export { petStatusEnum } from './PetStatusEnum'

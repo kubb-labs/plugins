@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import { updatePetHandler } from './updatePet.ts'
-import { updatePetBodySchema, updatePetHeaderXRequestIDSchema, updatePetPathPetIdSchema, updatePetQueryIncludeDeletedSchema, updatePetQueryRequestSourceSchema, updatePetStatus200Schema } from '../zod/updatePetSchema.ts'
+import { updatePetHandler } from './updatePet'
+import { updatePetBodySchema, updatePetHeaderXRequestIDSchema, updatePetPathPetIdSchema, updatePetQueryIncludeDeletedSchema, updatePetQueryRequestSourceSchema, updatePetStatus200Schema } from '../zod/updatePetSchema'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
 import { z } from 'zod'

@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options, RequestResult } from './.kubb/client.ts'
-import type { DeletePetOptions, DeletePetResponses } from './DeletePet.ts'
-import { client } from './.kubb/client.ts'
+import type { Options, RequestResult } from './.kubb/client'
+import type { DeletePetOptions, DeletePetResponses } from './DeletePet'
+import { client } from './.kubb/client'
 
 /**
  * {@link /pet/:petId}

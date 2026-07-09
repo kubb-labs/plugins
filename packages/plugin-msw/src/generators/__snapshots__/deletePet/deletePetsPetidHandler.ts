@@ -4,7 +4,7 @@
  * Source: text content
  */
 
-import type { DeletePetsPetidResponse } from './DeletePetsPetid.ts'
+import type { DeletePetsPetidResponse } from './DeletePetsPetid'
 import { http } from 'msw'
 
 export function deletePetsPetidHandlerResponse200(data?: DeletePetsPetidResponse) {

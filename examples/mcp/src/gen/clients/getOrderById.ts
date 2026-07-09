@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client.js'
-import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../models/ts/GetOrderById.js'
-import { client } from '../.kubb/client.js'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../models/ts/GetOrderById'
+import { client } from '../.kubb/client'
 
 /**
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.

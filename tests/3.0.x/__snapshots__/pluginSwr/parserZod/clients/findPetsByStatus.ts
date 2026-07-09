@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client.ts'
-import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../types/FindPetsByStatus.ts'
-import { client } from '../.kubb/client.ts'
-import { findPetsByStatusResponseSchema, findPetsByStatusErrorSchema } from '../zod/findPetsByStatusSchema.ts'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../types/FindPetsByStatus'
+import { client } from '../.kubb/client'
+import { findPetsByStatusResponseSchema, findPetsByStatusErrorSchema } from '../zod/findPetsByStatusSchema'
 
 /**
  * @description Multiple status values can be provided with comma separated strings

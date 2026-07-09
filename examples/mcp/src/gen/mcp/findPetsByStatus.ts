@@ -1,7 +1,7 @@
-import type { FindPetsByStatusOptions } from '../models/ts/FindPetsByStatus.js'
+import type { FindPetsByStatusOptions } from '../models/ts/FindPetsByStatus'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { findPetsByStatus } from '../clients/findPetsByStatus.js'
+import { findPetsByStatus } from '../clients/findPetsByStatus'
 
 /**
  * @description Multiple status values can be provided with comma separated strings

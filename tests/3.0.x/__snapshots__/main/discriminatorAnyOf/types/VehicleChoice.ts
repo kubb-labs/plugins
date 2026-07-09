@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { ElectricCar } from './ElectricCar.ts'
-import type { SUV } from './SUV.ts'
-import type { Sedan } from './Sedan.ts'
+import type { ElectricCar } from './ElectricCar'
+import type { SUV } from './SUV'
+import type { Sedan } from './Sedan'
 
 export type VehicleChoice = ((Sedan & {
     /**

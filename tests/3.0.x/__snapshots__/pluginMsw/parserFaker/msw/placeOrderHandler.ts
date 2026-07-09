@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { PlaceOrderResponse, PlaceOrderStatus405, PlaceOrderBody } from '../types/PlaceOrder.ts'
+import type { PlaceOrderResponse, PlaceOrderStatus405, PlaceOrderBody } from '../types/PlaceOrder'
 import type { HttpResponseResolver } from 'msw'
-import { createPlaceOrderResponse } from '../faker/createPlaceOrder.ts'
+import { createPlaceOrderResponse } from '../faker/createPlaceOrder'
 import { http } from 'msw'
 
 export function placeOrderHandlerResponse200(data: PlaceOrderResponse) {
