@@ -4,10 +4,10 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsOptions, FindPetsByTagsResponse } from './FindPetsByTags'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
+import type { FindPetsByTagsOptions, FindPetsByTagsResponse } from './FindPetsByTags.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { findPetsByTags } from './clients/findPetsByTags'
+import { findPetsByTags } from './clients/findPetsByTags.ts'
 
 export const findPetsByTagsMutationKey = () => [{ url: '/pet/findByTags' }] as const
 

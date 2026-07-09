@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UpdatePetWithFormOptions, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormStatus200 } from './UpdatePetWithForm.ts'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from 'custom-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { updatePetWithForm } from './clients/updatePetWithForm'
+import { updatePetWithForm } from './clients/updatePetWithForm.ts'
 import { queryOptions, useQuery } from 'custom-query'
 import { toValue } from 'vue'
 

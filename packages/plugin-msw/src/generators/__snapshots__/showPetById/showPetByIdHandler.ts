@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { ShowPetByIdResponse } from './ShowPetById'
+import type { ShowPetByIdResponse } from './ShowPetById.ts'
 import { http } from 'msw'
 
 export function showPetByIdHandlerResponse200(data: ShowPetByIdResponse) {

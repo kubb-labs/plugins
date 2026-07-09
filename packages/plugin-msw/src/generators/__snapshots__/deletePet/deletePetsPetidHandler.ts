@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { DeletePetsPetidResponse } from './DeletePetsPetid'
+import type { DeletePetsPetidResponse } from './DeletePetsPetid.ts'
 import { http } from 'msw'
 
 export function deletePetsPetidHandlerResponse200(data?: DeletePetsPetidResponse) {

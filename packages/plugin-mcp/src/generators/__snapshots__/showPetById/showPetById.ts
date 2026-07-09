@@ -1,7 +1,7 @@
-import type { ShowPetByIdOptions } from './ShowPetById'
+import type { ShowPetByIdOptions } from './ShowPetById.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { showPetById } from './clients/showPetById'
+import { showPetById } from './clients/showPetById.ts'
 
 /**
  * {@link /pets/:petId}

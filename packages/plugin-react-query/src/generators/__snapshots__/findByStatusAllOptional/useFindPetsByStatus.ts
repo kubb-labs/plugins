@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByStatusOptions, FindPetsByStatusStatus200 } from './FindPetsByStatus'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
+import type { FindPetsByStatusOptions, FindPetsByStatusStatus200 } from './FindPetsByStatus.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
-import { findPetsByStatus } from './clients/findPetsByStatus'
+import { findPetsByStatus } from './clients/findPetsByStatus.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusOptions, 'headers'> = {}) =>

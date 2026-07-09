@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UploadFileOptions, UploadFileStatus200 } from './UploadFile'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
+import type { UploadFileOptions, UploadFileStatus200 } from './UploadFile.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { uploadFile } from './clients/uploadFile'
+import { uploadFile } from './clients/uploadFile.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const

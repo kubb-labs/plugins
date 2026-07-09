@@ -4,10 +4,10 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { DeletePetOptions, DeletePetResponse } from './DeletePet'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
+import type { DeletePetOptions, DeletePetResponse } from './DeletePet.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { deletePet } from './clients/deletePet'
+import { deletePet } from './clients/deletePet.ts'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 

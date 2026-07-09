@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { ListPetsResponse, ListPetsStatus400 } from './ListPets'
-import { createListPetsResponse } from './createListPets'
+import type { ListPetsResponse, ListPetsStatus400 } from './ListPets.ts'
+import { createListPetsResponse } from './createListPets.ts'
 import { http } from 'msw'
 
 export function listPetsHandlerResponse200(data: ListPetsResponse) {

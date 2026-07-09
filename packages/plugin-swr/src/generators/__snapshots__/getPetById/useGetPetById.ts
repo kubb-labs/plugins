@@ -4,10 +4,10 @@
  */
 
 import useSWR from 'swr'
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { GetPetByIdOptions, GetPetByIdResponse, GetPetByIdStatus400 } from './GetPetById'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
+import type { GetPetByIdOptions, GetPetByIdResponse, GetPetByIdStatus400 } from './GetPetById.ts'
 import type { SWRConfiguration } from 'swr'
-import { getPetById } from './clients/getPetById'
+import { getPetById } from './clients/getPetById.ts'
 
 export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 

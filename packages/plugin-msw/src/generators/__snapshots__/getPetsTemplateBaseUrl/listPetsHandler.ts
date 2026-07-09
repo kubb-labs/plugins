@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { ListPetsResponse, ListPetsStatus400 } from './ListPets'
+import type { ListPetsResponse, ListPetsStatus400 } from './ListPets.ts'
 import { http } from 'msw'
 
 export function listPetsHandlerResponse200(data: ListPetsResponse) {

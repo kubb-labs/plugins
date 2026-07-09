@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { CreatePetsResponse, CreatePetsBody } from './CreatePets'
+import type { CreatePetsResponse, CreatePetsBody } from './CreatePets.ts'
 import type { HttpResponseResolver } from 'msw'
-import { createCreatePetsResponse } from './createCreatePets'
+import { createCreatePetsResponse } from './createCreatePets.ts'
 import { http } from 'msw'
 
 export function createPetsHandlerResponse201(data?: CreatePetsResponse) {

@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import { showPetByIdHandler } from './showPetById'
-import { showPetByIdPathPetIdSchema, showPetByIdStatus200Schema } from './showPetByIdSchema'
+import { showPetByIdHandler } from './showPetById.ts'
+import { showPetByIdPathPetIdSchema, showPetByIdStatus200Schema } from './showPetByIdSchema.ts'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
 import { z } from 'zod'

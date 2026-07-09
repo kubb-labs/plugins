@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { UpdatePetOptions, UpdatePetResponse } from './UpdatePet'
+import type { UpdatePetOptions, UpdatePetResponse } from './UpdatePet.ts'
 
 export function updatePet({ path, body }: UpdatePetOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<UpdatePetResponse> {
   return cy

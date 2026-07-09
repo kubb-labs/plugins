@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { GetBestSellersOptions, GetBestSellersResponse } from './GetBestSellers'
+import type { GetBestSellersOptions, GetBestSellersResponse } from './GetBestSellers.ts'
 
 export function getBestSellers(
   { query }: GetBestSellersOptions = {},

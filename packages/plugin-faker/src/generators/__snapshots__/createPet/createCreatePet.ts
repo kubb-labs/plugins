@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { CreatePetBody, CreatePetResponse, CreatePetStatus201 } from './types/CreatePet'
+import type { CreatePetBody, CreatePetResponse, CreatePetStatus201 } from './types/CreatePet.ts'
 import { faker } from '@faker-js/faker'
 
 /**

@@ -4,7 +4,7 @@
  */
 
 import dayjs from 'dayjs'
-import type { Pet } from './types/Pet'
+import type { Pet } from './types/Pet.ts'
 import { faker } from '@faker-js/faker'
 
 export function createPet<TData extends Partial<Pet> = object>(data?: TData) {

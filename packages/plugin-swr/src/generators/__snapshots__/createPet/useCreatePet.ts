@@ -4,10 +4,10 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { CreatePetOptions, CreatePetResponse } from './CreatePet'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
+import type { CreatePetOptions, CreatePetResponse } from './CreatePet.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { createPet } from './clients/createPet'
+import { createPet } from './clients/createPet.ts'
 
 export const createPetMutationKey = () => [{ url: '/pet' }] as const
 

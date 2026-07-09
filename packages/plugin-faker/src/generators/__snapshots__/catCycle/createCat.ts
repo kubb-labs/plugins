@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Cat } from './types/Cat'
+import type { Cat } from './types/Cat.ts'
 import { faker } from '@faker-js/faker'
 
 export function createCat<TData extends Partial<Cat> = object>(data?: TData) {

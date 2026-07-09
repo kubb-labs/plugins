@@ -8,6 +8,8 @@ import { buildPropertyJSDocComments, isInlineConstEnum } from '../utils.ts'
 
 const { isNonNullable } = factory
 
+const parser = parserTs()
+
 /**
  * Partial map of node-type overrides for the TypeScript printer.
  *
@@ -293,7 +295,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
           (meta.nullish || meta.optional) && addsUndefined
             ? factory.createUnionDeclaration({ nodes: [withNullable, factory.keywordTypeNodes.undefined] })
             : withNullable
-        return parserTs.print(result)
+        return parser.print(result)
       }
 
       // When keysToOmit is present, wrap with Omit first, then apply nullable/optional
@@ -321,7 +323,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         }),
       })
 
-      return parserTs.print(typeNode)
+      return parser.print(typeNode)
     },
   }
 })

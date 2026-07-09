@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { DeletePetOptions, DeletePetResponse } from './DeletePet'
+import type { DeletePetOptions, DeletePetResponse } from './DeletePet.ts'
 
 export function deletePet({ path }: DeletePetOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeletePetResponse> {
   return cy
