@@ -13,7 +13,7 @@ import { cypressGenerator } from './cypressGenerator.tsx'
 
 const testConfig: Config = {
   root: '.',
-  input: '',
+  input: {},
   output: { path: 'test' },
   plugins: [],
   parsers: [],

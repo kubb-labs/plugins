@@ -14,7 +14,7 @@ import { mutationGenerator } from './mutationGenerator.tsx'
 
 const testConfig: Config = {
   root: '.',
-  input: '',
+  input: {},
   output: { path: 'test' },
   plugins: [],
   parsers: [],

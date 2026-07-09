@@ -13,7 +13,7 @@ import { suspenseInfiniteQueryGenerator } from './suspenseInfiniteQueryGenerator
 
 const testConfig: Config = {
   root: '.',
-  input: '',
+  input: {},
   output: { path: 'test' },
   plugins: [],
   parsers: [],

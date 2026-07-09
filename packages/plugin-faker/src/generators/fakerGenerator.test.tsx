@@ -125,7 +125,7 @@ const dogSchema = ast.factory.createSchema({
 
 const testConfig: Config = {
   root: '.',
-  input: '',
+  input: {},
   output: { path: 'test' },
   plugins: [],
   parsers: [],

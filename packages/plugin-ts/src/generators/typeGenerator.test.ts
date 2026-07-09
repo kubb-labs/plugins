@@ -12,7 +12,7 @@ import { typeGenerator } from './typeGenerator.tsx'
 
 const testConfig: Config = {
   root: '.',
-  input: '',
+  input: {},
   output: { path: 'test' },
   plugins: [],
   parsers: [],
