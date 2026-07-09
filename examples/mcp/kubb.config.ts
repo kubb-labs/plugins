@@ -9,9 +9,7 @@ import { defineConfig } from 'kubb/config'
 export default defineConfig(() => {
   return {
     root: '.',
-    input: {
-      path: './petStore.yaml',
-    },
+    input: './petStore.yaml',
     adapter: adapterOas({ unknownType: 'unknown', validate: false, integerType: 'number', enums: 'root' }),
     hooks: {
       done: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],

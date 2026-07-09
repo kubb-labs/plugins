@@ -3,7 +3,7 @@ import { pluginCypress } from '@kubb/plugin-cypress'
 import { pluginTs } from '@kubb/plugin-ts'
 import { defineConfig } from 'kubb/config'
 
-const input = { path: './petStore.yaml' }
+const input = './petStore.yaml'
 export default defineConfig([
   {
     root: '.',

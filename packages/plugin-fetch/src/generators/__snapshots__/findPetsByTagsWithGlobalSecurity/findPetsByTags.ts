@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options, RequestResult } from './.kubb/client'
-import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from './FindPetsByTags'
-import { client } from './.kubb/client'
+import type { Options, RequestResult } from './.kubb/client.ts'
+import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from './FindPetsByTags.ts'
+import { client } from './.kubb/client.ts'
 
 /**
  * {@link /pet/findByTags}

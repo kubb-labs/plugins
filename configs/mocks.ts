@@ -28,7 +28,7 @@ export async function format(source?: string): Promise<string> {
 
 export const mockedPluginDriver = createMockedPluginDriver()
 
-const parsers = new Map<`.${string}`, any>([['.ts', parserTs]])
+const parsers = new Map<`.${string}`, any>([['.ts', parserTs()]])
 
 /**
  * Renders the driver's `.ts` files to their raw, unformatted source. Snapshots run through
@@ -36,7 +36,7 @@ const parsers = new Map<`.${string}`, any>([['.ts', parserTs]])
  * own output means inspecting this raw text instead.
  */
 export function rawSources(files: Array<ast.FileNode> | undefined): Array<string> {
-  return (files ?? []).filter((file) => file.baseName.endsWith('.ts')).map((file) => parserTs.parse(file))
+  return (files ?? []).filter((file) => file.baseName.endsWith('.ts')).map((file) => parserTs().parse(file))
 }
 
 /**
