@@ -4,8 +4,8 @@
  */
 
 import { z } from '../../zod.ts'
-import { categorySchema } from './categorySchema.ts'
-import { tagSchema } from './tagSchema.ts'
+import { categorySchema } from './categorySchema'
+import { tagSchema } from './tagSchema'
 
 export const petSchema = z.object({
   id: z

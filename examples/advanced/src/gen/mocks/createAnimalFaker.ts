@@ -1,7 +1,7 @@
-import type { Animal } from '../models/ts/Animal.ts'
-import { createAnimalTypeEnumFaker } from './createAnimalTypeEnumFaker.ts'
-import { createCatFaker } from './createCatFaker.ts'
-import { createDogFaker } from './createDogFaker.ts'
+import type { Animal } from '../models/ts/Animal'
+import { createAnimalTypeEnumFaker } from './createAnimalTypeEnumFaker'
+import { createCatFaker } from './createCatFaker'
+import { createDogFaker } from './createDogFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createAnimalFaker<TData extends Partial<Animal> = object>(data?: TData) {

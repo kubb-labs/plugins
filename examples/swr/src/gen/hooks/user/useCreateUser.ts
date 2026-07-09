@@ -4,10 +4,10 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { CreateUserOptions, CreateUserResponse } from '../../models/user/CreateUser.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { CreateUserOptions, CreateUserResponse } from '../../models/user/CreateUser'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { createUser } from '../../clients/user/createUser.ts'
+import { createUser } from '../../clients/user/createUser'
 
 export const createUserMutationKey = () => [{ url: '/user' }] as const
 

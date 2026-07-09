@@ -1,5 +1,5 @@
 import * as z from 'zod'
-import { imageSchema } from './imageSchema.ts'
+import { imageSchema } from './imageSchema'
 
 export const dogSchema = z
   .object({

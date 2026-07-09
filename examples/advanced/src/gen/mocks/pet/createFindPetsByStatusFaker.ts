@@ -5,8 +5,8 @@ import type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-} from '../../models/ts/pet/FindPetsByStatus.ts'
-import { createPetFaker } from '../createPetFaker.ts'
+} from '../../models/ts/pet/FindPetsByStatus'
+import { createPetFaker } from '../createPetFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createFindPetsByStatusPathFaker<TData extends Partial<FindPetsByStatusPath> = object>(data?: TData) {

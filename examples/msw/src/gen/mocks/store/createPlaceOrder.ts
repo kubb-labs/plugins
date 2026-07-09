@@ -11,8 +11,8 @@ import type {
   PlaceOrderResponse,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-} from '../../models/PlaceOrder.ts'
-import { createOrder } from '../createOrder.ts'
+} from '../../models/PlaceOrder'
+import { createOrder } from '../createOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { GetInventoryResponse, GetInventoryStatus200 } from '../models/GetInventory.ts'
+import type { GetInventoryResponse, GetInventoryStatus200 } from '../models/GetInventory'
 
 /**
  * @description successful operation

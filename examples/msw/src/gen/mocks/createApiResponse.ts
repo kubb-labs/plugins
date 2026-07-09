@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { ApiResponse } from '../models/ApiResponse.ts'
+import type { ApiResponse } from '../models/ApiResponse'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createApiResponse<TData extends Partial<ApiResponse> = object>(data?: TData) {

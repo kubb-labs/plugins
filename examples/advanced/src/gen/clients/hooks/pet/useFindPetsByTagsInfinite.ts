@@ -1,8 +1,8 @@
 import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '../../../../tanstack-query-hook'
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
-import type { FindPetsByTagsOptions, FindPetsByTagsQuery, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../../models/ts/pet/FindPetsByTags.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { FindPetsByTagsOptions, FindPetsByTagsQuery, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../../models/ts/pet/FindPetsByTags'
 import { infiniteQueryOptions, useInfiniteQuery } from '../../../../tanstack-query-hook'
-import { findPetsByTags } from '../../axios/petService/findPetsByTags.ts'
+import { findPetsByTags } from '../../axios/petService/findPetsByTags'
 
 export const findPetsByTagsInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'> = {}) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const

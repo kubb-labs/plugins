@@ -1,6 +1,6 @@
-import type { CreatePetsBoolParamKey } from '../CreatePetsBoolParam.ts'
-import type { CreatePetsXEXAMPLEKey } from '../CreatePetsXEXAMPLE.ts'
-import type { PetNotFound } from '../PetNotFound.ts'
+import type { CreatePetsBoolParamKey } from '../CreatePetsBoolParam'
+import type { CreatePetsXEXAMPLEKey } from '../CreatePetsXEXAMPLE'
+import type { PetNotFound } from '../PetNotFound'
 
 /**
  * @type object

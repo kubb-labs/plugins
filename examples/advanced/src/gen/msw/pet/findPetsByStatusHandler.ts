@@ -1,4 +1,4 @@
-import type { FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../../models/ts/pet/FindPetsByStatus.ts'
+import type { FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../../models/ts/pet/FindPetsByStatus'
 import { http } from 'msw'
 
 export function findPetsByStatusHandlerResponse200(data: FindPetsByStatusResponse) {

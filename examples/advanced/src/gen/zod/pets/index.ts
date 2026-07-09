@@ -8,7 +8,7 @@ export type {
   CreatePetsResponseSchemaType,
   CreatePetsStatus201SchemaType,
   CreatePetsStatusDefaultSchemaType,
-} from './createPetsSchema.ts'
+} from './createPetsSchema'
 export {
   createPetsBodySchema,
   createPetsErrorSchema,
@@ -19,4 +19,4 @@ export {
   createPetsResponseSchema,
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
-} from './createPetsSchema.ts'
+} from './createPetsSchema'

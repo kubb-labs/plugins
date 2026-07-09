@@ -4,10 +4,10 @@
  */
 
 import useSWR from 'swr'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetOrderByIdOptions, GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { GetOrderByIdOptions, GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById'
 import type { SWRConfiguration } from 'swr'
-import { getOrderById } from '../../clients/store/getOrderById.ts'
+import { getOrderById } from '../../clients/store/getOrderById'
 
 export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdOptions, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
 

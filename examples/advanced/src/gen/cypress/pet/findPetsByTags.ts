@@ -1,4 +1,4 @@
-import type { FindPetsByTagsOptions, FindPetsByTagsResponse } from '../../models/ts/pet/FindPetsByTags.ts'
+import type { FindPetsByTagsOptions, FindPetsByTagsResponse } from '../../models/ts/pet/FindPetsByTags'
 
 export function findPetsByTags(
   { query, headers }: FindPetsByTagsOptions,

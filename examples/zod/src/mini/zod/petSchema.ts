@@ -4,8 +4,8 @@
  */
 
 import * as z from 'zod/mini'
-import { categorySchema } from './categorySchema.ts'
-import { tagSchema } from './tagSchema.ts'
+import { categorySchema } from './categorySchema'
+import { tagSchema } from './tagSchema'
 
 export const petSchema = z.object({
   id: z.optional(z.bigint()),

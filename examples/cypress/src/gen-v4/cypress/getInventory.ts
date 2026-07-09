@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { GetInventoryResponse } from '../models.ts'
+import type { GetInventoryResponse } from '../models'
 
 export function getInventory(options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetInventoryResponse> {
   return cy

@@ -1,5 +1,5 @@
 import * as z from 'zod'
-import { petSchema } from '../petSchema.ts'
+import { petSchema } from '../petSchema'
 
 export const findPetsByStatusPathStepIdSchema = z.string()
 

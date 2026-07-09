@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Customer } from './Customer.ts'
+import type { Customer } from './Customer'
 
 export type UnhappyCustomer = Customer & {
   /**

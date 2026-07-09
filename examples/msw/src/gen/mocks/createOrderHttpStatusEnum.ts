@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { OrderHttpStatusEnumKey } from '../models/OrderHttpStatusEnum.ts'
+import type { OrderHttpStatusEnumKey } from '../models/OrderHttpStatusEnum'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

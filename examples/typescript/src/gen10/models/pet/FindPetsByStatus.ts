@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { FindPetsByStatusStatus } from '../FindPetsByStatusStatus.ts'
-import type { Pet } from '../Pet.ts'
+import type { FindPetsByStatusStatus } from '../FindPetsByStatusStatus'
+import type { Pet } from '../Pet'
 
 /**
  * @type object

@@ -1,7 +1,7 @@
 import * as z from 'zod'
-import { createPetsBoolParamSchema } from '../createPetsBoolParamSchema.ts'
-import { createPetsXEXAMPLESchema } from '../createPetsXEXAMPLESchema.ts'
-import { petNotFoundSchema } from '../petNotFoundSchema.ts'
+import { createPetsBoolParamSchema } from '../createPetsBoolParamSchema'
+import { createPetsXEXAMPLESchema } from '../createPetsXEXAMPLESchema'
+import { petNotFoundSchema } from '../petNotFoundSchema'
 
 export const createPetsQueryBoolParamSchema = createPetsBoolParamSchema.optional()
 

@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetUserByNameOptions, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName.ts'
-import { getUserByName } from '../../clients/user/getUserByName.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { GetUserByNameOptions, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName'
+import { getUserByName } from '../../clients/user/getUserByName'
 import { queryOptions } from '@tanstack/react-query'
 
 export const getUserByNameQueryKey = ({ path }: Omit<GetUserByNameOptions, 'headers'>) => [{ url: '/user/:username', params: path }] as const

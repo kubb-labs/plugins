@@ -4,10 +4,10 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { DeleteOrderOptions, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/store/DeleteOrder.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { DeleteOrderOptions, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/store/DeleteOrder'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { deleteOrder } from '../../clients/store/deleteOrder.ts'
+import { deleteOrder } from '../../clients/store/deleteOrder'
 
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
 

@@ -1,5 +1,5 @@
-import type { Pet } from './Pet.ts'
-import type { PetEventTypeEnumKey } from './PetEventTypeEnum.ts'
+import type { Pet } from './Pet'
+import type { PetEventTypeEnumKey } from './PetEventTypeEnum'
 
 /**
  * @type object
