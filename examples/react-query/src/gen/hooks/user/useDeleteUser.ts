@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { DeleteUserOptions, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/user/DeleteUser.ts'
-import { deleteUser } from '../../clients/user/deleteUser.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { DeleteUserOptions, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/user/DeleteUser'
+import { deleteUser } from '../../clients/user/deleteUser'
 import { mutationOptions } from '@tanstack/react-query'
 
 export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const

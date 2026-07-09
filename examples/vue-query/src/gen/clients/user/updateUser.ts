@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { UpdateUserOptions, UpdateUserResponses } from '../../models/user/UpdateUser.ts'
-import { client } from '../../.kubb/client.ts'
+import type { Options, RequestResult } from '../../.kubb/client'
+import type { UpdateUserOptions, UpdateUserResponses } from '../../models/user/UpdateUser'
+import { client } from '../../.kubb/client'
 
 /**
  * @description This can only be done by the logged in user.

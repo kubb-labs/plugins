@@ -4,10 +4,10 @@
  */
 
 import useSWR from 'swr'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { FindPetsByTagsOptions, FindPetsByTagsResponse, FindPetsByTagsStatus400 } from '../../models/pet/FindPetsByTags.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { FindPetsByTagsOptions, FindPetsByTagsResponse, FindPetsByTagsStatus400 } from '../../models/pet/FindPetsByTags'
 import type { SWRConfiguration } from 'swr'
-import { findPetsByTags } from '../../clients/pet/findPetsByTags.ts'
+import { findPetsByTags } from '../../clients/pet/findPetsByTags'
 
 export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'> = {}) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const

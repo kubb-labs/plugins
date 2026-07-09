@@ -1,7 +1,7 @@
-import type { Options, RequestResult } from '../../../.kubb/client.ts'
-import type { CreatePetsOptions, CreatePetsResponses } from '../../../models/ts/pets/CreatePets.ts'
-import { client } from '../../../.kubb/client.ts'
-import { createPetsResponseSchema, createPetsErrorSchema } from '../../../zod/pets/createPetsSchema.ts'
+import type { Options, RequestResult } from '../../../.kubb/client'
+import type { CreatePetsOptions, CreatePetsResponses } from '../../../models/ts/pets/CreatePets'
+import { client } from '../../../.kubb/client'
+import { createPetsResponseSchema, createPetsErrorSchema } from '../../../zod/pets/createPetsSchema'
 
 /**
  * @summary Create a pet

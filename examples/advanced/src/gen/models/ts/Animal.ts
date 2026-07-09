@@ -1,6 +1,6 @@
-import type { AnimalTypeEnumKey } from './AnimalTypeEnum.ts'
-import type { Cat } from './Cat.ts'
-import type { Dog } from './Dog.ts'
+import type { AnimalTypeEnumKey } from './AnimalTypeEnum'
+import type { Cat } from './Cat'
+import type { Dog } from './Dog'
 
 export type Animal = (
   | (Cat & {

@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Pet } from '../models/Pet.ts'
-import { createCategory } from './createCategory.ts'
-import { createTag } from './createTag.ts'
+import type { Pet } from '../models/Pet'
+import { createCategory } from './createCategory'
+import { createTag } from './createTag'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createPet<TData extends Partial<Pet> = object>(data?: TData) {

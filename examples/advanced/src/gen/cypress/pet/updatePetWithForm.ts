@@ -1,4 +1,4 @@
-import type { UpdatePetWithFormOptions, UpdatePetWithFormResponse } from '../../models/ts/pet/UpdatePetWithForm.ts'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormResponse } from '../../models/ts/pet/UpdatePetWithForm'
 
 export function updatePetWithForm(
   { path, query }: UpdatePetWithFormOptions,

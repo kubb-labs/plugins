@@ -1,4 +1,4 @@
-import type { UploadFileOptions, UploadFileResponse } from '../../models/ts/pet/UploadFile.ts'
+import type { UploadFileOptions, UploadFileResponse } from '../../models/ts/pet/UploadFile'
 
 export function uploadFile({ path, query, body }: UploadFileOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<UploadFileResponse> {
   return cy

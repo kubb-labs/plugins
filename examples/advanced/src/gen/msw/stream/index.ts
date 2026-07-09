@@ -1,1 +1,1 @@
-export { streamPetEventsHandler, streamPetEventsHandlerResponse200 } from './streamPetEventsHandler.ts'
+export { streamPetEventsHandler, streamPetEventsHandlerResponse200 } from './streamPetEventsHandler'

@@ -1,4 +1,4 @@
-import type { PlaceOrderOptions, PlaceOrderResponse } from '../../models/ts/store/PlaceOrder.ts'
+import type { PlaceOrderOptions, PlaceOrderResponse } from '../../models/ts/store/PlaceOrder'
 
 export function placeOrder({ body }: PlaceOrderOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderResponse> {
   return cy

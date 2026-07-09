@@ -1,7 +1,7 @@
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
-import type { CreatePetsOptions, CreatePetsStatus201 } from '../../../models/ts/pets/CreatePets.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { CreatePetsOptions, CreatePetsStatus201 } from '../../../models/ts/pets/CreatePets'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { createPets } from '../../axios/petsService/createPets.ts'
+import { createPets } from '../../axios/petsService/createPets'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const createPetsMutationKey = () => [{ url: '/pets/:uuid' }] as const

@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponses } from '../../models/user/CreateUsersWithListInput.ts'
-import { client } from '../../.kubb/client.ts'
+import type { Options, RequestResult } from '../../.kubb/client'
+import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponses } from '../../models/user/CreateUsersWithListInput'
+import { client } from '../../.kubb/client'
 
 /**
  * @description Creates list of users with given input array

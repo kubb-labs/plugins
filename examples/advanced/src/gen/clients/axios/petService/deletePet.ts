@@ -1,7 +1,7 @@
-import type { Options, RequestResult } from '../../../.kubb/client.ts'
-import type { DeletePetOptions, DeletePetResponses } from '../../../models/ts/pet/DeletePet.ts'
-import { client } from '../../../.kubb/client.ts'
-import { deletePetResponseSchema, deletePetErrorSchema } from '../../../zod/pet/deletePetSchema.ts'
+import type { Options, RequestResult } from '../../../.kubb/client'
+import type { DeletePetOptions, DeletePetResponses } from '../../../models/ts/pet/DeletePet'
+import { client } from '../../../.kubb/client'
+import { deletePetResponseSchema, deletePetErrorSchema } from '../../../zod/pet/deletePetSchema'
 
 /**
  * @description delete a pet

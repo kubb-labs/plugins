@@ -1,7 +1,7 @@
-import type { GetPetByIdOptions } from '../../models/ts/pet/GetPetById.ts'
+import type { GetPetByIdOptions } from '../../models/ts/pet/GetPetById'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { getPetById } from '../../clients/axios/petService/getPetById.ts'
+import { getPetById } from '../../clients/axios/petService/getPetById'
 
 /**
  * @description Returns a single pet

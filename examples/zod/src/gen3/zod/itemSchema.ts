@@ -4,8 +4,8 @@
  */
 
 import * as z from 'zod'
-import { itemTypeASchema } from './itemTypeASchema.ts'
-import { itemTypeBSchema } from './itemTypeBSchema.ts'
+import { itemTypeASchema } from './itemTypeASchema'
+import { itemTypeBSchema } from './itemTypeBSchema'
 
 export const itemSchema = z
   .discriminatedUnion('type', [

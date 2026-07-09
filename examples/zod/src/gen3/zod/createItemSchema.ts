@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { itemSchema } from './itemSchema.ts'
+import { itemSchema } from './itemSchema'
 
 export const createItemStatus200Schema = itemSchema
 

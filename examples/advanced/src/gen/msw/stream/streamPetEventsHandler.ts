@@ -1,4 +1,4 @@
-import type { StreamPetEventsResponse } from '../../models/ts/stream/StreamPetEvents.ts'
+import type { StreamPetEventsResponse } from '../../models/ts/stream/StreamPetEvents'
 import { http } from 'msw'
 
 export function streamPetEventsHandlerResponse200(data: StreamPetEventsResponse) {

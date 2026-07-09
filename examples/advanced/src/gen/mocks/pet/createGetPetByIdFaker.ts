@@ -6,8 +6,8 @@ import type {
   GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
-} from '../../models/ts/pet/GetPetById.ts'
-import { createPetFaker } from '../createPetFaker.ts'
+} from '../../models/ts/pet/GetPetById'
+import { createPetFaker } from '../createPetFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createGetPetByIdPathFaker<TData extends Partial<GetPetByIdPath> = object>(data?: TData) {

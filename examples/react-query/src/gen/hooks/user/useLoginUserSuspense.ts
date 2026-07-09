@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { LoginUserOptions, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser.ts'
-import { loginUser } from '../../clients/user/loginUser.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { LoginUserOptions, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser'
+import { loginUser } from '../../clients/user/loginUser'
 import { queryOptions } from '@tanstack/react-query'
 
 export const loginUserSuspenseQueryKey = ({ query }: Omit<LoginUserOptions, 'headers'> = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const

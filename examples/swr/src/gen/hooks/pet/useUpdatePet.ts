@@ -4,10 +4,10 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { UpdatePetOptions, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/pet/UpdatePet.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { UpdatePetOptions, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/pet/UpdatePet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { updatePet } from '../../clients/pet/updatePet.ts'
+import { updatePet } from '../../clients/pet/updatePet'
 
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 

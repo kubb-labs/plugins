@@ -4,4 +4,4 @@ export type {
   StreamPetEventsResponse,
   StreamPetEventsResponses,
   StreamPetEventsStatus200,
-} from './StreamPetEvents.ts'
+} from './StreamPetEvents'

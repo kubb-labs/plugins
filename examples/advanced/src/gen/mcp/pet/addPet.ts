@@ -1,7 +1,7 @@
-import type { AddPetOptions } from '../../models/ts/pet/AddPet.ts'
+import type { AddPetOptions } from '../../models/ts/pet/AddPet'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { addPet } from '../../clients/axios/petService/addPet.ts'
+import { addPet } from '../../clients/axios/petService/addPet'
 
 /**
  * @description Add a new pet to the store

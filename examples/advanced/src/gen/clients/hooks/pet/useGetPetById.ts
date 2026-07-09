@@ -1,8 +1,8 @@
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
-import type { GetPetByIdOptions, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/pet/GetPetById.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { GetPetByIdOptions, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/pet/GetPetById'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
-import { getPetById } from '../../axios/petService/getPetById.ts'
+import { getPetById } from '../../axios/petService/getPetById'
 
 export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>) => [{ url: '/pet/:petId:search', params: path }] as const
 

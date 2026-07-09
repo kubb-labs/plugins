@@ -4,10 +4,10 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponse } from '../../models/user/CreateUsersWithListInput.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponse } from '../../models/user/CreateUsersWithListInput'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { createUsersWithListInput } from '../../clients/user/createUsersWithListInput.ts'
+import { createUsersWithListInput } from '../../clients/user/createUsersWithListInput'
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
 

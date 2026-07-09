@@ -1,6 +1,6 @@
-import type { Options, EventStreamResult, SuccessOf } from '../../../.kubb/client.ts'
-import type { StreamPetEventsOptions, StreamPetEventsResponses } from '../../../models/ts/stream/StreamPetEvents.ts'
-import { client, toEventStream } from '../../../.kubb/client.ts'
+import type { Options, EventStreamResult, SuccessOf } from '../../../.kubb/client'
+import type { StreamPetEventsOptions, StreamPetEventsResponses } from '../../../models/ts/stream/StreamPetEvents'
+import { client, toEventStream } from '../../../.kubb/client'
 
 /**
  * @description Server-Sent Events stream of changes for a single pet

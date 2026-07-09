@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { AddPetRequestStatusEnumKey } from '../models/AddPetRequestStatusEnum.ts'
+import type { AddPetRequestStatusEnumKey } from '../models/AddPetRequestStatusEnum'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

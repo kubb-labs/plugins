@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { DeleteOrderOptions, DeleteOrderResponses } from '../../models/store/DeleteOrder.ts'
-import { client } from '../../.kubb/client.ts'
+import type { Options, RequestResult } from '../../.kubb/client'
+import type { DeleteOrderOptions, DeleteOrderResponses } from '../../models/store/DeleteOrder'
+import { client } from '../../.kubb/client'
 
 /**
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors

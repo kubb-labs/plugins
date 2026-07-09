@@ -6,10 +6,10 @@ import type {
   CreatePetsResponse,
   CreatePetsStatus201,
   CreatePetsStatusDefault,
-} from '../../models/ts/pets/CreatePets.ts'
-import { createCreatePetsBoolParamFaker } from '../createCreatePetsBoolParamFaker.ts'
-import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLEFaker.ts'
-import { createPetNotFoundFaker } from '../createPetNotFoundFaker.ts'
+} from '../../models/ts/pets/CreatePets'
+import { createCreatePetsBoolParamFaker } from '../createCreatePetsBoolParamFaker'
+import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLEFaker'
+import { createPetNotFoundFaker } from '../createPetNotFoundFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createCreatePetsPathFaker<TData extends Partial<CreatePetsPath> = object>(data?: TData) {

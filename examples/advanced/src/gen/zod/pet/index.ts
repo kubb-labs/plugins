@@ -6,7 +6,7 @@ export type {
   AddFilesResponseSchemaType,
   AddFilesStatus200SchemaType,
   AddFilesStatus405SchemaType,
-} from './addFilesSchema.ts'
+} from './addFilesSchema'
 export type {
   AddPetBodySchemaFormUrlEncodedType,
   AddPetBodySchemaJsonType,
@@ -18,14 +18,14 @@ export type {
   AddPetStatusDefaultSchemaJsonType,
   AddPetStatusDefaultSchemaType,
   AddPetStatusDefaultSchemaXmlType,
-} from './addPetSchema.ts'
+} from './addPetSchema'
 export type {
   DeletePetErrorSchemaType,
   DeletePetHeaderApiKeySchemaType,
   DeletePetPathPetIdSchemaType,
   DeletePetResponseSchemaType,
   DeletePetStatus400SchemaType,
-} from './deletePetSchema.ts'
+} from './deletePetSchema'
 export type {
   FindPetsByStatusErrorSchemaType,
   FindPetsByStatusPathStepIdSchemaType,
@@ -34,7 +34,7 @@ export type {
   FindPetsByStatusStatus200SchemaType,
   FindPetsByStatusStatus200SchemaXmlType,
   FindPetsByStatusStatus400SchemaType,
-} from './findPetsByStatusSchema.ts'
+} from './findPetsByStatusSchema'
 export type {
   FindPetsByTagsErrorSchemaType,
   FindPetsByTagsHeaderXEXAMPLESchemaType,
@@ -46,7 +46,7 @@ export type {
   FindPetsByTagsStatus200SchemaType,
   FindPetsByTagsStatus200SchemaXmlType,
   FindPetsByTagsStatus400SchemaType,
-} from './findPetsByTagsSchema.ts'
+} from './findPetsByTagsSchema'
 export type {
   GetPetByIdErrorSchemaType,
   GetPetByIdPathPetIdSchemaType,
@@ -56,7 +56,7 @@ export type {
   GetPetByIdStatus200SchemaXmlType,
   GetPetByIdStatus400SchemaType,
   GetPetByIdStatus404SchemaType,
-} from './getPetByIdSchema.ts'
+} from './getPetByIdSchema'
 export type {
   UpdatePetBodySchemaFormUrlEncodedType,
   UpdatePetBodySchemaJsonType,
@@ -71,7 +71,7 @@ export type {
   UpdatePetStatus400SchemaType,
   UpdatePetStatus404SchemaType,
   UpdatePetStatus405SchemaType,
-} from './updatePetSchema.ts'
+} from './updatePetSchema'
 export type {
   UpdatePetWithFormErrorSchemaType,
   UpdatePetWithFormPathPetIdSchemaType,
@@ -79,14 +79,14 @@ export type {
   UpdatePetWithFormQueryStatusSchemaType,
   UpdatePetWithFormResponseSchemaType,
   UpdatePetWithFormStatus405SchemaType,
-} from './updatePetWithFormSchema.ts'
+} from './updatePetWithFormSchema'
 export type {
   UploadFileBodySchemaType,
   UploadFilePathPetIdSchemaType,
   UploadFileQueryAdditionalMetadataSchemaType,
   UploadFileResponseSchemaType,
   UploadFileStatus200SchemaType,
-} from './uploadFileSchema.ts'
+} from './uploadFileSchema'
 export {
   addFilesBodySchema,
   addFilesBodySchemaFormData,
@@ -95,7 +95,7 @@ export {
   addFilesResponseSchema,
   addFilesStatus200Schema,
   addFilesStatus405Schema,
-} from './addFilesSchema.ts'
+} from './addFilesSchema'
 export {
   addPetBodySchema,
   addPetBodySchemaFormUrlEncoded,
@@ -107,14 +107,14 @@ export {
   addPetStatusDefaultSchema,
   addPetStatusDefaultSchemaJson,
   addPetStatusDefaultSchemaXml,
-} from './addPetSchema.ts'
+} from './addPetSchema'
 export {
   deletePetErrorSchema,
   deletePetHeaderApiKeySchema,
   deletePetPathPetIdSchema,
   deletePetResponseSchema,
   deletePetStatus400Schema,
-} from './deletePetSchema.ts'
+} from './deletePetSchema'
 export {
   findPetsByStatusErrorSchema,
   findPetsByStatusPathStepIdSchema,
@@ -123,7 +123,7 @@ export {
   findPetsByStatusStatus200SchemaJson,
   findPetsByStatusStatus200SchemaXml,
   findPetsByStatusStatus400Schema,
-} from './findPetsByStatusSchema.ts'
+} from './findPetsByStatusSchema'
 export {
   findPetsByTagsErrorSchema,
   findPetsByTagsHeaderXEXAMPLESchema,
@@ -135,7 +135,7 @@ export {
   findPetsByTagsStatus200SchemaJson,
   findPetsByTagsStatus200SchemaXml,
   findPetsByTagsStatus400Schema,
-} from './findPetsByTagsSchema.ts'
+} from './findPetsByTagsSchema'
 export {
   getPetByIdErrorSchema,
   getPetByIdPathPetIdSchema,
@@ -145,7 +145,7 @@ export {
   getPetByIdStatus200SchemaXml,
   getPetByIdStatus400Schema,
   getPetByIdStatus404Schema,
-} from './getPetByIdSchema.ts'
+} from './getPetByIdSchema'
 export {
   updatePetBodySchema,
   updatePetBodySchemaFormUrlEncoded,
@@ -160,7 +160,7 @@ export {
   updatePetStatus400Schema,
   updatePetStatus404Schema,
   updatePetStatus405Schema,
-} from './updatePetSchema.ts'
+} from './updatePetSchema'
 export {
   updatePetWithFormErrorSchema,
   updatePetWithFormPathPetIdSchema,
@@ -168,11 +168,11 @@ export {
   updatePetWithFormQueryStatusSchema,
   updatePetWithFormResponseSchema,
   updatePetWithFormStatus405Schema,
-} from './updatePetWithFormSchema.ts'
+} from './updatePetWithFormSchema'
 export {
   uploadFileBodySchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,
   uploadFileStatus200Schema,
-} from './uploadFileSchema.ts'
+} from './uploadFileSchema'
