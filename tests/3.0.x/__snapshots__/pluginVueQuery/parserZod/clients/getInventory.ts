@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client.ts'
-import type { GetInventoryOptions, GetInventoryResponses } from '../types/GetInventory.ts'
-import { client } from '../.kubb/client.ts'
-import { getInventoryResponseSchema } from '../zod/getInventorySchema.ts'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { GetInventoryOptions, GetInventoryResponses } from '../types/GetInventory'
+import { client } from '../.kubb/client'
+import { getInventoryResponseSchema } from '../zod/getInventorySchema'
 
 /**
  * @description Returns a map of status codes to quantities

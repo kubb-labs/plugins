@@ -4,6 +4,6 @@
  */
 
 import * as z from 'zod/mini'
-import { phoneNumberSchema } from './phoneNumberSchema.ts'
+import { phoneNumberSchema } from './phoneNumberSchema'
 
 export const phoneWithMaxLengthSchema = phoneNumberSchema.check(z.maxLength(15))

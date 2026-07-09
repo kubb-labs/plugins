@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { UpdatePetBody, UpdatePetHeaders, UpdatePetPath, UpdatePetQuery, UpdatePetResponse, UpdatePetStatus200 } from '../types/UpdatePet.ts'
-import { createPet } from './createPet.ts'
-import { createPetUpdate } from './createPetUpdate.ts'
+import type { UpdatePetBody, UpdatePetHeaders, UpdatePetPath, UpdatePetQuery, UpdatePetResponse, UpdatePetStatus200 } from '../types/UpdatePet'
+import { createPet } from './createPet'
+import { createPetUpdate } from './createPetUpdate'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createUpdatePetPath<TData extends Partial<UpdatePetPath> = object>(data?: TData)

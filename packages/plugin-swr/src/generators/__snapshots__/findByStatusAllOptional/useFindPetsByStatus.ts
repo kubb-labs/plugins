@@ -5,10 +5,10 @@
  */
 
 import useSWR from 'swr'
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
-import type { FindPetsByStatusOptions, FindPetsByStatusResponse } from './FindPetsByStatus.ts'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponse } from './FindPetsByStatus'
 import type { SWRConfiguration } from 'swr'
-import { findPetsByStatus } from './clients/findPetsByStatus.ts'
+import { findPetsByStatus } from './clients/findPetsByStatus'
 
 export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusOptions, 'headers'> = {}) =>
   [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { AddPetResponse, AddPetStatus405, AddPetBody } from '../../../models/AddPet.ts'
+import type { AddPetResponse, AddPetStatus405, AddPetBody } from '../../../models/AddPet'
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 

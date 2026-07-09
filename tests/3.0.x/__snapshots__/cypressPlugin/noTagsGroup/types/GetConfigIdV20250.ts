@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Config } from './Config.ts'
+import type { Config } from './Config'
 
 /**
  * @type object

@@ -1,4 +1,4 @@
-import type { FindPetsByTagsXEXAMPLEKey } from '../models/ts/FindPetsByTagsXEXAMPLE.ts'
+import type { FindPetsByTagsXEXAMPLEKey } from '../models/ts/FindPetsByTagsXEXAMPLE'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

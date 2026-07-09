@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import { addPetHandler } from './addPetHandler.ts'
-import { deletePetHandler } from './deletePetHandler.ts'
-import { findPetsByStatusHandler } from './findPetsByStatusHandler.ts'
-import { getInventoryHandler } from './getInventoryHandler.ts'
-import { getPetByIdHandler } from './getPetByIdHandler.ts'
-import { placeOrderHandler } from './placeOrderHandler.ts'
-import { uploadFileHandler } from './uploadFileHandler.ts'
+import { addPetHandler } from './addPetHandler'
+import { deletePetHandler } from './deletePetHandler'
+import { findPetsByStatusHandler } from './findPetsByStatusHandler'
+import { getInventoryHandler } from './getInventoryHandler'
+import { getPetByIdHandler } from './getPetByIdHandler'
+import { placeOrderHandler } from './placeOrderHandler'
+import { uploadFileHandler } from './uploadFileHandler'
 
 export const handlers = [addPetHandler(),findPetsByStatusHandler(),getPetByIdHandler(),deletePetHandler(),uploadFileHandler(),getInventoryHandler(),placeOrderHandler()] as const

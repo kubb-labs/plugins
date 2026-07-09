@@ -4,7 +4,7 @@
 */
 
 import * as z from 'zod'
-import { paymentMethodMappedTypeEnumSchema } from './paymentMethodMappedTypeEnumSchema.ts'
+import { paymentMethodMappedTypeEnumSchema } from './paymentMethodMappedTypeEnumSchema'
 
 export const paymentMethodMappedSchema = z.object({
   type: paymentMethodMappedTypeEnumSchema,

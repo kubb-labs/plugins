@@ -3,12 +3,12 @@
  * Do not edit manually.
  */
 
-import type { Cat } from './Cat.ts'
-import type { Category } from './Category.ts'
-import type { Dog } from './Dog.ts'
-import type { PetStatusEnumKey } from './PetStatusEnum.ts'
-import type { PetTypeEnumKey } from './PetTypeEnum.ts'
-import type { Tag } from './Tag.ts'
+import type { Cat } from './Cat'
+import type { Category } from './Category'
+import type { Dog } from './Dog'
+import type { PetStatusEnumKey } from './PetStatusEnum'
+import type { PetTypeEnumKey } from './PetTypeEnum'
+import type { Tag } from './Tag'
 
 export type Pet = (
   | (Dog & {

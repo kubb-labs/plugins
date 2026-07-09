@@ -1,4 +1,4 @@
-import type { OrderParamsStatusEnumKey } from '../models/ts/OrderParamsStatusEnum.ts'
+import type { OrderParamsStatusEnumKey } from '../models/ts/OrderParamsStatusEnum'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

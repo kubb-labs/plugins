@@ -1,4 +1,4 @@
-import type { AddPetStatus405, AddPetBody } from '../../models/ts/pet/AddPet.ts'
+import type { AddPetStatus405, AddPetBody } from '../../models/ts/pet/AddPet'
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 

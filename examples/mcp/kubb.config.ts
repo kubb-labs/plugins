@@ -19,7 +19,7 @@ export default defineConfig(() => {
       format: false,
       lint: false,
     },
-    parsers: [parserTs({ extension: { '.ts': '.js' } }), parserTsx()],
+    parsers: [parserTs(), parserTsx()],
     plugins: [
       pluginTs({
         output: { path: 'models/ts', barrel: { type: 'named' } },

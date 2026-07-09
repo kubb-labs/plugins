@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { DeletePetOptions, DeletePetResponse, DeletePetStatus400 } from '../../models/pet/DeletePet.ts'
-import { deletePet } from '../../clients/pet/deletePet.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { DeletePetOptions, DeletePetResponse, DeletePetStatus400 } from '../../models/pet/DeletePet'
+import { deletePet } from '../../clients/pet/deletePet'
 import { mutationOptions } from '@tanstack/react-query'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const

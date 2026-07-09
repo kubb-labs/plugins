@@ -4,7 +4,7 @@
  * Source: text content
  */
 
-import type { CreatePetBody, CreatePetResponse, CreatePetStatus201 } from './types/CreatePet.ts'
+import type { CreatePetBody, CreatePetResponse, CreatePetStatus201 } from './types/CreatePet'
 import { faker } from '@faker-js/faker'
 
 /**

@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { LoginUserOptions, LoginUserResponses } from '../../models/user/LoginUser.ts'
-import { client } from '../../.kubb/client.ts'
+import type { Options, RequestResult } from '../../.kubb/client'
+import type { LoginUserOptions, LoginUserResponses } from '../../models/user/LoginUser'
+import { client } from '../../.kubb/client'
 
 /**
  * @summary Logs user into the system

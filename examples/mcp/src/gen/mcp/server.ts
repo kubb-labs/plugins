@@ -3,46 +3,46 @@
  * Do not edit manually.
  */
 
-import { addFilesHandler } from './addFiles.js'
-import { addPetHandler } from './addPet.js'
-import { createPetsHandler } from './createPets.js'
-import { deleteOrderHandler } from './deleteOrder.js'
-import { deletePetHandler } from './deletePet.js'
-import { findPetsByStatusHandler } from './findPetsByStatus.js'
-import { findPetsByTagsHandler } from './findPetsByTags.js'
-import { getInventoryHandler } from './getInventory.js'
-import { getOrderByIdHandler } from './getOrderById.js'
-import { getPetByIdHandler } from './getPetById.js'
-import { placeOrderHandler } from './placeOrder.js'
-import { placeOrderPatchHandler } from './placeOrderPatch.js'
-import { updatePetHandler } from './updatePet.js'
-import { updatePetWithFormHandler } from './updatePetWithForm.js'
-import { addFilesBodySchema, addFilesStatus200Schema } from '../zod/addFilesSchema.js'
-import { addPetBodySchema, addPetStatus200Schema } from '../zod/addPetSchema.js'
+import { addFilesHandler } from './addFiles'
+import { addPetHandler } from './addPet'
+import { createPetsHandler } from './createPets'
+import { deleteOrderHandler } from './deleteOrder'
+import { deletePetHandler } from './deletePet'
+import { findPetsByStatusHandler } from './findPetsByStatus'
+import { findPetsByTagsHandler } from './findPetsByTags'
+import { getInventoryHandler } from './getInventory'
+import { getOrderByIdHandler } from './getOrderById'
+import { getPetByIdHandler } from './getPetById'
+import { placeOrderHandler } from './placeOrder'
+import { placeOrderPatchHandler } from './placeOrderPatch'
+import { updatePetHandler } from './updatePet'
+import { updatePetWithFormHandler } from './updatePetWithForm'
+import { addFilesBodySchema, addFilesStatus200Schema } from '../zod/addFilesSchema'
+import { addPetBodySchema, addPetStatus200Schema } from '../zod/addPetSchema'
 import {
   createPetsBodySchema,
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,
   createPetsQueryOffsetSchema,
   createPetsStatus201Schema,
-} from '../zod/createPetsSchema.js'
-import { deleteOrderPathOrderIdSchema } from '../zod/deleteOrderSchema.js'
-import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/deletePetSchema.js'
-import { findPetsByStatusPathStepIdSchema, findPetsByStatusStatus200Schema } from '../zod/findPetsByStatusSchema.js'
+} from '../zod/createPetsSchema'
+import { deleteOrderPathOrderIdSchema } from '../zod/deleteOrderSchema'
+import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/deletePetSchema'
+import { findPetsByStatusPathStepIdSchema, findPetsByStatusStatus200Schema } from '../zod/findPetsByStatusSchema'
 import {
   findPetsByTagsHeaderXEXAMPLESchema,
   findPetsByTagsQueryPageSchema,
   findPetsByTagsQueryPageSizeSchema,
   findPetsByTagsQueryTagsSchema,
   findPetsByTagsStatus200Schema,
-} from '../zod/findPetsByTagsSchema.js'
-import { getInventoryStatus200Schema } from '../zod/getInventorySchema.js'
-import { getOrderByIdPathOrderIdSchema, getOrderByIdStatus200Schema } from '../zod/getOrderByIdSchema.js'
-import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema.js'
-import { placeOrderPatchBodySchema, placeOrderPatchStatus200Schema } from '../zod/placeOrderPatchSchema.js'
-import { placeOrderBodySchema, placeOrderStatus200Schema } from '../zod/placeOrderSchema.js'
-import { updatePetBodySchema, updatePetStatus200Schema } from '../zod/updatePetSchema.js'
-import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from '../zod/updatePetWithFormSchema.js'
+} from '../zod/findPetsByTagsSchema'
+import { getInventoryStatus200Schema } from '../zod/getInventorySchema'
+import { getOrderByIdPathOrderIdSchema, getOrderByIdStatus200Schema } from '../zod/getOrderByIdSchema'
+import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema'
+import { placeOrderPatchBodySchema, placeOrderPatchStatus200Schema } from '../zod/placeOrderPatchSchema'
+import { placeOrderBodySchema, placeOrderStatus200Schema } from '../zod/placeOrderSchema'
+import { updatePetBodySchema, updatePetStatus200Schema } from '../zod/updatePetSchema'
+import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from '../zod/updatePetWithFormSchema'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
 import { z } from 'zod'

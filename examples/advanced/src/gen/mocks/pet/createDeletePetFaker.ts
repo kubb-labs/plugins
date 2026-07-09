@@ -1,4 +1,4 @@
-import type { DeletePetHeaders, DeletePetPath } from '../../models/ts/pet/DeletePet.ts'
+import type { DeletePetHeaders, DeletePetPath } from '../../models/ts/pet/DeletePet'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createDeletePetPathFaker<TData extends Partial<DeletePetPath> = object>(data?: TData) {

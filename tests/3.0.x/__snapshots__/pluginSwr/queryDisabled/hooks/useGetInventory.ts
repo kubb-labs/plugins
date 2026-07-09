@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig } from '../.kubb/client.ts'
-import { getInventory } from '../clients/getInventory.ts'
+import type { RequestConfig } from '../.kubb/client'
+import { getInventory } from '../clients/getInventory'
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 

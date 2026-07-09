@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client.ts'
-import type { PlaceOrderOptions, PlaceOrderResponses } from '../types/PlaceOrder.ts'
-import { client } from '../.kubb/client.ts'
-import { placeOrderResponseSchema, placeOrderErrorSchema } from '../zod/placeOrderSchema.ts'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { PlaceOrderOptions, PlaceOrderResponses } from '../types/PlaceOrder'
+import { client } from '../.kubb/client'
+import { placeOrderResponseSchema, placeOrderErrorSchema } from '../zod/placeOrderSchema'
 
 /**
  * @description Place a new order in the store

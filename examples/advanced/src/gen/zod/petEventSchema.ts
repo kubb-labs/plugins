@@ -1,6 +1,6 @@
 import * as z from 'zod'
-import { petEventTypeEnumSchema } from './petEventTypeEnumSchema.ts'
-import { petSchema } from './petSchema.ts'
+import { petEventTypeEnumSchema } from './petEventTypeEnumSchema'
+import { petSchema } from './petSchema'
 
 export const petEventSchema = z.object({
   type: petEventTypeEnumSchema.describe('The kind of change that occurred'),

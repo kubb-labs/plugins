@@ -4,8 +4,8 @@
 */
 
 import * as z from 'zod'
-import { bankTransferPaymentUnionSchema } from './bankTransferPaymentUnionSchema.ts'
-import { cardPaymentUnionSchema } from './cardPaymentUnionSchema.ts'
+import { bankTransferPaymentUnionSchema } from './bankTransferPaymentUnionSchema'
+import { cardPaymentUnionSchema } from './cardPaymentUnionSchema'
 
 export const paymentMethodUnionSchema = z.discriminatedUnion('type', [
   cardPaymentUnionSchema.extend({

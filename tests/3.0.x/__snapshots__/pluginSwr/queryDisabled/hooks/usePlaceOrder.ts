@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig } from '../.kubb/client.ts'
-import type { PlaceOrderOptions } from '../types/PlaceOrder.ts'
-import { placeOrder } from '../clients/placeOrder.ts'
+import type { RequestConfig } from '../.kubb/client'
+import type { PlaceOrderOptions } from '../types/PlaceOrder'
+import { placeOrder } from '../clients/placeOrder'
 
 export const placeOrderQueryKey = ({ body }: Omit<PlaceOrderOptions, 'headers'>) => [{ url: '/store/order' }, ...(body ? [body] : [])] as const
 

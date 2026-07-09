@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client.ts'
-import type { DeletePetOptions, DeletePetResponses } from '../types/DeletePet.ts'
-import { client } from '../.kubb/client.ts'
-import { deletePetResponseSchema, deletePetErrorSchema } from '../zod/deletePetSchema.ts'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { DeletePetOptions, DeletePetResponses } from '../types/DeletePet'
+import { client } from '../.kubb/client'
+import { deletePetResponseSchema, deletePetErrorSchema } from '../zod/deletePetSchema'
 
 /**
  * @description delete a pet

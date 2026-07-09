@@ -4,11 +4,11 @@
  * Source: text content
  */
 
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
-import type { FindPetsByTagsOptions, FindPetsByTagsStatus200 } from './FindPetsByTags.ts'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByTagsOptions, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/react-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { findPetsByTags } from './clients/findPetsByTags.ts'
+import { findPetsByTags } from './clients/findPetsByTags'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { toValue } from 'vue'
 

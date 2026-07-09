@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { GetPetByIdOptions, GetPetByIdResponse } from '../types/GetPetById.ts'
+import type { GetPetByIdOptions, GetPetByIdResponse } from '../types/GetPetById'
 
 export function getPetById({ path }: GetPetByIdOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetByIdResponse> {
   return cy.request<GetPetByIdResponse>({

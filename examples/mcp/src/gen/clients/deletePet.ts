@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client.js'
-import type { DeletePetOptions, DeletePetResponses } from '../models/ts/DeletePet.js'
-import { client } from '../.kubb/client.js'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { DeletePetOptions, DeletePetResponses } from '../models/ts/DeletePet'
+import { client } from '../.kubb/client'
 
 /**
  * @description delete a pet

@@ -1,6 +1,6 @@
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { getInventory } from '../clients/getInventory.js'
+import { getInventory } from '../clients/getInventory'
 
 /**
  * @description Returns a map of status codes to quantities

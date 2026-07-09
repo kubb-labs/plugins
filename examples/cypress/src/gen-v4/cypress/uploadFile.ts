@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { UploadFileOptions, UploadFileResponse } from '../models.ts'
+import type { UploadFileOptions, UploadFileResponse } from '../models'
 
 export function uploadFile({ path, query, body }: UploadFileOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<UploadFileResponse> {
   return cy

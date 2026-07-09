@@ -1,7 +1,7 @@
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
-import type { AddFilesOptions, AddFilesStatus200, AddFilesStatus405 } from '../../../models/ts/pet/AddFiles.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { AddFilesOptions, AddFilesStatus200, AddFilesStatus405 } from '../../../models/ts/pet/AddFiles'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { addFiles } from '../../axios/petService/addFiles.ts'
+import { addFiles } from '../../axios/petService/addFiles'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const addFilesMutationKey = () => [{ url: '/pet/files' }] as const

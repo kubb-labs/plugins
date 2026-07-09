@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { UploadFilePath, UploadFileQuery, UploadFileResponse, UploadFileStatus200 } from '../types/UploadFile.ts'
-import { createApiResponse } from './createApiResponse.ts'
+import type { UploadFilePath, UploadFileQuery, UploadFileResponse, UploadFileStatus200 } from '../types/UploadFile'
+import { createApiResponse } from './createApiResponse'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createUploadFilePath<TData extends Partial<UploadFilePath> = object>(data?: TData)

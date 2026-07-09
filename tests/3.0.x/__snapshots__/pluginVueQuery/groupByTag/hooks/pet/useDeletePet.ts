@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { DeletePetOptions, DeletePetResponse, DeletePetStatus400 } from '../../types/DeletePet.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { DeletePetOptions, DeletePetResponse, DeletePetStatus400 } from '../../types/DeletePet'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import { deletePet } from '../../clients/deletePet.ts'
+import { deletePet } from '../../clients/deletePet'
 import { useMutation } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 

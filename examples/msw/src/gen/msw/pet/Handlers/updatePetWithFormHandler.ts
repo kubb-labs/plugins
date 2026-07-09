@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { UpdatePetWithFormStatus405 } from '../../../models/UpdatePetWithForm.ts'
+import type { UpdatePetWithFormStatus405 } from '../../../models/UpdatePetWithForm'
 import { http } from 'msw'
 
 export function updatePetWithFormHandlerResponse405(data: UpdatePetWithFormStatus405) {

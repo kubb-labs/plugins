@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { LoginUserOptions, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { LoginUserOptions, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser'
 import type { MaybeRefOrGetter } from 'vue'
-import { loginUser } from '../../clients/user/loginUser.ts'
+import { loginUser } from '../../clients/user/loginUser'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 

@@ -4,10 +4,10 @@
  * Source: text content
  */
 
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
-import type { UpdatePetWithFormOptions, UpdatePetWithFormStatus200 } from './UpdatePetWithForm.ts'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { updatePetWithForm } from './clients/updatePetWithForm.ts'
+import { updatePetWithForm } from './clients/updatePetWithForm'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const

@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Variant } from './Variant.ts'
+import type { Variant } from './Variant'
 
 /**
  * @type object

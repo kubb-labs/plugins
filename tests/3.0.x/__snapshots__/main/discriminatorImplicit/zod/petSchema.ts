@@ -4,8 +4,8 @@
 */
 
 import * as z from 'zod'
-import { catSchema } from './catSchema.ts'
-import { dogSchema } from './dogSchema.ts'
+import { catSchema } from './catSchema'
+import { dogSchema } from './dogSchema'
 
 export const petSchema = z.discriminatedUnion('petType', [
   catSchema.extend({

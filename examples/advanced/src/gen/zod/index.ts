@@ -1,20 +1,20 @@
-export type { AddPetRequestSchemaType } from './addPetRequestSchema.ts'
-export type { AddPetRequestStatusEnumSchemaType } from './addPetRequestStatusEnumSchema.ts'
-export type { AnimalSchemaType } from './animalSchema.ts'
-export type { AnimalTypeEnumSchemaType } from './animalTypeEnumSchema.ts'
-export type { ApiResponseSchemaType } from './apiResponseSchema.ts'
-export type { CatSchemaType } from './catSchema.ts'
-export type { CategorySchemaType } from './categorySchema.ts'
-export type { CreatePetsBoolParamSchemaType } from './createPetsBoolParamSchema.ts'
-export type { CreatePetsXEXAMPLESchemaType } from './createPetsXEXAMPLESchema.ts'
-export type { DogSchemaType } from './dogSchema.ts'
-export type { FindPetsByTagsXEXAMPLESchemaType } from './findPetsByTagsXEXAMPLESchema.ts'
-export type { ImageSchemaType } from './imageSchema.ts'
-export type { OrderHttpStatusEnumSchemaType } from './orderHttpStatusEnumSchema.ts'
-export type { OrderOrderTypeEnumSchemaType } from './orderOrderTypeEnumSchema.ts'
-export type { OrderParamsStatusEnumSchemaType } from './orderParamsStatusEnumSchema.ts'
-export type { OrderSchemaType } from './orderSchema.ts'
-export type { OrderStatusEnumSchemaType } from './orderStatusEnumSchema.ts'
+export type { AddPetRequestSchemaType } from './addPetRequestSchema'
+export type { AddPetRequestStatusEnumSchemaType } from './addPetRequestStatusEnumSchema'
+export type { AnimalSchemaType } from './animalSchema'
+export type { AnimalTypeEnumSchemaType } from './animalTypeEnumSchema'
+export type { ApiResponseSchemaType } from './apiResponseSchema'
+export type { CatSchemaType } from './catSchema'
+export type { CategorySchemaType } from './categorySchema'
+export type { CreatePetsBoolParamSchemaType } from './createPetsBoolParamSchema'
+export type { CreatePetsXEXAMPLESchemaType } from './createPetsXEXAMPLESchema'
+export type { DogSchemaType } from './dogSchema'
+export type { FindPetsByTagsXEXAMPLESchemaType } from './findPetsByTagsXEXAMPLESchema'
+export type { ImageSchemaType } from './imageSchema'
+export type { OrderHttpStatusEnumSchemaType } from './orderHttpStatusEnumSchema'
+export type { OrderOrderTypeEnumSchemaType } from './orderOrderTypeEnumSchema'
+export type { OrderParamsStatusEnumSchemaType } from './orderParamsStatusEnumSchema'
+export type { OrderSchemaType } from './orderSchema'
+export type { OrderStatusEnumSchemaType } from './orderStatusEnumSchema'
 export type {
   AddFilesBodySchemaFormDataType,
   AddFilesBodySchemaJsonType,
@@ -23,7 +23,7 @@ export type {
   AddFilesResponseSchemaType,
   AddFilesStatus200SchemaType,
   AddFilesStatus405SchemaType,
-} from './pet/addFilesSchema.ts'
+} from './pet/addFilesSchema'
 export type {
   AddPetBodySchemaFormUrlEncodedType,
   AddPetBodySchemaJsonType,
@@ -35,14 +35,14 @@ export type {
   AddPetStatusDefaultSchemaJsonType,
   AddPetStatusDefaultSchemaType,
   AddPetStatusDefaultSchemaXmlType,
-} from './pet/addPetSchema.ts'
+} from './pet/addPetSchema'
 export type {
   DeletePetErrorSchemaType,
   DeletePetHeaderApiKeySchemaType,
   DeletePetPathPetIdSchemaType,
   DeletePetResponseSchemaType,
   DeletePetStatus400SchemaType,
-} from './pet/deletePetSchema.ts'
+} from './pet/deletePetSchema'
 export type {
   FindPetsByStatusErrorSchemaType,
   FindPetsByStatusPathStepIdSchemaType,
@@ -51,7 +51,7 @@ export type {
   FindPetsByStatusStatus200SchemaType,
   FindPetsByStatusStatus200SchemaXmlType,
   FindPetsByStatusStatus400SchemaType,
-} from './pet/findPetsByStatusSchema.ts'
+} from './pet/findPetsByStatusSchema'
 export type {
   FindPetsByTagsErrorSchemaType,
   FindPetsByTagsHeaderXEXAMPLESchemaType,
@@ -63,7 +63,7 @@ export type {
   FindPetsByTagsStatus200SchemaType,
   FindPetsByTagsStatus200SchemaXmlType,
   FindPetsByTagsStatus400SchemaType,
-} from './pet/findPetsByTagsSchema.ts'
+} from './pet/findPetsByTagsSchema'
 export type {
   GetPetByIdErrorSchemaType,
   GetPetByIdPathPetIdSchemaType,
@@ -73,7 +73,7 @@ export type {
   GetPetByIdStatus200SchemaXmlType,
   GetPetByIdStatus400SchemaType,
   GetPetByIdStatus404SchemaType,
-} from './pet/getPetByIdSchema.ts'
+} from './pet/getPetByIdSchema'
 export type {
   UpdatePetBodySchemaFormUrlEncodedType,
   UpdatePetBodySchemaJsonType,
@@ -88,7 +88,7 @@ export type {
   UpdatePetStatus400SchemaType,
   UpdatePetStatus404SchemaType,
   UpdatePetStatus405SchemaType,
-} from './pet/updatePetSchema.ts'
+} from './pet/updatePetSchema'
 export type {
   UpdatePetWithFormErrorSchemaType,
   UpdatePetWithFormPathPetIdSchemaType,
@@ -96,19 +96,19 @@ export type {
   UpdatePetWithFormQueryStatusSchemaType,
   UpdatePetWithFormResponseSchemaType,
   UpdatePetWithFormStatus405SchemaType,
-} from './pet/updatePetWithFormSchema.ts'
+} from './pet/updatePetWithFormSchema'
 export type {
   UploadFileBodySchemaType,
   UploadFilePathPetIdSchemaType,
   UploadFileQueryAdditionalMetadataSchemaType,
   UploadFileResponseSchemaType,
   UploadFileStatus200SchemaType,
-} from './pet/uploadFileSchema.ts'
-export type { PetEventSchemaType } from './petEventSchema.ts'
-export type { PetEventTypeEnumSchemaType } from './petEventTypeEnumSchema.ts'
-export type { PetNotFoundSchemaType } from './petNotFoundSchema.ts'
-export type { PetSchemaType } from './petSchema.ts'
-export type { PetStatusEnumSchemaType } from './petStatusEnumSchema.ts'
+} from './pet/uploadFileSchema'
+export type { PetEventSchemaType } from './petEventSchema'
+export type { PetEventTypeEnumSchemaType } from './petEventTypeEnumSchema'
+export type { PetNotFoundSchemaType } from './petNotFoundSchema'
+export type { PetSchemaType } from './petSchema'
+export type { PetStatusEnumSchemaType } from './petStatusEnumSchema'
 export type {
   CreatePetsBodySchemaType,
   CreatePetsErrorSchemaType,
@@ -119,30 +119,26 @@ export type {
   CreatePetsResponseSchemaType,
   CreatePetsStatus201SchemaType,
   CreatePetsStatusDefaultSchemaType,
-} from './pets/createPetsSchema.ts'
-export type {
-  StreamPetEventsPathPetIdSchemaType,
-  StreamPetEventsResponseSchemaType,
-  StreamPetEventsStatus200SchemaType,
-} from './stream/streamPetEventsSchema.ts'
-export type { TagTagSchemaType } from './tag/tagSchema.ts'
-export { addPetRequestSchema } from './addPetRequestSchema.ts'
-export { addPetRequestStatusEnumSchema } from './addPetRequestStatusEnumSchema.ts'
-export { animalSchema } from './animalSchema.ts'
-export { animalTypeEnumSchema } from './animalTypeEnumSchema.ts'
-export { apiResponseSchema } from './apiResponseSchema.ts'
-export { catSchema } from './catSchema.ts'
-export { categorySchema } from './categorySchema.ts'
-export { createPetsBoolParamSchema } from './createPetsBoolParamSchema.ts'
-export { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.ts'
-export { dogSchema } from './dogSchema.ts'
-export { findPetsByTagsXEXAMPLESchema } from './findPetsByTagsXEXAMPLESchema.ts'
-export { imageSchema } from './imageSchema.ts'
-export { orderHttpStatusEnumSchema } from './orderHttpStatusEnumSchema.ts'
-export { orderOrderTypeEnumSchema } from './orderOrderTypeEnumSchema.ts'
-export { orderParamsStatusEnumSchema } from './orderParamsStatusEnumSchema.ts'
-export { orderSchema } from './orderSchema.ts'
-export { orderStatusEnumSchema } from './orderStatusEnumSchema.ts'
+} from './pets/createPetsSchema'
+export type { StreamPetEventsPathPetIdSchemaType, StreamPetEventsResponseSchemaType, StreamPetEventsStatus200SchemaType } from './stream/streamPetEventsSchema'
+export type { TagTagSchemaType } from './tag/tagSchema'
+export { addPetRequestSchema } from './addPetRequestSchema'
+export { addPetRequestStatusEnumSchema } from './addPetRequestStatusEnumSchema'
+export { animalSchema } from './animalSchema'
+export { animalTypeEnumSchema } from './animalTypeEnumSchema'
+export { apiResponseSchema } from './apiResponseSchema'
+export { catSchema } from './catSchema'
+export { categorySchema } from './categorySchema'
+export { createPetsBoolParamSchema } from './createPetsBoolParamSchema'
+export { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema'
+export { dogSchema } from './dogSchema'
+export { findPetsByTagsXEXAMPLESchema } from './findPetsByTagsXEXAMPLESchema'
+export { imageSchema } from './imageSchema'
+export { orderHttpStatusEnumSchema } from './orderHttpStatusEnumSchema'
+export { orderOrderTypeEnumSchema } from './orderOrderTypeEnumSchema'
+export { orderParamsStatusEnumSchema } from './orderParamsStatusEnumSchema'
+export { orderSchema } from './orderSchema'
+export { orderStatusEnumSchema } from './orderStatusEnumSchema'
 export {
   addFilesBodySchema,
   addFilesBodySchemaFormData,
@@ -151,7 +147,7 @@ export {
   addFilesResponseSchema,
   addFilesStatus200Schema,
   addFilesStatus405Schema,
-} from './pet/addFilesSchema.ts'
+} from './pet/addFilesSchema'
 export {
   addPetBodySchema,
   addPetBodySchemaFormUrlEncoded,
@@ -163,14 +159,14 @@ export {
   addPetStatusDefaultSchema,
   addPetStatusDefaultSchemaJson,
   addPetStatusDefaultSchemaXml,
-} from './pet/addPetSchema.ts'
+} from './pet/addPetSchema'
 export {
   deletePetErrorSchema,
   deletePetHeaderApiKeySchema,
   deletePetPathPetIdSchema,
   deletePetResponseSchema,
   deletePetStatus400Schema,
-} from './pet/deletePetSchema.ts'
+} from './pet/deletePetSchema'
 export {
   findPetsByStatusErrorSchema,
   findPetsByStatusPathStepIdSchema,
@@ -179,7 +175,7 @@ export {
   findPetsByStatusStatus200SchemaJson,
   findPetsByStatusStatus200SchemaXml,
   findPetsByStatusStatus400Schema,
-} from './pet/findPetsByStatusSchema.ts'
+} from './pet/findPetsByStatusSchema'
 export {
   findPetsByTagsErrorSchema,
   findPetsByTagsHeaderXEXAMPLESchema,
@@ -191,7 +187,7 @@ export {
   findPetsByTagsStatus200SchemaJson,
   findPetsByTagsStatus200SchemaXml,
   findPetsByTagsStatus400Schema,
-} from './pet/findPetsByTagsSchema.ts'
+} from './pet/findPetsByTagsSchema'
 export {
   getPetByIdErrorSchema,
   getPetByIdPathPetIdSchema,
@@ -201,7 +197,7 @@ export {
   getPetByIdStatus200SchemaXml,
   getPetByIdStatus400Schema,
   getPetByIdStatus404Schema,
-} from './pet/getPetByIdSchema.ts'
+} from './pet/getPetByIdSchema'
 export {
   updatePetBodySchema,
   updatePetBodySchemaFormUrlEncoded,
@@ -216,7 +212,7 @@ export {
   updatePetStatus400Schema,
   updatePetStatus404Schema,
   updatePetStatus405Schema,
-} from './pet/updatePetSchema.ts'
+} from './pet/updatePetSchema'
 export {
   updatePetWithFormErrorSchema,
   updatePetWithFormPathPetIdSchema,
@@ -224,19 +220,19 @@ export {
   updatePetWithFormQueryStatusSchema,
   updatePetWithFormResponseSchema,
   updatePetWithFormStatus405Schema,
-} from './pet/updatePetWithFormSchema.ts'
+} from './pet/updatePetWithFormSchema'
 export {
   uploadFileBodySchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,
   uploadFileStatus200Schema,
-} from './pet/uploadFileSchema.ts'
-export { petEventSchema } from './petEventSchema.ts'
-export { petEventTypeEnumSchema } from './petEventTypeEnumSchema.ts'
-export { petNotFoundSchema } from './petNotFoundSchema.ts'
-export { petSchema } from './petSchema.ts'
-export { petStatusEnumSchema } from './petStatusEnumSchema.ts'
+} from './pet/uploadFileSchema'
+export { petEventSchema } from './petEventSchema'
+export { petEventTypeEnumSchema } from './petEventTypeEnumSchema'
+export { petNotFoundSchema } from './petNotFoundSchema'
+export { petSchema } from './petSchema'
+export { petStatusEnumSchema } from './petStatusEnumSchema'
 export {
   createPetsBodySchema,
   createPetsErrorSchema,
@@ -247,6 +243,6 @@ export {
   createPetsResponseSchema,
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
-} from './pets/createPetsSchema.ts'
-export { streamPetEventsPathPetIdSchema, streamPetEventsResponseSchema, streamPetEventsStatus200Schema } from './stream/streamPetEventsSchema.ts'
-export { tagTagSchema } from './tag/tagSchema.ts'
+} from './pets/createPetsSchema'
+export { streamPetEventsPathPetIdSchema, streamPetEventsResponseSchema, streamPetEventsStatus200Schema } from './stream/streamPetEventsSchema'
+export { tagTagSchema } from './tag/tagSchema'

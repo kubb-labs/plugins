@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { Address } from './Address.ts'
-import type { CustomerParamsStatusEnum } from './CustomerParamsStatusEnum.ts'
+import type { Address } from './Address'
+import type { CustomerParamsStatusEnum } from './CustomerParamsStatusEnum'
 
 /**
  * @type object

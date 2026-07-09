@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { UpdatePetWithFormPath, UpdatePetWithFormQuery } from '../../models/UpdatePetWithForm.ts'
+import type { UpdatePetWithFormPath, UpdatePetWithFormQuery } from '../../models/UpdatePetWithForm'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createUpdatePetWithFormPath<TData extends Partial<UpdatePetWithFormPath> = object>(data?: TData) {

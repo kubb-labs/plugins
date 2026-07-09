@@ -1,7 +1,7 @@
-import type { FindPetsByTagsOptions } from '../models/ts/FindPetsByTags.js'
+import type { FindPetsByTagsOptions } from '../models/ts/FindPetsByTags'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { findPetsByTags } from '../clients/findPetsByTags.js'
+import { findPetsByTags } from '../clients/findPetsByTags'
 
 /**
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.

@@ -4,7 +4,7 @@
 */
 
 import * as z from 'zod'
-import { itemSchema } from './itemSchema.ts'
+import { itemSchema } from './itemSchema'
 
 export const getItemPathIdSchema = z.bigint()
 

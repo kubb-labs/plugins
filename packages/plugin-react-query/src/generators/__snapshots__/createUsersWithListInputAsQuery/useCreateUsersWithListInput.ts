@@ -4,10 +4,10 @@
  * Source: text content
  */
 
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
-import type { CreateUsersWithListInputOptions, CreateUsersWithListInputStatus200 } from './CreateUsersWithListInput.ts'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { CreateUsersWithListInputOptions, CreateUsersWithListInputStatus200 } from './CreateUsersWithListInput'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
-import { createUsersWithListInput } from './clients/createUsersWithListInput.ts'
+import { createUsersWithListInput } from './clients/createUsersWithListInput'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const createUsersWithListInputQueryKey = ({ body }: Omit<CreateUsersWithListInputOptions, 'headers'>) =>

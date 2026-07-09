@@ -1,4 +1,4 @@
-import type { FindPetsByStatusOptions, FindPetsByStatusResponse } from '../../models/ts/pet/FindPetsByStatus.ts'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponse } from '../../models/ts/pet/FindPetsByStatus'
 
 export function findPetsByStatus(
   { path }: FindPetsByStatusOptions,

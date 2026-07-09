@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client.ts'
-import type { GetPetByIdOptions, GetPetByIdResponses } from '../types/GetPetById.ts'
-import { client } from '../.kubb/client.ts'
-import { getPetByIdResponseSchema, getPetByIdErrorSchema } from '../zod/getPetByIdSchema.ts'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { GetPetByIdOptions, GetPetByIdResponses } from '../types/GetPetById'
+import { client } from '../.kubb/client'
+import { getPetByIdResponseSchema, getPetByIdErrorSchema } from '../zod/getPetByIdSchema'
 
 /**
  * @description Returns a single pet

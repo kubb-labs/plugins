@@ -1,11 +1,11 @@
 /* eslint-disable no-alert, no-console */
 
-import type { ClientConfig, ClientInstance, Options, RequestResult } from './.kubb/client.ts'
-import type { DeletePetOptions, DeletePetResponses } from './DeletePet.ts'
-import type { GetInventoryOptions, GetInventoryResponses } from './GetInventory.ts'
-import type { GetPetByIdOptions, GetPetByIdResponses } from './GetPetById.ts'
-import type { GetProjectOptions, GetProjectResponses } from './GetProject.ts'
-import { createClient } from './.kubb/client.ts'
+import type { ClientConfig, ClientInstance, Options, RequestResult } from './.kubb/client'
+import type { DeletePetOptions, DeletePetResponses } from './DeletePet'
+import type { GetInventoryOptions, GetInventoryResponses } from './GetInventory'
+import type { GetPetByIdOptions, GetPetByIdResponses } from './GetPetById'
+import type { GetProjectOptions, GetProjectResponses } from './GetProject'
+import { createClient } from './.kubb/client'
 
 export class PetStore {
   private readonly client: ClientInstance

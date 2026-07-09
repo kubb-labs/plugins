@@ -1,18 +1,18 @@
-export * from './.kubb/client.ts'
-export * from './.kubb/serializers.ts'
-export * from './.kubb/standardSchema.ts'
-export type { AddPetRequest } from './models/AddPetRequest.ts'
-export type { AddPetRequestStatusEnumKey } from './models/AddPetRequestStatusEnum.ts'
-export type { ApiResponse } from './models/ApiResponse.ts'
-export type { Category } from './models/Category.ts'
-export type { FindPetsByStatusStatusKey } from './models/FindPetsByStatusStatus.ts'
-export type { Order } from './models/Order.ts'
-export type { OrderHttpStatusEnumKey } from './models/OrderHttpStatusEnum.ts'
-export type { OrderStatusEnumKey } from './models/OrderStatusEnum.ts'
-export type { Pet } from './models/Pet.ts'
-export type { PetNotFound } from './models/PetNotFound.ts'
-export type { PetStatusEnumKey } from './models/PetStatusEnum.ts'
-export type { Tag } from './models/Tag.ts'
+export * from './.kubb/client'
+export * from './.kubb/serializers'
+export * from './.kubb/standardSchema'
+export type { AddPetRequest } from './models/AddPetRequest'
+export type { AddPetRequestStatusEnumKey } from './models/AddPetRequestStatusEnum'
+export type { ApiResponse } from './models/ApiResponse'
+export type { Category } from './models/Category'
+export type { FindPetsByStatusStatusKey } from './models/FindPetsByStatusStatus'
+export type { Order } from './models/Order'
+export type { OrderHttpStatusEnumKey } from './models/OrderHttpStatusEnum'
+export type { OrderStatusEnumKey } from './models/OrderStatusEnum'
+export type { Pet } from './models/Pet'
+export type { PetNotFound } from './models/PetNotFound'
+export type { PetStatusEnumKey } from './models/PetStatusEnum'
+export type { Tag } from './models/Tag'
 export type {
   AddPetBody,
   AddPetBodyFormUrlEncoded,
@@ -25,8 +25,8 @@ export type {
   AddPetStatus200Json,
   AddPetStatus200Xml,
   AddPetStatus405,
-} from './models/pet/AddPet.ts'
-export type { DeletePetHeaders, DeletePetOptions, DeletePetPath, DeletePetResponse, DeletePetResponses, DeletePetStatus400 } from './models/pet/DeletePet.ts'
+} from './models/pet/AddPet'
+export type { DeletePetHeaders, DeletePetOptions, DeletePetPath, DeletePetResponse, DeletePetResponses, DeletePetStatus400 } from './models/pet/DeletePet'
 export type {
   FindPetsByStatusOptions,
   FindPetsByStatusQuery,
@@ -36,7 +36,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-} from './models/pet/FindPetsByStatus.ts'
+} from './models/pet/FindPetsByStatus'
 export type {
   FindPetsByTagsOptions,
   FindPetsByTagsQuery,
@@ -46,7 +46,7 @@ export type {
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
-} from './models/pet/FindPetsByTags.ts'
+} from './models/pet/FindPetsByTags'
 export type {
   GetPetByIdOptions,
   GetPetByIdPath,
@@ -57,7 +57,7 @@ export type {
   GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
-} from './models/pet/GetPetById.ts'
+} from './models/pet/GetPetById'
 export type {
   UpdatePetBody,
   UpdatePetBodyFormUrlEncoded,
@@ -72,7 +72,7 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-} from './models/pet/UpdatePet.ts'
+} from './models/pet/UpdatePet'
 export type {
   UpdatePetWithFormOptions,
   UpdatePetWithFormPath,
@@ -80,7 +80,7 @@ export type {
   UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
-} from './models/pet/UpdatePetWithForm.ts'
+} from './models/pet/UpdatePetWithForm'
 export type {
   UploadFileBody,
   UploadFileBodyFormData,
@@ -91,7 +91,7 @@ export type {
   UploadFileResponse,
   UploadFileResponses,
   UploadFileStatus200,
-} from './models/pet/UploadFile.ts'
+} from './models/pet/UploadFile'
 export type {
   DeleteOrderOptions,
   DeleteOrderPath,
@@ -99,8 +99,8 @@ export type {
   DeleteOrderResponses,
   DeleteOrderStatus400,
   DeleteOrderStatus404,
-} from './models/store/DeleteOrder.ts'
-export type { GetInventoryOptions, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/store/GetInventory.ts'
+} from './models/store/DeleteOrder'
+export type { GetInventoryOptions, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/store/GetInventory'
 export type {
   GetOrderByIdOptions,
   GetOrderByIdPath,
@@ -111,7 +111,7 @@ export type {
   GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
-} from './models/store/GetOrderById.ts'
+} from './models/store/GetOrderById'
 export type {
   PlaceOrderBody,
   PlaceOrderBodyFormUrlEncoded,
@@ -122,7 +122,7 @@ export type {
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-} from './models/store/PlaceOrder.ts'
+} from './models/store/PlaceOrder'
 export type {
   PlaceOrderPatchBody,
   PlaceOrderPatchBodyFormUrlEncoded,
@@ -133,12 +133,12 @@ export type {
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
-} from './models/store/PlaceOrderPatch.ts'
-export { addPetRequestStatusEnum } from './models/AddPetRequestStatusEnum.ts'
-export { findPetsByStatusStatus } from './models/FindPetsByStatusStatus.ts'
-export { orderHttpStatusEnum } from './models/OrderHttpStatusEnum.ts'
-export { orderStatusEnum } from './models/OrderStatusEnum.ts'
-export { petStatusEnum } from './models/PetStatusEnum.ts'
-export { pet } from './sdk/pet/pet.ts'
-export { PetStoreSDK } from './sdk/petStoreSDK.ts'
-export { store } from './sdk/store/store.ts'
+} from './models/store/PlaceOrderPatch'
+export { addPetRequestStatusEnum } from './models/AddPetRequestStatusEnum'
+export { findPetsByStatusStatus } from './models/FindPetsByStatusStatus'
+export { orderHttpStatusEnum } from './models/OrderHttpStatusEnum'
+export { orderStatusEnum } from './models/OrderStatusEnum'
+export { petStatusEnum } from './models/PetStatusEnum'
+export { pet } from './sdk/pet/pet'
+export { PetStoreSDK } from './sdk/petStoreSDK'
+export { store } from './sdk/store/store'

@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options, RequestResult } from './.kubb/client.ts'
-import type { AddPetOptions, AddPetResponses } from './AddPet.ts'
-import { client } from './.kubb/client.ts'
+import type { Options, RequestResult } from './.kubb/client'
+import type { AddPetOptions, AddPetResponses } from './AddPet'
+import { client } from './.kubb/client'
 
 /**
  * {@link /pet}

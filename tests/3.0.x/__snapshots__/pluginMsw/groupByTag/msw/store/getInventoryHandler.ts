@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { GetInventoryResponse } from '../../types/GetInventory.ts'
+import type { GetInventoryResponse } from '../../types/GetInventory'
 import { http } from 'msw'
 
 export function getInventoryHandlerResponse200(data: GetInventoryResponse) {

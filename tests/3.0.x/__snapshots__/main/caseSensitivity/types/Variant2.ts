@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Variant2CategoryEnumKey } from './Variant2CategoryEnum.ts'
+import type { Variant2CategoryEnumKey } from './Variant2CategoryEnum'
 
 /**
  * @type object

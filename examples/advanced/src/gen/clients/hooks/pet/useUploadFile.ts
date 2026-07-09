@@ -1,7 +1,7 @@
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
-import type { UploadFileOptions, UploadFileStatus200 } from '../../../models/ts/pet/UploadFile.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { UploadFileOptions, UploadFileStatus200 } from '../../../models/ts/pet/UploadFile'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { uploadFile } from '../../axios/petService/uploadFile.ts'
+import { uploadFile } from '../../axios/petService/uploadFile'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const

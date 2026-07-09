@@ -4,10 +4,10 @@
  */
 
 import useSWR from 'swr'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { LoginUserOptions, LoginUserResponse, LoginUserStatus400 } from '../../models/user/LoginUser.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { LoginUserOptions, LoginUserResponse, LoginUserStatus400 } from '../../models/user/LoginUser'
 import type { SWRConfiguration } from 'swr'
-import { loginUser } from '../../clients/user/loginUser.ts'
+import { loginUser } from '../../clients/user/loginUser'
 
 export const loginUserQueryKey = ({ query }: Omit<LoginUserOptions, 'headers'> = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
 

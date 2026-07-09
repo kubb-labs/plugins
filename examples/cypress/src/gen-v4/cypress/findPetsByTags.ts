@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { FindPetsByTagsOptions, FindPetsByTagsResponse } from '../models.ts'
+import type { FindPetsByTagsOptions, FindPetsByTagsResponse } from '../models'
 
 export function findPetsByTags(
   { query }: FindPetsByTagsOptions = {},

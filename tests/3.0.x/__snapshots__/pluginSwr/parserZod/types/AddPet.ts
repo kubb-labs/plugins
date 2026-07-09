@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { AddPetRequest } from './AddPetRequest.ts'
-import type { Pet } from './Pet.ts'
+import type { AddPetRequest } from './AddPetRequest'
+import type { Pet } from './Pet'
 
 /**
  * @type object

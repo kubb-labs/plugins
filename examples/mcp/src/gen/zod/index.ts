@@ -6,9 +6,9 @@ export {
   addFilesResponseSchema,
   addFilesStatus200Schema,
   addFilesStatus405Schema,
-} from './addFilesSchema.js'
-export { addPetRequestSchema } from './addPetRequestSchema.js'
-export { addPetRequestStatusEnumSchema } from './addPetRequestStatusEnumSchema.js'
+} from './addFilesSchema'
+export { addPetRequestSchema } from './addPetRequestSchema'
+export { addPetRequestStatusEnumSchema } from './addPetRequestStatusEnumSchema'
 export {
   addPetBodySchema,
   addPetBodySchemaFormUrlEncoded,
@@ -20,9 +20,9 @@ export {
   addPetStatus200SchemaJson,
   addPetStatus200SchemaXml,
   addPetStatus405Schema,
-} from './addPetSchema.js'
-export { apiResponseSchema } from './apiResponseSchema.js'
-export { categorySchema } from './categorySchema.js'
+} from './addPetSchema'
+export { apiResponseSchema } from './apiResponseSchema'
+export { categorySchema } from './categorySchema'
 export {
   createPetsBodySchema,
   createPetsErrorSchema,
@@ -32,22 +32,22 @@ export {
   createPetsResponseSchema,
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
-} from './createPetsSchema.js'
-export { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.js'
+} from './createPetsSchema'
+export { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema'
 export {
   deleteOrderErrorSchema,
   deleteOrderPathOrderIdSchema,
   deleteOrderResponseSchema,
   deleteOrderStatus400Schema,
   deleteOrderStatus404Schema,
-} from './deleteOrderSchema.js'
+} from './deleteOrderSchema'
 export {
   deletePetErrorSchema,
   deletePetHeaderApiKeySchema,
   deletePetPathPetIdSchema,
   deletePetResponseSchema,
   deletePetStatus400Schema,
-} from './deletePetSchema.js'
+} from './deletePetSchema'
 export {
   findPetsByStatusErrorSchema,
   findPetsByStatusPathStepIdSchema,
@@ -56,7 +56,7 @@ export {
   findPetsByStatusStatus200SchemaJson,
   findPetsByStatusStatus200SchemaXml,
   findPetsByStatusStatus400Schema,
-} from './findPetsByStatusSchema.js'
+} from './findPetsByStatusSchema'
 export {
   findPetsByTagsErrorSchema,
   findPetsByTagsHeaderXEXAMPLESchema,
@@ -68,9 +68,9 @@ export {
   findPetsByTagsStatus200SchemaJson,
   findPetsByTagsStatus200SchemaXml,
   findPetsByTagsStatus400Schema,
-} from './findPetsByTagsSchema.js'
-export { findPetsByTagsXEXAMPLESchema } from './findPetsByTagsXEXAMPLESchema.js'
-export { getInventoryResponseSchema, getInventoryStatus200Schema } from './getInventorySchema.js'
+} from './findPetsByTagsSchema'
+export { findPetsByTagsXEXAMPLESchema } from './findPetsByTagsXEXAMPLESchema'
+export { getInventoryResponseSchema, getInventoryStatus200Schema } from './getInventorySchema'
 export {
   getOrderByIdErrorSchema,
   getOrderByIdPathOrderIdSchema,
@@ -80,7 +80,7 @@ export {
   getOrderByIdStatus200SchemaXml,
   getOrderByIdStatus400Schema,
   getOrderByIdStatus404Schema,
-} from './getOrderByIdSchema.js'
+} from './getOrderByIdSchema'
 export {
   getPetByIdErrorSchema,
   getPetByIdPathPetIdSchema,
@@ -90,14 +90,14 @@ export {
   getPetByIdStatus200SchemaXml,
   getPetByIdStatus400Schema,
   getPetByIdStatus404Schema,
-} from './getPetByIdSchema.js'
-export { orderHttpStatusEnumSchema } from './orderHttpStatusEnumSchema.js'
-export { orderOrderTypeEnumSchema } from './orderOrderTypeEnumSchema.js'
-export { orderSchema } from './orderSchema.js'
-export { orderStatusEnumSchema } from './orderStatusEnumSchema.js'
-export { petNotFoundSchema } from './petNotFoundSchema.js'
-export { petSchema } from './petSchema.js'
-export { petStatusEnumSchema } from './petStatusEnumSchema.js'
+} from './getPetByIdSchema'
+export { orderHttpStatusEnumSchema } from './orderHttpStatusEnumSchema'
+export { orderOrderTypeEnumSchema } from './orderOrderTypeEnumSchema'
+export { orderSchema } from './orderSchema'
+export { orderStatusEnumSchema } from './orderStatusEnumSchema'
+export { petNotFoundSchema } from './petNotFoundSchema'
+export { petSchema } from './petSchema'
+export { petStatusEnumSchema } from './petStatusEnumSchema'
 export {
   placeOrderPatchBodySchema,
   placeOrderPatchBodySchemaFormUrlEncoded,
@@ -107,7 +107,7 @@ export {
   placeOrderPatchResponseSchema,
   placeOrderPatchStatus200Schema,
   placeOrderPatchStatus405Schema,
-} from './placeOrderPatchSchema.js'
+} from './placeOrderPatchSchema'
 export {
   placeOrderBodySchema,
   placeOrderBodySchemaFormUrlEncoded,
@@ -117,8 +117,8 @@ export {
   placeOrderResponseSchema,
   placeOrderStatus200Schema,
   placeOrderStatus405Schema,
-} from './placeOrderSchema.js'
-export { tagTagSchema } from './tag/tagSchema.js'
+} from './placeOrderSchema'
+export { tagTagSchema } from './tag/tagSchema'
 export {
   updatePetBodySchema,
   updatePetBodySchemaFormUrlEncoded,
@@ -133,7 +133,7 @@ export {
   updatePetStatus400Schema,
   updatePetStatus404Schema,
   updatePetStatus405Schema,
-} from './updatePetSchema.js'
+} from './updatePetSchema'
 export {
   updatePetWithFormErrorSchema,
   updatePetWithFormPathPetIdSchema,
@@ -141,4 +141,4 @@ export {
   updatePetWithFormQueryStatusSchema,
   updatePetWithFormResponseSchema,
   updatePetWithFormStatus405Schema,
-} from './updatePetWithFormSchema.js'
+} from './updatePetWithFormSchema'

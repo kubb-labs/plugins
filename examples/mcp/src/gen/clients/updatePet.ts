@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client.js'
-import type { UpdatePetOptions, UpdatePetResponses } from '../models/ts/UpdatePet.js'
-import { client } from '../.kubb/client.js'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { UpdatePetOptions, UpdatePetResponses } from '../models/ts/UpdatePet'
+import { client } from '../.kubb/client'
 
 /**
  * @description Update an existing pet by Id

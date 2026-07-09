@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { PaymentMethodMapped } from './PaymentMethodMapped.ts'
+import type { PaymentMethodMapped } from './PaymentMethodMapped'
 
 export type CardPaymentMapped = (PaymentMethodMapped & {
     /**

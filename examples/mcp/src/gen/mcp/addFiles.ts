@@ -1,7 +1,7 @@
-import type { AddFilesOptions } from '../models/ts/AddFiles.js'
+import type { AddFilesOptions } from '../models/ts/AddFiles'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { addFiles } from '../clients/addFiles.js'
+import { addFiles } from '../clients/addFiles'
 
 /**
  * @description Place a new file in the store

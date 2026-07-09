@@ -4,7 +4,7 @@
 */
 
 import * as z from 'zod'
-import { animalSchema } from './animalSchema.ts'
+import { animalSchema } from './animalSchema'
 
 export const dogSchema = animalSchema.extend({
   packSize: z.int().optional(),

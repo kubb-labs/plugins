@@ -1,4 +1,4 @@
-import type { AddFilesOptions, AddFilesResponse } from '../../models/ts/pet/AddFiles.ts'
+import type { AddFilesOptions, AddFilesResponse } from '../../models/ts/pet/AddFiles'
 
 export function addFiles({ body }: AddFilesOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<AddFilesResponse> {
   return cy

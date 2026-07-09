@@ -4,7 +4,7 @@
 */
 
 import * as z from 'zod'
-import { orderStatusEnumSchema } from './orderStatusEnumSchema.ts'
+import { orderStatusEnumSchema } from './orderStatusEnumSchema'
 
 export const orderSchema = z.object({
   id: z.bigint().optional().meta({ examples: [10] }),
