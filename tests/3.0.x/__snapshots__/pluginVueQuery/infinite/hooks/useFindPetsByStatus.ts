@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { FindPetsByStatusOptions, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { FindPetsByStatusOptions, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { findPetsByStatus } from '../clients/findPetsByStatus.ts'
+import { findPetsByStatus } from '../clients/findPetsByStatus'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 

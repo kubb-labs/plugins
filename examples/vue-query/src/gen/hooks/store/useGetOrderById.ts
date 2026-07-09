@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetOrderByIdOptions, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { GetOrderByIdOptions, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById'
 import type { MaybeRefOrGetter } from 'vue'
-import { getOrderById } from '../../clients/store/getOrderById.ts'
+import { getOrderById } from '../../clients/store/getOrderById'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 

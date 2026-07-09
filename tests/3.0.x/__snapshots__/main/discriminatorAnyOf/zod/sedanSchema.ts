@@ -4,8 +4,8 @@
 */
 
 import * as z from 'zod'
-import { typeEnumSchema } from './typeEnumSchema.ts'
-import { vehicleSchema } from './vehicleSchema.ts'
+import { typeEnumSchema } from './typeEnumSchema'
+import { vehicleSchema } from './vehicleSchema'
 
 export const sedanSchema = vehicleSchema.extend({
   type: typeEnumSchema.optional(),

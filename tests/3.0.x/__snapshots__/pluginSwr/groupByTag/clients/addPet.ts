@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client.ts'
-import type { AddPetOptions, AddPetResponses } from '../types/AddPet.ts'
-import { client } from '../.kubb/client.ts'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { AddPetOptions, AddPetResponses } from '../types/AddPet'
+import { client } from '../.kubb/client'
 
 /**
  * @description Add a new pet to the store

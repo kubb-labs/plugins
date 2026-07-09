@@ -1,7 +1,7 @@
-import type { Options, RequestResult } from '../../../.kubb/client.ts'
-import type { AddPetOptions, AddPetResponses } from '../../../models/ts/pet/AddPet.ts'
-import { client } from '../../../.kubb/client.ts'
-import { addPetResponseSchema, addPetErrorSchema } from '../../../zod/pet/addPetSchema.ts'
+import type { Options, RequestResult } from '../../../.kubb/client'
+import type { AddPetOptions, AddPetResponses } from '../../../models/ts/pet/AddPet'
+import { client } from '../../../.kubb/client'
+import { addPetResponseSchema, addPetErrorSchema } from '../../../zod/pet/addPetSchema'
 
 /**
  * @description Add a new pet to the store

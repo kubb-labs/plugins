@@ -1,4 +1,4 @@
-import type { ApiResponse } from '../models/ts/ApiResponse.ts'
+import type { ApiResponse } from '../models/ts/ApiResponse'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createApiResponseFaker<TData extends Partial<ApiResponse> = object>(data?: TData) {

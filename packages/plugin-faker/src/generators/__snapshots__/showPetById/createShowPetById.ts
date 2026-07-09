@@ -4,7 +4,7 @@
  * Source: text content
  */
 
-import type { ShowPetByIdPath, ShowPetByIdResponse, ShowPetByIdStatus200, ShowPetByIdStatusDefault } from './types/ShowPetById.ts'
+import type { ShowPetByIdPath, ShowPetByIdResponse, ShowPetByIdStatus200, ShowPetByIdStatusDefault } from './types/ShowPetById'
 import { faker } from '@faker-js/faker'
 
 export function createShowPetByIdPath<TData extends Partial<ShowPetByIdPath> = object>(data?: TData) {

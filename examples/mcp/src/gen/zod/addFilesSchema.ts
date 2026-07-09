@@ -4,7 +4,7 @@
  */
 
 import * as z from 'zod'
-import { petSchema } from './petSchema.js'
+import { petSchema } from './petSchema'
 
 export const addFilesStatus200Schema = petSchema.omit({ name: true })
 

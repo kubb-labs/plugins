@@ -1,1 +1,1 @@
-export { createPetsMutationKey, createPetsMutationOptions, useCreatePets } from './useCreatePets.ts'
+export { createPetsMutationKey, createPetsMutationOptions, useCreatePets } from './useCreatePets'

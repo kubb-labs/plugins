@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options, RequestResult } from './.kubb/client.ts'
-import type { GetProjectOptions, GetProjectResponses } from './GetProject.ts'
-import { client } from './.kubb/client.ts'
+import type { Options, RequestResult } from './.kubb/client'
+import type { GetProjectOptions, GetProjectResponses } from './GetProject'
+import { client } from './.kubb/client'
 
 /**
  * {@link /projects/:project_id}

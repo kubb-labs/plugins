@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options, EventStreamResult, SuccessOf } from './.kubb/client.ts'
-import type { StreamEventsOptions, StreamEventsResponses } from './StreamEvents.ts'
-import { client, toEventStream } from './.kubb/client.ts'
+import type { Options, EventStreamResult, SuccessOf } from './.kubb/client'
+import type { StreamEventsOptions, StreamEventsResponses } from './StreamEvents'
+import { client, toEventStream } from './.kubb/client'
 
 /**
  * {@link /events}

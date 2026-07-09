@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetOrderByIdOptions, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById.ts'
-import { getOrderById } from '../../clients/store/getOrderById.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { GetOrderByIdOptions, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById'
+import { getOrderById } from '../../clients/store/getOrderById'
 import { queryOptions } from '@tanstack/react-query'
 
 export const getOrderByIdSuspenseQueryKey = ({ path }: Omit<GetOrderByIdOptions, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const

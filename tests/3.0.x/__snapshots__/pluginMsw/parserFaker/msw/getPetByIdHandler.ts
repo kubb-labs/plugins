@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
-import { createGetPetByIdResponse } from '../faker/createGetPetById.ts'
+import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById'
+import { createGetPetByIdResponse } from '../faker/createGetPetById'
 import { http } from 'msw'
 
 export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {

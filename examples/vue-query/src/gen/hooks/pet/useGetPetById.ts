@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetPetByIdOptions, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { GetPetByIdOptions, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById'
 import type { MaybeRefOrGetter } from 'vue'
-import { getPetById } from '../../clients/pet/getPetById.ts'
+import { getPetById } from '../../clients/pet/getPetById'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 

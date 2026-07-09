@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { GetInventoryOptions, GetInventoryResponses } from '../../models/store/GetInventory.ts'
-import { client } from '../../.kubb/client.ts'
+import type { Options, RequestResult } from '../../.kubb/client'
+import type { GetInventoryOptions, GetInventoryResponses } from '../../models/store/GetInventory'
+import { client } from '../../.kubb/client'
 
 /**
  * @description Returns a map of status codes to quantities

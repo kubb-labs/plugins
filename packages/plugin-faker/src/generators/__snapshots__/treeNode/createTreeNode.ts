@@ -4,7 +4,7 @@
  * Source: text content
  */
 
-import type { TreeNode } from './types/TreeNode.ts'
+import type { TreeNode } from './types/TreeNode'
 import { faker } from '@faker-js/faker'
 
 export function createTreeNode<TData extends Partial<TreeNode> = object>(data?: TData) {

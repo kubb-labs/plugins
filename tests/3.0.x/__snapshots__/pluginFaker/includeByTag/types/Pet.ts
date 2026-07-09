@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { Category } from './Category.ts'
-import type { PetStatusEnumKey } from './PetStatusEnum.ts'
-import type { Tag } from './Tag.ts'
+import type { Category } from './Category'
+import type { PetStatusEnumKey } from './PetStatusEnum'
+import type { Tag } from './Tag'
 
 /**
  * @type object

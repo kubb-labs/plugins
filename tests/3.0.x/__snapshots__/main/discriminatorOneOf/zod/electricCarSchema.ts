@@ -4,8 +4,8 @@
 */
 
 import * as z from 'zod'
-import { electricCarTypeEnumSchema } from './electricCarTypeEnumSchema.ts'
-import { vehicleSchema } from './vehicleSchema.ts'
+import { electricCarTypeEnumSchema } from './electricCarTypeEnumSchema'
+import { vehicleSchema } from './vehicleSchema'
 
 export const electricCarSchema = vehicleSchema.strict().extend({
   type: electricCarTypeEnumSchema.optional(),

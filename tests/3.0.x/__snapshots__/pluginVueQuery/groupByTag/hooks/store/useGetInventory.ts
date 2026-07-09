@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetInventoryStatus200 } from '../../types/GetInventory.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { GetInventoryStatus200 } from '../../types/GetInventory'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
-import { getInventory } from '../../clients/getInventory.ts'
+import { getInventory } from '../../clients/getInventory'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 

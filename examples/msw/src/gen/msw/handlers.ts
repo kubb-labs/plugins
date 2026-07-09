@@ -3,20 +3,20 @@
  * Do not edit manually.
  */
 
-import { addPetHandler } from './pet/Handlers/addPetHandler.ts'
-import { deletePetHandler } from './pet/Handlers/deletePetHandler.ts'
-import { findPetsByStatusHandler } from './pet/Handlers/findPetsByStatusHandler.ts'
-import { findPetsByTagsHandler } from './pet/Handlers/findPetsByTagsHandler.ts'
-import { getPetByIdHandler } from './pet/Handlers/getPetByIdHandler.ts'
-import { optionsFindPetsByStatusHandler } from './pet/Handlers/optionsFindPetsByStatusHandler.ts'
-import { updatePetHandler } from './pet/Handlers/updatePetHandler.ts'
-import { updatePetWithFormHandler } from './pet/Handlers/updatePetWithFormHandler.ts'
-import { uploadFileHandler } from './pet/Handlers/uploadFileHandler.ts'
-import { deleteOrderHandler } from './store/Handlers/deleteOrderHandler.ts'
-import { getInventoryHandler } from './store/Handlers/getInventoryHandler.ts'
-import { getOrderByIdHandler } from './store/Handlers/getOrderByIdHandler.ts'
-import { placeOrderHandler } from './store/Handlers/placeOrderHandler.ts'
-import { placeOrderPatchHandler } from './store/Handlers/placeOrderPatchHandler.ts'
+import { addPetHandler } from './pet/Handlers/addPetHandler'
+import { deletePetHandler } from './pet/Handlers/deletePetHandler'
+import { findPetsByStatusHandler } from './pet/Handlers/findPetsByStatusHandler'
+import { findPetsByTagsHandler } from './pet/Handlers/findPetsByTagsHandler'
+import { getPetByIdHandler } from './pet/Handlers/getPetByIdHandler'
+import { optionsFindPetsByStatusHandler } from './pet/Handlers/optionsFindPetsByStatusHandler'
+import { updatePetHandler } from './pet/Handlers/updatePetHandler'
+import { updatePetWithFormHandler } from './pet/Handlers/updatePetWithFormHandler'
+import { uploadFileHandler } from './pet/Handlers/uploadFileHandler'
+import { deleteOrderHandler } from './store/Handlers/deleteOrderHandler'
+import { getInventoryHandler } from './store/Handlers/getInventoryHandler'
+import { getOrderByIdHandler } from './store/Handlers/getOrderByIdHandler'
+import { placeOrderHandler } from './store/Handlers/placeOrderHandler'
+import { placeOrderPatchHandler } from './store/Handlers/placeOrderPatchHandler'
 
 export const handlers = [
   updatePetHandler(),

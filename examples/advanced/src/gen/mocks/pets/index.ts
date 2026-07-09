@@ -6,4 +6,4 @@ export {
   createCreatePetsResponseFaker,
   createCreatePetsStatus201Faker,
   createCreatePetsStatusDefaultFaker,
-} from './createCreatePetsFaker.ts'
+} from './createCreatePetsFaker'

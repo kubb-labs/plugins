@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { PetNotFound } from '../models/PetNotFound.ts'
+import type { PetNotFound } from '../models/PetNotFound'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createPetNotFound<TData extends Partial<PetNotFound> = object>(data?: TData) {

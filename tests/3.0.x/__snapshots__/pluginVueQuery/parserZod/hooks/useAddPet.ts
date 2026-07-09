@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { AddPetOptions, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { AddPetOptions, AddPetStatus200, AddPetStatus405 } from '../types/AddPet'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import { addPet } from '../clients/addPet.ts'
+import { addPet } from '../clients/addPet'
 import { useMutation } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 

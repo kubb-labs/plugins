@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { UploadFileResponse, UploadFileBody } from '../types/UploadFile.ts'
+import type { UploadFileResponse, UploadFileBody } from '../types/UploadFile'
 import type { HttpResponseResolver } from 'msw'
-import { createUploadFileResponse } from '../faker/createUploadFile.ts'
+import { createUploadFileResponse } from '../faker/createUploadFile'
 import { http } from 'msw'
 
 export function uploadFileHandlerResponse200(data: UploadFileResponse) {

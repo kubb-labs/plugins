@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client.ts'
-import type { AddPetOptions, AddPetResponses } from '../types/AddPet.ts'
-import { client } from '../.kubb/client.ts'
-import { addPetResponseSchema, addPetErrorSchema } from '../zod/addPetSchema.ts'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { AddPetOptions, AddPetResponses } from '../types/AddPet'
+import { client } from '../.kubb/client'
+import { addPetResponseSchema, addPetErrorSchema } from '../zod/addPetSchema'
 
 /**
  * @description Add a new pet to the store

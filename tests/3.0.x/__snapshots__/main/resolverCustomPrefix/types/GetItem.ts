@@ -1,6 +1,6 @@
 // Custom banner
 
-import type { CustomItem } from './Item.ts'
+import type { CustomItem } from './Item'
 
 /**
  * @type object

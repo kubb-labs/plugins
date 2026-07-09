@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client.ts'
-import type { UpdatePetOptions, UpdatePetResponses } from '../types/UpdatePet.ts'
-import { client } from '../.kubb/client.ts'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { UpdatePetOptions, UpdatePetResponses } from '../types/UpdatePet'
+import { client } from '../.kubb/client'
 
 /**
  * {@link /pets/:pet_id}

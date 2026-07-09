@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig } from '../.kubb/client.ts'
-import type { DeletePetOptions } from '../types/DeletePet.ts'
-import { deletePet } from '../clients/deletePet.ts'
+import type { RequestConfig } from '../.kubb/client'
+import type { DeletePetOptions } from '../types/DeletePet'
+import { deletePet } from '../clients/deletePet'
 
 export const deletePetQueryKey = ({ path }: Omit<DeletePetOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 

@@ -4,10 +4,10 @@
  * Source: text content
  */
 
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
-import type { FindPetsByTagsOptions, FindPetsByTagsQuery, FindPetsByTagsStatus200 } from './FindPetsByTags.ts'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByTagsOptions, FindPetsByTagsQuery, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '@tanstack/react-query'
-import { findPetsByTags } from './clients/findPetsByTags.ts'
+import { findPetsByTags } from './clients/findPetsByTags'
 import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 
 export const findPetsByTagsInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'>) =>

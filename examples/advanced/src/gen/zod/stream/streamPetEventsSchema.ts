@@ -1,5 +1,5 @@
 import * as z from 'zod'
-import { petEventSchema } from '../petEventSchema.ts'
+import { petEventSchema } from '../petEventSchema'
 
 export const streamPetEventsPathPetIdSchema = z.int().describe('ID of pet to stream events for')
 

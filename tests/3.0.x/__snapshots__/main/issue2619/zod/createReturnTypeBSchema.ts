@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import { resultSchema } from './resultSchema.ts'
-import { typeBRequestSchema } from './typeBRequestSchema.ts'
+import { resultSchema } from './resultSchema'
+import { typeBRequestSchema } from './typeBRequestSchema'
 
 export const createReturnTypeBStatus200Schema = resultSchema
 

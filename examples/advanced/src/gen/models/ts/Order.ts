@@ -1,7 +1,7 @@
-import type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum.ts'
-import type { OrderOrderTypeEnumKey } from './OrderOrderTypeEnum.ts'
-import type { OrderParamsStatusEnumKey } from './OrderParamsStatusEnum.ts'
-import type { OrderStatusEnumKey } from './OrderStatusEnum.ts'
+import type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum'
+import type { OrderOrderTypeEnumKey } from './OrderOrderTypeEnum'
+import type { OrderParamsStatusEnumKey } from './OrderParamsStatusEnum'
+import type { OrderStatusEnumKey } from './OrderStatusEnum'
 
 /**
  * @type object

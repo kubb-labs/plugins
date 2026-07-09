@@ -4,10 +4,10 @@
  */
 
 import useSWR from 'swr'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetInventoryResponse } from '../../models/store/GetInventory.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { GetInventoryResponse } from '../../models/store/GetInventory'
 import type { SWRConfiguration } from 'swr'
-import { getInventory } from '../../clients/store/getInventory.ts'
+import { getInventory } from '../../clients/store/getInventory'
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 

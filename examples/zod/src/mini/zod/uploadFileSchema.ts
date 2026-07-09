@@ -4,7 +4,7 @@
  */
 
 import * as z from 'zod/mini'
-import { apiResponseSchema } from './apiResponseSchema.ts'
+import { apiResponseSchema } from './apiResponseSchema'
 
 export const uploadFilePathPetIdSchema = z.bigint()
 

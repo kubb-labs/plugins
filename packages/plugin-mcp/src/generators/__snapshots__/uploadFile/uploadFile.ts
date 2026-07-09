@@ -1,7 +1,7 @@
-import type { UploadFileOptions } from './UploadFile.ts'
+import type { UploadFileOptions } from './UploadFile'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { uploadFile } from './clients/uploadFile.ts'
+import { uploadFile } from './clients/uploadFile'
 
 /**
  * {@link /pets/:petId/upload}

@@ -1,6 +1,6 @@
-import type { Options, RequestResult } from '../../../.kubb/client.ts'
-import type { AddFilesOptions, AddFilesResponses } from '../../../models/ts/pet/AddFiles.ts'
-import { client } from '../../../.kubb/client.ts'
+import type { Options, RequestResult } from '../../../.kubb/client'
+import type { AddFilesOptions, AddFilesResponses } from '../../../models/ts/pet/AddFiles'
+import { client } from '../../../.kubb/client'
 
 /**
  * @description Place a new file in the store

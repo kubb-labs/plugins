@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { CreateUsersWithListInputOptions, CreateUsersWithListInputStatus200 } from '../../models/user/CreateUsersWithListInput.ts'
-import { createUsersWithListInput } from '../../clients/user/createUsersWithListInput.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { CreateUsersWithListInputOptions, CreateUsersWithListInputStatus200 } from '../../models/user/CreateUsersWithListInput'
+import { createUsersWithListInput } from '../../clients/user/createUsersWithListInput'
 import { mutationOptions } from '@tanstack/react-query'
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const

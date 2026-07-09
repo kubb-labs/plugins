@@ -1,7 +1,7 @@
-import type { UpdatePetWithFormOptions } from '../models/ts/UpdatePetWithForm.js'
+import type { UpdatePetWithFormOptions } from '../models/ts/UpdatePetWithForm'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { updatePetWithForm } from '../clients/updatePetWithForm.js'
+import { updatePetWithForm } from '../clients/updatePetWithForm'
 
 /**
  * @summary Updates a pet in the store with form data

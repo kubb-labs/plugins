@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { GetInventoryResponse, GetInventoryStatus200 } from '../types/GetInventory.ts'
+import type { GetInventoryResponse, GetInventoryStatus200 } from '../types/GetInventory'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

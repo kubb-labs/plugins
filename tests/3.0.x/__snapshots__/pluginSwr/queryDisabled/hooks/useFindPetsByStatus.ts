@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig } from '../.kubb/client.ts'
-import type { FindPetsByStatusOptions } from '../types/FindPetsByStatus.ts'
-import { findPetsByStatus } from '../clients/findPetsByStatus.ts'
+import type { RequestConfig } from '../.kubb/client'
+import type { FindPetsByStatusOptions } from '../types/FindPetsByStatus'
+import { findPetsByStatus } from '../clients/findPetsByStatus'
 
 export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusOptions, 'headers'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 

@@ -1,7 +1,7 @@
-import type { DeletePetOptions } from './DeletePet.ts'
+import type { DeletePetOptions } from './DeletePet'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { deletePet } from './clients/deletePet.ts'
+import { deletePet } from './clients/deletePet'
 
 /**
  * {@link /pets/:petId}

@@ -4,8 +4,8 @@
 */
 
 import * as z from 'zod'
-import { parcelSchema } from './parcelSchema.ts'
-import { resultStateEnumSchema } from './resultStateEnumSchema.ts'
+import { parcelSchema } from './parcelSchema'
+import { resultStateEnumSchema } from './resultStateEnumSchema'
 
 export const resultSchema = z.object({
   returnId: z.string(),

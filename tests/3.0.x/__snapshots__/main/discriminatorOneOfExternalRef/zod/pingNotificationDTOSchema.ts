@@ -4,8 +4,8 @@
 */
 
 import * as z from 'zod'
-import { notificationTypeSchema } from './notificationTypeSchema.ts'
-import { sendNotificationRequestSchema } from './sendNotificationRequestSchema.ts'
+import { notificationTypeSchema } from './notificationTypeSchema'
+import { sendNotificationRequestSchema } from './sendNotificationRequestSchema'
 
 export const pingNotificationDTOSchema = z.object({
   notificationType: notificationTypeSchema.describe('Notification type: PING — test, ORDER_CREATED — new order, ORDER_CANCELLED — order cancelled'),

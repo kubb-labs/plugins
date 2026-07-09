@@ -1,7 +1,7 @@
-import type { GetOrderByIdOptions } from '../models/ts/GetOrderById.js'
+import type { GetOrderByIdOptions } from '../models/ts/GetOrderById'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { getOrderById } from '../clients/getOrderById.js'
+import { getOrderById } from '../clients/getOrderById'
 
 /**
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.

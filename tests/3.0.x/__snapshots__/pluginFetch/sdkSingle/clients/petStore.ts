@@ -3,15 +3,15 @@
 * Do not edit manually.
 */
 
-import type { ClientConfig, ClientInstance, Options, RequestResult } from '../.kubb/client.ts'
-import type { AddPetOptions, AddPetResponses } from '../types/AddPet.ts'
-import type { DeletePetOptions, DeletePetResponses } from '../types/DeletePet.ts'
-import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../types/FindPetsByStatus.ts'
-import type { GetInventoryOptions, GetInventoryResponses } from '../types/GetInventory.ts'
-import type { GetPetByIdOptions, GetPetByIdResponses } from '../types/GetPetById.ts'
-import type { PlaceOrderOptions, PlaceOrderResponses } from '../types/PlaceOrder.ts'
-import type { UploadFileOptions, UploadFileResponses } from '../types/UploadFile.ts'
-import { createClient } from '../.kubb/client.ts'
+import type { ClientConfig, ClientInstance, Options, RequestResult } from '../.kubb/client'
+import type { AddPetOptions, AddPetResponses } from '../types/AddPet'
+import type { DeletePetOptions, DeletePetResponses } from '../types/DeletePet'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../types/FindPetsByStatus'
+import type { GetInventoryOptions, GetInventoryResponses } from '../types/GetInventory'
+import type { GetPetByIdOptions, GetPetByIdResponses } from '../types/GetPetById'
+import type { PlaceOrderOptions, PlaceOrderResponses } from '../types/PlaceOrder'
+import type { UploadFileOptions, UploadFileResponses } from '../types/UploadFile'
+import { createClient } from '../.kubb/client'
 
 export class PetStore {
   private readonly client: ClientInstance

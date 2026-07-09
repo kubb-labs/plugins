@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE.js'
-import type { PetNotFound } from './PetNotFound.js'
+import type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE'
+import type { PetNotFound } from './PetNotFound'
 
 /**
  * @type object

@@ -1,4 +1,4 @@
-import type { Image } from './Image.ts'
+import type { Image } from './Image'
 
 /**
  * @type object

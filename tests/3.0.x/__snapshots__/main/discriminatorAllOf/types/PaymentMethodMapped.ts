@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { PaymentMethodMappedTypeEnumKey } from './PaymentMethodMappedTypeEnum.ts'
+import type { PaymentMethodMappedTypeEnumKey } from './PaymentMethodMappedTypeEnum'
 
 /**
  * @type object

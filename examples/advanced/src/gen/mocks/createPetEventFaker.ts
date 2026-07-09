@@ -1,6 +1,6 @@
-import type { PetEvent } from '../models/ts/PetEvent.ts'
-import { createPetEventTypeEnumFaker } from './createPetEventTypeEnumFaker.ts'
-import { createPetFaker } from './createPetFaker.ts'
+import type { PetEvent } from '../models/ts/PetEvent'
+import { createPetEventTypeEnumFaker } from './createPetEventTypeEnumFaker'
+import { createPetFaker } from './createPetFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createPetEventFaker<TData extends Partial<PetEvent> = object>(data?: TData) {

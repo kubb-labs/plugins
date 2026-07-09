@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { AddPetRequestStatusEnumKey } from './AddPetRequestStatusEnum.js'
-import type { Category } from './Category.js'
-import type { TagTag } from './tag/Tag.js'
+import type { AddPetRequestStatusEnumKey } from './AddPetRequestStatusEnum'
+import type { Category } from './Category'
+import type { TagTag } from './tag/Tag'
 
 /**
  * @type object

@@ -4,7 +4,7 @@
  * Source: text content
  */
 
-import type { ShowPetByIdOptions, ShowPetByIdResponse } from './ShowPetById.ts'
+import type { ShowPetByIdOptions, ShowPetByIdResponse } from './ShowPetById'
 
 export function showPetById({ path }: ShowPetByIdOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<ShowPetByIdResponse> {
   return cy

@@ -11,8 +11,8 @@ import type {
   GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
-} from '../../models/GetOrderById.ts'
-import { createOrder } from '../createOrder.ts'
+} from '../../models/GetOrderById'
+import { createOrder } from '../createOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createGetOrderByIdPath<TData extends Partial<GetOrderByIdPath> = object>(data?: TData) {

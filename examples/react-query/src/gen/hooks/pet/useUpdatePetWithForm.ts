@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { UpdatePetWithFormOptions, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../../models/pet/UpdatePetWithForm.ts'
-import { updatePetWithForm } from '../../clients/pet/updatePetWithForm.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../../models/pet/UpdatePetWithForm'
+import { updatePetWithForm } from '../../clients/pet/updatePetWithForm'
 import { mutationOptions } from '@tanstack/react-query'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const

@@ -8,8 +8,8 @@ export {
   createAddPetStatus200Json,
   createAddPetStatus200Xml,
   createAddPetStatus405,
-} from './createAddPet.ts'
-export { createDeletePetHeaders, createDeletePetPath, createDeletePetResponse, createDeletePetStatus400 } from './createDeletePet.ts'
+} from './createAddPet'
+export { createDeletePetHeaders, createDeletePetPath, createDeletePetResponse, createDeletePetStatus400 } from './createDeletePet'
 export {
   createFindPetsByStatusQuery,
   createFindPetsByStatusResponse,
@@ -17,7 +17,7 @@ export {
   createFindPetsByStatusStatus200Json,
   createFindPetsByStatusStatus200Xml,
   createFindPetsByStatusStatus400,
-} from './createFindPetsByStatus.ts'
+} from './createFindPetsByStatus'
 export {
   createFindPetsByTagsQuery,
   createFindPetsByTagsResponse,
@@ -25,7 +25,7 @@ export {
   createFindPetsByTagsStatus200Json,
   createFindPetsByTagsStatus200Xml,
   createFindPetsByTagsStatus400,
-} from './createFindPetsByTags.ts'
+} from './createFindPetsByTags'
 export {
   createGetPetByIdPath,
   createGetPetByIdResponse,
@@ -34,8 +34,8 @@ export {
   createGetPetByIdStatus200Xml,
   createGetPetByIdStatus400,
   createGetPetByIdStatus404,
-} from './createGetPetById.ts'
-export { createOptionsFindPetsByStatusResponse, createOptionsFindPetsByStatusStatus200 } from './createOptionsFindPetsByStatus.ts'
+} from './createGetPetById'
+export { createOptionsFindPetsByStatusResponse, createOptionsFindPetsByStatusStatus200 } from './createOptionsFindPetsByStatus'
 export {
   createUpdatePetBody,
   createUpdatePetBodyFormUrlEncoded,
@@ -48,11 +48,11 @@ export {
   createUpdatePetStatus400,
   createUpdatePetStatus404,
   createUpdatePetStatus405,
-} from './createUpdatePet.ts'
+} from './createUpdatePet'
 export {
   createUpdatePetWithFormPath,
   createUpdatePetWithFormQuery,
   createUpdatePetWithFormResponse,
   createUpdatePetWithFormStatus405,
-} from './createUpdatePetWithForm.ts'
-export { createUploadFileBody, createUploadFilePath, createUploadFileQuery, createUploadFileResponse, createUploadFileStatus200 } from './createUploadFile.ts'
+} from './createUpdatePetWithForm'
+export { createUploadFileBody, createUploadFilePath, createUploadFileQuery, createUploadFileResponse, createUploadFileStatus200 } from './createUploadFile'

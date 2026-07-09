@@ -4,7 +4,7 @@
  * Source: text content
  */
 
-import type { GetPetsOptions, GetPetsResponse } from './GetPets.ts'
+import type { GetPetsOptions, GetPetsResponse } from './GetPets'
 
 export function getPets({ query }: GetPetsOptions = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetsResponse> {
   return cy

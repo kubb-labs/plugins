@@ -4,7 +4,7 @@
  */
 
 import { z } from '../../zod.ts'
-import { petSchema } from './petSchema.ts'
+import { petSchema } from './petSchema'
 
 export const updatePetStatus200SchemaJson = z.lazy(() => petSchema)
 

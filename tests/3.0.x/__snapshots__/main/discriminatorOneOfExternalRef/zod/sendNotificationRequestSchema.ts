@@ -4,8 +4,8 @@
 */
 
 import * as z from 'zod'
-import { orderCreatedNotificationDTOSchema } from './orderCreatedNotificationDTOSchema.ts'
-import { pingNotificationDTOSchema } from './pingNotificationDTOSchema.ts'
+import { orderCreatedNotificationDTOSchema } from './orderCreatedNotificationDTOSchema'
+import { pingNotificationDTOSchema } from './pingNotificationDTOSchema'
 
 export const sendNotificationRequestSchema: z.ZodType = z.union([
   z.lazy(() => pingNotificationDTOSchema).and(z.object({

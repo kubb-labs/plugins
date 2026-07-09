@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByStatusQuery, FindPetsByStatusResponse, FindPetsByStatusStatus200, FindPetsByStatusStatus200Json, FindPetsByStatusStatus200Xml, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
-import { createFindPetsByStatusStatus } from './createFindPetsByStatusStatus.ts'
-import { createPet } from './createPet.ts'
+import type { FindPetsByStatusQuery, FindPetsByStatusResponse, FindPetsByStatusStatus200, FindPetsByStatusStatus200Json, FindPetsByStatusStatus200Xml, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus'
+import { createFindPetsByStatusStatus } from './createFindPetsByStatusStatus'
+import { createPet } from './createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createFindPetsByStatusQuery<TData extends Partial<FindPetsByStatusQuery> = object>(data?: TData)

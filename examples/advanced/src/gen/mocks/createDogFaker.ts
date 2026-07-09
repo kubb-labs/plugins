@@ -1,5 +1,5 @@
-import type { Dog } from '../models/ts/Dog.ts'
-import { createImageFaker } from './createImageFaker.ts'
+import type { Dog } from '../models/ts/Dog'
+import { createImageFaker } from './createImageFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createDogFaker<TData extends Partial<Dog> = object>(data?: TData) {

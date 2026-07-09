@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { Employer } from './Employer.ts'
-import type { User } from './User.ts'
+import type { Employer } from './Employer'
+import type { User } from './User'
 
 /**
  * @type object

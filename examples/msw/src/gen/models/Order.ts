@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum.ts'
-import type { OrderStatusEnumKey } from './OrderStatusEnum.ts'
+import type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum'
+import type { OrderStatusEnumKey } from './OrderStatusEnum'
 
 /**
  * @type object

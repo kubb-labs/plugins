@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { DeleteOrderPath, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../models/DeleteOrder.ts'
+import type { DeleteOrderPath, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../models/DeleteOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createDeleteOrderPath<TData extends Partial<DeleteOrderPath> = object>(data?: TData) {

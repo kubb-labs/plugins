@@ -1,4 +1,4 @@
-export type { AddPetRequestSchemaType } from './addPetRequestSchema.ts'
+export type { AddPetRequestSchemaType } from './addPetRequestSchema'
 export type {
   AddPetBodySchemaFormUrlEncodedType,
   AddPetBodySchemaJsonType,
@@ -10,9 +10,9 @@ export type {
   AddPetStatus200SchemaType,
   AddPetStatus200SchemaXmlType,
   AddPetStatus405SchemaType,
-} from './addPetSchema.ts'
-export type { ApiResponseSchemaType } from './apiResponseSchema.ts'
-export type { CategorySchemaType } from './categorySchema.ts'
+} from './addPetSchema'
+export type { ApiResponseSchemaType } from './apiResponseSchema'
+export type { CategorySchemaType } from './categorySchema'
 export type {
   CreatePetsBodySchemaType,
   CreatePetsErrorSchemaType,
@@ -22,21 +22,21 @@ export type {
   CreatePetsResponseSchemaType,
   CreatePetsStatus201SchemaType,
   CreatePetsStatusDefaultSchemaType,
-} from './createPetsSchema.ts'
+} from './createPetsSchema'
 export type {
   DeleteOrderErrorSchemaType,
   DeleteOrderPathOrderIdSchemaType,
   DeleteOrderResponseSchemaType,
   DeleteOrderStatus400SchemaType,
   DeleteOrderStatus404SchemaType,
-} from './deleteOrderSchema.ts'
+} from './deleteOrderSchema'
 export type {
   DeletePetErrorSchemaType,
   DeletePetHeaderApiKeySchemaType,
   DeletePetPathPetIdSchemaType,
   DeletePetResponseSchemaType,
   DeletePetStatus400SchemaType,
-} from './deletePetSchema.ts'
+} from './deletePetSchema'
 export type {
   FindPetsByStatusErrorSchemaType,
   FindPetsByStatusQueryStatusSchemaType,
@@ -45,7 +45,7 @@ export type {
   FindPetsByStatusStatus200SchemaType,
   FindPetsByStatusStatus200SchemaXmlType,
   FindPetsByStatusStatus400SchemaType,
-} from './findPetsByStatusSchema.ts'
+} from './findPetsByStatusSchema'
 export type {
   FindPetsByTagsErrorSchemaType,
   FindPetsByTagsHeaderXEXAMPLESchemaType,
@@ -57,8 +57,8 @@ export type {
   FindPetsByTagsStatus200SchemaType,
   FindPetsByTagsStatus200SchemaXmlType,
   FindPetsByTagsStatus400SchemaType,
-} from './findPetsByTagsSchema.ts'
-export type { GetInventoryResponseSchemaType, GetInventoryStatus200SchemaType } from './getInventorySchema.ts'
+} from './findPetsByTagsSchema'
+export type { GetInventoryResponseSchemaType, GetInventoryStatus200SchemaType } from './getInventorySchema'
 export type {
   GetOrderByIdErrorSchemaType,
   GetOrderByIdPathOrderIdSchemaType,
@@ -68,7 +68,7 @@ export type {
   GetOrderByIdStatus200SchemaXmlType,
   GetOrderByIdStatus400SchemaType,
   GetOrderByIdStatus404SchemaType,
-} from './getOrderByIdSchema.ts'
+} from './getOrderByIdSchema'
 export type {
   GetPetByIdErrorSchemaType,
   GetPetByIdPathPetIdSchemaType,
@@ -78,7 +78,7 @@ export type {
   GetPetByIdStatus200SchemaXmlType,
   GetPetByIdStatus400SchemaType,
   GetPetByIdStatus404SchemaType,
-} from './getPetByIdSchema.ts'
+} from './getPetByIdSchema'
 export type {
   GetThingsErrorSchemaType,
   GetThingsQueryLimitSchemaType,
@@ -86,13 +86,13 @@ export type {
   GetThingsResponseSchemaType,
   GetThingsStatus201SchemaType,
   GetThingsStatusDefaultSchemaType,
-} from './getThingsSchema.ts'
-export type { OrderSchemaType } from './orderSchema.ts'
-export type { PetNotFoundSchemaType } from './petNotFoundSchema.ts'
-export type { PetSchemaType } from './petSchema.ts'
-export type { PhoneNumberSchemaType } from './phoneNumberSchema.ts'
-export type { PhoneWithMaxLengthExplicitSchemaType } from './phoneWithMaxLengthExplicitSchema.ts'
-export type { PhoneWithMaxLengthSchemaType } from './phoneWithMaxLengthSchema.ts'
+} from './getThingsSchema'
+export type { OrderSchemaType } from './orderSchema'
+export type { PetNotFoundSchemaType } from './petNotFoundSchema'
+export type { PetSchemaType } from './petSchema'
+export type { PhoneNumberSchemaType } from './phoneNumberSchema'
+export type { PhoneWithMaxLengthExplicitSchemaType } from './phoneWithMaxLengthExplicitSchema'
+export type { PhoneWithMaxLengthSchemaType } from './phoneWithMaxLengthSchema'
 export type {
   PlaceOrderPatchBodySchemaFormUrlEncodedType,
   PlaceOrderPatchBodySchemaJsonType,
@@ -102,7 +102,7 @@ export type {
   PlaceOrderPatchResponseSchemaType,
   PlaceOrderPatchStatus200SchemaType,
   PlaceOrderPatchStatus405SchemaType,
-} from './placeOrderPatchSchema.ts'
+} from './placeOrderPatchSchema'
 export type {
   PlaceOrderBodySchemaFormUrlEncodedType,
   PlaceOrderBodySchemaJsonType,
@@ -112,8 +112,8 @@ export type {
   PlaceOrderResponseSchemaType,
   PlaceOrderStatus200SchemaType,
   PlaceOrderStatus405SchemaType,
-} from './placeOrderSchema.ts'
-export type { TagSchemaType } from './tagSchema.ts'
+} from './placeOrderSchema'
+export type { TagSchemaType } from './tagSchema'
 export type {
   UpdatePetBodySchemaFormUrlEncodedType,
   UpdatePetBodySchemaJsonType,
@@ -127,7 +127,7 @@ export type {
   UpdatePetStatus400SchemaType,
   UpdatePetStatus404SchemaType,
   UpdatePetStatus405SchemaType,
-} from './updatePetSchema.ts'
+} from './updatePetSchema'
 export type {
   UpdatePetWithFormErrorSchemaType,
   UpdatePetWithFormPathPetIdSchemaType,
@@ -135,15 +135,15 @@ export type {
   UpdatePetWithFormQueryStatusSchemaType,
   UpdatePetWithFormResponseSchemaType,
   UpdatePetWithFormStatus405SchemaType,
-} from './updatePetWithFormSchema.ts'
+} from './updatePetWithFormSchema'
 export type {
   UploadFileBodySchemaType,
   UploadFilePathPetIdSchemaType,
   UploadFileQueryAdditionalMetadataSchemaType,
   UploadFileResponseSchemaType,
   UploadFileStatus200SchemaType,
-} from './uploadFileSchema.ts'
-export { addPetRequestSchema } from './addPetRequestSchema.ts'
+} from './uploadFileSchema'
+export { addPetRequestSchema } from './addPetRequestSchema'
 export {
   addPetBodySchema,
   addPetBodySchemaFormUrlEncoded,
@@ -155,9 +155,9 @@ export {
   addPetStatus200SchemaJson,
   addPetStatus200SchemaXml,
   addPetStatus405Schema,
-} from './addPetSchema.ts'
-export { apiResponseSchema } from './apiResponseSchema.ts'
-export { categorySchema } from './categorySchema.ts'
+} from './addPetSchema'
+export { apiResponseSchema } from './apiResponseSchema'
+export { categorySchema } from './categorySchema'
 export {
   createPetsBodySchema,
   createPetsErrorSchema,
@@ -167,21 +167,21 @@ export {
   createPetsResponseSchema,
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
-} from './createPetsSchema.ts'
+} from './createPetsSchema'
 export {
   deleteOrderErrorSchema,
   deleteOrderPathOrderIdSchema,
   deleteOrderResponseSchema,
   deleteOrderStatus400Schema,
   deleteOrderStatus404Schema,
-} from './deleteOrderSchema.ts'
+} from './deleteOrderSchema'
 export {
   deletePetErrorSchema,
   deletePetHeaderApiKeySchema,
   deletePetPathPetIdSchema,
   deletePetResponseSchema,
   deletePetStatus400Schema,
-} from './deletePetSchema.ts'
+} from './deletePetSchema'
 export {
   findPetsByStatusErrorSchema,
   findPetsByStatusQueryStatusSchema,
@@ -190,7 +190,7 @@ export {
   findPetsByStatusStatus200SchemaJson,
   findPetsByStatusStatus200SchemaXml,
   findPetsByStatusStatus400Schema,
-} from './findPetsByStatusSchema.ts'
+} from './findPetsByStatusSchema'
 export {
   findPetsByTagsErrorSchema,
   findPetsByTagsHeaderXEXAMPLESchema,
@@ -202,8 +202,8 @@ export {
   findPetsByTagsStatus200SchemaJson,
   findPetsByTagsStatus200SchemaXml,
   findPetsByTagsStatus400Schema,
-} from './findPetsByTagsSchema.ts'
-export { getInventoryResponseSchema, getInventoryStatus200Schema } from './getInventorySchema.ts'
+} from './findPetsByTagsSchema'
+export { getInventoryResponseSchema, getInventoryStatus200Schema } from './getInventorySchema'
 export {
   getOrderByIdErrorSchema,
   getOrderByIdPathOrderIdSchema,
@@ -213,7 +213,7 @@ export {
   getOrderByIdStatus200SchemaXml,
   getOrderByIdStatus400Schema,
   getOrderByIdStatus404Schema,
-} from './getOrderByIdSchema.ts'
+} from './getOrderByIdSchema'
 export {
   getPetByIdErrorSchema,
   getPetByIdPathPetIdSchema,
@@ -223,7 +223,7 @@ export {
   getPetByIdStatus200SchemaXml,
   getPetByIdStatus400Schema,
   getPetByIdStatus404Schema,
-} from './getPetByIdSchema.ts'
+} from './getPetByIdSchema'
 export {
   getThingsErrorSchema,
   getThingsQueryLimitSchema,
@@ -231,14 +231,14 @@ export {
   getThingsResponseSchema,
   getThingsStatus201Schema,
   getThingsStatusDefaultSchema,
-} from './getThingsSchema.ts'
-export { OperationSchema, OperationsMap, operations, paths } from './operationsSchema.ts'
-export { orderSchema } from './orderSchema.ts'
-export { petNotFoundSchema } from './petNotFoundSchema.ts'
-export { petSchema } from './petSchema.ts'
-export { phoneNumberSchema } from './phoneNumberSchema.ts'
-export { phoneWithMaxLengthExplicitSchema } from './phoneWithMaxLengthExplicitSchema.ts'
-export { phoneWithMaxLengthSchema } from './phoneWithMaxLengthSchema.ts'
+} from './getThingsSchema'
+export { OperationSchema, OperationsMap, operations, paths } from './operationsSchema'
+export { orderSchema } from './orderSchema'
+export { petNotFoundSchema } from './petNotFoundSchema'
+export { petSchema } from './petSchema'
+export { phoneNumberSchema } from './phoneNumberSchema'
+export { phoneWithMaxLengthExplicitSchema } from './phoneWithMaxLengthExplicitSchema'
+export { phoneWithMaxLengthSchema } from './phoneWithMaxLengthSchema'
 export {
   placeOrderPatchBodySchema,
   placeOrderPatchBodySchemaFormUrlEncoded,
@@ -248,7 +248,7 @@ export {
   placeOrderPatchResponseSchema,
   placeOrderPatchStatus200Schema,
   placeOrderPatchStatus405Schema,
-} from './placeOrderPatchSchema.ts'
+} from './placeOrderPatchSchema'
 export {
   placeOrderBodySchema,
   placeOrderBodySchemaFormUrlEncoded,
@@ -258,8 +258,8 @@ export {
   placeOrderResponseSchema,
   placeOrderStatus200Schema,
   placeOrderStatus405Schema,
-} from './placeOrderSchema.ts'
-export { tagSchema } from './tagSchema.ts'
+} from './placeOrderSchema'
+export { tagSchema } from './tagSchema'
 export {
   updatePetBodySchema,
   updatePetBodySchemaFormUrlEncoded,
@@ -273,7 +273,7 @@ export {
   updatePetStatus400Schema,
   updatePetStatus404Schema,
   updatePetStatus405Schema,
-} from './updatePetSchema.ts'
+} from './updatePetSchema'
 export {
   updatePetWithFormErrorSchema,
   updatePetWithFormPathPetIdSchema,
@@ -281,11 +281,11 @@ export {
   updatePetWithFormQueryStatusSchema,
   updatePetWithFormResponseSchema,
   updatePetWithFormStatus405Schema,
-} from './updatePetWithFormSchema.ts'
+} from './updatePetWithFormSchema'
 export {
   uploadFileBodySchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,
   uploadFileStatus200Schema,
-} from './uploadFileSchema.ts'
+} from './uploadFileSchema'

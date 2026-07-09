@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client.js'
-import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from '../models/ts/UpdatePetWithForm.js'
-import { client } from '../.kubb/client.js'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from '../models/ts/UpdatePetWithForm'
+import { client } from '../.kubb/client'
 
 /**
  * @summary Updates a pet in the store with form data

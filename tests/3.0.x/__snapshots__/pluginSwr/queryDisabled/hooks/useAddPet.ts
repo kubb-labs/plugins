@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig } from '../.kubb/client.ts'
-import type { AddPetOptions } from '../types/AddPet.ts'
-import { addPet } from '../clients/addPet.ts'
+import type { RequestConfig } from '../.kubb/client'
+import type { AddPetOptions } from '../types/AddPet'
+import { addPet } from '../clients/addPet'
 
 export const addPetQueryKey = ({ body }: Omit<AddPetOptions, 'headers'>) => [{ url: '/pet' }, ...(body ? [body] : [])] as const
 
