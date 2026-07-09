@@ -24,9 +24,7 @@ export default defineConfig({
     defaultBanner: false,
     lint: false,
     format: 'oxfmt',
-  },
-  hooks: {
-    done: ['npm run typecheck'],
+    postGenerate: ['npm run typecheck'],
   },
   plugins: [
     pluginRedoc(),

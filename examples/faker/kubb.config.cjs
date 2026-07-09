@@ -14,11 +14,9 @@ module.exports = defineConfig(() => {
         lint: false,
         format: false,
         clean: true,
+        postGenerate: ['npm run typecheck'],
       },
       adapter: adapterOas({ unknownType: 'unknown' }),
-      hooks: {
-        done: ['npm run typecheck'],
-      },
       plugins: [
         pluginTs({
           output: {
@@ -47,11 +45,9 @@ module.exports = defineConfig(() => {
         path: './src/gen',
         lint: false,
         format: false,
+        postGenerate: ['npm run typecheck'],
       },
       adapter: adapterOas({ unknownType: 'unknown' }),
-      hooks: {
-        done: ['npm run typecheck'],
-      },
       plugins: [
         pluginTs({
           output: {

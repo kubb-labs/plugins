@@ -6,11 +6,9 @@ import { defineConfig } from 'kubb/config'
 export default defineConfig({
   root: '.',
   input: './petStore.yaml',
-  hooks: {
-    done: ['npm run typecheck'],
-  },
   output: {
     path: './src/gen',
+    postGenerate: ['npm run typecheck'],
     clean: true,
     format: false,
     lint: false,

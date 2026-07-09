@@ -18,9 +18,7 @@ export default defineConfig([
       barrel: { type: 'named' },
       lint: false,
       format: 'auto',
-    },
-    hooks: {
-      done: ['npm run typecheck'],
+      postGenerate: ['npm run typecheck'],
     },
     adapter: adapterOas({ unknownType: 'unknown', collisionDetection: false, enums: 'root' }),
     parsers: [parserTs({ extension: { '.ts': '' } }), parserTsx()],
