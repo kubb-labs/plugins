@@ -7,9 +7,7 @@ import { defineConfig } from 'kubb/config'
 export default defineConfig(() => {
   return {
     root: '.',
-    input: {
-      path: './petStore.yaml',
-    },
+    input: './petStore.yaml',
     output: {
       path: './src/gen',
       clean: true,

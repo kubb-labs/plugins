@@ -1,4 +1,5 @@
 import { adapterOas } from '@kubb/adapter-oas'
+import { parserTs, parserTsx } from '@kubb/parser-ts'
 import { pluginFetch } from '@kubb/plugin-fetch'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginRedoc } from '@kubb/plugin-redoc'
@@ -10,21 +11,17 @@ export default defineConfig([
   {
     name: 'petStore',
     root: '.',
-    input: {
-      path: './petStore.yaml',
-    },
+    input: './petStore.yaml',
     output: {
       path: './src/gen',
       clean: true,
       barrel: { type: 'named' },
-      extension: {
-        '.ts': '',
-      },
       lint: false,
       format: 'auto',
       postGenerate: ['npm run typecheck'],
     },
     adapter: adapterOas({ unknownType: 'unknown', collisionDetection: false, enums: 'root' }),
+    parsers: [parserTs({ extension: { '.ts': '' } }), parserTsx()],
     plugins: [
       pluginRedoc({
         output: {

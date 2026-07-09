@@ -21,15 +21,13 @@ const configs = [
     name: 'simple',
     config: {
       root: __dirname,
-      input: {
-        path: '../../schemas/3.0.x/petStore.yaml',
-      },
+      input: '../../schemas/3.0.x/petStore.yaml',
       adapter: adapterOas({ validate: false, enums: 'root' }),
       output: {
         path: './gen',
         barrel: false,
       },
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -44,15 +42,13 @@ const configs = [
     name: 'petStore',
     config: {
       root: __dirname,
-      input: {
-        path: '../../schemas/3.0.x/petStore.yaml',
-      },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: {
         path: './gen',
         barrel: false,
       },
       adapter: adapterOas({ validate: false, discriminator: 'propagate', enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -67,15 +63,13 @@ const configs = [
     name: 'discriminatorAllOf',
     config: {
       root: __dirname,
-      input: {
-        path: '../../schemas/3.0.x/discriminatorAllOf.yaml',
-      },
+      input: '../../schemas/3.0.x/discriminatorAllOf.yaml',
       output: {
         path: './gen',
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -96,16 +90,14 @@ const configs = [
     name: 'discriminatorAnyOf',
     config: {
       root: __dirname,
-      input: {
-        path: '../../schemas/3.0.x/discriminatorAnyOf.yaml',
-      },
+      input: '../../schemas/3.0.x/discriminatorAnyOf.yaml',
       output: {
         path: './gen',
         clean: true,
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({}),
         pluginZod({
@@ -121,15 +113,13 @@ const configs = [
     name: 'discriminatorOneOf',
     config: {
       root: __dirname,
-      input: {
-        path: '../../schemas/3.0.x/discriminatorOneOf.yaml',
-      },
+      input: '../../schemas/3.0.x/discriminatorOneOf.yaml',
       output: {
         path: './gen',
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -155,15 +145,13 @@ const configs = [
     name: 'discriminatorImplicit',
     config: {
       root: __dirname,
-      input: {
-        path: '../../schemas/3.0.x/discriminatorImplicit.yaml',
-      },
+      input: '../../schemas/3.0.x/discriminatorImplicit.yaml',
       output: {
         path: './gen',
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginZod({
           output: {
@@ -178,15 +166,13 @@ const configs = [
     name: 'discriminatorOneOfMini',
     config: {
       root: __dirname,
-      input: {
-        path: '../../schemas/3.0.x/discriminatorOneOf.yaml',
-      },
+      input: '../../schemas/3.0.x/discriminatorOneOf.yaml',
       output: {
         path: './gen',
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginZod({
           mini: true,
@@ -202,15 +188,13 @@ const configs = [
     name: 'discriminatorOneOfExternalRef',
     config: {
       root: __dirname,
-      input: {
-        path: '../../schemas/3.0.x/discriminatorOneOfExternalRef.yaml',
-      },
+      input: '../../schemas/3.0.x/discriminatorOneOfExternalRef.yaml',
       output: {
         path: './gen',
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginZod({
           output: {
@@ -225,15 +209,13 @@ const configs = [
     name: 'caseSensitivity',
     config: {
       root: __dirname,
-      input: {
-        path: '../../schemas/3.0.x/caseSensitivity.yaml',
-      },
+      input: '../../schemas/3.0.x/caseSensitivity.yaml',
       output: {
         path: './gen',
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -248,15 +230,13 @@ const configs = [
     name: 'duplicateEnum',
     config: {
       root: __dirname,
-      input: {
-        path: '../../schemas/3.0.x/duplicateEnum.yaml',
-      },
+      input: '../../schemas/3.0.x/duplicateEnum.yaml',
       output: {
         path: './gen',
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -278,15 +258,13 @@ const configs = [
     name: 'issue2619',
     config: {
       root: __dirname,
-      input: {
-        path: '../../schemas/external-refs/returns/main.yaml',
-      },
+      input: '../../schemas/external-refs/returns/main.yaml',
       output: {
         path: './gen',
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginZod({
           output: {
@@ -310,15 +288,13 @@ const configs = [
     name: 'issue2696',
     config: {
       root: __dirname,
-      input: {
-        path: '../../schemas/external-refs/phantom/main.yaml',
-      },
+      input: '../../schemas/external-refs/phantom/main.yaml',
       output: {
         path: './gen',
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -338,15 +314,13 @@ const configs = [
     name: 'asConstEnum',
     config: {
       root: __dirname,
-      input: {
-        path: '../../schemas/3.0.x/asConstEnum.yaml',
-      },
+      input: '../../schemas/3.0.x/asConstEnum.yaml',
       output: {
         path: './gen',
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -366,15 +340,13 @@ const configs = [
     name: 'noTagsDotOperationId',
     config: {
       root: __dirname,
-      input: {
-        path: '../../schemas/3.0.x/noTagsDotOperationId.yaml',
-      },
+      input: '../../schemas/3.0.x/noTagsDotOperationId.yaml',
       output: {
         path: './gen',
         barrel: false,
       },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: {
@@ -396,10 +368,10 @@ const configs = [
     name: 'resolverCustomPrefix',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/simple.yaml' },
+      input: '../../schemas/3.0.x/simple.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: { path: './types', barrel: false, banner: '// Custom banner' },
@@ -421,10 +393,10 @@ const configs = [
     name: 'printerNodesZod',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/simple.yaml' },
+      input: '../../schemas/3.0.x/simple.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginZod({
           output: { path: './zod', barrel: false },
@@ -448,10 +420,10 @@ const configs = [
     name: 'transformerStripDescriptions',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/simple.yaml' },
+      input: '../../schemas/3.0.x/simple.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       plugins: [
         pluginTs({
           output: { path: './types', barrel: false },

@@ -8,9 +8,7 @@ export default defineConfig([
   {
     name: 'zod',
     root: '.',
-    input: {
-      path: './petStore.yaml',
-    },
+    input: './petStore.yaml',
     adapter: adapterOas({ unknownType: 'unknown' }),
     output: {
       path: './src/zod',
@@ -35,9 +33,7 @@ export default defineConfig([
   {
     name: 'zod-mini',
     root: '.',
-    input: {
-      path: './petStore.yaml',
-    },
+    input: './petStore.yaml',
     adapter: adapterOas({ unknownType: 'unknown' }),
     output: {
       path: './src/mini',
@@ -55,9 +51,7 @@ export default defineConfig([
   {
     name: 'zod-union',
     root: '.',
-    input: {
-      path: './unionWithReadOnly.yaml',
-    },
+    input: './unionWithReadOnly.yaml',
     adapter: adapterOas({ unknownType: 'unknown' }),
     output: {
       path: './src/gen3',

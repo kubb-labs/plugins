@@ -23,10 +23,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'petStore',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
         pluginZod({
@@ -40,10 +40,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'excludeByOperationId',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
         pluginZod({
@@ -60,10 +60,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'includeByTag',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
         pluginZod({
@@ -78,10 +78,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'groupByTag',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
         pluginZod({
@@ -96,10 +96,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'inferred',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
         pluginZod({
@@ -114,10 +114,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'coercion',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
         pluginZod({
@@ -132,10 +132,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'dateTypeDate',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, dateType: 'date', enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
         pluginZod({
@@ -149,10 +149,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'paramsCasing',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/paramsCasing.yaml' },
+      input: '../../schemas/3.0.x/paramsCasing.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
         pluginZod({

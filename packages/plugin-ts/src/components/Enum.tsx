@@ -77,7 +77,7 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
     <>
       {nameNode && (
         <File.Source name={enumName} isExportable isIndexable isTypeOnly={false}>
-          {parserTs.print(nameNode)}
+          {parserTs().print(nameNode)}
         </File.Source>
       )}
       <File.Source
@@ -86,7 +86,7 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
         isExportable={!namesMerge && ENUM_TYPES_WITH_RUNTIME_VALUE.has(enumOptions.type)}
         isTypeOnly={ENUM_TYPES_WITH_TYPE_ONLY.has(enumOptions.type)}
       >
-        {parserTs.print(typeNode)}
+        {parserTs().print(typeNode)}
       </File.Source>
     </>
   )

@@ -27,10 +27,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'noTagsDotOperationId',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/noTagsDotOperationId.yaml' },
+      input: '../../schemas/3.0.x/noTagsDotOperationId.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
         pluginTs({
@@ -46,10 +46,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'excludeByOperationId',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
         pluginTs({
@@ -66,10 +66,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'includeByTag',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
+      parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
         pluginTs({

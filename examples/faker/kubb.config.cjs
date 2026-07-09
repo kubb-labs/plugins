@@ -8,9 +8,7 @@ module.exports = defineConfig(() => {
   return [
     {
       root: '.',
-      input: {
-        path: './petStore.yaml',
-      },
+      input: './petStore.yaml',
       output: {
         path: './src/gen',
         lint: false,
@@ -42,9 +40,7 @@ module.exports = defineConfig(() => {
     },
     {
       root: '.',
-      input: {
-        path: './petStore.yaml',
-      },
+      input: './petStore.yaml',
       output: {
         path: './src/gen',
         lint: false,

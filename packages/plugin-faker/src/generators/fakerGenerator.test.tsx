@@ -125,7 +125,7 @@ const dogSchema = ast.factory.createSchema({
 
 const testConfig: Config = {
   root: '.',
-  input: { path: '' },
+  input: {},
   output: { path: 'test' },
   plugins: [],
   parsers: [],
@@ -241,7 +241,7 @@ describe('fakerGenerator — schema', () => {
     const file = driver.fileManager.files.find((item) => item.baseName === 'createEmoji.ts')
     expect(file).toBeDefined()
 
-    const output = await format(parserTs.parse(file!))
+    const output = await format(parserTs().parse(file!))
 
     expect(output).toContain('export function createEmoji(data?: string): string')
     expect(output).not.toContain('import type { Emoji }')

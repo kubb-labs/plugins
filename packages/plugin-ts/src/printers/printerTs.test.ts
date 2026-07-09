@@ -20,7 +20,7 @@ const formatTS = async (node: ts.Node | null | undefined): Promise<string> => {
   if (!node) return ''
 
   const alias = ts.factory.createTypeAliasDeclaration(undefined, '_', undefined, node as ts.TypeNode)
-  const source = parserTs.print(alias)
+  const source = parserTs().print(alias)
   const formatted = await format(source)
 
   return formatted

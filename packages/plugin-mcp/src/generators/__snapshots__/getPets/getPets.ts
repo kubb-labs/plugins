@@ -1,7 +1,7 @@
-import type { GetPetsOptions } from './GetPets'
+import type { GetPetsOptions } from './GetPets.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { getPets } from './clients/getPets'
+import { getPets } from './clients/getPets.ts'
 
 /**
  * {@link /pets}

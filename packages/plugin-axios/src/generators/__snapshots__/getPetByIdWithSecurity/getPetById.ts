@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options, RequestResult } from './.kubb/client'
-import type { GetPetByIdOptions, GetPetByIdResponses } from './GetPetById'
-import { client } from './.kubb/client'
+import type { Options, RequestResult } from './.kubb/client.ts'
+import type { GetPetByIdOptions, GetPetByIdResponses } from './GetPetById.ts'
+import { client } from './.kubb/client.ts'
 
 /**
  * {@link /pet/:petId}

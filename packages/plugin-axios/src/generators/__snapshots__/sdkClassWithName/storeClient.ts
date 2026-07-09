@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { ClientConfig, ClientInstance, Options, RequestResult } from './.kubb/client'
-import type { GetInventoryOptions, GetInventoryResponses } from './GetInventory'
-import { createClient } from './.kubb/client'
+import type { ClientConfig, ClientInstance, Options, RequestResult } from './.kubb/client.ts'
+import type { GetInventoryOptions, GetInventoryResponses } from './GetInventory.ts'
+import { createClient } from './.kubb/client.ts'
 
 export class StoreClient {
   private readonly client: ClientInstance

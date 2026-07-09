@@ -2,7 +2,7 @@ import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { defineConfig } from 'kubb/config'
 
-const input = { path: './petStore.yaml' } as const
+const input = './petStore.yaml'
 
 export default defineConfig([
   {

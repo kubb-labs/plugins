@@ -15,9 +15,7 @@ import { defineConfig } from 'kubb/config'
 export default defineConfig({
   name: 'gen',
   root: '.',
-  input: {
-    path: './petStore.yaml',
-  },
+  input: './petStore.yaml',
   adapter: adapterOas({ unknownType: 'unknown', validate: true, discriminator: 'preserve', integerType: 'number', enums: 'root' }),
   output: {
     path: './src/gen',

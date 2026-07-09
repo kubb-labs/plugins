@@ -23,7 +23,7 @@ export const pluginFakerName = 'plugin-faker' satisfies PluginFaker['name']
  * import { pluginFaker } from '@kubb/plugin-faker'
  *
  * export default defineConfig({
- *   input: { path: './petStore.yaml' },
+ *   input: './petStore.yaml',
  *   output: { path: './src/gen' },
  *   plugins: [
  *     pluginTs(),

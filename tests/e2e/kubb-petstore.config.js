@@ -1,4 +1,5 @@
 import { adapterOas } from '@kubb/adapter-oas'
+import { parserTs, parserTsx } from '@kubb/parser-ts'
 import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginCypress } from '@kubb/plugin-cypress'
 import { pluginFaker } from '@kubb/plugin-faker'
@@ -11,15 +12,16 @@ import { defineConfig } from 'kubb/config'
 export default defineConfig(() => {
   return {
     root: '.',
-    input: {
-      path: 'https://petstore3.swagger.io/api/v3/openapi.json',
-    },
+    input: 'https://petstore3.swagger.io/api/v3/openapi.json',
     adapter: adapterOas({ validate: false }),
     output: {
       path: './src/gen',
       clean: true,
       format: 'oxfmt',
     },
+    // TODO: drop once @kubb/parser-ts releases the beta.92 default (no extension on relative
+    // imports) and the catalog is bumped to it.
+    parsers: [parserTs({ extension: { '.ts': '' } }), parserTsx({ extension: { '.ts': '' } })],
     plugins: [
       pluginTs({
         output: {
