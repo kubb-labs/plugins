@@ -11,9 +11,7 @@ import { defineConfig } from 'kubb/config'
 export default defineConfig(() => {
   return {
     root: '.',
-    input: {
-      path: 'https://petstore3.swagger.io/api/v3/openapi.json',
-    },
+    input: 'https://petstore3.swagger.io/api/v3/openapi.json',
     adapter: adapterOas({ validate: false }),
     output: {
       path: './src/gen',

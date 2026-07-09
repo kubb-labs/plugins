@@ -90,9 +90,7 @@ const schemas = [
 /** @type {import('@kubb/core').UserConfig} */
 const baseConfig = {
   root: '.',
-  input: {
-    path: 'https://petstore3.swagger.io/api/v3/openapi.json',
-  },
+  input: 'https://petstore3.swagger.io/api/v3/openapi.json',
   adapter: adapterOas({ validate: false }),
   output: {
     path: './gen',
@@ -183,9 +181,7 @@ export default defineConfig(() => {
         ...baseConfig.output,
         path: `./gen/${name}`,
       },
-      input: {
-        path,
-      },
+      input: path,
       hooks: skipTypecheck.has(name)
         ? undefined
         : {
