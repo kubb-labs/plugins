@@ -12,11 +12,9 @@ export default defineConfig(() => {
       path: './petStore.yaml',
     },
     adapter: adapterOas({ unknownType: 'unknown', validate: false, integerType: 'number', enums: 'root' }),
-    hooks: {
-      done: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],
-    },
     output: {
       path: './src/gen',
+      postGenerate: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],
       clean: true,
       barrel: { type: 'all' },
       extension: {

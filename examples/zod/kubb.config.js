@@ -16,7 +16,6 @@ export default defineConfig([
       path: './src/zod',
       clean: true,
     },
-    hooks: {},
     plugins: [
       pluginTs({
         output: {

@@ -8,11 +8,9 @@ export default defineConfig({
   input: {
     path: './petStore.yaml',
   },
-  hooks: {
-    done: ['npm run typecheck'],
-  },
   output: {
     path: './src/gen',
+    postGenerate: ['npm run typecheck'],
     clean: true,
     format: false,
     lint: false,

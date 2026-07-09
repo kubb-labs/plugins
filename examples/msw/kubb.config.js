@@ -15,9 +15,7 @@ export default defineConfig(() => {
       clean: true,
       lint: false,
       format: false,
-    },
-    hooks: {
-      done: ['npm run typecheck'],
+      postGenerate: ['npm run typecheck'],
     },
     adapter: adapterOas({ unknownType: 'unknown', collisionDetection: false, enums: 'root' }),
     plugins: [

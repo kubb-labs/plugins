@@ -22,9 +22,7 @@ export default defineConfig([
       },
       lint: false,
       format: 'auto',
-    },
-    hooks: {
-      done: ['npm run typecheck'],
+      postGenerate: ['npm run typecheck'],
     },
     adapter: adapterOas({ unknownType: 'unknown', collisionDetection: false, enums: 'root' }),
     plugins: [

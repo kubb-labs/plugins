@@ -125,10 +125,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen6', clean: true, format: false, lint: false },
-    hooks: {
-      done: ['npm run typecheck'],
-    },
+    output: { path: './src/gen6', clean: true, format: false, lint: false, postGenerate: ['npm run typecheck'] },
     adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
@@ -204,10 +201,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen12', clean: true, format: false, lint: false },
-    hooks: {
-      done: ['npm run typecheck'],
-    },
+    output: { path: './src/gen12', clean: true, format: false, lint: false, postGenerate: ['npm run typecheck'] },
     adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
