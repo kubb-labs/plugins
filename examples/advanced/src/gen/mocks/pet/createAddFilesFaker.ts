@@ -1,12 +1,5 @@
-import type {
-  AddFilesBody,
-  AddFilesBodyFormData,
-  AddFilesBodyJson,
-  AddFilesResponse,
-  AddFilesStatus200,
-  AddFilesStatus405,
-} from '../../models/ts/pet/AddFiles.ts'
-import { createPetFaker } from '../createPetFaker.ts'
+import type { AddFilesBody, AddFilesBodyFormData, AddFilesBodyJson, AddFilesResponse, AddFilesStatus200, AddFilesStatus405 } from '../../models/ts/pet/AddFiles'
+import { createPetFaker } from '../createPetFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

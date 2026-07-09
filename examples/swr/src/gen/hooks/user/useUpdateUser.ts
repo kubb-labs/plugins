@@ -4,10 +4,10 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { UpdateUserOptions, UpdateUserResponse } from '../../models/user/UpdateUser.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { UpdateUserOptions, UpdateUserResponse } from '../../models/user/UpdateUser'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { updateUser } from '../../clients/user/updateUser.ts'
+import { updateUser } from '../../clients/user/updateUser'
 
 export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 

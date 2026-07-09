@@ -4,10 +4,10 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { UploadFileOptions, UploadFileResponse } from '../../models/pet/UploadFile.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { UploadFileOptions, UploadFileResponse } from '../../models/pet/UploadFile'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { uploadFile } from '../../clients/pet/uploadFile.ts'
+import { uploadFile } from '../../clients/pet/uploadFile'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 

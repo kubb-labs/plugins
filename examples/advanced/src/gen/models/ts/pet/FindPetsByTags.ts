@@ -1,5 +1,5 @@
-import type { FindPetsByTagsXEXAMPLEKey } from '../FindPetsByTagsXEXAMPLE.ts'
-import type { Pet } from '../Pet.ts'
+import type { FindPetsByTagsXEXAMPLEKey } from '../FindPetsByTagsXEXAMPLE'
+import type { Pet } from '../Pet'
 
 /**
  * @type object

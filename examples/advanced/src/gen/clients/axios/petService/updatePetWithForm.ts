@@ -1,7 +1,7 @@
-import type { Options, RequestResult } from '../../../.kubb/client.ts'
-import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from '../../../models/ts/pet/UpdatePetWithForm.ts'
-import { client } from '../../../.kubb/client.ts'
-import { updatePetWithFormResponseSchema, updatePetWithFormErrorSchema } from '../../../zod/pet/updatePetWithFormSchema.ts'
+import type { Options, RequestResult } from '../../../.kubb/client'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from '../../../models/ts/pet/UpdatePetWithForm'
+import { client } from '../../../.kubb/client'
+import { updatePetWithFormResponseSchema, updatePetWithFormErrorSchema } from '../../../zod/pet/updatePetWithFormSchema'
 
 /**
  * @summary Updates a pet in the store with form data

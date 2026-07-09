@@ -1,6 +1,6 @@
-import type { Category } from './Category.ts'
-import type { PetStatusEnumKey } from './PetStatusEnum.ts'
-import type { TagTag } from './tag/Tag.ts'
+import type { Category } from './Category'
+import type { PetStatusEnumKey } from './PetStatusEnum'
+import type { TagTag } from './tag/Tag'
 
 /**
  * @type object

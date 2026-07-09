@@ -1,8 +1,8 @@
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
-import type { FindPetsByStatusOptions, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../../models/ts/pet/FindPetsByStatus.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { FindPetsByStatusOptions, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../../models/ts/pet/FindPetsByStatus'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
-import { findPetsByStatus } from '../../axios/petService/findPetsByStatus.ts'
+import { findPetsByStatus } from '../../axios/petService/findPetsByStatus'
 
 export const findPetsByStatusQueryKey = ({ path }: Omit<FindPetsByStatusOptions, 'headers'>) => [{ url: '/pet/findByStatus/:step_id', params: path }] as const
 

@@ -1,4 +1,4 @@
-import type { CreatePetsResponse, CreatePetsBody } from '../../models/ts/pets/CreatePets.ts'
+import type { CreatePetsResponse, CreatePetsBody } from '../../models/ts/pets/CreatePets'
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 

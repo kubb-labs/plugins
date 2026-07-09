@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { ClientConfig } from '../.kubb/client.ts'
-import { pet } from './pet/pet.ts'
-import { store } from './store/store.ts'
+import type { ClientConfig } from '../.kubb/client'
+import { pet } from './pet/pet'
+import { store } from './store/store'
 
 export class PetStoreSDK {
   readonly pet: pet

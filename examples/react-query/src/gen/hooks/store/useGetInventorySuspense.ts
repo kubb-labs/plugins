@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetInventoryStatus200 } from '../../models/store/GetInventory.ts'
-import { getInventory } from '../../clients/store/getInventory.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { GetInventoryStatus200 } from '../../models/store/GetInventory'
+import { getInventory } from '../../clients/store/getInventory'
 import { queryOptions } from '@tanstack/react-query'
 
 export const getInventorySuspenseQueryKey = () => [{ url: '/store/inventory' }] as const

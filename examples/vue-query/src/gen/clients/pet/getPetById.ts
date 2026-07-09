@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { GetPetByIdOptions, GetPetByIdResponses } from '../../models/pet/GetPetById.ts'
-import { client } from '../../.kubb/client.ts'
+import type { Options, RequestResult } from '../../.kubb/client'
+import type { GetPetByIdOptions, GetPetByIdResponses } from '../../models/pet/GetPetById'
+import { client } from '../../.kubb/client'
 
 /**
  * @description Returns a single pet

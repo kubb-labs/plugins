@@ -1,6 +1,6 @@
 import * as z from 'zod'
-import { findPetsByTagsXEXAMPLESchema } from '../findPetsByTagsXEXAMPLESchema.ts'
-import { petSchema } from '../petSchema.ts'
+import { findPetsByTagsXEXAMPLESchema } from '../findPetsByTagsXEXAMPLESchema'
+import { petSchema } from '../petSchema'
 
 export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
 

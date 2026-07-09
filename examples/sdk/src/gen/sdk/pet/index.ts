@@ -1,1 +1,1 @@
-export * from './pet.ts'
+export * from './pet'

@@ -1,8 +1,8 @@
 import * as z from 'zod'
-import { orderHttpStatusEnumSchema } from './orderHttpStatusEnumSchema.ts'
-import { orderOrderTypeEnumSchema } from './orderOrderTypeEnumSchema.ts'
-import { orderParamsStatusEnumSchema } from './orderParamsStatusEnumSchema.ts'
-import { orderStatusEnumSchema } from './orderStatusEnumSchema.ts'
+import { orderHttpStatusEnumSchema } from './orderHttpStatusEnumSchema'
+import { orderOrderTypeEnumSchema } from './orderOrderTypeEnumSchema'
+import { orderParamsStatusEnumSchema } from './orderParamsStatusEnumSchema'
+import { orderStatusEnumSchema } from './orderStatusEnumSchema'
 
 export const orderSchema = z.object({
   id: z

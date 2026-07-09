@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
-import type { ClientConfig, ClientInstance, Options, RequestResult } from '../../.kubb/client.ts'
-import type { AddPetOptions, AddPetResponses } from '../../models/pet/AddPet.ts'
-import type { DeletePetOptions, DeletePetResponses } from '../../models/pet/DeletePet.ts'
-import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../../models/pet/FindPetsByStatus.ts'
-import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from '../../models/pet/FindPetsByTags.ts'
-import type { GetPetByIdOptions, GetPetByIdResponses } from '../../models/pet/GetPetById.ts'
-import type { UpdatePetOptions, UpdatePetResponses } from '../../models/pet/UpdatePet.ts'
-import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from '../../models/pet/UpdatePetWithForm.ts'
-import type { UploadFileOptions, UploadFileResponses } from '../../models/pet/UploadFile.ts'
-import { createClient } from '../../.kubb/client.ts'
+import type { ClientConfig, ClientInstance, Options, RequestResult } from '../../.kubb/client'
+import type { AddPetOptions, AddPetResponses } from '../../models/pet/AddPet'
+import type { DeletePetOptions, DeletePetResponses } from '../../models/pet/DeletePet'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../../models/pet/FindPetsByStatus'
+import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from '../../models/pet/FindPetsByTags'
+import type { GetPetByIdOptions, GetPetByIdResponses } from '../../models/pet/GetPetById'
+import type { UpdatePetOptions, UpdatePetResponses } from '../../models/pet/UpdatePet'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from '../../models/pet/UpdatePetWithForm'
+import type { UploadFileOptions, UploadFileResponses } from '../../models/pet/UploadFile'
+import { createClient } from '../../.kubb/client'
 
 export class pet {
   private readonly client: ClientInstance

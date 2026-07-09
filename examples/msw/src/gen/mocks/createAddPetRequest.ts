@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { AddPetRequest } from '../models/AddPetRequest.ts'
-import { createAddPetRequestStatusEnum } from './createAddPetRequestStatusEnum.ts'
-import { createCategory } from './createCategory.ts'
-import { createTag } from './createTag.ts'
+import type { AddPetRequest } from '../models/AddPetRequest'
+import { createAddPetRequestStatusEnum } from './createAddPetRequestStatusEnum'
+import { createCategory } from './createCategory'
+import { createTag } from './createTag'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createAddPetRequest<TData extends Partial<AddPetRequest> = object>(data?: TData) {

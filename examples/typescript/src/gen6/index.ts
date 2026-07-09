@@ -10,15 +10,15 @@ export type {
   AddPetStatus200Json,
   AddPetStatus200Xml,
   AddPetStatus405,
-} from './ts/models/AddPet.ts'
-export type { AddPetRequest } from './ts/models/AddPetRequest.ts'
-export type { AddPetRequestStatusEnumKey } from './ts/models/AddPetRequestStatusEnum.ts'
-export type { Address } from './ts/models/Address.ts'
-export type { ApiResponse } from './ts/models/ApiResponse.ts'
-export type { Cat } from './ts/models/Cat.ts'
-export type { Category } from './ts/models/Category.ts'
-export type { Customer } from './ts/models/Customer.ts'
-export type { CustomerParamsStatusEnumKey } from './ts/models/CustomerParamsStatusEnum.ts'
+} from './ts/models/AddPet'
+export type { AddPetRequest } from './ts/models/AddPetRequest'
+export type { AddPetRequestStatusEnumKey } from './ts/models/AddPetRequestStatusEnum'
+export type { Address } from './ts/models/Address'
+export type { ApiResponse } from './ts/models/ApiResponse'
+export type { Cat } from './ts/models/Cat'
+export type { Category } from './ts/models/Category'
+export type { Customer } from './ts/models/Customer'
+export type { CustomerParamsStatusEnumKey } from './ts/models/CustomerParamsStatusEnum'
 export type {
   DeleteOrderOptions,
   DeleteOrderPath,
@@ -26,7 +26,7 @@ export type {
   DeleteOrderResponses,
   DeleteOrderStatus400,
   DeleteOrderStatus404,
-} from './ts/models/DeleteOrder.ts'
+} from './ts/models/DeleteOrder'
 export type {
   DeletePetHeaders,
   DeletePetOptions,
@@ -35,9 +35,9 @@ export type {
   DeletePetResponses,
   DeletePetStatus200,
   DeletePetStatus400,
-} from './ts/models/DeletePet.ts'
-export type { DeletePetStatus200EnumKey } from './ts/models/DeletePetStatus200Enum.ts'
-export type { Dog } from './ts/models/Dog.ts'
+} from './ts/models/DeletePet'
+export type { DeletePetStatus200EnumKey } from './ts/models/DeletePetStatus200Enum'
+export type { Dog } from './ts/models/Dog'
 export type {
   FindPetsByStatusOptions,
   FindPetsByStatusQuery,
@@ -47,8 +47,8 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-} from './ts/models/FindPetsByStatus.ts'
-export type { FindPetsByStatusStatusKey } from './ts/models/FindPetsByStatusStatus.ts'
+} from './ts/models/FindPetsByStatus'
+export type { FindPetsByStatusStatusKey } from './ts/models/FindPetsByStatusStatus'
 export type {
   FindPetsByTagsOptions,
   FindPetsByTagsQuery,
@@ -58,9 +58,9 @@ export type {
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
-} from './ts/models/FindPetsByTags.ts'
-export type { FullAddress } from './ts/models/FullAddress.ts'
-export type { GetInventoryOptions, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './ts/models/GetInventory.ts'
+} from './ts/models/FindPetsByTags'
+export type { FullAddress } from './ts/models/FullAddress'
+export type { GetInventoryOptions, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './ts/models/GetInventory'
 export type {
   GetOrderByIdOptions,
   GetOrderByIdPath,
@@ -71,7 +71,7 @@ export type {
   GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
-} from './ts/models/GetOrderById.ts'
+} from './ts/models/GetOrderById'
 export type {
   GetPetByIdOptions,
   GetPetByIdPath,
@@ -82,16 +82,16 @@ export type {
   GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
-} from './ts/models/GetPetById.ts'
-export type { HappyCustomer } from './ts/models/HappyCustomer.ts'
-export type { Order } from './ts/models/Order.ts'
-export type { OrderHttpStatusEnumKey } from './ts/models/OrderHttpStatusEnum.ts'
-export type { OrderParamsStatusEnumKey } from './ts/models/OrderParamsStatusEnum.ts'
-export type { OrderStatusKey } from './ts/models/OrderStatus.ts'
-export type { Pet } from './ts/models/Pet.ts'
-export type { PetNotFound } from './ts/models/PetNotFound.ts'
-export type { PetStatusEnumKey } from './ts/models/PetStatusEnum.ts'
-export type { PetTypeEnumKey } from './ts/models/PetTypeEnum.ts'
+} from './ts/models/GetPetById'
+export type { HappyCustomer } from './ts/models/HappyCustomer'
+export type { Order } from './ts/models/Order'
+export type { OrderHttpStatusEnumKey } from './ts/models/OrderHttpStatusEnum'
+export type { OrderParamsStatusEnumKey } from './ts/models/OrderParamsStatusEnum'
+export type { OrderStatusKey } from './ts/models/OrderStatus'
+export type { Pet } from './ts/models/Pet'
+export type { PetNotFound } from './ts/models/PetNotFound'
+export type { PetStatusEnumKey } from './ts/models/PetStatusEnum'
+export type { PetTypeEnumKey } from './ts/models/PetTypeEnum'
 export type {
   PlaceOrderBody,
   PlaceOrderBodyFormUrlEncoded,
@@ -102,7 +102,7 @@ export type {
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
-} from './ts/models/PlaceOrder.ts'
+} from './ts/models/PlaceOrder'
 export type {
   PlaceOrderPatchBody,
   PlaceOrderPatchBodyFormUrlEncoded,
@@ -113,9 +113,9 @@ export type {
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
-} from './ts/models/PlaceOrderPatch.ts'
-export type { Tag } from './ts/models/Tag.ts'
-export type { UnhappyCustomer } from './ts/models/UnhappyCustomer.ts'
+} from './ts/models/PlaceOrderPatch'
+export type { Tag } from './ts/models/Tag'
+export type { UnhappyCustomer } from './ts/models/UnhappyCustomer'
 export type {
   UpdatePetBody,
   UpdatePetBodyFormUrlEncoded,
@@ -130,7 +130,7 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-} from './ts/models/UpdatePet.ts'
+} from './ts/models/UpdatePet'
 export type {
   UpdatePetWithFormOptions,
   UpdatePetWithFormPath,
@@ -138,7 +138,7 @@ export type {
   UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
-} from './ts/models/UpdatePetWithForm.ts'
+} from './ts/models/UpdatePetWithForm'
 export type {
   UploadFileBody,
   UploadFileOptions,
@@ -147,13 +147,13 @@ export type {
   UploadFileResponse,
   UploadFileResponses,
   UploadFileStatus200,
-} from './ts/models/UploadFile.ts'
-export { addPetRequestStatusEnum } from './ts/models/AddPetRequestStatusEnum.ts'
-export { customerParamsStatusEnum } from './ts/models/CustomerParamsStatusEnum.ts'
-export { deletePetStatus200Enum } from './ts/models/DeletePetStatus200Enum.ts'
-export { findPetsByStatusStatus } from './ts/models/FindPetsByStatusStatus.ts'
-export { orderHttpStatusEnum } from './ts/models/OrderHttpStatusEnum.ts'
-export { orderParamsStatusEnum } from './ts/models/OrderParamsStatusEnum.ts'
-export { orderStatus } from './ts/models/OrderStatus.ts'
-export { petStatusEnum } from './ts/models/PetStatusEnum.ts'
-export { petTypeEnum } from './ts/models/PetTypeEnum.ts'
+} from './ts/models/UploadFile'
+export { addPetRequestStatusEnum } from './ts/models/AddPetRequestStatusEnum'
+export { customerParamsStatusEnum } from './ts/models/CustomerParamsStatusEnum'
+export { deletePetStatus200Enum } from './ts/models/DeletePetStatus200Enum'
+export { findPetsByStatusStatus } from './ts/models/FindPetsByStatusStatus'
+export { orderHttpStatusEnum } from './ts/models/OrderHttpStatusEnum'
+export { orderParamsStatusEnum } from './ts/models/OrderParamsStatusEnum'
+export { orderStatus } from './ts/models/OrderStatus'
+export { petStatusEnum } from './ts/models/PetStatusEnum'
+export { petTypeEnum } from './ts/models/PetTypeEnum'

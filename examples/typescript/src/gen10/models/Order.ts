@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { OrderHttpStatusEnum } from './OrderHttpStatusEnum.ts'
-import type { OrderParamsStatusEnum } from './OrderParamsStatusEnum.ts'
-import type { OrderStatus } from './OrderStatus.ts'
+import type { OrderHttpStatusEnum } from './OrderHttpStatusEnum'
+import type { OrderParamsStatusEnum } from './OrderParamsStatusEnum'
+import type { OrderStatus } from './OrderStatus'
 
 /**
  * @type object

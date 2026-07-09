@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { DeletePetStatus200Enum } from '../DeletePetStatus200Enum.ts'
+import type { DeletePetStatus200Enum } from '../DeletePetStatus200Enum'
 
 /**
  * @type object

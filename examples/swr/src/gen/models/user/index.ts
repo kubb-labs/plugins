@@ -9,7 +9,7 @@ export type {
   CreateUserStatusDefault,
   CreateUserStatusDefaultJson,
   CreateUserStatusDefaultXml,
-} from './CreateUser.ts'
+} from './CreateUser'
 export type {
   CreateUsersWithListInputBody,
   CreateUsersWithListInputOptions,
@@ -19,8 +19,8 @@ export type {
   CreateUsersWithListInputStatus200Json,
   CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
-} from './CreateUsersWithListInput.ts'
-export type { DeleteUserOptions, DeleteUserPath, DeleteUserResponse, DeleteUserResponses, DeleteUserStatus400, DeleteUserStatus404 } from './DeleteUser.ts'
+} from './CreateUsersWithListInput'
+export type { DeleteUserOptions, DeleteUserPath, DeleteUserResponse, DeleteUserResponses, DeleteUserStatus400, DeleteUserStatus404 } from './DeleteUser'
 export type {
   GetUserByNameOptions,
   GetUserByNamePath,
@@ -31,7 +31,7 @@ export type {
   GetUserByNameStatus200Xml,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
-} from './GetUserByName.ts'
+} from './GetUserByName'
 export type {
   LoginUserOptions,
   LoginUserQuery,
@@ -41,8 +41,8 @@ export type {
   LoginUserStatus200Json,
   LoginUserStatus200Xml,
   LoginUserStatus400,
-} from './LoginUser.ts'
-export type { LogoutUserOptions, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.ts'
+} from './LoginUser'
+export type { LogoutUserOptions, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser'
 export type {
   UpdateUserBody,
   UpdateUserBodyFormUrlEncoded,
@@ -53,4 +53,4 @@ export type {
   UpdateUserResponse,
   UpdateUserResponses,
   UpdateUserStatusDefault,
-} from './UpdateUser.ts'
+} from './UpdateUser'

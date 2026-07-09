@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetPetByIdOptions, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById.ts'
-import { getPetById } from '../../clients/pet/getPetById.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { GetPetByIdOptions, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById'
+import { getPetById } from '../../clients/pet/getPetById'
 import { queryOptions } from '@tanstack/react-query'
 
 export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const

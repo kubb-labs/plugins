@@ -1,4 +1,4 @@
-import type { PetEvent } from '../PetEvent.ts'
+import type { PetEvent } from '../PetEvent'
 
 /**
  * @type object

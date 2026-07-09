@@ -1,4 +1,4 @@
-import type { AddFilesResponse, AddFilesStatus405, AddFilesBody } from '../../models/ts/pet/AddFiles.ts'
+import type { AddFilesResponse, AddFilesStatus405, AddFilesBody } from '../../models/ts/pet/AddFiles'
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 

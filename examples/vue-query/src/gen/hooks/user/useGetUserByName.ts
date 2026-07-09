@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetUserByNameOptions, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { GetUserByNameOptions, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName'
 import type { MaybeRefOrGetter } from 'vue'
-import { getUserByName } from '../../clients/user/getUserByName.ts'
+import { getUserByName } from '../../clients/user/getUserByName'
 import { queryOptions } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 

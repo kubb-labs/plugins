@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { LogoutUserResponse } from '../../models/user/LogoutUser.ts'
-import { logoutUser } from '../../clients/user/logoutUser.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { LogoutUserResponse } from '../../models/user/LogoutUser'
+import { logoutUser } from '../../clients/user/logoutUser'
 import { queryOptions } from '@tanstack/react-query'
 
 export const logoutUserSuspenseQueryKey = () => [{ url: '/user/logout' }] as const

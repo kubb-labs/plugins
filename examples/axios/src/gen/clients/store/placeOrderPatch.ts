@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch.ts'
-import { client } from '../../.kubb/client.ts'
+import type { Options, RequestResult } from '../../.kubb/client'
+import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch'
+import { client } from '../../.kubb/client'
 
 /**
  * @description Place a new order in the store with patch

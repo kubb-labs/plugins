@@ -1,7 +1,7 @@
-import type { Options, RequestResult } from '../../../.kubb/client.ts'
-import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from '../../../models/ts/pet/FindPetsByTags.ts'
-import { client } from '../../../.kubb/client.ts'
-import { findPetsByTagsResponseSchema, findPetsByTagsErrorSchema } from '../../../zod/pet/findPetsByTagsSchema.ts'
+import type { Options, RequestResult } from '../../../.kubb/client'
+import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from '../../../models/ts/pet/FindPetsByTags'
+import { client } from '../../../.kubb/client'
+import { findPetsByTagsResponseSchema, findPetsByTagsErrorSchema } from '../../../zod/pet/findPetsByTagsSchema'
 
 /**
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
