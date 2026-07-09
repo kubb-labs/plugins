@@ -25,7 +25,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'default',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
@@ -38,7 +38,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'sdkClass',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
@@ -54,7 +54,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'sdkClassWithName',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
@@ -70,7 +70,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'sdkSingle',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      input: '../../schemas/3.0.x/petStore.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
@@ -86,7 +86,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     name: 'paramsCasing',
     config: {
       root: __dirname,
-      input: { path: '../../schemas/3.0.x/paramsCasing.yaml' },
+      input: '../../schemas/3.0.x/paramsCasing.yaml',
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
@@ -134,7 +134,7 @@ describe(`plugin-fetch options ${version}`, () => {
     const { files, diagnostics } = await createKubb(
       {
         root: __dirname,
-        input: { path: '../../schemas/3.0.x/petStore.yaml' },
+        input: '../../schemas/3.0.x/petStore.yaml',
         output: { path: output, barrel: false },
         adapter: adapterOas({ validate: false, enums: 'root' }),
         parsers: [parserTs()],
@@ -174,7 +174,7 @@ describe(`plugin-fetch options ${version}`, () => {
     const { files, diagnostics } = await createKubb(
       {
         root: __dirname,
-        input: { path: '../../schemas/3.0.x/petStore.yaml' },
+        input: '../../schemas/3.0.x/petStore.yaml',
         output: { path: output, barrel: { type: 'named' } },
         adapter: adapterOas({ validate: false, enums: 'root' }),
         parsers: [parserTs()],

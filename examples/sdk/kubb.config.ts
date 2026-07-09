@@ -5,9 +5,7 @@ import { defineConfig } from 'kubb/config'
 
 export default defineConfig({
   root: '.',
-  input: {
-    path: './petStore.yaml',
-  },
+  input: './petStore.yaml',
   hooks: {
     done: ['npm run typecheck'],
   },

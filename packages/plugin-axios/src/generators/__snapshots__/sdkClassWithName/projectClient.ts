@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { ClientConfig, ClientInstance, Options, RequestResult } from './.kubb/client'
-import type { GetProjectOptions, GetProjectResponses } from './GetProject'
-import { createClient } from './.kubb/client'
+import type { ClientConfig, ClientInstance, Options, RequestResult } from './.kubb/client.ts'
+import type { GetProjectOptions, GetProjectResponses } from './GetProject.ts'
+import { createClient } from './.kubb/client.ts'
 
 export class ProjectClient {
   private readonly client: ClientInstance
