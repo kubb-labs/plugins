@@ -1,4 +1,4 @@
-import type { AddPetRequestStatusEnumKey } from '../models/ts/AddPetRequestStatusEnum.ts'
+import type { AddPetRequestStatusEnumKey } from '../models/ts/AddPetRequestStatusEnum'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

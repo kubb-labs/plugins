@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { AddPetOptions, AddPetStatus200, AddPetStatus405 } from '../../models/pet/AddPet.ts'
-import { addPet } from '../../clients/pet/addPet.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { AddPetOptions, AddPetStatus200, AddPetStatus405 } from '../../models/pet/AddPet'
+import { addPet } from '../../clients/pet/addPet'
 import { mutationOptions } from '@tanstack/react-query'
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const

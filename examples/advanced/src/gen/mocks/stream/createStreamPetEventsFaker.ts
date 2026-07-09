@@ -1,5 +1,5 @@
-import type { StreamPetEventsPath, StreamPetEventsResponse, StreamPetEventsStatus200 } from '../../models/ts/stream/StreamPetEvents.ts'
-import { createPetEventFaker } from '../createPetEventFaker.ts'
+import type { StreamPetEventsPath, StreamPetEventsResponse, StreamPetEventsStatus200 } from '../../models/ts/stream/StreamPetEvents'
+import { createPetEventFaker } from '../createPetEventFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createStreamPetEventsPathFaker<TData extends Partial<StreamPetEventsPath> = object>(data?: TData) {

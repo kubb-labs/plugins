@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { DeleteUserOptions, DeleteUserResponses } from '../../models/user/DeleteUser.ts'
-import { client } from '../../.kubb/client.ts'
+import type { Options, RequestResult } from '../../.kubb/client'
+import type { DeleteUserOptions, DeleteUserResponses } from '../../models/user/DeleteUser'
+import { client } from '../../.kubb/client'
 
 /**
  * @description This can only be done by the logged in user.

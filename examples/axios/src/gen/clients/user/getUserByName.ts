@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { GetUserByNameOptions, GetUserByNameResponses } from '../../models/user/GetUserByName.ts'
-import { client } from '../../.kubb/client.ts'
+import type { Options, RequestResult } from '../../.kubb/client'
+import type { GetUserByNameOptions, GetUserByNameResponses } from '../../models/user/GetUserByName'
+import { client } from '../../.kubb/client'
 
 /**
  * @summary Get user by user name

@@ -5,7 +5,7 @@ export {
   createAddFilesResponseFaker,
   createAddFilesStatus200Faker,
   createAddFilesStatus405Faker,
-} from './createAddFilesFaker.ts'
+} from './createAddFilesFaker'
 export {
   createAddPetBodyFaker,
   createAddPetBodyFakerFormUrlEncoded,
@@ -16,8 +16,8 @@ export {
   createAddPetStatusDefaultFaker,
   createAddPetStatusDefaultFakerJson,
   createAddPetStatusDefaultFakerXml,
-} from './createAddPetFaker.ts'
-export { createDeletePetHeadersFaker, createDeletePetPathFaker, createDeletePetResponseFaker, createDeletePetStatus400Faker } from './createDeletePetFaker.ts'
+} from './createAddPetFaker'
+export { createDeletePetHeadersFaker, createDeletePetPathFaker, createDeletePetResponseFaker, createDeletePetStatus400Faker } from './createDeletePetFaker'
 export {
   createFindPetsByStatusPathFaker,
   createFindPetsByStatusResponseFaker,
@@ -25,7 +25,7 @@ export {
   createFindPetsByStatusStatus200FakerJson,
   createFindPetsByStatusStatus200FakerXml,
   createFindPetsByStatusStatus400Faker,
-} from './createFindPetsByStatusFaker.ts'
+} from './createFindPetsByStatusFaker'
 export {
   createFindPetsByTagsHeadersFaker,
   createFindPetsByTagsQueryFaker,
@@ -34,7 +34,7 @@ export {
   createFindPetsByTagsStatus200FakerJson,
   createFindPetsByTagsStatus200FakerXml,
   createFindPetsByTagsStatus400Faker,
-} from './createFindPetsByTagsFaker.ts'
+} from './createFindPetsByTagsFaker'
 export {
   createGetPetByIdPathFaker,
   createGetPetByIdResponseFaker,
@@ -43,7 +43,7 @@ export {
   createGetPetByIdStatus200FakerXml,
   createGetPetByIdStatus400Faker,
   createGetPetByIdStatus404Faker,
-} from './createGetPetByIdFaker.ts'
+} from './createGetPetByIdFaker'
 export {
   createUpdatePetBodyFaker,
   createUpdatePetBodyFakerFormUrlEncoded,
@@ -57,17 +57,17 @@ export {
   createUpdatePetStatus400Faker,
   createUpdatePetStatus404Faker,
   createUpdatePetStatus405Faker,
-} from './createUpdatePetFaker.ts'
+} from './createUpdatePetFaker'
 export {
   createUpdatePetWithFormPathFaker,
   createUpdatePetWithFormQueryFaker,
   createUpdatePetWithFormResponseFaker,
   createUpdatePetWithFormStatus405Faker,
-} from './createUpdatePetWithFormFaker.ts'
+} from './createUpdatePetWithFormFaker'
 export {
   createUploadFileBodyFaker,
   createUploadFilePathFaker,
   createUploadFileQueryFaker,
   createUploadFileResponseFaker,
   createUploadFileStatus200Faker,
-} from './createUploadFileFaker.ts'
+} from './createUploadFileFaker'

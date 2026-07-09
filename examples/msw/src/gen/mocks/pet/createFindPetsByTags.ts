@@ -10,8 +10,8 @@ import type {
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
-} from '../../models/FindPetsByTags.ts'
-import { createPet } from '../createPet.ts'
+} from '../../models/FindPetsByTags'
+import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createFindPetsByTagsQuery<TData extends Partial<FindPetsByTagsQuery> = object>(data?: TData) {

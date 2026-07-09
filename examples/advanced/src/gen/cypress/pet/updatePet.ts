@@ -1,4 +1,4 @@
-import type { UpdatePetOptions, UpdatePetResponse } from '../../models/ts/pet/UpdatePet.ts'
+import type { UpdatePetOptions, UpdatePetResponse } from '../../models/ts/pet/UpdatePet'
 
 export function updatePet({ body }: UpdatePetOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<UpdatePetResponse> {
   return cy

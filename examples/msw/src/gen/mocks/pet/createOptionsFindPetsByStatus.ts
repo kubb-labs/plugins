@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { OptionsFindPetsByStatusResponse, OptionsFindPetsByStatusStatus200 } from '../../models/OptionsFindPetsByStatus.ts'
-import { createPet } from '../createPet.ts'
+import type { OptionsFindPetsByStatusResponse, OptionsFindPetsByStatusStatus200 } from '../../models/OptionsFindPetsByStatus'
+import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

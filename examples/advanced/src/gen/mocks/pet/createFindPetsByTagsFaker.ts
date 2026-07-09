@@ -6,9 +6,9 @@ import type {
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
-} from '../../models/ts/pet/FindPetsByTags.ts'
-import { createFindPetsByTagsXEXAMPLEFaker } from '../createFindPetsByTagsXEXAMPLEFaker.ts'
-import { createPetFaker } from '../createPetFaker.ts'
+} from '../../models/ts/pet/FindPetsByTags'
+import { createFindPetsByTagsXEXAMPLEFaker } from '../createFindPetsByTagsXEXAMPLEFaker'
+import { createPetFaker } from '../createPetFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createFindPetsByTagsQueryFaker<TData extends Partial<FindPetsByTagsQuery> = object>(data?: TData) {

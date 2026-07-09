@@ -1,4 +1,4 @@
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type {
   UpdatePetOptions,
   UpdatePetStatus200,
@@ -6,9 +6,9 @@ import type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-} from '../../../models/ts/pet/UpdatePet.ts'
+} from '../../../models/ts/pet/UpdatePet'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { updatePet } from '../../axios/petService/updatePet.ts'
+import { updatePet } from '../../axios/petService/updatePet'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const

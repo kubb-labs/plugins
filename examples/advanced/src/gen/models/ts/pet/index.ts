@@ -7,7 +7,7 @@ export type {
   AddFilesResponses,
   AddFilesStatus200,
   AddFilesStatus405,
-} from './AddFiles.ts'
+} from './AddFiles'
 export type {
   AddPetBody,
   AddPetBodyFormUrlEncoded,
@@ -20,8 +20,8 @@ export type {
   AddPetStatusDefault,
   AddPetStatusDefaultJson,
   AddPetStatusDefaultXml,
-} from './AddPet.ts'
-export type { DeletePetHeaders, DeletePetOptions, DeletePetPath, DeletePetResponse, DeletePetResponses, DeletePetStatus400 } from './DeletePet.ts'
+} from './AddPet'
+export type { DeletePetHeaders, DeletePetOptions, DeletePetPath, DeletePetResponse, DeletePetResponses, DeletePetStatus400 } from './DeletePet'
 export type {
   FindPetsByStatusOptions,
   FindPetsByStatusPath,
@@ -31,7 +31,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-} from './FindPetsByStatus.ts'
+} from './FindPetsByStatus'
 export type {
   FindPetsByTagsHeaders,
   FindPetsByTagsOptions,
@@ -42,7 +42,7 @@ export type {
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
-} from './FindPetsByTags.ts'
+} from './FindPetsByTags'
 export type {
   GetPetByIdOptions,
   GetPetByIdPath,
@@ -53,7 +53,7 @@ export type {
   GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
-} from './GetPetById.ts'
+} from './GetPetById'
 export type {
   UpdatePetBody,
   UpdatePetBodyFormUrlEncoded,
@@ -69,7 +69,7 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-} from './UpdatePet.ts'
+} from './UpdatePet'
 export type {
   UpdatePetWithFormOptions,
   UpdatePetWithFormPath,
@@ -77,7 +77,7 @@ export type {
   UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
-} from './UpdatePetWithForm.ts'
+} from './UpdatePetWithForm'
 export type {
   UploadFileBody,
   UploadFileOptions,
@@ -86,4 +86,4 @@ export type {
   UploadFileResponse,
   UploadFileResponses,
   UploadFileStatus200,
-} from './UploadFile.ts'
+} from './UploadFile'

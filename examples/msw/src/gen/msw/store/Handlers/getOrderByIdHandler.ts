@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../../models/GetOrderById.ts'
+import type { GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../../models/GetOrderById'
 import { http } from 'msw'
 
 export function getOrderByIdHandlerResponse200(data: GetOrderByIdResponse) {

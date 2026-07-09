@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { PlaceOrderPatchOptions, PlaceOrderPatchResponse } from '../models.ts'
+import type { PlaceOrderPatchOptions, PlaceOrderPatchResponse } from '../models'
 
 export function placeOrderPatch({ body }: PlaceOrderPatchOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderPatchResponse> {
   return cy

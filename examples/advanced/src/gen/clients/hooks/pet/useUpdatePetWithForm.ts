@@ -1,7 +1,7 @@
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
-import type { UpdatePetWithFormOptions, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../../../models/ts/pet/UpdatePetWithForm.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../../../models/ts/pet/UpdatePetWithForm'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { updatePetWithForm } from '../../axios/petService/updatePetWithForm.ts'
+import { updatePetWithForm } from '../../axios/petService/updatePetWithForm'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId:search' }] as const

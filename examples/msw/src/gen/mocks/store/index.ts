@@ -1,5 +1,5 @@
-export { createDeleteOrderPath, createDeleteOrderResponse, createDeleteOrderStatus400, createDeleteOrderStatus404 } from './createDeleteOrder.ts'
-export { createGetInventoryResponse, createGetInventoryStatus200 } from './createGetInventory.ts'
+export { createDeleteOrderPath, createDeleteOrderResponse, createDeleteOrderStatus400, createDeleteOrderStatus404 } from './createDeleteOrder'
+export { createGetInventoryResponse, createGetInventoryStatus200 } from './createGetInventory'
 export {
   createGetOrderByIdPath,
   createGetOrderByIdResponse,
@@ -8,7 +8,7 @@ export {
   createGetOrderByIdStatus200Xml,
   createGetOrderByIdStatus400,
   createGetOrderByIdStatus404,
-} from './createGetOrderById.ts'
+} from './createGetOrderById'
 export {
   createPlaceOrderBody,
   createPlaceOrderBodyFormUrlEncoded,
@@ -17,7 +17,7 @@ export {
   createPlaceOrderResponse,
   createPlaceOrderStatus200,
   createPlaceOrderStatus405,
-} from './createPlaceOrder.ts'
+} from './createPlaceOrder'
 export {
   createPlaceOrderPatchBody,
   createPlaceOrderPatchBodyFormUrlEncoded,
@@ -26,4 +26,4 @@ export {
   createPlaceOrderPatchResponse,
   createPlaceOrderPatchStatus200,
   createPlaceOrderPatchStatus405,
-} from './createPlaceOrderPatch.ts'
+} from './createPlaceOrderPatch'

@@ -4,7 +4,7 @@
  */
 
 import * as z from 'zod/mini'
-import { petSchema } from './petSchema.ts'
+import { petSchema } from './petSchema'
 
 export const findPetsByStatusQueryStatusSchema = z._default(z.optional(z.enum(['available', 'pending', 'sold'])), 'available')
 
