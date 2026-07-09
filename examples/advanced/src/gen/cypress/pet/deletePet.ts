@@ -1,4 +1,4 @@
-import type { DeletePetOptions, DeletePetResponse } from '../../models/ts/pet/DeletePet.ts'
+import type { DeletePetOptions, DeletePetResponse } from '../../models/ts/pet/DeletePet'
 
 export function deletePet({ path, headers }: DeletePetOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeletePetResponse> {
   return cy

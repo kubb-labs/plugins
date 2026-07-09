@@ -1,4 +1,4 @@
-import type { Cat } from '../models/ts/Cat.ts'
+import type { Cat } from '../models/ts/Cat'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createCatFaker<TData extends Partial<Cat> = object>(data?: TData) {

@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { PlaceOrderPatchOptions, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/store/PlaceOrderPatch.ts'
-import { placeOrderPatch } from '../../clients/store/placeOrderPatch.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { PlaceOrderPatchOptions, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/store/PlaceOrderPatch'
+import { placeOrderPatch } from '../../clients/store/placeOrderPatch'
 import { mutationOptions } from '@tanstack/react-query'
 
 export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as const

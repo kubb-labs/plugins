@@ -1,7 +1,7 @@
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
-import type { AddPetOptions, AddPetResponse, AddPetStatus405 } from '../../../models/ts/pet/AddPet.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { AddPetOptions, AddPetResponse, AddPetStatus405 } from '../../../models/ts/pet/AddPet'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { addPet } from '../../axios/petService/addPet.ts'
+import { addPet } from '../../axios/petService/addPet'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const

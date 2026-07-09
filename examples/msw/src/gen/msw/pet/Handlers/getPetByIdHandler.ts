@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/GetPetById.ts'
+import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/GetPetById'
 import { http } from 'msw'
 
 export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {

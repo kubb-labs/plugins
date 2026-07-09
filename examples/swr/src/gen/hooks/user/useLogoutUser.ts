@@ -4,10 +4,10 @@
  */
 
 import useSWR from 'swr'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { LogoutUserResponse } from '../../models/user/LogoutUser.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { LogoutUserResponse } from '../../models/user/LogoutUser'
 import type { SWRConfiguration } from 'swr'
-import { logoutUser } from '../../clients/user/logoutUser.ts'
+import { logoutUser } from '../../clients/user/logoutUser'
 
 export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 

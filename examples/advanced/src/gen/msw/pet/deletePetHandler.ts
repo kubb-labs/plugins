@@ -1,4 +1,4 @@
-import type { DeletePetStatus400 } from '../../models/ts/pet/DeletePet.ts'
+import type { DeletePetStatus400 } from '../../models/ts/pet/DeletePet'
 import { http } from 'msw'
 
 export function deletePetHandlerResponse400(data: DeletePetStatus400) {

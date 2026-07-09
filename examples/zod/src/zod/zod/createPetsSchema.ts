@@ -4,7 +4,7 @@
  */
 
 import { z } from '../../zod.ts'
-import { petNotFoundSchema } from './petNotFoundSchema.ts'
+import { petNotFoundSchema } from './petNotFoundSchema'
 
 export const createPetsPathUuidSchema = z.string().describe('UUID')
 

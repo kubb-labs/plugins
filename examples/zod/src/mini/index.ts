@@ -1,4 +1,4 @@
-export { addPetRequestSchema } from './zod/addPetRequestSchema.ts'
+export { addPetRequestSchema } from './zod/addPetRequestSchema'
 export {
   addPetBodySchema,
   addPetBodySchemaFormUrlEncoded,
@@ -10,9 +10,9 @@ export {
   addPetStatus200SchemaJson,
   addPetStatus200SchemaXml,
   addPetStatus405Schema,
-} from './zod/addPetSchema.ts'
-export { apiResponseSchema } from './zod/apiResponseSchema.ts'
-export { categorySchema } from './zod/categorySchema.ts'
+} from './zod/addPetSchema'
+export { apiResponseSchema } from './zod/apiResponseSchema'
+export { categorySchema } from './zod/categorySchema'
 export {
   createPetsBodySchema,
   createPetsErrorSchema,
@@ -22,21 +22,21 @@ export {
   createPetsResponseSchema,
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
-} from './zod/createPetsSchema.ts'
+} from './zod/createPetsSchema'
 export {
   deleteOrderErrorSchema,
   deleteOrderPathOrderIdSchema,
   deleteOrderResponseSchema,
   deleteOrderStatus400Schema,
   deleteOrderStatus404Schema,
-} from './zod/deleteOrderSchema.ts'
+} from './zod/deleteOrderSchema'
 export {
   deletePetErrorSchema,
   deletePetHeaderApiKeySchema,
   deletePetPathPetIdSchema,
   deletePetResponseSchema,
   deletePetStatus400Schema,
-} from './zod/deletePetSchema.ts'
+} from './zod/deletePetSchema'
 export {
   findPetsByStatusErrorSchema,
   findPetsByStatusQueryStatusSchema,
@@ -45,7 +45,7 @@ export {
   findPetsByStatusStatus200SchemaJson,
   findPetsByStatusStatus200SchemaXml,
   findPetsByStatusStatus400Schema,
-} from './zod/findPetsByStatusSchema.ts'
+} from './zod/findPetsByStatusSchema'
 export {
   findPetsByTagsErrorSchema,
   findPetsByTagsHeaderXEXAMPLESchema,
@@ -57,8 +57,8 @@ export {
   findPetsByTagsStatus200SchemaJson,
   findPetsByTagsStatus200SchemaXml,
   findPetsByTagsStatus400Schema,
-} from './zod/findPetsByTagsSchema.ts'
-export { getInventoryResponseSchema, getInventoryStatus200Schema } from './zod/getInventorySchema.ts'
+} from './zod/findPetsByTagsSchema'
+export { getInventoryResponseSchema, getInventoryStatus200Schema } from './zod/getInventorySchema'
 export {
   getOrderByIdErrorSchema,
   getOrderByIdPathOrderIdSchema,
@@ -68,7 +68,7 @@ export {
   getOrderByIdStatus200SchemaXml,
   getOrderByIdStatus400Schema,
   getOrderByIdStatus404Schema,
-} from './zod/getOrderByIdSchema.ts'
+} from './zod/getOrderByIdSchema'
 export {
   getPetByIdErrorSchema,
   getPetByIdPathPetIdSchema,
@@ -78,7 +78,7 @@ export {
   getPetByIdStatus200SchemaXml,
   getPetByIdStatus400Schema,
   getPetByIdStatus404Schema,
-} from './zod/getPetByIdSchema.ts'
+} from './zod/getPetByIdSchema'
 export {
   getThingsErrorSchema,
   getThingsQueryLimitSchema,
@@ -86,13 +86,13 @@ export {
   getThingsResponseSchema,
   getThingsStatus201Schema,
   getThingsStatusDefaultSchema,
-} from './zod/getThingsSchema.ts'
-export { orderSchema } from './zod/orderSchema.ts'
-export { petNotFoundSchema } from './zod/petNotFoundSchema.ts'
-export { petSchema } from './zod/petSchema.ts'
-export { phoneNumberSchema } from './zod/phoneNumberSchema.ts'
-export { phoneWithMaxLengthExplicitSchema } from './zod/phoneWithMaxLengthExplicitSchema.ts'
-export { phoneWithMaxLengthSchema } from './zod/phoneWithMaxLengthSchema.ts'
+} from './zod/getThingsSchema'
+export { orderSchema } from './zod/orderSchema'
+export { petNotFoundSchema } from './zod/petNotFoundSchema'
+export { petSchema } from './zod/petSchema'
+export { phoneNumberSchema } from './zod/phoneNumberSchema'
+export { phoneWithMaxLengthExplicitSchema } from './zod/phoneWithMaxLengthExplicitSchema'
+export { phoneWithMaxLengthSchema } from './zod/phoneWithMaxLengthSchema'
 export {
   placeOrderPatchBodySchema,
   placeOrderPatchBodySchemaFormUrlEncoded,
@@ -102,7 +102,7 @@ export {
   placeOrderPatchResponseSchema,
   placeOrderPatchStatus200Schema,
   placeOrderPatchStatus405Schema,
-} from './zod/placeOrderPatchSchema.ts'
+} from './zod/placeOrderPatchSchema'
 export {
   placeOrderBodySchema,
   placeOrderBodySchemaFormUrlEncoded,
@@ -112,8 +112,8 @@ export {
   placeOrderResponseSchema,
   placeOrderStatus200Schema,
   placeOrderStatus405Schema,
-} from './zod/placeOrderSchema.ts'
-export { tagSchema } from './zod/tagSchema.ts'
+} from './zod/placeOrderSchema'
+export { tagSchema } from './zod/tagSchema'
 export {
   updatePetBodySchema,
   updatePetBodySchemaFormUrlEncoded,
@@ -127,7 +127,7 @@ export {
   updatePetStatus400Schema,
   updatePetStatus404Schema,
   updatePetStatus405Schema,
-} from './zod/updatePetSchema.ts'
+} from './zod/updatePetSchema'
 export {
   updatePetWithFormErrorSchema,
   updatePetWithFormPathPetIdSchema,
@@ -135,11 +135,11 @@ export {
   updatePetWithFormQueryStatusSchema,
   updatePetWithFormResponseSchema,
   updatePetWithFormStatus405Schema,
-} from './zod/updatePetWithFormSchema.ts'
+} from './zod/updatePetWithFormSchema'
 export {
   uploadFileBodySchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,
   uploadFileStatus200Schema,
-} from './zod/uploadFileSchema.ts'
+} from './zod/uploadFileSchema'

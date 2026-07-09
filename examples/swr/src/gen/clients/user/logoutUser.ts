@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { LogoutUserOptions, LogoutUserResponses } from '../../models/user/LogoutUser.ts'
-import { client } from '../../.kubb/client.ts'
+import type { Options, RequestResult } from '../../.kubb/client'
+import type { LogoutUserOptions, LogoutUserResponses } from '../../models/user/LogoutUser'
+import { client } from '../../.kubb/client'
 
 /**
  * @summary Logs out current logged in user session

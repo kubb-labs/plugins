@@ -1,5 +1,5 @@
 import type { z } from '../../zod.ts'
-import { addPetBodySchema, addPetStatus200Schema, addPetStatus405Schema, addPetResponseSchema } from './addPetSchema.ts'
+import { addPetBodySchema, addPetStatus200Schema, addPetStatus405Schema, addPetResponseSchema } from './addPetSchema'
 import {
   createPetsBodySchema,
   createPetsStatus201Schema,
@@ -7,45 +7,45 @@ import {
   createPetsPathUuidSchema,
   createPetsQueryOffsetSchema,
   createPetsHeaderXEXAMPLESchema,
-} from './createPetsSchema.ts'
-import { deleteOrderStatus400Schema, deleteOrderStatus404Schema, deleteOrderResponseSchema, deleteOrderPathOrderIdSchema } from './deleteOrderSchema.ts'
-import { deletePetStatus400Schema, deletePetResponseSchema, deletePetPathPetIdSchema, deletePetHeaderApiKeySchema } from './deletePetSchema.ts'
+} from './createPetsSchema'
+import { deleteOrderStatus400Schema, deleteOrderStatus404Schema, deleteOrderResponseSchema, deleteOrderPathOrderIdSchema } from './deleteOrderSchema'
+import { deletePetStatus400Schema, deletePetResponseSchema, deletePetPathPetIdSchema, deletePetHeaderApiKeySchema } from './deletePetSchema'
 import {
   findPetsByStatusStatus200Schema,
   findPetsByStatusStatus400Schema,
   findPetsByStatusResponseSchema,
   findPetsByStatusQueryStatusSchema,
-} from './findPetsByStatusSchema.ts'
+} from './findPetsByStatusSchema'
 import {
   findPetsByTagsStatus200Schema,
   findPetsByTagsStatus400Schema,
   findPetsByTagsResponseSchema,
   findPetsByTagsQueryTagsSchema,
   findPetsByTagsHeaderXEXAMPLESchema,
-} from './findPetsByTagsSchema.ts'
-import { getInventoryStatus200Schema, getInventoryResponseSchema } from './getInventorySchema.ts'
+} from './findPetsByTagsSchema'
+import { getInventoryStatus200Schema, getInventoryResponseSchema } from './getInventorySchema'
 import {
   getOrderByIdStatus200Schema,
   getOrderByIdStatus400Schema,
   getOrderByIdStatus404Schema,
   getOrderByIdResponseSchema,
   getOrderByIdPathOrderIdSchema,
-} from './getOrderByIdSchema.ts'
+} from './getOrderByIdSchema'
 import {
   getPetByIdStatus200Schema,
   getPetByIdStatus400Schema,
   getPetByIdStatus404Schema,
   getPetByIdResponseSchema,
   getPetByIdPathPetIdSchema,
-} from './getPetByIdSchema.ts'
-import { getThingsStatus201Schema, getThingsResponseSchema, getThingsQueryLimitSchema } from './getThingsSchema.ts'
+} from './getPetByIdSchema'
+import { getThingsStatus201Schema, getThingsResponseSchema, getThingsQueryLimitSchema } from './getThingsSchema'
 import {
   placeOrderPatchBodySchema,
   placeOrderPatchStatus200Schema,
   placeOrderPatchStatus405Schema,
   placeOrderPatchResponseSchema,
-} from './placeOrderPatchSchema.ts'
-import { placeOrderBodySchema, placeOrderStatus200Schema, placeOrderStatus405Schema, placeOrderResponseSchema } from './placeOrderSchema.ts'
+} from './placeOrderPatchSchema'
+import { placeOrderBodySchema, placeOrderStatus200Schema, placeOrderStatus405Schema, placeOrderResponseSchema } from './placeOrderSchema'
 import {
   updatePetBodySchema,
   updatePetStatus200Schema,
@@ -53,20 +53,20 @@ import {
   updatePetStatus404Schema,
   updatePetStatus405Schema,
   updatePetResponseSchema,
-} from './updatePetSchema.ts'
+} from './updatePetSchema'
 import {
   updatePetWithFormStatus405Schema,
   updatePetWithFormResponseSchema,
   updatePetWithFormPathPetIdSchema,
   updatePetWithFormQueryNameSchema,
-} from './updatePetWithFormSchema.ts'
+} from './updatePetWithFormSchema'
 import {
   uploadFileBodySchema,
   uploadFileStatus200Schema,
   uploadFileResponseSchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
-} from './uploadFileSchema.ts'
+} from './uploadFileSchema'
 
 export type OperationSchema = {
   readonly request: z.ZodTypeAny | undefined

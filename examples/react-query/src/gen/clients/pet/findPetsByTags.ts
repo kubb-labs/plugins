@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from '../../models/pet/FindPetsByTags.ts'
-import { client } from '../../.kubb/client.ts'
+import type { Options, RequestResult } from '../../.kubb/client'
+import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from '../../models/pet/FindPetsByTags'
+import { client } from '../../.kubb/client'
 
 /**
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.

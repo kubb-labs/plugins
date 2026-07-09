@@ -1,2 +1,2 @@
-export type { TagTagSchemaType } from './tagSchema.ts'
-export { tagTagSchema } from './tagSchema.ts'
+export type { TagTagSchemaType } from './tagSchema'
+export { tagTagSchema } from './tagSchema'

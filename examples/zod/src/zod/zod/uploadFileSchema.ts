@@ -4,7 +4,7 @@
  */
 
 import { z } from '../../zod.ts'
-import { apiResponseSchema } from './apiResponseSchema.ts'
+import { apiResponseSchema } from './apiResponseSchema'
 
 export const uploadFilePathPetIdSchema = z.bigint().describe('ID of pet to update')
 

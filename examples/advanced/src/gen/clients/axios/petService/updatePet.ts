@@ -1,7 +1,7 @@
-import type { Options, RequestResult } from '../../../.kubb/client.ts'
-import type { UpdatePetOptions, UpdatePetResponses } from '../../../models/ts/pet/UpdatePet.ts'
-import { client } from '../../../.kubb/client.ts'
-import { updatePetResponseSchema, updatePetErrorSchema } from '../../../zod/pet/updatePetSchema.ts'
+import type { Options, RequestResult } from '../../../.kubb/client'
+import type { UpdatePetOptions, UpdatePetResponses } from '../../../models/ts/pet/UpdatePet'
+import { client } from '../../../.kubb/client'
+import { updatePetResponseSchema, updatePetErrorSchema } from '../../../zod/pet/updatePetSchema'
 
 /**
  * @description Update an existing pet by Id

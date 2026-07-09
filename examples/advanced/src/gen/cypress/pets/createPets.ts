@@ -1,4 +1,4 @@
-import type { CreatePetsOptions, CreatePetsResponse } from '../../models/ts/pets/CreatePets.ts'
+import type { CreatePetsOptions, CreatePetsResponse } from '../../models/ts/pets/CreatePets'
 
 export function createPets(
   { path, query, body, headers }: CreatePetsOptions,

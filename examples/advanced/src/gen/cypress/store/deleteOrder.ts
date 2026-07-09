@@ -1,4 +1,4 @@
-import type { DeleteOrderOptions, DeleteOrderResponse } from '../../models/ts/store/DeleteOrder.ts'
+import type { DeleteOrderOptions, DeleteOrderResponse } from '../../models/ts/store/DeleteOrder'
 
 export function deleteOrder({ path }: DeleteOrderOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeleteOrderResponse> {
   return cy

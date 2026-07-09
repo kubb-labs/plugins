@@ -1,4 +1,4 @@
-import type { UpdatePetWithFormPath, UpdatePetWithFormQuery } from '../../models/ts/pet/UpdatePetWithForm.ts'
+import type { UpdatePetWithFormPath, UpdatePetWithFormQuery } from '../../models/ts/pet/UpdatePetWithForm'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createUpdatePetWithFormPathFaker<TData extends Partial<UpdatePetWithFormPath> = object>(data?: TData) {

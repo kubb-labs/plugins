@@ -4,7 +4,7 @@
  */
 
 import type { z } from '../../zod.ts'
-import { phoneNumberSchema } from './phoneNumberSchema.ts'
+import { phoneNumberSchema } from './phoneNumberSchema'
 
 export const phoneWithMaxLengthSchema = phoneNumberSchema.max(15)
 

@@ -1,7 +1,7 @@
-import type { AddFilesOptions } from '../../models/ts/pet/AddFiles.ts'
+import type { AddFilesOptions } from '../../models/ts/pet/AddFiles'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { addFiles } from '../../clients/axios/petService/addFiles.ts'
+import { addFiles } from '../../clients/axios/petService/addFiles'
 
 /**
  * @description Place a new file in the store

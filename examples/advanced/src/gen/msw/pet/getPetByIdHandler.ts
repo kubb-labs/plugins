@@ -1,4 +1,4 @@
-import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/ts/pet/GetPetById.ts'
+import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/ts/pet/GetPetById'
 import { http } from 'msw'
 
 export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {

@@ -1,1 +1,1 @@
-export { streamPetEvents } from './streamPetEvents.ts'
+export { streamPetEvents } from './streamPetEvents'

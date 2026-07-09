@@ -1,4 +1,4 @@
-import type { CreatePetsXEXAMPLEKey } from '../models/ts/CreatePetsXEXAMPLE.ts'
+import type { CreatePetsXEXAMPLEKey } from '../models/ts/CreatePetsXEXAMPLE'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**

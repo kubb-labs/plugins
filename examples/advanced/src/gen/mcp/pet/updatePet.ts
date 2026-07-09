@@ -1,7 +1,7 @@
-import type { UpdatePetOptions } from '../../models/ts/pet/UpdatePet.ts'
+import type { UpdatePetOptions } from '../../models/ts/pet/UpdatePet'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { updatePet } from '../../clients/axios/petService/updatePet.ts'
+import { updatePet } from '../../clients/axios/petService/updatePet'
 
 /**
  * @description Update an existing pet by Id

@@ -4,10 +4,10 @@
  */
 
 import useSWR from 'swr'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetUserByNameOptions, GetUserByNameResponse, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { GetUserByNameOptions, GetUserByNameResponse, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName'
 import type { SWRConfiguration } from 'swr'
-import { getUserByName } from '../../clients/user/getUserByName.ts'
+import { getUserByName } from '../../clients/user/getUserByName'
 
 export const getUserByNameQueryKey = ({ path }: Omit<GetUserByNameOptions, 'headers'>) => [{ url: '/user/:username', params: path }] as const
 

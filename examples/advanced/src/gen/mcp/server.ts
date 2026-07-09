@@ -1,33 +1,33 @@
-import { addFilesHandler } from './pet/addFiles.ts'
-import { addPetHandler } from './pet/addPet.ts'
-import { deletePetHandler } from './pet/deletePet.ts'
-import { findPetsByStatusHandler } from './pet/findPetsByStatus.ts'
-import { findPetsByTagsHandler } from './pet/findPetsByTags.ts'
-import { getPetByIdHandler } from './pet/getPetById.ts'
-import { updatePetHandler } from './pet/updatePet.ts'
-import { updatePetWithFormHandler } from './pet/updatePetWithForm.ts'
-import { uploadFileHandler } from './pet/uploadFile.ts'
-import { createPetsHandler } from './pets/createPets.ts'
-import { addFilesBodySchema, addFilesStatus200Schema } from '../zod/pet/addFilesSchema.ts'
-import { addPetBodySchema } from '../zod/pet/addPetSchema.ts'
-import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/pet/deletePetSchema.ts'
-import { findPetsByStatusPathStepIdSchema, findPetsByStatusStatus200Schema } from '../zod/pet/findPetsByStatusSchema.ts'
+import { addFilesHandler } from './pet/addFiles'
+import { addPetHandler } from './pet/addPet'
+import { deletePetHandler } from './pet/deletePet'
+import { findPetsByStatusHandler } from './pet/findPetsByStatus'
+import { findPetsByTagsHandler } from './pet/findPetsByTags'
+import { getPetByIdHandler } from './pet/getPetById'
+import { updatePetHandler } from './pet/updatePet'
+import { updatePetWithFormHandler } from './pet/updatePetWithForm'
+import { uploadFileHandler } from './pet/uploadFile'
+import { createPetsHandler } from './pets/createPets'
+import { addFilesBodySchema, addFilesStatus200Schema } from '../zod/pet/addFilesSchema'
+import { addPetBodySchema } from '../zod/pet/addPetSchema'
+import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/pet/deletePetSchema'
+import { findPetsByStatusPathStepIdSchema, findPetsByStatusStatus200Schema } from '../zod/pet/findPetsByStatusSchema'
 import {
   findPetsByTagsHeaderXEXAMPLESchema,
   findPetsByTagsQueryPageSchema,
   findPetsByTagsQueryPageSizeSchema,
   findPetsByTagsQueryTagsSchema,
   findPetsByTagsStatus200Schema,
-} from '../zod/pet/findPetsByTagsSchema.ts'
-import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/pet/getPetByIdSchema.ts'
-import { updatePetBodySchema, updatePetStatus200Schema } from '../zod/pet/updatePetSchema.ts'
-import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from '../zod/pet/updatePetWithFormSchema.ts'
+} from '../zod/pet/findPetsByTagsSchema'
+import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/pet/getPetByIdSchema'
+import { updatePetBodySchema, updatePetStatus200Schema } from '../zod/pet/updatePetSchema'
+import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from '../zod/pet/updatePetWithFormSchema'
 import {
   uploadFileBodySchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileStatus200Schema,
-} from '../zod/pet/uploadFileSchema.ts'
+} from '../zod/pet/uploadFileSchema'
 import {
   createPetsBodySchema,
   createPetsHeaderXEXAMPLESchema,
@@ -35,7 +35,7 @@ import {
   createPetsQueryBoolParamSchema,
   createPetsQueryOffsetSchema,
   createPetsStatus201Schema,
-} from '../zod/pets/createPetsSchema.ts'
+} from '../zod/pets/createPetsSchema'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
 import { z } from 'zod'

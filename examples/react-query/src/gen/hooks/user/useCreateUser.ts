@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { CreateUserOptions, CreateUserResponse } from '../../models/user/CreateUser.ts'
-import { createUser } from '../../clients/user/createUser.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { CreateUserOptions, CreateUserResponse } from '../../models/user/CreateUser'
+import { createUser } from '../../clients/user/createUser'
 import { mutationOptions } from '@tanstack/react-query'
 
 export const createUserMutationKey = () => [{ url: '/user' }] as const

@@ -3,13 +3,13 @@
  * Do not edit manually.
  */
 
-import type { ClientConfig, ClientInstance, Options, RequestResult } from '../../.kubb/client.ts'
-import type { DeleteOrderOptions, DeleteOrderResponses } from '../../models/store/DeleteOrder.ts'
-import type { GetInventoryOptions, GetInventoryResponses } from '../../models/store/GetInventory.ts'
-import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../../models/store/GetOrderById.ts'
-import type { PlaceOrderOptions, PlaceOrderResponses } from '../../models/store/PlaceOrder.ts'
-import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch.ts'
-import { createClient } from '../../.kubb/client.ts'
+import type { ClientConfig, ClientInstance, Options, RequestResult } from '../../.kubb/client'
+import type { DeleteOrderOptions, DeleteOrderResponses } from '../../models/store/DeleteOrder'
+import type { GetInventoryOptions, GetInventoryResponses } from '../../models/store/GetInventory'
+import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../../models/store/GetOrderById'
+import type { PlaceOrderOptions, PlaceOrderResponses } from '../../models/store/PlaceOrder'
+import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch'
+import { createClient } from '../../.kubb/client'
 
 export class store {
   private readonly client: ClientInstance

@@ -13,9 +13,9 @@ import type {
   AddPetStatus200Json,
   AddPetStatus200Xml,
   AddPetStatus405,
-} from '../../models/AddPet.ts'
-import { createAddPetRequest } from '../createAddPetRequest.ts'
-import { createPet } from '../createPet.ts'
+} from '../../models/AddPet'
+import { createAddPetRequest } from '../createAddPetRequest'
+import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**
