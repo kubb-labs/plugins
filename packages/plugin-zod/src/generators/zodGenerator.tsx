@@ -1,7 +1,5 @@
-import { caseParams, getSuccessResponses, isSuccessStatusCode, resolveContentTypeVariants } from '@internals/shared'
-import type { Adapter } from 'kubb/kit'
+import { caseParams, getOasAdapter, getSuccessResponses, isSuccessStatusCode, resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
-import type { AdapterOas } from '@kubb/adapter-oas'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Zod } from '../components/Zod.tsx'
 import { ZOD_NAMESPACE_IMPORTS } from '../constants.ts'
@@ -51,9 +49,8 @@ function getStdPrinters(resolver: ResolverZod, params: StdPrinterParams): StdPri
   ) {
     return { output: cached.output, input: cached.input }
   }
-  const base = { ...params, resolver } as Parameters<typeof printerZod>[0]
-  const output = printerZod({ ...base, direction: 'output' })
-  const input = printerZod({ ...base, direction: 'input' })
+  const output = printerZod({ ...params, resolver, direction: 'output' } as Parameters<typeof printerZod>[0])
+  const input = printerZod({ ...params, resolver, direction: 'input' } as Parameters<typeof printerZod>[0])
   zodPrinterCache.set(resolver, {
     output,
     input,
@@ -95,7 +92,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
     const { output, coercion, guidType, regexType, mini, inferred, importPath, group, printer } = ctx.options
-    const dateType = (adapter as Adapter<AdapterOas>).options.dateType
+    const dateType = getOasAdapter(adapter).options.dateType
 
     if (!node.name) {
       return
@@ -134,7 +131,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const inferTypeName = inferred ? resolver.schema.typeName(node.name) : null
 
-    const nameMapping = (adapter as Adapter<AdapterOas>).options.nameMapping
+    const nameMapping = getOasAdapter(adapter).options.nameMapping
     const stdPrinters = mini ? null : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, cyclicSchemas, nameMapping, nodes: printer?.nodes })
     const schemaPrinter = mini ? getMiniPrinter(resolver, { guidType, regexType, cyclicSchemas, nameMapping, nodes: printer?.nodes }) : stdPrinters!.output
 
@@ -168,7 +165,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     if (!ast.isHttpOperationNode(node)) return null
     const { adapter, config, resolver, root } = ctx
     const { output, coercion, guidType, regexType, mini, inferred, importPath, group, printer } = ctx.options
-    const dateType = (adapter as Adapter<AdapterOas>).options.dateType
+    const dateType = getOasAdapter(adapter).options.dateType
 
     const isZodImport = ZOD_NAMESPACE_IMPORTS.has(importPath as 'zod' | 'zod/mini')
 
@@ -179,7 +176,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     } as const
 
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
-    const nameMapping = (adapter as Adapter<AdapterOas>).options.nameMapping
+    const nameMapping = getOasAdapter(adapter).options.nameMapping
 
     function renderSchemaEntry({
       schema,

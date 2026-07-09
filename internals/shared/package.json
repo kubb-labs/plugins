@@ -54,6 +54,7 @@
     "kubb": "catalog:"
   },
   "devDependencies": {
+    "@kubb/adapter-oas": "catalog:",
     "@types/node": "catalog:"
   },
   "engines": {

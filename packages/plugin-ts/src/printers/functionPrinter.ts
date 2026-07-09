@@ -123,21 +123,21 @@ function renderGroupType(type: TypeExpression | undefined, sorted: Array<GroupMe
 
 function printParameter(node: FunctionParameterNode, options: FunctionPrinterOptions): string {
   const { mode, transformName, transformType } = options
-  const isGroup = typeof node.name !== 'string'
+  const bindingName = node.name
 
   if (mode === 'call') {
-    if (isGroup) {
-      const keys = sortedGroupMembers(node.name as ObjectBindingPatternNode, node.type)
+    if (typeof bindingName !== 'string') {
+      const keys = sortedGroupMembers(bindingName, node.type)
         .map((member) => renderBindingMember(member))
         .join(', ')
       return `{ ${keys} }`
     }
-    const name = transformName ? transformName(node.name as string) : (node.name as string)
+    const name = transformName ? transformName(bindingName) : bindingName
     return node.rest ? `...${name}` : name
   }
 
-  if (isGroup) {
-    const sorted = sortedGroupMembers(node.name as ObjectBindingPatternNode, node.type)
+  if (typeof bindingName !== 'string') {
+    const sorted = sortedGroupMembers(bindingName, node.type)
     const binding = `{ ${sorted.map((member) => renderBindingMember(member, transformName)).join(', ')} }`
     const allOptional = sorted.every((member) => member.optional)
     const type = renderGroupType(node.type, sorted, transformType)
@@ -148,7 +148,7 @@ function printParameter(node: FunctionParameterNode, options: FunctionPrinterOpt
     return node.default ? `${binding} = ${node.default}` : binding
   }
 
-  const name = transformName ? transformName(node.name as string) : (node.name as string)
+  const name = transformName ? transformName(bindingName) : bindingName
   const type = node.type ? renderType(node.type, transformType) : undefined
 
   if (node.rest) {
