@@ -46,11 +46,13 @@ export default defineConfig({
       },
     },
     {
-      // Test fixtures build partial mock objects (`{ ... } as GeneratorContext`) that a
-      // type annotation or `satisfies` cannot express, so the assertion is intentional there.
+      // Test fixtures build partial or intentionally-invalid mock objects (`{ ... } as GeneratorContext`,
+      // `undefined as any`) that a type annotation or `satisfies` cannot express, so assertions and
+      // `any` are intentional there. The source rules stay strict.
       files: ['**/*.test.ts', '**/*.test.tsx'],
       rules: {
         'typescript/consistent-type-assertions': 'off',
+        'typescript/no-explicit-any': 'off',
       },
     },
   ],
