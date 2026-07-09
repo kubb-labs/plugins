@@ -7,8 +7,6 @@ import { ENUM_TYPES_WITH_KEY_SUFFIX, ENUM_TYPES_WITH_RUNTIME_VALUE, ENUM_TYPES_W
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 
-const parser = parserTs()
-
 type EnumOptions = PluginTs['resolvedOptions']['enum']
 
 /**
@@ -79,7 +77,7 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
     <>
       {nameNode && (
         <File.Source name={enumName} isExportable isIndexable isTypeOnly={false}>
-          {parser.print(nameNode)}
+          {parserTs().print(nameNode)}
         </File.Source>
       )}
       <File.Source
@@ -88,7 +86,7 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
         isExportable={!namesMerge && ENUM_TYPES_WITH_RUNTIME_VALUE.has(enumOptions.type)}
         isTypeOnly={ENUM_TYPES_WITH_TYPE_ONLY.has(enumOptions.type)}
       >
-        {parser.print(typeNode)}
+        {parserTs().print(typeNode)}
       </File.Source>
     </>
   )

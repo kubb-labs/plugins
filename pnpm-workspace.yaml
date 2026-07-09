@@ -27,7 +27,7 @@ catalog:
   prettier: ^3.9.4
   tsdown: ^0.22.3
   typescript: ^6.0.3
-  unplugin-kubb: 5.0.0-beta.89
+  unplugin-kubb: 5.0.0-beta.91
   vitest: ^4.1.9
 #
 #overrides:

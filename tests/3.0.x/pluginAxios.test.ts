@@ -42,7 +42,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
-      plugins: [pluginTs({ output: { path: './types', barrel: false } }), pluginAxios({ output: { path: './clients', barrel: false }, sdk: {} })],
+      plugins: [
+        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false }, sdk: {} }),
+      ],
     },
   },
 

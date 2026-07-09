@@ -22,10 +22,8 @@ import {
 
 const { factory } = ts
 
-const parser = parserTs()
-
 const formatTS = (elements: ts.Node | Array<ts.Node | undefined>) => {
-  return format(parser.print(...[elements].flat().filter(Boolean)))
+  return format(parserTs().print(...[elements].flat().filter(Boolean)))
 }
 
 describe('Code Generation', () => {
@@ -45,7 +43,7 @@ describe('Code Generation', () => {
   it('should create array declaration', () => {
     // Default arrayType: 'array' - generates (string | number)[]
     expect(
-      parser.print(
+      parserTs().print(
         createArrayDeclaration({
           nodes: [factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword), factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)],
         })!,
@@ -54,7 +52,7 @@ describe('Code Generation', () => {
 
     // arrayType: 'generic' - generates Array<string | number>
     expect(
-      parser.print(
+      parserTs().print(
         createArrayDeclaration({
           nodes: [factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword), factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)],
           arrayType: 'generic',
@@ -64,7 +62,7 @@ describe('Code Generation', () => {
 
     // Single node with default arrayType: 'array' - generates string[]
     expect(
-      parser.print(
+      parserTs().print(
         createArrayDeclaration({
           nodes: [factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)],
         })!,
@@ -73,7 +71,7 @@ describe('Code Generation', () => {
 
     // Single node with arrayType: 'generic' - generates Array<string>
     expect(
-      parser.print(
+      parserTs().print(
         createArrayDeclaration({
           nodes: [factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)],
           arrayType: 'generic',
@@ -84,7 +82,7 @@ describe('Code Generation', () => {
 
   it('should create intersection declaration', () => {
     expect(
-      parser.print(
+      parserTs().print(
         createIntersectionDeclaration({
           nodes: [factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword), factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)],
         })!,
@@ -93,7 +91,7 @@ describe('Code Generation', () => {
   })
   it('should create union declaration', () => {
     expect(
-      parser.print(
+      parserTs().print(
         createUnionDeclaration({
           nodes: [factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword), factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)],
         })!,
@@ -102,7 +100,7 @@ describe('Code Generation', () => {
   })
   it('should create property signature', () => {
     expect(
-      parser.print(
+      parserTs().print(
         createPropertySignature({
           modifiers: [modifiers.const],
           name: 'hello',
@@ -114,14 +112,14 @@ describe('Code Generation', () => {
 
   it('should create parameter signature', () => {
     expect(
-      parser.print(
+      parserTs().print(
         createParameterSignature('hello', {
           type: factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
         })!,
       ),
     ).toMatchSnapshot()
     expect(
-      parser.print(
+      parserTs().print(
         createParameterSignature('hello', {
           questionToken: true,
           type: factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
@@ -129,7 +127,7 @@ describe('Code Generation', () => {
       ),
     ).toMatchSnapshot()
     expect(
-      parser.print(
+      parserTs().print(
         createParameterSignature('hello', {
           questionToken: true,
           type: factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
@@ -525,8 +523,8 @@ describe('Import/Export Sorting Consistency', () => {
       path: './test.ts',
     })
 
-    const output1 = parser.print(import1)
-    const output2 = parser.print(import2)
+    const output1 = parserTs().print(import1)
+    const output2 = parserTs().print(import2)
 
     // Both should produce the same sorted output
     expect(output1).toBe(output2)
@@ -544,8 +542,8 @@ describe('Import/Export Sorting Consistency', () => {
       path: './animals.ts',
     })
 
-    const output1 = parser.print(export1)
-    const output2 = parser.print(export2)
+    const output1 = parserTs().print(export1)
+    const output2 = parserTs().print(export2)
 
     // Both should produce the same sorted output
     expect(output1).toBe(output2)
@@ -558,7 +556,7 @@ describe('Import/Export Sorting Consistency', () => {
       path: './mixed.ts',
     })
 
-    const output = parser.print(import1)
+    const output = parserTs().print(import1)
 
     // Should be sorted alphabetically: apple, banana as yellow, monkey, zoo
     expect(output).toContain('apple, banana as yellow, monkey, zoo')
@@ -583,9 +581,9 @@ describe('Import/Export Sorting Consistency', () => {
       path: './services.ts',
     })
 
-    const output1 = parser.print(import1)
-    const output2 = parser.print(import2)
-    const output3 = parser.print(import3)
+    const output1 = parserTs().print(import1)
+    const output2 = parserTs().print(import2)
+    const output3 = parserTs().print(import3)
 
     // All three should produce identical output regardless of input order
     expect(output1).toBe(output2)
@@ -596,43 +594,43 @@ describe('Import/Export Sorting Consistency', () => {
   it('should create URL template type for path without parameters', () => {
     const result = createUrlTemplateType('/pets')
 
-    expect(parser.print(result).trim()).toBe('"/pets"')
+    expect(parserTs().print(result).trim()).toBe('"/pets"')
   })
 
   it('should create URL template type for path with single parameter', () => {
     const result = createUrlTemplateType('/pets/{petId}')
 
-    expect(parser.print(result).trim()).toBe('`/pets/${string}`')
+    expect(parserTs().print(result).trim()).toBe('`/pets/${string}`')
   })
 
   it('should create URL template type for path with multiple parameters', () => {
     const result = createUrlTemplateType('/pets/{petId}/owner/{ownerId}')
 
-    expect(parser.print(result).trim()).toBe('`/pets/${string}/owner/${string}`')
+    expect(parserTs().print(result).trim()).toBe('`/pets/${string}/owner/${string}`')
   })
 
   it('should create URL template type for path with parameter at start', () => {
     const result = createUrlTemplateType('/{category}/pets')
 
-    expect(parser.print(result).trim()).toBe('`/${string}/pets`')
+    expect(parserTs().print(result).trim()).toBe('`/${string}/pets`')
   })
 
   it('should create URL template type for path with parameter at end', () => {
     const result = createUrlTemplateType('/user/{username}')
 
-    expect(parser.print(result).trim()).toBe('`/user/${string}`')
+    expect(parserTs().print(result).trim()).toBe('`/user/${string}`')
   })
 
   it('should create URL template type for complex path', () => {
     const result = createUrlTemplateType('/pet/findByStatus/{step_id}')
 
-    expect(parser.print(result).trim()).toBe('`/pet/findByStatus/${string}`')
+    expect(parserTs().print(result).trim()).toBe('`/pet/findByStatus/${string}`')
   })
 
   it('should create URL template type for path with consecutive parameters', () => {
     const result = createUrlTemplateType('/api/{version}/{resource}')
 
-    expect(parser.print(result).trim()).toBe('`/api/${string}/${string}`')
+    expect(parserTs().print(result).trim()).toBe('`/api/${string}/${string}`')
   })
 })
 
@@ -640,30 +638,30 @@ describe('createUrlTemplateType (Express-style paths)', () => {
   it('returns a string literal for paths without params', () => {
     const result = createUrlTemplateType('/pets')
 
-    expect(parser.print(result).trim()).toBe('"/pets"')
+    expect(parserTs().print(result).trim()).toBe('"/pets"')
   })
 
   it('converts a single Express path param to a template literal', () => {
     const result = createUrlTemplateType('/pets/:petId')
 
-    expect(parser.print(result).trim()).toBe('`/pets/${string}`')
+    expect(parserTs().print(result).trim()).toBe('`/pets/${string}`')
   })
 
   it('converts multiple Express path params to a template literal', () => {
     const result = createUrlTemplateType('/store/:storeId/order/:orderId')
 
-    expect(parser.print(result).trim()).toBe('`/store/${string}/order/${string}`')
+    expect(parserTs().print(result).trim()).toBe('`/store/${string}/order/${string}`')
   })
 
   it('handles trailing static segments after params', () => {
     const result = createUrlTemplateType('/pets/:petId/photos')
 
-    expect(parser.print(result).trim()).toBe('`/pets/${string}/photos`')
+    expect(parserTs().print(result).trim()).toBe('`/pets/${string}/photos`')
   })
 
   it('handles consecutive params', () => {
     const result = createUrlTemplateType('/api/:version/:resource')
 
-    expect(parser.print(result).trim()).toBe('`/api/${string}/${string}`')
+    expect(parserTs().print(result).trim()).toBe('`/api/${string}/${string}`')
   })
 })

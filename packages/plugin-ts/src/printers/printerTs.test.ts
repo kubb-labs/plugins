@@ -12,8 +12,6 @@ const asConstEnum = { type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Ke
 const literalEnum = { type: 'literal', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
 const constEnumEnum = { type: 'constEnum', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
 
-const parser = parserTs()
-
 /**
  * Wraps a `ts.TypeNode` in `type _ = <node>` so prettier can parse it as a
  * valid TypeScript statement, then strips the wrapper from the result.
@@ -22,7 +20,7 @@ const formatTS = async (node: ts.Node | null | undefined): Promise<string> => {
   if (!node) return ''
 
   const alias = ts.factory.createTypeAliasDeclaration(undefined, '_', undefined, node as ts.TypeNode)
-  const source = parser.print(alias)
+  const source = parserTs().print(alias)
   const formatted = await format(source)
 
   return formatted
