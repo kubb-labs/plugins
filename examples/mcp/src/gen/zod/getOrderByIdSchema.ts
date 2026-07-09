@@ -4,7 +4,7 @@
  */
 
 import * as z from 'zod'
-import { orderSchema } from './orderSchema.js'
+import { orderSchema } from './orderSchema'
 
 export const getOrderByIdPathOrderIdSchema = z.int().describe('ID of order that needs to be fetched')
 

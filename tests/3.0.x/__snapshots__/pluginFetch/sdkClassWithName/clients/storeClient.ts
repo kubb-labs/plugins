@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { ClientConfig, ClientInstance, Options, RequestResult } from '../.kubb/client.ts'
-import type { GetInventoryOptions, GetInventoryResponses } from '../types/GetInventory.ts'
-import type { PlaceOrderOptions, PlaceOrderResponses } from '../types/PlaceOrder.ts'
-import { createClient } from '../.kubb/client.ts'
+import type { ClientConfig, ClientInstance, Options, RequestResult } from '../.kubb/client'
+import type { GetInventoryOptions, GetInventoryResponses } from '../types/GetInventory'
+import type { PlaceOrderOptions, PlaceOrderResponses } from '../types/PlaceOrder'
+import { createClient } from '../.kubb/client'
 
 export class StoreClient {
   private readonly client: ClientInstance

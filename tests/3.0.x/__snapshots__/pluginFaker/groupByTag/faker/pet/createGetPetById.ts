@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { GetPetByIdPath, GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus200Json, GetPetByIdStatus200Xml, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../types/GetPetById.ts'
-import { createPet } from '../createPet.ts'
+import type { GetPetByIdPath, GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus200Json, GetPetByIdStatus200Xml, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../types/GetPetById'
+import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createGetPetByIdPath<TData extends Partial<GetPetByIdPath> = object>(data?: TData)

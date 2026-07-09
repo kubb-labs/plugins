@@ -4,7 +4,7 @@
  * Source: text content
  */
 
-import type { GetBestSellersOptions, GetBestSellersResponse } from './GetBestSellers.ts'
+import type { GetBestSellersOptions, GetBestSellersResponse } from './GetBestSellers'
 
 export function getBestSellers(
   { query }: GetBestSellersOptions = {},

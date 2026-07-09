@@ -4,9 +4,9 @@
  */
 
 import * as z from 'zod'
-import { addPetRequestStatusEnumSchema } from './addPetRequestStatusEnumSchema.js'
-import { categorySchema } from './categorySchema.js'
-import { tagTagSchema } from './tag/tagSchema.js'
+import { addPetRequestStatusEnumSchema } from './addPetRequestStatusEnumSchema'
+import { categorySchema } from './categorySchema'
+import { tagTagSchema } from './tag/tagSchema'
 
 export const addPetRequestSchema = z.object({
   id: z

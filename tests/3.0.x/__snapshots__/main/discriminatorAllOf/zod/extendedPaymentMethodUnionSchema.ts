@@ -3,6 +3,6 @@
 * Do not edit manually.
 */
 
-import { paymentMethodUnionSchema } from './paymentMethodUnionSchema.ts'
+import { paymentMethodUnionSchema } from './paymentMethodUnionSchema'
 
 export const extendedPaymentMethodUnionSchema = paymentMethodUnionSchema

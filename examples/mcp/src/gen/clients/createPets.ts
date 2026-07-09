@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client.js'
-import type { CreatePetsOptions, CreatePetsResponses } from '../models/ts/CreatePets.js'
-import { client } from '../.kubb/client.js'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { CreatePetsOptions, CreatePetsResponses } from '../models/ts/CreatePets'
+import { client } from '../.kubb/client'
 
 /**
  * @summary Create a pet

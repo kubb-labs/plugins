@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { UploadFileOptions, UploadFileStatus200 } from '../types/UploadFile.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { UploadFileOptions, UploadFileStatus200 } from '../types/UploadFile'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import { uploadFile } from '../clients/uploadFile.ts'
+import { uploadFile } from '../clients/uploadFile'
 import { useMutation } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 

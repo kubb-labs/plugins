@@ -1,7 +1,7 @@
-import type { PlaceOrderOptions } from '../../types/PlaceOrder.ts'
+import type { PlaceOrderOptions } from '../../types/PlaceOrder'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { placeOrder } from '../../clients/placeOrder.ts'
+import { placeOrder } from '../../clients/placeOrder'
 
 /**
  * @description Place a new order in the store

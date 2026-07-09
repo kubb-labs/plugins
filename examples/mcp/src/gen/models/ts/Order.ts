@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum.js'
-import type { OrderOrderTypeEnumKey } from './OrderOrderTypeEnum.js'
-import type { OrderStatusEnumKey } from './OrderStatusEnum.js'
+import type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum'
+import type { OrderOrderTypeEnumKey } from './OrderOrderTypeEnum'
+import type { OrderStatusEnumKey } from './OrderStatusEnum'
 
 /**
  * @type object

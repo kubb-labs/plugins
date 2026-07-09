@@ -4,8 +4,8 @@
 */
 
 import * as z from 'zod'
-import { contactDetailsTypeSchema } from './contactDetailsTypeSchema.ts'
-import { productDetailsSchema } from './productDetailsSchema.ts'
+import { contactDetailsTypeSchema } from './contactDetailsTypeSchema'
+import { productDetailsSchema } from './productDetailsSchema'
 
 export const typeARequestSchema = z.object({
   actorId: z.string(),

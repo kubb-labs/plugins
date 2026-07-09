@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig } from '../.kubb/client.ts'
-import type { GetPetByIdOptions } from '../types/GetPetById.ts'
-import { getPetById } from '../clients/getPetById.ts'
+import type { RequestConfig } from '../.kubb/client'
+import type { GetPetByIdOptions } from '../types/GetPetById'
+import { getPetById } from '../clients/getPetById'
 
 export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 

@@ -4,9 +4,9 @@
 */
 
 import * as z from 'zod'
-import { addPetRequestStatusEnumSchema } from './addPetRequestStatusEnumSchema.ts'
-import { categorySchema } from './categorySchema.ts'
-import { tagSchema } from './tagSchema.ts'
+import { addPetRequestStatusEnumSchema } from './addPetRequestStatusEnumSchema'
+import { categorySchema } from './categorySchema'
+import { tagSchema } from './tagSchema'
 
 export const addPetRequestSchema = z.object({
   id: z.coerce.bigint().optional().meta({ examples: [10] }),

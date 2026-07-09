@@ -4,7 +4,7 @@
 */
 
 import * as z from 'zod'
-import { petSchema } from './petSchema.ts'
+import { petSchema } from './petSchema'
 
 export const getPetByIdPathPetIdSchema = z.bigint().describe('ID of pet to return')
 

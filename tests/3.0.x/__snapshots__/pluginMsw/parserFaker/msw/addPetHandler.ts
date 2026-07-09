@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { AddPetResponse, AddPetStatus405, AddPetBody } from '../types/AddPet.ts'
+import type { AddPetResponse, AddPetStatus405, AddPetBody } from '../types/AddPet'
 import type { HttpResponseResolver } from 'msw'
-import { createAddPetResponse } from '../faker/createAddPet.ts'
+import { createAddPetResponse } from '../faker/createAddPet'
 import { http } from 'msw'
 
 export function addPetHandlerResponse200(data: AddPetResponse) {

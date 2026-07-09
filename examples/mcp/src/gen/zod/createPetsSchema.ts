@@ -4,8 +4,8 @@
  */
 
 import * as z from 'zod'
-import { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.js'
-import { petNotFoundSchema } from './petNotFoundSchema.js'
+import { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema'
+import { petNotFoundSchema } from './petNotFoundSchema'
 
 export const createPetsPathUuidSchema = z.string().describe('UUID')
 

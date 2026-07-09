@@ -3,6 +3,6 @@
 * Do not edit manually.
 */
 
-import type { PaymentMethodUnion } from './PaymentMethodUnion.ts'
+import type { PaymentMethodUnion } from './PaymentMethodUnion'
 
 export type ExtendedPaymentMethodUnion = PaymentMethodUnion;

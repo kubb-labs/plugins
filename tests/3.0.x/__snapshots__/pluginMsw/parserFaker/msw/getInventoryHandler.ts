@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { GetInventoryResponse } from '../types/GetInventory.ts'
-import { createGetInventoryResponse } from '../faker/createGetInventory.ts'
+import type { GetInventoryResponse } from '../types/GetInventory'
+import { createGetInventoryResponse } from '../faker/createGetInventory'
 import { http } from 'msw'
 
 export function getInventoryHandlerResponse200(data: GetInventoryResponse) {

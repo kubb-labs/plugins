@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { NotificationTypeBParamsChannelEnumKey } from './NotificationTypeBParamsChannelEnum.ts'
+import type { NotificationTypeBParamsChannelEnumKey } from './NotificationTypeBParamsChannelEnum'
 
 /**
  * @type object

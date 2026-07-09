@@ -4,8 +4,8 @@
  * Source: text content
  */
 
-import { createPetsHandler } from './createPetsHandler.ts'
-import { listPetsHandler } from './listPetsHandler.ts'
-import { showPetByIdHandler } from './showPetByIdHandler.ts'
+import { createPetsHandler } from './createPetsHandler'
+import { listPetsHandler } from './listPetsHandler'
+import { showPetByIdHandler } from './showPetByIdHandler'
 
 export const handlers = [listPetsHandler(), createPetsHandler(), showPetByIdHandler()] as const

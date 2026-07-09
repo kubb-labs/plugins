@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { FindPetsByTagsXEXAMPLEKey } from './FindPetsByTagsXEXAMPLE.js'
-import type { Pet } from './Pet.js'
+import type { FindPetsByTagsXEXAMPLEKey } from './FindPetsByTagsXEXAMPLE'
+import type { Pet } from './Pet'
 
 /**
  * @type object

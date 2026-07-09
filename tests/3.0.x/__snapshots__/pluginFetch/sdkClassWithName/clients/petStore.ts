@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { ClientConfig } from '../.kubb/client.ts'
-import { PetClient } from './petClient.ts'
-import { StoreClient } from './storeClient.ts'
+import type { ClientConfig } from '../.kubb/client'
+import { PetClient } from './petClient'
+import { StoreClient } from './storeClient'
 
 export class PetStore {
   readonly pet: PetClient

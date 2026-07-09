@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client.ts'
-import type { UploadFileOptions, UploadFileResponses } from '../types/UploadFile.ts'
-import { client } from '../.kubb/client.ts'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { UploadFileOptions, UploadFileResponses } from '../types/UploadFile'
+import { client } from '../.kubb/client'
 
 /**
  * @summary uploads an image

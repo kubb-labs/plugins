@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { PlaceOrderOptions, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { PlaceOrderOptions, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import { placeOrder } from '../clients/placeOrder.ts'
+import { placeOrder } from '../clients/placeOrder'
 import { useMutation } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 

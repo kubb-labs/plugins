@@ -4,7 +4,7 @@
  * Source: text content
  */
 
-import type { ListPetsResponse, ListPetsStatus400 } from './ListPets.ts'
+import type { ListPetsResponse, ListPetsStatus400 } from './ListPets'
 import { http } from 'msw'
 
 export function listPetsHandlerResponse200(data: ListPetsResponse) {

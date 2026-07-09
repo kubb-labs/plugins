@@ -4,7 +4,7 @@
 */
 
 import * as z from 'zod'
-import { paymentMethodSchema } from './paymentMethodSchema.ts'
+import { paymentMethodSchema } from './paymentMethodSchema'
 
 export const walletPaymentSchema = paymentMethodSchema.extend({
   walletId: z.string().optional(),

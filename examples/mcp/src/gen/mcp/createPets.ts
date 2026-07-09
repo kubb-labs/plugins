@@ -1,7 +1,7 @@
-import type { CreatePetsOptions } from '../models/ts/CreatePets.js'
+import type { CreatePetsOptions } from '../models/ts/CreatePets'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { createPets } from '../clients/createPets.js'
+import { createPets } from '../clients/createPets'
 
 /**
  * @summary Create a pet

@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client.js'
-import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../models/ts/FindPetsByStatus.js'
-import { client } from '../.kubb/client.js'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../models/ts/FindPetsByStatus'
+import { client } from '../.kubb/client'
 
 /**
  * @description Multiple status values can be provided with comma separated strings

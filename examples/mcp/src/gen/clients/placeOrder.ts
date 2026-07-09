@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client.js'
-import type { PlaceOrderOptions, PlaceOrderResponses } from '../models/ts/PlaceOrder.js'
-import { client } from '../.kubb/client.js'
+import type { Options, RequestResult } from '../.kubb/client'
+import type { PlaceOrderOptions, PlaceOrderResponses } from '../models/ts/PlaceOrder'
+import { client } from '../.kubb/client'
 
 /**
  * @description Place a new order in the store

@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig } from '../.kubb/client.ts'
-import type { UploadFileOptions } from '../types/UploadFile.ts'
-import { uploadFile } from '../clients/uploadFile.ts'
+import type { RequestConfig } from '../.kubb/client'
+import type { UploadFileOptions } from '../types/UploadFile'
+import { uploadFile } from '../clients/uploadFile'
 
 export const uploadFileQueryKey = ({ path, query, body }: Omit<UploadFileOptions, 'headers'>) => [{ url: '/pet/:petId/uploadImage', params: path }, ...(query ? [query] : []), ...(body ? [body] : [])] as const
 

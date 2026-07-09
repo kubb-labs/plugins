@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { DeletePetHeaders, DeletePetPath } from '../../types/DeletePet.ts'
+import type { DeletePetHeaders, DeletePetPath } from '../../types/DeletePet'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createDeletePetPath<TData extends Partial<DeletePetPath> = object>(data?: TData)

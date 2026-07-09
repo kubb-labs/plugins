@@ -4,9 +4,9 @@
 */
 
 import * as z from 'zod'
-import { SUVSchema } from './SUVSchema.ts'
-import { electricCarSchema } from './electricCarSchema.ts'
-import { sedanSchema } from './sedanSchema.ts'
+import { SUVSchema } from './SUVSchema'
+import { electricCarSchema } from './electricCarSchema'
+import { sedanSchema } from './sedanSchema'
 
 export const vehicleChoiceSchema = z.discriminatedUnion('type', [
   sedanSchema.extend({

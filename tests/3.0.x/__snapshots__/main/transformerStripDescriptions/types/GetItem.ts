@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Item } from './Item.ts'
+import type { Item } from './Item'
 
 /**
  * @type object

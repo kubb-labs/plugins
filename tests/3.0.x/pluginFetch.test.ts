@@ -196,7 +196,7 @@ describe(`plugin-fetch options ${version}`, () => {
     const source = await fs.readFile(rootBarrel!.path, 'utf-8')
 
     expect(source).toContain('PetClient')
-    expect(source).toContain("export type { Pet } from './types/Pet.ts'")
+    expect(source).toContain("export type { Pet } from './types/Pet'")
     expect(source).not.toMatch(/export \{ Pet \}/)
 
     await fs.rm(tmpDir, { recursive: true, force: true })

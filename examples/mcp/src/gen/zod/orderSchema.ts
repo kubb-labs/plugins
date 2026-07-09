@@ -4,9 +4,9 @@
  */
 
 import * as z from 'zod'
-import { orderHttpStatusEnumSchema } from './orderHttpStatusEnumSchema.js'
-import { orderOrderTypeEnumSchema } from './orderOrderTypeEnumSchema.js'
-import { orderStatusEnumSchema } from './orderStatusEnumSchema.js'
+import { orderHttpStatusEnumSchema } from './orderHttpStatusEnumSchema'
+import { orderOrderTypeEnumSchema } from './orderOrderTypeEnumSchema'
+import { orderStatusEnumSchema } from './orderStatusEnumSchema'
 
 export const orderSchema = z.object({
   id: z
