@@ -196,7 +196,7 @@ const fakerKeywordMapper = {
 
 function getEnumValues(node: ast.EnumSchemaNode): Array<string | number | boolean | undefined> {
   if (node.namedEnumValues?.length) {
-    return node.namedEnumValues.map((item) => item.value as string | number | boolean | undefined)
+    return node.namedEnumValues.map((item) => item.value)
   }
 
   return (node.enumValues ?? []) as Array<string | number | boolean | undefined>

@@ -334,9 +334,9 @@ export function createTypeDeclaration({
   name: string | ts.Identifier
   type: ts.TypeNode
 }) {
-  if (syntax === 'interface' && 'members' in type) {
+  if (syntax === 'interface' && ts.isTypeLiteralNode(type)) {
     const node = createInterfaceDeclaration({
-      members: [...(type as ts.TypeLiteralNode).members],
+      members: [...type.members],
       modifiers: isExportable ? [modifiers.export] : [],
       name,
       typeParameters: undefined,
@@ -586,11 +586,11 @@ export function createEnumDeclaration({
             let initializer: ts.Expression = factory.createStringLiteral(value?.toString())
             const isExactNumber = Number.parseInt(value.toString(), 10) === value
 
-            if (isExactNumber && isNumber(Number.parseInt(value.toString(), 10))) {
-              if ((value as number) < 0) {
-                initializer = factory.createPrefixUnaryExpression(ts.SyntaxKind.MinusToken, factory.createNumericLiteral(Math.abs(value as number)))
+            if (isExactNumber && isNumber(value)) {
+              if (value < 0) {
+                initializer = factory.createPrefixUnaryExpression(ts.SyntaxKind.MinusToken, factory.createNumericLiteral(Math.abs(value)))
               } else {
-                initializer = factory.createNumericLiteral(value as number)
+                initializer = factory.createNumericLiteral(value)
               }
             }
 

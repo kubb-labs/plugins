@@ -40,5 +40,6 @@ export {
   type ResponseType,
   type ResolveOperationTypeNameOptions,
 } from './operation.ts'
+export { getOasAdapter } from './adapter.ts'
 export { createGroupConfig } from './group.ts'
 export { buildParamsMapping, buildParamsRemapExpression, buildTransformedParamsMapping, caseParams } from './params.ts'
