@@ -10,7 +10,7 @@ import type { PluginFetch } from '../types.ts'
 
 const testConfig: Config = {
   root: '.',
-  input: { path: '' },
+  input: '',
   output: { path: 'test' },
   plugins: [],
   parsers: [],

@@ -27,7 +27,7 @@ export const pluginFetchName = 'plugin-fetch' satisfies PluginFetch['name']
  * import { pluginFetch } from '@kubb/plugin-fetch'
  *
  * export default defineConfig({
- *   input: { path: './petStore.yaml' },
+ *   input: './petStore.yaml',
  *   output: { path: './src/gen' },
  *   plugins: [
  *     pluginTs(),
