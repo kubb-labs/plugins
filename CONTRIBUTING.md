@@ -52,6 +52,8 @@ plugins/
 │   ├── plugin-redoc/        # ReDoc documentation
 │   └── plugin-mcp/          # MCP integration
 ├── internals/               # Shared, non-published helpers
+│   ├── client/              # Shared generator builders for the HTTP client plugins
+│   ├── shared/              # Shared AST helpers used across packages
 │   ├── tanstack-query/      # Shared TanStack Query utilities
 │   └── utils/               # General utilities
 ├── examples/                # A runnable project per plugin
@@ -61,7 +63,7 @@ plugins/
 └── assets/                  # Static assets
 ```
 
-Each plugin under `packages/` follows the same shape: `src/plugin.ts` defines the plugin, `src/generators/` holds the generation logic, `src/components/` holds JSX-renderer components, and `src/*.test.ts` holds the tests.
+Most plugins under `packages/` follow the same shape: `src/plugin.ts` defines the plugin, `src/generators/` holds the generation logic, `src/components/` holds JSX-renderer components, and `src/*.test.ts` holds the tests. A few are leaner, like the client plugins (`plugin-axios`, `plugin-fetch`) that reuse `@internals/client`, and `plugin-redoc`, which is a single `redoc.tsx` with no `generators/` or `components/`.
 
 ## Tech stack
 
@@ -110,10 +112,10 @@ pnpm vitest run --config ./configs/vitest.config.ts -u packages/plugin-ts   # up
 
 ## Plugin options and docs
 
-A plugin's options are documented in the platform repo ([kubb-labs/platform](https://github.com/kubb-labs/platform)):
+A plugin's options are documented in the docs repo ([kubb-labs/docs](https://github.com/kubb-labs/docs)):
 
-- Each plugin has a hand-written docs page at `apps/kubb.dev/plugins/<name>.md` and a small metadata file at `extensions/plugins/<name>.yaml`.
-- When a change here adds, removes, or alters an option, update the matching kubb.dev page in the same release cycle.
+- Each plugin has a hand-written page at `plugins/<name>/index.md` whose frontmatter carries the registry metadata (name, category, npm package, maintainers, compatibility). Options live in the body of that page and its `reference/` subpages.
+- When a change here adds, removes, or alters an option, update the matching page in the same release cycle. It reaches kubb.dev through the platform fetch pipeline.
 - A documented option must exist in the plugin's `src/types.ts` `Options` type and be honored in `src/plugin.ts`. Keep documented defaults in step with the destructuring defaults in `plugin.ts`.
 
 ## Adding a plugin
