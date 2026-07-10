@@ -1,5 +1,11 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.87
+
+### Patch Changes
+
+- [#656](https://github.com/kubb-labs/plugins/pull/656) [`d815500`](https://github.com/kubb-labs/plugins/commit/d81550018b7cf65bcc4715c4adbf8949fcba5516) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Narrow the OpenAPI adapter through a shared `getOasAdapter` helper instead of an unchecked `as` assertion. When a non-OpenAPI adapter is configured, the zod, TypeScript, and faker generators now throw a clear error naming `adapterOas` rather than silently reading `undefined` options. AST node narrowing in `@kubb/plugin-ts` uses type guards (`ts.isTypeLiteralNode`, `typeof`) in place of casts.
+
 ## 5.0.0-beta.86
 
 ### Patch Changes

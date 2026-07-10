@@ -1,5 +1,12 @@
 # @kubb/plugin-swr
 
+## 5.0.0-beta.94
+
+### Patch Changes
+
+- Updated dependencies [[`d815500`](https://github.com/kubb-labs/plugins/commit/d81550018b7cf65bcc4715c4adbf8949fcba5516)]:
+  - @kubb/plugin-ts@5.0.0-beta.87
+
 ## 5.0.0-beta.87
 
 ### Patch Changes
