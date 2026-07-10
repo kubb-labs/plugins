@@ -1,4 +1,4 @@
-export { camelCase, pascalCase, screamingSnakeCase, snakeCase } from './casing.ts'
+export { camelCase, capitalize, pascalCase, screamingSnakeCase, snakeCase } from './casing.ts'
 export { buildJSDoc, buildList, buildObject, lazyGetter, objectKey } from './codegen.ts'
 export { getRelativePath, toFilePath } from './fs.ts'
 export { aliasConflictingImports, filterUsedImports, rewriteAliasedImports, type ImportEntry, type ImportName } from './imports.ts'

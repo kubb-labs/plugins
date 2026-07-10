@@ -1,4 +1,5 @@
 export { MutationKey, mutationKeyTransformer } from './components/MutationKey.tsx'
+export { createMutationResolver, createQueryResolver, type MutationResolver, type QueryResolver, type QueryVariant } from './resolver.ts'
 export { QueryKey, queryKeyTransformer } from './components/QueryKey.tsx'
 export type { ParamsCasing, ParamsType, PathParamsType, Transformer } from './types.ts'
 export {

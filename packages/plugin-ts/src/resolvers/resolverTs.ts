@@ -1,4 +1,5 @@
-import { ensureValidVarName, pascalCase, toFilePath } from '@internals/utils'
+import { createCasedFile, createOperationParamResolver, createOperationResponseResolver } from '@internals/shared'
+import { ensureValidVarName, pascalCase } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
 import type { PluginTs } from '../types.ts'
 
@@ -26,40 +27,12 @@ export const resolverTs = createResolver<PluginTs>({
   name(name) {
     return ensureValidVarName(pascalCase(name))
   },
-  file: {
-    baseName({ name, extname }) {
-      return `${toFilePath(name, pascalCase)}${extname}`
-    },
-  },
-  param: {
-    name(node, param) {
-      return this.name(`${node.operationId} ${param.in} ${param.name}`)
-    },
-    path(node) {
-      return this.name(`${node.operationId} Path`)
-    },
-    query(node) {
-      return this.name(`${node.operationId} Query`)
-    },
-    headers(node) {
-      return this.name(`${node.operationId} Headers`)
-    },
-  },
+  file: createCasedFile(pascalCase),
+  param: createOperationParamResolver(),
   response: {
-    status(node, statusCode) {
-      return this.name(`${node.operationId} Status ${statusCode}`)
-    },
+    ...createOperationResponseResolver(),
     options(node) {
       return this.name(`${node.operationId} Options`)
-    },
-    responses(node) {
-      return this.name(`${node.operationId} Responses`)
-    },
-    response(node) {
-      return this.name(`${node.operationId} Response`)
-    },
-    body(node) {
-      return this.name(`${node.operationId} Body`)
     },
   },
   enum: {

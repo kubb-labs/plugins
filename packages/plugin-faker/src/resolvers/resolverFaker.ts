@@ -1,4 +1,5 @@
-import { camelCase, ensureValidVarName, toFilePath } from '@internals/utils'
+import { createCasedFile, createOperationParamResolver, createOperationResponseResolver } from '@internals/shared'
+import { camelCase, ensureValidVarName } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
 import type { PluginFaker } from '../types.ts'
 
@@ -19,37 +20,7 @@ export const resolverFaker = createResolver<PluginFaker>({
   name(name) {
     return ensureValidVarName(camelCase(name, { prefix: 'create' }))
   },
-  file: {
-    baseName({ name, extname }) {
-      return `${toFilePath(name, (part) => camelCase(part, { prefix: 'create' }))}${extname}`
-    },
-  },
-  param: {
-    name(node, param) {
-      return this.name(`${node.operationId} ${param.in} ${param.name}`)
-    },
-    path(node) {
-      return this.name(`${node.operationId} Path`)
-    },
-    query(node) {
-      return this.name(`${node.operationId} Query`)
-    },
-    headers(node) {
-      return this.name(`${node.operationId} Headers`)
-    },
-  },
-  response: {
-    status(node, statusCode) {
-      return this.name(`${node.operationId} Status ${statusCode}`)
-    },
-    body(node) {
-      return this.name(`${node.operationId} Body`)
-    },
-    response(node) {
-      return this.name(`${node.operationId} Response`)
-    },
-    responses(node) {
-      return this.name(`${node.operationId} Responses`)
-    },
-  },
+  file: createCasedFile((part) => camelCase(part, { prefix: 'create' })),
+  param: createOperationParamResolver(),
+  response: createOperationResponseResolver(),
 })

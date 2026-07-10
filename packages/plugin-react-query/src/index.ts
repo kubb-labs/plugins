@@ -1,2 +1,3 @@
 export { default, pluginReactQuery, pluginReactQueryName } from './plugin.ts'
-export type { PluginReactQuery } from './types.ts'
+export { resolverReactQuery } from './resolvers/resolverReactQuery.ts'
+export type { PluginReactQuery, ResolverReactQuery } from './types.ts'

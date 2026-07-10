@@ -1,9 +1,7 @@
+import { createMutationResolver, createQueryResolver } from '@internals/tanstack-query'
+import { capitalize } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
 import type { PluginSwr } from '../types.ts'
-
-function capitalize(name: string): string {
-  return `${name.charAt(0).toUpperCase()}${name.slice(1)}`
-}
 
 /**
  * Default resolver used by `@kubb/plugin-swr`. Decides the names and file paths for every generated
@@ -23,30 +21,9 @@ function capitalize(name: string): string {
  */
 export const resolverSwr = createResolver<PluginSwr>({
   pluginName: 'plugin-swr',
-  query: {
-    name(node) {
-      return `use${capitalize(this.name(node.operationId))}`
-    },
-    optionsName(node) {
-      return `${this.name(node.operationId)}QueryOptions`
-    },
-    keyName(node) {
-      return `${this.name(node.operationId)}QueryKey`
-    },
-    keyTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}QueryKey`
-    },
-    clientName(node) {
-      return this.name(node.operationId)
-    },
-  },
+  query: createQueryResolver(),
   mutation: {
-    name(node) {
-      return `use${capitalize(this.name(node.operationId))}`
-    },
-    keyName(node) {
-      return `${this.name(node.operationId)}MutationKey`
-    },
+    ...createMutationResolver(),
     keyTypeName(node) {
       return `${capitalize(this.name(node.operationId))}MutationKey`
     },
