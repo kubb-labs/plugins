@@ -1,4 +1,4 @@
-import { caseParams, getOasAdapter, getSuccessResponses, isSuccessStatusCode, resolveContentTypeVariants } from '@internals/shared'
+import { caseParams, collectRefNames, getOasAdapter, getSuccessResponses, isSuccessStatusCode, resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Zod } from '../components/Zod.tsx'
@@ -262,13 +262,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       // redeclaration errors.
       const importedNames = new Set(
         responses.flatMap((res) =>
-          (res.content ?? []).flatMap((entry) =>
-            entry.schema
-              ? resolver
-                  .imports({ node: entry.schema, root, output, group: group ?? undefined })
-                  .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
-              : [],
-          ),
+          (res.content ?? []).flatMap((entry) => (entry.schema ? collectRefNames(entry.schema).map((refName) => resolver.name(refName)) : [])),
         ),
       )
 

@@ -226,7 +226,8 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         if (!node.name) return null
         // `resolveRefName` prefers the node's `targetName` (set for collision or macro renames),
         // then the $ref path segment, then `node.name` for inline refs.
-        const refName = ast.resolveRefName(node) ?? node.name
+        const refName = ast.resolveRefName(node)
+        if (!refName) return null
         const resolvedName = node.ref ? (this.options.resolver?.name(refName) ?? refName) : node.name
 
         if (node.ref && this.options.cyclicSchemas?.has(refName)) {

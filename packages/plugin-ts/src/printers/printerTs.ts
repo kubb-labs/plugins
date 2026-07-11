@@ -159,7 +159,10 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         // then the $ref path segment — `node.name` may have been overridden (e.g. by single-member
         // allOf flatten using the property-derived child name). Inline refs (without $ref) from
         // utils already carry resolved type names.
-        const refName = ast.resolveRefName(node) ?? node.name
+        const refName = ast.resolveRefName(node)
+        if (!refName) {
+          return null
+        }
 
         // When a Key suffix is configured, enum refs must use the suffixed name (e.g. `StatusKey`)
         // so the reference matches what the enum file actually exports.

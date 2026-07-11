@@ -307,7 +307,8 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         if (!node.name) return null
         // `resolveRefName` prefers the node's `targetName` (set for collision or macro renames),
         // then the $ref path segment, then `node.name` for inline refs.
-        const refName = ast.resolveRefName(node) ?? node.name
+        const refName = ast.resolveRefName(node)
+        if (!refName) return null
 
         // In the input direction, a date-bearing component resolves to its `${name}InputSchema`
         // variant so request bodies encode `Date → string` instead of decoding.
