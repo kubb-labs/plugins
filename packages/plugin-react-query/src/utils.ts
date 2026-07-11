@@ -5,7 +5,6 @@ import type { Infinite, ResolvedOptions } from './types.ts'
 
 export { buildQueryKeyParams, maybeValueOrGetter, resolveOperationOverrides } from '@internals/tanstack-query'
 export { buildClientOptionType, buildOperationComments as getComments, buildRequestConfigType } from '@internals/shared'
-export { resolveErrorNames, resolveSuccessNames }
 
 type OperationClassification = {
   isQuery: boolean
