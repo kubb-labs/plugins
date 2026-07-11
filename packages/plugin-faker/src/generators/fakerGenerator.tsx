@@ -68,10 +68,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       typeFilePath: meta.typeFile.path,
     })
 
-    const imports = adapter.getImports(node, (schemaName) => ({
-      name: resolver.name(schemaName),
-      path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
-    }))
+    const imports = resolver.imports({ node, meta: ctx.meta, root, output, group: group ?? undefined })
     const usedImports = filterUsedImports(imports, fakerText)
 
     return (
@@ -199,12 +196,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     } as const
 
     function resolveMockImports(schema: ast.SchemaNode) {
-      return adapter
-        .getImports(schema, (schemaName) => ({
-          name: resolver.name(schemaName),
-          path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
-        }))
-        .filter((entry) => entry.path !== meta.file.path)
+      return resolver.imports({ node: schema, meta: ctx.meta, root, output, group: group ?? undefined }).filter((entry) => entry.path !== meta.file.path)
     }
 
     function renderEntry({

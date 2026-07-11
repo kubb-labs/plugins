@@ -42,14 +42,18 @@ export const typeGenerator = defineGenerator<PluginTs>({
     if (!node.name) {
       return
     }
-    // Build a set of schema names that are enums so the ref handler and getImports
-    // callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
+    // Build a set of schema names that are enums so the ref handler and the imports
+    // name callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
     const enumSchemaNames = new Set<string>(ctx.meta.enumNames)
 
-    const imports = adapter.getImports(node, (schemaName) => ({
-      name: resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver }),
-      path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
-    }))
+    const imports = resolver.imports({
+      node,
+      meta: ctx.meta,
+      root,
+      output,
+      group: group ?? undefined,
+      name: (schemaName) => resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver }),
+    })
 
     const enumNode = ast.narrowSchema(node, ast.schemaTypes.enum)
     // An inline `const` (single-value enum the adapter did not register) renders as a literal type,
@@ -99,17 +103,21 @@ export const typeGenerator = defineGenerator<PluginTs>({
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
     } as const
 
-    // Build a set of schema names that are enums so the ref handler and getImports
-    // callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
+    // Build a set of schema names that are enums so the ref handler and the imports
+    // name callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
     const enumSchemaNames = new Set<string>(ctx.meta.enumNames)
 
     function renderSchemaType({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
       if (!schema) return null
 
-      const imports = adapter.getImports(schema, (schemaName) => ({
-        name: resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver }),
-        path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
-      }))
+      const imports = resolver.imports({
+        node: schema,
+        meta: ctx.meta,
+        root,
+        output,
+        group: group ?? undefined,
+        name: (schemaName) => resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver }),
+      })
 
       const schemaPrinter = printerTs({
         optionalType,
@@ -236,11 +244,15 @@ export const typeGenerator = defineGenerator<PluginTs>({
         responsesWithSchema.flatMap((res) =>
           (res.content ?? []).flatMap((entry) =>
             entry.schema
-              ? adapter
-                  .getImports(entry.schema, (schemaName) => ({
-                    name: resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver }),
-                    path: '',
-                  }))
+              ? resolver
+                  .imports({
+                    node: entry.schema,
+                    meta: ctx.meta,
+                    root,
+                    output,
+                    group: group ?? undefined,
+                    name: (schemaName) => resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver }),
+                  })
                   .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
               : [],
           ),

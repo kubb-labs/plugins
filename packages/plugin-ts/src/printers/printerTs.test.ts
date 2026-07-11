@@ -174,7 +174,7 @@ describe('printerTs', () => {
     })
 
     it('ref without $ref path (inline ref) uses node.name directly', async () => {
-      // Inline refs from getImports/utils don't carry a $ref path — node.name is the resolved type.
+      // Inline refs from resolver.imports/utils don't carry a $ref path — node.name is the resolved type.
       const result = printer.transform(ast.factory.createSchema({ type: 'ref', name: 'ResolvedType' }))
 
       expect(await formatTS(result)).toBe('ResolvedType')

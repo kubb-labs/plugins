@@ -106,10 +106,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const hasCodec = !mini && containsCodec(node)
 
     const codecRefNames = new Set(hasCodec ? collectCodecRefNames(node) : [])
-    const importEntries = adapter.getImports(node, (schemaName) => ({
-      name: resolver.name(schemaName),
-      path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
-    }))
+    const importEntries = resolver.imports({ node, meta: ctx.meta, root, output, group: group ?? undefined })
     const inputImportEntries = hasCodec
       ? [...codecRefNames].map((schemaName) => ({
           name: [resolver.schema.inputName(schemaName)],
@@ -195,10 +192,14 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
       // In the input direction, refs to codec components resolve to their input variant.
       const codecRefNames = direction === 'input' && !mini ? new Set(collectCodecRefNames(schema)) : null
-      const imports = adapter.getImports(schema, (schemaName) => ({
-        name: codecRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName),
-        path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
-      }))
+      const imports = resolver.imports({
+        node: schema,
+        meta: ctx.meta,
+        root,
+        output,
+        group: group ?? undefined,
+        name: (schemaName) => (codecRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
+      })
 
       const schemaPrinter = mini
         ? keysToOmit?.length
@@ -269,11 +270,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
         responses.flatMap((res) =>
           (res.content ?? []).flatMap((entry) =>
             entry.schema
-              ? adapter
-                  .getImports(entry.schema, (schemaName) => ({
-                    name: resolver.name(schemaName),
-                    path: '',
-                  }))
+              ? resolver
+                  .imports({ node: entry.schema, meta: ctx.meta, root, output, group: group ?? undefined })
                   .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
               : [],
           ),
