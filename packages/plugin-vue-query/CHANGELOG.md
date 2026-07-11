@@ -1,5 +1,14 @@
 # @kubb/plugin-vue-query
 
+## 5.0.0-beta.95
+
+### Patch Changes
+
+- [#670](https://github.com/kubb-labs/plugins/pull/670) [`d069022`](https://github.com/kubb-labs/plugins/commit/d069022633b46fcacc8a7899780bd68e35b5f743) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove unused exports flagged by Fallow. Internal `factory.ts` helpers in `@kubb/plugin-ts` are now module-private, and the plugin `utils.ts` files no longer re-export helpers nothing imports. None of these symbols were part of a package's public `exports` map, so consumers are unaffected.
+
+- Updated dependencies [[`d069022`](https://github.com/kubb-labs/plugins/commit/d069022633b46fcacc8a7899780bd68e35b5f743)]:
+  - @kubb/plugin-ts@5.0.0-beta.95
+
 ## 5.0.0-beta.94
 
 ### Patch Changes

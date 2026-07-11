@@ -63,6 +63,7 @@
     "faker-drop-shapeless-allof-members",
     "faker-msw-no-any-output",
     "faker-remove-mapper",
+    "fallow-remove-unused-exports",
     "fetch-axios-path-param-casing",
     "fetch-axios-path-serializer",
     "fetch-request-init-passthrough",

@@ -1,5 +1,12 @@
 # @kubb/plugin-cypress
 
+## 5.0.0-beta.95
+
+### Patch Changes
+
+- Updated dependencies [[`d069022`](https://github.com/kubb-labs/plugins/commit/d069022633b46fcacc8a7899780bd68e35b5f743)]:
+  - @kubb/plugin-ts@5.0.0-beta.95
+
 ## 5.0.0-beta.94
 
 ### Patch Changes
