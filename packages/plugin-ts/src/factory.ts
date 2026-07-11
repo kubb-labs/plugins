@@ -267,7 +267,7 @@ export function appendJSDocToNode<TNode extends ts.Node>({ node, comments }: { n
  * Creates a TypeScript index signature for dynamic property access.
  * Defines the key type (default: `string`) and value type on an object.
  */
-export function createIndexSignature(
+function createIndexSignature(
   type: ts.TypeNode,
   {
     modifiers,
@@ -286,7 +286,7 @@ export function createIndexSignature(
 /**
  * Creates a TypeScript type alias declaration with optional modifiers and type parameters.
  */
-export function createTypeAliasDeclaration({
+function createTypeAliasDeclaration({
   modifiers,
   name,
   typeParameters,
@@ -303,7 +303,7 @@ export function createTypeAliasDeclaration({
 /**
  * Creates a TypeScript interface declaration with optional modifiers, type parameters, and members.
  */
-export function createInterfaceDeclaration({
+function createInterfaceDeclaration({
   modifiers,
   name,
   typeParameters,
@@ -791,62 +791,57 @@ export const createTypeReferenceNode = factory.createTypeReferenceNode
 /**
  * Creates a numeric literal type node.
  */
-export const createNumericLiteral = factory.createNumericLiteral
+const createNumericLiteral = factory.createNumericLiteral
 
 /**
  * Creates a string literal type node.
  */
-export const createStringLiteral = factory.createStringLiteral
+const createStringLiteral = factory.createStringLiteral
 
 /**
  * Creates an array type node (e.g., `T[]`).
  */
-export const createArrayTypeNode = factory.createArrayTypeNode
+const createArrayTypeNode = factory.createArrayTypeNode
 
 /**
  * Creates a literal type node (e.g., `'hello'`, `42`, `true`).
  */
-export const createLiteralTypeNode = factory.createLiteralTypeNode
+const createLiteralTypeNode = factory.createLiteralTypeNode
 
 /**
  * Creates an identifier node.
  */
-export const createIdentifier = factory.createIdentifier
+const createIdentifier = factory.createIdentifier
 
 /**
  * Creates an optional type node (e.g., `T | undefined`).
  */
-export const createOptionalTypeNode = factory.createOptionalTypeNode
+const createOptionalTypeNode = factory.createOptionalTypeNode
 
 /**
  * Creates a tuple type node (e.g., `[string, number]`).
  */
-export const createTupleTypeNode = factory.createTupleTypeNode
+const createTupleTypeNode = factory.createTupleTypeNode
 
 /**
  * Creates a rest type node for variadic tuple elements (e.g., `...T[]`).
  */
-export const createRestTypeNode = factory.createRestTypeNode
+const createRestTypeNode = factory.createRestTypeNode
 
 /**
  * Creates a boolean true literal type node.
  */
-export const createTrue = factory.createTrue
+const createTrue = factory.createTrue
 
 /**
  * Creates a boolean false literal type node.
  */
-export const createFalse = factory.createFalse
+const createFalse = factory.createFalse
 
 /**
  * Creates a prefix unary expression (e.g., negative numbers, logical not).
  */
-export const createPrefixUnaryExpression = factory.createPrefixUnaryExpression
-
-/**
- * Exports TypeScript SyntaxKind enum for AST node type checking.
- */
-export { SyntaxKind }
+const createPrefixUnaryExpression = factory.createPrefixUnaryExpression
 
 // ─── Printer helpers ──────────────────────────────────────────────────────────
 

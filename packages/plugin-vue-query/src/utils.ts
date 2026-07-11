@@ -1,7 +1,7 @@
 import { getRequestGroups } from '@internals/shared'
 import type { ast } from 'kubb/kit'
 
-export { buildQueryKeyParams, maybeRefOrGetter, resolveOperationOverrides } from '@internals/tanstack-query'
+export { maybeRefOrGetter } from '@internals/tanstack-query'
 export { buildClientOptionType, buildOperationComments as getComments, buildRequestConfigType, resolveErrorNames, resolveSuccessNames } from '@internals/shared'
 
 const requestGroupOrder = ['path', 'query', 'body', 'headers'] as const

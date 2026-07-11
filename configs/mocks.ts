@@ -1,5 +1,5 @@
 import type { ast } from 'kubb/kit'
-import { createMockedPluginDriver, matchFiles as matchFilesBase } from 'kubb/kit/testing'
+import { matchFiles as matchFilesBase } from 'kubb/kit/testing'
 import { parserTs } from '@kubb/parser-ts'
 import type { Options } from 'prettier'
 import { format as prettierFormat } from 'prettier'
@@ -25,8 +25,6 @@ export async function format(source?: string): Promise<string> {
     return source
   }
 }
-
-export const mockedPluginDriver = createMockedPluginDriver()
 
 const parsers = new Map<`.${string}`, any>([['.ts', parserTs()]])
 
