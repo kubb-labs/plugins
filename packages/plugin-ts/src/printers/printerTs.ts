@@ -155,10 +155,8 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         if (!node.name) {
           return null
         }
-        // `resolveRefName` prefers the node's `targetName` (set for collision or macro renames),
-        // then the $ref path segment — `node.name` may have been overridden (e.g. by single-member
-        // allOf flatten using the property-derived child name). Inline refs (without $ref) from
-        // utils already carry resolved type names.
+        // `node.name` may have been overridden (e.g. by the single-member allOf flatten using the
+        // property-derived child name), so resolve the target through `resolveRefName` instead.
         const refName = ast.resolveRefName(node)
         if (!refName) {
           return null

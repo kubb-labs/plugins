@@ -305,8 +305,6 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       },
       ref(node) {
         if (!node.name) return null
-        // `resolveRefName` prefers the node's `targetName` (set for collision or macro renames),
-        // then the $ref path segment, then `node.name` for inline refs.
         const refName = ast.resolveRefName(node)
         if (!refName) return null
 
