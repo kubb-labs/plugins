@@ -5,6 +5,8 @@
  */
 
 import type { ShowPetByIdPath, ShowPetByIdResponse, ShowPetByIdStatus200, ShowPetByIdStatusDefault } from './types/ShowPetById'
+import { createError } from './createError'
+import { createPet } from './createPet'
 import { faker } from '@faker-js/faker'
 
 export function createShowPetByIdPath<TData extends Partial<ShowPetByIdPath> = object>(data?: TData) {

@@ -5,6 +5,8 @@
  */
 
 import type { CreatePetBody, CreatePetResponse, CreatePetStatus201 } from './types/CreatePet'
+import { createCategory } from './createCategory'
+import { createPet } from './createPet'
 import { faker } from '@faker-js/faker'
 
 /**

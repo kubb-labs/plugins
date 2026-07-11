@@ -49,12 +49,6 @@ export type PrinterFakerOptions = {
    * the recursive faker call from ever executing (avoiding stack overflow).
    */
   cyclicSchemas?: ReadonlySet<string>
-  /**
-   * Maps a component `$ref` path to its collision-resolved name. When two components collide
-   * (across sections or by case), the adapter renames one of them; the `ref()` handler resolves
-   * the referenced name through this map so the emitted faker reference matches the renamed component.
-   */
-  nameMapping?: ReadonlyMap<string, string>
 }
 
 /**
@@ -288,15 +282,11 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.time(node.representation ?? 'string', this.options.dateParser)
       },
       ref(node) {
-        // Parser-generated refs (with $ref) carry raw schema names that need resolving.
-        // Use the canonical name from the $ref path, since node.name may have been overridden
-        // (e.g. by single-member allOf flatten using the property-derived child name).
-        // Inline refs (without $ref) from faker utils already carry resolved helper names.
-        // `nameMapping` (keyed by the full $ref) carries the collision-resolved name when the
-        // referenced component was renamed; otherwise fall back to the short ref name.
-        const refName = node.ref
-          ? (this.options.nameMapping?.get(node.ref) ?? ast.extractRefName(node.ref) ?? node.name ?? node.schema?.name)
-          : (node.name ?? node.schema?.name)
+        // `resolveRefName` prefers the node's `targetName` (set for collision or macro renames),
+        // then the $ref path segment, since node.name may have been overridden (e.g. by
+        // single-member allOf flatten using the property-derived child name). Inline refs
+        // (without $ref) from faker utils already carry resolved helper names.
+        const refName = ast.resolveRefName(node)
 
         if (!refName) {
           throw new Error('Name not defined for ref node')

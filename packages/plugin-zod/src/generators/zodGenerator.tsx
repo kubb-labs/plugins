@@ -1,4 +1,4 @@
-import { caseParams, getOasAdapter, getSuccessResponses, isSuccessStatusCode, resolveContentTypeVariants } from '@internals/shared'
+import { caseParams, collectRefNames, getOasAdapter, getSuccessResponses, isSuccessStatusCode, resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Zod } from '../components/Zod.tsx'
@@ -22,7 +22,6 @@ type StdPrinterParams = {
   regexType: unknown
   dateType: unknown
   cyclicSchemas: ReadonlySet<string>
-  nameMapping?: ReadonlyMap<string, string>
   nodes: unknown
 }
 
@@ -69,7 +68,6 @@ function getMiniPrinter(
     guidType: unknown
     regexType: unknown
     cyclicSchemas: ReadonlySet<string>
-    nameMapping?: ReadonlyMap<string, string>
     nodes: unknown
   },
 ) {
@@ -106,10 +104,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const hasCodec = !mini && containsCodec(node)
 
     const codecRefNames = new Set(hasCodec ? collectCodecRefNames(node) : [])
-    const importEntries = adapter.getImports(node, (schemaName) => ({
-      name: resolver.name(schemaName),
-      path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
-    }))
+    const importEntries = resolver.imports({ node, root, output, group: group ?? undefined })
     const inputImportEntries = hasCodec
       ? [...codecRefNames].map((schemaName) => ({
           name: [resolver.schema.inputName(schemaName)],
@@ -131,9 +126,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const inferTypeName = inferred ? resolver.schema.typeName(node.name) : null
 
-    const nameMapping = getOasAdapter(adapter).options.nameMapping
-    const stdPrinters = mini ? null : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, cyclicSchemas, nameMapping, nodes: printer?.nodes })
-    const schemaPrinter = mini ? getMiniPrinter(resolver, { guidType, regexType, cyclicSchemas, nameMapping, nodes: printer?.nodes }) : stdPrinters!.output
+    const stdPrinters = mini ? null : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, cyclicSchemas, nodes: printer?.nodes })
+    const schemaPrinter = mini ? getMiniPrinter(resolver, { guidType, regexType, cyclicSchemas, nodes: printer?.nodes }) : stdPrinters!.output
 
     return (
       <File
@@ -176,7 +170,6 @@ export const zodGenerator = defineGenerator<PluginZod>({
     } as const
 
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
-    const nameMapping = getOasAdapter(adapter).options.nameMapping
 
     function renderSchemaEntry({
       schema,
@@ -195,15 +188,18 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
       // In the input direction, refs to codec components resolve to their input variant.
       const codecRefNames = direction === 'input' && !mini ? new Set(collectCodecRefNames(schema)) : null
-      const imports = adapter.getImports(schema, (schemaName) => ({
-        name: codecRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName),
-        path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
-      }))
+      const imports = resolver.imports({
+        node: schema,
+        root,
+        output,
+        group: group ?? undefined,
+        name: (schemaName) => (codecRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
+      })
 
       const schemaPrinter = mini
         ? keysToOmit?.length
-          ? printerZodMini({ guidType, regexType, resolver, keysToOmit, cyclicSchemas, nameMapping, nodes: printer?.nodes })
-          : getMiniPrinter(resolver, { guidType, regexType, cyclicSchemas, nameMapping, nodes: printer?.nodes })
+          ? printerZodMini({ guidType, regexType, resolver, keysToOmit, cyclicSchemas, nodes: printer?.nodes })
+          : getMiniPrinter(resolver, { guidType, regexType, cyclicSchemas, nodes: printer?.nodes })
         : keysToOmit?.length
           ? printerZod({
               coercion,
@@ -213,11 +209,10 @@ export const zodGenerator = defineGenerator<PluginZod>({
               resolver,
               keysToOmit,
               cyclicSchemas,
-              nameMapping,
               nodes: printer?.nodes,
               direction,
             })
-          : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, cyclicSchemas, nameMapping, nodes: printer?.nodes })[direction]
+          : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, cyclicSchemas, nodes: printer?.nodes })[direction]
 
       return (
         <>
@@ -267,16 +262,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       // redeclaration errors.
       const importedNames = new Set(
         responses.flatMap((res) =>
-          (res.content ?? []).flatMap((entry) =>
-            entry.schema
-              ? adapter
-                  .getImports(entry.schema, (schemaName) => ({
-                    name: resolver.name(schemaName),
-                    path: '',
-                  }))
-                  .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
-              : [],
-          ),
+          (res.content ?? []).flatMap((entry) => (entry.schema ? collectRefNames(entry.schema).map((refName) => resolver.name(refName)) : [])),
         ),
       )
 

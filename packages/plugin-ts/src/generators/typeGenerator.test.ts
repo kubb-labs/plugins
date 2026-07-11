@@ -120,13 +120,7 @@ describe('typeGenerator — custom resolver', () => {
         }),
       ],
     })
-    const adapter = createMockedAdapter({
-      getImports: (_node, resolve) =>
-        ['Pet', 'ErrorResponse', 'NewPet'].map((name) => {
-          const imported = resolve(name)
-          return ast.factory.createImport({ name: [imported.name], path: imported.path })
-        }),
-    })
+    const adapter = createMockedAdapter()
 
     await renderGeneratorOperation(typeGenerator, node, {
       config: testConfig,

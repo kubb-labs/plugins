@@ -3,7 +3,7 @@ import type { AdapterOas } from '@kubb/adapter-oas'
 
 /**
  * Narrows the generic `Adapter` from a generator context to the OpenAPI adapter,
- * so OAS-only options (`dateType`, `nameMapping`) and the parsed `document` are typed.
+ * so OAS-only options (`dateType`, `enums`) and the parsed `document` are typed.
  *
  * Throws when a non-OAS adapter is configured, turning a silently wrong cast into a
  * clear, actionable error at the point of use.

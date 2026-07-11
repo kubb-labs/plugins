@@ -378,9 +378,9 @@ describe('printerZod', () => {
       expect(printer.print(node)).toBe('PhoneNumber')
     })
 
-    test('collided ref resolves to its renamed name via nameMapping', () => {
-      const p = printerZod({ nameMapping: new Map([['#/components/schemas/Order', 'OrderSchema']]) })
-      const node = ast.factory.createSchema({ type: 'ref', name: 'Order', ref: '#/components/schemas/Order' })
+    test('collided ref resolves to its renamed name via targetName', () => {
+      const p = printerZod({})
+      const node = ast.factory.createSchema({ type: 'ref', name: 'Order', ref: '#/components/schemas/Order', targetName: 'OrderSchema' })
 
       expect(p.print(node)).toBe('OrderSchema')
     })

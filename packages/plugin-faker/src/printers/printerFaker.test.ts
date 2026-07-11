@@ -87,11 +87,10 @@ describe('printerFaker', () => {
     expect(printerFaker({ resolver: resolverFaker }).print(node)).toMatchInlineSnapshot(`"createEpisodeBase(data)"`)
   })
 
-  test('resolves a collided ref to its renamed name via nameMapping', () => {
-    const node = ast.factory.createSchema({ type: 'ref', name: 'Order', ref: '#/components/schemas/Order' })
-    const nameMapping = new Map([['#/components/schemas/Order', 'OrderSchema']])
+  test('resolves a collided ref to its renamed name via targetName', () => {
+    const node = ast.factory.createSchema({ type: 'ref', name: 'Order', ref: '#/components/schemas/Order', targetName: 'OrderSchema' })
 
-    expect(printerFaker({ resolver: resolverFaker, nameMapping }).print(node)).toMatchInlineSnapshot(`"createOrderSchema(data)"`)
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toMatchInlineSnapshot(`"createOrderSchema(data)"`)
   })
 
   test('uses tuple item types for nested enum members', () => {
