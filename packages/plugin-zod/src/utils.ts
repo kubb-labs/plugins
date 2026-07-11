@@ -111,7 +111,7 @@ export function containsCodec(node: ast.SchemaNode | undefined, seen: Set<string
  */
 export function collectCodecRefNames(node: ast.SchemaNode): Array<string> {
   return ast.collect<string>(node, {
-    schema: (n) => (n.type === 'ref' && n.ref && containsCodec(n) ? (ast.extractRefName(n.ref) ?? undefined) : undefined),
+    schema: (n) => (n.type === 'ref' && n.ref && containsCodec(n) ? (ast.resolveRefName(n) ?? undefined) : undefined),
   })
 }
 
@@ -136,7 +136,7 @@ export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: Readonl
   if (node.type === 'object') return true
 
   if (node.type === 'ref') {
-    const refName = (node.ref ? ast.extractRefName(node.ref) : undefined) ?? node.name
+    const refName = ast.resolveRefName(node)
     if (refName && cyclicSchemas?.has(refName)) return false
     const resolved = ast.syncSchemaRef(node)
     // An unresolved ref keeps its `ref` type; assume it resolves to an object (matches the printer's

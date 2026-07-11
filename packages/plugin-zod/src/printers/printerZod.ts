@@ -120,8 +120,7 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
 
     // A cyclic ref is annotated `z.ZodType`, and a nullable/optional ref is wrapped in
     // ZodNullable/ZodOptional, and neither exposes `.strict()`. Only a bare `ZodObject` ref takes it.
-    // A union member ref may carry only `node.name` (no `node.ref`), so fall back to it like `ref()`.
-    const refName = (node.ref ? ast.extractRefName(node.ref) : undefined) ?? node.name
+    const refName = ast.resolveRefName(node)
     if (refName && cyclicSchemas?.has(refName)) {
       return member
     }
