@@ -85,11 +85,6 @@ export type PrinterTsOptions = {
    */
   enumSchemaNames?: Set<string>
   /**
-   * Maps a component `$ref` path to its collision-resolved name, so a reference to a renamed
-   * component (e.g. `#/components/schemas/Order` → `OrderSchema`) emits the renamed name.
-   */
-  nameMapping?: ReadonlyMap<string, string>
-  /**
    * Custom handler map for node type overrides.
    */
   nodes?: PrinterTsNodes
@@ -160,13 +155,11 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         if (!node.name) {
           return null
         }
-        // Parser-generated refs (with $ref) carry raw schema names that need resolving.
-        // Resolve the referenced name from the $ref path — `node.name` may have been overridden
-        // (e.g. by single-member allOf flatten using the property-derived child name). When the
-        // referenced component was renamed to resolve a name collision, `nameMapping` (keyed by the
-        // full $ref) carries the renamed name; otherwise fall back to the short ref name.
-        // Inline refs (without $ref) from utils already carry resolved type names.
-        const refName = node.ref ? (this.options.nameMapping?.get(node.ref) ?? ast.extractRefName(node.ref) ?? node.name) : node.name
+        // `resolveRefName` prefers the node's `targetName` (set for collision or macro renames),
+        // then the $ref path segment — `node.name` may have been overridden (e.g. by single-member
+        // allOf flatten using the property-derived child name). Inline refs (without $ref) from
+        // utils already carry resolved type names.
+        const refName = ast.resolveRefName(node) ?? node.name
 
         // When a Key suffix is configured, enum refs must use the suffixed name (e.g. `StatusKey`)
         // so the reference matches what the enum file actually exports.

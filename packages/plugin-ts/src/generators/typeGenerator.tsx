@@ -1,4 +1,4 @@
-import { caseParams, getOasAdapter, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
+import { caseParams, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Type } from '../components/Type.tsx'
@@ -37,7 +37,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { enum: enumOptions, syntaxType, optionalType, arrayType, output, group, printer } = ctx.options
-    const { adapter, config, resolver, root } = ctx
+    const { config, resolver, root } = ctx
 
     if (!node.name) {
       return
@@ -48,7 +48,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const imports = resolver.imports({
       node,
-      meta: ctx.meta,
       root,
       output,
       group: group ?? undefined,
@@ -74,7 +73,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
       description: node.description,
       resolver,
       enumSchemaNames,
-      nameMapping: getOasAdapter(adapter).options.nameMapping,
       nodes: printer?.nodes,
     })
 
@@ -95,7 +93,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
   },
   operation(node, ctx) {
     const { enum: enumOptions, optionalType, arrayType, syntaxType, group, output, printer } = ctx.options
-    const { adapter, config, resolver, root } = ctx
+    const { config, resolver, root } = ctx
 
     const params = caseParams(node.parameters, 'camelcase')
 
@@ -112,7 +110,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
       const imports = resolver.imports({
         node: schema,
-        meta: ctx.meta,
         root,
         output,
         group: group ?? undefined,
@@ -129,7 +126,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
         keysToOmit,
         resolver,
         enumSchemaNames,
-        nameMapping: getOasAdapter(adapter).options.nameMapping,
         nodes: printer?.nodes,
       })
 
@@ -247,7 +243,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
               ? resolver
                   .imports({
                     node: entry.schema,
-                    meta: ctx.meta,
                     root,
                     output,
                     group: group ?? undefined,

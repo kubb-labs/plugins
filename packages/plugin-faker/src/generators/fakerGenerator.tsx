@@ -1,4 +1,4 @@
-import { caseParams, getOasAdapter, getOperationParameters, getPerContentTypeName, resolveContentTypeVariants } from '@internals/shared'
+import { caseParams, getOperationParameters, getPerContentTypeName, resolveContentTypeVariants } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from 'kubb/kit'
 import { buildParams, pluginTsName } from '@kubb/plugin-ts'
@@ -18,7 +18,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   name: 'faker',
   renderer: jsxRenderer,
   schema(node, ctx) {
-    const { adapter, config, resolver, root } = ctx
+    const { config, resolver, root } = ctx
     const { output, group, dateParser, regexGenerator, seed, locale, printer } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
@@ -56,7 +56,6 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       regexGenerator,
       nodes: printer?.nodes,
       cyclicSchemas,
-      nameMapping: getOasAdapter(adapter).options.nameMapping,
     })
     const fakerText = printerInstance.print(node) ?? 'undefined'
     const typeReference = resolveTypeReference({
@@ -68,7 +67,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       typeFilePath: meta.typeFile.path,
     })
 
-    const imports = resolver.imports({ node, meta: ctx.meta, root, output, group: group ?? undefined })
+    const imports = resolver.imports({ node, root, output, group: group ?? undefined })
     const usedImports = filterUsedImports(imports, fakerText)
 
     return (
@@ -99,7 +98,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     )
   },
   operation(node, ctx) {
-    const { adapter, config, resolver, root } = ctx
+    const { config, resolver, root } = ctx
     const { output, group, dateParser, regexGenerator, seed, locale, printer } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
@@ -196,7 +195,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     } as const
 
     function resolveMockImports(schema: ast.SchemaNode) {
-      return resolver.imports({ node: schema, meta: ctx.meta, root, output, group: group ?? undefined }).filter((entry) => entry.path !== meta.file.path)
+      return resolver.imports({ node: schema, root, output, group: group ?? undefined }).filter((entry) => entry.path !== meta.file.path)
     }
 
     function renderEntry({
@@ -225,7 +224,6 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         regexGenerator,
         nodes: printer?.nodes,
         cyclicSchemas,
-        nameMapping: getOasAdapter(adapter).options.nameMapping,
       })
       const fakerText = printerInstance.print(schema) ?? 'undefined'
       const usedImports = filterUsedImports(resolveMockImports(schema), fakerText, skipImportNames)

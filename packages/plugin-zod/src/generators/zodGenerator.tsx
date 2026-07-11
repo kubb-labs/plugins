@@ -22,7 +22,6 @@ type StdPrinterParams = {
   regexType: unknown
   dateType: unknown
   cyclicSchemas: ReadonlySet<string>
-  nameMapping?: ReadonlyMap<string, string>
   nodes: unknown
 }
 
@@ -69,7 +68,6 @@ function getMiniPrinter(
     guidType: unknown
     regexType: unknown
     cyclicSchemas: ReadonlySet<string>
-    nameMapping?: ReadonlyMap<string, string>
     nodes: unknown
   },
 ) {
@@ -106,7 +104,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const hasCodec = !mini && containsCodec(node)
 
     const codecRefNames = new Set(hasCodec ? collectCodecRefNames(node) : [])
-    const importEntries = resolver.imports({ node, meta: ctx.meta, root, output, group: group ?? undefined })
+    const importEntries = resolver.imports({ node, root, output, group: group ?? undefined })
     const inputImportEntries = hasCodec
       ? [...codecRefNames].map((schemaName) => ({
           name: [resolver.schema.inputName(schemaName)],
@@ -128,9 +126,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const inferTypeName = inferred ? resolver.schema.typeName(node.name) : null
 
-    const nameMapping = getOasAdapter(adapter).options.nameMapping
-    const stdPrinters = mini ? null : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, cyclicSchemas, nameMapping, nodes: printer?.nodes })
-    const schemaPrinter = mini ? getMiniPrinter(resolver, { guidType, regexType, cyclicSchemas, nameMapping, nodes: printer?.nodes }) : stdPrinters!.output
+    const stdPrinters = mini ? null : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, cyclicSchemas, nodes: printer?.nodes })
+    const schemaPrinter = mini ? getMiniPrinter(resolver, { guidType, regexType, cyclicSchemas, nodes: printer?.nodes }) : stdPrinters!.output
 
     return (
       <File
@@ -173,7 +170,6 @@ export const zodGenerator = defineGenerator<PluginZod>({
     } as const
 
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
-    const nameMapping = getOasAdapter(adapter).options.nameMapping
 
     function renderSchemaEntry({
       schema,
@@ -194,7 +190,6 @@ export const zodGenerator = defineGenerator<PluginZod>({
       const codecRefNames = direction === 'input' && !mini ? new Set(collectCodecRefNames(schema)) : null
       const imports = resolver.imports({
         node: schema,
-        meta: ctx.meta,
         root,
         output,
         group: group ?? undefined,
@@ -203,8 +198,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
       const schemaPrinter = mini
         ? keysToOmit?.length
-          ? printerZodMini({ guidType, regexType, resolver, keysToOmit, cyclicSchemas, nameMapping, nodes: printer?.nodes })
-          : getMiniPrinter(resolver, { guidType, regexType, cyclicSchemas, nameMapping, nodes: printer?.nodes })
+          ? printerZodMini({ guidType, regexType, resolver, keysToOmit, cyclicSchemas, nodes: printer?.nodes })
+          : getMiniPrinter(resolver, { guidType, regexType, cyclicSchemas, nodes: printer?.nodes })
         : keysToOmit?.length
           ? printerZod({
               coercion,
@@ -214,11 +209,10 @@ export const zodGenerator = defineGenerator<PluginZod>({
               resolver,
               keysToOmit,
               cyclicSchemas,
-              nameMapping,
               nodes: printer?.nodes,
               direction,
             })
-          : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, cyclicSchemas, nameMapping, nodes: printer?.nodes })[direction]
+          : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, cyclicSchemas, nodes: printer?.nodes })[direction]
 
       return (
         <>
@@ -271,7 +265,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
           (res.content ?? []).flatMap((entry) =>
             entry.schema
               ? resolver
-                  .imports({ node: entry.schema, meta: ctx.meta, root, output, group: group ?? undefined })
+                  .imports({ node: entry.schema, root, output, group: group ?? undefined })
                   .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
               : [],
           ),
