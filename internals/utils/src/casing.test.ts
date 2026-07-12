@@ -1,7 +1,17 @@
 import { describe, expect, test } from 'vitest'
-import { camelCase, pascalCase, screamingSnakeCase, snakeCase } from './casing.ts'
+import { camelCase, capitalize, pascalCase, screamingSnakeCase, snakeCase } from './casing.ts'
 
 describe('casing', () => {
+  test.each([
+    ['getPetById', 'GetPetById'],
+    ['hello-world', 'Hello-world'],
+    ['HTML', 'HTML'],
+    ['a', 'A'],
+    ['', ''],
+  ])('capitalize(%s) -> %s', (input, expected) => {
+    expect(capitalize(input)).toBe(expected)
+  })
+
   test('camelCase', () => {
     expect(camelCase('pet pet')).toBe('petPet')
     expect(camelCase('is HTML test')).toBe('isHTMLTest')

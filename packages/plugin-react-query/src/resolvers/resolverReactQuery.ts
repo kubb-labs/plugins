@@ -1,9 +1,7 @@
+import { createMutationResolver, createQueryResolver } from '@internals/tanstack-query'
+import { capitalize } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
 import type { PluginReactQuery } from '../types.ts'
-
-function capitalize(name: string): string {
-  return `${name.charAt(0).toUpperCase()}${name.slice(1)}`
-}
 
 /**
  * Default resolver used by `@kubb/plugin-react-query`. Decides the names and
@@ -26,83 +24,14 @@ function capitalize(name: string): string {
  */
 export const resolverReactQuery = createResolver<PluginReactQuery>({
   pluginName: 'plugin-react-query',
-  query: {
-    name(node) {
-      return `use${capitalize(this.name(node.operationId))}`
-    },
-    optionsName(node) {
-      return `${this.name(node.operationId)}QueryOptions`
-    },
-    keyName(node) {
-      return `${this.name(node.operationId)}QueryKey`
-    },
-    keyTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}QueryKey`
-    },
-    clientName(node) {
-      return this.name(node.operationId)
-    },
-  },
-  suspenseQuery: {
-    name(node) {
-      return `use${capitalize(this.name(node.operationId))}Suspense`
-    },
-    optionsName(node) {
-      return `${this.name(node.operationId)}SuspenseQueryOptions`
-    },
-    keyName(node) {
-      return `${this.name(node.operationId)}SuspenseQueryKey`
-    },
-    keyTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}SuspenseQueryKey`
-    },
-    clientName(node) {
-      return `${this.name(node.operationId)}Suspense`
-    },
-  },
-  infiniteQuery: {
-    name(node) {
-      return `use${capitalize(this.name(node.operationId))}Infinite`
-    },
-    optionsName(node) {
-      return `${this.name(node.operationId)}InfiniteQueryOptions`
-    },
-    keyName(node) {
-      return `${this.name(node.operationId)}InfiniteQueryKey`
-    },
-    keyTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}InfiniteQueryKey`
-    },
-    clientName(node) {
-      return `${this.name(node.operationId)}Infinite`
-    },
-  },
-  suspenseInfiniteQuery: {
-    name(node) {
-      return `use${capitalize(this.name(node.operationId))}SuspenseInfinite`
-    },
-    optionsName(node) {
-      return `${this.name(node.operationId)}SuspenseInfiniteQueryOptions`
-    },
-    keyName(node) {
-      return `${this.name(node.operationId)}SuspenseInfiniteQueryKey`
-    },
-    keyTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}SuspenseInfiniteQueryKey`
-    },
-    clientName(node) {
-      return `${this.name(node.operationId)}SuspenseInfinite`
-    },
-  },
+  query: createQueryResolver(),
+  suspenseQuery: createQueryResolver('Suspense'),
+  infiniteQuery: createQueryResolver('Infinite'),
+  suspenseInfiniteQuery: createQueryResolver('SuspenseInfinite'),
   mutation: {
-    name(node) {
-      return `use${capitalize(this.name(node.operationId))}`
-    },
+    ...createMutationResolver(),
     optionsName(node) {
       return `${this.name(node.operationId)}MutationOptions`
-    },
-    keyName(node) {
-      return `${this.name(node.operationId)}MutationKey`
     },
     typeName(node) {
       return capitalize(this.name(node.operationId))

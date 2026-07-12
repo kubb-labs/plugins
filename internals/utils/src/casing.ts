@@ -60,6 +60,17 @@ export function pascalCase(text: string, { prefix = '', suffix = '' }: Options =
 }
 
 /**
+ * Uppercases only the first character of `text`, leaving the rest untouched.
+ * Unlike {@link pascalCase} it never re-splits word boundaries or strips characters.
+ *
+ * @example
+ * `capitalize('getPetById') // 'GetPetById'`
+ */
+export function capitalize(text: string): string {
+  return `${text.charAt(0).toUpperCase()}${text.slice(1)}`
+}
+
+/**
  * Converts `text` to snake_case.
  *
  * @example From camelCase

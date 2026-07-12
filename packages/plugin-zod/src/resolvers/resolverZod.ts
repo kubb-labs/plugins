@@ -1,4 +1,5 @@
-import { camelCase, ensureValidVarName, pascalCase, toFilePath } from '@internals/utils'
+import { createCasedFile, createOperationResponseResolver, operationParamName } from '@internals/shared'
+import { camelCase, ensureValidVarName, pascalCase } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
 import type { PluginZod } from '../types.ts'
 
@@ -22,11 +23,7 @@ export const resolverZod = createResolver<PluginZod>({
   name(name) {
     return ensureValidVarName(camelCase(name, { suffix: 'schema' }))
   },
-  file: {
-    baseName({ name, extname }) {
-      return `${toFilePath(name, (part) => camelCase(part, { suffix: 'schema' }))}${extname}`
-    },
-  },
+  file: createCasedFile((part) => camelCase(part, { suffix: 'schema' })),
   schema: {
     typeName(name) {
       return ensureValidVarName(pascalCase(name, { suffix: 'schema type' }))
@@ -42,9 +39,7 @@ export const resolverZod = createResolver<PluginZod>({
     },
   },
   param: {
-    name(node, param) {
-      return this.name(`${node.operationId} ${param.in} ${param.name}`)
-    },
+    name: operationParamName,
     path(node, param) {
       return this.param.name(node, param)
     },
@@ -56,18 +51,7 @@ export const resolverZod = createResolver<PluginZod>({
     },
   },
   response: {
-    status(node, statusCode) {
-      return this.name(`${node.operationId} Status ${statusCode}`)
-    },
-    body(node) {
-      return this.name(`${node.operationId} Body`)
-    },
-    responses(node) {
-      return this.name(`${node.operationId} Responses`)
-    },
-    response(node) {
-      return this.name(`${node.operationId} Response`)
-    },
+    ...createOperationResponseResolver(),
     error(node) {
       return this.name(`${node.operationId} Error`)
     },
