@@ -6,6 +6,7 @@
 
 import dayjs from 'dayjs'
 import type { Pet } from './types/Pet'
+import { createCategory } from './createCategory'
 import { faker } from '@faker-js/faker'
 
 export function createPet<TData extends Partial<Pet> = object>(data?: TData) {

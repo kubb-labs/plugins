@@ -98,12 +98,6 @@ export type PrinterZodOptions = {
    */
   direction?: 'input' | 'output'
   /**
-   * Maps a component `$ref` path to its collision-resolved name. When two components collide
-   * (across sections or by case), the adapter renames one of them; the `ref()` handler resolves
-   * the referenced name through this map so the emitted schema reference matches the renamed component.
-   */
-  nameMapping?: ReadonlyMap<string, string>
-  /**
    * Custom handler map for node type overrides.
    */
   nodes?: PrinterZodNodes
@@ -126,8 +120,7 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
 
     // A cyclic ref is annotated `z.ZodType`, and a nullable/optional ref is wrapped in
     // ZodNullable/ZodOptional, and neither exposes `.strict()`. Only a bare `ZodObject` ref takes it.
-    // A union member ref may carry only `node.name` (no `node.ref`), so fall back to it like `ref()`.
-    const refName = (node.ref ? ast.extractRefName(node.ref) : undefined) ?? node.name
+    const refName = ast.resolveRefName(node)
     if (refName && cyclicSchemas?.has(refName)) {
       return member
     }
@@ -311,9 +304,8 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       },
       ref(node) {
         if (!node.name) return null
-        // `nameMapping` (keyed by the full $ref) carries the collision-resolved name when the
-        // referenced component was renamed; otherwise fall back to the short ref name.
-        const refName = node.ref ? (this.options.nameMapping?.get(node.ref) ?? ast.extractRefName(node.ref) ?? node.name) : node.name
+        const refName = ast.resolveRefName(node)
+        if (!refName) return null
 
         // In the input direction, a date-bearing component resolves to its `${name}InputSchema`
         // variant so request bodies encode `Date → string` instead of decoding.

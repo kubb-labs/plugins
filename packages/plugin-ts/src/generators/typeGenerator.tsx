@@ -1,4 +1,4 @@
-import { caseParams, getOasAdapter, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
+import { caseParams, collectRefNames, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Type } from '../components/Type.tsx'
@@ -37,19 +37,17 @@ export const typeGenerator = defineGenerator<PluginTs>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { enum: enumOptions, syntaxType, optionalType, arrayType, output, group, printer } = ctx.options
-    const { adapter, config, resolver, root } = ctx
+    const { config, resolver, root } = ctx
 
     if (!node.name) {
       return
     }
-    // Build a set of schema names that are enums so the ref handler and getImports
-    // callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
+    // Build a set of schema names that are enums so the ref handler and the imports
+    // name callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
     const enumSchemaNames = new Set<string>(ctx.meta.enumNames)
+    const importName = (schemaName: string) => resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver })
 
-    const imports = adapter.getImports(node, (schemaName) => ({
-      name: resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver }),
-      path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
-    }))
+    const imports = resolver.imports({ node, root, output, group: group ?? undefined, name: importName })
 
     const enumNode = ast.narrowSchema(node, ast.schemaTypes.enum)
     // An inline `const` (single-value enum the adapter did not register) renders as a literal type,
@@ -70,7 +68,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
       description: node.description,
       resolver,
       enumSchemaNames,
-      nameMapping: getOasAdapter(adapter).options.nameMapping,
       nodes: printer?.nodes,
     })
 
@@ -91,7 +88,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
   },
   operation(node, ctx) {
     const { enum: enumOptions, optionalType, arrayType, syntaxType, group, output, printer } = ctx.options
-    const { adapter, config, resolver, root } = ctx
+    const { config, resolver, root } = ctx
 
     const params = caseParams(node.parameters, 'camelcase')
 
@@ -99,17 +96,15 @@ export const typeGenerator = defineGenerator<PluginTs>({
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
     } as const
 
-    // Build a set of schema names that are enums so the ref handler and getImports
-    // callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
+    // Build a set of schema names that are enums so the ref handler and the imports
+    // name callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
     const enumSchemaNames = new Set<string>(ctx.meta.enumNames)
+    const importName = (schemaName: string) => resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver })
 
     function renderSchemaType({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
       if (!schema) return null
 
-      const imports = adapter.getImports(schema, (schemaName) => ({
-        name: resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver }),
-        path: resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path,
-      }))
+      const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, name: importName })
 
       const schemaPrinter = printerTs({
         optionalType,
@@ -121,7 +116,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
         keysToOmit,
         resolver,
         enumSchemaNames,
-        nameMapping: getOasAdapter(adapter).options.nameMapping,
         nodes: printer?.nodes,
       })
 
@@ -233,18 +227,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
       const responsesWithSchema = node.responses.filter(hasSchema)
       const importedNames = new Set(
-        responsesWithSchema.flatMap((res) =>
-          (res.content ?? []).flatMap((entry) =>
-            entry.schema
-              ? adapter
-                  .getImports(entry.schema, (schemaName) => ({
-                    name: resolveImportName({ schemaName, enumOptions, enumSchemaNames, resolver }),
-                    path: '',
-                  }))
-                  .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
-              : [],
-          ),
-        ),
+        responsesWithSchema.flatMap((res) => (res.content ?? []).flatMap((entry) => (entry.schema ? collectRefNames(entry.schema).map(importName) : []))),
       )
 
       if (importedNames.has(responseName)) {

@@ -5,6 +5,7 @@
  */
 
 import * as z from 'zod'
+import { petSchema } from './petSchema'
 
 export const catSchema = z.object({
   id: z.int(),

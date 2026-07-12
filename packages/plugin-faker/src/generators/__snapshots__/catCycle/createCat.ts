@@ -5,6 +5,7 @@
  */
 
 import type { Cat } from './types/Cat'
+import { createPet } from './createPet'
 import { faker } from '@faker-js/faker'
 
 export function createCat<TData extends Partial<Cat> = object>(data?: TData) {

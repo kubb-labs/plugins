@@ -5,5 +5,7 @@
  */
 
 import * as z from 'zod'
+import { cardPaymentSchema } from './cardPaymentSchema'
+import { walletPaymentSchema } from './walletPaymentSchema'
 
 export const paymentSchema = z.discriminatedUnion('method', [cardPaymentSchema, walletPaymentSchema])
