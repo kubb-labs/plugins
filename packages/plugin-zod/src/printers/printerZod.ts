@@ -1,20 +1,8 @@
-import { buildList, buildObject, lazyGetter, objectKey, stringify } from '@internals/utils'
 import { ast } from 'kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import {
-  applyModifiers,
-  buildEnum,
-  containsCodec,
-  formatLiteral,
-  getCodec,
-  isObjectComposableIntersection,
-  isObjectSchemaNode,
-  lengthConstraints,
-  numberConstraints,
-  omitUnwrapChain,
-  patternKeySchema,
-  shouldCoerce,
-} from '../utils.ts'
+import { applyModifiers, getCodec, lengthConstraints, numberConstraints, patternKeySchema, shouldCoerce } from '../utils.ts'
+import { sharedZodNodes } from './shared.ts'
+import type { ZodDialect } from './shared.ts'
 import type { AdapterOas } from '@kubb/adapter-oas'
 
 /**
@@ -108,30 +96,30 @@ export type PrinterZodOptions = {
  */
 export type PrinterZodFactory = ast.PrinterFactoryOptions<'zod', PrinterZodOptions, string, string>
 
-function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): string {
-  if (node.type === 'object' && node.additionalProperties === undefined) {
+function strictOneOfMember({ member, schema, cyclicSchemas }: { member: string; schema: ast.SchemaNode; cyclicSchemas?: ReadonlySet<string> }): string {
+  if (schema.type === 'object' && schema.additionalProperties === undefined) {
     return `${member}.strict()`
   }
 
-  if (node.type === 'ref') {
+  if (schema.type === 'ref') {
     if (member.startsWith('z.lazy(')) {
       return member
     }
 
     // A cyclic ref is annotated `z.ZodType`, and a nullable/optional ref is wrapped in
     // ZodNullable/ZodOptional, and neither exposes `.strict()`. Only a bare `ZodObject` ref takes it.
-    const refName = ast.resolveRefName(node)
+    const refName = ast.resolveRefName(schema)
     if (refName && cyclicSchemas?.has(refName)) {
       return member
     }
 
-    const schema = ast.syncSchemaRef(node)
+    const resolved = ast.syncSchemaRef(schema)
 
-    if (schema.nullable || schema.optional || node.nullable || node.optional) {
+    if (resolved.nullable || resolved.optional || schema.nullable || schema.optional) {
       return member
     }
 
-    if (schema.type === 'object' && (schema.additionalProperties === undefined || schema.additionalProperties === false)) {
+    if (resolved.type === 'object' && (resolved.additionalProperties === undefined || resolved.additionalProperties === false)) {
       return `${member}.strict()`
     }
   }
@@ -139,67 +127,20 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
   return member
 }
 
-function getMemberConstraint({ member, regexType }: { member: ast.SchemaNode; regexType: PrinterZodOptions['regexType'] }): string | undefined {
-  if (member.primitive === 'string') return lengthConstraints({ ...(ast.narrowSchema(member, 'string') ?? {}), regexType }) || undefined
-  if (member.primitive === 'number' || member.primitive === 'integer')
-    return numberConstraints(ast.narrowSchema(member, 'number') ?? ast.narrowSchema(member, 'integer') ?? {}) || undefined
-  if (member.primitive === 'array') return lengthConstraints({ ...(ast.narrowSchema(member, 'array') ?? {}), regexType }) || undefined
-}
-
 /**
- * The printer slice `buildZodObjectShape` needs: the recursive `transform` and the resolved options.
+ * Chainable Zod v4 emission for the shared printer handlers.
  */
-type ZodPrinterContext = {
-  transform: (node: ast.SchemaNode) => string | null
-  options: PrinterZodOptions
-}
-
-/**
- * Builds the `{ key: value, … }` shape for an object node, shared by the `z.object(...)` and
- * `.extend(...)` renderings so they stay in lockstep.
- */
-function buildZodObjectShape(ctx: ZodPrinterContext, node: ast.SchemaNode): string {
-  const objectNode = ast.narrowSchema(node, 'object')
-  if (!objectNode) return '{}'
-
-  const isCyclic = (schema: ast.SchemaNode): boolean =>
-    ctx.options.cyclicSchemas != null && ast.containsCircularRef(schema, { circularSchemas: ctx.options.cyclicSchemas })
-
-  const entries = ast
-    .mapSchemaProperties(objectNode, (schema) => {
-      // Inside a getter the getter itself defers evaluation, so suppress z.lazy() wrapping on
-      // nested refs by temporarily clearing cyclicSchemas.
-      const hasSelfRef = isCyclic(schema)
-      const savedCyclicSchemas = ctx.options.cyclicSchemas
-      if (hasSelfRef) ctx.options.cyclicSchemas = undefined
-      const baseOutput = ctx.transform(schema) ?? ctx.transform(ast.factory.createSchema({ type: 'unknown' }))!
-      if (hasSelfRef) ctx.options.cyclicSchemas = savedCyclicSchemas
-      return baseOutput
-    })
-    .map(({ name: propName, property, output: baseOutput }) => {
-      const { schema } = property
-      const meta = ast.syncSchemaRef(schema)
-
-      // When a property schema is not a ref but the metadata is from a ref (e.g., discriminator
-      // property override), skip applying the description from the ref target to avoid applying
-      // metadata from a replaced schema.
-      const descriptionToApply = schema.type !== 'ref' && meta.type === 'ref' ? undefined : meta.description
-
-      const value = applyModifiers({
-        value: baseOutput,
-        schema,
-        nullable: meta.nullable,
-        optional: schema.optional || property.required === false,
-        nullish: schema.nullish,
-        defaultValue: meta.default,
-        description: descriptionToApply,
-        examples: meta.examples,
-      })
-
-      return isCyclic(schema) ? lazyGetter({ name: propName, body: value }) : `${objectKey(propName)}: ${value}`
-    })
-
-  return buildObject(entries)
+const zodDialect: ZodDialect = {
+  applyModifiers,
+  lengthConstraints,
+  numberConstraints,
+  patternKeySchema,
+  nullable: (value) => `${value}.nullable()`,
+  strictObject: (objectBase) => `${objectBase}.strict()`,
+  catchall: ({ objectBase, value }) => `${objectBase}.catchall(${value})`,
+  extend: ({ base, shape }) => `${base}.extend(${shape})`,
+  intersect: ({ base, member }) => `${base}.and(${member})`,
+  strictOneOfMember,
 }
 
 /**
@@ -215,20 +156,13 @@ function buildZodObjectShape(ctx: ZodPrinterContext, node: ast.SchemaNode): stri
  * ```
  */
 export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
-  // The object handler temporarily reassigns `options.cyclicSchemas` to `undefined` while rendering a
-  // getter body (to suppress nested `z.lazy()`), so capture a stable reference for the `.strict()`
-  // skip decision, which must still see cyclic members inside those getter bodies.
-  const cyclicSchemaNames = options.cyclicSchemas
+  const shared = sharedZodNodes({ dialect: zodDialect, cyclicSchemas: options.cyclicSchemas })
+
   return {
     name: 'zod',
     options,
     nodes: {
-      any: () => 'z.any()',
-      unknown: () => 'z.unknown()',
-      void: () => 'z.void()',
-      never: () => 'z.never()',
-      boolean: () => 'z.boolean()',
-      null: () => 'z.null()',
+      ...shared.nodes,
       string(node) {
         const base = shouldCoerce(this.options.coercion, 'strings') ? 'z.coerce.string()' : 'z.string()'
 
@@ -273,183 +207,8 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
 
         return shouldCoerce(this.options.coercion, 'dates') ? 'z.coerce.date()' : 'z.date()'
       },
-      uuid(node) {
-        const base = this.options.guidType === 'guid' ? 'z.guid()' : 'z.uuid()'
-
-        return `${base}${lengthConstraints({ ...node, regexType: this.options.regexType })}`
-      },
-      email(node) {
-        return `z.email()${lengthConstraints({ ...node, regexType: this.options.regexType })}`
-      },
-      url(node) {
-        return `z.url()${lengthConstraints({ ...node, regexType: this.options.regexType })}`
-      },
-      ipv4: () => 'z.ipv4()',
-      ipv6: () => 'z.ipv6()',
-      blob: () => 'z.instanceof(File)',
-      enum(node) {
-        const values = node.namedEnumValues?.map((v) => v.value) ?? node.enumValues ?? []
-        const nonNullValues = values.filter((v): v is string | number | boolean => v !== null)
-
-        // asConst-style enum: use z.union([z.literal(…), …])
-        if (node.namedEnumValues?.length) {
-          const literals = nonNullValues.map((v) => `z.literal(${formatLiteral(v)})`)
-
-          if (literals.length === 1) return literals[0]!
-          return `z.union([${literals.join(', ')}])`
-        }
-
-        // Regular enum: z.enum for all-string sets, z.literal/z.union otherwise
-        return buildEnum(nonNullValues)
-      },
-      ref(node) {
-        if (!node.name) return null
-        const refName = ast.resolveRefName(node)
-        if (!refName) return null
-
-        // In the input direction, a date-bearing component resolves to its `${name}InputSchema`
-        // variant so request bodies encode `Date → string` instead of decoding.
-        const useInputVariant = node.ref != null && this.options.direction === 'input' && containsCodec(node)
-        const resolvedName = node.ref
-          ? useInputVariant
-            ? (this.options.resolver?.schema.inputName(refName) ?? refName)
-            : (this.options.resolver?.name(refName) ?? refName)
-          : node.name
-
-        if (node.ref && this.options.cyclicSchemas?.has(refName)) {
-          return `z.lazy(() => ${resolvedName})`
-        }
-
-        return resolvedName
-      },
-      object(node) {
-        const entries = node.properties ?? []
-        const objectBase = `z.object(${buildZodObjectShape(this, node)})`
-
-        const result = (() => {
-          const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
-
-          if (node.additionalProperties && node.additionalProperties !== true) {
-            const catchallType = this.transform(node.additionalProperties)
-            return catchallType ? `${objectBase}.catchall(${catchallType})` : objectBase
-          }
-          if (node.additionalProperties === true) return `${objectBase}.catchall(${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
-          // `additionalProperties: false` still permits patternProperties keys, so skip `.strict()` when patterns exist.
-          if (node.additionalProperties === false && patterns.length === 0) return `${objectBase}.strict()`
-
-          // No fixed properties: z.record enforces the key pattern. With fixed properties a record would
-          // reject the declared keys, so fall back to .catchall (value validated, key pattern not).
-          if (patterns.length > 0) {
-            const values = patterns.map(([, valueSchema]) => {
-              const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: 'unknown' }))!
-              return valueSchema.nullable ? `${valueType}.nullable()` : valueType
-            })
-            const distinct = [...new Set(values)]
-            const value = distinct.length === 1 ? distinct[0]! : `z.union([${distinct.join(', ')}])`
-
-            if (entries.length > 0) return `${objectBase}.catchall(${value})`
-            return `z.record(${patternKeySchema({ patterns: patterns.map(([pattern]) => pattern), regexType: this.options.regexType })}, ${value})`
-          }
-          return objectBase
-        })()
-
-        return result
-      },
-      array(node) {
-        const items = ast
-          .mapSchemaItems(node, (item) => this.transform(item))
-          .map(({ output }) => output)
-          .filter(Boolean)
-        const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: 'unknown' }))!
-        const base = `z.array(${inner})${lengthConstraints({ ...node, regexType: this.options.regexType })}`
-
-        return node.unique ? `${base}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })` : base
-      },
-      tuple(node) {
-        const items = ast
-          .mapSchemaItems(node, (item) => this.transform(item))
-          .map(({ output }) => output)
-          .filter(Boolean)
-
-        return `z.tuple(${buildList(items)})`
-      },
-      union(node) {
-        const nodeMembers = node.members ?? []
-        const members = ast
-          .mapSchemaMembers(node, (memberNode) => this.transform(memberNode))
-          .map(({ schema, output }) => (output && node.strategy === 'one' ? strictOneOfMember(output, schema, cyclicSchemaNames) : output))
-          .filter(Boolean)
-        if (members.length === 0) return ''
-        if (members.length === 1) return members[0]!
-        // z.discriminatedUnion needs every option to be a ZodObject. Object variants (refs or
-        // `.extend(…)`-composed `allOf`) qualify; intersections, cyclic `z.lazy(…)` refs, and
-        // non-objects fall back to z.union.
-        const allDiscriminable = nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemaNames))
-        if (node.discriminatorPropertyName && allDiscriminable) {
-          return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
-        }
-
-        return `z.union(${buildList(members)})`
-      },
-      intersection(node) {
-        const members = node.members ?? []
-        if (members.length === 0) return ''
-
-        const [first, ...rest] = members
-        if (!first) return ''
-
-        const firstBase = this.transform(first)
-        if (!firstBase) return ''
-
-        // An object `allOf` is a merge, not a runtime intersection: `.extend({ … })` keeps it a
-        // ZodObject (usable in z.discriminatedUnion) instead of the non-discriminable `.and(…)`.
-        if (rest.length > 0 && isObjectComposableIntersection(node, cyclicSchemaNames)) {
-          return rest.reduce((acc, member) => `${acc}.extend(${buildZodObjectShape(this, member)})`, firstBase)
-        }
-
-        return rest.reduce((acc, member) => {
-          const constraint = getMemberConstraint({ member, regexType: this.options.regexType })
-          if (constraint) return acc + constraint
-          const transformed = this.transform(member)
-          return transformed ? `${acc}.and(${transformed})` : acc
-        }, firstBase)
-      },
     },
     overrides: options.nodes,
-    print(node) {
-      const { keysToOmit } = this.options
-
-      const transformed = this.transform(node)
-      if (!transformed) return null
-
-      const meta = ast.syncSchemaRef(node)
-
-      const base = (() => {
-        if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed
-        // Discriminated unions (z.discriminatedUnion) do not support .omit(), so skip them.
-
-        // A nullable/optional ref resolves to a ZodNullable/ZodOptional variable; .omit() lives on
-        // the inner ZodObject, so unwrap down to it first (mirrors printerTs `Omit<NonNullable<T>, …>`).
-        // applyModifiers re-applies the nullable/optional wrapper after the omit.
-        const unwrap = omitUnwrapChain(node)
-        const omit = `.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} })`
-
-        // If this is a lazy reference, apply omit inside the lazy function
-        const lazyMatch = transformed.match(/^z\.lazy\(\(\)\s*=>\s*(.+)\)$/)
-        if (lazyMatch) return `z.lazy(() => ${lazyMatch[1]}${unwrap}${omit})`
-        return `${transformed}${unwrap}${omit}`
-      })()
-
-      return applyModifiers({
-        value: base,
-        schema: node,
-        nullable: meta.nullable,
-        optional: meta.optional,
-        nullish: meta.nullish,
-        defaultValue: meta.default,
-        description: meta.description,
-        examples: meta.examples,
-      })
-    },
+    print: shared.print,
   }
 })
