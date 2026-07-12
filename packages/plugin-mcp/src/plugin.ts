@@ -70,7 +70,7 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
           include,
           override,
           group: groupConfig,
-          client: resolveContractClient({ client, plugins: ctx.config.plugins ?? [] }),
+          client: resolveContractClient({ client, plugins: ctx.config.plugins }),
           resolver,
         })
         ctx.setResolver(resolver)

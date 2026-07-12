@@ -88,7 +88,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
 
         ctx.setOptions({
           output,
-          client: resolveContractClient({ client, plugins: ctx.config.plugins ?? [] }),
+          client: resolveContractClient({ client, plugins: ctx.config.plugins }),
           queryKey,
           query: resolveQueryConfig(query, { importPath: '@tanstack/react-query' }),
           mutationKey,

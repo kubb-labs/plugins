@@ -28,15 +28,10 @@ function buildQueryParamsNode(
   node: ast.OperationNode,
   options: {
     resolver: ResolverTs
-    suspense?: boolean
+    observerOptionsType: string
   },
 ): FunctionParametersNode {
-  const { resolver, suspense } = options
-  const { TData, TError } = buildResponseTypes(node, resolver)
-
-  const observerOptionsType = suspense
-    ? `UseSuspenseQueryOptions<${[TData, TError, 'TData', 'TQueryKey'].join(', ')}>`
-    : `QueryObserverOptions<${[TData, TError, 'TData', 'TQueryData', 'TQueryKey'].join(', ')}>`
+  const { resolver, observerOptionsType } = options
 
   const optionsParam = createFunctionParameter({
     name: 'options',
@@ -56,6 +51,9 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
   const { TData, TError } = buildResponseTypes(node, tsResolver)
   const hookName = suspense ? 'useSuspenseQuery' : 'useQuery'
   const observerOptionsName = suspense ? 'UseSuspenseQueryOptions' : 'QueryObserverOptions'
+  const observerOptionsType = suspense
+    ? `${observerOptionsName}<${[TData, TError, 'TData', 'TQueryKey'].join(', ')}>`
+    : `${observerOptionsName}<${[TData, TError, 'TData', 'TQueryData', 'TQueryKey'].join(', ')}>`
   const resultTypeName = suspense ? 'UseSuspenseQueryResult' : 'UseQueryResult'
   const returnType = `${resultTypeName}<TData, ${TError}> & { queryKey: TQueryKey }`
   const generics = suspense
@@ -66,7 +64,7 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
   const queryKeyArgs = resolvedParams ? 'resolvedParams' : ''
   const queryOptionsArgs = resolvedParams ? 'resolvedParams, config' : 'config'
 
-  const paramsNode = buildQueryParamsNode(node, { resolver: tsResolver, suspense })
+  const paramsNode = buildQueryParamsNode(node, { resolver: tsResolver, observerOptionsType })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

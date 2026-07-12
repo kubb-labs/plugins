@@ -100,25 +100,8 @@ export function InfiniteQueryOptions({
     } as ${queryParamsTypeName}`
       : ''
 
-  if (infiniteOverrideParams) {
-    return (
-      <File.Source name={name} isExportable isIndexable>
-        <Function name={name} export params={paramsSignature}>
-          {`
-const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, ${queryKeyType}, ${pageParamType}>({
-  queryKey,
-  queryFn: async ({ signal, pageParam }) => {
-    ${infiniteOverrideParams}
-    ${queryFnBody}
-  },
-  ${queryOptionsArr.join(',\n  ')}
-})
-`}
-        </Function>
-      </File.Source>
-    )
-  }
+  const queryFnArgs = infiniteOverrideParams ? '{ signal, pageParam }' : '{ signal }'
+  const queryFnStatements = infiniteOverrideParams ? `${infiniteOverrideParams}\n    ${queryFnBody}` : queryFnBody
 
   return (
     <File.Source name={name} isExportable isIndexable>
@@ -127,8 +110,8 @@ return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${que
 const queryKey = ${queryKeyName}(${queryKeyParamsCall})
 return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, ${queryKeyType}, ${pageParamType}>({
   queryKey,
-  queryFn: async ({ signal }) => {
-    ${queryFnBody}
+  queryFn: async (${queryFnArgs}) => {
+    ${queryFnStatements}
   },
   ${queryOptionsArr.join(',\n  ')}
 })

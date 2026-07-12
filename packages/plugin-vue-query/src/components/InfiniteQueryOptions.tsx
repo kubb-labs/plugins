@@ -3,7 +3,7 @@ import type { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { Infinite } from '../types.ts'
-import { maybeRefOrGetter } from '../utils.ts'
+import { maybeRefOrGetter, unwrapWithToValue } from '../utils.ts'
 
 type Props = {
   name: string
@@ -17,8 +17,6 @@ type Props = {
   previousParam: Infinite['previousParam']
   queryParam: Infinite['queryParam']
 }
-
-const unwrapWithToValue = (name: string) => `toValue(${name})`
 
 /**
  * The vue-query flavor of the shared `infiniteQueryOptions` component: request groups accept
