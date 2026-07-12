@@ -1,5 +1,18 @@
 # @kubb/plugin-faker
 
+## 5.0.0-beta.95
+
+### Minor Changes
+
+- [#669](https://github.com/kubb-labs/plugins/pull/669) [`b37ad9b`](https://github.com/kubb-labs/plugins/commit/b37ad9b3c663f21b72ffdce947c984ce705ebf4d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Resolve schema ref imports through `resolver.imports` and ref names through `resolveRefName` instead of the removed `adapter.getImports` and `nameMapping` printer options. Generated output is unchanged. This release requires the matching `@kubb/core` and `@kubb/adapter-oas` that ship `resolver.imports` and stamp `targetName` on collision-renamed refs.
+
+### Patch Changes
+
+- [#668](https://github.com/kubb-labs/plugins/pull/668) [`d8654b0`](https://github.com/kubb-labs/plugins/commit/d8654b0e1b221b5db7a0137ed0b3da3eb80cb155) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Share the resolver naming templates through internal helpers instead of repeating them per plugin. The `param`, `response`, and `file.baseName` templates used by plugin-ts, plugin-zod, and plugin-faker now come from one implementation, and the query/mutation naming used by plugin-react-query, plugin-swr, and plugin-vue-query comes from a shared TanStack Query base. Generated output is unchanged.
+
+- Updated dependencies [[`d069022`](https://github.com/kubb-labs/plugins/commit/d069022633b46fcacc8a7899780bd68e35b5f743), [`b37ad9b`](https://github.com/kubb-labs/plugins/commit/b37ad9b3c663f21b72ffdce947c984ce705ebf4d), [`d8654b0`](https://github.com/kubb-labs/plugins/commit/d8654b0e1b221b5db7a0137ed0b3da3eb80cb155)]:
+  - @kubb/plugin-ts@5.0.0-beta.95
+
 ## 5.0.0-beta.87
 
 ### Patch Changes
