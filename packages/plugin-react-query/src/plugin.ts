@@ -1,8 +1,8 @@
 import { createGroupConfig } from '@internals/shared'
 import { definePlugin, Resolver } from 'kubb/kit'
-import { resolveClient } from '@internals/client'
+import { resolveContractClient } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
+import { mutationKeyTransformer, queryKeyTransformer, resolveInfiniteConfig, resolveMutationConfig, resolveQueryConfig } from '@internals/tanstack-query'
 import {
   customHookOptionsFileGenerator,
   hookOptionsGenerator,
@@ -86,47 +86,14 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? Resolver.merge<ResolverReactQuery>(resolverReactQuery, userResolver) : resolverReactQuery
 
-        const pluginNames = (ctx.config.plugins ?? []).map((p) => (p as { name?: string }).name).filter((name): name is string => Boolean(name))
-        const resolvedClient = resolveClient({ client, pluginNames })
-        if (resolvedClient.kind === 'error') {
-          throw new Error(resolvedClient.message)
-        }
-
-        // The hooks always call a registered client plugin's op. The client runtime lives in
-        // plugin-axios / plugin-fetch, so nothing is bundled here.
-        const resolvedClientDescriptor: PluginReactQuery['resolvedOptions']['client'] = { kind: 'contract', pluginName: resolvedClient.pluginName }
-
         ctx.setOptions({
           output,
-          client: resolvedClientDescriptor,
+          client: resolveContractClient({ client, plugins: ctx.config.plugins ?? [] }),
           queryKey,
-          query:
-            query === false
-              ? false
-              : {
-                  importPath: '@tanstack/react-query',
-                  methods: ['GET'],
-                  ...query,
-                },
+          query: resolveQueryConfig(query, { importPath: '@tanstack/react-query' }),
           mutationKey,
-          mutation:
-            mutation === false
-              ? false
-              : {
-                  importPath: '@tanstack/react-query',
-                  methods: ['POST', 'PUT', 'PATCH', 'DELETE'],
-                  ...mutation,
-                },
-          infinite: infinite
-            ? {
-                queryParam: 'id',
-                initialPageParam: 0,
-                cursorParam: null,
-                nextParam: null,
-                previousParam: null,
-                ...infinite,
-              }
-            : false,
+          mutation: resolveMutationConfig(mutation, { importPath: '@tanstack/react-query' }),
+          infinite: resolveInfiniteConfig(infinite),
           suspense,
           customOptions: customOptions ? { name: 'useCustomHookOptions', ...customOptions } : null,
           hooks,

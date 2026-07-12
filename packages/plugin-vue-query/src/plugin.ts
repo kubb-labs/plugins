@@ -1,9 +1,8 @@
 import { createGroupConfig } from '@internals/shared'
 import { definePlugin, Resolver } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { mutationKeyTransformer } from '@internals/tanstack-query'
-import { queryKeyTransformer } from '@internals/tanstack-query'
-import { resolveClient } from '@internals/client'
+import { mutationKeyTransformer, queryKeyTransformer, resolveInfiniteConfig, resolveMutationConfig, resolveQueryConfig } from '@internals/tanstack-query'
+import { resolveContractClient } from '@internals/client'
 import { infiniteQueryGenerator, mutationGenerator, queryGenerator } from './generators'
 import { resolverVueQuery } from './resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery, ResolverVueQuery } from './types.ts'
@@ -68,47 +67,14 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? Resolver.merge<ResolverVueQuery>(resolverVueQuery, userResolver) : resolverVueQuery
 
-        const pluginNames = (ctx.config.plugins ?? []).map((p) => (p as { name?: string }).name).filter((name): name is string => Boolean(name))
-        const resolvedClient = resolveClient({ client, pluginNames })
-        if (resolvedClient.kind === 'error') {
-          throw new Error(resolvedClient.message)
-        }
-
-        // The hooks always call a registered client plugin's op. The client runtime lives in
-        // plugin-axios / plugin-fetch, so nothing is bundled here.
-        const resolvedClientDescriptor: PluginVueQuery['resolvedOptions']['client'] = { kind: 'contract', pluginName: resolvedClient.pluginName }
-
         ctx.setOptions({
           output,
-          client: resolvedClientDescriptor,
+          client: resolveContractClient({ client, plugins: ctx.config.plugins ?? [] }),
           queryKey,
-          query:
-            query === false
-              ? false
-              : {
-                  importPath: '@tanstack/vue-query',
-                  methods: ['GET'],
-                  ...query,
-                },
+          query: resolveQueryConfig(query, { importPath: '@tanstack/vue-query' }),
           mutationKey,
-          mutation:
-            mutation === false
-              ? false
-              : {
-                  importPath: '@tanstack/vue-query',
-                  methods: ['POST', 'PUT', 'PATCH', 'DELETE'],
-                  ...mutation,
-                },
-          infinite: infinite
-            ? {
-                queryParam: 'id',
-                initialPageParam: 0,
-                cursorParam: null,
-                nextParam: null,
-                previousParam: null,
-                ...infinite,
-              }
-            : false,
+          mutation: resolveMutationConfig(mutation, { importPath: '@tanstack/vue-query' }),
+          infinite: resolveInfiniteConfig(infinite),
           hooks,
           group: groupConfig,
           exclude,

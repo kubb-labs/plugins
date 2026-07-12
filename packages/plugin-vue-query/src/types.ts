@@ -1,11 +1,8 @@
-import type { ClientSelector } from '@internals/client'
+import type { ClientSelector, ResolvedContractClient } from '@internals/client'
+import type { Infinite, Mutation, Query, Transformer } from '@internals/tanstack-query'
 import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
-/**
- * Builds the parts of a query or mutation key for one operation. Receives the operation node and
- * the resolved `paramsCasing` setting and returns the key elements in order.
- */
-export type Transformer = (props: { node: ast.OperationNode; casing: 'camelcase' | undefined }) => Array<unknown>
+export type { Infinite, Transformer } from '@internals/tanstack-query'
 
 /**
  * Resolver for Vue Query that provides naming methods for hook functions.
@@ -98,70 +95,6 @@ type QueryKey = Transformer
  */
 type MutationKey = Transformer
 
-type Query = {
-  /**
-   * HTTP methods treated as queries.
-   *
-   * @default ['GET']
-   */
-  methods?: Array<string>
-  /**
-   * Module specifier used in the `import { useQuery } from '...'` statement at
-   * the top of every generated composable file.
-   *
-   * @default '@tanstack/vue-query'
-   */
-  importPath?: string
-}
-
-type Mutation = {
-  /**
-   * HTTP methods treated as mutations.
-   *
-   * @default ['POST', 'PUT', 'PATCH', 'DELETE']
-   */
-  methods?: Array<string>
-  /**
-   * Module specifier used in the `import { useMutation } from '...'` statement
-   * at the top of every generated composable file.
-   *
-   * @default '@tanstack/vue-query'
-   */
-  importPath?: string
-}
-
-export type Infinite = {
-  /**
-   * Name of the query parameter that holds the page cursor.
-   *
-   * @default 'id'
-   */
-  queryParam?: string
-  /**
-   * Path to the cursor field on the response. Leave undefined when the cursor
-   * is not known.
-   *
-   * @deprecated Use `nextParam` and `previousParam` for richer pagination control.
-   */
-  cursorParam?: string | null
-  /**
-   * Path to the next-page cursor on the response. Supports dot notation
-   * (`'pagination.next.id'`) or array form.
-   */
-  nextParam?: string | Array<string> | null
-  /**
-   * Path to the previous-page cursor on the response. Supports dot notation
-   * or array form.
-   */
-  previousParam?: string | Array<string> | null
-  /**
-   * Initial value for `pageParam` on the first fetch.
-   *
-   * @default 0
-   */
-  initialPageParam?: unknown
-}
-
 /**
  * Where the generated composables are written and how they are exported, plus the optional
  * `group` strategy. The `group` option organizes `output.mode: 'directory'` output into per-tag or per-path subdirectories.
@@ -237,7 +170,7 @@ export type Options = OutputOptions & {
  * The resolved client strategy for the generated composables, computed once during setup. The
  * composables always import and call a registered contract client plugin's `<op>`.
  */
-export type ResolvedClient = { kind: 'contract'; pluginName: string }
+export type ResolvedClient = ResolvedContractClient
 
 export type ResolvedOptions = {
   output: Output

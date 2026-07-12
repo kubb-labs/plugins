@@ -1,14 +1,9 @@
-import { getOperationParameters } from '@internals/shared'
-import { getNestedAccessor } from '@internals/utils'
+import { InfiniteQueryOptions as BaseInfiniteQueryOptions } from '@internals/tanstack-query'
 import type { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { functionPrinter } from '@kubb/plugin-ts'
-import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { Infinite } from '../types.ts'
-import { buildVueClientCall, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
-import { buildQueryKeyParamsNode } from './QueryKey.tsx'
-import { getQueryOptionsParams } from './QueryOptions.tsx'
+import { maybeRefOrGetter } from '../utils.ts'
 
 type Props = {
   name: string
@@ -23,131 +18,13 @@ type Props = {
   queryParam: Infinite['queryParam']
 }
 
-const declarationPrinter = functionPrinter({ mode: 'declaration' })
-const callPrinter = functionPrinter({ mode: 'call' })
+const unwrapWithToValue = (name: string) => `toValue(${name})`
 
-export function InfiniteQueryOptions({
-  name,
-  clientName,
-  initialPageParam,
-  cursorParam,
-  nextParam,
-  previousParam,
-  node,
-  tsResolver,
-  queryParam,
-  queryKeyName,
-}: Props): KubbReactNode {
-  const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.response.response(node)
-  const queryFnDataType = responseName
-  const errorNames = resolveErrorNames(node, tsResolver)
-  const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
-
-  const isInitialPageParamDefined = initialPageParam !== undefined && initialPageParam !== null
-  const fallbackPageParamType =
-    typeof initialPageParam === 'number'
-      ? 'number'
-      : typeof initialPageParam === 'string'
-        ? initialPageParam.includes(' as ')
-          ? (() => {
-              const parts = initialPageParam.split(' as ')
-              return parts[parts.length - 1] ?? 'unknown'
-            })()
-          : 'string'
-        : typeof initialPageParam === 'boolean'
-          ? 'boolean'
-          : 'unknown'
-
-  const rawQueryParams = getOperationParameters(node, { paramsCasing: 'original' }).query
-  const queryParamsTypeName =
-    rawQueryParams.length > 0
-      ? (() => {
-          const groupName = tsResolver.param.query(node, rawQueryParams[0]!)
-          const individualName = tsResolver.param.name(node, rawQueryParams[0]!)
-          return groupName !== individualName ? groupName : null
-        })()
-      : null
-
-  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
-  const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
-
-  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { resolver: tsResolver })
-  const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
-
-  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
-  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const queryFnBody = `const { data } = await ${buildVueClientCall(node, { clientName, signal: true })}
-    return data`
-
-  const hasNewParams = nextParam != null || previousParam != null
-
-  const [getNextPageParamExpr, getPreviousPageParamExpr] = (() => {
-    if (hasNewParams) {
-      const nextAccessor = nextParam ? getNestedAccessor(nextParam, 'lastPage') : null
-      const prevAccessor = previousParam ? getNestedAccessor(previousParam, 'firstPage') : null
-      return [
-        nextAccessor ? `getNextPageParam: (lastPage) => ${nextAccessor}` : null,
-        prevAccessor ? `getPreviousPageParam: (firstPage) => ${prevAccessor}` : null,
-      ] as const
-    }
-    if (cursorParam) {
-      return [`getNextPageParam: (lastPage) => lastPage['${cursorParam}']`, `getPreviousPageParam: (firstPage) => firstPage['${cursorParam}']`] as const
-    }
-    return [
-      'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1',
-      'getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= 1 ? undefined : firstPageParam - 1',
-    ] as const
-  })()
-
-  const queryOptionsArr = [
-    `initialPageParam: ${typeof initialPageParam === 'string' ? JSON.stringify(initialPageParam) : initialPageParam}`,
-    getNextPageParamExpr,
-    getPreviousPageParamExpr,
-  ].filter(Boolean)
-
-  const infiniteOverrideParams =
-    queryParam && queryParamsTypeName
-      ? `query = {
-      ...(query ?? {}),
-      ['${queryParam}']: pageParam as unknown as ${queryParamsTypeName}['${queryParam}'],
-    } as ${queryParamsTypeName}`
-      : ''
-
-  if (infiniteOverrideParams) {
-    return (
-      <File.Source name={name} isExportable isIndexable>
-        <Function name={name} export params={paramsSignature}>
-          {`
-const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
-  queryKey,
-  queryFn: async ({ signal, pageParam }) => {
-    ${infiniteOverrideParams}
-    ${queryFnBody}
-  },
-  ${queryOptionsArr.join(',\n  ')}
-})
-`}
-        </Function>
-      </File.Source>
-    )
-  }
-
-  return (
-    <File.Source name={name} isExportable isIndexable>
-      <Function name={name} export params={paramsSignature}>
-        {`
-const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
-  queryKey,
-  queryFn: async ({ signal }) => {
-    ${queryFnBody}
-  },
-  ${queryOptionsArr.join(',\n  ')}
-})
-`}
-      </Function>
-    </File.Source>
-  )
+/**
+ * The vue-query flavor of the shared `infiniteQueryOptions` component: request groups accept
+ * `MaybeRefOrGetter` values, are unwrapped with `toValue(...)` in the client call, and the emitted
+ * `TQueryKey` generic is the imported `QueryKey` type instead of `typeof queryKey`.
+ */
+export function InfiniteQueryOptions(props: Props): KubbReactNode {
+  return <BaseInfiniteQueryOptions {...props} queryKeyType="QueryKey" memberTypeWrapper={maybeRefOrGetter} unwrapName={unwrapWithToValue} />
 }

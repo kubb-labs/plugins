@@ -26,12 +26,19 @@ const pluginAxiosName = 'plugin-axios'
 export type ClientSelector = 'fetch' | 'axios'
 
 /**
+ * The resolved client strategy stored in a consumer plugin's options: the generated code always
+ * imports and calls a registered contract client plugin's `<op>`. The client runtime lives in
+ * plugin-axios / plugin-fetch, so nothing is bundled by the consumer.
+ */
+export type ResolvedContractClient = { kind: 'contract'; pluginName: string }
+
+/**
  * The outcome of {@link resolveClient}.
  *
  * - `contract` names the contract client plugin whose `<op>` functions the consumer imports.
  * - `error` carries a setup diagnostic.
  */
-export type ResolveClientResult = { kind: 'contract'; pluginName: string } | { kind: 'error'; message: string }
+export type ResolveClientResult = ResolvedContractClient | { kind: 'error'; message: string }
 
 const selectorToPlugin: Record<'fetch' | 'axios', string> = {
   fetch: pluginFetchName,
@@ -87,4 +94,19 @@ export function resolveClient(options: { client: ClientSelector | undefined; plu
     kind: 'error',
     message: 'No client plugin is registered. Add `@kubb/plugin-axios` or `@kubb/plugin-fetch` to `plugins` so the generated code has an HTTP client to call.',
   }
+}
+
+/**
+ * Resolves the contract client during a consumer plugin's setup hook. Extracts the plugin names
+ * from the raw `plugins` config, applies {@link resolveClient}, and throws the diagnostic on a
+ * misconfiguration so every consumer fails fast with the same message.
+ */
+export function resolveContractClient(options: { client: ClientSelector | undefined; plugins: ReadonlyArray<unknown> }): ResolvedContractClient {
+  const { client, plugins } = options
+  const pluginNames = plugins.map((plugin) => (plugin as { name?: string }).name).filter((name): name is string => Boolean(name))
+  const resolved = resolveClient({ client, pluginNames })
+  if (resolved.kind === 'error') {
+    throw new Error(resolved.message)
+  }
+  return resolved
 }

@@ -1,10 +1,8 @@
-import { getRequestGroups } from '@internals/shared'
+import { buildClientCall } from '@internals/tanstack-query'
 import type { ast } from 'kubb/kit'
 
 export { maybeRefOrGetter } from '@internals/tanstack-query'
-export { buildClientOptionType, buildOperationComments as getComments, buildRequestConfigType, resolveErrorNames, resolveSuccessNames } from '@internals/shared'
-
-const requestGroupOrder = ['path', 'query', 'body', 'headers'] as const
+export { buildClientOptionType, buildOperationComments as getComments, buildRequestConfigType } from '@internals/shared'
 
 /**
  * Builds the call to a contract client `<op>` function inside a vue-query composable body. The
@@ -14,16 +12,5 @@ const requestGroupOrder = ['path', 'query', 'body', 'headers'] as const
  * Mutations omit the `signal`.
  */
 export function buildVueClientCall(node: ast.OperationNode, options: { clientName: string; signal?: boolean }): string {
-  const { clientName, signal = false } = options
-  const groups = getRequestGroups(node)
-  const names = requestGroupOrder.filter((key) => groups[key])
-
-  const args = [
-    '...config',
-    ...names.map((name) => `${name}: toValue(${name})`),
-    signal ? 'signal: config.signal ?? signal' : null,
-    'throwOnError: true',
-  ].filter((part): part is string => part !== null)
-
-  return `${clientName}({ ${args.join(', ')} })`
+  return buildClientCall(node, { ...options, unwrapName: (name) => `toValue(${name})` })
 }
