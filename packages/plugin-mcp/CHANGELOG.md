@@ -1,5 +1,15 @@
 # @kubb/plugin-mcp
 
+## 5.0.0-beta.95
+
+### Patch Changes
+
+- [#678](https://github.com/kubb-labs/plugins/pull/678) [`dfcb48f`](https://github.com/kubb-labs/plugins/commit/dfcb48f9c17a0ad4693100d092403396e3ac79da) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Consolidate the shared TanStack Query internals into `@internals/tanstack-query`. The `infiniteQueryOptions` assembly, the react-query suspense variants, and the repeated `plugin.ts` option-resolution blocks now live in one place instead of being copied across react-query, vue-query, and swr. Generated output is unchanged.
+
+- Updated dependencies [[`d069022`](https://github.com/kubb-labs/plugins/commit/d069022633b46fcacc8a7899780bd68e35b5f743), [`b37ad9b`](https://github.com/kubb-labs/plugins/commit/b37ad9b3c663f21b72ffdce947c984ce705ebf4d), [`d8654b0`](https://github.com/kubb-labs/plugins/commit/d8654b0e1b221b5db7a0137ed0b3da3eb80cb155)]:
+  - @kubb/plugin-ts@5.0.0-beta.95
+  - @kubb/plugin-zod@5.0.0-beta.95
+
 ## 5.0.0-beta.94
 
 ### Patch Changes

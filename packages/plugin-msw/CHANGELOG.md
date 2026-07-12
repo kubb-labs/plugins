@@ -1,5 +1,15 @@
 # @kubb/plugin-msw
 
+## 5.0.0-beta.95
+
+### Patch Changes
+
+- [#668](https://github.com/kubb-labs/plugins/pull/668) [`d8654b0`](https://github.com/kubb-labs/plugins/commit/d8654b0e1b221b5db7a0137ed0b3da3eb80cb155) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Export the default resolver (`resolverReactQuery`, `resolverVueQuery`, `resolverSwr`, `resolverMsw`) and its type from the package index, matching plugin-ts, plugin-zod, plugin-faker, plugin-mcp, and plugin-cypress. Import it to reference the exact names a plugin generates or to build a custom resolver on top of the defaults.
+
+- Updated dependencies [[`d069022`](https://github.com/kubb-labs/plugins/commit/d069022633b46fcacc8a7899780bd68e35b5f743), [`b37ad9b`](https://github.com/kubb-labs/plugins/commit/b37ad9b3c663f21b72ffdce947c984ce705ebf4d), [`d8654b0`](https://github.com/kubb-labs/plugins/commit/d8654b0e1b221b5db7a0137ed0b3da3eb80cb155)]:
+  - @kubb/plugin-ts@5.0.0-beta.95
+  - @kubb/plugin-faker@5.0.0-beta.95
+
 ## 5.0.0-beta.87
 
 ### Patch Changes
