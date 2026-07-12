@@ -3,7 +3,7 @@ import type { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { Infinite } from '../types.ts'
-import { maybeRefOrGetter, unwrapWithToValue } from '../utils.ts'
+import { maybeRefOrGetter } from '../utils.ts'
 
 type Props = {
   name: string
@@ -24,5 +24,5 @@ type Props = {
  * `TQueryKey` generic is the imported `QueryKey` type instead of `typeof queryKey`.
  */
 export function InfiniteQueryOptions(props: Props): KubbReactNode {
-  return <BaseInfiniteQueryOptions {...props} queryKeyType="QueryKey" memberTypeWrapper={maybeRefOrGetter} unwrapName={unwrapWithToValue} />
+  return <BaseInfiniteQueryOptions {...props} queryKeyType="QueryKey" memberTypeWrapper={maybeRefOrGetter} unwrapName={(name) => `toValue(${name})`} />
 }
