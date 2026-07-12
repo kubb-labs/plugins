@@ -1,6 +1,6 @@
 import { createGroupConfig } from '@internals/shared'
 
-import { resolveClient } from '@internals/client'
+import { resolveContractClient } from '@internals/client'
 import { definePlugin, Resolver } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -64,23 +64,13 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? Resolver.merge<ResolverMcp>(resolverMcp, userResolver) : resolverMcp
 
-        const pluginNames = (ctx.config.plugins ?? []).map((p) => (p as { name?: string }).name).filter((name): name is string => Boolean(name))
-        const resolvedClient = resolveClient({ client, pluginNames })
-        if (resolvedClient.kind === 'error') {
-          throw new Error(resolvedClient.message)
-        }
-
-        // The handlers always call a registered client plugin's op. The client runtime lives in
-        // plugin-axios / plugin-fetch, so nothing is bundled here.
-        const resolvedClientDescriptor: PluginMcp['resolvedOptions']['client'] = { kind: 'contract', pluginName: resolvedClient.pluginName }
-
         ctx.setOptions({
           output,
           exclude,
           include,
           override,
           group: groupConfig,
-          client: resolvedClientDescriptor,
+          client: resolveContractClient({ client, plugins: ctx.config.plugins }),
           resolver,
         })
         ctx.setResolver(resolver)

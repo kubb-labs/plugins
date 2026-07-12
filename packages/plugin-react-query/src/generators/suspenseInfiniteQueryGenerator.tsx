@@ -3,7 +3,7 @@ import { resolveClientOperation } from '@internals/client'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
-import { QueryKey, SuspenseInfiniteQuery, SuspenseInfiniteQueryOptions } from '../components'
+import { InfiniteQuery, InfiniteQueryOptions, QueryKey } from '../components'
 import { classifyOperation } from '../utils.ts'
 import type { PluginReactQuery } from '../types'
 
@@ -93,7 +93,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
         <File.Import name={['InfiniteData']} isTypeOnly path={importPath} />
         <File.Import name={['infiniteQueryOptions']} path={importPath} />
 
-        <SuspenseInfiniteQueryOptions
+        <InfiniteQueryOptions
           name={queryOptionsName}
           clientName={calledClientName}
           queryKeyName={queryKeyName}
@@ -111,7 +111,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
             <File.Import name={['useSuspenseInfiniteQuery']} path={importPath} />
             <File.Import name={['QueryKey', 'QueryClient', 'UseSuspenseInfiniteQueryOptions', 'UseSuspenseInfiniteQueryResult']} path={importPath} isTypeOnly />
 
-            <SuspenseInfiniteQuery
+            <InfiniteQuery
               name={queryName}
               queryOptionsName={queryOptionsName}
               queryKeyName={queryKeyName}
@@ -121,6 +121,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
               initialPageParam={infiniteOptions.initialPageParam}
               queryParam={infiniteOptions.queryParam}
               customOptions={customOptions}
+              suspense
             />
           </>
         )}

@@ -1,13 +1,11 @@
-import { buildClientCall } from '@internals/tanstack-query'
 import { getNestedAccessor } from '@internals/utils'
 import type { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { functionPrinter } from '@kubb/plugin-ts'
+import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { Infinite } from '../types.ts'
-import { buildQueryKeyParams, buildResponseTypes, resolvePageParamType } from '../utils.ts'
-import { getQueryOptionsParams } from './QueryOptions.tsx'
+import { buildClientCall, buildGroupedRequestParam, buildQueryOptionsParams, buildResponseTypes, resolvePageParamType } from '../utils.ts'
 
 type Props = {
   name: string
@@ -20,6 +18,21 @@ type Props = {
   nextParam: Infinite['nextParam']
   previousParam: Infinite['previousParam']
   queryParam: Infinite['queryParam']
+  /**
+   * The `TQueryKey` generic written into the emitted `infiniteQueryOptions` call. react-query
+   * points it at the local `queryKey` const, vue-query uses the imported `QueryKey` type.
+   *
+   * @default 'typeof queryKey'
+   */
+  queryKeyType?: string
+  /**
+   * Wraps each grouped request member type, used by vue-query to accept `MaybeRefOrGetter` values.
+   */
+  memberTypeWrapper?: (type: string) => string
+  /**
+   * Unwraps a request group inside the client call, used by vue-query to emit `toValue(...)`.
+   */
+  unwrapName?: (name: string) => string
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -36,17 +49,21 @@ export function InfiniteQueryOptions({
   tsResolver,
   queryParam,
   queryKeyName,
+  queryKeyType = 'typeof queryKey',
+  memberTypeWrapper,
+  unwrapName,
 }: Props): KubbReactNode {
   const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver)
 
   const { queryParamsTypeName, pageParamType } = resolvePageParamType(node, { resolver: tsResolver, initialPageParam, queryParam })
 
-  const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
+  const groupedKeyParam = buildGroupedRequestParam(node, { resolver: tsResolver, keys: ['path', 'query', 'body'], memberTypeWrapper })
+  const queryKeyParamsNode = createFunctionParameters({ params: groupedKeyParam ? [groupedKeyParam] : [] })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
+  const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver, memberTypeWrapper })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const queryFnBody = `const { data } = await ${buildClientCall(node, { clientName, signal: true })}
+  const queryFnBody = `const { data } = await ${buildClientCall(node, { clientName, signal: true, unwrapName })}
     return data`
 
   const hasNewParams = nextParam != null || previousParam != null
@@ -83,35 +100,18 @@ export function InfiniteQueryOptions({
     } as ${queryParamsTypeName}`
       : ''
 
-  if (infiniteOverrideParams) {
-    return (
-      <File.Source name={name} isExportable isIndexable>
-        <Function name={name} export params={paramsSignature}>
-          {`
-const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
-  queryKey,
-  queryFn: async ({ signal, pageParam }) => {
-    ${infiniteOverrideParams}
-    ${queryFnBody}
-  },
-  ${queryOptionsArr.join(',\n  ')}
-})
-`}
-        </Function>
-      </File.Source>
-    )
-  }
+  const queryFnArgs = infiniteOverrideParams ? '{ signal, pageParam }' : '{ signal }'
+  const queryFnStatements = infiniteOverrideParams ? `${infiniteOverrideParams}\n    ${queryFnBody}` : queryFnBody
 
   return (
     <File.Source name={name} isExportable isIndexable>
       <Function name={name} export params={paramsSignature}>
         {`
 const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, ${queryKeyType}, ${pageParamType}>({
   queryKey,
-  queryFn: async ({ signal }) => {
-    ${queryFnBody}
+  queryFn: async (${queryFnArgs}) => {
+    ${queryFnStatements}
   },
   ${queryOptionsArr.join(',\n  ')}
 })

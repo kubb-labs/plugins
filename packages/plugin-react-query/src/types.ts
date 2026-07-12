@@ -1,8 +1,8 @@
-import type { ClientSelector } from '@internals/client'
-import type { Transformer } from '@internals/tanstack-query'
+import type { ClientSelector, ResolvedContractClient } from '@internals/client'
+import type { Infinite, Mutation, Query, Transformer } from '@internals/tanstack-query'
 import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
-export type { Transformer } from '@internals/tanstack-query'
+export type { Infinite, Transformer } from '@internals/tanstack-query'
 
 /**
  * The concrete resolver type for `@kubb/plugin-react-query`.
@@ -196,73 +196,6 @@ type QueryKey = Transformer
  */
 type MutationKey = Transformer
 
-type Query = {
-  /**
-   * HTTP methods treated as queries. Operations using these methods produce
-   * `useQuery`-style hooks.
-   *
-   * @default ['GET']
-   */
-  methods?: Array<string>
-  /**
-   * Module specifier used in the `import { useQuery } from '...'` statement at
-   * the top of every generated hook file. Useful for routing through a wrapper
-   * that injects a default `queryClient`.
-   *
-   * @default '@tanstack/react-query'
-   */
-  importPath?: string
-}
-
-type Mutation = {
-  /**
-   * HTTP methods treated as mutations. Operations using these methods produce
-   * `useMutation`-style hooks.
-   *
-   * @default ['POST', 'PUT', 'PATCH', 'DELETE']
-   */
-  methods?: Array<string>
-  /**
-   * Module specifier used in the `import { useMutation } from '...'` statement
-   * at the top of every generated hook file.
-   *
-   * @default '@tanstack/react-query'
-   */
-  importPath?: string
-}
-
-export type Infinite = {
-  /**
-   * Name of the query parameter that holds the page cursor.
-   *
-   * @default 'id'
-   */
-  queryParam?: string
-  /**
-   * Path to the cursor field on the response. Leave undefined when the cursor
-   * is not known.
-   *
-   * @deprecated Use `nextParam` and `previousParam` for richer pagination control.
-   */
-  cursorParam?: string | null
-  /**
-   * Path to the next-page cursor on the response. Supports dot notation
-   * (`'pagination.next.id'`) or array form (`['pagination', 'next', 'id']`).
-   */
-  nextParam?: string | Array<string> | null
-  /**
-   * Path to the previous-page cursor on the response. Supports dot notation
-   * or array form.
-   */
-  previousParam?: string | Array<string> | null
-  /**
-   * Initial value for `pageParam` on the first fetch.
-   *
-   * @default 0
-   */
-  initialPageParam?: unknown
-}
-
 type CustomOptions = {
   /**
    * Module specifier of your custom-options hook. Imported as a named import,
@@ -369,7 +302,7 @@ export type Options = OutputOptions & {
  * The resolved client strategy for the generated hooks, computed once during setup. The hooks always
  * import and call a registered contract client plugin's `<op>`.
  */
-export type ResolvedClient = { kind: 'contract'; pluginName: string }
+export type ResolvedClient = ResolvedContractClient
 
 export type ResolvedOptions = {
   output: Output

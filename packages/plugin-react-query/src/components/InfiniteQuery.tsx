@@ -17,6 +17,11 @@ type Props = {
   initialPageParam: Infinite['initialPageParam']
   queryParam?: Infinite['queryParam']
   customOptions: PluginReactQuery['resolvedOptions']['customOptions']
+  /**
+   * Emits the `useSuspenseInfiniteQuery` variant of the hook instead of `useInfiniteQuery`.
+   * Only the hook, observer options, and result type names change.
+   */
+  suspense?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -26,14 +31,15 @@ function buildInfiniteQueryParamsNode(
   options: {
     resolver: ResolverTs
     pageParamGeneric: string
+    observerOptionsName: string
   },
 ): FunctionParametersNode {
-  const { resolver, pageParamGeneric } = options
+  const { resolver, pageParamGeneric, observerOptionsName } = options
 
   const optionsParam = createFunctionParameter({
     name: 'options',
     type: `{
-  query?: Partial<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, ${pageParamGeneric}>> & { client?: QueryClient },
+  query?: Partial<${observerOptionsName}<TQueryFnData, TError, TData, TQueryKey, ${pageParamGeneric}>> & { client?: QueryClient },
   client?: ${buildClientOptionType()}
 }`,
     default: '{}',
@@ -54,12 +60,16 @@ export function InfiniteQuery({
   initialPageParam,
   queryParam,
   customOptions,
+  suspense,
 }: Props): KubbReactNode {
   const { TData: responseType, TError: errorType } = buildResponseTypes(node, tsResolver)
 
   const { pageParamType } = resolvePageParamType(node, { resolver: tsResolver, initialPageParam, queryParam })
 
-  const returnType = 'UseInfiniteQueryResult<TData, TError> & { queryKey: TQueryKey }'
+  const hookName = suspense ? 'useSuspenseInfiniteQuery' : 'useInfiniteQuery'
+  const observerOptionsName = suspense ? 'UseSuspenseInfiniteQueryOptions' : 'InfiniteQueryObserverOptions'
+  const resultTypeName = suspense ? 'UseSuspenseInfiniteQueryResult' : 'UseInfiniteQueryResult'
+  const returnType = `${resultTypeName}<TData, TError> & { queryKey: TQueryKey }`
   const generics = [
     `TQueryFnData = ${responseType}`,
     `TError = ${errorType}`,
@@ -75,6 +85,7 @@ export function InfiniteQuery({
   const paramsNode = buildInfiniteQueryParamsNode(node, {
     resolver: tsResolver,
     pageParamGeneric: 'TPageParam',
+    observerOptionsName,
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
@@ -86,11 +97,11 @@ export function InfiniteQuery({
        const { client: queryClient, ...resolvedOptions } = queryConfig${resolvedParams ? `\n       const resolvedParams = ${resolvedParams}` : ''}
        const queryKey = resolvedOptions?.queryKey ?? ${queryKeyName}(${queryKeyArgs})${customOptions ? `\n       const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${node.operationId}' })` : ''}
 
-       const queryResult = useInfiniteQuery({
+       const queryResult = ${hookName}({
         ...${queryOptionsName}(${queryOptionsArgs}),${customOptions ? '\n        ...customOptions,' : ''}
         ...resolvedOptions,
         queryKey,
-       } as unknown as InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient) as ${returnType}
+       } as unknown as ${observerOptionsName}<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient) as ${returnType}
 
        queryResult.queryKey = queryKey as TQueryKey
 

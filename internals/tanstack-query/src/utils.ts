@@ -1,7 +1,8 @@
-import { getOperationParameters, getRequestGroupOptionality } from '@internals/shared'
+import { getOperationParameters, getRequestGroupOptionality, resolveErrorNames, resolveSuccessNames } from '@internals/shared'
 import type { ast } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
+import type { Infinite, Mutation, Query } from './types.ts'
 
 /**
  * The grouped request options, ordered for both the destructured signature and the
@@ -125,20 +126,120 @@ export function buildQueryOptionsParams(
  * shorthand alongside the spread `config`, with `throwOnError: true` pinned last so a caller's config
  * can't flip the query's error semantics. Queries thread the TanStack `signal`; mutations omit it.
  *
+ * When `unwrapName` is set, each request group is passed as an explicit member unwrapped through it,
+ * used by vue-query to resolve refs and getters with `toValue(...)` at call time.
+ *
  * @example
  * ```ts
  * buildClientCall(node, { clientName: 'getPetById', signal: true })
  * // getPetById({ path, ...config, signal: config.signal ?? signal, throwOnError: true })
  * ```
  */
-export function buildClientCall(node: ast.OperationNode, options: { clientName: string; signal?: boolean }): string {
-  const { clientName, signal = false } = options
+export function buildClientCall(node: ast.OperationNode, options: { clientName: string; signal?: boolean; unwrapName?: (name: string) => string }): string {
+  const { clientName, signal = false, unwrapName } = options
   const { groups } = getRequestGroupOptionality(node)
   const names = requestGroupOrder.filter((key) => groups[key])
 
-  const args = ['...config', ...names, signal ? 'signal: config.signal ?? signal' : null, 'throwOnError: true'].filter((part): part is string => part !== null)
+  const args = [
+    '...config',
+    ...names.map((name) => (unwrapName ? `${name}: ${unwrapName(name)}` : name)),
+    signal ? 'signal: config.signal ?? signal' : null,
+    'throwOnError: true',
+  ].filter((part): part is string => part !== null)
 
   return `${clientName}({ ${args.join(', ')} })`
+}
+
+type ResponseTypes = {
+  TData: string
+  TError: string
+}
+
+type PageParamType = {
+  queryParamsTypeName: string | null
+  pageParamType: string
+}
+
+type ResolvePageParamTypeParams = {
+  resolver: ResolverTs
+  initialPageParam: Infinite['initialPageParam']
+  queryParam?: Infinite['queryParam']
+}
+
+/**
+ * Builds the `TData` / `TError` type expressions shared by every generated hook, joining the resolved
+ * success responses into `TData` and wrapping the error responses in `ResponseErrorConfig<...>`.
+ */
+export function buildResponseTypes(node: ast.OperationNode, resolver: ResolverTs): ResponseTypes {
+  const successNames = resolveSuccessNames(node, resolver)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
+  const errorNames = resolveErrorNames(node, resolver)
+
+  return {
+    TData: responseName,
+    TError: `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`,
+  }
+}
+
+function resolveFallbackPageParamType(initialPageParam: Infinite['initialPageParam']): string {
+  if (typeof initialPageParam === 'number') return 'number'
+  if (typeof initialPageParam === 'boolean') return 'boolean'
+  if (typeof initialPageParam !== 'string') return 'unknown'
+  if (!initialPageParam.includes(' as ')) return 'string'
+
+  return initialPageParam.split(' as ').at(-1) ?? 'unknown'
+}
+
+/**
+ * Resolves the `TPageParam` generic for the infinite-query hooks. Prefers the type read from the
+ * configured `queryParam` on the operation's query object, and falls back to the type inferred from
+ * `initialPageParam` when that parameter type is unavailable. Also returns the query params type name
+ * so callers can reuse it when rewriting the paginated request.
+ */
+export function resolvePageParamType(node: ast.OperationNode, { resolver, initialPageParam, queryParam }: ResolvePageParamTypeParams): PageParamType {
+  const firstQueryParam = getOperationParameters(node, { paramsCasing: 'original' }).query[0]
+  const groupName = firstQueryParam ? resolver.param.query(node, firstQueryParam) : null
+  const individualName = firstQueryParam ? resolver.param.name(node, firstQueryParam) : null
+  const queryParamsTypeName = groupName !== individualName ? groupName : null
+
+  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
+
+  if (!queryParamType) {
+    return { queryParamsTypeName, pageParamType: resolveFallbackPageParamType(initialPageParam) }
+  }
+
+  const isInitialPageParamDefined = initialPageParam !== undefined && initialPageParam !== null
+
+  return { queryParamsTypeName, pageParamType: isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType }
+}
+
+/**
+ * Applies the shared query defaults during plugin setup: `false` disables query generation, and an
+ * object merges over `methods: ['GET']` and the plugin's runtime `importPath`.
+ */
+export function resolveQueryConfig(query: Partial<Query> | false, options: { importPath: string }): Required<Query> | false {
+  if (query === false) return false
+  return { importPath: options.importPath, methods: ['GET'], ...query }
+}
+
+/**
+ * Applies the shared mutation defaults during plugin setup: `false` disables mutation generation,
+ * and an object merges over `methods: ['POST', 'PUT', 'PATCH', 'DELETE']` and the plugin's runtime
+ * `importPath`.
+ */
+export function resolveMutationConfig(mutation: Partial<Mutation> | false, options: { importPath: string }): Required<Mutation> | false {
+  if (mutation === false) return false
+  return { importPath: options.importPath, methods: ['POST', 'PUT', 'PATCH', 'DELETE'], ...mutation }
+}
+
+/**
+ * Applies the shared infinite-query defaults during plugin setup: a falsy value disables infinite
+ * queries, and an object merges over `queryParam: 'id'` and `initialPageParam: 0` with the cursor
+ * paths cleared.
+ */
+export function resolveInfiniteConfig(infinite: Partial<Infinite> | false): Required<Infinite> | false {
+  if (!infinite) return false
+  return { queryParam: 'id', initialPageParam: 0, cursorParam: null, nextParam: null, previousParam: null, ...infinite }
 }
 
 export function transformName(name: string, type: string, transformers?: { name?: (name: string, type?: string) => string }): string {

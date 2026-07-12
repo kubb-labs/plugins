@@ -1,9 +1,8 @@
-import { getOperationParameters, getRequestGroups, resolveErrorNames, resolveSuccessNames } from '@internals/shared'
-import type { ResolverTs } from '@kubb/plugin-ts'
+import { getRequestGroups } from '@internals/shared'
 import type { ast } from 'kubb/kit'
-import type { Infinite, ResolvedOptions } from './types.ts'
+import type { ResolvedOptions } from './types.ts'
 
-export { buildQueryKeyParams, maybeValueOrGetter, resolveOperationOverrides } from '@internals/tanstack-query'
+export { buildQueryKeyParams, buildResponseTypes, maybeValueOrGetter, resolveOperationOverrides, resolvePageParamType } from '@internals/tanstack-query'
 export { buildClientOptionType, buildOperationComments as getComments, buildRequestConfigType } from '@internals/shared'
 
 type OperationClassification = {
@@ -14,22 +13,6 @@ type OperationClassification = {
 type ClassifyOperationParams = {
   query: ResolvedOptions['query']
   mutation: ResolvedOptions['mutation']
-}
-
-type ResponseTypes = {
-  TData: string
-  TError: string
-}
-
-type PageParamType = {
-  queryParamsTypeName: string | null
-  pageParamType: string
-}
-
-type ResolvePageParamTypeParams = {
-  resolver: ResolverTs
-  initialPageParam: Infinite['initialPageParam']
-  queryParam?: Infinite['queryParam']
 }
 
 const requestGroupOrder = ['path', 'query', 'body', 'headers'] as const
@@ -65,51 +48,4 @@ export function classifyOperation(node: ast.HttpOperationNode, { query, mutation
     (mutation ? mutation.methods : []).some((method) => !queryMethods.has(method) && node.method.toLowerCase() === method.toLowerCase())
 
   return { isQuery, isMutation }
-}
-
-/**
- * Builds the `TData` / `TError` type expressions shared by every generated hook, joining the resolved
- * success responses into `TData` and wrapping the error responses in `ResponseErrorConfig<...>`.
- */
-export function buildResponseTypes(node: ast.OperationNode, resolver: ResolverTs): ResponseTypes {
-  const successNames = resolveSuccessNames(node, resolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
-  const errorNames = resolveErrorNames(node, resolver)
-
-  return {
-    TData: responseName,
-    TError: `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`,
-  }
-}
-
-function resolveFallbackPageParamType(initialPageParam: Infinite['initialPageParam']): string {
-  if (typeof initialPageParam === 'number') return 'number'
-  if (typeof initialPageParam === 'boolean') return 'boolean'
-  if (typeof initialPageParam !== 'string') return 'unknown'
-  if (!initialPageParam.includes(' as ')) return 'string'
-
-  return initialPageParam.split(' as ').at(-1) ?? 'unknown'
-}
-
-/**
- * Resolves the `TPageParam` generic for the infinite-query hooks. Prefers the type read from the
- * configured `queryParam` on the operation's query object, and falls back to the type inferred from
- * `initialPageParam` when that parameter type is unavailable. Also returns the query params type name
- * so callers can reuse it when rewriting the paginated request.
- */
-export function resolvePageParamType(node: ast.OperationNode, { resolver, initialPageParam, queryParam }: ResolvePageParamTypeParams): PageParamType {
-  const firstQueryParam = getOperationParameters(node, { paramsCasing: 'original' }).query[0]
-  const groupName = firstQueryParam ? resolver.param.query(node, firstQueryParam) : null
-  const individualName = firstQueryParam ? resolver.param.name(node, firstQueryParam) : null
-  const queryParamsTypeName = groupName !== individualName ? groupName : null
-
-  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
-
-  if (!queryParamType) {
-    return { queryParamsTypeName, pageParamType: resolveFallbackPageParamType(initialPageParam) }
-  }
-
-  const isInitialPageParamDefined = initialPageParam !== undefined && initialPageParam !== null
-
-  return { queryParamsTypeName, pageParamType: isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType }
 }

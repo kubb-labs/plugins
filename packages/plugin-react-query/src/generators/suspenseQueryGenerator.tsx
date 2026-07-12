@@ -3,7 +3,7 @@ import { resolveClientOperation } from '@internals/client'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
-import { QueryKey, QueryOptions, SuspenseQuery } from '../components'
+import { Query, QueryKey, QueryOptions } from '../components'
 import { classifyOperation } from '../utils.ts'
 import type { PluginReactQuery } from '../types'
 
@@ -88,7 +88,7 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
           <>
             <File.Import name={['useSuspenseQuery']} path={importPath} />
             <File.Import name={['QueryKey', 'QueryClient', 'UseSuspenseQueryOptions', 'UseSuspenseQueryResult']} path={importPath} isTypeOnly />
-            <SuspenseQuery
+            <Query
               name={queryName}
               queryOptionsName={queryOptionsName}
               queryKeyName={queryKeyName}
@@ -96,6 +96,7 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
               node={node}
               tsResolver={tsResolver}
               customOptions={customOptions}
+              suspense
             />
           </>
         )}
