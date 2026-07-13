@@ -33,7 +33,8 @@ function formatExample(value: unknown): string {
     return String(value)
   }
 
-  return JSON.stringify(value)?.replaceAll('*/', '*\\/') ?? String(value)
+  const rendered = JSON.stringify(value) ?? String(value)
+  return rendered.replaceAll('*/', '*\\/')
 }
 
 export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: boolean): Array<string | undefined> {
