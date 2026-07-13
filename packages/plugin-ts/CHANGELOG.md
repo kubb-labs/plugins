@@ -1,5 +1,11 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.96
+
+### Patch Changes
+
+- [#682](https://github.com/kubb-labs/plugins/pull/682) [`2488522`](https://github.com/kubb-labs/plugins/commit/24885221badaa73f8c7eb8bd6a9828d579c316b6) Thanks [@SferaDev](https://github.com/SferaDev)! - Serialize structured JSDoc examples as JSON instead of `[object Object]`.
+
 ## 5.0.0-beta.95
 
 ### Minor Changes
