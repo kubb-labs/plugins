@@ -238,4 +238,34 @@ describe('buildPropertyJSDocComments', () => {
     expect(comments).toContain('@example a')
     expect(comments).toContain('@example b')
   })
+
+  it('serializes object examples as JSON', () => {
+    const schema = ast.factory.createSchema({ type: 'object', examples: [{ cidr: '10.0.0.0/8', label: 'VPC' }] })
+    const comments = buildPropertyJSDocComments(schema)
+
+    expect(comments).toContain('@example {"cidr":"10.0.0.0/8","label":"VPC"}')
+  })
+
+  it('serializes array examples as JSON', () => {
+    const schema = ast.factory.createSchema({
+      type: 'array',
+      primitive: 'array',
+      examples: [
+        [
+          { cidr: '10.0.0.0/8', label: 'VPC' },
+          { cidr: '203.0.113.5/32', label: 'Office' },
+        ],
+      ],
+    })
+    const comments = buildPropertyJSDocComments(schema)
+
+    expect(comments).toContain('@example [{"cidr":"10.0.0.0/8","label":"VPC"},{"cidr":"203.0.113.5/32","label":"Office"}]')
+  })
+
+  it('escapes comment terminators in structured examples', () => {
+    const schema = ast.factory.createSchema({ type: 'object', examples: [{ label: '*/' }] })
+    const comments = buildPropertyJSDocComments(schema)
+
+    expect(comments).toContain('@example {"label":"*\\/"}')
+  })
 })

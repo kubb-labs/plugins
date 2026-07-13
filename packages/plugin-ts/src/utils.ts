@@ -28,6 +28,14 @@ function isSchemaOptional(schema: ast.SchemaNode): boolean {
   return Boolean(('optional' in schema && schema.optional) || ('nullish' in schema && schema.nullish))
 }
 
+function formatExample(value: unknown): string {
+  if (value === null || typeof value !== 'object') {
+    return String(value)
+  }
+
+  return JSON.stringify(value)?.replaceAll('*/', '*\\/') ?? String(value)
+}
+
 export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: boolean): Array<string | undefined> {
   const meta = ast.syncSchemaRef(schema)
 
@@ -57,7 +65,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
     meta && 'default' in meta && meta.default !== undefined
       ? `@default ${'primitive' in meta && meta.primitive === 'string' && typeof meta.default === 'string' ? stringify(meta.default) : meta.default}`
       : null,
-    ...exampleValues.map((example) => `@example ${example}`),
+    ...exampleValues.map((example) => `@example ${formatExample(example)}`),
     meta && 'primitive' in meta && meta.primitive
       ? [`@type ${meta.primitive}`, (optional ?? isSchemaOptional(schema)) ? ' | undefined' : null].filter(Boolean).join('')
       : null,
