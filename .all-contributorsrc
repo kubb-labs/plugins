@@ -1,6 +1,6 @@
 {
   "files": [
-    "packages/core/README.md"
+    "README.md"
   ],
   "imageSize": 100,
   "commit": false,
@@ -488,7 +488,7 @@
   "skipCi": true,
   "repoType": "github",
   "repoHost": "https://github.com",
-  "projectName": "kubb",
+  "projectName": "plugins",
   "projectOwner": "kubb-labs",
   "commitType": "docs"
 }
