@@ -73,7 +73,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         if (isInfiniteOp) {
           // Validate queryParam
           const normalizeKey = (key: string) => key.replace(/\?$/, '')
-          const queryParamKeys = getOperationParameters(node, { paramsCasing: 'original' }).query.map((p) => p.name)
+          const queryParamKeys = getOperationParameters(node).query.map((p) => p.name)
           const hasQueryParam = nodeInfiniteOptions!.queryParam ? queryParamKeys.some((k) => normalizeKey(k) === nodeInfiniteOptions!.queryParam) : false
 
           if (hasQueryParam) {

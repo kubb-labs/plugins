@@ -51,4 +51,3 @@ export {
 } from './resolver.ts'
 export { collectRefNames } from './refs.ts'
 export { createGroupConfig } from './group.ts'
-export { buildParamsMapping, buildParamsRemapExpression, buildTransformedParamsMapping, caseParams } from './params.ts'

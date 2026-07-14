@@ -12,7 +12,7 @@ export function createUpdatePetPath<TData extends Partial<UpdatePetPath> = objec
 
 {
   const defaultFakeData = {
-  petId: faker.string.alpha(),
+  pet_id: faker.string.alpha(),
 }
   return {
     ...defaultFakeData,
@@ -24,8 +24,8 @@ export function createUpdatePetQuery<TData extends Partial<UpdatePetQuery> = obj
 
 {
   const defaultFakeData = {
-  includeDeleted: faker.datatype.boolean(),
-  requestSource: faker.string.alpha(),
+  include_deleted: faker.datatype.boolean(),
+  request_source: faker.string.alpha(),
 }
   return {
     ...defaultFakeData,
@@ -37,7 +37,7 @@ export function createUpdatePetHeaders<TData extends Partial<UpdatePetHeaders> =
 
 {
   const defaultFakeData = {
-  xRequestID: faker.string.alpha(),
+  'X-Request-ID': faker.string.alpha(),
 }
   return {
     ...defaultFakeData,

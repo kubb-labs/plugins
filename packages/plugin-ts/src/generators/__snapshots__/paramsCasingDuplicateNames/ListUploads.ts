@@ -11,7 +11,7 @@ export type ListUploadsQuery = {
   /**
    * @type integer | undefined
    */
-  maxUploads?: number
+  'max-uploads'?: number
   /**
    * @type string | undefined
    */

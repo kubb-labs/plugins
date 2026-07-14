@@ -197,7 +197,7 @@ function resolveFallbackPageParamType(initialPageParam: Infinite['initialPagePar
  * so callers can reuse it when rewriting the paginated request.
  */
 export function resolvePageParamType(node: ast.OperationNode, { resolver, initialPageParam, queryParam }: ResolvePageParamTypeParams): PageParamType {
-  const firstQueryParam = getOperationParameters(node, { paramsCasing: 'original' }).query[0]
+  const firstQueryParam = getOperationParameters(node).query[0]
   const groupName = firstQueryParam ? resolver.param.query(node, firstQueryParam) : null
   const individualName = firstQueryParam ? resolver.param.name(node, firstQueryParam) : null
   const queryParamsTypeName = groupName !== individualName ? groupName : null
@@ -330,7 +330,7 @@ export function resolveQueryParamsParser(parser: ParserOption): 'zod' | null {
  */
 export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodSchemaNameResolverLike | null | undefined, parser: ParserOption): Array<string> {
   if (!zodResolver || !parser) return []
-  const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'original' })
+  const { query: queryParams } = getOperationParameters(node)
   return [
     resolveResponseParser(parser) === 'zod' ? zodResolver.response?.response?.(node) : null,
     resolveRequestParser(parser) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.response?.body?.(node) : null,

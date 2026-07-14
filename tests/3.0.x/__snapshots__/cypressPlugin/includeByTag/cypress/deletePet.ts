@@ -9,7 +9,7 @@ export function deletePet({ path, headers }: DeletePetOptions, options: Partial<
   return cy.request<DeletePetResponse>({
     method: 'DELETE',
     url: `/pet/${path.petId}`,
-    headers: headers ? { "api_key": headers.apiKey } : headers,
+    headers,
     ...options
   }).then((res) => res.body)
 }

@@ -725,7 +725,7 @@ describe('zodGenerator — Operation — group', () => {
 })
 
 describe('zodGenerator — params casing', () => {
-  test('snake_case params are always converted to camelCase', async () => {
+  test('snake_case params keep the exact OpenAPI spec name', async () => {
     const options: PluginZod['resolvedOptions'] = { ...defaultOptions }
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
     const driver = createMockedPluginDriver({ name: 'paramsCasing camelcase' })

@@ -11,7 +11,7 @@ export type GetEnterpriseConfigurationsIdV20250Path = {
   /**
    * @type string
    */
-  enterpriseId: string
+  enterprise_id: string
 }
 
 /**

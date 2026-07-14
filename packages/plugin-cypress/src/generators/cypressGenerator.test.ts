@@ -155,7 +155,7 @@ describe('cypressGenerator — params casing', () => {
     ],
   })
 
-  test('query param name is always camelCased', async () => {
+  test('query param name matches the OpenAPI spec exactly', async () => {
     const options: PluginCypress['resolvedOptions'] = { ...defaultOptions }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
     const driver = createMockedPluginDriver({
@@ -194,7 +194,7 @@ describe('cypressGenerator — params casing headers', () => {
     ],
   })
 
-  test('header and query param names are always camelCased and remapped', async () => {
+  test('header and query param names match the OpenAPI spec exactly, with no remap', async () => {
     const options: PluginCypress['resolvedOptions'] = { ...defaultOptions }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
     const driver = createMockedPluginDriver({

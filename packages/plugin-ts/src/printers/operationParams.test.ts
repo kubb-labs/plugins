@@ -365,25 +365,6 @@ describe('createOperationParams', () => {
     })
   })
 
-  describe('paramsCasing', () => {
-    it('applies camelCase to parameter names', () => {
-      const node = makeOperation({
-        parameters: [makePathParam('pet_id')],
-      })
-
-      const params = createOperationParams(node, {
-        paramsType: 'inline',
-        pathParamsType: 'inline',
-        paramsCasing: 'camelcase',
-        resolver: makeResolver({ resolveParamName: () => 'string' }),
-      })
-
-      const pathParam = params.params[0]
-      expect(pathParam).toBeDefined()
-      expect(pathParam?.name).toBe('petId')
-    })
-  })
-
   describe('no parameters', () => {
     it('returns empty params when operation has no parameters', () => {
       const node = makeOperation()
@@ -748,8 +729,8 @@ describe('createOperationParams', () => {
     })
   })
 
-  describe('paramsCasing with query and header params', () => {
-    it('applies camelCase to query param names', () => {
+  describe('parameter names match the OpenAPI spec', () => {
+    it('keeps query param names exactly as declared, including snake_case', () => {
       const node = makeOperation({
         parameters: [makeQueryParam('order_status'), makeQueryParam('pet_category')],
       })
@@ -757,7 +738,6 @@ describe('createOperationParams', () => {
       const params = createOperationParams(node, {
         paramsType: 'inline',
         pathParamsType: 'inline',
-        paramsCasing: 'camelcase',
         resolver: makeResolver({
           resolveParamName: (_node, param) => `Types["${param.name}"]`,
         }),
@@ -774,14 +754,14 @@ describe('createOperationParams', () => {
               kind: 'TypeLiteral',
               members: [
                 {
-                  name: 'orderStatus',
+                  name: 'order_status',
                   optional: true,
-                  type: 'Types["orderStatus"]',
+                  type: 'Types["order_status"]',
                 },
                 {
-                  name: 'petCategory',
+                  name: 'pet_category',
                   optional: true,
-                  type: 'Types["petCategory"]',
+                  type: 'Types["pet_category"]',
                 },
               ],
             },
@@ -790,7 +770,7 @@ describe('createOperationParams', () => {
       })
     })
 
-    it('applies camelCase to path params with object path params type', () => {
+    it('keeps path param names as-is when already a valid identifier, with an object path params type', () => {
       const node = makeOperation({
         parameters: [makePathParam('pet_id'), makePathParam('store_name')],
       })
@@ -798,7 +778,6 @@ describe('createOperationParams', () => {
       const params = createOperationParams(node, {
         paramsType: 'inline',
         pathParamsType: 'object',
-        paramsCasing: 'camelcase',
         resolver: makeResolver({ resolveParamName: () => 'string' }),
       })
 
@@ -806,8 +785,23 @@ describe('createOperationParams', () => {
       expect(pathGroup).toBeDefined()
       expect(pathGroup?.name).toMatchObject({ kind: 'ObjectBindingPattern' })
       if (pathGroup?.name && typeof pathGroup.name === 'object' && pathGroup.name.kind === 'ObjectBindingPattern') {
-        expect(pathGroup.name.elements.map((e) => e.name)).toStrictEqual(['petId', 'storeName'])
+        expect(pathGroup.name.elements.map((e) => e.name)).toStrictEqual(['pet_id', 'store_name'])
       }
+    })
+
+    it('camelCases a path param name only as an identifier-safety fallback, e.g. a hyphenated segment', () => {
+      const node = makeOperation({
+        parameters: [makePathParam('store-name')],
+      })
+
+      const params = createOperationParams(node, {
+        paramsType: 'inline',
+        pathParamsType: 'inline',
+        resolver: makeResolver({ resolveParamName: () => 'string' }),
+      })
+
+      const pathParam = params.params[0]
+      expect(pathParam?.name).toBe('storeName')
     })
   })
 
@@ -947,7 +941,7 @@ describe('createOperationParams', () => {
       })
     })
 
-    it('inline paramsType with paramsCasing and named query group', () => {
+    it('inline paramsType keeps the spec param name and a named query group', () => {
       const node = makeOperation({
         parameters: [makePathParam('pet_id', { required: true }), makeQueryParam('sort_order')],
       })
@@ -955,7 +949,6 @@ describe('createOperationParams', () => {
       const params = createOperationParams(node, {
         paramsType: 'inline',
         pathParamsType: 'inline',
-        paramsCasing: 'camelcase',
         resolver: makeResolver({
           resolveParamName: (_node, param) => `Types["${param.name}"]`,
           resolveQueryName: () => 'ListPetsQueryParams',
@@ -963,7 +956,7 @@ describe('createOperationParams', () => {
       })
 
       const pathParam = params.params[0]
-      expect(pathParam?.name).toBe('petId')
+      expect(pathParam?.name).toBe('pet_id')
       const queryParam = params.params.find((p) => p.kind === 'FunctionParameter' && p.name === 'params')
       expect(queryParam?.type).toStrictEqual('ListPetsQueryParams')
     })
