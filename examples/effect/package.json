@@ -1,0 +1,32 @@
+{
+  "name": "effect-pet-store",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Effect v4 PetStore example",
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kubb-labs/plugins.git",
+    "directory": "examples/effect"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "generate": "KUBB_DISABLE_TELEMETRY=1 kubb --config kubb.config.js",
+    "test": "vitest --passWithNoTests",
+    "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@kubb/adapter-oas": "catalog:",
+    "@kubb/plugin-effect": "workspace:*",
+    "effect": "catalog:",
+    "kubb": "catalog:",
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=11.0.0"
+  },
+  "packageManager": "pnpm@11.5.0"
+}

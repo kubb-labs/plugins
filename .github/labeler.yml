@@ -49,6 +49,9 @@
 '@kubb/plugin-zod':
   - any: ['packages/plugin-zod/**', '!packages/plugin-zod/package.json']
 
+'@kubb/plugin-effect':
+  - any: ['packages/plugin-effect/**', '!packages/plugin-effect/package.json']
+
 'unplugin-kubb':
   - any: ['packages/unplugin-kubb/**', '!packages/unplugin-kubb/package.json']
 

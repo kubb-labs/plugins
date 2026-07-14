@@ -1,0 +1,69 @@
+{
+  "name": "@kubb/plugin-effect",
+  "version": "5.0.0-beta.95",
+  "description": "Generate Effect v4 schemas and TypeScript types from OpenAPI with Kubb.",
+  "keywords": [
+    "code-generation",
+    "codegen",
+    "effect",
+    "kubb",
+    "openapi",
+    "runtime-validation",
+    "schema",
+    "typescript",
+    "validation"
+  ],
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kubb-labs/plugins.git",
+    "directory": "packages/plugin-effect"
+  },
+  "files": [
+    "dist",
+    "!/**/**.test.**",
+    "!/**/__tests__/**",
+    "!/**/__snapshots__/**"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "release": "pnpm publish --no-git-check",
+    "release:canary": "bash ../../.github/canary.sh && node ../../scripts/build.js canary && pnpm publish --no-git-check",
+    "release:stage": "pnpm stage publish --no-git-check",
+    "start": "tsdown --watch",
+    "test": "vitest --passWithNoTests",
+    "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
+  },
+  "devDependencies": {
+    "@internals/shared": "workspace:*",
+    "@internals/utils": "workspace:*",
+    "effect": "catalog:",
+    "kubb": "catalog:"
+  },
+  "peerDependencies": {
+    "kubb": "catalog:"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

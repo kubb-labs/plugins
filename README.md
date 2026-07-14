@@ -22,7 +22,7 @@
 
 **Official and community plugins for [Kubb](https://kubb.dev).**
 
-This monorepo is home to official and community plugins for [Kubb](https://kubb.dev), the meta framework for code generation. Point Kubb at your OpenAPI specification and it generates TypeScript types, API clients, Zod schemas, React/Vue/Svelte/Solid Query hooks, Faker mocks, MSW handlers, and more.
+This monorepo is home to official and community plugins for [Kubb](https://kubb.dev), the meta framework for code generation. Point Kubb at your OpenAPI specification and it generates TypeScript types, API clients, Effect and Zod schemas, React/Vue/Svelte/Solid Query hooks, Faker mocks, MSW handlers, and more.
 
 Want to build your own plugin? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
@@ -48,6 +48,12 @@ Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](h
 | Package                                     | Version                                                                                                        | Description                                                                       |
 | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | [`@kubb/plugin-zod`](./packages/plugin-zod) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-zod.svg)](https://npmx.dev/package/@kubb/plugin-zod) | [Zod](https://github.com/colinhacks/zod) schema generation for runtime validation |
+
+### Effect
+
+| Package                                           | Version                                                                                                              | Description                                                                            |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| [`@kubb/plugin-effect`](./packages/plugin-effect) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-effect.svg)](https://npmx.dev/package/@kubb/plugin-effect) | [Effect](https://github.com/Effect-TS/effect-smol) v4 schema and TypeScript generation |
 
 ### Data fetching
 
@@ -85,6 +91,7 @@ Plugins built and maintained by the community. Want to add yours? See [CONTRIBUT
 | [`client`](./examples/client)           | Generate API clients with Axios     |
 | [`fetch`](./examples/fetch)             | Generate API clients with Fetch     |
 | [`zod`](./examples/zod)                 | Generate Zod validation schemas     |
+| [`effect`](./examples/effect)           | Generate Effect v4 schemas          |
 | [`react-query`](./examples/react-query) | Generate React Query hooks          |
 | [`vue-query`](./examples/vue-query)     | Generate Vue Query composables      |
 | [`faker`](./examples/faker)             | Generate Faker.js mock data         |

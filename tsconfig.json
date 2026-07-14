@@ -26,7 +26,8 @@
       "@kubb/plugin-faker": ["./packages/plugin-faker/src/index.ts"],
       "@kubb/plugin-cypress": ["./packages/plugin-cypress/src/index.ts"],
       "@kubb/plugin-zod/utils": ["./packages/plugin-zod/src/utils/index.ts"],
-      "@kubb/plugin-zod": ["./packages/plugin-zod/src/index.ts"]
+      "@kubb/plugin-zod": ["./packages/plugin-zod/src/index.ts"],
+      "@kubb/plugin-effect": ["./packages/plugin-effect/src/index.ts"]
     }
   },
   "include": ["./package.json", "./tsdown.config.ts", "./vitest.config.ts", "./src/**/*", "tests"],
