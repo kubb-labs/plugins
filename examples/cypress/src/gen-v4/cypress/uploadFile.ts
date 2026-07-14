@@ -9,7 +9,7 @@ export function uploadFile({ path, query, body }: UploadFileOptions, options: Pa
   return cy
     .request<UploadFileResponse>({
       method: 'POST',
-      url: `http://localhost:3000/pet/${path.pet_id}/uploadImage`,
+      url: `http://localhost:3000/pet/${path.petId}/uploadImage`,
       qs: query,
       body,
       ...options,

@@ -125,11 +125,17 @@ export class Url {
    * names match the generated `path` type, and `prefix` is prepended inside the literal. Shared by
    * the client and cypress generators that pass a grouped `path` object.
    *
+   * `names`, given in path-parameter order, overrides each placeholder's own text with the
+   * declared parameter name. A spec's path template and its parameter objects are expected to
+   * agree, but when they don't, the generated `path` type follows the declared name, so the
+   * interpolation must too.
+   *
    * @example
    * Url.toGroupedTemplateString('/pet/{petId}') // '`/pet/${path.petId}`'
    */
-  static toGroupedTemplateString(path: string, { prefix }: { prefix?: string | null } = {}): string {
-    return Url.toTemplateString(path, { prefix, replacer: (name) => `path.${name}` })
+  static toGroupedTemplateString(path: string, { prefix, names }: { prefix?: string | null; names?: ReadonlyArray<string> } = {}): string {
+    let index = 0
+    return Url.toTemplateString(path, { prefix, replacer: (name) => `path.${names?.[index++] ?? name}` })
   }
 
   /**

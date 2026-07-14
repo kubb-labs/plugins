@@ -34,6 +34,27 @@ describe('Url.toTemplateString', () => {
   })
 })
 
+describe('Url.toGroupedTemplateString', () => {
+  test('reads each parameter off the grouped path option', () => {
+    expect(Url.toGroupedTemplateString('/pet/{petId}')).toBe('`/pet/${path.petId}`')
+  })
+
+  test('prepends the prefix inside the literal', () => {
+    expect(Url.toGroupedTemplateString('/pet/{petId}', { prefix: 'https://api' })).toBe('`https://api/pet/${path.petId}`')
+  })
+
+  test('substitutes the resolved name by position when it differs from the placeholder text', () => {
+    // A spec can declare a path parameter under a different name than its own path template
+    // placeholder (`{pet_id}` vs. a declared `petId`). The generated `path` type follows the
+    // declared name, so the interpolation must match it, not the placeholder's own text.
+    expect(Url.toGroupedTemplateString('/pet/{pet_id}/uploadImage', { names: ['petId'] })).toBe('`/pet/${path.petId}/uploadImage`')
+  })
+
+  test('falls back to the placeholder text for a position with no resolved name', () => {
+    expect(Url.toGroupedTemplateString('/user/{userID}/post/{postID}', { names: ['userId'] })).toBe('`/user/${path.userId}/post/${path.postID}`')
+  })
+})
+
 describe('Url.toSafeTemplate', () => {
   test('preserves already-valid identifier placeholder names, including snake_case', () => {
     expect(Url.toSafeTemplate('/projects/{project_id}')).toBe('/projects/{project_id}')
