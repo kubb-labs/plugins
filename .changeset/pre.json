@@ -153,6 +153,7 @@
     "plugin-zod-v5-rewrite",
     "plugins-ast-via-kit",
     "plugins-macros-option",
+    "preserve-spec-param-names",
     "printer-options-api",
     "printer-shared-traversal",
     "prune-dead-plugin-code",
