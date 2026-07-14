@@ -1,5 +1,4 @@
-import { camelCase, isValidVarName, Url } from '@internals/utils'
-import { ast, type ResolverFileParams } from 'kubb/kit'
+import { type ast, type ResolverFileParams, Url } from 'kubb/kit'
 import { dedupeParams } from './params.ts'
 
 /**
@@ -147,11 +146,7 @@ function getOperationLink(node: ast.OperationNode, link: OperationCommentLink): 
     return link(node) ?? null
   }
 
-  if (link === 'urlPath') {
-    return node.path ? `{@link ${Url.toPath(node.path)}}` : null
-  }
-
-  return node.path ? `{@link ${node.path.replaceAll('{', ':').replaceAll('}', '')}}` : null
+  return node.path ? `{@link ${Url.toPath(node.path)}}` : null
 }
 
 /**
@@ -405,12 +400,8 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
 }
 
 export function getOperationParameters(node: ast.OperationNode): OperationParameterGroups {
-  const path = node.parameters
-    .filter((param) => param.in === 'path')
-    .map((param) => (isValidVarName(param.name) ? param : { ...param, name: camelCase(param.name) }))
-
   return {
-    path: dedupeParams(path),
+    path: dedupeParams(node.parameters.filter((param) => param.in === 'path')),
     query: dedupeParams(node.parameters.filter((param) => param.in === 'query')),
     header: dedupeParams(node.parameters.filter((param) => param.in === 'header')),
     cookie: dedupeParams(node.parameters.filter((param) => param.in === 'cookie')),

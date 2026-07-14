@@ -801,7 +801,7 @@ describe('createOperationParams', () => {
       })
 
       const pathParam = params.params[0]
-      expect(pathParam?.name).toBe('storeName')
+      expect(pathParam?.name).toBe('store-name')
     })
   })
 

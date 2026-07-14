@@ -43,13 +43,6 @@ export function getMswMethod(node: ast.OperationNode): string {
 }
 
 /**
- * Converts an OpenAPI-style path to an Express/MSW-style path by replacing `{param}` with `:param`.
- */
-export function getMswUrl(node: ast.OperationNode): string {
-  return ast.isHttpOperationNode(node) ? node.path.replaceAll('{', ':').replaceAll('}', '') : ''
-}
-
-/**
  * Resolves faker metadata for an MSW operation, including response name and file path.
  */
 export function resolveFakerMeta(

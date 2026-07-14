@@ -1,6 +1,5 @@
 import { buildRequestParamsSignature } from '@internals/shared'
-import { Url } from '@internals/utils'
-import { ast } from 'kubb/kit'
+import { ast, Url } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
@@ -30,8 +29,7 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   const responseType = resolver.response.response(node)
   const returnType = `Cypress.Chainable<${responseType}>`
 
-  // Reference the path object straight in the URL with the sanitized placeholders shared with the
-  // generated `path` type.
+  // Bracket-access the path object with the raw OpenAPI param names, matching the generated `path` type's keys.
   const urlTemplate = Url.toGroupedTemplateString(node.path, { prefix: baseURL })
 
   const requestOptions: Array<string> = [`method: '${node.method}'`, `url: ${urlTemplate}`]

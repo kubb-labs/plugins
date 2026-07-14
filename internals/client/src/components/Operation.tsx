@@ -1,5 +1,4 @@
 import { buildOperationComments, getContentTypeInfo, getResponseContentTypeInfo, getResponseType, isEventStream } from '@internals/shared'
-import { Url } from '@internals/utils'
 import { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -82,7 +81,7 @@ export function Operation({ name, node, tsResolver, zodResolver, validator, secu
 
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
-    `url: '${Url.toSafeTemplate(node.path)}'`,
+    `url: '${node.path}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
     stylesLiteral ? `styles: ${stylesLiteral}` : null,
     validatorLiteral,
