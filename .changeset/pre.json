@@ -51,6 +51,7 @@
     "client-templates-copy-real-files",
     "consolidate-jsx-renderer",
     "consolidate-tanstack-query-clones",
+    "consolidate-url-template-into-kubb-kit",
     "consume-ast-utils",
     "curly-areas-sit",
     "cypress-quote-non-identifier-query-params",

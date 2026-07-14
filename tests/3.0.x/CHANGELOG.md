@@ -1,5 +1,13 @@
 # tests-3.0.x
 
+## 0.0.1-beta.41
+
+### Patch Changes
+
+- Updated dependencies [[`3d6f94b`](https://github.com/kubb-labs/plugins/commit/3d6f94b08174be0f39175bd6f641bea00c9459b0)]:
+  - @kubb/plugin-cypress@5.0.0-beta.100
+  - @kubb/plugin-msw@5.0.0-beta.100
+
 ## 0.0.1-beta.40
 
 ### Patch Changes
