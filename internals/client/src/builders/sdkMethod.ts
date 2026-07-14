@@ -35,7 +35,7 @@ function buildCallConfig({
 
   return `{ ${[
     `method: '${node.method.toUpperCase()}'`,
-    `url: '${Url.toCasedTemplate(node.path)}'`,
+    `url: '${Url.toSafeTemplate(node.path)}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
     validatorLiteral,
     '...config',

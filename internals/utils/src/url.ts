@@ -90,9 +90,9 @@ export class Url {
    * key.
    *
    * @example
-   * Url.toCasedTemplate('/user/{monetary-account-id}') // '/user/{monetaryAccountId}'
+   * Url.toSafeTemplate('/user/{monetary-account-id}') // '/user/{monetaryAccountId}'
    */
-  static toCasedTemplate(path: string): string {
+  static toSafeTemplate(path: string): string {
     return path.replace(/\{([^}]+)\}/g, (_, name: string) => `{${transformParam(name)}}`)
   }
 

@@ -82,7 +82,7 @@ export function Operation({ name, node, tsResolver, zodResolver, validator, secu
 
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
-    `url: '${Url.toCasedTemplate(node.path)}'`,
+    `url: '${Url.toSafeTemplate(node.path)}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
     stylesLiteral ? `styles: ${stylesLiteral}` : null,
     validatorLiteral,
