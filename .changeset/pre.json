@@ -154,6 +154,7 @@
     "plugin-zod-v5-rewrite",
     "plugins-ast-via-kit",
     "plugins-macros-option",
+    "preserve-spec-param-names",
     "printer-options-api",
     "prune-dead-plugin-code",
     "query-mutation-methods-default-patch",
