@@ -1,4 +1,4 @@
-import { buildParamsMapping, buildParamsRemapExpression, buildRequestParamsSignature, getOperationParameters } from '@internals/shared'
+import { buildRequestParamsSignature } from '@internals/shared'
 import { Url } from '@internals/utils'
 import { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -24,29 +24,24 @@ type Props = {
 export function Request({ baseURL = '', name, resolver, node }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
 
-  const { query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node, { paramsCasing: 'original' })
-  const { query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node)
-
-  const queryParamsMapping = buildParamsMapping(originalQueryParams, casedQueryParams)
-  const headerParamsMapping = buildParamsMapping(originalHeaderParams, casedHeaderParams)
-
   const { signature, groups } = buildRequestParamsSignature(node, resolver, { isConfigurable: false })
   const paramsSignature = [signature, 'options: Partial<Cypress.RequestOptions> = {}'].filter(Boolean).join(', ')
 
   const responseType = resolver.response.response(node)
   const returnType = `Cypress.Chainable<${responseType}>`
 
-  // Reference the path object straight in the URL with camelCase placeholders.
+  // Reference the path object straight in the URL with the sanitized placeholders shared with the
+  // generated `path` type.
   const urlTemplate = Url.toGroupedTemplateString(node.path, { prefix: baseURL })
 
   const requestOptions: Array<string> = [`method: '${node.method}'`, `url: ${urlTemplate}`]
 
   if (groups.query) {
-    requestOptions.push(queryParamsMapping ? `qs: ${buildParamsRemapExpression({ source: 'query', mapping: queryParamsMapping })}` : 'qs: query')
+    requestOptions.push('qs: query')
   }
 
   if (groups.headers) {
-    requestOptions.push(headerParamsMapping ? `headers: ${buildParamsRemapExpression({ source: 'headers', mapping: headerParamsMapping })}` : 'headers')
+    requestOptions.push('headers')
   }
 
   if (groups.body) {

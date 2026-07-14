@@ -13,5 +13,5 @@ import { client } from '../.kubb/client'
 export function updatePet<ThrowOnError extends boolean = true>(options: Options<UpdatePetOptions, ThrowOnError>): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pets/{petId}', ...config, query: config.query ? { "include_deleted": config.query.includeDeleted, "request_source": config.query.requestSource } : config.query, headers: config.headers ? { "X-Request-ID": config.headers.xRequestID } : config.headers }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
+  return request({ method: 'POST', url: '/pets/{pet_id}', ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
 }

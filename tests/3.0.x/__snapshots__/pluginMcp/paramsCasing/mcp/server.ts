@@ -18,7 +18,7 @@ export function getServer() {
   server.registerTool("updatePet", {
     description: "Make a POST request to /pets/{pet_id}",
     outputSchema: { data: updatePetStatus200Schema },
-    inputSchema: { path: z.object({ "petId": updatePetPathPetIdSchema }), query: z.object({ "includeDeleted": updatePetQueryIncludeDeletedSchema, "requestSource": updatePetQueryRequestSourceSchema }), headers: z.object({ "xRequestID": updatePetHeaderXRequestIDSchema }), body: updatePetBodySchema },
+    inputSchema: { path: z.object({ "pet_id": updatePetPathPetIdSchema }), query: z.object({ "include_deleted": updatePetQueryIncludeDeletedSchema, "request_source": updatePetQueryRequestSourceSchema }), headers: z.object({ "X-Request-ID": updatePetHeaderXRequestIDSchema }), body: updatePetBodySchema },
   }, async ({ path, query, headers, body }, request) => {
     return updatePetHandler({ path, query, headers, body }, request)
   })

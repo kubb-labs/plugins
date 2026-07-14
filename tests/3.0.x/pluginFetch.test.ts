@@ -81,7 +81,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
-  // ─── paramsCasing (camelCase types, spec names on the wire) ──────────────
+  // ─── paramsCasing (query, path, and header names match the spec exactly) ──
   {
     name: 'paramsCasing',
     config: {

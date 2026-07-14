@@ -1,6 +1,6 @@
-import { Url } from '@internals/utils'
+import { camelCase, isValidVarName, Url } from '@internals/utils'
 import { ast, type ResolverFileParams } from 'kubb/kit'
-import { caseParams, dedupeByCasedName } from './params.ts'
+import { dedupeParams } from './params.ts'
 
 /**
  * Builds the `ResolverFileParams` every operation generator passes to
@@ -128,7 +128,6 @@ type ResponseLike = {
 export type OperationParameterGroups = Record<ast.ParameterNode['in'], Array<ast.ParameterNode>>
 
 export type ResolveOperationTypeNameOptions = {
-  paramsCasing?: 'camelcase' | 'original'
   responseStatusNames?: boolean | 'error'
   exclude?: ReadonlyArray<string | undefined>
   order?: 'params-first' | 'body-response-first'
@@ -405,14 +404,16 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
   return filteredComments.flatMap((text) => text.split(/\r?\n/).map((line) => line.trim())).filter((comment): comment is string => Boolean(comment))
 }
 
-export function getOperationParameters(node: ast.OperationNode, options: { paramsCasing?: 'camelcase' | 'original' } = {}): OperationParameterGroups {
-  const params = caseParams(node.parameters, options.paramsCasing === 'original' ? undefined : 'camelcase')
+export function getOperationParameters(node: ast.OperationNode): OperationParameterGroups {
+  const path = node.parameters
+    .filter((param) => param.in === 'path')
+    .map((param) => (isValidVarName(param.name) ? param : { ...param, name: camelCase(param.name) }))
 
   return {
-    path: dedupeByCasedName(params.filter((param) => param.in === 'path')),
-    query: dedupeByCasedName(params.filter((param) => param.in === 'query')),
-    header: dedupeByCasedName(params.filter((param) => param.in === 'header')),
-    cookie: dedupeByCasedName(params.filter((param) => param.in === 'cookie')),
+    path: dedupeParams(path),
+    query: dedupeParams(node.parameters.filter((param) => param.in === 'query')),
+    header: dedupeParams(node.parameters.filter((param) => param.in === 'header')),
+    cookie: dedupeParams(node.parameters.filter((param) => param.in === 'cookie')),
   }
 }
 
@@ -465,7 +466,7 @@ export function resolveOperationTypeNames(
   resolver: OperationTypeNameResolver,
   options: ResolveOperationTypeNameOptions = {},
 ): string[] {
-  const cacheKey = `${node.operationId}\0${options.paramsCasing ?? ''}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
+  const cacheKey = `${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
   let byResolver = typeNamesByResolver.get(resolver)
   if (byResolver) {
     const cached = byResolver.get(cacheKey)
@@ -475,7 +476,7 @@ export function resolveOperationTypeNames(
     typeNamesByResolver.set(resolver, byResolver)
   }
 
-  const { path, query, header } = getOperationParameters(node, { paramsCasing: options.paramsCasing })
+  const { path, query, header } = getOperationParameters(node)
   const responseStatusNames =
     options.responseStatusNames === 'error'
       ? resolveErrorNames(node, resolver)

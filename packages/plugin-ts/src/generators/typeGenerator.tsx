@@ -1,4 +1,4 @@
-import { caseParams, collectRefNames, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
+import { collectRefNames, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Type } from '../components/Type.tsx'
@@ -90,8 +90,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const { enum: enumOptions, optionalType, arrayType, syntaxType, group, output, printer } = ctx.options
     const { config, resolver, root } = ctx
 
-    const params = caseParams(node.parameters, 'camelcase')
-
     const meta = {
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
     } as const
@@ -159,7 +157,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       )
     }
 
-    const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters({ ...node, parameters: params }, { paramsCasing: 'original' })
+    const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
 
     const paramGroupTypes = [
       pathParams.length > 0 && renderSchemaType({ schema: buildParams({ params: pathParams }), name: resolver.param.path(node, pathParams[0]!) }),
@@ -208,7 +206,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     })
 
     const optionsType = renderSchemaType({
-      schema: buildOptions({ ...node, parameters: params }, { resolver }),
+      schema: buildOptions(node, { resolver }),
       name: resolver.response.options(node),
     })
 

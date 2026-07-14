@@ -100,7 +100,7 @@ export function buildParams({ params }: BuildParamsSchemaOptions): ast.SchemaNod
 }
 
 export function buildOptions(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode {
-  const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing: 'original' })
+  const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const hasRequiredPath = pathParams.some((param) => param.required)
   const hasRequiredQuery = queryParams.some((param) => param.required)

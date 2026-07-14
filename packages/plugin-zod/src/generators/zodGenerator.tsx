@@ -1,4 +1,4 @@
-import { caseParams, collectRefNames, getOasAdapter, getSuccessResponses, isSuccessStatusCode, resolveContentTypeVariants } from '@internals/shared'
+import { collectRefNames, getOasAdapter, getSuccessResponses, isSuccessStatusCode, resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Zod } from '../components/Zod.tsx'
@@ -163,8 +163,6 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const isZodImport = ZOD_NAMESPACE_IMPORTS.has(importPath as 'zod' | 'zod/mini')
 
-    const params = caseParams(node.parameters, 'camelcase')
-
     const meta = {
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
     } as const
@@ -286,7 +284,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       })
     }
 
-    const paramSchemas = params.map((param) => renderSchemaEntry({ schema: param.schema, name: resolver.param.name(node, param), direction: 'input' }))
+    const paramSchemas = node.parameters.map((param) => renderSchemaEntry({ schema: param.schema, name: resolver.param.name(node, param), direction: 'input' }))
 
     const responseSchemas = node.responses.map((res) => {
       const variants = (res.content ?? []).filter((entry) => entry.schema)

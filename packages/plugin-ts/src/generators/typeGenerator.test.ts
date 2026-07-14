@@ -656,7 +656,7 @@ describe('typeGenerator — Operation — output.mode', () => {
 })
 
 describe('typeGenerator — params casing', () => {
-  test('snake_case params are always converted to camelCase', async () => {
+  test('snake_case params keep the exact OpenAPI spec name', async () => {
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'paramsCasing camelcase' })
@@ -673,8 +673,8 @@ describe('typeGenerator — params casing', () => {
     await matchFiles(driver.fileManager.files, 'paramsCasing camelcase')
   })
 
-  test('query params that collide after casing are de-duplicated in the request config', async () => {
-    const operationWithCollidingParams: ast.OperationNode = ast.factory.createOperation({
+  test('query params with distinct spec names, including casing variants, all render as separate properties', async () => {
+    const operationWithCasingVariantParams: ast.OperationNode = ast.factory.createOperation({
       operationId: 'listUploads',
       method: 'GET',
       path: '/uploads',
@@ -691,9 +691,9 @@ describe('typeGenerator — params casing', () => {
 
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
-    const driver = createMockedPluginDriver({ name: 'paramsCasing collision' })
+    const driver = createMockedPluginDriver({ name: 'paramsCasing distinct names' })
 
-    await renderGeneratorOperation(typeGenerator, operationWithCollidingParams, {
+    await renderGeneratorOperation(typeGenerator, operationWithCasingVariantParams, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,
@@ -702,7 +702,39 @@ describe('typeGenerator — params casing', () => {
       resolver: resolverTs,
     })
 
-    await matchFiles(driver.fileManager.files, 'paramsCasing collision')
+    await matchFiles(driver.fileManager.files, 'paramsCasing distinct names')
+  })
+
+  test('query params sharing the exact same name are de-duplicated, keeping the first', async () => {
+    const operationWithDuplicateParamName: ast.OperationNode = ast.factory.createOperation({
+      operationId: 'listUploads',
+      method: 'GET',
+      path: '/uploads',
+      tags: ['uploads'],
+      parameters: [
+        ast.factory.createParameter({ name: 'max-uploads', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
+        ast.factory.createParameter({ name: 'prefix', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({ name: 'max-uploads', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
+      ],
+      responses: [
+        ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Success' }),
+      ],
+    })
+
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'paramsCasing duplicate names' })
+
+    await renderGeneratorOperation(typeGenerator, operationWithDuplicateParamName, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'paramsCasing duplicate names')
   })
 })
 

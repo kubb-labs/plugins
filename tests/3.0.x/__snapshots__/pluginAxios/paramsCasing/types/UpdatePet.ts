@@ -13,7 +13,7 @@ export type UpdatePetPath = {
     /**
      * @type string
     */
-    petId: string;
+    pet_id: string;
 };
 
 /**
@@ -23,11 +23,11 @@ export type UpdatePetQuery = {
     /**
      * @type boolean | undefined
     */
-    includeDeleted?: boolean;
+    include_deleted?: boolean;
     /**
      * @type string | undefined
     */
-    requestSource?: string;
+    request_source?: string;
 };
 
 /**
@@ -37,7 +37,7 @@ export type UpdatePetHeaders = {
     /**
      * @type string | undefined
     */
-    xRequestID?: string;
+    "X-Request-ID"?: string;
 };
 
 /**

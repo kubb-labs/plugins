@@ -24,7 +24,7 @@ export function createDeletePetHeaders<TData extends Partial<DeletePetHeaders> =
 {
   faker.seed([42])
   const defaultFakeData = {
-  apiKey: faker.string.alpha(),
+  api_key: faker.string.alpha(),
 }
   return {
     ...defaultFakeData,

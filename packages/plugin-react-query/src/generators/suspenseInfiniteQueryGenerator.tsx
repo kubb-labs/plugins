@@ -33,7 +33,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
 
     // Validate queryParam exists in operation's query parameters
     const normalizeKey = (key: string) => key.replace(/\?$/, '')
-    const queryParamKeys = getOperationParameters(node, { paramsCasing: 'original' }).query.map((p) => p.name)
+    const queryParamKeys = getOperationParameters(node).query.map((p) => p.name)
     const hasQueryParam = infiniteOptions.queryParam ? queryParamKeys.some((k) => normalizeKey(k) === infiniteOptions.queryParam) : false
     if (!hasQueryParam) return null
 
@@ -58,7 +58,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
       }),
     }
 
-    const rawQueryParams = getOperationParameters(node, { paramsCasing: 'original' }).query
+    const rawQueryParams = getOperationParameters(node).query
     const queryParamsTypeName =
       rawQueryParams.length > 0 && tsResolver.param.query(node, rawQueryParams[0]!) !== tsResolver.param.name(node, rawQueryParams[0]!)
         ? tsResolver.param.query(node, rawQueryParams[0]!)

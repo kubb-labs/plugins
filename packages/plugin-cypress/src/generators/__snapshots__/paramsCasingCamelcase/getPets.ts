@@ -11,7 +11,7 @@ export function getPets({ query }: GetPetsOptions = {}, options: Partial<Cypress
     .request<GetPetsResponse>({
       method: 'GET',
       url: `/pets`,
-      qs: query ? { page_size: query.pageSize } : query,
+      qs: query,
       ...options,
     })
     .then((res) => res.body)
