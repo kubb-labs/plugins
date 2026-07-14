@@ -24,7 +24,7 @@ export function createCreatePetsPathFaker<TData extends Partial<CreatePetsPath> 
 
 export function createCreatePetsQueryFaker<TData extends Partial<CreatePetsQuery> = object>(data?: TData) {
   const defaultFakeData = {
-    boolParam: createCreatePetsBoolParamFaker(),
+    bool_param: createCreatePetsBoolParamFaker(),
     offset: faker.number.int(),
   }
   return {
@@ -35,7 +35,7 @@ export function createCreatePetsQueryFaker<TData extends Partial<CreatePetsQuery
 
 export function createCreatePetsHeadersFaker<TData extends Partial<CreatePetsHeaders> = object>(data?: TData) {
   const defaultFakeData = {
-    xEXAMPLE: createCreatePetsXEXAMPLEFaker(),
+    'X-EXAMPLE': createCreatePetsXEXAMPLEFaker(),
   }
   return {
     ...defaultFakeData,

@@ -20,7 +20,7 @@ export function createDeletePetPath<TData extends Partial<DeletePetPath> = objec
 export function createDeletePetHeaders<TData extends Partial<DeletePetHeaders> = object>(data?: TData) {
   faker.seed([220])
   const defaultFakeData = {
-    apiKey: faker.string.alpha(),
+    api_key: faker.string.alpha(),
   }
   return {
     ...defaultFakeData,

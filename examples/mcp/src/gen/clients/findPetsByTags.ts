@@ -23,6 +23,5 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
     security: [{ type: 'oauth2' }],
     styles: { query: { tags: { explode: true } } },
     ...config,
-    headers: config.headers ? { 'X-EXAMPLE': config.headers.xEXAMPLE } : config.headers,
   }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
 }

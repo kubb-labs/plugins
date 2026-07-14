@@ -7,7 +7,7 @@ export function findPetsByStatus(
   return cy
     .request<FindPetsByStatusResponse>({
       method: 'GET',
-      url: `/pet/findByStatus/${path.stepId}`,
+      url: `/pet/findByStatus/${path.step_id}`,
       ...options,
     })
     .then((res) => res.body)

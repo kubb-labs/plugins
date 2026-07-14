@@ -803,7 +803,7 @@ export type DeletePetHeaders = {
   /**
    * @type string | undefined
    */
-  apiKey?: string | undefined
+  api_key?: string | undefined
 }
 
 /**
