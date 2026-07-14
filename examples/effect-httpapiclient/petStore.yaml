@@ -1,0 +1,159 @@
+openapi: 3.0.3
+info:
+  title: Effect HttpApiClient PetStore
+  version: 1.0.0
+paths:
+  /pets/{pet_id}:
+    get:
+      operationId: getPet
+      summary: Get one pet
+      tags:
+        - pet
+      parameters:
+        - name: pet_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: fields
+          in: query
+          style: pipeDelimited
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: X-Trace
+          in: header
+          schema:
+            type: string
+        - name: session_id
+          in: cookie
+          style: form
+          explode: false
+          schema:
+            type: string
+      security:
+        - api_key: []
+        - petstore_auth:
+            - read:pets
+      responses:
+        '200':
+          description: Pet found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '404':
+          description: Pet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /pets:
+    get:
+      operationId: listPets
+      summary: List pets
+      tags:
+        - pet
+      parameters:
+        - name: status
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - available
+                - pending
+      security:
+        - petstore_auth:
+            - read:pets
+            - list:pets
+      responses:
+        '200':
+          description: Pet list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+  /orders:
+    post:
+      operationId: placeOrder
+      summary: Place an order
+      tags:
+        - store
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderInput'
+      responses:
+        '200':
+          description: Created order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+components:
+  schemas:
+    Pet:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+    OrderInput:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int64
+    Order:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int64
+        shipDate:
+          type: string
+          format: date-time
+    ApiError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: x-api-key
+      in: header
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://example.com/oauth/authorize
+          scopes:
+            read:pets: Read pets
+            list:pets: List pets

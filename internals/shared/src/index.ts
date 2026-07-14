@@ -13,6 +13,7 @@ export {
   getRequestGroups,
   getResponseContentTypeInfo,
   getResponseType,
+  getStatusCodeNumber,
   getSuccessResponses,
   isErrorStatusCode,
   isEventStream,

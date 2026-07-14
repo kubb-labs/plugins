@@ -273,6 +273,27 @@ importers:
         specifier: 'catalog:'
         version: 6.0.3
 
+  examples/effect-httpapiclient:
+    dependencies:
+      '@kubb/adapter-oas':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.97(openapi-types@12.1.3)
+      '@kubb/plugin-effect':
+        specifier: workspace:*
+        version: link:../../packages/plugin-effect
+      '@kubb/plugin-effect-httpapiclient':
+        specifier: workspace:*
+        version: link:../../packages/plugin-effect-httpapiclient
+      effect:
+        specifier: 'catalog:'
+        version: 4.0.0-beta.98
+      kubb:
+        specifier: 'catalog:'
+        version: 5.0.0-beta.97(openapi-types@12.1.3)(rolldown@1.1.5)(typescript@6.0.3)(vite@8.1.0(@types/node@26.0.1)(jiti@2.7.0)(yaml@2.9.0))
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
   examples/faker:
     dependencies:
       '@faker-js/faker':
@@ -696,6 +717,25 @@ importers:
         version: 5.0.0-beta.97(openapi-types@12.1.3)(rolldown@1.1.5)(typescript@6.0.3)(vite@8.1.0(@types/node@26.0.1)(jiti@2.7.0)(yaml@2.9.0))
 
   packages/plugin-effect:
+    devDependencies:
+      '@internals/shared':
+        specifier: workspace:*
+        version: link:../../internals/shared
+      '@internals/utils':
+        specifier: workspace:*
+        version: link:../../internals/utils
+      effect:
+        specifier: 'catalog:'
+        version: 4.0.0-beta.98
+      kubb:
+        specifier: 'catalog:'
+        version: 5.0.0-beta.97(openapi-types@12.1.3)(rolldown@1.1.5)(typescript@6.0.3)(vite@8.1.0(@types/node@26.0.1)(jiti@2.7.0)(yaml@2.9.0))
+
+  packages/plugin-effect-httpapiclient:
+    dependencies:
+      '@kubb/plugin-effect':
+        specifier: workspace:*
+        version: link:../plugin-effect
     devDependencies:
       '@internals/shared':
         specifier: workspace:*

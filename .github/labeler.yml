@@ -52,6 +52,9 @@
 '@kubb/plugin-effect':
   - any: ['packages/plugin-effect/**', '!packages/plugin-effect/package.json']
 
+'@kubb/plugin-effect-httpapiclient':
+  - any: ['packages/plugin-effect-httpapiclient/**', '!packages/plugin-effect-httpapiclient/package.json']
+
 'unplugin-kubb':
   - any: ['packages/unplugin-kubb/**', '!packages/unplugin-kubb/package.json']
 
