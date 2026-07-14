@@ -22,14 +22,6 @@ export default defineConfig([
           mode: 'file',
           barrel: false,
         },
-        transformer: {
-          // Make all properties of the "Pet" schema required
-          property(node, { parent }) {
-            if (parent?.name === 'Address') {
-              return { ...node, required: false }
-            }
-          },
-        },
         enum: { type: 'enum' },
         syntaxType: 'interface',
       }),
