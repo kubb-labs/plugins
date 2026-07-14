@@ -39,6 +39,7 @@
   },
   "changesets": [
     "circular-schema-detection-shared",
+    "clean-jsdoc-examples",
     "clean-raw-generated-whitespace",
     "clever-pets-punch",
     "client-banner-aggregation-context",
