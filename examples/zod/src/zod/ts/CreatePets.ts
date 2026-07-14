@@ -43,7 +43,7 @@ export type CreatePetsHeaders = {
    * @description Header parameters
    * @type string
    */
-  xEXAMPLE: CreatePetsXEXAMPLEKey
+  'X-EXAMPLE': CreatePetsXEXAMPLEKey
 }
 
 /**

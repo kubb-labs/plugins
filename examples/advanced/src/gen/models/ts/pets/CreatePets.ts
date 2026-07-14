@@ -17,7 +17,7 @@ export type CreatePetsPath = {
  * @type object
  */
 export type CreatePetsQuery = {
-  boolParam?: CreatePetsBoolParamKey
+  bool_param?: CreatePetsBoolParamKey
   /**
    * @description Offset *\/
    * @type integer | undefined
@@ -32,7 +32,7 @@ export type CreatePetsHeaders = {
   /**
    * @description Header parameters
    */
-  xEXAMPLE: CreatePetsXEXAMPLEKey
+  'X-EXAMPLE': CreatePetsXEXAMPLEKey
 }
 
 /**

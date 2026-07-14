@@ -15,7 +15,7 @@ export function findPetsByStatus<ThrowOnError extends boolean = true>(
 
   return request({
     method: 'GET',
-    url: '/pet/findByStatus/{stepId}',
+    url: '/pet/findByStatus/{step_id}',
     security: [{ type: 'oauth2' }],
     validator: { response: findPetsByStatusResponseSchema, error: findPetsByStatusErrorSchema },
     ...config,

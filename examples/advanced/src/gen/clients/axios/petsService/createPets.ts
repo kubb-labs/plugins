@@ -17,7 +17,5 @@ export function createPets<ThrowOnError extends boolean = true>(
     url: '/pets/{uuid}',
     validator: { response: createPetsResponseSchema, error: createPetsErrorSchema },
     ...config,
-    query: config.query ? { bool_param: config.query.boolParam, offset: config.query.offset } : config.query,
-    headers: config.headers ? { 'X-EXAMPLE': config.headers.xEXAMPLE } : config.headers,
   }) as Promise<RequestResult<CreatePetsResponses, ThrowOnError>>
 }

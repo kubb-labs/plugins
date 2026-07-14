@@ -10,7 +10,7 @@ export function deletePet({ path, headers }: DeletePetOptions, options: Partial<
     .request<DeletePetResponse>({
       method: 'DELETE',
       url: `http://localhost:3000/pet/${path.petId}`,
-      headers: headers ? { api_key: headers.apiKey } : headers,
+      headers,
       ...options,
     })
     .then((res) => res.body)

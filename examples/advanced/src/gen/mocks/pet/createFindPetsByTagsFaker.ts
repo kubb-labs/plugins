@@ -25,7 +25,7 @@ export function createFindPetsByTagsQueryFaker<TData extends Partial<FindPetsByT
 
 export function createFindPetsByTagsHeadersFaker<TData extends Partial<FindPetsByTagsHeaders> = object>(data?: TData) {
   const defaultFakeData = {
-    xEXAMPLE: createFindPetsByTagsXEXAMPLEFaker(),
+    'X-EXAMPLE': createFindPetsByTagsXEXAMPLEFaker(),
   }
   return {
     ...defaultFakeData,

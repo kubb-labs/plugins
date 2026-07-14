@@ -17,7 +17,7 @@ export function findPetsByStatus<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/pet/findByStatus/{stepId}', security: [{ type: 'oauth2' }], ...config }) as Promise<
+  return request({ method: 'GET', url: '/pet/findByStatus/{step_id}', security: [{ type: 'oauth2' }], ...config }) as Promise<
     RequestResult<FindPetsByStatusResponses, ThrowOnError>
   >
 }

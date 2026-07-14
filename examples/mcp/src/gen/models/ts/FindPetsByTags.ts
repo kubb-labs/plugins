@@ -34,7 +34,7 @@ export type FindPetsByTagsHeaders = {
   /**
    * @description Header parameters
    */
-  xEXAMPLE: FindPetsByTagsXEXAMPLEKey
+  'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
 }
 
 /**

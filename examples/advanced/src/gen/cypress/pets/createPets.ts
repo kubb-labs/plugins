@@ -8,8 +8,8 @@ export function createPets(
     .request<CreatePetsResponse>({
       method: 'POST',
       url: `/pets/${path.uuid}`,
-      qs: query ? { bool_param: query.boolParam, offset: query.offset } : query,
-      headers: headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : headers,
+      qs: query,
+      headers,
       body,
       ...options,
     })
