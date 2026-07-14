@@ -146,11 +146,7 @@ function getOperationLink(node: ast.OperationNode, link: OperationCommentLink): 
     return link(node) ?? null
   }
 
-  if (link === 'urlPath') {
-    return node.path ? `{@link ${Url.toPath(node.path)}}` : null
-  }
-
-  return node.path ? `{@link ${node.path.replaceAll('{', ':').replaceAll('}', '')}}` : null
+  return node.path ? `{@link ${Url.toPath(node.path)}}` : null
 }
 
 /**
