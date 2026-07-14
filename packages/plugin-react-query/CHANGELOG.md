@@ -1,5 +1,28 @@
 # @kubb/plugin-react-query
 
+## 5.0.0-beta.99
+
+### Minor Changes
+
+- [#687](https://github.com/kubb-labs/plugins/pull/687) [`d290530`](https://github.com/kubb-labs/plugins/commit/d290530a2b49823b20af29400ac69a02925c2292) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Keep the OpenAPI document's exact parameter names for path, query, and header parameters, instead of forcing them to camelCase (kubb-labs/plugins#631).
+
+  ```ts
+  export type UpdatePetQuery = {
+    include_deleted?: boolean;
+  };
+
+  updatePet({ path: { pet_id: "1" }, query: { include_deleted: true } });
+  ```
+
+  There's no remapping step anymore, so a query or header name can't collide with a differently cased sibling, like `start_date` next to `startDate`.
+
+  A path parameter still falls back to camelCase when its spec name isn't a valid identifier on its own (a hyphenated segment, say), since a few generators bind it directly as a variable. Query and header names are never touched.
+
+### Patch Changes
+
+- Updated dependencies [[`d290530`](https://github.com/kubb-labs/plugins/commit/d290530a2b49823b20af29400ac69a02925c2292)]:
+  - @kubb/plugin-ts@5.0.0-beta.99
+
 ## 5.0.0-beta.98
 
 ### Patch Changes
