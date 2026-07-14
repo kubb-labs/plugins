@@ -253,45 +253,6 @@ describe('cypressGenerator — non-identifier query param names', () => {
   })
 })
 
-describe('cypressGenerator — path param name mismatch', () => {
-  // A path template placeholder can differ from its declared parameter's name (e.g. a spec with
-  // `/pet/{pet_id}/uploadImage` but a path parameter declared as `petId`). The generated `path`
-  // type follows the declared name, so the URL interpolation must too.
-  const node = ast.factory.createOperation({
-    operationId: 'uploadFile',
-    method: 'POST',
-    path: '/pet/{pet_id}/uploadImage',
-    tags: ['pets'],
-    parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
-    responses: [
-      ast.factory.createResponse({
-        statusCode: '200',
-        schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-        description: 'successful operation',
-      }),
-    ],
-  })
-
-  test('interpolates the declared parameter name, not the placeholder text', async () => {
-    const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options: defaultOptions, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({
-      name: 'uploadFile',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
-
-    await renderGeneratorOperation(cypressGenerator, node, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options: defaultOptions,
-      resolver: resolverCypress,
-    })
-
-    await matchFiles(driver.fileManager.files, 'path param name mismatch')
-  })
-})
-
 describe('cypressGenerator — baseURL', () => {
   const node = ast.factory.createOperation({
     operationId: 'getPets',

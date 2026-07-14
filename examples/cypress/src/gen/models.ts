@@ -730,7 +730,7 @@ export type UploadFilePath = {
    * Format: `int64`
    * @type integer
    */
-  petId: bigint
+  pet_id: bigint
 }
 
 /**

@@ -1,4 +1,4 @@
-import { buildRequestParamsSignature, getOperationParameters } from '@internals/shared'
+import { buildRequestParamsSignature } from '@internals/shared'
 import { Url } from '@internals/utils'
 import { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -30,11 +30,9 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   const responseType = resolver.response.response(node)
   const returnType = `Cypress.Chainable<${responseType}>`
 
-  // Reference the path object straight in the URL, using the resolved path-param names that the
-  // generated `path` type uses (not the placeholder's own text, which can differ from a param's
-  // declared name in a loosely-specced document).
-  const { path: pathParams } = getOperationParameters(node)
-  const urlTemplate = Url.toGroupedTemplateString(node.path, { prefix: baseURL, names: pathParams.map((param) => param.name) })
+  // Reference the path object straight in the URL with the sanitized placeholders shared with the
+  // generated `path` type.
+  const urlTemplate = Url.toGroupedTemplateString(node.path, { prefix: baseURL })
 
   const requestOptions: Array<string> = [`method: '${node.method}'`, `url: ${urlTemplate}`]
 
