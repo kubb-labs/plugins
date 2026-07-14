@@ -239,7 +239,7 @@ function applyCredential({ request, resolved }: { request: HttpClientRequest.Htt
   if (scheme.in === 'query') return HttpClientRequest.setUrlParam(request, scheme.wireName, value)
 
   const cookie = \`${'${encodeURIComponent(scheme.wireName)}'}=${'${encodeURIComponent(value)}'}\`
-  const previous = request.headers.cookie
+  const previous = request.headers['cookie']
   return HttpClientRequest.setHeader(request, 'Cookie', previous ? \`${'${previous}'}; ${'${cookie}'}\` : cookie)
 }
 
@@ -256,12 +256,10 @@ export function makeSecurityLayer<E = never, R = never>(options: SecurityLayerOp
         return yield* next(resolved.reduce((current, credential) => applyCredential({ request: current, resolved: credential }), request))
       }
 
-      return yield* Effect.fail(
-        new MissingSecurityCredentials({
-          endpoint: endpoint.identifier,
-          requirements: requirements.map((requirement) => requirement.map((entry) => entry.name)),
-        }),
-      )
+      return yield* new MissingSecurityCredentials({
+        endpoint: endpoint.identifier,
+        requirements: requirements.map((requirement) => requirement.map((entry) => entry.name)),
+      })
     }),
   )
 }

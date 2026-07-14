@@ -284,6 +284,7 @@ function renderResponses({ node, effectResolver }: { node: ast.HttpOperationNode
   const imports: Array<string> = []
 
   for (const response of node.responses) {
+    if (response.statusCode === 'default') continue
     const status = getStatusCodeNumber(response.statusCode)
     if (status === null) throw new Error(`Operation "${node.operationId}" uses unsupported non-numeric response status "${response.statusCode}"`)
     const target = status >= 200 && status < 300 ? success : error

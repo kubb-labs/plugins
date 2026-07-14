@@ -85,7 +85,14 @@ const operations: Array<ast.OperationNode> = [
     method: 'GET',
     path: '/orders',
     tags: ['store'],
-    responses: [ast.factory.createResponse({ statusCode: '204', description: 'No content' })],
+    responses: [
+      ast.factory.createResponse({ statusCode: '204', description: 'No content' }),
+      ast.factory.createResponse({
+        statusCode: 'default',
+        description: 'Unspecified error',
+        content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+      }),
+    ],
   }),
 ]
 
@@ -132,6 +139,7 @@ describe('httpApiClientGenerator', () => {
     expect(output).toContain('HttpApiGroup.make("pets")')
     expect(output).toContain('HttpApiClient.make(Api, { baseUrl: "https://example.com" })')
     expect(output).toContain('"getPet": [[{"name":"apiKey","scopes":[]}]]')
+    expect(output).toContain("request.headers['cookie']")
   })
 
   test('marks groups as top-level in flat mode', async () => {
@@ -140,5 +148,13 @@ describe('httpApiClientGenerator', () => {
 
     expect(api).toContain('HttpApiGroup.make("pets", { topLevel: true })')
     expect(api).toContain('HttpApiGroup.make("store", { topLevel: true })')
+  })
+
+  test('omits default responses that Effect HttpApi cannot represent as a concrete status', async () => {
+    const sources = await render(defaultOptions)
+    const output = sources.join('\n')
+
+    expect(output).toContain('HttpApiSchema.Empty(204)')
+    expect(output).not.toContain('ListOrdersDefault')
   })
 })
