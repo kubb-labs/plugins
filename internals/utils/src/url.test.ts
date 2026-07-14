@@ -34,23 +34,19 @@ describe('Url.toTemplateString', () => {
   })
 })
 
-describe('Url.toCasedTemplate', () => {
-  test('camelCases placeholder names while keeping the braces', () => {
-    expect(Url.toCasedTemplate('/projects/{project_id}', { casing: 'camelcase' })).toBe('/projects/{projectId}')
-    expect(Url.toCasedTemplate('/user/{user_id}/posts/{post_id}', { casing: 'camelcase' })).toBe('/user/{userId}/posts/{postId}')
+describe('Url.toSafeTemplate', () => {
+  test('preserves already-valid identifier placeholder names, including snake_case', () => {
+    expect(Url.toSafeTemplate('/projects/{project_id}')).toBe('/projects/{project_id}')
+    expect(Url.toSafeTemplate('/user/{user_id}/posts/{post_id}')).toBe('/user/{user_id}/posts/{post_id}')
   })
 
   test('leaves already-camelCase and braceless paths unchanged', () => {
-    expect(Url.toCasedTemplate('/pet/{petId}', { casing: 'camelcase' })).toBe('/pet/{petId}')
-    expect(Url.toCasedTemplate('/health', { casing: 'camelcase' })).toBe('/health')
+    expect(Url.toSafeTemplate('/pet/{petId}')).toBe('/pet/{petId}')
+    expect(Url.toSafeTemplate('/health')).toBe('/health')
   })
 
-  test('camelCases non-identifier placeholders such as kebab-case', () => {
-    expect(Url.toCasedTemplate('/user/{monetary-account-id}', { casing: 'camelcase' })).toBe('/user/{monetaryAccountId}')
-  })
-
-  test('preserves the original casing when no casing is requested', () => {
-    expect(Url.toCasedTemplate('/user/{user_id}')).toBe('/user/{user_id}')
+  test('camelCases non-identifier placeholders such as kebab-case, as an identifier-safety fallback', () => {
+    expect(Url.toSafeTemplate('/user/{monetary-account-id}')).toBe('/user/{monetaryAccountId}')
   })
 })
 

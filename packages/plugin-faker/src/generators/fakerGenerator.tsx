@@ -1,4 +1,4 @@
-import { caseParams, getOperationParameters, getPerContentTypeName, resolveContentTypeVariants } from '@internals/shared'
+import { getOperationParameters, getPerContentTypeName, resolveContentTypeVariants } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from 'kubb/kit'
 import { buildParams, pluginTsName } from '@kubb/plugin-ts'
@@ -108,8 +108,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
-    const params = caseParams(node.parameters, 'camelcase')
-    const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters({ ...node, parameters: params }, { paramsCasing: 'original' })
+    const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
     const paramGroups = (
       [
         { params: pathParams, name: resolver.param.path, typeName: tsResolver.param.path },

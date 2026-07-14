@@ -11,7 +11,7 @@ import { fakerEN as faker } from '@faker-js/faker'
 
 export function createFindPetsByStatusPathFaker<TData extends Partial<FindPetsByStatusPath> = object>(data?: TData) {
   const defaultFakeData = {
-    stepId: faker.string.alpha(),
+    step_id: faker.string.alpha(),
   }
   return {
     ...defaultFakeData,

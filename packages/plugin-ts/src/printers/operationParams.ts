@@ -1,4 +1,4 @@
-import { caseParams } from '@internals/shared'
+import { getOperationParameters } from '@internals/shared'
 import type { OperationParamsResolver } from '@internals/shared'
 import type { ast } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createIndexedAccessType, createTypeLiteral } from './functionParams.ts'
@@ -44,10 +44,6 @@ export type CreateOperationParamsOptions = {
    * - `'inlineSpread'` emits a single rest parameter `...pathParams: PathParams`
    */
   pathParamsType: 'object' | 'inline' | 'inlineSpread'
-  /**
-   * Converts parameter names to camelCase before output.
-   */
-  paramsCasing?: 'camelcase'
   /**
    * Resolver for parameter and request body type names.
    * Pass `ResolverTs` from `@kubb/plugin-ts` directly.
@@ -184,7 +180,7 @@ function resolveGroupType({
  * name resolution and `extraParams` for plugin-specific trailing parameters such as an `options` object.
  */
 export function createOperationParams(node: ast.OperationNode, options: CreateOperationParamsOptions): FunctionParametersNode {
-  const { paramsType, pathParamsType, paramsCasing, resolver, pathParamsDefault, extraParams = [], paramNames, typeWrapper } = options
+  const { paramsType, pathParamsType, resolver, pathParamsDefault, extraParams = [], paramNames, typeWrapper } = options
 
   const dataName = paramNames?.data ?? 'data'
   const paramsName = paramNames?.params ?? 'params'
@@ -196,10 +192,7 @@ export function createOperationParams(node: ast.OperationNode, options: CreateOp
   // TypeLiteral and IndexedAccessType expressions are pre-resolved and pass through unchanged.
   const wrapTypeExpression = (type: TypeExpression): TypeExpression => (typeof type === 'string' ? wrapType(type) : type)
 
-  const casedParams = caseParams(node.parameters, paramsCasing)
-  const pathParams = casedParams.filter((p) => p.in === 'path')
-  const queryParams = casedParams.filter((p) => p.in === 'query')
-  const headerParams = casedParams.filter((p) => p.in === 'header')
+  const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
 
   const toProperty = (param: ast.ParameterNode): GroupProperty => ({
     name: param.name,

@@ -11,8 +11,8 @@ export function getPets({ query, headers }: GetPetsOptions, options: Partial<Cyp
     .request<GetPetsResponse>({
       method: 'GET',
       url: `/pets`,
-      qs: query ? { page_size: query.pageSize } : query,
-      headers: headers ? { 'x-api-key': headers.xApiKey } : headers,
+      qs: query,
+      headers,
       ...options,
     })
     .then((res) => res.body)

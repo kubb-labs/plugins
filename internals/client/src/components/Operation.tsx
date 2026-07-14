@@ -5,7 +5,6 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import { buildParamsRemap } from '../builders/paramsRemap.ts'
 import { buildReturnStatement } from '../builders/returnStatement.ts'
 import { type Auth, buildSecurityMetadata } from '../builders/security.ts'
 import { buildGroupedOptionsSignature } from '../builders/signature.ts'
@@ -83,14 +82,13 @@ export function Operation({ name, node, tsResolver, zodResolver, validator, secu
 
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
-    `url: '${Url.toCasedTemplate(node.path, { casing: 'camelcase' })}'`,
+    `url: '${Url.toSafeTemplate(node.path)}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
     stylesLiteral ? `styles: ${stylesLiteral}` : null,
     validatorLiteral,
     contentTypeLiteral,
     responseTypeLiteral,
     '...config',
-    ...buildParamsRemap({ node }),
   ]
     .filter(Boolean)
     .join(', ')} }`

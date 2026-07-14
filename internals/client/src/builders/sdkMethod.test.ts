@@ -16,9 +16,10 @@ const node = ast.factory.createOperation({
 })
 
 describe('buildSdkMethod', () => {
-  test('remaps renamed query params to the spec names after the config spread', () => {
+  test('builds the call config without remapping, since query param names already match the spec', () => {
     const method = buildSdkMethod({ node, name: 'updatePet', tsResolver: resolverTs, validator: undefined })
 
-    expect(method).toContain('...config, query: config.query ? { "include_deleted": config.query.includeDeleted } : config.query')
+    expect(method).toContain("url: '/pets/{pet_id}', ...config")
+    expect(method).not.toContain('include_deleted')
   })
 })

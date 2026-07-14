@@ -16,5 +16,5 @@ import { deletePetResponseSchema, deletePetErrorSchema } from '../zod/deletePetS
 export function deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetOptions, ThrowOnError>): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], validator: { response: deletePetResponseSchema, error: deletePetErrorSchema }, ...config, headers: config.headers ? { "api_key": config.headers.apiKey } : config.headers }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
+  return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], validator: { response: deletePetResponseSchema, error: deletePetErrorSchema }, ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
 }

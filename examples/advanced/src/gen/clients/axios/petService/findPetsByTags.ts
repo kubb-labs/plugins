@@ -20,6 +20,5 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
     styles: { query: { tags: { explode: true } } },
     validator: { response: findPetsByTagsResponseSchema, error: findPetsByTagsErrorSchema },
     ...config,
-    headers: config.headers ? { 'X-EXAMPLE': config.headers.xEXAMPLE } : config.headers,
   }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
 }

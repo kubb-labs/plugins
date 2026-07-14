@@ -762,7 +762,7 @@ export type DeletePetHeaders = {
   /**
    * @type string | undefined
    */
-  apiKey?: string
+  api_key?: string
 }
 
 /**

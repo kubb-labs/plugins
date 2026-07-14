@@ -2,9 +2,9 @@ openapi: 3.0.3
 info:
   title: Params Casing Test
   description: |
-    Minimal spec to test the paramsCasing option.
+    Minimal spec to verify that generated code preserves OpenAPI parameter names exactly.
     The POST endpoint has snake_case path and query params plus a hyphenated
-    header param so that 'camelcase' conversion can be verified.
+    header param so that name preservation can be verified.
   version: 1.0.0
 paths:
   /pets/{pet_id}:

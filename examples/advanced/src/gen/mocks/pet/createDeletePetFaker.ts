@@ -13,7 +13,7 @@ export function createDeletePetPathFaker<TData extends Partial<DeletePetPath> = 
 
 export function createDeletePetHeadersFaker<TData extends Partial<DeletePetHeaders> = object>(data?: TData) {
   const defaultFakeData = {
-    apiKey: faker.string.alpha(),
+    api_key: faker.string.alpha(),
   }
   return {
     ...defaultFakeData,

@@ -51,7 +51,7 @@ function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs)
 }
 
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod, validator: ValidatorOptions): Array<string> {
-  const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'original' })
+  const { query: queryParams } = getOperationParameters(node)
   const names: Array<string | null | undefined> = [
     resolveResponseValidator(validator) === 'zod' ? zodResolver.response.response(node) : null,
     resolveResponseValidator(validator) === 'zod' ? (buildZodErrorParse(node, zodResolver)?.expression ?? null) : null,

@@ -12,7 +12,7 @@ export type GetConfigIdV20250Path = {
     /**
      * @type string
     */
-    configId: string;
+    config_id: string;
 };
 
 /**
