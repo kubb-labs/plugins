@@ -1,6 +1,6 @@
 import { buildOperationComments } from '@internals/shared'
-import { buildJSDoc, Url } from '@internals/utils'
-import { ast } from 'kubb/kit'
+import { buildJSDoc } from '@internals/utils'
+import { ast, Url } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import type { ValidatorOptions } from '../types.ts'

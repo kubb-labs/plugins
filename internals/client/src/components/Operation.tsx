@@ -1,6 +1,5 @@
 import { buildOperationComments, getContentTypeInfo, getResponseContentTypeInfo, getResponseType, isEventStream } from '@internals/shared'
-import { Url } from '@internals/utils'
-import { ast } from 'kubb/kit'
+import { ast, Url } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { File, Function } from 'kubb/jsx'

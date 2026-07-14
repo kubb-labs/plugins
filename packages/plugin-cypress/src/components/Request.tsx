@@ -1,6 +1,5 @@
 import { buildRequestParamsSignature } from '@internals/shared'
-import { Url } from '@internals/utils'
-import { ast } from 'kubb/kit'
+import { ast, Url } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'

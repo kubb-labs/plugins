@@ -1,5 +1,5 @@
-import { camelCase, isValidVarName, Url } from '@internals/utils'
-import { ast, type ResolverFileParams } from 'kubb/kit'
+import { camelCase, isValidVarName } from '@internals/utils'
+import { type ast, type ResolverFileParams, Url } from 'kubb/kit'
 import { dedupeParams } from './params.ts'
 
 /**
