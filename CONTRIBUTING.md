@@ -175,7 +175,7 @@ To approve a release:
 2. The same maintainer approves the `promote` job's environment review on the workflow run in the Actions tab.
 3. The `promote` job then verifies the versions are actually live on npm, tags the released versions, and creates a GitHub Release, and only then dispatches the content refresh to [kubb-labs/platform](https://github.com/kubb-labs/platform).
 
-Packages in this repo version and changelog independently (see the empty `fixed` and `linked` groups in `.changeset/config.json`), so a release here creates one GitHub Release per staged package, tagged `<package>@<version>`, with notes taken from that package's own `CHANGELOG.md`. This differs from [kubb-labs/kubb](https://github.com/kubb-labs/kubb), where every package shares one fixed version and a release covers all of them combined.
+Packages in this repo version and changelog independently (see the empty `fixed` and `linked` groups in `.changeset/config.json`), so a release here creates one GitHub Release per staged package, tagged `<package>@<version>`, with notes taken from that package's own `CHANGELOG.md`. This differs from [kubb-labs/kubb](https://github.com/kubb-labs/kubb), where every package shares one fixed version and a release covers all of them combined. `scripts/createReleases.mjs` is shared verbatim between the two repos; the `RELEASE_MODE` environment variable picks the mode, and this repo simply never sets it to `combined`.
 
 If a staged version turns out to be wrong, reject it with `npm stage reject` instead of approving it. Nothing downstream fires for a rejected version.
 
