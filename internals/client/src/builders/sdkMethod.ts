@@ -1,6 +1,6 @@
 import { buildOperationComments } from '@internals/shared'
 import { buildJSDoc } from '@internals/utils'
-import { ast, Url } from 'kubb/kit'
+import { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import type { ValidatorOptions } from '../types.ts'
@@ -35,7 +35,7 @@ function buildCallConfig({
 
   return `{ ${[
     `method: '${node.method.toUpperCase()}'`,
-    `url: '${Url.toSafeTemplate(node.path)}'`,
+    `url: '${node.path}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
     validatorLiteral,
     '...config',

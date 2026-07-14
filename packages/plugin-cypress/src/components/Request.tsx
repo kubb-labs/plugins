@@ -29,8 +29,8 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   const responseType = resolver.response.response(node)
   const returnType = `Cypress.Chainable<${responseType}>`
 
-  // Reference the path object straight in the URL with the sanitized placeholders shared with the
-  // generated `path` type.
+  // Reference the path object straight in the URL, through bracket access, matching the
+  // generated `path` type's keys (the original OpenAPI parameter names).
   const urlTemplate = Url.toGroupedTemplateString(node.path, { prefix: baseURL })
 
   const requestOptions: Array<string> = [`method: '${node.method}'`, `url: ${urlTemplate}`]

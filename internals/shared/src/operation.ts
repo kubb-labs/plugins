@@ -1,4 +1,3 @@
-import { camelCase, isValidVarName } from '@internals/utils'
 import { type ast, type ResolverFileParams, Url } from 'kubb/kit'
 import { dedupeParams } from './params.ts'
 
@@ -405,12 +404,8 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
 }
 
 export function getOperationParameters(node: ast.OperationNode): OperationParameterGroups {
-  const path = node.parameters
-    .filter((param) => param.in === 'path')
-    .map((param) => (isValidVarName(param.name) ? param : { ...param, name: camelCase(param.name) }))
-
   return {
-    path: dedupeParams(path),
+    path: dedupeParams(node.parameters.filter((param) => param.in === 'path')),
     query: dedupeParams(node.parameters.filter((param) => param.in === 'query')),
     header: dedupeParams(node.parameters.filter((param) => param.in === 'header')),
     cookie: dedupeParams(node.parameters.filter((param) => param.in === 'cookie')),
