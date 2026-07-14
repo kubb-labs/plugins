@@ -11,24 +11,29 @@ type ResponseUnionOptions = {
   fallbackUnknown: boolean
 }
 
+function containsSchema(node: ast.SchemaNode, predicate: (schema: ast.SchemaNode) => boolean, seen: ReadonlySet<string> = new Set()): boolean {
+  if (predicate(node)) return true
+  if (node.type === 'ref') {
+    const name = ast.resolveRefName(node)
+    if (name && seen.has(name)) return false
+    const resolved = ast.syncSchemaRef(node)
+    if (resolved.type !== 'ref') return containsSchema(resolved, predicate, name ? new Set([...seen, name]) : seen)
+  }
+  if ('properties' in node && node.properties?.some((property) => containsSchema(property.schema, predicate, seen))) return true
+  if ('items' in node && node.items?.some((item) => containsSchema(item, predicate, seen))) return true
+  if ('members' in node && node.members?.some((member) => containsSchema(member, predicate, seen))) return true
+  if ('additionalProperties' in node && node.additionalProperties && node.additionalProperties !== true) {
+    return containsSchema(node.additionalProperties, predicate, seen)
+  }
+  return false
+}
+
 function needsSchemaGetter(node: ast.SchemaNode): boolean {
-  return ast
-    .collect<boolean>(node, {
-      schema(schema) {
-        return schema.type === 'date' && schema.representation === 'date' && schema.format === 'date' ? true : undefined
-      },
-    })
-    .some(Boolean)
+  return containsSchema(node, (schema) => schema.type === 'bigint' || (schema.type === 'date' && schema.representation === 'date' && schema.format === 'date'))
 }
 
 function needsDateTime(node: ast.SchemaNode): boolean {
-  return ast
-    .collect<boolean>(node, {
-      schema(schema) {
-        return schema.type === 'date' && schema.representation === 'date' && schema.format !== 'date' ? true : undefined
-      },
-    })
-    .some(Boolean)
+  return containsSchema(node, (schema) => schema.type === 'date' && schema.representation === 'date' && schema.format !== 'date')
 }
 
 /**

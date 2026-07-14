@@ -91,7 +91,29 @@ function valueLiteral(value: unknown): string {
   return 'undefined'
 }
 
-function annotationLiteral(node: ast.SchemaNode, value: unknown): string {
+function annotationLiteral(node: ast.SchemaNode, value: unknown, seen: ReadonlySet<string> = new Set()): string {
+  if (node.type === 'ref') {
+    const name = ast.resolveRefName(node)
+    if (name && seen.has(name)) return valueLiteral(value)
+    const resolved = ast.syncSchemaRef(node)
+    if (resolved.type !== 'ref') return annotationLiteral(resolved, value, name ? new Set([...seen, name]) : seen)
+  }
+  if (node.type === 'object' && typeof value === 'object' && value !== null && !Array.isArray(value)) {
+    const properties = new Map(node.properties?.map((property) => [property.name, property.schema]))
+    return `{ ${Object.entries(value)
+      .map(([key, item]) => {
+        const property = properties.get(key)
+        return `${propertyKey(key)}: ${property ? annotationLiteral(property, item, seen) : valueLiteral(item)}`
+      })
+      .join(', ')} }`
+  }
+  if (node.type === 'array' && Array.isArray(value)) {
+    const item = node.items?.[0]
+    return `[${value.map((entry) => (item ? annotationLiteral(item, entry, seen) : valueLiteral(entry))).join(', ')}]`
+  }
+  if (node.type === 'tuple' && Array.isArray(value)) {
+    return `[${value.map((entry, index) => (node.items?.[index] ? annotationLiteral(node.items[index]!, entry, seen) : valueLiteral(entry))).join(', ')}]`
+  }
   if (node.type === 'bigint' && (typeof value === 'number' || typeof value === 'string' || typeof value === 'bigint')) {
     return `BigInt(${JSON.stringify(String(value))})`
   }
@@ -341,12 +363,17 @@ export const printerEffect = ast.createPrinter<PrinterEffectFactory>((options) =
       return schemaCode(`Schema.String${lengthChecks(node, this.options.regexType)}`, 'string')
     },
     number(node) {
-      return schemaCode(`Schema.Number${checks(['Schema.isFinite()', ...numberChecks(node)])}`, 'number')
+      return schemaCode(`Schema.Finite${checks(numberChecks(node))}`, 'number')
     },
     integer(node) {
-      return schemaCode(`Schema.Number${checks(['Schema.isFinite()', 'Schema.isInt()', ...numberChecks(node)])}`, 'number')
+      return schemaCode(`Schema.Int${checks(numberChecks(node))}`, 'number')
     },
-    bigint: () => schemaCode('Schema.BigInt', 'bigint'),
+    bigint: () =>
+      schemaCode(
+        'Schema.Int.pipe(Schema.decodeTo(Schema.BigInt, { decode: SchemaGetter.transform((value) => BigInt(value)), encode: SchemaGetter.transform((value) => Number(value)) }))',
+        'bigint',
+        'number',
+      ),
     date(node) {
       if (node.representation !== 'date') return schemaCode('Schema.String', 'string')
       if (node.format === 'date') {

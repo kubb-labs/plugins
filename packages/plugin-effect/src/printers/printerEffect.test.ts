@@ -13,7 +13,7 @@ describe('printerEffect', () => {
       encoded: 'string',
     })
     expect(printer.print(ast.factory.createSchema({ type: 'integer', min: 1, exclusiveMaximum: 10, multipleOf: 2 }))).toEqual({
-      runtime: 'Schema.Number.check(Schema.isFinite(), Schema.isInt(), Schema.isGreaterThanOrEqualTo(1), Schema.isLessThan(10), Schema.isMultipleOf(2))',
+      runtime: 'Schema.Int.check(Schema.isGreaterThanOrEqualTo(1), Schema.isLessThan(10), Schema.isMultipleOf(2))',
       type: 'number',
       encoded: 'number',
     })
@@ -36,8 +36,7 @@ describe('printerEffect', () => {
       ],
     })
     expect(printer.print(node)).toEqual({
-      runtime:
-        'Schema.Struct({ id: Schema.Number.check(Schema.isFinite(), Schema.isInt()), "display-name": Schema.optionalKey(Schema.NullOr(Schema.String)) })',
+      runtime: 'Schema.Struct({ id: Schema.Int, "display-name": Schema.optionalKey(Schema.NullOr(Schema.String)) })',
       type: '{ readonly id: number; readonly "display-name"?: string | null }',
       encoded: '{ readonly id: number; readonly "display-name"?: string | null }',
     })
@@ -52,7 +51,7 @@ describe('printerEffect', () => {
       strategy: 'one',
       members: [ast.factory.createSchema({ type: 'string' }), ast.factory.createSchema({ type: 'number' })],
     })
-    expect(printer.print(oneOf)?.runtime).toBe('Schema.Union([Schema.String, Schema.Number.check(Schema.isFinite())], { mode: "oneOf" })')
+    expect(printer.print(oneOf)?.runtime).toBe('Schema.Union([Schema.String, Schema.Finite], { mode: "oneOf" })')
   })
 
   test('omits fields from referenced operation schemas', () => {
@@ -81,6 +80,15 @@ describe('printerEffect', () => {
     })
   })
 
+  test('decodes JSON int64 numbers to bigint values', () => {
+    expect(printer.print(ast.factory.createSchema({ type: 'bigint', format: 'int64', examples: [100_000] }))).toEqual({
+      runtime:
+        'Schema.Int.pipe(Schema.decodeTo(Schema.BigInt, { decode: SchemaGetter.transform((value) => BigInt(value)), encode: SchemaGetter.transform((value) => Number(value)) })).annotate({ format: "int64", examples: [BigInt("100000")] })',
+      type: 'bigint',
+      encoded: 'number',
+    })
+  })
+
   test('prints Effect DateTime codecs and annotations', () => {
     const node = ast.factory.createSchema({
       type: 'date',
@@ -95,6 +103,28 @@ describe('printerEffect', () => {
       type: 'DateTime.Utc',
       encoded: 'string',
     })
+  })
+
+  test('converts DateTime values inside referenced object examples', () => {
+    const schema = ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({
+          name: 'createdDate',
+          required: true,
+          schema: ast.factory.createSchema({ type: 'date', representation: 'date', format: 'date-time' }),
+        }),
+      ],
+    })
+    const ref = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Order',
+      ref: '#/components/schemas/Order',
+      schema,
+      examples: [{ createdDate: '2026-07-14T10:30:00.000Z' }],
+    })
+
+    expect(printer.print(ref)?.runtime).toBe('Order.annotate({ examples: [{ createdDate: DateTime.makeUnsafe("2026-07-14T10:30:00.000Z") }] })')
   })
 
   test('prints recursive refs with an explicit codec contract', () => {
