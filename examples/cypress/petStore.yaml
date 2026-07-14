@@ -304,7 +304,7 @@ paths:
       description: ''
       operationId: uploadFile
       parameters:
-        - name: petId
+        - name: pet_id
           in: path
           description: ID of pet to update
           required: true
