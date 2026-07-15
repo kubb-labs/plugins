@@ -1,6 +1,5 @@
 import { getOperationParameters } from '@internals/shared'
-import { Url } from '@internals/utils'
-import type { ast } from 'kubb/kit'
+import { type ast, Url } from 'kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from 'kubb/jsx'

@@ -248,7 +248,7 @@ describe('response status helpers', () => {
 })
 
 describe('getOperationParameters', () => {
-  test('groups parameters by location, sanitizing only path names into valid identifiers', () => {
+  test('groups parameters by location, keeping every name exactly as in the OpenAPI spec', () => {
     const node = ast.factory.createOperation({
       operationId: 'showPet',
       method: 'GET',
@@ -263,7 +263,7 @@ describe('getOperationParameters', () => {
 
     const grouped = getOperationParameters(node)
 
-    expect(grouped.path.map((param) => param.name)).toStrictEqual(['petId'])
+    expect(grouped.path.map((param) => param.name)).toStrictEqual(['pet-id'])
     expect(grouped.query.map((param) => param.name)).toStrictEqual(['page-size'])
     expect(grouped.header.map((param) => param.name)).toStrictEqual(['x-api-key'])
     expect(grouped.cookie.map((param) => param.name)).toStrictEqual(['session-id'])
@@ -291,7 +291,7 @@ describe('resolveOperationTypeNames', () => {
     })
 
     expect(resolveOperationTypeNames(node, resolver, { exclude: ['Status200'] })).toStrictEqual([
-      'petIdPathParams',
+      'pet-idPathParams',
       'page-sizeQueryParams',
       'x-api-keyHeaderParams',
       'showPetData',

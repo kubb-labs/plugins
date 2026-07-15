@@ -1,10 +1,9 @@
 import { getPrimarySuccessResponse } from '@internals/shared'
-import { Url } from '@internals/utils'
-import type { ast } from 'kubb/kit'
+import { ast, Url } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import { getContentType, getMswMethod, getMswUrl, hasResponseSchema } from '../utils.ts'
+import { getContentType, getMswMethod, hasResponseSchema } from '../utils.ts'
 
 type Props = {
   name: string
@@ -22,7 +21,7 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
   const successResponse = getPrimarySuccessResponse(node)
   const statusCode = successResponse ? Number(successResponse.statusCode) : 200
   const contentType = getContentType(successResponse)
-  const url = Url.toPath(getMswUrl(node))
+  const url = ast.isHttpOperationNode(node) ? Url.toPath(node.path) : ''
 
   const headers = [contentType ? `'Content-Type': '${contentType}'` : null].filter(Boolean)
   const responseHasSchema = hasResponseSchema(successResponse)
