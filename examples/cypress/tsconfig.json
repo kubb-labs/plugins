@@ -19,6 +19,6 @@
     "strict": true,
     "types": ["cypress", "node"]
   },
-  "include": ["./src/**/*"],
+  "include": ["./src/**/*", "./kubb.config.js"],
   "exclude": ["**/node_modules", "**/types/**", "**/mocks/**"]
 }

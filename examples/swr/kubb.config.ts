@@ -16,7 +16,7 @@ export default defineConfig(() => {
       format: false,
       lint: false,
     },
-    adapter: adapterOas({ unknownType: 'unknown', serverIndex: 0 }),
+    adapter: adapterOas({ unknownType: 'unknown', server: { index: 0 } }),
     plugins: [
       pluginTs({
         output: { path: 'models', mode: 'directory', barrel: { type: 'named' } },
