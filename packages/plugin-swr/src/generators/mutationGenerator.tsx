@@ -1,5 +1,6 @@
 import { resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
+import { classifyOperation } from '@internals/tanstack-query'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
@@ -23,12 +24,7 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
     if (!pluginTs) return null
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
-    const queryMethods = new Set(query ? query.methods : [])
-    const isMutation =
-      mutation !== false &&
-      !isQuery &&
-      (mutation ? mutation.methods : []).some((method) => !queryMethods.has(method) && node.method.toLowerCase() === method.toLowerCase())
+    const { isMutation } = classifyOperation(node, { query, mutation })
 
     if (!isMutation) return null
 
