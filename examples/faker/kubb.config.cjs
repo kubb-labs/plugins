@@ -21,11 +21,13 @@ module.exports = defineConfig(() => {
         pluginTs({
           output: {
             path: 'models',
+            mode: 'directory',
           },
         }),
         pluginFaker({
           output: {
             path: './tag',
+            mode: 'directory',
             barrelType: 'propagate',
           },
           include: [
@@ -52,11 +54,13 @@ module.exports = defineConfig(() => {
         pluginTs({
           output: {
             path: 'models',
+            mode: 'directory',
           },
         }),
         pluginFaker({
           output: {
             path: './faker',
+            mode: 'directory',
           },
           transformers: {
             schema({ schema: _schema, name, parentName }, defaultSchemas) {

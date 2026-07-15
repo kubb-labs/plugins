@@ -20,11 +20,13 @@ export default defineConfig(() => {
       pluginTs({
         output: {
           path: 'models',
+          mode: 'directory',
         },
       }),
       pluginFaker({
         output: {
           path: './mocks',
+          mode: 'directory',
         },
         group: {
           type: 'tag',
@@ -35,6 +37,7 @@ export default defineConfig(() => {
       pluginMsw({
         output: {
           path: './msw',
+          mode: 'directory',
         },
         handlers: true,
         group: {

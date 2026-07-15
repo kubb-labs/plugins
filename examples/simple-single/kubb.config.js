@@ -32,7 +32,7 @@ export default defineConfig([
         output: { path: 'models.ts', mode: 'file', clean: true },
       }),
       pluginFetch({
-        output: { path: './clients', barrel: { type: 'named' } },
+        output: { path: './clients', mode: 'directory', barrel: { type: 'named' } },
       }),
       pluginReactQuery({
         output: {

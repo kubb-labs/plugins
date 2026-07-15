@@ -26,6 +26,7 @@ export default defineConfig([
       pluginCypress({
         output: {
           path: 'cypress',
+          mode: 'directory',
         },
         group: {
           type: 'tag',
@@ -47,7 +48,7 @@ export default defineConfig([
         output: { path: 'models.ts', mode: 'file' },
       }),
       pluginCypress({
-        output: { path: 'cypress' },
+        output: { path: 'cypress', mode: 'directory' },
         baseURL: 'http://localhost:3000',
       }),
     ],

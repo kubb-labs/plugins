@@ -22,16 +22,16 @@ export default defineConfig(() => {
     parsers: [parserTs(), parserTsx()],
     plugins: [
       pluginTs({
-        output: { path: 'models/ts', barrel: { type: 'named' } },
+        output: { path: 'models/ts', mode: 'directory', barrel: { type: 'named' } },
       }),
-      pluginZod({}),
+      pluginZod({ output: { path: 'zod', mode: 'directory' } }),
       // A registered contract client. pluginMcp detects it and its handlers import and call its
       // generated `<op>` functions, which return the shared `RequestResult` shape.
       pluginAxios({
-        output: { path: './clients', barrel: { type: 'named' } },
+        output: { path: './clients', mode: 'directory', barrel: { type: 'named' } },
         baseURL: 'https://petstore.swagger.io/v2',
       }),
-      pluginMcp({}),
+      pluginMcp({ output: { path: 'mcp', mode: 'directory' } }),
     ],
   }
 })
