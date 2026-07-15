@@ -12,3 +12,12 @@ export type GetInventoryStatus200SchemaType = z.infer<typeof getInventoryStatus2
 export const getInventoryResponseSchema = getInventoryStatus200Schema
 
 export type GetInventoryResponseSchemaType = z.infer<typeof getInventoryResponseSchema>
+
+export const getInventoryOptionsSchema = z.object({
+  body: z.never().optional(),
+  path: z.never().optional(),
+  query: z.never().optional(),
+  headers: z.never().optional(),
+})
+
+export type GetInventoryOptionsSchemaType = z.infer<typeof getInventoryOptionsSchema>

@@ -29,3 +29,19 @@ export type GetThingsResponseSchemaType = z.infer<typeof getThingsResponseSchema
 export const getThingsErrorSchema = getThingsStatusDefaultSchema
 
 export type GetThingsErrorSchemaType = z.infer<typeof getThingsErrorSchema>
+
+export const getThingsQuerySchema = z.object({
+  limit: z.int().min(1).max(100).optional().default(100).describe('Maximum number of things to return'),
+  skip: z.int().min(0).optional().default(0).describe('Number of things to skip'),
+})
+
+export type GetThingsQuerySchemaType = z.infer<typeof getThingsQuerySchema>
+
+export const getThingsOptionsSchema = z.object({
+  body: z.never().optional(),
+  path: z.never().optional(),
+  query: getThingsQuerySchema.optional(),
+  headers: z.never().optional(),
+})
+
+export type GetThingsOptionsSchemaType = z.infer<typeof getThingsOptionsSchema>

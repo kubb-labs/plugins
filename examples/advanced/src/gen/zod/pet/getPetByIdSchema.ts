@@ -32,3 +32,18 @@ export type GetPetByIdResponseSchemaType = z.infer<typeof getPetByIdResponseSche
 export const getPetByIdErrorSchema = z.union([getPetByIdStatus400Schema, getPetByIdStatus404Schema])
 
 export type GetPetByIdErrorSchemaType = z.infer<typeof getPetByIdErrorSchema>
+
+export const getPetByIdPathSchema = z.object({
+  petId: z.int().describe('ID of pet to return'),
+})
+
+export type GetPetByIdPathSchemaType = z.infer<typeof getPetByIdPathSchema>
+
+export const getPetByIdOptionsSchema = z.object({
+  body: z.never().optional(),
+  path: getPetByIdPathSchema,
+  query: z.never().optional(),
+  headers: z.never().optional(),
+})
+
+export type GetPetByIdOptionsSchemaType = z.infer<typeof getPetByIdOptionsSchema>

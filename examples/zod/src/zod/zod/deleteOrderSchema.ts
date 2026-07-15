@@ -24,3 +24,18 @@ export type DeleteOrderResponseSchemaType = z.infer<typeof deleteOrderResponseSc
 export const deleteOrderErrorSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])
 
 export type DeleteOrderErrorSchemaType = z.infer<typeof deleteOrderErrorSchema>
+
+export const deleteOrderPathSchema = z.object({
+  orderId: z.bigint().describe('ID of the order that needs to be deleted'),
+})
+
+export type DeleteOrderPathSchemaType = z.infer<typeof deleteOrderPathSchema>
+
+export const deleteOrderOptionsSchema = z.object({
+  body: z.never().optional(),
+  path: deleteOrderPathSchema,
+  query: z.never().optional(),
+  headers: z.never().optional(),
+})
+
+export type DeleteOrderOptionsSchemaType = z.infer<typeof deleteOrderOptionsSchema>
