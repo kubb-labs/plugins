@@ -1,4 +1,4 @@
-import { collectRefNames, getOasAdapter, getSuccessResponses, isSuccessStatusCode, resolveContentTypeVariants } from '@internals/shared'
+import { collectRefNames, getOasAdapter, getOperationParameters, getSuccessResponses, isSuccessStatusCode, resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Zod } from '../components/Zod.tsx'
@@ -6,7 +6,7 @@ import { ZOD_NAMESPACE_IMPORTS } from '../constants.ts'
 import { printerZod } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
-import { collectCodecRefNames, containsCodec } from '../utils.ts'
+import { buildGroupedParamsSchema, buildOptionsSchema, collectCodecRefNames, containsCodec } from '../utils.ts'
 
 type StdPrinters = { output: ReturnType<typeof printerZod>; input: ReturnType<typeof printerZod> }
 type ZodPrinterEntry = StdPrinters & { coercion: unknown; guidType: unknown; regexType: unknown; dateType: unknown; nodes: unknown }
@@ -339,6 +339,38 @@ export const zodGenerator = defineGenerator<PluginZod>({
       )
     })()
 
+    // Grouped path/query/headers schemas plus the combined `{ body, path, query, headers }` options
+    // schema exist only to back `resolver.response.options(node)` for consumers sourcing types from
+    // this plugin instead of `plugin-ts`. Not worth generating when nothing will import them.
+    const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
+
+    const paramGroupSchemas = inferred
+      ? [
+          pathParams.length > 0 &&
+            renderSchemaEntry({
+              schema: buildGroupedParamsSchema({ params: pathParams }),
+              name: resolver.param.path(node, pathParams[0]!),
+              direction: 'input',
+            }),
+          queryParams.length > 0 &&
+            renderSchemaEntry({
+              schema: buildGroupedParamsSchema({ params: queryParams }),
+              name: resolver.param.query(node, queryParams[0]!),
+              direction: 'input',
+            }),
+          headerParams.length > 0 &&
+            renderSchemaEntry({
+              schema: buildGroupedParamsSchema({ params: headerParams }),
+              name: resolver.param.headers(node, headerParams[0]!),
+              direction: 'input',
+            }),
+        ]
+      : []
+
+    const optionsSchema = inferred
+      ? renderSchemaEntry({ schema: buildOptionsSchema(node, { resolver }), name: resolver.name(`${node.operationId} Options`), direction: 'input' })
+      : null
+
     return (
       <File
         baseName={meta.file.baseName}
@@ -353,6 +385,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
         {responseUnionSchema}
         {errorUnionSchema}
         {requestSchema}
+        {paramGroupSchemas}
+        {optionsSchema}
       </File>
     )
   },
