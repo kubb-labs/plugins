@@ -28,9 +28,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginCypress({
-          output: { path: './cypress', barrel: false },
+          output: { path: './cypress', barrel: false, mode: 'directory' },
           group: { type: 'tag' },
         }),
       ],
@@ -45,9 +45,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginCypress({
-          output: { path: './cypress', barrel: false },
+          output: { path: './cypress', barrel: false, mode: 'directory' },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -65,9 +65,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginCypress({
-          output: { path: './cypress', barrel: false },
+          output: { path: './cypress', barrel: false, mode: 'directory' },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],

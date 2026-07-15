@@ -41,20 +41,20 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   exclude: [],
   include: undefined,
   override: [],
-  output: { path: '.' },
+  output: { path: '.', mode: 'directory' },
   group: null,
   resolver: resolverReactQuery,
 }
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
+  options: { output: { path: '.', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 
 const mockedAxiosPlugin = createMockedPlugin({
   name: 'plugin-axios',
-  options: { output: { path: './clients' }, group: null } as PluginTs['resolvedOptions'],
+  options: { output: { path: './clients', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverClient,
 })
 

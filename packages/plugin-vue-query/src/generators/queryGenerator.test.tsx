@@ -38,7 +38,7 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
     importPath: '@tanstack/react-query',
   },
   infinite: false,
-  output: { path: '.' },
+  output: { path: '.', mode: 'directory' },
   group: null,
   exclude: [],
   include: undefined,
@@ -49,13 +49,13 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
+  options: { output: { path: '.', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 
 const mockedAxiosPlugin = createMockedPlugin({
   name: 'plugin-axios',
-  options: { output: { path: './clients' }, group: null } as PluginTs['resolvedOptions'],
+  options: { output: { path: './clients', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverClient,
 })
 

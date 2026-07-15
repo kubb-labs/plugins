@@ -31,9 +31,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginMsw({
-          output: { path: './msw', barrel: false },
+          output: { path: './msw', barrel: false, mode: 'directory' },
         }),
       ],
     },
@@ -50,10 +50,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginFaker({ output: { path: './faker', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginFaker({ output: { path: './faker', barrel: false, mode: 'directory' } }),
         pluginMsw({
-          output: { path: './msw', barrel: false },
+          output: { path: './msw', barrel: false, mode: 'directory' },
           parser: 'faker',
         }),
       ],
@@ -71,9 +71,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginMsw({
-          output: { path: './msw', barrel: false },
+          output: { path: './msw', barrel: false, mode: 'directory' },
           handlers: true,
         }),
       ],
@@ -91,9 +91,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginMsw({
-          output: { path: './msw', barrel: false },
+          output: { path: './msw', barrel: false, mode: 'directory' },
           baseURL: 'http://localhost:3000',
         }),
       ],
@@ -111,9 +111,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginMsw({
-          output: { path: './msw', barrel: false },
+          output: { path: './msw', barrel: false, mode: 'directory' },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -132,9 +132,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginMsw({
-          output: { path: './msw', barrel: false },
+          output: { path: './msw', barrel: false, mode: 'directory' },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
@@ -152,9 +152,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginMsw({
-          output: { path: './msw', barrel: false },
+          output: { path: './msw', barrel: false, mode: 'directory' },
           group: { type: 'tag' },
         }),
       ],

@@ -30,9 +30,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginFaker({
-          output: { path: './faker', barrel: false },
+          output: { path: './faker', barrel: false, mode: 'directory' },
         }),
       ],
     },
@@ -49,9 +49,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginFaker({
-          output: { path: './faker', barrel: false },
+          output: { path: './faker', barrel: false, mode: 'directory' },
           locale: 'de',
         }),
       ],
@@ -69,9 +69,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginFaker({
-          output: { path: './faker', barrel: false },
+          output: { path: './faker', barrel: false, mode: 'directory' },
           seed: [42],
         }),
       ],
@@ -89,9 +89,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginFaker({
-          output: { path: './faker', barrel: false },
+          output: { path: './faker', barrel: false, mode: 'directory' },
           macros: [
             {
               name: 'pet-status-values',
@@ -126,9 +126,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginFaker({
-          output: { path: './faker', barrel: false },
+          output: { path: './faker', barrel: false, mode: 'directory' },
           dateParser: 'dayjs',
         }),
       ],
@@ -146,9 +146,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginFaker({
-          output: { path: './faker', barrel: false },
+          output: { path: './faker', barrel: false, mode: 'directory' },
           regexGenerator: 'randexp',
         }),
       ],
@@ -166,9 +166,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginFaker({
-          output: { path: './faker', barrel: false },
+          output: { path: './faker', barrel: false, mode: 'directory' },
         }),
       ],
     },
@@ -185,9 +185,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginFaker({
-          output: { path: './faker', barrel: false },
+          output: { path: './faker', barrel: false, mode: 'directory' },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -206,9 +206,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginFaker({
-          output: { path: './faker', barrel: false },
+          output: { path: './faker', barrel: false, mode: 'directory' },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
@@ -226,9 +226,9 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs()],
       storage: fsStorage(),
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginFaker({
-          output: { path: './faker', barrel: false },
+          output: { path: './faker', barrel: false, mode: 'directory' },
           group: { type: 'tag' },
         }),
       ],

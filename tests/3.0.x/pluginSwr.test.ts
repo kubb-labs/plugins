@@ -31,10 +31,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginAxios({ output: { path: './clients', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
         pluginSwr({
-          output: { path: './hooks', barrel: false },
+          output: { path: './hooks', barrel: false, mode: 'directory' },
         }),
       ],
     },
@@ -50,11 +50,11 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginZod({ output: { path: './zod', barrel: false } }),
-        pluginAxios({ output: { path: './clients', barrel: false }, validator: 'zod' }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginZod({ output: { path: './zod', barrel: false, mode: 'directory' } }),
+        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' }, validator: 'zod' }),
         pluginSwr({
-          output: { path: './hooks', barrel: false },
+          output: { path: './hooks', barrel: false, mode: 'directory' },
         }),
       ],
     },
@@ -70,10 +70,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginAxios({ output: { path: './clients', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
         pluginSwr({
-          output: { path: './hooks', barrel: false },
+          output: { path: './hooks', barrel: false, mode: 'directory' },
           query: {
             methods: ['get'],
             importPath: 'swr',
@@ -96,10 +96,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginAxios({ output: { path: './clients', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
         pluginSwr({
-          output: { path: './hooks', barrel: false },
+          output: { path: './hooks', barrel: false, mode: 'directory' },
           query: false,
         }),
       ],
@@ -116,10 +116,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginAxios({ output: { path: './clients', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
         pluginSwr({
-          output: { path: './hooks', barrel: false },
+          output: { path: './hooks', barrel: false, mode: 'directory' },
           mutation: false,
         }),
       ],
@@ -136,10 +136,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginAxios({ output: { path: './clients', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
         pluginSwr({
-          output: { path: './hooks', barrel: false },
+          output: { path: './hooks', barrel: false, mode: 'directory' },
         }),
       ],
     },
@@ -155,10 +155,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginAxios({ output: { path: './clients', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
         pluginSwr({
-          output: { path: './hooks', barrel: false },
+          output: { path: './hooks', barrel: false, mode: 'directory' },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -176,10 +176,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginAxios({ output: { path: './clients', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
         pluginSwr({
-          output: { path: './hooks', barrel: false },
+          output: { path: './hooks', barrel: false, mode: 'directory' },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
@@ -196,10 +196,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginAxios({ output: { path: './clients', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
         pluginSwr({
-          output: { path: './hooks', barrel: false },
+          output: { path: './hooks', barrel: false, mode: 'directory' },
           group: { type: 'tag' },
         }),
       ],
@@ -216,10 +216,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginAxios({ output: { path: './clients', barrel: false } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
         pluginSwr({
-          output: { path: './hooks', barrel: false },
+          output: { path: './hooks', barrel: false, mode: 'directory' },
         }),
       ],
     },
