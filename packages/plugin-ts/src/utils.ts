@@ -1,6 +1,6 @@
 import { resolveContentTypeVariants } from '@internals/shared'
 import { jsStringEscape, stringify } from '@internals/utils'
-import { ast } from 'kubb/kit'
+import { ast, syncSchemaRef } from 'kubb/kit'
 import type { ResolverTs } from './types.ts'
 
 /**
@@ -38,7 +38,7 @@ function formatExample(value: unknown): string {
 }
 
 export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: boolean): Array<string | undefined> {
-  const meta = ast.syncSchemaRef(schema)
+  const meta = syncSchemaRef(schema)
 
   const isArray = meta?.primitive === 'array'
 

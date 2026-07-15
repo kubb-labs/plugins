@@ -1,6 +1,6 @@
 import { mapSchemaItems, mapSchemaMembers, mapSchemaProperties } from '@internals/shared'
 import { buildList, buildObject, lazyGetter, objectKey, stringify } from '@internals/utils'
-import { ast } from 'kubb/kit'
+import { ast, containsCircularRef, syncSchemaRef } from 'kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyMiniModifiers,
@@ -108,7 +108,7 @@ function buildZodMiniObjectShape(ctx: ZodMiniPrinterContext, node: ast.SchemaNod
   if (!objectNode) return '{}'
 
   const isCyclic = (schema: ast.SchemaNode): boolean =>
-    ctx.options.cyclicSchemas != null && ast.containsCircularRef(schema, { circularSchemas: ctx.options.cyclicSchemas })
+    ctx.options.cyclicSchemas != null && containsCircularRef(schema, { circularSchemas: ctx.options.cyclicSchemas })
 
   const entries = mapSchemaProperties(objectNode, (schema) => {
     const hasSelfRef = isCyclic(schema)
@@ -119,7 +119,7 @@ function buildZodMiniObjectShape(ctx: ZodMiniPrinterContext, node: ast.SchemaNod
     return baseOutput
   }).map(({ name: propName, property, output: baseOutput }) => {
     const { schema } = property
-    const meta = ast.syncSchemaRef(schema)
+    const meta = syncSchemaRef(schema)
 
     const value = applyMiniModifiers({
       value: baseOutput,
@@ -324,7 +324,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
       const transformed = this.transform(node)
       if (!transformed) return null
 
-      const meta = ast.syncSchemaRef(node)
+      const meta = syncSchemaRef(node)
 
       const base = (() => {
         if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed

@@ -6,7 +6,7 @@ import { ast } from 'kubb/kit'
  * `resolver.imports` would resolve file paths that are then discarded.
  */
 export function collectRefNames(schema: ast.SchemaNode): Array<string> {
-  return ast.collect(schema, {
+  return ast.collectSync(schema, {
     schema: (node) => {
       const refNode = ast.narrowSchema(node, 'ref')
       if (!refNode?.ref) return null

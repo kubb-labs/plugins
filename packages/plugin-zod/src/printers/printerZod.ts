@@ -1,6 +1,6 @@
 import { mapSchemaItems, mapSchemaMembers, mapSchemaProperties } from '@internals/shared'
 import { buildList, buildObject, lazyGetter, objectKey, stringify } from '@internals/utils'
-import { ast } from 'kubb/kit'
+import { ast, containsCircularRef, syncSchemaRef } from 'kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyModifiers,
@@ -126,7 +126,7 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
       return member
     }
 
-    const schema = ast.syncSchemaRef(node)
+    const schema = syncSchemaRef(node)
 
     if (schema.nullable || schema.optional || node.nullable || node.optional) {
       return member
@@ -164,7 +164,7 @@ function buildZodObjectShape(ctx: ZodPrinterContext, node: ast.SchemaNode): stri
   if (!objectNode) return '{}'
 
   const isCyclic = (schema: ast.SchemaNode): boolean =>
-    ctx.options.cyclicSchemas != null && ast.containsCircularRef(schema, { circularSchemas: ctx.options.cyclicSchemas })
+    ctx.options.cyclicSchemas != null && containsCircularRef(schema, { circularSchemas: ctx.options.cyclicSchemas })
 
   const entries = mapSchemaProperties(objectNode, (schema) => {
     // Inside a getter the getter itself defers evaluation, so suppress z.lazy() wrapping on
@@ -177,7 +177,7 @@ function buildZodObjectShape(ctx: ZodPrinterContext, node: ast.SchemaNode): stri
     return baseOutput
   }).map(({ name: propName, property, output: baseOutput }) => {
     const { schema } = property
-    const meta = ast.syncSchemaRef(schema)
+    const meta = syncSchemaRef(schema)
 
     // When a property schema is not a ref but the metadata is from a ref (e.g., discriminator
     // property override), skip applying the description from the ref target to avoid applying
@@ -418,7 +418,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       const transformed = this.transform(node)
       if (!transformed) return null
 
-      const meta = ast.syncSchemaRef(node)
+      const meta = syncSchemaRef(node)
 
       const base = (() => {
         if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed
