@@ -3,27 +3,12 @@
 * Do not edit manually.
 */
 
-/**
- * @type object
-*/
 export type GetProductsStatus200 = {
-    /**
-     * @type string | undefined
-    */
     productId?: string;
-    /**
-     * @type string | undefined
-    */
     productName?: string;
-    /**
-     * @type integer | undefined
-    */
     stock?: number;
 };
 
-/**
- * @type object
-*/
 export type GetProductsOptions = {
     body?: never;
     path?: never;
@@ -31,9 +16,6 @@ export type GetProductsOptions = {
     headers?: never;
 };
 
-/**
- * @type object
-*/
 export type GetProductsResponses = {
     "200": GetProductsStatus200;
 };

@@ -30,9 +30,6 @@ export const orderValueEnum = {
 
 export type OrderValueEnumKey = (typeof orderValueEnum)[keyof typeof orderValueEnum]
 
-/**
- * @type object
- */
 export type Order = {
   /**
    * @description
@@ -79,8 +76,5 @@ export type Order = {
    * @type number | undefined
    */
   value?: OrderValueEnumKey
-  /**
-   * @type boolean | undefined
-   */
   complete?: boolean
 }

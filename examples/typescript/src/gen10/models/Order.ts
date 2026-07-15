@@ -7,9 +7,6 @@ import type { OrderHttpStatusEnum } from './OrderHttpStatusEnum'
 import type { OrderParamsStatusEnum } from './OrderParamsStatusEnum'
 import type { OrderStatus } from './OrderStatus'
 
-/**
- * @type object
- */
 export type Order = {
   /**
    * @description
@@ -25,18 +22,12 @@ export type Order = {
    * @type integer | undefined
    */
   petId?: bigint
-  /**
-   * @type object | undefined
-   */
   params?: {
     /**
      * @description Order Status
      * @example approved
      */
     status: OrderParamsStatusEnum
-    /**
-     * @type string
-     */
     type: string
   }
   /**
@@ -61,8 +52,5 @@ export type Order = {
    * @example 200
    */
   http_status?: OrderHttpStatusEnum
-  /**
-   * @type boolean | undefined
-   */
   complete?: boolean
 }

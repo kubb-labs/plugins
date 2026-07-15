@@ -3,9 +3,6 @@
 * Do not edit manually.
 */
 
-/**
- * @type object
-*/
 export type Tag = {
     /**
      * @description
@@ -13,8 +10,5 @@ export type Tag = {
      * @type integer | undefined
     */
     id?: bigint;
-    /**
-     * @type string | undefined
-    */
     name?: string;
 };

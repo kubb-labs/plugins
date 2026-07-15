@@ -6,9 +6,6 @@
 import type { FindPetsByStatusStatusKey } from './FindPetsByStatusStatus'
 import type { Pet } from './Pet'
 
-/**
- * @type object
-*/
 export type FindPetsByStatusQuery = {
     /**
      * @description Status values that need to be considered for filter
@@ -17,26 +14,14 @@ export type FindPetsByStatusQuery = {
     status?: FindPetsByStatusStatusKey;
 };
 
-/**
- * @type array
-*/
 export type FindPetsByStatusStatus200Json = Pet[];
 
-/**
- * @type array
-*/
 export type FindPetsByStatusStatus200Xml = Pet[];
 
 export type FindPetsByStatusStatus200 = (FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml);
 
-/**
- * @type any
-*/
 export type FindPetsByStatusStatus400 = any;
 
-/**
- * @type object
-*/
 export type FindPetsByStatusOptions = {
     body?: never;
     path?: never;
@@ -44,9 +29,6 @@ export type FindPetsByStatusOptions = {
     headers?: never;
 };
 
-/**
- * @type object
-*/
 export type FindPetsByStatusResponses = {
     "200": ({
         contentType: "application/json";

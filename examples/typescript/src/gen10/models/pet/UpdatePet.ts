@@ -11,19 +11,10 @@ export type UpdatePetStatus200Xml = Pet
 
 export type UpdatePetStatus200 = UpdatePetStatus200Json | UpdatePetStatus200Xml
 
-/**
- * @type unknown
- */
 export type UpdatePetStatus400 = unknown
 
-/**
- * @type unknown
- */
 export type UpdatePetStatus404 = unknown
 
-/**
- * @type unknown
- */
 export type UpdatePetStatus405 = unknown
 
 /**
@@ -43,9 +34,6 @@ export type UpdatePetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'type' | 'tags'
 
 export type UpdatePetBody = UpdatePetBodyJson | UpdatePetBodyXml | UpdatePetBodyFormUrlEncoded
 
-/**
- * @type object
- */
 export type UpdatePetOptions = {
   body: UpdatePetBody
   path?: never
@@ -53,9 +41,6 @@ export type UpdatePetOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type UpdatePetResponses = {
   '200':
     | {

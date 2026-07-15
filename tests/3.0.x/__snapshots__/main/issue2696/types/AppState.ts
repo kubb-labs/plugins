@@ -6,16 +6,7 @@
 import type { Employer } from './Employer'
 import type { User } from './User'
 
-/**
- * @type object
-*/
 export type AppState = {
-    /**
-     * @type object | undefined
-    */
     currentUser?: User;
-    /**
-     * @type array | undefined
-    */
     employers?: Employer[];
 };

@@ -4,24 +4,12 @@
  * Source: text content
  */
 
-/**
- * @type object
- */
 export type DeletePetPath = {
-  /**
-   * @type string
-   */
   petId: string
 }
 
-/**
- * @type void
- */
 export type DeletePetStatus204 = void
 
-/**
- * @type object
- */
 export type DeletePetOptions = {
   body?: never
   path: DeletePetPath
@@ -29,9 +17,6 @@ export type DeletePetOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type DeletePetResponses = {
   '204': DeletePetStatus204
 }

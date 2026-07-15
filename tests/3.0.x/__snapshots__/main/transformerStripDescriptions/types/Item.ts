@@ -3,9 +3,6 @@
 * Do not edit manually.
 */
 
-/**
- * @type object
-*/
 export type Item = {
     /**
      * @description
@@ -13,9 +10,6 @@ export type Item = {
      * @type integer
     */
     id: bigint;
-    /**
-     * @type string
-    */
     name: string;
     /**
      * @description

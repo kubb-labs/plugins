@@ -55,7 +55,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   // OAS 3.1 carries schema examples as an `examples` array, one `@example` line each.
   const exampleValues = meta?.examples ?? []
 
-  return [
+  const comments = [
     hasDescription ? `@description ${jsStringEscape(meta.description)}` : null,
     ...formatComment,
     meta && 'deprecated' in meta && meta.deprecated ? '@deprecated' : null,
@@ -67,10 +67,17 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
       ? `@default ${'primitive' in meta && meta.primitive === 'string' && typeof meta.default === 'string' ? stringify(meta.default) : meta.default}`
       : null,
     ...exampleValues.map((example) => `@example ${formatExample(example)}`),
-    meta && 'primitive' in meta && meta.primitive
-      ? [`@type ${meta.primitive}`, (optional ?? isSchemaOptional(schema)) ? ' | undefined' : null].filter(Boolean).join('')
-      : null,
   ].filter(Boolean)
+
+  // `@type` merely repeats the TypeScript type already sitting next to the property, so it only
+  // earns its place inside a comment block that exists for another reason. Bare, it would just
+  // add bytes with no information a reader can't already see in the signature.
+  const typeTag =
+    comments.length && meta && 'primitive' in meta && meta.primitive
+      ? [`@type ${meta.primitive}`, (optional ?? isSchemaOptional(schema)) ? ' | undefined' : null].filter(Boolean).join('')
+      : null
+
+  return [...comments, typeTag].filter(Boolean)
 }
 
 type BuildParamsSchemaOptions = {

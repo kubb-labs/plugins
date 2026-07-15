@@ -3,9 +3,6 @@
 * Do not edit manually.
 */
 
-/**
- * @type object
-*/
 export type Vehicle = {
     /**
      * @description Unique vehicle identifier

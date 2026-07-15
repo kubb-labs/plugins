@@ -5,9 +5,6 @@
 
 import type { PetNotFound } from './PetNotFound'
 
-/**
- * @type object
- */
 export type GetThingsQuery = {
   /**
    * @description Maximum number of things to return
@@ -26,9 +23,6 @@ export type GetThingsQuery = {
   skip?: number
 }
 
-/**
- * @type unknown
- */
 export type GetThingsStatus201 = unknown
 
 /**
@@ -37,9 +31,6 @@ export type GetThingsStatus201 = unknown
  */
 export type GetThingsStatusDefault = PetNotFound
 
-/**
- * @type object
- */
 export type GetThingsOptions = {
   body?: never
   path?: never
@@ -47,9 +38,6 @@ export type GetThingsOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type GetThingsResponses = {
   '201': GetThingsStatus201
   default: GetThingsStatusDefault

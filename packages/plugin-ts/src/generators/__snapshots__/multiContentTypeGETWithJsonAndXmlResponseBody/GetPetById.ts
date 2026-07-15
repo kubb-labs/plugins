@@ -4,41 +4,20 @@
  * Source: text content
  */
 
-/**
- * @type object
- */
 export type GetPetByIdPath = {
-  /**
-   * @type string
-   */
   petId: string
 }
 
-/**
- * @type object
- */
 export type GetPetByIdStatus200Json = {
-  /**
-   * @type string
-   */
   name: string
 }
 
-/**
- * @type object
- */
 export type GetPetByIdStatus200Xml = {
-  /**
-   * @type integer
-   */
   id: number
 }
 
 export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml
 
-/**
- * @type object
- */
 export type GetPetByIdOptions = {
   body?: never
   path: GetPetByIdPath
@@ -46,9 +25,6 @@ export type GetPetByIdOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type GetPetByIdResponses = {
   '200':
     | {

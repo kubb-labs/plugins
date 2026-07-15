@@ -3,17 +3,8 @@
  * Do not edit manually.
  */
 
-/**
- * @type object
- */
 export type Address = {
-  /**
-   * @type string | undefined
-   */
   streetName?: string
-  /**
-   * @type string | undefined
-   */
   streetNumber?: string
   /**
    * @example Palo Alto

@@ -1,6 +1,3 @@
-/**
- * @type object
- */
 export type DeletePetPath = {
   /**
    * @description Pet id to delete
@@ -11,24 +8,12 @@ export type DeletePetPath = {
   petId: number
 }
 
-/**
- * @type object
- */
 export type DeletePetHeaders = {
-  /**
-   * @type string | undefined
-   */
   api_key?: string
 }
 
-/**
- * @type unknown
- */
 export type DeletePetStatus400 = unknown
 
-/**
- * @type object
- */
 export type DeletePetOptions = {
   body?: never
   path: DeletePetPath
@@ -36,9 +21,6 @@ export type DeletePetOptions = {
   headers?: DeletePetHeaders
 }
 
-/**
- * @type object
- */
 export type DeletePetResponses = {
   '400': DeletePetStatus400
 }

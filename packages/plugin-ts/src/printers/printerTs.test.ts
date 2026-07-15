@@ -355,14 +355,8 @@ describe('printerTs', () => {
 
       expect(await formatTS(result)).toMatchInlineSnapshot(`
         "{
-          /**
-           * @type string
-           */
           a: string
         } & {
-          /**
-           * @type number
-           */
           b: number
         }"
       `)
@@ -487,13 +481,7 @@ describe('printerTs', () => {
 
       expect(await formatTS(result)).toMatchInlineSnapshot(`
         "{
-          /**
-           * @type number
-           */
           id: number
-          /**
-           * @type string
-           */
           name: string
         }"
       `)
@@ -509,9 +497,6 @@ describe('printerTs', () => {
 
       expect(await formatTS(result)).toMatchInlineSnapshot(`
         "{
-          /**
-           * @type string | undefined
-           */
           tag?: string
         }"
       `)
@@ -528,9 +513,6 @@ describe('printerTs', () => {
 
       expect(await formatTS(result)).toMatchInlineSnapshot(`
         "{
-          /**
-           * @type string | undefined
-           */
           tag: string | undefined
         }"
       `)
@@ -547,9 +529,6 @@ describe('printerTs', () => {
 
       expect(await formatTS(result)).toMatchInlineSnapshot(`
         "{
-          /**
-           * @type string | undefined
-           */
           tag?: string | undefined
         }"
       `)
@@ -565,9 +544,6 @@ describe('printerTs', () => {
 
       expect(await formatTS(result)).toMatchInlineSnapshot(`
         "{
-          /**
-           * @type string
-           */
           value: string | null
         }"
       `)
@@ -583,9 +559,6 @@ describe('printerTs', () => {
 
       expect(await formatTS(result)).toMatchInlineSnapshot(`
         "{
-          /**
-           * @type number
-           */
           readonly id: number
         }"
       `)
@@ -631,9 +604,6 @@ describe('printerTs', () => {
       )
 
       expect(await formatTS(result)).toBe(`{
-  /**
-   * @type number
-   */
   id: number
   [key: string]: unknown
 }`)
@@ -726,9 +696,6 @@ describe('printerTs', () => {
       )
 
       expect(await formatTS(result)).toBe(`{
-  /**
-   * @type number
-   */
   id: number
   [key: string]: unknown
 }`)
@@ -744,9 +711,6 @@ describe('printerTs', () => {
 
       expect(await formatTS(result)).toMatchInlineSnapshot(`
         "{
-          /**
-           * @type string | undefined
-           */
           tag?: string
         }"
       `)
@@ -763,9 +727,6 @@ describe('printerTs', () => {
 
       expect(await formatTS(result)).toMatchInlineSnapshot(`
         "{
-          /**
-           * @type string | undefined
-           */
           tag: string | undefined
         }"
       `)
@@ -865,10 +826,7 @@ describe('printerTs', () => {
       const result = p.print(ast.factory.createSchema({ type: 'string' }))
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
-        "/**
-         * @type string
-         */
-        export type MyType = string
+        "export type MyType = string
         "
       `)
     })
@@ -883,13 +841,7 @@ describe('printerTs', () => {
       )
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
-        "/**
-         * @type object
-         */
-        export type MyObject = {
-          /**
-           * @type number | undefined
-           */
+        "export type MyObject = {
           id?: number
         }
         "
@@ -913,13 +865,7 @@ describe('printerTs', () => {
       )
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
-        "/**
-         * @type object
-         */
-        export type MyObject = {
-          /**
-           * @type number | undefined
-           */
+        "export type MyObject = {
           id?: number
         }
         "
@@ -931,10 +877,7 @@ describe('printerTs', () => {
       const result = p.print(ast.factory.createSchema({ type: 'string', nullable: true }))
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
-        "/**
-         * @type string
-         */
-        export type Status = string | null
+        "export type Status = string | null
         "
       `)
     })
@@ -950,10 +893,7 @@ describe('printerTs', () => {
       const result = p.print(ast.factory.createSchema({ type: 'string', optional: true }))
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
-        "/**
-         * @type string | undefined
-         */
-        export type MaybeValue = string | undefined
+        "export type MaybeValue = string | undefined
         "
       `)
     })
@@ -1000,22 +940,10 @@ describe('printerTs', () => {
       )
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
-        "/**
-         * @type object
-         */
-        export type Partial = Omit<
+        "export type Partial = Omit<
           NonNullable<{
-            /**
-             * @type number | undefined
-             */
             id?: number
-            /**
-             * @type string | undefined
-             */
             name?: string
-            /**
-             * @type string | undefined
-             */
             createdAt?: string
           }>,
           'id' | 'createdAt'

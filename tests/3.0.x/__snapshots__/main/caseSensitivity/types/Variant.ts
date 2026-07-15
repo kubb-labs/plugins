@@ -5,17 +5,8 @@
 
 import type { VariantTypeEnumKey } from './VariantTypeEnum'
 
-/**
- * @type object
-*/
 export type Variant = {
-    /**
-     * @type string | undefined
-    */
     id?: string;
-    /**
-     * @type string | undefined
-    */
     name?: string;
     type?: VariantTypeEnumKey;
 };

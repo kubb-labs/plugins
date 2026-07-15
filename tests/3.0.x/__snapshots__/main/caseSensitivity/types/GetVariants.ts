@@ -5,14 +5,8 @@
 
 import type { Variant } from './Variant'
 
-/**
- * @type object
-*/
 export type GetVariantsStatus200 = Variant;
 
-/**
- * @type object
-*/
 export type GetVariantsOptions = {
     body?: never;
     path?: never;
@@ -20,9 +14,6 @@ export type GetVariantsOptions = {
     headers?: never;
 };
 
-/**
- * @type object
-*/
 export type GetVariantsResponses = {
     "200": GetVariantsStatus200;
 };

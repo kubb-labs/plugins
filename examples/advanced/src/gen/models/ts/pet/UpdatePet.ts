@@ -1,20 +1,11 @@
 import type { Pet } from '../Pet'
 
-/**
- * @type object
- */
 export type UpdatePetStatus200Json = Omit<NonNullable<Pet>, 'name'>
 
-/**
- * @type object
- */
 export type UpdatePetStatus200Xml = Omit<NonNullable<Pet>, 'name'>
 
 export type UpdatePetStatus200 = UpdatePetStatus200Json | UpdatePetStatus200Xml
 
-/**
- * @type object
- */
 export type UpdatePetStatus202 = {
   /**
    * @description
@@ -25,19 +16,10 @@ export type UpdatePetStatus202 = {
   id?: number
 }
 
-/**
- * @type unknown
- */
 export type UpdatePetStatus400 = unknown
 
-/**
- * @type unknown
- */
 export type UpdatePetStatus404 = unknown
 
-/**
- * @type unknown
- */
 export type UpdatePetStatus405 = unknown
 
 /**
@@ -60,9 +42,6 @@ export type UpdatePetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'id'>
 
 export type UpdatePetBody = UpdatePetBodyJson | UpdatePetBodyXml | UpdatePetBodyFormUrlEncoded
 
-/**
- * @type object
- */
 export type UpdatePetOptions = {
   body: UpdatePetBody
   path?: never
@@ -70,9 +49,6 @@ export type UpdatePetOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type UpdatePetResponses = {
   '200':
     | {

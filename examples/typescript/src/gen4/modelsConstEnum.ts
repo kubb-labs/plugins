@@ -55,9 +55,6 @@ export const enum DeletePetStatus200Enum {
   TYPE3 = 'TYPE3',
 }
 
-/**
- * @type object
- */
 export type Order = {
   /**
    * @description
@@ -73,18 +70,12 @@ export type Order = {
    * @type integer | undefined
    */
   petId?: bigint
-  /**
-   * @type object | undefined
-   */
   params?: {
     /**
      * @description Order Status
      * @example approved
      */
     status: OrderParamsStatusEnum
-    /**
-     * @type string
-     */
     type: string
   }
   /**
@@ -109,23 +100,11 @@ export type Order = {
    * @example 200
    */
   http_status?: OrderHttpStatusEnum
-  /**
-   * @type boolean | undefined
-   */
   complete?: boolean
 }
 
-/**
- * @type object
- */
 export type Address = {
-  /**
-   * @type string | undefined
-   */
   streetName?: string
-  /**
-   * @type string | undefined
-   */
   streetNumber?: string
   /**
    * @example Palo Alto
@@ -144,9 +123,6 @@ export type Address = {
   zip?: string
 }
 
-/**
- * @type object
- */
 export type Customer = {
   /**
    * @description
@@ -155,18 +131,12 @@ export type Customer = {
    * @type integer | undefined
    */
   id?: bigint
-  /**
-   * @type object | undefined
-   */
   params?: {
     /**
      * @description Order Status
      * @example approved
      */
     status: CustomerParamsStatusEnum
-    /**
-     * @type string
-     */
     type: string
   }
   /**
@@ -174,33 +144,18 @@ export type Customer = {
    * @type string | undefined
    */
   username?: string
-  /**
-   * @type array | undefined
-   */
   address?: Array<Address>
 }
 
 export type HappyCustomer = Customer & {
-  /**
-   * @type boolean | undefined
-   */
   isHappy?: true
 }
 
 export type UnhappyCustomer = Customer & {
-  /**
-   * @type string | undefined
-   */
   reasonToBeUnhappy?: string
-  /**
-   * @type boolean | undefined
-   */
   isHappy?: false
 }
 
-/**
- * @type object
- */
 export type Category = {
   /**
    * @description
@@ -216,9 +171,6 @@ export type Category = {
   name?: string
 }
 
-/**
- * @type object
- */
 export type Tag = {
   /**
    * @description
@@ -226,53 +178,32 @@ export type Tag = {
    * @type integer | undefined
    */
   id?: bigint
-  /**
-   * @type string | undefined
-   */
   name?: string
 }
 
-/**
- * @type object
- */
 export type Dog = {
   /**
    * @minLength 1
    * @type string | undefined
    */
   readonly type?: string
-  /**
-   * @type string | undefined
-   */
   bark?: string
 }
 
-/**
- * @type object
- */
 export type Cat = {
   /**
    * @minLength 1
    * @type string | undefined
    */
   readonly type?: string
-  /**
-   * @type string | undefined
-   */
   name?: string
 }
 
 export type Pet = (
   | (Dog & {
-      /**
-       * @type string
-       */
       readonly type: 'dog'
     })
   | (Cat & {
-      /**
-       * @type string
-       */
       readonly type: 'cat'
     })
 ) & {
@@ -289,17 +220,8 @@ export type Pet = (
    * @type string
    */
   name: string
-  /**
-   * @type object | undefined
-   */
   category?: Category
-  /**
-   * @type array
-   */
   photoUrls: Array<string>
-  /**
-   * @type array | undefined
-   */
   readonly tags?: Array<Tag>
   /**
    * @description pet status in the store
@@ -308,20 +230,11 @@ export type Pet = (
 }
 
 export type FullAddress = Address & {
-  /**
-   * @type string
-   */
   streetNumber: string
 } & {
-  /**
-   * @type string
-   */
   streetName: string
 }
 
-/**
- * @type object
- */
 export type AddPetRequest = {
   /**
    * @description
@@ -335,17 +248,8 @@ export type AddPetRequest = {
    * @type string
    */
   name: string
-  /**
-   * @type object | undefined
-   */
   category?: Category
-  /**
-   * @type array
-   */
   photoUrls: Array<string>
-  /**
-   * @type array | undefined
-   */
   tags?: Array<Tag>
   /**
    * @description pet status in the store
@@ -353,9 +257,6 @@ export type AddPetRequest = {
   status?: AddPetRequestStatusEnum
 }
 
-/**
- * @type object
- */
 export type ApiResponse = {
   /**
    * @description
@@ -363,19 +264,10 @@ export type ApiResponse = {
    * @type integer | undefined
    */
   code?: number
-  /**
-   * @type string | undefined
-   */
   type?: string
-  /**
-   * @type string | undefined
-   */
   message?: string
 }
 
-/**
- * @type object
- */
 export type PetNotFound = {
   /**
    * @description
@@ -383,9 +275,6 @@ export type PetNotFound = {
    * @type integer | undefined
    */
   code?: number
-  /**
-   * @type string | undefined
-   */
   message?: string
 }
 
@@ -395,19 +284,10 @@ export type UpdatePetStatus200Xml = Pet
 
 export type UpdatePetStatus200 = UpdatePetStatus200Json | UpdatePetStatus200Xml
 
-/**
- * @type unknown
- */
 export type UpdatePetStatus400 = unknown
 
-/**
- * @type unknown
- */
 export type UpdatePetStatus404 = unknown
 
-/**
- * @type unknown
- */
 export type UpdatePetStatus405 = unknown
 
 /**
@@ -427,9 +307,6 @@ export type UpdatePetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'type' | 'tags'
 
 export type UpdatePetBody = UpdatePetBodyJson | UpdatePetBodyXml | UpdatePetBodyFormUrlEncoded
 
-/**
- * @type object
- */
 export type UpdatePetOptions = {
   body: UpdatePetBody
   path?: never
@@ -437,9 +314,6 @@ export type UpdatePetOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type UpdatePetResponses = {
   '200':
     | {
@@ -466,9 +340,6 @@ export type AddPetStatus200Xml = Pet
 
 export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
-/**
- * @type object
- */
 export type AddPetStatus405 = {
   /**
    * @description
@@ -476,9 +347,6 @@ export type AddPetStatus405 = {
    * @type integer | undefined
    */
   code?: number
-  /**
-   * @type string | undefined
-   */
   message?: string
 }
 
@@ -500,9 +368,6 @@ export type AddPetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'type' | 'tags'>
 
 export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded
 
-/**
- * @type object
- */
 export type AddPetOptions = {
   body: AddPetBody
   path?: never
@@ -510,9 +375,6 @@ export type AddPetOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type AddPetResponses = {
   '200':
     | {
@@ -531,9 +393,6 @@ export type AddPetResponses = {
  */
 export type AddPetResponse = AddPetStatus200 | AddPetStatus405
 
-/**
- * @type object
- */
 export type FindPetsByStatusQuery = {
   /**
    * @description Status values that need to be considered for filter
@@ -542,26 +401,14 @@ export type FindPetsByStatusQuery = {
   status?: FindPetsByStatusStatus
 }
 
-/**
- * @type array
- */
 export type FindPetsByStatusStatus200Json = Array<Pet>
 
-/**
- * @type array
- */
 export type FindPetsByStatusStatus200Xml = Array<Pet>
 
 export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
 
-/**
- * @type unknown
- */
 export type FindPetsByStatusStatus400 = unknown
 
-/**
- * @type object
- */
 export type FindPetsByStatusOptions = {
   body?: never
   path?: never
@@ -569,9 +416,6 @@ export type FindPetsByStatusOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type FindPetsByStatusResponses = {
   '200':
     | {
@@ -590,9 +434,6 @@ export type FindPetsByStatusResponses = {
  */
 export type FindPetsByStatusResponse = FindPetsByStatusStatus200 | FindPetsByStatusStatus400
 
-/**
- * @type object
- */
 export type FindPetsByTagsQuery = {
   /**
    * @description Tags to filter by
@@ -611,26 +452,14 @@ export type FindPetsByTagsQuery = {
   pageSize?: string
 }
 
-/**
- * @type array
- */
 export type FindPetsByTagsStatus200Json = Array<Pet>
 
-/**
- * @type array
- */
 export type FindPetsByTagsStatus200Xml = Array<Pet>
 
 export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
 
-/**
- * @type unknown
- */
 export type FindPetsByTagsStatus400 = unknown
 
-/**
- * @type object
- */
 export type FindPetsByTagsOptions = {
   body?: never
   path?: never
@@ -638,9 +467,6 @@ export type FindPetsByTagsOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type FindPetsByTagsResponses = {
   '200':
     | {
@@ -659,9 +485,6 @@ export type FindPetsByTagsResponses = {
  */
 export type FindPetsByTagsResponse = FindPetsByTagsStatus200 | FindPetsByTagsStatus400
 
-/**
- * @type object
- */
 export type GetPetByIdPath = {
   /**
    * @description ID of pet to return
@@ -678,19 +501,10 @@ export type GetPetByIdStatus200Xml = Pet
 
 export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml
 
-/**
- * @type unknown
- */
 export type GetPetByIdStatus400 = unknown
 
-/**
- * @type unknown
- */
 export type GetPetByIdStatus404 = unknown
 
-/**
- * @type object
- */
 export type GetPetByIdOptions = {
   body?: never
   path: GetPetByIdPath
@@ -698,9 +512,6 @@ export type GetPetByIdOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type GetPetByIdResponses = {
   '200':
     | {
@@ -720,9 +531,6 @@ export type GetPetByIdResponses = {
  */
 export type GetPetByIdResponse = GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404
 
-/**
- * @type object
- */
 export type UpdatePetWithFormPath = {
   /**
    * @description ID of pet that needs to be updated
@@ -733,9 +541,6 @@ export type UpdatePetWithFormPath = {
   petId: bigint
 }
 
-/**
- * @type object
- */
 export type UpdatePetWithFormQuery = {
   /**
    * @description Name of pet that needs to be updated
@@ -749,14 +554,8 @@ export type UpdatePetWithFormQuery = {
   status?: string
 }
 
-/**
- * @type unknown
- */
 export type UpdatePetWithFormStatus405 = unknown
 
-/**
- * @type object
- */
 export type UpdatePetWithFormOptions = {
   body?: never
   path: UpdatePetWithFormPath
@@ -764,9 +563,6 @@ export type UpdatePetWithFormOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type UpdatePetWithFormResponses = {
   '405': UpdatePetWithFormStatus405
 }
@@ -776,9 +572,6 @@ export type UpdatePetWithFormResponses = {
  */
 export type UpdatePetWithFormResponse = UpdatePetWithFormStatus405
 
-/**
- * @type object
- */
 export type DeletePetPath = {
   /**
    * @description Pet id to delete
@@ -789,29 +582,14 @@ export type DeletePetPath = {
   petId: bigint
 }
 
-/**
- * @type object
- */
 export type DeletePetHeaders = {
-  /**
-   * @type string | undefined
-   */
   api_key?: string
 }
 
-/**
- * @type array
- */
 export type DeletePetStatus200 = Array<DeletePetStatus200Enum>
 
-/**
- * @type unknown
- */
 export type DeletePetStatus400 = unknown
 
-/**
- * @type object
- */
 export type DeletePetOptions = {
   body?: never
   path: DeletePetPath
@@ -819,9 +597,6 @@ export type DeletePetOptions = {
   headers?: DeletePetHeaders
 }
 
-/**
- * @type object
- */
 export type DeletePetResponses = {
   '200': DeletePetStatus200
   '400': DeletePetStatus400
@@ -832,9 +607,6 @@ export type DeletePetResponses = {
  */
 export type DeletePetResponse = DeletePetStatus200 | DeletePetStatus400
 
-/**
- * @type object
- */
 export type UploadFilePath = {
   /**
    * @description ID of pet to update
@@ -845,9 +617,6 @@ export type UploadFilePath = {
   petId: bigint
 }
 
-/**
- * @type object
- */
 export type UploadFileQuery = {
   /**
    * @description Additional Metadata
@@ -856,9 +625,6 @@ export type UploadFileQuery = {
   additionalMetadata?: string
 }
 
-/**
- * @type object
- */
 export type UploadFileStatus200 = ApiResponse
 
 /**
@@ -868,9 +634,6 @@ export type UploadFileStatus200 = ApiResponse
  */
 export type UploadFileBody = Blob | undefined
 
-/**
- * @type object
- */
 export type UploadFileOptions = {
   body: UploadFileBody
   path: UploadFilePath
@@ -878,9 +641,6 @@ export type UploadFileOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type UploadFileResponses = {
   '200': UploadFileStatus200
 }
@@ -890,16 +650,10 @@ export type UploadFileResponses = {
  */
 export type UploadFileResponse = UploadFileStatus200
 
-/**
- * @type object
- */
 export type GetInventoryStatus200 = {
   [key: string]: number
 }
 
-/**
- * @type object
- */
 export type GetInventoryOptions = {
   body?: never
   path?: never
@@ -907,9 +661,6 @@ export type GetInventoryOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type GetInventoryResponses = {
   '200': GetInventoryStatus200
 }
@@ -919,14 +670,8 @@ export type GetInventoryResponses = {
  */
 export type GetInventoryResponse = GetInventoryStatus200
 
-/**
- * @type object
- */
 export type PlaceOrderStatus200 = Order
 
-/**
- * @type unknown
- */
 export type PlaceOrderStatus405 = unknown
 
 /**
@@ -935,21 +680,12 @@ export type PlaceOrderStatus405 = unknown
  */
 export type PlaceOrderBodyJson = Order | undefined
 
-/**
- * @type object | undefined
- */
 export type PlaceOrderBodyXml = Order | undefined
 
-/**
- * @type object | undefined
- */
 export type PlaceOrderBodyFormUrlEncoded = Order | undefined
 
 export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrderBodyFormUrlEncoded
 
-/**
- * @type object
- */
 export type PlaceOrderOptions = {
   body: PlaceOrderBody
   path?: never
@@ -957,9 +693,6 @@ export type PlaceOrderOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type PlaceOrderResponses = {
   '200': PlaceOrderStatus200
   '405': PlaceOrderStatus405
@@ -970,36 +703,18 @@ export type PlaceOrderResponses = {
  */
 export type PlaceOrderResponse = PlaceOrderStatus200 | PlaceOrderStatus405
 
-/**
- * @type object
- */
 export type PlaceOrderPatchStatus200 = Order
 
-/**
- * @type unknown
- */
 export type PlaceOrderPatchStatus405 = unknown
 
-/**
- * @type object | undefined
- */
 export type PlaceOrderPatchBodyJson = Order | undefined
 
-/**
- * @type object | undefined
- */
 export type PlaceOrderPatchBodyXml = Order | undefined
 
-/**
- * @type object | undefined
- */
 export type PlaceOrderPatchBodyFormUrlEncoded = Order | undefined
 
 export type PlaceOrderPatchBody = PlaceOrderPatchBodyJson | PlaceOrderPatchBodyXml | PlaceOrderPatchBodyFormUrlEncoded
 
-/**
- * @type object
- */
 export type PlaceOrderPatchOptions = {
   body: PlaceOrderPatchBody
   path?: never
@@ -1007,9 +722,6 @@ export type PlaceOrderPatchOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type PlaceOrderPatchResponses = {
   '200': PlaceOrderPatchStatus200
   '405': PlaceOrderPatchStatus405
@@ -1020,9 +732,6 @@ export type PlaceOrderPatchResponses = {
  */
 export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatchStatus405
 
-/**
- * @type object
- */
 export type GetOrderByIdPath = {
   /**
    * @description ID of order that needs to be fetched
@@ -1033,31 +742,16 @@ export type GetOrderByIdPath = {
   orderId: bigint
 }
 
-/**
- * @type object
- */
 export type GetOrderByIdStatus200Json = Order
 
-/**
- * @type object
- */
 export type GetOrderByIdStatus200Xml = Order
 
 export type GetOrderByIdStatus200 = GetOrderByIdStatus200Json | GetOrderByIdStatus200Xml
 
-/**
- * @type unknown
- */
 export type GetOrderByIdStatus400 = unknown
 
-/**
- * @type unknown
- */
 export type GetOrderByIdStatus404 = unknown
 
-/**
- * @type object
- */
 export type GetOrderByIdOptions = {
   body?: never
   path: GetOrderByIdPath
@@ -1065,9 +759,6 @@ export type GetOrderByIdOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type GetOrderByIdResponses = {
   '200':
     | {
@@ -1087,9 +778,6 @@ export type GetOrderByIdResponses = {
  */
 export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400 | GetOrderByIdStatus404
 
-/**
- * @type object
- */
 export type DeleteOrderPath = {
   /**
    * @description ID of the order that needs to be deleted
@@ -1100,19 +788,10 @@ export type DeleteOrderPath = {
   orderId: bigint
 }
 
-/**
- * @type unknown
- */
 export type DeleteOrderStatus400 = unknown
 
-/**
- * @type unknown
- */
 export type DeleteOrderStatus404 = unknown
 
-/**
- * @type object
- */
 export type DeleteOrderOptions = {
   body?: never
   path: DeleteOrderPath
@@ -1120,9 +799,6 @@ export type DeleteOrderOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type DeleteOrderResponses = {
   '400': DeleteOrderStatus400
   '404': DeleteOrderStatus404

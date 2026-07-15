@@ -11,9 +11,6 @@ export const orderStatusEnum = {
 
 export type OrderStatusEnumKey = (typeof orderStatusEnum)[keyof typeof orderStatusEnum]
 
-/**
- * @type object
- */
 export type Order = {
   /**
    * @description
@@ -60,8 +57,5 @@ export type Order = {
    * @type string | undefined
    */
   status?: OrderStatusEnumKey
-  /**
-   * @type boolean | undefined
-   */
   complete?: boolean
 }

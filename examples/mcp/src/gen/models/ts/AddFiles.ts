@@ -5,19 +5,10 @@
 
 import type { Pet } from './Pet'
 
-/**
- * @type object
- */
 export type AddFilesStatus200 = Omit<NonNullable<Pet>, 'name'>
 
-/**
- * @type unknown
- */
 export type AddFilesStatus405 = unknown
 
-/**
- * @type object | undefined
- */
 export type AddFilesBodyJson =
   | {
       /**
@@ -30,16 +21,10 @@ export type AddFilesBodyJson =
     }
   | undefined
 
-/**
- * @type object | undefined
- */
 export type AddFilesBodyFormData = Omit<NonNullable<Pet>, 'id'> | undefined
 
 export type AddFilesBody = AddFilesBodyJson | AddFilesBodyFormData
 
-/**
- * @type object
- */
 export type AddFilesOptions = {
   body: AddFilesBody
   path?: never
@@ -47,9 +32,6 @@ export type AddFilesOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type AddFilesResponses = {
   '200': AddFilesStatus200
   '405': AddFilesStatus405

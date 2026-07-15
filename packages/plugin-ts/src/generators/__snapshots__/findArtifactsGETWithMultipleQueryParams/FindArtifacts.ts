@@ -4,32 +4,14 @@
  * Source: text content
  */
 
-/**
- * @type object
- */
 export type FindArtifactsQuery = {
-  /**
-   * @type integer | undefined
-   */
   page?: number
-  /**
-   * @type integer | undefined
-   */
   limit?: number
-  /**
-   * @type string | undefined
-   */
   sort?: string
 }
 
-/**
- * @type object
- */
 export type FindArtifactsStatus200 = object
 
-/**
- * @type object
- */
 export type FindArtifactsOptions = {
   body?: never
   path?: never
@@ -37,9 +19,6 @@ export type FindArtifactsOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type FindArtifactsResponses = {
   '200': FindArtifactsStatus200
 }

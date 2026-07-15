@@ -4,24 +4,12 @@
  * Source: text content
  */
 
-/**
- * @type object
- */
 export type PlaceOrderPatchPath = {
-  /**
-   * @type integer
-   */
   orderId: number
 }
 
-/**
- * @type object
- */
 export type PlaceOrderPatchStatus200 = object
 
-/**
- * @type object
- */
 export type PlaceOrderPatchStatus405 = object
 
 /**
@@ -30,9 +18,6 @@ export type PlaceOrderPatchStatus405 = object
  */
 export type PlaceOrderPatchBody = object
 
-/**
- * @type object
- */
 export type PlaceOrderPatchOptions = {
   body: PlaceOrderPatchBody
   path: PlaceOrderPatchPath
@@ -40,9 +25,6 @@ export type PlaceOrderPatchOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type PlaceOrderPatchResponses = {
   '200': PlaceOrderPatchStatus200
   '405': PlaceOrderPatchStatus405

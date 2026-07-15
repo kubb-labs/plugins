@@ -1,9 +1,6 @@
 import type { AddPetRequest } from '../AddPetRequest'
 import type { Pet } from '../Pet'
 
-/**
- * @type object
- */
 export type AddPetStatus405 = {
   /**
    * @description
@@ -11,20 +8,11 @@ export type AddPetStatus405 = {
    * @type integer | undefined
    */
   code?: number
-  /**
-   * @type string | undefined
-   */
   message?: string
 }
 
-/**
- * @type object
- */
 export type AddPetStatusDefaultJson = Omit<NonNullable<Pet>, 'name'>
 
-/**
- * @type object
- */
 export type AddPetStatusDefaultXml = Omit<NonNullable<Pet>, 'name'>
 
 export type AddPetStatusDefault = AddPetStatusDefaultJson | AddPetStatusDefaultXml
@@ -49,9 +37,6 @@ export type AddPetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'id'>
 
 export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded
 
-/**
- * @type object
- */
 export type AddPetOptions = {
   body: AddPetBody
   path?: never
@@ -59,9 +44,6 @@ export type AddPetOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type AddPetResponses = {
   '405': AddPetStatus405
   default:

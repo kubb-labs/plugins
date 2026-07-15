@@ -5,14 +5,8 @@
 
 import type { Pet } from './Pet'
 
-/**
- * @type array
- */
 export type OptionsFindPetsByStatusStatus200 = Pet[]
 
-/**
- * @type object
- */
 export type OptionsFindPetsByStatusOptions = {
   body?: never
   path?: never
@@ -20,9 +14,6 @@ export type OptionsFindPetsByStatusOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type OptionsFindPetsByStatusResponses = {
   '200': OptionsFindPetsByStatusStatus200
 }

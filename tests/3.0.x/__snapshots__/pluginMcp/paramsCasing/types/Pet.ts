@@ -3,16 +3,7 @@
 * Do not edit manually.
 */
 
-/**
- * @type object
-*/
 export type Pet = {
-    /**
-     * @type string
-    */
     id: string;
-    /**
-     * @type string
-    */
     name: string;
 };

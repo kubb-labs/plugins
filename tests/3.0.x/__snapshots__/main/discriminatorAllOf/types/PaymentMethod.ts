@@ -3,12 +3,6 @@
 * Do not edit manually.
 */
 
-/**
- * @type object
-*/
 export type PaymentMethod = {
-    /**
-     * @type string
-    */
     type: string;
 };

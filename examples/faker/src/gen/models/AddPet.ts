@@ -5,21 +5,12 @@
 
 import type { Pet } from './Pet'
 
-/**
- * @type object
- */
 export type AddPetStatus200Json = Pet
 
-/**
- * @type object
- */
 export type AddPetStatus200Xml = Pet
 
 export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
-/**
- * @type unknown
- */
 export type AddPetStatus405 = unknown
 
 /**
@@ -42,9 +33,6 @@ export type AddPetBodyFormUrlEncoded = Pet
 
 export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded
 
-/**
- * @type object
- */
 export type AddPetOptions = {
   body: AddPetBody
   path?: never
@@ -52,9 +40,6 @@ export type AddPetOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type AddPetResponses = {
   '200':
     | {

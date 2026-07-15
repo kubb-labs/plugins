@@ -5,9 +5,6 @@
 
 import type { ApiResponse } from '../ApiResponse'
 
-/**
- * @type object
- */
 export type UploadFilePath = {
   /**
    * @description ID of pet to update
@@ -18,9 +15,6 @@ export type UploadFilePath = {
   petId: bigint
 }
 
-/**
- * @type object
- */
 export type UploadFileQuery = {
   /**
    * @description Additional Metadata
@@ -29,14 +23,8 @@ export type UploadFileQuery = {
   additionalMetadata?: string
 }
 
-/**
- * @type object
- */
 export type UploadFileStatus200 = ApiResponse
 
-/**
- * @type object
- */
 export type UploadFileBodyJson = {
   /**
    * @description URL of the image to upload
@@ -47,21 +35,12 @@ export type UploadFileBodyJson = {
   url: string
 }
 
-/**
- * @type object
- */
 export type UploadFileBodyFormData = {
-  /**
-   * @type string
-   */
   file: Blob
 }
 
 export type UploadFileBody = UploadFileBodyJson | UploadFileBodyFormData
 
-/**
- * @type object
- */
 export type UploadFileOptions = {
   body: UploadFileBody
   path: UploadFilePath
@@ -69,9 +48,6 @@ export type UploadFileOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type UploadFileResponses = {
   '200': UploadFileStatus200
 }

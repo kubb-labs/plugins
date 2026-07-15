@@ -19,9 +19,6 @@ export const orderHttpStatusEnum = {
 
 export type OrderHttpStatusEnumKey = (typeof orderHttpStatusEnum)[keyof typeof orderHttpStatusEnum]
 
-/**
- * @type object
- */
 export type Order = {
   /**
    * @description
@@ -62,8 +59,5 @@ export type Order = {
    * @type number | undefined
    */
   http_status?: OrderHttpStatusEnumKey
-  /**
-   * @type boolean | undefined
-   */
   complete?: boolean
 }

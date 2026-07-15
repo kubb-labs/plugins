@@ -5,9 +5,6 @@
 
 import type { Item } from './Item'
 
-/**
- * @type object
-*/
 export type GetItemPath = {
     /**
      * @description
@@ -17,14 +14,8 @@ export type GetItemPath = {
     id: bigint;
 };
 
-/**
- * @type object
-*/
 export type GetItemStatus200 = Item;
 
-/**
- * @type object
-*/
 export type GetItemOptions = {
     body?: never;
     path: GetItemPath;
@@ -32,9 +23,6 @@ export type GetItemOptions = {
     headers?: never;
 };
 
-/**
- * @type object
-*/
 export type GetItemResponses = {
     "200": GetItemStatus200;
 };

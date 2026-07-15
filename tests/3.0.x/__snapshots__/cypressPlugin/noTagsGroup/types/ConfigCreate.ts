@@ -3,12 +3,6 @@
 * Do not edit manually.
 */
 
-/**
- * @type object
-*/
 export type ConfigCreate = {
-    /**
-     * @type string
-    */
     name: string;
 };

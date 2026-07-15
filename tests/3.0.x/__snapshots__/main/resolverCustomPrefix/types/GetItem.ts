@@ -2,9 +2,6 @@
 
 import type { CustomItem } from './Item'
 
-/**
- * @type object
-*/
 export type CustomGetItemPath = {
     /**
      * @description
@@ -20,9 +17,6 @@ export type CustomGetItemPath = {
 */
 export type CustomGetItemStatus200 = CustomItem;
 
-/**
- * @type object
-*/
 export type CustomGetItemOptions = {
     body?: never;
     path: CustomGetItemPath;
@@ -30,9 +24,6 @@ export type CustomGetItemOptions = {
     headers?: never;
 };
 
-/**
- * @type object
-*/
 export type CustomGetItemResponses = {
     "200": CustomGetItemStatus200;
 };

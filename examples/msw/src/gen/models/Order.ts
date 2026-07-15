@@ -6,9 +6,6 @@
 import type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum'
 import type { OrderStatusEnumKey } from './OrderStatusEnum'
 
-/**
- * @type object
- */
 export type Order = {
   /**
    * @description
@@ -47,8 +44,5 @@ export type Order = {
    * @example 200
    */
   http_status?: OrderHttpStatusEnumKey
-  /**
-   * @type boolean | undefined
-   */
   complete?: boolean
 }

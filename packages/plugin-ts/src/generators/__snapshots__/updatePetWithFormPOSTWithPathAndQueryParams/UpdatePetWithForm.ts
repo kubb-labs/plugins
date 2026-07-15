@@ -4,43 +4,19 @@
  * Source: text content
  */
 
-/**
- * @type object
- */
 export type UpdatePetWithFormPath = {
-  /**
-   * @type integer
-   */
   petId: number
 }
 
-/**
- * @type object
- */
 export type UpdatePetWithFormQuery = {
-  /**
-   * @type string | undefined
-   */
   name?: string
-  /**
-   * @type string | undefined
-   */
   status?: string
 }
 
-/**
- * @type void
- */
 export type UpdatePetWithFormStatus200 = void
 
-/**
- * @type object
- */
 export type UpdatePetWithFormStatus405 = object
 
-/**
- * @type object
- */
 export type UpdatePetWithFormOptions = {
   body?: never
   path: UpdatePetWithFormPath
@@ -48,9 +24,6 @@ export type UpdatePetWithFormOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type UpdatePetWithFormResponses = {
   '200': UpdatePetWithFormStatus200
   '405': UpdatePetWithFormStatus405

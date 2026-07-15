@@ -3,20 +3,8 @@
 * Do not edit manually.
 */
 
-/**
- * @type object
-*/
 export type OrderSchema = {
-    /**
-     * @type string | undefined
-    */
     id?: string;
-    /**
-     * @type string | undefined
-    */
     customerId?: string;
-    /**
-     * @type array | undefined
-    */
     items?: string[];
 };

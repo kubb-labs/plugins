@@ -3,16 +3,7 @@
 * Do not edit manually.
 */
 
-/**
- * @type object
-*/
 export type OrderRequest = {
-    /**
-     * @type string | undefined
-    */
     userId?: string;
-    /**
-     * @type array | undefined
-    */
     productIds?: string[];
 };

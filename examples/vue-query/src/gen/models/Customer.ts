@@ -5,9 +5,6 @@
 
 import type { Address } from './Address'
 
-/**
- * @type object
- */
 export type Customer = {
   /**
    * @description
@@ -21,8 +18,5 @@ export type Customer = {
    * @type string | undefined
    */
   username?: string
-  /**
-   * @type array | undefined
-   */
   address?: Address[]
 }

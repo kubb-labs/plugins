@@ -6,9 +6,6 @@
 import type { Address } from './Address'
 import type { CustomerParamsStatusEnum } from './CustomerParamsStatusEnum'
 
-/**
- * @type object
- */
 export type Customer = {
   /**
    * @description
@@ -17,18 +14,12 @@ export type Customer = {
    * @type integer | undefined
    */
   id?: bigint
-  /**
-   * @type object | undefined
-   */
   params?: {
     /**
      * @description Order Status
      * @example approved
      */
     status: CustomerParamsStatusEnum
-    /**
-     * @type string
-     */
     type: string
   }
   /**
@@ -36,8 +27,5 @@ export type Customer = {
    * @type string | undefined
    */
   username?: string
-  /**
-   * @type array | undefined
-   */
   address?: Array<Address>
 }

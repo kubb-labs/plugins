@@ -2,9 +2,6 @@ import type { Category } from './Category'
 import type { PetStatusEnumKey } from './PetStatusEnum'
 import type { TagTag } from './tag/Tag'
 
-/**
- * @type object
- */
 export type Pet = {
   /**
    * @description
@@ -13,9 +10,6 @@ export type Pet = {
    * @type integer | undefined
    */
   readonly id?: number
-  /**
-   * @type array | undefined
-   */
   parent?: Array<Pet>
   /**
    * @pattern ^data:image\/(png|jpeg|gif|webp);base64,([A-Za-z0-9+/]+={0,2})$
@@ -34,17 +28,8 @@ export type Pet = {
    * @type string | undefined
    */
   url?: string
-  /**
-   * @type object | undefined
-   */
   category?: Category
-  /**
-   * @type array
-   */
   photoUrls: Array<string>
-  /**
-   * @type array | undefined
-   */
   tags?: Array<TagTag>
   /**
    * @description pet status in the store

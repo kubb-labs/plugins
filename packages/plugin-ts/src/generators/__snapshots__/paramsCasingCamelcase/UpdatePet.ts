@@ -4,48 +4,21 @@
  * Source: text content
  */
 
-/**
- * @type object
- */
 export type UpdatePetPath = {
-  /**
-   * @type string
-   */
   pet_id: string
 }
 
-/**
- * @type object
- */
 export type UpdatePetQuery = {
-  /**
-   * @type boolean | undefined
-   */
   include_deleted?: boolean
-  /**
-   * @type string | undefined
-   */
   request_source?: string
 }
 
-/**
- * @type object
- */
 export type UpdatePetStatus200 = object
 
-/**
- * @type object
- */
 export type UpdatePetBody = {
-  /**
-   * @type string
-   */
   name: string
 }
 
-/**
- * @type object
- */
 export type UpdatePetOptions = {
   body: UpdatePetBody
   path: UpdatePetPath
@@ -53,9 +26,6 @@ export type UpdatePetOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type UpdatePetResponses = {
   '200': UpdatePetStatus200
 }

@@ -5,9 +5,6 @@
 
 import type { Order } from './Order'
 
-/**
- * @type object
- */
 export type GetOrderByIdPath = {
   /**
    * @description ID of order that needs to be fetched
@@ -18,31 +15,16 @@ export type GetOrderByIdPath = {
   orderId: number
 }
 
-/**
- * @type object
- */
 export type GetOrderByIdStatus200Json = Order
 
-/**
- * @type object
- */
 export type GetOrderByIdStatus200Xml = Order
 
 export type GetOrderByIdStatus200 = GetOrderByIdStatus200Json | GetOrderByIdStatus200Xml
 
-/**
- * @type unknown
- */
 export type GetOrderByIdStatus400 = unknown
 
-/**
- * @type unknown
- */
 export type GetOrderByIdStatus404 = unknown
 
-/**
- * @type object
- */
 export type GetOrderByIdOptions = {
   body?: never
   path: GetOrderByIdPath
@@ -50,9 +32,6 @@ export type GetOrderByIdOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type GetOrderByIdResponses = {
   '200':
     | {

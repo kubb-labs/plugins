@@ -4,29 +4,14 @@
  * Source: text content
  */
 
-/**
- * @type object
- */
 export type ShowPetByIdPath = {
-  /**
-   * @type string
-   */
   petId: string
 }
 
-/**
- * @type object
- */
 export type ShowPetByIdStatus200 = object
 
-/**
- * @type object
- */
 export type ShowPetByIdStatusDefault = object
 
-/**
- * @type object
- */
 export type ShowPetByIdOptions = {
   body?: never
   path: ShowPetByIdPath
@@ -34,9 +19,6 @@ export type ShowPetByIdOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type ShowPetByIdResponses = {
   '200': ShowPetByIdStatus200
   default: ShowPetByIdStatusDefault

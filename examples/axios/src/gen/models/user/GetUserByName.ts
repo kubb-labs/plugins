@@ -5,9 +5,6 @@
 
 import type { User } from '../User'
 
-/**
- * @type object
- */
 export type GetUserByNamePath = {
   /**
    * @description The name that needs to be fetched. Use user1 for testing.
@@ -16,31 +13,16 @@ export type GetUserByNamePath = {
   username: string
 }
 
-/**
- * @type object
- */
 export type GetUserByNameStatus200Json = User
 
-/**
- * @type object
- */
 export type GetUserByNameStatus200Xml = User
 
 export type GetUserByNameStatus200 = GetUserByNameStatus200Json | GetUserByNameStatus200Xml
 
-/**
- * @type unknown
- */
 export type GetUserByNameStatus400 = unknown
 
-/**
- * @type unknown
- */
 export type GetUserByNameStatus404 = unknown
 
-/**
- * @type object
- */
 export type GetUserByNameOptions = {
   body?: never
   path: GetUserByNamePath
@@ -48,9 +30,6 @@ export type GetUserByNameOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type GetUserByNameResponses = {
   '200':
     | {
