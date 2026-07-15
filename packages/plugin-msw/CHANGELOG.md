@@ -1,5 +1,11 @@
 # @kubb/plugin-msw
 
+## 5.0.0-beta.100
+
+### Patch Changes
+
+- [#692](https://github.com/kubb-labs/plugins/pull/692) [`3d6f94b`](https://github.com/kubb-labs/plugins/commit/3d6f94b08174be0f39175bd6f641bea00c9459b0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Consume the `Url` path-template helper from `kubb/kit` instead of a locally duplicated copy in `@internals/utils`, now that kubb core exposes `Url.toSafeTemplate` and `Url.toGroupedTemplateString` alongside its existing `toPath`/`toTemplateString`/`toObject`. Requires `kubb`/`@kubb/kit` 5.0.0-beta.98 or later.
+
 ## 5.0.0-beta.99
 
 ### Patch Changes
