@@ -21,7 +21,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginFetch['resolvedOptions'] = {
-  output: { path: '.', banner: '/* eslint-disable no-alert, no-console */' },
+  output: { path: '.', mode: 'directory', banner: '/* eslint-disable no-alert, no-console */' },
   exclude: [],
   include: undefined,
   override: [],
@@ -34,7 +34,7 @@ const defaultOptions: PluginFetch['resolvedOptions'] = {
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
+  options: { output: { path: '.', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 

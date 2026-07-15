@@ -16,12 +16,13 @@ export default defineConfig({
   adapter: adapterOas({ unknownType: 'unknown', enums: 'root' }),
   plugins: [
     pluginTs({
-      output: { path: 'models' },
+      output: { path: 'models', mode: 'directory' },
       group: { type: 'tag' },
     }),
     pluginFetch({
       output: {
         path: './sdk',
+        mode: 'directory',
         barrel: { type: 'all', nested: true },
       },
       group: { type: 'tag' },

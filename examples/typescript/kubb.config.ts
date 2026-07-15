@@ -123,6 +123,7 @@ export default defineConfig([
       pluginTs({
         output: {
           path: 'ts/models',
+          mode: 'directory',
         },
       }),
     ],
@@ -172,7 +173,7 @@ export default defineConfig([
     adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
     plugins: [
       pluginTs({
-        output: { path: 'models' },
+        output: { path: 'models', mode: 'directory' },
         enum: { type: 'inlineLiteral' },
         group: { type: 'tag' },
       }),

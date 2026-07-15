@@ -18,11 +18,11 @@ export default defineConfig(() => {
     adapter: adapterOas({ unknownType: 'unknown', server: { index: 0 } }),
     plugins: [
       pluginTs({
-        output: { path: 'models', barrel: { type: 'named' } },
+        output: { path: 'models', mode: 'directory', barrel: { type: 'named' } },
         group: { type: 'tag' },
       }),
       pluginFetch({
-        output: { path: './clients', barrel: { type: 'named' } },
+        output: { path: './clients', mode: 'directory', barrel: { type: 'named' } },
         group: { type: 'tag' },
       }),
     ],

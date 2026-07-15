@@ -4,7 +4,6 @@
     /* If NOT transpiling with TypeScript: */
     "module": "ES2020",
     "moduleResolution": "Bundler",
-    "resolvePackageJsonExports": false,
     "sourceMap": true,
     "strictNullChecks": true,
     "jsx": "react-jsx",
@@ -21,6 +20,6 @@
     "alwaysStrict": true,
     "strict": true
   },
-  "include": ["./src/**/*", "./templates/**/*"],
+  "include": ["./src/**/*", "./templates/**/*", "./kubb.config.ts"],
   "exclude": ["**/node_modules", "**/types/**", "**/mocks/**"]
 }

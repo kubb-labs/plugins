@@ -37,3 +37,18 @@ export type GetOrderByIdResponseSchemaType = z.infer<typeof getOrderByIdResponse
 export const getOrderByIdErrorSchema = z.union([getOrderByIdStatus400Schema, getOrderByIdStatus404Schema])
 
 export type GetOrderByIdErrorSchemaType = z.infer<typeof getOrderByIdErrorSchema>
+
+export const getOrderByIdPathSchema = z.object({
+  orderId: z.bigint().describe('ID of order that needs to be fetched'),
+})
+
+export type GetOrderByIdPathSchemaType = z.infer<typeof getOrderByIdPathSchema>
+
+export const getOrderByIdOptionsSchema = z.object({
+  body: z.never().optional(),
+  path: getOrderByIdPathSchema,
+  query: z.never().optional(),
+  headers: z.never().optional(),
+})
+
+export type GetOrderByIdOptionsSchemaType = z.infer<typeof getOrderByIdOptionsSchema>

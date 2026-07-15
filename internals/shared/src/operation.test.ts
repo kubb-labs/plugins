@@ -2,6 +2,7 @@ import { ast } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
 import {
   buildOperationComments,
+  buildOptionsSchema,
   buildRequestConfigType,
   findSuccessStatusCode,
   getContentTypeInfo,
@@ -267,6 +268,52 @@ describe('getOperationParameters', () => {
     expect(grouped.query.map((param) => param.name)).toStrictEqual(['page-size'])
     expect(grouped.header.map((param) => param.name)).toStrictEqual(['x-api-key'])
     expect(grouped.cookie.map((param) => param.name)).toStrictEqual(['session-id'])
+  })
+})
+
+describe('buildOptionsSchema', () => {
+  test('marks body, path, query, and headers as never when the operation has none of them', () => {
+    const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
+
+    const schema = buildOptionsSchema(node, resolver)
+
+    expect(schema.type).toBe('object')
+    expect(schema.primitive).toBe('object')
+    expect(schema.properties?.map((property) => ({ name: property.name, required: property.required, schemaType: property.schema.type }))).toStrictEqual([
+      { name: 'body', required: false, schemaType: 'never' },
+      { name: 'path', required: false, schemaType: 'never' },
+      { name: 'query', required: false, schemaType: 'never' },
+      { name: 'headers', required: false, schemaType: 'never' },
+    ])
+  })
+
+  test('references the resolved body, path, query, and headers names when present', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'createPet',
+      method: 'POST',
+      path: '/pets/{petId}',
+      parameters: [
+        ast.factory.createParameter({ name: 'petId', in: 'path', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({ name: 'limit', in: 'query', required: false, schema: ast.factory.createSchema({ type: 'integer' }) }),
+        ast.factory.createParameter({ name: 'x-api-key', in: 'header', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+      ],
+      requestBody: { content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) })] },
+    })
+
+    const schema = buildOptionsSchema(node, resolver)
+
+    expect(
+      schema.properties?.map((property) => ({
+        name: property.name,
+        required: property.required,
+        ref: property.schema.type === 'ref' ? property.schema.name : null,
+      })),
+    ).toStrictEqual([
+      { name: 'body', required: true, ref: 'createPetData' },
+      { name: 'path', required: true, ref: 'petIdPathParams' },
+      { name: 'query', required: false, ref: 'limitQueryParams' },
+      { name: 'headers', required: true, ref: 'x-api-keyHeaderParams' },
+    ])
   })
 })
 

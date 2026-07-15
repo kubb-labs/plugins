@@ -1,2 +1,14 @@
-export type { StreamPetEventsPathPetIdSchemaType, StreamPetEventsResponseSchemaType, StreamPetEventsStatus200SchemaType } from './streamPetEventsSchema'
-export { streamPetEventsPathPetIdSchema, streamPetEventsResponseSchema, streamPetEventsStatus200Schema } from './streamPetEventsSchema'
+export type {
+  StreamPetEventsOptionsSchemaType,
+  StreamPetEventsPathPetIdSchemaType,
+  StreamPetEventsPathSchemaType,
+  StreamPetEventsResponseSchemaType,
+  StreamPetEventsStatus200SchemaType,
+} from './streamPetEventsSchema'
+export {
+  streamPetEventsOptionsSchema,
+  streamPetEventsPathPetIdSchema,
+  streamPetEventsPathSchema,
+  streamPetEventsResponseSchema,
+  streamPetEventsStatus200Schema,
+} from './streamPetEventsSchema'

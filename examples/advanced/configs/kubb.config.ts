@@ -31,6 +31,7 @@ export default defineConfig({
     pluginTs({
       output: {
         path: 'models/ts',
+        mode: 'directory',
       },
       group: {
         type: 'tag',
@@ -50,6 +51,7 @@ export default defineConfig({
     pluginZod({
       output: {
         path: './zod',
+        mode: 'directory',
       },
       exclude: [
         {
@@ -63,6 +65,7 @@ export default defineConfig({
     pluginReactQuery({
       output: {
         path: './clients/hooks',
+        mode: 'directory',
       },
       exclude: [
         {
@@ -101,6 +104,7 @@ export default defineConfig({
     pluginAxios({
       output: {
         path: './clients/axios',
+        mode: 'directory',
       },
       exclude: [
         {
@@ -138,6 +142,7 @@ export default defineConfig({
     pluginMcp({
       output: {
         path: './mcp',
+        mode: 'directory',
         barrel: false,
       },
       exclude: [
@@ -155,6 +160,7 @@ export default defineConfig({
     pluginFaker({
       output: {
         path: 'mocks',
+        mode: 'directory',
       },
       exclude: [
         {
@@ -195,6 +201,7 @@ export default defineConfig({
     pluginCypress({
       output: {
         path: 'cypress',
+        mode: 'directory',
         barrel: false,
       },
       group: { type: 'tag' },
@@ -202,6 +209,7 @@ export default defineConfig({
     pluginMsw({
       output: {
         path: 'msw',
+        mode: 'directory',
       },
       handlers: true,
       exclude: [

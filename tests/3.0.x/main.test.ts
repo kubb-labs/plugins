@@ -33,6 +33,7 @@ const configs = [
           output: {
             path: './types',
             barrel: false,
+            mode: 'directory',
           },
         }),
       ],
@@ -54,6 +55,7 @@ const configs = [
           output: {
             path: './types',
             barrel: false,
+            mode: 'directory',
           },
         }),
       ],
@@ -75,12 +77,14 @@ const configs = [
           output: {
             path: './types',
             barrel: false,
+            mode: 'directory',
           },
         }),
         pluginZod({
           output: {
             path: './zod',
             barrel: false,
+            mode: 'directory',
           },
         }),
       ],
@@ -99,11 +103,17 @@ const configs = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({}),
+        pluginTs({
+          output: {
+            path: 'types',
+            mode: 'directory',
+          },
+        }),
         pluginZod({
           output: {
             path: './zod',
             barrel: false,
+            mode: 'directory',
           },
         }),
       ],
@@ -125,12 +135,14 @@ const configs = [
           output: {
             path: './types',
             barrel: false,
+            mode: 'directory',
           },
         }),
         pluginZod({
           output: {
             path: './zod',
             barrel: false,
+            mode: 'directory',
           },
         }),
       ],
@@ -157,6 +169,7 @@ const configs = [
           output: {
             path: './zod',
             barrel: false,
+            mode: 'directory',
           },
         }),
       ],
@@ -179,6 +192,7 @@ const configs = [
           output: {
             path: './zod',
             barrel: false,
+            mode: 'directory',
           },
         }),
       ],
@@ -200,6 +214,7 @@ const configs = [
           output: {
             path: './zod',
             barrel: false,
+            mode: 'directory',
           },
         }),
       ],
@@ -221,6 +236,7 @@ const configs = [
           output: {
             path: './types',
             barrel: false,
+            mode: 'directory',
           },
         }),
       ],
@@ -242,6 +258,7 @@ const configs = [
           output: {
             path: './types',
             barrel: false,
+            mode: 'directory',
           },
         }),
       ],
@@ -270,6 +287,7 @@ const configs = [
           output: {
             path: './zod',
             barrel: false,
+            mode: 'directory',
           },
         }),
       ],
@@ -300,6 +318,7 @@ const configs = [
           output: {
             path: './types',
             barrel: false,
+            mode: 'directory',
           },
         }),
       ],
@@ -326,6 +345,7 @@ const configs = [
           output: {
             path: './types',
             barrel: false,
+            mode: 'directory',
           },
           enum: { type: 'asConst' },
         }),
@@ -352,6 +372,7 @@ const configs = [
           output: {
             path: './types',
             barrel: false,
+            mode: 'directory',
           },
           group: { type: 'tag' },
         }),
@@ -374,7 +395,7 @@ const configs = [
       parsers: [parserTs()],
       plugins: [
         pluginTs({
-          output: { path: './types', barrel: false, banner: '// Custom banner' },
+          output: { path: './types', barrel: false, banner: '// Custom banner', mode: 'directory' },
           resolver: {
             name(name: string) {
               return `Custom${ensureValidVarName(pascalCase(name))}`
@@ -399,7 +420,7 @@ const configs = [
       parsers: [parserTs()],
       plugins: [
         pluginZod({
-          output: { path: './zod', barrel: false },
+          output: { path: './zod', barrel: false, mode: 'directory' },
           printer: {
             nodes: {
               integer() {
@@ -426,7 +447,7 @@ const configs = [
       parsers: [parserTs()],
       plugins: [
         pluginTs({
-          output: { path: './types', barrel: false },
+          output: { path: './types', barrel: false, mode: 'directory' },
           macros: [
             {
               name: 'strip-descriptions',

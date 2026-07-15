@@ -16,20 +16,20 @@ export default defineConfig(() => {
       format: false,
       lint: false,
     },
-    adapter: adapterOas({ unknownType: 'unknown', serverIndex: 0 }),
+    adapter: adapterOas({ unknownType: 'unknown', server: { index: 0 } }),
     plugins: [
       pluginTs({
-        output: { path: 'models', barrel: { type: 'named' } },
+        output: { path: 'models', mode: 'directory', barrel: { type: 'named' } },
         group: { type: 'tag' },
       }),
       // The slim client. pluginVueQuery auto-detects it (no `client` option needed) and the composables
       // call its generated functions, surfacing `ResponseError` from the bundled `.kubb/client.ts`.
       pluginFetch({
-        output: { path: './clients', barrel: { type: 'named' } },
+        output: { path: './clients', mode: 'directory', barrel: { type: 'named' } },
         group: { type: 'tag' },
       }),
       pluginVueQuery({
-        output: { path: './hooks', barrel: { type: 'named' } },
+        output: { path: './hooks', mode: 'directory', barrel: { type: 'named' } },
         group: { type: 'tag' },
       }),
     ],

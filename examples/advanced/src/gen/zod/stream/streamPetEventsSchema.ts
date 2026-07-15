@@ -12,3 +12,18 @@ export type StreamPetEventsStatus200SchemaType = z.infer<typeof streamPetEventsS
 export const streamPetEventsResponseSchema = streamPetEventsStatus200Schema
 
 export type StreamPetEventsResponseSchemaType = z.infer<typeof streamPetEventsResponseSchema>
+
+export const streamPetEventsPathSchema = z.object({
+  petId: z.int().describe('ID of pet to stream events for'),
+})
+
+export type StreamPetEventsPathSchemaType = z.infer<typeof streamPetEventsPathSchema>
+
+export const streamPetEventsOptionsSchema = z.object({
+  body: z.never().optional(),
+  path: streamPetEventsPathSchema,
+  query: z.never().optional(),
+  headers: z.never().optional(),
+})
+
+export type StreamPetEventsOptionsSchemaType = z.infer<typeof streamPetEventsOptionsSchema>

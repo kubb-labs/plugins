@@ -1,4 +1,4 @@
-import { getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
+import { resolveContentTypeVariants } from '@internals/shared'
 import { jsStringEscape, stringify } from '@internals/utils'
 import { ast } from 'kubb/kit'
 import type { ResolverTs } from './types.ts'
@@ -96,55 +96,6 @@ export function buildParams({ params }: BuildParamsSchemaOptions): ast.SchemaNod
         schema: ast.factory.createSchema({ ...param.schema, optional: !param.required }),
       }),
     ),
-  })
-}
-
-export function buildOptions(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode {
-  const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
-  const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
-  const hasRequiredPath = pathParams.some((param) => param.required)
-  const hasRequiredQuery = queryParams.some((param) => param.required)
-  const hasRequiredHeader = headerParams.some((param) => param.required)
-
-  // NOTE(v5-stable): the fields were renamed from the legacy beta shape
-  // (`data`/`pathParams`/`queryParams`/`headerParams`) to `body`/`path`/`query`/`headers` so the
-  // type matches the runtime client. Drop this note once v5 leaves beta.
-  return ast.factory.createSchema({
-    type: 'object',
-    deprecated: node.deprecated,
-    properties: [
-      ast.factory.createProperty({
-        name: 'body',
-        required: hasBody,
-        schema: hasBody
-          ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) })
-          : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
-      }),
-      ast.factory.createProperty({
-        name: 'path',
-        required: hasRequiredPath,
-        schema:
-          pathParams.length > 0
-            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.path(node, pathParams[0]!), optional: !hasRequiredPath })
-            : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
-      }),
-      ast.factory.createProperty({
-        name: 'query',
-        required: hasRequiredQuery,
-        schema:
-          queryParams.length > 0
-            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.query(node, queryParams[0]!), optional: !hasRequiredQuery })
-            : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
-      }),
-      ast.factory.createProperty({
-        name: 'headers',
-        required: hasRequiredHeader,
-        schema:
-          headerParams.length > 0
-            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.headers(node, headerParams[0]!), optional: !hasRequiredHeader })
-            : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
-      }),
-    ],
   })
 }
 

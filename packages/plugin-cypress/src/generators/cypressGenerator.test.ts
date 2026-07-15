@@ -23,7 +23,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginCypress['resolvedOptions'] = {
-  output: { path: '.' },
+  output: { path: '.', mode: 'directory' },
   exclude: [],
   include: undefined,
   override: [],
@@ -34,7 +34,7 @@ const defaultOptions: PluginCypress['resolvedOptions'] = {
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
+  options: { output: { path: '.', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 

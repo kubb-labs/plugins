@@ -17,3 +17,18 @@ export type ListPetsInferredStatus200SchemaType = z.infer<typeof listPetsInferre
 export const listPetsInferredResponseSchema = listPetsInferredStatus200Schema
 
 export type ListPetsInferredResponseSchemaType = z.infer<typeof listPetsInferredResponseSchema>
+
+export const listPetsInferredQuerySchema = z.object({
+  limit: z.int().optional(),
+})
+
+export type ListPetsInferredQuerySchemaType = z.infer<typeof listPetsInferredQuerySchema>
+
+export const listPetsInferredOptionsSchema = z.object({
+  body: z.never().optional(),
+  path: z.never().optional(),
+  query: listPetsInferredQuerySchema.optional(),
+  headers: z.never().optional(),
+})
+
+export type ListPetsInferredOptionsSchemaType = z.infer<typeof listPetsInferredOptionsSchema>

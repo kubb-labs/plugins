@@ -4,24 +4,24 @@ import {
   createPetsBodySchema,
   createPetsStatus201Schema,
   createPetsResponseSchema,
-  createPetsPathUuidSchema,
-  createPetsQueryOffsetSchema,
-  createPetsHeaderXEXAMPLESchema,
+  createPetsPathSchema,
+  createPetsQuerySchema,
+  createPetsHeadersSchema,
 } from './createPetsSchema'
-import { deleteOrderStatus400Schema, deleteOrderStatus404Schema, deleteOrderResponseSchema, deleteOrderPathOrderIdSchema } from './deleteOrderSchema'
-import { deletePetStatus400Schema, deletePetResponseSchema, deletePetPathPetIdSchema, deletePetHeaderApiKeySchema } from './deletePetSchema'
+import { deleteOrderStatus400Schema, deleteOrderStatus404Schema, deleteOrderResponseSchema, deleteOrderPathSchema } from './deleteOrderSchema'
+import { deletePetStatus400Schema, deletePetResponseSchema, deletePetPathSchema, deletePetHeadersSchema } from './deletePetSchema'
 import {
   findPetsByStatusStatus200Schema,
   findPetsByStatusStatus400Schema,
   findPetsByStatusResponseSchema,
-  findPetsByStatusQueryStatusSchema,
+  findPetsByStatusQuerySchema,
 } from './findPetsByStatusSchema'
 import {
   findPetsByTagsStatus200Schema,
   findPetsByTagsStatus400Schema,
   findPetsByTagsResponseSchema,
-  findPetsByTagsQueryTagsSchema,
-  findPetsByTagsHeaderXEXAMPLESchema,
+  findPetsByTagsQuerySchema,
+  findPetsByTagsHeadersSchema,
 } from './findPetsByTagsSchema'
 import { getInventoryStatus200Schema, getInventoryResponseSchema } from './getInventorySchema'
 import {
@@ -29,16 +29,16 @@ import {
   getOrderByIdStatus400Schema,
   getOrderByIdStatus404Schema,
   getOrderByIdResponseSchema,
-  getOrderByIdPathOrderIdSchema,
+  getOrderByIdPathSchema,
 } from './getOrderByIdSchema'
 import {
   getPetByIdStatus200Schema,
   getPetByIdStatus400Schema,
   getPetByIdStatus404Schema,
   getPetByIdResponseSchema,
-  getPetByIdPathPetIdSchema,
+  getPetByIdPathSchema,
 } from './getPetByIdSchema'
-import { getThingsStatus201Schema, getThingsResponseSchema, getThingsQueryLimitSchema } from './getThingsSchema'
+import { getThingsStatus201Schema, getThingsResponseSchema, getThingsQuerySchema } from './getThingsSchema'
 import {
   placeOrderPatchBodySchema,
   placeOrderPatchStatus200Schema,
@@ -57,16 +57,10 @@ import {
 import {
   updatePetWithFormStatus405Schema,
   updatePetWithFormResponseSchema,
-  updatePetWithFormPathPetIdSchema,
-  updatePetWithFormQueryNameSchema,
+  updatePetWithFormPathSchema,
+  updatePetWithFormQuerySchema,
 } from './updatePetWithFormSchema'
-import {
-  uploadFileBodySchema,
-  uploadFileStatus200Schema,
-  uploadFileResponseSchema,
-  uploadFilePathPetIdSchema,
-  uploadFileQueryAdditionalMetadataSchema,
-} from './uploadFileSchema'
+import { uploadFileBodySchema, uploadFileStatus200Schema, uploadFileResponseSchema, uploadFilePathSchema, uploadFileQuerySchema } from './uploadFileSchema'
 
 export type OperationSchema = {
   readonly request: z.ZodTypeAny | undefined
@@ -91,7 +85,7 @@ export const operations = {
     request: null,
     parameters: {
       path: null,
-      query: getThingsQueryLimitSchema,
+      query: getThingsQuerySchema,
       header: null,
     },
     responses: {
@@ -103,9 +97,9 @@ export const operations = {
   createPets: {
     request: createPetsBodySchema,
     parameters: {
-      path: createPetsPathUuidSchema,
-      query: createPetsQueryOffsetSchema,
-      header: createPetsHeaderXEXAMPLESchema,
+      path: createPetsPathSchema,
+      query: createPetsQuerySchema,
+      header: createPetsHeadersSchema,
     },
     responses: {
       201: createPetsStatus201Schema,
@@ -153,7 +147,7 @@ export const operations = {
     request: null,
     parameters: {
       path: null,
-      query: findPetsByStatusQueryStatusSchema,
+      query: findPetsByStatusQuerySchema,
       header: null,
     },
     responses: {
@@ -169,8 +163,8 @@ export const operations = {
     request: null,
     parameters: {
       path: null,
-      query: findPetsByTagsQueryTagsSchema,
-      header: findPetsByTagsHeaderXEXAMPLESchema,
+      query: findPetsByTagsQuerySchema,
+      header: findPetsByTagsHeadersSchema,
     },
     responses: {
       200: findPetsByTagsStatus200Schema,
@@ -184,7 +178,7 @@ export const operations = {
   getPetById: {
     request: null,
     parameters: {
-      path: getPetByIdPathPetIdSchema,
+      path: getPetByIdPathSchema,
       query: null,
       header: null,
     },
@@ -202,8 +196,8 @@ export const operations = {
   updatePetWithForm: {
     request: null,
     parameters: {
-      path: updatePetWithFormPathPetIdSchema,
-      query: updatePetWithFormQueryNameSchema,
+      path: updatePetWithFormPathSchema,
+      query: updatePetWithFormQuerySchema,
       header: null,
     },
     responses: {
@@ -217,9 +211,9 @@ export const operations = {
   deletePet: {
     request: null,
     parameters: {
-      path: deletePetPathPetIdSchema,
+      path: deletePetPathSchema,
       query: null,
-      header: deletePetHeaderApiKeySchema,
+      header: deletePetHeadersSchema,
     },
     responses: {
       400: deletePetStatus400Schema,
@@ -232,8 +226,8 @@ export const operations = {
   uploadFile: {
     request: uploadFileBodySchema,
     parameters: {
-      path: uploadFilePathPetIdSchema,
-      query: uploadFileQueryAdditionalMetadataSchema,
+      path: uploadFilePathSchema,
+      query: uploadFileQuerySchema,
       header: null,
     },
     responses: {
@@ -290,7 +284,7 @@ export const operations = {
   getOrderById: {
     request: null,
     parameters: {
-      path: getOrderByIdPathOrderIdSchema,
+      path: getOrderByIdPathSchema,
       query: null,
       header: null,
     },
@@ -308,7 +302,7 @@ export const operations = {
   deleteOrder: {
     request: null,
     parameters: {
-      path: deleteOrderPathOrderIdSchema,
+      path: deleteOrderPathSchema,
       query: null,
       header: null,
     },

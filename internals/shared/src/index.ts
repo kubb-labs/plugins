@@ -1,6 +1,7 @@
 export {
   buildClientOptionType,
   buildOperationComments,
+  buildOptionsSchema,
   buildRequestConfigType,
   buildRequestParamsSignature,
   findSuccessStatusCode,

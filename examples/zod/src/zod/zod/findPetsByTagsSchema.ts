@@ -45,3 +45,26 @@ export type FindPetsByTagsResponseSchemaType = z.infer<typeof findPetsByTagsResp
 export const findPetsByTagsErrorSchema = findPetsByTagsStatus400Schema
 
 export type FindPetsByTagsErrorSchemaType = z.infer<typeof findPetsByTagsErrorSchema>
+
+export const findPetsByTagsQuerySchema = z.object({
+  tags: z.array(z.string()).optional().describe('Tags to filter by'),
+  page: z.string().optional().describe('to request with required page number or pagination'),
+  pageSize: z.string().optional().describe('to request with required page size'),
+})
+
+export type FindPetsByTagsQuerySchemaType = z.infer<typeof findPetsByTagsQuerySchema>
+
+export const findPetsByTagsHeadersSchema = z.object({
+  'X-EXAMPLE': z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters'),
+})
+
+export type FindPetsByTagsHeadersSchemaType = z.infer<typeof findPetsByTagsHeadersSchema>
+
+export const findPetsByTagsOptionsSchema = z.object({
+  body: z.never().optional(),
+  path: z.never().optional(),
+  query: findPetsByTagsQuerySchema.optional(),
+  headers: findPetsByTagsHeadersSchema,
+})
+
+export type FindPetsByTagsOptionsSchemaType = z.infer<typeof findPetsByTagsOptionsSchema>

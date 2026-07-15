@@ -61,21 +61,21 @@ export type ResolverZod = Resolver & {
      * Resolves the name for an operation's grouped path parameters schema.
      *
      * @example Path parameters names
-     * `resolver.param.path(node, param) // → 'deletePetPathPetIdSchema'`
+     * `resolver.param.path(node, param) // → 'deletePetPathSchema'`
      */
     path(node: ast.OperationNode, param: ast.ParameterNode): string
     /**
      * Resolves the name for an operation's grouped query parameters schema.
      *
      * @example Query parameters names
-     * `resolver.param.query(node, param) // → 'findPetsByStatusQueryStatusSchema'`
+     * `resolver.param.query(node, param) // → 'findPetsByStatusQuerySchema'`
      */
     query(node: ast.OperationNode, param: ast.ParameterNode): string
     /**
      * Resolves the name for an operation's grouped header parameters schema.
      *
      * @example Header parameters names
-     * `resolver.param.headers(node, param) // → 'deletePetHeaderApiKeySchema'`
+     * `resolver.param.headers(node, param) // → 'deletePetHeadersSchema'`
      */
     headers(node: ast.OperationNode, param: ast.ParameterNode): string
   }
@@ -120,6 +120,15 @@ export type ResolverZod = Resolver & {
      * `resolver.response.error(node) // → 'listPetsErrorSchema'`
      */
     error(node: ast.OperationNode): string
+    /**
+     * Resolves the inferred type name for an operation's combined `{ body, path, query, headers }`
+     * options object. Only meaningful when `inferred: true`, since the schema and type this name
+     * points to are generated only in that case.
+     *
+     * @example Options type names
+     * `resolver.response.options(node) // → 'ListPetsOptionsSchemaType'`
+     */
+    options(node: ast.OperationNode): string
   }
 }
 

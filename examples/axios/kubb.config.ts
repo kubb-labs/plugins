@@ -23,11 +23,11 @@ export default defineConfig(() => {
     }),
     plugins: [
       pluginTs({
-        output: { path: 'models', barrel: { type: 'named' } },
+        output: { path: 'models', mode: 'directory', barrel: { type: 'named' } },
         group: { type: 'tag' },
       }),
       pluginAxios({
-        output: { path: './clients', barrel: { type: 'named' } },
+        output: { path: './clients', mode: 'directory', barrel: { type: 'named' } },
         group: { type: 'tag' },
       }),
     ],

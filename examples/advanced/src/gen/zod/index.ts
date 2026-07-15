@@ -20,6 +20,7 @@ export type {
   AddFilesBodySchemaJsonType,
   AddFilesBodySchemaType,
   AddFilesErrorSchemaType,
+  AddFilesOptionsSchemaType,
   AddFilesResponseSchemaType,
   AddFilesStatus200SchemaType,
   AddFilesStatus405SchemaType,
@@ -30,6 +31,7 @@ export type {
   AddPetBodySchemaType,
   AddPetBodySchemaXmlType,
   AddPetErrorSchemaType,
+  AddPetOptionsSchemaType,
   AddPetResponseSchemaType,
   AddPetStatus405SchemaType,
   AddPetStatusDefaultSchemaJsonType,
@@ -39,12 +41,17 @@ export type {
 export type {
   DeletePetErrorSchemaType,
   DeletePetHeaderApiKeySchemaType,
+  DeletePetHeadersSchemaType,
+  DeletePetOptionsSchemaType,
   DeletePetPathPetIdSchemaType,
+  DeletePetPathSchemaType,
   DeletePetResponseSchemaType,
   DeletePetStatus400SchemaType,
 } from './pet/deletePetSchema'
 export type {
   FindPetsByStatusErrorSchemaType,
+  FindPetsByStatusOptionsSchemaType,
+  FindPetsByStatusPathSchemaType,
   FindPetsByStatusPathStepIdSchemaType,
   FindPetsByStatusResponseSchemaType,
   FindPetsByStatusStatus200SchemaJsonType,
@@ -55,8 +62,11 @@ export type {
 export type {
   FindPetsByTagsErrorSchemaType,
   FindPetsByTagsHeaderXEXAMPLESchemaType,
+  FindPetsByTagsHeadersSchemaType,
+  FindPetsByTagsOptionsSchemaType,
   FindPetsByTagsQueryPageSchemaType,
   FindPetsByTagsQueryPageSizeSchemaType,
+  FindPetsByTagsQuerySchemaType,
   FindPetsByTagsQueryTagsSchemaType,
   FindPetsByTagsResponseSchemaType,
   FindPetsByTagsStatus200SchemaJsonType,
@@ -66,7 +76,9 @@ export type {
 } from './pet/findPetsByTagsSchema'
 export type {
   GetPetByIdErrorSchemaType,
+  GetPetByIdOptionsSchemaType,
   GetPetByIdPathPetIdSchemaType,
+  GetPetByIdPathSchemaType,
   GetPetByIdResponseSchemaType,
   GetPetByIdStatus200SchemaJsonType,
   GetPetByIdStatus200SchemaType,
@@ -80,6 +92,7 @@ export type {
   UpdatePetBodySchemaType,
   UpdatePetBodySchemaXmlType,
   UpdatePetErrorSchemaType,
+  UpdatePetOptionsSchemaType,
   UpdatePetResponseSchemaType,
   UpdatePetStatus200SchemaJsonType,
   UpdatePetStatus200SchemaType,
@@ -91,16 +104,22 @@ export type {
 } from './pet/updatePetSchema'
 export type {
   UpdatePetWithFormErrorSchemaType,
+  UpdatePetWithFormOptionsSchemaType,
   UpdatePetWithFormPathPetIdSchemaType,
+  UpdatePetWithFormPathSchemaType,
   UpdatePetWithFormQueryNameSchemaType,
+  UpdatePetWithFormQuerySchemaType,
   UpdatePetWithFormQueryStatusSchemaType,
   UpdatePetWithFormResponseSchemaType,
   UpdatePetWithFormStatus405SchemaType,
 } from './pet/updatePetWithFormSchema'
 export type {
   UploadFileBodySchemaType,
+  UploadFileOptionsSchemaType,
   UploadFilePathPetIdSchemaType,
+  UploadFilePathSchemaType,
   UploadFileQueryAdditionalMetadataSchemaType,
+  UploadFileQuerySchemaType,
   UploadFileResponseSchemaType,
   UploadFileStatus200SchemaType,
 } from './pet/uploadFileSchema'
@@ -113,14 +132,24 @@ export type {
   CreatePetsBodySchemaType,
   CreatePetsErrorSchemaType,
   CreatePetsHeaderXEXAMPLESchemaType,
+  CreatePetsHeadersSchemaType,
+  CreatePetsOptionsSchemaType,
+  CreatePetsPathSchemaType,
   CreatePetsPathUuidSchemaType,
   CreatePetsQueryBoolParamSchemaType,
   CreatePetsQueryOffsetSchemaType,
+  CreatePetsQuerySchemaType,
   CreatePetsResponseSchemaType,
   CreatePetsStatus201SchemaType,
   CreatePetsStatusDefaultSchemaType,
 } from './pets/createPetsSchema'
-export type { StreamPetEventsPathPetIdSchemaType, StreamPetEventsResponseSchemaType, StreamPetEventsStatus200SchemaType } from './stream/streamPetEventsSchema'
+export type {
+  StreamPetEventsOptionsSchemaType,
+  StreamPetEventsPathPetIdSchemaType,
+  StreamPetEventsPathSchemaType,
+  StreamPetEventsResponseSchemaType,
+  StreamPetEventsStatus200SchemaType,
+} from './stream/streamPetEventsSchema'
 export type { TagTagSchemaType } from './tag/tagSchema'
 export { addPetRequestSchema } from './addPetRequestSchema'
 export { addPetRequestStatusEnumSchema } from './addPetRequestStatusEnumSchema'
@@ -144,6 +173,7 @@ export {
   addFilesBodySchemaFormData,
   addFilesBodySchemaJson,
   addFilesErrorSchema,
+  addFilesOptionsSchema,
   addFilesResponseSchema,
   addFilesStatus200Schema,
   addFilesStatus405Schema,
@@ -154,6 +184,7 @@ export {
   addPetBodySchemaJson,
   addPetBodySchemaXml,
   addPetErrorSchema,
+  addPetOptionsSchema,
   addPetResponseSchema,
   addPetStatus405Schema,
   addPetStatusDefaultSchema,
@@ -163,12 +194,17 @@ export {
 export {
   deletePetErrorSchema,
   deletePetHeaderApiKeySchema,
+  deletePetHeadersSchema,
+  deletePetOptionsSchema,
   deletePetPathPetIdSchema,
+  deletePetPathSchema,
   deletePetResponseSchema,
   deletePetStatus400Schema,
 } from './pet/deletePetSchema'
 export {
   findPetsByStatusErrorSchema,
+  findPetsByStatusOptionsSchema,
+  findPetsByStatusPathSchema,
   findPetsByStatusPathStepIdSchema,
   findPetsByStatusResponseSchema,
   findPetsByStatusStatus200Schema,
@@ -179,8 +215,11 @@ export {
 export {
   findPetsByTagsErrorSchema,
   findPetsByTagsHeaderXEXAMPLESchema,
+  findPetsByTagsHeadersSchema,
+  findPetsByTagsOptionsSchema,
   findPetsByTagsQueryPageSchema,
   findPetsByTagsQueryPageSizeSchema,
+  findPetsByTagsQuerySchema,
   findPetsByTagsQueryTagsSchema,
   findPetsByTagsResponseSchema,
   findPetsByTagsStatus200Schema,
@@ -190,7 +229,9 @@ export {
 } from './pet/findPetsByTagsSchema'
 export {
   getPetByIdErrorSchema,
+  getPetByIdOptionsSchema,
   getPetByIdPathPetIdSchema,
+  getPetByIdPathSchema,
   getPetByIdResponseSchema,
   getPetByIdStatus200Schema,
   getPetByIdStatus200SchemaJson,
@@ -204,6 +245,7 @@ export {
   updatePetBodySchemaJson,
   updatePetBodySchemaXml,
   updatePetErrorSchema,
+  updatePetOptionsSchema,
   updatePetResponseSchema,
   updatePetStatus200Schema,
   updatePetStatus200SchemaJson,
@@ -215,16 +257,22 @@ export {
 } from './pet/updatePetSchema'
 export {
   updatePetWithFormErrorSchema,
+  updatePetWithFormOptionsSchema,
   updatePetWithFormPathPetIdSchema,
+  updatePetWithFormPathSchema,
   updatePetWithFormQueryNameSchema,
+  updatePetWithFormQuerySchema,
   updatePetWithFormQueryStatusSchema,
   updatePetWithFormResponseSchema,
   updatePetWithFormStatus405Schema,
 } from './pet/updatePetWithFormSchema'
 export {
   uploadFileBodySchema,
+  uploadFileOptionsSchema,
   uploadFilePathPetIdSchema,
+  uploadFilePathSchema,
   uploadFileQueryAdditionalMetadataSchema,
+  uploadFileQuerySchema,
   uploadFileResponseSchema,
   uploadFileStatus200Schema,
 } from './pet/uploadFileSchema'
@@ -237,12 +285,22 @@ export {
   createPetsBodySchema,
   createPetsErrorSchema,
   createPetsHeaderXEXAMPLESchema,
+  createPetsHeadersSchema,
+  createPetsOptionsSchema,
+  createPetsPathSchema,
   createPetsPathUuidSchema,
   createPetsQueryBoolParamSchema,
   createPetsQueryOffsetSchema,
+  createPetsQuerySchema,
   createPetsResponseSchema,
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
 } from './pets/createPetsSchema'
-export { streamPetEventsPathPetIdSchema, streamPetEventsResponseSchema, streamPetEventsStatus200Schema } from './stream/streamPetEventsSchema'
+export {
+  streamPetEventsOptionsSchema,
+  streamPetEventsPathPetIdSchema,
+  streamPetEventsPathSchema,
+  streamPetEventsResponseSchema,
+  streamPetEventsStatus200Schema,
+} from './stream/streamPetEventsSchema'
 export { tagTagSchema } from './tag/tagSchema'

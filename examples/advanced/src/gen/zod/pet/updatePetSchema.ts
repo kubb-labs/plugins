@@ -57,3 +57,12 @@ export type UpdatePetBodySchemaFormUrlEncodedType = z.infer<typeof updatePetBody
 export const updatePetBodySchema = z.union([updatePetBodySchemaJson, updatePetBodySchemaXml, updatePetBodySchemaFormUrlEncoded])
 
 export type UpdatePetBodySchemaType = z.infer<typeof updatePetBodySchema>
+
+export const updatePetOptionsSchema = z.object({
+  body: updatePetBodySchema,
+  path: z.never().optional(),
+  query: z.never().optional(),
+  headers: z.never().optional(),
+})
+
+export type UpdatePetOptionsSchemaType = z.infer<typeof updatePetOptionsSchema>

@@ -18,11 +18,13 @@ export default defineConfig([
       pluginTs({
         output: {
           path: './ts',
+          mode: 'directory',
         },
       }),
       pluginZod({
         output: {
           path: './zod',
+          mode: 'directory',
         },
         importPath: '../../zod.ts',
         inferred: true,
@@ -43,6 +45,7 @@ export default defineConfig([
       pluginZod({
         output: {
           path: './zod',
+          mode: 'directory',
         },
         mini: true,
       }),
@@ -61,6 +64,7 @@ export default defineConfig([
       pluginZod({
         output: {
           path: './zod',
+          mode: 'directory',
         },
       }),
     ],

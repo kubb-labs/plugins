@@ -19,7 +19,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginMsw['resolvedOptions'] = {
-  output: { path: '.' },
+  output: { path: '.', mode: 'directory' },
   parser: 'data',
   baseURL: undefined,
   group: null,
