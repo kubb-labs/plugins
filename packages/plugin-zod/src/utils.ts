@@ -1,7 +1,6 @@
-import { getOperationParameters } from '@internals/shared'
 import { stringify, toRegExpString } from '@internals/utils'
 import { ast } from 'kubb/kit'
-import type { PluginZod, ResolverZod } from './types.ts'
+import type { PluginZod } from './types.ts'
 
 /**
  * Returns `true` when the given coercion option enables coercion for the specified type.
@@ -431,63 +430,5 @@ export function buildGroupedParamsSchema({ params, optional }: BuildGroupedParam
         schema: param.schema,
       }),
     ),
-  })
-}
-
-type BuildOptionsSchemaOptions = {
-  resolver: ResolverZod
-}
-
-/**
- * Builds the combined `{ body, path, query, headers }` options object schema for an operation,
- * referencing the already-resolved body and grouped param schema names. Mirrors `@kubb/plugin-ts`'s
- * `buildOptions`, so a type source can be swapped between the two plugins without changing the shape
- * consumers destructure. Only meaningful when `inferred: true`, since that's what backs the
- * `resolver.response.options(node)` type name with a real declaration.
- */
-export function buildOptionsSchema(node: ast.OperationNode, { resolver }: BuildOptionsSchemaOptions): ast.SchemaNode {
-  const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
-  const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
-  const hasRequiredPath = pathParams.some((param) => param.required)
-  const hasRequiredQuery = queryParams.some((param) => param.required)
-  const hasRequiredHeader = headerParams.some((param) => param.required)
-
-  return ast.factory.createSchema({
-    type: 'object',
-    primitive: 'object',
-    deprecated: node.deprecated,
-    properties: [
-      ast.factory.createProperty({
-        name: 'body',
-        required: hasBody,
-        schema: hasBody
-          ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node), optional: !hasBody })
-          : ast.factory.createSchema({ type: 'never', optional: true }),
-      }),
-      ast.factory.createProperty({
-        name: 'path',
-        required: hasRequiredPath,
-        schema:
-          pathParams.length > 0
-            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.path(node, pathParams[0]!), optional: !hasRequiredPath })
-            : ast.factory.createSchema({ type: 'never', optional: true }),
-      }),
-      ast.factory.createProperty({
-        name: 'query',
-        required: hasRequiredQuery,
-        schema:
-          queryParams.length > 0
-            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.query(node, queryParams[0]!), optional: !hasRequiredQuery })
-            : ast.factory.createSchema({ type: 'never', optional: true }),
-      }),
-      ast.factory.createProperty({
-        name: 'headers',
-        required: hasRequiredHeader,
-        schema:
-          headerParams.length > 0
-            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.headers(node, headerParams[0]!), optional: !hasRequiredHeader })
-            : ast.factory.createSchema({ type: 'never', optional: true }),
-      }),
-    ],
   })
 }

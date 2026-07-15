@@ -3,7 +3,7 @@ import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 import { printerTs } from './printers/printerTs.ts'
 import { resolverTs } from './resolvers/resolverTs.ts'
-import { buildOptions, buildParams, buildPropertyJSDocComments, buildResponses, buildResponseUnion } from './utils.ts'
+import { buildParams, buildPropertyJSDocComments, buildResponses, buildResponseUnion } from './utils.ts'
 
 const printer = printerTs({
   resolver: resolverTs,
@@ -66,76 +66,6 @@ describe('buildParams', () => {
            * @type integer | undefined
           */
           limit?: number;
-      }"
-    `)
-  })
-})
-
-describe('buildOptions', () => {
-  const baseNode = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
-
-  it('emits body?: never when no request body', () => {
-    const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
-
-    expect(printSchema(buildOptions(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
-      "{
-          body?: never;
-          path?: never;
-          query?: never;
-          headers?: never;
-      }"
-    `)
-  })
-
-  it('emits required body referencing the Body type when body exists', () => {
-    const node = ast.factory.createOperation({
-      operationId: 'createPet',
-      method: 'POST',
-      path: '/pets',
-      requestBody: { content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) })] },
-    })
-
-    expect(printSchema(buildOptions(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
-      "{
-          body: CreatePetBody;
-          path?: never;
-          query?: never;
-          headers?: never;
-      }"
-    `)
-  })
-
-  it('emits path referencing the grouped Path type when path parameters exist', () => {
-    const node = ast.factory.createOperation({
-      operationId: 'showPetById',
-      method: 'GET',
-      path: '/pets/{petId}',
-      parameters: [ast.factory.createParameter({ name: 'petId', schema: ast.factory.createSchema({ type: 'string' }), in: 'path', required: true })],
-    })
-
-    expect(printSchema(buildOptions(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
-      "{
-          body?: never;
-          path: ShowPetByIdPath;
-          query?: never;
-          headers?: never;
-      }"
-    `)
-  })
-
-  it('emits query referencing the grouped Query type when query parameters exist', () => {
-    const node = ast.factory.createOperation({
-      ...baseNode,
-      operationId: 'listPets',
-      parameters: [ast.factory.createParameter({ name: 'limit', schema: ast.factory.createSchema({ type: 'integer' }), in: 'query', required: false })],
-    })
-
-    expect(printSchema(buildOptions(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
-      "{
-          body?: never;
-          path?: never;
-          query?: ListPetsQuery;
-          headers?: never;
       }"
     `)
   })

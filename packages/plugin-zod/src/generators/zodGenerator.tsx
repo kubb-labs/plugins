@@ -1,4 +1,12 @@
-import { collectRefNames, getOasAdapter, getOperationParameters, getSuccessResponses, isSuccessStatusCode, resolveContentTypeVariants } from '@internals/shared'
+import {
+  buildOptionsSchema,
+  collectRefNames,
+  getOasAdapter,
+  getOperationParameters,
+  getSuccessResponses,
+  isSuccessStatusCode,
+  resolveContentTypeVariants,
+} from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Zod } from '../components/Zod.tsx'
@@ -6,7 +14,7 @@ import { ZOD_NAMESPACE_IMPORTS } from '../constants.ts'
 import { printerZod } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
-import { buildGroupedParamsSchema, buildOptionsSchema, collectCodecRefNames, containsCodec } from '../utils.ts'
+import { buildGroupedParamsSchema, collectCodecRefNames, containsCodec } from '../utils.ts'
 
 type StdPrinters = { output: ReturnType<typeof printerZod>; input: ReturnType<typeof printerZod> }
 type ZodPrinterEntry = StdPrinters & { coercion: unknown; guidType: unknown; regexType: unknown; dateType: unknown; nodes: unknown }
@@ -368,7 +376,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       : []
 
     const optionsSchema = inferred
-      ? renderSchemaEntry({ schema: buildOptionsSchema(node, { resolver }), name: resolver.name(`${node.operationId} Options`), direction: 'input' })
+      ? renderSchemaEntry({ schema: buildOptionsSchema(node, resolver), name: resolver.name(`${node.operationId} Options`), direction: 'input' })
       : null
 
     return (

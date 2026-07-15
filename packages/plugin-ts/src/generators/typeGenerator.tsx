@@ -1,11 +1,11 @@
-import { collectRefNames, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
+import { buildOptionsSchema, collectRefNames, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Type } from '../components/Type.tsx'
 import { ENUM_TYPES_WITH_KEY_SUFFIX } from '../constants.ts'
 import { printerTs } from '../printers/printerTs.ts'
 import type { PluginTs, ResolvedEnumOptions, ResolverTs } from '../types'
-import { buildOptions, buildParams, buildResponses, buildResponseUnion, isInlineConstEnum } from '../utils.ts'
+import { buildParams, buildResponses, buildResponseUnion, isInlineConstEnum } from '../utils.ts'
 
 type ResolveImportNameParams = {
   schemaName: string
@@ -206,7 +206,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     })
 
     const optionsType = renderSchemaType({
-      schema: buildOptions(node, { resolver }),
+      schema: buildOptionsSchema(node, resolver),
       name: resolver.response.options(node),
     })
 

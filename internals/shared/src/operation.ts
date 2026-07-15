@@ -1,4 +1,4 @@
-import { type ast, type ResolverFileParams, Url } from 'kubb/kit'
+import { ast, type ResolverFileParams, Url } from 'kubb/kit'
 import { dedupeParams } from './params.ts'
 
 /**
@@ -406,6 +406,63 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
     header: dedupeParams(node.parameters.filter((param) => param.in === 'header')),
     cookie: dedupeParams(node.parameters.filter((param) => param.in === 'cookie')),
   }
+}
+
+/**
+ * Builds the combined `{ body, path, query, headers }` options object schema for an operation,
+ * referencing the already-resolved body and grouped param names. Shared by `@kubb/plugin-ts`'s
+ * `Options` type and `@kubb/plugin-zod`'s inferred options schema, so both printers emit the same
+ * shape from the same inputs. `primitive: 'object'` is a no-op for the TS printer and tells the Zod
+ * printer to emit `z.object(…)` rather than a record.
+ */
+export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver): ast.SchemaNode {
+  const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
+  const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
+  const hasRequiredPath = pathParams.some((param) => param.required)
+  const hasRequiredQuery = queryParams.some((param) => param.required)
+  const hasRequiredHeader = headerParams.some((param) => param.required)
+
+  // NOTE(v5-stable): the fields were renamed from the legacy beta shape
+  // (`data`/`pathParams`/`queryParams`/`headerParams`) to `body`/`path`/`query`/`headers` so the
+  // type matches the runtime client. Drop this note once v5 leaves beta.
+  return ast.factory.createSchema({
+    type: 'object',
+    primitive: 'object',
+    deprecated: node.deprecated,
+    properties: [
+      ast.factory.createProperty({
+        name: 'body',
+        required: hasBody,
+        schema: hasBody
+          ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) })
+          : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
+      }),
+      ast.factory.createProperty({
+        name: 'path',
+        required: hasRequiredPath,
+        schema:
+          pathParams.length > 0
+            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.path(node, pathParams[0]!), optional: !hasRequiredPath })
+            : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
+      }),
+      ast.factory.createProperty({
+        name: 'query',
+        required: hasRequiredQuery,
+        schema:
+          queryParams.length > 0
+            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.query(node, queryParams[0]!), optional: !hasRequiredQuery })
+            : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
+      }),
+      ast.factory.createProperty({
+        name: 'headers',
+        required: hasRequiredHeader,
+        schema:
+          headerParams.length > 0
+            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.headers(node, headerParams[0]!), optional: !hasRequiredHeader })
+            : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
+      }),
+    ],
+  })
 }
 
 export function getStatusCodeNumber(statusCode: ast.StatusCode | number | string): number | null {
