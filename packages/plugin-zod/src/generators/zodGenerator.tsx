@@ -350,29 +350,24 @@ export const zodGenerator = defineGenerator<PluginZod>({
     // Grouped path/query/headers schemas plus the combined `{ body, path, query, headers }` options
     // schema exist only to back `resolver.response.options(node)` for consumers sourcing types from
     // this plugin instead of `plugin-ts`. Not worth generating when nothing will import them.
-    const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
+    const { path, query, header } = getOperationParameters(node)
 
     const paramGroupSchemas = inferred
-      ? [
-          pathParams.length > 0 &&
+      ? (
+          [
+            { kind: 'path', params: path },
+            { kind: 'query', params: query },
+            { kind: 'headers', params: header },
+          ] as const
+        )
+          .filter(({ params }) => params.length > 0)
+          .map(({ kind, params }) =>
             renderSchemaEntry({
-              schema: buildGroupedParamsSchema({ params: pathParams }),
-              name: resolver.param.path(node, pathParams[0]!),
+              schema: buildGroupedParamsSchema({ params }),
+              name: resolver.param[kind](node, params[0]!),
               direction: 'input',
             }),
-          queryParams.length > 0 &&
-            renderSchemaEntry({
-              schema: buildGroupedParamsSchema({ params: queryParams }),
-              name: resolver.param.query(node, queryParams[0]!),
-              direction: 'input',
-            }),
-          headerParams.length > 0 &&
-            renderSchemaEntry({
-              schema: buildGroupedParamsSchema({ params: headerParams }),
-              name: resolver.param.headers(node, headerParams[0]!),
-              direction: 'input',
-            }),
-        ]
+          )
       : []
 
     const optionsSchema = inferred

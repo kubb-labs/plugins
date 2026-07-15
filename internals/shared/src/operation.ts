@@ -416,11 +416,14 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
  * printer to emit `z.object(…)` rather than a record.
  */
 export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver): ast.SchemaNode {
-  const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
+  const { path, query, header } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
-  const hasRequiredPath = pathParams.some((param) => param.required)
-  const hasRequiredQuery = queryParams.some((param) => param.required)
-  const hasRequiredHeader = headerParams.some((param) => param.required)
+  const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
+  const groups = [
+    { name: 'path', params: path, resolve: resolver.param.path },
+    { name: 'query', params: query, resolve: resolver.param.query },
+    { name: 'headers', params: header, resolve: resolver.param.headers },
+  ] as const
 
   // NOTE(v5-stable): the fields were renamed from the legacy beta shape
   // (`data`/`pathParams`/`queryParams`/`headerParams`) to `body`/`path`/`query`/`headers` so the
@@ -433,33 +436,19 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
       ast.factory.createProperty({
         name: 'body',
         required: hasBody,
-        schema: hasBody
-          ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) })
-          : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
+        schema: hasBody ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) }) : createNever(),
       }),
-      ast.factory.createProperty({
-        name: 'path',
-        required: hasRequiredPath,
-        schema:
-          pathParams.length > 0
-            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.path(node, pathParams[0]!), optional: !hasRequiredPath })
-            : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
-      }),
-      ast.factory.createProperty({
-        name: 'query',
-        required: hasRequiredQuery,
-        schema:
-          queryParams.length > 0
-            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.query(node, queryParams[0]!), optional: !hasRequiredQuery })
-            : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
-      }),
-      ast.factory.createProperty({
-        name: 'headers',
-        required: hasRequiredHeader,
-        schema:
-          headerParams.length > 0
-            ? ast.factory.createSchema({ type: 'ref', name: resolver.param.headers(node, headerParams[0]!), optional: !hasRequiredHeader })
-            : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
+      ...groups.map(({ name, params, resolve }) => {
+        const required = params.some((param) => param.required)
+
+        return ast.factory.createProperty({
+          name,
+          required,
+          schema:
+            params.length > 0
+              ? ast.factory.createSchema({ type: 'ref', name: resolve.call(resolver.param, node, params[0]!), optional: !required })
+              : createNever(),
+        })
       }),
     ],
   })
