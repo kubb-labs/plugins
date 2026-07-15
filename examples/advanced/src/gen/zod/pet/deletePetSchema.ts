@@ -19,3 +19,24 @@ export type DeletePetResponseSchemaType = z.infer<typeof deletePetResponseSchema
 export const deletePetErrorSchema = deletePetStatus400Schema
 
 export type DeletePetErrorSchemaType = z.infer<typeof deletePetErrorSchema>
+
+export const deletePetPathSchema = z.object({
+  petId: z.int().describe('Pet id to delete'),
+})
+
+export type DeletePetPathSchemaType = z.infer<typeof deletePetPathSchema>
+
+export const deletePetHeadersSchema = z.object({
+  api_key: z.string().optional(),
+})
+
+export type DeletePetHeadersSchemaType = z.infer<typeof deletePetHeadersSchema>
+
+export const deletePetOptionsSchema = z.object({
+  body: z.never().optional(),
+  path: deletePetPathSchema,
+  query: z.never().optional(),
+  headers: deletePetHeadersSchema.optional(),
+})
+
+export type DeletePetOptionsSchemaType = z.infer<typeof deletePetOptionsSchema>

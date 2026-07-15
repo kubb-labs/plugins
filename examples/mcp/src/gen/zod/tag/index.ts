@@ -1,1 +1,1 @@
-export { tagTagSchema } from './tagSchema'
+export * from './tagSchema'

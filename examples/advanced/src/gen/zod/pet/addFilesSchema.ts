@@ -30,3 +30,12 @@ export type AddFilesBodySchemaFormDataType = z.infer<typeof addFilesBodySchemaFo
 export const addFilesBodySchema = z.union([addFilesBodySchemaJson, addFilesBodySchemaFormData])
 
 export type AddFilesBodySchemaType = z.infer<typeof addFilesBodySchema>
+
+export const addFilesOptionsSchema = z.object({
+  body: addFilesBodySchema,
+  path: z.never().optional(),
+  query: z.never().optional(),
+  headers: z.never().optional(),
+})
+
+export type AddFilesOptionsSchemaType = z.infer<typeof addFilesOptionsSchema>

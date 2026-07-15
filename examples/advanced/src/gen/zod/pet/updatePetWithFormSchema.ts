@@ -23,3 +23,25 @@ export type UpdatePetWithFormResponseSchemaType = z.infer<typeof updatePetWithFo
 export const updatePetWithFormErrorSchema = updatePetWithFormStatus405Schema
 
 export type UpdatePetWithFormErrorSchemaType = z.infer<typeof updatePetWithFormErrorSchema>
+
+export const updatePetWithFormPathSchema = z.object({
+  petId: z.int().describe('ID of pet that needs to be updated'),
+})
+
+export type UpdatePetWithFormPathSchemaType = z.infer<typeof updatePetWithFormPathSchema>
+
+export const updatePetWithFormQuerySchema = z.object({
+  name: z.string().optional().describe('Name of pet that needs to be updated'),
+  status: z.string().optional().describe('Status of pet that needs to be updated'),
+})
+
+export type UpdatePetWithFormQuerySchemaType = z.infer<typeof updatePetWithFormQuerySchema>
+
+export const updatePetWithFormOptionsSchema = z.object({
+  body: z.never().optional(),
+  path: updatePetWithFormPathSchema,
+  query: updatePetWithFormQuerySchema.optional(),
+  headers: z.never().optional(),
+})
+
+export type UpdatePetWithFormOptionsSchemaType = z.infer<typeof updatePetWithFormOptionsSchema>

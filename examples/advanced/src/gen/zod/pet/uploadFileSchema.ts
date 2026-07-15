@@ -20,3 +20,24 @@ export type UploadFileResponseSchemaType = z.infer<typeof uploadFileResponseSche
 export const uploadFileBodySchema = z.instanceof(File)
 
 export type UploadFileBodySchemaType = z.infer<typeof uploadFileBodySchema>
+
+export const uploadFilePathSchema = z.object({
+  petId: z.int().describe('ID of pet to update'),
+})
+
+export type UploadFilePathSchemaType = z.infer<typeof uploadFilePathSchema>
+
+export const uploadFileQuerySchema = z.object({
+  additionalMetadata: z.string().optional().describe('Additional Metadata'),
+})
+
+export type UploadFileQuerySchemaType = z.infer<typeof uploadFileQuerySchema>
+
+export const uploadFileOptionsSchema = z.object({
+  body: uploadFileBodySchema,
+  path: uploadFilePathSchema,
+  query: uploadFileQuerySchema.optional(),
+  headers: z.never().optional(),
+})
+
+export type UploadFileOptionsSchemaType = z.infer<typeof uploadFileOptionsSchema>
