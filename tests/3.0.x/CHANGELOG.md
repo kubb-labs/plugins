@@ -1,5 +1,15 @@
 # tests-3.0.x
 
+## 0.0.1-beta.42
+
+### Patch Changes
+
+- Updated dependencies [[`85e43d9`](https://github.com/kubb-labs/plugins/commit/85e43d9fe7d23ab6fcbc877ede4d43aadfe4828f)]:
+  - @kubb/plugin-zod@5.0.0-beta.100
+  - @kubb/plugin-axios@5.0.0-beta.100
+  - @kubb/plugin-fetch@5.0.0-beta.100
+  - @kubb/plugin-mcp@5.0.0-beta.100
+
 ## 0.0.1-beta.41
 
 ### Patch Changes
