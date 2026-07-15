@@ -1,5 +1,6 @@
 import { jsStringEscape } from '@internals/utils'
-import { ast } from 'kubb/kit'
+import { containsCircularRef } from 'kubb/kit'
+import type { ast } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
@@ -109,7 +110,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   const hasGetters =
     node.type === 'object' &&
     !!cyclicSchemas &&
-    (node.properties ?? []).some((p) => ast.containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
+    (node.properties ?? []).some((p) => containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
 
   const functionBody = hasGetters
     ? `{

@@ -1,5 +1,5 @@
 import { stringify, toRegExpString } from '@internals/utils'
-import { ast } from 'kubb/kit'
+import { ast, extractRefName, syncSchemaRef } from 'kubb/kit'
 import type { PluginZod } from './types.ts'
 
 /**
@@ -86,12 +86,12 @@ export function containsCodec(node: ast.SchemaNode | undefined, seen: Set<string
 
   if (node.type === 'ref') {
     if (!node.ref) return false
-    const refName = ast.extractRefName(node.ref)
+    const refName = extractRefName(node.ref)
     if (refName) {
       if (seen.has(refName)) return false
       seen.add(refName)
     }
-    const resolved = ast.syncSchemaRef(node)
+    const resolved = syncSchemaRef(node)
     if (resolved.type === 'ref') return false
     return containsCodec(resolved, seen)
   }
@@ -110,7 +110,7 @@ export function containsCodec(node: ast.SchemaNode | undefined, seen: Set<string
  * them to their input (encode) variant.
  */
 export function collectCodecRefNames(node: ast.SchemaNode): Array<string> {
-  return ast.collect<string>(node, {
+  return ast.collectSync<string>(node, {
     schema: (n) => (n.type === 'ref' && n.ref && containsCodec(n) ? (ast.resolveRefName(n) ?? undefined) : undefined),
   })
 }
@@ -138,7 +138,7 @@ export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: Readonl
   if (node.type === 'ref') {
     const refName = ast.resolveRefName(node)
     if (refName && cyclicSchemas?.has(refName)) return false
-    const resolved = ast.syncSchemaRef(node)
+    const resolved = syncSchemaRef(node)
     // An unresolved ref keeps its `ref` type; assume it resolves to an object (matches the printer's
     // prior optimism that only a resolved intersection blocks a discriminated union).
     return resolved.type === 'ref' || isObjectSchemaNode(resolved, cyclicSchemas)

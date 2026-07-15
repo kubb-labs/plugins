@@ -1,5 +1,5 @@
 import { mapSchemaItems, mapSchemaProperties } from '@internals/shared'
-import { ast } from 'kubb/kit'
+import { ast, isStringType, syncSchemaRef } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
 import type ts from 'typescript'
 import { ENUM_TYPES_WITH_KEY_SUFFIX, OPTIONAL_ADDS_QUESTION_TOKEN, OPTIONAL_ADDS_UNDEFINED } from '../constants.ts'
@@ -204,12 +204,12 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
           const enumNode = ast.narrowSchema(m, ast.schemaTypes.enum)
           return enumNode?.primitive === 'string'
         })
-        const hasPlainString = members.some((m) => ast.isStringType(m))
+        const hasPlainString = members.some((m) => isStringType(m))
 
         if (hasStringLiteral && hasPlainString) {
           const memberNodes = members
             .map((m) => {
-              if (ast.isStringType(m)) {
+              if (isStringType(m)) {
                 return factory.createIntersectionDeclaration({
                   nodes: [factory.keywordTypeNodes.string, factory.createTypeLiteralNode([])],
                   withParentheses: true,
@@ -247,7 +247,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
           const baseType = output ?? factory.keywordTypeNodes.unknown
           const optional = !property.required || !!property.schema.optional || !!property.schema.nullish
           const type = factory.buildPropertyType(property.schema, baseType, options.optionalType, optional)
-          const propMeta = ast.syncSchemaRef(property.schema)
+          const propMeta = syncSchemaRef(property.schema)
 
           const propertyNode = factory.createPropertySignature({
             questionToken: optional ? addsQuestionToken : false,
@@ -276,7 +276,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       if (!transformed) return null
 
       // For ref nodes, structural metadata lives on node.schema rather than the ref node itself.
-      const meta = ast.syncSchemaRef(node)
+      const meta = syncSchemaRef(node)
 
       // Without name, apply modifiers inline and return.
       if (!name) {
