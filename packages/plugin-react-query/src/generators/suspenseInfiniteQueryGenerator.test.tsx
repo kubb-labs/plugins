@@ -4,7 +4,7 @@ import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, rend
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
-import { describe, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { matchFiles } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
@@ -159,5 +159,28 @@ describe('suspenseInfiniteQueryGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('suspenseInfiniteQueryGenerator operation with hooks disabled', () => {
+  test('returns no file when hooks is false', async () => {
+    const options: PluginReactQuery['resolvedOptions'] = {
+      ...defaultOptions,
+      ...suspenseInfiniteConfig,
+      hooks: false,
+    }
+    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
+    const driver = createMultiPluginDriver('hooksDisabled')
+
+    await renderGeneratorOperation(suspenseInfiniteQueryGenerator, findByTagsNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverReactQuery,
+    })
+
+    expect(driver.fileManager.files).toStrictEqual([])
   })
 })
