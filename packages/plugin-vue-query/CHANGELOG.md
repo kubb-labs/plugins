@@ -1,5 +1,12 @@
 # @kubb/plugin-vue-query
 
+## 5.0.0-beta.101
+
+### Patch Changes
+
+- Updated dependencies [[`326f59c`](https://github.com/kubb-labs/plugins/commit/326f59c382c24c2a11ee9144bb6d7bc41ffbc97e)]:
+  - @kubb/plugin-ts@5.0.0-beta.100
+
 ## 5.0.0-beta.100
 
 ### Major Changes
