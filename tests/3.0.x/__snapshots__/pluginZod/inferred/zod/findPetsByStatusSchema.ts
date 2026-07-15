@@ -34,3 +34,18 @@ export type FindPetsByStatusResponseSchemaType = z.infer<typeof findPetsByStatus
 export const findPetsByStatusErrorSchema = findPetsByStatusStatus400Schema
 
 export type FindPetsByStatusErrorSchemaType = z.infer<typeof findPetsByStatusErrorSchema>
+
+export const findPetsByStatusQuerySchema = z.object({
+  status: findPetsByStatusStatusSchema.optional().default('available').describe('Status values that need to be considered for filter'),
+})
+
+export type FindPetsByStatusQuerySchemaType = z.infer<typeof findPetsByStatusQuerySchema>
+
+export const findPetsByStatusOptionsSchema = z.object({
+  body: z.never().optional(),
+  path: z.never().optional(),
+  query: findPetsByStatusQuerySchema.optional(),
+  headers: z.never().optional(),
+})
+
+export type FindPetsByStatusOptionsSchemaType = z.infer<typeof findPetsByStatusOptionsSchema>
