@@ -2,7 +2,7 @@ import path from 'node:path'
 import { getOperationParameters, operationFileEntry } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import { ast, defineGenerator } from 'kubb/kit'
-import type { Generator, PluginFactoryOptions } from 'kubb/kit'
+import type { Generator } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -18,14 +18,7 @@ import {
 import { type Auth, getOperationSecurity, type SecurityDocument } from '../builders/security.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
 import { SdkFacade } from '../components/SdkFacade.tsx'
-import type { Options, ValidatorOptions, ResolvedOptions, ResolverClient } from '../types.ts'
-
-/**
- * The shape any client plugin (plugin-fetch, plugin-axios) must satisfy to reuse the shared SDK
- * generator. Pins the option, resolved-option, and resolver shapes while leaving the plugin name
- * free.
- */
-type ContractClientFactory = PluginFactoryOptions<string, Options, ResolvedOptions, ResolverClient>
+import type { ContractClientFactory, ValidatorOptions } from '../types.ts'
 
 type GeneratorContext = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]
 

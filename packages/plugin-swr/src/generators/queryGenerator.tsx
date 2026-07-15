@@ -1,5 +1,6 @@
 import { resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
+import { classifyOperation } from '@internals/tanstack-query'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
@@ -16,13 +17,13 @@ export const queryGenerator = defineGenerator<PluginSwr>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, client, group } = ctx.options
+    const { output, query, mutation, client, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
+    const { isQuery } = classifyOperation(node, { query, mutation })
 
     if (!isQuery) return null
 

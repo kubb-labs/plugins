@@ -9,6 +9,7 @@ export {
   buildQueryOptionsParams,
   buildClientCall,
   buildResponseTypes,
+  classifyOperation,
   maybeRefOrGetter,
   maybeValueOrGetter,
   resolveInfiniteConfig,
