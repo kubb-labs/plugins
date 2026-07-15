@@ -40,6 +40,7 @@ describe('Plugin Generation Performance', () => {
           pluginTs({
             output: {
               path: 'types',
+              mode: 'directory',
               barrel: false,
             },
             enum: { type: 'asConst' },
@@ -71,6 +72,7 @@ describe('Plugin Generation Performance', () => {
           pluginTs({
             output: {
               path: 'types',
+              mode: 'directory',
               barrel: false,
             },
             enum: { type: 'asConst' },
@@ -78,6 +80,7 @@ describe('Plugin Generation Performance', () => {
           pluginAxios({
             output: {
               path: 'clients',
+              mode: 'directory',
             },
           }),
         ] as Plugin[],
@@ -107,6 +110,7 @@ describe('Plugin Generation Performance', () => {
           pluginTs({
             output: {
               path: 'types',
+              mode: 'directory',
               barrel: false,
             },
             enum: { type: 'asConst' },
@@ -114,11 +118,13 @@ describe('Plugin Generation Performance', () => {
           pluginAxios({
             output: {
               path: 'clients',
+              mode: 'directory',
             },
           }),
           pluginZod({
             output: {
               path: 'zod',
+              mode: 'directory',
               barrel: false,
             },
             inferred: true,
@@ -126,6 +132,7 @@ describe('Plugin Generation Performance', () => {
           pluginFaker({
             output: {
               path: 'mocks',
+              mode: 'directory',
               barrel: false,
             },
           }),

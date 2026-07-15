@@ -26,6 +26,7 @@ export default defineConfig(() => {
       pluginTs({
         output: {
           path: 'models/ts',
+          mode: 'directory',
           barrel: false,
         },
         group: {
@@ -36,6 +37,7 @@ export default defineConfig(() => {
       pluginReactQuery({
         output: {
           path: './clients/hooks',
+          mode: 'directory',
         },
         group: { type: 'tag' },
         mutation: {
@@ -45,6 +47,7 @@ export default defineConfig(() => {
       pluginAxios({
         output: {
           path: './clients/axiosClass',
+          mode: 'directory',
           barrel: false,
         },
         group: {
@@ -57,6 +60,7 @@ export default defineConfig(() => {
       pluginCypress({
         output: {
           path: './clients/cypress',
+          mode: 'directory',
           barrel: false,
         },
         group: {
@@ -69,6 +73,7 @@ export default defineConfig(() => {
       pluginZod({
         output: {
           path: './zod',
+          mode: 'directory',
           barrel: false,
         },
         group: { type: 'tag' },
@@ -79,6 +84,7 @@ export default defineConfig(() => {
       pluginFaker({
         output: {
           path: 'mocks',
+          mode: 'directory',
           barrel: false,
         },
         group: { type: 'tag' },
@@ -86,6 +92,7 @@ export default defineConfig(() => {
       pluginMsw({
         output: {
           path: 'msw',
+          mode: 'directory',
         },
         group: { type: 'tag' },
       }),

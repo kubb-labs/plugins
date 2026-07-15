@@ -109,6 +109,7 @@ const baseConfig = {
     pluginTs({
       output: {
         path: 'models/ts',
+        mode: 'directory',
         barrel: false,
       },
       group: {
@@ -119,12 +120,14 @@ const baseConfig = {
     pluginReactQuery({
       output: {
         path: './clients/hooks',
+        mode: 'directory',
       },
       group: { type: 'tag' },
     }),
     pluginAxios({
       output: {
         path: './clients/axios',
+        mode: 'directory',
       },
       group: {
         type: 'tag',
@@ -136,6 +139,7 @@ const baseConfig = {
     pluginCypress({
       output: {
         path: './clients/cypress',
+        mode: 'directory',
         barrel: false,
       },
       group: {
@@ -148,6 +152,7 @@ const baseConfig = {
     pluginZod({
       output: {
         path: './zod',
+        mode: 'directory',
         barrel: false,
       },
       group: { type: 'tag' },
@@ -158,6 +163,7 @@ const baseConfig = {
     pluginFaker({
       output: {
         path: 'mocks',
+        mode: 'directory',
         barrel: false,
       },
       group: { type: 'tag' },
@@ -165,6 +171,7 @@ const baseConfig = {
     pluginMsw({
       output: {
         path: 'msw',
+        mode: 'directory',
       },
       group: { type: 'tag' },
     }),
