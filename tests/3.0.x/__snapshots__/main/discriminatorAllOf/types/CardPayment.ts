@@ -6,8 +6,5 @@
 import type { PaymentMethod } from './PaymentMethod'
 
 export type CardPayment = (PaymentMethod & {
-    /**
-     * @type string | undefined
-    */
     cardNumber?: string;
 });

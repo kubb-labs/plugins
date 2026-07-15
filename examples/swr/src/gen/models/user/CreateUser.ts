@@ -5,14 +5,8 @@
 
 import type { User } from '../User'
 
-/**
- * @type object
- */
 export type CreateUserStatusDefaultJson = User
 
-/**
- * @type object
- */
 export type CreateUserStatusDefaultXml = User
 
 export type CreateUserStatusDefault = CreateUserStatusDefaultJson | CreateUserStatusDefaultXml
@@ -37,9 +31,6 @@ export type CreateUserBodyFormUrlEncoded = User | undefined
 
 export type CreateUserBody = CreateUserBodyJson | CreateUserBodyXml | CreateUserBodyFormUrlEncoded
 
-/**
- * @type object
- */
 export type CreateUserOptions = {
   body: CreateUserBody
   path?: never
@@ -47,9 +38,6 @@ export type CreateUserOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type CreateUserResponses = {
   default:
     | {

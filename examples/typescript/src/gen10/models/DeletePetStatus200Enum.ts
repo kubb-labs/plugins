@@ -3,7 +3,4 @@
  * Do not edit manually.
  */
 
-/**
- * @type string
- */
 export type DeletePetStatus200Enum = 'TYPE1' | 'TYPE2' | 'TYPE3'

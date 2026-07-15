@@ -4,32 +4,14 @@
  * Source: text content
  */
 
-/**
- * @type object
- */
 export type ListUploadsQuery = {
-  /**
-   * @type integer | undefined
-   */
   'max-uploads'?: number
-  /**
-   * @type string | undefined
-   */
   prefix?: string
-  /**
-   * @type integer | undefined
-   */
   MaxUploads?: number
 }
 
-/**
- * @type object
- */
 export type ListUploadsStatus200 = object
 
-/**
- * @type object
- */
 export type ListUploadsOptions = {
   body?: never
   path?: never
@@ -37,9 +19,6 @@ export type ListUploadsOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type ListUploadsResponses = {
   '200': ListUploadsStatus200
 }

@@ -5,9 +5,6 @@
 
 import type { Pet } from '../Pet'
 
-/**
- * @type object
- */
 export type FindPetsByTagsQuery = {
   /**
    * @description Tags to filter by
@@ -26,26 +23,14 @@ export type FindPetsByTagsQuery = {
   pageSize?: string
 }
 
-/**
- * @type array
- */
 export type FindPetsByTagsStatus200Json = Array<Pet>
 
-/**
- * @type array
- */
 export type FindPetsByTagsStatus200Xml = Array<Pet>
 
 export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
 
-/**
- * @type unknown
- */
 export type FindPetsByTagsStatus400 = unknown
 
-/**
- * @type object
- */
 export type FindPetsByTagsOptions = {
   body?: never
   path?: never
@@ -53,9 +38,6 @@ export type FindPetsByTagsOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type FindPetsByTagsResponses = {
   '200':
     | {

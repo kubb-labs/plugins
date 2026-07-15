@@ -3,16 +3,7 @@
 * Do not edit manually.
 */
 
-/**
- * @type object
-*/
 export type BankTransferPaymentUnion = {
-    /**
-     * @type string | undefined
-    */
     type?: string;
-    /**
-     * @type string | undefined
-    */
     iban?: string;
 };

@@ -8,18 +8,9 @@ import type { SUV } from './SUV'
 import type { Sedan } from './Sedan'
 
 export type VehicleChoice = ((Sedan & {
-    /**
-     * @type string
-    */
     type: "Sedan";
 }) | (SUV & {
-    /**
-     * @type string
-    */
     type: "SUV";
 }) | (ElectricCar & {
-    /**
-     * @type string
-    */
     type: "ElectricCar";
 }));

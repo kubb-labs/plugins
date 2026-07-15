@@ -7,9 +7,6 @@ import type { Category } from './Category'
 import type { PetStatusEnumKey } from './PetStatusEnum'
 import type { TagTag } from './tag/Tag'
 
-/**
- * @type object
- */
 export type Pet = {
   /**
    * @description
@@ -23,17 +20,8 @@ export type Pet = {
    * @type string
    */
   name: string
-  /**
-   * @type object | undefined
-   */
   category?: Category
-  /**
-   * @type array
-   */
   photoUrls: string[]
-  /**
-   * @type array | undefined
-   */
   tags?: TagTag[]
   /**
    * @description pet status in the store

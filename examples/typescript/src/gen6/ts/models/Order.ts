@@ -7,9 +7,6 @@ import type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum'
 import type { OrderParamsStatusEnumKey } from './OrderParamsStatusEnum'
 import type { OrderStatusKey } from './OrderStatus'
 
-/**
- * @type object
- */
 export type Order = {
   /**
    * @description
@@ -25,18 +22,12 @@ export type Order = {
    * @type integer | undefined
    */
   petId?: bigint
-  /**
-   * @type object | undefined
-   */
   params?: {
     /**
      * @description Order Status
      * @example approved
      */
     status: OrderParamsStatusEnumKey
-    /**
-     * @type string
-     */
     type: string
   }
   /**
@@ -61,8 +52,5 @@ export type Order = {
    * @example 200
    */
   http_status?: OrderHttpStatusEnumKey
-  /**
-   * @type boolean | undefined
-   */
   complete?: boolean
 }

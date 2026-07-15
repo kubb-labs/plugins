@@ -4,7 +4,4 @@
  * Source: text content
  */
 
-/**
- * @type string
- */
 export type Status = 'active'

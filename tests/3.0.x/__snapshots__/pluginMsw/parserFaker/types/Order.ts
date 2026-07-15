@@ -5,9 +5,6 @@
 
 import type { OrderStatusEnumKey } from './OrderStatusEnum'
 
-/**
- * @type object
-*/
 export type Order = {
     /**
      * @description
@@ -41,8 +38,5 @@ export type Order = {
      * @example approved
     */
     status?: OrderStatusEnumKey;
-    /**
-     * @type boolean | undefined
-    */
     complete?: boolean;
 };

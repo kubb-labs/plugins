@@ -4,24 +4,12 @@
  * Source: text content
  */
 
-/**
- * @type object
- */
 export type FindPetsByStatusQuery = {
-  /**
-   * @type string | undefined
-   */
   status?: 'available' | 'pending' | 'sold'
 }
 
-/**
- * @type object
- */
 export type FindPetsByStatusStatus200 = object
 
-/**
- * @type object
- */
 export type FindPetsByStatusOptions = {
   body?: never
   path?: never
@@ -29,9 +17,6 @@ export type FindPetsByStatusOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type FindPetsByStatusResponses = {
   '200': FindPetsByStatusStatus200
 }

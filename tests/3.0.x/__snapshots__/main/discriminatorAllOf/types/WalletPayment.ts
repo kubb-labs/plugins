@@ -6,8 +6,5 @@
 import type { PaymentMethod } from './PaymentMethod'
 
 export type WalletPayment = (PaymentMethod & {
-    /**
-     * @type string | undefined
-    */
     walletId?: string;
 });

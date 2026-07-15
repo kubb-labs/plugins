@@ -6,8 +6,5 @@
 import type { Customer } from './Customer'
 
 export type HappyCustomer = Customer & {
-  /**
-   * @type boolean | undefined
-   */
   isHappy?: true
 }

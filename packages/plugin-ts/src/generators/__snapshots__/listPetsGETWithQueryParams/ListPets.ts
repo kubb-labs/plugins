@@ -4,29 +4,14 @@
  * Source: text content
  */
 
-/**
- * @type object
- */
 export type ListPetsQuery = {
-  /**
-   * @type integer | undefined
-   */
   limit?: number
 }
 
-/**
- * @type object
- */
 export type ListPetsStatus200 = object
 
-/**
- * @type object
- */
 export type ListPetsStatusDefault = object
 
-/**
- * @type object
- */
 export type ListPetsOptions = {
   body?: never
   path?: never
@@ -34,9 +19,6 @@ export type ListPetsOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type ListPetsResponses = {
   '200': ListPetsStatus200
   default: ListPetsStatusDefault

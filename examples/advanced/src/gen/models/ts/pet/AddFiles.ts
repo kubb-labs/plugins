@@ -1,18 +1,9 @@
 import type { Pet } from '../Pet'
 
-/**
- * @type object
- */
 export type AddFilesStatus200 = Omit<NonNullable<Pet>, 'name'>
 
-/**
- * @type unknown
- */
 export type AddFilesStatus405 = unknown
 
-/**
- * @type object
- */
 export type AddFilesBodyJson = {
   /**
    * @description URL of the image to upload
@@ -23,16 +14,10 @@ export type AddFilesBodyJson = {
   url: string
 }
 
-/**
- * @type object
- */
 export type AddFilesBodyFormData = Omit<NonNullable<Pet>, 'id'>
 
 export type AddFilesBody = AddFilesBodyJson | AddFilesBodyFormData
 
-/**
- * @type object
- */
 export type AddFilesOptions = {
   body: AddFilesBody
   path?: never
@@ -40,9 +25,6 @@ export type AddFilesOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type AddFilesResponses = {
   '200': AddFilesStatus200
   '405': AddFilesStatus405

@@ -5,9 +5,6 @@
 
 import type { OrderSchema } from './OrderSchema'
 
-/**
- * @type object
-*/
 export type CreateOrderStatus201 = OrderSchema;
 
 /**
@@ -15,19 +12,10 @@ export type CreateOrderStatus201 = OrderSchema;
  * @type object | undefined
 */
 export type CreateOrderBody = {
-    /**
-     * @type string | undefined
-    */
     userId?: string;
-    /**
-     * @type array | undefined
-    */
     productIds?: string[];
 } | undefined;
 
-/**
- * @type object
-*/
 export type CreateOrderOptions = {
     body: CreateOrderBody;
     path?: never;
@@ -35,9 +23,6 @@ export type CreateOrderOptions = {
     headers?: never;
 };
 
-/**
- * @type object
-*/
 export type CreateOrderResponses = {
     "201": CreateOrderStatus201;
 };

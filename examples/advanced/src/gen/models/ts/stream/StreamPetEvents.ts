@@ -1,8 +1,5 @@
 import type { PetEvent } from '../PetEvent'
 
-/**
- * @type object
- */
 export type StreamPetEventsPath = {
   /**
    * @description ID of pet to stream events for
@@ -13,14 +10,8 @@ export type StreamPetEventsPath = {
   petId: number
 }
 
-/**
- * @type object
- */
 export type StreamPetEventsStatus200 = PetEvent
 
-/**
- * @type object
- */
 export type StreamPetEventsOptions = {
   body?: never
   path: StreamPetEventsPath
@@ -28,9 +19,6 @@ export type StreamPetEventsOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type StreamPetEventsResponses = {
   '200': StreamPetEventsStatus200
 }

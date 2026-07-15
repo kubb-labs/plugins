@@ -5,31 +5,16 @@
 
 import type { User } from '../User'
 
-/**
- * @type object
- */
 export type CreateUsersWithListInputStatus200Json = User
 
-/**
- * @type object
- */
 export type CreateUsersWithListInputStatus200Xml = User
 
 export type CreateUsersWithListInputStatus200 = CreateUsersWithListInputStatus200Json | CreateUsersWithListInputStatus200Xml
 
-/**
- * @type unknown
- */
 export type CreateUsersWithListInputStatusDefault = unknown
 
-/**
- * @type array | undefined
- */
 export type CreateUsersWithListInputBody = User[] | undefined
 
-/**
- * @type object
- */
 export type CreateUsersWithListInputOptions = {
   body: CreateUsersWithListInputBody
   path?: never
@@ -37,9 +22,6 @@ export type CreateUsersWithListInputOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type CreateUsersWithListInputResponses = {
   '200':
     | {

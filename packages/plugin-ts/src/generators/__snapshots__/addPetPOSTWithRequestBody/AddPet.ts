@@ -4,24 +4,12 @@
  * Source: text content
  */
 
-/**
- * @type object
- */
 export type AddPetStatus200 = object
 
-/**
- * @type object
- */
 export type AddPetStatus405 = object
 
-/**
- * @type object
- */
 export type AddPetBody = object
 
-/**
- * @type object
- */
 export type AddPetOptions = {
   body: AddPetBody
   path?: never
@@ -29,9 +17,6 @@ export type AddPetOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type AddPetResponses = {
   '200': AddPetStatus200
   '405': AddPetStatus405

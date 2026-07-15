@@ -14,9 +14,6 @@ export const addPetRequestStatusEnum = {
 
 export type AddPetRequestStatusEnumKey = (typeof addPetRequestStatusEnum)[keyof typeof addPetRequestStatusEnum]
 
-/**
- * @type object
- */
 export type AddPetRequest = {
   /**
    * @description
@@ -30,17 +27,8 @@ export type AddPetRequest = {
    * @type string
    */
   name: string
-  /**
-   * @type object | undefined
-   */
   category?: Category
-  /**
-   * @type array
-   */
   photoUrls: string[]
-  /**
-   * @type array | undefined
-   */
   tags?: Tag[]
   /**
    * @description pet status in the store

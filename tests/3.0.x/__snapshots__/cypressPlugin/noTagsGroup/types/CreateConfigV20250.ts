@@ -6,19 +6,10 @@
 import type { Config } from './Config'
 import type { ConfigCreate } from './ConfigCreate'
 
-/**
- * @type object
-*/
 export type CreateConfigV20250Status201 = Config;
 
-/**
- * @type object
-*/
 export type CreateConfigV20250Body = ConfigCreate;
 
-/**
- * @type object
-*/
 export type CreateConfigV20250Options = {
     body: CreateConfigV20250Body;
     path?: never;
@@ -26,9 +17,6 @@ export type CreateConfigV20250Options = {
     headers?: never;
 };
 
-/**
- * @type object
-*/
 export type CreateConfigV20250Responses = {
     "201": CreateConfigV20250Status201;
 };

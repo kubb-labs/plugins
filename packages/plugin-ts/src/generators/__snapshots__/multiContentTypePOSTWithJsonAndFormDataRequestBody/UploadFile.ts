@@ -4,46 +4,22 @@
  * Source: text content
  */
 
-/**
- * @type object
- */
 export type UploadFilePath = {
-  /**
-   * @type string
-   */
   petId: string
 }
 
-/**
- * @type object
- */
 export type UploadFileStatus200 = object
 
-/**
- * @type object
- */
 export type UploadFileBodyJson = {
-  /**
-   * @type string
-   */
   name: string
 }
 
-/**
- * @type object
- */
 export type UploadFileBodyFormData = {
-  /**
-   * @type string
-   */
   file: string
 }
 
 export type UploadFileBody = UploadFileBodyJson | UploadFileBodyFormData
 
-/**
- * @type object
- */
 export type UploadFileOptions = {
   body: UploadFileBody
   path: UploadFilePath
@@ -51,9 +27,6 @@ export type UploadFileOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type UploadFileResponses = {
   '200': UploadFileStatus200
 }

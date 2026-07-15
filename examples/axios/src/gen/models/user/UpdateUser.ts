@@ -5,9 +5,6 @@
 
 import type { User } from '../User'
 
-/**
- * @type object
- */
 export type UpdateUserPath = {
   /**
    * @description name that need to be deleted
@@ -16,9 +13,6 @@ export type UpdateUserPath = {
   username: string
 }
 
-/**
- * @type unknown
- */
 export type UpdateUserStatusDefault = unknown
 
 /**
@@ -41,9 +35,6 @@ export type UpdateUserBodyFormUrlEncoded = User | undefined
 
 export type UpdateUserBody = UpdateUserBodyJson | UpdateUserBodyXml | UpdateUserBodyFormUrlEncoded
 
-/**
- * @type object
- */
 export type UpdateUserOptions = {
   body: UpdateUserBody
   path: UpdateUserPath
@@ -51,9 +42,6 @@ export type UpdateUserOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type UpdateUserResponses = {
   default: UpdateUserStatusDefault
 }

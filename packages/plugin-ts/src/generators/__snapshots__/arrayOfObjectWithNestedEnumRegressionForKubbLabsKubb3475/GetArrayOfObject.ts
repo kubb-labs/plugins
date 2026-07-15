@@ -11,23 +11,11 @@ export const arrayOfObjectStatusEnum = {
 
 export type ArrayOfObjectStatusEnumKey = (typeof arrayOfObjectStatusEnum)[keyof typeof arrayOfObjectStatusEnum]
 
-/**
- * @type array
- */
 export type GetArrayOfObjectStatus200 = {
-  /**
-   * @type number
-   */
   id: number
-  /**
-   * @type string
-   */
   status: ArrayOfObjectStatusEnumKey
 }[]
 
-/**
- * @type object
- */
 export type GetArrayOfObjectOptions = {
   body?: never
   path?: never
@@ -35,9 +23,6 @@ export type GetArrayOfObjectOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type GetArrayOfObjectResponses = {
   '200': GetArrayOfObjectStatus200
 }

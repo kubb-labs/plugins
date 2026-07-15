@@ -5,14 +5,8 @@
 
 import type { User } from './User'
 
-/**
- * @type object
-*/
 export type GetMeStatus200 = User;
 
-/**
- * @type object
-*/
 export type GetMeOptions = {
     body?: never;
     path?: never;
@@ -20,9 +14,6 @@ export type GetMeOptions = {
     headers?: never;
 };
 
-/**
- * @type object
-*/
 export type GetMeResponses = {
     "200": GetMeStatus200;
 };

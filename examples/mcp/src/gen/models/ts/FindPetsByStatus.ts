@@ -5,36 +5,18 @@
 
 import type { Pet } from './Pet'
 
-/**
- * @type object
- */
 export type FindPetsByStatusPath = {
-  /**
-   * @type string
-   */
   step_id: string
 }
 
-/**
- * @type array
- */
 export type FindPetsByStatusStatus200Json = Pet[]
 
-/**
- * @type array
- */
 export type FindPetsByStatusStatus200Xml = Pet[]
 
 export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
 
-/**
- * @type unknown
- */
 export type FindPetsByStatusStatus400 = unknown
 
-/**
- * @type object
- */
 export type FindPetsByStatusOptions = {
   body?: never
   path: FindPetsByStatusPath
@@ -42,9 +24,6 @@ export type FindPetsByStatusOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type FindPetsByStatusResponses = {
   '200':
     | {

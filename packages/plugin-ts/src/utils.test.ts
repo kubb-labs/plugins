@@ -28,9 +28,6 @@ describe('buildParams', () => {
 
     expect(printSchema(buildParams({ params }))).toMatchInlineSnapshot(`
       "{
-          /**
-           * @type string
-          */
           petId: string;
       }"
     `)
@@ -41,9 +38,6 @@ describe('buildParams', () => {
 
     expect(printSchema(buildParams({ params }))).toMatchInlineSnapshot(`
       "{
-          /**
-           * @type integer | undefined
-          */
           limit?: number;
       }"
     `)
@@ -197,5 +191,19 @@ describe('buildPropertyJSDocComments', () => {
     const comments = buildPropertyJSDocComments(schema)
 
     expect(comments).toContain('@example {"label":"*\\/"}')
+  })
+
+  it('omits @type when it would be the only annotation', () => {
+    const schema = ast.factory.createSchema({ type: 'string' })
+    const comments = buildPropertyJSDocComments(schema)
+
+    expect(comments).toStrictEqual([])
+  })
+
+  it('keeps @type when another annotation already justifies the comment', () => {
+    const schema = ast.factory.createSchema({ type: 'string', description: 'A pet name' })
+    const comments = buildPropertyJSDocComments(schema)
+
+    expect(comments).toContain('@type string')
   })
 })

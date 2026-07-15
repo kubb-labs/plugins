@@ -3,9 +3,6 @@
  * Do not edit manually.
  */
 
-/**
- * @type object
- */
 export type DeleteOrderPath = {
   /**
    * @description ID of the order that needs to be deleted
@@ -16,19 +13,10 @@ export type DeleteOrderPath = {
   orderId: number
 }
 
-/**
- * @type unknown
- */
 export type DeleteOrderStatus400 = unknown
 
-/**
- * @type unknown
- */
 export type DeleteOrderStatus404 = unknown
 
-/**
- * @type object
- */
 export type DeleteOrderOptions = {
   body?: never
   path: DeleteOrderPath
@@ -36,9 +24,6 @@ export type DeleteOrderOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type DeleteOrderResponses = {
   '400': DeleteOrderStatus400
   '404': DeleteOrderStatus404

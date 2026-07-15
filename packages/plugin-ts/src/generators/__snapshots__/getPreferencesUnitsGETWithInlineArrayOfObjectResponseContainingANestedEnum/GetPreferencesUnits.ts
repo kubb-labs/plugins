@@ -12,27 +12,12 @@ export const getPreferencesUnitsStatus200TypeEnum = {
 
 export type GetPreferencesUnitsStatus200TypeEnumKey = (typeof getPreferencesUnitsStatus200TypeEnum)[keyof typeof getPreferencesUnitsStatus200TypeEnum]
 
-/**
- * @type array
- */
 export type GetPreferencesUnitsStatus200 = {
-  /**
-   * @type number
-   */
   id: number
-  /**
-   * @type string
-   */
   type: GetPreferencesUnitsStatus200TypeEnumKey
-  /**
-   * @type string
-   */
   value: string
 }[]
 
-/**
- * @type object
- */
 export type GetPreferencesUnitsOptions = {
   body?: never
   path?: never
@@ -40,9 +25,6 @@ export type GetPreferencesUnitsOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type GetPreferencesUnitsResponses = {
   '200': GetPreferencesUnitsStatus200
 }

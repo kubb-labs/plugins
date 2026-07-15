@@ -2,9 +2,6 @@ import type { CreatePetsBoolParamKey } from '../CreatePetsBoolParam'
 import type { CreatePetsXEXAMPLEKey } from '../CreatePetsXEXAMPLE'
 import type { PetNotFound } from '../PetNotFound'
 
-/**
- * @type object
- */
 export type CreatePetsPath = {
   /**
    * @description UUID
@@ -13,9 +10,6 @@ export type CreatePetsPath = {
   uuid: string
 }
 
-/**
- * @type object
- */
 export type CreatePetsQuery = {
   bool_param?: CreatePetsBoolParamKey
   /**
@@ -25,9 +19,6 @@ export type CreatePetsQuery = {
   offset?: number
 }
 
-/**
- * @type object
- */
 export type CreatePetsHeaders = {
   /**
    * @description Header parameters
@@ -35,9 +26,6 @@ export type CreatePetsHeaders = {
   'X-EXAMPLE': CreatePetsXEXAMPLEKey
 }
 
-/**
- * @type unknown
- */
 export type CreatePetsStatus201 = unknown
 
 /**
@@ -46,23 +34,11 @@ export type CreatePetsStatus201 = unknown
  */
 export type CreatePetsStatusDefault = PetNotFound
 
-/**
- * @type object
- */
 export type CreatePetsBody = {
-  /**
-   * @type string
-   */
   name: string
-  /**
-   * @type string
-   */
   tag: string
 }
 
-/**
- * @type object
- */
 export type CreatePetsOptions = {
   body: CreatePetsBody
   path: CreatePetsPath
@@ -70,9 +46,6 @@ export type CreatePetsOptions = {
   headers: CreatePetsHeaders
 }
 
-/**
- * @type object
- */
 export type CreatePetsResponses = {
   '201': CreatePetsStatus201
   default: CreatePetsStatusDefault

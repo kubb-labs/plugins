@@ -4,7 +4,4 @@
  * Source: text content
  */
 
-/**
- * @type string
- */
 export type ProxyHostALPN = '' | 'h3' | 'h2' | 'http/1.1'

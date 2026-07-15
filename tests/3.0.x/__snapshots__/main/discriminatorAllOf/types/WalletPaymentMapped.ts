@@ -6,8 +6,5 @@
 import type { PaymentMethodMapped } from './PaymentMethodMapped'
 
 export type WalletPaymentMapped = (PaymentMethodMapped & {
-    /**
-     * @type string | undefined
-    */
     walletId?: string;
 });

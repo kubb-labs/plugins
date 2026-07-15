@@ -3,17 +3,11 @@
  * Do not edit manually.
  */
 
-/**
- * @type object
- */
 export type Cat = {
   /**
    * @minLength 1
    * @type string | undefined
    */
   readonly type?: string
-  /**
-   * @type string | undefined
-   */
   name?: string
 }

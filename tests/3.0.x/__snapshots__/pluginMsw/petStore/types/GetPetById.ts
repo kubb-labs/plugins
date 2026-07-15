@@ -5,9 +5,6 @@
 
 import type { Pet } from './Pet'
 
-/**
- * @type object
-*/
 export type GetPetByIdPath = {
     /**
      * @description ID of pet to return
@@ -18,31 +15,16 @@ export type GetPetByIdPath = {
     petId: bigint;
 };
 
-/**
- * @type object
-*/
 export type GetPetByIdStatus200Json = Pet;
 
-/**
- * @type object
-*/
 export type GetPetByIdStatus200Xml = Pet;
 
 export type GetPetByIdStatus200 = (GetPetByIdStatus200Json | GetPetByIdStatus200Xml);
 
-/**
- * @type any
-*/
 export type GetPetByIdStatus400 = any;
 
-/**
- * @type any
-*/
 export type GetPetByIdStatus404 = any;
 
-/**
- * @type object
-*/
 export type GetPetByIdOptions = {
     body?: never;
     path: GetPetByIdPath;
@@ -50,9 +32,6 @@ export type GetPetByIdOptions = {
     headers?: never;
 };
 
-/**
- * @type object
-*/
 export type GetPetByIdResponses = {
     "200": ({
         contentType: "application/json";

@@ -3,20 +3,8 @@
 * Do not edit manually.
 */
 
-/**
- * @type object
-*/
 export type ProductSchema = {
-    /**
-     * @type string | undefined
-    */
     id?: string;
-    /**
-     * @type string | undefined
-    */
     name?: string;
-    /**
-     * @type number | undefined
-    */
     price?: number;
 };

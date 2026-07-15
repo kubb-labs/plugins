@@ -3,9 +3,6 @@
  * Do not edit manually.
  */
 
-/**
- * @type object
- */
 export type LoginUserQuery = {
   /**
    * @description The user name for login
@@ -19,26 +16,14 @@ export type LoginUserQuery = {
   password?: string
 }
 
-/**
- * @type string
- */
 export type LoginUserStatus200Xml = string
 
-/**
- * @type string
- */
 export type LoginUserStatus200Json = string
 
 export type LoginUserStatus200 = LoginUserStatus200Xml | LoginUserStatus200Json
 
-/**
- * @type unknown
- */
 export type LoginUserStatus400 = unknown
 
-/**
- * @type object
- */
 export type LoginUserOptions = {
   body?: never
   path?: never
@@ -46,9 +31,6 @@ export type LoginUserOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type LoginUserResponses = {
   '200':
     | {

@@ -3,9 +3,6 @@
  * Do not edit manually.
  */
 
-/**
- * @type object
- */
 export type UpdatePetWithFormPath = {
   /**
    * @description ID of pet that needs to be updated
@@ -16,9 +13,6 @@ export type UpdatePetWithFormPath = {
   petId: number
 }
 
-/**
- * @type object
- */
 export type UpdatePetWithFormQuery = {
   /**
    * @description Name of pet that needs to be updated
@@ -32,14 +26,8 @@ export type UpdatePetWithFormQuery = {
   status?: string
 }
 
-/**
- * @type unknown
- */
 export type UpdatePetWithFormStatus405 = unknown
 
-/**
- * @type object
- */
 export type UpdatePetWithFormOptions = {
   body?: never
   path: UpdatePetWithFormPath
@@ -47,9 +35,6 @@ export type UpdatePetWithFormOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type UpdatePetWithFormResponses = {
   '405': UpdatePetWithFormStatus405
 }

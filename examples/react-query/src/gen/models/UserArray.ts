@@ -5,7 +5,4 @@
 
 import type { User } from './User'
 
-/**
- * @type array
- */
 export type UserArray = User[]

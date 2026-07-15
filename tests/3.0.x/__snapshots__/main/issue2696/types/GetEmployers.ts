@@ -5,14 +5,8 @@
 
 import type { Employer } from './Employer'
 
-/**
- * @type array
-*/
 export type GetEmployersStatus200 = Employer[];
 
-/**
- * @type object
-*/
 export type GetEmployersOptions = {
     body?: never;
     path?: never;
@@ -20,9 +14,6 @@ export type GetEmployersOptions = {
     headers?: never;
 };
 
-/**
- * @type object
-*/
 export type GetEmployersResponses = {
     "200": GetEmployersStatus200;
 };

@@ -3,9 +3,6 @@
  * Do not edit manually.
  */
 
-/**
- * @type object
- */
 export type PetNotFound = {
   /**
    * @description
@@ -13,8 +10,5 @@ export type PetNotFound = {
    * @type integer | undefined
    */
   code?: number
-  /**
-   * @type string | undefined
-   */
   message?: string
 }

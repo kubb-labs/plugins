@@ -6,53 +6,23 @@
 import type { Pet } from './Pet'
 import type { PetUpdate } from './PetUpdate'
 
-/**
- * @type object
-*/
 export type UpdatePetPath = {
-    /**
-     * @type string
-    */
     pet_id: string;
 };
 
-/**
- * @type object
-*/
 export type UpdatePetQuery = {
-    /**
-     * @type boolean | undefined
-    */
     include_deleted?: boolean;
-    /**
-     * @type string | undefined
-    */
     request_source?: string;
 };
 
-/**
- * @type object
-*/
 export type UpdatePetHeaders = {
-    /**
-     * @type string | undefined
-    */
     "X-Request-ID"?: string;
 };
 
-/**
- * @type object
-*/
 export type UpdatePetStatus200 = Pet;
 
-/**
- * @type object
-*/
 export type UpdatePetBody = PetUpdate;
 
-/**
- * @type object
-*/
 export type UpdatePetOptions = {
     body: UpdatePetBody;
     path: UpdatePetPath;
@@ -60,9 +30,6 @@ export type UpdatePetOptions = {
     headers?: UpdatePetHeaders;
 };
 
-/**
- * @type object
-*/
 export type UpdatePetResponses = {
     "200": UpdatePetStatus200;
 };

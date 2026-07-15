@@ -3,14 +3,8 @@
  * Do not edit manually.
  */
 
-/**
- * @type unknown
- */
 export type LogoutUserStatusDefault = unknown
 
-/**
- * @type object
- */
 export type LogoutUserOptions = {
   body?: never
   path?: never
@@ -18,9 +12,6 @@ export type LogoutUserOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type LogoutUserResponses = {
   default: LogoutUserStatusDefault
 }

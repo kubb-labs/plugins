@@ -4,20 +4,8 @@
  * Source: text content
  */
 
-/**
- * @type object
- */
 export type Order = {
-  /**
-   * @type integer
-   */
   id: string
-  /**
-   * @type integer | undefined
-   */
   quantity?: string
-  /**
-   * @type string
-   */
   status: string
 }

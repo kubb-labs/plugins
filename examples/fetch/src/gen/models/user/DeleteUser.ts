@@ -3,9 +3,6 @@
  * Do not edit manually.
  */
 
-/**
- * @type object
- */
 export type DeleteUserPath = {
   /**
    * @description The name that needs to be deleted
@@ -14,19 +11,10 @@ export type DeleteUserPath = {
   username: string
 }
 
-/**
- * @type unknown
- */
 export type DeleteUserStatus400 = unknown
 
-/**
- * @type unknown
- */
 export type DeleteUserStatus404 = unknown
 
-/**
- * @type object
- */
 export type DeleteUserOptions = {
   body?: never
   path: DeleteUserPath
@@ -34,9 +22,6 @@ export type DeleteUserOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type DeleteUserResponses = {
   '400': DeleteUserStatus400
   '404': DeleteUserStatus404

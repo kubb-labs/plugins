@@ -12,9 +12,6 @@ export type AddPetStatus200Xml = Pet
 
 export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
-/**
- * @type object
- */
 export type AddPetStatus405 = {
   /**
    * @description
@@ -22,9 +19,6 @@ export type AddPetStatus405 = {
    * @type integer | undefined
    */
   code?: number
-  /**
-   * @type string | undefined
-   */
   message?: string
 }
 
@@ -46,9 +40,6 @@ export type AddPetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'type' | 'tags'>
 
 export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded
 
-/**
- * @type object
- */
 export type AddPetOptions = {
   body: AddPetBody
   path?: never
@@ -56,9 +47,6 @@ export type AddPetOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type AddPetResponses = {
   '200':
     | {

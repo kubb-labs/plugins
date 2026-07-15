@@ -3,16 +3,7 @@
 * Do not edit manually.
 */
 
-/**
- * @type object
-*/
 export type CardPaymentUnion = {
-    /**
-     * @type string | undefined
-    */
     type?: string;
-    /**
-     * @type string | undefined
-    */
     cardNumber?: string;
 };

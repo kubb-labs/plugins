@@ -12,15 +12,9 @@ import type { Tag } from './Tag'
 
 export type Pet = (
   | (Dog & {
-      /**
-       * @type string
-       */
       readonly type: 'dog'
     })
   | (Cat & {
-      /**
-       * @type string
-       */
       readonly type: 'cat'
     })
 ) & {
@@ -37,17 +31,8 @@ export type Pet = (
    * @type string
    */
   name: string
-  /**
-   * @type object | undefined
-   */
   category?: Category
-  /**
-   * @type array
-   */
   photoUrls: Array<string>
-  /**
-   * @type array | undefined
-   */
   readonly tags?: Array<Tag>
   /**
    * @description pet status in the store

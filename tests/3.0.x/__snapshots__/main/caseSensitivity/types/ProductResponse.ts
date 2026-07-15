@@ -3,20 +3,8 @@
 * Do not edit manually.
 */
 
-/**
- * @type object
-*/
 export type ProductResponse = {
-    /**
-     * @type string | undefined
-    */
     productId?: string;
-    /**
-     * @type string | undefined
-    */
     productName?: string;
-    /**
-     * @type integer | undefined
-    */
     stock?: number;
 };

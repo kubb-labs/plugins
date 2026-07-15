@@ -6,24 +6,9 @@
 import type { PriorityKey } from './Priority'
 import type { StatusKey } from './Status'
 
-/**
- * @type object
-*/
 export type Task = {
-    /**
-     * @type string
-    */
     id: string;
-    /**
-     * @type string
-    */
     status: StatusKey;
-    /**
-     * @type string | undefined
-    */
     priority?: PriorityKey;
-    /**
-     * @type string | undefined
-    */
     title?: string;
 };

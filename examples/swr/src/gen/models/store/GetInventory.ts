@@ -3,16 +3,10 @@
  * Do not edit manually.
  */
 
-/**
- * @type object
- */
 export type GetInventoryStatus200 = {
   [key: string]: number
 }
 
-/**
- * @type object
- */
 export type GetInventoryOptions = {
   body?: never
   path?: never
@@ -20,9 +14,6 @@ export type GetInventoryOptions = {
   headers?: never
 }
 
-/**
- * @type object
- */
 export type GetInventoryResponses = {
   '200': GetInventoryStatus200
 }

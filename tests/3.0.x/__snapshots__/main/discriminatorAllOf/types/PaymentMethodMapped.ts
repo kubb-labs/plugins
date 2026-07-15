@@ -5,9 +5,6 @@
 
 import type { PaymentMethodMappedTypeEnumKey } from './PaymentMethodMappedTypeEnum'
 
-/**
- * @type object
-*/
 export type PaymentMethodMapped = {
     type: PaymentMethodMappedTypeEnumKey;
 };
