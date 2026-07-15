@@ -30,7 +30,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginZod({
-          output: { path: './zod', barrel: false },
+          output: { path: './zod', barrel: false, mode: 'directory' },
         }),
       ],
     },
@@ -47,7 +47,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginZod({
-          output: { path: './zod', barrel: false },
+          output: { path: './zod', barrel: false, mode: 'directory' },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -67,7 +67,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginZod({
-          output: { path: './zod', barrel: false },
+          output: { path: './zod', barrel: false, mode: 'directory' },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
@@ -85,7 +85,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginZod({
-          output: { path: './zod', barrel: false },
+          output: { path: './zod', barrel: false, mode: 'directory' },
           group: { type: 'tag' },
         }),
       ],
@@ -103,7 +103,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginZod({
-          output: { path: './zod', barrel: false },
+          output: { path: './zod', barrel: false, mode: 'directory' },
           inferred: true,
         }),
       ],
@@ -121,7 +121,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginZod({
-          output: { path: './zod', barrel: false },
+          output: { path: './zod', barrel: false, mode: 'directory' },
           coercion: true,
         }),
       ],
@@ -139,7 +139,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginZod({
-          output: { path: './zod', barrel: false },
+          output: { path: './zod', barrel: false, mode: 'directory' },
         }),
       ],
     },
@@ -156,7 +156,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginZod({
-          output: { path: './zod', barrel: false },
+          output: { path: './zod', barrel: false, mode: 'directory' },
         }),
       ],
     },

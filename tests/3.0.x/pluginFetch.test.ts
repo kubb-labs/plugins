@@ -29,7 +29,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
-      plugins: [pluginTs({ output: { path: './types', barrel: false } }), pluginFetch({ output: { path: './clients', barrel: false } })],
+      plugins: [
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginFetch({ output: { path: './clients', barrel: false, mode: 'directory' } }),
+      ],
     },
   },
 
@@ -43,8 +46,8 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginFetch({ output: { path: './clients', barrel: false }, sdk: {} }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginFetch({ output: { path: './clients', barrel: false, mode: 'directory' }, sdk: {} }),
       ],
     },
   },
@@ -59,8 +62,8 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginFetch({ output: { path: './clients', barrel: false }, sdk: { name: 'PetStore' } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginFetch({ output: { path: './clients', barrel: false, mode: 'directory' }, sdk: { name: 'PetStore' } }),
       ],
     },
   },
@@ -75,8 +78,8 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginFetch({ output: { path: './clients', barrel: false }, sdk: { mode: 'flat', name: 'PetStore' } }),
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginFetch({ output: { path: './clients', barrel: false, mode: 'directory' }, sdk: { mode: 'flat', name: 'PetStore' } }),
       ],
     },
   },
@@ -90,7 +93,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs()],
-      plugins: [pluginTs({ output: { path: './types', barrel: false } }), pluginFetch({ output: { path: './clients', barrel: false } })],
+      plugins: [
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginFetch({ output: { path: './clients', barrel: false, mode: 'directory' } }),
+      ],
     },
   },
 ]
@@ -141,9 +147,9 @@ describe(`plugin-fetch options ${version}`, () => {
         reporters: [],
         storage: fsStorage(),
         plugins: [
-          pluginTs({ output: { path: './types', barrel: false } }),
+          pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
           pluginFetch({
-            output: { path: './clients', barrel: false },
+            output: { path: './clients', barrel: false, mode: 'directory' },
             baseURL: '${import.meta.env.VITE_API_SERVER}',
           }),
         ],
@@ -182,8 +188,8 @@ describe(`plugin-fetch options ${version}`, () => {
         storage: fsStorage(),
         plugins: [
           pluginBarrel(),
-          pluginTs({ output: { path: './types', barrel: { type: 'named' } } }),
-          pluginFetch({ output: { path: './clients', barrel: { type: 'named' } }, sdk: {} }),
+          pluginTs({ output: { path: './types', barrel: { type: 'named' }, mode: 'directory' } }),
+          pluginFetch({ output: { path: './clients', barrel: { type: 'named' }, mode: 'directory' }, sdk: {} }),
         ],
       } as Config,
       { hooks: new Hookable<KubbHooks>() },

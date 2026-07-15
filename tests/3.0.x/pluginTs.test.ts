@@ -34,7 +34,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginTs({
-          output: { path: './types', barrel: false },
+          output: { path: './types', mode: 'directory', barrel: false },
           group: { type: 'tag' },
         }),
       ],
@@ -53,7 +53,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginTs({
-          output: { path: './types', barrel: false },
+          output: { path: './types', mode: 'directory', barrel: false },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -73,7 +73,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginTs({
-          output: { path: './types', barrel: false },
+          output: { path: './types', mode: 'directory', barrel: false },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],

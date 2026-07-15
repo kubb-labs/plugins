@@ -23,7 +23,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginMcp['resolvedOptions'] = {
-  output: { path: '.' },
+  output: { path: '.', mode: 'directory' },
   exclude: [],
   include: undefined,
   override: [],
@@ -34,13 +34,13 @@ const defaultOptions: PluginMcp['resolvedOptions'] = {
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
+  options: { output: { path: '.', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 
 const mockedZodPlugin = createMockedPlugin<PluginZod>({
   name: 'plugin-zod',
-  options: { output: { path: '.' }, group: null } as PluginZod['resolvedOptions'],
+  options: { output: { path: '.', mode: 'directory' }, group: null } as PluginZod['resolvedOptions'],
   resolver: resolverZod,
 })
 

@@ -135,7 +135,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginFaker['resolvedOptions'] = {
-  output: { path: '.' },
+  output: { path: '.', mode: 'directory' },
   exclude: [],
   include: undefined,
   override: [],
@@ -149,7 +149,7 @@ const defaultOptions: PluginFaker['resolvedOptions'] = {
 
 const defaultTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: 'types' }, group: null } as PluginTs['resolvedOptions'],
+  options: { output: { path: 'types', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 
@@ -349,6 +349,6 @@ describe('fakerGenerator — operation', () => {
 
   test('default resolver applies create prefix to names', () => {
     expect(resolverFaker.name('Eval')).toBe('createEval')
-    expect(resolverFaker.file({ name: 'Eval', extname: '.ts', root: '.', output: { path: '.' } }).baseName).toBe('createEval.ts')
+    expect(resolverFaker.file({ name: 'Eval', extname: '.ts', root: '.', output: { path: '.', mode: 'directory' } }).baseName).toBe('createEval.ts')
   })
 })
