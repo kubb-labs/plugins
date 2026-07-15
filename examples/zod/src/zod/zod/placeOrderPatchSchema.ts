@@ -37,3 +37,12 @@ export type PlaceOrderPatchBodySchemaFormUrlEncodedType = z.infer<typeof placeOr
 export const placeOrderPatchBodySchema = z.union([placeOrderPatchBodySchemaJson, placeOrderPatchBodySchemaXml, placeOrderPatchBodySchemaFormUrlEncoded])
 
 export type PlaceOrderPatchBodySchemaType = z.infer<typeof placeOrderPatchBodySchema>
+
+export const placeOrderPatchOptionsSchema = z.object({
+  body: placeOrderPatchBodySchema,
+  path: z.never().optional(),
+  query: z.never().optional(),
+  headers: z.never().optional(),
+})
+
+export type PlaceOrderPatchOptionsSchemaType = z.infer<typeof placeOrderPatchOptionsSchema>

@@ -40,3 +40,30 @@ export const createPetsBodySchema = z.object({
 })
 
 export type CreatePetsBodySchemaType = z.infer<typeof createPetsBodySchema>
+
+export const createPetsPathSchema = z.object({
+  uuid: z.string().describe('UUID'),
+})
+
+export type CreatePetsPathSchemaType = z.infer<typeof createPetsPathSchema>
+
+export const createPetsQuerySchema = z.object({
+  offset: z.int().optional().describe('Offset'),
+})
+
+export type CreatePetsQuerySchemaType = z.infer<typeof createPetsQuerySchema>
+
+export const createPetsHeadersSchema = z.object({
+  'X-EXAMPLE': z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters'),
+})
+
+export type CreatePetsHeadersSchemaType = z.infer<typeof createPetsHeadersSchema>
+
+export const createPetsOptionsSchema = z.object({
+  body: createPetsBodySchema,
+  path: createPetsPathSchema,
+  query: createPetsQuerySchema.optional(),
+  headers: createPetsHeadersSchema,
+})
+
+export type CreatePetsOptionsSchemaType = z.infer<typeof createPetsOptionsSchema>
