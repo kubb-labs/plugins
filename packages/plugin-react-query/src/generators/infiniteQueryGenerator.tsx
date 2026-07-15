@@ -4,7 +4,7 @@ import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { InfiniteQuery, InfiniteQueryOptions, QueryKey } from '../components'
-import { classifyOperation } from '../utils.ts'
+import { classifyOperation, resolvePageParamType } from '../utils.ts'
 import type { PluginReactQuery } from '../types'
 
 /**
@@ -59,11 +59,11 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
       }),
     }
 
-    const rawQueryParams = getOperationParameters(node).query
-    const queryParamsTypeName =
-      rawQueryParams.length > 0 && tsResolver.param.query(node, rawQueryParams[0]!) !== tsResolver.param.name(node, rawQueryParams[0]!)
-        ? tsResolver.param.query(node, rawQueryParams[0]!)
-        : null
+    const { queryParamsTypeName } = resolvePageParamType(node, {
+      resolver: tsResolver,
+      initialPageParam: infiniteOptions.initialPageParam,
+      queryParam: infiniteOptions.queryParam,
+    })
 
     const importedTypeNames = [
       tsResolver.response.options(node),

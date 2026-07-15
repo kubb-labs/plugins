@@ -1,5 +1,6 @@
 import { getOperationParameters, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
+import { resolvePageParamType } from '@internals/tanstack-query'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
@@ -62,11 +63,11 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
       }),
     }
 
-    const rawQueryParams = getOperationParameters(node).query
-    const queryParamsTypeName =
-      rawQueryParams.length > 0 && tsResolver.param.query(node, rawQueryParams[0]!) !== tsResolver.param.name(node, rawQueryParams[0]!)
-        ? tsResolver.param.query(node, rawQueryParams[0]!)
-        : null
+    const { queryParamsTypeName } = resolvePageParamType(node, {
+      resolver: tsResolver,
+      initialPageParam: infiniteOptions.initialPageParam,
+      queryParam: infiniteOptions.queryParam,
+    })
 
     const importedTypeNames = [
       tsResolver.response.options(node),
