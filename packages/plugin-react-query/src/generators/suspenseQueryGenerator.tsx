@@ -9,9 +9,10 @@ import type { PluginReactQuery } from '../types'
 
 /**
  * Built-in generator for `useSuspenseQuery` hooks. Enabled when
- * `pluginReactQuery({ suspense: {} })`. Emits one `useFooSuspenseQuery` hook
- * per query operation. Suspense queries throw promises while loading and
- * require a `<Suspense>` boundary in the React tree. TanStack Query v5+ only.
+ * `pluginReactQuery({ suspense: {}, hooks: true })`. Emits one
+ * `useFooSuspenseQuery` hook per query operation. Suspense queries throw
+ * promises while loading and require a `<Suspense>` boundary in the React
+ * tree. TanStack Query v5+ only.
  */
 export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-suspense-query',
@@ -28,7 +29,7 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
     const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
     const isSuspense = !!suspense
 
-    if (!isQuery || isMutation || !isSuspense) return null
+    if (!isQuery || isMutation || !isSuspense || !hooks) return null
 
     const importPath = query ? query.importPath : '@tanstack/react-query'
 
@@ -84,22 +85,18 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
 
         <QueryOptions name={queryOptionsName} clientName={calledClientName} queryKeyName={queryKeyName} node={node} tsResolver={tsResolver} />
 
-        {suspense && hooks && (
-          <>
-            <File.Import name={['useSuspenseQuery']} path={importPath} />
-            <File.Import name={['QueryKey', 'QueryClient', 'UseSuspenseQueryOptions', 'UseSuspenseQueryResult']} path={importPath} isTypeOnly />
-            <Query
-              name={queryName}
-              queryOptionsName={queryOptionsName}
-              queryKeyName={queryKeyName}
-              queryKeyTypeName={queryKeyTypeName}
-              node={node}
-              tsResolver={tsResolver}
-              customOptions={customOptions}
-              suspense
-            />
-          </>
-        )}
+        <File.Import name={['useSuspenseQuery']} path={importPath} />
+        <File.Import name={['QueryKey', 'QueryClient', 'UseSuspenseQueryOptions', 'UseSuspenseQueryResult']} path={importPath} isTypeOnly />
+        <Query
+          name={queryName}
+          queryOptionsName={queryOptionsName}
+          queryKeyName={queryKeyName}
+          queryKeyTypeName={queryKeyTypeName}
+          node={node}
+          tsResolver={tsResolver}
+          customOptions={customOptions}
+          suspense
+        />
       </File>
     )
   },

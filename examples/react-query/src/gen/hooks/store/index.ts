@@ -1,7 +1,5 @@
 export { deleteOrderMutationKey, deleteOrderMutationOptions } from './useDeleteOrder'
 export { getInventoryQueryKey, getInventoryQueryOptions } from './useGetInventory'
-export { getInventorySuspenseQueryKey, getInventorySuspenseQueryOptions } from './useGetInventorySuspense'
 export { getOrderByIdQueryKey, getOrderByIdQueryOptions } from './useGetOrderById'
-export { getOrderByIdSuspenseQueryKey, getOrderByIdSuspenseQueryOptions } from './useGetOrderByIdSuspense'
 export { placeOrderMutationKey, placeOrderMutationOptions } from './usePlaceOrder'
 export { placeOrderPatchMutationKey, placeOrderPatchMutationOptions } from './usePlaceOrderPatch'

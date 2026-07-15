@@ -9,9 +9,10 @@ import type { PluginReactQuery } from '../types'
 
 /**
  * Built-in generator for `useInfiniteQuery` hooks. Enabled when
- * `pluginReactQuery({ infinite: { ... } })`. Emits one `useFooInfiniteQuery`
- * hook per query operation, wiring the configured `nextParam` /
- * `previousParam` paths into TanStack Query's cursor-based pagination.
+ * `pluginReactQuery({ infinite: { ... }, hooks: true })`. Emits one
+ * `useFooInfiniteQuery` hook per query operation, wiring the configured
+ * `nextParam` / `previousParam` paths into TanStack Query's cursor-based
+ * pagination.
  */
 export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-infinite-query',
@@ -28,7 +29,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
     const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
     const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
 
-    if (!isQuery || isMutation || !infiniteOptions) return null
+    if (!isQuery || isMutation || !infiniteOptions || !hooks) return null
 
     // Validate queryParam exists in operation's query parameters
     const normalizeKey = (key: string) => key.replace(/\?$/, '')
@@ -110,24 +111,20 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
           queryParam={infiniteOptions.queryParam}
         />
 
-        {hooks && (
-          <>
-            <File.Import name={['useInfiniteQuery']} path={importPath} />
-            <File.Import name={['QueryKey', 'QueryClient', 'InfiniteQueryObserverOptions', 'UseInfiniteQueryResult']} path={importPath} isTypeOnly />
+        <File.Import name={['useInfiniteQuery']} path={importPath} />
+        <File.Import name={['QueryKey', 'QueryClient', 'InfiniteQueryObserverOptions', 'UseInfiniteQueryResult']} path={importPath} isTypeOnly />
 
-            <InfiniteQuery
-              name={queryName}
-              queryOptionsName={queryOptionsName}
-              queryKeyName={queryKeyName}
-              queryKeyTypeName={queryKeyTypeName}
-              node={node}
-              tsResolver={tsResolver}
-              initialPageParam={infiniteOptions.initialPageParam}
-              queryParam={infiniteOptions.queryParam}
-              customOptions={customOptions}
-            />
-          </>
-        )}
+        <InfiniteQuery
+          name={queryName}
+          queryOptionsName={queryOptionsName}
+          queryKeyName={queryKeyName}
+          queryKeyTypeName={queryKeyTypeName}
+          node={node}
+          tsResolver={tsResolver}
+          initialPageParam={infiniteOptions.initialPageParam}
+          queryParam={infiniteOptions.queryParam}
+          customOptions={customOptions}
+        />
       </File>
     )
   },

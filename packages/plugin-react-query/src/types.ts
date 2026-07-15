@@ -250,6 +250,8 @@ export type Options = OutputOptions & {
   /**
    * Adds `useSuspenseQuery` hooks alongside the regular `useQuery` ones.
    * Pass an empty object (`{}`) to enable. TanStack Query v5+ only.
+   *
+   * @default false
    */
   suspense?: Partial<Suspense> | false
   /**

@@ -4,7 +4,7 @@ import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, rend
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
-import { describe, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { matchFiles } from '#mocks'
 import { mutationKeyTransformer } from '@internals/tanstack-query'
 import { queryKeyTransformer } from '@internals/tanstack-query'
@@ -129,5 +129,28 @@ describe('infiniteQueryGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('infiniteQueryGenerator operation with hooks disabled', () => {
+  test('returns no file when hooks is false', async () => {
+    const options: PluginVueQuery['resolvedOptions'] = {
+      ...defaultOptions,
+      infinite: infiniteOptions,
+      hooks: false,
+    }
+    const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
+    const driver = createMultiPluginDriver('hooksDisabled')
+
+    await renderGeneratorOperation(infiniteQueryGenerator, findByTagsNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverVueQuery,
+    })
+
+    expect(driver.fileManager.files).toStrictEqual([])
   })
 })
