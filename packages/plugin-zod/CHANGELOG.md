@@ -1,5 +1,21 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.100
+
+### Major Changes
+
+- [#701](https://github.com/kubb-labs/plugins/pull/701) [`85e43d9`](https://github.com/kubb-labs/plugins/commit/85e43d9fe7d23ab6fcbc877ede4d43aadfe4828f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add a combined `{ body, path, query, headers }` options schema per operation, matching the shape `@kubb/plugin-ts`'s `Options` type already has.
+
+  With `inferred: true`, each operation now also emits grouped `path`/`query`/`headers` schemas (when that group has parameters) and the combined options schema, backed by a new `resolver.response.options(node)` type name. Nothing changes when `inferred` is left at its default of `false`.
+
+  **Breaking change:** `resolver.param.path`, `resolver.param.query`, and `resolver.param.headers` now resolve the name of that grouped schema (e.g. `deletePetPathSchema`) instead of aliasing to the individual parameter's schema name. Anything calling these methods directly, or patching them via `resolver: ResolverPatch<ResolverZod>`, gets the new grouped name. `resolver.param.name(node, param)` is unaffected and still resolves an individual parameter's schema name.
+
+### Patch Changes
+
+- [#707](https://github.com/kubb-labs/plugins/pull/707) [`326f59c`](https://github.com/kubb-labs/plugins/commit/326f59c382c24c2a11ee9144bb6d7bc41ffbc97e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Reach `childName`, `enumPropName`, `extractRefName`, `isStringType`, `mergeAdjacentObjectsLazy`, `syncSchemaRef`, `containsCircularRef`, and `collectSync` from `kubb/kit` directly instead of through the `ast` namespace.
+
+  These helpers moved out of `@kubb/ast`'s `ast` namespace into `kubb/kit`'s flat exports in kubb-labs/kubb, and `ast.collect` now refers to the renamed lazy `collectLazy`. No behavior change; requires the matching `kubb` release.
+
 ## 5.0.0-beta.99
 
 ### Minor Changes

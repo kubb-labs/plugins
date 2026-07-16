@@ -1,5 +1,15 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.100
+
+### Patch Changes
+
+- [#707](https://github.com/kubb-labs/plugins/pull/707) [`326f59c`](https://github.com/kubb-labs/plugins/commit/326f59c382c24c2a11ee9144bb6d7bc41ffbc97e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Reach `childName`, `enumPropName`, `extractRefName`, `isStringType`, `mergeAdjacentObjectsLazy`, `syncSchemaRef`, `containsCircularRef`, and `collectSync` from `kubb/kit` directly instead of through the `ast` namespace.
+
+  These helpers moved out of `@kubb/ast`'s `ast` namespace into `kubb/kit`'s flat exports in kubb-labs/kubb, and `ast.collect` now refers to the renamed lazy `collectLazy`. No behavior change; requires the matching `kubb` release.
+
+- [#710](https://github.com/kubb-labs/plugins/pull/710) [`369e4cd`](https://github.com/kubb-labs/plugins/commit/369e4cd22e37644bb671429a6bdf18c12b39d76e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Omit the `@type` JSDoc tag when it would be the only content of a comment block, since it just repeats the TypeScript type already next to the property.
+
 ## 5.0.0-beta.99
 
 ### Minor Changes

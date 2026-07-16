@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-msw",
-  "version": "5.0.0-beta.100",
+  "version": "5.0.0-beta.101",
   "description": "Generate Mock Service Worker (MSW) request handlers with Kubb. Intercept HTTP requests in the browser or Node.js for frontend development and testing.",
   "keywords": [
     "api-mocking",
