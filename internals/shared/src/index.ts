@@ -21,6 +21,7 @@ export {
   operationFileEntry,
   resolveContentTypeVariants,
   resolveErrorNames,
+  resolveInlinableRefName,
   resolveOperationTypeNames,
   resolveResponseTypes,
   resolveSuccessNames,

@@ -1,4 +1,4 @@
-import { buildOptionsSchema, collectRefNames, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
+import { buildOptionsSchema, collectRefNames, getOperationParameters, resolveContentTypeVariants, resolveInlinableRefName } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Type } from '../components/Type.tsx'
@@ -87,7 +87,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     )
   },
   operation(node, ctx) {
-    const { enum: enumOptions, optionalType, arrayType, syntaxType, group, output, printer } = ctx.options
+    const { enum: enumOptions, optionalType, arrayType, syntaxType, operationTypes, group, output, printer } = ctx.options
     const { config, resolver, root } = ctx
 
     const meta = {
@@ -172,6 +172,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
       if (requestBodyContent.length === 1) {
         const entry = requestBodyContent[0]!
         if (!entry.schema) return null
+        // Inlined: the body is a single `$ref`, so consumers reference the base component directly
+        // and the `XxxData` alias is redundant.
+        if (!operationTypes && resolveInlinableRefName(requestBodyContent)) return null
         return renderSchemaType({
           schema: {
             ...entry.schema,
@@ -197,6 +200,11 @@ export const typeGenerator = defineGenerator<PluginTs>({
       if (variants.length > 1) {
         return buildContentTypeVariants(variants, resolver.response.status(node, res.statusCode))
       }
+      // Inlined: a single-`$ref` response references the base component, so the `XxxStatusNNN` alias
+      // is redundant. The aggregate `XxxResponses` / `XxxResponse` types point at the component.
+      if (!operationTypes && resolveInlinableRefName(res.content)) {
+        return null
+      }
       const primary = variants[0] ?? res.content?.[0]
       return renderSchemaType({
         schema: primary?.schema ?? null,
@@ -206,12 +214,12 @@ export const typeGenerator = defineGenerator<PluginTs>({
     })
 
     const optionsType = renderSchemaType({
-      schema: buildOptionsSchema(node, resolver),
+      schema: buildOptionsSchema(node, resolver, { operationTypes }),
       name: resolver.response.options(node),
     })
 
     const responsesType = renderSchemaType({
-      schema: buildResponses(node, { resolver }),
+      schema: buildResponses(node, { resolver, operationTypes }),
       name: resolver.response.responses(node),
     })
 
@@ -234,7 +242,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
       return renderSchemaType({
         schema: {
-          ...buildResponseUnion(node, { resolver })!,
+          ...buildResponseUnion(node, { resolver, operationTypes })!,
           description: 'Union of all possible responses',
         },
         name: responseName,

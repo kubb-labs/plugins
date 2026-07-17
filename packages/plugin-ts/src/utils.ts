@@ -1,4 +1,4 @@
-import { resolveContentTypeVariants } from '@internals/shared'
+import { resolveContentTypeVariants, resolveInlinableRefName } from '@internals/shared'
 import { jsStringEscape, stringify } from '@internals/utils'
 import { ast, syncSchemaRef } from 'kubb/kit'
 import type { ResolverTs } from './types.ts'
@@ -86,6 +86,7 @@ type BuildParamsSchemaOptions = {
 
 type BuildOperationSchemaOptions = {
   resolver: ResolverTs
+  operationTypes: boolean
 }
 
 /**
@@ -112,10 +113,12 @@ export function buildParams({ params }: BuildParamsSchemaOptions): ast.SchemaNod
  * on `result.parsed`, while the standalone `<Name>StatusNNN` alias stays the plain body union that the
  * query hooks and `result.data` use.
  */
-function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode, resolver: ResolverTs): ast.SchemaNode {
+function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode, resolver: ResolverTs, operationTypes: boolean): ast.SchemaNode {
   const statusName = resolver.response.status(node, res.statusCode)
   const variants = (res.content ?? []).filter((entry) => entry.schema)
   if (variants.length <= 1) {
+    const inlineName = operationTypes ? null : resolveInlinableRefName(res.content)
+    if (inlineName) return variants[0]!.schema!
     return ast.factory.createSchema({ type: 'ref', name: statusName })
   }
 
@@ -141,7 +144,7 @@ function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode
   })
 }
 
-export function buildResponses(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode {
+export function buildResponses(node: ast.OperationNode, { resolver, operationTypes }: BuildOperationSchemaOptions): ast.SchemaNode {
   // Always emit the keyed responses map, even when an operation declares no responses. An operation
   // with no responses renders as an empty `object`, which keeps every consumer's import (for example
   // the axios SDK's `RequestResult<XResponses>`) resolvable instead of pointing at a missing export.
@@ -151,13 +154,13 @@ export function buildResponses(node: ast.OperationNode, { resolver }: BuildOpera
       ast.factory.createProperty({
         name: String(res.statusCode),
         required: true,
-        schema: buildResponseRecordEntry(node, res, resolver),
+        schema: buildResponseRecordEntry(node, res, resolver, operationTypes),
       }),
     ),
   })
 }
 
-export function buildResponseUnion(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode | null {
+export function buildResponseUnion(node: ast.OperationNode, { resolver, operationTypes }: BuildOperationSchemaOptions): ast.SchemaNode | null {
   const responsesWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
 
   if (responsesWithSchema.length === 0) {
@@ -166,6 +169,10 @@ export function buildResponseUnion(node: ast.OperationNode, { resolver }: BuildO
 
   return ast.factory.createSchema({
     type: 'union',
-    members: responsesWithSchema.map((res) => ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, res.statusCode) })),
+    members: responsesWithSchema.map((res) => {
+      const inlineName = operationTypes ? null : resolveInlinableRefName(res.content)
+      if (inlineName) return res.content!.find((entry) => entry.schema)!.schema!
+      return ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, res.statusCode) })
+    }),
   })
 }

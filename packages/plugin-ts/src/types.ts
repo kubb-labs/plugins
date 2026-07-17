@@ -254,6 +254,15 @@ export type Options = OutputOptions & {
    */
   arrayType?: 'generic' | 'array'
   /**
+   * Whether to keep the per-operation alias layer or reference base component types directly.
+   * With `false`, a body or response backed by a single `$ref` resolves to the referenced component
+   * (for example `Pet`) instead of the `AddPetData` / `AddPetStatus200` alias, and those aliases are
+   * no longer emitted. Inline, array, union, multiple-content-type, and `Omit`-based schemas keep
+   * their per-operation alias, since no single base type exists. Consumer plugins read this through
+   * the plugin driver and inline the same way. Defaults to `true`, which keeps the existing output.
+   */
+  operationTypes?: boolean
+  /**
    * Override how names and file paths are built for generated symbols.
    * Methods you omit fall back to the default `resolverTs`. `this` is bound to the
    * full resolver, so `this.default.name(name)` delegates to the built-in implementation.
@@ -321,6 +330,7 @@ export type ResolvedOptions = {
   optionalType: NonNullable<Options['optionalType']>
   arrayType: NonNullable<Options['arrayType']>
   syntaxType: NonNullable<Options['syntaxType']>
+  operationTypes: NonNullable<Options['operationTypes']>
   printer: Options['printer']
 }
 

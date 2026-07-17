@@ -11,6 +11,13 @@ import type { PluginTs } from './types.ts'
 export const pluginTsName = 'plugin-ts' satisfies PluginTs['name']
 
 /**
+ * Default for the `operationTypes` option. Kept `true` so generated output is unchanged unless a
+ * user opts into inlining. Consumer plugins import this to resolve the same default when the option
+ * is left unset (`pluginTs.options?.operationTypes ?? defaultOperationTypes`).
+ */
+export const defaultOperationTypes = true
+
+/**
  * Generates TypeScript `type` aliases and `interface` declarations from an
  * OpenAPI spec. The foundation that every other Kubb plugin builds on:
  * clients, query hooks, mocks, and validators all reference the names this
@@ -45,6 +52,7 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
     optionalType = 'questionToken',
     arrayType = 'array',
     syntaxType = 'type',
+    operationTypes = defaultOperationTypes,
     printer,
     resolver: userResolver,
     macros: userMacros,
@@ -74,6 +82,7 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
           arrayType,
           enum: resolvedEnum,
           syntaxType,
+          operationTypes,
           printer,
         })
         ctx.setResolver(userResolver ? Resolver.merge(resolverTs, userResolver) : resolverTs)

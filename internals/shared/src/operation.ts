@@ -248,6 +248,21 @@ export type ContentVariantInput = { contentType: string; schema?: ast.SchemaNode
 export type ContentVariant = { name: string; suffix: string; schema: ast.SchemaNode; keysToOmit?: Array<string> | null; contentType: string }
 
 /**
+ * The base component name a body or response should inline to, or `null` to keep its per-operation
+ * alias. Only content that is a single, bare `$ref` has a base type to point at. Multiple content
+ * types, `keysToOmit` (an `Omit<Base, …>`), inline schemas, arrays, and unions all return `null`, so
+ * they keep the alias.
+ */
+export function resolveInlinableRefName(content: ReadonlyArray<ContentVariantInput> | null | undefined): string | null {
+  if (!content || content.length !== 1) return null
+  const entry = content[0]
+  if (!entry?.schema || (entry.keysToOmit?.length ?? 0) > 0) return null
+  const refNode = ast.narrowSchema(entry.schema, 'ref')
+  if (!refNode?.ref) return null
+  return ast.resolveRefName(refNode)
+}
+
+/**
  * Resolves per-content-type variant names for a set of content entries, deduplicating suffix
  * collisions with a numeric counter. Entries without a schema are skipped. The returned `suffix` is
  * the final (possibly counter-augmented) value, so callers can derive parallel names in another
@@ -415,10 +430,20 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
  * shape from the same inputs. `primitive: 'object'` is a no-op for the TS printer and tells the Zod
  * printer to emit `z.object(…)` rather than a record.
  */
-export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver): ast.SchemaNode {
+export function buildOptionsSchema(
+  node: ast.OperationNode,
+  resolver: OperationTypeNameResolver,
+  { operationTypes = true }: { operationTypes?: boolean } = {},
+): ast.SchemaNode {
   const { path, query, header } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
+  const bodySchema = () => {
+    if (!hasBody) return createNever()
+    const inlineName = operationTypes ? null : resolveInlinableRefName(node.requestBody?.content)
+    if (inlineName) return node.requestBody!.content!.find((entry) => entry.schema)!.schema!
+    return ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) })
+  }
   const groups = [
     { name: 'path', params: path, resolve: resolver.param.path },
     { name: 'query', params: query, resolve: resolver.param.query },
@@ -436,7 +461,7 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
       ast.factory.createProperty({
         name: 'body',
         required: hasBody,
-        schema: hasBody ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) }) : createNever(),
+        schema: bodySchema(),
       }),
       ...groups.map(({ name, params, resolve }) => {
         const required = params.some((param) => param.required)

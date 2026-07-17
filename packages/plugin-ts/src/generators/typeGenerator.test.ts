@@ -26,6 +26,7 @@ const defaultOptions: PluginTs['resolvedOptions'] = {
   optionalType: 'questionToken',
   arrayType: 'array',
   syntaxType: 'type',
+  operationTypes: true,
   output: { path: '.', mode: 'directory' },
   exclude: [],
   include: undefined,
@@ -139,6 +140,86 @@ describe('typeGenerator — custom resolver', () => {
     expect(source).toContain("import type { ApiPet } from './Pet'")
     expect(source).toContain("import type { ApiErrorResponse } from './ErrorResponse'")
     expect(source).toContain("import type { ApiNewPet } from './NewPet'")
+  })
+})
+
+describe('typeGenerator — operationTypes: false', () => {
+  async function renderInline(node: ast.OperationNode) {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, operationTypes: false }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: apiResolver })
+    const driver = createMockedPluginDriver({ name: 'operationTypes false' })
+    const adapter = createMockedAdapter()
+
+    await renderGeneratorOperation(typeGenerator, node, { config: testConfig, adapter, driver, plugin, options, resolver: apiResolver })
+
+    return rawSources(driver.fileManager.files).join('\n')
+  }
+
+  test('drops the $ref-backed aliases and points the aggregates at the base component', async () => {
+    const node = ast.factory.createOperation({
+      operationId: 'createPet',
+      method: 'POST',
+      path: '/pets',
+      tags: ['pets'],
+      requestBody: {
+        content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'ref', name: 'NewPet', ref: '#/components/schemas/NewPet' }) })],
+      },
+      responses: [
+        ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }), description: 'Created' }),
+        ast.factory.createResponse({ statusCode: '400', schema: ast.factory.createSchema({ type: 'ref', name: 'ErrorResponse', ref: '#/components/schemas/ErrorResponse' }), description: 'Bad request' }),
+      ],
+    })
+
+    const source = await renderInline(node)
+
+    expect(source).not.toContain('ApiCreatePetStatus201')
+    expect(source).not.toContain('ApiCreatePetStatus400')
+    expect(source).not.toContain('ApiCreatePetBody')
+    expect(source).toContain("import type { ApiPet } from './Pet'")
+    expect(source).toContain("import type { ApiErrorResponse } from './ErrorResponse'")
+    expect(source).toContain("import type { ApiNewPet } from './NewPet'")
+    expect(source).toMatch(/ApiCreatePetResponse = \(?ApiPet \| ApiErrorResponse\)?/)
+  })
+
+  test('keeps the alias when the content is an inline object rather than a $ref', async () => {
+    const node = ast.factory.createOperation({
+      operationId: 'createPet',
+      method: 'POST',
+      path: '/pets',
+      tags: ['pets'],
+      requestBody: {
+        content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+      },
+      responses: [ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Created' })],
+    })
+
+    const source = await renderInline(node)
+
+    expect(source).toContain('export type ApiCreatePetBody')
+    expect(source).toContain('export type ApiCreatePetStatus201')
+  })
+
+  test('keeps the alias when a $ref carries keysToOmit', async () => {
+    const node = ast.factory.createOperation({
+      operationId: 'createPet',
+      method: 'POST',
+      path: '/pets',
+      tags: ['pets'],
+      requestBody: {
+        content: [
+          ast.factory.createContent({
+            contentType: 'application/json',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'NewPet', ref: '#/components/schemas/NewPet' }),
+            keysToOmit: ['id'],
+          }),
+        ],
+      },
+      responses: [ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }), description: 'Created' })],
+    })
+
+    const source = await renderInline(node)
+
+    expect(source).toContain('export type ApiCreatePetBody')
   })
 })
 
