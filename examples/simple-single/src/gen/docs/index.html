@@ -163,22 +163,8 @@
                   },
                 },
                 405: {
-                  content: {
-                    'application/json': {
-                      schema: {
-                        properties: {
-                          code: {
-                            format: 'int32',
-                            type: 'integer',
-                          },
-                          message: {
-                            type: 'string',
-                          },
-                        },
-                      },
-                    },
-                  },
-                  description: 'Pet not found',
+                  $ref: '#/components/responses/PetNotFound',
+                  description: 'Invalid input',
                 },
               },
               security: [

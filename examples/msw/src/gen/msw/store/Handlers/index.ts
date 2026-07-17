@@ -1,5 +1,0 @@
-export { deleteOrderHandler, deleteOrderHandlerResponse400, deleteOrderHandlerResponse404 } from './deleteOrderHandler'
-export { getInventoryHandler, getInventoryHandlerResponse200 } from './getInventoryHandler'
-export { getOrderByIdHandler, getOrderByIdHandlerResponse200, getOrderByIdHandlerResponse400, getOrderByIdHandlerResponse404 } from './getOrderByIdHandler'
-export { placeOrderHandler, placeOrderHandlerResponse200, placeOrderHandlerResponse405 } from './placeOrderHandler'
-export { placeOrderPatchHandler, placeOrderPatchHandlerResponse200, placeOrderPatchHandlerResponse405 } from './placeOrderPatchHandler'
