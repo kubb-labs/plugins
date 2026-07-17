@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-axios",
-  "version": "5.0.0-beta.102",
+  "version": "5.0.0-beta.103",
   "description": "Generate a slim, type-safe HTTP client with Kubb based on axios.",
   "keywords": [
     "api-client",
