@@ -1,7 +1,7 @@
 import { getOperationSuccessResponses, resolveInlinableRefName, resolveResponseTypes } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
-import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
+import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Mock, Response } from '../components'
 import type { PluginMsw } from '../types'
@@ -63,7 +63,6 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     const tsOutput = pluginTs.options?.output ?? output
     const tsGroup = pluginTs.options?.group ?? undefined
-    const operationTypes = pluginTs.options?.operationTypes ?? defaultOperationTypes
     const componentPath = (refName: string) => tsResolver.file({ name: refName, extname: '.ts', root, output: tsOutput, group: tsGroup }).path
 
     const typeImportsByPath = new Map<string, Set<string>>()
@@ -75,11 +74,11 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     addTypeImport(type.responseName, type.file.path)
     for (const response of node.responses) {
       if (response.statusCode === 'default') continue
-      const inlineName = operationTypes ? null : resolveInlinableRefName(response.content)
+      const inlineName = pluginTs.options?.operationTypes === false ? resolveInlinableRefName(response.content) : null
       addTypeImport(tsResolver.response.status(node, response.statusCode), inlineName ? componentPath(inlineName) : type.file.path)
     }
     if (requestName) {
-      const inlineBody = operationTypes ? null : resolveInlinableRefName(node.requestBody?.content)
+      const inlineBody = pluginTs.options?.operationTypes === false ? resolveInlinableRefName(node.requestBody?.content) : null
       addTypeImport(requestName, inlineBody ? componentPath(inlineBody) : type.file.path)
     }
 

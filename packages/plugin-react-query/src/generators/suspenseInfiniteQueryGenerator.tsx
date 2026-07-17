@@ -1,7 +1,7 @@
 import { getOperationParameters, operationFileEntry, resolveOperationTypeImports } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { ast, defineGenerator } from 'kubb/kit'
-import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
+import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { InfiniteQuery, InfiniteQueryOptions, QueryKey } from '../components'
 import { classifyOperation } from '../utils.ts'
@@ -68,7 +68,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
       ? resolveOperationTypeImports(node, tsResolver, {
           order: 'body-response-first',
           includeParams: false,
-          operationTypes: pluginTs.options?.operationTypes ?? defaultOperationTypes,
+          operationTypes: pluginTs.options?.operationTypes,
           operationFilePath: meta.fileTs.path,
           root,
           output: pluginTs.options?.output ?? output,

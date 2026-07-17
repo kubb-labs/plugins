@@ -1,6 +1,6 @@
 import { resolveOperationTypeImports } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
-import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
+import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Request } from '../components/Request.tsx'
 import type { PluginCypress } from '../types.ts'
@@ -43,7 +43,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     const typeImportGroups = meta.fileTs
       ? resolveOperationTypeImports(node, tsResolver, {
           includeParams: false,
-          operationTypes: pluginTs.options?.operationTypes ?? defaultOperationTypes,
+          operationTypes: pluginTs.options?.operationTypes,
           operationFilePath: meta.fileTs.path,
           root,
           output: pluginTs.options?.output ?? output,

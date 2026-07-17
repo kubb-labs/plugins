@@ -1,7 +1,7 @@
 export { Enum } from './components/Enum.tsx'
 export { Type } from './components/Type.tsx'
 export { typeGenerator } from './generators/typeGenerator.tsx'
-export { default, defaultOperationTypes, pluginTs, pluginTsName } from './plugin.ts'
+export { default, pluginTs, pluginTsName } from './plugin.ts'
 export {
   createFunctionParameter,
   createFunctionParameters,

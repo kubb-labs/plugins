@@ -578,11 +578,11 @@ export type OperationTypeImportsResolver = OperationTypeNameResolver & {
 
 export type ResolveOperationTypeImportsOptions = ResolveOperationTypeNameOptions & {
   /**
-   * The resolved `operationTypes` value from `@kubb/plugin-ts`. When `true` every name lives in the
-   * operation file and this returns a single group, matching {@link resolveOperationTypeNames}. When
-   * `false`, `$ref`-backed bodies and responses resolve to their base component in a separate file.
+   * The `operationTypes` value from `@kubb/plugin-ts`. Unset or `true` keeps every name in the
+   * operation file and returns a single group, matching {@link resolveOperationTypeNames}. Only
+   * `false` resolves `$ref`-backed bodies and responses to their base component in a separate file.
    */
-  operationTypes: boolean
+  operationTypes?: boolean
   /**
    * The path of the operation's `@kubb/plugin-ts` file, where the aliases and aggregates live.
    */
@@ -613,7 +613,7 @@ export function resolveOperationTypeImports(
 ): OperationTypeImportGroup[] {
   const { operationTypes, operationFilePath, root, output, group, extraNames = [], ...nameOptions } = options
 
-  if (operationTypes) {
+  if (operationTypes !== false) {
     const names = [...extraNames, ...resolveOperationTypeNames(node, resolver, nameOptions)].filter((name): name is string => Boolean(name))
     const unique = [...new Set(names)]
     return unique.length > 0 ? [{ path: operationFilePath, names: unique }] : []

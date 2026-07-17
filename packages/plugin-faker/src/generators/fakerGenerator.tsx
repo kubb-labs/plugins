@@ -1,7 +1,7 @@
 import { getOperationParameters, getPerContentTypeName, resolveContentTypeVariants, resolveInlinableRefName } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from 'kubb/kit'
-import { buildParams, defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
+import { buildParams, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
@@ -156,11 +156,10 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ]
     }
 
-    const operationTypes = pluginTs.options?.operationTypes ?? defaultOperationTypes
     const componentPathFor = (
       content: ReadonlyArray<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }> | null | undefined,
     ) => {
-      const inlineName = operationTypes ? null : resolveInlinableRefName(content)
+      const inlineName = pluginTs.options?.operationTypes === false ? resolveInlinableRefName(content) : null
       if (!inlineName) return undefined
       return tsResolver.file({
         name: inlineName,

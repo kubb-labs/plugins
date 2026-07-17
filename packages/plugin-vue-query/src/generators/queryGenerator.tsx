@@ -2,7 +2,7 @@ import { operationFileEntry, resolveOperationTypeImports } from '@internals/shar
 import { resolveClientOperation } from '@internals/client'
 import { classifyOperation } from '@internals/tanstack-query'
 import { ast, defineGenerator } from 'kubb/kit'
-import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
+import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Query, QueryKey, QueryOptions } from '../components'
 import type { PluginVueQuery } from '../types'
@@ -54,7 +54,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
           exclude: [queryKeyTypeName],
           order: 'body-response-first',
           includeParams: false,
-          operationTypes: pluginTs.options?.operationTypes ?? defaultOperationTypes,
+          operationTypes: pluginTs.options?.operationTypes,
           operationFilePath: meta.fileTs.path,
           root,
           output: pluginTs.options?.output ?? output,

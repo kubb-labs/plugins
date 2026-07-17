@@ -2,7 +2,7 @@ import { getRequestGroups, operationFileEntry, resolveOperationTypeImports } fro
 import { resolveClientOperation } from '@internals/client'
 import { classifyOperation } from '@internals/tanstack-query'
 import { ast, defineGenerator } from 'kubb/kit'
-import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
+import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Mutation, MutationKey } from '../components'
 import type { PluginVueQuery } from '../types'
@@ -52,7 +52,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
       ? resolveOperationTypeImports(node, tsResolver, {
           order: 'body-response-first',
           includeParams: false,
-          operationTypes: pluginTs.options?.operationTypes ?? defaultOperationTypes,
+          operationTypes: pluginTs.options?.operationTypes,
           operationFilePath: meta.fileTs.path,
           root,
           output: pluginTs.options?.output ?? output,

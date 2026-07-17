@@ -1,7 +1,7 @@
 import { operationFileEntry, resolveOperationTypeImports } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { ast, defineGenerator } from 'kubb/kit'
-import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
+import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Query, QueryKey, QueryOptions } from '../components'
 import { classifyOperation } from '../utils.ts'
@@ -54,7 +54,7 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
           exclude: [queryKeyTypeName],
           order: 'body-response-first',
           includeParams: false,
-          operationTypes: pluginTs.options?.operationTypes ?? defaultOperationTypes,
+          operationTypes: pluginTs.options?.operationTypes,
           operationFilePath: meta.fileTs.path,
           root,
           output: pluginTs.options?.output ?? output,
