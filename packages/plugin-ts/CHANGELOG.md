@@ -1,5 +1,11 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.103
+
+### Patch Changes
+
+- [`75009a9`](https://github.com/kubb-labs/plugins/commit/75009a9a8b80acb4d65e54c7d11ca34a0732a742) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Sync kubb core
+
 ## 5.0.0-beta.100
 
 ### Patch Changes

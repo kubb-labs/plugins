@@ -1,5 +1,23 @@
 # tests-3.0.x
 
+## 0.0.1-beta.43
+
+### Patch Changes
+
+- Updated dependencies [[`75009a9`](https://github.com/kubb-labs/plugins/commit/75009a9a8b80acb4d65e54c7d11ca34a0732a742)]:
+  - @kubb/plugin-react-query@5.0.0-beta.103
+  - @kubb/plugin-vue-query@5.0.0-beta.103
+  - @kubb/plugin-cypress@5.0.0-beta.103
+  - @kubb/plugin-axios@5.0.0-beta.103
+  - @kubb/plugin-faker@5.0.0-beta.103
+  - @kubb/plugin-fetch@5.0.0-beta.103
+  - @kubb/plugin-redoc@5.0.0-beta.103
+  - @kubb/plugin-mcp@5.0.0-beta.103
+  - @kubb/plugin-msw@5.0.0-beta.103
+  - @kubb/plugin-swr@5.0.0-beta.103
+  - @kubb/plugin-zod@5.0.0-beta.103
+  - @kubb/plugin-ts@5.0.0-beta.103
+
 ## 0.0.1-beta.42
 
 ### Patch Changes
