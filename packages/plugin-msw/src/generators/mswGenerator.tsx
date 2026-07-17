@@ -1,7 +1,7 @@
-import { getOperationSuccessResponses, resolveResponseTypes } from '@internals/shared'
+import { getOperationSuccessResponses, resolveInlinableRefName, resolveResponseTypes } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
-import { pluginTsName } from '@kubb/plugin-ts'
+import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Mock, Response } from '../components'
 import type { PluginMsw } from '../types'
@@ -61,6 +61,28 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.response.body(node) : null
 
+    const tsOutput = pluginTs.options?.output ?? output
+    const tsGroup = pluginTs.options?.group ?? undefined
+    const operationTypes = pluginTs.options?.operationTypes ?? defaultOperationTypes
+    const componentPath = (refName: string) => tsResolver.file({ name: refName, extname: '.ts', root, output: tsOutput, group: tsGroup }).path
+
+    const typeImportsByPath = new Map<string, Set<string>>()
+    const addTypeImport = (name: string, path: string) => {
+      const names = typeImportsByPath.get(path) ?? new Set<string>()
+      names.add(name)
+      typeImportsByPath.set(path, names)
+    }
+    addTypeImport(type.responseName, type.file.path)
+    for (const response of node.responses) {
+      if (response.statusCode === 'default') continue
+      const inlineName = operationTypes ? null : resolveInlinableRefName(response.content)
+      addTypeImport(tsResolver.response.status(node, response.statusCode), inlineName ? componentPath(inlineName) : type.file.path)
+    }
+    if (requestName) {
+      const inlineBody = operationTypes ? null : resolveInlinableRefName(node.requestBody?.content)
+      addTypeImport(requestName, inlineBody ? componentPath(inlineBody) : type.file.path)
+    }
+
     return (
       <File
         baseName={mock.file.baseName}
@@ -71,12 +93,9 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       >
         <File.Import name={['http']} path="msw" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw" />
-        <File.Import
-          name={Array.from(new Set([type.responseName, ...types.map((t) => t[1]), ...(requestName ? [requestName] : [])]))}
-          path={type.file.path}
-          root={mock.file.path}
-          isTypeOnly
-        />
+        {Array.from(typeImportsByPath).map(([path, names]) => (
+          <File.Import key={path} name={Array.from(names)} root={mock.file.path} path={path} isTypeOnly />
+        ))}
         {parser === 'faker' && faker && <File.Import name={[faker.name]} root={mock.file.path} path={faker.file.path} />}
 
         {types

@@ -1,7 +1,7 @@
-import { getOperationParameters, getPerContentTypeName, resolveContentTypeVariants } from '@internals/shared'
+import { getOperationParameters, getPerContentTypeName, resolveContentTypeVariants, resolveInlinableRefName } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from 'kubb/kit'
-import { buildParams, pluginTsName } from '@kubb/plugin-ts'
+import { buildParams, defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
@@ -156,21 +156,29 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ]
     }
 
-    const responseUnits = node.responses.flatMap((response) =>
-      expandContentUnits(
+    const operationTypes = pluginTs.options?.operationTypes ?? defaultOperationTypes
+    const componentPathFor = (content: ReadonlyArray<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }> | null | undefined) => {
+      const inlineName = operationTypes ? null : resolveInlinableRefName(content)
+      if (!inlineName) return undefined
+      return tsResolver.file({ name: inlineName, extname: '.ts', root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined }).path
+    }
+
+    const responseUnits = node.responses.flatMap((response) => {
+      const componentPath = componentPathFor(response.content)
+      return expandContentUnits(
         response.content ?? [],
         resolver.response.status(node, response.statusCode),
         tsResolver.response.status(node, response.statusCode),
         response.description,
-      ),
-    )
+      ).map((unit) => ({ ...unit, componentPath }))
+    })
     const dataUnits = expandContentUnits(
       node.requestBody?.content ?? [],
       resolver.response.body(node),
       tsResolver.response.body(node),
       node.requestBody?.description,
       (schema) => ({ ...schema, description: node.requestBody?.description ?? schema.description }),
-    )
+    ).map((unit) => ({ ...unit, componentPath: componentPathFor(node.requestBody?.content) }))
     const responseName = resolver.response.response(node)
     const localHelperNames = new Set([
       ...paramGroups.map((group) => group.name),
@@ -203,12 +211,14 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       typeName,
       description,
       skipImportNames = [],
+      componentPath,
     }: {
       schema: ast.SchemaNode | null
       name: string
       typeName: string
       description?: string
       skipImportNames?: Array<string>
+      componentPath?: string
     }) {
       if (!schema) {
         return null
@@ -234,7 +244,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         name,
         typeName,
         filePath: meta.file.path,
-        typeFilePath: meta.typeFile.path,
+        typeFilePath: componentPath ?? meta.typeFile.path,
       })
 
       return (
@@ -275,6 +285,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             typeName: unit.typeName,
             description: unit.description,
             skipImportNames: unit.skipImportNames,
+            componentPath: unit.componentPath,
           }),
         )}
         {dataUnits.map((unit) =>
@@ -284,6 +295,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             typeName: unit.typeName,
             description: unit.description,
             skipImportNames: unit.skipImportNames,
+            componentPath: unit.componentPath,
           }),
         )}
         {renderEntry({
