@@ -162,11 +162,24 @@ describe('typeGenerator — operationTypes: false', () => {
       path: '/pets',
       tags: ['pets'],
       requestBody: {
-        content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'ref', name: 'NewPet', ref: '#/components/schemas/NewPet' }) })],
+        content: [
+          ast.factory.createContent({
+            contentType: 'application/json',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'NewPet', ref: '#/components/schemas/NewPet' }),
+          }),
+        ],
       },
       responses: [
-        ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }), description: 'Created' }),
-        ast.factory.createResponse({ statusCode: '400', schema: ast.factory.createSchema({ type: 'ref', name: 'ErrorResponse', ref: '#/components/schemas/ErrorResponse' }), description: 'Bad request' }),
+        ast.factory.createResponse({
+          statusCode: '201',
+          schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          description: 'Created',
+        }),
+        ast.factory.createResponse({
+          statusCode: '400',
+          schema: ast.factory.createSchema({ type: 'ref', name: 'ErrorResponse', ref: '#/components/schemas/ErrorResponse' }),
+          description: 'Bad request',
+        }),
       ],
     })
 
@@ -190,7 +203,9 @@ describe('typeGenerator — operationTypes: false', () => {
       requestBody: {
         content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
       },
-      responses: [ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Created' })],
+      responses: [
+        ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Created' }),
+      ],
     })
 
     const source = await renderInline(node)
@@ -214,7 +229,13 @@ describe('typeGenerator — operationTypes: false', () => {
           }),
         ],
       },
-      responses: [ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }), description: 'Created' })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '201',
+          schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          description: 'Created',
+        }),
+      ],
     })
 
     const source = await renderInline(node)

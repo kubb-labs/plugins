@@ -157,10 +157,18 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     }
 
     const operationTypes = pluginTs.options?.operationTypes ?? defaultOperationTypes
-    const componentPathFor = (content: ReadonlyArray<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }> | null | undefined) => {
+    const componentPathFor = (
+      content: ReadonlyArray<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }> | null | undefined,
+    ) => {
       const inlineName = operationTypes ? null : resolveInlinableRefName(content)
       if (!inlineName) return undefined
-      return tsResolver.file({ name: inlineName, extname: '.ts', root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined }).path
+      return tsResolver.file({
+        name: inlineName,
+        extname: '.ts',
+        root,
+        output: pluginTs.options?.output ?? output,
+        group: pluginTs.options?.group ?? undefined,
+      }).path
     }
 
     const responseUnits = node.responses.flatMap((response) => {

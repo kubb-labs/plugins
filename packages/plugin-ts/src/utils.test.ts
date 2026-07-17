@@ -109,7 +109,9 @@ describe('buildResponseUnion', () => {
       ],
     })
 
-    expect(printSchema(buildResponseUnion(node, { resolver: resolverTs, operationTypes: true })!)).toMatchInlineSnapshot(`"(ListPetsStatus200 | ListPetsStatus405)"`)
+    expect(printSchema(buildResponseUnion(node, { resolver: resolverTs, operationTypes: true })!)).toMatchInlineSnapshot(
+      `"(ListPetsStatus200 | ListPetsStatus405)"`,
+    )
   })
 
   it('references base components instead of status aliases when operationTypes is false', () => {
@@ -118,7 +120,11 @@ describe('buildResponseUnion', () => {
       method: 'GET',
       path: '/pets',
       responses: [
-        ast.factory.createResponse({ statusCode: '200', description: 'OK', schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }) }),
+        ast.factory.createResponse({
+          statusCode: '200',
+          description: 'OK',
+          schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+        }),
         ast.factory.createResponse({ statusCode: '405', description: 'Error', schema: ast.factory.createSchema({ type: 'object' }) }),
       ],
     })
