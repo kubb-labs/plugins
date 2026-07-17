@@ -1,6 +1,6 @@
-import { resolveOperationTypeNames } from '@internals/shared'
+import { resolveOperationTypeImports } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
-import { pluginTsName } from '@kubb/plugin-ts'
+import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Request } from '../components/Request.tsx'
 import type { PluginCypress } from '../types.ts'
@@ -26,8 +26,6 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const importedTypeNames = [tsResolver.response.options(node), ...resolveOperationTypeNames(node, tsResolver, { includeParams: false })]
-
     const meta = {
       name: resolver.name(node.operationId),
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
@@ -42,6 +40,18 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
       }),
     } as const
 
+    const typeImportGroups = meta.fileTs
+      ? resolveOperationTypeImports(node, tsResolver, {
+          includeParams: false,
+          operationTypes: pluginTs.options?.operationTypes ?? defaultOperationTypes,
+          operationFilePath: meta.fileTs.path,
+          root,
+          output: pluginTs.options?.output ?? output,
+          group: pluginTs.options?.group ?? undefined,
+          extraNames: [tsResolver.response.options(node)],
+        })
+      : []
+
     return (
       <File
         baseName={meta.file.baseName}
@@ -50,7 +60,9 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
-        {importedTypeNames.length > 0 && <File.Import name={importedTypeNames} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
+        {typeImportGroups.map((typeImport) => (
+          <File.Import key={typeImport.path} name={typeImport.names} root={meta.file.path} path={typeImport.path} isTypeOnly />
+        ))}
         <Request name={meta.name} node={node} resolver={tsResolver} baseURL={baseURL} />
       </File>
     )

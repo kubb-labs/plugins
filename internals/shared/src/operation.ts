@@ -1,4 +1,4 @@
-import { ast, type ResolverFileParams, Url } from 'kubb/kit'
+import { ast, type Group, type Output, type ResolverFileParams, Url } from 'kubb/kit'
 import { dedupeParams } from './params.ts'
 
 /**
@@ -563,6 +563,107 @@ export function resolveOperationTypeNames(
   const result = names.filter((name): name is string => Boolean(name) && !exclude.has(name as string))
   byResolver.set(cacheKey, result)
   return result
+}
+
+/**
+ * A set of type names imported from one source file. Consumer plugins emit one `File.Import` per
+ * group.
+ */
+export type OperationTypeImportGroup = { path: string; names: string[] }
+
+export type OperationTypeImportsResolver = OperationTypeNameResolver & {
+  name(name: string): string
+  file(options: ResolverFileParams & { root: string; output: Output; group?: Group }): { path: string }
+}
+
+export type ResolveOperationTypeImportsOptions = ResolveOperationTypeNameOptions & {
+  /**
+   * The resolved `operationTypes` value from `@kubb/plugin-ts`. When `true` every name lives in the
+   * operation file and this returns a single group, matching {@link resolveOperationTypeNames}. When
+   * `false`, `$ref`-backed bodies and responses resolve to their base component in a separate file.
+   */
+  operationTypes: boolean
+  /**
+   * The path of the operation's `@kubb/plugin-ts` file, where the aliases and aggregates live.
+   */
+  operationFilePath: string
+  /**
+   * Project root and the `@kubb/plugin-ts` output/group, used to resolve a base component's file when
+   * inlining.
+   */
+  root: string
+  output: Output
+  group?: Group
+  /**
+   * Extra names that always live in the operation file, prepended before the resolved names (for
+   * example the `Options` type a client references).
+   */
+  extraNames?: ReadonlyArray<string | null | undefined>
+}
+
+/**
+ * The import-path counterpart to {@link resolveOperationTypeNames}. Groups the type names an
+ * operation needs by the file they are exported from, so consumer plugins inherit `plugin-ts`'s
+ * `operationTypes` inlining without tracking which names moved to a base component file.
+ */
+export function resolveOperationTypeImports(
+  node: ast.OperationNode,
+  resolver: OperationTypeImportsResolver,
+  options: ResolveOperationTypeImportsOptions,
+): OperationTypeImportGroup[] {
+  const { operationTypes, operationFilePath, root, output, group, extraNames = [], ...nameOptions } = options
+
+  if (operationTypes) {
+    const names = [...extraNames, ...resolveOperationTypeNames(node, resolver, nameOptions)].filter((name): name is string => Boolean(name))
+    const unique = [...new Set(names)]
+    return unique.length > 0 ? [{ path: operationFilePath, names: unique }] : []
+  }
+
+  const exclude = new Set(nameOptions.exclude ?? [])
+  const byPath = new Map<string, Set<string>>()
+  const add = (name: string | null | undefined, path: string) => {
+    if (!name || exclude.has(name)) return
+    const set = byPath.get(path) ?? new Set<string>()
+    set.add(name)
+    byPath.set(path, set)
+  }
+  const addContent = (content: ReadonlyArray<ContentVariantInput> | null | undefined, aliasName: string) => {
+    const inlineName = resolveInlinableRefName(content)
+    if (inlineName) return add(resolver.name(inlineName), resolver.file({ name: inlineName, extname: '.ts', root, output, group }).path)
+    return add(aliasName, operationFilePath)
+  }
+
+  for (const name of extraNames) add(name, operationFilePath)
+
+  if (nameOptions.includeParams !== false) {
+    const { path, query, header } = getOperationParameters(node)
+    for (const param of path) add(resolver.param.path(node, param), operationFilePath)
+    for (const param of query) add(resolver.param.query(node, param), operationFilePath)
+    for (const param of header) add(resolver.param.headers(node, param), operationFilePath)
+  }
+
+  if (node.requestBody?.content?.[0]?.schema) {
+    addContent(node.requestBody.content, resolver.response.body(node))
+  }
+  add(resolver.response.response(node), operationFilePath)
+
+  if (nameOptions.responseStatusNames !== false) {
+    const responses = nameOptions.responseStatusNames === 'error' ? node.responses.filter((res) => isErrorStatusCode(res.statusCode)) : node.responses
+    for (const res of responses) {
+      addContent(res.content, resolver.response.status(node, res.statusCode))
+    }
+  }
+
+  const groups: OperationTypeImportGroup[] = []
+  const operationNames = byPath.get(operationFilePath)
+  if (operationNames?.size) {
+    groups.push({ path: operationFilePath, names: [...operationNames] })
+  }
+  for (const [path, names] of byPath) {
+    if (path === operationFilePath || names.size === 0) continue
+    groups.push({ path, names: [...names] })
+  }
+  return groups
 }
 
 export function resolveResponseTypes(node: ast.OperationNode, resolver: ResponseNameResolver): Array<[statusCode: number | 'default', typeName: string]> {

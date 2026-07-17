@@ -1,8 +1,8 @@
-import { createGroupConfig } from '@internals/shared'
+import { createGroupConfig, resolveInlinableRefName } from '@internals/shared'
 import { definePlugin, Resolver } from 'kubb/kit'
 import { typeGenerator } from './generators/typeGenerator.tsx'
 import { resolverTs } from './resolvers/resolverTs.ts'
-import type { PluginTs } from './types.ts'
+import type { PluginTs, ResolverTs } from './types.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-ts`. Used for driver lookups and
@@ -85,7 +85,24 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
           operationTypes,
           printer,
         })
-        ctx.setResolver(userResolver ? Resolver.merge(resolverTs, userResolver) : resolverTs)
+        // When inlining, the resolved response/body type names become the referenced base component,
+        // so every consumer plugin reading this resolver references `Pet` instead of `AddPetStatus200`.
+        const inlineResolver = operationTypes
+          ? resolverTs
+          : Resolver.merge(resolverTs, {
+              response: {
+                body(this: ResolverTs, node) {
+                  const inlineName = resolveInlinableRefName(node.requestBody?.content)
+                  return inlineName ? this.name(inlineName) : resolverTs.response.body(node)
+                },
+                status(this: ResolverTs, node, statusCode) {
+                  const response = node.responses.find((res) => res.statusCode === statusCode)
+                  const inlineName = response ? resolveInlinableRefName(response.content) : null
+                  return inlineName ? this.name(inlineName) : resolverTs.response.status(node, statusCode)
+                },
+              },
+            })
+        ctx.setResolver(userResolver ? Resolver.merge(inlineResolver, userResolver) : inlineResolver)
         if (userMacros?.length) {
           ctx.setMacros(userMacros)
         }

@@ -1,8 +1,8 @@
-import { resolveOperationTypeNames } from '@internals/shared'
+import { resolveOperationTypeImports } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { classifyOperation } from '@internals/tanstack-query'
 import { ast, defineGenerator } from 'kubb/kit'
-import { pluginTsName } from '@kubb/plugin-ts'
+import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Query, QueryKey, QueryOptions } from '../components'
 import type { PluginSwr } from '../types'
@@ -51,14 +51,19 @@ export const queryGenerator = defineGenerator<PluginSwr>({
       }),
     }
 
-    const importedTypeNames = [
-      tsResolver.response.options(node),
-      ...resolveOperationTypeNames(node, tsResolver, {
-        exclude: [queryKeyTypeName],
-        order: 'body-response-first',
-        includeParams: false,
-      }),
-    ].filter((name): name is string => Boolean(name))
+    const typeImportGroups = meta.fileTs
+      ? resolveOperationTypeImports(node, tsResolver, {
+          exclude: [queryKeyTypeName],
+          order: 'body-response-first',
+          includeParams: false,
+          operationTypes: pluginTs.options?.operationTypes ?? defaultOperationTypes,
+          operationFilePath: meta.fileTs.path,
+          root,
+          output: pluginTs.options?.output ?? output,
+          group: pluginTs.options?.group ?? undefined,
+          extraNames: [tsResolver.response.options(node)],
+        })
+      : []
 
     const calledClientName = contractOp.name
 
@@ -73,9 +78,9 @@ export const queryGenerator = defineGenerator<PluginSwr>({
         <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
         <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
 
-        {meta.fileTs && importedTypeNames.length > 0 && (
-          <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
-        )}
+        {typeImportGroups.map((typeImport) => (
+          <File.Import key={typeImport.path} name={typeImport.names} root={meta.file.path} path={typeImport.path} isTypeOnly />
+        ))}
 
         <QueryKey name={queryKeyName} typeName={queryKeyTypeName} node={node} tsResolver={tsResolver} transformer={ctx.options.queryKey} />
 

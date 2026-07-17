@@ -1,7 +1,7 @@
-import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
+import { operationFileEntry, resolveOperationTypeImports } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { ast, defineGenerator } from 'kubb/kit'
-import { pluginTsName } from '@kubb/plugin-ts'
+import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Mutation, MutationKey, MutationOptions } from '../components'
 import { classifyOperation } from '../utils.ts'
@@ -39,20 +39,26 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
     const mutationOptionsName = resolver.mutation.optionsName(node)
     const mutationKeyName = resolver.mutation.keyName(node)
 
+    const tsOutput = pluginTs.options?.output ?? output
+    const tsGroup = pluginTs.options?.group ?? undefined
+
     const meta = {
       file: resolver.file({ ...operationFileEntry(node, mutationHookName), root, output, group: group ?? undefined }),
-      fileTs: tsResolver.file({
-        ...operationFileEntry(node, node.operationId),
-        root,
-        output: pluginTs.options?.output ?? output,
-        group: pluginTs.options?.group ?? undefined,
-      }),
+      fileTs: tsResolver.file({ ...operationFileEntry(node, node.operationId), root, output: tsOutput, group: tsGroup }),
     }
 
-    const importedTypeNames = [
-      tsResolver.response.options(node),
-      ...resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first', includeParams: false }),
-    ].filter((name): name is string => Boolean(name))
+    const typeImportGroups = meta.fileTs
+      ? resolveOperationTypeImports(node, tsResolver, {
+          order: 'body-response-first',
+          includeParams: false,
+          operationTypes: pluginTs.options?.operationTypes ?? defaultOperationTypes,
+          operationFilePath: meta.fileTs.path,
+          root,
+          output: tsOutput,
+          group: tsGroup,
+          extraNames: [tsResolver.response.options(node)],
+        })
+      : []
 
     const calledClientName = contractOp.name
 
@@ -68,9 +74,9 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
         <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
 
         {customOptions && <File.Import name={[customOptions.name]} path={customOptions.importPath} />}
-        {meta.fileTs && importedTypeNames.length > 0 && (
-          <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
-        )}
+        {typeImportGroups.map((typeImport) => (
+          <File.Import key={typeImport.path} name={typeImport.names} root={meta.file.path} path={typeImport.path} isTypeOnly />
+        ))}
 
         <MutationKey name={mutationKeyName} node={node} transformer={ctx.options.mutationKey} />
 

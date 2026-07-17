@@ -22,6 +22,7 @@ export {
   resolveContentTypeVariants,
   resolveErrorNames,
   resolveInlinableRefName,
+  resolveOperationTypeImports,
   resolveOperationTypeNames,
   resolveResponseTypes,
   resolveSuccessNames,
