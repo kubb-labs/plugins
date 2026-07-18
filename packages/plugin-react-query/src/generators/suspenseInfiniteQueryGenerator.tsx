@@ -16,26 +16,30 @@ import type { PluginReactQuery } from '../types'
 export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-suspense-infinite-query',
   renderer: jsxRenderer,
+  match(node, ctx) {
+    const operationNode = node as ast.OperationNode
+    if (!ast.isHttpOperationNode(operationNode)) return false
+    const { query, mutation, infinite, suspense, hooks } = ctx.options
+
+    const { isQuery, isMutation } = classifyOperation(operationNode, { query, mutation })
+    const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
+    if (!isQuery || isMutation || !suspense || !infiniteOptions || !hooks) return false
+
+    // Validate queryParam exists in operation's query parameters, optional or not
+    const queryParamKeys = getOperationParameters(operationNode).query.map((p) => p.name)
+    return infiniteOptions.queryParam ? queryParamKeys.includes(infiniteOptions.queryParam) || queryParamKeys.includes(`${infiniteOptions.queryParam}?`) : false
+  },
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, infinite, suspense, client, group, customOptions, hooks } = ctx.options
+    const { output, query, infinite, client, group, customOptions } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
-    const isSuspense = !!suspense
     const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
-
-    if (!isQuery || isMutation || !isSuspense || !infiniteOptions || !hooks) return null
-
-    // Validate queryParam exists in operation's query parameters
-    const normalizeKey = (key: string) => key.replace(/\?$/, '')
-    const queryParamKeys = getOperationParameters(node).query.map((p) => p.name)
-    const hasQueryParam = infiniteOptions.queryParam ? queryParamKeys.some((k) => normalizeKey(k) === infiniteOptions.queryParam) : false
-    if (!hasQueryParam) return null
+    if (!infiniteOptions) return null
 
     const importPath = query ? query.importPath : '@tanstack/react-query'
 

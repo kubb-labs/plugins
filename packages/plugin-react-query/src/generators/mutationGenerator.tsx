@@ -15,18 +15,20 @@ import type { PluginReactQuery } from '../types'
 export const mutationGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-mutation',
   renderer: jsxRenderer,
+  match(node, ctx) {
+    const operationNode = node as ast.OperationNode
+    if (!ast.isHttpOperationNode(operationNode)) return false
+    const { query, mutation } = ctx.options
+    return classifyOperation(operationNode, { query, mutation }).isMutation
+  },
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, client, group, customOptions, hooks } = ctx.options
+    const { output, mutation, client, group, customOptions, hooks } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
     const tsResolver = driver.getResolver(pluginTsName)
-
-    const { isMutation } = classifyOperation(node, { query, mutation })
-
-    if (!isMutation) return null
 
     const importPath = mutation ? mutation.importPath : '@tanstack/react-query'
 
