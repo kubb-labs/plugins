@@ -18,18 +18,18 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-infinite-query',
   renderer: jsxRenderer,
   match(node, ctx) {
-    if (node.kind !== 'Operation' || !ast.isHttpOperationNode(node)) return false
+    const operationNode = node as ast.OperationNode
+    if (!ast.isHttpOperationNode(operationNode)) return false
     const { query, mutation, infinite, hooks } = ctx.options
 
-    const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
+    const { isQuery, isMutation } = classifyOperation(operationNode, { query, mutation })
     const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
     if (!isQuery || isMutation || !infiniteOptions || !hooks) return false
 
-    // Validate queryParam exists in operation's query parameters. cursorParam validation
-    // against response schema keys is skipped in v5 (complex schema inspection).
-    const normalizeKey = (key: string) => key.replace(/\?$/, '')
-    const queryParamKeys = getOperationParameters(node).query.map((p) => p.name)
-    return infiniteOptions.queryParam ? queryParamKeys.some((k) => normalizeKey(k) === infiniteOptions.queryParam) : false
+    // Validate queryParam exists in operation's query parameters, optional or not. cursorParam
+    // validation against response schema keys is skipped in v5 (complex schema inspection).
+    const queryParamKeys = getOperationParameters(operationNode).query.map((p) => p.name)
+    return infiniteOptions.queryParam ? queryParamKeys.includes(infiniteOptions.queryParam) || queryParamKeys.includes(`${infiniteOptions.queryParam}?`) : false
   },
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null

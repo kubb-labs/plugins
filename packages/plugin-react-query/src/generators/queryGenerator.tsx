@@ -16,9 +16,10 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query',
   renderer: jsxRenderer,
   match(node, ctx) {
-    if (node.kind !== 'Operation' || !ast.isHttpOperationNode(node)) return false
+    const operationNode = node as ast.OperationNode
+    if (!ast.isHttpOperationNode(operationNode)) return false
     const { query, mutation } = ctx.options
-    const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
+    const { isQuery, isMutation } = classifyOperation(operationNode, { query, mutation })
     return isQuery && !isMutation
   },
   operation(node, ctx) {

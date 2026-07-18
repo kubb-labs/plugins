@@ -16,9 +16,10 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-mutation',
   renderer: jsxRenderer,
   match(node, ctx) {
-    if (node.kind !== 'Operation' || !ast.isHttpOperationNode(node)) return false
+    const operationNode = node as ast.OperationNode
+    if (!ast.isHttpOperationNode(operationNode)) return false
     const { query, mutation } = ctx.options
-    return classifyOperation(node, { query, mutation }).isMutation
+    return classifyOperation(operationNode, { query, mutation }).isMutation
   },
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null

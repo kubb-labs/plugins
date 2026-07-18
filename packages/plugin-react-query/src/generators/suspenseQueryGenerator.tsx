@@ -18,9 +18,10 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-suspense-query',
   renderer: jsxRenderer,
   match(node, ctx) {
-    if (node.kind !== 'Operation' || !ast.isHttpOperationNode(node)) return false
+    const operationNode = node as ast.OperationNode
+    if (!ast.isHttpOperationNode(operationNode)) return false
     const { query, mutation, suspense, hooks } = ctx.options
-    const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
+    const { isQuery, isMutation } = classifyOperation(operationNode, { query, mutation })
     return isQuery && !isMutation && !!suspense && hooks
   },
   operation(node, ctx) {
