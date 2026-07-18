@@ -166,6 +166,7 @@
     "query-plugins-remove-validator",
     "quiet-jsdoc-types-vanish",
     "rare-birds-beg",
+    "react-query-match-predicate",
     "react-query-suspense-no-enabled",
     "react-query-value-or-getter-params",
     "react-query-vue-query-hookless-variant-files",

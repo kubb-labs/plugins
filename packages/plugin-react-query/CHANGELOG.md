@@ -1,5 +1,11 @@
 # @kubb/plugin-react-query
 
+## 5.0.0-beta.104
+
+### Patch Changes
+
+- [#730](https://github.com/kubb-labs/plugins/pull/730) [`350bcca`](https://github.com/kubb-labs/plugins/commit/350bccac0e053c4d5ec9c93b299ffbf2b9b37db5) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Give each of the five hook generators (`query`, `suspenseQuery`, `infiniteQuery`, `suspenseInfiniteQuery`, `mutation`) a `match` predicate instead of classifying and bailing out inside `operation()`. This replaces the `createOperationDispatcher` workaround from [#728](https://github.com/kubb-labs/plugins/issues/728), now that `@kubb/core`'s `Generator` supports `match` natively (kubb-labs/kubb#3828, released in `kubb@5.0.0-beta.104`). Generated output is unchanged.
+
 ## 5.0.0-beta.103
 
 ### Patch Changes
