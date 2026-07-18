@@ -24,7 +24,7 @@ catalog:
   oxfmt: ^0.59.0
   oxlint: ^1.74.0
   prettier: ^3.9.5
-  tsdown: ^0.22.7
+  tsdown: ^0.22.8
   typescript: ^6.0.3
   vitest: ^4.1.10
 #
