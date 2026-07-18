@@ -1,5 +1,13 @@
 # performance
 
+## 0.0.1-beta.43
+
+### Patch Changes
+
+- Updated dependencies [[`8bf93a5`](https://github.com/kubb-labs/plugins/commit/8bf93a5dd7728694c47cb142a35d073b69d770d9)]:
+  - @kubb/plugin-faker@5.0.0-beta.104
+  - @kubb/plugin-axios@5.0.0-beta.104
+
 ## 0.0.1-beta.42
 
 ### Patch Changes
