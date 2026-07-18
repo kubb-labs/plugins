@@ -1,4 +1,4 @@
-import { resolveOperationTypeNames } from '@internals/shared'
+import { resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { classifyOperation } from '@internals/tanstack-query'
 import { ast, defineGenerator } from 'kubb/kit'
@@ -30,7 +30,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
     const importPath = query ? query.importPath : 'swr'
 
     // The registered contract client plugin owns the `<op>` the hook imports and calls.
-    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output })
+    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, cache: ctx.cache })
     if (!contractOp) return null
 
     const queryName = resolver.query.name(node)
@@ -40,11 +40,10 @@ export const queryGenerator = defineGenerator<PluginSwr>({
 
     const meta = {
       file: resolver.file({ name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group }),
-      fileTs: tsResolver.file({
-        name: node.operationId,
-        extname: '.ts',
-        tag: node.tags[0] ?? 'default',
-        path: node.path,
+      fileTs: resolveDependencyOperationFile({
+        cache: ctx.cache,
+        node,
+        resolver: tsResolver,
         root,
         output: pluginTs.options?.output ?? output,
         group: pluginTs.options?.group,

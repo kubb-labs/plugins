@@ -1,4 +1,4 @@
-import { getOperationSuccessResponses, resolveResponseTypes } from '@internals/shared'
+import { getOperationSuccessResponses, resolveDependencyOperationFile, resolveResponseTypes } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -43,14 +43,13 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const tsResolver = driver.getResolver(pluginTsName)
 
     const type = {
-      file: tsResolver.file({
-        name: node.operationId,
-        extname: '.ts',
-        tag: node.tags[0] ?? 'default',
-        path: node.path,
+      file: resolveDependencyOperationFile({
+        cache: ctx.cache,
+        node,
+        resolver: tsResolver,
         root,
         output: pluginTs.options?.output ?? output,
-        group: pluginTs.options?.group ?? undefined,
+        group: pluginTs.options?.group,
       }),
       responseName: tsResolver.response.response(node),
     }

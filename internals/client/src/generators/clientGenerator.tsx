@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { isEventStream, operationFileEntry } from '@internals/shared'
+import { isEventStream, operationFileEntry, resolveDependencyOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import type { Generator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -50,11 +50,13 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       const meta = {
         name: resolver.name(node.operationId),
         file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
-        fileTs: tsResolver.file({
-          ...operationFileEntry(node, node.operationId),
+        fileTs: resolveDependencyOperationFile({
+          cache: ctx.cache,
+          node,
+          resolver: tsResolver,
           root,
           output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group ?? undefined,
+          group: pluginTs.options?.group,
         }),
         fileZod:
           zodResolver && pluginZod?.options
