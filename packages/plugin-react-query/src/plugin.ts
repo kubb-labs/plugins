@@ -1,11 +1,59 @@
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin, Resolver } from 'kubb/kit'
+import { ast, defineGenerator, definePlugin, Resolver } from 'kubb/kit'
+import { jsxRenderer } from 'kubb/jsx'
+import type { KubbReactElement } from 'kubb/jsx'
 import { resolveContractClient } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { mutationKeyTransformer, queryKeyTransformer, resolveInfiniteConfig, resolveMutationConfig, resolveQueryConfig } from '@internals/tanstack-query'
-import { customHookOptionsFileGenerator, hookOptionsGenerator, operationGenerator } from './generators'
+import {
+  classifyOperation,
+  mutationKeyTransformer,
+  queryKeyTransformer,
+  resolveInfiniteConfig,
+  resolveMutationConfig,
+  resolveQueryConfig,
+} from '@internals/tanstack-query'
+import {
+  customHookOptionsFileGenerator,
+  hookOptionsGenerator,
+  infiniteQueryGenerator,
+  mutationGenerator,
+  queryGenerator,
+  suspenseInfiniteQueryGenerator,
+  suspenseQueryGenerator,
+} from './generators'
 import { resolverReactQuery } from './resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery, ResolverReactQuery } from './types.ts'
+
+const queryFamily = [queryGenerator, suspenseQueryGenerator, infiniteQueryGenerator, suspenseInfiniteQueryGenerator]
+const mutationFamily = [mutationGenerator]
+
+/**
+ * Classifies each operation as query or mutation once, then renders only the generators for that
+ * family instead of running all five (query, suspenseQuery, infiniteQuery, suspenseInfiniteQuery,
+ * mutation) per operation, where four would return early. No `renderer` is set: each matching
+ * generator's JSX result is rendered and upserted directly, so this stays plain TypeScript.
+ */
+const operationGenerator = defineGenerator<PluginReactQuery>({
+  name: 'react-query-operation',
+  async operation(node, ctx) {
+    if (!ast.isHttpOperationNode(node)) return null
+    const { query, mutation } = ctx.options
+
+    const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
+    const family = isMutation ? mutationFamily : isQuery ? queryFamily : []
+
+    for (const generator of family) {
+      const element = await generator.operation!(node, ctx)
+      if (!element) continue
+
+      using instance = jsxRenderer()
+      await instance.render(element as KubbReactElement)
+      await ctx.upsertFile(...instance.files)
+    }
+
+    return null
+  },
+})
 
 /**
  * Canonical plugin name for `@kubb/plugin-react-query`. Used for driver lookups
