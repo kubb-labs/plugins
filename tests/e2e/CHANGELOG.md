@@ -1,5 +1,12 @@
 # e2e
 
+## 0.0.1-beta.37
+
+### Patch Changes
+
+- Updated dependencies [[`350bcca`](https://github.com/kubb-labs/plugins/commit/350bccac0e053c4d5ec9c93b299ffbf2b9b37db5)]:
+  - @kubb/plugin-react-query@5.0.0-beta.104
+
 ## 0.0.1-beta.36
 
 ### Patch Changes
