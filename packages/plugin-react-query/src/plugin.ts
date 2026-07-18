@@ -3,15 +3,7 @@ import { definePlugin, Resolver } from 'kubb/kit'
 import { resolveContractClient } from '@internals/client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { mutationKeyTransformer, queryKeyTransformer, resolveInfiniteConfig, resolveMutationConfig, resolveQueryConfig } from '@internals/tanstack-query'
-import {
-  customHookOptionsFileGenerator,
-  hookOptionsGenerator,
-  infiniteQueryGenerator,
-  mutationGenerator,
-  queryGenerator,
-  suspenseInfiniteQueryGenerator,
-  suspenseQueryGenerator,
-} from './generators'
+import { customHookOptionsFileGenerator, hookOptionsGenerator, operationGenerator } from './generators'
 import { resolverReactQuery } from './resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery, ResolverReactQuery } from './types.ts'
 
@@ -66,15 +58,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     macros: userMacros,
   } = options
 
-  const selectedGenerators = [
-    queryGenerator,
-    suspenseQueryGenerator,
-    infiniteQueryGenerator,
-    suspenseInfiniteQueryGenerator,
-    mutationGenerator,
-    hookOptionsGenerator,
-    customHookOptionsFileGenerator,
-  ]
+  const selectedGenerators = [operationGenerator, hookOptionsGenerator, customHookOptionsFileGenerator]
 
   const groupConfig = createGroupConfig(group)
 
