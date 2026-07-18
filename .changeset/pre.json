@@ -38,6 +38,7 @@
     "@kubb/plugin-fetch": "5.0.0-beta.61"
   },
   "changesets": [
+    "cache-dependency-resolution-per-node",
     "circular-schema-detection-shared",
     "clean-jsdoc-examples",
     "clean-raw-generated-whitespace",
