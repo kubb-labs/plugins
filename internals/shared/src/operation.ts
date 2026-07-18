@@ -399,13 +399,27 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
   return filteredComments.flatMap((text) => text.split(/\r?\n/).map((line) => line.trim())).filter((comment): comment is string => Boolean(comment))
 }
 
+const operationParameterGroupsByNode = new WeakMap<ast.OperationNode, OperationParameterGroups>()
+
+/**
+ * Groups an operation's parameters by location (`path`/`query`/`header`/`cookie`), deduping each
+ * group by name. Every plugin generator visiting the same `OperationNode` shares one AST instance
+ * (see `KubbDriver`), so the result is cached per node to avoid re-filtering and re-deduping the
+ * same parameters once per plugin.
+ */
 export function getOperationParameters(node: ast.OperationNode): OperationParameterGroups {
-  return {
+  const cached = operationParameterGroupsByNode.get(node)
+  if (cached) return cached
+
+  const groups: OperationParameterGroups = {
     path: dedupeParams(node.parameters.filter((param) => param.in === 'path')),
     query: dedupeParams(node.parameters.filter((param) => param.in === 'query')),
     header: dedupeParams(node.parameters.filter((param) => param.in === 'header')),
     cookie: dedupeParams(node.parameters.filter((param) => param.in === 'cookie')),
   }
+
+  operationParameterGroupsByNode.set(node, groups)
+  return groups
 }
 
 /**

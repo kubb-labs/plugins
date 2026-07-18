@@ -269,6 +269,32 @@ describe('getOperationParameters', () => {
     expect(grouped.header.map((param) => param.name)).toStrictEqual(['x-api-key'])
     expect(grouped.cookie.map((param) => param.name)).toStrictEqual(['session-id'])
   })
+
+  test('caches the grouped result per node so repeat calls for the same operation skip re-grouping', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'showPet',
+      method: 'GET',
+      path: '/pets/{petId}',
+      parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }) })],
+    })
+
+    expect(getOperationParameters(node)).toBe(getOperationParameters(node))
+  })
+
+  test('does not share cached results between distinct, structurally identical nodes', () => {
+    const buildNode = () =>
+      ast.factory.createOperation({
+        operationId: 'showPet',
+        method: 'GET',
+        path: '/pets/{petId}',
+        parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }) })],
+      })
+
+    const grouped = getOperationParameters(buildNode())
+
+    expect(getOperationParameters(buildNode())).not.toBe(grouped)
+    expect(getOperationParameters(buildNode())).toStrictEqual(grouped)
+  })
 })
 
 describe('buildOptionsSchema', () => {
