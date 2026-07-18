@@ -20,6 +20,7 @@ export {
   isSuccessStatusCode,
   operationFileEntry,
   resolveContentTypeVariants,
+  resolveDependencyOperationFile,
   resolveErrorNames,
   resolveOperationTypeNames,
   resolveResponseTypes,

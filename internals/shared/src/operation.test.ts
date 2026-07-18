@@ -1,5 +1,6 @@
 import { ast } from 'kubb/kit'
-import { describe, expect, test } from 'vitest'
+import type { NodeCache } from 'kubb/kit'
+import { describe, expect, test, vi } from 'vitest'
 import {
   buildOperationComments,
   buildOptionsSchema,
@@ -15,6 +16,7 @@ import {
   isErrorStatusCode,
   isEventStream,
   isSuccessStatusCode,
+  resolveDependencyOperationFile,
   resolveErrorNames,
   resolveOperationTypeNames,
   resolveResponseTypes,
@@ -417,5 +419,63 @@ describe('getResponseType / isEventStream', () => {
     expect(getResponseType(nodeWithResponseContentType('text/plain'))).toBe('text')
     expect(getResponseType(nodeWithResponseContentType('application/octet-stream'))).toBe('blob')
     expect(isEventStream(nodeWithResponseContentType('application/octet-stream'))).toBe(false)
+  })
+})
+
+describe('resolveDependencyOperationFile', () => {
+  function createTestCache(): NodeCache {
+    const store = new Map<string, unknown>()
+    return {
+      getItem<TValue>(key: string) {
+        return store.get(key) as TValue | undefined
+      },
+      setItem<TValue>(key: string, value: TValue) {
+        store.set(key, value)
+        return value
+      },
+      getOrSet<TValue>(key: string, factory: () => TValue) {
+        if (store.has(key)) return store.get(key) as TValue
+        const value = factory()
+        store.set(key, value)
+        return value
+      },
+    }
+  }
+
+  function createFileResolver(pluginName: string) {
+    return { pluginName, file: vi.fn(() => ast.factory.createFile({ path: '/root/getPetById.ts', baseName: 'getPetById.ts' as const })) }
+  }
+
+  const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
+
+  test('resolves the dependency plugin file for the operation', () => {
+    const dependencyResolver = createFileResolver('plugin-ts')
+
+    const file = resolveDependencyOperationFile({ cache: createTestCache(), node, resolver: dependencyResolver, root: '/root', output: { path: '.' } })
+
+    expect(file.path).toBe('/root/getPetById.ts')
+  })
+
+  test('reuses the cached file for the same dependency plugin and node instead of resolving again', () => {
+    const dependencyResolver = createFileResolver('plugin-ts')
+    const cache = createTestCache()
+
+    const first = resolveDependencyOperationFile({ cache, node, resolver: dependencyResolver, root: '/root', output: { path: '.' } })
+    const second = resolveDependencyOperationFile({ cache, node, resolver: dependencyResolver, root: '/root', output: { path: '.' } })
+
+    expect(second).toBe(first)
+    expect(dependencyResolver.file).toHaveBeenCalledOnce()
+  })
+
+  test('resolves independently per dependency plugin name, even sharing the same cache', () => {
+    const tsResolver = createFileResolver('plugin-ts')
+    const zodResolver = createFileResolver('plugin-zod')
+    const cache = createTestCache()
+
+    resolveDependencyOperationFile({ cache, node, resolver: tsResolver, root: '/root', output: { path: '.' } })
+    resolveDependencyOperationFile({ cache, node, resolver: zodResolver, root: '/root', output: { path: '.' } })
+
+    expect(tsResolver.file).toHaveBeenCalledOnce()
+    expect(zodResolver.file).toHaveBeenCalledOnce()
   })
 })

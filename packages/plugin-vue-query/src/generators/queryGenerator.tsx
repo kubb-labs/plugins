@@ -1,4 +1,4 @@
-import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
+import { operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { classifyOperation } from '@internals/tanstack-query'
 import { ast, defineGenerator } from 'kubb/kit'
@@ -31,7 +31,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
     const importPath = query ? query.importPath : '@tanstack/vue-query'
 
     // The registered contract client plugin owns the `<op>` the composable imports and calls.
-    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output })
+    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, cache: ctx.cache })
     if (!contractOp) return null
 
     const queryName = resolver.query.name(node)
@@ -41,11 +41,13 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
 
     const meta = {
       file: resolver.file({ ...operationFileEntry(node, queryName), root, output, group: group ?? undefined }),
-      fileTs: tsResolver.file({
-        ...operationFileEntry(node, node.operationId),
+      fileTs: resolveDependencyOperationFile({
+        cache: ctx.cache,
+        node,
+        resolver: tsResolver,
         root,
         output: pluginTs.options?.output ?? output,
-        group: pluginTs.options?.group ?? undefined,
+        group: pluginTs.options?.group,
       }),
     }
 

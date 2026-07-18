@@ -1,4 +1,4 @@
-import { ast, type ResolverFileParams, Url } from 'kubb/kit'
+import { ast, type Group, type NodeCache, type Output, type Resolver, type ResolverFileParams, Url } from 'kubb/kit'
 import { dedupeParams } from './params.ts'
 
 /**
@@ -19,6 +19,32 @@ export function operationFileEntry(node: ast.OperationNode, name: string, extnam
     tag: node.tags[0] ?? 'default',
     path: node.path,
   }
+}
+
+/**
+ * Resolves a dependency plugin's generated file for `node.operationId`, cached in `cache` (the
+ * current node's `ctx.cache`) under the resolver's own plugin name. Several dependents reading the
+ * same dependency for the same operation in one pass (a query plugin's several hook generators, the
+ * MCP handler, ...) share one computed name and path instead of each calling `resolver.file` again.
+ *
+ * @example Cache `plugin-ts`'s file for the current operation
+ * ```ts
+ * const fileTs = resolveDependencyOperationFile({ cache: ctx.cache, node, resolver: tsResolver, root, output })
+ * ```
+ */
+export function resolveDependencyOperationFile(options: {
+  cache: NodeCache
+  node: ast.OperationNode
+  resolver: Pick<Resolver, 'file' | 'pluginName'>
+  root: string
+  output: Output
+  group?: Group | null
+}): ast.FileNode {
+  const { cache, node, resolver, root, output, group } = options
+
+  return cache.getOrSet(`${resolver.pluginName}:operationFile`, () =>
+    resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
+  )
 }
 
 export type ContentTypeInfo = {
