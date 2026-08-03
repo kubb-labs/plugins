@@ -263,6 +263,23 @@ export type LengthConstraints = {
 }
 
 /**
+ * Digit pattern for a `type: 'string'` schema that carries an integer `format`, the way ProtoJSON
+ * encodes 64-bit integers. Returns `undefined` for every other format, and a `pattern` from the
+ * spec takes precedence over this fallback.
+ *
+ * @example
+ * ```ts
+ * integerFormatPattern('uint64') // '^\\d+$'
+ * ```
+ */
+export function integerFormatPattern(format: string | undefined): string | undefined {
+  if (format === 'int32' || format === 'int64') return '^-?\\d+$'
+  if (format === 'uint64') return '^\\d+$'
+
+  return undefined
+}
+
+/**
  * Map a `regexType` to the `func` argument of `toRegExpString`: `'constructor'` emits
  * `new RegExp(...)`, while `'literal'` (the default) emits a regex literal.
  */

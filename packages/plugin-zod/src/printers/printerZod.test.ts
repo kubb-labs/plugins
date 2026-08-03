@@ -57,6 +57,22 @@ describe('printerZod', () => {
       const p = printerZod({ regexType: 'literal' })
       expect(p.print(ast.factory.createSchema({ type: 'string', pattern: '^\\d+$' }))).toBe('z.string().regex(/^\\d+$/)')
     })
+
+    test('string with format int64 validates digits', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'int64' }))).toBe('z.string().regex(/^-?\\d+$/)')
+    })
+
+    test('string with format uint64 rejects a sign', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'uint64' }))).toBe('z.string().regex(/^\\d+$/)')
+    })
+
+    test('a pattern from the spec wins over the int64 fallback', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'int64', pattern: '^[0-9]{4}$' }))).toBe('z.string().regex(/^[0-9]{4}$/)')
+    })
+
+    test('string with a non-integer format stays unvalidated', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'double' }))).toBe('z.string()')
+    })
   })
 
   describe('number', () => {

@@ -6,6 +6,7 @@ import {
   applyMiniModifiers,
   buildEnum,
   formatLiteral,
+  integerFormatPattern,
   isObjectComposableIntersection,
   isObjectSchemaNode,
   lengthChecksMini,
@@ -163,7 +164,9 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
       boolean: () => 'z.boolean()',
       null: () => 'z.null()',
       string(node) {
-        return `z.string()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
+        const pattern = node.pattern ?? integerFormatPattern(node.format)
+
+        return `z.string()${lengthChecksMini({ ...node, pattern, regexType: this.options.regexType })}`
       },
       number(node) {
         return `z.number()${numberChecksMini(node)}`

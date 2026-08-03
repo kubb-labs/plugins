@@ -57,6 +57,16 @@ export type PrinterFakerOptions = {
  */
 export type PrinterFakerFactory = ast.PrinterFactoryOptions<'faker', PrinterFakerOptions, string, string>
 
+/**
+ * Formats that put a whole number inside a `type: 'string'` schema, the way ProtoJSON encodes
+ * 64-bit integers, so the mock has to be digits rather than letters.
+ *
+ * @see https://protobuf.dev/programming-guides/json/#int64-strings
+ */
+const integerFormats: ReadonlySet<string> = new Set(['int32', 'int64', 'uint64'])
+
+const maxInt32 = 2_147_483_647
+
 const fakerKeywordMapper = {
   any: () => 'undefined',
   unknown: () => 'undefined',
@@ -92,6 +102,11 @@ const fakerKeywordMapper = {
     return 'faker.number.int()'
   },
   bigint: () => 'faker.number.bigInt()',
+  integerString: (format?: string) => {
+    if (format === 'int32') return `faker.number.int({ max: ${maxInt32} }).toString()`
+
+    return 'faker.number.bigInt().toString()'
+  },
   string: (min?: number, max?: number) => {
     if (max !== undefined && min !== undefined) {
       return `faker.string.alpha({ length: { min: ${min}, max: ${max} } })`
@@ -260,6 +275,10 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       string(node) {
         if (node.pattern) {
           return fakerKeywordMapper.matches(node.pattern, this.options.regexGenerator)
+        }
+
+        if (node.format && integerFormats.has(node.format)) {
+          return fakerKeywordMapper.integerString(node.format)
         }
 
         return fakerKeywordMapper.string(node.min, node.max)

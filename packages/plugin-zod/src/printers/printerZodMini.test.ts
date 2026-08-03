@@ -51,6 +51,16 @@ describe('printerZodMini', () => {
       const p = printerZodMini({ regexType: 'constructor' })
       expect(p.print(ast.factory.createSchema({ type: 'string', pattern: '^\\d+$' }))).toBe('z.string().check(z.regex(new RegExp("^\\\\d+$")))')
     })
+
+    test('string with format int64 validates digits', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'int64' }))).toBe('z.string().check(z.regex(/^-?\\d+$/))')
+    })
+
+    test('a pattern from the spec wins over the int64 fallback', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'int64', pattern: '^[0-9]{4}$' }))).toBe(
+        'z.string().check(z.regex(/^[0-9]{4}$/))',
+      )
+    })
   })
 
   describe('number', () => {

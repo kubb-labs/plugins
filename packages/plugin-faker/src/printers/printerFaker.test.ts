@@ -55,6 +55,18 @@ describe('printerFaker', () => {
     expect(printerFaker({ resolver: resolverFaker, regexGenerator: 'randexp' }).print(node)).toMatchInlineSnapshot(`"new RandExp("^[A-Z]+$").gen()"`)
   })
 
+  test('mocks a string int64 as digits', () => {
+    const node = ast.factory.createSchema({ type: 'string', format: 'int64' })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toMatchInlineSnapshot(`"faker.number.bigInt().toString()"`)
+  })
+
+  test('mocks a string int32 within the 32-bit range', () => {
+    const node = ast.factory.createSchema({ type: 'string', format: 'int32' })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toMatchInlineSnapshot(`"faker.number.int({ max: 2147483647 }).toString()"`)
+  })
+
   test('guards self refs', () => {
     const node = ast.factory.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' })
 

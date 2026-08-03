@@ -8,6 +8,7 @@ import {
   containsCodec,
   formatLiteral,
   getCodec,
+  integerFormatPattern,
   isObjectComposableIntersection,
   isObjectSchemaNode,
   lengthConstraints,
@@ -230,8 +231,9 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       null: () => 'z.null()',
       string(node) {
         const base = shouldCoerce(this.options.coercion, 'strings') ? 'z.coerce.string()' : 'z.string()'
+        const pattern = node.pattern ?? integerFormatPattern(node.format)
 
-        return `${base}${lengthConstraints({ ...node, regexType: this.options.regexType })}`
+        return `${base}${lengthConstraints({ ...node, pattern, regexType: this.options.regexType })}`
       },
       number(node) {
         const base = shouldCoerce(this.options.coercion, 'numbers') ? 'z.coerce.number()' : 'z.number()'
