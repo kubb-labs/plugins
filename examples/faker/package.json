@@ -28,7 +28,7 @@
     "@kubb/plugin-ts": "workspace:*",
     "dayjs": "^1.11.21",
     "kubb": "catalog:",
-    "react": "^19.2.7"
+    "react": "^19.2.8"
   },
   "devDependencies": {
     "typescript": "catalog:"

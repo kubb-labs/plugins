@@ -23,9 +23,9 @@
     "@kubb/plugin-fetch": "workspace:*",
     "@kubb/plugin-react-query": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
-    "@tanstack/react-query": "^5.101.2",
+    "@tanstack/react-query": "^5.101.4",
     "kubb": "catalog:",
-    "react": "^19.2.7"
+    "react": "^19.2.8"
   },
   "devDependencies": {
     "@types/react": "catalog:",

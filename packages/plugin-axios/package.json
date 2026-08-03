@@ -64,7 +64,7 @@
   "devDependencies": {
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
-    "axios": "^1.18.1",
+    "axios": "^1.19.0",
     "kubb": "catalog:",
     "typescript": "catalog:"
   },

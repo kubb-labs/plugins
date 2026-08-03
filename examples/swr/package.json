@@ -24,7 +24,7 @@
     "@kubb/plugin-swr": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "kubb": "catalog:",
-    "react": "^19.2.7",
+    "react": "^19.2.8",
     "swr": "^2.4.2"
   },
   "devDependencies": {
