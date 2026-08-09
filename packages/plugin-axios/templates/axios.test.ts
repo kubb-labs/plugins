@@ -447,6 +447,16 @@ describe('createClientCore', () => {
     await expect(client({ method: 'POST', url: '/pet' })).rejects.toMatchObject({ status: 405, data: { message: 'invalid' } })
   })
 
+  test('passes an explicit 2xx-only validateStatus to axios when throwOnError is true by default', async () => {
+    const { instance, calls } = fakeAxios({ data: { id: 1 }, status: 200 })
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/pet/1' })
+    const validateStatus = calls[0]?.validateStatus as (s: number) => boolean
+    expect(validateStatus).toBeTypeOf('function')
+    expect(validateStatus(200)).toBe(true)
+    expect(validateStatus(401)).toBe(false)
+  })
+
   test('surfaces a non-2xx body as an error value when throwOnError is false', async () => {
     const { instance, calls } = fakeAxios({ data: { message: 'invalid' }, status: 405 })
     const client = createClientCore({ transport: instance })
