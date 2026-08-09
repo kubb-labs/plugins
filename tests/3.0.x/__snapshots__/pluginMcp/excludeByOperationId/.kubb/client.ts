@@ -483,7 +483,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   )
 
   const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
-  const validateStatus = requestConfig.validateStatus ?? config.validateStatus ?? (throwOnError ? undefined : () => true)
+  const validateStatus =
+    requestConfig.validateStatus ?? config.validateStatus ?? (throwOnError ? (status: number) => status >= 200 && status < 300 : () => true)
 
   const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
 
