@@ -1,5 +1,17 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.106
+
+### Patch Changes
+
+- [#736](https://github.com/kubb-labs/plugins/pull/736) [`daafccb`](https://github.com/kubb-labs/plugins/commit/daafccbfb2a9a544717578f7cede6975eac48175) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Plugins now declare their `kubb` peer dependency as a range (`^5.0.0-beta.104`) instead of a single pinned version, and depend on each other through a range as well. A pinned peer made `npm install` fail with `ERESOLVE` whenever the installed `kubb` was a newer release than the one the plugin was published against, which is what `kubb init` hits when it resolves the `kubb` and plugin dist-tags separately.
+
+- [#735](https://github.com/kubb-labs/plugins/pull/735) [`11f3cbc`](https://github.com/kubb-labs/plugins/commit/11f3cbc1bf7feec7237a34b73b2615ac879a62c5) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Treat a `type: 'string'` schema with an integer `format` as digits, reported in kubb-labs/kubb#3836.
+
+  `@kubb/adapter-oas` now keeps `{ type: 'string', format: 'int64' }` as a `string` node instead of turning it into a `bigint`, since ProtoJSON (and so every gRPC-gateway spec) encodes 64-bit integers as JSON strings. Those fields would have generated a bare `z.string()` and a `faker.string.alpha()` mock full of letters.
+
+  `plugin-zod` now falls back to a digits `.regex(...)` for the `int32`, `int64`, and `uint64` formats (`^-?\d+$`, or `^\d+$` for the unsigned one), and a `pattern` from the spec still wins. `plugin-faker` mocks the same fields with `faker.number.bigInt().toString()`, or `faker.number.int({ max: 2147483647 }).toString()` for `int32`.
+
 ## 5.0.0-beta.103
 
 ### Patch Changes

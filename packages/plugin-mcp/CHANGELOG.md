@@ -1,5 +1,15 @@
 # @kubb/plugin-mcp
 
+## 5.0.0-beta.106
+
+### Patch Changes
+
+- [#736](https://github.com/kubb-labs/plugins/pull/736) [`daafccb`](https://github.com/kubb-labs/plugins/commit/daafccbfb2a9a544717578f7cede6975eac48175) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Plugins now declare their `kubb` peer dependency as a range (`^5.0.0-beta.104`) instead of a single pinned version, and depend on each other through a range as well. A pinned peer made `npm install` fail with `ERESOLVE` whenever the installed `kubb` was a newer release than the one the plugin was published against, which is what `kubb init` hits when it resolves the `kubb` and plugin dist-tags separately.
+
+- Updated dependencies [[`daafccb`](https://github.com/kubb-labs/plugins/commit/daafccbfb2a9a544717578f7cede6975eac48175), [`11f3cbc`](https://github.com/kubb-labs/plugins/commit/11f3cbc1bf7feec7237a34b73b2615ac879a62c5)]:
+  - @kubb/plugin-ts@5.0.0-beta.106
+  - @kubb/plugin-zod@5.0.0-beta.106
+
 ## 5.0.0-beta.104
 
 ### Patch Changes
