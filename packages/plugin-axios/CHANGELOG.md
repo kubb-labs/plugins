@@ -1,5 +1,13 @@
 # @kubb/plugin-axios
 
+## 5.0.0-beta.107
+
+### Patch Changes
+
+- [#742](https://github.com/kubb-labs/plugins/pull/742) [`cceb284`](https://github.com/kubb-labs/plugins/commit/cceb284cad87f440183bf5ebad5cd922247d7b2b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix the generated axios client resolving non-2xx responses instead of rejecting them when `throwOnError: true` and no custom `validateStatus` is provided. Axios treats an explicitly passed `validateStatus: undefined` as accepting every status, so the client now falls back to an explicit 2xx-only validator in that case, restoring the `ResponseError` rejection the generated types promise.
+
+- [#745](https://github.com/kubb-labs/plugins/pull/745) [`58b01df`](https://github.com/kubb-labs/plugins/commit/58b01dfc83302d70bd4d3813e80a1a29683d48ab) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Raise the `axios` peer dependency lower bound from `^1.7.2` to `^1.19.0` to match the version actually tested in CI, reconciling it with the `axios` devDependency range.
+
 ## 5.0.0-beta.106
 
 ### Patch Changes
