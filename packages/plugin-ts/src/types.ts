@@ -1,3 +1,4 @@
+import type { CommentLevel } from '@internals/utils'
 import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 import type { PrinterTsNodes } from './printers/printerTs.ts'
 /**
@@ -254,6 +255,17 @@ export type Options = OutputOptions & {
    */
   arrayType?: 'generic' | 'array'
   /**
+   * How much of each OpenAPI description reaches the JSDoc above generated types.
+   * - `'full'` emits every description in full, however many paragraphs the spec carries.
+   * - `'brief'` cuts each description to its first sentence and keeps every other tag.
+   * - `'none'` emits no JSDoc. The generated-by banner still appears.
+   *
+   * @default 'full'
+   * @note Descriptions are a third of the output on a large spec. Pick `'brief'` or `'none'` when
+   * file size matters more than editor hovers.
+   */
+  comments?: CommentLevel
+  /**
    * Override how names and file paths are built for generated symbols.
    * Methods you omit fall back to the default `resolverTs`. `this` is bound to the
    * full resolver, so `this.default.name(name)` delegates to the built-in implementation.
@@ -321,6 +333,7 @@ export type ResolvedOptions = {
   optionalType: NonNullable<Options['optionalType']>
   arrayType: NonNullable<Options['arrayType']>
   syntaxType: NonNullable<Options['syntaxType']>
+  comments: NonNullable<Options['comments']>
   printer: Options['printer']
 }
 

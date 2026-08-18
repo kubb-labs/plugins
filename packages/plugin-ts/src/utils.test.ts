@@ -123,6 +123,20 @@ describe('buildPropertyJSDocComments', () => {
     expect(comments).toContain("@default 'Fluffy'")
   })
 
+  it('keeps only the first sentence of a description at level brief', () => {
+    const schema = ast.factory.createSchema({ type: 'string', description: 'The pet name. Shown on the profile page.' })
+    const comments = buildPropertyJSDocComments(schema, { level: 'brief' })
+
+    expect(comments).toContain('@description The pet name.')
+    expect(comments).not.toContain('@description The pet name. Shown on the profile page.')
+  })
+
+  it('emits nothing at level none', () => {
+    const schema = ast.factory.createSchema({ type: 'string', description: 'A pet name', deprecated: true, default: 'Fluffy' })
+
+    expect(buildPropertyJSDocComments(schema, { level: 'none' })).toStrictEqual([])
+  })
+
   it('does not emit @minLength/@maxLength for array schemas', () => {
     const schema = ast.factory.createSchema({ type: 'array', primitive: 'array', min: 1, max: 10 })
     const comments = buildPropertyJSDocComments(schema)

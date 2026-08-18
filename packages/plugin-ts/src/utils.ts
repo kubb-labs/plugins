@@ -1,7 +1,19 @@
 import { resolveContentTypeVariants } from '@internals/shared'
-import { jsStringEscape, stringify } from '@internals/utils'
+import { applyCommentLevel, type CommentLevel, jsStringEscape, stringify } from '@internals/utils'
 import { ast, syncSchemaRef } from 'kubb/kit'
 import type { ResolverTs } from './types.ts'
+
+export type BuildPropertyJSDocCommentsOptions = {
+  /**
+   * Whether the property is optional at its usage site. Falls back to the schema's own
+   * optional/nullish flags when omitted.
+   */
+  optional?: boolean
+  /**
+   * How much of the description to keep.
+   */
+  level?: CommentLevel
+}
 
 /**
  * Tells whether a `const` (single-value enum) should render as a bare literal type (`'active'`)
@@ -37,7 +49,11 @@ function formatExample(value: unknown): string {
   return rendered.replaceAll('*/', '*\\/')
 }
 
-export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: boolean): Array<string | undefined> {
+export function buildPropertyJSDocComments(schema: ast.SchemaNode, options: BuildPropertyJSDocCommentsOptions = {}): Array<string> {
+  const { optional, level = 'full' } = options
+
+  if (level === 'none') return []
+
   const meta = syncSchemaRef(schema)
 
   const isArray = meta?.primitive === 'array'
@@ -77,7 +93,10 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
       ? [`@type ${meta.primitive}`, (optional ?? isSchemaOptional(schema)) ? ' | undefined' : null].filter(Boolean).join('')
       : null
 
-  return [...comments, typeTag].filter(Boolean)
+  return applyCommentLevel(
+    [...comments, typeTag].filter((comment): comment is string => Boolean(comment)),
+    level,
+  )
 }
 
 type BuildParamsSchemaOptions = {

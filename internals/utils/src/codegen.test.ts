@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildJSDoc, buildList, buildObject, lazyGetter, objectKey } from './codegen.ts'
+import { applyCommentLevel, buildJSDoc, buildList, buildObject, lazyGetter, objectKey } from './codegen.ts'
 
 describe('buildJSDoc', () => {
   it('builds a comment block from lines', () => {
@@ -9,6 +9,82 @@ describe('buildJSDoc', () => {
   it('returns the fallback when there are no comments', () => {
     expect(buildJSDoc([])).toBe('  ')
     expect(buildJSDoc([], { fallback: '' })).toBe('')
+  })
+})
+
+describe('applyCommentLevel', () => {
+  it('returns every comment untouched at full', () => {
+    const comments = ['@description One sentence. And a second one.', '@type string']
+
+    expect(applyCommentLevel(comments, 'full')).toStrictEqual(comments)
+  })
+
+  it('drops every comment at none', () => {
+    expect(applyCommentLevel(['@description Anything', '@type string'], 'none')).toStrictEqual([])
+  })
+
+  it('keeps only the first sentence at brief', () => {
+    expect(applyCommentLevel(['@description The identifier. Referenced in API endpoints. And more.'], 'brief')).toStrictEqual(['@description The identifier.'])
+  })
+
+  it('leaves a description that is already one short sentence alone', () => {
+    expect(applyCommentLevel(['@description The name of the API key'], 'brief')).toStrictEqual(['@description The name of the API key'])
+  })
+
+  it('cuts at the first sentence that ends on a newline', () => {
+    expect(applyCommentLevel(['@description The chunk of bytes for this Part.\nSecond paragraph.'], 'brief')).toStrictEqual([
+      '@description The chunk of bytes for this Part.',
+    ])
+  })
+
+  it('keeps a whole sentence that runs a little past the cap', () => {
+    const description =
+      '@description A citation within the message that points to a specific quote from a specific File associated with the assistant or the message. Ignored otherwise.'
+
+    expect(applyCommentLevel([description], 'brief')).toStrictEqual([
+      '@description A citation within the message that points to a specific quote from a specific File associated with the assistant or the message.',
+    ])
+  })
+
+  it('caps a long opening sentence at a word boundary', () => {
+    const long = `@description ${'word '.repeat(40).trim()}`
+    const [result] = applyCommentLevel([long], 'brief')
+
+    expect(result?.endsWith('…')).toBe(true)
+    expect(result?.includes('word word')).toBe(true)
+    expect(result?.length).toBeLessThanOrEqual('@description '.length + 120)
+  })
+
+  it('does not treat an abbreviation as the end of a sentence', () => {
+    expect(applyCommentLevel(['@description The city and state, e.g. San Francisco, CA. Used for weather lookups.'], 'brief')).toStrictEqual([
+      '@description The city and state, e.g. San Francisco, CA.',
+    ])
+  })
+
+  it('does not cut inside an open bracket', () => {
+    expect(applyCommentLevel(['@description The role of the message (e.g. `system`, `user`). Defaults to `user`.'], 'brief')).toStrictEqual([
+      '@description The role of the message (e.g. `system`, `user`).',
+    ])
+  })
+
+  it('backs a cap off a half-written markdown link', () => {
+    const description =
+      '@description The identifier of the run step this delta belongs to, which you hand back to the [retrieve run step](https://platform.example.com/docs/api/runs) endpoint'
+
+    expect(applyCommentLevel([description], 'brief')).toStrictEqual([
+      '@description The identifier of the run step this delta belongs to, which you hand back to the…',
+    ])
+  })
+
+  it('backs a cap off a half-written code span', () => {
+    const description =
+      '@description An object specifying the format that the model must output, for example `{ "type": "json_schema", "strict": true, "name": "reply" }` and nothing more than that'
+
+    expect(applyCommentLevel([description], 'brief')).toStrictEqual(['@description An object specifying the format that the model must output, for example…'])
+  })
+
+  it('leaves tags other than description alone at brief', () => {
+    expect(applyCommentLevel(['@summary Show a pet. And more.', '@type string'], 'brief')).toStrictEqual(['@summary Show a pet. And more.', '@type string'])
   })
 })
 

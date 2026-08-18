@@ -1,4 +1,5 @@
 import { buildOperationComments, getContentTypeInfo, getResponseContentTypeInfo, getResponseType, isEventStream } from '@internals/shared'
+import type { CommentLevel } from '../types.ts'
 import { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -37,6 +38,10 @@ type Props = {
    * call config's `security` field for the runtime `auth` resolver to consume.
    */
   security?: Array<Auth>
+  /**
+   * How much of each OpenAPI description reaches the JSDoc above the generated function.
+   */
+  comments?: CommentLevel
   isExportable?: boolean
   isIndexable?: boolean
 }
@@ -46,7 +51,17 @@ type Props = {
  * single `options` object to the resolved client and returns the `RequestResult`. The type, signature,
  * and call config are built with the AST factory, and only the jsx-renderer emits the source.
  */
-export function Operation({ name, node, tsResolver, zodResolver, validator, security, isExportable = true, isIndexable = true }: Props): KubbReactNode {
+export function Operation({
+  name,
+  node,
+  tsResolver,
+  zodResolver,
+  validator,
+  security,
+  comments,
+  isExportable = true,
+  isIndexable = true,
+}: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
 
   const signature = buildGroupedOptionsSignature({ node, tsResolver })
@@ -104,7 +119,7 @@ export function Operation({ name, node, tsResolver, zodResolver, validator, secu
         generics={signature.generics}
         params={signature.paramsSignature}
         returnType={returnType}
-        JSDoc={{ comments: buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }) }}
+        JSDoc={{ comments: buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true, level: comments }) }}
       >
         {mergeContentType ? 'const { client: request = client, contentType, ...config } = options' : 'const { client: request = client, ...config } = options'}
         <br />

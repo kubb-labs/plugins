@@ -63,6 +63,12 @@ export type PrinterTsOptions = {
    */
   syntaxType?: PluginTs['resolvedOptions']['syntaxType']
   /**
+   * How much of each OpenAPI description reaches the JSDoc above generated types.
+   *
+   * @default `'brief'`
+   */
+  comments?: PluginTs['resolvedOptions']['comments']
+  /**
    * Exported name for the type declaration.
    * When omitted, returns only the raw type node.
    */
@@ -256,7 +262,10 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
             readOnly: propMeta?.readOnly,
           })
 
-          return factory.appendJSDocToNode({ node: propertyNode, comments: buildPropertyJSDocComments(property.schema, optional) })
+          return factory.appendJSDocToNode({
+            node: propertyNode,
+            comments: buildPropertyJSDocComments(property.schema, { optional, level: options.comments }),
+          })
         })
 
         const allElements = [...propertyNodes, ...factory.buildIndexSignatures(node, propertyNodes.length, transform)]
@@ -270,7 +279,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       ...options.nodes,
     },
     print(node) {
-      const { name, syntaxType = 'type', description, keysToOmit } = this.options
+      const { name, syntaxType = 'type', description, keysToOmit, comments } = this.options
 
       const transformed = this.transform(node)
       if (!transformed) return null
@@ -307,10 +316,13 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         isExportable: true,
         type: inner,
         syntax: useTypeGeneration ? 'type' : 'interface',
-        comments: buildPropertyJSDocComments({
-          ...meta,
-          description,
-        }),
+        comments: buildPropertyJSDocComments(
+          {
+            ...meta,
+            description,
+          },
+          { level: comments },
+        ),
       })
 
       return parserTs().print(typeNode)

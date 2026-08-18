@@ -36,7 +36,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
   name: 'typescript',
   renderer: jsxRenderer,
   schema(node, ctx) {
-    const { enum: enumOptions, syntaxType, optionalType, arrayType, output, group, printer } = ctx.options
+    const { enum: enumOptions, syntaxType, optionalType, arrayType, comments, output, group, printer } = ctx.options
     const { config, resolver, root } = ctx
 
     if (!node.name) {
@@ -65,6 +65,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       enum: enumOptions,
       name: meta.name,
       syntaxType,
+      comments,
       description: node.description,
       resolver,
       enumSchemaNames,
@@ -87,7 +88,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     )
   },
   operation(node, ctx) {
-    const { enum: enumOptions, optionalType, arrayType, syntaxType, group, output, printer } = ctx.options
+    const { enum: enumOptions, optionalType, arrayType, syntaxType, comments, group, output, printer } = ctx.options
     const { config, resolver, root } = ctx
 
     const meta = {
@@ -110,6 +111,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         enum: enumOptions,
         name,
         syntaxType,
+        comments,
         description: schema.description,
         keysToOmit,
         resolver,

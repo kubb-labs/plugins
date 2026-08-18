@@ -1,3 +1,4 @@
+import { applyCommentLevel } from '@internals/utils'
 import { ast, type Group, type NodeCache, type Output, type Resolver, type ResolverFileParams, Url } from 'kubb/kit'
 import { dedupeParams } from './params.ts'
 
@@ -144,6 +145,14 @@ export type BuildOperationCommentsOptions = {
   link?: OperationCommentLink
   linkPosition?: 'beforeDeprecated' | 'afterDeprecated'
   splitLines?: boolean
+  // Spelled out rather than imported from `@internals/utils`. This package is bundled into the
+  // client and query plugins, where a cross-package type edge leaves an import their `.d.ts`
+  // cannot resolve and sends their dts build time through the roof.
+  /**
+   * How much of each description to keep. Mirrors the `comments` option on the plugin that owns
+   * the generated file.
+   */
+  level?: 'full' | 'brief' | 'none'
 }
 
 type ResponseLike = {
@@ -409,14 +418,20 @@ export function buildRequestParamsSignature(
 }
 
 export function buildOperationComments(node: ast.OperationNode, options: BuildOperationCommentsOptions = {}): Array<string> {
-  const { link = 'pathTemplate', linkPosition = 'afterDeprecated', splitLines = false } = options
+  const { link = 'pathTemplate', linkPosition = 'afterDeprecated', splitLines = false, level = 'full' } = options
+
+  if (level === 'none') return []
+
   const linkComment = getOperationLink(node, link)
   const comments =
     linkPosition === 'beforeDeprecated'
       ? [node.description && `@description ${node.description}`, node.summary && `@summary ${node.summary}`, linkComment, node.deprecated && '@deprecated']
       : [node.description && `@description ${node.description}`, node.summary && `@summary ${node.summary}`, node.deprecated && '@deprecated', linkComment]
 
-  const filteredComments = comments.filter((comment): comment is string => Boolean(comment))
+  const filteredComments = applyCommentLevel(
+    comments.filter((comment): comment is string => Boolean(comment)),
+    level,
+  )
 
   if (!splitLines) {
     return filteredComments

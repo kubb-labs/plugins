@@ -11,6 +11,14 @@ import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions
  */
 export type ValidatorOptions = false | 'zod' | { request?: 'zod'; response?: 'zod' }
 
+// Spelled out rather than imported from `@internals/utils`. This package is bundled into the
+// client and query plugins, where a cross-package type edge leaves an import their `.d.ts` cannot
+// resolve and sends their dts build time through the roof.
+/**
+ * How much of each OpenAPI description reaches the JSDoc above a generated operation.
+ */
+export type CommentLevel = 'full' | 'brief' | 'none'
+
 /**
  * How the class-based SDK groups operations.
  * - `'tag'`: one class per tag, optionally composed into a root client.
@@ -73,6 +81,15 @@ export type Options = OutputOptions & {
    * @default false
    */
   validator?: ValidatorOptions
+  /**
+   * How much of each OpenAPI description reaches the JSDoc above each generated operation.
+   * - `'full'` emits every description in full, however many paragraphs the spec carries.
+   * - `'brief'` cuts each description to its first sentence and keeps every other tag.
+   * - `'none'` emits no JSDoc. The generated-by banner still appears.
+   *
+   * @default 'full'
+   */
+  comments?: CommentLevel
   /**
    * Generates a class-based SDK instead of the standalone functions. Each tag client is an instance
    * class whose constructor takes a client config and builds its own client, so every environment is
@@ -140,6 +157,7 @@ export type ResolvedOptions = {
   group: Group | null
   baseURL: Options['baseURL']
   validator: NonNullable<Options['validator']>
+  comments: NonNullable<Options['comments']>
   sdk:
     | {
         mode: Mode

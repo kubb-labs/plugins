@@ -1,3 +1,4 @@
+import type { CommentLevel } from '../types.ts'
 import type { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -21,6 +22,10 @@ type Props = {
   isIndexable?: boolean
   operations: Array<OperationData>
   validator: ValidatorOptions | undefined
+  /**
+   * How much of each OpenAPI description reaches the JSDoc above each generated method.
+   */
+  comments?: CommentLevel
   children?: KubbReactNode
 }
 
@@ -30,7 +35,7 @@ type Props = {
  * instance: `const api = new PetClient({ baseURL }); api.getPetById(...)`. A per-call `client` option
  * still overrides the instance client for a one-off call.
  */
-export function SdkClient({ name, isExportable = true, isIndexable = true, operations, validator, children }: Props): KubbReactNode {
+export function SdkClient({ name, isExportable = true, isIndexable = true, operations, validator, comments, children }: Props): KubbReactNode {
   const methods = operations.map(({ node, name: methodName, tsResolver, zodResolver, security }) =>
     buildSdkMethod({
       node,
@@ -39,6 +44,7 @@ export function SdkClient({ name, isExportable = true, isIndexable = true, opera
       zodResolver,
       validator,
       security,
+      comments,
     }),
   )
 

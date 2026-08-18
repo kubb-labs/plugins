@@ -41,6 +41,93 @@ export function buildJSDoc(
 }
 
 /**
+ * How much of each OpenAPI description reaches a generated comment block.
+ */
+export type CommentLevel = 'full' | 'brief' | 'none'
+
+// A whole sentence is worth a few characters over the cap, so the sentence limit sits above the
+// cut. Only a description that never finishes a sentence gets cut.
+const BRIEF_MAX_LENGTH = 120
+const BRIEF_SENTENCE_MAX_LENGTH = 150
+
+const DESCRIPTION_TAG = '@description '
+
+/**
+ * Trims a comment list down to the requested level. `'brief'` keeps every tag and shortens only
+ * `@description`, since specs routinely put several paragraphs there and the first sentence is
+ * the part that helps at a call site.
+ */
+export function applyCommentLevel(comments: Array<string>, level: CommentLevel): Array<string> {
+  if (level === 'none') return []
+  if (level === 'full') return comments
+
+  return comments.map((comment) => {
+    if (!comment.startsWith(DESCRIPTION_TAG)) return comment
+
+    return `${DESCRIPTION_TAG}${toFirstSentence(comment.slice(DESCRIPTION_TAG.length))}`
+  })
+}
+
+// Without these, "The role of the message (e.g. `system`)" gets cut to "The role of the
+// message (e.g.", losing the content and leaving a bracket open.
+const ABBREVIATIONS = new Set(['e.g.', 'i.e.', 'etc.', 'vs.', 'cf.', 'approx.', 'inc.', 'no.', 'dr.', 'mr.', 'mrs.', 'ms.', 'st.', 'fig.', 'al.'])
+
+function toFirstSentence(text: string): string {
+  const firstSentence = findFirstSentence(text) ?? text
+
+  if (firstSentence.length <= BRIEF_SENTENCE_MAX_LENGTH) return firstSentence
+
+  const capped = firstSentence.slice(0, BRIEF_MAX_LENGTH)
+  const lastSpace = capped.lastIndexOf(' ')
+
+  return `${dropDanglingMarkup(lastSpace > 0 ? capped.slice(0, lastSpace) : capped).trimEnd()}…`
+}
+
+// A word boundary still lands inside a markdown link or a code span often enough to matter, leaving
+// `[label` or a lone backtick that renders as broken markup on hover. Back up to before it opened.
+function dropDanglingMarkup(text: string): string {
+  const ticks = [...text.matchAll(/`/g)]
+  const cuts = [
+    firstUnclosed({ text, open: '(', close: ')' }),
+    firstUnclosed({ text, open: '[', close: ']' }),
+    ticks.length % 2 === 1 ? (ticks.at(-1)?.index ?? -1) : -1,
+  ].filter((index) => index !== -1)
+
+  return text.slice(0, Math.min(...cuts, text.length))
+}
+
+function firstUnclosed({ text, open, close }: { text: string; open: string; close: string }): number {
+  const stack: Array<number> = []
+
+  for (let index = 0; index < text.length; index++) {
+    if (text[index] === open) stack.push(index)
+    if (text[index] === close) stack.pop()
+  }
+
+  return stack[0] ?? -1
+}
+
+function findFirstSentence(text: string): string | null {
+  const pattern = /\.(\s|$)/g
+
+  for (let match = pattern.exec(text); match; match = pattern.exec(text)) {
+    if (match.index >= BRIEF_SENTENCE_MAX_LENGTH) return null
+
+    const head = text.slice(0, match.index + 1)
+    if (endsSentence(head)) return head
+  }
+
+  return null
+}
+
+function endsSentence(head: string): boolean {
+  const lastWord = head.split(/\s/).pop() ?? ''
+  if (ABBREVIATIONS.has(lastWord.replace(/^[^\w]+/, '').toLowerCase())) return false
+
+  return head.split('(').length <= head.split(')').length
+}
+
+/**
  * Indents every non-empty line of `text` by one indent level, leaving blank lines empty.
  */
 function indentLines(text: string): string {

@@ -177,6 +177,31 @@ describe('buildOperationComments', () => {
     expect(buildOperationComments(node)).toStrictEqual(['@description Show pet', '@summary Show', '@deprecated', '{@link /pets/:petId}'])
   })
 
+  test('keeps only the first sentence of the description at level brief', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'showPet',
+      method: 'GET',
+      path: '/pets/{petId}',
+      description: 'Show pet. Includes every field the store tracks.',
+      summary: 'Show',
+    })
+
+    expect(buildOperationComments(node, { level: 'brief' })).toStrictEqual(['@description Show pet.', '@summary Show', '{@link /pets/:petId}'])
+  })
+
+  test('returns no comments at level none', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'showPet',
+      method: 'GET',
+      path: '/pets/{petId}',
+      description: 'Show pet',
+      summary: 'Show',
+      deprecated: true,
+    })
+
+    expect(buildOperationComments(node, { level: 'none' })).toStrictEqual([])
+  })
+
   test('supports URLPath links before deprecation and multiline trimming', () => {
     const node = ast.factory.createOperation({
       operationId: 'showPet',

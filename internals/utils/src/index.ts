@@ -1,5 +1,5 @@
 export { camelCase, capitalize, pascalCase, screamingSnakeCase, snakeCase } from './casing.ts'
-export { buildJSDoc, buildList, buildObject, lazyGetter, objectKey } from './codegen.ts'
+export { applyCommentLevel, buildJSDoc, buildList, buildObject, type CommentLevel, lazyGetter, objectKey } from './codegen.ts'
 export { getRelativePath, toFilePath } from './fs.ts'
 export { aliasConflictingImports, filterUsedImports, rewriteAliasedImports, type ImportEntry, type ImportName } from './imports.ts'
 export { ensureValidVarName, isIdentifier, isValidVarName } from './reserved.ts'

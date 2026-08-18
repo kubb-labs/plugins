@@ -1,5 +1,6 @@
 import { buildOperationComments } from '@internals/shared'
 import { buildJSDoc } from '@internals/utils'
+import type { CommentLevel } from '../types.ts'
 import { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -57,6 +58,7 @@ export function buildSdkMethod({
   zodResolver,
   validator,
   security,
+  comments,
 }: {
   node: ast.OperationNode
   name: string
@@ -64,6 +66,7 @@ export function buildSdkMethod({
   zodResolver?: ResolverZod | null
   validator: ValidatorOptions | undefined
   security?: Array<Auth>
+  comments?: CommentLevel
 }): string {
   if (!ast.isHttpOperationNode(node)) return ''
 
@@ -71,7 +74,7 @@ export function buildSdkMethod({
   const callConfig = buildCallConfig({ node, validator, zodResolver, security })
   const returnStatement = buildReturnStatement({ node, tsResolver, callConfig })
   const generics = signature.generics.length ? `<${signature.generics.join(', ')}>` : ''
-  const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
+  const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true, level: comments }))
 
   const methodBody = ['const { client: request = this.client, ...config } = options', '', returnStatement].map((line) => (line ? `    ${line}` : '')).join('\n')
 

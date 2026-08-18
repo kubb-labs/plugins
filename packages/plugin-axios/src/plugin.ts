@@ -44,6 +44,7 @@ export const pluginAxios = definePlugin<PluginAxios>((options) => {
     override = [],
     baseURL,
     validator = false,
+    comments = 'full',
     group,
     sdk,
     resolver: userResolver,
@@ -57,6 +58,7 @@ export const pluginAxios = definePlugin<PluginAxios>((options) => {
     group: createGroupConfig(group),
     baseURL,
     validator,
+    comments,
     sdk: sdk ? { mode: sdk.mode ?? 'tag', name: sdk.name } : undefined,
     resolver: userResolver ? Resolver.merge<ResolverClient>(resolverClient, userResolver) : resolverClient,
   }

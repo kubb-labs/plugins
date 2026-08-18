@@ -26,6 +26,7 @@ const defaultOptions: PluginTs['resolvedOptions'] = {
   optionalType: 'questionToken',
   arrayType: 'array',
   syntaxType: 'type',
+  comments: 'full',
   output: { path: '.', mode: 'directory' },
   exclude: [],
   include: undefined,
@@ -998,6 +999,49 @@ describe('typeGenerator — syntaxType', () => {
 
     await matchFiles(driver.fileManager.files, 'syntaxType interface')
   })
+})
+
+describe('typeGenerator — comments', () => {
+  const documentedSchema = ast.factory.createSchema({
+    type: 'object',
+    name: 'ApiKey',
+    description: 'An API key issued to an organization. Keys are scoped to a single project and never expire on their own.',
+    properties: [
+      ast.factory.createProperty({
+        name: 'id',
+        required: true,
+        schema: ast.factory.createSchema({
+          type: 'string',
+          description: 'The identifier, which can be referenced in API endpoints. Treat it as opaque, since the format changes between releases.',
+        }),
+      }),
+      ast.factory.createProperty({
+        name: 'name',
+        schema: ast.factory.createSchema({ type: 'string', optional: true, description: 'The name of the API key' }),
+      }),
+    ],
+  })
+
+  const levels = ['full', 'brief', 'none'] as const satisfies Array<PluginTs['resolvedOptions']['comments']>
+
+  for (const comments of levels) {
+    test(`comments ${comments}`, async () => {
+      const options: PluginTs['resolvedOptions'] = { ...defaultOptions, comments }
+      const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+      const driver = createMockedPluginDriver({ name: `comments ${comments}` })
+
+      await renderGeneratorSchema(typeGenerator, documentedSchema, {
+        config: testConfig,
+        adapter: createMockedAdapter(),
+        driver,
+        plugin,
+        options,
+        resolver: resolverTs,
+      })
+
+      await matchFiles(driver.fileManager.files, `comments ${comments}`)
+    })
+  }
 })
 
 describe('typeGenerator — optionalType', () => {

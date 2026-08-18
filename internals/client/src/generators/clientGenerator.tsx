@@ -25,7 +25,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       if (!ast.isHttpOperationNode(node)) return null
 
       const { config, driver, resolver, root } = ctx
-      const { output, validator, group } = ctx.options
+      const { output, validator, comments, group } = ctx.options
 
       const pluginTs = driver.getPlugin(pluginTsName)
       if (!pluginTs) return null
@@ -100,7 +100,15 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
 
           {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames} root={meta.file.path} path={meta.fileZod.path} />}
 
-          <Operation name={meta.name} node={node} tsResolver={tsResolver} zodResolver={zodResolver} validator={validator} security={security} />
+          <Operation
+            name={meta.name}
+            node={node}
+            tsResolver={tsResolver}
+            zodResolver={zodResolver}
+            validator={validator}
+            security={security}
+            comments={comments}
+          />
         </File>
       )
     },
