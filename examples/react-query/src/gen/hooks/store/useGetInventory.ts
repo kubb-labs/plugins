@@ -13,12 +13,9 @@ export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
 type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
-export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}): UndefinedInitialDataOptions<
-  GetInventoryStatus200,
-  ResponseErrorConfig<Error>,
-  GetInventoryStatus200,
-  GetInventoryQueryKey
-> & {
+export function getInventoryQueryOptions(
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+): UndefinedInitialDataOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, GetInventoryQueryKey> & {
   queryKey: DataTag<GetInventoryQueryKey, GetInventoryStatus200, ResponseErrorConfig<Error>>
 } {
   const queryKey = getInventoryQueryKey()

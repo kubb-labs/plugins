@@ -47,6 +47,7 @@ import type {
   DeleteOrderStatus400,
   DeleteOrderStatus404,
 } from './models'
+import type { UndefinedInitialDataOptions, DataTag } from '@tanstack/react-query'
 import { addPet } from './clients/addPet'
 import { deleteOrder } from './clients/deleteOrder'
 import { deletePet } from './clients/deletePet'
@@ -104,9 +105,14 @@ type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 export function findPetsByStatusQueryOptions(
   { query }: FindPetsByStatusOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
-) {
+): UndefinedInitialDataOptions<
+  FindPetsByStatusStatus200,
+  ResponseErrorConfig<FindPetsByStatusStatus400>,
+  FindPetsByStatusStatus200,
+  FindPetsByStatusQueryKey
+> & { queryKey: DataTag<FindPetsByStatusQueryKey, FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>> } {
   const queryKey = findPetsByStatusQueryKey({ query })
-  return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, typeof queryKey>({
+  return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, FindPetsByStatusQueryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       const { data } = await findPetsByStatus({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
@@ -123,9 +129,11 @@ type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 export function findPetsByTagsQueryOptions(
   { query }: FindPetsByTagsOptions = {},
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
-) {
+): UndefinedInitialDataOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsStatus200, FindPetsByTagsQueryKey> & {
+  queryKey: DataTag<FindPetsByTagsQueryKey, FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>>
+} {
   const queryKey = findPetsByTagsQueryKey({ query })
-  return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsStatus200, typeof queryKey>({
+  return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsStatus200, FindPetsByTagsQueryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       const { data } = await findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
@@ -138,9 +146,14 @@ export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>)
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
-export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function getPetByIdQueryOptions(
+  { path }: GetPetByIdOptions,
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+): UndefinedInitialDataOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, GetPetByIdQueryKey> & {
+  queryKey: DataTag<GetPetByIdQueryKey, GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>>
+} {
   const queryKey = getPetByIdQueryKey({ path })
-  return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
+  return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, GetPetByIdQueryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       const { data } = await getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
@@ -192,9 +205,16 @@ export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
 type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
-export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}): UndefinedInitialDataOptions<
+  GetInventoryStatus200,
+  ResponseErrorConfig<Error>,
+  GetInventoryStatus200,
+  GetInventoryQueryKey
+> & {
+  queryKey: DataTag<GetInventoryQueryKey, GetInventoryStatus200, ResponseErrorConfig<Error>>
+} {
   const queryKey = getInventoryQueryKey()
-  return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
+  return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, GetInventoryQueryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       const { data } = await getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
@@ -244,9 +264,14 @@ type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 export function getOrderByIdQueryOptions(
   { path }: GetOrderByIdOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
-) {
+): UndefinedInitialDataOptions<
+  GetOrderByIdStatus200,
+  ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>,
+  GetOrderByIdStatus200,
+  GetOrderByIdQueryKey
+> & { queryKey: DataTag<GetOrderByIdQueryKey, GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>> } {
   const queryKey = getOrderByIdQueryKey({ path })
-  return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
+  return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, GetOrderByIdQueryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       const { data } = await getOrderById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
