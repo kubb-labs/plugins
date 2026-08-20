@@ -26,7 +26,7 @@
     "@kubb/adapter-oas": "catalog:",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
-    "dayjs": "^1.11.22",
+    "dayjs": "^1.11.23",
     "kubb": "catalog:",
     "react": "^19.2.8"
   },
