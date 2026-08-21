@@ -1,14 +1,14 @@
 {
   "$schema": "https://context7.com/schema/context7.json",
   "projectTitle": "Kubb Plugins",
-  "description": "Official Kubb plugins that generate TypeScript types, TanStack Query and SWR hooks, Zod schemas, Faker mocks, MSW handlers, Cypress tests, MCP servers, and typed Axios or Fetch clients. The full Kubb documentation lives at https://kubb.dev and is indexed as /kubb-labs/docs.",
+  "description": "Official Kubb plugins that generate TypeScript types, TanStack Query and SWR hooks, Zod schemas, Faker mocks, MSW handlers, Cypress tests, MCP servers, and typed Axios or Fetch clients. The documentation is at https://kubb.dev, indexed on Context7 as /kubb-labs/docs.",
   "folders": ["packages"],
   "excludeFiles": ["AGENTS.md", "CLAUDE.md", "GEMINI.md", "CHANGELOG.md", "CODE_OF_CONDUCT.md", "SECURITY.md"],
   "rules": [
-    "This repository holds the plugin packages only. For guides, configuration reference and per-plugin options, use https://kubb.dev or the /kubb-labs/docs library.",
+    "This repository holds the plugin packages, not the documentation. Per-plugin options, guides and the configuration reference are on https://kubb.dev, indexed on Context7 as /kubb-labs/docs.",
     "Import `defineConfig` from `kubb/config`, not from `kubb`.",
-    "Kubb v5 has no `pluginOas()`. The OpenAPI adapter is the top-level `adapter` key and defaults to `adapterOas()` from `@kubb/adapter-oas`, which ships with `kubb`. Set `adapter` only to pass options.",
-    "`@kubb/plugin-client` was removed in v5. Register `pluginAxios` or `pluginFetch` and point query and MCP plugins at it with `client: 'axios' | 'fetch'`.",
-    "Passing your own `output` to a plugin replaces that plugin's default `output` object wholesale, so repeat `barrel` inside it to keep the plugin's barrel file."
+    "Kubb v5 has no `pluginOas()`. The OpenAPI adapter is a top-level `adapter` key that defaults to `adapterOas()` from `@kubb/adapter-oas`, which ships with `kubb`. Set it only when you need to pass options.",
+    "`@kubb/plugin-client` was removed in v5. Register `pluginAxios` or `pluginFetch` instead, then point the query and MCP plugins at it with `client: 'axios' | 'fetch'`.",
+    "Passing your own `output` to a plugin replaces the plugin's default `output` wholesale. Repeat `barrel` inside it or you lose that plugin's barrel file."
   ]
 }
