@@ -22,7 +22,7 @@
 
 **Official and community plugins for [Kubb](https://kubb.dev).**
 
-This monorepo is home to official and community plugins for [Kubb](https://kubb.dev), the meta framework for code generation. Point Kubb at your OpenAPI specification and it generates TypeScript types, API clients, Zod schemas, React/Vue/Svelte/Solid Query hooks, Faker mocks, MSW handlers, and more.
+This monorepo is home to official and community plugins for [Kubb](https://kubb.dev), the meta framework for code generation. Point Kubb at your OpenAPI specification and it generates TypeScript types, API clients, Zod schemas, TanStack Query hooks for React, composables for Vue, SWR hooks, Faker mocks, MSW handlers, and more.
 
 Want to build your own plugin? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
@@ -55,6 +55,7 @@ Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](h
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
 | [`@kubb/plugin-react-query`](./packages/plugin-react-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-react-query.svg)](https://npmx.dev/package/@kubb/plugin-react-query) | [TanStack Query](https://github.com/TanStack/query) hooks for React     |
 | [`@kubb/plugin-vue-query`](./packages/plugin-vue-query)     | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-vue-query.svg)](https://npmx.dev/package/@kubb/plugin-vue-query)     | [TanStack Query](https://github.com/TanStack/query) composables for Vue |
+| [`@kubb/plugin-swr`](./packages/plugin-swr)                 | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-swr.svg)](https://npmx.dev/package/@kubb/plugin-swr)                 | [SWR](https://github.com/vercel/swr) hooks for React                    |
 
 ### Testing and mocking
 
