@@ -105,8 +105,8 @@ importers:
         specifier: 'catalog:'
         version: 3.9.6
       taze:
-        specifier: ^20.0.2
-        version: 20.0.2
+        specifier: ^21.1.0
+        version: 21.1.0
       tsdown:
         specifier: 'catalog:'
         version: 0.22.14(typescript@6.0.3)
@@ -3305,8 +3305,8 @@ packages:
     resolution: {integrity: sha512-wQ0b/W4Fr01qtpHlqSqspcj3EhBvimsdh0KlHhH8HRZnMsEa0ea2fTULOXOS9ccQr3om+GcGRk4e+isrZWV8qQ==}
     engines: {node: '>=16.20.0'}
 
-  pnpm-workspace-yaml@1.7.0:
-    resolution: {integrity: sha512-cgjaozHkjWL4H8oKZydEWE4mg31XydK3/1cLKjHvwnFAXutp45yAlMKljpOdZEq4TtLuzYAMvy9j05wRm3aoPw==}
+  pnpm-workspace-yaml@1.8.0:
+    resolution: {integrity: sha512-rqGldoFOzjalWzlPtzAi/RcjAyep+Pjl4QUKJ6/oEZXzhVAX79GS/i8gjhQT715g75kTkyfHjL9eBPGZ9Co++Q==}
 
   postcss@8.5.25:
     resolution: {integrity: sha512-DTPx3RWSSnWyzLxQnlH0rJP+EW5ekl16ZU4/psbIhA0e53kJfdgaN5vKM+xP7yJtXVu+nfdVFmlgFDEKAe4Pyw==}
@@ -3605,8 +3605,8 @@ packages:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
     engines: {node: '>=20'}
 
-  taze@20.0.2:
-    resolution: {integrity: sha512-OlY3OEHIeVq7kSfidnkpEPE8Gqn1DgDU05Q4kdVrjrvVN8OIWu4xci+hK9DXofprHyw29vkgBpaz7n8dEUcHng==}
+  taze@21.1.0:
+    resolution: {integrity: sha512-NkFkadmqqpaVZ9x3bV4cul1xQnUknhs1HzE3Q/VXHKS7np2Kg7ZNL7nNsEsBXKsafmgepa+aZNtzoegDgsymPw==}
     hasBin: true
 
   throttleit@1.0.1:
@@ -6180,7 +6180,7 @@ snapshots:
 
   pkce-challenge@5.0.1: {}
 
-  pnpm-workspace-yaml@1.7.0:
+  pnpm-workspace-yaml@1.8.0:
     dependencies:
       yaml: 2.9.0
 
@@ -6550,7 +6550,7 @@ snapshots:
 
   tagged-tag@1.0.0: {}
 
-  taze@20.0.2:
+  taze@21.1.0:
     dependencies:
       '@antfu/ni': 30.5.0
       '@henrygd/queue': 1.2.0
@@ -6559,7 +6559,7 @@ snapshots:
       ofetch: 1.5.1
       package-manager-detector: 1.8.0
       pathe: 2.0.3
-      pnpm-workspace-yaml: 1.7.0
+      pnpm-workspace-yaml: 1.8.0
       restore-cursor: 5.1.0
       tinyexec: 1.3.0
       tinyglobby: 0.2.17
