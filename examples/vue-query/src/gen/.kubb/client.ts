@@ -1,6 +1,6 @@
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers'
 import type { HeadersInit, PathParamStyle, PathSerializer, Serializers, Styles } from './serializers'
-import { type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
+import { type StandardSchemaValidator, validateStandardSchema } from './standardSchema'
 
 /**
  * HTTP status codes treated as a success, everything else is an error.
