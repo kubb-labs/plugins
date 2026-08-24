@@ -85,13 +85,13 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         {usedImports.map((imp) => (
           <File.Import key={[schemaName, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
         ))}
+        {seed ? <File.Source name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</File.Source> : undefined}
         <Faker
           name={meta.name}
           typeName={typeReference.typeName}
           description={node.description}
           node={node}
           printer={printerInstance}
-          seed={seed}
           canOverride={canOverride}
         />
       </File>
@@ -248,7 +248,6 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             description={description}
             node={schema}
             printer={{ ...printerInstance, print: () => rewrittenFakerText }}
-            seed={seed}
             canOverride={canOverride}
           />
         </>
@@ -266,6 +265,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
+        {seed ? <File.Source name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</File.Source> : undefined}
         {paramGroups.map((group) => renderEntry(group))}
         {responseUnits.map((unit) =>
           renderEntry({

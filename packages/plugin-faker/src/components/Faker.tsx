@@ -5,7 +5,6 @@ import { createFunctionParameter, createFunctionParameters, functionPrinter } fr
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
-import type { PluginFaker } from '../types.ts'
 import { resolveFakerTypeUsage } from '../utils.ts'
 
 type Props = {
@@ -13,7 +12,6 @@ type Props = {
   typeName: string
   node: ast.SchemaNode
   printer: ast.Printer<PrinterFakerFactory>
-  seed?: PluginFaker['options']['seed']
   description?: string
   canOverride: boolean
 }
@@ -36,7 +34,7 @@ const SCALAR_TYPES = new Set<ast.SchemaNode['type']>([
 ])
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export function Faker({ node, description, name, typeName, printer, seed, canOverride }: Props): KubbReactNode {
+export function Faker({ node, description, name, typeName, printer, canOverride }: Props): KubbReactNode {
   const fakerText = printer.print(node) ?? 'undefined'
 
   const isArray = node.type === 'array'
@@ -83,12 +81,6 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
           params={canOverride ? paramsSignature : undefined}
           returnType={returnType ?? undefined}
         >
-          {seed ? (
-            <>
-              {`faker.seed(${JSON.stringify(seed)})`}
-              <br />
-            </>
-          ) : undefined}
           {`return ${returnExpression}`}
         </Function>
       </File.Source>
@@ -98,8 +90,6 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   // Generate function with defaultFakeData structure
   const jsdoc = description ? `/**\n   * @description ${jsStringEscape(description)}\n   */\n  ` : ''
   const functionSignature = `${jsdoc}export function ${name}<TData extends Partial<${typeName}> = object>(data?: TData)`
-
-  const seedCode = seed ? `faker.seed(${JSON.stringify(seed)})\n  ` : ''
 
   // When the object node has properties that transitively reference a cyclic schema,
   // the printer emits memoizing getters for those properties. Spreading the object
@@ -114,7 +104,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
 
   const functionBody = hasGetters
     ? `{
-  ${seedCode}const defaultFakeData = ${fakerText}
+  const defaultFakeData = ${fakerText}
   if (data) {
     for (const [key, value] of Object.entries(data)) {
       Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
@@ -123,7 +113,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   return defaultFakeData as Omit<typeof defaultFakeData, keyof TData> & TData
 }`
     : `{
-  ${seedCode}const defaultFakeData = ${fakerText}
+  const defaultFakeData = ${fakerText}
   return {
     ...defaultFakeData,
     ...(data || {}),

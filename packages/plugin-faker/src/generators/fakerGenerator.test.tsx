@@ -161,6 +161,7 @@ describe('fakerGenerator — schema', () => {
     { name: 'treeNode', node: treeNodeSchema, options: {} },
     { name: 'catCycle', node: catSchema, options: {} },
     { name: 'petWithLocale', node: petSchema, options: { locale: 'de' as const } },
+    { name: 'petWithSeed', node: petSchema, options: { seed: [1] as Array<number> } },
   ] as const)('$name', async ({ name, node, options }) => {
     const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
@@ -307,6 +308,29 @@ describe('fakerGenerator — operation', () => {
         ],
       }),
       options: {},
+    },
+    {
+      name: 'showPetByIdWithSeed',
+      node: ast.factory.createOperation({
+        operationId: 'showPetById',
+        method: 'GET',
+        path: '/pets/{petId}',
+        tags: ['pets'],
+        parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            description: 'Expected response to a valid request',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          }),
+          ast.factory.createResponse({
+            statusCode: 'default',
+            description: 'Unexpected error',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'Error', ref: '#/components/schemas/Error' }),
+          }),
+        ],
+      }),
+      options: { seed: [1] as Array<number> },
     },
   ] as const)('$name', async ({ name, node, options }) => {
     const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
