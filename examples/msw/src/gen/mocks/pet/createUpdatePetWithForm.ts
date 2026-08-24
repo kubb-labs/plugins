@@ -6,8 +6,9 @@
 import type { UpdatePetWithFormPath, UpdatePetWithFormQuery } from '../../models/UpdatePetWithForm'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 export function createUpdatePetWithFormPath<TData extends Partial<UpdatePetWithFormPath> = object>(data?: TData) {
-  faker.seed([220])
   const defaultFakeData = {
     petId: faker.number.bigInt(),
   }
@@ -18,7 +19,6 @@ export function createUpdatePetWithFormPath<TData extends Partial<UpdatePetWithF
 }
 
 export function createUpdatePetWithFormQuery<TData extends Partial<UpdatePetWithFormQuery> = object>(data?: TData) {
-  faker.seed([220])
   const defaultFakeData = {
     name: faker.string.alpha(),
     status: faker.string.alpha(),
@@ -33,13 +33,9 @@ export function createUpdatePetWithFormQuery<TData extends Partial<UpdatePetWith
  * @description Invalid input
  */
 export function createUpdatePetWithFormStatus405() {
-  faker.seed([220])
-
   return undefined
 }
 
 export function createUpdatePetWithFormResponse() {
-  faker.seed([220])
-
   return undefined
 }

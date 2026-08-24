@@ -8,8 +8,9 @@ import { createOrderHttpStatusEnum } from './createOrderHttpStatusEnum'
 import { createOrderStatusEnum } from './createOrderStatusEnum'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 export function createOrder<TData extends Partial<Order> = object>(data?: TData) {
-  faker.seed([220])
   const defaultFakeData = {
     id: faker.number.bigInt(),
     petId: faker.number.bigInt(),

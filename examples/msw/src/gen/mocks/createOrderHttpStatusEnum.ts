@@ -6,11 +6,11 @@
 import type { OrderHttpStatusEnumKey } from '../models/OrderHttpStatusEnum'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 /**
  * @description HTTP Status
  */
 export function createOrderHttpStatusEnum(data?: OrderHttpStatusEnumKey): OrderHttpStatusEnumKey {
-  faker.seed([220])
-
   return data ?? faker.helpers.arrayElement<OrderHttpStatusEnumKey>([200, 400, 500])
 }

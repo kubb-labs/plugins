@@ -15,12 +15,12 @@ import type {
 import { createOrder } from '../createOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 /**
  * @description successful operation
  */
 export function createPlaceOrderPatchStatus200(data?: Partial<PlaceOrderPatchStatus200>): PlaceOrderPatchStatus200 {
-  faker.seed([220])
-
   return createOrder(data) as PlaceOrderPatchStatus200
 }
 
@@ -28,37 +28,25 @@ export function createPlaceOrderPatchStatus200(data?: Partial<PlaceOrderPatchSta
  * @description Invalid input
  */
 export function createPlaceOrderPatchStatus405() {
-  faker.seed([220])
-
   return undefined
 }
 
 export function createPlaceOrderPatchBodyJson(data?: Partial<PlaceOrderPatchBodyJson>): PlaceOrderPatchBodyJson {
-  faker.seed([220])
-
   return createOrder(data) as PlaceOrderPatchBodyJson
 }
 
 export function createPlaceOrderPatchBodyXml(data?: Partial<PlaceOrderPatchBodyXml>): PlaceOrderPatchBodyXml {
-  faker.seed([220])
-
   return createOrder(data) as PlaceOrderPatchBodyXml
 }
 
 export function createPlaceOrderPatchBodyFormUrlEncoded(data?: Partial<PlaceOrderPatchBodyFormUrlEncoded>): PlaceOrderPatchBodyFormUrlEncoded {
-  faker.seed([220])
-
   return createOrder(data) as PlaceOrderPatchBodyFormUrlEncoded
 }
 
 export function createPlaceOrderPatchBody(_data?: PlaceOrderPatchBody): PlaceOrderPatchBody {
-  faker.seed([220])
-
   return faker.helpers.arrayElement([createPlaceOrderPatchBodyJson(), createPlaceOrderPatchBodyXml(), createPlaceOrderPatchBodyFormUrlEncoded()])
 }
 
 export function createPlaceOrderPatchResponse(_data?: PlaceOrderPatchResponse): PlaceOrderPatchResponse {
-  faker.seed([220])
-
   return faker.helpers.arrayElement([createPlaceOrderPatchStatus200(), createPlaceOrderPatchStatus405()])
 }

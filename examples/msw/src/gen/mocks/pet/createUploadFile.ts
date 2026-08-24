@@ -7,8 +7,9 @@ import type { UploadFilePath, UploadFileQuery, UploadFileResponse, UploadFileSta
 import { createApiResponse } from '../createApiResponse'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 export function createUploadFilePath<TData extends Partial<UploadFilePath> = object>(data?: TData) {
-  faker.seed([220])
   const defaultFakeData = {
     petId: faker.number.bigInt(),
   }
@@ -19,7 +20,6 @@ export function createUploadFilePath<TData extends Partial<UploadFilePath> = obj
 }
 
 export function createUploadFileQuery<TData extends Partial<UploadFileQuery> = object>(data?: TData) {
-  faker.seed([220])
   const defaultFakeData = {
     additionalMetadata: faker.string.alpha(),
   }
@@ -33,19 +33,13 @@ export function createUploadFileQuery<TData extends Partial<UploadFileQuery> = o
  * @description successful operation
  */
 export function createUploadFileStatus200(data?: Partial<UploadFileStatus200>): UploadFileStatus200 {
-  faker.seed([220])
-
   return createApiResponse(data) as UploadFileStatus200
 }
 
 export function createUploadFileBody(data?: Blob): Blob {
-  faker.seed([220])
-
   return data ?? (faker.image.url() as unknown as Blob)
 }
 
 export function createUploadFileResponse(data?: Partial<UploadFileResponse>): UploadFileResponse {
-  faker.seed([220])
-
   return createUploadFileStatus200(data) as UploadFileResponse
 }

@@ -6,8 +6,9 @@
 import type { DeleteOrderPath, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/DeleteOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 export function createDeleteOrderPath<TData extends Partial<DeleteOrderPath> = object>(data?: TData) {
-  faker.seed([220])
   const defaultFakeData = {
     orderId: faker.number.bigInt(),
   }
@@ -21,8 +22,6 @@ export function createDeleteOrderPath<TData extends Partial<DeleteOrderPath> = o
  * @description Invalid ID supplied
  */
 export function createDeleteOrderStatus400() {
-  faker.seed([220])
-
   return undefined
 }
 
@@ -30,13 +29,9 @@ export function createDeleteOrderStatus400() {
  * @description Order not found
  */
 export function createDeleteOrderStatus404() {
-  faker.seed([220])
-
   return undefined
 }
 
 export function createDeleteOrderResponse(_data?: DeleteOrderResponse): DeleteOrderResponse {
-  faker.seed([220])
-
   return faker.helpers.arrayElement([createDeleteOrderStatus400(), createDeleteOrderStatus404()])
 }

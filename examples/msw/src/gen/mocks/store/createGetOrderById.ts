@@ -15,8 +15,9 @@ import type {
 import { createOrder } from '../createOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 export function createGetOrderByIdPath<TData extends Partial<GetOrderByIdPath> = object>(data?: TData) {
-  faker.seed([220])
   const defaultFakeData = {
     orderId: faker.number.bigInt(),
   }
@@ -30,8 +31,6 @@ export function createGetOrderByIdPath<TData extends Partial<GetOrderByIdPath> =
  * @description successful operation
  */
 export function createGetOrderByIdStatus200Json(data?: Partial<GetOrderByIdStatus200Json>): GetOrderByIdStatus200Json {
-  faker.seed([220])
-
   return createOrder(data) as GetOrderByIdStatus200Json
 }
 
@@ -39,8 +38,6 @@ export function createGetOrderByIdStatus200Json(data?: Partial<GetOrderByIdStatu
  * @description successful operation
  */
 export function createGetOrderByIdStatus200Xml(data?: Partial<GetOrderByIdStatus200Xml>): GetOrderByIdStatus200Xml {
-  faker.seed([220])
-
   return createOrder(data) as GetOrderByIdStatus200Xml
 }
 
@@ -48,8 +45,6 @@ export function createGetOrderByIdStatus200Xml(data?: Partial<GetOrderByIdStatus
  * @description successful operation
  */
 export function createGetOrderByIdStatus200(_data?: GetOrderByIdStatus200): GetOrderByIdStatus200 {
-  faker.seed([220])
-
   return faker.helpers.arrayElement([createGetOrderByIdStatus200Json(), createGetOrderByIdStatus200Xml()])
 }
 
@@ -57,8 +52,6 @@ export function createGetOrderByIdStatus200(_data?: GetOrderByIdStatus200): GetO
  * @description Invalid ID supplied
  */
 export function createGetOrderByIdStatus400() {
-  faker.seed([220])
-
   return undefined
 }
 
@@ -66,13 +59,9 @@ export function createGetOrderByIdStatus400() {
  * @description Order not found
  */
 export function createGetOrderByIdStatus404() {
-  faker.seed([220])
-
   return undefined
 }
 
 export function createGetOrderByIdResponse(_data?: GetOrderByIdResponse): GetOrderByIdResponse {
-  faker.seed([220])
-
   return faker.helpers.arrayElement([createGetOrderByIdStatus200(), createGetOrderByIdStatus400(), createGetOrderByIdStatus404()])
 }
