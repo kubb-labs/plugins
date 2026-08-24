@@ -1,5 +1,11 @@
 # @kubb/plugin-faker
 
+## 5.0.1
+
+### Patch Changes
+
+- [#781](https://github.com/kubb-labs/plugins/pull/781) [`41dfdd5`](https://github.com/kubb-labs/plugins/commit/41dfdd5668a939d8bef48aa2d159ace74e0ebfc5) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Emit `faker.seed(...)` once at module scope instead of inside every generated factory. Nested factory calls (for example, array items generated via `faker.helpers.multiple`) no longer reset the PRNG on every invocation, so repeated calls produce distinct values while output stays deterministic.
+
 ## 5.0.0
 
 ### Major Changes
