@@ -7,10 +7,11 @@ import type { Order } from '../types/Order'
 import { createOrderStatusEnum } from './createOrderStatusEnum'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([42])
+
 export function createOrder<TData extends Partial<Order> = object>(data?: TData)
 
 {
-  faker.seed([42])
   const defaultFakeData = {
   id: faker.number.bigInt(),
   petId: faker.number.bigInt(),

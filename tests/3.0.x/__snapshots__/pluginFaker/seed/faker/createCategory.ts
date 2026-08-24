@@ -6,10 +6,11 @@
 import type { Category } from '../types/Category'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([42])
+
 export function createCategory<TData extends Partial<Category> = object>(data?: TData)
 
 {
-  faker.seed([42])
   const defaultFakeData = {
   id: faker.number.bigInt(),
   name: faker.string.alpha(),

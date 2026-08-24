@@ -6,10 +6,11 @@
 import type { DeletePetHeaders, DeletePetPath } from '../types/DeletePet'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([42])
+
 export function createDeletePetPath<TData extends Partial<DeletePetPath> = object>(data?: TData)
 
 {
-  faker.seed([42])
   const defaultFakeData = {
   petId: faker.number.bigInt(),
 }
@@ -22,7 +23,6 @@ export function createDeletePetPath<TData extends Partial<DeletePetPath> = objec
 export function createDeletePetHeaders<TData extends Partial<DeletePetHeaders> = object>(data?: TData)
 
 {
-  faker.seed([42])
   const defaultFakeData = {
   api_key: faker.string.alpha(),
 }
@@ -36,13 +36,9 @@ export function createDeletePetHeaders<TData extends Partial<DeletePetHeaders> =
  * @description Invalid pet value
  */
 export function createDeletePetStatus400() {
-  faker.seed([42])
-
   return undefined
 }
 
 export function createDeletePetResponse() {
-  faker.seed([42])
-
   return undefined
 }

@@ -8,10 +8,11 @@ import { createFindPetsByStatusStatus } from './createFindPetsByStatusStatus'
 import { createPet } from './createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([42])
+
 export function createFindPetsByStatusQuery<TData extends Partial<FindPetsByStatusQuery> = object>(data?: TData)
 
 {
-  faker.seed([42])
   const defaultFakeData = {
   status: createFindPetsByStatusStatus(),
 }
@@ -25,8 +26,6 @@ export function createFindPetsByStatusQuery<TData extends Partial<FindPetsByStat
  * @description successful operation
  */
 export function createFindPetsByStatusStatus200Json(data?: FindPetsByStatusStatus200Json): FindPetsByStatusStatus200Json {
-  faker.seed([42])
-
   return [
     ...faker.helpers.multiple(() => (createPet())),
     ...(data || [])
@@ -37,8 +36,6 @@ export function createFindPetsByStatusStatus200Json(data?: FindPetsByStatusStatu
  * @description successful operation
  */
 export function createFindPetsByStatusStatus200Xml(data?: FindPetsByStatusStatus200Xml): FindPetsByStatusStatus200Xml {
-  faker.seed([42])
-
   return [
     ...faker.helpers.multiple(() => (createPet())),
     ...(data || [])
@@ -49,8 +46,6 @@ export function createFindPetsByStatusStatus200Xml(data?: FindPetsByStatusStatus
  * @description successful operation
  */
 export function createFindPetsByStatusStatus200(_data?: FindPetsByStatusStatus200): FindPetsByStatusStatus200 {
-  faker.seed([42])
-
   return faker.helpers.arrayElement([createFindPetsByStatusStatus200Json(), createFindPetsByStatusStatus200Xml()])
 }
 
@@ -58,13 +53,9 @@ export function createFindPetsByStatusStatus200(_data?: FindPetsByStatusStatus20
  * @description Invalid status value
  */
 export function createFindPetsByStatusStatus400() {
-  faker.seed([42])
-
   return undefined
 }
 
 export function createFindPetsByStatusResponse(_data?: FindPetsByStatusResponse): FindPetsByStatusResponse {
-  faker.seed([42])
-
   return faker.helpers.arrayElement([createFindPetsByStatusStatus200(), createFindPetsByStatusStatus400()])
 }

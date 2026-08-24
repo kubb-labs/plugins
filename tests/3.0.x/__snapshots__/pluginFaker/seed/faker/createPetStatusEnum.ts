@@ -6,11 +6,11 @@
 import type { PetStatusEnumKey } from '../types/PetStatusEnum'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([42])
+
 /**
  * @description pet status in the store
  */
 export function createPetStatusEnum(data?: PetStatusEnumKey): PetStatusEnumKey {
-  faker.seed([42])
-
   return data ?? faker.helpers.arrayElement<PetStatusEnumKey>(['available', 'pending', 'sold'])
 }

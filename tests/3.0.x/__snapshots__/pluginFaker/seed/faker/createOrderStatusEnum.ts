@@ -6,11 +6,11 @@
 import type { OrderStatusEnumKey } from '../types/OrderStatusEnum'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([42])
+
 /**
  * @description Order Status
  */
 export function createOrderStatusEnum(data?: OrderStatusEnumKey): OrderStatusEnumKey {
-  faker.seed([42])
-
   return data ?? faker.helpers.arrayElement<OrderStatusEnumKey>(['placed', 'approved', 'delivered'])
 }
