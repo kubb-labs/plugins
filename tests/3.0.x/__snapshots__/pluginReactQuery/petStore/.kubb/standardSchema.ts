@@ -50,5 +50,5 @@ export async function validateStandardSchema<TOutput>(schema: StandardSchemaVali
   if (result.issues) {
     throw new ParseError({ issues: result.issues })
   }
-  return result.value as TOutput
+  return (result as { value: TOutput }).value
 }
