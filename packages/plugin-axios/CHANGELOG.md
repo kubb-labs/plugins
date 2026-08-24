@@ -1,5 +1,37 @@
 # @kubb/plugin-axios
 
+## 5.0.1
+
+### Patch Changes
+
+- [#779](https://github.com/kubb-labs/plugins/pull/779) [`5a4db35`](https://github.com/kubb-labs/plugins/commit/5a4db35ed57ceb08e28b9ceb79e612431da2d9c4) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix the generated `client.ts` importing `./standardSchema.ts` with a `.ts` extension while every other sibling import (`./serializers`) omits it.
+  
+  Under `"moduleResolution": "nodenext"` an extensioned relative specifier is resolved as CommonJS even in an ESM package, which TypeScript 6 now rejects when the rest of the config expects ESM resolution. Dropping the extension makes the import consistent with the other generated files and compiles under `nodenext`.
+  
+  ```ts
+  // before
+  import { type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
+  
+  // after
+  import { type StandardSchemaValidator, validateStandardSchema } from './standardSchema'
+  ```
+  
+  Only the import specifier changes, so regenerating produces a one-line diff in existing `client.ts` files without any behavior change.
+
+- [#779](https://github.com/kubb-labs/plugins/pull/779) [`5a4db35`](https://github.com/kubb-labs/plugins/commit/5a4db35ed57ceb08e28b9ceb79e612431da2d9c4) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix `validateStandardSchema` failing to typecheck in the generated `standardSchema.ts` when a consumer's `tsconfig.json` sets `"strict": false`.
+  
+  The function narrowed `StandardSchemaResult` by checking `if (result.issues)` and then read `result.value` on the remaining branch. That narrowing depends on `strictNullChecks`: with `strict: false`, TypeScript keeps treating `result` as the full union after the check, and `value` isn't a property shared by both union members, so the read fails to compile.
+  
+  ```ts
+  // before
+  return result.value as TOutput
+  
+  // after
+  return (result as { value: TOutput }).value
+  ```
+  
+  Only the generated `standardSchema.ts` changes, so regenerating produces a one-line diff in existing output without any behavior change.
+
 ## 5.0.0
 
 ### Major Changes
