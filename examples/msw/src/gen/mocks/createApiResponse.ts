@@ -6,8 +6,9 @@
 import type { ApiResponse } from '../models/ApiResponse'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 export function createApiResponse<TData extends Partial<ApiResponse> = object>(data?: TData) {
-  faker.seed([220])
   const defaultFakeData = {
     code: faker.number.int(),
     type: faker.string.alpha(),

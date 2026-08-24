@@ -6,11 +6,12 @@
 import type { GetInventoryResponse, GetInventoryStatus200 } from '../../models/GetInventory'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 /**
  * @description successful operation
  */
 export function createGetInventoryStatus200<TData extends Partial<GetInventoryStatus200> = object>(data?: TData) {
-  faker.seed([220])
   const defaultFakeData = {}
   return {
     ...defaultFakeData,
@@ -19,7 +20,5 @@ export function createGetInventoryStatus200<TData extends Partial<GetInventorySt
 }
 
 export function createGetInventoryResponse(data?: Partial<GetInventoryResponse>): GetInventoryResponse {
-  faker.seed([220])
-
   return createGetInventoryStatus200(data) as GetInventoryResponse
 }

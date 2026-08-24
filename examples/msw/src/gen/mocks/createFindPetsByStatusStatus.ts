@@ -6,11 +6,11 @@
 import type { FindPetsByStatusStatusKey } from '../models/FindPetsByStatusStatus'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 /**
  * @description Status values that need to be considered for filter
  */
 export function createFindPetsByStatusStatus(data?: FindPetsByStatusStatusKey): FindPetsByStatusStatusKey {
-  faker.seed([220])
-
   return data ?? faker.helpers.arrayElement<FindPetsByStatusStatusKey>(['available', 'pending', 'sold'])
 }

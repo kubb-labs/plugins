@@ -6,8 +6,9 @@
 import type { PetNotFound } from '../models/PetNotFound'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 export function createPetNotFound<TData extends Partial<PetNotFound> = object>(data?: TData) {
-  faker.seed([220])
   const defaultFakeData = {
     code: faker.number.int(),
     message: faker.string.alpha(),

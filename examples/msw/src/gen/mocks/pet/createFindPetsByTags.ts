@@ -14,8 +14,9 @@ import type {
 import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 export function createFindPetsByTagsQuery<TData extends Partial<FindPetsByTagsQuery> = object>(data?: TData) {
-  faker.seed([220])
   const defaultFakeData = {
     tags: faker.helpers.multiple(() => faker.string.alpha()),
     page: faker.string.alpha(),
@@ -31,8 +32,6 @@ export function createFindPetsByTagsQuery<TData extends Partial<FindPetsByTagsQu
  * @description successful operation
  */
 export function createFindPetsByTagsStatus200Json(data?: FindPetsByTagsStatus200Json): FindPetsByTagsStatus200Json {
-  faker.seed([220])
-
   return [...faker.helpers.multiple(() => createPet()), ...(data || [])]
 }
 
@@ -40,8 +39,6 @@ export function createFindPetsByTagsStatus200Json(data?: FindPetsByTagsStatus200
  * @description successful operation
  */
 export function createFindPetsByTagsStatus200Xml(data?: FindPetsByTagsStatus200Xml): FindPetsByTagsStatus200Xml {
-  faker.seed([220])
-
   return [...faker.helpers.multiple(() => createPet()), ...(data || [])]
 }
 
@@ -49,8 +46,6 @@ export function createFindPetsByTagsStatus200Xml(data?: FindPetsByTagsStatus200X
  * @description successful operation
  */
 export function createFindPetsByTagsStatus200(_data?: FindPetsByTagsStatus200): FindPetsByTagsStatus200 {
-  faker.seed([220])
-
   return faker.helpers.arrayElement([createFindPetsByTagsStatus200Json(), createFindPetsByTagsStatus200Xml()])
 }
 
@@ -58,13 +53,9 @@ export function createFindPetsByTagsStatus200(_data?: FindPetsByTagsStatus200): 
  * @description Invalid tag value
  */
 export function createFindPetsByTagsStatus400() {
-  faker.seed([220])
-
   return undefined
 }
 
 export function createFindPetsByTagsResponse(_data?: FindPetsByTagsResponse): FindPetsByTagsResponse {
-  faker.seed([220])
-
   return faker.helpers.arrayElement([createFindPetsByTagsStatus200(), createFindPetsByTagsStatus400()])
 }

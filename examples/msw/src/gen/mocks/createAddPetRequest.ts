@@ -9,8 +9,9 @@ import { createCategory } from './createCategory'
 import { createTag } from './createTag'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 export function createAddPetRequest<TData extends Partial<AddPetRequest> = object>(data?: TData) {
-  faker.seed([220])
   const defaultFakeData = {
     id: faker.number.bigInt(),
     name: faker.string.alpha(),

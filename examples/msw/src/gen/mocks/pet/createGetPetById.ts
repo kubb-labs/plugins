@@ -15,8 +15,9 @@ import type {
 import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 export function createGetPetByIdPath<TData extends Partial<GetPetByIdPath> = object>(data?: TData) {
-  faker.seed([220])
   const defaultFakeData = {
     petId: faker.number.bigInt(),
   }
@@ -30,8 +31,6 @@ export function createGetPetByIdPath<TData extends Partial<GetPetByIdPath> = obj
  * @description successful operation
  */
 export function createGetPetByIdStatus200Json(data?: Partial<GetPetByIdStatus200Json>): GetPetByIdStatus200Json {
-  faker.seed([220])
-
   return createPet(data) as GetPetByIdStatus200Json
 }
 
@@ -39,8 +38,6 @@ export function createGetPetByIdStatus200Json(data?: Partial<GetPetByIdStatus200
  * @description successful operation
  */
 export function createGetPetByIdStatus200Xml(data?: Partial<GetPetByIdStatus200Xml>): GetPetByIdStatus200Xml {
-  faker.seed([220])
-
   return createPet(data) as GetPetByIdStatus200Xml
 }
 
@@ -48,8 +45,6 @@ export function createGetPetByIdStatus200Xml(data?: Partial<GetPetByIdStatus200X
  * @description successful operation
  */
 export function createGetPetByIdStatus200(_data?: GetPetByIdStatus200): GetPetByIdStatus200 {
-  faker.seed([220])
-
   return faker.helpers.arrayElement([createGetPetByIdStatus200Json(), createGetPetByIdStatus200Xml()])
 }
 
@@ -57,8 +52,6 @@ export function createGetPetByIdStatus200(_data?: GetPetByIdStatus200): GetPetBy
  * @description Invalid ID supplied
  */
 export function createGetPetByIdStatus400() {
-  faker.seed([220])
-
   return undefined
 }
 
@@ -66,13 +59,9 @@ export function createGetPetByIdStatus400() {
  * @description Pet not found
  */
 export function createGetPetByIdStatus404() {
-  faker.seed([220])
-
   return undefined
 }
 
 export function createGetPetByIdResponse(_data?: GetPetByIdResponse): GetPetByIdResponse {
-  faker.seed([220])
-
   return faker.helpers.arrayElement([createGetPetByIdStatus200(), createGetPetByIdStatus400(), createGetPetByIdStatus404()])
 }

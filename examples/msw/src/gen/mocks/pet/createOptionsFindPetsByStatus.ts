@@ -7,17 +7,15 @@ import type { OptionsFindPetsByStatusResponse, OptionsFindPetsByStatusStatus200 
 import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 /**
  * @description successful operation
  */
 export function createOptionsFindPetsByStatusStatus200(data?: OptionsFindPetsByStatusStatus200): OptionsFindPetsByStatusStatus200 {
-  faker.seed([220])
-
   return [...faker.helpers.multiple(() => createPet()), ...(data || [])]
 }
 
 export function createOptionsFindPetsByStatusResponse(data?: OptionsFindPetsByStatusResponse): OptionsFindPetsByStatusResponse {
-  faker.seed([220])
-
   return [...faker.helpers.multiple(() => createPet()), ...(data || [])]
 }

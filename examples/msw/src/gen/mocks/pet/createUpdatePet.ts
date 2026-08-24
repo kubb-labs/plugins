@@ -19,12 +19,12 @@ import type {
 import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 /**
  * @description Successful operation
  */
 export function createUpdatePetStatus200Json(data?: Partial<UpdatePetStatus200Json>): UpdatePetStatus200Json {
-  faker.seed([220])
-
   return createPet(data) as UpdatePetStatus200Json
 }
 
@@ -32,8 +32,6 @@ export function createUpdatePetStatus200Json(data?: Partial<UpdatePetStatus200Js
  * @description Successful operation
  */
 export function createUpdatePetStatus200Xml(data?: Partial<UpdatePetStatus200Xml>): UpdatePetStatus200Xml {
-  faker.seed([220])
-
   return createPet(data) as UpdatePetStatus200Xml
 }
 
@@ -41,8 +39,6 @@ export function createUpdatePetStatus200Xml(data?: Partial<UpdatePetStatus200Xml
  * @description Successful operation
  */
 export function createUpdatePetStatus200(_data?: UpdatePetStatus200): UpdatePetStatus200 {
-  faker.seed([220])
-
   return faker.helpers.arrayElement([createUpdatePetStatus200Json(), createUpdatePetStatus200Xml()])
 }
 
@@ -50,8 +46,6 @@ export function createUpdatePetStatus200(_data?: UpdatePetStatus200): UpdatePetS
  * @description Invalid ID supplied
  */
 export function createUpdatePetStatus400() {
-  faker.seed([220])
-
   return undefined
 }
 
@@ -59,8 +53,6 @@ export function createUpdatePetStatus400() {
  * @description Pet not found
  */
 export function createUpdatePetStatus404() {
-  faker.seed([220])
-
   return undefined
 }
 
@@ -68,8 +60,6 @@ export function createUpdatePetStatus404() {
  * @description Validation exception
  */
 export function createUpdatePetStatus405() {
-  faker.seed([220])
-
   return undefined
 }
 
@@ -77,8 +67,6 @@ export function createUpdatePetStatus405() {
  * @description Update an existent pet in the store
  */
 export function createUpdatePetBodyJson(data?: Partial<UpdatePetBodyJson>): UpdatePetBodyJson {
-  faker.seed([220])
-
   return createPet(data) as UpdatePetBodyJson
 }
 
@@ -86,8 +74,6 @@ export function createUpdatePetBodyJson(data?: Partial<UpdatePetBodyJson>): Upda
  * @description Update an existent pet in the store
  */
 export function createUpdatePetBodyXml(data?: Partial<UpdatePetBodyXml>): UpdatePetBodyXml {
-  faker.seed([220])
-
   return createPet(data) as UpdatePetBodyXml
 }
 
@@ -95,8 +81,6 @@ export function createUpdatePetBodyXml(data?: Partial<UpdatePetBodyXml>): Update
  * @description Update an existent pet in the store
  */
 export function createUpdatePetBodyFormUrlEncoded(data?: Partial<UpdatePetBodyFormUrlEncoded>): UpdatePetBodyFormUrlEncoded {
-  faker.seed([220])
-
   return createPet(data) as UpdatePetBodyFormUrlEncoded
 }
 
@@ -104,13 +88,9 @@ export function createUpdatePetBodyFormUrlEncoded(data?: Partial<UpdatePetBodyFo
  * @description Update an existent pet in the store
  */
 export function createUpdatePetBody(_data?: UpdatePetBody): UpdatePetBody {
-  faker.seed([220])
-
   return faker.helpers.arrayElement([createUpdatePetBodyJson(), createUpdatePetBodyXml(), createUpdatePetBodyFormUrlEncoded()])
 }
 
 export function createUpdatePetResponse(_data?: UpdatePetResponse): UpdatePetResponse {
-  faker.seed([220])
-
   return faker.helpers.arrayElement([createUpdatePetStatus200(), createUpdatePetStatus400(), createUpdatePetStatus404(), createUpdatePetStatus405()])
 }

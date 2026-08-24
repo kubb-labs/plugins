@@ -9,8 +9,9 @@ import { createPetStatusEnum } from './createPetStatusEnum'
 import { createTag } from './createTag'
 import { fakerEN as faker } from '@faker-js/faker'
 
+faker.seed([220])
+
 export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
-  faker.seed([220])
   const defaultFakeData = {
     id: faker.number.bigInt(),
     name: faker.string.alpha(),
