@@ -5,7 +5,9 @@ export {
   buildQueryKeyParams,
   buildResponseTypes,
   classifyOperation,
+  hasQueryKeyParams,
   maybeValueOrGetter,
+  queryKeyGroupOrder,
   resolveOperationOverrides,
   resolvePageParamType,
 } from '@internals/tanstack-query'

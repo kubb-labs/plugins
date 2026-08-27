@@ -1,4 +1,4 @@
-import { getOperationParameters, getRequestGroupOptionality, resolveErrorNames, resolveSuccessNames } from '@internals/shared'
+import { getOperationParameters, getRequestGroupOptionality, getRequestGroups, resolveErrorNames, resolveSuccessNames } from '@internals/shared'
 import type { ast } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
@@ -365,13 +365,29 @@ export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodS
 }
 
 /**
+ * The request groups a query key is built from, matching `buildQueryKeyParams`. Headers are
+ * deliberately absent: they do not identify a cache entry, so the key factory takes no parameter
+ * for an operation that only carries headers.
+ */
+export const queryKeyGroupOrder = ['path', 'query', 'body'] as const
+
+/**
+ * Whether the generated query key factory declares a parameter, so a call site passes an argument
+ * only when one is accepted.
+ */
+export function hasQueryKeyParams(node: ast.OperationNode): boolean {
+  const groups = getRequestGroups(node)
+  return queryKeyGroupOrder.some((key) => groups[key])
+}
+
+/**
  * Build QueryKey params as the grouped `{ path, query, body }` object (NO headers, NO config),
  * typed from the operation's `Options` minus `url`. The query key transformer reads the
  * grouped `path`/`query`/`body` bindings.
  */
 export function buildQueryKeyParams(node: ast.OperationNode, options: { resolver: PluginTs['resolver'] }): FunctionParametersNode {
   const { resolver } = options
-  const groupedParam = buildGroupedRequestParam(node, { resolver, keys: ['path', 'query', 'body'] })
+  const groupedParam = buildGroupedRequestParam(node, { resolver, keys: queryKeyGroupOrder })
 
   return createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
 }

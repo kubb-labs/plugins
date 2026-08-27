@@ -5,7 +5,7 @@ import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { Infinite } from '../types.ts'
-import { buildClientCall, buildGroupedRequestParam, buildQueryOptionsParams, buildResponseTypes, resolvePageParamType } from '../utils.ts'
+import { buildClientCall, buildGroupedRequestParam, buildQueryOptionsParams, buildResponseTypes, queryKeyGroupOrder, resolvePageParamType } from '../utils.ts'
 
 type Props = {
   name: string
@@ -57,7 +57,7 @@ export function InfiniteQueryOptions({
 
   const { queryParamsTypeName, pageParamType } = resolvePageParamType(node, { resolver: tsResolver, initialPageParam, queryParam })
 
-  const groupedKeyParam = buildGroupedRequestParam(node, { resolver: tsResolver, keys: ['path', 'query', 'body'], memberTypeWrapper })
+  const groupedKeyParam = buildGroupedRequestParam(node, { resolver: tsResolver, keys: queryKeyGroupOrder, memberTypeWrapper })
   const queryKeyParamsNode = createFunctionParameters({ params: groupedKeyParam ? [groupedKeyParam] : [] })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 

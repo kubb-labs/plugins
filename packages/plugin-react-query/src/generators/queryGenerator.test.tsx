@@ -148,6 +148,23 @@ const createUsersWithListInputNode = ast.factory.createOperation({
   ],
 })
 
+// Headers do not identify a cache entry, so the key factory takes no parameter here and the hook
+// must not pass one.
+const headersOnlyNode = ast.factory.createOperation({
+  operationId: 'retrieveMyProfile',
+  method: 'GET',
+  path: '/user/me',
+  tags: ['user'],
+  parameters: [ast.factory.createParameter({ name: 'X-Request-Id', in: 'header', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
+})
+
 describe('queryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
@@ -164,6 +181,7 @@ describe('queryGenerator operation', () => {
       node: createUsersWithListInputNode,
       options: { query: { importPath: '@tanstack/react-query', methods: ['post'] } },
     },
+    { name: 'headersOnly', node: headersOnlyNode, options: {} },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']>; baseURL?: string }>
 
   test.each(testData)('$name', async (props) => {
