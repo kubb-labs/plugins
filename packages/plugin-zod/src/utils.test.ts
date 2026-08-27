@@ -33,6 +33,11 @@ describe('formatDefault', () => {
     expect(formatDefault({ a: 1 })).toBe('{}')
   })
 
+  test('array value keeps its contents instead of collapsing to an object literal', () => {
+    expect(formatDefault([])).toBe('[]')
+    expect(formatDefault(['content'])).toBe('["content"]')
+  })
+
   test('null produces empty string (not object literal)', () => {
     expect(formatDefault(null)).toBe('')
   })
@@ -64,6 +69,13 @@ describe('defaultLiteral', () => {
 
   test('a plain string default is quoted', () => {
     expect(defaultLiteral(ast.factory.createSchema({ type: 'string' }), 'x')).toBe("'x'")
+  })
+
+  test('an array default reached through a $ref stays an array literal', () => {
+    // A ref node does not narrow to `array`, so this falls through to `formatDefault`.
+    const node = ast.factory.createSchema({ type: 'ref', name: 'Resources', ref: '#/components/schemas/Resources' })
+    expect(defaultLiteral(node, [])).toBe('[]')
+    expect(defaultLiteral(node, ['content'])).toBe('["content"]')
   })
 })
 
