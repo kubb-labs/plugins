@@ -62,10 +62,13 @@ export function isObjectComposableIntersection(node: ast.SchemaNode, cyclicSchem
 
 /**
  * Format a default value as a code-level literal.
- * Objects become `{}`, primitives become their string representation, strings are quoted.
+ * Arrays keep their contents, other objects become `{}`, primitives become their string
+ * representation, strings are quoted.
  */
 export function formatDefault(value: unknown): string {
   if (typeof value === 'string') return stringify(value)
+  // An array is also `typeof 'object'`, so it has to be handled before the object case.
+  if (Array.isArray(value)) return JSON.stringify(value)
   if (typeof value === 'object' && value !== null) return '{}'
 
   return String(value ?? '')
@@ -84,18 +87,19 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
   // A `null` default is invalid on a non-nullable schema and redundant on a nullish one, and emitting
   // it produces a bare `.default()` (no argument). Drop it.
   if (value === null) return null
-  if (node && ast.narrowSchema(node, 'bigint')) {
+  const resolved = node ? syncSchemaRef(node) : undefined
+  if (resolved && ast.narrowSchema(resolved, 'bigint')) {
     if (typeof value === 'bigint') return `BigInt(${value})`
     if (typeof value === 'number' && Number.isInteger(value)) return `BigInt(${value})`
     return null
   }
-  if (node && ast.narrowSchema(node, 'array')) {
+  if (resolved && ast.narrowSchema(resolved, 'array')) {
     return Array.isArray(value) ? JSON.stringify(value) : null
   }
   // An enum/literal schema narrows to its members (e.g. `1 | 3`), but the spec default may not match
   // that type (`default: '1'` on a numeric enum). Emit the matching member's typed literal so the
   // default agrees with the schema, or drop a default that matches no member.
-  const enumNode = node ? ast.narrowSchema(node, 'enum') : undefined
+  const enumNode = resolved ? ast.narrowSchema(resolved, 'enum') : undefined
   if (enumNode) {
     const values = enumNode.namedEnumValues?.map((member) => member.value) ?? enumNode.enumValues ?? []
     if (values.length) {

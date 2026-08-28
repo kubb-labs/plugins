@@ -33,6 +33,11 @@ describe('formatDefault', () => {
     expect(formatDefault({ a: 1 })).toBe('{}')
   })
 
+  test('array value keeps its contents instead of collapsing to an object literal', () => {
+    expect(formatDefault([])).toBe('[]')
+    expect(formatDefault(['content'])).toBe('["content"]')
+  })
+
   test('null produces empty string (not object literal)', () => {
     expect(formatDefault(null)).toBe('')
   })
@@ -64,6 +69,41 @@ describe('defaultLiteral', () => {
 
   test('a plain string default is quoted', () => {
     expect(defaultLiteral(ast.factory.createSchema({ type: 'string' }), 'x')).toBe("'x'")
+  })
+
+  test('an array default reached through a $ref stays an array literal', () => {
+    const node = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Resources',
+      ref: '#/components/schemas/Resources',
+      schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
+    })
+    expect(defaultLiteral(node, [])).toBe('[]')
+    expect(defaultLiteral(node, ['content'])).toBe('["content"]')
+    expect(defaultLiteral(node, {})).toBeNull()
+  })
+
+  test('a bigint default reached through a $ref is wrapped in BigInt(...)', () => {
+    const node = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Id',
+      ref: '#/components/schemas/Id',
+      schema: ast.factory.createSchema({ type: 'bigint' }),
+    })
+    expect(defaultLiteral(node, 0)).toBe('BigInt(0)')
+    expect(defaultLiteral(node, 42)).toBe('BigInt(42)')
+    expect(defaultLiteral(node, 'invalid')).toBeNull()
+  })
+
+  test('an enum default reached through a $ref coerces and drops correctly', () => {
+    const node = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Priority',
+      ref: '#/components/schemas/Priority',
+      schema: ast.factory.createSchema({ type: 'enum', enumValues: [1, 3] }),
+    })
+    expect(defaultLiteral(node, '1')).toBe('1')
+    expect(defaultLiteral(node, '2')).toBeNull()
   })
 })
 
