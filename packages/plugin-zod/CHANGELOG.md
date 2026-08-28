@@ -1,5 +1,13 @@
 # @kubb/plugin-zod
 
+## 5.1.2
+
+### Patch Changes
+
+- [#804](https://github.com/kubb-labs/plugins/pull/804) [`26660b6`](https://github.com/kubb-labs/plugins/commit/26660b68c3f19744a72b5c0bb3010357f6a7d6eb) Thanks [@xeoneux](https://github.com/xeoneux)! - Resolve `$ref` schemas when computing `default` literals and keep array defaults as array literals.
+  
+  `defaultLiteral` now resolves `$ref` schema targets so that array, bigint, and enum default formatting guards apply to referenced schemas. In addition, `formatDefault` preserves array literals instead of collapsing them to `{}`.
+
 ## 5.1.1
 
 ### Patch Changes
