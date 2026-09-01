@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options, RequestResult } from './.kubb/client'
+import type { Options, Unwrappable, RequestResult } from './.kubb/client'
 import type { AddPetOptions, AddPetResponses } from './AddPet'
-import { client } from './.kubb/client'
+import { client, withUnwrap } from './.kubb/client'
 import { AddPetResponse } from './AddPet'
 
 /**
@@ -10,8 +10,10 @@ import { AddPetResponse } from './AddPet'
  */
 export function addPet<ThrowOnError extends boolean = true>(
   options: Options<AddPetOptions, ThrowOnError>,
-): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet', validator: { response: AddPetResponse }, ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'POST', url: '/pet', validator: { response: AddPetResponse }, ...config })) as Unwrappable<
+    RequestResult<AddPetResponses, ThrowOnError>
+  >
 }

@@ -10,6 +10,7 @@ import {
   type ServerSentEvent,
   type Transport,
   type TransportResult,
+  withUnwrap,
 } from './fetch.ts'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
@@ -646,6 +647,33 @@ describe('getUrl', () => {
     expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, styles: { query: { id: { style: 'spaceDelimited', explode: false } } } })).toBe(
       '/pets?id=3%204%205',
     )
+  })
+})
+
+describe('withUnwrap', () => {
+  test('unwrap() resolves to the success data', async () => {
+    const { client } = createClient({ data: { id: 1 }, status: 200 })
+    const result = await withUnwrap(client({ method: 'GET', url: '/pet/1' }) as Promise<CallResult<string, string>>).unwrap()
+    expect(result).toStrictEqual({ id: 1 })
+  })
+
+  test('unwrap() rejects with error for a non-throwing error result', async () => {
+    const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
+    await expect(
+      withUnwrap(client({ method: 'POST', url: '/pet', throwOnError: false }) as Promise<CallResult<string, string>>).unwrap(),
+    ).rejects.toStrictEqual({ message: 'invalid' })
+  })
+
+  test('the wrapped promise still resolves to the full result when awaited directly', async () => {
+    const { client } = createClient({ data: { id: 1 }, status: 200 })
+    const result = await withUnwrap(client({ method: 'GET', url: '/pet/1' }) as Promise<CallResult<string, string>>)
+    expect(result.status).toBe(200)
+    expect(result.data).toStrictEqual({ id: 1 })
+  })
+
+  test('a throwing call rejects before unwrap() has a chance to run', async () => {
+    const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
+    await expect(withUnwrap(client({ method: 'POST', url: '/pet' }) as Promise<CallResult<string, string>>).unwrap()).rejects.toBeInstanceOf(ResponseError)
   })
 })
 

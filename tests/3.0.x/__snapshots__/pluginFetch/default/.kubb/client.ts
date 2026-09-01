@@ -83,6 +83,34 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequ
     : ResultUnion<TResponses, TRequest, TResponse>
 
 /**
+ * The success body of a `RequestResult`, picked out by its `error: undefined` discriminant so an
+ * error variant's `data: undefined` can never widen it.
+ */
+export type UnwrapResult<T extends { data: unknown; error: unknown }> = Extract<T, { error: undefined }>['data']
+
+/**
+ * A `RequestResult` promise with an extra `unwrap()` method, Redux-Toolkit-style: `unwrap()`
+ * resolves to the bare success body, or rejects with `error` for a result that carried one
+ * (only reachable with `throwOnError: false`, since the throwing path never resolves an error).
+ */
+export type Unwrappable<T extends { data: unknown; error: unknown }> = Promise<T> & { unwrap: () => Promise<UnwrapResult<T>> }
+
+/**
+ * Attaches `unwrap()` to a call's result promise. Generated operations call this so every result
+ * doubles as a plain promise (`await getPetById(...)`) and an RTK-style unwrap
+ * (`await getPetById(...).unwrap()`).
+ */
+export function withUnwrap<T extends { data: unknown; error: unknown }>(promise: Promise<T>): Unwrappable<T> {
+  const unwrappable = promise as Unwrappable<T>
+  unwrappable.unwrap = () =>
+    promise.then((result) => {
+      if (result.error !== undefined) throw result.error
+      return result.data as UnwrapResult<T>
+    })
+  return unwrappable
+}
+
+/**
  * The data-shaped keys of the grouped options object, which `Options` re-adds typed per operation.
  */
 export type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; path?: unknown; query?: unknown }

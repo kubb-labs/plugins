@@ -3,17 +3,17 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { UploadFileOptionsSchemaType, UploadFileResponsesSchemaType } from '../zod/uploadFileSchema'
-import { client } from '../.kubb/client'
+import { client, withUnwrap } from '../.kubb/client'
 import { uploadFileResponseSchema } from '../zod/uploadFileSchema'
 
 /**
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export function uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileOptionsSchemaType, ThrowOnError>): Promise<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>> {
+export function uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], validator: { response: uploadFileResponseSchema }, contentType: { request: 'application/octet-stream' }, ...config }) as Promise<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>>
+  return withUnwrap(request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], validator: { response: uploadFileResponseSchema }, contentType: { request: 'application/octet-stream' }, ...config })) as Unwrappable<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>>
 }

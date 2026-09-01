@@ -3,17 +3,17 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../types/FindPetsByStatus'
-import { client } from '../.kubb/client'
+import { client, withUnwrap } from '../.kubb/client'
 
 /**
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export function findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptions, ThrowOnError> = {}): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+export function findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptions, ThrowOnError> = {}): Unwrappable<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], styles: { query: { status: { explode: true } } }, ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], styles: { query: { status: { explode: true } } }, ...config })) as Unwrappable<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
 }

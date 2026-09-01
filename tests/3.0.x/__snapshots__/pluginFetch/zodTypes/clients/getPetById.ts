@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { GetPetByIdOptionsSchemaType, GetPetByIdResponsesSchemaType } from '../zod/getPetByIdSchema'
-import { client } from '../.kubb/client'
+import { client, withUnwrap } from '../.kubb/client'
 import { getPetByIdResponseSchema, getPetByIdErrorSchema } from '../zod/getPetByIdSchema'
 
 /**
@@ -13,8 +13,8 @@ import { getPetByIdResponseSchema, getPetByIdErrorSchema } from '../zod/getPetBy
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export function getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptionsSchemaType, ThrowOnError>): Promise<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>> {
+export function getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], validator: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema }, ...config }) as Promise<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>>
+  return withUnwrap(request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], validator: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema }, ...config })) as Unwrappable<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>>
 }

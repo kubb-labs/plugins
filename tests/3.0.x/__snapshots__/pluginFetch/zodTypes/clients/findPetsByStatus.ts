@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { FindPetsByStatusOptionsSchemaType, FindPetsByStatusResponsesSchemaType } from '../zod/findPetsByStatusSchema'
-import { client } from '../.kubb/client'
+import { client, withUnwrap } from '../.kubb/client'
 import { findPetsByStatusResponseSchema, findPetsByStatusErrorSchema } from '../zod/findPetsByStatusSchema'
 
 /**
@@ -13,8 +13,8 @@ import { findPetsByStatusResponseSchema, findPetsByStatusErrorSchema } from '../
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export function findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptionsSchemaType, ThrowOnError> = {}): Promise<RequestResult<FindPetsByStatusResponsesSchemaType, ThrowOnError>> {
+export function findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<FindPetsByStatusResponsesSchemaType, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], styles: { query: { status: { explode: true } } }, validator: { response: findPetsByStatusResponseSchema, error: findPetsByStatusErrorSchema }, ...config }) as Promise<RequestResult<FindPetsByStatusResponsesSchemaType, ThrowOnError>>
+  return withUnwrap(request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], styles: { query: { status: { explode: true } } }, validator: { response: findPetsByStatusResponseSchema, error: findPetsByStatusErrorSchema }, ...config })) as Unwrappable<RequestResult<FindPetsByStatusResponsesSchemaType, ThrowOnError>>
 }

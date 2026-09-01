@@ -3,15 +3,15 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { UpdatePetOptions, UpdatePetResponses } from '../types/UpdatePet'
-import { client } from '../.kubb/client'
+import { client, withUnwrap } from '../.kubb/client'
 
 /**
  * {@link /pets/:pet_id}
  */
-export function updatePet<ThrowOnError extends boolean = true>(options: Options<UpdatePetOptions, ThrowOnError>): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
+export function updatePet<ThrowOnError extends boolean = true>(options: Options<UpdatePetOptions, ThrowOnError>): Unwrappable<RequestResult<UpdatePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pets/{pet_id}', ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'POST', url: '/pets/{pet_id}', ...config })) as Unwrappable<RequestResult<UpdatePetResponses, ThrowOnError>>
 }

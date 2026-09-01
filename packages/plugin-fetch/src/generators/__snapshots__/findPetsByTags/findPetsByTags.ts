@@ -1,16 +1,16 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options, RequestResult } from './.kubb/client'
+import type { Options, Unwrappable, RequestResult } from './.kubb/client'
 import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from './FindPetsByTags'
-import { client } from './.kubb/client'
+import { client, withUnwrap } from './.kubb/client'
 
 /**
  * {@link /pet/findByTags}
  */
 export function findPetsByTags<ThrowOnError extends boolean = true>(
   options: Options<FindPetsByTagsOptions, ThrowOnError>,
-): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/pet/findByTags', ...config }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'GET', url: '/pet/findByTags', ...config })) as Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
 }

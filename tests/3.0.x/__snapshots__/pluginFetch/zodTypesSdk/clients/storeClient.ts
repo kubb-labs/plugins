@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { ClientConfig, ClientInstance, Options, RequestResult } from '../.kubb/client'
+import type { ClientConfig, ClientInstance, Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { GetInventoryOptionsSchemaType, GetInventoryResponsesSchemaType } from '../zod/getInventorySchema'
 import type { PlaceOrderOptionsSchemaType, PlaceOrderResponsesSchemaType } from '../zod/placeOrderSchema'
-import { createClient } from '../.kubb/client'
+import { createClient, withUnwrap } from '../.kubb/client'
 import { getInventoryResponseSchema } from '../zod/getInventorySchema'
 import { placeOrderResponseSchema } from '../zod/placeOrderSchema'
 
@@ -22,10 +22,10 @@ export class StoreClient {
    * @summary Returns pet inventories by status
    * {@link /store/inventory}
    */
-    public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptionsSchemaType, ThrowOnError> = {}): Promise<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>> {
+    public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], validator: { response: getInventoryResponseSchema }, ...config }) as Promise<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>>
+    return withUnwrap(request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], validator: { response: getInventoryResponseSchema }, ...config })) as Unwrappable<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>>
   }
 
 /**
@@ -33,9 +33,9 @@ export class StoreClient {
    * @summary Place an order for a pet
    * {@link /store/order}
    */
-    public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptionsSchemaType, ThrowOnError>): Promise<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>> {
+    public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'POST', url: '/store/order', validator: { response: placeOrderResponseSchema }, ...config }) as Promise<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>>
+    return withUnwrap(request({ method: 'POST', url: '/store/order', validator: { response: placeOrderResponseSchema }, ...config })) as Unwrappable<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>>
   }
 }

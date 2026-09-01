@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { GetInventoryOptions, GetInventoryResponses } from '../types/GetInventory'
-import { client } from '../.kubb/client'
+import { client, withUnwrap } from '../.kubb/client'
 import { getInventoryResponseSchema } from '../zod/getInventorySchema'
 
 /**
@@ -13,8 +13,8 @@ import { getInventoryResponseSchema } from '../zod/getInventorySchema'
  * @summary Returns pet inventories by status
  * {@link /store/inventory}
  */
-export function getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptions, ThrowOnError> = {}): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
+export function getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptions, ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], validator: { response: getInventoryResponseSchema }, ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], validator: { response: getInventoryResponseSchema }, ...config })) as Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>>
 }

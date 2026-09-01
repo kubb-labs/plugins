@@ -3,13 +3,13 @@
 * Do not edit manually.
 */
 
-import type { ClientConfig, ClientInstance, Options, RequestResult } from '../.kubb/client'
+import type { ClientConfig, ClientInstance, Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { AddPetOptionsSchemaType, AddPetResponsesSchemaType } from '../zod/addPetSchema'
 import type { DeletePetOptionsSchemaType, DeletePetResponsesSchemaType } from '../zod/deletePetSchema'
 import type { FindPetsByStatusOptionsSchemaType, FindPetsByStatusResponsesSchemaType } from '../zod/findPetsByStatusSchema'
 import type { GetPetByIdOptionsSchemaType, GetPetByIdResponsesSchemaType } from '../zod/getPetByIdSchema'
 import type { UploadFileOptionsSchemaType, UploadFileResponsesSchemaType } from '../zod/uploadFileSchema'
-import { createClient } from '../.kubb/client'
+import { createClient, withUnwrap } from '../.kubb/client'
 import { addPetResponseSchema } from '../zod/addPetSchema'
 import { deletePetResponseSchema } from '../zod/deletePetSchema'
 import { findPetsByStatusResponseSchema } from '../zod/findPetsByStatusSchema'
@@ -28,10 +28,10 @@ export class PetClient {
    * @summary Add a new pet to the store
    * {@link /pet}
    */
-    public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptionsSchemaType, ThrowOnError>): Promise<RequestResult<AddPetResponsesSchemaType, ThrowOnError>> {
+    public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<AddPetResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], validator: { response: addPetResponseSchema }, ...config }) as Promise<RequestResult<AddPetResponsesSchemaType, ThrowOnError>>
+    return withUnwrap(request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], validator: { response: addPetResponseSchema }, ...config })) as Unwrappable<RequestResult<AddPetResponsesSchemaType, ThrowOnError>>
   }
 
 /**
@@ -39,10 +39,10 @@ export class PetClient {
    * @summary Finds Pets by status
    * {@link /pet/findByStatus}
    */
-    public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptionsSchemaType, ThrowOnError> = {}): Promise<RequestResult<FindPetsByStatusResponsesSchemaType, ThrowOnError>> {
+    public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<FindPetsByStatusResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], validator: { response: findPetsByStatusResponseSchema }, ...config }) as Promise<RequestResult<FindPetsByStatusResponsesSchemaType, ThrowOnError>>
+    return withUnwrap(request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], validator: { response: findPetsByStatusResponseSchema }, ...config })) as Unwrappable<RequestResult<FindPetsByStatusResponsesSchemaType, ThrowOnError>>
   }
 
 /**
@@ -50,10 +50,10 @@ export class PetClient {
    * @summary Find pet by ID
    * {@link /pet/:petId}
    */
-    public getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptionsSchemaType, ThrowOnError>): Promise<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>> {
+    public getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], validator: { response: getPetByIdResponseSchema }, ...config }) as Promise<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>>
+    return withUnwrap(request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], validator: { response: getPetByIdResponseSchema }, ...config })) as Unwrappable<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>>
   }
 
 /**
@@ -61,19 +61,19 @@ export class PetClient {
    * @summary Deletes a pet
    * {@link /pet/:petId}
    */
-    public deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetOptionsSchemaType, ThrowOnError>): Promise<RequestResult<DeletePetResponsesSchemaType, ThrowOnError>> {
+    public deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<DeletePetResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], validator: { response: deletePetResponseSchema }, ...config }) as Promise<RequestResult<DeletePetResponsesSchemaType, ThrowOnError>>
+    return withUnwrap(request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], validator: { response: deletePetResponseSchema }, ...config })) as Unwrappable<RequestResult<DeletePetResponsesSchemaType, ThrowOnError>>
   }
 
 /**
    * @summary uploads an image
    * {@link /pet/:petId/uploadImage}
    */
-    public uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileOptionsSchemaType, ThrowOnError>): Promise<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>> {
+    public uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], validator: { response: uploadFileResponseSchema }, ...config }) as Promise<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>>
+    return withUnwrap(request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], validator: { response: uploadFileResponseSchema }, ...config })) as Unwrappable<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>>
   }
 }

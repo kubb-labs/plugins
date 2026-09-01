@@ -41,8 +41,8 @@ describe('buildGroupedOptionsSignature', () => {
     expect(signature.paramsSignature).toBe('options: Options<ListPetsOptions, ThrowOnError> = {}')
   })
 
-  test('keys the return type on the plugin-ts per-status responses record', () => {
+  test('keys the return type on the plugin-ts per-status responses record, wrapped in Unwrappable', () => {
     const signature = buildGroupedOptionsSignature({ node: addPet, types: resolverTs })
-    expect(signature.returnType).toBe('Promise<RequestResult<AddPetResponses, ThrowOnError>>')
+    expect(signature.returnType).toBe('Unwrappable<RequestResult<AddPetResponses, ThrowOnError>>')
   })
 })

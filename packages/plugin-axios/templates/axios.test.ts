@@ -1,6 +1,6 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import { type CallResult, createClientCore, parseEventStream, ResponseError, resolveAuth } from './axios.ts'
+import { type CallResult, createClientCore, parseEventStream, ResponseError, resolveAuth, withUnwrap } from './axios.ts'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
@@ -713,6 +713,35 @@ describe('getUrl', () => {
     expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, styles: { query: { id: { style: 'pipeDelimited', explode: false } } } })).toBe(
       '/pets?id=3|4|5',
     )
+  })
+})
+
+describe('withUnwrap', () => {
+  test('unwrap() resolves to the success data', async () => {
+    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
+    const client = createClientCore({ transport: instance })
+    const result = await withUnwrap(client({ method: 'GET', url: '/pet/1' }) as Promise<CallResult>).unwrap()
+    expect(result).toStrictEqual({ id: 1 })
+  })
+
+  test('unwrap() rejects with error for a non-throwing error result', async () => {
+    const { instance } = fakeAxios({ data: { message: 'not found' }, status: 404 })
+    const client = createClientCore({ transport: instance, validateStatus: () => true })
+    await expect(withUnwrap(client({ method: 'GET', url: '/pet/999' }) as Promise<CallResult>).unwrap()).rejects.toStrictEqual({ message: 'not found' })
+  })
+
+  test('the wrapped promise still resolves to the full result when awaited directly', async () => {
+    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
+    const client = createClientCore({ transport: instance })
+    const result = await withUnwrap(client({ method: 'GET', url: '/pet/1' }) as Promise<CallResult>)
+    expect(result.status).toBe(200)
+    expect(result.data).toStrictEqual({ id: 1 })
+  })
+
+  test('a throwing call rejects before unwrap() has a chance to run', async () => {
+    const { instance } = fakeAxios({ data: { message: 'not found' }, status: 404 })
+    const client = createClientCore({ transport: instance })
+    await expect(withUnwrap(client({ method: 'GET', url: '/pet/999' }) as Promise<CallResult>).unwrap()).rejects.toBeInstanceOf(ResponseError)
   })
 })
 

@@ -44,7 +44,7 @@ type Props = {
 
 /**
  * Renders one client operation: the grouped `<Name>Request` type and the function that forwards a
- * single `options` object to the resolved client and returns the `RequestResult`. The type, signature,
+ * single `options` object to the resolved client and returns the `Unwrappable<RequestResult>`. The type, signature,
  * and call config are built with the AST factory, and only the jsx-renderer emits the source.
  */
 export function Operation({ name, node, types, zodResolver, validator, security, isExportable = true, isIndexable = true }: Props): KubbReactNode {

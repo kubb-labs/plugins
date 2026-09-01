@@ -165,8 +165,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
 
         return (
           <File key={file.path} baseName={file.baseName} path={file.path} meta={file.meta} banner={banner(file)} footer={footer(file)}>
-            <File.Import name={['createClient']} root={file.path} path={clientPath} />
-            <File.Import name={['ClientConfig', 'ClientInstance', 'Options', 'RequestResult']} root={file.path} path={clientPath} isTypeOnly />
+            <File.Import name={['createClient', 'withUnwrap']} root={file.path} path={clientPath} />
+            <File.Import name={['ClientConfig', 'ClientInstance', 'Options', 'Unwrappable', 'RequestResult']} root={file.path} path={clientPath} isTypeOnly />
 
             {validator === 'zod' && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
 
