@@ -1,5 +1,11 @@
 # @kubb/plugin-fetch
 
+## 5.1.2
+
+### Patch Changes
+
+- [#814](https://github.com/kubb-labs/plugins/pull/814) [`8223e64`](https://github.com/kubb-labs/plugins/commit/8223e64ccac5ecbfb145e3f62d81e1d072b55eca) Thanks [@julian99m](https://github.com/julian99m)! - Changed client template to comply with TypeScript's `noPropertyAccessFromIndexSignature` rule
+
 ## 5.1.1
 
 ### Patch Changes
