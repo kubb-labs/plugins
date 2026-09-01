@@ -85,6 +85,19 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequ
     : ResultUnion<TResponses, TRequest, TResponse>
 
 /**
+ * The shape a generated operation returns when `returnType: 'data'` is set: the bare success body
+ * once `throwOnError` (on by default) narrows away the error branch, falling back to the full
+ * `RequestResult` when a call sets `throwOnError: false` and still needs `error` to discriminate a
+ * failed response.
+ */
+export type UnwrappedResult<
+  TResponses,
+  ThrowOnError extends boolean = true,
+  TRequest = AxiosRequestConfig,
+  TResponse = AxiosResponse,
+> = ThrowOnError extends true ? RequestResult<TResponses, true, TRequest, TResponse>['data'] : RequestResult<TResponses, ThrowOnError, TRequest, TResponse>
+
+/**
  * The data-shaped keys of the grouped options object, which `Options` re-adds typed per operation.
  */
 export type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; path?: unknown; query?: unknown }
