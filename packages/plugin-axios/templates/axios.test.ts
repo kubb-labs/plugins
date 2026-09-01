@@ -717,25 +717,15 @@ describe('getUrl', () => {
 })
 
 describe('unwrapResult', () => {
-  test('narrows a resolved success result to its data', async () => {
-    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
-    const client = createClientCore({ transport: instance })
-    const result = await unwrapResult(client({ method: 'GET', url: '/pet/1' }) as Promise<CallResult>, undefined)
+  test('narrows a success result to its data', async () => {
+    const result = await unwrapResult(Promise.resolve({ data: { id: 1 }, error: undefined }), undefined)
     expect(result).toStrictEqual({ id: 1 })
   })
 
   test('falls back to the full result when throwOnError is false', async () => {
-    const { instance } = fakeAxios({ data: { message: 'not found' }, status: 404 })
-    const client = createClientCore({ transport: instance, validateStatus: () => true })
-    const result = await unwrapResult(client({ method: 'GET', url: '/pet/999' }) as Promise<CallResult>, false)
-    expect(result).toStrictEqual({
-      status: 404,
-      data: undefined,
-      error: { message: 'not found' },
-      contentType: undefined,
-      request: expect.anything(),
-      response: expect.anything(),
-    })
+    const full = { data: undefined, error: { message: 'not found' } }
+    const result = await unwrapResult(Promise.resolve(full), false)
+    expect(result).toBe(full)
   })
 })
 

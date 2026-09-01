@@ -651,16 +651,15 @@ describe('getUrl', () => {
 })
 
 describe('unwrapResult', () => {
-  test('narrows a resolved success result to its data', async () => {
-    const { client } = createClient({ data: { id: 1 }, status: 200 })
-    const result = await unwrapResult(client({ method: 'GET', url: '/pet/1' }) as Promise<CallResult<string, string>>, undefined)
+  test('narrows a success result to its data', async () => {
+    const result = await unwrapResult(Promise.resolve({ data: { id: 1 }, error: undefined }), undefined)
     expect(result).toStrictEqual({ id: 1 })
   })
 
   test('falls back to the full result when throwOnError is false', async () => {
-    const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
-    const result = await unwrapResult(client({ method: 'POST', url: '/pet', throwOnError: false }) as Promise<CallResult<string, string>>, false)
-    expect(result).toStrictEqual({ status: 405, data: undefined, error: { message: 'invalid' }, contentType: undefined, request: 'REQ', response: 'RES' })
+    const full = { data: undefined, error: { message: 'invalid' } }
+    const result = await unwrapResult(Promise.resolve(full), false)
+    expect(result).toBe(full)
   })
 })
 
