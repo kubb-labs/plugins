@@ -15,5 +15,5 @@ import { uploadFileResponseSchema } from '../zod/uploadFileSchema'
 export function uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], validator: { response: uploadFileResponseSchema }, contentType: { request: 'application/octet-stream' }, ...config })) as Unwrappable<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>>
+  return withUnwrap(request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], validator: { response: uploadFileResponseSchema }, contentType: { request: 'application/octet-stream' }, ...config }) as Promise<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>>)
 }

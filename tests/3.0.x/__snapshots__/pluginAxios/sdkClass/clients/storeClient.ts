@@ -23,7 +23,7 @@ export class StoreClient {
     public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptions, ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config })) as Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>>
+    return withUnwrap(request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>)
   }
 
 /**
@@ -34,6 +34,6 @@ export class StoreClient {
     public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptions, ThrowOnError>): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'POST', url: '/store/order', ...config })) as Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>>
+    return withUnwrap(request({ method: 'POST', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>)
   }
 }

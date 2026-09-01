@@ -12,7 +12,9 @@ export function uploadFile<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<UploadFileResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'POST', url: '/pet/{petId}/uploadImage', contentType: { request: 'multipart/form-data' }, ...config })) as Unwrappable<
-    RequestResult<UploadFileResponses, ThrowOnError>
-  >
+  return withUnwrap(
+    request({ method: 'POST', url: '/pet/{petId}/uploadImage', contentType: { request: 'multipart/form-data' }, ...config }) as Promise<
+      RequestResult<UploadFileResponses, ThrowOnError>
+    >,
+  )
 }

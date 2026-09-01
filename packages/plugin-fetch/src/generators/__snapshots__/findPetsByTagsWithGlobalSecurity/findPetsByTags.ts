@@ -12,7 +12,9 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'GET', url: '/pet/findByTags', security: [{ type: 'http', scheme: 'bearer' }], ...config })) as Unwrappable<
-    RequestResult<FindPetsByTagsResponses, ThrowOnError>
-  >
+  return withUnwrap(
+    request({ method: 'GET', url: '/pet/findByTags', security: [{ type: 'http', scheme: 'bearer' }], ...config }) as Promise<
+      RequestResult<FindPetsByTagsResponses, ThrowOnError>
+    >,
+  )
 }

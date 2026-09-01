@@ -13,6 +13,8 @@ export function getPetById<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'oauth2' }, { type: 'apiKey', name: 'api_key', in: 'header' }], ...config }),
-  ) as Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>>
+    request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'oauth2' }, { type: 'apiKey', name: 'api_key', in: 'header' }], ...config }) as Promise<
+      RequestResult<GetPetByIdResponses, ThrowOnError>
+    >,
+  )
 }

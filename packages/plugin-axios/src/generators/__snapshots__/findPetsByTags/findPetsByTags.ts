@@ -12,5 +12,5 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'GET', url: '/pet/findByTags', ...config })) as Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'GET', url: '/pet/findByTags', ...config }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>)
 }

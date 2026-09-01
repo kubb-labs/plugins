@@ -13,7 +13,7 @@ export function addPet<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'POST', url: '/pet', validator: { response: AddPetResponse }, ...config })) as Unwrappable<
-    RequestResult<AddPetResponses, ThrowOnError>
-  >
+  return withUnwrap(
+    request({ method: 'POST', url: '/pet', validator: { response: AddPetResponse }, ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>,
+  )
 }

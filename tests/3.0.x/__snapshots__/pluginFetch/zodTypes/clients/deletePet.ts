@@ -16,5 +16,5 @@ import { deletePetResponseSchema, deletePetErrorSchema } from '../zod/deletePetS
 export function deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<DeletePetResponsesSchemaType, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], validator: { response: deletePetResponseSchema, error: deletePetErrorSchema }, ...config })) as Unwrappable<RequestResult<DeletePetResponsesSchemaType, ThrowOnError>>
+  return withUnwrap(request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], validator: { response: deletePetResponseSchema, error: deletePetErrorSchema }, ...config }) as Promise<RequestResult<DeletePetResponsesSchemaType, ThrowOnError>>)
 }

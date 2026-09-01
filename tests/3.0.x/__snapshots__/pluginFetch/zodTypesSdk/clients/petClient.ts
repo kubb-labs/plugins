@@ -31,7 +31,7 @@ export class PetClient {
     public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<AddPetResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], validator: { response: addPetResponseSchema }, ...config })) as Unwrappable<RequestResult<AddPetResponsesSchemaType, ThrowOnError>>
+    return withUnwrap(request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], validator: { response: addPetResponseSchema }, ...config }) as Promise<RequestResult<AddPetResponsesSchemaType, ThrowOnError>>)
   }
 
 /**
@@ -42,7 +42,7 @@ export class PetClient {
     public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<FindPetsByStatusResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], validator: { response: findPetsByStatusResponseSchema }, ...config })) as Unwrappable<RequestResult<FindPetsByStatusResponsesSchemaType, ThrowOnError>>
+    return withUnwrap(request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], validator: { response: findPetsByStatusResponseSchema }, ...config }) as Promise<RequestResult<FindPetsByStatusResponsesSchemaType, ThrowOnError>>)
   }
 
 /**
@@ -53,7 +53,7 @@ export class PetClient {
     public getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], validator: { response: getPetByIdResponseSchema }, ...config })) as Unwrappable<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>>
+    return withUnwrap(request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], validator: { response: getPetByIdResponseSchema }, ...config }) as Promise<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>>)
   }
 
 /**
@@ -64,7 +64,7 @@ export class PetClient {
     public deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<DeletePetResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], validator: { response: deletePetResponseSchema }, ...config })) as Unwrappable<RequestResult<DeletePetResponsesSchemaType, ThrowOnError>>
+    return withUnwrap(request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], validator: { response: deletePetResponseSchema }, ...config }) as Promise<RequestResult<DeletePetResponsesSchemaType, ThrowOnError>>)
   }
 
 /**
@@ -74,6 +74,6 @@ export class PetClient {
     public uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], validator: { response: uploadFileResponseSchema }, ...config })) as Unwrappable<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>>
+    return withUnwrap(request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], validator: { response: uploadFileResponseSchema }, ...config }) as Promise<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>>)
   }
 }

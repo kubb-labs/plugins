@@ -16,5 +16,5 @@ import { getInventoryResponseSchema } from '../zod/getInventorySchema'
 export function getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptions, ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], validator: { response: getInventoryResponseSchema }, ...config })) as Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], validator: { response: getInventoryResponseSchema }, ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>)
 }

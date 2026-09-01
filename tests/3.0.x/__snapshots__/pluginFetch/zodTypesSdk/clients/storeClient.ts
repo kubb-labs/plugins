@@ -25,7 +25,7 @@ export class StoreClient {
     public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], validator: { response: getInventoryResponseSchema }, ...config })) as Unwrappable<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>>
+    return withUnwrap(request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], validator: { response: getInventoryResponseSchema }, ...config }) as Promise<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>>)
   }
 
 /**
@@ -36,6 +36,6 @@ export class StoreClient {
     public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'POST', url: '/store/order', validator: { response: placeOrderResponseSchema }, ...config })) as Unwrappable<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>>
+    return withUnwrap(request({ method: 'POST', url: '/store/order', validator: { response: placeOrderResponseSchema }, ...config }) as Promise<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>>)
   }
 }

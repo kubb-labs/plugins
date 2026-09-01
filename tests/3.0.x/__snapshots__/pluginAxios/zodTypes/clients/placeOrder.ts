@@ -16,5 +16,5 @@ import { placeOrderResponseSchema, placeOrderErrorSchema } from '../zod/placeOrd
 export function placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'POST', url: '/store/order', validator: { response: placeOrderResponseSchema, error: placeOrderErrorSchema }, ...config })) as Unwrappable<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>>
+  return withUnwrap(request({ method: 'POST', url: '/store/order', validator: { response: placeOrderResponseSchema, error: placeOrderErrorSchema }, ...config }) as Promise<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>>)
 }

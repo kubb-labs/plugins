@@ -22,7 +22,7 @@ export class PetStore {
   ): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/pet/{petId}', ...config })) as Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>>
+    return withUnwrap(request({ method: 'GET', url: '/pet/{petId}', ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>)
   }
 
   /**
@@ -33,7 +33,7 @@ export class PetStore {
   ): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'DELETE', url: '/pet/{petId}', ...config })) as Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>>
+    return withUnwrap(request({ method: 'DELETE', url: '/pet/{petId}', ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>)
   }
 
   /**
@@ -44,7 +44,7 @@ export class PetStore {
   ): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/store/inventory', ...config })) as Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>>
+    return withUnwrap(request({ method: 'GET', url: '/store/inventory', ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>)
   }
 
   /**
@@ -55,6 +55,6 @@ export class PetStore {
   ): Unwrappable<RequestResult<GetProjectResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/projects/{project_id}', ...config })) as Unwrappable<RequestResult<GetProjectResponses, ThrowOnError>>
+    return withUnwrap(request({ method: 'GET', url: '/projects/{project_id}', ...config }) as Promise<RequestResult<GetProjectResponses, ThrowOnError>>)
   }
 }

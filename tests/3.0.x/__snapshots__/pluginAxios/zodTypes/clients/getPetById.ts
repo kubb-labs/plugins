@@ -16,5 +16,5 @@ import { getPetByIdResponseSchema, getPetByIdErrorSchema } from '../zod/getPetBy
 export function getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], validator: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema }, ...config })) as Unwrappable<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>>
+  return withUnwrap(request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], validator: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema }, ...config }) as Promise<RequestResult<GetPetByIdResponsesSchemaType, ThrowOnError>>)
 }

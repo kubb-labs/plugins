@@ -12,5 +12,5 @@ export function getProject<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<GetProjectResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'GET', url: '/projects/{project_id}', ...config })) as Unwrappable<RequestResult<GetProjectResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'GET', url: '/projects/{project_id}', ...config }) as Promise<RequestResult<GetProjectResponses, ThrowOnError>>)
 }

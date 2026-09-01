@@ -18,6 +18,6 @@ export function listPetsStyled<ThrowOnError extends boolean = true>(
       url: '/pets/{petId}',
       styles: { path: { petId: { style: 'matrix', explode: true } }, query: { tags: { style: 'pipeDelimited', explode: false } } },
       ...config,
-    }),
-  ) as Unwrappable<RequestResult<ListPetsStyledResponses, ThrowOnError>>
+    }) as Promise<RequestResult<ListPetsStyledResponses, ThrowOnError>>,
+  )
 }
