@@ -10,6 +10,7 @@ import {
   type ServerSentEvent,
   type Transport,
   type TransportResult,
+  unwrapResult,
 } from './fetch.ts'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
@@ -646,6 +647,20 @@ describe('getUrl', () => {
     expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, styles: { query: { id: { style: 'spaceDelimited', explode: false } } } })).toBe(
       '/pets?id=3%204%205',
     )
+  })
+})
+
+describe('unwrapResult', () => {
+  test('narrows a resolved success result to its data', async () => {
+    const { client } = createClient({ data: { id: 1 }, status: 200 })
+    const result = await unwrapResult(client({ method: 'GET', url: '/pet/1' }) as Promise<CallResult<string, string>>, undefined)
+    expect(result).toStrictEqual({ id: 1 })
+  })
+
+  test('falls back to the full result when throwOnError is false', async () => {
+    const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
+    const result = await unwrapResult(client({ method: 'POST', url: '/pet', throwOnError: false }) as Promise<CallResult<string, string>>, false)
+    expect(result).toStrictEqual({ status: 405, data: undefined, error: { message: 'invalid' }, contentType: undefined, request: 'REQ', response: 'RES' })
   })
 })
 

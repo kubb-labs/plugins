@@ -3,7 +3,7 @@
 import type { ClientConfig, ClientInstance, Options, UnwrappedResult } from './.kubb/client'
 import type { DeletePetOptions, DeletePetResponses } from './DeletePet'
 import type { GetPetByIdOptions, GetPetByIdResponses } from './GetPetById'
-import { createClient } from './.kubb/client'
+import { createClient, unwrapResult } from './.kubb/client'
 
 export class PetClient {
   private readonly client: ClientInstance
@@ -20,7 +20,7 @@ export class PetClient {
   ): Promise<UnwrappedResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/pet/{petId}', ...config }).then((result) => ((config.throwOnError ?? true) ? result.data : result)) as Promise<
+    return unwrapResult(request({ method: 'GET', url: '/pet/{petId}', ...config }), config.throwOnError) as Promise<
       UnwrappedResult<GetPetByIdResponses, ThrowOnError>
     >
   }
@@ -33,7 +33,7 @@ export class PetClient {
   ): Promise<UnwrappedResult<DeletePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'DELETE', url: '/pet/{petId}', ...config }).then((result) => ((config.throwOnError ?? true) ? result.data : result)) as Promise<
+    return unwrapResult(request({ method: 'DELETE', url: '/pet/{petId}', ...config }), config.throwOnError) as Promise<
       UnwrappedResult<DeletePetResponses, ThrowOnError>
     >
   }

@@ -2,7 +2,7 @@
 
 import type { ClientConfig, ClientInstance, Options, UnwrappedResult } from './.kubb/client'
 import type { GetInventoryOptions, GetInventoryResponses } from './GetInventory'
-import { createClient } from './.kubb/client'
+import { createClient, unwrapResult } from './.kubb/client'
 
 export class StoreClient {
   private readonly client: ClientInstance
@@ -19,7 +19,7 @@ export class StoreClient {
   ): Promise<UnwrappedResult<GetInventoryResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/store/inventory', ...config }).then((result) => ((config.throwOnError ?? true) ? result.data : result)) as Promise<
+    return unwrapResult(request({ method: 'GET', url: '/store/inventory', ...config }), config.throwOnError) as Promise<
       UnwrappedResult<GetInventoryResponses, ThrowOnError>
     >
   }

@@ -2,7 +2,7 @@
 
 import type { ClientConfig, ClientInstance, Options, UnwrappedResult } from './.kubb/client'
 import type { GetProjectOptions, GetProjectResponses } from './GetProject'
-import { createClient } from './.kubb/client'
+import { createClient, unwrapResult } from './.kubb/client'
 
 export class ProjectClient {
   private readonly client: ClientInstance
@@ -19,8 +19,8 @@ export class ProjectClient {
   ): Promise<UnwrappedResult<GetProjectResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/projects/{project_id}', ...config }).then((result) =>
-      (config.throwOnError ?? true) ? result.data : result,
-    ) as Promise<UnwrappedResult<GetProjectResponses, ThrowOnError>>
+    return unwrapResult(request({ method: 'GET', url: '/projects/{project_id}', ...config }), config.throwOnError) as Promise<
+      UnwrappedResult<GetProjectResponses, ThrowOnError>
+    >
   }
 }

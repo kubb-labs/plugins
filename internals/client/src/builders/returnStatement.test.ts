@@ -19,10 +19,10 @@ describe('buildReturnStatement', () => {
     )
   })
 
-  test('unwraps to the success body when returnType is data', () => {
+  test('routes the call through unwrapResult when returnType is data', () => {
     const callConfig = "{ method: 'POST', url: '/pet', ...config }"
     expect(buildReturnStatement({ node, types: resolverTs, callConfig, returnType: 'data' })).toBe(
-      "return request({ method: 'POST', url: '/pet', ...config }).then((result) => (config.throwOnError ?? true ? result.data : result)) as Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>",
+      "return unwrapResult(request({ method: 'POST', url: '/pet', ...config }), config.throwOnError) as Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>",
     )
   })
 })

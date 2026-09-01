@@ -1,6 +1,6 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import { type CallResult, createClientCore, parseEventStream, ResponseError, resolveAuth } from './axios.ts'
+import { type CallResult, createClientCore, parseEventStream, ResponseError, resolveAuth, unwrapResult } from './axios.ts'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
@@ -713,6 +713,29 @@ describe('getUrl', () => {
     expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, styles: { query: { id: { style: 'pipeDelimited', explode: false } } } })).toBe(
       '/pets?id=3|4|5',
     )
+  })
+})
+
+describe('unwrapResult', () => {
+  test('narrows a resolved success result to its data', async () => {
+    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
+    const client = createClientCore({ transport: instance })
+    const result = await unwrapResult(client({ method: 'GET', url: '/pet/1' }) as Promise<CallResult>, undefined)
+    expect(result).toStrictEqual({ id: 1 })
+  })
+
+  test('falls back to the full result when throwOnError is false', async () => {
+    const { instance } = fakeAxios({ data: { message: 'not found' }, status: 404 })
+    const client = createClientCore({ transport: instance, validateStatus: () => true })
+    const result = await unwrapResult(client({ method: 'GET', url: '/pet/999' }) as Promise<CallResult>, false)
+    expect(result).toStrictEqual({
+      status: 404,
+      data: undefined,
+      error: { message: 'not found' },
+      contentType: undefined,
+      request: expect.anything(),
+      response: expect.anything(),
+    })
   })
 })
 
