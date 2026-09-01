@@ -17,7 +17,7 @@ const node = ast.factory.createOperation({
 
 describe('buildSdkMethod', () => {
   test('builds the call config without remapping, since query param names already match the spec', () => {
-    const method = buildSdkMethod({ node, name: 'updatePet', types: resolverTs, validator: undefined })
+    const method = buildSdkMethod({ node, name: 'updatePet', types: resolverTs, validator: undefined, returnType: 'full' })
 
     expect(method).toContain("url: '/pets/{pet_id}', ...config")
     expect(method).not.toContain('include_deleted')

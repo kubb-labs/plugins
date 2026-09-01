@@ -138,7 +138,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
     renderer: jsxRenderer,
     operations(nodes, ctx) {
       const { config, resolver, root } = ctx
-      const { output, group, validator, sdk } = ctx.options
+      const { output, group, validator, returnType, sdk } = ctx.options
 
       if (!sdk) return null
 
@@ -166,7 +166,12 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
         return (
           <File key={file.path} baseName={file.baseName} path={file.path} meta={file.meta} banner={banner(file)} footer={footer(file)}>
             <File.Import name={['createClient']} root={file.path} path={clientPath} />
-            <File.Import name={['ClientConfig', 'ClientInstance', 'Options', 'RequestResult']} root={file.path} path={clientPath} isTypeOnly />
+            <File.Import
+              name={['ClientConfig', 'ClientInstance', 'Options', returnType === 'data' ? 'UnwrappedResult' : 'RequestResult']}
+              root={file.path}
+              path={clientPath}
+              isTypeOnly
+            />
 
             {validator === 'zod' && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
 
@@ -179,7 +184,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
                 <File.Import key={filePath} name={Array.from(set)} root={file.path} path={zodFilesByPath.get(filePath)!.path} />
               ))}
 
-            <SdkClient name={className} operations={ops} validator={validator} />
+            <SdkClient name={className} operations={ops} validator={validator} returnType={returnType} />
           </File>
         )
       }
