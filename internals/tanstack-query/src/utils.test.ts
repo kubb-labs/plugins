@@ -107,9 +107,7 @@ describe('hasQueryKeyParams', () => {
 
 describe('buildCallResultBody', () => {
   test('reads data off the full result by default', () => {
-    expect(buildCallResultBody('getPetById({ throwOnError: true })')).toBe(
-      'const { data } = await getPetById({ throwOnError: true })\n          return data',
-    )
+    expect(buildCallResultBody('getPetById({ throwOnError: true })')).toBe('const { data } = await getPetById({ throwOnError: true })\n          return data')
   })
 
   test('indents the second line to match the caller', () => {
@@ -119,8 +117,6 @@ describe('buildCallResultBody', () => {
   })
 
   test('returns the call directly when the client already resolves to bare data', () => {
-    expect(buildCallResultBody('getPetById({ throwOnError: true })', { returnType: 'data' })).toBe(
-      'return await getPetById({ throwOnError: true })',
-    )
+    expect(buildCallResultBody('getPetById({ throwOnError: true })', { returnType: 'data' })).toBe('return await getPetById({ throwOnError: true })')
   })
 })
