@@ -14,10 +14,21 @@
  * contract client plugin is picked up automatically.
  */
 
+import { isVersionAtLeast, resolvePackageVersion } from './resolvePackageVersion.ts'
+
 // Canonical plugin names. They mirror the `pluginFetchName` / `pluginAxiosName` consts the plugins
 // export, kept as literals so this internal needs no plugin install deps.
 const pluginFetchName = 'plugin-fetch'
 const pluginAxiosName = 'plugin-axios'
+
+// Consumers (react-query, vue-query, swr) build their generated hooks on `unwrap()`, which the
+// contract client plugins only started attaching to their `RequestResult` promise at this version.
+// An older client plugin generates a client without `unwrap()`, so the hooks would call a method
+// that does not exist at runtime.
+const MIN_CONTRACT_CLIENT_VERSION: Record<string, string> = {
+  [pluginFetchName]: '5.2.0',
+  [pluginAxiosName]: '5.2.0',
+}
 
 /**
  * The client selector accepted by a consumer's `client` option. Both call a registered contract
@@ -100,13 +111,36 @@ export function resolveClient(options: { client: ClientSelector | undefined; plu
  * Resolves the contract client during a consumer plugin's setup hook. Extracts the plugin names
  * from the raw `plugins` config, applies {@link resolveClient}, and throws the diagnostic on a
  * misconfiguration so every consumer fails fast with the same message.
+ *
+ * Pass `requireUnwrap: true` for a consumer (react-query, vue-query, swr) whose generated hooks
+ * call `unwrap()` on the client's result. This checks the resolved contract client plugin's
+ * installed version against {@link MIN_CONTRACT_CLIENT_VERSION} and throws when it predates
+ * `unwrap()`, so the setup fails with a clear diagnostic instead of the generated hooks calling a
+ * method that does not exist at runtime.
  */
-export function resolveContractClient(options: { client: ClientSelector | undefined; plugins?: ReadonlyArray<unknown> }): ResolvedContractClient {
-  const { client, plugins = [] } = options
+export function resolveContractClient(options: {
+  client: ClientSelector | undefined
+  plugins?: ReadonlyArray<unknown>
+  root: string
+  requireUnwrap?: boolean
+}): ResolvedContractClient {
+  const { client, plugins = [], root, requireUnwrap = false } = options
   const pluginNames = plugins.map((plugin) => (plugin as { name?: string }).name).filter((name): name is string => Boolean(name))
   const resolved = resolveClient({ client, pluginNames })
   if (resolved.kind === 'error') {
     throw new Error(resolved.message)
   }
+
+  const minVersion = requireUnwrap ? MIN_CONTRACT_CLIENT_VERSION[resolved.pluginName] : undefined
+  const packageName = `@kubb/${resolved.pluginName}`
+  const installedVersion = minVersion ? resolvePackageVersion(packageName, root) : undefined
+  if (minVersion && installedVersion && !isVersionAtLeast(installedVersion, minVersion)) {
+    throw new Error(
+      `\`${packageName}\` is registered at version ${installedVersion}, but this plugin needs \`${packageName}@${minVersion}\` or newer. ` +
+        `Generated hooks call \`unwrap()\` on the client's result, which \`${packageName}\` only added in ${minVersion}. ` +
+        `Upgrade \`${packageName}\` to ${minVersion} or later.`,
+    )
+  }
+
   return resolved
 }

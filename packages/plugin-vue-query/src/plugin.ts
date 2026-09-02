@@ -69,7 +69,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
 
         ctx.setOptions({
           output,
-          client: resolveContractClient({ client, plugins: ctx.config.plugins }),
+          client: resolveContractClient({ client, plugins: ctx.config.plugins, root: ctx.config.root, requireUnwrap: true }),
           queryKey,
           query: resolveQueryConfig(query, { importPath: '@tanstack/vue-query' }),
           mutationKey,
