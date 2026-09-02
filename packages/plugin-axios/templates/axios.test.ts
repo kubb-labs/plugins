@@ -718,30 +718,25 @@ describe('getUrl', () => {
 
 describe('withUnwrap', () => {
   test('unwrap() resolves to the success data', async () => {
-    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
-    const client = createClientCore({ transport: instance })
-    const result = await withUnwrap(client({ method: 'GET', url: '/pet/1' }) as Promise<CallResult>).unwrap()
+    const result = await withUnwrap(Promise.resolve({ data: { id: 1 }, error: undefined })).unwrap()
     expect(result).toStrictEqual({ id: 1 })
   })
 
   test('unwrap() rejects with error for a non-throwing error result', async () => {
-    const { instance } = fakeAxios({ data: { message: 'not found' }, status: 404 })
-    const client = createClientCore({ transport: instance, validateStatus: () => true })
-    await expect(withUnwrap(client({ method: 'GET', url: '/pet/999' }) as Promise<CallResult>).unwrap()).rejects.toStrictEqual({ message: 'not found' })
+    await expect(withUnwrap(Promise.resolve({ data: undefined, error: { message: 'not found' } })).unwrap()).rejects.toStrictEqual({
+      message: 'not found',
+    })
   })
 
   test('the wrapped promise still resolves to the full result when awaited directly', async () => {
-    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
-    const client = createClientCore({ transport: instance })
-    const result = await withUnwrap(client({ method: 'GET', url: '/pet/1' }) as Promise<CallResult>)
-    expect(result.status).toBe(200)
-    expect(result.data).toStrictEqual({ id: 1 })
+    const full = { data: { id: 1 }, error: undefined }
+    const result = await withUnwrap(Promise.resolve(full))
+    expect(result).toBe(full)
   })
 
-  test('a throwing call rejects before unwrap() has a chance to run', async () => {
-    const { instance } = fakeAxios({ data: { message: 'not found' }, status: 404 })
-    const client = createClientCore({ transport: instance })
-    await expect(withUnwrap(client({ method: 'GET', url: '/pet/999' }) as Promise<CallResult>).unwrap()).rejects.toBeInstanceOf(ResponseError)
+  test('a rejected call propagates the rejection unchanged', async () => {
+    const error = new ResponseError({ data: { message: 'not found' }, status: 404, statusText: 'Not Found', request: {}, response: {} })
+    await expect(withUnwrap(Promise.reject(error)).unwrap()).rejects.toBe(error)
   })
 })
 

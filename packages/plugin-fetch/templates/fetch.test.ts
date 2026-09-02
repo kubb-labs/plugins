@@ -652,28 +652,23 @@ describe('getUrl', () => {
 
 describe('withUnwrap', () => {
   test('unwrap() resolves to the success data', async () => {
-    const { client } = createClient({ data: { id: 1 }, status: 200 })
-    const result = await withUnwrap(client({ method: 'GET', url: '/pet/1' }) as Promise<CallResult<string, string>>).unwrap()
+    const result = await withUnwrap(Promise.resolve({ data: { id: 1 }, error: undefined })).unwrap()
     expect(result).toStrictEqual({ id: 1 })
   })
 
   test('unwrap() rejects with error for a non-throwing error result', async () => {
-    const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
-    await expect(
-      withUnwrap(client({ method: 'POST', url: '/pet', throwOnError: false }) as Promise<CallResult<string, string>>).unwrap(),
-    ).rejects.toStrictEqual({ message: 'invalid' })
+    await expect(withUnwrap(Promise.resolve({ data: undefined, error: { message: 'invalid' } })).unwrap()).rejects.toStrictEqual({ message: 'invalid' })
   })
 
   test('the wrapped promise still resolves to the full result when awaited directly', async () => {
-    const { client } = createClient({ data: { id: 1 }, status: 200 })
-    const result = await withUnwrap(client({ method: 'GET', url: '/pet/1' }) as Promise<CallResult<string, string>>)
-    expect(result.status).toBe(200)
-    expect(result.data).toStrictEqual({ id: 1 })
+    const full = { data: { id: 1 }, error: undefined }
+    const result = await withUnwrap(Promise.resolve(full))
+    expect(result).toBe(full)
   })
 
-  test('a throwing call rejects before unwrap() has a chance to run', async () => {
-    const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
-    await expect(withUnwrap(client({ method: 'POST', url: '/pet' }) as Promise<CallResult<string, string>>).unwrap()).rejects.toBeInstanceOf(ResponseError)
+  test('a rejected call propagates the rejection unchanged', async () => {
+    const error = new ResponseError({ data: { message: 'invalid' }, status: 405, statusText: 'Method Not Allowed', request: 'REQ', response: 'RES' })
+    await expect(withUnwrap(Promise.reject(error)).unwrap()).rejects.toBe(error)
   })
 })
 
