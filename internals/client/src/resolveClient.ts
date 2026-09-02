@@ -14,21 +14,19 @@
  * contract client plugin is picked up automatically.
  */
 
-import { isVersionAtLeast, resolvePackageVersion } from './resolvePackageVersion.ts'
+import { createRequire } from 'node:module'
+import path from 'node:path'
 
 // Canonical plugin names. They mirror the `pluginFetchName` / `pluginAxiosName` consts the plugins
 // export, kept as literals so this internal needs no plugin install deps.
 const pluginFetchName = 'plugin-fetch'
 const pluginAxiosName = 'plugin-axios'
 
-// Consumers (react-query, vue-query, swr) build their generated hooks on `unwrap()`, which the
-// contract client plugins only started attaching to their `RequestResult` promise at this version.
-// An older client plugin generates a client without `unwrap()`, so the hooks would call a method
-// that does not exist at runtime.
-const MIN_CONTRACT_CLIENT_VERSION: Record<string, string> = {
-  [pluginFetchName]: '5.2.0',
-  [pluginAxiosName]: '5.2.0',
-}
+// react-query, vue-query, and swr build their generated hooks on `unwrap()`, which plugin-fetch
+// and plugin-axios only started attaching to their result at this version. An older client plugin
+// would generate a client without `unwrap()`, so the hooks would call a method that does not
+// exist at runtime.
+const MIN_CLIENT_VERSION_FOR_UNWRAP = '5.2.0'
 
 /**
  * The client selector accepted by a consumer's `client` option. Both call a registered contract
@@ -108,15 +106,28 @@ export function resolveClient(options: { client: ClientSelector | undefined; plu
 }
 
 /**
+ * Compares dot-separated `major.minor.patch` version strings. Missing or non-numeric parts count
+ * as `0`, and a prerelease suffix (`-beta.1`) is ignored.
+ */
+function isVersionAtLeast(version: string, minVersion: string): boolean {
+  const parts = (value: string) => value.split('-')[0]!.split('.').map(Number)
+  const [major = 0, minor = 0, patch = 0] = parts(version)
+  const [minMajor = 0, minMinor = 0, minPatch = 0] = parts(minVersion)
+
+  if (major !== minMajor) return major > minMajor
+  if (minor !== minMinor) return minor > minMinor
+  return patch >= minPatch
+}
+
+/**
  * Resolves the contract client during a consumer plugin's setup hook. Extracts the plugin names
  * from the raw `plugins` config, applies {@link resolveClient}, and throws the diagnostic on a
  * misconfiguration so every consumer fails fast with the same message.
  *
  * Pass `requireUnwrap: true` for a consumer (react-query, vue-query, swr) whose generated hooks
- * call `unwrap()` on the client's result. This checks the resolved contract client plugin's
- * installed version against {@link MIN_CONTRACT_CLIENT_VERSION} and throws when it predates
- * `unwrap()`, so the setup fails with a clear diagnostic instead of the generated hooks calling a
- * method that does not exist at runtime.
+ * call `unwrap()` on the client's result. This reads the resolved client plugin's installed
+ * version from the user's project and throws when it predates `unwrap()`, so setup fails with a
+ * clear diagnostic instead of the generated hooks calling a method that does not exist.
  */
 export function resolveContractClient(options: {
   client: ClientSelector | undefined
@@ -130,15 +141,23 @@ export function resolveContractClient(options: {
   if (resolved.kind === 'error') {
     throw new Error(resolved.message)
   }
+  if (!requireUnwrap) {
+    return resolved
+  }
 
-  const minVersion = requireUnwrap ? MIN_CONTRACT_CLIENT_VERSION[resolved.pluginName] : undefined
   const packageName = `@kubb/${resolved.pluginName}`
-  const installedVersion = minVersion ? resolvePackageVersion(packageName, root) : undefined
-  if (minVersion && installedVersion && !isVersionAtLeast(installedVersion, minVersion)) {
+  let installedVersion: string | undefined
+  try {
+    installedVersion = (createRequire(path.join(root, 'package.json'))(`${packageName}/package.json`) as { version?: string }).version
+  } catch {
+    installedVersion = undefined
+  }
+
+  if (installedVersion && !isVersionAtLeast(installedVersion, MIN_CLIENT_VERSION_FOR_UNWRAP)) {
     throw new Error(
-      `\`${packageName}\` is registered at version ${installedVersion}, but this plugin needs \`${packageName}@${minVersion}\` or newer. ` +
-        `Generated hooks call \`unwrap()\` on the client's result, which \`${packageName}\` only added in ${minVersion}. ` +
-        `Upgrade \`${packageName}\` to ${minVersion} or later.`,
+      `\`${packageName}\` is registered at version ${installedVersion}, but this plugin needs \`${packageName}@${MIN_CLIENT_VERSION_FOR_UNWRAP}\` or newer. ` +
+        `Generated hooks call \`unwrap()\` on the client's result, which \`${packageName}\` only added in ${MIN_CLIENT_VERSION_FOR_UNWRAP}. ` +
+        `Upgrade \`${packageName}\` to ${MIN_CLIENT_VERSION_FOR_UNWRAP} or later.`,
     )
   }
 
