@@ -1,5 +1,11 @@
 # @kubb/plugin-faker
 
+## 5.0.2
+
+### Patch Changes
+
+- [#824](https://github.com/kubb-labs/plugins/pull/824) [`e4eed1f`](https://github.com/kubb-labs/plugins/commit/e4eed1fa7da1bdf50a8dd25aa67ecf7a92fc64d5) Thanks [@Ericlm](https://github.com/Ericlm)! - Preserve required properties when Faker generates mocks for referenced `oneOf` object members.
+
 ## 5.0.1
 
 ### Patch Changes
