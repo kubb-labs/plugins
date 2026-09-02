@@ -1,6 +1,6 @@
 import { ast } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { classifyOperation, hasQueryKeyParams } from './utils.ts'
+import { buildCallResultBody, classifyOperation, hasQueryKeyParams } from './utils.ts'
 
 describe('classifyOperation', () => {
   test('classifies a GET as a query when methods include it', () => {
@@ -102,5 +102,25 @@ describe('hasQueryKeyParams', () => {
       ],
     })
     expect(hasQueryKeyParams(node)).toBe(true)
+  })
+})
+
+describe('buildCallResultBody', () => {
+  test('reads data off the full result by default', () => {
+    expect(buildCallResultBody('getPetById({ throwOnError: true })')).toBe(
+      'const { data } = await getPetById({ throwOnError: true })\n          return data',
+    )
+  })
+
+  test('indents the second line to match the caller', () => {
+    expect(buildCallResultBody('getPetById({ throwOnError: true })', { indent: '    ' })).toBe(
+      'const { data } = await getPetById({ throwOnError: true })\n    return data',
+    )
+  })
+
+  test('returns the call directly when the client already resolves to bare data', () => {
+    expect(buildCallResultBody('getPetById({ throwOnError: true })', { returnType: 'data' })).toBe(
+      'return await getPetById({ throwOnError: true })',
+    )
   })
 })

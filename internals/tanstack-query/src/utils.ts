@@ -150,6 +150,28 @@ export function buildClientCall(node: ast.OperationNode, options: { clientName: 
   return `${clientName}({ ${args.join(', ')} })`
 }
 
+/**
+ * Builds the query/mutation body that resolves a `buildClientCall` expression down to the bare
+ * success body. `returnType` mirrors the registered client plugin's own `returnType` option: with
+ * `'data'` the call already resolves to the bare body, so it is returned directly; with `'full'`
+ * (the default) the body is read off the resolved `RequestResult`. `indent` matches the second
+ * line to the caller's own template, since the body is embedded as a raw string, not reprinted.
+ *
+ * @example
+ * ```ts
+ * buildCallResultBody(buildClientCall(node, { clientName: 'getPetById' }))
+ * // const { data } = await getPetById({ ...config, throwOnError: true })
+ * // return data
+ * ```
+ */
+export function buildCallResultBody(call: string, options: { returnType?: 'full' | 'data'; indent?: string } = {}): string {
+  const { returnType = 'full', indent = '          ' } = options
+  if (returnType === 'data') {
+    return `return await ${call}`
+  }
+  return `const { data } = await ${call}\n${indent}return data`
+}
+
 type ResponseTypes = {
   TData: string
   TError: string

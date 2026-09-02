@@ -92,6 +92,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
               node={node}
               tsResolver={tsResolver}
               mutationKeyName={mutationKeyName}
+              returnType={contractOp.returnType}
             />
           </>
         )}

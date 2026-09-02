@@ -58,7 +58,24 @@ describe('resolveClientOperation', () => {
       cache: createTestCache(),
     })
 
-    expect(result).toStrictEqual({ name: 'getPetById', path: '/root/getPetById.ts', clientPath: '/root/.kubb/client.ts' })
+    expect(result).toStrictEqual({ name: 'getPetById', path: '/root/getPetById.ts', clientPath: '/root/.kubb/client.ts', returnType: 'full' })
+  })
+
+  test("reads the client plugin's returnType, defaulting to 'full' when unset", () => {
+    const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
+    const driver = createDriver()
+    driver.getPlugin.mockReturnValueOnce({ options: { returnType: 'data' } })
+
+    const result = resolveClientOperation({
+      clientPlugin: { pluginName: 'plugin-fetch' },
+      driver,
+      node,
+      root: '/root',
+      output: { path: '.' },
+      cache: createTestCache(),
+    })
+
+    expect(result?.returnType).toBe('data')
   })
 
   test('reuses the cached result for the same client plugin and node instead of resolving again', () => {
