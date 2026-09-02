@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { CreateUserOptions, CreateUserResponses } from '../../models/user/CreateUser'
-import { client } from '../../.kubb/client'
+import { client, withUnwrap } from '../../.kubb/client'
 
 /**
  * @description This can only be done by the logged in user.
@@ -14,8 +14,8 @@ import { client } from '../../.kubb/client'
  */
 export function createUser<ThrowOnError extends boolean = true>(
   options: Options<CreateUserOptions, ThrowOnError>,
-): Promise<RequestResult<CreateUserResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<CreateUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/user', ...config }) as Promise<RequestResult<CreateUserResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'POST', url: '/user', ...config }) as Promise<RequestResult<CreateUserResponses, ThrowOnError>>)
 }
