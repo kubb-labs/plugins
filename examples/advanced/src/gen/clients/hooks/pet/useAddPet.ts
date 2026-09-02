@@ -15,8 +15,7 @@ export function addPetMutationOptions<TContext = unknown>(
   return mutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
-      const { data } = await addPet({ ...config, body, throwOnError: true })
-      return data
+      return addPet({ ...config, body, throwOnError: true }).unwrap()
     },
   })
 }
