@@ -41,8 +41,7 @@ export function MutationOptions({ name, clientName, node, tsResolver, mutationKe
   const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const TRequest = hasMutationParams ? tsResolver.response.options(node) : 'undefined'
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : '_'
-  const mutationFnBody = `const { data } = await ${buildClientCall(node, { clientName, signal: false })}
-          return data`
+  const mutationFnBody = `return ${buildClientCall(node, { clientName, signal: false })}.unwrap()`
 
   return (
     <File.Source name={name} isExportable isIndexable>

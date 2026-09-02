@@ -55,8 +55,7 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName }
   const hasMutationParams = groupedParam !== null
   const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
-  const mutationFnBody = `const { data } = await ${buildVueClientCall(node, { clientName, signal: false })}
-            return data`
+  const mutationFnBody = `return ${buildVueClientCall(node, { clientName, signal: false })}.unwrap()`
 
   const TRequest = resolveMutationRequestType(node, tsResolver)
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')

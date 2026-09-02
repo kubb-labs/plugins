@@ -30,8 +30,7 @@ export function QueryOptions({ name, clientName, node, tsResolver, queryKeyName 
 
   const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const queryFnBody = `const { data } = await ${buildVueClientCall(node, { clientName, signal: true })}
-          return data`
+  const queryFnBody = `return ${buildVueClientCall(node, { clientName, signal: true })}.unwrap()`
 
   return (
     <File.Source name={name} isExportable isIndexable>

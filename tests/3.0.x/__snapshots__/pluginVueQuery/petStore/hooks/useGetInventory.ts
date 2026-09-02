@@ -19,8 +19,7 @@ export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'pa
   return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200>({
    queryKey,
    queryFn: async ({ signal }) => {
-      const { data } = await getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
-      return data
+      return getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true }).unwrap()
    },
   })
 }

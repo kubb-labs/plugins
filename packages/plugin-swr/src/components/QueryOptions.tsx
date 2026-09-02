@@ -17,8 +17,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 export function QueryOptions({ name, clientName, node, tsResolver }: Props): KubbReactNode {
   const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const fetcherBody = `const { data } = await ${buildClientCall(node, { clientName, signal: false })}
-          return data`
+  const fetcherBody = `return ${buildClientCall(node, { clientName, signal: false })}.unwrap()`
 
   return (
     <File.Source name={name} isExportable isIndexable>

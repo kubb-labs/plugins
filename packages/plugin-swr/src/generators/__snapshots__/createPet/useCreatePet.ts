@@ -34,8 +34,7 @@ export function useCreatePet(
   return useSWRMutation<CreatePetResponse, ResponseErrorConfig<Error>, CreatePetMutationKey | null, CreatePetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { body } }) => {
-      const { data } = await createPet({ ...config, body, throwOnError: true })
-      return data
+      return createPet({ ...config, body, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

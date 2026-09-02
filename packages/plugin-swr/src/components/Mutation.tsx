@@ -61,8 +61,7 @@ export function Mutation({ name, clientName, mutationKeyName, mutationKeyTypeNam
   const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const argTypeBody = hasMutationParams ? tsResolver.response.options(node) : ''
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
-  const mutationFnBody = `const { data } = await ${buildClientCall(node, { clientName, signal: false })}
-            return data`
+  const mutationFnBody = `return ${buildClientCall(node, { clientName, signal: false })}.unwrap()`
 
   const generics = [TData, TError, `${mutationKeyTypeName} | null`, mutationArgTypeName]
 

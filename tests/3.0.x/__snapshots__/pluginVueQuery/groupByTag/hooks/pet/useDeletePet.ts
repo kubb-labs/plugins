@@ -27,8 +27,7 @@ export function useDeletePet<TContext>(options: {
 
   return useMutation<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext>({
     mutationFn: async({ path, headers }) => {
-      const { data } = await deletePet({ ...config, path: toValue(path), headers: toValue(headers), throwOnError: true })
-      return data
+      return deletePet({ ...config, path: toValue(path), headers: toValue(headers), throwOnError: true }).unwrap()
     },
     mutationKey,
     ...mutationOptions
