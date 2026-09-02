@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { LoginUserOptions, LoginUserResponses } from '../../models/user/LoginUser'
-import { client } from '../../.kubb/client'
+import { client, withUnwrap } from '../../.kubb/client'
 
 /**
  * @summary Logs user into the system
@@ -13,8 +13,8 @@ import { client } from '../../.kubb/client'
  */
 export function loginUser<ThrowOnError extends boolean = true>(
   options: Options<LoginUserOptions, ThrowOnError> = {},
-): Promise<RequestResult<LoginUserResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<LoginUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/user/login', ...config }) as Promise<RequestResult<LoginUserResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'GET', url: '/user/login', ...config }) as Promise<RequestResult<LoginUserResponses, ThrowOnError>>)
 }
