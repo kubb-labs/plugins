@@ -12,15 +12,3 @@ import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 export function buildRequestResultGenerics({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string {
   return `${types.response.responses(node)}, ThrowOnError`
 }
-
-/**
- * Builds the result type name an operation's function signature and return statement use: the
- * runtime's `Unwrappable`, wrapping `RequestResult` so the resolved call also carries an
- * RTK-style `unwrap()` method.
- *
- * @example
- * `buildResultType({ node, types }) // 'Unwrappable<RequestResult<AddPetResponses, ThrowOnError>>'`
- */
-export function buildResultType({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string {
-  return `Unwrappable<RequestResult<${buildRequestResultGenerics({ node, types })}>>`
-}

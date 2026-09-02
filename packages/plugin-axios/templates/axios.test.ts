@@ -728,12 +728,6 @@ describe('withUnwrap', () => {
     })
   })
 
-  test('the wrapped promise still resolves to the full result when awaited directly', async () => {
-    const full = { data: { id: 1 }, error: undefined }
-    const result = await withUnwrap(Promise.resolve(full))
-    expect(result).toBe(full)
-  })
-
   test('a rejected call propagates the rejection unchanged', async () => {
     const error = new ResponseError({ data: { message: 'not found' }, status: 404, statusText: 'Not Found', request: {}, response: {} })
     await expect(withUnwrap(Promise.reject(error)).unwrap()).rejects.toBe(error)

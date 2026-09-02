@@ -47,8 +47,9 @@ function buildCallConfig({
 /**
  * Builds a single instance method for a generated SDK class. The body forwards the single grouped
  * `options` object to the instance's own client (`this.client`, built once in the constructor) and
- * returns the `Unwrappable<RequestResult>`. A per-call `options.client` still overrides the instance client, so
- * one operation can be routed to a different environment without a new instance.
+ * returns the `Unwrappable<RequestResult>`. A per-call `options.client` still overrides the
+ * instance client, so one operation can be routed to a different environment without a new
+ * instance.
  */
 export function buildSdkMethod({
   node,

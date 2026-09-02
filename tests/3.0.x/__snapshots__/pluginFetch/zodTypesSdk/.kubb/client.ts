@@ -83,29 +83,37 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequ
     : ResultUnion<TResponses, TRequest, TResponse>
 
 /**
- * The success body of a `RequestResult`, picked out by its `error: undefined` discriminant so an
- * error variant's `data: undefined` can never widen it.
+ * A `RequestResult` promise with an extra `unwrap()` method, the way Redux Toolkit does it.
+ * `unwrap()` resolves to the bare success body, or rejects with `error` when the result carried
+ * one. Only `throwOnError: false` can reach that rejection, because the throwing path never
+ * resolves an error in the first place.
+ *
+ * `Extract` picks the success body by the `error: undefined` discriminant, so an error variant's
+ * `data: undefined` can never widen it.
+ *
+ * @example
+ * `Unwrappable<RequestResult<AddPetResponses, false>>`
  */
-export type UnwrapResult<T extends { data: unknown; error: unknown }> = Extract<T, { error: undefined }>['data']
+export type Unwrappable<T extends { data: unknown; error: unknown }> = Promise<T> & {
+  unwrap: () => Promise<Extract<T, { error: undefined }>['data']>
+}
 
 /**
- * A `RequestResult` promise with an extra `unwrap()` method, Redux-Toolkit-style: `unwrap()`
- * resolves to the bare success body, or rejects with `error` for a result that carried one
- * (only reachable with `throwOnError: false`, since the throwing path never resolves an error).
- */
-export type Unwrappable<T extends { data: unknown; error: unknown }> = Promise<T> & { unwrap: () => Promise<UnwrapResult<T>> }
-
-/**
- * Attaches `unwrap()` to a call's result promise. Generated operations call this so every result
- * doubles as a plain promise (`await getPetById(...)`) and an RTK-style unwrap
- * (`await getPetById(...).unwrap()`).
+ * Attaches `unwrap()` to a call's result promise. Generated operations wrap every result with this,
+ * so the same value works as a plain promise and as an unwrap.
+ *
+ * @example Full result
+ * `const { data, error } = await getPetById({ path: { petId: 1 } })`
+ *
+ * @example Success body only
+ * `const pet = await getPetById({ path: { petId: 1 } }).unwrap()`
  */
 export function withUnwrap<T extends { data: unknown; error: unknown }>(promise: Promise<T>): Unwrappable<T> {
   const unwrappable = promise as Unwrappable<T>
   unwrappable.unwrap = () =>
     promise.then((result) => {
       if (result.error !== undefined) throw result.error
-      return result.data as UnwrapResult<T>
+      return result.data as Extract<T, { error: undefined }>['data']
     })
   return unwrappable
 }

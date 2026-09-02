@@ -2,7 +2,7 @@ import type { ast } from 'kubb/kit'
 import { getRequestGroupOptionality } from '@internals/shared'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
-import { buildResultType } from './generics.ts'
+import { buildRequestResultGenerics } from './generics.ts'
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
@@ -46,7 +46,7 @@ export function buildGroupedOptionsSignature({ node, types }: { node: ast.Operat
 
   return {
     paramsSignature,
-    returnType: buildResultType({ node, types }),
+    returnType: `Unwrappable<RequestResult<${buildRequestResultGenerics({ node, types })}>>`,
     generics: ['ThrowOnError extends boolean = true'],
   }
 }
