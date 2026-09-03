@@ -8,7 +8,6 @@ const shared: Partial<UserConfig> = {
   platform: 'node',
   sourcemap: true,
   shims: true,
-  exports: true,
   alias: {},
   deps: {
     neverBundle: [/^@kubb\//, '@types/react'],

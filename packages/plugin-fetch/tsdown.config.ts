@@ -8,14 +8,6 @@ const shared: Partial<UserConfig> = {
   platform: 'node',
   sourcemap: true,
   shims: true,
-  // Expose the raw `.ts` templates so consumers can resolve them through
-  // `@kubb/plugin-fetch/templates/**` and copy them into the generated output.
-  exports: {
-    customExports(exports) {
-      exports['./templates/*'] = './templates/*'
-      return exports
-    },
-  },
   fixedExtension: false,
   deps: {
     neverBundle: [/^@kubb\//],
