@@ -1,5 +1,14 @@
 # @kubb/plugin-fetch
 
+## 5.2.1
+
+### Patch Changes
+
+- [#835](https://github.com/kubb-labs/plugins/pull/835) [`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d) Thanks [@julian99m](https://github.com/julian99m)! - Explicit `types` fields for each package.json `exports` entry, so that it works with tsconfig.json `moduleResulotion: 'bundler'`
+- Updated dependencies [[`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d)]:
+  - @kubb/plugin-ts@5.0.1
+  - @kubb/plugin-zod@5.1.3
+
 ## 5.2.0
 
 ### Minor Changes
