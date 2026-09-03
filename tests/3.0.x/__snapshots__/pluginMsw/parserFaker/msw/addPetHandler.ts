@@ -17,12 +17,9 @@ export function addPetHandlerResponse200(data: AddPetResponse) {
   })
 }
 
-export function addPetHandlerResponse405(data: AddPetStatus405) {
+export function addPetHandlerResponse405(data?: AddPetStatus405) {
   return new Response(JSON.stringify(data), {
     status: 405,
-    headers: {
-      'Content-Type': 'application/json'
-    },
   })
 }
 
