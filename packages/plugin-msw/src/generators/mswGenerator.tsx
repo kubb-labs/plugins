@@ -5,7 +5,7 @@ import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Mock, Response } from '../components'
 import type { PluginMsw } from '../types'
-import { resolveFakerMeta } from '../utils.ts'
+import { hasResponseSchema, resolveFakerMeta } from '../utils.ts'
 
 /**
  * Built-in operation generator for `@kubb/plugin-msw`. Emits one MSW handler
@@ -56,7 +56,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     const types = resolveResponseTypes(node, tsResolver)
     const successResponses = getOperationSuccessResponses(node)
-    const hasSuccessSchema = successResponses.some((response) => !!response.content?.[0]?.schema)
+    const hasSuccessSchema = successResponses.some((response) => hasResponseSchema(response))
 
     const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.response.body(node) : null
 
@@ -76,7 +76,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
           root={mock.file.path}
           isTypeOnly
         />
-        {parser === 'faker' && faker && <File.Import name={[faker.name]} root={mock.file.path} path={faker.file.path} />}
+        {parser === 'faker' && faker && hasSuccessSchema && <File.Import name={[faker.name]} root={mock.file.path} path={faker.file.path} />}
 
         {types
           .filter(([code]) => code !== 'default')
