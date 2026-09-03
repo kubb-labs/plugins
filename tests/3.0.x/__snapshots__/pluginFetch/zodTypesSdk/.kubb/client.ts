@@ -8,6 +8,12 @@ import { type StandardSchemaValidator, validateStandardSchema } from './standard
 export type SuccessStatusCode = '200' | '201' | '202' | '203' | '204' | '205' | '206' | '207' | '208' | '226'
 
 /**
+ * The request body type `fetch` accepts, derived from `RequestInit` instead of the global `BodyInit`
+ * name, which a Node-only project (`@types/node` without the `dom` lib) does not declare.
+ */
+export type RequestBody = NonNullable<RequestInit['body']>
+
+/**
  * The success members of a per-status responses record.
  */
 export type SuccessOf<TResponses> = TResponses[Extract<keyof TResponses, SuccessStatusCode>]
@@ -124,7 +130,7 @@ export type Deserializer<T = unknown> = (raw: unknown, contentType: string) => T
 /**
  * Serializes a request body for a single media type, registered per content type as a codec's `serialize` to encode formats the default serializer does not handle.
  */
-export type ContentBodySerializer = (body: unknown, contentType?: string) => BodyInit | undefined
+export type ContentBodySerializer = (body: unknown, contentType?: string) => RequestBody | undefined
 
 /**
  * A per-content-type codec registered on `codecs`, keyed by content type. `serialize` encodes the
@@ -238,7 +244,7 @@ export type ResolvedRequest = {
   url: string
   method: string
   headers: Record<string, string>
-  body?: BodyInit
+  body?: RequestBody
   signal?: AbortSignal
   credentials?: RequestCredentials
   options?: FetchOptions
