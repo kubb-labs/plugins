@@ -85,6 +85,32 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequ
     : ResultUnion<TResponses, TRequest, TResponse>
 
 /**
+ * A `RequestResult` promise with an extra `unwrap()` method that resolves to the success body.
+ */
+export type Unwrappable<T extends { data: unknown; error: unknown }> = Promise<T> & {
+  unwrap: () => Promise<Extract<T, { error: undefined }>['data']>
+}
+
+/**
+ * Attaches `unwrap()` to a result promise, which rejects with `error` when the result carried one.
+ *
+ * @example Full result
+ * `const { data, error } = await getPetById({ path: { petId: 1 } })`
+ *
+ * @example Success body only
+ * `const pet = await getPetById({ path: { petId: 1 } }).unwrap()`
+ */
+export function withUnwrap<T extends { data: unknown; error: unknown }>(promise: Promise<T>): Unwrappable<T> {
+  const unwrappable = promise as Unwrappable<T>
+  unwrappable.unwrap = () =>
+    promise.then((result) => {
+      if (result.error !== undefined) throw result.error
+      return result.data as Extract<T, { error: undefined }>['data']
+    })
+  return unwrappable
+}
+
+/**
  * The shape a generated operation returns when `returnType: 'data'` is set: the bare success body
  * once `throwOnError` (on by default) narrows away the error branch, falling back to the full
  * `RequestResult` when a call sets `throwOnError: false` and still needs `error` to discriminate a
