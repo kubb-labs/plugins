@@ -1,17 +1,11 @@
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers'
-import type { HeadersInit, PathParamStyle, PathSerializer, Serializers, Styles } from './serializers'
+import type { HeadersInit, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers'
 import { type StandardSchemaValidator, validateStandardSchema } from './standardSchema'
 
 /**
  * HTTP status codes treated as a success, everything else is an error.
  */
 export type SuccessStatusCode = '200' | '201' | '202' | '203' | '204' | '205' | '206' | '207' | '208' | '226'
-
-/**
- * The request body type `fetch` accepts, derived from `RequestInit` instead of the global `BodyInit`
- * name, which a Node-only project (`@types/node` without the `dom` lib) does not declare.
- */
-export type RequestBody = NonNullable<RequestInit['body']>
 
 /**
  * The success members of a per-status responses record.
