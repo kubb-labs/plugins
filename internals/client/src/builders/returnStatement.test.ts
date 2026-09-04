@@ -12,10 +12,10 @@ const node = ast.factory.createOperation({
 })
 
 describe('buildReturnStatement', () => {
-  test('forwards the call config and casts to the operation RequestResult', () => {
+  test('casts to RequestResult first, then wraps the call in withUnwrap', () => {
     const callConfig = "{ method: 'POST', url: '/pet', ...config }"
     expect(buildReturnStatement({ node, types: resolverTs, callConfig, returnType: 'full' })).toBe(
-      "return request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>",
+      "return withUnwrap(request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>)",
     )
   })
 

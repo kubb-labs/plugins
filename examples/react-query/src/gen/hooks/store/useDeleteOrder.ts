@@ -15,8 +15,7 @@ export function deleteOrderMutationOptions<TContext = unknown>(config: Partial<O
   return mutationOptions<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path }) => {
-      const { data } = await deleteOrder({ ...config, path, throwOnError: true })
-      return data
+      return deleteOrder({ ...config, path, throwOnError: true }).unwrap()
     },
   })
 }

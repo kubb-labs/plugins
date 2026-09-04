@@ -78,7 +78,7 @@ export function InfiniteQueryOptions({
 
   const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver, memberTypeWrapper })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName }), { returnType, indent: '    ' })
+  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName }), { returnType })
 
   const hasNewParams = nextParam != null || previousParam != null
 

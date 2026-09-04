@@ -22,8 +22,7 @@ export function retrieveMyProfileQueryOptions(
   return queryOptions<RetrieveMyProfileStatus200, ResponseErrorConfig<Error>, RetrieveMyProfileStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      const { data } = await retrieveMyProfile({ ...config, headers, signal: config.signal ?? signal, throwOnError: true })
-      return data
+      return retrieveMyProfile({ ...config, headers, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }

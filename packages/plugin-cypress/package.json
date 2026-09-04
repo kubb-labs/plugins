@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-cypress",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Generate Cypress request commands and e2e test fixtures with Kubb for automated API testing.",
   "keywords": [
     "code-generation",
@@ -45,6 +45,7 @@
   "typesVersions": {},
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },

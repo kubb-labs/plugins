@@ -19,8 +19,7 @@ export function placeOrderPatchMutationOptions<TContext = unknown>(
   return mutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
-      const { data } = await placeOrderPatch({ ...config, body, throwOnError: true })
-      return data
+      return placeOrderPatch({ ...config, body, throwOnError: true }).unwrap()
     },
   })
 }

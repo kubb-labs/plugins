@@ -1,6 +1,6 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import { type CallResult, createClientCore, parseEventStream, ResponseError, resolveAuth, unwrapResult } from './axios.ts'
+import { type CallResult, createClientCore, parseEventStream, ResponseError, resolveAuth, unwrapResult, withUnwrap } from './axios.ts'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
@@ -726,6 +726,24 @@ describe('unwrapResult', () => {
     const full = { data: undefined, error: { message: 'not found' } }
     const result = await unwrapResult(Promise.resolve(full), false)
     expect(result).toBe(full)
+  })
+})
+
+describe('withUnwrap', () => {
+  test('unwrap() resolves to the success data', async () => {
+    const result = await withUnwrap(Promise.resolve({ data: { id: 1 }, error: undefined })).unwrap()
+    expect(result).toStrictEqual({ id: 1 })
+  })
+
+  test('unwrap() rejects with error for a non-throwing error result', async () => {
+    await expect(withUnwrap(Promise.resolve({ data: undefined, error: { message: 'not found' } })).unwrap()).rejects.toStrictEqual({
+      message: 'not found',
+    })
+  })
+
+  test('a rejected call propagates the rejection unchanged', async () => {
+    const error = new ResponseError({ data: { message: 'not found' }, status: 404, statusText: 'Not Found', request: {}, response: {} })
+    await expect(withUnwrap(Promise.reject(error)).unwrap()).rejects.toBe(error)
   })
 })
 

@@ -16,7 +16,7 @@ export type GroupedOptionsSignature = {
    */
   paramsSignature: string
   /**
-   * The function return type: `Promise<RequestResult<<Name>Responses, ThrowOnError>>`.
+   * The function return type: `Unwrappable<RequestResult<<Name>Responses, ThrowOnError>>`.
    */
   returnType: string
   /**
@@ -55,7 +55,7 @@ export function buildGroupedOptionsSignature({
 
   return {
     paramsSignature,
-    returnType: `Promise<${buildResultType({ node, types, returnType })}>`,
+    returnType: buildResultType({ node, types, returnType }),
     generics: ['ThrowOnError extends boolean = true'],
   }
 }

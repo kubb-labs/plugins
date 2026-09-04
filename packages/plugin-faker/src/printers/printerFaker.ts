@@ -40,6 +40,10 @@ export type PrinterFakerOptions = {
    * Set while printing the members of a union (`oneOf`). Object properties then index their
    * type as `(NonNullable<T> & Record<K, unknown>)[K]` instead of `NonNullable<T>[K]`, so a key
    * carried by only some branches stays valid (a plain index would be a TS2339).
+   *
+   * Referenced object factories also receive their explicit default type argument (`object`).
+   * This prevents a surrounding generic helper from inferring `TData` as `Partial<T>` when the
+   * factory is called without override data, which would make required properties optional.
    */
   nestedInUnion?: boolean
   nodes?: PrinterFakerNodes
@@ -324,7 +328,9 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           return `${resolvedName}(data)`
         }
 
-        return `${resolvedName}()`
+        const typeArgument = this.options.nestedInUnion && (node.schema?.type === 'object' || node.schema?.type === 'intersection') ? '<object>' : ''
+
+        return `${resolvedName}${typeArgument}()`
       },
       enum(node) {
         return fakerKeywordMapper.enum(getEnumValues(node).map(parseEnumValue), this.options.typeName)

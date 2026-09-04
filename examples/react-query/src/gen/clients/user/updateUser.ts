@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { UpdateUserOptions, UpdateUserResponses } from '../../models/user/UpdateUser'
-import { client } from '../../.kubb/client'
+import { client, withUnwrap } from '../../.kubb/client'
 
 /**
  * @description This can only be done by the logged in user.
@@ -14,8 +14,8 @@ import { client } from '../../.kubb/client'
  */
 export function updateUser<ThrowOnError extends boolean = true>(
   options: Options<UpdateUserOptions, ThrowOnError>,
-): Promise<RequestResult<UpdateUserResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<UpdateUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'PUT', url: '/user/{username}', ...config }) as Promise<RequestResult<UpdateUserResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'PUT', url: '/user/{username}', ...config }) as Promise<RequestResult<UpdateUserResponses, ThrowOnError>>)
 }

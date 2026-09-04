@@ -14,8 +14,7 @@ type PlaceOrderQueryKey = ReturnType<typeof placeOrderQueryKey>
 export function placeOrderQueryOptions({ body }: PlaceOrderOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      const { data } = await placeOrder({ ...config, body, throwOnError: true })
-      return data
+      return placeOrder({ ...config, body, throwOnError: true }).unwrap()
     },
   }
 }

@@ -1,6 +1,6 @@
-import type { Options, RequestResult } from '../../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { UploadFileOptions, UploadFileResponses } from '../../../models/ts/pet/UploadFile'
-import { client } from '../../../.kubb/client'
+import { client, withUnwrap } from '../../../.kubb/client'
 
 /**
  * @summary uploads an image
@@ -8,14 +8,16 @@ import { client } from '../../../.kubb/client'
  */
 export function uploadFile<ThrowOnError extends boolean = true>(
   options: Options<UploadFileOptions, ThrowOnError>,
-): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<UploadFileResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({
-    method: 'POST',
-    url: '/pet/{petId}/uploadImage',
-    security: [{ type: 'oauth2' }],
-    contentType: { request: 'application/octet-stream' },
-    ...config,
-  }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
+  return withUnwrap(
+    request({
+      method: 'POST',
+      url: '/pet/{petId}/uploadImage',
+      security: [{ type: 'oauth2' }],
+      contentType: { request: 'application/octet-stream' },
+      ...config,
+    }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>,
+  )
 }

@@ -1,5 +1,19 @@
 # @kubb/plugin-faker
 
+## 5.0.3
+
+### Patch Changes
+
+- [#835](https://github.com/kubb-labs/plugins/pull/835) [`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d) Thanks [@julian99m](https://github.com/julian99m)! - Explicit `types` fields for each package.json `exports` entry, so that it works with tsconfig.json `moduleResulotion: 'bundler'`
+- Updated dependencies [[`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d)]:
+  - @kubb/plugin-ts@5.0.1
+
+## 5.0.2
+
+### Patch Changes
+
+- [#824](https://github.com/kubb-labs/plugins/pull/824) [`e4eed1f`](https://github.com/kubb-labs/plugins/commit/e4eed1fa7da1bdf50a8dd25aa67ecf7a92fc64d5) Thanks [@Ericlm](https://github.com/Ericlm)! - Preserve required properties when Faker generates mocks for referenced `oneOf` object members.
+
 ## 5.0.1
 
 ### Patch Changes

@@ -165,9 +165,13 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
 
         return (
           <File key={file.path} baseName={file.baseName} path={file.path} meta={file.meta} banner={banner(file)} footer={footer(file)}>
-            <File.Import name={returnType === 'data' ? ['createClient', 'unwrapResult'] : ['createClient']} root={file.path} path={clientPath} />
+            <File.Import name={['createClient', returnType === 'data' ? 'unwrapResult' : 'withUnwrap']} root={file.path} path={clientPath} />
             <File.Import
-              name={['ClientConfig', 'ClientInstance', 'Options', returnType === 'data' ? 'UnwrappedResult' : 'RequestResult']}
+              name={
+                returnType === 'data'
+                  ? ['ClientConfig', 'ClientInstance', 'Options', 'UnwrappedResult']
+                  : ['ClientConfig', 'ClientInstance', 'Options', 'Unwrappable', 'RequestResult']
+              }
               root={file.path}
               path={clientPath}
               isTypeOnly

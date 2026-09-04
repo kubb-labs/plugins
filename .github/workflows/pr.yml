@@ -4,10 +4,7 @@ on:
   workflow_dispatch:
   pull_request:
 
-permissions:
-  contents: read
-  pull-requests: write
-  checks: write
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -18,10 +15,12 @@ jobs:
     name: Build
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: github.actor != 'github-actions[bot]'
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -37,11 +36,13 @@ jobs:
     name: Typecheck
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: github.actor != 'github-actions[bot]'
     needs: build
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -63,13 +64,15 @@ jobs:
     name: Tests
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: github.actor != 'github-actions[bot]'
     needs: build
     env:
       TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -91,10 +94,12 @@ jobs:
     name: Linting
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: github.actor != 'github-actions[bot]'
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -112,11 +117,13 @@ jobs:
     name: Performance benchmarks (Vitest)
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: github.actor != 'github-actions[bot]'
     needs: build
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -135,11 +142,14 @@ jobs:
     name: Prerelease
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     if: github.actor != 'github-actions[bot]' && github.event.pull_request.head.repo.full_name == github.repository
     needs: build
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 2
 
@@ -158,10 +168,13 @@ jobs:
     name: Dependency Diff
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     if: github.actor != 'github-actions[bot]' && github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -176,11 +189,14 @@ jobs:
     name: Compressed size
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     if: github.actor != 'github-actions[bot]' && github.event_name == 'pull_request'
     needs: build
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -209,7 +225,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
 
@@ -255,6 +271,8 @@ jobs:
   e2e:
     name: Build and test on ${{ matrix.os }}
     timeout-minutes: 30
+    permissions:
+      contents: read
     if: github.actor != 'github-actions[bot]'
     needs: build
     strategy:
@@ -267,7 +285,7 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 

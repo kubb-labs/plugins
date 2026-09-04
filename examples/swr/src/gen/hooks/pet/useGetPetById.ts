@@ -16,8 +16,7 @@ type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      const { data } = await getPetById({ ...config, path, throwOnError: true })
-      return data
+      return getPetById({ ...config, path, throwOnError: true }).unwrap()
     },
   }
 }

@@ -23,8 +23,7 @@ export function createUsersWithListInputQueryOptions(
   return queryOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      const { data } = await createUsersWithListInput({ ...config, body, signal: config.signal ?? signal, throwOnError: true })
-      return data
+      return createUsersWithListInput({ ...config, body, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }

@@ -14,8 +14,7 @@ type AddPetQueryKey = ReturnType<typeof addPetQueryKey>
 export function addPetQueryOptions({ body }: AddPetOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      const { data } = await addPet({ ...config, body, throwOnError: true })
-      return data
+      return addPet({ ...config, body, throwOnError: true }).unwrap()
     },
   }
 }

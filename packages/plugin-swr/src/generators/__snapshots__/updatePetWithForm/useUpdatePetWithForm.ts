@@ -37,8 +37,7 @@ export function useUpdatePetWithForm(
   return useSWRMutation<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormMutationKey | null, UpdatePetWithFormMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, body } }) => {
-      const { data } = await updatePetWithForm({ ...config, path, body, throwOnError: true })
-      return data
+      return updatePetWithForm({ ...config, path, body, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

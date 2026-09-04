@@ -43,8 +43,7 @@ export function useDeleteUser(
   >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path } }) => {
-      const { data } = await deleteUser({ ...config, path, throwOnError: true })
-      return data
+      return deleteUser({ ...config, path, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

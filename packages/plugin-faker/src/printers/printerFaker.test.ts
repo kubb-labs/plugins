@@ -188,6 +188,34 @@ describe('printerFaker', () => {
     )
   })
 
+  test('prevents contextual override inference for object refs in unions', () => {
+    const makeVariant = (name: string, petType: string) => {
+      const schema = ast.factory.createSchema({
+        type: 'object',
+        name,
+        properties: [
+          ast.factory.createProperty({
+            name: 'petType',
+            required: true,
+            schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: [petType] }),
+          }),
+        ],
+      })
+
+      return ast.factory.createSchema({ type: 'ref', name, ref: `#/components/schemas/${name}`, schema })
+    }
+
+    const node = ast.factory.createSchema({
+      type: 'union',
+      name: 'Pet',
+      members: [makeVariant('Cat', 'cat'), makeVariant('Dog', 'dog')],
+    })
+
+    expect(printerFaker({ resolver: resolverFaker, typeName: 'Pet', schemaName: 'Pet' }).print(node)).toBe(
+      'faker.helpers.arrayElement([createCat<object>(), createDog<object>()])',
+    )
+  })
+
   test('drops shapeless allOf members instead of spreading undefined', () => {
     // `allOf: [{ $ref: EquipmentCategory }, { description }]` — the metadata-only member has no
     // shape and mocks to `undefined`. It must be dropped, not spread as `{...x, ...undefined}`.

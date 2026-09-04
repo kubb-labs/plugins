@@ -19,11 +19,11 @@ describe('buildRequestResultGenerics', () => {
 })
 
 describe('buildResultType', () => {
-  test('names RequestResult for the default full return type', () => {
-    expect(buildResultType({ node, types: resolverTs, returnType: 'full' })).toBe('RequestResult<GetPetByIdResponses, ThrowOnError>')
+  test('wraps RequestResult in Unwrappable for the default full return type', () => {
+    expect(buildResultType({ node, types: resolverTs, returnType: 'full' })).toBe('Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>>')
   })
 
-  test('names UnwrappedResult when returnType is data', () => {
-    expect(buildResultType({ node, types: resolverTs, returnType: 'data' })).toBe('UnwrappedResult<GetPetByIdResponses, ThrowOnError>')
+  test('wraps UnwrappedResult in a Promise when returnType is data', () => {
+    expect(buildResultType({ node, types: resolverTs, returnType: 'data' })).toBe('Promise<UnwrappedResult<GetPetByIdResponses, ThrowOnError>>')
   })
 })

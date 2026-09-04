@@ -45,8 +45,7 @@ export function useCreateUsersWithListInput(
   >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { body } }) => {
-      const { data } = await createUsersWithListInput({ ...config, body, throwOnError: true })
-      return data
+      return createUsersWithListInput({ ...config, body, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

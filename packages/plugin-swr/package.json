@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-swr",
-  "version": "5.0.0",
+  "version": "5.0.2",
   "description": "Generate type-safe SWR hooks with Kubb. Covers useSWR and useSWRMutation with full TypeScript support.",
   "keywords": [
     "code-generation",
@@ -56,6 +56,7 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
