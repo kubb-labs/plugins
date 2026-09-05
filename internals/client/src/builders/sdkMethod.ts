@@ -3,7 +3,7 @@ import { buildJSDoc } from '@internals/utils'
 import { ast } from 'kubb/kit'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
-import type { ValidatorOptions } from '../types.ts'
+import type { ReturnTypeOption, ValidatorOptions } from '../types.ts'
 import { buildReturnStatement } from './returnStatement.ts'
 import { type Auth, buildSecurityMetadata } from './security.ts'
 import { buildGroupedOptionsSignature } from './signature.ts'
@@ -58,6 +58,7 @@ export function buildSdkMethod({
   zodResolver,
   validator,
   security,
+  returnType,
 }: {
   node: ast.OperationNode
   name: string
@@ -65,12 +66,13 @@ export function buildSdkMethod({
   zodResolver?: ResolverZod | null
   validator: ValidatorOptions | undefined
   security?: Array<Auth>
+  returnType: ReturnTypeOption
 }): string {
   if (!ast.isHttpOperationNode(node)) return ''
 
-  const signature = buildGroupedOptionsSignature({ node, types })
+  const signature = buildGroupedOptionsSignature({ node, types, returnType })
   const callConfig = buildCallConfig({ node, validator, zodResolver, security })
-  const returnStatement = buildReturnStatement({ node, types, callConfig })
+  const returnStatement = buildReturnStatement({ node, types, callConfig, returnType })
   const generics = signature.generics.length ? `<${signature.generics.join(', ')}>` : ''
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 

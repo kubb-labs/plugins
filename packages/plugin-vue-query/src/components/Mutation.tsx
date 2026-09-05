@@ -3,7 +3,7 @@ import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import { buildGroupedRequestParam, buildResponseTypes } from '@internals/tanstack-query'
+import { buildCallResultBody, buildGroupedRequestParam, buildResponseTypes } from '@internals/tanstack-query'
 import { buildRequestConfigType, buildVueClientCall, getComments } from '../utils.ts'
 
 type Props = {
@@ -13,6 +13,12 @@ type Props = {
   mutationKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
+  /**
+   * The registered client plugin's `returnType`, read by the caller off `resolveClientOperation`.
+   *
+   * @default 'full'
+   */
+  returnType?: 'full' | 'data'
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -48,14 +54,14 @@ function buildMutationParamsNode(
   })
 }
 
-export function Mutation({ name, clientName, node, tsResolver, mutationKeyName }: Props): KubbReactNode {
+export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, returnType = 'full' }: Props): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver)
 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver })
   const hasMutationParams = groupedParam !== null
   const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
-  const mutationFnBody = `return ${buildVueClientCall(node, { clientName, signal: false })}.unwrap()`
+  const mutationFnBody = buildCallResultBody(buildVueClientCall(node, { clientName, signal: false }), { returnType })
 
   const TRequest = resolveMutationRequestType(node, tsResolver)
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')

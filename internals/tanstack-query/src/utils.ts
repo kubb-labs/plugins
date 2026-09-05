@@ -150,6 +150,27 @@ export function buildClientCall(node: ast.OperationNode, options: { clientName: 
   return `${clientName}({ ${args.join(', ')} })`
 }
 
+/**
+ * Builds the query/mutation body that resolves a `buildClientCall` expression down to the bare
+ * success body. `returnType` mirrors the registered client plugin's own `returnType` option: with
+ * `'data'` the call already resolves to the bare body, so it is returned directly; with `'full'`
+ * (the default) the call carries `unwrap()`, so the body calls it instead of destructuring `data`
+ * off the full result by hand.
+ *
+ * @example
+ * ```ts
+ * buildCallResultBody(buildClientCall(node, { clientName: 'getPetById' }))
+ * // return getPetById({ ...config, throwOnError: true }).unwrap()
+ * ```
+ */
+export function buildCallResultBody(call: string, options: { returnType?: 'full' | 'data' } = {}): string {
+  const { returnType = 'full' } = options
+  if (returnType === 'data') {
+    return `return await ${call}`
+  }
+  return `return ${call}.unwrap()`
+}
+
 type ResponseTypes = {
   TData: string
   TError: string

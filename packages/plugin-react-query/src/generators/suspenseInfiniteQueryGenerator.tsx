@@ -110,6 +110,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
           previousParam={infiniteOptions.previousParam}
           initialPageParam={infiniteOptions.initialPageParam}
           queryParam={infiniteOptions.queryParam}
+          returnType={contractOp.returnType}
         />
 
         <File.Import name={['useSuspenseInfiniteQuery']} path={importPath} />

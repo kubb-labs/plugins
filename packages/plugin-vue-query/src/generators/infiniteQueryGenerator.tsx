@@ -112,6 +112,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           previousParam={infiniteOptions.previousParam}
           initialPageParam={infiniteOptions.initialPageParam}
           queryParam={infiniteOptions.queryParam}
+          returnType={contractOp.returnType}
         />
 
         <File.Import name={['useInfiniteQuery']} path={importPath} />

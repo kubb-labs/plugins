@@ -3,7 +3,7 @@ import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import { buildGroupedRequestParam, buildClientCall } from '@internals/tanstack-query'
+import { buildCallResultBody, buildGroupedRequestParam, buildClientCall } from '@internals/tanstack-query'
 import { buildRequestConfigType, getComments, resolveErrorNames } from '../utils.ts'
 
 type Props = {
@@ -14,6 +14,12 @@ type Props = {
   mutationArgTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
+  /**
+   * The registered client plugin's `returnType`, read by the caller off `resolveClientOperation`.
+   *
+   * @default 'full'
+   */
+  returnType?: 'full' | 'data'
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -49,7 +55,16 @@ function buildMutationParamsNode(
   })
 }
 
-export function Mutation({ name, clientName, mutationKeyName, mutationKeyTypeName, mutationArgTypeName, node, tsResolver }: Props): KubbReactNode {
+export function Mutation({
+  name,
+  clientName,
+  mutationKeyName,
+  mutationKeyTypeName,
+  mutationArgTypeName,
+  node,
+  tsResolver,
+  returnType = 'full',
+}: Props): KubbReactNode {
   const responseName = tsResolver.response.response(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
@@ -61,7 +76,7 @@ export function Mutation({ name, clientName, mutationKeyName, mutationKeyTypeNam
   const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const argTypeBody = hasMutationParams ? tsResolver.response.options(node) : ''
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
-  const mutationFnBody = `return ${buildClientCall(node, { clientName, signal: false })}.unwrap()`
+  const mutationFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false }), { returnType })
 
   const generics = [TData, TError, `${mutationKeyTypeName} | null`, mutationArgTypeName]
 

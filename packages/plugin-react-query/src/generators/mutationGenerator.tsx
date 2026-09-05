@@ -80,7 +80,14 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
 
         <File.Import name={['mutationOptions']} path={importPath} />
 
-        <MutationOptions name={mutationOptionsName} clientName={calledClientName} mutationKeyName={mutationKeyName} node={node} tsResolver={tsResolver} />
+        <MutationOptions
+          name={mutationOptionsName}
+          clientName={calledClientName}
+          mutationKeyName={mutationKeyName}
+          node={node}
+          tsResolver={tsResolver}
+          returnType={contractOp.returnType}
+        />
 
         {mutation && hooks && (
           <>
