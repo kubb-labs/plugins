@@ -14,11 +14,12 @@ export function getContentType(response: ast.ResponseNode | null | undefined): s
 }
 
 /**
- * Determines if a response has a schema that is not void or any.
+ * Determines if a response has a schema that is not void, any, or unknown (the placeholder
+ * used for a response with no declared content).
  */
 export function hasResponseSchema(response: ast.ResponseNode | null | undefined): boolean {
   const schema = response?.content?.find((entry) => entry.schema)?.schema
-  return !!schema && schema.type !== 'void' && schema.type !== 'any'
+  return !!schema && schema.type !== 'void' && schema.type !== 'any' && schema.type !== 'unknown'
 }
 
 /**
