@@ -1,5 +1,5 @@
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers'
-import type { HeadersInit, PathParamStyle, PathSerializer, Serializers, Styles } from './serializers'
+import type { HeadersInit, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers'
 import { type StandardSchemaValidator, validateStandardSchema } from './standardSchema'
 
 /**
@@ -124,7 +124,7 @@ export type Deserializer<T = unknown> = (raw: unknown, contentType: string) => T
 /**
  * Serializes a request body for a single media type, registered per content type as a codec's `serialize` to encode formats the default serializer does not handle.
  */
-export type ContentBodySerializer = (body: unknown, contentType?: string) => BodyInit | undefined
+export type ContentBodySerializer = (body: unknown, contentType?: string) => RequestBody | undefined
 
 /**
  * A per-content-type codec registered on `codecs`, keyed by content type. `serialize` encodes the
@@ -238,7 +238,7 @@ export type ResolvedRequest = {
   url: string
   method: string
   headers: Record<string, string>
-  body?: BodyInit
+  body?: RequestBody
   signal?: AbortSignal
   credentials?: RequestCredentials
   options?: FetchOptions
