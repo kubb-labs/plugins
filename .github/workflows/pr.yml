@@ -303,4 +303,4 @@ jobs:
           NODE_OPTIONS: '--max_old_space_size=4096'
           KUBB_DISABLE_TELEMETRY: '1'
         run: |
-          pnpm run generate --debug
+          pnpm run generate --reporter file
