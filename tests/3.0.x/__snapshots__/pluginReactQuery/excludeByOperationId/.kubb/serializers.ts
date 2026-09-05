@@ -2,6 +2,12 @@ export type HeaderValue = string | number | boolean | null | undefined | object
 export type HeadersInit = Array<[string, HeaderValue]> | Record<string, HeaderValue>
 
 /**
+ * The request body type `fetch` accepts, derived from `RequestInit` instead of the global `BodyInit`
+ * name, which a Node-only project (`@types/node` without the `dom` lib) does not declare.
+ */
+export type RequestBody = NonNullable<RequestInit['body']>
+
+/**
  * The OpenAPI query-parameter serialization style. `form` is the default; `spaceDelimited` and
  * `pipeDelimited` join arrays with a space or pipe, and `deepObject` renders objects as
  * `key[prop]=value`.
@@ -67,7 +73,7 @@ export type BodyEncoding = SerializationStyle<QueryStyle> & {
  * `ArrayBuffer`, and string bodies pass through untouched. The optional `encoding` argument carries
  * the per-property OpenAPI `encoding` metadata for form bodies.
  */
-export type BodySerializer = (args: { body: unknown; contentType?: string; encoding?: Record<string, BodyEncoding> }) => BodyInit | undefined
+export type BodySerializer = (args: { body: unknown; contentType?: string; encoding?: Record<string, BodyEncoding> }) => RequestBody | undefined
 
 /**
  * The OpenAPI path-parameter serialization style. `simple` is the default and emits the bare value;
@@ -111,7 +117,7 @@ export type Styles = {
   body?: Record<string, BodyEncoding>
 }
 
-function isFormBody(body: unknown): body is BodyInit {
+function isFormBody(body: unknown): body is RequestBody {
   return (
     body instanceof FormData ||
     body instanceof URLSearchParams ||
@@ -163,7 +169,7 @@ function appendFormDataValue({ formData, key, value, contentType }: { formData: 
  */
 export const defaultBodySerializer: BodySerializer = ({ body, contentType, encoding }) => {
   if (body === undefined || body === null) return undefined
-  if (isFormBody(body)) return body as BodyInit
+  if (isFormBody(body)) return body as RequestBody
   if (contentType?.includes('multipart/form-data')) {
     const formData = new FormData()
     for (const [key, value] of Object.entries(body as Record<string, unknown>)) {
