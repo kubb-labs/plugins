@@ -1,5 +1,11 @@
 # @kubb/plugin-mcp
 
+## 5.0.2
+
+### Patch Changes
+
+- [#846](https://github.com/kubb-labs/plugins/pull/846) [`b0d08e5`](https://github.com/kubb-labs/plugins/commit/b0d08e57d357b63b188d59a52de166610d836900) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Forward the MCP request cancellation signal from generated handlers to client calls.
+
 ## 5.0.1
 
 ### Patch Changes
