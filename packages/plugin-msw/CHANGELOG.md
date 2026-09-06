@@ -1,5 +1,11 @@
 # @kubb/plugin-msw
 
+## 5.0.2
+
+### Patch Changes
+
+- [#842](https://github.com/kubb-labs/plugins/pull/842) [`65257a7`](https://github.com/kubb-labs/plugins/commit/65257a70483216a2dc3f975ceb183d0246dd5233) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Stop MSW handlers for bodyless responses from passing data to zero-parameter Faker factories. These responses also no longer include an inferred `Content-Type: application/json` header.
+
 ## 5.0.1
 
 ### Patch Changes
