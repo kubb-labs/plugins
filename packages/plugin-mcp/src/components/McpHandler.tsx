@@ -59,7 +59,7 @@ export function McpHandler({ name, clientName, node, resolver }: Props): KubbRea
         }}
         returnType={'Promise<CallToolResult>'}
       >
-        {`const res = await ${clientName}(${callConfig})`}
+        {`const res = await ${clientName}(${callConfig}, request)`}
         <br />
         {callToolResult}
       </Function>

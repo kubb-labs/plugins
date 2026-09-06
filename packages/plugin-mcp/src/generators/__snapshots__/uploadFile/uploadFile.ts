@@ -10,7 +10,7 @@ export async function uploadFileHandler(
   { path, body }: UploadFileOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await uploadFile({ path, body })
+  const res = await uploadFile({ path, body }, request)
 
   return {
     content: [

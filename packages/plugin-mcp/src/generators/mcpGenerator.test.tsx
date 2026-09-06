@@ -162,6 +162,7 @@ describe('mcpGenerator — Operation', () => {
     for (const source of rawSources(driver.fileManager.files)) {
       if (source.includes('structuredContent')) {
         expect(source, 'handler return is indented at the function-body baseline').toContain('\n  return {\n    content: [')
+        expect(source, 'handler forwards the MCP request context to the client').toContain(', request)')
       }
     }
 

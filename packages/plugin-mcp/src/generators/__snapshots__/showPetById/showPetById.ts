@@ -10,7 +10,7 @@ export async function showPetByIdHandler(
   { path }: ShowPetByIdOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await showPetById({ path })
+  const res = await showPetById({ path }, request)
 
   return {
     content: [
