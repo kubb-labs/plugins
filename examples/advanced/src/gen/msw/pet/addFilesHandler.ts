@@ -11,12 +11,9 @@ export function addFilesHandlerResponse200(data: AddFilesResponse) {
   })
 }
 
-export function addFilesHandlerResponse405(data: AddFilesStatus405) {
+export function addFilesHandlerResponse405(data?: AddFilesStatus405) {
   return new Response(JSON.stringify(data), {
     status: 405,
-    headers: {
-      'Content-Type': 'application/json',
-    },
   })
 }
 
