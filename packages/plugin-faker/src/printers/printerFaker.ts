@@ -227,11 +227,29 @@ function parseEnumValue(value: string | number | boolean | undefined) {
 /**
  * Reads the discriminator literal off a variant, or `undefined` when it can't be determined.
  */
-function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string) {
-  const prop = ast.narrowSchema(member, 'object')?.properties?.find((p) => p.name === discriminatorPropertyName)
+function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string): string | number | boolean | undefined {
+  const objectNode = ast.narrowSchema(member, 'object')
+  const prop = objectNode?.properties?.find((property) => property.name === discriminatorPropertyName)
   const enumNode = prop ? ast.narrowSchema(prop.schema, 'enum') : null
 
-  return enumNode ? getEnumValues(enumNode)[0] : undefined
+  if (enumNode) {
+    return getEnumValues(enumNode)[0]
+  }
+
+  const refNode = ast.narrowSchema(member, 'ref')
+  if (refNode?.schema) {
+    return getDiscriminatorValue(refNode.schema, discriminatorPropertyName)
+  }
+
+  const intersectionNode = ast.narrowSchema(member, 'intersection')
+  for (const intersectionMember of intersectionNode?.members ?? []) {
+    const value = getDiscriminatorValue(intersectionMember, discriminatorPropertyName)
+    if (value !== undefined) {
+      return value
+    }
+  }
+
+  return undefined
 }
 
 /**
@@ -347,7 +365,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           if (baseTypeName && value !== undefined) {
             const typeName = `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
 
-            return printNested(member, { typeName, nestedInObject: true })
+            return printNested(member, { typeName, nestedInObject: true, nestedInUnion: true })
           }
 
           // Without a discriminator, keep the union type but guard each indexed access (see

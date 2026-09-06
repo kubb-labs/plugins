@@ -157,6 +157,52 @@ describe('printerFaker', () => {
     expect(result).not.toContain('NonNullable<NodeBalancerConfig>["algorithm"]')
   })
 
+  test('narrows referenced discriminated oneOf variants to their own branch', () => {
+    const makeVariant = (name: string, petType: string) => {
+      const schema = ast.factory.createSchema({
+        type: 'object',
+        name,
+        properties: [
+          ast.factory.createProperty({
+            name: 'pet_type',
+            required: true,
+            schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: [petType] }),
+          }),
+        ],
+      })
+
+      return ast.factory.createSchema({
+        type: 'intersection',
+        members: [
+          ast.factory.createSchema({ type: 'ref', name, ref: `#/components/schemas/${name}`, schema }),
+          ast.factory.createSchema({
+            type: 'object',
+            properties: [
+              ast.factory.createProperty({
+                name: 'pet_type',
+                required: true,
+                schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: [petType] }),
+              }),
+            ],
+          }),
+        ],
+      })
+    }
+
+    const node = ast.factory.createSchema({
+      type: 'union',
+      discriminatorPropertyName: 'pet_type',
+      members: [makeVariant('Cat', 'cat'), makeVariant('Dog', 'dog')],
+    })
+
+    const result = printerFaker({ resolver: resolverFaker, typeName: 'AddPetBody' }).print(node)
+
+    expect(result).toContain(`Extract<NonNullable<AddPetBody>, { "pet_type": 'cat' }>`)
+    expect(result).toContain(`Extract<NonNullable<AddPetBody>, { "pet_type": 'dog' }>`)
+    expect(result).toContain('createCat<object>()')
+    expect(result).toContain('createDog<object>()')
+  })
+
   test('guards member property access in non-discriminated unions of objects', () => {
     // A `oneOf` without a discriminator carries `+order` on only one branch, so a plain
     // `NonNullable<Filter>["+order"]` would be a TS2339. Members index via
