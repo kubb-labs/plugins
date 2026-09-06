@@ -16,12 +16,9 @@ export function placeOrderPatchHandlerResponse200(data: PlaceOrderPatchResponse)
   })
 }
 
-export function placeOrderPatchHandlerResponse405(data: PlaceOrderPatchStatus405) {
+export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatchStatus405) {
   return new Response(JSON.stringify(data), {
     status: 405,
-    headers: {
-      'Content-Type': 'application/json',
-    },
   })
 }
 
