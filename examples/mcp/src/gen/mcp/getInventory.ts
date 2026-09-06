@@ -8,7 +8,7 @@ import { getInventory } from '../clients/getInventory'
  * {@link /store/inventory}
  */
 export async function getInventoryHandler(request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-  const res = await getInventory({})
+  const res = await getInventory({ signal: request.signal })
 
   return {
     content: [
