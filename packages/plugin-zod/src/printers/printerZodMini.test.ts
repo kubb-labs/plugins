@@ -278,6 +278,17 @@ describe('printerZodMini', () => {
       })
       expect(printer.print(node)).toBe('z.array(z.string())')
     })
+
+    test('unique array', () => {
+      const node = ast.factory.createSchema({
+        type: 'array',
+        items: [ast.factory.createSchema({ type: 'string' })],
+        unique: true,
+      })
+      expect(printer.print(node)).toBe(
+        'z.array(z.string()).check(z.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" }))',
+      )
+    })
   })
 
   describe('modifiers (functional syntax)', () => {

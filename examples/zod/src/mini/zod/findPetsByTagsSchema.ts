@@ -6,7 +6,9 @@
 import * as z from 'zod/mini'
 import { petSchema } from './petSchema'
 
-export const findPetsByTagsQueryTagsSchema = z.optional(z.array(z.string()))
+export const findPetsByTagsQueryTagsSchema = z.optional(
+  z.array(z.string()).check(z.refine((items) => new Set(items).size === items.length, { message: 'Array entries must be unique' })),
+)
 
 export const findPetsByTagsQueryPageSchema = z.optional(z.string())
 
