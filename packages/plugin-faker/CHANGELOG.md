@@ -1,5 +1,11 @@
 # @kubb/plugin-faker
 
+## 5.0.4
+
+### Patch Changes
+
+- [#849](https://github.com/kubb-labs/plugins/pull/849) [`d53bfe5`](https://github.com/kubb-labs/plugins/commit/d53bfe5d41f163dbc38d1b856292f18a12156352) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix discriminator types in Faker mocks generated from referenced `oneOf` branches.
+
 ## 5.0.3
 
 ### Patch Changes
