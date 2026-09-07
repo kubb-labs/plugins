@@ -244,6 +244,7 @@ paths:
           explode: true
           schema:
             type: array
+            uniqueItems: true
             items:
               type: string
         - $ref: '#/components/parameters/page'

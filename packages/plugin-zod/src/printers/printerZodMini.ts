@@ -270,7 +270,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: 'unknown' }))!
         const base = `z.array(${inner})${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
 
-        return node.unique ? `${base}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })` : base
+        return node.unique ? `${base}.check(z.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" }))` : base
       },
       tuple(node) {
         const items = mapSchemaItems(node, (item) => this.transform(item))

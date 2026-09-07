@@ -12,7 +12,7 @@ export async function getOrderByIdHandler(
   { path }: GetOrderByIdOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await getOrderById({ path })
+  const res = await getOrderById({ path, signal: request.signal })
 
   return {
     content: [

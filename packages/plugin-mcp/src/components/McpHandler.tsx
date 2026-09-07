@@ -31,11 +31,9 @@ export function McpHandler({ name, clientName, node, resolver }: Props): KubbRea
   const { signature, groups } = buildRequestParamsSignature(node, resolver, { isConfigurable: false })
   const paramsSignature = [signature, 'request: RequestHandlerExtra<ServerRequest, ServerNotification>'].filter(Boolean).join(', ')
 
-  // Forward the same grouped config the contract `<op>` expects, so MCP behaves like every other
-  // client consumer instead of re-implementing request building. The `<op>` always takes one
-  // required options object, so a param-less operation still passes an empty `{}`.
+  // Forward the grouped config and MCP cancellation signal through the contract client.
   const callArgs = requestGroupOrder.filter((key) => groups[key])
-  const callConfig = callArgs.length ? `{ ${callArgs.join(', ')} }` : '{}'
+  const callConfig = `{ ${[...callArgs, 'signal: request.signal'].join(', ')} }`
 
   const callToolResult = `return {
   content: [

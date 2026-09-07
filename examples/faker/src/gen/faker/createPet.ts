@@ -4,18 +4,37 @@
  */
 
 import type { Pet } from '../models/Pet'
+import { createCat } from './createCat'
 import { createCategory } from './createCategory'
+import { createDog } from './createDog'
 import { createTag } from './createTag'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
   const defaultFakeData = {
-    id: faker.number.bigInt(),
-    name: faker.string.alpha(),
-    category: createCategory(),
-    photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
-    tags: faker.helpers.multiple(() => createTag()),
-    status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
+    ...faker.helpers.arrayElement([
+      {
+        ...createDog<object>(),
+        ...{
+          type: faker.helpers.arrayElement<(NonNullable<Extract<NonNullable<Pet>, { type: 'dog' }>> & Record<'type', unknown>)['type']>(['dog']),
+        },
+      },
+      {
+        ...createCat<object>(),
+        ...{
+          type: faker.helpers.arrayElement<(NonNullable<Extract<NonNullable<Pet>, { type: 'cat' }>> & Record<'type', unknown>)['type']>(['cat']),
+        },
+      },
+    ]),
+    ...{
+      id: faker.number.bigInt(),
+      name: faker.string.alpha(),
+      type: faker.helpers.arrayElement<NonNullable<Pet>['type']>(['dog', 'cat']),
+      category: createCategory(),
+      photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
+      tags: faker.helpers.multiple(() => createTag()),
+      status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
+    },
   }
   return {
     ...defaultFakeData,

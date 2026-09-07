@@ -10,7 +10,7 @@ export async function getPetsHandler(
   { query }: GetPetsOptions = {},
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await getPets({ query })
+  const res = await getPets({ query, signal: request.signal })
 
   return {
     content: [

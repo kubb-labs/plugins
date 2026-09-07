@@ -6,7 +6,11 @@
 import { z } from '../../zod.ts'
 import { petSchema } from './petSchema'
 
-export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
+export const findPetsByTagsQueryTagsSchema = z
+  .array(z.string())
+  .refine((items) => new Set(items).size === items.length, { message: 'Array entries must be unique' })
+  .optional()
+  .describe('Tags to filter by')
 
 export type FindPetsByTagsQueryTagsSchemaType = z.infer<typeof findPetsByTagsQueryTagsSchema>
 
@@ -47,7 +51,11 @@ export const findPetsByTagsErrorSchema = findPetsByTagsStatus400Schema
 export type FindPetsByTagsErrorSchemaType = z.infer<typeof findPetsByTagsErrorSchema>
 
 export const findPetsByTagsQuerySchema = z.object({
-  tags: z.array(z.string()).optional().describe('Tags to filter by'),
+  tags: z
+    .array(z.string())
+    .refine((items) => new Set(items).size === items.length, { message: 'Array entries must be unique' })
+    .optional()
+    .describe('Tags to filter by'),
   page: z.string().optional().describe('to request with required page number or pagination'),
   pageSize: z.string().optional().describe('to request with required page size'),
 })

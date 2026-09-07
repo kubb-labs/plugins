@@ -12,7 +12,7 @@ export async function addPetHandler(
   { body }: AddPetOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await addPet({ body })
+  const res = await addPet({ body, signal: request.signal })
 
   return {
     content: [
