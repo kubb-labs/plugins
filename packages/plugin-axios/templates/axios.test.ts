@@ -1,6 +1,6 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import { type CallResult, createClientCore, parseEventStream, ResponseError, resolveAuth, withUnwrap } from './axios.ts'
+import { type CallResult, createClientCore, parseEventStream, ResponseError, resolveAuth, unwrapResult, withUnwrap } from './axios.ts'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
@@ -713,6 +713,19 @@ describe('getUrl', () => {
     expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, styles: { query: { id: { style: 'pipeDelimited', explode: false } } } })).toBe(
       '/pets?id=3|4|5',
     )
+  })
+})
+
+describe('unwrapResult', () => {
+  test('narrows a success result to its data', async () => {
+    const result = await unwrapResult(Promise.resolve({ data: { id: 1 }, error: undefined }), undefined)
+    expect(result).toStrictEqual({ id: 1 })
+  })
+
+  test('falls back to the full result when throwOnError is false', async () => {
+    const full = { data: undefined, error: { message: 'not found' } }
+    const result = await unwrapResult(Promise.resolve(full), false)
+    expect(result).toBe(full)
   })
 })
 

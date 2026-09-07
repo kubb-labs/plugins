@@ -87,6 +87,7 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
               mutationArgTypeName={mutationArgTypeName}
               node={node}
               tsResolver={tsResolver}
+              returnType={contractOp.returnType}
             />
           </>
         )}

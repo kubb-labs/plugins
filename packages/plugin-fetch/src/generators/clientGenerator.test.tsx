@@ -28,6 +28,7 @@ const defaultOptions: PluginFetch['resolvedOptions'] = {
   group: null,
   baseURL: undefined,
   validator: false,
+  returnType: 'full',
   sdk: undefined,
   resolver: resolverClient,
 }
@@ -223,6 +224,8 @@ describe('clientGenerator operation', () => {
     // text/event-stream response returns a typed event stream instead of a one-shot result.
     { name: 'streamEventsSse', node: streamEventsNode, options: {} },
     { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { validator: 'zod' as const } },
+    // returnType: 'data' unwraps the resolved call down to the bare success body.
+    { name: 'getPetByIdWithReturnTypeData', node: getPetByIdNode, options: { returnType: 'data' as const } },
     // Operation-level security overriding the global default, oauth2 reduced to bearer.
     { name: 'addPetWithSecurity', node: createPetNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
     // No operation-level security: falls back to the document's global `bearerAuth`.

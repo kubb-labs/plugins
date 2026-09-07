@@ -5,7 +5,7 @@ import type { KubbReactNode } from 'kubb/jsx'
 import { buildSdkMethod } from '../builders/sdkMethod.ts'
 import type { Auth } from '../builders/security.ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
-import type { ValidatorOptions } from '../types.ts'
+import type { ReturnTypeOption, ValidatorOptions } from '../types.ts'
 
 type OperationData = {
   node: ast.OperationNode
@@ -21,6 +21,7 @@ type Props = {
   isIndexable?: boolean
   operations: Array<OperationData>
   validator: ValidatorOptions | undefined
+  returnType: ReturnTypeOption
   children?: KubbReactNode
 }
 
@@ -30,7 +31,7 @@ type Props = {
  * instance: `const api = new PetClient({ baseURL }); api.getPetById(...)`. A per-call `client` option
  * still overrides the instance client for a one-off call.
  */
-export function SdkClient({ name, isExportable = true, isIndexable = true, operations, validator, children }: Props): KubbReactNode {
+export function SdkClient({ name, isExportable = true, isIndexable = true, operations, validator, returnType, children }: Props): KubbReactNode {
   const methods = operations.map(({ node, name: methodName, types, zodResolver, security }) =>
     buildSdkMethod({
       node,
@@ -39,6 +40,7 @@ export function SdkClient({ name, isExportable = true, isIndexable = true, opera
       zodResolver,
       validator,
       security,
+      returnType,
     }),
   )
 

@@ -3,7 +3,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import { buildQueryOptionsParams, buildClientCall } from '@internals/tanstack-query'
+import { buildCallResultBody, buildQueryOptionsParams, buildClientCall } from '@internals/tanstack-query'
 import { buildQueryKeyParams, buildResponseTypes } from '../utils.ts'
 
 type Props = {
@@ -12,12 +12,18 @@ type Props = {
   queryKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
+  /**
+   * The registered client plugin's `returnType`, read by the caller off `resolveClientOperation`.
+   *
+   * @default 'full'
+   */
+  returnType?: 'full' | 'data'
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function QueryOptions({ name, clientName, node, tsResolver, queryKeyName }: Props): KubbReactNode {
+export function QueryOptions({ name, clientName, node, tsResolver, queryKeyName, returnType = 'full' }: Props): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver)
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
@@ -25,7 +31,7 @@ export function QueryOptions({ name, clientName, node, tsResolver, queryKeyName 
 
   const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const queryFnBody = `return ${buildClientCall(node, { clientName, signal: true })}.unwrap()`
+  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true }), { returnType })
 
   return (
     <File.Source name={name} isExportable isIndexable>

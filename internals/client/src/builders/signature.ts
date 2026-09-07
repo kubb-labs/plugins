@@ -2,7 +2,8 @@ import type { ast } from 'kubb/kit'
 import { getRequestGroupOptionality } from '@internals/shared'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
-import { buildRequestResultGenerics } from './generics.ts'
+import type { ReturnTypeOption } from '../types.ts'
+import { buildResultType } from './generics.ts'
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
@@ -33,7 +34,15 @@ export type GroupedOptionsSignature = {
  * per-operation input type has to be emitted. Both names come from `types`, which is `plugin-ts` or
  * `plugin-zod`'s inferred types (see `resolveOperationTypes`).
  */
-export function buildGroupedOptionsSignature({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): GroupedOptionsSignature {
+export function buildGroupedOptionsSignature({
+  node,
+  types,
+  returnType,
+}: {
+  node: ast.OperationNode
+  types: OperationTypeNames
+  returnType: ReturnTypeOption
+}): GroupedOptionsSignature {
   const optionsName = types.response.options(node)
   const { isOptional } = getRequestGroupOptionality(node)
 
@@ -46,7 +55,7 @@ export function buildGroupedOptionsSignature({ node, types }: { node: ast.Operat
 
   return {
     paramsSignature,
-    returnType: `Unwrappable<RequestResult<${buildRequestResultGenerics({ node, types })}>>`,
+    returnType: buildResultType({ node, types, returnType }),
     generics: ['ThrowOnError extends boolean = true'],
   }
 }

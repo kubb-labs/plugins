@@ -31,18 +31,23 @@ const listPets = ast.factory.createOperation({
 
 describe('buildGroupedOptionsSignature', () => {
   test('emits a single grouped options parameter with a ThrowOnError generic', () => {
-    const signature = buildGroupedOptionsSignature({ node: addPet, types: resolverTs })
+    const signature = buildGroupedOptionsSignature({ node: addPet, types: resolverTs, returnType: 'full' })
     expect(signature.paramsSignature).toBe('options: Options<AddPetOptions, ThrowOnError>')
     expect(signature.generics).toStrictEqual(['ThrowOnError extends boolean = true'])
   })
 
   test('defaults the options parameter when the operation has no required request data', () => {
-    const signature = buildGroupedOptionsSignature({ node: listPets, types: resolverTs })
+    const signature = buildGroupedOptionsSignature({ node: listPets, types: resolverTs, returnType: 'full' })
     expect(signature.paramsSignature).toBe('options: Options<ListPetsOptions, ThrowOnError> = {}')
   })
 
   test('keys the return type on the plugin-ts per-status responses record, wrapped in Unwrappable', () => {
-    const signature = buildGroupedOptionsSignature({ node: addPet, types: resolverTs })
+    const signature = buildGroupedOptionsSignature({ node: addPet, types: resolverTs, returnType: 'full' })
     expect(signature.returnType).toBe('Unwrappable<RequestResult<AddPetResponses, ThrowOnError>>')
+  })
+
+  test('keys the return type on UnwrappedResult when returnType is data', () => {
+    const signature = buildGroupedOptionsSignature({ node: addPet, types: resolverTs, returnType: 'data' })
+    expect(signature.returnType).toBe('Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>')
   })
 })

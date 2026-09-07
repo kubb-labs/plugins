@@ -9,7 +9,7 @@ import { buildGroupedOptionsSignature } from '../builders/signature.ts'
 import { buildStyles } from '../builders/styles.ts'
 import { buildValidatorHooks } from '../builders/validator.ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
-import type { ValidatorOptions } from '../types.ts'
+import type { ReturnTypeOption, ValidatorOptions } from '../types.ts'
 
 type Props = {
   /**
@@ -34,6 +34,10 @@ type Props = {
    */
   validator?: ValidatorOptions
   /**
+   * Shape of the value the generated function resolves to.
+   */
+  returnType: ReturnTypeOption
+  /**
    * Per-operation security, resolved from the spec into inline `Auth` objects and serialized onto the
    * call config's `security` field for the runtime `auth` resolver to consume.
    */
@@ -48,10 +52,10 @@ type Props = {
  * type, signature, and call config are built with the AST factory, and only the jsx-renderer emits
  * the source.
  */
-export function Operation({ name, node, types, zodResolver, validator, security, isExportable = true, isIndexable = true }: Props): KubbReactNode {
+export function Operation({ name, node, types, zodResolver, validator, returnType, security, isExportable = true, isIndexable = true }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
 
-  const signature = buildGroupedOptionsSignature({ node, types })
+  const signature = buildGroupedOptionsSignature({ node, types, returnType })
   const validators = buildValidatorHooks({ node, validator, zodResolver })
   const securityLiteral = buildSecurityMetadata({ security })
   const stylesLiteral = buildStyles({ node })
@@ -95,8 +99,10 @@ export function Operation({ name, node, types, zodResolver, validator, security,
     .join(', ')} }`
 
   const eventType = `SuccessOf<${types.response.responses(node)}>`
-  const returnType = eventStream ? `Promise<EventStreamResult<${eventType}>>` : signature.returnType
-  const returnStatement = eventStream ? `return toEventStream<${eventType}>(request(${callConfig}))` : buildReturnStatement({ node, types, callConfig })
+  const functionReturnType = eventStream ? `Promise<EventStreamResult<${eventType}>>` : signature.returnType
+  const returnStatement = eventStream
+    ? `return toEventStream<${eventType}>(request(${callConfig}))`
+    : buildReturnStatement({ node, types, callConfig, returnType })
 
   return (
     <File.Source name={name} isExportable={isExportable} isIndexable={isIndexable}>
@@ -105,7 +111,7 @@ export function Operation({ name, node, types, zodResolver, validator, security,
         export={isExportable}
         generics={signature.generics}
         params={signature.paramsSignature}
-        returnType={returnType}
+        returnType={functionReturnType}
         JSDoc={{ comments: buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }) }}
       >
         {mergeContentType ? 'const { client: request = client, contentType, ...config } = options' : 'const { client: request = client, ...config } = options'}

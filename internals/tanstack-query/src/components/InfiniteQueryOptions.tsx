@@ -5,7 +5,15 @@ import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { Infinite } from '../types.ts'
-import { buildClientCall, buildGroupedRequestParam, buildQueryOptionsParams, buildResponseTypes, queryKeyGroupOrder, resolvePageParamType } from '../utils.ts'
+import {
+  buildCallResultBody,
+  buildClientCall,
+  buildGroupedRequestParam,
+  buildQueryOptionsParams,
+  buildResponseTypes,
+  queryKeyGroupOrder,
+  resolvePageParamType,
+} from '../utils.ts'
 
 type Props = {
   name: string
@@ -33,6 +41,12 @@ type Props = {
    * Unwraps a request group inside the client call, used by vue-query to emit `toValue(...)`.
    */
   unwrapName?: (name: string) => string
+  /**
+   * The registered client plugin's `returnType`, read by the caller off `resolveClientOperation`.
+   *
+   * @default 'full'
+   */
+  returnType?: 'full' | 'data'
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -52,6 +66,7 @@ export function InfiniteQueryOptions({
   queryKeyType = 'typeof queryKey',
   memberTypeWrapper,
   unwrapName,
+  returnType = 'full',
 }: Props): KubbReactNode {
   const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver)
 
@@ -63,7 +78,7 @@ export function InfiniteQueryOptions({
 
   const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver, memberTypeWrapper })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const queryFnBody = `return ${buildClientCall(node, { clientName, signal: true, unwrapName })}.unwrap()`
+  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName }), { returnType })
 
   const hasNewParams = nextParam != null || previousParam != null
 

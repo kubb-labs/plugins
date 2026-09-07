@@ -87,7 +87,14 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
 
         <File.Import name={['queryOptions']} path={importPath} />
 
-        <QueryOptions name={queryOptionsName} clientName={calledClientName} queryKeyName={queryKeyName} node={node} tsResolver={tsResolver} />
+        <QueryOptions
+          name={queryOptionsName}
+          clientName={calledClientName}
+          queryKeyName={queryKeyName}
+          node={node}
+          tsResolver={tsResolver}
+          returnType={contractOp.returnType}
+        />
 
         <File.Import name={['useSuspenseQuery']} path={importPath} />
         <File.Import name={['QueryKey', 'QueryClient', 'UseSuspenseQueryOptions', 'UseSuspenseQueryResult']} path={importPath} isTypeOnly />

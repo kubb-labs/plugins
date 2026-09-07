@@ -3,7 +3,7 @@ import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import { buildQueryOptionsParams, buildResponseTypes } from '@internals/tanstack-query'
+import { buildCallResultBody, buildQueryOptionsParams, buildResponseTypes } from '@internals/tanstack-query'
 import { buildVueClientCall, maybeRefOrGetter } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 
@@ -13,6 +13,12 @@ type Props = {
   queryKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
+  /**
+   * The registered client plugin's `returnType`, read by the caller off `resolveClientOperation`.
+   *
+   * @default 'full'
+   */
+  returnType?: 'full' | 'data'
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -22,7 +28,7 @@ export function getQueryOptionsParams(node: ast.OperationNode, options: { resolv
   return buildQueryOptionsParams(node, { resolver: options.resolver, memberTypeWrapper: maybeRefOrGetter })
 }
 
-export function QueryOptions({ name, clientName, node, tsResolver, queryKeyName }: Props): KubbReactNode {
+export function QueryOptions({ name, clientName, node, tsResolver, queryKeyName, returnType = 'full' }: Props): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver)
 
   const queryKeyParamsNode = buildQueryKeyParamsNode(node, { resolver: tsResolver })
@@ -30,7 +36,7 @@ export function QueryOptions({ name, clientName, node, tsResolver, queryKeyName 
 
   const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const queryFnBody = `return ${buildVueClientCall(node, { clientName, signal: true })}.unwrap()`
+  const queryFnBody = buildCallResultBody(buildVueClientCall(node, { clientName, signal: true }), { returnType })
 
   return (
     <File.Source name={name} isExportable isIndexable>

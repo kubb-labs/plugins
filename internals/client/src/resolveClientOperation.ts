@@ -4,10 +4,10 @@ import type { ast, Group, NodeCache, Output, Resolver } from 'kubb/kit'
 
 /**
  * The resolved contract `<op>` for one operation: the generated function name, the file it lives in,
- * and the contract runtime's `.kubb/client.ts` path (where `RequestConfig` / `ResponseErrorConfig`
- * come from).
+ * the contract runtime's `.kubb/client.ts` path (where `RequestConfig` / `ResponseErrorConfig`
+ * come from), and the registered client plugin's `returnType`.
  */
-export type ClientOperation = { name: string; path: string; clientPath: string }
+export type ClientOperation = { name: string; path: string; clientPath: string; returnType: 'full' | 'data' }
 
 /**
  * Resolves the contract client `<op>` a consumer (query hook, MCP handler) imports, by looking up
@@ -20,11 +20,14 @@ export type ClientOperation = { name: string; path: string; clientPath: string }
  * so several dependents reading the same client plugin for one operation in a single pass
  * (react-query's query/mutation/infinite generators, vue-query, swr, the MCP handler, ...) share
  * one computed result instead of each re-deriving the name and path.
+ *
+ * `returnType` mirrors the client plugin's own `returnType` option (`'full'` when unset), so a
+ * dependent's generated call body can match it instead of assuming the full `RequestResult` shape.
  */
 export function resolveClientOperation(options: {
   clientPlugin: { pluginName: string } | null
   driver: {
-    getPlugin: (name: string) => { options?: { output?: Output; group?: Group | null } } | undefined
+    getPlugin: (name: string) => { options?: { output?: Output; group?: Group | null; returnType?: 'full' | 'data' } } | undefined
     getResolver: (name: string) => Resolver
   }
   node: ast.OperationNode
@@ -45,6 +48,11 @@ export function resolveClientOperation(options: {
       group: plugin?.options?.group ?? undefined,
     })
 
-    return { name: resolver.name(node.operationId), path: file.path, clientPath: path.resolve(root, '.kubb/client.ts') }
+    return {
+      name: resolver.name(node.operationId),
+      path: file.path,
+      clientPath: path.resolve(root, '.kubb/client.ts'),
+      returnType: plugin?.options?.returnType ?? 'full',
+    }
   })
 }

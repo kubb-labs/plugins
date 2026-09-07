@@ -44,6 +44,7 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
     override = [],
     baseURL,
     validator = false,
+    returnType = 'full',
     group,
     sdk,
     resolver: userResolver,
@@ -57,6 +58,7 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
     group: createGroupConfig(group),
     baseURL,
     validator,
+    returnType,
     sdk: sdk ? { mode: sdk.mode ?? 'tag', name: sdk.name } : undefined,
     resolver: userResolver ? Resolver.merge<ResolverClient>(resolverClient, userResolver) : resolverClient,
   }
