@@ -1,5 +1,11 @@
 # @kubb/plugin-zod
 
+## 5.1.4
+
+### Patch Changes
+
+- [#852](https://github.com/kubb-labs/plugins/pull/852) [`3dcf220`](https://github.com/kubb-labs/plugins/commit/3dcf22017b5b0b83422ac0b2af90c817b64bd43b) Thanks [@ghettoDdOS](https://github.com/ghettoDdOS)! - Fix unique array case in printer zod/mini
+
 ## 5.1.3
 
 ### Patch Changes
