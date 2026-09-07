@@ -183,6 +183,9 @@ Want to contribute to an existing plugin or add a new one, official or community
       <td align="center" valign="top" width="14.28%"><a href="https://xeoneux.com"><img src="https://avatars.githubusercontent.com/u/3099626?v=4?s=100" width="100px;" alt="Aayush Kapoor"/><br /><sub><b>Aayush Kapoor</b></sub></a><br /><a href="https://github.com/kubb-labs/plugins/commits?author=xeoneux" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/julian99m"><img src="https://avatars.githubusercontent.com/u/54702068?v=4?s=100" width="100px;" alt="Julian Meyer"/><br /><sub><b>Julian Meyer</b></sub></a><br /><a href="https://github.com/kubb-labs/plugins/commits?author=julian99m" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://ghettoddos.su"><img src="https://avatars.githubusercontent.com/u/47575319?v=4?s=100" width="100px;" alt="Egor"/><br /><sub><b>Egor</b></sub></a><br /><a href="https://github.com/kubb-labs/plugins/commits?author=ghettoDdOS" title="Code">💻</a></td>
+    </tr>
   </tbody>
 </table>
 
