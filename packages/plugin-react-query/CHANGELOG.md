@@ -1,5 +1,18 @@
 # @kubb/plugin-react-query
 
+## 5.1.0
+
+### Minor Changes
+
+- [#818](https://github.com/kubb-labs/plugins/pull/818) [`353c2f1`](https://github.com/kubb-labs/plugins/commit/353c2f1165d47d5717df90e37fa054b41f8580d6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add a `returnType` option (`'full' | 'data'`, default `'full'`) to the standalone client
+  functions and the class-based SDK. `'data'` resolves a call to the bare success body instead of
+  the full `{ status, data, error, contentType, request, response }` result, once `throwOnError`
+  (on by default) rules out the error branch.
+  
+  `plugin-react-query`, `plugin-vue-query`, and `plugin-swr` now read this option off the
+  registered client plugin, so their generated hooks work with either setting instead of assuming
+  the full result.
+
 ## 5.0.3
 
 ### Patch Changes
