@@ -1,6 +1,6 @@
-import type { Options, RequestResult } from '../../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { DeletePetOptions, DeletePetResponses } from '../../../models/ts/pet/DeletePet'
-import { client } from '../../../.kubb/client'
+import { client, withUnwrap } from '../../../.kubb/client'
 import { deletePetResponseSchema, deletePetErrorSchema } from '../../../zod/pet/deletePetSchema'
 
 /**
@@ -10,14 +10,16 @@ import { deletePetResponseSchema, deletePetErrorSchema } from '../../../zod/pet/
  */
 export function deletePet<ThrowOnError extends boolean = true>(
   options: Options<DeletePetOptions, ThrowOnError>,
-): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({
-    method: 'DELETE',
-    url: '/pet/{petId}:search',
-    security: [{ type: 'oauth2' }],
-    validator: { response: deletePetResponseSchema, error: deletePetErrorSchema },
-    ...config,
-  }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
+  return withUnwrap(
+    request({
+      method: 'DELETE',
+      url: '/pet/{petId}:search',
+      security: [{ type: 'oauth2' }],
+      validator: { response: deletePetResponseSchema, error: deletePetErrorSchema },
+      ...config,
+    }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>,
+  )
 }

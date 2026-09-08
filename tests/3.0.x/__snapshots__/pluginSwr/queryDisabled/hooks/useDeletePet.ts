@@ -14,8 +14,7 @@ type DeletePetQueryKey = ReturnType<typeof deletePetQueryKey>
 export function deletePetQueryOptions({ path, headers }: DeletePetOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      const { data } = await deletePet({ ...config, path, headers, throwOnError: true })
-      return data
+      return deletePet({ ...config, path, headers, throwOnError: true }).unwrap()
     },
   }
 }

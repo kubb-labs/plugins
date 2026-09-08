@@ -23,8 +23,7 @@ export function getOrderByIdQueryOptions(
   return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200>({
     queryKey,
     queryFn: async ({ signal }) => {
-      const { data } = await getOrderById({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true })
-      return data
+      return getOrderById({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }

@@ -27,6 +27,7 @@ const defaultOptions: PluginFetch['resolvedOptions'] = {
   group: null,
   baseURL: undefined,
   validator: false,
+  returnType: 'full',
   sdk: { mode: 'tag', name: undefined },
   resolver: resolverClient,
 }
@@ -119,6 +120,8 @@ describe('sdkGenerator operations', () => {
       options: { sdk: { mode: 'flat', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']>,
       adapter: mockedAdapterWithDocument(securityDocument),
     },
+    // returnType: 'data' unwraps every SDK method down to the bare success body.
+    { name: 'sdkClassWithReturnTypeData', options: { returnType: 'data' } as Partial<PluginFetch['resolvedOptions']> },
   ] as const satisfies Array<{ name: string; options: Partial<PluginFetch['resolvedOptions']>; adapter?: Adapter }>
 
   test.each(testData)('$name', async (props) => {

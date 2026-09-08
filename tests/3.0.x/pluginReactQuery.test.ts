@@ -269,6 +269,27 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       ],
     },
   },
+
+  // ─── with the client plugin's returnType ────────────────────────────────
+  {
+    name: 'returnTypeData',
+    config: {
+      root: __dirname,
+      input: '../../schemas/3.0.x/petStore.yaml',
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false, enums: 'root' }),
+      parsers: [parserTs()],
+      storage: fsStorage(),
+      plugins: [
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' }, returnType: 'data' }),
+        pluginReactQuery({
+          hooks: true,
+          output: { path: './hooks', barrel: false, mode: 'directory' },
+        }),
+      ],
+    },
+  },
 ]
 
 describe(`plugin-react-query options ${version}`, () => {

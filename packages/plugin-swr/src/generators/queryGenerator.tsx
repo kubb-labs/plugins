@@ -78,7 +78,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
 
         <QueryKey name={queryKeyName} typeName={queryKeyTypeName} node={node} tsResolver={tsResolver} transformer={ctx.options.queryKey} />
 
-        <QueryOptions name={queryOptionsName} clientName={calledClientName} node={node} tsResolver={tsResolver} />
+        <QueryOptions name={queryOptionsName} clientName={calledClientName} node={node} tsResolver={tsResolver} returnType={contractOp.returnType} />
 
         {query && (
           <>

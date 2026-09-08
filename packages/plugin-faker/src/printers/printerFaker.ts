@@ -40,6 +40,10 @@ export type PrinterFakerOptions = {
    * Set while printing the members of a union (`oneOf`). Object properties then index their
    * type as `(NonNullable<T> & Record<K, unknown>)[K]` instead of `NonNullable<T>[K]`, so a key
    * carried by only some branches stays valid (a plain index would be a TS2339).
+   *
+   * Referenced object factories also receive their explicit default type argument (`object`).
+   * This prevents a surrounding generic helper from inferring `TData` as `Partial<T>` when the
+   * factory is called without override data, which would make required properties optional.
    */
   nestedInUnion?: boolean
   nodes?: PrinterFakerNodes
@@ -223,11 +227,29 @@ function parseEnumValue(value: string | number | boolean | undefined) {
 /**
  * Reads the discriminator literal off a variant, or `undefined` when it can't be determined.
  */
-function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string) {
-  const prop = ast.narrowSchema(member, 'object')?.properties?.find((p) => p.name === discriminatorPropertyName)
+function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string): string | number | boolean | undefined {
+  const objectNode = ast.narrowSchema(member, 'object')
+  const prop = objectNode?.properties?.find((property) => property.name === discriminatorPropertyName)
   const enumNode = prop ? ast.narrowSchema(prop.schema, 'enum') : null
 
-  return enumNode ? getEnumValues(enumNode)[0] : undefined
+  if (enumNode) {
+    return getEnumValues(enumNode)[0]
+  }
+
+  const refNode = ast.narrowSchema(member, 'ref')
+  if (refNode?.schema) {
+    return getDiscriminatorValue(refNode.schema, discriminatorPropertyName)
+  }
+
+  const intersectionNode = ast.narrowSchema(member, 'intersection')
+  for (const intersectionMember of intersectionNode?.members ?? []) {
+    const value = getDiscriminatorValue(intersectionMember, discriminatorPropertyName)
+    if (value !== undefined) {
+      return value
+    }
+  }
+
+  return undefined
 }
 
 /**
@@ -324,7 +346,9 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           return `${resolvedName}(data)`
         }
 
-        return `${resolvedName}()`
+        const typeArgument = this.options.nestedInUnion && (node.schema?.type === 'object' || node.schema?.type === 'intersection') ? '<object>' : ''
+
+        return `${resolvedName}${typeArgument}()`
       },
       enum(node) {
         return fakerKeywordMapper.enum(getEnumValues(node).map(parseEnumValue), this.options.typeName)
@@ -341,7 +365,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           if (baseTypeName && value !== undefined) {
             const typeName = `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
 
-            return printNested(member, { typeName, nestedInObject: true })
+            return printNested(member, { typeName, nestedInObject: true, nestedInUnion: true })
           }
 
           // Without a discriminator, keep the union type but guard each indexed access (see

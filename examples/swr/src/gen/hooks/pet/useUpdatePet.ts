@@ -48,8 +48,7 @@ export function useUpdatePet(
   >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { body } }) => {
-      const { data } = await updatePet({ ...config, body, throwOnError: true })
-      return data
+      return updatePet({ ...config, body, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

@@ -101,7 +101,7 @@ const createPetsNode = ast.factory.createOperation({
     content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
   },
   responses: [
-    ast.factory.createResponse({ statusCode: '201', description: 'Null response', schema: ast.factory.createSchema({ type: 'void' }) }),
+    ast.factory.createResponse({ statusCode: '201', description: 'Bodyless response', schema: ast.factory.createSchema({ type: 'unknown' }) }),
     ast.factory.createResponse({
       statusCode: 'default',
       description: 'unexpected error',

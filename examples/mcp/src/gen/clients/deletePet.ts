@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { DeletePetOptions, DeletePetResponses } from '../models/ts/DeletePet'
-import { client } from '../.kubb/client'
+import { client, withUnwrap } from '../.kubb/client'
 
 /**
  * @description delete a pet
@@ -14,10 +14,10 @@ import { client } from '../.kubb/client'
  */
 export function deletePet<ThrowOnError extends boolean = true>(
   options: Options<DeletePetOptions, ThrowOnError>,
-): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<
-    RequestResult<DeletePetResponses, ThrowOnError>
-  >
+  return withUnwrap(
+    request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>,
+  )
 }

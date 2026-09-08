@@ -1,7 +1,7 @@
 import { ast } from 'kubb/kit'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import { buildRequestResultGenerics } from './generics.ts'
+import { buildRequestResultGenerics, buildResultType } from './generics.ts'
 
 const node = ast.factory.createOperation({
   operationId: 'getPetById',
@@ -15,5 +15,15 @@ const node = ast.factory.createOperation({
 describe('buildRequestResultGenerics', () => {
   test('names the responses record and threads ThrowOnError', () => {
     expect(buildRequestResultGenerics({ node, types: resolverTs })).toBe('GetPetByIdResponses, ThrowOnError')
+  })
+})
+
+describe('buildResultType', () => {
+  test('wraps RequestResult in Unwrappable for the default full return type', () => {
+    expect(buildResultType({ node, types: resolverTs, returnType: 'full' })).toBe('Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>>')
+  })
+
+  test('wraps UnwrappedResult in a Promise when returnType is data', () => {
+    expect(buildResultType({ node, types: resolverTs, returnType: 'data' })).toBe('Promise<UnwrappedResult<GetPetByIdResponses, ThrowOnError>>')
   })
 })

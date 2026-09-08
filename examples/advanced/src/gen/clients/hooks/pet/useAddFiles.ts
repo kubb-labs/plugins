@@ -15,8 +15,7 @@ export function addFilesMutationOptions<TContext = unknown>(
   return mutationOptions<AddFilesStatus200, ResponseErrorConfig<AddFilesStatus405>, AddFilesOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
-      const { data } = await addFiles({ ...config, body, throwOnError: true })
-      return data
+      return addFiles({ ...config, body, throwOnError: true }).unwrap()
     },
   })
 }

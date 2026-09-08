@@ -37,8 +37,7 @@ export function useUpdateUser(
   return useSWRMutation<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserMutationKey | null, UpdateUserMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, body } }) => {
-      const { data } = await updateUser({ ...config, path, body, throwOnError: true })
-      return data
+      return updateUser({ ...config, path, body, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

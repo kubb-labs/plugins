@@ -9,7 +9,7 @@ import { getPetById } from '../../clients/getPetById'
  * {@link /pet/:petId}
  */
 export async function getPetByIdHandler({ path }: GetPetByIdOptions, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-  const res = await getPetById({ path })
+  const res = await getPetById({ path, signal: request.signal })
 
   return {
     content: [

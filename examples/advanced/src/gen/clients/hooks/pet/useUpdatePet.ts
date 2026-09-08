@@ -27,8 +27,7 @@ export function updatePetMutationOptions<TContext = unknown>(
   >({
     mutationKey,
     mutationFn: async ({ body }) => {
-      const { data } = await updatePet({ ...config, body, throwOnError: true })
-      return data
+      return updatePet({ ...config, body, throwOnError: true }).unwrap()
     },
   })
 }

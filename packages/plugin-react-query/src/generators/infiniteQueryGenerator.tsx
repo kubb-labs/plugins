@@ -116,6 +116,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
           previousParam={infiniteOptions.previousParam}
           initialPageParam={infiniteOptions.initialPageParam}
           queryParam={infiniteOptions.queryParam}
+          returnType={contractOp.returnType}
         />
 
         <File.Import name={['useInfiniteQuery']} path={importPath} />

@@ -1,5 +1,43 @@
 # @kubb/plugin-vue-query
 
+## 5.1.0
+
+### Minor Changes
+
+- [#818](https://github.com/kubb-labs/plugins/pull/818) [`353c2f1`](https://github.com/kubb-labs/plugins/commit/353c2f1165d47d5717df90e37fa054b41f8580d6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add a `returnType` option (`'full' | 'data'`, default `'full'`) to the standalone client
+  functions and the class-based SDK. `'data'` resolves a call to the bare success body instead of
+  the full `{ status, data, error, contentType, request, response }` result, once `throwOnError`
+  (on by default) rules out the error branch.
+  
+  `plugin-react-query`, `plugin-vue-query`, and `plugin-swr` now read this option off the
+  registered client plugin, so their generated hooks work with either setting instead of assuming
+  the full result.
+
+## 5.0.2
+
+### Patch Changes
+
+- [#835](https://github.com/kubb-labs/plugins/pull/835) [`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d) Thanks [@julian99m](https://github.com/julian99m)! - Explicit `types` fields for each package.json `exports` entry, so that it works with tsconfig.json `moduleResulotion: 'bundler'`
+- Updated dependencies [[`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d)]:
+  - @kubb/plugin-ts@5.0.1
+
+## 5.0.1
+
+### Patch Changes
+
+- [#820](https://github.com/kubb-labs/plugins/pull/820) [`15b789f`](https://github.com/kubb-labs/plugins/commit/15b789fb8a3b8933df5d2415888f0c4d44640a1b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Generated calls now return a promise with an extra `unwrap()` method. Calling it gives you the bare
+  success body, or rejects with `error` when the call was made with `throwOnError: false`.
+  
+  ```ts
+  const { data, error } = await getPetById({ path: { petId: 1 } })
+  const pet = await getPetById({ path: { petId: 1 } }).unwrap()
+  ```
+  
+  Awaiting the call directly still gives the full result, so nothing existing changes.
+  
+  `plugin-react-query`, `plugin-vue-query`, and `plugin-swr` now build their generated query and
+  mutation bodies on top of `unwrap()` too, instead of destructuring the result by hand.
+
 ## 5.0.0
 
 ### Major Changes

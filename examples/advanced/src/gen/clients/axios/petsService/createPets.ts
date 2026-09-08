@@ -1,6 +1,6 @@
-import type { Options, RequestResult } from '../../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { CreatePetsOptions, CreatePetsResponses } from '../../../models/ts/pets/CreatePets'
-import { client } from '../../../.kubb/client'
+import { client, withUnwrap } from '../../../.kubb/client'
 import { createPetsResponseSchema, createPetsErrorSchema } from '../../../zod/pets/createPetsSchema'
 
 /**
@@ -9,13 +9,12 @@ import { createPetsResponseSchema, createPetsErrorSchema } from '../../../zod/pe
  */
 export function createPets<ThrowOnError extends boolean = true>(
   options: Options<CreatePetsOptions, ThrowOnError>,
-): Promise<RequestResult<CreatePetsResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<CreatePetsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({
-    method: 'POST',
-    url: '/pets/{uuid}',
-    validator: { response: createPetsResponseSchema, error: createPetsErrorSchema },
-    ...config,
-  }) as Promise<RequestResult<CreatePetsResponses, ThrowOnError>>
+  return withUnwrap(
+    request({ method: 'POST', url: '/pets/{uuid}', validator: { response: createPetsResponseSchema, error: createPetsErrorSchema }, ...config }) as Promise<
+      RequestResult<CreatePetsResponses, ThrowOnError>
+    >,
+  )
 }

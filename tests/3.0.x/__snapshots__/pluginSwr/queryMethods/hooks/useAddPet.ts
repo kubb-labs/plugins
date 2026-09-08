@@ -31,8 +31,7 @@ export function useAddPet(options: {
   return useSWRMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { body } }) => {
-      const { data } = await addPet({ ...config, body, throwOnError: true })
-      return data
+      return addPet({ ...config, body, throwOnError: true }).unwrap()
     },
     mutationOptions
   )

@@ -23,8 +23,7 @@ export function loginUserQueryOptions(
   return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200>({
     queryKey,
     queryFn: async ({ signal }) => {
-      const { data } = await loginUser({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true })
-      return data
+      return loginUser({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }

@@ -15,8 +15,7 @@ export function deleteUserMutationOptions<TContext = unknown>(config: Partial<Om
   return mutationOptions<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, DeleteUserOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path }) => {
-      const { data } = await deleteUser({ ...config, path, throwOnError: true })
-      return data
+      return deleteUser({ ...config, path, throwOnError: true }).unwrap()
     },
   })
 }

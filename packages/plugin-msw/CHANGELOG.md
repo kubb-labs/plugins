@@ -1,5 +1,20 @@
 # @kubb/plugin-msw
 
+## 5.0.2
+
+### Patch Changes
+
+- [#842](https://github.com/kubb-labs/plugins/pull/842) [`65257a7`](https://github.com/kubb-labs/plugins/commit/65257a70483216a2dc3f975ceb183d0246dd5233) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Stop MSW handlers for bodyless responses from passing data to zero-parameter Faker factories. These responses also no longer include an inferred `Content-Type: application/json` header.
+
+## 5.0.1
+
+### Patch Changes
+
+- [#835](https://github.com/kubb-labs/plugins/pull/835) [`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d) Thanks [@julian99m](https://github.com/julian99m)! - Explicit `types` fields for each package.json `exports` entry, so that it works with tsconfig.json `moduleResulotion: 'bundler'`
+- Updated dependencies [[`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d)]:
+  - @kubb/plugin-faker@5.0.3
+  - @kubb/plugin-ts@5.0.1
+
 ## 5.0.0
 
 ### Major Changes

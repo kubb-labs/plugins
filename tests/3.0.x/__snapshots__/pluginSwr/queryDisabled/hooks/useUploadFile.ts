@@ -14,8 +14,7 @@ type UploadFileQueryKey = ReturnType<typeof uploadFileQueryKey>
 export function uploadFileQueryOptions({ path, query, body }: UploadFileOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      const { data } = await uploadFile({ ...config, path, query, body, throwOnError: true })
-      return data
+      return uploadFile({ ...config, path, query, body, throwOnError: true }).unwrap()
     },
   }
 }

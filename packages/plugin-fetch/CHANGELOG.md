@@ -1,5 +1,56 @@
 # @kubb/plugin-fetch
 
+## 5.3.0
+
+### Minor Changes
+
+- [#818](https://github.com/kubb-labs/plugins/pull/818) [`353c2f1`](https://github.com/kubb-labs/plugins/commit/353c2f1165d47d5717df90e37fa054b41f8580d6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add a `returnType` option (`'full' | 'data'`, default `'full'`) to the standalone client
+  functions and the class-based SDK. `'data'` resolves a call to the bare success body instead of
+  the full `{ status, data, error, contentType, request, response }` result, once `throwOnError`
+  (on by default) rules out the error branch.
+  
+  `plugin-react-query`, `plugin-vue-query`, and `plugin-swr` now read this option off the
+  registered client plugin, so their generated hooks work with either setting instead of assuming
+  the full result.
+
+## 5.2.2
+
+### Patch Changes
+
+- [#839](https://github.com/kubb-labs/plugins/pull/839) [`eddfd39`](https://github.com/kubb-labs/plugins/commit/eddfd39bb78ce48bb7e02e5b50eba82f61919c15) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix the generated client failing to type-check in Node-only projects (`@types/node` without the `dom` lib). The generated `.kubb/client.ts` and `.kubb/serializers.ts` no longer reference the global `BodyInit` name, which such a project never declares. They now use a local `RequestBody` type derived from `RequestInit['body']`.
+
+## 5.2.1
+
+### Patch Changes
+
+- [#835](https://github.com/kubb-labs/plugins/pull/835) [`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d) Thanks [@julian99m](https://github.com/julian99m)! - Explicit `types` fields for each package.json `exports` entry, so that it works with tsconfig.json `moduleResulotion: 'bundler'`
+- Updated dependencies [[`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d)]:
+  - @kubb/plugin-ts@5.0.1
+  - @kubb/plugin-zod@5.1.3
+
+## 5.2.0
+
+### Minor Changes
+
+- [#820](https://github.com/kubb-labs/plugins/pull/820) [`15b789f`](https://github.com/kubb-labs/plugins/commit/15b789fb8a3b8933df5d2415888f0c4d44640a1b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Generated calls now return a promise with an extra `unwrap()` method. Calling it gives you the bare
+  success body, or rejects with `error` when the call was made with `throwOnError: false`.
+  
+  ```ts
+  const { data, error } = await getPetById({ path: { petId: 1 } })
+  const pet = await getPetById({ path: { petId: 1 } }).unwrap()
+  ```
+  
+  Awaiting the call directly still gives the full result, so nothing existing changes.
+  
+  `plugin-react-query`, `plugin-vue-query`, and `plugin-swr` now build their generated query and
+  mutation bodies on top of `unwrap()` too, instead of destructuring the result by hand.
+
+## 5.1.2
+
+### Patch Changes
+
+- [#814](https://github.com/kubb-labs/plugins/pull/814) [`8223e64`](https://github.com/kubb-labs/plugins/commit/8223e64ccac5ecbfb145e3f62d81e1d072b55eca) Thanks [@julian99m](https://github.com/julian99m)! - Changed client template to comply with TypeScript's `noPropertyAccessFromIndexSignature` rule
+
 ## 5.1.1
 
 ### Patch Changes

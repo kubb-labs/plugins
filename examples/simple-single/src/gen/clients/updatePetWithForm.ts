@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from '../models'
-import { client } from '../.kubb/client'
+import { client, withUnwrap } from '../.kubb/client'
 
 /**
  * @summary Updates a pet in the store with form data
@@ -13,10 +13,12 @@ import { client } from '../.kubb/client'
  */
 export function updatePetWithForm<ThrowOnError extends boolean = true>(
   options: Options<UpdatePetWithFormOptions, ThrowOnError>,
-): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<
-    RequestResult<UpdatePetWithFormResponses, ThrowOnError>
-  >
+  return withUnwrap(
+    request({ method: 'POST', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<
+      RequestResult<UpdatePetWithFormResponses, ThrowOnError>
+    >,
+  )
 }

@@ -19,8 +19,7 @@ export function createUserMutationOptions<TContext = unknown>(
   return mutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
-      const { data } = await createUser({ ...config, body, throwOnError: true })
-      return data
+      return createUser({ ...config, body, throwOnError: true }).unwrap()
     },
   })
 }

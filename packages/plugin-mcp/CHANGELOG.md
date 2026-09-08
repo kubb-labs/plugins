@@ -1,5 +1,20 @@
 # @kubb/plugin-mcp
 
+## 5.0.2
+
+### Patch Changes
+
+- [#846](https://github.com/kubb-labs/plugins/pull/846) [`b0d08e5`](https://github.com/kubb-labs/plugins/commit/b0d08e57d357b63b188d59a52de166610d836900) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Forward the MCP request cancellation signal from generated handlers to client calls.
+
+## 5.0.1
+
+### Patch Changes
+
+- [#835](https://github.com/kubb-labs/plugins/pull/835) [`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d) Thanks [@julian99m](https://github.com/julian99m)! - Explicit `types` fields for each package.json `exports` entry, so that it works with tsconfig.json `moduleResulotion: 'bundler'`
+- Updated dependencies [[`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d)]:
+  - @kubb/plugin-ts@5.0.1
+  - @kubb/plugin-zod@5.1.3
+
 ## 5.0.0
 
 ### Major Changes

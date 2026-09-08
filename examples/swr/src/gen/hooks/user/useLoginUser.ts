@@ -19,8 +19,7 @@ export function loginUserQueryOptions(
 ) {
   return {
     fetcher: async () => {
-      const { data } = await loginUser({ ...config, query, throwOnError: true })
-      return data
+      return loginUser({ ...config, query, throwOnError: true }).unwrap()
     },
   }
 }

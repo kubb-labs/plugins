@@ -7,6 +7,7 @@ export {
   buildGroupedRequestParam,
   buildQueryKeyParams,
   buildQueryOptionsParams,
+  buildCallResultBody,
   buildClientCall,
   buildResponseTypes,
   classifyOperation,

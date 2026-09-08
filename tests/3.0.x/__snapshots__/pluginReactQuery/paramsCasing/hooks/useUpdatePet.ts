@@ -16,8 +16,7 @@ export function updatePetMutationOptions<TContext = unknown>(config: Partial<Omi
   return mutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetOptions, TContext>({
     mutationKey,
     mutationFn: async({ path, query, body, headers }) => {
-      const { data } = await updatePet({ ...config, path, query, body, headers, throwOnError: true })
-      return data
+      return updatePet({ ...config, path, query, body, headers, throwOnError: true }).unwrap()
     },
   })
 }

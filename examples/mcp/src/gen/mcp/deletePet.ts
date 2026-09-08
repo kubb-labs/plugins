@@ -12,7 +12,7 @@ export async function deletePetHandler(
   { path, headers }: DeletePetOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await deletePet({ path, headers })
+  const res = await deletePet({ path, headers, signal: request.signal })
 
   return {
     content: [
