@@ -64,6 +64,6 @@
     "node": ">=22",
     "pnpm": ">=11.0.0"
   },
-  "packageManager": "pnpm@11.24.0",
+  "packageManager": "pnpm@12.2.1",
   "namespace": "@kubb"
 }

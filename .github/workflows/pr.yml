@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@1025da3611eb8e52736df9279bffa13de99f1d27 # main
         with:
           node-version: '22.22.3'
 
@@ -47,7 +47,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@1025da3611eb8e52736df9279bffa13de99f1d27 # main
         with:
           node-version: '22.22.3'
 
@@ -77,7 +77,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@1025da3611eb8e52736df9279bffa13de99f1d27 # main
         with:
           node-version: '22.22.3'
 
@@ -104,7 +104,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@1025da3611eb8e52736df9279bffa13de99f1d27 # main
         with:
           node-version: '22.22.3'
 
@@ -128,7 +128,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@1025da3611eb8e52736df9279bffa13de99f1d27 # main
         with:
           node-version: '22.22.3'
 
@@ -154,7 +154,7 @@ jobs:
           fetch-depth: 2
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@1025da3611eb8e52736df9279bffa13de99f1d27 # main
         with:
           node-version: '22.22.3'
 
@@ -201,7 +201,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@1025da3611eb8e52736df9279bffa13de99f1d27 # main
         with:
           node-version: '22.22.3'
 
@@ -230,7 +230,7 @@ jobs:
           fetch-depth: 1
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@1025da3611eb8e52736df9279bffa13de99f1d27 # main
         with:
           node-version: '22.22.3'
 
@@ -290,7 +290,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@1025da3611eb8e52736df9279bffa13de99f1d27 # main
         with:
           node-version: '22.22.3'
 
