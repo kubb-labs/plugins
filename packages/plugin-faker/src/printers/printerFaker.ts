@@ -150,7 +150,7 @@ const fakerKeywordMapper = {
     return `faker.helpers.multiple(() => (${item}))`
   },
   tuple: (items: Array<string> = []) => `[${items.join(', ')}]`,
-  enum: (items: Array<string | number | boolean | undefined> = [], type?: string) =>
+  enum: (items: Array<string | number | boolean | null | undefined> = [], type?: string) =>
     `faker.helpers.arrayElement${type ? `<${type}>` : ''}([${items.join(', ')}])`,
   union: (items: Array<string> = []) => `faker.helpers.arrayElement([${items.join(', ')}])`,
   datetime: () => 'faker.date.anytime().toISOString()',
@@ -208,15 +208,7 @@ const fakerKeywordMapper = {
   blob: () => 'faker.image.url() as unknown as Blob',
 } as const
 
-function getEnumValues(node: ast.EnumSchemaNode): Array<string | number | boolean | undefined> {
-  if (node.namedEnumValues?.length) {
-    return node.namedEnumValues.map((item) => item.value)
-  }
-
-  return (node.enumValues ?? []) as Array<string | number | boolean | undefined>
-}
-
-function parseEnumValue(value: string | number | boolean | undefined) {
+function parseEnumValue(value: string | number | boolean | null | undefined) {
   if (typeof value === 'string') {
     return stringify(value)
   }
@@ -226,26 +218,19 @@ function parseEnumValue(value: string | number | boolean | undefined) {
 
 /**
  * Reads the discriminator literal off a variant, or `undefined` when it can't be determined.
+ *
+ * `resolveSchemaProperties` reaches the property through `ref` and `intersection` nodes, and
+ * `getSchemaLiteralValues` reads its literals, including through a `ref` to a named enum.
+ *
+ * A variant of a discriminated union carries exactly one discriminator value, so a property that
+ * resolves to several literals (a `ref` to the shared enum of every branch, say) narrows nothing
+ * and returns `undefined`. The caller then keeps the whole union as the type.
  */
-function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string): string | number | boolean | undefined {
-  const objectNode = ast.narrowSchema(member, 'object')
-  const prop = objectNode?.properties?.find((property) => property.name === discriminatorPropertyName)
-  const enumNode = prop ? ast.narrowSchema(prop.schema, 'enum') : null
-
-  if (enumNode) {
-    return getEnumValues(enumNode)[0]
-  }
-
-  const refNode = ast.narrowSchema(member, 'ref')
-  if (refNode?.schema) {
-    return getDiscriminatorValue(refNode.schema, discriminatorPropertyName)
-  }
-
-  const intersectionNode = ast.narrowSchema(member, 'intersection')
-  for (const intersectionMember of intersectionNode?.members ?? []) {
-    const value = getDiscriminatorValue(intersectionMember, discriminatorPropertyName)
-    if (value !== undefined) {
-      return value
+function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string): string | number | boolean | null | undefined {
+  for (const property of ast.resolveSchemaProperties({ node: member, propertyName: discriminatorPropertyName })) {
+    const values = ast.getSchemaLiteralValues(property.schema)
+    if (values.length === 1) {
+      return values[0]
     }
   }
 
@@ -351,7 +336,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return `${resolvedName}${typeArgument}()`
       },
       enum(node) {
-        return fakerKeywordMapper.enum(getEnumValues(node).map(parseEnumValue), this.options.typeName)
+        return fakerKeywordMapper.enum(ast.getSchemaLiteralValues(node).map(parseEnumValue), this.options.typeName)
       },
       union(node): string {
         const { discriminatorPropertyName } = node
