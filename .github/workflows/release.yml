@@ -37,7 +37,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@1025da3611eb8e52736df9279bffa13de99f1d27 # main
+        uses: kubb-labs/config/.github/setup@b9065b9f512bfabcd1448bb1a723966c3b99cdbf # main
         with:
           node-version: '22.22.3'
           cache: 'false'
@@ -56,7 +56,7 @@ jobs:
 
       - name: Release
         id: release
-        uses: kubb-labs/config/.github/actions/release@3f4c08f50e67174c9e0ba09290bc79199f50ddfb # main
+        uses: kubb-labs/config/.github/actions/release@b9065b9f512bfabcd1448bb1a723966c3b99cdbf # main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -100,7 +100,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@1025da3611eb8e52736df9279bffa13de99f1d27 # main
+        uses: kubb-labs/config/.github/setup@b9065b9f512bfabcd1448bb1a723966c3b99cdbf # main
         with:
           node-version: '22.22.3'
           cache: 'false'
@@ -109,7 +109,7 @@ jobs:
       # defaults to per-package.
       - name: Promote
         id: promote
-        uses: kubb-labs/config/.github/actions/promote@3f4c08f50e67174c9e0ba09290bc79199f50ddfb # main
+        uses: kubb-labs/config/.github/actions/promote@b9065b9f512bfabcd1448bb1a723966c3b99cdbf # main
         with:
           staged-packages: ${{ needs.release.outputs.staged_packages }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
