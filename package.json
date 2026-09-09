@@ -49,7 +49,7 @@
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
-    "bun-types": "^1.4.1",
+    "bun-types": "^1.4.2",
     "kubb": "catalog:",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
@@ -64,6 +64,6 @@
     "node": ">=22",
     "pnpm": ">=11.0.0"
   },
-  "packageManager": "pnpm@12.2.1",
+  "packageManager": "pnpm@12.4.0",
   "namespace": "@kubb"
 }
