@@ -1,5 +1,13 @@
 # @kubb/plugin-faker
 
+## 5.0.5
+
+### Patch Changes
+
+- [#864](https://github.com/kubb-labs/plugins/pull/864) [`1ba9310`](https://github.com/kubb-labs/plugins/commit/1ba9310cd1584b390b94aa53658adf955f79f8e4) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Read enum literals through `@kubb/ast`'s `getSchemaLiteralValues` and resolve discriminator properties with `resolveSchemaProperties`. A `oneOf` variant whose discriminator is a `$ref` to a single-value enum now narrows to its own branch instead of keeping the whole union.
+- Updated dependencies [[`1ba9310`](https://github.com/kubb-labs/plugins/commit/1ba9310cd1584b390b94aa53658adf955f79f8e4)]:
+  - @kubb/plugin-ts@5.0.2
+
 ## 5.0.4
 
 ### Patch Changes
