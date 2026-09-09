@@ -219,12 +219,8 @@ function parseEnumValue(value: string | number | boolean | null | undefined) {
 /**
  * Reads the discriminator literal off a variant, or `undefined` when it can't be determined.
  *
- * `resolveSchemaProperties` reaches the property through `ref` and `intersection` nodes, and
- * `getSchemaLiteralValues` reads its literals, including through a `ref` to a named enum.
- *
- * A variant of a discriminated union carries exactly one discriminator value, so a property that
- * resolves to several literals (a `ref` to the shared enum of every branch, say) narrows nothing
- * and returns `undefined`. The caller then keeps the whole union as the type.
+ * A variant carries exactly one discriminator value, so a property resolving to several literals
+ * (a `ref` to the enum shared by every branch, say) identifies no branch and narrows nothing.
  */
 function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string): string | number | boolean | null | undefined {
   for (const property of ast.resolveSchemaProperties({ node: member, propertyName: discriminatorPropertyName })) {

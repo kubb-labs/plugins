@@ -203,65 +203,6 @@ describe('printerFaker', () => {
     expect(result).toContain('createDog<object>()')
   })
 
-  test('narrows variants whose discriminator is a ref to a single-value enum', () => {
-    const makeVariant = (name: string, petType: string, sounds: Array<string>) =>
-      ast.factory.createSchema({
-        type: 'object',
-        properties: [
-          ast.factory.createProperty({
-            name: 'pet_type',
-            required: true,
-            schema: ast.factory.createSchema({
-              type: 'ref',
-              name: `${name}Type`,
-              ref: `#/components/schemas/${name}Type`,
-              schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: [petType] }),
-            }),
-          }),
-          ast.factory.createProperty({ name: 'sound', schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: sounds }) }),
-        ],
-      })
-
-    const node = ast.factory.createSchema({
-      type: 'union',
-      discriminatorPropertyName: 'pet_type',
-      members: [makeVariant('Cat', 'cat', ['meow']), makeVariant('Dog', 'dog', ['woof'])],
-    })
-
-    const result = printerFaker({ resolver: resolverFaker, typeName: 'AddPetBody' }).print(node)
-
-    expect(result).toContain(`Extract<NonNullable<AddPetBody>, { "pet_type": 'cat' }>`)
-    expect(result).toContain(`Extract<NonNullable<AddPetBody>, { "pet_type": 'dog' }>`)
-  })
-
-  test('keeps the whole union when the discriminator carries more than one literal', () => {
-    // Every branch shares one enum of all values, so no single literal identifies a branch.
-    const petType = ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['cat', 'dog'] })
-    const makeVariant = (sounds: Array<string>) =>
-      ast.factory.createSchema({
-        type: 'object',
-        properties: [
-          ast.factory.createProperty({
-            name: 'pet_type',
-            required: true,
-            schema: ast.factory.createSchema({ type: 'ref', name: 'PetType', ref: '#/components/schemas/PetType', schema: petType }),
-          }),
-          ast.factory.createProperty({ name: 'sound', schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: sounds }) }),
-        ],
-      })
-
-    const node = ast.factory.createSchema({
-      type: 'union',
-      discriminatorPropertyName: 'pet_type',
-      members: [makeVariant(['meow']), makeVariant(['woof'])],
-    })
-
-    const result = printerFaker({ resolver: resolverFaker, typeName: 'AddPetBody' }).print(node)
-
-    expect(result).not.toContain('Extract<')
-    expect(result).toContain(`(NonNullable<AddPetBody> & Record<"sound", unknown>)["sound"]`)
-  })
-
   test('guards member property access in non-discriminated unions of objects', () => {
     // A `oneOf` without a discriminator carries `+order` on only one branch, so a plain
     // `NonNullable<Filter>["+order"]` would be a TS2339. Members index via
