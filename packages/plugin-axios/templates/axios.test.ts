@@ -46,6 +46,10 @@ function toSchema<T>(transform: (value: unknown) => T) {
   return { '~standard': { validate: (value: unknown) => ({ value: transform(value) }) } }
 }
 
+function toFailingSchema(message = 'invalid') {
+  return { '~standard': { validate: () => ({ issues: [{ message, path: ['name'] }] }) } }
+}
+
 describe('defaultQuerySerializer', () => {
   test('explodes arrays into repeated keys', () => {
     expect(defaultQuerySerializer({ tags: ['a', 'b'] })).toBe('tags=a&tags=b')
@@ -544,6 +548,57 @@ describe('createClientCore', () => {
     const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { error: toSchema(error) } })) as CallResult
     expect(error).toHaveBeenCalledTimes(1)
     expect(result.error).toStrictEqual({ parsed: true })
+  })
+
+  test('throws the ParseError when no onValidationError is set', async () => {
+    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
+    const client = createClientCore({ transport: instance })
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({
+      name: 'ParseError',
+      issues: [{ message: 'invalid', path: ['name'] }],
+    })
+  })
+
+  test('resolves with the substituted value when onValidationError returns one', async () => {
+    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
+    const onValidationError = vi.fn((_error: unknown, context: { value: unknown }) => ({ value: context.value }))
+    const client = createClientCore({ transport: instance, onValidationError })
+    const result = (await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })) as CallResult
+    expect(result.data).toStrictEqual({ id: 1 })
+    expect(onValidationError).toHaveBeenCalledTimes(1)
+    expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({
+      direction: 'response',
+      method: 'GET',
+      url: '/pet/1',
+      status: 200,
+      value: { id: 1 },
+    })
+  })
+
+  test('rethrows when onValidationError returns nothing', async () => {
+    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
+    const onValidationError = vi.fn(() => undefined)
+    const client = createClientCore({ transport: instance, onValidationError })
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({ name: 'ParseError' })
+    expect(onValidationError).toHaveBeenCalledTimes(1)
+  })
+
+  test('reports a failing request body with the request direction', async () => {
+    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
+    const onValidationError = vi.fn(() => ({ value: { name: 'odie' } }))
+    const client = createClientCore({ transport: instance, onValidationError })
+    await client({ method: 'POST', url: '/pet', body: { name: 1 }, validator: { request: toFailingSchema() } })
+    expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'request', method: 'POST', url: '/pet', value: { name: 1 } })
+  })
+
+  test('prefers the per-call onValidationError over the client one', async () => {
+    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
+    const clientLevel = vi.fn(() => ({ value: 'client' }))
+    const perCall = vi.fn(() => ({ value: 'call' }))
+    const client = createClientCore({ transport: instance, onValidationError: clientLevel })
+    const result = (await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() }, onValidationError: perCall })) as CallResult
+    expect(result.data).toBe('call')
+    expect(clientLevel).not.toHaveBeenCalled()
   })
 
   test('skips the error parser on a success body', async () => {

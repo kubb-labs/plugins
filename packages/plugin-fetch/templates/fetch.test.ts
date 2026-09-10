@@ -43,6 +43,10 @@ function toSchema<T>(transform: (value: unknown) => T) {
   return { '~standard': { validate: (value: unknown) => ({ value: transform(value) }) } }
 }
 
+function toFailingSchema(message = 'invalid') {
+  return { '~standard': { validate: () => ({ issues: [{ message, path: ['name'] }] }) } }
+}
+
 describe('createInterceptorStack', () => {
   test('runs interceptors in registration order', async () => {
     const stack = createInterceptorStack<Array<string>>()
@@ -482,6 +486,54 @@ describe('createClientCore', () => {
     const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { error: toSchema(error) } })) as CallResult<string, string>
     expect(error).toHaveBeenCalledTimes(1)
     expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, contentType: undefined, request: 'REQ', response: 'RES' })
+  })
+
+  test('throws the ParseError when no onValidationError is set', async () => {
+    const { client } = createClient({ data: { id: 1 }, status: 200 })
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({
+      name: 'ParseError',
+      issues: [{ message: 'invalid', path: ['name'] }],
+    })
+  })
+
+  test('resolves with the substituted value when onValidationError returns one', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const onValidationError = vi.fn((_error: unknown, context: { value: unknown }) => ({ value: context.value }))
+    const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError })
+    const result = (await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })) as CallResult<string, string>
+    expect(result.data).toStrictEqual({ id: 1 })
+    expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'response', method: 'GET', status: 200, value: { id: 1 } })
+  })
+
+  test('rethrows when onValidationError returns nothing', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const onValidationError = vi.fn(() => undefined)
+    const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError })
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({ name: 'ParseError' })
+    expect(onValidationError).toHaveBeenCalledTimes(1)
+  })
+
+  test('reports a failing request body with the request direction', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const onValidationError = vi.fn(() => ({ value: { name: 'odie' } }))
+    const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError })
+    await client({ method: 'POST', url: '/pet', body: { name: 1 }, validator: { request: toFailingSchema() } })
+    expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'request', method: 'POST', url: '/pet', value: { name: 1 } })
+  })
+
+  test('prefers the per-call onValidationError over the client one', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const clientLevel = vi.fn(() => ({ value: 'client' }))
+    const perCall = vi.fn(() => ({ value: 'call' }))
+    const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError: clientLevel })
+    const result = (await client({
+      method: 'GET',
+      url: '/pet/1',
+      validator: { response: toFailingSchema() },
+      onValidationError: perCall,
+    })) as CallResult<string, string>
+    expect(result.data).toBe('call')
+    expect(clientLevel).not.toHaveBeenCalled()
   })
 
   test('skips the error parser on a success body', async () => {
