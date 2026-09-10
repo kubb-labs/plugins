@@ -196,7 +196,7 @@ Want to contribute to an existing plugin or add a new one, official or community
 
 ## Sponsors
 
-Kubb's development is funded by sponsors. To support the project, [become a sponsor on GitHub](https://github.com/sponsors/stijnvanhulle) or [back us on Open Collective](https://opencollective.com/kubb).
+Kubb's development is funded by sponsors. To support the project, [become a sponsor on GitHub](https://github.com/sponsors/stijnvanhulle) or [back us on Open Collective](https://opencollective.com/kubb). See [sponsorship tiers and our sponsors](https://kubb.dev/sponsors).
 
 <p align="center">
   <a href="https://github.com/sponsors/stijnvanhulle">
