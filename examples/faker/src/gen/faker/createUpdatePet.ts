@@ -36,8 +36,12 @@ export function createUpdatePetStatus200Xml(data?: Partial<UpdatePetStatus200Xml
 /**
  * @description Successful operation
  */
-export function createUpdatePetStatus200(_data?: UpdatePetStatus200): UpdatePetStatus200 {
-  return faker.helpers.arrayElement([createUpdatePetStatus200Json(), createUpdatePetStatus200Xml()])
+export function createUpdatePetStatus200(data?: Partial<UpdatePetStatus200>): UpdatePetStatus200 {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([createUpdatePetStatus200Json(), createUpdatePetStatus200Xml()])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as UpdatePetStatus200
+  }
+  return (data ?? defaultFakeData) as UpdatePetStatus200
 }
 
 /**
@@ -85,10 +89,23 @@ export function createUpdatePetBodyFormUrlEncoded(data?: Partial<UpdatePetBodyFo
 /**
  * @description Update an existent pet in the store
  */
-export function createUpdatePetBody(_data?: UpdatePetBody): UpdatePetBody {
-  return faker.helpers.arrayElement([createUpdatePetBodyJson(), createUpdatePetBodyXml(), createUpdatePetBodyFormUrlEncoded()])
+export function createUpdatePetBody(data?: Partial<UpdatePetBody>): UpdatePetBody {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([createUpdatePetBodyJson(), createUpdatePetBodyXml(), createUpdatePetBodyFormUrlEncoded()])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as UpdatePetBody
+  }
+  return (data ?? defaultFakeData) as UpdatePetBody
 }
 
-export function createUpdatePetResponse(_data?: UpdatePetResponse): UpdatePetResponse {
-  return faker.helpers.arrayElement([createUpdatePetStatus200(), createUpdatePetStatus400(), createUpdatePetStatus404(), createUpdatePetStatus405()])
+export function createUpdatePetResponse(data?: Partial<UpdatePetResponse>): UpdatePetResponse {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([
+    createUpdatePetStatus200(),
+    createUpdatePetStatus400(),
+    createUpdatePetStatus404(),
+    createUpdatePetStatus405(),
+  ])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as UpdatePetResponse
+  }
+  return (data ?? defaultFakeData) as UpdatePetResponse
 }

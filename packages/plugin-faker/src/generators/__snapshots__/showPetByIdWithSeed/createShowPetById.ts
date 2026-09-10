@@ -35,6 +35,10 @@ export function createShowPetByIdStatusDefault(data?: Partial<ShowPetByIdStatusD
   return createError(data) as ShowPetByIdStatusDefault
 }
 
-export function createShowPetByIdResponse(_data?: ShowPetByIdResponse): ShowPetByIdResponse {
-  return faker.helpers.arrayElement([createShowPetByIdStatus200(), createShowPetByIdStatusDefault()])
+export function createShowPetByIdResponse(data?: Partial<ShowPetByIdResponse>): ShowPetByIdResponse {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([createShowPetByIdStatus200(), createShowPetByIdStatusDefault()])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as ShowPetByIdResponse
+  }
+  return (data ?? defaultFakeData) as ShowPetByIdResponse
 }

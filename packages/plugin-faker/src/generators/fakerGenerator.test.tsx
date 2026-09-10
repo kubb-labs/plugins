@@ -51,6 +51,44 @@ const petSchema = ast.factory.createSchema({
   ],
 })
 
+// Issue #873: a named union schema referenced by a response. The status factory
+// declares `Partial<T>` and forwards it, so the union factory has to accept a
+// partial and merge it into the picked member.
+const apiErrorSchema = ast.factory.createSchema({
+  type: 'union',
+  name: 'ApiError',
+  members: [
+    ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({
+          name: 'error',
+          required: true,
+          schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['not_found'] }),
+        }),
+      ],
+    }),
+    ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({
+          name: 'error',
+          required: true,
+          schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['rate_limited'] }),
+        }),
+      ],
+    }),
+  ],
+})
+
+// Same mismatch as ApiError, but for a named array: `Partial<string[]>` is
+// `(string | undefined)[]`, which a factory taking the full array type rejects.
+const petListSchema = ast.factory.createSchema({
+  type: 'array',
+  name: 'PetList',
+  items: [ast.factory.createSchema({ type: 'string' })],
+})
+
 const treeNodeSchema = ast.factory.createSchema({
   type: 'object',
   name: 'TreeNode',
@@ -159,6 +197,8 @@ describe('fakerGenerator — schema', () => {
     { name: 'petWithDayjs', node: petSchema, options: { dateParser: 'dayjs' as const } },
     { name: 'petWithRandExp', node: petSchema, options: { regexGenerator: 'randexp' as const } },
     { name: 'treeNode', node: treeNodeSchema, options: {} },
+    { name: 'apiError', node: apiErrorSchema, options: {} },
+    { name: 'petList', node: petListSchema, options: {} },
     { name: 'catCycle', node: catSchema, options: {} },
     { name: 'petWithLocale', node: petSchema, options: { locale: 'de' as const } },
     { name: 'petWithSeed', node: petSchema, options: { seed: [1] as Array<number> } },
@@ -174,7 +214,20 @@ describe('fakerGenerator — schema', () => {
       config: testConfig,
       adapter: createMockedAdapter(),
       meta: {
-        circularNames: [...ast.findCircularSchemas([categorySchema, emojiSchema, errorSchema, petSchema, treeNodeSchema, petPolySchema, catSchema, dogSchema])],
+        circularNames: [
+          ...ast.findCircularSchemas([
+            categorySchema,
+            apiErrorSchema,
+            petListSchema,
+            emojiSchema,
+            errorSchema,
+            petSchema,
+            treeNodeSchema,
+            petPolySchema,
+            catSchema,
+            dogSchema,
+          ]),
+        ],
         enumNames: [],
       },
       driver,
@@ -332,6 +385,33 @@ describe('fakerGenerator — operation', () => {
       }),
       options: { seed: [1] as Array<number> },
     },
+    {
+      name: 'getPet',
+      node: ast.factory.createOperation({
+        operationId: 'getPet',
+        method: 'GET',
+        path: '/pet',
+        tags: ['pets'],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            description: 'A pet',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          }),
+          ast.factory.createResponse({
+            statusCode: '202',
+            description: 'A list of pets',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'PetList', ref: '#/components/schemas/PetList' }),
+          }),
+          ast.factory.createResponse({
+            statusCode: '404',
+            description: 'Not found',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'ApiError', ref: '#/components/schemas/ApiError' }),
+          }),
+        ],
+      }),
+      options: {},
+    },
   ] as const)('$name', async ({ name, node, options }) => {
     const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
@@ -344,7 +424,7 @@ describe('fakerGenerator — operation', () => {
       config: testConfig,
       adapter: createMockedAdapter(),
       meta: {
-        circularNames: [...ast.findCircularSchemas([categorySchema, errorSchema, petSchema, treeNodeSchema])],
+        circularNames: [...ast.findCircularSchemas([apiErrorSchema, petListSchema, categorySchema, errorSchema, petSchema, treeNodeSchema])],
         enumNames: [],
       },
       driver,

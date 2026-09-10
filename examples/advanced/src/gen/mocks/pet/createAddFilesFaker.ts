@@ -30,10 +30,18 @@ export function createAddFilesBodyFakerFormData(data?: Partial<AddFilesBodyFormD
   return createPetFaker(data) as AddFilesBodyFormData
 }
 
-export function createAddFilesBodyFaker(_data?: AddFilesBody): AddFilesBody {
-  return faker.helpers.arrayElement([createAddFilesBodyFakerJson(), createAddFilesBodyFakerFormData()])
+export function createAddFilesBodyFaker(data?: Partial<AddFilesBody>): AddFilesBody {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([createAddFilesBodyFakerJson(), createAddFilesBodyFakerFormData()])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as AddFilesBody
+  }
+  return (data ?? defaultFakeData) as AddFilesBody
 }
 
-export function createAddFilesResponseFaker(_data?: AddFilesResponse): AddFilesResponse {
-  return faker.helpers.arrayElement([createAddFilesStatus200Faker(), createAddFilesStatus405Faker()])
+export function createAddFilesResponseFaker(data?: Partial<AddFilesResponse>): AddFilesResponse {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([createAddFilesStatus200Faker(), createAddFilesStatus405Faker()])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as AddFilesResponse
+  }
+  return (data ?? defaultFakeData) as AddFilesResponse
 }

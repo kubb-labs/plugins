@@ -32,8 +32,12 @@ export function createUpdatePetStatus200FakerXml(data?: Partial<UpdatePetStatus2
 /**
  * @description Successful operation
  */
-export function createUpdatePetStatus200Faker(_data?: UpdatePetStatus200): UpdatePetStatus200 {
-  return faker.helpers.arrayElement([createUpdatePetStatus200FakerJson(), createUpdatePetStatus200FakerXml()])
+export function createUpdatePetStatus200Faker(data?: Partial<UpdatePetStatus200>): UpdatePetStatus200 {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([createUpdatePetStatus200FakerJson(), createUpdatePetStatus200FakerXml()])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as UpdatePetStatus200
+  }
+  return (data ?? defaultFakeData) as UpdatePetStatus200
 }
 
 /**
@@ -94,16 +98,28 @@ export function createUpdatePetBodyFakerFormUrlEncoded(data?: Partial<UpdatePetB
 /**
  * @description Update an existent pet in the store
  */
-export function createUpdatePetBodyFaker(_data?: UpdatePetBody): UpdatePetBody {
-  return faker.helpers.arrayElement([createUpdatePetBodyFakerJson(), createUpdatePetBodyFakerXml(), createUpdatePetBodyFakerFormUrlEncoded()])
+export function createUpdatePetBodyFaker(data?: Partial<UpdatePetBody>): UpdatePetBody {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([
+    createUpdatePetBodyFakerJson(),
+    createUpdatePetBodyFakerXml(),
+    createUpdatePetBodyFakerFormUrlEncoded(),
+  ])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as UpdatePetBody
+  }
+  return (data ?? defaultFakeData) as UpdatePetBody
 }
 
-export function createUpdatePetResponseFaker(_data?: UpdatePetResponse): UpdatePetResponse {
-  return faker.helpers.arrayElement([
+export function createUpdatePetResponseFaker(data?: Partial<UpdatePetResponse>): UpdatePetResponse {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([
     createUpdatePetStatus200Faker(),
     createUpdatePetStatus202Faker(),
     createUpdatePetStatus400Faker(),
     createUpdatePetStatus404Faker(),
     createUpdatePetStatus405Faker(),
   ])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as UpdatePetResponse
+  }
+  return (data ?? defaultFakeData) as UpdatePetResponse
 }

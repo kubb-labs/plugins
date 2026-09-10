@@ -44,8 +44,12 @@ export function createAddPetStatusDefaultFakerXml(data?: Partial<AddPetStatusDef
 /**
  * @description Successful operation
  */
-export function createAddPetStatusDefaultFaker(_data?: AddPetStatusDefault): AddPetStatusDefault {
-  return faker.helpers.arrayElement([createAddPetStatusDefaultFakerJson(), createAddPetStatusDefaultFakerXml()])
+export function createAddPetStatusDefaultFaker(data?: Partial<AddPetStatusDefault>): AddPetStatusDefault {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([createAddPetStatusDefaultFakerJson(), createAddPetStatusDefaultFakerXml()])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as AddPetStatusDefault
+  }
+  return (data ?? defaultFakeData) as AddPetStatusDefault
 }
 
 /**
@@ -72,10 +76,18 @@ export function createAddPetBodyFakerFormUrlEncoded(data?: Partial<AddPetBodyFor
 /**
  * @description Create a new pet in the store
  */
-export function createAddPetBodyFaker(_data?: AddPetBody): AddPetBody {
-  return faker.helpers.arrayElement([createAddPetBodyFakerJson(), createAddPetBodyFakerXml(), createAddPetBodyFakerFormUrlEncoded()])
+export function createAddPetBodyFaker(data?: Partial<AddPetBody>): AddPetBody {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([createAddPetBodyFakerJson(), createAddPetBodyFakerXml(), createAddPetBodyFakerFormUrlEncoded()])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as AddPetBody
+  }
+  return (data ?? defaultFakeData) as AddPetBody
 }
 
-export function createAddPetResponseFaker(_data?: AddPetResponse): AddPetResponse {
-  return faker.helpers.arrayElement([createAddPetStatus405Faker(), createAddPetStatusDefaultFaker()])
+export function createAddPetResponseFaker(data?: Partial<AddPetResponse>): AddPetResponse {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([createAddPetStatus405Faker(), createAddPetStatusDefaultFaker()])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as AddPetResponse
+  }
+  return (data ?? defaultFakeData) as AddPetResponse
 }

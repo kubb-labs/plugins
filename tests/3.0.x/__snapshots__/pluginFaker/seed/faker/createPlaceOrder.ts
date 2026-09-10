@@ -35,10 +35,18 @@ export function createPlaceOrderBodyFormUrlEncoded(data?: Partial<PlaceOrderBody
   return createOrder(data) as PlaceOrderBodyFormUrlEncoded
 }
 
-export function createPlaceOrderBody(_data?: PlaceOrderBody): PlaceOrderBody {
-  return faker.helpers.arrayElement([createPlaceOrderBodyJson(), createPlaceOrderBodyXml(), createPlaceOrderBodyFormUrlEncoded()])
+export function createPlaceOrderBody(data?: Partial<PlaceOrderBody>): PlaceOrderBody {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([createPlaceOrderBodyJson(), createPlaceOrderBodyXml(), createPlaceOrderBodyFormUrlEncoded()])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as PlaceOrderBody
+  }
+  return (data ?? defaultFakeData) as PlaceOrderBody
 }
 
-export function createPlaceOrderResponse(_data?: PlaceOrderResponse): PlaceOrderResponse {
-  return faker.helpers.arrayElement([createPlaceOrderStatus200(), createPlaceOrderStatus405()])
+export function createPlaceOrderResponse(data?: Partial<PlaceOrderResponse>): PlaceOrderResponse {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([createPlaceOrderStatus200(), createPlaceOrderStatus405()])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as PlaceOrderResponse
+  }
+  return (data ?? defaultFakeData) as PlaceOrderResponse
 }

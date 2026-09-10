@@ -43,10 +43,22 @@ export function createPlaceOrderPatchBodyFormUrlEncoded(data?: Partial<PlaceOrde
   return createOrder(data) as PlaceOrderPatchBodyFormUrlEncoded
 }
 
-export function createPlaceOrderPatchBody(_data?: PlaceOrderPatchBody): PlaceOrderPatchBody {
-  return faker.helpers.arrayElement([createPlaceOrderPatchBodyJson(), createPlaceOrderPatchBodyXml(), createPlaceOrderPatchBodyFormUrlEncoded()])
+export function createPlaceOrderPatchBody(data?: Partial<PlaceOrderPatchBody>): PlaceOrderPatchBody {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([
+    createPlaceOrderPatchBodyJson(),
+    createPlaceOrderPatchBodyXml(),
+    createPlaceOrderPatchBodyFormUrlEncoded(),
+  ])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as PlaceOrderPatchBody
+  }
+  return (data ?? defaultFakeData) as PlaceOrderPatchBody
 }
 
-export function createPlaceOrderPatchResponse(_data?: PlaceOrderPatchResponse): PlaceOrderPatchResponse {
-  return faker.helpers.arrayElement([createPlaceOrderPatchStatus200(), createPlaceOrderPatchStatus405()])
+export function createPlaceOrderPatchResponse(data?: Partial<PlaceOrderPatchResponse>): PlaceOrderPatchResponse {
+  const defaultFakeData: unknown = faker.helpers.arrayElement([createPlaceOrderPatchStatus200(), createPlaceOrderPatchStatus405()])
+  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+    return { ...defaultFakeData, ...data } as PlaceOrderPatchResponse
+  }
+  return (data ?? defaultFakeData) as PlaceOrderPatchResponse
 }

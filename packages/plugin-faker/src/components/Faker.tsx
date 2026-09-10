@@ -41,6 +41,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride 
   const isObject = OBJECT_TYPES.has(node.type)
   const isTuple = node.type === 'tuple'
   const isScalar = SCALAR_TYPES.has(node.type)
+  const isUnion = node.type === 'union'
 
   const useGenericOverride = canOverride && isObject
   const fakerTextWithOverride = (() => {
@@ -52,8 +53,17 @@ export function Faker({ node, description, name, typeName, printer, canOverride 
 
   const { dataType, returnType: resolvedReturnType } = resolveFakerTypeUsage(node, typeName, canOverride)
 
+  const unionBody =
+    canOverride && isUnion && resolvedReturnType
+      ? `const defaultFakeData: unknown = ${fakerText}
+if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
+  return { ...defaultFakeData, ...data } as ${resolvedReturnType}
+}
+return (data ?? defaultFakeData) as ${resolvedReturnType}`
+      : null
+
   if (!useGenericOverride) {
-    const usesData = /\bdata\b/.test(fakerTextWithOverride)
+    const usesData = !!unionBody || /\bdata\b/.test(fakerTextWithOverride)
     const dataParamName = usesData ? 'data' : '_data'
     const params = createFunctionParameters({
       params: [
@@ -67,10 +77,12 @@ export function Faker({ node, description, name, typeName, printer, canOverride 
     const paramsSignature = declarationPrinter.print(params) ?? ''
     const returnType = resolvedReturnType
 
-    // A `ref` wrapper delegates to another faker. Object fakers are now generic and
-    // widen to `Partial<T>` when called with a `Partial<T>`-typed argument, so cast
-    // back to the wrapper's declared return type to keep it assignable.
-    const returnExpression = node.type === 'ref' && canOverride && returnType ? `${fakerTextWithOverride} as ${returnType}` : fakerTextWithOverride
+    // Merging a `Partial<T>` override never produces `T` on its own: a `ref` wrapper gets
+    // the widened return of the generic object faker it delegates to, and an array or tuple
+    // that spreads `Partial<T>` picks up the optional holes. Cast back to the declared
+    // return type in both cases.
+    const needsCast = canOverride && !!returnType && (node.type === 'ref' || isArray || isTuple)
+    const returnExpression = needsCast ? `${fakerTextWithOverride} as ${returnType}` : fakerTextWithOverride
 
     return (
       <File.Source name={name} isExportable isIndexable>
@@ -81,7 +93,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride 
           params={canOverride ? paramsSignature : undefined}
           returnType={returnType ?? undefined}
         >
-          {`return ${returnExpression}`}
+          {unionBody ?? `return ${returnExpression}`}
         </Function>
       </File.Source>
     )
