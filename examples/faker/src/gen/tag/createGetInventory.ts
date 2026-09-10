@@ -3,7 +3,8 @@
  * Do not edit manually.
  */
 
-import type { GetInventoryResponse, GetInventoryStatus200 } from '../models/GetInventory'
+import type { GetInventoryResponse, GetInventoryStatus200, GetInventoryStatus401 } from '../models/GetInventory'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description successful operation
@@ -16,6 +17,19 @@ export function createGetInventoryStatus200<TData extends Partial<GetInventorySt
   } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
-export function createGetInventoryResponse(data?: Partial<GetInventoryResponse>): GetInventoryResponse {
-  return createGetInventoryStatus200(data) as GetInventoryResponse
+/**
+ * @description unauthorized
+ */
+export function createGetInventoryStatus401<TData extends Partial<GetInventoryStatus401> = object>(data?: TData) {
+  const defaultFakeData = {
+    error: faker.helpers.arrayElement<NonNullable<GetInventoryStatus401>['error']>(['unauthorized']),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
+}
+
+export function createGetInventoryResponse(_data?: GetInventoryResponse): GetInventoryResponse {
+  return faker.helpers.arrayElement([createGetInventoryStatus200<object>(), createGetInventoryStatus401<object>()])
 }

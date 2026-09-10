@@ -101,7 +101,7 @@ export function createUpdatePetBodyFaker(_data?: UpdatePetBody): UpdatePetBody {
 export function createUpdatePetResponseFaker(_data?: UpdatePetResponse): UpdatePetResponse {
   return faker.helpers.arrayElement([
     createUpdatePetStatus200Faker(),
-    createUpdatePetStatus202Faker(),
+    createUpdatePetStatus202Faker<object>(),
     createUpdatePetStatus400Faker(),
     createUpdatePetStatus404Faker(),
     createUpdatePetStatus405Faker(),

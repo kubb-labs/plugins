@@ -31,7 +31,7 @@ export function createAddFilesBodyFakerFormData(data?: Partial<AddFilesBodyFormD
 }
 
 export function createAddFilesBodyFaker(_data?: AddFilesBody): AddFilesBody {
-  return faker.helpers.arrayElement([createAddFilesBodyFakerJson(), createAddFilesBodyFakerFormData()])
+  return faker.helpers.arrayElement([createAddFilesBodyFakerJson<object>(), createAddFilesBodyFakerFormData()])
 }
 
 export function createAddFilesResponseFaker(_data?: AddFilesResponse): AddFilesResponse {

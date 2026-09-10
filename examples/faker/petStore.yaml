@@ -333,6 +333,19 @@ paths:
                 additionalProperties:
                   type: integer
                   format: int32
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: string
+                    enum:
+                      - unauthorized
       security:
         - api_key: []
   /store/order:
