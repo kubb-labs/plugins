@@ -1,5 +1,12 @@
 # @kubb/plugin-redoc
 
+## 5.0.2
+
+### Patch Changes
+
+- [#869](https://github.com/kubb-labs/plugins/pull/869) [`7e936bc`](https://github.com/kubb-labs/plugins/commit/7e936bce055fa8f35de5d53e4354e7fd574b651d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add a `kubb.dev/sponsors` entry to each package's `funding` field, alongside the existing GitHub
+  Sponsors and Open Collective links.
+
 ## 5.0.1
 
 ### Patch Changes
