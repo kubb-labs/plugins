@@ -30,6 +30,6 @@ export function createGetInventoryStatus401<TData extends Partial<GetInventorySt
   } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
-export function createGetInventoryResponse(_data?: GetInventoryResponse): GetInventoryResponse {
-  return faker.helpers.arrayElement([createGetInventoryStatus200<object>(), createGetInventoryStatus401<object>()])
+export function createGetInventoryResponse(data?: Partial<GetInventoryResponse>): GetInventoryResponse {
+  return (data ?? faker.helpers.arrayElement([createGetInventoryStatus200<object>(), createGetInventoryStatus401<object>()])) as GetInventoryResponse
 }

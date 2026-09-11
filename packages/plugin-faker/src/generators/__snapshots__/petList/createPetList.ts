@@ -8,5 +8,5 @@ import type { PetList } from './types/PetList'
 import { faker } from '@faker-js/faker'
 
 export function createPetList(data?: Partial<PetList>): PetList {
-  return [...faker.helpers.multiple(() => faker.string.alpha()), ...(data || [])] as PetList
+  return [...faker.helpers.multiple(() => faker.string.alpha()), ...(data || []).filter((item) => item !== undefined)] as PetList
 }

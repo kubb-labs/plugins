@@ -45,25 +45,18 @@ export function Faker({ node, description, name, typeName, printer, canOverride 
 
   const useGenericOverride = canOverride && isObject
   const fakerTextWithOverride = (() => {
-    if (canOverride && isTuple) return `data || ${fakerText}`
-    if (canOverride && isArray) return `[\n  ...${fakerText},\n  ...(data || [])\n]`
-    if (canOverride && isScalar) return `data ?? ${fakerText}`
+    if (canOverride && node.type === 'tuple') {
+      return `data && data.length === ${node.items?.length ?? 0} && !data.includes(undefined) ? data : ${fakerText}`
+    }
+    if (canOverride && isArray) return `[\n  ...${fakerText},\n  ...(data || []).filter((item) => item !== undefined),\n]`
+    if (canOverride && (isScalar || isUnion)) return `data ?? ${fakerText}`
     return fakerText
   })()
 
   const { dataType, returnType: resolvedReturnType } = resolveFakerTypeUsage(node, typeName, canOverride)
 
-  const unionBody =
-    canOverride && isUnion && resolvedReturnType
-      ? `const defaultFakeData: unknown = ${fakerText}
-if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-  return { ...defaultFakeData, ...data } as ${resolvedReturnType}
-}
-return (data ?? defaultFakeData) as ${resolvedReturnType}`
-      : null
-
   if (!useGenericOverride) {
-    const usesData = !!unionBody || /\bdata\b/.test(fakerTextWithOverride)
+    const usesData = /\bdata\b/.test(fakerTextWithOverride)
     const dataParamName = usesData ? 'data' : '_data'
     const params = createFunctionParameters({
       params: [
@@ -77,12 +70,10 @@ return (data ?? defaultFakeData) as ${resolvedReturnType}`
     const paramsSignature = declarationPrinter.print(params) ?? ''
     const returnType = resolvedReturnType
 
-    // Merging a `Partial<T>` override never produces `T` on its own: a `ref` wrapper gets
-    // the widened return of the generic object faker it delegates to, and an array or tuple
-    // that spreads `Partial<T>` picks up the optional holes. Cast back to the declared
-    // return type in both cases.
-    const needsCast = canOverride && !!returnType && (node.type === 'ref' || isArray || isTuple)
-    const returnExpression = needsCast ? `${fakerTextWithOverride} as ${returnType}` : fakerTextWithOverride
+    // `as` binds tighter than `??`/`?:`, so tuple/union need parens or `data`'s own type leaks through.
+    const needsCast = canOverride && !!returnType && (node.type === 'ref' || isArray || isTuple || isUnion)
+    const needsParens = isTuple || isUnion
+    const returnExpression = needsCast ? `${needsParens ? `(${fakerTextWithOverride})` : fakerTextWithOverride} as ${returnType}` : fakerTextWithOverride
 
     return (
       <File.Source name={name} isExportable isIndexable>
@@ -93,7 +84,7 @@ return (data ?? defaultFakeData) as ${resolvedReturnType}`
           params={canOverride ? paramsSignature : undefined}
           returnType={returnType ?? undefined}
         >
-          {unionBody ?? `return ${returnExpression}`}
+          {`return ${returnExpression}`}
         </Function>
       </File.Source>
     )

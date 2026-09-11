@@ -13,9 +13,9 @@ faker.seed([220])
  * @description successful operation
  */
 export function createOptionsFindPetsByStatusStatus200(data?: Partial<OptionsFindPetsByStatusStatus200>): OptionsFindPetsByStatusStatus200 {
-  return [...faker.helpers.multiple(() => createPet()), ...(data || [])] as OptionsFindPetsByStatusStatus200
+  return [...faker.helpers.multiple(() => createPet()), ...(data || []).filter((item) => item !== undefined)] as OptionsFindPetsByStatusStatus200
 }
 
 export function createOptionsFindPetsByStatusResponse(data?: Partial<OptionsFindPetsByStatusResponse>): OptionsFindPetsByStatusResponse {
-  return [...faker.helpers.multiple(() => createPet()), ...(data || [])] as OptionsFindPetsByStatusResponse
+  return [...faker.helpers.multiple(() => createPet()), ...(data || []).filter((item) => item !== undefined)] as OptionsFindPetsByStatusResponse
 }

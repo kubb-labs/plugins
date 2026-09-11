@@ -38,11 +38,7 @@ export function createGetPetByIdStatus200FakerXml(data?: Partial<GetPetByIdStatu
  * @description successful operation
  */
 export function createGetPetByIdStatus200Faker(data?: Partial<GetPetByIdStatus200>): GetPetByIdStatus200 {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([createGetPetByIdStatus200FakerJson(), createGetPetByIdStatus200FakerXml()])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as GetPetByIdStatus200
-  }
-  return (data ?? defaultFakeData) as GetPetByIdStatus200
+  return (data ?? faker.helpers.arrayElement([createGetPetByIdStatus200FakerJson(), createGetPetByIdStatus200FakerXml()])) as GetPetByIdStatus200
 }
 
 /**
@@ -60,13 +56,6 @@ export function createGetPetByIdStatus404Faker() {
 }
 
 export function createGetPetByIdResponseFaker(data?: Partial<GetPetByIdResponse>): GetPetByIdResponse {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([
-    createGetPetByIdStatus200Faker(),
-    createGetPetByIdStatus400Faker(),
-    createGetPetByIdStatus404Faker(),
-  ])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as GetPetByIdResponse
-  }
-  return (data ?? defaultFakeData) as GetPetByIdResponse
+  return (data ??
+    faker.helpers.arrayElement([createGetPetByIdStatus200Faker(), createGetPetByIdStatus400Faker(), createGetPetByIdStatus404Faker()])) as GetPetByIdResponse
 }

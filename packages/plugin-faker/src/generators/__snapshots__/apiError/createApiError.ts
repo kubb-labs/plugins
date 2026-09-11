@@ -8,16 +8,13 @@ import type { ApiError } from './types/ApiError'
 import { faker } from '@faker-js/faker'
 
 export function createApiError(data?: Partial<ApiError>): ApiError {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([
-    {
-      error: faker.helpers.arrayElement<(NonNullable<ApiError> & Record<'error', unknown>)['error']>(['not_found']),
-    },
-    {
-      error: faker.helpers.arrayElement<(NonNullable<ApiError> & Record<'error', unknown>)['error']>(['rate_limited']),
-    },
-  ])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as ApiError
-  }
-  return (data ?? defaultFakeData) as ApiError
+  return (data ??
+    faker.helpers.arrayElement([
+      {
+        error: faker.helpers.arrayElement<(NonNullable<ApiError> & Record<'error', unknown>)['error']>(['not_found']),
+      },
+      {
+        error: faker.helpers.arrayElement<(NonNullable<ApiError> & Record<'error', unknown>)['error']>(['rate_limited']),
+      },
+    ])) as ApiError
 }

@@ -33,11 +33,7 @@ export function createUpdatePetStatus200FakerXml(data?: Partial<UpdatePetStatus2
  * @description Successful operation
  */
 export function createUpdatePetStatus200Faker(data?: Partial<UpdatePetStatus200>): UpdatePetStatus200 {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([createUpdatePetStatus200FakerJson(), createUpdatePetStatus200FakerXml()])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as UpdatePetStatus200
-  }
-  return (data ?? defaultFakeData) as UpdatePetStatus200
+  return (data ?? faker.helpers.arrayElement([createUpdatePetStatus200FakerJson(), createUpdatePetStatus200FakerXml()])) as UpdatePetStatus200
 }
 
 /**
@@ -99,27 +95,17 @@ export function createUpdatePetBodyFakerFormUrlEncoded(data?: Partial<UpdatePetB
  * @description Update an existent pet in the store
  */
 export function createUpdatePetBodyFaker(data?: Partial<UpdatePetBody>): UpdatePetBody {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([
-    createUpdatePetBodyFakerJson(),
-    createUpdatePetBodyFakerXml(),
-    createUpdatePetBodyFakerFormUrlEncoded(),
-  ])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as UpdatePetBody
-  }
-  return (data ?? defaultFakeData) as UpdatePetBody
+  return (data ??
+    faker.helpers.arrayElement([createUpdatePetBodyFakerJson(), createUpdatePetBodyFakerXml(), createUpdatePetBodyFakerFormUrlEncoded()])) as UpdatePetBody
 }
 
 export function createUpdatePetResponseFaker(data?: Partial<UpdatePetResponse>): UpdatePetResponse {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([
-    createUpdatePetStatus200Faker(),
-    createUpdatePetStatus202Faker<object>(),
-    createUpdatePetStatus400Faker(),
-    createUpdatePetStatus404Faker(),
-    createUpdatePetStatus405Faker(),
-  ])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as UpdatePetResponse
-  }
-  return (data ?? defaultFakeData) as UpdatePetResponse
+  return (data ??
+    faker.helpers.arrayElement([
+      createUpdatePetStatus200Faker(),
+      createUpdatePetStatus202Faker<object>(),
+      createUpdatePetStatus400Faker(),
+      createUpdatePetStatus404Faker(),
+      createUpdatePetStatus405Faker(),
+    ])) as UpdatePetResponse
 }

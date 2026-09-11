@@ -32,9 +32,5 @@ export function createGetPetStatus404(data?: Partial<GetPetStatus404>): GetPetSt
 }
 
 export function createGetPetResponse(data?: Partial<GetPetResponse>): GetPetResponse {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([createGetPetStatus200(), createGetPetStatus202(), createGetPetStatus404()])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as GetPetResponse
-  }
-  return (data ?? defaultFakeData) as GetPetResponse
+  return (data ?? faker.helpers.arrayElement([createGetPetStatus200(), createGetPetStatus202(), createGetPetStatus404()])) as GetPetResponse
 }

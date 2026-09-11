@@ -45,11 +45,7 @@ export function createAddPetStatusDefaultFakerXml(data?: Partial<AddPetStatusDef
  * @description Successful operation
  */
 export function createAddPetStatusDefaultFaker(data?: Partial<AddPetStatusDefault>): AddPetStatusDefault {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([createAddPetStatusDefaultFakerJson(), createAddPetStatusDefaultFakerXml()])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as AddPetStatusDefault
-  }
-  return (data ?? defaultFakeData) as AddPetStatusDefault
+  return (data ?? faker.helpers.arrayElement([createAddPetStatusDefaultFakerJson(), createAddPetStatusDefaultFakerXml()])) as AddPetStatusDefault
 }
 
 /**
@@ -77,17 +73,9 @@ export function createAddPetBodyFakerFormUrlEncoded(data?: Partial<AddPetBodyFor
  * @description Create a new pet in the store
  */
 export function createAddPetBodyFaker(data?: Partial<AddPetBody>): AddPetBody {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([createAddPetBodyFakerJson(), createAddPetBodyFakerXml(), createAddPetBodyFakerFormUrlEncoded()])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as AddPetBody
-  }
-  return (data ?? defaultFakeData) as AddPetBody
+  return (data ?? faker.helpers.arrayElement([createAddPetBodyFakerJson(), createAddPetBodyFakerXml(), createAddPetBodyFakerFormUrlEncoded()])) as AddPetBody
 }
 
 export function createAddPetResponseFaker(data?: Partial<AddPetResponse>): AddPetResponse {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([createAddPetStatus405Faker<object>(), createAddPetStatusDefaultFaker()])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as AddPetResponse
-  }
-  return (data ?? defaultFakeData) as AddPetResponse
+  return (data ?? faker.helpers.arrayElement([createAddPetStatus405Faker<object>(), createAddPetStatusDefaultFaker()])) as AddPetResponse
 }

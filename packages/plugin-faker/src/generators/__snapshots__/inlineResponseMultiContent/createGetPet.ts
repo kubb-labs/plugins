@@ -37,11 +37,7 @@ export function createGetPetStatus200Xml<TData extends Partial<GetPetStatus200Xm
  * @description A pet
  */
 export function createGetPetStatus200(data?: Partial<GetPetStatus200>): GetPetStatus200 {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([createGetPetStatus200Json<object>(), createGetPetStatus200Xml<object>()])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as GetPetStatus200
-  }
-  return (data ?? defaultFakeData) as GetPetStatus200
+  return (data ?? faker.helpers.arrayElement([createGetPetStatus200Json<object>(), createGetPetStatus200Xml<object>()])) as GetPetStatus200
 }
 
 /**
@@ -58,9 +54,5 @@ export function createGetPetStatus401<TData extends Partial<GetPetStatus401> = o
 }
 
 export function createGetPetResponse(data?: Partial<GetPetResponse>): GetPetResponse {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([createGetPetStatus200(), createGetPetStatus401<object>()])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as GetPetResponse
-  }
-  return (data ?? defaultFakeData) as GetPetResponse
+  return (data ?? faker.helpers.arrayElement([createGetPetStatus200(), createGetPetStatus401<object>()])) as GetPetResponse
 }

@@ -37,25 +37,21 @@ export function createFindPetsByTagsHeadersFaker<TData extends Partial<FindPetsB
  * @description successful operation
  */
 export function createFindPetsByTagsStatus200FakerJson(data?: Partial<FindPetsByTagsStatus200Json>): FindPetsByTagsStatus200Json {
-  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || [])] as FindPetsByTagsStatus200Json
+  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || []).filter((item) => item !== undefined)] as FindPetsByTagsStatus200Json
 }
 
 /**
  * @description successful operation
  */
 export function createFindPetsByTagsStatus200FakerXml(data?: Partial<FindPetsByTagsStatus200Xml>): FindPetsByTagsStatus200Xml {
-  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || [])] as FindPetsByTagsStatus200Xml
+  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || []).filter((item) => item !== undefined)] as FindPetsByTagsStatus200Xml
 }
 
 /**
  * @description successful operation
  */
 export function createFindPetsByTagsStatus200Faker(data?: Partial<FindPetsByTagsStatus200>): FindPetsByTagsStatus200 {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([createFindPetsByTagsStatus200FakerJson(), createFindPetsByTagsStatus200FakerXml()])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as FindPetsByTagsStatus200
-  }
-  return (data ?? defaultFakeData) as FindPetsByTagsStatus200
+  return (data ?? faker.helpers.arrayElement([createFindPetsByTagsStatus200FakerJson(), createFindPetsByTagsStatus200FakerXml()])) as FindPetsByTagsStatus200
 }
 
 /**
@@ -66,9 +62,5 @@ export function createFindPetsByTagsStatus400Faker() {
 }
 
 export function createFindPetsByTagsResponseFaker(data?: Partial<FindPetsByTagsResponse>): FindPetsByTagsResponse {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([createFindPetsByTagsStatus200Faker(), createFindPetsByTagsStatus400Faker()])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as FindPetsByTagsResponse
-  }
-  return (data ?? defaultFakeData) as FindPetsByTagsResponse
+  return (data ?? faker.helpers.arrayElement([createFindPetsByTagsStatus200Faker(), createFindPetsByTagsStatus400Faker()])) as FindPetsByTagsResponse
 }

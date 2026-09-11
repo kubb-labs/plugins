@@ -31,9 +31,5 @@ export function createDeleteOrderStatus404() {
 }
 
 export function createDeleteOrderResponse(data?: Partial<DeleteOrderResponse>): DeleteOrderResponse {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([createDeleteOrderStatus400(), createDeleteOrderStatus404()])
-  if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
-    return { ...defaultFakeData, ...data } as DeleteOrderResponse
-  }
-  return (data ?? defaultFakeData) as DeleteOrderResponse
+  return (data ?? faker.helpers.arrayElement([createDeleteOrderStatus400(), createDeleteOrderStatus404()])) as DeleteOrderResponse
 }

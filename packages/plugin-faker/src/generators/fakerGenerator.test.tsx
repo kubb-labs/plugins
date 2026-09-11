@@ -89,6 +89,70 @@ const petListSchema = ast.factory.createSchema({
   items: [ast.factory.createSchema({ type: 'string' })],
 })
 
+// A named tuple: `Partial<[string, number]>` is `[string?, number?]`, so a shorter or
+// `undefined`-holding override must not pass for the full tuple type either.
+const coordinateSchema = ast.factory.createSchema({
+  type: 'tuple',
+  name: 'Coordinate',
+  items: [ast.factory.createSchema({ type: 'number' }), ast.factory.createSchema({ type: 'number' })],
+})
+
+// Branches that differ in more than the discriminant: overriding only `error` must not leave
+// the wrong branch's `details` shape behind (e.g. `retry_after_seconds` next to `field_errors`).
+const apiErrorDetailedSchema = ast.factory.createSchema({
+  type: 'union',
+  name: 'ApiErrorDetailed',
+  members: [
+    ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({
+          name: 'error',
+          required: true,
+          schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['validation_failed'] }),
+        }),
+        ast.factory.createProperty({
+          name: 'details',
+          required: true,
+          schema: ast.factory.createSchema({
+            type: 'object',
+            properties: [ast.factory.createProperty({ name: 'field_errors', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+          }),
+        }),
+      ],
+    }),
+    ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({
+          name: 'error',
+          required: true,
+          schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['rate_limited'] }),
+        }),
+        ast.factory.createProperty({
+          name: 'details',
+          required: true,
+          schema: ast.factory.createSchema({
+            type: 'object',
+            properties: [ast.factory.createProperty({ name: 'retry_after_seconds', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+          }),
+        }),
+      ],
+    }),
+  ],
+})
+
+// A union with an array member alongside an object member: an override targeting the array
+// member must never be spread into the object member's fields (or vice versa).
+const petOrPetListSchema = ast.factory.createSchema({
+  type: 'union',
+  name: 'PetOrPetList',
+  members: [
+    ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+    ast.factory.createSchema({ type: 'ref', name: 'PetList', ref: '#/components/schemas/PetList' }),
+  ],
+})
+
 const treeNodeSchema = ast.factory.createSchema({
   type: 'object',
   name: 'TreeNode',
@@ -198,7 +262,10 @@ describe('fakerGenerator — schema', () => {
     { name: 'petWithRandExp', node: petSchema, options: { regexGenerator: 'randexp' as const } },
     { name: 'treeNode', node: treeNodeSchema, options: {} },
     { name: 'apiError', node: apiErrorSchema, options: {} },
+    { name: 'apiErrorDetailed', node: apiErrorDetailedSchema, options: {} },
     { name: 'petList', node: petListSchema, options: {} },
+    { name: 'petOrPetList', node: petOrPetListSchema, options: {} },
+    { name: 'coordinate', node: coordinateSchema, options: {} },
     { name: 'catCycle', node: catSchema, options: {} },
     { name: 'petWithLocale', node: petSchema, options: { locale: 'de' as const } },
     { name: 'petWithSeed', node: petSchema, options: { seed: [1] as Array<number> } },
@@ -218,7 +285,10 @@ describe('fakerGenerator — schema', () => {
           ...ast.findCircularSchemas([
             categorySchema,
             apiErrorSchema,
+            apiErrorDetailedSchema,
             petListSchema,
+            petOrPetListSchema,
+            coordinateSchema,
             emojiSchema,
             errorSchema,
             petSchema,
