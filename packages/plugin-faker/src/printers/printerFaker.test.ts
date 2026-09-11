@@ -157,6 +157,68 @@ describe('printerFaker', () => {
     expect(result).not.toContain('NonNullable<NodeBalancerConfig>["algorithm"]')
   })
 
+  test('narrows oneOf variants distinguished only by an enum property', () => {
+    const makeVariant = (error: string, detailsName: string, detailsSchema: ast.SchemaNode) =>
+      ast.factory.createSchema({
+        type: 'object',
+        properties: [
+          ast.factory.createProperty({
+            name: 'error',
+            required: true,
+            schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: [error] }),
+          }),
+          ast.factory.createProperty({
+            name: 'details',
+            required: true,
+            schema: ast.factory.createSchema({
+              type: 'object',
+              properties: [ast.factory.createProperty({ name: detailsName, required: true, schema: detailsSchema })],
+            }),
+          }),
+        ],
+      })
+
+    const node = ast.factory.createSchema({
+      type: 'union',
+      members: [
+        makeVariant('validation_failed', 'field_errors', ast.factory.createSchema({ type: 'object', properties: [] })),
+        makeVariant('rate_limited', 'retry_after_seconds', ast.factory.createSchema({ type: 'integer' })),
+      ],
+    })
+
+    const result = printerFaker({ resolver: resolverFaker, typeName: 'ApiError' }).print(node)
+
+    expect(result).toContain(`Extract<NonNullable<ApiError>, { "error": 'validation_failed' }>`)
+    expect(result).toContain(`Extract<NonNullable<ApiError>, { "error": 'rate_limited' }>`)
+    expect(result).not.toContain('(NonNullable<ApiError> & Record<"error", unknown>)["error"]')
+  })
+
+  test('narrows oneOf variants distinguished only by a boolean const', () => {
+    const makeVariant = (noPatronymic: boolean, extraName: string) =>
+      ast.factory.createSchema({
+        type: 'object',
+        properties: [
+          ast.factory.createProperty({
+            name: 'no_patronymic',
+            required: true,
+            schema: ast.factory.createSchema({ type: 'enum', primitive: 'boolean', enumValues: [noPatronymic] }),
+          }),
+          ast.factory.createProperty({ name: extraName, required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+        ],
+      })
+
+    const node = ast.factory.createSchema({
+      type: 'union',
+      members: [makeVariant(true, 'given_name'), makeVariant(false, 'patronymic')],
+    })
+
+    const result = printerFaker({ resolver: resolverFaker, typeName: 'PersonName' }).print(node)
+
+    expect(result).toContain(`Extract<NonNullable<PersonName>, { "no_patronymic": true }>`)
+    expect(result).toContain(`Extract<NonNullable<PersonName>, { "no_patronymic": false }>`)
+    expect(result).not.toContain('(NonNullable<PersonName> & Record<"no_patronymic", unknown>)["no_patronymic"]')
+  })
+
   test('narrows referenced discriminated oneOf variants to their own branch', () => {
     const makeVariant = (name: string, petType: string) => {
       const schema = ast.factory.createSchema({

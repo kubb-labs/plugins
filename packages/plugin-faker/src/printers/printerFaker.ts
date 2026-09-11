@@ -233,6 +233,73 @@ function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName
   return undefined
 }
 
+function collectSchemaPropertyNames(node: ast.SchemaNode): Array<string> {
+  const names: Array<string> = []
+  const seen = new Set<string>()
+  const visited = new WeakSet<ast.SchemaNode>()
+
+  function visit(current: ast.SchemaNode | null | undefined): void {
+    if (!current || visited.has(current)) {
+      return
+    }
+
+    visited.add(current)
+
+    if (current.type === 'object') {
+      for (const property of current.properties ?? []) {
+        if (seen.has(property.name)) {
+          continue
+        }
+
+        seen.add(property.name)
+        names.push(property.name)
+      }
+      return
+    }
+
+    if (current.type === 'ref') {
+      visit(current.schema)
+      return
+    }
+
+    if (current.type === 'intersection') {
+      for (const member of current.members ?? []) {
+        visit(member)
+      }
+    }
+  }
+
+  visit(node)
+  return names
+}
+
+/**
+ * Finds a property whose single literal uniquely identifies every union member when the schema
+ * omitted an OpenAPI `discriminator`. TypeScript still discriminates on that literal; without it
+ * the printer indexes the whole union and widens each branch (TS2322).
+ */
+function inferDiscriminatorPropertyName(members: Array<ast.SchemaNode>): string | undefined {
+  const first = members[0]
+  if (!first || members.length < 2) {
+    return undefined
+  }
+
+  for (const propertyName of collectSchemaPropertyNames(first)) {
+    const values = members.map((member) => getDiscriminatorValue(member, propertyName))
+    if (values.some((value) => value === undefined)) {
+      continue
+    }
+
+    if (new Set(values.map((value) => JSON.stringify(value))).size !== members.length) {
+      continue
+    }
+
+    return propertyName
+  }
+
+  return undefined
+}
+
 /**
  * Type expression for an object property's value, indexed off the parent `typeName`.
  *
@@ -335,7 +402,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.enum(ast.getSchemaLiteralValues(node).map(parseEnumValue), this.options.typeName)
       },
       union(node): string {
-        const { discriminatorPropertyName } = node
+        const discriminatorPropertyName = node.discriminatorPropertyName ?? inferDiscriminatorPropertyName(node.members ?? [])
         const baseTypeName = this.options.typeName
 
         const items: Array<string> = mapSchemaMembers(node, (member) => {
