@@ -44,8 +44,8 @@ export function createAddPetStatusDefaultFakerXml(data?: Partial<AddPetStatusDef
 /**
  * @description Successful operation
  */
-export function createAddPetStatusDefaultFaker(_data?: AddPetStatusDefault): AddPetStatusDefault {
-  return faker.helpers.arrayElement([createAddPetStatusDefaultFakerJson(), createAddPetStatusDefaultFakerXml()])
+export function createAddPetStatusDefaultFaker(data?: Partial<AddPetStatusDefault>): AddPetStatusDefault {
+  return (data ?? faker.helpers.arrayElement([createAddPetStatusDefaultFakerJson(), createAddPetStatusDefaultFakerXml()])) as AddPetStatusDefault
 }
 
 /**
@@ -72,10 +72,10 @@ export function createAddPetBodyFakerFormUrlEncoded(data?: Partial<AddPetBodyFor
 /**
  * @description Create a new pet in the store
  */
-export function createAddPetBodyFaker(_data?: AddPetBody): AddPetBody {
-  return faker.helpers.arrayElement([createAddPetBodyFakerJson(), createAddPetBodyFakerXml(), createAddPetBodyFakerFormUrlEncoded()])
+export function createAddPetBodyFaker(data?: Partial<AddPetBody>): AddPetBody {
+  return (data ?? faker.helpers.arrayElement([createAddPetBodyFakerJson(), createAddPetBodyFakerXml(), createAddPetBodyFakerFormUrlEncoded()])) as AddPetBody
 }
 
-export function createAddPetResponseFaker(_data?: AddPetResponse): AddPetResponse {
-  return faker.helpers.arrayElement([createAddPetStatus405Faker<object>(), createAddPetStatusDefaultFaker()])
+export function createAddPetResponseFaker(data?: Partial<AddPetResponse>): AddPetResponse {
+  return (data ?? faker.helpers.arrayElement([createAddPetStatus405Faker<object>(), createAddPetStatusDefaultFaker()])) as AddPetResponse
 }

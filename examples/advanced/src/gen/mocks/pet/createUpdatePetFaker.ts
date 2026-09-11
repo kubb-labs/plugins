@@ -32,8 +32,8 @@ export function createUpdatePetStatus200FakerXml(data?: Partial<UpdatePetStatus2
 /**
  * @description Successful operation
  */
-export function createUpdatePetStatus200Faker(_data?: UpdatePetStatus200): UpdatePetStatus200 {
-  return faker.helpers.arrayElement([createUpdatePetStatus200FakerJson(), createUpdatePetStatus200FakerXml()])
+export function createUpdatePetStatus200Faker(data?: Partial<UpdatePetStatus200>): UpdatePetStatus200 {
+  return (data ?? faker.helpers.arrayElement([createUpdatePetStatus200FakerJson(), createUpdatePetStatus200FakerXml()])) as UpdatePetStatus200
 }
 
 /**
@@ -94,16 +94,18 @@ export function createUpdatePetBodyFakerFormUrlEncoded(data?: Partial<UpdatePetB
 /**
  * @description Update an existent pet in the store
  */
-export function createUpdatePetBodyFaker(_data?: UpdatePetBody): UpdatePetBody {
-  return faker.helpers.arrayElement([createUpdatePetBodyFakerJson(), createUpdatePetBodyFakerXml(), createUpdatePetBodyFakerFormUrlEncoded()])
+export function createUpdatePetBodyFaker(data?: Partial<UpdatePetBody>): UpdatePetBody {
+  return (data ??
+    faker.helpers.arrayElement([createUpdatePetBodyFakerJson(), createUpdatePetBodyFakerXml(), createUpdatePetBodyFakerFormUrlEncoded()])) as UpdatePetBody
 }
 
-export function createUpdatePetResponseFaker(_data?: UpdatePetResponse): UpdatePetResponse {
-  return faker.helpers.arrayElement([
-    createUpdatePetStatus200Faker(),
-    createUpdatePetStatus202Faker<object>(),
-    createUpdatePetStatus400Faker(),
-    createUpdatePetStatus404Faker(),
-    createUpdatePetStatus405Faker(),
-  ])
+export function createUpdatePetResponseFaker(data?: Partial<UpdatePetResponse>): UpdatePetResponse {
+  return (data ??
+    faker.helpers.arrayElement([
+      createUpdatePetStatus200Faker(),
+      createUpdatePetStatus202Faker<object>(),
+      createUpdatePetStatus400Faker(),
+      createUpdatePetStatus404Faker(),
+      createUpdatePetStatus405Faker(),
+    ])) as UpdatePetResponse
 }

@@ -51,6 +51,108 @@ const petSchema = ast.factory.createSchema({
   ],
 })
 
+// Issue #873: a named union schema referenced by a response. The status factory
+// declares `Partial<T>` and forwards it, so the union factory has to accept a
+// partial and merge it into the picked member.
+const apiErrorSchema = ast.factory.createSchema({
+  type: 'union',
+  name: 'ApiError',
+  members: [
+    ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({
+          name: 'error',
+          required: true,
+          schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['not_found'] }),
+        }),
+      ],
+    }),
+    ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({
+          name: 'error',
+          required: true,
+          schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['rate_limited'] }),
+        }),
+      ],
+    }),
+  ],
+})
+
+// Same mismatch as ApiError, but for a named array: `Partial<string[]>` is
+// `(string | undefined)[]`, which a factory taking the full array type rejects.
+const petListSchema = ast.factory.createSchema({
+  type: 'array',
+  name: 'PetList',
+  items: [ast.factory.createSchema({ type: 'string' })],
+})
+
+// A named tuple: `Partial<[string, number]>` is `[string?, number?]`, so a shorter or
+// `undefined`-holding override must not pass for the full tuple type either.
+const coordinateSchema = ast.factory.createSchema({
+  type: 'tuple',
+  name: 'Coordinate',
+  items: [ast.factory.createSchema({ type: 'number' }), ast.factory.createSchema({ type: 'number' })],
+})
+
+// Branches that differ in more than the discriminant: overriding only `error` must not leave
+// the wrong branch's `details` shape behind (e.g. `retry_after_seconds` next to `field_errors`).
+const apiErrorDetailedSchema = ast.factory.createSchema({
+  type: 'union',
+  name: 'ApiErrorDetailed',
+  members: [
+    ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({
+          name: 'error',
+          required: true,
+          schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['validation_failed'] }),
+        }),
+        ast.factory.createProperty({
+          name: 'details',
+          required: true,
+          schema: ast.factory.createSchema({
+            type: 'object',
+            properties: [ast.factory.createProperty({ name: 'field_errors', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+          }),
+        }),
+      ],
+    }),
+    ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({
+          name: 'error',
+          required: true,
+          schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['rate_limited'] }),
+        }),
+        ast.factory.createProperty({
+          name: 'details',
+          required: true,
+          schema: ast.factory.createSchema({
+            type: 'object',
+            properties: [ast.factory.createProperty({ name: 'retry_after_seconds', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+          }),
+        }),
+      ],
+    }),
+  ],
+})
+
+// A union with an array member alongside an object member: an override targeting the array
+// member must never be spread into the object member's fields (or vice versa).
+const petOrPetListSchema = ast.factory.createSchema({
+  type: 'union',
+  name: 'PetOrPetList',
+  members: [
+    ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+    ast.factory.createSchema({ type: 'ref', name: 'PetList', ref: '#/components/schemas/PetList' }),
+  ],
+})
+
 const treeNodeSchema = ast.factory.createSchema({
   type: 'object',
   name: 'TreeNode',
@@ -159,6 +261,11 @@ describe('fakerGenerator — schema', () => {
     { name: 'petWithDayjs', node: petSchema, options: { dateParser: 'dayjs' as const } },
     { name: 'petWithRandExp', node: petSchema, options: { regexGenerator: 'randexp' as const } },
     { name: 'treeNode', node: treeNodeSchema, options: {} },
+    { name: 'apiError', node: apiErrorSchema, options: {} },
+    { name: 'apiErrorDetailed', node: apiErrorDetailedSchema, options: {} },
+    { name: 'petList', node: petListSchema, options: {} },
+    { name: 'petOrPetList', node: petOrPetListSchema, options: {} },
+    { name: 'coordinate', node: coordinateSchema, options: {} },
     { name: 'catCycle', node: catSchema, options: {} },
     { name: 'petWithLocale', node: petSchema, options: { locale: 'de' as const } },
     { name: 'petWithSeed', node: petSchema, options: { seed: [1] as Array<number> } },
@@ -174,7 +281,23 @@ describe('fakerGenerator — schema', () => {
       config: testConfig,
       adapter: createMockedAdapter(),
       meta: {
-        circularNames: [...ast.findCircularSchemas([categorySchema, emojiSchema, errorSchema, petSchema, treeNodeSchema, petPolySchema, catSchema, dogSchema])],
+        circularNames: [
+          ...ast.findCircularSchemas([
+            categorySchema,
+            apiErrorSchema,
+            apiErrorDetailedSchema,
+            petListSchema,
+            petOrPetListSchema,
+            coordinateSchema,
+            emojiSchema,
+            errorSchema,
+            petSchema,
+            treeNodeSchema,
+            petPolySchema,
+            catSchema,
+            dogSchema,
+          ]),
+        ],
         enumNames: [],
       },
       driver,
@@ -333,6 +456,33 @@ describe('fakerGenerator — operation', () => {
       options: { seed: [1] as Array<number> },
     },
     {
+      name: 'getPet',
+      node: ast.factory.createOperation({
+        operationId: 'getPet',
+        method: 'GET',
+        path: '/pet',
+        tags: ['pets'],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            description: 'A pet',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          }),
+          ast.factory.createResponse({
+            statusCode: '202',
+            description: 'A list of pets',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'PetList', ref: '#/components/schemas/PetList' }),
+          }),
+          ast.factory.createResponse({
+            statusCode: '404',
+            description: 'Not found',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'ApiError', ref: '#/components/schemas/ApiError' }),
+          }),
+        ],
+      }),
+      options: {},
+    },
+    {
       name: 'inlineResponseUnion',
       node: ast.factory.createOperation({
         operationId: 'getPet',
@@ -418,7 +568,7 @@ describe('fakerGenerator — operation', () => {
       config: testConfig,
       adapter: createMockedAdapter(),
       meta: {
-        circularNames: [...ast.findCircularSchemas([categorySchema, errorSchema, petSchema, treeNodeSchema])],
+        circularNames: [...ast.findCircularSchemas([apiErrorSchema, petListSchema, categorySchema, errorSchema, petSchema, treeNodeSchema])],
         enumNames: [],
       },
       driver,

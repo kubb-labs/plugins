@@ -211,15 +211,12 @@ export function resolveFakerTypeUsage(
   returnType: string | null
   usesTypeName: boolean
 } {
-  const isArray = node.type === 'array'
-  const isTuple = node.type === 'tuple'
   const isScalar = SCALAR_TYPES.has(node.type)
 
+  // Every overridable factory takes `Partial<T>`, so a `ref` wrapper can forward its own
+  // `Partial<T>` argument to whatever schema it points at. Scalars are the exception:
+  // `Partial<string>` is still `string`, so they name the primitive directly.
   let dataType = `Partial<${typeName}>`
-
-  if (isArray || isTuple || node.type === 'union' || node.type === 'enum') {
-    dataType = typeName
-  }
 
   if (isScalar) {
     dataType = getScalarType(node, typeName)
