@@ -233,6 +233,45 @@ function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName
   return undefined
 }
 
+// Resolves through `ref`/`intersection` so a branch that isn't an inline object still counts.
+function collectPropertyNames(node: ast.SchemaNode, visited: Set<ast.SchemaNode> = new Set()): Set<string> {
+  if (visited.has(node)) return new Set()
+  visited.add(node)
+
+  if (node.type === 'object') return new Set((node.properties ?? []).map((property) => property.name))
+  if (node.type === 'ref') return node.schema ? collectPropertyNames(node.schema, visited) : new Set()
+
+  if (node.type === 'intersection') {
+    const names = new Set<string>()
+    for (const member of node.members ?? []) {
+      for (const name of collectPropertyNames(member, visited)) names.add(name)
+    }
+    return names
+  }
+
+  return new Set()
+}
+
+// A property with a distinct single literal per branch acts as an implicit discriminator.
+function inferDiscriminatorPropertyName(members: ReadonlyArray<ast.SchemaNode>): string | undefined {
+  if (members.length < 2) return undefined
+
+  let candidates: Set<string> | undefined
+  for (const member of members) {
+    const names = collectPropertyNames(member)
+    candidates = candidates ? new Set([...candidates].filter((name) => names.has(name))) : names
+  }
+
+  for (const name of candidates ?? []) {
+    const values = members.map((member) => getDiscriminatorValue(member, name))
+    if (values.every((value) => value !== undefined) && new Set(values).size === members.length) {
+      return name
+    }
+  }
+
+  return undefined
+}
+
 /**
  * Type expression for an object property's value, indexed off the parent `typeName`.
  *
@@ -335,7 +374,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.enum(ast.getSchemaLiteralValues(node).map(parseEnumValue), this.options.typeName)
       },
       union(node): string {
-        const { discriminatorPropertyName } = node
+        const discriminatorPropertyName = node.discriminatorPropertyName ?? inferDiscriminatorPropertyName(node.members ?? [])
         const baseTypeName = this.options.typeName
 
         const items: Array<string> = mapSchemaMembers(node, (member) => {

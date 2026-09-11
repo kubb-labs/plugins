@@ -346,6 +346,46 @@ paths:
                     type: string
                     enum:
                       - unauthorized
+        '429':
+          description: too many requests
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    required:
+                      - error
+                      - details
+                    properties:
+                      error:
+                        type: string
+                        enum:
+                          - validation_failed
+                      details:
+                        type: object
+                        required:
+                          - field_errors
+                        properties:
+                          field_errors:
+                            type: object
+                            additionalProperties:
+                              type: string
+                  - type: object
+                    required:
+                      - error
+                      - details
+                    properties:
+                      error:
+                        type: string
+                        enum:
+                          - rate_limited
+                      details:
+                        type: object
+                        required:
+                          - retry_after_seconds
+                        properties:
+                          retry_after_seconds:
+                            type: integer
       security:
         - api_key: []
   /store/order:

@@ -157,6 +157,67 @@ describe('printerFaker', () => {
     expect(result).not.toContain('NonNullable<NodeBalancerConfig>["algorithm"]')
   })
 
+  test('infers an undeclared discriminator when one property carries a distinct literal per branch', () => {
+    // No `discriminator` keyword, and the branches differ beyond that property too
+    // (`details` has a different shape per branch) — issue #874.
+    const makeVariant = (error: string, detailProperty: string) =>
+      ast.factory.createSchema({
+        type: 'object',
+        properties: [
+          ast.factory.createProperty({
+            name: 'error',
+            required: true,
+            schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: [error] }),
+          }),
+          ast.factory.createProperty({
+            name: 'details',
+            required: true,
+            schema: ast.factory.createSchema({
+              type: 'object',
+              properties: [ast.factory.createProperty({ name: detailProperty, required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+            }),
+          }),
+        ],
+      })
+
+    const node = ast.factory.createSchema({
+      type: 'union',
+      members: [makeVariant('validation_failed', 'field_errors'), makeVariant('rate_limited', 'retry_after_seconds')],
+    })
+
+    const result = printerFaker({ resolver: resolverFaker, typeName: 'ApiError' }).print(node)
+
+    expect(result).toContain(`Extract<NonNullable<ApiError>, { "error": 'validation_failed' }>`)
+    expect(result).toContain(`Extract<NonNullable<ApiError>, { "error": 'rate_limited' }>`)
+    expect(result).not.toContain('(NonNullable<ApiError> & Record<"error", unknown>)["error"]')
+  })
+
+  test('falls back to the guarded union type when no property carries a single literal on every branch', () => {
+    // Each branch's `state` has two literal values, so `getDiscriminatorValue` can't resolve a
+    // single value per branch even though `state` is the only shared property.
+    const makeVariant = (values: Array<string>) =>
+      ast.factory.createSchema({
+        type: 'object',
+        properties: [
+          ast.factory.createProperty({
+            name: 'state',
+            required: true,
+            schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: values }),
+          }),
+        ],
+      })
+
+    const node = ast.factory.createSchema({
+      type: 'union',
+      members: [makeVariant(['open', 'reopened']), makeVariant(['closed', 'archived'])],
+    })
+
+    const result = printerFaker({ resolver: resolverFaker, typeName: 'Status' }).print(node)
+
+    expect(result).not.toContain('Extract<')
+    expect(result).toContain('(NonNullable<Status> & Record<"state", unknown>)["state"]')
+  })
+
   test('narrows referenced discriminated oneOf variants to their own branch', () => {
     const makeVariant = (name: string, petType: string) => {
       const schema = ast.factory.createSchema({
