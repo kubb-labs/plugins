@@ -84,5 +84,5 @@ export function createAddPetBody(_data?: AddPetBody): AddPetBody {
 }
 
 export function createAddPetResponse(_data?: AddPetResponse): AddPetResponse {
-  return faker.helpers.arrayElement([createAddPetStatus200(), createAddPetStatus405()])
+  return faker.helpers.arrayElement([createAddPetStatus200(), createAddPetStatus405<object>()])
 }
