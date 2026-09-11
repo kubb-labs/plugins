@@ -221,12 +221,12 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   baseURL?: string
   url?: string
   method?: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD'
-  path?: Record<string, unknown>
+  path?: unknown
   query?: unknown
   params?: unknown
-  cookies?: Record<string, unknown>
+  cookies?: unknown
   body?: TBody
-  headers?: HeadersInit
+  headers?: unknown
   styles?: Styles
   signal?: AbortSignal
   credentials?: RequestCredentials
@@ -558,7 +558,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   const { querySerializer, bodySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
   const codecs = { ...config.codecs, ...requestConfig.codecs }
 
-  const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.styles?.header))
+  const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers as HeadersInit | undefined, requestConfig.styles?.header))
   const { request: requestContentTypeOption, response: responseContentType } = resolveContentType(requestConfig.contentType)
   const requestContentType = requestContentTypeOption ?? getHeader(headers, 'content-type')
   if (responseContentType && !hasHeader(headers, 'accept')) {
@@ -575,7 +575,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   })
 
   if (requestConfig.cookies) {
-    const cookie = serializeCookies(requestConfig.cookies, requestConfig.styles?.cookie)
+    const cookie = serializeCookies(requestConfig.cookies as Record<string, unknown>, requestConfig.styles?.cookie)
     if (cookie) headers['Cookie'] = [headers['Cookie'], cookie].filter(Boolean).join('; ')
   }
 
@@ -604,7 +604,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 
   const url = serializeUrl({
     parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
-    pathParams: requestConfig.path ?? {},
+    pathParams: (requestConfig.path ?? {}) as Record<string, unknown>,
     search: querySerializer(query, requestConfig.styles?.query),
     pathSerializer,
     pathStyles: requestConfig.styles?.path,
@@ -733,7 +733,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
     return serializeUrl({
       parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
-      pathParams: requestConfig.path ?? {},
+      pathParams: (requestConfig.path ?? {}) as Record<string, unknown>,
       search: querySerializer(query, requestConfig.styles?.query),
       pathSerializer,
       pathStyles: requestConfig.styles?.path,

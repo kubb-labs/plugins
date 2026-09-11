@@ -382,6 +382,30 @@ describe('createClientCore', () => {
     expect(calls[0]?.headers['X-Filter']).toBe('role=admin')
   })
 
+  // `plugin-ts`'s `syntaxType: 'interface'` types path/headers/cookies params as interfaces, which
+  // (unlike a type alias) get no implicit index signature, so `RequestConfig` must accept them too.
+  test('accepts interface-typed path, headers, and cookies params', async () => {
+    interface PetPath {
+      petId: number
+    }
+    interface PetHeaders {
+      'X-Request-Id': string
+    }
+    interface PetCookies {
+      session: string
+    }
+
+    const { client, calls } = createClient()
+    const path: PetPath = { petId: 7 }
+    const headers: PetHeaders = { 'X-Request-Id': 'abc' }
+    const cookies: PetCookies = { session: 'xyz' }
+    await client({ method: 'GET', url: '/pet/{petId}', path, headers, cookies })
+
+    expect(calls[0]?.url).toBe('/pet/7')
+    expect(calls[0]?.headers['X-Request-Id']).toBe('abc')
+    expect(calls[0]?.headers.Cookie).toBe('session=xyz')
+  })
+
   test('builds FormData and omits Content-Type for multipart/form-data', async () => {
     const { client, calls } = createClient()
     await client({ method: 'POST', url: '/pet', body: { field: 'x' }, contentType: 'multipart/form-data' })
