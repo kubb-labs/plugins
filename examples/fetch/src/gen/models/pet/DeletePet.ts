@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-export type DeletePetPath = {
+export interface DeletePetPath {
   /**
    * @description Pet id to delete
    *
@@ -13,20 +13,20 @@ export type DeletePetPath = {
   petId: bigint
 }
 
-export type DeletePetHeaders = {
+export interface DeletePetHeaders {
   api_key?: string
 }
 
 export type DeletePetStatus400 = unknown
 
-export type DeletePetOptions = {
+export interface DeletePetOptions {
   body?: never
   path: DeletePetPath
   query?: never
   headers?: DeletePetHeaders
 }
 
-export type DeletePetResponses = {
+export interface DeletePetResponses {
   '400': DeletePetStatus400
 }
 
