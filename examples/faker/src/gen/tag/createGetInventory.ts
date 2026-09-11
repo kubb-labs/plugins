@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { GetInventoryResponse, GetInventoryStatus200, GetInventoryStatus401 } from '../models/GetInventory'
+import type { GetInventoryResponse, GetInventoryStatus200, GetInventoryStatus401, GetInventoryStatus429 } from '../models/GetInventory'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**
@@ -30,6 +30,30 @@ export function createGetInventoryStatus401<TData extends Partial<GetInventorySt
   } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
+/**
+ * @description too many requests
+ */
+export function createGetInventoryStatus429(_data?: GetInventoryStatus429): GetInventoryStatus429 {
+  return faker.helpers.arrayElement([
+    {
+      error: faker.helpers.arrayElement<
+        (NonNullable<Extract<NonNullable<GetInventoryStatus429>, { error: 'validation_failed' }>> & Record<'error', unknown>)['error']
+      >(['validation_failed']),
+      details: {
+        field_errors: {},
+      },
+    },
+    {
+      error: faker.helpers.arrayElement<
+        (NonNullable<Extract<NonNullable<GetInventoryStatus429>, { error: 'rate_limited' }>> & Record<'error', unknown>)['error']
+      >(['rate_limited']),
+      details: {
+        retry_after_seconds: faker.number.int(),
+      },
+    },
+  ])
+}
+
 export function createGetInventoryResponse(_data?: GetInventoryResponse): GetInventoryResponse {
-  return faker.helpers.arrayElement([createGetInventoryStatus200<object>(), createGetInventoryStatus401<object>()])
+  return faker.helpers.arrayElement([createGetInventoryStatus200<object>(), createGetInventoryStatus401<object>(), createGetInventoryStatus429()])
 }

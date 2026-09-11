@@ -11,6 +11,22 @@ export type GetInventoryStatus401 = {
   error: 'unauthorized'
 }
 
+export type GetInventoryStatus429 =
+  | {
+      error: 'validation_failed'
+      details: {
+        field_errors: {
+          [key: string]: string
+        }
+      }
+    }
+  | {
+      error: 'rate_limited'
+      details: {
+        retry_after_seconds: number
+      }
+    }
+
 export type GetInventoryOptions = {
   body?: never
   path?: never
@@ -21,9 +37,10 @@ export type GetInventoryOptions = {
 export type GetInventoryResponses = {
   '200': GetInventoryStatus200
   '401': GetInventoryStatus401
+  '429': GetInventoryStatus429
 }
 
 /**
  * @description Union of all possible responses
  */
-export type GetInventoryResponse = GetInventoryStatus200 | GetInventoryStatus401
+export type GetInventoryResponse = GetInventoryStatus200 | GetInventoryStatus401 | GetInventoryStatus429
