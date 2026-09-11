@@ -1,5 +1,13 @@
 # @kubb/plugin-faker
 
+## 5.0.7
+
+### Patch Changes
+
+- [#877](https://github.com/kubb-labs/plugins/pull/877) [`ce57416`](https://github.com/kubb-labs/plugins/commit/ce574168a6a37cad9f12358db2ae469b38cff86a) Thanks [@ghettoDdOS](https://github.com/ghettoDdOS)! - Faker factories for arrays, tuples, and unions now accept and use their `Partial<T>` override. A
+  union factory no longer silently drops it under the name `_data`, and array/tuple overrides can
+  no longer leave an `undefined` hole in the generated value.
+
 ## 5.0.6
 
 ### Patch Changes
