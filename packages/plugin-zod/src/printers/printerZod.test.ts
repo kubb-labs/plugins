@@ -164,7 +164,7 @@ describe('printerZod', () => {
 
     test('time (JS Date) — output decodes string → Date', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'time', representation: 'date' }))).toBe(
-        'z.iso.time().transform((value) => new Date(`1970-01-01T${value}`))',
+        'z.iso.time().transform((value) => new Date(`1970-01-01T${value}Z`))',
       )
     })
 

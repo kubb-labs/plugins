@@ -343,7 +343,7 @@ const scalarNodes: PrinterZodNodes = {
       return 'z.date().transform((value) => value.toISOString().slice(11, 19))'
     }
 
-    const decoded = 'z.iso.time().transform((value) => new Date(`1970-01-01T${value}`))'
+    const decoded = 'z.iso.time().transform((value) => new Date(`1970-01-01T${value}Z`))'
     return shouldCoerce(this.options.coercion, 'dates') ? 'z.coerce.date()' : decoded
   },
   uuid(node) {

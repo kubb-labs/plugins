@@ -6,6 +6,6 @@
 
 import * as z from 'zod'
 
-export const timeFieldSchema = z.iso.time().transform((value) => new Date(`1970-01-01T${value}`))
+export const timeFieldSchema = z.iso.time().transform((value) => new Date(`1970-01-01T${value}Z`))
 
 export const timeFieldInputSchema = z.date().transform((value) => value.toISOString().slice(11, 19))
