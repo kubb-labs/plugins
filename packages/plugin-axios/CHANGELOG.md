@@ -1,5 +1,15 @@
 # @kubb/plugin-axios
 
+## 5.4.1
+
+### Patch Changes
+
+- [#888](https://github.com/kubb-labs/plugins/pull/888) [`a892c1e`](https://github.com/kubb-labs/plugins/commit/a892c1eb1434c7165f02efe1002fb62a56a6781c) Thanks [@ghettoDdOS](https://github.com/ghettoDdOS)! - `RequestConfig`'s `path`, `headers`, and `cookies` fields no longer require an index signature.
+  With `pluginTs({ syntaxType: 'interface' })`, the generated per-operation `Path`/`Headers`/
+  `Cookies` types are `interface`s, which TypeScript never gives an implicit index signature (unlike
+  a `type` alias), so passing one to the generated client failed to typecheck (`TS2345`). These
+  fields now accept `unknown`, the same treatment `query` already had.
+
 ## 5.4.0
 
 ### Minor Changes
