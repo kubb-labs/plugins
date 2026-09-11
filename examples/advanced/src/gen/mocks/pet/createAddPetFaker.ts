@@ -85,7 +85,7 @@ export function createAddPetBodyFaker(data?: Partial<AddPetBody>): AddPetBody {
 }
 
 export function createAddPetResponseFaker(data?: Partial<AddPetResponse>): AddPetResponse {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([createAddPetStatus405Faker(), createAddPetStatusDefaultFaker()])
+  const defaultFakeData: unknown = faker.helpers.arrayElement([createAddPetStatus405Faker<object>(), createAddPetStatusDefaultFaker()])
   if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
     return { ...defaultFakeData, ...data } as AddPetResponse
   }

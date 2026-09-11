@@ -31,7 +31,7 @@ export function createAddFilesBodyFakerFormData(data?: Partial<AddFilesBodyFormD
 }
 
 export function createAddFilesBodyFaker(data?: Partial<AddFilesBody>): AddFilesBody {
-  const defaultFakeData: unknown = faker.helpers.arrayElement([createAddFilesBodyFakerJson(), createAddFilesBodyFakerFormData()])
+  const defaultFakeData: unknown = faker.helpers.arrayElement([createAddFilesBodyFakerJson<object>(), createAddFilesBodyFakerFormData()])
   if (data && defaultFakeData && typeof defaultFakeData === 'object' && !Array.isArray(defaultFakeData)) {
     return { ...defaultFakeData, ...data } as AddFilesBody
   }

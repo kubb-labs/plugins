@@ -101,7 +101,10 @@ export function buildResponseUnionSchema(node: ast.OperationNode, resolver: Reso
 
   return ast.factory.createSchema({
     type: 'union',
-    members: responses.map((response) => ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, response.statusCode) })),
+    members: responses.map((response) => {
+      const schema = (response.content?.length ?? 0) === 1 ? response.content?.[0]?.schema : undefined
+      return ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, response.statusCode), schema })
+    }),
   })
 }
 

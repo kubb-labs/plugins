@@ -2,7 +2,7 @@ import axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers'
 import type { HeadersInit, PathParamStyle, PathSerializer, Serializers, Styles } from './serializers'
-import { type StandardSchemaValidator, validateStandardSchema } from './standardSchema'
+import { ParseError, type StandardSchemaValidator, validateStandardSchema } from './standardSchema'
 
 /**
  * HTTP status codes treated as a success, everything else is an error.
@@ -175,6 +175,25 @@ export type ContentType = string | { request?: string; response?: string }
 export type Validator<T = unknown> = StandardSchemaValidator<T>
 
 /**
+ * The failing body and the call it came from, handed to `onValidationError` alongside the `ParseError`.
+ * `direction` says which slot rejected it: the request body, the success body, or the error body.
+ */
+export type ValidationErrorContext = {
+  value: unknown
+  direction: 'request' | 'response' | 'error'
+  method?: string
+  url?: string
+  status?: number
+}
+
+/**
+ * Decides what a failed validation does. Returning nothing rethrows the `ParseError`; returning
+ * `{ value }` resolves the call with that value instead, so a drifted body can be reported and still
+ * delivered. The box keeps an explicit `{ value: undefined }` substitution distinct from declining.
+ */
+export type ValidationErrorHandler = (error: ParseError, context: ValidationErrorContext) => { value: unknown } | void | Promise<{ value: unknown } | void>
+
+/**
  * A resolved security scheme carried on each generated call's `security` array and passed to the `auth` resolver.
  */
 export type Auth = {
@@ -224,6 +243,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   serializer?: Serializers
   codecs?: Record<string, Codec>
   validator?: { request?: Validator; response?: Validator; error?: Validator }
+  onValidationError?: ValidationErrorHandler
   security?: Array<Auth>
   auth?: AuthResolver
 }
@@ -253,6 +273,7 @@ export type ClientConfig = {
   transport?: AxiosInstance
   serializer?: Serializers
   codecs?: Record<string, Codec>
+  onValidationError?: ValidationErrorHandler
   auth?: AuthResolver
 }
 
@@ -431,9 +452,26 @@ export async function resolveAuth(params: {
   }
 }
 
-async function runValidator<T>(validator: Validator<T> | undefined, value: T): Promise<T> {
+async function runValidator<T>({
+  validator,
+  value,
+  context,
+  onValidationError,
+}: {
+  validator: Validator<T> | undefined
+  value: T
+  context: Omit<ValidationErrorContext, 'value'>
+  onValidationError: ValidationErrorHandler | undefined
+}): Promise<T> {
   if (!validator) return value
-  return validateStandardSchema(validator, value)
+  try {
+    return await validateStandardSchema(validator, value)
+  } catch (error) {
+    if (!onValidationError || !(error instanceof ParseError)) throw error
+    const handled = await onValidationError(error, { ...context, value })
+    if (!handled) throw error
+    return handled.value as T
+  }
 }
 
 /**
@@ -509,7 +547,12 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     if (cookie) headers['Cookie'] = [headers['Cookie'], cookie].filter(Boolean).join('; ')
   }
 
-  const validatedBody = await runValidator(requestConfig.validator?.request, requestConfig.body)
+  const validatedBody = await runValidator({
+    validator: requestConfig.validator?.request,
+    value: requestConfig.body,
+    context: { direction: 'request', method: requestConfig.method, url: requestConfig.url },
+    onValidationError: requestConfig.onValidationError ?? config.onValidationError,
+  })
   const requestContentTypeBase = baseContentType(requestContentType)
   const contentCodec = requestContentTypeBase ? codecs[requestContentTypeBase] : undefined
   const usesDefaultBodySerializer = !contentCodec?.serialize && bodySerializer === defaultBodySerializer
@@ -571,10 +614,12 @@ async function settleResponse<TRequest, TResponse>({
   response,
   codecs,
   validator,
+  onValidationError,
 }: {
   response: AxiosResponse
   codecs: Record<string, Codec>
   validator: { response?: Validator; error?: Validator } | undefined
+  onValidationError: ValidationErrorHandler | undefined
 }): Promise<CallResult<TRequest, TResponse>> {
   const isSuccess = response.status >= 200 && response.status < 300
   const contentType = getResponseContentType(response.headers as Record<string, unknown>)
@@ -583,8 +628,27 @@ async function settleResponse<TRequest, TResponse>({
     const codec = codecs[contentType]
     if (codec?.deserialize) decoded = await codec.deserialize(response.data, contentType)
   }
-  const data = isSuccess ? await runValidator(validator?.response, decoded) : undefined
-  const error = isSuccess ? undefined : await runValidator(validator?.error, decoded)
+  const validationContext = {
+    method: response.config?.method?.toUpperCase(),
+    url: response.config?.url,
+    status: response.status,
+  }
+  const data = isSuccess
+    ? await runValidator({
+        validator: validator?.response,
+        value: decoded,
+        context: { direction: 'response', ...validationContext },
+        onValidationError,
+      })
+    : undefined
+  const error = isSuccess
+    ? undefined
+    : await runValidator({
+        validator: validator?.error,
+        value: decoded,
+        context: { direction: 'error', ...validationContext },
+        onValidationError,
+      })
   return {
     status: response.status,
     data,
@@ -629,7 +693,12 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
 
     try {
       const response = await activeInstance.request<unknown, AxiosResponse>(axiosConfig)
-      return await settleResponse({ response, codecs, validator: requestConfig.validator })
+      return await settleResponse({
+        response,
+        codecs,
+        validator: requestConfig.validator,
+        onValidationError: requestConfig.onValidationError ?? config.onValidationError,
+      })
     } catch (error) {
       const axiosError = error as AxiosError
       if (throwOnError && axiosError.response) {

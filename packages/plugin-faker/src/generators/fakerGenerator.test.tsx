@@ -412,6 +412,80 @@ describe('fakerGenerator — operation', () => {
       }),
       options: {},
     },
+    {
+      name: 'inlineResponseUnion',
+      node: ast.factory.createOperation({
+        operationId: 'getPet',
+        method: 'GET',
+        path: '/pet',
+        tags: ['pets'],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            description: 'A pet',
+            schema: ast.factory.createSchema({
+              type: 'object',
+              properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+            }),
+          }),
+          ast.factory.createResponse({
+            statusCode: '401',
+            description: 'Unauthorized',
+            schema: ast.factory.createSchema({
+              type: 'object',
+              properties: [
+                ast.factory.createProperty({
+                  name: 'error',
+                  required: true,
+                  schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['unauthorized'] }),
+                }),
+              ],
+            }),
+          }),
+        ],
+      }),
+      options: {},
+    },
+    {
+      name: 'inlineResponseMultiContent',
+      node: ast.factory.createOperation({
+        operationId: 'getPet',
+        method: 'GET',
+        path: '/pet',
+        tags: ['pets'],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            description: 'A pet',
+            content: [
+              ast.factory.createContent({
+                contentType: 'application/json',
+                schema: ast.factory.createSchema({
+                  type: 'object',
+                  properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+                }),
+              }),
+              ast.factory.createContent({
+                contentType: 'application/xml',
+                schema: ast.factory.createSchema({
+                  type: 'object',
+                  properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+                }),
+              }),
+            ],
+          }),
+          ast.factory.createResponse({
+            statusCode: '401',
+            description: 'Unauthorized',
+            schema: ast.factory.createSchema({
+              type: 'object',
+              properties: [ast.factory.createProperty({ name: 'error', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+            }),
+          }),
+        ],
+      }),
+      options: {},
+    },
   ] as const)('$name', async ({ name, node, options }) => {
     const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })

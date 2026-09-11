@@ -142,7 +142,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       const variants = resolveContentTypeVariants(entries, baseName)
       const unionSchema = ast.factory.createSchema({
         type: 'union',
-        members: variants.map((variant) => ast.factory.createSchema({ type: 'ref', name: variant.name })),
+        members: variants.map((variant) => ast.factory.createSchema({ type: 'ref', name: variant.name, schema: variant.schema })),
       })
       return [
         ...variants.map((variant) => ({

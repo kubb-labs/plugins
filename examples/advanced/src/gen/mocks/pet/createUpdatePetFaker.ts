@@ -113,7 +113,7 @@ export function createUpdatePetBodyFaker(data?: Partial<UpdatePetBody>): UpdateP
 export function createUpdatePetResponseFaker(data?: Partial<UpdatePetResponse>): UpdatePetResponse {
   const defaultFakeData: unknown = faker.helpers.arrayElement([
     createUpdatePetStatus200Faker(),
-    createUpdatePetStatus202Faker(),
+    createUpdatePetStatus202Faker<object>(),
     createUpdatePetStatus400Faker(),
     createUpdatePetStatus404Faker(),
     createUpdatePetStatus405Faker(),

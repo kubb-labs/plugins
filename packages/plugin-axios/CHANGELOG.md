@@ -1,5 +1,19 @@
 # @kubb/plugin-axios
 
+## 5.4.0
+
+### Minor Changes
+
+- [#879](https://github.com/kubb-labs/plugins/pull/879) [`9e292cb`](https://github.com/kubb-labs/plugins/commit/9e292cb1509fb1ba4485edfc10f6f316e75e52a4) Thanks [@rajp33](https://github.com/rajp33)! - Add `onValidationError` to `ClientConfig` and `RequestConfig`, so a body that fails its schema no longer has to throw. The handler receives the `ParseError` plus the failing `value` and the call's `direction` / `method` / `url` / `status`; returning nothing rethrows (the default, unchanged), and returning `{ value }` resolves the call with that value instead. This makes it possible to report a drifted response to your error tracker and still render the page.
+
+### Patch Changes
+
+- [#869](https://github.com/kubb-labs/plugins/pull/869) [`7e936bc`](https://github.com/kubb-labs/plugins/commit/7e936bce055fa8f35de5d53e4354e7fd574b651d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add a `kubb.dev/sponsors` entry to each package's `funding` field, alongside the existing GitHub
+  Sponsors and Open Collective links.
+- Updated dependencies [[`1ba9310`](https://github.com/kubb-labs/plugins/commit/1ba9310cd1584b390b94aa53658adf955f79f8e4), [`7e936bc`](https://github.com/kubb-labs/plugins/commit/7e936bce055fa8f35de5d53e4354e7fd574b651d)]:
+  - @kubb/plugin-ts@5.0.2
+  - @kubb/plugin-zod@5.1.5
+
 ## 5.3.0
 
 ### Minor Changes

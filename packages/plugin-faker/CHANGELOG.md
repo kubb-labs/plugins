@@ -1,5 +1,22 @@
 # @kubb/plugin-faker
 
+## 5.0.6
+
+### Patch Changes
+
+- [#876](https://github.com/kubb-labs/plugins/pull/876) [`8ff5820`](https://github.com/kubb-labs/plugins/commit/8ff5820736c4b0a652a9aedd08a9ac38eebfdeba) Thanks [@ghettoDdOS](https://github.com/ghettoDdOS)! - `create<Operation>Response` now typechecks when a status or content-type variant has an inline object schema. The generated union helper calls each status factory with its explicit `<object>` type argument, so the response return type no longer infers `TData` as `Partial<T>` and drops required properties (TS2322).
+
+## 5.0.5
+
+### Patch Changes
+
+- [#864](https://github.com/kubb-labs/plugins/pull/864) [`1ba9310`](https://github.com/kubb-labs/plugins/commit/1ba9310cd1584b390b94aa53658adf955f79f8e4) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Read enum literals through `@kubb/ast`'s `getSchemaLiteralValues` and resolve discriminator properties with `resolveSchemaProperties`. A `oneOf` variant whose discriminator is a `$ref` to a single-value enum now narrows to its own branch instead of keeping the whole union.
+
+- [#869](https://github.com/kubb-labs/plugins/pull/869) [`7e936bc`](https://github.com/kubb-labs/plugins/commit/7e936bce055fa8f35de5d53e4354e7fd574b651d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add a `kubb.dev/sponsors` entry to each package's `funding` field, alongside the existing GitHub
+  Sponsors and Open Collective links.
+- Updated dependencies [[`1ba9310`](https://github.com/kubb-labs/plugins/commit/1ba9310cd1584b390b94aa53658adf955f79f8e4), [`7e936bc`](https://github.com/kubb-labs/plugins/commit/7e936bce055fa8f35de5d53e4354e7fd574b651d)]:
+  - @kubb/plugin-ts@5.0.2
+
 ## 5.0.4
 
 ### Patch Changes
