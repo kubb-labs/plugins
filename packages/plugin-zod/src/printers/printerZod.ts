@@ -283,10 +283,11 @@ export function collectDirectionalRefNames({ node, printerOptions }: { node: ast
  * Handlers that never recurse into children, so {@link variesByDirection} can call one directly
  * to probe both directions without building a printer.
  *
- * `date` is the built-in two-way conversion, decoding `string → Date` on responses and encoding
- * back on requests, keeping `date` and `date-time` precision apart. Only `representation: 'date'`
- * fields convert; ISO-string fields print `z.iso.date()` either way. A `printer.nodes.date`
- * override replaces the whole handler, direction branch included.
+ * `date` and `time` are the built-in two-way conversions, decoding `string → Date` on responses and
+ * encoding back on requests. `date` keeps `date` and `date-time` precision apart. Only
+ * `representation: 'date'` fields convert; ISO-string fields print the matching `z.iso.*()` either
+ * way. A `printer.nodes.date` or `printer.nodes.time` override replaces the whole handler, direction
+ * branch included.
  */
 const scalarNodes: PrinterZodNodes = {
   any: () => 'z.any()',
@@ -338,7 +339,12 @@ const scalarNodes: PrinterZodNodes = {
       return 'z.iso.time()'
     }
 
-    return shouldCoerce(this.options.coercion, 'dates') ? 'z.coerce.date()' : 'z.date()'
+    if (this.options.direction === 'encode') {
+      return 'z.date().transform((value) => value.toISOString().slice(11, 19))'
+    }
+
+    const decoded = 'z.iso.time().transform((value) => new Date(`1970-01-01T${value}`))'
+    return shouldCoerce(this.options.coercion, 'dates') ? 'z.coerce.date()' : decoded
   },
   uuid(node) {
     const base = this.options.guidType === 'guid' ? 'z.guid()' : 'z.uuid()'

@@ -197,6 +197,7 @@ describe('zodGenerator — Schema', () => {
     // dateType — printer renders based on representation, integration tests cover adapter-level dateType option
     { name: 'dateType string', node: ast.factory.createSchema({ type: 'date', name: 'DateField', representation: 'string' }) },
     { name: 'dateType date', node: ast.factory.createSchema({ type: 'date', name: 'DateField', representation: 'date' }) },
+    { name: 'timeType date', node: ast.factory.createSchema({ type: 'time', name: 'TimeField', representation: 'date' }) },
     // guidType options
     { name: 'guidType uuid', node: ast.factory.createSchema({ type: 'uuid', name: 'UuidField' }), options: { guidType: 'uuid' } },
     { name: 'guidType guid', node: ast.factory.createSchema({ type: 'uuid', name: 'GuidField' }), options: { guidType: 'guid' } },

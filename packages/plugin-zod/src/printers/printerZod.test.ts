@@ -161,6 +161,19 @@ describe('printerZod', () => {
     test('time (ISO string)', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'time', representation: 'string' }))).toBe('z.iso.time()')
     })
+
+    test('time (JS Date) — output decodes string → Date', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'time', representation: 'date' }))).toBe(
+        'z.iso.time().transform((value) => new Date(`1970-01-01T${value}`))',
+      )
+    })
+
+    test('time (JS Date) — input encodes Date → HH:mm:ss string', () => {
+      const p = printerZod({ direction: 'encode' })
+      expect(p.print(ast.factory.createSchema({ type: 'time', representation: 'date' }))).toBe(
+        'z.date().transform((value) => value.toISOString().slice(11, 19))',
+      )
+    })
   })
 
   describe('special string formats', () => {
