@@ -1,5 +1,11 @@
 # @kubb/plugin-faker
 
+## 5.0.6
+
+### Patch Changes
+
+- [#876](https://github.com/kubb-labs/plugins/pull/876) [`8ff5820`](https://github.com/kubb-labs/plugins/commit/8ff5820736c4b0a652a9aedd08a9ac38eebfdeba) Thanks [@ghettoDdOS](https://github.com/ghettoDdOS)! - `create<Operation>Response` now typechecks when a status or content-type variant has an inline object schema. The generated union helper calls each status factory with its explicit `<object>` type argument, so the response return type no longer infers `TData` as `Partial<T>` and drops required properties (TS2322).
+
 ## 5.0.5
 
 ### Patch Changes
