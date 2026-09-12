@@ -72,10 +72,17 @@
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "zod": "^4.0.0"
   },
   "peerDependencies": {
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "zod": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22"
