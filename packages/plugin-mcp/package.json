@@ -76,10 +76,22 @@
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "kubb": "catalog:"
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "kubb": "catalog:",
+    "zod": "^4.0.0"
   },
   "peerDependencies": {
-    "kubb": "catalog:"
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "kubb": "catalog:",
+    "zod": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@modelcontextprotocol/sdk": {
+      "optional": true
+    },
+    "zod": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22"

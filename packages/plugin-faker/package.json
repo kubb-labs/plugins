@@ -83,12 +83,19 @@
     "@kubb/plugin-ts": "workspace:^"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.0.0",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
     "kubb": "catalog:"
   },
   "peerDependencies": {
+    "@faker-js/faker": "^10.0.0",
     "kubb": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "@faker-js/faker": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22"

@@ -74,10 +74,17 @@
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
+    "cypress": "^15.0.0 || ^16.0.0",
     "kubb": "catalog:"
   },
   "peerDependencies": {
+    "cypress": "^15.0.0 || ^16.0.0",
     "kubb": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "cypress": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22"

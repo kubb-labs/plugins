@@ -87,10 +87,17 @@
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*",
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "swr": "^2.0.0"
   },
   "peerDependencies": {
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "swr": "^2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "swr": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22"
