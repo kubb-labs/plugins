@@ -10,8 +10,9 @@ import type { PluginPlaywright } from './types.ts'
 export const pluginPlaywrightName = 'plugin-playwright' satisfies PluginPlaywright['name']
 
 /**
- * Generates native Playwright responses for GET operations without parameters or a request body.
- * Other operations are skipped. Requires `pluginTs()` for the response types.
+ * Generates native Playwright responses for GET operations with or without path parameters.
+ * Operations with query, header, cookie parameters or a request body are skipped.
+ * Requires `pluginTs()` for the response types.
  */
 export const pluginPlaywright = definePlugin<PluginPlaywright>((options) => ({
   name: pluginPlaywrightName,
@@ -19,7 +20,7 @@ export const pluginPlaywright = definePlugin<PluginPlaywright>((options) => ({
   dependencies: [pluginTsName],
   hooks: {
     'kubb:plugin:setup'(ctx) {
-      ctx.setOptions({ output: { path: 'playwright', barrel: { type: 'named' } } })
+      ctx.setOptions({ output: { path: 'playwright', barrel: { type: 'named' } }, baseURL: options.baseURL })
       ctx.setResolver(resolverPlaywright)
       ctx.addGenerator(playwrightGenerator)
     },
