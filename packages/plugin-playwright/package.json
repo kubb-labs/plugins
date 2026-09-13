@@ -38,11 +38,18 @@
     "start": "tsdown --watch",
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
+  "dependencies": {
+    "@kubb/plugin-ts": "workspace:^"
+  },
   "devDependencies": {
-    "@playwright/test": "^1.63.0"
+    "@internals/shared": "workspace:*",
+    "@internals/utils": "workspace:*",
+    "@playwright/test": "^1.63.0",
+    "kubb": "catalog:"
   },
   "peerDependencies": {
-    "@playwright/test": "^1.63.0"
+    "@playwright/test": "^1.63.0",
+    "kubb": "catalog:"
   },
   "engines": {
     "node": ">=22"
