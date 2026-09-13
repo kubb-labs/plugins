@@ -7,7 +7,5 @@ export default defineConfig({
     path: './src/gen',
     clean: true,
   },
-  plugins: [
-    pluginTs(),
-  ],
+  plugins: [pluginTs()],
 })
