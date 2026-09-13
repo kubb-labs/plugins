@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*", "./package.json", "./tsdown.config.ts"],
+  "include": ["src/**/*", "templates/**/*", "./package.json", "./tsdown.config.ts"],
   "compilerOptions": {
     "types": ["bun-types", "../../reset.d.ts"]
   }

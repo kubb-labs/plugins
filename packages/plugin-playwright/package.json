@@ -10,7 +10,8 @@
     "directory": "packages/plugin-playwright"
   },
   "files": [
-    "dist"
+    "dist",
+    "templates"
   ],
   "type": "module",
   "sideEffects": false,

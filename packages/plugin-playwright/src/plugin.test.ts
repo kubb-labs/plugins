@@ -1,6 +1,6 @@
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { pluginTs } from '@kubb/plugin-ts'
 import { createKubb, defineConfig } from 'kubb'
 import { Diagnostics } from 'kubb/kit'
@@ -67,9 +67,8 @@ async function typecheck({ root, source }: { root: string; source: string }) {
   expect(ts.getPreEmitDiagnostics(program).map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'))).toStrictEqual([])
 }
 
-async function loadHelper(source: string) {
-  const { outputText } = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext } })
-  return import(/* @vite-ignore */ `data:text/javascript;base64,${Buffer.from(outputText).toString('base64')}`)
+async function loadHelper({ root, name }: { root: string; name: string }) {
+  return import(/* @vite-ignore */ pathToFileURL(join(root, 'generated/playwright', `${name}.ts`)).href)
 }
 
 test('generates a GET helper with a required context and a typed native response', async () => {
@@ -79,9 +78,10 @@ test('generates a GET helper with a required context and a typed native response
   expect(await format(source)).toMatchInlineSnapshot(`
     "import type { GetPetsResponse } from '../types/GetPets'
     import type { APIRequestContext, APIResponse } from '@playwright/test'
+    import { playwrightRequest } from '../.kubb/playwright'
 
     export function pwGetPets({ request }: { request: APIRequestContext }): Promise<APIResponse<GetPetsResponse>> {
-      return request.fetch<GetPetsResponse>('/pets', { method: 'GET' })
+      return playwrightRequest<GetPetsResponse>({ request, method: 'GET', url: '/pets' })
     }
     "
   `)
@@ -105,7 +105,7 @@ pwGetPets()
 const invalid: number = pets[0]!.name
 `,
   })
-  const { pwGetPets } = await loadHelper(source)
+  const { pwGetPets } = await loadHelper({ root, name: 'pwGetPets' })
   const response = { json: vi.fn() }
   const request = { fetch: vi.fn().mockResolvedValue(response) }
   expect(await pwGetPets({ request })).toBe(response)
@@ -119,9 +119,10 @@ test('requires the OpenAPI path type and preserves the typed native response', a
   expect(await format(source)).toMatchInlineSnapshot(`
     "import type { GetPetByIdResponse, GetPetByIdPath } from '../types/GetPetById'
     import type { APIRequestContext, APIResponse } from '@playwright/test'
+    import { playwrightRequest } from '../.kubb/playwright'
 
     export function pwGetPetById({ request, path }: { request: APIRequestContext; path: GetPetByIdPath }): Promise<APIResponse<GetPetByIdResponse>> {
-      return request.fetch<GetPetByIdResponse>('/pets/' + encodeURIComponent(String(path['petId'])), { method: 'GET' })
+      return playwrightRequest<GetPetByIdResponse>({ request, path, method: 'GET', url: '/pets/{petId}' })
     }
     "
   `)
@@ -146,7 +147,7 @@ pwGetPetById({ path: { petId: '123' } })
 const invalid: number = pets[0]!.name
 `,
   })
-  const { pwGetPetById } = await loadHelper(source)
+  const { pwGetPetById } = await loadHelper({ root, name: 'pwGetPetById' })
   const response = { json: vi.fn() }
   const request = { fetch: vi.fn().mockResolvedValue(response) }
   expect(await pwGetPetById({ request, path: { petId: 'a/b' } })).toBe(response)
@@ -168,7 +169,6 @@ test('encodes multiple path values and keeps their OpenAPI property names', asyn
       },
     },
   })
-  const source = await readFile(join(root, 'generated/playwright/pwGetPets.ts'), 'utf8')
   await typecheck({
     root,
     source: `
@@ -184,7 +184,7 @@ pwGetPets({ request, path: { ownerId: 42 } })
 pwGetPets({ request, path: { ownerId: 42, petId: '123' } })
 `,
   })
-  const { pwGetPets } = await loadHelper(source)
+  const { pwGetPets } = await loadHelper({ root, name: 'pwGetPets' })
   const request = { fetch: vi.fn() }
   await pwGetPets({ request, path: { ownerId: 42, 'pet-id': 'a/b ?#%&=+é🐾' } })
   expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/owners/42/pets/a%2Fb%20%3F%23%25%26%3D%2B%C3%A9%F0%9F%90%BE.json', { method: 'GET' })
@@ -197,8 +197,7 @@ test.each([
   { baseURL: 'https://api.example.com/v1/', expected: 'https://api.example.com/v1/pets/a%2Fb' },
 ])('joins baseURL $baseURL with the encoded path', async ({ baseURL, expected }) => {
   const { root } = await generate({ baseURL, paths: { '/pets/{petId}': { get: getPetById } } })
-  const source = await readFile(join(root, 'generated/playwright/pwGetPetById.ts'), 'utf8')
-  const { pwGetPetById } = await loadHelper(source)
+  const { pwGetPetById } = await loadHelper({ root, name: 'pwGetPetById' })
   const request = { fetch: vi.fn() }
   await pwGetPetById({ request, path: { petId: 'a/b' } })
   expect(request.fetch).toHaveBeenCalledExactlyOnceWith(expected, { method: 'GET' })
@@ -215,7 +214,6 @@ test('escapes literal URL text and unusual parameter names as TypeScript strings
       },
     },
   })
-  const source = await readFile(join(root, 'generated/playwright/pwGetPets.ts'), 'utf8')
   await typecheck({
     root,
     source: `
@@ -225,21 +223,174 @@ declare const request: APIRequestContext
 pwGetPets({ request, path: { 'pet"id': '123' } })
 `,
   })
-  const { pwGetPets } = await loadHelper(source)
+  const { pwGetPets } = await loadHelper({ root, name: 'pwGetPets' })
   const request = { fetch: vi.fn() }
   await pwGetPets({ request, path: { 'pet"id': 'a/b' } })
   expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets`/a%2Fb/$fixed', { method: 'GET' })
 })
 
 test.each([
-  { name: 'non-GET', method: 'post', operation: {} },
-  ...['query', 'header', 'cookie'].map((location) => ({
-    name: location,
-    method: 'get',
-    operation: { parameters: [{ name: 'filter', in: location, schema: { type: 'string' } }] },
-  })),
-  { name: 'request body', method: 'get', operation: { requestBody: { content: { 'application/json': { schema: { type: 'string' } } } } } },
-])('skips operations with $name outside this lot', async ({ method, operation }) => {
-  const { files } = await generate({ paths: { '/pets': { [method]: { ...getPets, ...operation } } } })
-  expect(files).toStrictEqual([])
+  { queryRequired: false, headerRequired: false },
+  { queryRequired: true, headerRequired: false },
+  { queryRequired: false, headerRequired: true },
+  { queryRequired: true, headerRequired: true },
+])('respects required groups: query=$queryRequired, headers=$headerRequired', async ({ queryRequired, headerRequired }) => {
+  const { root } = await generate({
+    paths: {
+      '/pets': {
+        get: {
+          ...getPets,
+          parameters: [
+            { name: 'status', in: 'query', required: queryRequired, schema: { type: 'array', items: { type: 'string', enum: ['available', 'pending'] } } },
+            { name: 'limit', in: 'query', schema: { type: 'integer' } },
+            { name: 'x-limit', in: 'header', required: headerRequired, schema: { type: 'integer' } },
+            { name: 'x-label', in: 'header', schema: { type: 'string' } },
+          ],
+        },
+      },
+    },
+  })
+  await typecheck({
+    root,
+    source: `
+import type { APIRequestContext } from '@playwright/test'
+import { pwGetPets } from './generated/playwright/pwGetPets'
+declare const request: APIRequestContext
+const response = await pwGetPets({ request, query: { status: ['available', 'pending'] }, headers: { 'x-limit': 0 } })
+const pets = await response.json()
+const names: Array<string> = pets.map(pet => pet.name)
+${queryRequired ? '// @ts-expect-error The query group is required.' : ''}
+pwGetPets({ request, headers: { 'x-limit': 1 } })
+${queryRequired ? '// @ts-expect-error The status parameter is required.' : ''}
+pwGetPets({ request, query: {}, headers: { 'x-limit': 1 } })
+${headerRequired ? '// @ts-expect-error The headers group is required.' : ''}
+pwGetPets({ request, query: { status: [] } })
+${headerRequired ? '// @ts-expect-error The x-limit header is required.' : ''}
+pwGetPets({ request, query: { status: [] }, headers: {} })
+// @ts-expect-error Query array items must match the OpenAPI enum.
+pwGetPets({ request, query: { status: ['invalid'] }, headers: { 'x-limit': 1 } })
+// @ts-expect-error Header values retain their OpenAPI types before serialization.
+pwGetPets({ request, query: { status: [] }, headers: { 'x-limit': '1' } })
+// @ts-expect-error Optional query members retain their OpenAPI types.
+pwGetPets({ request, query: { status: [], limit: '1' }, headers: { 'x-limit': 1 } })
+// @ts-expect-error The request context is always required.
+pwGetPets({ query: { status: [] }, headers: { 'x-limit': 1 } })
+// @ts-expect-error The native JSON response remains typed.
+const invalid: number = pets[0]!.name
+`,
+  })
+  const { pwGetPets } = await loadHelper({ root, name: 'pwGetPets' })
+  const request = { fetch: vi.fn() }
+  await pwGetPets({
+    request,
+    ...(queryRequired ? { query: { status: ['available'] } } : {}),
+    ...(headerRequired ? { headers: { 'x-limit': 0 } } : {}),
+  })
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', {
+    method: 'GET',
+    params: new URLSearchParams(queryRequired ? 'status=available' : ''),
+    headers: headerRequired ? { 'x-limit': '0' } : {},
+  })
+})
+
+test('serializes query arrays as repeated keys and omits nullish values', async () => {
+  const { root } = await generate({
+    baseURL: 'https://api.example.com/v1/',
+    paths: {
+      '/pets/{petId}': {
+        get: {
+          ...getPetById,
+          parameters: [
+            ...getPetById.parameters,
+            { name: 'filter[name][]', in: 'query', schema: { type: 'array', items: { type: 'string' } } },
+            { name: 'offset', in: 'query', schema: { type: 'integer' } },
+            { name: 'active', in: 'query', schema: { type: 'boolean' } },
+            { name: 'empty', in: 'query', schema: { type: 'string' } },
+            { name: 'missing', in: 'query', schema: { type: 'string' } },
+            { name: 'nullable', in: 'query', schema: { type: 'string', nullable: true } },
+            { name: 'tags', in: 'query', schema: { type: 'array', items: { type: 'string' } } },
+          ],
+        },
+      },
+    },
+  })
+  await typecheck({
+    root,
+    source: `
+import type { APIRequestContext } from '@playwright/test'
+import { pwGetPetById } from './generated/playwright/pwGetPetById'
+declare const request: APIRequestContext
+pwGetPetById({ request, path: { petId: 'a/b' }, query: { 'filter[name][]': ['a/b'], offset: 0, active: false, empty: '', missing: undefined, nullable: null, tags: [] } })
+// @ts-expect-error The query-only operation does not declare headers.
+pwGetPetById({ request, path: { petId: 'a/b' }, headers: {} })
+`,
+  })
+  const { pwGetPetById } = await loadHelper({ root, name: 'pwGetPetById' })
+  const query = {
+    'filter[name][]': ['a/b', ' ?#%&=+é🐾'],
+    offset: 0,
+    active: false,
+    empty: '',
+    missing: undefined,
+    nullable: null,
+    tags: [],
+  }
+  const response = { json: vi.fn() }
+  const request = { fetch: vi.fn().mockResolvedValue(response) }
+  expect(await pwGetPetById({ request, path: { petId: 'a/b' }, query })).toBe(response)
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('https://api.example.com/v1/pets/a%2Fb', {
+    method: 'GET',
+    params: new URLSearchParams([
+      ['filter[name][]', 'a/b'],
+      ['filter[name][]', ' ?#%&=+é🐾'],
+      ['offset', '0'],
+      ['active', 'false'],
+      ['empty', ''],
+    ]),
+  })
+  expect(request.fetch.mock.calls[0]![1].params.toString()).toBe(
+    'filter%5Bname%5D%5B%5D=a%2Fb&filter%5Bname%5D%5B%5D=+%3F%23%25%26%3D%2B%C3%A9%F0%9F%90%BE&offset=0&active=false&empty=',
+  )
+  expect(response.json).not.toHaveBeenCalled()
+})
+
+test('preserves header names, stringifies values, and omits nullish values', async () => {
+  const { root } = await generate({
+    paths: {
+      '/pets': {
+        get: {
+          ...getPets,
+          parameters: [
+            { name: 'X-Request-ID', in: 'header', schema: { type: 'string' } },
+            { name: 'x-count', in: 'header', schema: { type: 'integer' } },
+            { name: 'x-active', in: 'header', schema: { type: 'boolean' } },
+            { name: 'x-empty', in: 'header', schema: { type: 'string' } },
+            { name: 'x-missing', in: 'header', schema: { type: 'string' } },
+            { name: 'x-nullable', in: 'header', schema: { type: 'string', nullable: true } },
+          ],
+        },
+      },
+    },
+  })
+  await typecheck({
+    root,
+    source: `
+import type { APIRequestContext } from '@playwright/test'
+import { pwGetPets } from './generated/playwright/pwGetPets'
+declare const request: APIRequestContext
+pwGetPets({ request, headers: { 'X-Request-ID': '123', 'x-count': 0, 'x-active': false, 'x-empty': '', 'x-missing': undefined, 'x-nullable': null } })
+// @ts-expect-error OpenAPI header names are not renamed.
+pwGetPets({ request, headers: { xRequestId: '123' } })
+// @ts-expect-error The headers-only operation does not declare query parameters.
+pwGetPets({ request, query: {} })
+`,
+  })
+  const { pwGetPets } = await loadHelper({ root, name: 'pwGetPets' })
+  const headers = { 'X-Request-ID': '123', 'x-count': 0, 'x-active': false, 'x-empty': '', 'x-missing': undefined, 'x-nullable': null }
+  const request = { fetch: vi.fn() }
+  await pwGetPets({ request, headers })
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', {
+    method: 'GET',
+    headers: { 'X-Request-ID': '123', 'x-count': '0', 'x-active': 'false', 'x-empty': '' },
+  })
 })
