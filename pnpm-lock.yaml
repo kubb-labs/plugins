@@ -297,10 +297,10 @@ importers:
         specifier: 'catalog:'
         version: 5.2.3(openapi-types@12.1.3)
       '@kubb/plugin-ts':
-        specifier: workspace:*
-        version: link:../../packages/plugin-ts
+        specifier: ^5.0.2
+        version: 5.0.2(kubb@5.2.3(openapi-types@12.1.3)(rolldown@1.2.7)(typescript@6.0.3)(vite@8.1.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.0)))
       kubb:
-        specifier: 'catalog:'
+        specifier: 5.2.3
         version: 5.2.3(openapi-types@12.1.3)(rolldown@1.2.7)(typescript@6.0.3)(vite@8.1.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.0))
       typescript:
         specifier: 'catalog:'
@@ -1413,6 +1413,12 @@ packages:
     engines: {node: '>=22'}
     peerDependencies:
       '@kubb/core': 5.2.3
+
+  '@kubb/plugin-ts@5.0.2':
+    resolution: {integrity: sha512-p/9729bxFUpJqZp6u2DTND588YhQLoT8WjGUCoTmks0XC36+Aj1tCcHzOuNg9DZCGrJ9PRQBHBaZG4Xg3M8RsA==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      kubb: ^5.2.0
 
   '@kubb/renderer-jsx@5.2.3':
     resolution: {integrity: sha512-KZdIbT1Y8UK0mv7pbBdw2CfZezKXsLLYaPDOgM537U0tMku8CPPlJdmEgqTDKkqRJk7lNswKCtkQ17IeUWduWA==}
@@ -4649,6 +4655,12 @@ snapshots:
     dependencies:
       '@kubb/ast': 5.2.3
       '@kubb/core': 5.2.3
+
+  '@kubb/plugin-ts@5.0.2(kubb@5.2.3(openapi-types@12.1.3)(rolldown@1.2.7)(typescript@6.0.3)(vite@8.1.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.0)))':
+    dependencies:
+      '@kubb/parser-ts': 5.2.3
+      kubb: 5.2.3(openapi-types@12.1.3)(rolldown@1.2.7)(typescript@6.0.3)(vite@8.1.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.0))
+      typescript: 6.0.3
 
   '@kubb/renderer-jsx@5.2.3':
     dependencies:

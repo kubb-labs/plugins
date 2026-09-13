@@ -50,8 +50,8 @@
   },
   "devDependencies": {
     "@kubb/adapter-oas": "catalog:",
-    "@kubb/plugin-ts": "workspace:*",
-    "kubb": "catalog:",
+    "@kubb/plugin-ts": "^5.0.2",
+    "kubb": "5.2.3",
     "typescript": "catalog:"
   },
   "engines": {
