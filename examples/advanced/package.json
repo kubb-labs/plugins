@@ -14,6 +14,8 @@
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
     "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate",
+    "studio": "KUBB_DISABLE_TELEMETRY=1 kubb studio",
+    "studio:dev": "KUBB_DISABLE_TELEMETRY=1 kubb studio --url https://dev.kubb.studio",
     "validate": "kubb validate petStore.yaml",
     "mcp": "kubb mcp",
     "generate:watch": "KUBB_DISABLE_TELEMETRY=1 kubb generate --watch",

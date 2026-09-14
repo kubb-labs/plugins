@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - 'examples/advanced/**'
+      - 'examples/fetch/**'
       - 'packages/**'
       - 'internals/**'
       - 'configs/**'
       - 'pnpm-lock.yaml'
-      - '.github/workflows/advanced-example.yml'
+      - 'fetch-example.yml'
 
 permissions:
   contents: write
@@ -43,7 +43,7 @@ jobs:
         uses: kubb-labs/action@main # feat: support working directory
         with:
           token: ${{ secrets.KUBB_TOKEN }}
-          working-directory: examples/advanced
-          config: 'configs/kubb.config.ts'
+          working-directory: examples/fetch
+          config: 'kubb.config.ts'
         env:
           KUBB_STUDIO_URL: https://dev.kubb.studio
