@@ -1,5 +1,11 @@
 # @kubb/plugin-cypress
 
+## 5.0.3
+
+### Patch Changes
+
+- [#891](https://github.com/kubb-labs/plugins/pull/891) [`8be0c24`](https://github.com/kubb-labs/plugins/commit/8be0c24172b2ec28a20c8df80460eafb1bde8ad8) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Declare the generated code's runtime libraries as optional peer dependencies so package managers can report incompatible versions without installing unused libraries.
+
 ## 5.0.2
 
 ### Patch Changes
