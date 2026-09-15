@@ -1,3 +1,4 @@
+# Docs: https://kubb.dev/docs/5.x/guide/integrations/studio#snapshot-from-ci
 name: Fetch Studio Connection
 
 on:
