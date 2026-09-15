@@ -46,7 +46,7 @@
     "svelte": "^5.57.0",
     "swr": "^2.5.1",
     "vue": "^3.5.42",
-    "zod": "^4.6.1"
+    "zod": "^4.6.2"
   },
   "devDependencies": {
     "@kubb/adapter-oas": "catalog:",
