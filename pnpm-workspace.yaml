@@ -29,7 +29,13 @@ catalog:
   tsdown: ^0.23.0
   typescript: ^6.0.3
   vitest: ^5.0.0
-#overrides:
+
+overrides:
+  # `resolutionMode: highest` otherwise lets a loosely-pinned transitive dependency (bun-types,
+  # @types/set-cookie-parser) pull in a newer @types/node than the catalog entry above, defeating
+  # the pin CI's package-age check needs. Uncommenting the local-linking entries below means
+  # adding them under this same key, not a second `overrides:`.
+  '@types/node': 22.20.2
 #  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
 #  '@kubb/ast': link:../kubb/packages/ast
 #  '@kubb/cli': link:../kubb/packages/cli
