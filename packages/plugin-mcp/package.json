@@ -78,7 +78,7 @@
     "@internals/utils": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "kubb": "catalog:",
-    "zod": "^4.6.2"
+    "zod": "^4.6.5"
   },
   "peerDependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
