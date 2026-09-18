@@ -1,5 +1,11 @@
 # @kubb/plugin-faker
 
+## 5.0.9
+
+### Patch Changes
+
+- [#905](https://github.com/kubb-labs/plugins/pull/905) [`c732d1a`](https://github.com/kubb-labs/plugins/commit/c732d1af7c0421be6c8206bf1d1b71b764164e49) Thanks [@Ericlm](https://github.com/Ericlm)! - Avoid duplicate response factories when an operation response name matches a referenced component schema.
+
 ## 5.0.8
 
 ### Patch Changes
