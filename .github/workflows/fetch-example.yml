@@ -42,6 +42,7 @@ jobs:
 
       - name: Generate Kubb Studio snapshot
         uses: kubb-labs/action@main # feat: support working directory
+        continue-on-error: true
         with:
           token: ${{ secrets.KUBB_TOKEN }}
           working-directory: examples/fetch
