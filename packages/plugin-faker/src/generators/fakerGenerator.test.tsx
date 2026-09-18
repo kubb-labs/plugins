@@ -556,6 +556,28 @@ describe('fakerGenerator — operation', () => {
       }),
       options: {},
     },
+    {
+      name: 'responseNameCollision',
+      node: ast.factory.createOperation({
+        operationId: 'getThing',
+        method: 'GET',
+        path: '/things/{id}',
+        tags: ['things'],
+        parameters: [ast.factory.createParameter({ name: 'id', in: 'path', schema: ast.factory.createSchema({ type: 'integer' }), required: true })],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            description: 'The requested thing',
+            schema: ast.factory.createSchema({
+              type: 'ref',
+              name: 'GetThingResponse',
+              ref: '#/components/schemas/GetThingResponse',
+            }),
+          }),
+        ],
+      }),
+      options: {},
+    },
   ] as const)('$name', async ({ name, node, options }) => {
     const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
