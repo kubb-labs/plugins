@@ -74,7 +74,7 @@
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "cypress": "^16.0.0",
+    "cypress": "^16.1.0",
     "kubb": "catalog:"
   },
   "peerDependencies": {

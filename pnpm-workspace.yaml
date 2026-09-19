@@ -14,29 +14,24 @@ allowBuilds:
 catalog:
   # Ranges, not pins: these end up in the published dependencies and peerDependencies of every
   # plugin, and a pin there conflicts with any newer Kubb release the user installs.
-  "@kubb/adapter-oas": ^5.3.6
-  "@kubb/core": ^5.3.6
-  "@kubb/plugin-barrel": ^5.3.6
-  "@kubb/parser-ts": ^5.3.6
-  "@types/node": 22.20.2
-  "@types/react": ^19.3.0
-  "@vitest/coverage-v8": ^5.0.0
-  "@vitest/ui": ^5.0.0
-  kubb: ^5.3.6
+  '@kubb/adapter-oas': ^5.3.8
+  '@kubb/core': ^5.3.8
+  '@kubb/plugin-barrel': ^5.3.8
+  '@kubb/parser-ts': ^5.3.8
+  '@types/node': 22.20.2
+  '@types/react': ^19.3.0
+  '@vitest/coverage-v8': ^5.0.1
+  '@vitest/ui': ^5.0.1
+  kubb: ^5.3.8
   oxfmt: ^0.67.0
   oxlint: ^1.83.0
-  prettier: ^3.9.6
+  prettier: ^3.9.7
   tsdown: ^0.23.0
   typescript: ^6.0.3
-  vitest: ^5.0.0
+  vitest: ^5.0.1
 
-overrides:
-  # `resolutionMode: highest` otherwise lets a loosely-pinned transitive dependency (bun-types,
-  # @types/set-cookie-parser) pull in a newer @types/node than the catalog entry above, defeating
-  # the pin CI's package-age check needs. Uncommenting the local-linking entries below means
-  # adding them under this same key, not a second `overrides:`.
-  "@types/node": 22.20.2
-#  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
+overrides: #  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
+
 #  '@kubb/ast': link:../kubb/packages/ast
 #  '@kubb/cli': link:../kubb/packages/cli
 #  '@kubb/core': link:../kubb/packages/core
@@ -53,10 +48,10 @@ overrides:
 
 minimumReleaseAge: 2880 # 48 hours, matches CI's SAFE_CHAIN_MINIMUM_PACKAGE_AGE_HOURS
 minimumReleaseAgeExclude:
-  - "@kubb/*"
-  - "kubb"
-  - "unplugin-kubb"
-  - "@types/*"
-  - "@clack/core"
+  - '@kubb/*'
+  - 'kubb'
+  - 'unplugin-kubb'
+  - '@types/*'
+  - '@clack/core'
 pmOnFail: warn
 resolutionMode: highest

@@ -89,7 +89,7 @@
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*",
-    "@tanstack/react-query": "^5.102.8",
+    "@tanstack/react-query": "^5.103.1",
     "kubb": "catalog:"
   },
   "peerDependencies": {
