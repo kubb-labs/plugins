@@ -26,6 +26,10 @@ This monorepo is home to official and community plugins for [Kubb](https://kubb.
 
 Want to build your own plugin? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
+## Use plugins in Kubb Studio
+
+[Kubb Studio](https://kubb.studio) lets you configure and inspect Kubb generations in the browser while your project or self-hosted agent runs Kubb. [Connect a project](https://kubb.dev/docs/5.x/guide/integrations/studio) to use these plugins in that workflow.
+
 ## Official plugins
 
 Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](https://npmx.dev/package/@kubb/adapter-oas) as the adapter layer.
