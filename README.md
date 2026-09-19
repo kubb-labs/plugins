@@ -28,7 +28,7 @@ Want to build your own plugin? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Use plugins in Kubb Studio
 
-[Kubb Studio](https://kubb.studio) lets you configure and inspect Kubb generations in the browser while your Kubb project or self-hosted agent runs the generator. [Connect a project](https://kubb.dev/docs/5.x/guide/integrations/studio) when you want a visual workflow around these plugins.
+[Kubb Studio](https://kubb.studio) lets you configure and inspect Kubb generations in the browser while your project or self-hosted agent runs Kubb. [Connect a project](https://kubb.dev/docs/5.x/guide/integrations/studio) to use these plugins in that workflow.
 
 ## Official plugins
 
