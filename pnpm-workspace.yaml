@@ -30,8 +30,10 @@ catalog:
   typescript: ^6.0.3
   vitest: ^5.0.1
 
-overrides: #  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
+overrides:
+  '@types/node': 22.20.2
 
+#  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
 #  '@kubb/ast': link:../kubb/packages/ast
 #  '@kubb/cli': link:../kubb/packages/cli
 #  '@kubb/core': link:../kubb/packages/core
