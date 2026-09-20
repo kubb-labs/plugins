@@ -25,7 +25,7 @@
     "@kubb/plugin-vue-query": "workspace:*",
     "@tanstack/vue-query": "^5.103.1",
     "kubb": "catalog:",
-    "vue": "^3.5.42"
+    "vue": "^3.5.43"
   },
   "devDependencies": {
     "typescript": "catalog:"
