@@ -4,6 +4,22 @@ import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import { printerFaker } from './printerFaker.ts'
 
 describe('printerFaker', () => {
+  test('falls back to the base string printer from a node override', () => {
+    const printer = printerFaker({
+      resolver: resolverFaker,
+      nodes: {
+        string(node) {
+          if (node.title === 'Note') return 'faker.lorem.lines()'
+
+          return this.base(node)
+        },
+      },
+    })
+
+    expect(printer.print(ast.factory.createSchema({ type: 'string', title: 'Note' }))).toBe('faker.lorem.lines()')
+    expect(printer.print(ast.factory.createSchema({ type: 'string', title: 'Name' }))).toBe('faker.string.alpha()')
+  })
+
   test('renders object properties recursively', () => {
     const node = ast.factory.createSchema({
       type: 'object',
