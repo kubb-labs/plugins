@@ -19,6 +19,23 @@ type RequestOptions = {
 }
 
 /**
+ * Converts flat fields and arrays to FormData, preserving binary files and omitting absent values.
+ */
+function toFormData(body: unknown): FormData {
+  const form = new FormData()
+  for (const [key, value] of Object.entries(body as Record<string, unknown>)) {
+    for (const item of Array.isArray(value) ? value : [value]) {
+      if (item == null) continue
+      if (typeof item === 'object' && !(item instanceof Blob)) {
+        throw new TypeError('Use config.form or config.multipart to serialize nested form values.')
+      }
+      form.append(key, item instanceof Blob ? item : String(item))
+    }
+  }
+  return form
+}
+
+/**
  * Prepares OpenAPI parameters and returns the native Playwright response without reading its body.
  * Query arrays use repeated keys; null and undefined query and header values are omitted.
  */
@@ -51,9 +68,19 @@ export function playwrightRequest<T>(options: RequestOptions): Promise<APIRespon
 
   const hasNativeBody = config?.data !== undefined || config?.form !== undefined || config?.multipart !== undefined
   if (body !== undefined && !hasNativeBody) {
-    fetchOptions.data = JSON.stringify(body)
-    if (!Object.keys(fetchOptions.headers ?? {}).some((key) => key.toLowerCase() === 'content-type')) {
-      fetchOptions.headers = { ...fetchOptions.headers, 'Content-Type': contentType ?? 'application/json' }
+    const mediaType = contentType?.split(';')[0]?.trim().toLowerCase()
+    switch (mediaType) {
+      case 'application/x-www-form-urlencoded':
+        fetchOptions.form = toFormData(body)
+        break
+      case 'multipart/form-data':
+        fetchOptions.multipart = toFormData(body)
+        break
+      default:
+        fetchOptions.data = JSON.stringify(body)
+        if (!Object.keys(fetchOptions.headers ?? {}).some((key) => key.toLowerCase() === 'content-type')) {
+          fetchOptions.headers = { ...fetchOptions.headers, 'Content-Type': contentType ?? 'application/json' }
+        }
     }
   }
 

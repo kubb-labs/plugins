@@ -419,8 +419,12 @@ test.each(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'])
   expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', { method: method.toUpperCase(), timeout: 0, failOnStatusCode: false })
 })
 
-test.each([true, false])('types JSON bodies with required=%s and native config', async (required) => {
-  const { root } = await generate({ paths: { '/pets': { post: { ...addPet, requestBody: { ...addPet.requestBody, required } } } } })
+test.each(
+  ['application/json', 'application/x-www-form-urlencoded', 'multipart/form-data'].flatMap((contentType) =>
+    [true, false].map((required) => ({ contentType, required })),
+  ),
+)('types $contentType bodies with required=$required and native config', async ({ contentType, required }) => {
+  const { root } = await generate({ paths: { '/pets': { post: { ...addPet, requestBody: { required, content: { [contentType]: { schema: petBody } } } } } } })
   await typecheck({
     root,
     source: `
@@ -451,10 +455,16 @@ pwAddPet({ request, body: { name: 'Rex' }, config: { headers: { 'x-id': 123 } } 
   const { pwAddPet } = await loadHelper({ root, name: 'pwAddPet' })
   const request = { fetch: vi.fn() }
   await pwAddPet({ request, ...(required ? { body: { name: 'Rex' } } : {}) })
-  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', {
-    method: 'POST',
-    ...(required ? { data: '{"name":"Rex"}', headers: { 'Content-Type': 'application/json' } } : {}),
-  })
+  if (required && contentType !== 'application/json') {
+    const mode = contentType === 'multipart/form-data' ? 'multipart' : 'form'
+    expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', { method: 'POST', [mode]: expect.any(FormData) })
+    expect([...request.fetch.mock.calls[0]![1][mode].entries()]).toStrictEqual([['name', 'Rex']])
+  } else {
+    expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', {
+      method: 'POST',
+      ...(required ? { data: '{"name":"Rex"}', headers: { 'Content-Type': 'application/json' } } : {}),
+    })
+  }
 })
 
 test.each([
@@ -566,4 +576,75 @@ test('passes conflicting native body modes to Playwright and propagates its reje
   const config = { data: 'raw', form: { name: 'Rex' } }
   await expect(pwAddPet({ request, body: { name: 'Rex' }, config })).rejects.toBe(error)
   expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', { method: 'POST', ...config })
+})
+
+test.each([
+  { contentType: 'application/x-www-form-urlencoded; charset=utf-8', mode: 'form' },
+  { contentType: 'multipart/form-data', mode: 'multipart' },
+])('sends $mode fields using the first declared content type', async ({ contentType, mode }) => {
+  const schema = {
+    type: 'object',
+    properties: {
+      'pet-name': { type: 'string' },
+      tags: { type: 'array', items: { type: 'string' } },
+      count: { type: 'integer' },
+      active: { type: 'boolean' },
+      absent: { type: 'string', nullable: true },
+      missing: { type: 'string' },
+    },
+  }
+  const { root } = await generate({
+    paths: { '/pets': { post: { ...addPet, requestBody: { content: { [contentType]: { schema }, 'application/json': { schema } } } } } },
+  })
+  const { pwAddPet } = await loadHelper({ root, name: 'pwAddPet' })
+  const request = { fetch: vi.fn() }
+  await pwAddPet({
+    request,
+    body: { 'pet-name': '', tags: ['a&b', 'é'], count: 0, active: false, absent: null },
+    config: { data: undefined, form: undefined, multipart: undefined },
+  })
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', { method: 'POST', [mode]: expect.any(FormData) })
+  expect([...request.fetch.mock.calls[0]![1][mode].entries()]).toStrictEqual([
+    ['pet-name', ''],
+    ['tags', 'a&b'],
+    ['tags', 'é'],
+    ['count', '0'],
+    ['active', 'false'],
+  ])
+
+  const body = { metadata: { nested: true } }
+  expect(() => pwAddPet({ request, body })).toThrow('Use config.form or config.multipart')
+  for (const config of [{ data: '' }, { form: { metadata: '{"nested":true}' } }, { multipart: new FormData() }, { data: 'raw', form: {} }]) {
+    await pwAddPet({ request, body, config: { ...config, headers: { 'Content-Type': 'custom/type' } } })
+    expect(request.fetch).toHaveBeenLastCalledWith('/pets', { method: 'POST', ...config, headers: { 'Content-Type': 'custom/type' } })
+  }
+})
+
+test('types binary multipart fields as Blob and passes files to Playwright', async () => {
+  const schema = { type: 'object', required: ['file'], properties: { file: { type: 'string', format: 'binary' }, description: { type: 'string' } } }
+  const { root } = await generate({
+    paths: { '/pets': { post: { ...addPet, requestBody: { required: true, content: { 'multipart/form-data': { schema } } } } } },
+  })
+  await typecheck({
+    root,
+    source: `
+import type { APIRequestContext } from '@playwright/test'
+import { pwAddPet } from './generated/playwright/pwAddPet'
+declare const request: APIRequestContext
+pwAddPet({ request, body: { file: new Blob(['photo']) } })
+pwAddPet({ request, body: { file: new File(['photo'], 'pet.txt') } })
+// @ts-expect-error The binary field requires a Blob.
+pwAddPet({ request, body: { file: 'photo' } })
+// @ts-expect-error The file field is required.
+pwAddPet({ request, body: {} })
+`,
+  })
+  const { pwAddPet } = await loadHelper({ root, name: 'pwAddPet' })
+  const request = { fetch: vi.fn() }
+  const file = new File(['photo'], 'pet.txt', { type: 'text/plain' })
+  await pwAddPet({ request, body: { file, description: 'Rex' } })
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', { method: 'POST', multipart: expect.any(FormData) })
+  const multipart: FormData = request.fetch.mock.calls[0]![1].multipart
+  expect(multipart.get('description')).toBe('Rex')
+  expect(multipart.get('file')).toBe(file)
 })

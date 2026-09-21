@@ -7,7 +7,7 @@ import { Request } from '../components/Request.tsx'
 import type { PluginPlaywright } from '../types.ts'
 
 /**
- * Emits typed HTTP helpers with OpenAPI parameters, JSON bodies, and native fetch options.
+ * Emits typed HTTP helpers with OpenAPI parameters, JSON and form bodies, and native fetch options.
  */
 export const playwrightGenerator = defineGenerator<PluginPlaywright>({
   name: 'playwright',
@@ -17,7 +17,12 @@ export const playwrightGenerator = defineGenerator<PluginPlaywright>({
 
     const content = node.requestBody?.content?.[0]
     const mediaType = content?.contentType.split(';')[0]?.trim().toLowerCase()
-    if (node.requestBody && mediaType !== 'application/json' && !mediaType?.endsWith('+json')) return null
+    const supportedBody =
+      mediaType === 'application/json' ||
+      mediaType?.endsWith('+json') ||
+      mediaType === 'application/x-www-form-urlencoded' ||
+      mediaType === 'multipart/form-data'
+    if (node.requestBody && !supportedBody) return null
 
     const { config, resolver, driver, root } = ctx
     const { output, baseURL } = ctx.options
