@@ -9,28 +9,34 @@ type Props = {
   pathType?: string
   queryType?: string
   headersType?: string
+  bodyType?: string
+  contentType?: string
   baseURL?: string
 }
 
 /**
  * Prints a request that returns Playwright's response without reading its body.
  */
-export function Request({ name, node, responseType, pathType, queryType, headersType, baseURL }: Props): KubbReactNode {
+export function Request({ name, node, responseType, pathType, queryType, headersType, bodyType, contentType, baseURL }: Props): KubbReactNode {
   const { hasRequiredPath, hasRequiredQuery, hasRequiredHeader } = getRequestGroupOptionality(node)
   const names = ['request']
   const types = ['request: APIRequestContext']
   for (const [group, type, required] of [
     ['path', pathType, hasRequiredPath],
     ['query', queryType, hasRequiredQuery],
+    ['body', bodyType, node.requestBody?.required],
     ['headers', headersType, hasRequiredHeader],
   ] as const) {
     if (!type) continue
     names.push(group)
     types.push(`${group}${required ? '' : '?'}: ${type}`)
   }
+  names.push('config')
+  types.push('config?: RequestConfig')
 
   const options = [...names, `method: ${JSON.stringify(node.method)}`, `url: ${JSON.stringify(node.path)}`]
   if (baseURL !== undefined) options.push(`baseURL: ${JSON.stringify(baseURL)}`)
+  if (bodyType) options.push(`contentType: ${JSON.stringify(contentType)}`)
 
   return (
     <File.Source name={name} isIndexable isExportable>

@@ -7,13 +7,17 @@ import { Request } from '../components/Request.tsx'
 import type { PluginPlaywright } from '../types.ts'
 
 /**
- * Emits typed GET helpers with path, query, and header parameters and a native response.
+ * Emits typed HTTP helpers with OpenAPI parameters, JSON bodies, and native fetch options.
  */
 export const playwrightGenerator = defineGenerator<PluginPlaywright>({
   name: 'playwright',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    if (!ast.isHttpOperationNode(node) || node.method !== 'GET' || node.parameters.some((param) => param.in === 'cookie') || node.requestBody) return null
+    if (!ast.isHttpOperationNode(node) || node.parameters.some((param) => param.in === 'cookie')) return null
+
+    const content = node.requestBody?.content?.[0]
+    const mediaType = content?.contentType.split(';')[0]?.trim().toLowerCase()
+    if (node.requestBody && mediaType !== 'application/json' && !mediaType?.endsWith('+json')) return null
 
     const { config, resolver, driver, root } = ctx
     const { output, baseURL } = ctx.options
@@ -26,7 +30,8 @@ export const playwrightGenerator = defineGenerator<PluginPlaywright>({
     const pathType = path[0] ? tsResolver.param.path(node, path[0]) : undefined
     const queryType = query[0] ? tsResolver.param.query(node, query[0]) : undefined
     const headersType = header[0] ? tsResolver.param.headers(node, header[0]) : undefined
-    const importedTypeNames = [responseType, pathType, queryType, headersType].filter((name) => name !== undefined)
+    const bodyType = content?.schema ? tsResolver.response.body(node) : undefined
+    const importedTypeNames = [responseType, pathType, queryType, headersType, bodyType].filter((name) => name !== undefined)
     const file = resolver.file({ ...operationFileEntry(node, node.operationId), root, output })
     const fileTs = resolveDependencyOperationFile({
       cache: ctx.cache,
@@ -48,6 +53,7 @@ export const playwrightGenerator = defineGenerator<PluginPlaywright>({
         <File.Import name={['APIRequestContext', 'APIResponse']} path="@playwright/test" isTypeOnly />
         <File.Import name={importedTypeNames} root={file.path} path={fileTs.path} isTypeOnly />
         <File.Import name={['playwrightRequest']} root={file.path} path={resolve(root, '.kubb/playwright.ts')} />
+        <File.Import name={['RequestConfig']} root={file.path} path={resolve(root, '.kubb/playwright.ts')} isTypeOnly />
         <Request
           name={resolver.name(node.operationId)}
           node={node}
@@ -55,6 +61,8 @@ export const playwrightGenerator = defineGenerator<PluginPlaywright>({
           pathType={pathType}
           queryType={queryType}
           headersType={headersType}
+          bodyType={bodyType}
+          contentType={content?.contentType}
           baseURL={baseURL}
         />
       </File>

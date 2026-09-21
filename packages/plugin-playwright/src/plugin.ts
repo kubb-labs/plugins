@@ -12,9 +12,10 @@ import type { PluginPlaywright } from './types.ts'
 export const pluginPlaywrightName = 'plugin-playwright' satisfies PluginPlaywright['name']
 
 /**
- * Generates native Playwright responses for GET operations with path, query, and header parameters.
+ * Generates native Playwright responses for HTTP operations with parameters and JSON bodies.
  * Query arrays use repeated keys. Null and undefined query and header values are omitted.
- * Operations with cookie parameters or a request body are skipped.
+ * Native config options override generated values, except the operation's HTTP method.
+ * Operations with cookie parameters or non-JSON request bodies are skipped.
  * Requires `pluginTs()` for the response types.
  */
 export const pluginPlaywright = definePlugin<PluginPlaywright>((options) => ({

@@ -28,6 +28,12 @@ const getPetById = {
   parameters: [{ name: 'petId', in: 'path', required: true, schema: { type: 'string' } }],
   responses,
 }
+const petBody = { type: 'object', required: ['name'], properties: { name: { type: 'string' } } }
+const addPet = {
+  operationId: 'addPet',
+  requestBody: { required: true, content: { 'application/json': { schema: petBody } } },
+  responses,
+}
 
 async function generate({ paths = { '/pets': { get: getPets } }, baseURL }: { paths?: Record<string, unknown>; baseURL?: string } = {}) {
   const root = await mkdtemp(fileURLToPath(new URL('../.test-', import.meta.url)))
@@ -76,12 +82,13 @@ test('generates a GET helper with a required context and a typed native response
   const source = await readFile(join(root, 'generated/playwright/pwGetPets.ts'), 'utf8')
   expect(files).toStrictEqual(['pwGetPets.ts'])
   expect(await format(source)).toMatchInlineSnapshot(`
-    "import type { GetPetsResponse } from '../types/GetPets'
+    "import type { RequestConfig } from '../.kubb/playwright'
+    import type { GetPetsResponse } from '../types/GetPets'
     import type { APIRequestContext, APIResponse } from '@playwright/test'
     import { playwrightRequest } from '../.kubb/playwright'
 
-    export function pwGetPets({ request }: { request: APIRequestContext }): Promise<APIResponse<GetPetsResponse>> {
-      return playwrightRequest<GetPetsResponse>({ request, method: 'GET', url: '/pets' })
+    export function pwGetPets({ request, config }: { request: APIRequestContext; config?: RequestConfig }): Promise<APIResponse<GetPetsResponse>> {
+      return playwrightRequest<GetPetsResponse>({ request, config, method: 'GET', url: '/pets' })
     }
     "
   `)
@@ -117,12 +124,21 @@ test('requires the OpenAPI path type and preserves the typed native response', a
   const { root } = await generate({ paths: { '/pets/{petId}': { get: getPetById } } })
   const source = await readFile(join(root, 'generated/playwright/pwGetPetById.ts'), 'utf8')
   expect(await format(source)).toMatchInlineSnapshot(`
-    "import type { GetPetByIdResponse, GetPetByIdPath } from '../types/GetPetById'
+    "import type { RequestConfig } from '../.kubb/playwright'
+    import type { GetPetByIdResponse, GetPetByIdPath } from '../types/GetPetById'
     import type { APIRequestContext, APIResponse } from '@playwright/test'
     import { playwrightRequest } from '../.kubb/playwright'
 
-    export function pwGetPetById({ request, path }: { request: APIRequestContext; path: GetPetByIdPath }): Promise<APIResponse<GetPetByIdResponse>> {
-      return playwrightRequest<GetPetByIdResponse>({ request, path, method: 'GET', url: '/pets/{petId}' })
+    export function pwGetPetById({
+      request,
+      path,
+      config,
+    }: {
+      request: APIRequestContext
+      path: GetPetByIdPath
+      config?: RequestConfig
+    }): Promise<APIResponse<GetPetByIdResponse>> {
+      return playwrightRequest<GetPetByIdResponse>({ request, path, config, method: 'GET', url: '/pets/{petId}' })
     }
     "
   `)
@@ -393,4 +409,161 @@ pwGetPets({ request, query: {} })
     method: 'GET',
     headers: { 'X-Request-ID': '123', 'x-count': '0', 'x-active': 'false', 'x-empty': '' },
   })
+})
+
+test.each(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'])('fixes the %s method and forwards native config', async (method) => {
+  const { root } = await generate({ paths: { '/pets': { [method]: getPets } } })
+  const { pwGetPets } = await loadHelper({ root, name: 'pwGetPets' })
+  const request = { fetch: vi.fn() }
+  await pwGetPets({ request, config: { method: 'WRONG', timeout: 0, failOnStatusCode: false, maxRetries: undefined } })
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', { method: method.toUpperCase(), timeout: 0, failOnStatusCode: false })
+})
+
+test.each([true, false])('types JSON bodies with required=%s and native config', async (required) => {
+  const { root } = await generate({ paths: { '/pets': { post: { ...addPet, requestBody: { ...addPet.requestBody, required } } } } })
+  await typecheck({
+    root,
+    source: `
+import type { APIRequestContext } from '@playwright/test'
+import type { RequestConfig } from './generated/.kubb/playwright'
+import { pwAddPet } from './generated/playwright/pwAddPet'
+declare const request: APIRequestContext
+const config: RequestConfig = { timeout: 0, failOnStatusCode: false, maxRetries: 1, signal: new AbortController().signal }
+const response = await pwAddPet({ request, body: { name: 'Rex' }, config })
+const names: string[] = (await response.json()).map(pet => pet.name)
+pwAddPet({ request, body: { name: 'Rex' }, config: { data: 'raw', params: new URLSearchParams('tag=a&tag=b'), headers: { 'x-id': '123' } } })
+pwAddPet({ request, body: { name: 'Rex' }, config: { form: { name: 'Rex' } } })
+pwAddPet({ request, body: { name: 'Rex' }, config: { multipart: new FormData() } })
+${required ? '// @ts-expect-error The OpenAPI body is required.' : ''}
+pwAddPet({ request })
+${required ? '// @ts-expect-error Native data does not make the OpenAPI body optional.' : ''}
+pwAddPet({ request, config: { data: 'raw' } })
+// @ts-expect-error The body must match the generated type.
+pwAddPet({ request, body: { name: 42 } })
+// @ts-expect-error The method belongs to the operation.
+pwAddPet({ request, body: { name: 'Rex' }, config: { method: 'PUT' } })
+// @ts-expect-error Native timeout is numeric.
+pwAddPet({ request, body: { name: 'Rex' }, config: { timeout: '5000' } })
+// @ts-expect-error Native headers require strings.
+pwAddPet({ request, body: { name: 'Rex' }, config: { headers: { 'x-id': 123 } } })
+`,
+  })
+  const { pwAddPet } = await loadHelper({ root, name: 'pwAddPet' })
+  const request = { fetch: vi.fn() }
+  await pwAddPet({ request, ...(required ? { body: { name: 'Rex' } } : {}) })
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', {
+    method: 'POST',
+    ...(required ? { data: '{"name":"Rex"}', headers: { 'Content-Type': 'application/json' } } : {}),
+  })
+})
+
+test.each([
+  { body: { name: 'Rex' }, data: '{"name":"Rex"}' },
+  { body: ['Rex'], data: '["Rex"]' },
+  { body: 'Rex', data: '"Rex"' },
+  { body: '', data: '""' },
+  { body: 0, data: '0' },
+  { body: false, data: 'false' },
+  { body: null, data: 'null' },
+])('encodes JSON body $body as $data', async ({ body, data }) => {
+  const { root } = await generate({
+    paths: { '/pets': { post: { ...addPet, requestBody: { content: { 'application/json': { schema: {} } } } } } },
+  })
+  const { pwAddPet } = await loadHelper({ root, name: 'pwAddPet' })
+  const request = { fetch: vi.fn() }
+  await pwAddPet({ request, body })
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', { method: 'POST', data, headers: { 'Content-Type': 'application/json' } })
+})
+
+test('uses the first JSON media type and respects an explicit Content-Type', async () => {
+  const { root } = await generate({
+    paths: {
+      '/pets': {
+        post: {
+          ...addPet,
+          requestBody: {
+            content: {
+              'application/vnd.pet+json; charset=utf-8': { schema: petBody },
+              'application/json': { schema: petBody },
+            },
+          },
+          parameters: [{ name: 'x-id', in: 'header', schema: { type: 'string' } }],
+        },
+      },
+    },
+  })
+  const { pwAddPet } = await loadHelper({ root, name: 'pwAddPet' })
+  const request = { fetch: vi.fn() }
+  await pwAddPet({ request, body: { name: 'Rex' }, headers: { 'x-id': '123' } })
+  expect(request.fetch).toHaveBeenLastCalledWith('/pets', {
+    method: 'POST',
+    data: '{"name":"Rex"}',
+    headers: { 'x-id': '123', 'Content-Type': 'application/vnd.pet+json; charset=utf-8' },
+  })
+  await pwAddPet({ request, body: { name: 'Rex' }, headers: { 'x-id': '123' }, config: { headers: { 'cOnTeNt-TyPe': 'application/custom+json' } } })
+  expect(request.fetch).toHaveBeenLastCalledWith('/pets', {
+    method: 'POST',
+    data: '{"name":"Rex"}',
+    headers: { 'cOnTeNt-TyPe': 'application/custom+json' },
+  })
+})
+
+test('replaces query and headers completely and ignores undefined overrides', async () => {
+  const { root } = await generate({
+    paths: {
+      '/pets': {
+        get: {
+          ...getPets,
+          parameters: [
+            { name: 'tag', in: 'query', schema: { type: 'string' } },
+            { name: 'x-id', in: 'header', schema: { type: 'string' } },
+          ],
+        },
+      },
+    },
+  })
+  const { pwGetPets } = await loadHelper({ root, name: 'pwGetPets' })
+  const request = { fetch: vi.fn() }
+  const args = { request, query: { tag: 'generated' }, headers: { 'x-id': 'generated' } }
+  await pwGetPets({ ...args, config: { params: 'tag=a&tag=b', headers: { 'x-other': 'native' } } })
+  expect(request.fetch).toHaveBeenLastCalledWith('/pets', { method: 'GET', params: 'tag=a&tag=b', headers: { 'x-other': 'native' } })
+  await pwGetPets({ ...args, config: { params: '', headers: {} } })
+  expect(request.fetch).toHaveBeenLastCalledWith('/pets', { method: 'GET', params: '', headers: {} })
+  await pwGetPets({ ...args, config: { params: undefined, headers: undefined } })
+  expect(request.fetch).toHaveBeenLastCalledWith('/pets', { method: 'GET', params: new URLSearchParams('tag=generated'), headers: { 'x-id': 'generated' } })
+})
+
+test.each([
+  { mode: 'empty data', config: { data: '' } },
+  { mode: 'binary data', config: { data: Buffer.from('raw') } },
+  { mode: 'form', config: { form: { name: 'Rex' } } },
+  { mode: 'multipart', config: { multipart: new FormData() } },
+])('replaces generated JSON with native $mode', async ({ config }) => {
+  const { root } = await generate({ paths: { '/pets': { post: addPet } } })
+  const { pwAddPet } = await loadHelper({ root, name: 'pwAddPet' })
+  const request = { fetch: vi.fn() }
+  await pwAddPet({ request, body: { name: 'Rex' }, config })
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', { method: 'POST', ...config })
+})
+
+test('keeps generated JSON when native body overrides are undefined', async () => {
+  const { root } = await generate({ paths: { '/pets': { post: addPet } } })
+  const { pwAddPet } = await loadHelper({ root, name: 'pwAddPet' })
+  const request = { fetch: vi.fn() }
+  await pwAddPet({ request, body: { name: 'Rex' }, config: { data: undefined, form: undefined, multipart: undefined, headers: {} } })
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', {
+    method: 'POST',
+    data: '{"name":"Rex"}',
+    headers: { 'Content-Type': 'application/json' },
+  })
+})
+
+test('passes conflicting native body modes to Playwright and propagates its rejection', async () => {
+  const { root } = await generate({ paths: { '/pets': { post: addPet } } })
+  const { pwAddPet } = await loadHelper({ root, name: 'pwAddPet' })
+  const error = new Error('Only one body mode is allowed')
+  const request = { fetch: vi.fn().mockRejectedValue(error) }
+  const config = { data: 'raw', form: { name: 'Rex' } }
+  await expect(pwAddPet({ request, body: { name: 'Rex' }, config })).rejects.toBe(error)
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', { method: 'POST', ...config })
 })
