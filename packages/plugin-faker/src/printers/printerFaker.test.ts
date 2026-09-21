@@ -18,6 +18,21 @@ describe('printerFaker', () => {
 
     expect(printer.print(ast.factory.createSchema({ type: 'string', title: 'Note' }))).toBe('faker.lorem.lines()')
     expect(printer.print(ast.factory.createSchema({ type: 'string', title: 'Name' }))).toBe('faker.string.alpha()')
+
+    const object = ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({ name: 'note', schema: ast.factory.createSchema({ type: 'string', title: 'Note' }) }),
+        ast.factory.createProperty({ name: 'name', schema: ast.factory.createSchema({ type: 'string', title: 'Name' }) }),
+      ],
+    })
+
+    expect(printer.print(object)).toMatchInlineSnapshot(`
+      "{
+        note: faker.lorem.lines(),
+        name: faker.string.alpha(),
+      }"
+    `)
   })
 
   test('renders object properties recursively', () => {
