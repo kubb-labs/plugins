@@ -7,7 +7,8 @@ import type { PluginFaker, ResolverFaker } from '../types.ts'
  * Partial map of node-type overrides for the Faker printer. Each key is a
  * `SchemaType` (`'string'`, `'date'`, ...) and each handler returns the
  * Faker expression for that schema as a string. Use `this.transform` to
- * recurse into nested schema nodes and `this.options` to read printer options.
+ * recurse into nested schema nodes, `this.base` to reuse the built-in handler,
+ * and `this.options` to read printer options.
  *
  * @example Override the integer handler
  * ```ts
@@ -419,8 +420,8 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
         return buildObject(entries)
       },
-      ...options.nodes,
     },
+    overrides: options.nodes,
     print(node) {
       return this.transform(node) ?? null
     },
