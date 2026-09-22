@@ -232,6 +232,8 @@ export type Options = OutputOptions & {
    * - `{ is?: boolean; assert?: boolean }`: Selectively enable type guards or assertions.
    *
    * @default false
+   * @note Only compatible with Zod v4.6.0 or above.
+   * @see https://zod.dev
    */
   typeGuards?: boolean | { is?: boolean; assert?: boolean }
   /**
