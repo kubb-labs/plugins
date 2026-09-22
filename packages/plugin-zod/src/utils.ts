@@ -18,7 +18,15 @@ export function shouldCoerce(coercion: PluginZod['resolvedOptions']['coercion'] 
  * on `.and(…)`.
  */
 function isPlainInlineObject(node: ast.SchemaNode): boolean {
-  return node.type === 'object' && !node.nullable && !node.optional && !node.nullish && node.additionalProperties === undefined && !node.patternProperties
+  return (
+    node.type === 'object' &&
+    !node.nullable &&
+    !node.optional &&
+    !node.nullish &&
+    node.additionalProperties === undefined &&
+    !node.patternProperties &&
+    !('propertyNames' in node && (node as { propertyNames?: ast.SchemaNode }).propertyNames)
+  )
 }
 
 /**
@@ -30,7 +38,15 @@ function isPlainInlineObject(node: ast.SchemaNode): boolean {
  */
 export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
   if (node.nullable || node.optional || node.nullish) return false
-  if (node.type === 'object') return true
+  if (node.type === 'object') {
+    const entries = node.properties ?? []
+    const isRecord =
+      entries.length === 0 &&
+      ((node.additionalProperties && node.additionalProperties !== true) ||
+        Boolean(node.patternProperties) ||
+        ('propertyNames' in node && Boolean((node as { propertyNames?: ast.SchemaNode }).propertyNames)))
+    return !isRecord
+  }
 
   if (node.type === 'ref') {
     const refName = ast.resolveRefName(node)

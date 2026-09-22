@@ -209,14 +209,94 @@ describe('printerZodMini', () => {
       `)
     })
 
-    test('additionalProperties schema → z.catchall(object, schema)', () => {
+    test('additionalProperties schema and no properties → z.record(z.string(), schema)', () => {
       const node = ast.factory.createSchema({
         type: 'object',
         primitive: 'object',
         properties: [],
         additionalProperties: ast.factory.createSchema({ type: 'string' }),
       })
-      expect(printer.print(node)).toBe('z.catchall(z.object({}), z.string())')
+      expect(printer.print(node)).toBe('z.record(z.string(), z.string())')
+    })
+
+    test('additionalProperties schema and fixed properties → z.catchall(object, schema)', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+        additionalProperties: ast.factory.createSchema({ type: 'string' }),
+      })
+      expect(printer.print(node)).toBe('z.catchall(z.object({\n  id: z.int(),\n}), z.string())')
+    })
+
+    test('propertyNames regex and additionalProperties → z.record(keySchema, schema)', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        propertyNames: ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }),
+        additionalProperties: ast.factory.createSchema({ type: 'integer' }),
+      } as any)
+      expect(printer.print(node)).toBe('z.record(z.string().check(z.regex(/^[a-z]+$/)), z.int())')
+    })
+
+    test('propertyNames enum and additionalProperties → z.record(enumKeySchema, schema)', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        propertyNames: ast.factory.createSchema({ type: 'enum', enumValues: ['admin', 'user'] }),
+        additionalProperties: ast.factory.createSchema({ type: 'string' }),
+      } as any)
+      expect(printer.print(node)).toBe("z.record(z.enum(['admin', 'user']), z.string())")
+    })
+
+    test('propertyNames format and additionalProperties → z.record(formatKeySchema, schema)', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        propertyNames: ast.factory.createSchema({ type: 'uuid' }),
+        additionalProperties: ast.factory.createSchema({ type: 'string' }),
+      } as any)
+      expect(printer.print(node)).toBe('z.record(z.uuid(), z.string())')
+    })
+
+    test('propertyNames and additionalProperties: true → z.record(keySchema, z.unknown())', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        propertyNames: ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }),
+        additionalProperties: true,
+      } as any)
+      expect(printer.print(node)).toBe('z.record(z.string().check(z.regex(/^[a-z]+$/)), z.unknown())')
+    })
+
+    test('propertyNames only → z.record(keySchema, z.unknown())', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        propertyNames: ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }),
+      } as any)
+      expect(printer.print(node)).toBe('z.record(z.string().check(z.regex(/^[a-z]+$/)), z.unknown())')
+    })
+
+    test('generated mini record parses valid keys and rejects invalid keys at runtime', async () => {
+      const zm = await import('zod/mini')
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        propertyNames: ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }),
+        additionalProperties: ast.factory.createSchema({ type: 'integer' }),
+      } as any)
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(zm)
+      expect(schema.safeParse({ abc: 123 }).success).toBe(true)
+      expect(schema.safeParse({ '123': 123 }).success).toBe(false)
+      expect(schema.safeParse({ abc: 'not-a-number' }).success).toBe(false)
     })
 
     test('additionalProperties: true → z.catchall(object, z.unknown())', () => {
