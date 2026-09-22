@@ -43,6 +43,7 @@ const defaultOptions: PluginZod['resolvedOptions'] = {
   override: [],
   group: null,
   printer: undefined,
+  typeGuards: false,
 }
 
 const stringSchema = ast.factory.createSchema({ type: 'string', name: 'PetName' })
@@ -857,5 +858,122 @@ describe('zodGenerator — transformers', () => {
     })
 
     await matchFiles(driver.fileManager.files, 'transformers integerToString')
+  })
+})
+
+describe('zodGenerator — Type Guards', () => {
+  const testSchema = ast.factory.createSchema({
+    type: 'object',
+    primitive: 'object',
+    name: 'Pet',
+    properties: [
+      ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) }),
+      ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+    ],
+  })
+
+  test('typeGuards: true generates both is* and assert*', async () => {
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, typeGuards: true }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'typeguards-true' })
+
+    await renderGeneratorSchema(zodGenerator, testSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files)[0]
+    expect(source).toBeDefined()
+    expect(source).toContain('export const isPet = (data: unknown): data is z.infer<typeof petSchema> => petSchema.validate(data)')
+    expect(source).toContain('export function assertPet(data: unknown): asserts data is z.infer<typeof petSchema>')
+    expect(source).toContain('if (!petSchema.validate(data))')
+    expect(source).toContain('petSchema.parse(data)')
+  })
+
+  test('typeGuards: { is: true, assert: false } generates only is*', async () => {
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, typeGuards: { is: true, assert: false } }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'typeguards-is-only' })
+
+    await renderGeneratorSchema(zodGenerator, testSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files)[0]
+    expect(source).toBeDefined()
+    expect(source).toContain('export const isPet = (data: unknown): data is z.infer<typeof petSchema> => petSchema.validate(data)')
+    expect(source).not.toContain('assertPet')
+  })
+
+  test('typeGuards: { is: false, assert: true } generates only assert*', async () => {
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, typeGuards: { is: false, assert: true } }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'typeguards-assert-only' })
+
+    await renderGeneratorSchema(zodGenerator, testSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files)[0]
+    expect(source).toBeDefined()
+    expect(source).not.toContain('isPet')
+    expect(source).toContain('export function assertPet(data: unknown): asserts data is z.infer<typeof petSchema>')
+  })
+
+  test('typeGuards with inferred: true narrows to inferred type alias', async () => {
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, typeGuards: true, inferred: true }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'typeguards-inferred' })
+
+    await renderGeneratorSchema(zodGenerator, testSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files)[0]
+    expect(source).toBeDefined()
+    expect(source).toContain('export type PetSchemaType = z.infer<typeof petSchema>')
+    expect(source).toContain('export const isPet = (data: unknown): data is PetSchemaType => petSchema.validate(data)')
+    expect(source).toContain('export function assertPet(data: unknown): asserts data is PetSchemaType')
+  })
+
+  test('typeGuards with mini: true uses z.validate and z.parse', async () => {
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, typeGuards: true, mini: true, importPath: 'zod/mini' }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'typeguards-mini' })
+
+    await renderGeneratorSchema(zodGenerator, testSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files)[0]
+    expect(source).toBeDefined()
+    expect(source).toContain('export const isPet = (data: unknown): data is z.infer<typeof petSchema> => z.validate(petSchema, data)')
+    expect(source).toContain('export function assertPet(data: unknown): asserts data is z.infer<typeof petSchema>')
+    expect(source).toContain('if (!z.validate(petSchema, data))')
+    expect(source).toContain('z.parse(petSchema, data)')
   })
 })

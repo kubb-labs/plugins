@@ -37,6 +37,12 @@ export const resolverZod = createResolver<PluginZod>({
     inputTypeName(name) {
       return this.schema.typeName(`${name} input`)
     },
+    isName(name) {
+      return ensureValidVarName(camelCase(name, { prefix: 'is' }))
+    },
+    assertName(name) {
+      return ensureValidVarName(camelCase(name, { prefix: 'assert' }))
+    },
   },
   param: createOperationParamResolver(),
   response: {

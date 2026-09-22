@@ -98,7 +98,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, regexType, mini, inferred, importPath, group, printer } = ctx.options
+    const { output, coercion, guidType, regexType, mini, inferred, typeGuards, importPath, group, printer } = ctx.options
     const dateType = getOasAdapter(adapter).options.dateType
 
     if (!node.name) {
@@ -134,6 +134,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
     } as const
 
     const inferTypeName = inferred ? resolver.schema.typeName(node.name) : null
+    const isName = typeGuards ? resolver.schema.isName(node.name) : null
+    const assertName = typeGuards ? resolver.schema.assertName(node.name) : null
 
     const stdPrinters = mini ? null : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, cyclicSchemas, nodes: printer?.nodes })
     const schemaPrinter = mini ? getMiniPrinter(resolver, { guidType, regexType, cyclicSchemas, nodes: printer?.nodes }) : stdPrinters!.decode
@@ -151,13 +153,27 @@ export const zodGenerator = defineGenerator<PluginZod>({
           <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
         ))}
 
-        <Zod name={meta.name} node={node} printer={schemaPrinter} inferTypeName={inferTypeName} cyclic={cyclicSchemas.has(node.name)} />
+        <Zod
+          name={meta.name}
+          node={node}
+          printer={schemaPrinter}
+          inferTypeName={inferTypeName}
+          typeGuards={typeGuards}
+          isName={isName}
+          assertName={assertName}
+          mini={mini}
+          cyclic={cyclicSchemas.has(node.name)}
+        />
         {hasDirectionalNode && stdPrinters && (
           <Zod
             name={resolver.schema.inputName(node.name)}
             node={node}
             printer={stdPrinters.encode}
             inferTypeName={inferred ? resolver.schema.inputTypeName(node.name) : null}
+            typeGuards={typeGuards}
+            isName={typeGuards ? resolver.schema.isName(resolver.schema.inputName(node.name)) : null}
+            assertName={typeGuards ? resolver.schema.assertName(resolver.schema.inputName(node.name)) : null}
+            mini={mini}
             cyclic={cyclicSchemas.has(node.name)}
           />
         )}
