@@ -44,6 +44,20 @@ export type ResolverZod = Resolver & {
      * `resolver.schema.inputTypeName('order') // → 'OrderInputSchemaType'`
      */
     inputTypeName(name: string): string
+    /**
+     * Resolves the type guard function name for a schema.
+     *
+     * @example Type guard names
+     * `resolver.schema.isName('pet') // → 'isPet'`
+     */
+    isName(name: string): string
+    /**
+     * Resolves the assertion function name for a schema.
+     *
+     * @example Assertion names
+     * `resolver.schema.assertName('pet') // → 'assertPet'`
+     */
+    assertName(name: string): string
   }
   /**
    * Names for an operation's parameters: an individual parameter and the grouped path, query, and
@@ -212,6 +226,15 @@ export type Options = OutputOptions & {
    */
   resolver?: ResolverPatch<ResolverZod>
   /**
+   * Generate TypeScript type guards (`is*`) and assertion functions (`assert*`) for schemas
+   * using Zod v4's native `validate` API.
+   * - `true`: Generates both `is*` type guards and `assert*` assertion functions.
+   * - `{ is?: boolean; assert?: boolean }`: Selectively enable type guards or assertions.
+   *
+   * @default false
+   */
+  typeGuards?: boolean | { is?: boolean; assert?: boolean }
+  /**
    * Replace the Zod handler for a specific schema type (`'integer'`, `'date'`, ...).
    * When `mini: true`, overrides target the Zod Mini printer instead.
    *
@@ -241,6 +264,7 @@ export type ResolvedOptions = {
   guidType: NonNullable<Options['guidType']>
   regexType: NonNullable<Options['regexType']>
   mini: NonNullable<Options['mini']>
+  typeGuards: NonNullable<Options['typeGuards']>
   printer: Options['printer']
 }
 
