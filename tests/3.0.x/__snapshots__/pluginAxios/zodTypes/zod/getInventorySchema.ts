@@ -5,7 +5,7 @@
 
 import * as z from 'zod'
 
-export const getInventoryStatus200Schema = z.object({}).catchall(z.int())
+export const getInventoryStatus200Schema = z.record(z.string(), z.int())
 
 export type GetInventoryStatus200SchemaType = z.infer<typeof getInventoryStatus200Schema>
 
