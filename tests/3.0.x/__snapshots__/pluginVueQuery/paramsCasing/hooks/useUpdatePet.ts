@@ -25,7 +25,7 @@ export function useUpdatePet<TContext>(options: {
 
   return useMutation<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetOptions, TContext>({
     mutationFn: async({ path, query, body, headers }) => {
-      return updatePet({ ...config, path: toValue(path), query: toValue(query), body: toValue(body), headers: toValue(headers), throwOnError: true }).unwrap()
+      return updatePet({ ...config, path: toValue<UpdatePetOptions['path']>(path), query: toValue<UpdatePetOptions['query']>(query), body: toValue<UpdatePetOptions['body']>(body), headers: toValue<UpdatePetOptions['headers']>(headers), throwOnError: true }).unwrap()
     },
     mutationKey,
     ...mutationOptions
