@@ -1,5 +1,11 @@
 # @kubb/plugin-faker
 
+## 5.0.10
+
+### Patch Changes
+
+- [#914](https://github.com/kubb-labs/plugins/pull/914) [`5ca0d65`](https://github.com/kubb-labs/plugins/commit/5ca0d655d93c3f726100838f59700b61660170ef) Thanks [@Ericlm](https://github.com/Ericlm)! - Allow Faker printer node overrides to call `this.base()` without recursively calling themselves.
+
 ## 5.0.9
 
 ### Patch Changes
