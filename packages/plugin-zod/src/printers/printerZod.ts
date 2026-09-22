@@ -431,7 +431,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           if (entries.length === 0 && propertyNamesKeySchema) {
             return `z.record(${propertyNamesKeySchema}, ${unknownType})`
           }
-          return `${objectBase}.catchall(${unknownType})`
+          return objectBase.replace(/^z\.object\(/, 'z.looseObject(')
         }
         // `additionalProperties: false` still permits patternProperties keys, so skip `.strict()` when patterns exist.
         if (node.additionalProperties === false && patterns.length === 0) return `${objectBase}.strict()`

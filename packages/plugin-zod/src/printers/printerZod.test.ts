@@ -259,9 +259,31 @@ describe('printerZod', () => {
       `)
     })
 
-    test('object with additionalProperties: true → .catchall(z.unknown())', () => {
+    test('object with additionalProperties: true → z.looseObject', () => {
       const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], additionalProperties: true })
-      expect(printer.print(node)).toBe('z.object({}).catchall(z.unknown())')
+      expect(printer.print(node)).toBe('z.looseObject({})')
+    })
+
+    test('object with additionalProperties: true and properties → z.looseObject', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+        additionalProperties: true,
+      })
+      expect(printer.print(node)).toBe('z.looseObject({\n  id: z.int(),\n})')
+    })
+
+    test('generated looseObject allows undeclared properties at runtime', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+        additionalProperties: true,
+      })
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(z)
+      expect(schema.safeParse({ id: 1, extraKey: 'allowed' }).success).toBe(true)
     })
 
     test('object with additionalProperties: false → .strict()', () => {

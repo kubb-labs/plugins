@@ -257,7 +257,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           if (entries.length === 0 && propertyNamesKeySchema) {
             return `z.record(${propertyNamesKeySchema}, ${unknownType})`
           }
-          return `z.catchall(${objectBase}, ${unknownType})`
+          return objectBase.replace(/^z\.object\(/, 'z.looseObject(')
         }
         if (node.additionalProperties === false && patterns.length === 0) return objectBase.replace(/^z\.object\(/, 'z.strictObject(')
 

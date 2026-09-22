@@ -299,9 +299,32 @@ describe('printerZodMini', () => {
       expect(schema.safeParse({ abc: 'not-a-number' }).success).toBe(false)
     })
 
-    test('additionalProperties: true → z.catchall(object, z.unknown())', () => {
+    test('additionalProperties: true → z.looseObject', () => {
       const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], additionalProperties: true })
-      expect(printer.print(node)).toBe('z.catchall(z.object({}), z.unknown())')
+      expect(printer.print(node)).toBe('z.looseObject({})')
+    })
+
+    test('additionalProperties: true and properties → z.looseObject', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+        additionalProperties: true,
+      })
+      expect(printer.print(node)).toBe('z.looseObject({\n  id: z.int(),\n})')
+    })
+
+    test('generated mini looseObject allows undeclared properties at runtime', async () => {
+      const zm = await import('zod/mini')
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+        additionalProperties: true,
+      })
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(zm)
+      expect(schema.safeParse({ id: 1, extraKey: 'allowed' }).success).toBe(true)
     })
 
     test('additionalProperties: false → z.strictObject', () => {
