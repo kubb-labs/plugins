@@ -9,7 +9,7 @@ import { orderStatusEnumSchema } from './orderStatusEnumSchema'
 export const orderSchema = z.object({
   id: z.coerce.bigint().optional().meta({ examples: [10] }),
   petId: z.coerce.bigint().optional().meta({ examples: [198772] }),
-  quantity: z.int().optional().meta({ examples: [7] }),
+  quantity: z.int32().optional().meta({ examples: [7] }),
   shipDate: z.iso.datetime().transform((value) => Temporal.Instant.from(value)).optional(),
   status: orderStatusEnumSchema.optional().describe('Order Status').meta({ examples: ['approved'] }),
   complete: z.boolean().optional(),
@@ -18,7 +18,7 @@ export const orderSchema = z.object({
 export const orderInputSchema = z.object({
   id: z.coerce.bigint().optional().meta({ examples: [10] }),
   petId: z.coerce.bigint().optional().meta({ examples: [198772] }),
-  quantity: z.int().optional().meta({ examples: [7] }),
+  quantity: z.int32().optional().meta({ examples: [7] }),
   shipDate: z.instanceof(Temporal.Instant).transform((value) => value.toString()).optional(),
   status: orderStatusEnumSchema.optional().describe('Order Status').meta({ examples: ['approved'] }),
   complete: z.boolean().optional(),
