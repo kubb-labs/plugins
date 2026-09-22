@@ -20,9 +20,15 @@ type Props = {
    * explicit `z.ZodType` to break the inference cycle.
    */
   cyclic?: boolean
+  /**
+   * Wrap the schema initializer in `z.compile(...)` for fast-path validation.
+   *
+   * @note Only compatible with Zod v4.5.0 or above.
+   */
+  compile?: boolean
 }
 
-export function Zod({ name, node, printer, inferTypeName, cyclic }: Props): KubbReactNode {
+export function Zod({ name, node, printer, inferTypeName, cyclic, compile }: Props): KubbReactNode {
   const output = printer.print(node)
 
   if (!output) {
@@ -34,12 +40,14 @@ export function Zod({ name, node, printer, inferTypeName, cyclic }: Props): Kubb
   // only strip the `ZodObject` methods (`.omit()`, `.strict()`). Only non-object cyclic schemas (a
   // union/array with a top-level `z.lazy(() => self)`) are implicitly `any` and need the annotation.
   const needsAnnotation = cyclic && node.type !== 'object'
+  const isBareRef = node.type === 'ref' && /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(output.trim())
+  const value = compile && !isBareRef ? `z.compile(${output})` : output
 
   return (
     <>
       <File.Source name={name} isExportable isIndexable>
         <Const export name={name} type={needsAnnotation ? 'z.ZodType' : undefined}>
-          {output}
+          {value}
         </Const>
       </File.Source>
       {inferTypeName && (

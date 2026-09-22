@@ -36,6 +36,7 @@ const defaultOptions: PluginZod['resolvedOptions'] = {
   coercion: false,
   guidType: 'uuid',
   regexType: 'literal',
+  compile: false,
   mini: false,
   output: { path: '.', mode: 'directory' },
   exclude: [],
@@ -857,5 +858,144 @@ describe('zodGenerator — transformers', () => {
     })
 
     await matchFiles(driver.fileManager.files, 'transformers integerToString')
+  })
+})
+
+describe('zodGenerator — Compile Option', () => {
+  test('compile option wraps schema in z.compile', async () => {
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: true }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'compileSchema' })
+
+    await renderGeneratorSchema(zodGenerator, objectSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('export const petSchema = z.compile(z.object(')
+  })
+
+  test('compile option in mini mode wraps schema in z.compile', async () => {
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: true, mini: true, importPath: 'zod/mini' }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'compileMiniSchema' })
+
+    await renderGeneratorSchema(zodGenerator, objectSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain("import * as z from 'zod/mini'")
+    expect(source).toContain('export const petSchema = z.compile(z.object(')
+    expect(source).toContain('status: z.optional(z.string())')
+    expect(source).toContain('tags: z.optional(z.array(z.string()))')
+  })
+
+  test('compile option in mini mode with operations wraps schemas in z.compile', async () => {
+    const operation: ast.OperationNode = ast.factory.createOperation({
+      operationId: 'createPet',
+      method: 'POST',
+      path: '/pets',
+      tags: ['pets'],
+      parameters: [ast.factory.createParameter({ name: 'dryRun', in: 'query', schema: ast.factory.createSchema({ type: 'boolean' }) })],
+      requestBody: {
+        content: [
+          ast.factory.createContent({
+            contentType: 'application/json',
+            schema: objectSchema,
+          }),
+        ],
+      },
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '201',
+          schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          description: 'Created pet',
+        }),
+      ],
+    })
+
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: true, mini: true, importPath: 'zod/mini' }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'compileMiniOperation' })
+
+    await renderGeneratorOperation(zodGenerator, operation, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain("import * as z from 'zod/mini'")
+    // Query parameter is wrapped
+    expect(source).toContain('export const createPetQueryDryRunSchema = z.compile(z.optional(z.boolean()))')
+    // Request body is wrapped with mini syntax
+    expect(source).toContain('export const createPetBodySchema = z.compile(z.object(')
+    // Bare ref response remains an alias
+    expect(source).toContain('export const createPetStatus201Schema = petSchema')
+  })
+
+  test('compile option on operation wraps schemas in z.compile but leaves bare ref', async () => {
+    const operationWithRefAndInline: ast.OperationNode = ast.factory.createOperation({
+      operationId: 'getPet',
+      method: 'GET',
+      path: '/pets/{petId}',
+      tags: ['pets'],
+      parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          description: 'A pet ref',
+        }),
+        ast.factory.createResponse({
+          statusCode: '400',
+          schema: ast.factory.createSchema({
+            type: 'object',
+            primitive: 'object',
+            properties: [ast.factory.createProperty({ name: 'message', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+          }),
+          description: 'Error',
+        }),
+      ],
+    })
+
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: true }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'compileOperation' })
+
+    await renderGeneratorOperation(zodGenerator, operationWithRefAndInline, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    // Parameter schema is wrapped
+    expect(source).toContain('export const getPetPathPetIdSchema = z.compile(z.string())')
+    // Bare ref response is NOT wrapped (since Pet schema is already compiled at declaration)
+    expect(source).toContain('export const getPetStatus200Schema = petSchema')
+    // Inline object response is wrapped
+    expect(source).toContain('export const getPetStatus400Schema = z.compile(z.object(')
+    // Response union (single ref member) is NOT wrapped
+    expect(source).toContain('export const getPetResponseSchema = getPetStatus200Schema')
+    // Error union (single ref member) is NOT wrapped
+    expect(source).toContain('export const getPetErrorSchema = getPetStatus400Schema')
   })
 })

@@ -43,6 +43,7 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
     exclude = [],
     include,
     override = [],
+    compile = false,
     mini = false,
     guidType = 'uuid',
     regexType = 'literal',
@@ -72,6 +73,7 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
           inferred,
           guidType,
           regexType,
+          compile,
           mini,
           printer,
         })

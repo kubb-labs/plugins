@@ -199,6 +199,15 @@ export type Options = OutputOptions & {
    */
   regexType?: 'literal' | 'constructor'
   /**
+   * Wrap generated schemas with `z.compile(...)` to enable Zod's hyperoptimized
+   * fast-path validation logic.
+   *
+   * @default false
+   * @note Only compatible with Zod v4.5.0 or above.
+   * @see https://zod.dev/blog/introducing-z-compile
+   */
+  compile?: boolean
+  /**
    * Switch to Zod Mini's functional API for better tree-shaking. Also defaults
    * `importPath` to `'zod/mini'`.
    *
@@ -240,6 +249,7 @@ export type ResolvedOptions = {
   coercion: NonNullable<Options['coercion']>
   guidType: NonNullable<Options['guidType']>
   regexType: NonNullable<Options['regexType']>
+  compile: NonNullable<Options['compile']>
   mini: NonNullable<Options['mini']>
   printer: Options['printer']
 }

@@ -98,7 +98,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, regexType, mini, inferred, importPath, group, printer } = ctx.options
+    const { output, coercion, guidType, regexType, compile, mini, inferred, importPath, group, printer } = ctx.options
     const dateType = getOasAdapter(adapter).options.dateType
 
     if (!node.name) {
@@ -151,7 +151,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
           <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
         ))}
 
-        <Zod name={meta.name} node={node} printer={schemaPrinter} inferTypeName={inferTypeName} cyclic={cyclicSchemas.has(node.name)} />
+        <Zod name={meta.name} node={node} printer={schemaPrinter} inferTypeName={inferTypeName} cyclic={cyclicSchemas.has(node.name)} compile={compile} />
         {hasDirectionalNode && stdPrinters && (
           <Zod
             name={resolver.schema.inputName(node.name)}
@@ -159,6 +159,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
             printer={stdPrinters.encode}
             inferTypeName={inferred ? resolver.schema.inputTypeName(node.name) : null}
             cyclic={cyclicSchemas.has(node.name)}
+            compile={compile}
           />
         )}
       </File>
@@ -167,7 +168,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, regexType, mini, inferred, importPath, group, printer } = ctx.options
+    const { output, coercion, guidType, regexType, compile, mini, inferred, importPath, group, printer } = ctx.options
     const dateType = getOasAdapter(adapter).options.dateType
 
     const isZodImport = ZOD_NAMESPACE_IMPORTS.has(importPath as 'zod' | 'zod/mini')
@@ -230,7 +231,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
               `z.ZodType` annotation at their own definition when cyclic. Annotating the operation
               schema too would only erase its inferred type to `unknown`, breaking typed consumers
               (e.g. the MCP server's request types), so it is never marked cyclic here. */}
-          <Zod name={name} node={schema} printer={schemaPrinter} inferTypeName={inferTypeName} cyclic={false} />
+          <Zod name={name} node={schema} printer={schemaPrinter} inferTypeName={inferTypeName} cyclic={false} compile={compile} />
         </>
       )
     }
