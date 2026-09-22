@@ -8,4 +8,4 @@ export { printerZodMini } from './printers/printerZodMini.ts'
 
 export { resolverZod } from './resolvers/resolverZod.ts'
 
-export type { PluginZod, ResolverZod } from './types.ts'
+export type { CompileOptions, PluginZod, ResolverZod } from './types.ts'

@@ -4,6 +4,8 @@ import type { KubbReactNode } from 'kubb/jsx'
 import type { PrinterZodFactory } from '../printers/printerZod.ts'
 import type { PrinterZodMiniFactory } from '../printers/printerZodMini.ts'
 
+import type { CompileOptions } from '../types.ts'
+
 type Props = {
   name: string
   node: ast.SchemaNode
@@ -22,10 +24,11 @@ type Props = {
   cyclic?: boolean
   /**
    * Wrap the schema initializer in `z.compile(...)` for fast-path validation.
+   * Pass `{ strict: true }` to enforce strict compilation without silent fallback.
    *
    * @note Only compatible with Zod v4.5.0 or above.
    */
-  compile?: boolean
+  compile?: boolean | CompileOptions
 }
 
 export function Zod({ name, node, printer, inferTypeName, cyclic, compile }: Props): KubbReactNode {
@@ -41,7 +44,9 @@ export function Zod({ name, node, printer, inferTypeName, cyclic, compile }: Pro
   // union/array with a top-level `z.lazy(() => self)`) are implicitly `any` and need the annotation.
   const needsAnnotation = cyclic && node.type !== 'object'
   const isBareRef = node.type === 'ref' && /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(output.trim())
-  const value = compile && !isBareRef ? `z.compile(${output})` : output
+  const hasLazy = cyclic || output.includes('z.lazy(')
+  const shouldCompile = Boolean(compile) && !isBareRef && !hasLazy
+  const value = shouldCompile ? (typeof compile === 'object' && compile.strict ? `z.compile(${output}, { strict: true })` : `z.compile(${output})`) : output
 
   return (
     <>
