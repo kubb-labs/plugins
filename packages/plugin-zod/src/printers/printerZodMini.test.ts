@@ -299,6 +299,105 @@ describe('printerZodMini', () => {
       expect(schema.safeParse({ abc: 'not-a-number' }).success).toBe(false)
     })
 
+    test('complex: nested record of records with propertyNames key schemas', async () => {
+      const zm = await import('zod/mini')
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        propertyNames: ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }),
+        additionalProperties: ast.factory.createSchema({
+          type: 'object',
+          primitive: 'object',
+          properties: [],
+          propertyNames: ast.factory.createSchema({ type: 'uuid' }),
+          additionalProperties: ast.factory.createSchema({ type: 'integer' }),
+        } as any),
+      } as any)
+      expect(printer.print(node)).toBe('z.record(z.string().check(z.regex(/^[a-z]+$/)), z.record(z.uuid(), z.int()))')
+
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(zm)
+      const valid = {
+        section: {
+          '123e4567-e89b-12d3-a456-426614174000': 42,
+        },
+      }
+      expect(schema.safeParse(valid).success).toBe(true)
+      expect(schema.safeParse({ '123_invalid': { '123e4567-e89b-12d3-a456-426614174000': 42 } }).success).toBe(false)
+      expect(schema.safeParse({ section: { not_a_uuid: 42 } }).success).toBe(false)
+      expect(schema.safeParse({ section: { '123e4567-e89b-12d3-a456-426614174000': 'not_int' } }).success).toBe(false)
+    })
+
+    test('complex: record with enum keys and looseObject values', async () => {
+      const zm = await import('zod/mini')
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        propertyNames: ast.factory.createSchema({ type: 'enum', enumValues: ['admin', 'editor'] }),
+        additionalProperties: ast.factory.createSchema({
+          type: 'object',
+          primitive: 'object',
+          properties: [ast.factory.createProperty({ name: 'level', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+          additionalProperties: true,
+        }),
+      } as any)
+      expect(printer.print(node)).toBe("z.record(z.enum(['admin', 'editor']), z.looseObject({\n  level: z.int(),\n}))")
+
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(zm)
+      const valid = {
+        admin: { level: 1, extraAllowed: true },
+        editor: { level: 2, extraTag: 'content' },
+      }
+      expect(schema.safeParse(valid).success).toBe(true)
+      expect(schema.safeParse({ admin: { extraAllowed: true } }).success).toBe(false)
+      expect(schema.safeParse({ viewer: { level: 3 } }).success).toBe(false)
+    })
+
+    test('complex: object containing both a record property and a looseObject property', async () => {
+      const zm = await import('zod/mini')
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [
+          ast.factory.createProperty({
+            name: 'dictionaries',
+            required: true,
+            schema: ast.factory.createSchema({
+              type: 'object',
+              primitive: 'object',
+              properties: [],
+              additionalProperties: ast.factory.createSchema({ type: 'string' }),
+            }),
+          }),
+          ast.factory.createProperty({
+            name: 'metadata',
+            required: false,
+            schema: ast.factory.createSchema({
+              type: 'object',
+              primitive: 'object',
+              properties: [ast.factory.createProperty({ name: 'version', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+              additionalProperties: true,
+            }),
+          }),
+        ],
+      })
+      expect(printer.print(node)).toBe(
+        'z.object({\n  dictionaries: z.record(z.string(), z.string()),\n  metadata: z.optional(z.looseObject({\n    version: z.int(),\n  })),\n})',
+      )
+
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(zm)
+      expect(
+        schema.safeParse({
+          dictionaries: { en: 'Hello', es: 'Hola' },
+          metadata: { version: 1, author: 'Kubb' },
+        }).success,
+      ).toBe(true)
+    })
+
     test('additionalProperties: true → z.looseObject', () => {
       const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], additionalProperties: true })
       expect(printer.print(node)).toBe('z.looseObject({})')
