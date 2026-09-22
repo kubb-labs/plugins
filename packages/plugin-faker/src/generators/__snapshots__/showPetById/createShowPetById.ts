@@ -33,6 +33,6 @@ export function createShowPetByIdStatusDefault(data?: Partial<ShowPetByIdStatusD
   return createError(data) as ShowPetByIdStatusDefault
 }
 
-export function createShowPetByIdResponse(_data?: ShowPetByIdResponse): ShowPetByIdResponse {
-  return faker.helpers.arrayElement([createShowPetByIdStatus200(), createShowPetByIdStatusDefault()])
+export function createShowPetByIdResponse(data?: Partial<ShowPetByIdResponse>): ShowPetByIdResponse {
+  return (data ?? faker.helpers.arrayElement([createShowPetByIdStatus200(), createShowPetByIdStatusDefault()])) as ShowPetByIdResponse
 }

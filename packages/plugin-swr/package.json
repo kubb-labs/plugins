@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-swr",
-  "version": "5.0.0",
+  "version": "5.1.2",
   "description": "Generate type-safe SWR hooks with Kubb. Covers useSWR and useSWRMutation with full TypeScript support.",
   "keywords": [
     "code-generation",
@@ -31,6 +31,10 @@
     {
       "type": "opencollective",
       "url": "https://opencollective.com/kubb"
+    },
+    {
+      "type": "custom",
+      "url": "https://kubb.dev/sponsors"
     }
   ],
   "files": [
@@ -56,6 +60,7 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
@@ -82,10 +87,17 @@
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*",
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "swr": "^2.5.1"
   },
   "peerDependencies": {
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "swr": "^2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "swr": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22"

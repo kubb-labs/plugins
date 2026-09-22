@@ -1,6 +1,6 @@
-import type { Options, RequestResult } from '../../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from '../../../models/ts/pet/FindPetsByTags'
-import { client } from '../../../.kubb/client'
+import { client, withUnwrap } from '../../../.kubb/client'
 import { findPetsByTagsResponseSchema, findPetsByTagsErrorSchema } from '../../../zod/pet/findPetsByTagsSchema'
 
 /**
@@ -10,15 +10,17 @@ import { findPetsByTagsResponseSchema, findPetsByTagsErrorSchema } from '../../.
  */
 export function findPetsByTags<ThrowOnError extends boolean = true>(
   options: Options<FindPetsByTagsOptions, ThrowOnError>,
-): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({
-    method: 'GET',
-    url: '/pet/findByTags',
-    security: [{ type: 'oauth2' }],
-    styles: { query: { tags: { explode: true } } },
-    validator: { response: findPetsByTagsResponseSchema, error: findPetsByTagsErrorSchema },
-    ...config,
-  }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
+  return withUnwrap(
+    request({
+      method: 'GET',
+      url: '/pet/findByTags',
+      security: [{ type: 'oauth2' }],
+      styles: { query: { tags: { explode: true } } },
+      validator: { response: findPetsByTagsResponseSchema, error: findPetsByTagsErrorSchema },
+      ...config,
+    }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>,
+  )
 }

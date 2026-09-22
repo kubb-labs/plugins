@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { CreatePetsOptions, CreatePetsResponses } from '../models/ts/CreatePets'
-import { client } from '../.kubb/client'
+import { client, withUnwrap } from '../.kubb/client'
 
 /**
  * @summary Create a pet
@@ -13,8 +13,8 @@ import { client } from '../.kubb/client'
  */
 export function createPets<ThrowOnError extends boolean = true>(
   options: Options<CreatePetsOptions, ThrowOnError>,
-): Promise<RequestResult<CreatePetsResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<CreatePetsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pets/{uuid}', ...config }) as Promise<RequestResult<CreatePetsResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'POST', url: '/pets/{uuid}', ...config }) as Promise<RequestResult<CreatePetsResponses, ThrowOnError>>)
 }

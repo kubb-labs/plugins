@@ -7,6 +7,10 @@ export type GetInventoryStatus200 = {
   [key: string]: number
 }
 
+export type GetInventoryStatus401 = {
+  error: 'unauthorized'
+}
+
 export type GetInventoryOptions = {
   body?: never
   path?: never
@@ -16,9 +20,10 @@ export type GetInventoryOptions = {
 
 export type GetInventoryResponses = {
   '200': GetInventoryStatus200
+  '401': GetInventoryStatus401
 }
 
 /**
  * @description Union of all possible responses
  */
-export type GetInventoryResponse = GetInventoryStatus200
+export type GetInventoryResponse = GetInventoryStatus200 | GetInventoryStatus401

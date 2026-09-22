@@ -1,5 +1,28 @@
 # @kubb/plugin-cypress
 
+## 5.0.3
+
+### Patch Changes
+
+- [#891](https://github.com/kubb-labs/plugins/pull/891) [`8be0c24`](https://github.com/kubb-labs/plugins/commit/8be0c24172b2ec28a20c8df80460eafb1bde8ad8) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Declare the generated code's runtime libraries as optional peer dependencies so package managers can report incompatible versions without installing unused libraries.
+
+## 5.0.2
+
+### Patch Changes
+
+- [#869](https://github.com/kubb-labs/plugins/pull/869) [`7e936bc`](https://github.com/kubb-labs/plugins/commit/7e936bce055fa8f35de5d53e4354e7fd574b651d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add a `kubb.dev/sponsors` entry to each package's `funding` field, alongside the existing GitHub
+  Sponsors and Open Collective links.
+- Updated dependencies [[`1ba9310`](https://github.com/kubb-labs/plugins/commit/1ba9310cd1584b390b94aa53658adf955f79f8e4), [`7e936bc`](https://github.com/kubb-labs/plugins/commit/7e936bce055fa8f35de5d53e4354e7fd574b651d)]:
+  - @kubb/plugin-ts@5.0.2
+
+## 5.0.1
+
+### Patch Changes
+
+- [#835](https://github.com/kubb-labs/plugins/pull/835) [`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d) Thanks [@julian99m](https://github.com/julian99m)! - Explicit `types` fields for each package.json `exports` entry, so that it works with tsconfig.json `moduleResulotion: 'bundler'`
+- Updated dependencies [[`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d)]:
+  - @kubb/plugin-ts@5.0.1
+
 ## 5.0.0
 
 ### Major Changes

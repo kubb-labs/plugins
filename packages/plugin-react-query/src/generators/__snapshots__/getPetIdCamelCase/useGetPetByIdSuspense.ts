@@ -22,8 +22,7 @@ export function getPetByIdSuspenseQueryOptions(
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, GetPetByIdStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      const { data } = await getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
-      return data
+      return getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }

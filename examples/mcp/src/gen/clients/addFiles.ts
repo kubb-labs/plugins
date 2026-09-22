@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { AddFilesOptions, AddFilesResponses } from '../models/ts/AddFiles'
-import { client } from '../.kubb/client'
+import { client, withUnwrap } from '../.kubb/client'
 
 /**
  * @description Place a new file in the store
@@ -14,8 +14,8 @@ import { client } from '../.kubb/client'
  */
 export function addFiles<ThrowOnError extends boolean = true>(
   options: Options<AddFilesOptions, ThrowOnError>,
-): Promise<RequestResult<AddFilesResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<AddFilesResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet/files', ...config }) as Promise<RequestResult<AddFilesResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'POST', url: '/pet/files', ...config }) as Promise<RequestResult<AddFilesResponses, ThrowOnError>>)
 }

@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-fetch",
-  "version": "5.1.1",
+  "version": "5.4.1",
   "description": "Generate a slim, type-safe HTTP client with Kubb based on the native Fetch api.",
   "keywords": [
     "api-client",
@@ -29,6 +29,10 @@
     {
       "type": "opencollective",
       "url": "https://opencollective.com/kubb"
+    },
+    {
+      "type": "custom",
+      "url": "https://kubb.dev/sponsors"
     }
   ],
   "files": [
@@ -49,6 +53,7 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },

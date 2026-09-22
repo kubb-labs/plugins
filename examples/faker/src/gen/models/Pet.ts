@@ -3,8 +3,17 @@
  * Do not edit manually.
  */
 
+import type { Cat } from './Cat'
 import type { Category } from './Category'
+import type { Dog } from './Dog'
 import type { Tag } from './Tag'
+
+export const petTypeEnum = {
+  dog: 'dog',
+  cat: 'cat',
+} as const
+
+export type PetTypeEnumKey = (typeof petTypeEnum)[keyof typeof petTypeEnum]
 
 export const petStatusEnum = {
   available: 'available',
@@ -14,7 +23,14 @@ export const petStatusEnum = {
 
 export type PetStatusEnumKey = (typeof petStatusEnum)[keyof typeof petStatusEnum]
 
-export type Pet = {
+export type Pet = (
+  | (Dog & {
+      readonly type: 'dog'
+    })
+  | (Cat & {
+      readonly type: 'cat'
+    })
+) & {
   /**
    * @description
    * Format: `int64`
@@ -27,6 +43,7 @@ export type Pet = {
    * @type string
    */
   name: string
+  readonly type: PetTypeEnumKey
   category?: Category
   photoUrls: string[]
   tags?: Tag[]

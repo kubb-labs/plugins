@@ -73,8 +73,7 @@ export function updatePetMutationOptions<TContext = unknown>(
   return mutationOptions<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
-      const { data } = await updatePet({ ...config, body, throwOnError: true })
-      return data
+      return updatePet({ ...config, body, throwOnError: true }).unwrap()
     },
   })
 }
@@ -90,8 +89,7 @@ export function addPetMutationOptions<TContext = unknown>(
   return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
-      const { data } = await addPet({ ...config, body, throwOnError: true })
-      return data
+      return addPet({ ...config, body, throwOnError: true }).unwrap()
     },
   })
 }
@@ -109,8 +107,7 @@ export function findPetsByStatusQueryOptions(
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      const { data } = await findPetsByStatus({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
-      return data
+      return findPetsByStatus({ ...config, query, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }
@@ -128,8 +125,7 @@ export function findPetsByTagsQueryOptions(
   return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      const { data } = await findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
-      return data
+      return findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }
@@ -143,8 +139,7 @@ export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Part
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      const { data } = await getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
-      return data
+      return getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }
@@ -156,8 +151,7 @@ export function updatePetWithFormMutationOptions<TContext = unknown>(config: Par
   return mutationOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, query }) => {
-      const { data } = await updatePetWithForm({ ...config, path, query, throwOnError: true })
-      return data
+      return updatePetWithForm({ ...config, path, query, throwOnError: true }).unwrap()
     },
   })
 }
@@ -169,8 +163,7 @@ export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omi
   return mutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, headers }) => {
-      const { data } = await deletePet({ ...config, path, headers, throwOnError: true })
-      return data
+      return deletePet({ ...config, path, headers, throwOnError: true }).unwrap()
     },
   })
 }
@@ -182,8 +175,7 @@ export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Om
   return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, query, body }) => {
-      const { data } = await uploadFile({ ...config, path, query, body, throwOnError: true })
-      return data
+      return uploadFile({ ...config, path, query, body, throwOnError: true }).unwrap()
     },
   })
 }
@@ -197,8 +189,7 @@ export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'pa
   return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      const { data } = await getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
-      return data
+      return getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }
@@ -214,8 +205,7 @@ export function placeOrderMutationOptions<TContext = unknown>(
   return mutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
-      const { data } = await placeOrder({ ...config, body, throwOnError: true })
-      return data
+      return placeOrder({ ...config, body, throwOnError: true }).unwrap()
     },
   })
 }
@@ -231,8 +221,7 @@ export function placeOrderPatchMutationOptions<TContext = unknown>(
   return mutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
-      const { data } = await placeOrderPatch({ ...config, body, throwOnError: true })
-      return data
+      return placeOrderPatch({ ...config, body, throwOnError: true }).unwrap()
     },
   })
 }
@@ -249,8 +238,7 @@ export function getOrderByIdQueryOptions(
   return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      const { data } = await getOrderById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
-      return data
+      return getOrderById({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }
@@ -262,8 +250,7 @@ export function deleteOrderMutationOptions<TContext = unknown>(config: Partial<O
   return mutationOptions<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path }) => {
-      const { data } = await deleteOrder({ ...config, path, throwOnError: true })
-      return data
+      return deleteOrder({ ...config, path, throwOnError: true }).unwrap()
     },
   })
 }

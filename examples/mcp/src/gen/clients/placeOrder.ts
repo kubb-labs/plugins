@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { PlaceOrderOptions, PlaceOrderResponses } from '../models/ts/PlaceOrder'
-import { client } from '../.kubb/client'
+import { client, withUnwrap } from '../.kubb/client'
 
 /**
  * @description Place a new order in the store
@@ -14,8 +14,8 @@ import { client } from '../.kubb/client'
  */
 export function placeOrder<ThrowOnError extends boolean = true>(
   options: Options<PlaceOrderOptions, ThrowOnError>,
-): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'POST', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>)
 }

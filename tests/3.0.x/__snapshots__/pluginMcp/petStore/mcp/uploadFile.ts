@@ -8,7 +8,7 @@ import { uploadFile } from '../clients/uploadFile'
  * {@link /pet/:petId/uploadImage}
  */
 export async function uploadFileHandler({ path, query, body }: UploadFileOptions, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-  const res = await uploadFile({ path, query, body })
+  const res = await uploadFile({ path, query, body, signal: request.signal })
 
   return {
     content: [

@@ -177,7 +177,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         return factory.createTypeReferenceNode(name, undefined)
       },
       enum(node) {
-        const values = node.namedEnumValues?.map((v) => v.value) ?? node.enumValues ?? []
+        const values = ast.getSchemaLiteralValues(node)
 
         // A `const` (single-value enum) the adapter did not register as a named enum emits the bare
         // literal regardless of `enum.type`, matching how its references resolve.

@@ -19,6 +19,15 @@ export type ValidatorOptions = false | 'zod' | { request?: 'zod'; response?: 'zo
 export type Mode = 'tag' | 'flat'
 
 /**
+ * Shape of the value a generated operation function resolves to.
+ * - `'full'`: the complete `{ status, data, error, contentType, request, response }` result.
+ * - `'data'`: the bare success body once `throwOnError` (on by default) narrows away the error
+ *   branch, falling back to the full result when a call sets `throwOnError: false` and still
+ *   needs `error` to discriminate a failed response.
+ */
+export type ReturnTypeOption = 'full' | 'data'
+
+/**
  * The resolver shared by the client plugins. Inherits the built-in camelCase `name` and `file`;
  * classes and tag groups use PascalCase (with a `Client` suffix for groups).
  */
@@ -73,6 +82,20 @@ export type Options = OutputOptions & {
    * @default false
    */
   validator?: ValidatorOptions
+  /**
+   * Shape of the value a generated operation function resolves to. Applies to the standalone
+   * functions and the class-based SDK; not to the query-hook plugins (`@kubb/plugin-react-query`,
+   * `@kubb/plugin-vue-query`, `@kubb/plugin-swr`), which keep calling the client directly and
+   * expect the full result.
+   *
+   * @default 'full'
+   * @example
+   * ```ts
+   * pluginAxios({ returnType: 'data' })
+   * // const pet = await getPetById({ path: { petId: 1 } }) // Pet, not { status, data, ... }
+   * ```
+   */
+  returnType?: ReturnTypeOption
   /**
    * Generates a class-based SDK instead of the standalone functions. Each tag client is an instance
    * class whose constructor takes a client config and builds its own client, so every environment is
@@ -140,6 +163,7 @@ export type ResolvedOptions = {
   group: Group | null
   baseURL: Options['baseURL']
   validator: NonNullable<Options['validator']>
+  returnType: ReturnTypeOption
   sdk:
     | {
         mode: Mode

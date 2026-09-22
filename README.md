@@ -26,6 +26,10 @@ This monorepo is home to official and community plugins for [Kubb](https://kubb.
 
 Want to build your own plugin? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
+## Use plugins in Kubb Studio
+
+[Kubb Studio](https://kubb.studio) lets you configure and inspect Kubb generations in the browser while your project or self-hosted agent runs Kubb. [Connect a project](https://kubb.dev/docs/5.x/guide/integrations/studio) to use these plugins in that workflow.
+
 ## Official plugins
 
 Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](https://npmx.dev/package/@kubb/adapter-oas) as the adapter layer.
@@ -180,6 +184,11 @@ Want to contribute to an existing plugin or add a new one, official or community
       <td align="center" valign="top" width="14.28%"><a href="https://pateljay.io"><img src="https://avatars.githubusercontent.com/u/36803168?v=4?s=100" width="100px;" alt="Jay Patel"/><br /><sub><b>Jay Patel</b></sub></a><br /><a href="https://github.com/kubb-labs/plugins/commits?author=jay-babu" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://hamzamihaidaniel.com"><img src="https://avatars.githubusercontent.com/u/12731515?v=4?s=100" width="100px;" alt="Hamza Mihai Daniel"/><br /><sub><b>Hamza Mihai Daniel</b></sub></a><br /><a href="https://github.com/kubb-labs/plugins/commits?author=hamzamihaidanielx" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://sferadev.com"><img src="https://avatars.githubusercontent.com/u/2181866?v=4?s=100" width="100px;" alt="Alexis Rico"/><br /><sub><b>Alexis Rico</b></sub></a><br /><a href="https://github.com/kubb-labs/plugins/commits?author=SferaDev" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://xeoneux.com"><img src="https://avatars.githubusercontent.com/u/3099626?v=4?s=100" width="100px;" alt="Aayush Kapoor"/><br /><sub><b>Aayush Kapoor</b></sub></a><br /><a href="https://github.com/kubb-labs/plugins/commits?author=xeoneux" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/julian99m"><img src="https://avatars.githubusercontent.com/u/54702068?v=4?s=100" width="100px;" alt="Julian Meyer"/><br /><sub><b>Julian Meyer</b></sub></a><br /><a href="https://github.com/kubb-labs/plugins/commits?author=julian99m" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://ghettoddos.su"><img src="https://avatars.githubusercontent.com/u/47575319?v=4?s=100" width="100px;" alt="Egor"/><br /><sub><b>Egor</b></sub></a><br /><a href="https://github.com/kubb-labs/plugins/commits?author=ghettoDdOS" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
@@ -191,7 +200,7 @@ Want to contribute to an existing plugin or add a new one, official or community
 
 ## Sponsors
 
-Kubb's development is funded by sponsors. To support the project, [become a sponsor on GitHub](https://github.com/sponsors/stijnvanhulle) or [back us on Open Collective](https://opencollective.com/kubb).
+Kubb's development is funded by sponsors. To support the project, [become a sponsor on GitHub](https://github.com/sponsors/stijnvanhulle) or [back us on Open Collective](https://opencollective.com/kubb). See [sponsorship tiers and our sponsors](https://kubb.dev/sponsors).
 
 <p align="center">
   <a href="https://github.com/sponsors/stijnvanhulle">

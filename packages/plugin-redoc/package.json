@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-redoc",
-  "version": "5.0.0",
+  "version": "5.0.2",
   "description": "Generate a ReDoc API reference page with Kubb. Produces a standalone HTML file you can host without a build step.",
   "keywords": [
     "api-docs",
@@ -29,6 +29,10 @@
     {
       "type": "opencollective",
       "url": "https://opencollective.com/kubb"
+    },
+    {
+      "type": "custom",
+      "url": "https://kubb.dev/sponsors"
     }
   ],
   "files": [
@@ -47,6 +51,7 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },

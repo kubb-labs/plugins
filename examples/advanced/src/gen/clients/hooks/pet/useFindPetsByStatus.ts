@@ -16,8 +16,7 @@ export function findPetsByStatusQueryOptions(
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      const { data } = await findPetsByStatus({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
-      return data
+      return findPetsByStatus({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }

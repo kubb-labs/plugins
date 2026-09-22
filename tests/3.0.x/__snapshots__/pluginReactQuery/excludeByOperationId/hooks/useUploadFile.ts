@@ -16,8 +16,7 @@ export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Om
   return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
     mutationKey,
     mutationFn: async({ path, query, body }) => {
-      const { data } = await uploadFile({ ...config, path, query, body, throwOnError: true })
-      return data
+      return uploadFile({ ...config, path, query, body, throwOnError: true }).unwrap()
     },
   })
 }

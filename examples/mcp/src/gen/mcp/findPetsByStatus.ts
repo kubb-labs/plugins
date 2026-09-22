@@ -12,7 +12,7 @@ export async function findPetsByStatusHandler(
   { path }: FindPetsByStatusOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await findPetsByStatus({ path })
+  const res = await findPetsByStatus({ path, signal: request.signal })
 
   return {
     content: [

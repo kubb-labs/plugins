@@ -34,8 +34,7 @@ export function useDeletePet(
   return useSWRMutation<DeletePetResponse, ResponseErrorConfig<Error>, DeletePetMutationKey | null, DeletePetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, headers } }) => {
-      const { data } = await deletePet({ ...config, path, headers, throwOnError: true })
-      return data
+      return deletePet({ ...config, path, headers, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

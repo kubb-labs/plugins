@@ -84,7 +84,14 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
 
         <File.Import name={['queryOptions']} path={importPath} />
 
-        <QueryOptions name={queryOptionsName} clientName={calledClientName} queryKeyName={queryKeyName} node={node} tsResolver={tsResolver} />
+        <QueryOptions
+          name={queryOptionsName}
+          clientName={calledClientName}
+          queryKeyName={queryKeyName}
+          node={node}
+          tsResolver={tsResolver}
+          returnType={contractOp.returnType}
+        />
 
         {query && hooks && (
           <>

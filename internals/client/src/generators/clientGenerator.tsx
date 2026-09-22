@@ -14,8 +14,9 @@ import type { ContractClientFactory } from '../types.ts'
  * Builds the built-in per-operation generator shared by the client plugins (`@kubb/plugin-fetch`,
  * `@kubb/plugin-axios`). Emits one async function per OpenAPI operation using the shared
  * `Operation` component: a grouped `<Name>Request` type and a function that forwards a single
- * `options` object to the bundled `client` and returns the `RequestResult`. Only the generator
- * `name` differs between plugins; every other resolution, import, and rendering step is identical.
+ * `options` object to the bundled `client` and returns the `Unwrappable<RequestResult>`. Only the
+ * generator `name` differs between plugins. Every other resolution, import, and rendering step is
+ * identical.
  */
 export function createClientGenerator<TFactory extends ContractClientFactory>(name: string): Generator<TFactory> {
   return defineGenerator<TFactory>({
@@ -25,7 +26,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       if (!ast.isHttpOperationNode(node)) return null
 
       const { config, driver, resolver, root } = ctx
-      const { output, validator, group } = ctx.options
+      const { output, validator, returnType, group } = ctx.options
 
       const types = resolveOperationTypes(driver)
       if (!types) {
@@ -87,9 +88,19 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
           banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
           footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         >
-          <File.Import name={eventStream ? ['client', 'toEventStream'] : ['client']} root={meta.file.path} path={clientPath} />
           <File.Import
-            name={eventStream ? ['Options', 'EventStreamResult', 'SuccessOf'] : ['Options', 'RequestResult']}
+            name={eventStream ? ['client', 'toEventStream'] : ['client', returnType === 'data' ? 'unwrapResult' : 'withUnwrap']}
+            root={meta.file.path}
+            path={clientPath}
+          />
+          <File.Import
+            name={
+              eventStream
+                ? ['Options', 'EventStreamResult', 'SuccessOf']
+                : returnType === 'data'
+                  ? ['Options', 'UnwrappedResult']
+                  : ['Options', 'Unwrappable', 'RequestResult']
+            }
             root={meta.file.path}
             path={clientPath}
             isTypeOnly
@@ -101,7 +112,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
 
           {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames} root={meta.file.path} path={meta.fileZod.path} />}
 
-          <Operation name={meta.name} node={node} types={types} zodResolver={zodResolver} validator={validator} security={security} />
+          <Operation name={meta.name} node={node} types={types} zodResolver={zodResolver} validator={validator} returnType={returnType} security={security} />
         </File>
       )
     },

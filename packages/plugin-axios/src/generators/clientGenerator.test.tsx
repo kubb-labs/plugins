@@ -28,6 +28,7 @@ const defaultOptions: PluginAxios['resolvedOptions'] = {
   group: null,
   baseURL: undefined,
   validator: false,
+  returnType: 'full',
   sdk: undefined,
   resolver: resolverClient,
 }
@@ -192,6 +193,8 @@ describe('clientGenerator operation', () => {
     // text/event-stream response returns a typed event stream instead of a one-shot result.
     { name: 'streamEventsSse', node: streamEventsNode, options: {} },
     { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { validator: 'zod' as const } },
+    // returnType: 'data' unwraps the resolved call down to the bare success body.
+    { name: 'getPetByIdWithReturnTypeData', node: getPetByIdNode, options: { returnType: 'data' as const } },
     // Two requirements referencing two schemes (oauth2 bearer + apiKey header).
     { name: 'getPetByIdWithSecurity', node: getPetByIdNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginAxios['resolvedOptions']>; adapter?: Adapter }>

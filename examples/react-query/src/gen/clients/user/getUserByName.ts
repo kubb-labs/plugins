@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { GetUserByNameOptions, GetUserByNameResponses } from '../../models/user/GetUserByName'
-import { client } from '../../.kubb/client'
+import { client, withUnwrap } from '../../.kubb/client'
 
 /**
  * @summary Get user by user name
@@ -13,8 +13,8 @@ import { client } from '../../.kubb/client'
  */
 export function getUserByName<ThrowOnError extends boolean = true>(
   options: Options<GetUserByNameOptions, ThrowOnError>,
-): Promise<RequestResult<GetUserByNameResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<GetUserByNameResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/user/{username}', ...config }) as Promise<RequestResult<GetUserByNameResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'GET', url: '/user/{username}', ...config }) as Promise<RequestResult<GetUserByNameResponses, ThrowOnError>>)
 }

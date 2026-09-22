@@ -22,7 +22,7 @@
     "@kubb/adapter-oas": "catalog:",
     "@kubb/plugin-axios": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
-    "axios": "^1.19.0",
+    "axios": "^1.20.0",
     "kubb": "catalog:"
   },
   "devDependencies": {
@@ -32,5 +32,5 @@
     "node": ">=22",
     "pnpm": ">=11.0.0"
   },
-  "packageManager": "pnpm@11.20.0"
+  "packageManager": "pnpm@12.3.4"
 }

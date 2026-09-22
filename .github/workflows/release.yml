@@ -32,12 +32,12 @@ jobs:
       staged_packages: ${{ steps.release.outputs.staged_packages }}
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@ec40df0e3e54565e006f6d92a2fce16ff43b14d8 # main
         with:
           node-version: '22.22.3'
           cache: 'false'
@@ -50,13 +50,13 @@ jobs:
         run: pnpm run test --coverage
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Release
         id: release
-        uses: kubb-labs/config/.github/actions/release@3f4c08f50e67174c9e0ba09290bc79199f50ddfb # main
+        uses: kubb-labs/config/.github/actions/release@ec40df0e3e54565e006f6d92a2fce16ff43b14d8 # main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -95,12 +95,12 @@ jobs:
       approved: ${{ steps.promote.outputs.approved }}
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@ec40df0e3e54565e006f6d92a2fce16ff43b14d8 # main
         with:
           node-version: '22.22.3'
           cache: 'false'
@@ -109,7 +109,7 @@ jobs:
       # defaults to per-package.
       - name: Promote
         id: promote
-        uses: kubb-labs/config/.github/actions/promote@3f4c08f50e67174c9e0ba09290bc79199f50ddfb # main
+        uses: kubb-labs/config/.github/actions/promote@ec40df0e3e54565e006f6d92a2fce16ff43b14d8 # main
         with:
           staged-packages: ${{ needs.release.outputs.staged_packages }}
           github-token: ${{ secrets.GITHUB_TOKEN }}

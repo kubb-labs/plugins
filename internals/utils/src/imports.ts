@@ -32,7 +32,8 @@ export function filterUsedImports(imports: Array<ImportEntry>, text: string, ski
         return false
       }
 
-      return new RegExp(`\\b${escapeRegExp(name)}\\b(?=\\s*\\()`).test(text)
+      // Generated helpers can use explicit type arguments, such as `createPet<object>()`.
+      return new RegExp(`\\b${escapeRegExp(name)}\\b(?=\\s*[<(])`).test(text)
     })
   })
 }

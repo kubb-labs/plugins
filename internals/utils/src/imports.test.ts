@@ -10,7 +10,7 @@ describe('import utilities', () => {
       { name: [{ propertyName: 'createUser', name: 'makeUser' }], path: './user.ts' },
     ]
 
-    expect(filterUsedImports(imports, 'createPet(data); makeUser(data); const value = unused')).toStrictEqual([
+    expect(filterUsedImports(imports, 'createPet(data); makeUser<object>(); const value = unused')).toStrictEqual([
       { name: 'createPet', path: './pet.ts' },
       { name: [{ propertyName: 'createUser', name: 'makeUser' }], path: './user.ts' },
     ])

@@ -27,8 +27,7 @@ export function usePlaceOrder<TContext>(options: {
 
   return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>({
     mutationFn: async({ body }) => {
-      const { data } = await placeOrder({ ...config, body: toValue(body), throwOnError: true })
-      return data
+      return placeOrder({ ...config, body: toValue(body), throwOnError: true }).unwrap()
     },
     mutationKey,
     ...mutationOptions

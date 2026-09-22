@@ -15,21 +15,18 @@ export type AddPetStatus405 = unknown
 
 /**
  * @description Create a new pet in the store
- * @type object
  */
-export type AddPetBodyJson = Pet
+export type AddPetBodyJson = Omit<NonNullable<Pet>, 'type'>
 
 /**
  * @description Create a new pet in the store
- * @type object
  */
-export type AddPetBodyXml = Pet
+export type AddPetBodyXml = Omit<NonNullable<Pet>, 'type'>
 
 /**
  * @description Create a new pet in the store
- * @type object
  */
-export type AddPetBodyFormUrlEncoded = Pet
+export type AddPetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'type'>
 
 export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded
 

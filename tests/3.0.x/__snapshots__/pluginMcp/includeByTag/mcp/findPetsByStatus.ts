@@ -9,7 +9,7 @@ import { findPetsByStatus } from '../clients/findPetsByStatus'
  * {@link /pet/findByStatus}
  */
 export async function findPetsByStatusHandler({ query }: FindPetsByStatusOptions = {}, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-  const res = await findPetsByStatus({ query })
+  const res = await findPetsByStatus({ query, signal: request.signal })
 
   return {
     content: [

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { ClientConfig, ClientInstance, Options, RequestResult } from '../../.kubb/client'
+import type { ClientConfig, ClientInstance, Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { AddPetOptions, AddPetResponses } from '../../models/pet/AddPet'
 import type { DeletePetOptions, DeletePetResponses } from '../../models/pet/DeletePet'
 import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../../models/pet/FindPetsByStatus'
@@ -12,7 +12,7 @@ import type { GetPetByIdOptions, GetPetByIdResponses } from '../../models/pet/Ge
 import type { UpdatePetOptions, UpdatePetResponses } from '../../models/pet/UpdatePet'
 import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from '../../models/pet/UpdatePetWithForm'
 import type { UploadFileOptions, UploadFileResponses } from '../../models/pet/UploadFile'
-import { createClient } from '../../.kubb/client'
+import { createClient, withUnwrap } from '../../.kubb/client'
 
 export class pet {
   private readonly client: ClientInstance
@@ -28,10 +28,12 @@ export class pet {
    */
   public updatePet<ThrowOnError extends boolean = true>(
     options: Options<UpdatePetOptions, ThrowOnError>,
-  ): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
+  ): Unwrappable<RequestResult<UpdatePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'PUT', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
+    return withUnwrap(
+      request({ method: 'PUT', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>,
+    )
   }
 
   /**
@@ -39,10 +41,12 @@ export class pet {
    * @summary Add a new pet to the store
    * {@link /pet}
    */
-  public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptions, ThrowOnError>): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
+  public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptions, ThrowOnError>): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
+    return withUnwrap(
+      request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>,
+    )
   }
 
   /**
@@ -52,12 +56,14 @@ export class pet {
    */
   public findPetsByStatus<ThrowOnError extends boolean = true>(
     options: Options<FindPetsByStatusOptions, ThrowOnError> = {},
-  ): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+  ): Unwrappable<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], ...config }) as Promise<
-      RequestResult<FindPetsByStatusResponses, ThrowOnError>
-    >
+    return withUnwrap(
+      request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], ...config }) as Promise<
+        RequestResult<FindPetsByStatusResponses, ThrowOnError>
+      >,
+    )
   }
 
   /**
@@ -67,12 +73,14 @@ export class pet {
    */
   public findPetsByTags<ThrowOnError extends boolean = true>(
     options: Options<FindPetsByTagsOptions, ThrowOnError> = {},
-  ): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
+  ): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/pet/findByTags', security: [{ type: 'oauth2' }], ...config }) as Promise<
-      RequestResult<FindPetsByTagsResponses, ThrowOnError>
-    >
+    return withUnwrap(
+      request({ method: 'GET', url: '/pet/findByTags', security: [{ type: 'oauth2' }], ...config }) as Promise<
+        RequestResult<FindPetsByTagsResponses, ThrowOnError>
+      >,
+    )
   }
 
   /**
@@ -82,15 +90,14 @@ export class pet {
    */
   public getPetById<ThrowOnError extends boolean = true>(
     options: Options<GetPetByIdOptions, ThrowOnError>,
-  ): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
+  ): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({
-      method: 'GET',
-      url: '/pet/{petId}',
-      security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }],
-      ...config,
-    }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
+    return withUnwrap(
+      request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], ...config }) as Promise<
+        RequestResult<GetPetByIdResponses, ThrowOnError>
+      >,
+    )
   }
 
   /**
@@ -99,12 +106,14 @@ export class pet {
    */
   public updatePetWithForm<ThrowOnError extends boolean = true>(
     options: Options<UpdatePetWithFormOptions, ThrowOnError>,
-  ): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
+  ): Unwrappable<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'POST', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<
-      RequestResult<UpdatePetWithFormResponses, ThrowOnError>
-    >
+    return withUnwrap(
+      request({ method: 'POST', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<
+        RequestResult<UpdatePetWithFormResponses, ThrowOnError>
+      >,
+    )
   }
 
   /**
@@ -114,12 +123,12 @@ export class pet {
    */
   public deletePet<ThrowOnError extends boolean = true>(
     options: Options<DeletePetOptions, ThrowOnError>,
-  ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
+  ): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<
-      RequestResult<DeletePetResponses, ThrowOnError>
-    >
+    return withUnwrap(
+      request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>,
+    )
   }
 
   /**
@@ -128,11 +137,13 @@ export class pet {
    */
   public uploadFile<ThrowOnError extends boolean = true>(
     options: Options<UploadFileOptions, ThrowOnError>,
-  ): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
+  ): Unwrappable<RequestResult<UploadFileResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], ...config }) as Promise<
-      RequestResult<UploadFileResponses, ThrowOnError>
-    >
+    return withUnwrap(
+      request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], ...config }) as Promise<
+        RequestResult<UploadFileResponses, ThrowOnError>
+      >,
+    )
   }
 }

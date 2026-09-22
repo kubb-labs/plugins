@@ -40,15 +40,14 @@ export function updatePetWithFormQueryOptions(
   return queryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormStatus200>({
     queryKey,
     queryFn: async ({ signal }) => {
-      const { data } = await updatePetWithForm({
+      return updatePetWithForm({
         ...config,
         path: toValue(path),
         query: toValue(query),
         body: toValue(body),
         signal: config.signal ?? signal,
         throwOnError: true,
-      })
-      return data
+      }).unwrap()
     },
   })
 }

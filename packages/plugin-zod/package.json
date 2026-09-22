@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-zod",
-  "version": "5.1.1",
+  "version": "5.1.6",
   "description": "Generate Zod validation schemas with Kubb for runtime data parsing and type safety. Pairs with @kubb/plugin-ts for end-to-end type coverage.",
   "keywords": [
     "code-generation",
@@ -30,6 +30,10 @@
     {
       "type": "opencollective",
       "url": "https://opencollective.com/kubb"
+    },
+    {
+      "type": "custom",
+      "url": "https://kubb.dev/sponsors"
     }
   ],
   "files": [
@@ -46,6 +50,7 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
@@ -67,10 +72,17 @@
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "zod": "^4.6.5"
   },
   "peerDependencies": {
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "zod": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22"

@@ -1,4 +1,4 @@
-import { getOperationParameters, getPerContentTypeName, resolveContentTypeVariants, resolveDependencyOperationFile } from '@internals/shared'
+import { collectRefNames, getOperationParameters, getPerContentTypeName, resolveContentTypeVariants, resolveDependencyOperationFile } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from 'kubb/kit'
 import { buildParams, pluginTsName } from '@kubb/plugin-ts'
@@ -142,7 +142,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       const variants = resolveContentTypeVariants(entries, baseName)
       const unionSchema = ast.factory.createSchema({
         type: 'union',
-        members: variants.map((variant) => ast.factory.createSchema({ type: 'ref', name: variant.name })),
+        members: variants.map((variant) => ast.factory.createSchema({ type: 'ref', name: variant.name, schema: variant.schema })),
       })
       return [
         ...variants.map((variant) => ({
@@ -172,11 +172,17 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       (schema) => ({ ...schema, description: node.requestBody?.description ?? schema.description }),
     )
     const responseName = resolver.response.response(node)
+    const importedResponseNames = new Set(
+      node.responses.flatMap((response) =>
+        (response.content ?? []).flatMap((entry) => (entry.schema ? collectRefNames(entry.schema).map((name) => resolver.name(name)) : [])),
+      ),
+    )
+    const hasResponseNameCollision = importedResponseNames.has(responseName)
     const localHelperNames = new Set([
       ...paramGroups.map((group) => group.name),
       ...responseUnits.map((unit) => unit.name),
       ...dataUnits.map((unit) => unit.name),
-      responseName,
+      ...(hasResponseNameCollision ? [] : [responseName]),
     ])
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
 
@@ -285,12 +291,13 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             skipImportNames: unit.skipImportNames,
           }),
         )}
-        {renderEntry({
-          schema: buildResponseUnionSchema(node, resolver),
-          name: responseName,
-          typeName: tsResolver.response.response(node),
-          skipImportNames: responseUnits.map((unit) => unit.name),
-        })}
+        {!hasResponseNameCollision &&
+          renderEntry({
+            schema: buildResponseUnionSchema(node, resolver),
+            name: responseName,
+            typeName: tsResolver.response.response(node),
+            skipImportNames: responseUnits.map((unit) => unit.name),
+          })}
       </File>
     )
   },

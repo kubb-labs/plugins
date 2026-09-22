@@ -9,7 +9,7 @@ import { placeOrder } from '../../clients/placeOrder'
  * {@link /store/order}
  */
 export async function placeOrderHandler({ body }: PlaceOrderOptions, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-  const res = await placeOrder({ body })
+  const res = await placeOrder({ body, signal: request.signal })
 
   return {
     content: [

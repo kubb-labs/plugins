@@ -16,8 +16,7 @@ type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusOptions = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      const { data } = await findPetsByStatus({ ...config, query, throwOnError: true })
-      return data
+      return findPetsByStatus({ ...config, query, throwOnError: true }).unwrap()
     },
   }
 }

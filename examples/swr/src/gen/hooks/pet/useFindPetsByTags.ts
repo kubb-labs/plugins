@@ -20,8 +20,7 @@ export function findPetsByTagsQueryOptions(
 ) {
   return {
     fetcher: async () => {
-      const { data } = await findPetsByTags({ ...config, query, throwOnError: true })
-      return data
+      return findPetsByTags({ ...config, query, throwOnError: true }).unwrap()
     },
   }
 }

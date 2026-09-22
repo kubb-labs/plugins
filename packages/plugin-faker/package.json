@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-faker",
-  "version": "5.0.1",
+  "version": "5.0.10",
   "description": "Generate Faker.js mock data factories with Kubb. Produces realistic seed data and fixtures for development and testing.",
   "keywords": [
     "code-generation",
@@ -31,6 +31,10 @@
     {
       "type": "opencollective",
       "url": "https://opencollective.com/kubb"
+    },
+    {
+      "type": "custom",
+      "url": "https://kubb.dev/sponsors"
     }
   ],
   "files": [
@@ -56,6 +60,7 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
@@ -78,12 +83,19 @@
     "@kubb/plugin-ts": "workspace:^"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.6.0",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
     "kubb": "catalog:"
   },
   "peerDependencies": {
+    "@faker-js/faker": "^10.0.0",
     "kubb": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "@faker-js/faker": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22"

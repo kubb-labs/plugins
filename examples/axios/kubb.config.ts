@@ -25,6 +25,9 @@ export default defineConfig(() => {
       pluginTs({
         output: { path: 'models', mode: 'directory', barrel: { type: 'named' } },
         group: { type: 'tag' },
+        // deletePet's path/header params cover issue #875 (interface params reaching the
+        // client's RequestConfig). Everything else keeps the default `type` alias.
+        override: [{ type: 'operationId', pattern: 'deletePet', options: { syntaxType: 'interface' } }],
       }),
       pluginAxios({
         output: { path: './clients', mode: 'directory', barrel: { type: 'named' } },

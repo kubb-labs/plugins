@@ -5,7 +5,15 @@ import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { Infinite, PluginReactQuery } from '../types.ts'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
-import { buildClientOptionType, buildResolvedRequestParams, buildResponseTypes, getComments, maybeValueOrGetter, resolvePageParamType } from '../utils.ts'
+import {
+  buildClientOptionType,
+  buildResolvedRequestParams,
+  buildResponseTypes,
+  getComments,
+  hasQueryKeyParams,
+  maybeValueOrGetter,
+  resolvePageParamType,
+} from '../utils.ts'
 
 type Props = {
   name: string
@@ -79,7 +87,7 @@ export function InfiniteQuery({
   ]
 
   const resolvedParams = buildResolvedRequestParams(node)
-  const queryKeyArgs = resolvedParams ? 'resolvedParams' : ''
+  const queryKeyArgs = resolvedParams && hasQueryKeyParams(node) ? 'resolvedParams' : ''
   const queryOptionsArgs = resolvedParams ? 'resolvedParams, config' : 'config'
 
   const paramsNode = buildInfiniteQueryParamsNode(node, {

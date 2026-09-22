@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { UpdatePetOptions, UpdatePetResponses } from '../models/ts/UpdatePet'
-import { client } from '../.kubb/client'
+import { client, withUnwrap } from '../.kubb/client'
 
 /**
  * @description Update an existing pet by Id
@@ -14,8 +14,10 @@ import { client } from '../.kubb/client'
  */
 export function updatePet<ThrowOnError extends boolean = true>(
   options: Options<UpdatePetOptions, ThrowOnError>,
-): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<UpdatePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'PUT', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
+  return withUnwrap(
+    request({ method: 'PUT', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>,
+  )
 }

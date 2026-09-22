@@ -491,6 +491,33 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "xeoneux",
+      "name": "Aayush Kapoor",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3099626?v=4",
+      "profile": "https://xeoneux.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "julian99m",
+      "name": "Julian Meyer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/54702068?v=4",
+      "profile": "https://github.com/julian99m",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ghettoDdOS",
+      "name": "Egor",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47575319?v=4",
+      "profile": "https://ghettoddos.su",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

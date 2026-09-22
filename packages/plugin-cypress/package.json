@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-cypress",
-  "version": "5.0.0",
+  "version": "5.0.3",
   "description": "Generate Cypress request commands and e2e test fixtures with Kubb for automated API testing.",
   "keywords": [
     "code-generation",
@@ -29,6 +29,10 @@
     {
       "type": "opencollective",
       "url": "https://opencollective.com/kubb"
+    },
+    {
+      "type": "custom",
+      "url": "https://kubb.dev/sponsors"
     }
   ],
   "files": [
@@ -45,6 +49,7 @@
   "typesVersions": {},
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
@@ -69,10 +74,17 @@
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
+    "cypress": "^16.1.0",
     "kubb": "catalog:"
   },
   "peerDependencies": {
+    "cypress": "^15.0.0 || ^16.0.0",
     "kubb": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "cypress": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22"

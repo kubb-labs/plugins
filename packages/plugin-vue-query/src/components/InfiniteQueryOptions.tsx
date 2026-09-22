@@ -16,6 +16,12 @@ type Props = {
   nextParam: Infinite['nextParam']
   previousParam: Infinite['previousParam']
   queryParam: Infinite['queryParam']
+  /**
+   * The registered client plugin's `returnType`, read by the caller off `resolveClientOperation`.
+   *
+   * @default 'full'
+   */
+  returnType?: 'full' | 'data'
 }
 
 /**

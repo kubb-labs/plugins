@@ -43,8 +43,7 @@ export function useDeleteOrder(
   >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path } }) => {
-      const { data } = await deleteOrder({ ...config, path, throwOnError: true })
-      return data
+      return deleteOrder({ ...config, path, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

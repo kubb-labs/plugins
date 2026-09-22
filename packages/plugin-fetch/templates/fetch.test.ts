@@ -10,6 +10,8 @@ import {
   type ServerSentEvent,
   type Transport,
   type TransportResult,
+  unwrapResult,
+  withUnwrap,
 } from './fetch.ts'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
@@ -39,6 +41,10 @@ function createClient(result?: FakeResult) {
 
 function toSchema<T>(transform: (value: unknown) => T) {
   return { '~standard': { validate: (value: unknown) => ({ value: transform(value) }) } }
+}
+
+function toFailingSchema(message = 'invalid') {
+  return { '~standard': { validate: () => ({ issues: [{ message, path: ['name'] }] }) } }
 }
 
 describe('createInterceptorStack', () => {
@@ -376,6 +382,30 @@ describe('createClientCore', () => {
     expect(calls[0]?.headers['X-Filter']).toBe('role=admin')
   })
 
+  // `plugin-ts`'s `syntaxType: 'interface'` types path/headers/cookies params as interfaces, which
+  // (unlike a type alias) get no implicit index signature, so `RequestConfig` must accept them too.
+  test('accepts interface-typed path, headers, and cookies params', async () => {
+    interface PetPath {
+      petId: number
+    }
+    interface PetHeaders {
+      'X-Request-Id': string
+    }
+    interface PetCookies {
+      session: string
+    }
+
+    const { client, calls } = createClient()
+    const path: PetPath = { petId: 7 }
+    const headers: PetHeaders = { 'X-Request-Id': 'abc' }
+    const cookies: PetCookies = { session: 'xyz' }
+    await client({ method: 'GET', url: '/pet/{petId}', path, headers, cookies })
+
+    expect(calls[0]?.url).toBe('/pet/7')
+    expect(calls[0]?.headers['X-Request-Id']).toBe('abc')
+    expect(calls[0]?.headers.Cookie).toBe('session=xyz')
+  })
+
   test('builds FormData and omits Content-Type for multipart/form-data', async () => {
     const { client, calls } = createClient()
     await client({ method: 'POST', url: '/pet', body: { field: 'x' }, contentType: 'multipart/form-data' })
@@ -480,6 +510,54 @@ describe('createClientCore', () => {
     const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { error: toSchema(error) } })) as CallResult<string, string>
     expect(error).toHaveBeenCalledTimes(1)
     expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, contentType: undefined, request: 'REQ', response: 'RES' })
+  })
+
+  test('throws the ParseError when no onValidationError is set', async () => {
+    const { client } = createClient({ data: { id: 1 }, status: 200 })
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({
+      name: 'ParseError',
+      issues: [{ message: 'invalid', path: ['name'] }],
+    })
+  })
+
+  test('resolves with the substituted value when onValidationError returns one', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const onValidationError = vi.fn((_error: unknown, context: { value: unknown }) => ({ value: context.value }))
+    const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError })
+    const result = (await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })) as CallResult<string, string>
+    expect(result.data).toStrictEqual({ id: 1 })
+    expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'response', method: 'GET', status: 200, value: { id: 1 } })
+  })
+
+  test('rethrows when onValidationError returns nothing', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const onValidationError = vi.fn(() => undefined)
+    const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError })
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({ name: 'ParseError' })
+    expect(onValidationError).toHaveBeenCalledTimes(1)
+  })
+
+  test('reports a failing request body with the request direction', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const onValidationError = vi.fn(() => ({ value: { name: 'odie' } }))
+    const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError })
+    await client({ method: 'POST', url: '/pet', body: { name: 1 }, validator: { request: toFailingSchema() } })
+    expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'request', method: 'POST', url: '/pet', value: { name: 1 } })
+  })
+
+  test('prefers the per-call onValidationError over the client one', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const clientLevel = vi.fn(() => ({ value: 'client' }))
+    const perCall = vi.fn(() => ({ value: 'call' }))
+    const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError: clientLevel })
+    const result = (await client({
+      method: 'GET',
+      url: '/pet/1',
+      validator: { response: toFailingSchema() },
+      onValidationError: perCall,
+    })) as CallResult<string, string>
+    expect(result.data).toBe('call')
+    expect(clientLevel).not.toHaveBeenCalled()
   })
 
   test('skips the error parser on a success body', async () => {
@@ -646,6 +724,35 @@ describe('getUrl', () => {
     expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, styles: { query: { id: { style: 'spaceDelimited', explode: false } } } })).toBe(
       '/pets?id=3%204%205',
     )
+  })
+})
+
+describe('unwrapResult', () => {
+  test('narrows a success result to its data', async () => {
+    const result = await unwrapResult(Promise.resolve({ data: { id: 1 }, error: undefined }), undefined)
+    expect(result).toStrictEqual({ id: 1 })
+  })
+
+  test('falls back to the full result when throwOnError is false', async () => {
+    const full = { data: undefined, error: { message: 'invalid' } }
+    const result = await unwrapResult(Promise.resolve(full), false)
+    expect(result).toBe(full)
+  })
+})
+
+describe('withUnwrap', () => {
+  test('unwrap() resolves to the success data', async () => {
+    const result = await withUnwrap(Promise.resolve({ data: { id: 1 }, error: undefined })).unwrap()
+    expect(result).toStrictEqual({ id: 1 })
+  })
+
+  test('unwrap() rejects with error for a non-throwing error result', async () => {
+    await expect(withUnwrap(Promise.resolve({ data: undefined, error: { message: 'invalid' } })).unwrap()).rejects.toStrictEqual({ message: 'invalid' })
+  })
+
+  test('a rejected call propagates the rejection unchanged', async () => {
+    const error = new ResponseError({ data: { message: 'invalid' }, status: 405, statusText: 'Method Not Allowed', request: 'REQ', response: 'RES' })
+    await expect(withUnwrap(Promise.reject(error)).unwrap()).rejects.toBe(error)
   })
 })
 

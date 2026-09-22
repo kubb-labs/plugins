@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-msw",
-  "version": "5.0.0",
+  "version": "5.0.4",
   "description": "Generate Mock Service Worker (MSW) request handlers with Kubb. Intercept HTTP requests in the browser or Node.js for frontend development and testing.",
   "keywords": [
     "api-mocking",
@@ -31,6 +31,10 @@
     {
       "type": "opencollective",
       "url": "https://opencollective.com/kubb"
+    },
+    {
+      "type": "custom",
+      "url": "https://kubb.dev/sponsors"
     }
   ],
   "files": [
@@ -62,6 +66,7 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
@@ -87,10 +92,17 @@
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "msw": "^2.15.0"
   },
   "peerDependencies": {
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "msw": "^2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "msw": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22"

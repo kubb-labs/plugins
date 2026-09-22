@@ -19,8 +19,7 @@ export function createUsersWithListInputMutationOptions<TContext = unknown>(
   return mutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
-      const { data } = await createUsersWithListInput({ ...config, body, throwOnError: true })
-      return data
+      return createUsersWithListInput({ ...config, body, throwOnError: true }).unwrap()
     },
   })
 }

@@ -1,0 +1,51 @@
+# Docs: https://kubb.dev/docs/5.x/guide/integrations/studio#snapshot-from-ci
+name: Fetch Studio Connection
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'examples/fetch/**'
+      - 'packages/**'
+      - 'internals/**'
+      - 'configs/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/fetch-example.yml'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    name: Generate Studio snapshot
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Tools
+        uses: kubb-labs/config/.github/setup@ec40df0e3e54565e006f6d92a2fce16ff43b14d8 # main
+        with:
+          node-version: '22.22.3'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build plugins
+        run: pnpm build
+
+      - name: Generate Kubb Studio snapshot
+        uses: kubb-labs/action@main # feat: support working directory
+        continue-on-error: true
+        with:
+          token: ${{ secrets.KUBB_TOKEN }}
+          working-directory: examples/fetch
+          config: 'kubb.config.ts'
+        env:
+          KUBB_STUDIO_URL: https://dev.kubb.studio

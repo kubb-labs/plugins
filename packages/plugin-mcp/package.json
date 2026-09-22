@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-mcp",
-  "version": "5.0.0",
+  "version": "5.0.4",
   "description": "Generate Model Context Protocol (MCP) tool definitions with Kubb. Expose your REST APIs as AI-callable tools for LLMs, Claude, ChatGPT, and other AI assistants.",
   "keywords": [
     "ai",
@@ -30,6 +30,10 @@
     {
       "type": "opencollective",
       "url": "https://opencollective.com/kubb"
+    },
+    {
+      "type": "custom",
+      "url": "https://kubb.dev/sponsors"
     }
   ],
   "files": [
@@ -45,6 +49,7 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
@@ -71,10 +76,22 @@
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "kubb": "catalog:"
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "kubb": "catalog:",
+    "zod": "^4.6.5"
   },
   "peerDependencies": {
-    "kubb": "catalog:"
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "kubb": "catalog:",
+    "zod": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@modelcontextprotocol/sdk": {
+      "optional": true
+    },
+    "zod": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22"

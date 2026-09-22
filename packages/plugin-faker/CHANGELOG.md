@@ -1,5 +1,68 @@
 # @kubb/plugin-faker
 
+## 5.0.10
+
+### Patch Changes
+
+- [#914](https://github.com/kubb-labs/plugins/pull/914) [`5ca0d65`](https://github.com/kubb-labs/plugins/commit/5ca0d655d93c3f726100838f59700b61660170ef) Thanks [@Ericlm](https://github.com/Ericlm)! - Allow Faker printer node overrides to call `this.base()` without recursively calling themselves.
+
+## 5.0.9
+
+### Patch Changes
+
+- [#905](https://github.com/kubb-labs/plugins/pull/905) [`c732d1a`](https://github.com/kubb-labs/plugins/commit/c732d1af7c0421be6c8206bf1d1b71b764164e49) Thanks [@Ericlm](https://github.com/Ericlm)! - Avoid duplicate response factories when an operation response name matches a referenced component schema.
+
+## 5.0.8
+
+### Patch Changes
+
+- [#891](https://github.com/kubb-labs/plugins/pull/891) [`8be0c24`](https://github.com/kubb-labs/plugins/commit/8be0c24172b2ec28a20c8df80460eafb1bde8ad8) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Declare the generated code's runtime libraries as optional peer dependencies so package managers can report incompatible versions without installing unused libraries.
+
+## 5.0.7
+
+### Patch Changes
+
+- [#877](https://github.com/kubb-labs/plugins/pull/877) [`ce57416`](https://github.com/kubb-labs/plugins/commit/ce574168a6a37cad9f12358db2ae469b38cff86a) Thanks [@ghettoDdOS](https://github.com/ghettoDdOS)! - Faker factories for arrays, tuples, and unions now accept and use their `Partial<T>` override. A
+  union factory no longer silently drops it under the name `_data`, and array/tuple overrides can
+  no longer leave an `undefined` hole in the generated value.
+
+## 5.0.6
+
+### Patch Changes
+
+- [#876](https://github.com/kubb-labs/plugins/pull/876) [`8ff5820`](https://github.com/kubb-labs/plugins/commit/8ff5820736c4b0a652a9aedd08a9ac38eebfdeba) Thanks [@ghettoDdOS](https://github.com/ghettoDdOS)! - `create<Operation>Response` now typechecks when a status or content-type variant has an inline object schema. The generated union helper calls each status factory with its explicit `<object>` type argument, so the response return type no longer infers `TData` as `Partial<T>` and drops required properties (TS2322).
+
+## 5.0.5
+
+### Patch Changes
+
+- [#864](https://github.com/kubb-labs/plugins/pull/864) [`1ba9310`](https://github.com/kubb-labs/plugins/commit/1ba9310cd1584b390b94aa53658adf955f79f8e4) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Read enum literals through `@kubb/ast`'s `getSchemaLiteralValues` and resolve discriminator properties with `resolveSchemaProperties`. A `oneOf` variant whose discriminator is a `$ref` to a single-value enum now narrows to its own branch instead of keeping the whole union.
+
+- [#869](https://github.com/kubb-labs/plugins/pull/869) [`7e936bc`](https://github.com/kubb-labs/plugins/commit/7e936bce055fa8f35de5d53e4354e7fd574b651d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add a `kubb.dev/sponsors` entry to each package's `funding` field, alongside the existing GitHub
+  Sponsors and Open Collective links.
+- Updated dependencies [[`1ba9310`](https://github.com/kubb-labs/plugins/commit/1ba9310cd1584b390b94aa53658adf955f79f8e4), [`7e936bc`](https://github.com/kubb-labs/plugins/commit/7e936bce055fa8f35de5d53e4354e7fd574b651d)]:
+  - @kubb/plugin-ts@5.0.2
+
+## 5.0.4
+
+### Patch Changes
+
+- [#849](https://github.com/kubb-labs/plugins/pull/849) [`d53bfe5`](https://github.com/kubb-labs/plugins/commit/d53bfe5d41f163dbc38d1b856292f18a12156352) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix discriminator types in Faker mocks generated from referenced `oneOf` branches.
+
+## 5.0.3
+
+### Patch Changes
+
+- [#835](https://github.com/kubb-labs/plugins/pull/835) [`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d) Thanks [@julian99m](https://github.com/julian99m)! - Explicit `types` fields for each package.json `exports` entry, so that it works with tsconfig.json `moduleResulotion: 'bundler'`
+- Updated dependencies [[`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d)]:
+  - @kubb/plugin-ts@5.0.1
+
+## 5.0.2
+
+### Patch Changes
+
+- [#824](https://github.com/kubb-labs/plugins/pull/824) [`e4eed1f`](https://github.com/kubb-labs/plugins/commit/e4eed1fa7da1bdf50a8dd25aa67ecf7a92fc64d5) Thanks [@Ericlm](https://github.com/Ericlm)! - Preserve required properties when Faker generates mocks for referenced `oneOf` object members.
+
 ## 5.0.1
 
 ### Patch Changes

@@ -41,12 +41,15 @@ export function Faker({ node, description, name, typeName, printer, canOverride 
   const isObject = OBJECT_TYPES.has(node.type)
   const isTuple = node.type === 'tuple'
   const isScalar = SCALAR_TYPES.has(node.type)
+  const isUnion = node.type === 'union'
 
   const useGenericOverride = canOverride && isObject
   const fakerTextWithOverride = (() => {
-    if (canOverride && isTuple) return `data || ${fakerText}`
-    if (canOverride && isArray) return `[\n  ...${fakerText},\n  ...(data || [])\n]`
-    if (canOverride && isScalar) return `data ?? ${fakerText}`
+    if (canOverride && node.type === 'tuple') {
+      return `data && data.length === ${node.items?.length ?? 0} && !data.includes(undefined) ? data : ${fakerText}`
+    }
+    if (canOverride && isArray) return `[\n  ...${fakerText},\n  ...(data || []).filter((item) => item !== undefined),\n]`
+    if (canOverride && (isScalar || isUnion)) return `data ?? ${fakerText}`
     return fakerText
   })()
 
@@ -67,10 +70,10 @@ export function Faker({ node, description, name, typeName, printer, canOverride 
     const paramsSignature = declarationPrinter.print(params) ?? ''
     const returnType = resolvedReturnType
 
-    // A `ref` wrapper delegates to another faker. Object fakers are now generic and
-    // widen to `Partial<T>` when called with a `Partial<T>`-typed argument, so cast
-    // back to the wrapper's declared return type to keep it assignable.
-    const returnExpression = node.type === 'ref' && canOverride && returnType ? `${fakerTextWithOverride} as ${returnType}` : fakerTextWithOverride
+    // `as` binds tighter than `??`/`?:`, so tuple/union need parens or `data`'s own type leaks through.
+    const needsCast = canOverride && !!returnType && (node.type === 'ref' || isArray || isTuple || isUnion)
+    const needsParens = isTuple || isUnion
+    const returnExpression = needsCast ? `${needsParens ? `(${fakerTextWithOverride})` : fakerTextWithOverride} as ${returnType}` : fakerTextWithOverride
 
     return (
       <File.Source name={name} isExportable isIndexable>

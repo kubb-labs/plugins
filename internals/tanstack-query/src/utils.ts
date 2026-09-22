@@ -1,4 +1,4 @@
-import { getOperationParameters, getRequestGroupOptionality, resolveErrorNames, resolveSuccessNames } from '@internals/shared'
+import { getOperationParameters, getRequestGroupOptionality, getRequestGroups, resolveErrorNames, resolveSuccessNames } from '@internals/shared'
 import type { ast } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
@@ -148,6 +148,27 @@ export function buildClientCall(node: ast.OperationNode, options: { clientName: 
   ].filter((part): part is string => part !== null)
 
   return `${clientName}({ ${args.join(', ')} })`
+}
+
+/**
+ * Builds the query/mutation body that resolves a `buildClientCall` expression down to the bare
+ * success body. `returnType` mirrors the registered client plugin's own `returnType` option: with
+ * `'data'` the call already resolves to the bare body, so it is returned directly; with `'full'`
+ * (the default) the call carries `unwrap()`, so the body calls it instead of destructuring `data`
+ * off the full result by hand.
+ *
+ * @example
+ * ```ts
+ * buildCallResultBody(buildClientCall(node, { clientName: 'getPetById' }))
+ * // return getPetById({ ...config, throwOnError: true }).unwrap()
+ * ```
+ */
+export function buildCallResultBody(call: string, options: { returnType?: 'full' | 'data' } = {}): string {
+  const { returnType = 'full' } = options
+  if (returnType === 'data') {
+    return `return await ${call}`
+  }
+  return `return ${call}.unwrap()`
 }
 
 type ResponseTypes = {
@@ -365,13 +386,29 @@ export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodS
 }
 
 /**
+ * The request groups a query key is built from, matching `buildQueryKeyParams`. Headers are
+ * deliberately absent: they do not identify a cache entry, so the key factory takes no parameter
+ * for an operation that only carries headers.
+ */
+export const queryKeyGroupOrder = ['path', 'query', 'body'] as const
+
+/**
+ * Whether the generated query key factory declares a parameter, so a call site passes an argument
+ * only when one is accepted.
+ */
+export function hasQueryKeyParams(node: ast.OperationNode): boolean {
+  const groups = getRequestGroups(node)
+  return queryKeyGroupOrder.some((key) => groups[key])
+}
+
+/**
  * Build QueryKey params as the grouped `{ path, query, body }` object (NO headers, NO config),
  * typed from the operation's `Options` minus `url`. The query key transformer reads the
  * grouped `path`/`query`/`body` bindings.
  */
 export function buildQueryKeyParams(node: ast.OperationNode, options: { resolver: PluginTs['resolver'] }): FunctionParametersNode {
   const { resolver } = options
-  const groupedParam = buildGroupedRequestParam(node, { resolver, keys: ['path', 'query', 'body'] })
+  const groupedParam = buildGroupedRequestParam(node, { resolver, keys: queryKeyGroupOrder })
 
   return createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
 }

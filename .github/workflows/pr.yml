@@ -2,31 +2,62 @@ name: PR
 
 on:
   workflow_dispatch:
+  # Skips the whole workflow. autofix.ci is unfiltered and still formats these.
   pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - '.agents/**'
+      - '.claude/**'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/FUNDING.yml'
+      - 'assets/**'
+      - 'LICENSE'
 
-permissions:
-  contents: read
-  pull-requests: write
-  checks: write
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Detect changes
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      packages: ${{ steps.filter.outputs.packages }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Filter paths
+        id: filter
+        uses: dorny/paths-filter@0e4a8c6effa4802afeda77dc8d303f8176d7dfad # v3.0.4
+        with:
+          filters: |
+            packages:
+              - 'packages/**'
+              - 'internals/**'
+              - 'configs/**'
+              - 'pnpm-lock.yaml'
+
   build:
     name: Build
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: github.actor != 'github-actions[bot]'
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@ec40df0e3e54565e006f6d92a2fce16ff43b14d8 # main
         with:
           node-version: '22.22.3'
 
@@ -37,16 +68,18 @@ jobs:
     name: Typecheck
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: github.actor != 'github-actions[bot]'
     needs: build
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@ec40df0e3e54565e006f6d92a2fce16ff43b14d8 # main
         with:
           node-version: '22.22.3'
 
@@ -63,18 +96,18 @@ jobs:
     name: Tests
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: github.actor != 'github-actions[bot]'
     needs: build
-    env:
-      TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@ec40df0e3e54565e006f6d92a2fce16ff43b14d8 # main
         with:
           node-version: '22.22.3'
 
@@ -83,7 +116,7 @@ jobs:
 
       - name: Upload coverage reports to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -91,15 +124,17 @@ jobs:
     name: Linting
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: github.actor != 'github-actions[bot]'
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@ec40df0e3e54565e006f6d92a2fce16ff43b14d8 # main
         with:
           node-version: '22.22.3'
 
@@ -112,16 +147,18 @@ jobs:
     name: Performance benchmarks (Vitest)
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: github.actor != 'github-actions[bot]'
     needs: build
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@ec40df0e3e54565e006f6d92a2fce16ff43b14d8 # main
         with:
           node-version: '22.22.3'
 
@@ -135,16 +172,20 @@ jobs:
     name: Prerelease
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    if: github.actor != 'github-actions[bot]' && github.event.pull_request.head.repo.full_name == github.repository
-    needs: build
+    permissions:
+      contents: read
+      pull-requests: write
+    # pkg-pr-new publishes preview packages, so gate it on a package changing.
+    if: github.actor != 'github-actions[bot]' && github.event.pull_request.head.repo.full_name == github.repository && needs.changes.outputs.packages == 'true'
+    needs: [build, changes]
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 2
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@ec40df0e3e54565e006f6d92a2fce16ff43b14d8 # main
         with:
           node-version: '22.22.3'
 
@@ -158,10 +199,13 @@ jobs:
     name: Dependency Diff
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     if: github.actor != 'github-actions[bot]' && github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -176,16 +220,19 @@ jobs:
     name: Compressed size
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     if: github.actor != 'github-actions[bot]' && github.event_name == 'pull_request'
     needs: build
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@ec40df0e3e54565e006f6d92a2fce16ff43b14d8 # main
         with:
           node-version: '22.22.3'
 
@@ -202,19 +249,19 @@ jobs:
     name: Update generated examples
     timeout-minutes: 20
     runs-on: ubuntu-latest
-    if: github.actor != 'github-actions[bot]'
-    needs: build
+    if: github.actor != 'github-actions[bot]' && needs.changes.outputs.packages == 'true'
+    needs: [build, changes]
     permissions:
       contents: write
       pull-requests: write
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@ec40df0e3e54565e006f6d92a2fce16ff43b14d8 # main
         with:
           node-version: '22.22.3'
 
@@ -255,6 +302,8 @@ jobs:
   e2e:
     name: Build and test on ${{ matrix.os }}
     timeout-minutes: 30
+    permissions:
+      contents: read
     if: github.actor != 'github-actions[bot]'
     needs: build
     strategy:
@@ -267,12 +316,12 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@b6c32300e26286508cc3da47d55b0a7a4c8d5583 # main
+        uses: kubb-labs/config/.github/setup@ec40df0e3e54565e006f6d92a2fce16ff43b14d8 # main
         with:
           node-version: '22.22.3'
 
@@ -285,4 +334,27 @@ jobs:
           NODE_OPTIONS: '--max_old_space_size=4096'
           KUBB_DISABLE_TELEMETRY: '1'
         run: |
-          pnpm run generate --debug
+          pnpm run generate --reporter file
+
+  comment-ratio:
+    name: Comment ratio
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    if: github.actor != 'github-actions[bot]' && github.event_name == 'pull_request'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Check comment ratio
+        uses: IgnaceMaes/comment-ratio@8667d710c02c19dcca42be02f97d5f6824012932 # v1.0.0
+        with:
+          max-comment-ratio: 0.15
+          exclude: |
+            examples/**
+            **/__snapshots__/**
+            **/gen/**

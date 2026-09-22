@@ -101,7 +101,10 @@ export function buildResponseUnionSchema(node: ast.OperationNode, resolver: Reso
 
   return ast.factory.createSchema({
     type: 'union',
-    members: responses.map((response) => ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, response.statusCode) })),
+    members: responses.map((response) => {
+      const schema = (response.content?.length ?? 0) === 1 ? response.content?.[0]?.schema : undefined
+      return ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, response.statusCode), schema })
+    }),
   })
 }
 
@@ -208,15 +211,12 @@ export function resolveFakerTypeUsage(
   returnType: string | null
   usesTypeName: boolean
 } {
-  const isArray = node.type === 'array'
-  const isTuple = node.type === 'tuple'
   const isScalar = SCALAR_TYPES.has(node.type)
 
+  // Every overridable factory takes `Partial<T>`, so a `ref` wrapper can forward its own
+  // `Partial<T>` argument to whatever schema it points at. Scalars are the exception:
+  // `Partial<string>` is still `string`, so they name the primitive directly.
   let dataType = `Partial<${typeName}>`
-
-  if (isArray || isTuple || node.type === 'union' || node.type === 'enum') {
-    dataType = typeName
-  }
 
   if (isScalar) {
     dataType = getScalarType(node, typeName)

@@ -12,7 +12,7 @@ export async function findPetsByTagsHandler(
   { query, headers }: FindPetsByTagsOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await findPetsByTags({ query, headers })
+  const res = await findPetsByTags({ query, headers, signal: request.signal })
 
   return {
     content: [

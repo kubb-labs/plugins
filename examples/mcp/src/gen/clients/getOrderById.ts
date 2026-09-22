@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../models/ts/GetOrderById'
-import { client } from '../.kubb/client'
+import { client, withUnwrap } from '../.kubb/client'
 
 /**
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
@@ -14,8 +14,8 @@ import { client } from '../.kubb/client'
  */
 export function getOrderById<ThrowOnError extends boolean = true>(
   options: Options<GetOrderByIdOptions, ThrowOnError>,
-): Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/store/order/{orderId}', ...config }) as Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'GET', url: '/store/order/{orderId}', ...config }) as Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>>)
 }

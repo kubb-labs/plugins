@@ -19,8 +19,7 @@ export function getUserByNameQueryOptions(
 ) {
   return {
     fetcher: async () => {
-      const { data } = await getUserByName({ ...config, path, throwOnError: true })
-      return data
+      return getUserByName({ ...config, path, throwOnError: true }).unwrap()
     },
   }
 }

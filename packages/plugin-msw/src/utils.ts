@@ -14,11 +14,11 @@ export function getContentType(response: ast.ResponseNode | null | undefined): s
 }
 
 /**
- * Determines if a response has a schema that is not void or any.
+ * Determines if a response has a usable body schema.
  */
 export function hasResponseSchema(response: ast.ResponseNode | null | undefined): boolean {
   const schema = response?.content?.find((entry) => entry.schema)?.schema
-  return !!schema && schema.type !== 'void' && schema.type !== 'any'
+  return !!schema && schema.type !== 'void' && schema.type !== 'any' && schema.type !== 'unknown'
 }
 
 /**

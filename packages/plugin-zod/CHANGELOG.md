@@ -1,5 +1,38 @@
 # @kubb/plugin-zod
 
+## 5.1.6
+
+### Patch Changes
+
+- [#891](https://github.com/kubb-labs/plugins/pull/891) [`8be0c24`](https://github.com/kubb-labs/plugins/commit/8be0c24172b2ec28a20c8df80460eafb1bde8ad8) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Declare the generated code's runtime libraries as optional peer dependencies so package managers can report incompatible versions without installing unused libraries.
+
+## 5.1.5
+
+### Patch Changes
+
+- [#869](https://github.com/kubb-labs/plugins/pull/869) [`7e936bc`](https://github.com/kubb-labs/plugins/commit/7e936bce055fa8f35de5d53e4354e7fd574b651d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add a `kubb.dev/sponsors` entry to each package's `funding` field, alongside the existing GitHub
+  Sponsors and Open Collective links.
+
+## 5.1.4
+
+### Patch Changes
+
+- [#852](https://github.com/kubb-labs/plugins/pull/852) [`3dcf220`](https://github.com/kubb-labs/plugins/commit/3dcf22017b5b0b83422ac0b2af90c817b64bd43b) Thanks [@ghettoDdOS](https://github.com/ghettoDdOS)! - Fix unique array case in printer zod/mini
+
+## 5.1.3
+
+### Patch Changes
+
+- [#835](https://github.com/kubb-labs/plugins/pull/835) [`0e791e1`](https://github.com/kubb-labs/plugins/commit/0e791e1b7c27ee6f75e8ee303dbb86b968bad38d) Thanks [@julian99m](https://github.com/julian99m)! - Explicit `types` fields for each package.json `exports` entry, so that it works with tsconfig.json `moduleResulotion: 'bundler'`
+
+## 5.1.2
+
+### Patch Changes
+
+- [#804](https://github.com/kubb-labs/plugins/pull/804) [`26660b6`](https://github.com/kubb-labs/plugins/commit/26660b68c3f19744a72b5c0bb3010357f6a7d6eb) Thanks [@xeoneux](https://github.com/xeoneux)! - Resolve `$ref` schemas when computing `default` literals and keep array defaults as array literals.
+  
+  `defaultLiteral` now resolves `$ref` schema targets so that array, bigint, and enum default formatting guards apply to referenced schemas. In addition, `formatDefault` preserves array literals instead of collapsing them to `{}`.
+
 ## 5.1.1
 
 ### Patch Changes

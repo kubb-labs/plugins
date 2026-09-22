@@ -7,7 +7,8 @@ import type { PluginFaker, ResolverFaker } from '../types.ts'
  * Partial map of node-type overrides for the Faker printer. Each key is a
  * `SchemaType` (`'string'`, `'date'`, ...) and each handler returns the
  * Faker expression for that schema as a string. Use `this.transform` to
- * recurse into nested schema nodes and `this.options` to read printer options.
+ * recurse into nested schema nodes, `this.base` to reuse the built-in handler,
+ * and `this.options` to read printer options.
  *
  * @example Override the integer handler
  * ```ts
@@ -40,6 +41,10 @@ export type PrinterFakerOptions = {
    * Set while printing the members of a union (`oneOf`). Object properties then index their
    * type as `(NonNullable<T> & Record<K, unknown>)[K]` instead of `NonNullable<T>[K]`, so a key
    * carried by only some branches stays valid (a plain index would be a TS2339).
+   *
+   * Referenced object factories also receive their explicit default type argument (`object`).
+   * This prevents a surrounding generic helper from inferring `TData` as `Partial<T>` when the
+   * factory is called without override data, which would make required properties optional.
    */
   nestedInUnion?: boolean
   nodes?: PrinterFakerNodes
@@ -146,7 +151,7 @@ const fakerKeywordMapper = {
     return `faker.helpers.multiple(() => (${item}))`
   },
   tuple: (items: Array<string> = []) => `[${items.join(', ')}]`,
-  enum: (items: Array<string | number | boolean | undefined> = [], type?: string) =>
+  enum: (items: Array<string | number | boolean | null | undefined> = [], type?: string) =>
     `faker.helpers.arrayElement${type ? `<${type}>` : ''}([${items.join(', ')}])`,
   union: (items: Array<string> = []) => `faker.helpers.arrayElement([${items.join(', ')}])`,
   datetime: () => 'faker.date.anytime().toISOString()',
@@ -204,15 +209,7 @@ const fakerKeywordMapper = {
   blob: () => 'faker.image.url() as unknown as Blob',
 } as const
 
-function getEnumValues(node: ast.EnumSchemaNode): Array<string | number | boolean | undefined> {
-  if (node.namedEnumValues?.length) {
-    return node.namedEnumValues.map((item) => item.value)
-  }
-
-  return (node.enumValues ?? []) as Array<string | number | boolean | undefined>
-}
-
-function parseEnumValue(value: string | number | boolean | undefined) {
+function parseEnumValue(value: string | number | boolean | null | undefined) {
   if (typeof value === 'string') {
     return stringify(value)
   }
@@ -222,12 +219,19 @@ function parseEnumValue(value: string | number | boolean | undefined) {
 
 /**
  * Reads the discriminator literal off a variant, or `undefined` when it can't be determined.
+ *
+ * A variant carries exactly one discriminator value, so a property resolving to several literals
+ * (a `ref` to the enum shared by every branch, say) identifies no branch and narrows nothing.
  */
-function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string) {
-  const prop = ast.narrowSchema(member, 'object')?.properties?.find((p) => p.name === discriminatorPropertyName)
-  const enumNode = prop ? ast.narrowSchema(prop.schema, 'enum') : null
+function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string): string | number | boolean | null | undefined {
+  for (const property of ast.resolveSchemaProperties({ node: member, propertyName: discriminatorPropertyName })) {
+    const values = ast.getSchemaLiteralValues(property.schema)
+    if (values.length === 1) {
+      return values[0]
+    }
+  }
 
-  return enumNode ? getEnumValues(enumNode)[0] : undefined
+  return undefined
 }
 
 /**
@@ -324,10 +328,12 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           return `${resolvedName}(data)`
         }
 
-        return `${resolvedName}()`
+        const typeArgument = this.options.nestedInUnion && (node.schema?.type === 'object' || node.schema?.type === 'intersection') ? '<object>' : ''
+
+        return `${resolvedName}${typeArgument}()`
       },
       enum(node) {
-        return fakerKeywordMapper.enum(getEnumValues(node).map(parseEnumValue), this.options.typeName)
+        return fakerKeywordMapper.enum(ast.getSchemaLiteralValues(node).map(parseEnumValue), this.options.typeName)
       },
       union(node): string {
         const { discriminatorPropertyName } = node
@@ -341,7 +347,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           if (baseTypeName && value !== undefined) {
             const typeName = `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
 
-            return printNested(member, { typeName, nestedInObject: true })
+            return printNested(member, { typeName, nestedInObject: true, nestedInUnion: true })
           }
 
           // Without a discriminator, keep the union type but guard each indexed access (see
@@ -414,8 +420,8 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
         return buildObject(entries)
       },
-      ...options.nodes,
     },
+    overrides: options.nodes,
     print(node) {
       return this.transform(node) ?? null
     },

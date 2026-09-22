@@ -12,10 +12,17 @@ const node = ast.factory.createOperation({
 })
 
 describe('buildReturnStatement', () => {
-  test('forwards the call config and casts to the operation RequestResult', () => {
+  test('casts to RequestResult first, then wraps the call in withUnwrap', () => {
     const callConfig = "{ method: 'POST', url: '/pet', ...config }"
-    expect(buildReturnStatement({ node, types: resolverTs, callConfig })).toBe(
-      "return request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>",
+    expect(buildReturnStatement({ node, types: resolverTs, callConfig, returnType: 'full' })).toBe(
+      "return withUnwrap(request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>)",
+    )
+  })
+
+  test('routes the call through unwrapResult when returnType is data', () => {
+    const callConfig = "{ method: 'POST', url: '/pet', ...config }"
+    expect(buildReturnStatement({ node, types: resolverTs, callConfig, returnType: 'data' })).toBe(
+      "return unwrapResult(request({ method: 'POST', url: '/pet', ...config }), config.throwOnError) as Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>",
     )
   })
 })

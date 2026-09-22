@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult } from '../../.kubb/client'
+import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch'
-import { client } from '../../.kubb/client'
+import { client, withUnwrap } from '../../.kubb/client'
 
 /**
  * @description Place a new order in the store with patch
@@ -14,8 +14,8 @@ import { client } from '../../.kubb/client'
  */
 export function placeOrderPatch<ThrowOnError extends boolean = true>(
   options: Options<PlaceOrderPatchOptions, ThrowOnError>,
-): Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
+): Unwrappable<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'PATCH', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>>
+  return withUnwrap(request({ method: 'PATCH', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>>)
 }

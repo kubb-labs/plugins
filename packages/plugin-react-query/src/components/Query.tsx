@@ -5,7 +5,7 @@ import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { PluginReactQuery } from '../types.ts'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
-import { buildClientOptionType, buildResolvedRequestParams, buildResponseTypes, getComments, maybeValueOrGetter } from '../utils.ts'
+import { buildClientOptionType, buildResolvedRequestParams, buildResponseTypes, getComments, hasQueryKeyParams, maybeValueOrGetter } from '../utils.ts'
 
 type Props = {
   name: string
@@ -61,7 +61,7 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
     : [`TData = ${TData}`, `TQueryData = ${TData}`, `TQueryKey extends QueryKey = ${queryKeyTypeName}`]
 
   const resolvedParams = buildResolvedRequestParams(node)
-  const queryKeyArgs = resolvedParams ? 'resolvedParams' : ''
+  const queryKeyArgs = resolvedParams && hasQueryKeyParams(node) ? 'resolvedParams' : ''
   const queryOptionsArgs = resolvedParams ? 'resolvedParams, config' : 'config'
 
   const paramsNode = buildQueryParamsNode(node, { resolver: tsResolver, observerOptionsType })

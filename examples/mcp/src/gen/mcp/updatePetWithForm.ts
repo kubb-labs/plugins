@@ -11,7 +11,7 @@ export async function updatePetWithFormHandler(
   { path, query }: UpdatePetWithFormOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await updatePetWithForm({ path, query })
+  const res = await updatePetWithForm({ path, query, signal: request.signal })
 
   return {
     content: [
