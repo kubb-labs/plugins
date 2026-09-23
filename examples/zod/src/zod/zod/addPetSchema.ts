@@ -20,7 +20,7 @@ export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetS
 export type AddPetStatus200SchemaType = z.infer<typeof addPetStatus200Schema>
 
 export const addPetStatus405Schema = z.object({
-  code: z.int().optional(),
+  code: z.int32().optional(),
   message: z.string().optional(),
 })
 

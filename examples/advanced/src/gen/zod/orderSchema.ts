@@ -20,7 +20,7 @@ export const orderSchema = z.object({
     })
     .optional(),
   quantity: z
-    .int()
+    .int32()
     .optional()
     .meta({ examples: [7] }),
   orderType: orderOrderTypeEnumSchema.optional(),

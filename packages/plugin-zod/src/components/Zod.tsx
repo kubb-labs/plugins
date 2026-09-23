@@ -39,8 +39,8 @@ export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, as
   // union/array with a top-level `z.lazy(() => self)`) are implicitly `any` and need the annotation.
   const needsAnnotation = cyclic && node.type !== 'object'
   const targetType = inferTypeName ?? `z.infer<typeof ${name}>`
-  const shouldGenerateIs = isName && (typeof typeGuards === 'object' ? typeGuards.is ?? true : Boolean(typeGuards))
-  const shouldGenerateAssert = assertName && (typeof typeGuards === 'object' ? typeGuards.assert ?? true : Boolean(typeGuards))
+  const shouldGenerateIs = isName && (typeof typeGuards === 'object' ? (typeGuards.is ?? true) : Boolean(typeGuards))
+  const shouldGenerateAssert = assertName && (typeof typeGuards === 'object' ? (typeGuards.assert ?? true) : Boolean(typeGuards))
 
   return (
     <>
@@ -72,9 +72,7 @@ export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, as
             returnType={`asserts data is ${targetType}`}
             JSDoc={{ comments: [`Asserter for {@link ${name}}`, '@throws {z.ZodError} If data is invalid'] }}
           >
-            {mini
-              ? `if (!z.validate(${name}, data)) {\n  z.parse(${name}, data)\n}`
-              : `if (!${name}.validate(data)) {\n  ${name}.parse(data)\n}`}
+            {mini ? `if (!z.validate(${name}, data)) {\n  z.parse(${name}, data)\n}` : `if (!${name}.validate(data)) {\n  ${name}.parse(data)\n}`}
           </Function>
         </File.Source>
       )}

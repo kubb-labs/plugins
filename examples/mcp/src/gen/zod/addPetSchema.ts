@@ -14,7 +14,7 @@ export const addPetStatus200SchemaXml = petSchema.omit({ name: true })
 export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])
 
 export const addPetStatus405Schema = z.object({
-  code: z.int().optional(),
+  code: z.int32().optional(),
   message: z.string().optional(),
 })
 
