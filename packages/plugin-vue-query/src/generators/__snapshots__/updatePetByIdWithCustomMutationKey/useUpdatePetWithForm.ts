@@ -29,7 +29,12 @@ export function useUpdatePetWithForm<TContext>(
   return useMutation<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormOptions, TContext>(
     {
       mutationFn: async ({ path, body }) => {
-        return updatePetWithForm({ ...config, path: toValue(path), body: toValue(body), throwOnError: true }).unwrap()
+        return updatePetWithForm({
+          ...config,
+          path: toValue<UpdatePetWithFormOptions['path']>(path),
+          body: toValue<UpdatePetWithFormOptions['body']>(body),
+          throwOnError: true,
+        }).unwrap()
       },
       mutationKey,
       ...mutationOptions,

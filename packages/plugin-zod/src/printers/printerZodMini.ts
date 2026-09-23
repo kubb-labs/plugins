@@ -164,6 +164,25 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
       boolean: () => 'z.boolean()',
       null: () => 'z.null()',
       string(node) {
+        if (node.format === 'byte' || node.format === 'base64') {
+          return `z.base64()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
+        }
+        if (node.format === 'base64url') {
+          return `z.base64url()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
+        }
+        if (node.format === 'jwt') {
+          return `z.jwt()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
+        }
+        if (node.format === 'ulid') {
+          return `z.ulid()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
+        }
+        if (node.format === 'iban') {
+          return `z.iban()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
+        }
+        if (node.format === 'duration') {
+          return `z.iso.duration()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
+        }
+
         const pattern = node.pattern ?? integerFormatPattern(node.format)
 
         return `z.string()${lengthChecksMini({ ...node, pattern, regexType: this.options.regexType })}`
@@ -172,6 +191,13 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         return `z.number()${numberChecksMini(node)}`
       },
       integer(node) {
+        if (node.format === 'int32') {
+          return `z.int32()${numberChecksMini(node)}`
+        }
+        if (node.format === 'uint32') {
+          return `z.uint32()${numberChecksMini(node)}`
+        }
+
         return `z.int()${numberChecksMini(node)}`
       },
       bigint(node) {
