@@ -112,6 +112,25 @@ const updatePetWithFormNode = ast.factory.createOperation({
   ],
 })
 
+const setPropertyNode = ast.factory.createOperation({
+  operationId: 'setProperty',
+  method: 'PUT',
+  path: '/properties',
+  requestBody: {
+    required: true,
+    content: [
+      ast.factory.createContent({
+        contentType: 'application/json',
+        schema: ast.factory.createSchema({
+          type: 'object',
+          properties: [ast.factory.createProperty({ name: 'value', required: false, schema: ast.factory.createSchema({ type: 'string' }) })],
+        }),
+      }),
+    ],
+  },
+  responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'string' }) })],
+})
+
 const deletePetNode = ast.factory.createOperation({
   operationId: 'deletePet',
   method: 'DELETE',
@@ -140,6 +159,7 @@ describe('mutationGenerator operation', () => {
     },
     { name: 'updatePetById', node: updatePetWithFormNode, options: {} },
     { name: 'deletePet', node: deletePetNode, options: {} },
+    { name: 'bodyWithValueProperty', node: setPropertyNode, options: { mutation: { importPath: '@tanstack/vue-query', methods: ['PUT'] } } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginVueQuery['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {

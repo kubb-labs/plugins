@@ -27,7 +27,7 @@ export function useAddPet<TContext>(options: {
 
   return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
     mutationFn: async({ body }) => {
-      return addPet({ ...config, body: toValue(body), throwOnError: true }).unwrap()
+      return addPet({ ...config, body: toValue<AddPetOptions['body']>(body), throwOnError: true }).unwrap()
     },
     mutationKey,
     ...mutationOptions

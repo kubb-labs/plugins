@@ -14,7 +14,7 @@ export const addPetStatus200SchemaXml = z.lazy(() => petSchema)
 export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])
 
 export const addPetStatus405Schema = z.object({
-  code: z.optional(z.int()),
+  code: z.optional(z.int32()),
   message: z.optional(z.string()),
 })
 

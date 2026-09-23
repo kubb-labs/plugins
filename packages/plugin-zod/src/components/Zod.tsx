@@ -1,6 +1,6 @@
 import { containsCircularRef } from 'kubb/kit'
 import type { ast } from 'kubb/kit'
-import { Const, File, Type } from 'kubb/jsx'
+import { Const, File, Function, Type } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { PrinterZodFactory } from '../printers/printerZod.ts'
 import type { PrinterZodMiniFactory } from '../printers/printerZodMini.ts'
@@ -18,6 +18,10 @@ type Props = {
    */
   printer: ast.Printer<PrinterZodFactory> | ast.Printer<PrinterZodMiniFactory>
   inferTypeName?: string | null
+  typeGuards?: boolean | { is?: boolean; assert?: boolean }
+  isName?: string | null
+  assertName?: string | null
+  mini?: boolean
   /**
    * Set when the schema references itself. A self-referential initializer (e.g. a `z.lazy(() => …)`
    * back to the same const) is implicitly `any` under `strict`, so the const is annotated with an
@@ -33,7 +37,7 @@ type Props = {
   compile?: boolean | CompileOptions
 }
 
-export function Zod({ name, node, printer, inferTypeName, cyclic, compile }: Props): KubbReactNode {
+export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, assertName, mini, cyclic, compile }: Props): KubbReactNode {
   const output = printer.print(node)
 
   if (!output) {
@@ -50,6 +54,10 @@ export function Zod({ name, node, printer, inferTypeName, cyclic, compile }: Pro
   const shouldCompile = Boolean(compile) && !isBare && !isCyclic
   const value = shouldCompile ? (typeof compile === 'object' && compile.strict ? `z.compile(${output}, { strict: true })` : `z.compile(${output})`) : output
 
+  const targetType = inferTypeName ?? `z.infer<typeof ${name}>`
+  const shouldGenerateIs = isName && (typeof typeGuards === 'object' ? (typeGuards.is ?? true) : Boolean(typeGuards))
+  const shouldGenerateAssert = assertName && (typeof typeGuards === 'object' ? (typeGuards.assert ?? true) : Boolean(typeGuards))
+
   return (
     <>
       <File.Source name={name} isExportable isIndexable>
@@ -62,6 +70,26 @@ export function Zod({ name, node, printer, inferTypeName, cyclic, compile }: Pro
           <Type export name={inferTypeName}>
             {`z.infer<typeof ${name}>`}
           </Type>
+        </File.Source>
+      )}
+      {shouldGenerateIs && (
+        <File.Source name={isName} isExportable isIndexable>
+          <Const export name={isName} JSDoc={{ comments: [`Type guard for {@link ${name}}`] }}>
+            {mini ? `(data: unknown): data is ${targetType} => z.validate(${name}, data)` : `(data: unknown): data is ${targetType} => ${name}.validate(data)`}
+          </Const>
+        </File.Source>
+      )}
+      {shouldGenerateAssert && (
+        <File.Source name={assertName} isExportable isIndexable>
+          <Function
+            export
+            name={assertName}
+            params="data: unknown"
+            returnType={`asserts data is ${targetType}`}
+            JSDoc={{ comments: [`Asserter for {@link ${name}}`, '@throws {z.ZodError} If data is invalid'] }}
+          >
+            {mini ? `if (!z.validate(${name}, data)) {\n  z.parse(${name}, data)\n}` : `if (!${name}.validate(data)) {\n  ${name}.parse(data)\n}`}
+          </Function>
         </File.Source>
       )}
     </>

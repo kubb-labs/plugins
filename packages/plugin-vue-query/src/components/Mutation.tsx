@@ -3,8 +3,8 @@ import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import { buildCallResultBody, buildGroupedRequestParam, buildResponseTypes } from '@internals/tanstack-query'
-import { buildRequestConfigType, buildVueClientCall, getComments } from '../utils.ts'
+import { buildCallResultBody, buildClientCall, buildGroupedRequestParam, buildResponseTypes } from '@internals/tanstack-query'
+import { buildRequestConfigType, getComments } from '../utils.ts'
 
 type Props = {
   name: string
@@ -61,9 +61,16 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, 
   const hasMutationParams = groupedParam !== null
   const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
-  const mutationFnBody = buildCallResultBody(buildVueClientCall(node, { clientName, signal: false }), { returnType })
-
   const TRequest = resolveMutationRequestType(node, tsResolver)
+  const mutationFnBody = buildCallResultBody(
+    buildClientCall(node, {
+      clientName,
+      signal: false,
+      // Pin the payload type: an optional `value` property can otherwise drive Vue's ref inference.
+      unwrapName: (name) => `toValue<${TRequest}['${name}']>(${name})`,
+    }),
+    { returnType },
+  )
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')
 
   const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver })

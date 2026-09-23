@@ -50,6 +50,7 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
     importPath = mini ? 'zod/mini' : 'zod',
     coercion = false,
     inferred = false,
+    typeGuards = false,
     printer,
     resolver: userResolver,
     macros: userMacros,
@@ -75,6 +76,7 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
           regexType,
           compile,
           mini,
+          typeGuards,
           printer,
         })
         ctx.setResolver(userResolver ? Resolver.merge(resolverZod, userResolver) : resolverZod)
