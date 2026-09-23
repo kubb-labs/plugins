@@ -22,6 +22,18 @@ function isPlainInlineObject(node: ast.SchemaNode): boolean {
 }
 
 /**
+ * Whether the node is a bare reference schema (a `$ref` with no modifiers, descriptions, or omit keys).
+ * Bare references resolve directly to another schema variable and should not be re-wrapped in `z.compile(...)`.
+ */
+export function isBareRef(node: ast.SchemaNode, keysToOmit?: Array<string> | null): boolean {
+  const ref = ast.narrowSchema(node, 'ref')
+  if (!ref) return false
+
+  const meta = syncSchemaRef(ref)
+  return !meta.nullable && !meta.optional && !meta.nullish && meta.default === undefined && !meta.description && !meta.examples?.length && !keysToOmit?.length
+}
+
+/**
  * Whether a node renders as a bare Zod object — one that accepts `.extend(…)` and can be a
  * `z.discriminatedUnion` option. Covers object nodes, `$ref`s that resolve to (or are still
  * unresolved) objects, single-member unions of an object, and object-composable `allOf`.
