@@ -10,6 +10,7 @@ import {
   formatLiteral,
   isObjectComposableIntersection,
   isObjectSchemaNode,
+  isPlainInlineObject,
   lengthChecksMini,
   lengthConstraints,
   numberChecksMini,
@@ -634,5 +635,47 @@ describe('isObjectComposableIntersection', () => {
       ],
     })
     expect(isObjectComposableIntersection(node)).toBe(false)
+  })
+})
+
+describe('isPlainInlineObject', () => {
+  test('plain object returns true', () => {
+    const node = ast.factory.createSchema({
+      type: 'object',
+      properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+    })
+    expect(isPlainInlineObject(node)).toBe(true)
+  })
+
+  test('non-object returns false', () => {
+    expect(isPlainInlineObject(ast.factory.createSchema({ type: 'string' }))).toBe(false)
+  })
+
+  test('nullable, optional, or nullish object returns false', () => {
+    expect(isPlainInlineObject(ast.factory.createSchema({ type: 'object', nullable: true }))).toBe(false)
+    expect(isPlainInlineObject(ast.factory.createSchema({ type: 'object', optional: true }))).toBe(false)
+    expect(isPlainInlineObject(ast.factory.createSchema({ type: 'object', nullish: true }))).toBe(false)
+  })
+
+  test('object with additionalProperties returns false', () => {
+    expect(isPlainInlineObject(ast.factory.createSchema({ type: 'object', additionalProperties: true }))).toBe(false)
+    expect(isPlainInlineObject(ast.factory.createSchema({ type: 'object', additionalProperties: false }))).toBe(false)
+    expect(isPlainInlineObject(ast.factory.createSchema({ type: 'object', additionalProperties: ast.factory.createSchema({ type: 'string' }) }))).toBe(false)
+  })
+
+  test('object with patternProperties returns false', () => {
+    const node = ast.factory.createSchema({
+      type: 'object',
+      patternProperties: { '^S_': ast.factory.createSchema({ type: 'string' }) },
+    })
+    expect(isPlainInlineObject(node)).toBe(false)
+  })
+
+  test('object with propertyNames returns false', () => {
+    const node = ast.factory.createSchema({
+      type: 'object',
+      propertyNames: ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }),
+    } as any)
+    expect(isPlainInlineObject(node)).toBe(false)
   })
 })
