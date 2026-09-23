@@ -431,6 +431,43 @@ describe('printerZodMini', () => {
       expect(printer.print(node)).toBe('z.strictObject({})')
     })
 
+    test('object with propertyNames $ref key schema → z.record(RefName, schema)', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        propertyNames: ast.factory.createSchema({
+          type: 'ref',
+          name: 'ErrorCode',
+          ref: '#/components/schemas/ErrorCode',
+        }),
+        additionalProperties: ast.factory.createSchema({ type: 'string' }),
+      } as any)
+      expect(printer.print(node)).toBe('z.record(ErrorCode, z.string())')
+    })
+
+    test('object with nullable dictionary schema → z.nullable(z.record(...))', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        additionalProperties: ast.factory.createSchema({ type: 'string' }),
+        nullable: true,
+      })
+      expect(printer.print(node)).toBe('z.nullable(z.record(z.string(), z.string()))')
+    })
+
+    test('object with nullable looseObject → z.nullable(z.looseObject(...))', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+        additionalProperties: true,
+        nullable: true,
+      })
+      expect(printer.print(node)).toBe('z.nullable(z.looseObject({\n  id: z.int(),\n}))')
+    })
+
     test('patternProperties → z.record with a regex-checked key', () => {
       const node = ast.factory.createSchema({
         type: 'object',
@@ -682,6 +719,26 @@ describe('printerZodMini', () => {
       })
       expect(printer.print(node)).toBe('z.string()')
     })
+
+    test('intersection with propertyNames member falls back to z.intersection() instead of z.extend()', () => {
+      const node = ast.factory.createSchema({
+        type: 'intersection',
+        members: [
+          ast.factory.createSchema({
+            type: 'object',
+            properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+          }),
+          ast.factory.createSchema({
+            type: 'object',
+            properties: [],
+            propertyNames: ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }),
+          } as any),
+        ],
+      })
+      expect(printer.print(node)).toBe(`z.intersection(z.object({
+  id: z.string(),
+}), z.record(z.string().check(z.regex(/^[a-z]+$/)), z.unknown()))`)
+    })
   })
 
   describe('union', () => {
@@ -879,6 +936,71 @@ describe('printerZodMini', () => {
         members: [],
       })
       expect(printer.print(node)).toBeNull()
+    })
+
+    test('falls back to z.union when a variant is a record (not a ZodObject)', () => {
+      const node = ast.factory.createSchema({
+        type: 'union',
+        discriminatorPropertyName: 'type',
+        members: [
+          ast.factory.createSchema({
+            type: 'object',
+            properties: [ast.factory.createProperty({ name: 'type', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+          }),
+          ast.factory.createSchema({
+            type: 'object',
+            properties: [],
+            additionalProperties: ast.factory.createSchema({ type: 'string' }),
+          }),
+        ],
+      })
+      expect(printer.print(node)).toBe(`z.union([
+  z.object({
+    type: z.string(),
+  }),
+  z.record(z.string(), z.string()),
+])`)
+    })
+
+    test('discriminated union with looseObject variants emits z.discriminatedUnion and allows undeclared keys', async () => {
+      const zm = await import('zod/mini')
+      const node = ast.factory.createSchema({
+        type: 'union',
+        discriminatorPropertyName: 'type',
+        members: [
+          ast.factory.createSchema({
+            type: 'object',
+            properties: [
+              ast.factory.createProperty({ name: 'type', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: ['cat'] }) }),
+              ast.factory.createProperty({ name: 'meow', required: true, schema: ast.factory.createSchema({ type: 'boolean' }) }),
+            ],
+            additionalProperties: true,
+          }),
+          ast.factory.createSchema({
+            type: 'object',
+            properties: [
+              ast.factory.createProperty({ name: 'type', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: ['dog'] }) }),
+              ast.factory.createProperty({ name: 'bark', required: true, schema: ast.factory.createSchema({ type: 'boolean' }) }),
+            ],
+            additionalProperties: true,
+          }),
+        ],
+      })
+      expect(printer.print(node)).toBe(`z.discriminatedUnion('type', [
+  z.looseObject({
+    type: z.enum(['cat']),
+    meow: z.boolean(),
+  }),
+  z.looseObject({
+    type: z.enum(['dog']),
+    bark: z.boolean(),
+  }),
+])`)
+
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(zm)
+      expect(schema.safeParse({ type: 'cat', meow: true, extraProperty: 123 }).success).toBe(true)
+      expect(schema.safeParse({ type: 'unknown', meow: true }).success).toBe(false)
     })
   })
 

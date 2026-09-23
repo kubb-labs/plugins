@@ -8,6 +8,8 @@ import {
   defaultLiteral,
   formatDefault,
   formatLiteral,
+  isObjectComposableIntersection,
+  isObjectSchemaNode,
   lengthChecksMini,
   lengthConstraints,
   numberChecksMini,
@@ -476,5 +478,161 @@ describe('omitUnwrapChain', () => {
       schema: ast.factory.createSchema({ type: 'object', nullable: true }),
     })
     expect(omitUnwrapChain(node)).toBe('.unwrap()')
+  })
+})
+
+describe('isObjectSchemaNode', () => {
+  test('plain object with properties returns true', () => {
+    const node = ast.factory.createSchema({
+      type: 'object',
+      properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+    })
+    expect(isObjectSchemaNode(node)).toBe(true)
+  })
+
+  test('empty object without additionalProperties returns true', () => {
+    const node = ast.factory.createSchema({ type: 'object', properties: [] })
+    expect(isObjectSchemaNode(node)).toBe(true)
+  })
+
+  test('open object with additionalProperties: true returns true', () => {
+    const node = ast.factory.createSchema({ type: 'object', properties: [], additionalProperties: true })
+    expect(isObjectSchemaNode(node)).toBe(true)
+  })
+
+  test('open object with declared properties and additionalProperties: true returns true', () => {
+    const node = ast.factory.createSchema({
+      type: 'object',
+      properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+      additionalProperties: true,
+    })
+    expect(isObjectSchemaNode(node)).toBe(true)
+  })
+
+  test('strict object with additionalProperties: false returns true', () => {
+    const node = ast.factory.createSchema({ type: 'object', properties: [], additionalProperties: false })
+    expect(isObjectSchemaNode(node)).toBe(true)
+  })
+
+  test('object with properties and typed additionalProperties returns true (catchall)', () => {
+    const node = ast.factory.createSchema({
+      type: 'object',
+      properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+      additionalProperties: ast.factory.createSchema({ type: 'string' }),
+    })
+    expect(isObjectSchemaNode(node)).toBe(true)
+  })
+
+  test('dictionary with empty properties and typed additionalProperties returns false (record)', () => {
+    const node = ast.factory.createSchema({
+      type: 'object',
+      properties: [],
+      additionalProperties: ast.factory.createSchema({ type: 'string' }),
+    })
+    expect(isObjectSchemaNode(node)).toBe(false)
+  })
+
+  test('object with empty properties and patternProperties returns false (record)', () => {
+    const node = ast.factory.createSchema({
+      type: 'object',
+      properties: [],
+      patternProperties: { '^[a-z]+$': ast.factory.createSchema({ type: 'string' }) },
+    })
+    expect(isObjectSchemaNode(node)).toBe(false)
+  })
+
+  test('object with empty properties and propertyNames returns false (record)', () => {
+    const node = ast.factory.createSchema({
+      type: 'object',
+      properties: [],
+      propertyNames: ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }),
+    } as any)
+    expect(isObjectSchemaNode(node)).toBe(false)
+  })
+
+  test('nullable, optional, or nullish object returns false', () => {
+    expect(isObjectSchemaNode(ast.factory.createSchema({ type: 'object', nullable: true }))).toBe(false)
+    expect(isObjectSchemaNode(ast.factory.createSchema({ type: 'object', optional: true }))).toBe(false)
+    expect(isObjectSchemaNode(ast.factory.createSchema({ type: 'object', nullish: true }))).toBe(false)
+  })
+
+  test('ref resolving to record returns false, ref resolving to object returns true', () => {
+    const recordRef = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Dict',
+      ref: '#/components/schemas/Dict',
+      schema: ast.factory.createSchema({
+        type: 'object',
+        properties: [],
+        additionalProperties: ast.factory.createSchema({ type: 'string' }),
+      }),
+    })
+    expect(isObjectSchemaNode(recordRef)).toBe(false)
+
+    const objectRef = ast.factory.createSchema({
+      type: 'ref',
+      name: 'User',
+      ref: '#/components/schemas/User',
+      schema: ast.factory.createSchema({
+        type: 'object',
+        properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+      }),
+    })
+    expect(isObjectSchemaNode(objectRef)).toBe(true)
+  })
+})
+
+describe('isObjectComposableIntersection', () => {
+  test('intersection with plain object members returns true', () => {
+    const node = ast.factory.createSchema({
+      type: 'intersection',
+      members: [
+        ast.factory.createSchema({
+          type: 'object',
+          properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+        }),
+        ast.factory.createSchema({
+          type: 'object',
+          properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+        }),
+      ],
+    })
+    expect(isObjectComposableIntersection(node)).toBe(true)
+  })
+
+  test('intersection where a member has propertyNames returns false', () => {
+    const node = ast.factory.createSchema({
+      type: 'intersection',
+      members: [
+        ast.factory.createSchema({
+          type: 'object',
+          properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+        }),
+        ast.factory.createSchema({
+          type: 'object',
+          properties: [],
+          propertyNames: ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }),
+        } as any),
+      ],
+    })
+    expect(isObjectComposableIntersection(node)).toBe(false)
+  })
+
+  test('intersection where a member has typed additionalProperties returns false', () => {
+    const node = ast.factory.createSchema({
+      type: 'intersection',
+      members: [
+        ast.factory.createSchema({
+          type: 'object',
+          properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+        }),
+        ast.factory.createSchema({
+          type: 'object',
+          properties: [],
+          additionalProperties: ast.factory.createSchema({ type: 'string' }),
+        }),
+      ],
+    })
+    expect(isObjectComposableIntersection(node)).toBe(false)
   })
 })
