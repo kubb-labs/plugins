@@ -238,7 +238,8 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
       },
       object(node) {
         const entries = node.properties ?? []
-        const objectBase = `z.object(${buildZodMiniObjectShape(this, node)})`
+        const shape = buildZodMiniObjectShape(this, node)
+        const objectBase = `z.object(${shape})`
 
         // zod/mini has no chainable `.catchall()`/`.strict()`, so route through the functional forms.
         const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
@@ -257,9 +258,9 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           if (entries.length === 0 && propertyNamesKeySchema) {
             return `z.record(${propertyNamesKeySchema}, ${unknownType})`
           }
-          return objectBase.replace(/^z\.object\(/, 'z.looseObject(')
+          return `z.looseObject(${shape})`
         }
-        if (node.additionalProperties === false && patterns.length === 0) return objectBase.replace(/^z\.object\(/, 'z.strictObject(')
+        if (node.additionalProperties === false && patterns.length === 0) return `z.strictObject(${shape})`
 
         if (patterns.length > 0) {
           const values = patterns.map(([, valueSchema]) => {

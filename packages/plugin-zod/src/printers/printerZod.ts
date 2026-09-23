@@ -412,7 +412,8 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
     },
     object(node) {
       const entries = node.properties ?? []
-      const objectBase = `z.object(${buildZodObjectShape(this, node)})`
+      const shape = buildZodObjectShape(this, node)
+      const objectBase = `z.object(${shape})`
 
       const result = (() => {
         const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
@@ -431,7 +432,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           if (entries.length === 0 && propertyNamesKeySchema) {
             return `z.record(${propertyNamesKeySchema}, ${unknownType})`
           }
-          return objectBase.replace(/^z\.object\(/, 'z.looseObject(')
+          return `z.looseObject(${shape})`
         }
         // `additionalProperties: false` still permits patternProperties keys, so skip `.strict()` when patterns exist.
         if (node.additionalProperties === false && patterns.length === 0) return `${objectBase}.strict()`
