@@ -103,6 +103,23 @@ describe('printerZod', () => {
       const p = printerZod({ coercion: { numbers: true } })
       expect(p.print(ast.factory.createSchema({ type: 'integer' }))).toBe('z.coerce.number().int()')
     })
+
+    test('integer with int32 format', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'integer', format: 'int32' }))).toBe('z.int32()')
+    })
+
+    test('integer with uint32 format', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'integer', format: 'uint32' }))).toBe('z.uint32()')
+    })
+
+    test('integer with int32 format and constraints', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'integer', format: 'int32', min: 0, max: 100 }))).toBe('z.int32().min(0).max(100)')
+    })
+
+    test('integer with int32 format respects coercion over native helper', () => {
+      const p = printerZod({ coercion: { numbers: true } })
+      expect(p.print(ast.factory.createSchema({ type: 'integer', format: 'int32' }))).toBe('z.coerce.number().int()')
+    })
   })
 
   describe('bigint', () => {
@@ -187,6 +204,37 @@ describe('printerZod', () => {
 
     test('ipv6', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'ipv6' }))).toBe('z.ipv6()')
+    })
+
+    test('byte and base64 formats', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'byte' }))).toBe('z.base64()')
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'base64' }))).toBe('z.base64()')
+    })
+
+    test('base64url format', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'base64url' }))).toBe('z.base64url()')
+    })
+
+    test('jwt format', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'jwt' }))).toBe('z.jwt()')
+    })
+
+    test('ulid format', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'ulid' }))).toBe('z.ulid()')
+    })
+
+    test('iban format', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'iban' }))).toBe('z.iban()')
+    })
+
+    test('duration format', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'duration' }))).toBe('z.iso.duration()')
+    })
+
+    test('format helpers with constraints and coercion', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'base64', min: 10 }))).toBe('z.base64().min(10)')
+      const p = printerZod({ coercion: { strings: true } })
+      expect(p.print(ast.factory.createSchema({ type: 'string', format: 'base64' }))).toBe('z.coerce.string()')
     })
   })
 

@@ -6,7 +6,7 @@
 import * as z from 'zod/mini'
 
 export const apiResponseSchema = z.object({
-  code: z.optional(z.int()),
+  code: z.optional(z.int32()),
   type: z.optional(z.string()),
   message: z.optional(z.string()),
 })

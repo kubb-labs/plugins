@@ -3,7 +3,7 @@ import { addPetRequestSchema } from '../addPetRequestSchema'
 import { petSchema } from '../petSchema'
 
 export const addPetStatus405Schema = z.object({
-  code: z.int().optional(),
+  code: z.int32().optional(),
   message: z.string().optional(),
 })
 

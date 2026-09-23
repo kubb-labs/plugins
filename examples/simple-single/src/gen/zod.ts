@@ -34,7 +34,7 @@ export const orderSchema = z.object({
     .optional()
     .meta({ examples: [198772] }),
   quantity: z
-    .int()
+    .int32()
     .optional()
     .meta({ examples: [7] }),
   shipDate: z.iso.datetime().optional(),
@@ -94,13 +94,13 @@ export const addPetRequestSchema = z.object({
 })
 
 export const apiResponseSchema = z.object({
-  code: z.int().optional(),
+  code: z.int32().optional(),
   type: z.string().optional(),
   message: z.string().optional(),
 })
 
 export const petNotFoundSchema = z.object({
-  code: z.int().optional(),
+  code: z.int32().optional(),
   message: z.string().optional(),
 })
 
@@ -135,7 +135,7 @@ export const addPetStatus200SchemaXml = petSchema
 export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])
 
 export const addPetStatus405Schema = z.object({
-  code: z.int().optional(),
+  code: z.int32().optional(),
   message: z.string().optional(),
 })
 
@@ -234,7 +234,7 @@ export const uploadFileResponseSchema = uploadFileStatus200Schema
 
 export const uploadFileBodySchema = z.instanceof(File).optional()
 
-export const getInventoryStatus200Schema = z.object({}).catchall(z.int())
+export const getInventoryStatus200Schema = z.object({}).catchall(z.int32())
 
 export const getInventoryResponseSchema = getInventoryStatus200Schema
 

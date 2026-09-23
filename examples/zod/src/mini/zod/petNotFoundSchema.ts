@@ -6,6 +6,6 @@
 import * as z from 'zod/mini'
 
 export const petNotFoundSchema = z.object({
-  code: z.optional(z.int()),
+  code: z.optional(z.int32()),
   message: z.optional(z.string()),
 })

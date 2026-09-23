@@ -296,6 +296,27 @@ const scalarNodes: PrinterZodNodes = {
   boolean: () => 'z.boolean()',
   null: () => 'z.null()',
   string(node) {
+    if (!shouldCoerce(this.options.coercion, 'strings')) {
+      if (node.format === 'byte' || node.format === 'base64') {
+        return `z.base64()${lengthConstraints({ ...node, regexType: this.options.regexType })}`
+      }
+      if (node.format === 'base64url') {
+        return `z.base64url()${lengthConstraints({ ...node, regexType: this.options.regexType })}`
+      }
+      if (node.format === 'jwt') {
+        return `z.jwt()${lengthConstraints({ ...node, regexType: this.options.regexType })}`
+      }
+      if (node.format === 'ulid') {
+        return `z.ulid()${lengthConstraints({ ...node, regexType: this.options.regexType })}`
+      }
+      if (node.format === 'iban') {
+        return `z.iban()${lengthConstraints({ ...node, regexType: this.options.regexType })}`
+      }
+      if (node.format === 'duration') {
+        return `z.iso.duration()${lengthConstraints({ ...node, regexType: this.options.regexType })}`
+      }
+    }
+
     const base = shouldCoerce(this.options.coercion, 'strings') ? 'z.coerce.string()' : 'z.string()'
     const pattern = node.pattern ?? integerFormatPattern(node.format)
 
@@ -307,6 +328,15 @@ const scalarNodes: PrinterZodNodes = {
     return `${base}${numberConstraints(node)}`
   },
   integer(node) {
+    if (!shouldCoerce(this.options.coercion, 'numbers')) {
+      if (node.format === 'int32') {
+        return `z.int32()${numberConstraints(node)}`
+      }
+      if (node.format === 'uint32') {
+        return `z.uint32()${numberConstraints(node)}`
+      }
+    }
+
     const base = shouldCoerce(this.options.coercion, 'numbers') ? 'z.coerce.number().int()' : 'z.int()'
 
     return `${base}${numberConstraints(node)}`
