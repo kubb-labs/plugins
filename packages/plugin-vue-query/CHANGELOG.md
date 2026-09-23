@@ -1,5 +1,11 @@
 # @kubb/plugin-vue-query
 
+## 5.1.3
+
+### Patch Changes
+
+- [#917](https://github.com/kubb-labs/plugins/pull/917) [`68e0a65`](https://github.com/kubb-labs/plugins/commit/68e0a65247e99d3c606ef7a5ac93f2306e7f66db) Thanks [@DemonStore](https://github.com/DemonStore)! - Preserve mutation payload types when resolving request groups with Vue's `toValue`. Bodies with an optional `value` property now compile without being inferred as the property's value type.
+
 ## 5.1.2
 
 ### Patch Changes
