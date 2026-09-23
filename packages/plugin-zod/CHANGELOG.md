@@ -1,5 +1,13 @@
 # @kubb/plugin-zod
 
+## 5.2.0
+
+### Minor Changes
+
+- [#923](https://github.com/kubb-labs/plugins/pull/923) [`8c7d2d1`](https://github.com/kubb-labs/plugins/commit/8c7d2d1a7f12c156109fea43ac17d3fb16562728) Thanks [@xeoneux](https://github.com/xeoneux)! - Add `typeGuards` option to generate TypeScript type guards (`is*`) and assertion functions (`assert*`) using Zod v4's native `validate` API (requires Zod v4.6.0 or above).
+
+- [#920](https://github.com/kubb-labs/plugins/pull/920) [`693c640`](https://github.com/kubb-labs/plugins/commit/693c640f7e744f0c6e77aed5192e24616ea708d7) Thanks [@xeoneux](https://github.com/xeoneux)! - Support Zod 4 fixed-width integers (`z.int32()`, `z.uint32()`) and top-level format helpers (`z.base64()`, `z.base64url()`, `z.jwt()`, `z.ulid()`, `z.iban()`, `z.iso.duration()`).
+
 ## 5.1.6
 
 ### Patch Changes
