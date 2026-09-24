@@ -13,8 +13,8 @@ import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/de
 import { findPetsByStatusQueryStatusSchema, findPetsByStatusStatus200Schema } from '../zod/findPetsByStatusSchema'
 import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema'
 import { uploadFileBodySchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from '../zod/uploadFileSchema'
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod'
 
 export function getServer() {
