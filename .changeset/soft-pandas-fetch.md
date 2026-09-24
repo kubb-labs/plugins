@@ -1,5 +1,6 @@
 ---
 '@kubb/plugin-fetch': patch
+'@kubb/plugin-axios': patch
 ---
 
-Pass each call's `RequestConfig` to fetch interceptors and include explicit `.ts` extensions in the copied runtime imports for Node's native TypeScript execution.
+Pass each call's `RequestConfig` to client interceptors and include explicit `.ts` extensions in copied runtime imports for Node's native TypeScript execution.
