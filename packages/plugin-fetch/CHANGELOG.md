@@ -1,5 +1,11 @@
 # @kubb/plugin-fetch
 
+## 5.4.2
+
+### Patch Changes
+
+- [#935](https://github.com/kubb-labs/plugins/pull/935) [`7215b46`](https://github.com/kubb-labs/plugins/commit/7215b465664eb082a936b0cb6564e3c2f8197c5c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Pass each call's `RequestConfig` to client interceptors and apply the configured TypeScript parser extension to runtime imports.
+
 ## 5.4.1
 
 ### Patch Changes
