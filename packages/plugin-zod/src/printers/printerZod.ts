@@ -442,21 +442,20 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
     },
     object(node) {
       const entries = node.properties ?? []
-      const objectBase = `z.object(${buildZodObjectShape(this, node)})`
+      const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
+      // `additionalProperties: false` still permits patternProperties keys, so only a pattern-free object is strict.
+      // `z.strictObject(...)` rather than `z.object(...).strict()`: `.strict()` reads `.shape` eagerly, which runs a
+      // self-reference's deferred getter while its own `const` is still in the temporal dead zone.
+      const isStrict = node.additionalProperties === false && patterns.length === 0
+      const objectBase = `${isStrict ? 'z.strictObject' : 'z.object'}(${buildZodObjectShape(this, node)})`
 
       const result = (() => {
-        const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
-
         if (node.additionalProperties && node.additionalProperties !== true) {
           const catchallType = this.transform(node.additionalProperties)
           return catchallType ? `${objectBase}.catchall(${catchallType})` : objectBase
         }
         if (node.additionalProperties === true) return `${objectBase}.catchall(${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
-        // `additionalProperties: false` still permits patternProperties keys, so skip the strict object when patterns exist.
-        // `z.strictObject(...)` rather than `z.object(...).strict()`: `.strict()` reads `.shape` eagerly, which runs a
-        // self-reference's deferred getter while its own `const` is still in the temporal dead zone. Same validation,
-        // and it matches what the Zod Mini printer already emits.
-        if (node.additionalProperties === false && patterns.length === 0) return objectBase.replace(/^z\.object\(/, 'z.strictObject(')
+        if (isStrict) return objectBase
 
         // No fixed properties: z.record enforces the key pattern. With fixed properties a record would
         // reject the declared keys, so fall back to .catchall (value validated, key pattern not).
