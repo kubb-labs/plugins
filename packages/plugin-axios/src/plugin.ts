@@ -100,36 +100,36 @@ export const pluginAxios = definePlugin<PluginAxios>((options) => {
           baseName: 'client.ts',
           path: clientPath,
           imports: [
-            ast.createImport({ name: 'axios', path: 'axios' }),
-            ast.createImport({
+            ast.factory.createImport({ name: 'axios', path: 'axios' }),
+            ast.factory.createImport({
               name: ['AxiosError', 'AxiosInstance', 'AxiosRequestConfig', 'AxiosResponse', 'InternalAxiosRequestConfig'],
               path: 'axios',
               isTypeOnly: true,
             }),
-            ast.createImport({
+            ast.factory.createImport({
               name: ['applyHeaderStyles', 'defaultBodySerializer', 'defaultPathSerializer', 'defaultQuerySerializer', 'isDefaultJsonBody', 'serializeCookies'],
               path: path.resolve(root, '.kubb/serializers.ts'),
               root: runtimeRoot,
             }),
-            ast.createImport({
+            ast.factory.createImport({
               name: ['HeadersInit', 'PathParamStyle', 'PathSerializer', 'Serializers', 'Styles'],
               path: path.resolve(root, '.kubb/serializers.ts'),
               root: runtimeRoot,
               isTypeOnly: true,
             }),
-            ast.createImport({
+            ast.factory.createImport({
               name: ['ParseError', 'validateStandardSchema'],
               path: path.resolve(root, '.kubb/standardSchema.ts'),
               root: runtimeRoot,
             }),
-            ast.createImport({
+            ast.factory.createImport({
               name: ['StandardSchemaValidator'],
               path: path.resolve(root, '.kubb/standardSchema.ts'),
               root: runtimeRoot,
               isTypeOnly: true,
             }),
           ],
-          sources: [ast.createSource({ nodes: [ast.createText(clientBody)] })],
+          sources: [ast.factory.createSource({ nodes: [ast.factory.createText(clientBody)] })],
           footer: baseURLExpression ? `client.setConfig({ baseURL: ${baseURLExpression} })` : undefined,
         })
 

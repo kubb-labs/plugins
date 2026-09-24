@@ -100,30 +100,30 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
           baseName: 'client.ts',
           path: clientPath,
           imports: [
-            ast.createImport({
+            ast.factory.createImport({
               name: ['applyHeaderStyles', 'defaultBodySerializer', 'defaultPathSerializer', 'defaultQuerySerializer', 'isDefaultJsonBody', 'serializeCookies'],
               path: path.resolve(root, '.kubb/serializers.ts'),
               root: runtimeRoot,
             }),
-            ast.createImport({
+            ast.factory.createImport({
               name: ['HeadersInit', 'PathParamStyle', 'PathSerializer', 'RequestBody', 'Serializers', 'Styles'],
               path: path.resolve(root, '.kubb/serializers.ts'),
               root: runtimeRoot,
               isTypeOnly: true,
             }),
-            ast.createImport({
+            ast.factory.createImport({
               name: ['ParseError', 'validateStandardSchema'],
               path: path.resolve(root, '.kubb/standardSchema.ts'),
               root: runtimeRoot,
             }),
-            ast.createImport({
+            ast.factory.createImport({
               name: ['StandardSchemaValidator'],
               path: path.resolve(root, '.kubb/standardSchema.ts'),
               root: runtimeRoot,
               isTypeOnly: true,
             }),
           ],
-          sources: [ast.createSource({ nodes: [ast.createText(clientBody)] })],
+          sources: [ast.factory.createSource({ nodes: [ast.factory.createText(clientBody)] })],
           footer: baseURLExpression ? `client.setConfig({ baseURL: ${baseURLExpression} })` : undefined,
         })
 
