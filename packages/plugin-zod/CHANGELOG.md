@@ -1,5 +1,11 @@
 # @kubb/plugin-zod
 
+## 5.2.2
+
+### Patch Changes
+
+- [#950](https://github.com/kubb-labs/plugins/pull/950) [`38f0616`](https://github.com/kubb-labs/plugins/commit/38f0616127d6bcd7d5af33fac2a4f97069c8cb66) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - `format: time` fields with `dateType.time: 'date'` now decode a wire `HH:mm:ss` string into a `Date` on `1970-01-01` UTC and encode it back to `HH:mm:ss` on requests, instead of printing `z.date()` both ways and rejecting every real time value. A component whose only `Date` field is a `time` now gets its `InputSchema` variant, and `coercion.dates` no longer turns `time` into `z.coerce.date()`, which cannot parse a bare time.
+
 ## 5.2.1
 
 ### Patch Changes
