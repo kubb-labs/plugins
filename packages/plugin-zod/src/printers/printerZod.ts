@@ -452,8 +452,11 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           return catchallType ? `${objectBase}.catchall(${catchallType})` : objectBase
         }
         if (node.additionalProperties === true) return `${objectBase}.catchall(${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
-        // `additionalProperties: false` still permits patternProperties keys, so skip `.strict()` when patterns exist.
-        if (node.additionalProperties === false && patterns.length === 0) return `${objectBase}.strict()`
+        // `additionalProperties: false` still permits patternProperties keys, so skip the strict object when patterns exist.
+        // `z.strictObject(...)` rather than `z.object(...).strict()`: `.strict()` reads `.shape` eagerly, which runs a
+        // self-reference's deferred getter while its own `const` is still in the temporal dead zone. Same validation,
+        // and it matches what the Zod Mini printer already emits.
+        if (node.additionalProperties === false && patterns.length === 0) return objectBase.replace(/^z\.object\(/, 'z.strictObject(')
 
         // No fixed properties: z.record enforces the key pattern. With fixed properties a record would
         // reject the declared keys, so fall back to .catchall (value validated, key pattern not).
