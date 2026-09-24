@@ -55,7 +55,7 @@ jobs:
 
       - name: Generate Kubb Studio snapshot
         uses: kubb-labs/action@main # feat: support working directory
-        continue-on-error: true
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
         with:
           token: ${{ secrets.KUBB_TOKEN }}
           working-directory: examples/fetch
