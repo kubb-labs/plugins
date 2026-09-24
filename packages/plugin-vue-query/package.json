@@ -91,7 +91,7 @@
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*",
-    "@tanstack/vue-query": "^5.103.1",
+    "@tanstack/vue-query": "^5.103.2",
     "kubb": "catalog:"
   },
   "peerDependencies": {
