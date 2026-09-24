@@ -1,4 +1,3 @@
-export * from './.kubb/client'
 export * from './.kubb/serializers'
 export * from './.kubb/standardSchema'
 export type { AddPetMutationArg, AddPetMutationKey } from './hooks/pet/useAddPet'
