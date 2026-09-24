@@ -738,7 +738,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     try {
       try {
         const response = await activeInstance.request<unknown, AxiosResponse>(axiosConfig)
-        const result = await settleResponse({
+        const result = await settleResponse<TRequest, TResponse>({
           response,
           codecs,
           validator: requestConfig.validator,
