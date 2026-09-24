@@ -138,7 +138,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
     renderer: jsxRenderer,
     operations(nodes, ctx) {
       const { config, resolver, root } = ctx
-      const { output, group, validator, returnType, sdk } = ctx.options
+      const { output, group, validator, returnType, throwOnErrorDefault, sdk } = ctx.options
 
       if (!sdk) return null
 
@@ -188,7 +188,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
                 <File.Import key={filePath} name={Array.from(set)} root={file.path} path={zodFilesByPath.get(filePath)!.path} />
               ))}
 
-            <SdkClient name={className} operations={ops} validator={validator} returnType={returnType} />
+            <SdkClient name={className} operations={ops} validator={validator} returnType={returnType} throwOnErrorDefault={throwOnErrorDefault} />
           </File>
         )
       }

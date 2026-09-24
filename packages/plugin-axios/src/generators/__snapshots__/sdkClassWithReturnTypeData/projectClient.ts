@@ -19,8 +19,9 @@ export class ProjectClient {
   ): Promise<UnwrappedResult<GetProjectResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return unwrapResult(request({ method: 'GET', url: '/projects/{project_id}', ...config }), config.throwOnError) as Promise<
-      UnwrappedResult<GetProjectResponses, ThrowOnError>
-    >
+    return unwrapResult(
+      request({ method: 'GET', url: '/projects/{project_id}', ...config }),
+      config.throwOnError ?? request.getConfig().throwOnError,
+    ) as Promise<UnwrappedResult<GetProjectResponses, ThrowOnError>>
   }
 }

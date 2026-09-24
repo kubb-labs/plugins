@@ -43,6 +43,7 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
     include,
     override = [],
     baseURL,
+    throwOnErrorDefault = true,
     validator = false,
     returnType = 'full',
     group,
@@ -57,6 +58,7 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
     override,
     group: createGroupConfig(group),
     baseURL,
+    throwOnErrorDefault,
     validator,
     returnType,
     sdk: sdk ? { mode: sdk.mode ?? 'tag', name: sdk.name } : undefined,
@@ -83,6 +85,7 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
         const baseURLExpression = baseURL ? (baseURL.includes('${') ? `\`${baseURL.replaceAll('`', '\\`')}\`` : JSON.stringify(baseURL)) : undefined
+        const clientConfig = [baseURLExpression && `baseURL: ${baseURLExpression}`, !throwOnErrorDefault && 'throwOnError: false'].filter(Boolean)
 
         ctx.injectFile({
           baseName: 'serializers.ts',
@@ -94,7 +97,7 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
           baseName: 'client.ts',
           path: path.resolve(root, '.kubb/client.ts'),
           copy: fetchClientTemplatePath,
-          footer: baseURLExpression ? `client.setConfig({ baseURL: ${baseURLExpression} })` : undefined,
+          footer: clientConfig.length ? `client.setConfig({ ${clientConfig.join(', ')} })` : undefined,
         })
 
         ctx.injectFile({

@@ -19,7 +19,7 @@ export class StoreClient {
   ): Promise<UnwrappedResult<GetInventoryResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return unwrapResult(request({ method: 'GET', url: '/store/inventory', ...config }), config.throwOnError) as Promise<
+    return unwrapResult(request({ method: 'GET', url: '/store/inventory', ...config }), config.throwOnError ?? request.getConfig().throwOnError) as Promise<
       UnwrappedResult<GetInventoryResponses, ThrowOnError>
     >
   }

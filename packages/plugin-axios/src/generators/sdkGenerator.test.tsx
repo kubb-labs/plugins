@@ -26,6 +26,7 @@ const defaultOptions: PluginAxios['resolvedOptions'] = {
   override: [],
   group: null,
   baseURL: undefined,
+  throwOnErrorDefault: true,
   validator: false,
   returnType: 'full',
   sdk: { mode: 'tag', name: undefined },
@@ -98,6 +99,7 @@ describe('sdkGenerator operations', () => {
     { name: 'sdkSingle', options: { sdk: { mode: 'flat', name: 'PetStore' } } as Partial<PluginAxios['resolvedOptions']> },
     // returnType: 'data' unwraps every SDK method down to the bare success body.
     { name: 'sdkClassWithReturnTypeData', options: { returnType: 'data' } as Partial<PluginAxios['resolvedOptions']> },
+    { name: 'sdkClassWithoutThrowing', options: { throwOnErrorDefault: false } as Partial<PluginAxios['resolvedOptions']> },
   ] as const satisfies Array<{ name: string; options: Partial<PluginAxios['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {

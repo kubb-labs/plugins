@@ -22,6 +22,7 @@ type Props = {
   operations: Array<OperationData>
   validator: ValidatorOptions | undefined
   returnType: ReturnTypeOption
+  throwOnErrorDefault: boolean
   children?: KubbReactNode
 }
 
@@ -31,7 +32,16 @@ type Props = {
  * instance: `const api = new PetClient({ baseURL }); api.getPetById(...)`. A per-call `client` option
  * still overrides the instance client for a one-off call.
  */
-export function SdkClient({ name, isExportable = true, isIndexable = true, operations, validator, returnType, children }: Props): KubbReactNode {
+export function SdkClient({
+  name,
+  isExportable = true,
+  isIndexable = true,
+  operations,
+  validator,
+  returnType,
+  throwOnErrorDefault,
+  children,
+}: Props): KubbReactNode {
   const methods = operations.map(({ node, name: methodName, types, zodResolver, security }) =>
     buildSdkMethod({
       node,
@@ -41,6 +51,7 @@ export function SdkClient({ name, isExportable = true, isIndexable = true, opera
       validator,
       security,
       returnType,
+      throwOnErrorDefault,
     }),
   )
 

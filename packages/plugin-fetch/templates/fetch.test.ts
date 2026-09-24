@@ -270,6 +270,14 @@ describe('applyHeaderStyles', () => {
 })
 
 describe('createClientCore', () => {
+  test('uses a non-throwing client default and honors a per-call override', async () => {
+    const { transport } = fakeTransport({ data: { message: 'invalid' }, status: 405 })
+    const client = createClientCore<string, string>({ defaultTransport: transport })
+    client.setConfig({ throwOnError: false })
+    const result = await unwrapResult(client({ method: 'GET', url: '/pet' }), client.getConfig().throwOnError)
+    expect(result).toMatchObject({ status: 405, error: { message: 'invalid' } })
+    await expect(client({ method: 'GET', url: '/pet', throwOnError: true })).rejects.toBeInstanceOf(ResponseError)
+  })
   test('builds the url from method, path interpolation, and query', async () => {
     const { client, calls } = createClient()
     await client({ method: 'GET', url: '/pet/{petId}', path: { petId: 7 }, query: { sort: 'name' } })

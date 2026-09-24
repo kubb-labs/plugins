@@ -59,6 +59,7 @@ export function buildSdkMethod({
   validator,
   security,
   returnType,
+  throwOnErrorDefault,
 }: {
   node: ast.OperationNode
   name: string
@@ -67,10 +68,11 @@ export function buildSdkMethod({
   validator: ValidatorOptions | undefined
   security?: Array<Auth>
   returnType: ReturnTypeOption
+  throwOnErrorDefault: boolean
 }): string {
   if (!ast.isHttpOperationNode(node)) return ''
 
-  const signature = buildGroupedOptionsSignature({ node, types, returnType })
+  const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault })
   const callConfig = buildCallConfig({ node, validator, zodResolver, security })
   const returnStatement = buildReturnStatement({ node, types, callConfig, returnType })
   const generics = signature.generics.length ? `<${signature.generics.join(', ')}>` : ''
