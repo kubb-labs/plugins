@@ -6,7 +6,6 @@ import type { PrinterZodFactory } from '../printers/printerZod.ts'
 import type { PrinterZodMiniFactory } from '../printers/printerZodMini.ts'
 
 import type { CompileOptions } from '../types.ts'
-import { isBareRef } from '../utils.ts'
 
 type Props = {
   name: string
@@ -49,7 +48,7 @@ export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, as
   // only strip the `ZodObject` methods (`.omit()`, `.strict()`). Only non-object cyclic schemas (a
   // union/array with a top-level `z.lazy(() => self)`) are implicitly `any` and need the annotation.
   const needsAnnotation = cyclic && node.type !== 'object'
-  const isBare = isBareRef(node, printer.options.keysToOmit)
+  const isBare = ast.isBareRef(node, printer.options.keysToOmit)
   const isCyclic = Boolean(cyclic || (printer.options.cyclicSchemas && containsCircularRef(node, { circularSchemas: printer.options.cyclicSchemas })))
   const shouldCompile = Boolean(compile) && !isBare && !isCyclic
   const value = shouldCompile ? (typeof compile === 'object' && compile.strict ? `z.compile(${output}, { strict: true })` : `z.compile(${output})`) : output
