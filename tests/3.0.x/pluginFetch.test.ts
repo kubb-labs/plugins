@@ -1,7 +1,8 @@
+import { spawnSync } from 'node:child_process'
 import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
 import { Hookable, createKubb } from '@kubb/core'
@@ -163,6 +164,38 @@ describe(`plugin-fetch options ${version}`, () => {
         if ((e as NodeJS.ErrnoException).code !== 'ENOENT') throw e
       }
     }
+
+    await fs.rm(tmpDir, { recursive: true, force: true })
+  })
+
+  test('Node imports the client runtime with .ts specifiers', async () => {
+    const tmpDir = path.join(os.tmpdir(), `kubb-test-fetch-ts-extension-${Date.now()}`)
+    const output = path.join(tmpDir, 'gen')
+    const { diagnostics } = await createKubb(
+      {
+        root: __dirname,
+        input: '../../schemas/3.0.x/petStore.yaml',
+        output: { path: output, barrel: false },
+        adapter: adapterOas({ validate: false, enums: 'root' }),
+        parsers: [parserTs({ extension: { '.ts': '.ts' } })],
+        reporters: [],
+        storage: fsStorage(),
+        plugins: [pluginTs({ output: { path: './types', barrel: false } }), pluginFetch({ output: { path: './clients', barrel: false } })],
+      } as Config,
+      { hooks: new Hookable<KubbHooks>() },
+    ).safeBuild()
+
+    expect(Diagnostics.hasError(diagnostics)).toBe(false)
+
+    const clientPath = path.join(output, '.kubb/client.ts')
+    expect(await fs.readFile(clientPath, 'utf-8')).toContain("from './serializers.ts'")
+
+    const result = spawnSync(
+      process.execPath,
+      ['--experimental-strip-types', '--input-type=module', '-e', `await import(${JSON.stringify(pathToFileURL(clientPath).href)})`],
+      { encoding: 'utf8' },
+    )
+    expect(result.status, result.stderr).toBe(0)
 
     await fs.rm(tmpDir, { recursive: true, force: true })
   })
