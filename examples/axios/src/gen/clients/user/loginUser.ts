@@ -16,5 +16,9 @@ export function loginUser<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<LoginUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'GET', url: '/user/login', ...config }) as Promise<RequestResult<LoginUserResponses, ThrowOnError>>)
+  return withUnwrap(
+    request({ method: 'GET', url: '/user/login', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+      RequestResult<LoginUserResponses, ThrowOnError>
+    >,
+  )
 }

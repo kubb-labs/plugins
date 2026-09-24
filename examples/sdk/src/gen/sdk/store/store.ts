@@ -29,9 +29,13 @@ export class store {
     const { client: request = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config }) as Promise<
-        RequestResult<GetInventoryResponses, ThrowOnError>
-      >,
+      request({
+        method: 'GET',
+        url: '/store/inventory',
+        security: [{ type: 'apiKey', name: 'api_key', in: 'header' }],
+        ...config,
+        throwOnError: config.throwOnError ?? true,
+      }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>,
     )
   }
 
@@ -45,7 +49,11 @@ export class store {
   ): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'POST', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>)
+    return withUnwrap(
+      request({ method: 'POST', url: '/store/order', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+        RequestResult<PlaceOrderResponses, ThrowOnError>
+      >,
+    )
   }
 
   /**
@@ -58,7 +66,11 @@ export class store {
   ): Unwrappable<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'PATCH', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>>)
+    return withUnwrap(
+      request({ method: 'PATCH', url: '/store/order', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+        RequestResult<PlaceOrderPatchResponses, ThrowOnError>
+      >,
+    )
   }
 
   /**
@@ -71,7 +83,11 @@ export class store {
   ): Unwrappable<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/store/order/{orderId}', ...config }) as Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>>)
+    return withUnwrap(
+      request({ method: 'GET', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+        RequestResult<GetOrderByIdResponses, ThrowOnError>
+      >,
+    )
   }
 
   /**
@@ -84,6 +100,10 @@ export class store {
   ): Unwrappable<RequestResult<DeleteOrderResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'DELETE', url: '/store/order/{orderId}', ...config }) as Promise<RequestResult<DeleteOrderResponses, ThrowOnError>>)
+    return withUnwrap(
+      request({ method: 'DELETE', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+        RequestResult<DeleteOrderResponses, ThrowOnError>
+      >,
+    )
   }
 }

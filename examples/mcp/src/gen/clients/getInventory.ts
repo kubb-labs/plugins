@@ -18,8 +18,12 @@ export function getInventory<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config }) as Promise<
-      RequestResult<GetInventoryResponses, ThrowOnError>
-    >,
+    request({
+      method: 'GET',
+      url: '/store/inventory',
+      security: [{ type: 'apiKey', name: 'api_key', in: 'header' }],
+      ...config,
+      throwOnError: config.throwOnError ?? true,
+    }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>,
   )
 }

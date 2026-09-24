@@ -21,6 +21,7 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
       styles: { query: { tags: { explode: true } } },
       validator: { response: findPetsByTagsResponseSchema, error: findPetsByTagsErrorSchema },
       ...config,
+      throwOnError: config.throwOnError ?? true,
     }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>,
   )
 }
