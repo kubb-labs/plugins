@@ -198,6 +198,19 @@ describe('zodGenerator — Schema', () => {
     // dateType — printer renders based on representation, integration tests cover adapter-level dateType option
     { name: 'dateType string', node: ast.factory.createSchema({ type: 'date', name: 'DateField', representation: 'string' }) },
     { name: 'dateType date', node: ast.factory.createSchema({ type: 'date', name: 'DateField', representation: 'date' }) },
+    { name: 'timeType date', node: ast.factory.createSchema({ type: 'time', name: 'TimeField', representation: 'date' }) },
+    // a component whose only convertible field is a `time` still needs an input (encode) variant
+    {
+      name: 'timeType date object',
+      node: ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        name: 'Slot',
+        properties: [
+          ast.factory.createProperty({ name: 'startsAt', required: true, schema: ast.factory.createSchema({ type: 'time', representation: 'date' }) }),
+        ],
+      }),
+    },
     // guidType options
     { name: 'guidType uuid', node: ast.factory.createSchema({ type: 'uuid', name: 'UuidField' }), options: { guidType: 'uuid' } },
     { name: 'guidType guid', node: ast.factory.createSchema({ type: 'uuid', name: 'GuidField' }), options: { guidType: 'guid' } },
@@ -208,6 +221,11 @@ describe('zodGenerator — Schema', () => {
     {
       name: 'coercion dates',
       node: ast.factory.createSchema({ type: 'date', name: 'DateField', representation: 'date' }),
+      options: { coercion: { dates: true } },
+    },
+    {
+      name: 'coercion dates time',
+      node: ast.factory.createSchema({ type: 'time', name: 'TimeField', representation: 'date' }),
       options: { coercion: { dates: true } },
     },
     // inferred

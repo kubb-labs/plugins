@@ -187,7 +187,9 @@ export type Options = OutputOptions & {
    *
    * `dates` applies to fields typed as `Date` (adapter `dateType: 'date'`): they
    * validate with `z.coerce.date()` instead of the string-to-Date codec. Fields
-   * kept as ISO strings (`z.iso.date()`, `z.iso.datetime()`) are never coerced.
+   * kept as ISO strings (`z.iso.date()`, `z.iso.datetime()`) are never coerced,
+   * and neither are `format: time` fields, since `new Date()` cannot parse a bare
+   * `HH:mm:ss` value.
    *
    * `bigint` fields (`format: int64`) always coerce, regardless of this option:
    * `JSON.parse` hands back a `number`, which a plain `z.bigint()` rejects.

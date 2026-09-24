@@ -178,6 +178,26 @@ describe('printerZod', () => {
     test('time (ISO string)', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'time', representation: 'string' }))).toBe('z.iso.time()')
     })
+
+    test('time (JS Date) — output decodes HH:mm:ss string → Date on 1970-01-01 UTC', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'time', representation: 'date' }))).toBe(
+        'z.iso.time().transform((value) => new Date(`1970-01-01T${value}Z`))',
+      )
+    })
+
+    test('time (JS Date) — input encodes Date → HH:mm:ss string', () => {
+      const p = printerZod({ direction: 'encode' })
+      expect(p.print(ast.factory.createSchema({ type: 'time', representation: 'date' }))).toBe(
+        'z.date().transform((value) => value.toISOString().slice(11, 19))',
+      )
+    })
+
+    test('time (JS Date) — coercion.dates keeps the decode transform, since z.coerce.date() cannot parse HH:mm:ss', () => {
+      const p = printerZod({ coercion: { dates: true } })
+      expect(p.print(ast.factory.createSchema({ type: 'time', representation: 'date' }))).toBe(
+        'z.iso.time().transform((value) => new Date(`1970-01-01T${value}Z`))',
+      )
+    })
   })
 
   describe('special string formats', () => {
