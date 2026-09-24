@@ -11,6 +11,19 @@ on:
       - 'configs/**'
       - 'pnpm-lock.yaml'
       - '.github/workflows/fetch-example.yml'
+  # A snapshot of main is what pull requests compare with.
+  push:
+    branches: [main]
+    paths:
+      - 'examples/fetch/**'
+      - 'packages/**'
+      - 'internals/**'
+      - 'configs/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/fetch-example.yml'
+  # Snapshots expire after a week, so refresh main's even without a push.
+  schedule:
+    - cron: '17 6 * * 1,4'
 
 permissions:
   contents: write
@@ -47,5 +60,7 @@ jobs:
           token: ${{ secrets.KUBB_TOKEN }}
           working-directory: examples/fetch
           config: 'kubb.config.ts'
+          # The example's generated files are committed, so show when they are out of date.
+          compare-committed: true
         env:
           KUBB_STUDIO_URL: https://dev.kubb.studio
