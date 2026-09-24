@@ -15,5 +15,5 @@ import { client, unwrapResult } from '../.kubb/client'
 export function findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptions, ThrowOnError> = {}): Promise<UnwrappedResult<FindPetsByStatusResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return unwrapResult(request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], styles: { query: { status: { explode: true } } }, ...config }), config.throwOnError) as Promise<UnwrappedResult<FindPetsByStatusResponses, ThrowOnError>>
+  return unwrapResult(request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], styles: { query: { status: { explode: true } } }, ...config }), config.throwOnError ?? request.getConfig().throwOnError) as Promise<UnwrappedResult<FindPetsByStatusResponses, ThrowOnError>>
 }

@@ -15,5 +15,5 @@ import { client, unwrapResult } from '../.kubb/client'
 export function getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptions, ThrowOnError>): Promise<UnwrappedResult<GetPetByIdResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return unwrapResult(request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], ...config }), config.throwOnError) as Promise<UnwrappedResult<GetPetByIdResponses, ThrowOnError>>
+  return unwrapResult(request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], ...config }), config.throwOnError ?? request.getConfig().throwOnError) as Promise<UnwrappedResult<GetPetByIdResponses, ThrowOnError>>
 }

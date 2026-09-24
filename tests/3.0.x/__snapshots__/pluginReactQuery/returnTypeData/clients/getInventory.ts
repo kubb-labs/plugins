@@ -15,5 +15,5 @@ import { client, unwrapResult } from '../.kubb/client'
 export function getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptions, ThrowOnError> = {}): Promise<UnwrappedResult<GetInventoryResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return unwrapResult(request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config }), config.throwOnError) as Promise<UnwrappedResult<GetInventoryResponses, ThrowOnError>>
+  return unwrapResult(request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config }), config.throwOnError ?? request.getConfig().throwOnError) as Promise<UnwrappedResult<GetInventoryResponses, ThrowOnError>>
 }
