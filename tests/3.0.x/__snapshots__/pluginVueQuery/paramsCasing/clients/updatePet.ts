@@ -13,5 +13,5 @@ import { client, withUnwrap } from '../.kubb/client'
 export function updatePet<ThrowOnError extends boolean = true>(options: Options<UpdatePetOptions, ThrowOnError>): Unwrappable<RequestResult<UpdatePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'POST', url: '/pets/{pet_id}', ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>)
+  return withUnwrap(request({ method: 'POST', url: '/pets/{pet_id}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>)
 }

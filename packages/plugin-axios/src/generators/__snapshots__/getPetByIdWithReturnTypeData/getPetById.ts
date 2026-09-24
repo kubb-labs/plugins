@@ -12,7 +12,8 @@ export function getPetById<ThrowOnError extends boolean = true>(
 ): Promise<UnwrappedResult<GetPetByIdResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return unwrapResult(request({ method: 'GET', url: '/pet/{petId}', ...config }), config.throwOnError ?? request.getConfig().throwOnError) as Promise<
-    UnwrappedResult<GetPetByIdResponses, ThrowOnError>
-  >
+  return unwrapResult(
+    request({ method: 'GET', url: '/pet/{petId}', ...config, throwOnError: config.throwOnError ?? true }),
+    config.throwOnError ?? true,
+  ) as Promise<UnwrappedResult<GetPetByIdResponses, ThrowOnError>>
 }

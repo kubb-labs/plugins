@@ -22,4 +22,13 @@ describe('buildSdkMethod', () => {
     expect(method).toContain("url: '/pets/{pet_id}', ...config")
     expect(method).not.toContain('include_deleted')
   })
+
+  test('uses the same fallback for the request and data return type', () => {
+    const method = buildSdkMethod({ node, name: 'updatePet', types: resolverTs, validator: undefined, returnType: 'data', throwOnErrorDefault: false })
+
+    expect(method).toContain('public updatePet<ThrowOnError extends boolean = false>')
+    expect(method).toContain('...config, throwOnError: config.throwOnError ?? false })')
+    expect(method).toContain('config.throwOnError ?? false) as Promise<UnwrappedResult<UpdatePetResponses, ThrowOnError>>')
+    expect(method).not.toContain('request.getConfig()')
+  })
 })

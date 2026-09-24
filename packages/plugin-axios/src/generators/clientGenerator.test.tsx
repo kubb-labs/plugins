@@ -196,6 +196,7 @@ describe('clientGenerator operation', () => {
     { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { validator: 'zod' as const } },
     // returnType: 'data' unwraps the resolved call down to the bare success body.
     { name: 'getPetByIdWithReturnTypeData', node: getPetByIdNode, options: { returnType: 'data' as const } },
+    { name: 'getPetByIdWithReturnTypeDataWithoutThrowing', node: getPetByIdNode, options: { returnType: 'data' as const, throwOnErrorDefault: false } },
     { name: 'getPetByIdWithoutThrowing', node: getPetByIdNode, options: { throwOnErrorDefault: false } },
     // Two requirements referencing two schemes (oauth2 bearer + apiKey header).
     { name: 'getPetByIdWithSecurity', node: getPetByIdNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },

@@ -3,7 +3,7 @@
 '@kubb/plugin-axios': minor
 ---
 
-Configure the generated client's error behavior and return types together with `throwOnErrorDefault`.
+Set generated Fetch and Axios operations' error behavior and return types together with `throwOnErrorDefault`.
 Copied Fetch and Axios runtimes now follow the TypeScript parser's import extension setting, including `.ts` for Node's native TypeScript execution.
 
 ```typescript

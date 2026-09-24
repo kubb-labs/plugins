@@ -15,5 +15,5 @@ import { client, withUnwrap } from '../.kubb/client'
 export function placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptions, ThrowOnError>): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'POST', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>)
+  return withUnwrap(request({ method: 'POST', url: '/store/order', ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>)
 }

@@ -99,6 +99,10 @@ describe('sdkGenerator operations', () => {
     { name: 'sdkSingle', options: { sdk: { mode: 'flat', name: 'PetStore' } } as Partial<PluginAxios['resolvedOptions']> },
     // returnType: 'data' unwraps every SDK method down to the bare success body.
     { name: 'sdkClassWithReturnTypeData', options: { returnType: 'data' } as Partial<PluginAxios['resolvedOptions']> },
+    {
+      name: 'sdkClassWithReturnTypeDataWithoutThrowing',
+      options: { returnType: 'data', throwOnErrorDefault: false } as Partial<PluginAxios['resolvedOptions']>,
+    },
     { name: 'sdkClassWithoutThrowing', options: { throwOnErrorDefault: false } as Partial<PluginAxios['resolvedOptions']> },
   ] as const satisfies Array<{ name: string; options: Partial<PluginAxios['resolvedOptions']> }>
 

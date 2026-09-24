@@ -14,15 +14,15 @@ const node = ast.factory.createOperation({
 describe('buildReturnStatement', () => {
   test('casts to RequestResult first, then wraps the call in withUnwrap', () => {
     const callConfig = "{ method: 'POST', url: '/pet', ...config }"
-    expect(buildReturnStatement({ node, types: resolverTs, callConfig, returnType: 'full' })).toBe(
+    expect(buildReturnStatement({ node, types: resolverTs, callConfig, returnType: 'full', throwOnErrorDefault: true })).toBe(
       "return withUnwrap(request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>)",
     )
   })
 
-  test('routes the call through unwrapResult when returnType is data', () => {
+  test.each([true, false])('uses the plugin default %s when returnType is data', (throwOnErrorDefault) => {
     const callConfig = "{ method: 'POST', url: '/pet', ...config }"
-    expect(buildReturnStatement({ node, types: resolverTs, callConfig, returnType: 'data' })).toBe(
-      "return unwrapResult(request({ method: 'POST', url: '/pet', ...config }), config.throwOnError ?? request.getConfig().throwOnError) as Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>",
+    expect(buildReturnStatement({ node, types: resolverTs, callConfig, returnType: 'data', throwOnErrorDefault })).toBe(
+      `return unwrapResult(request({ method: 'POST', url: '/pet', ...config }), config.throwOnError ?? ${throwOnErrorDefault}) as Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>`,
     )
   })
 })

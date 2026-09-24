@@ -106,6 +106,7 @@ export function Operation({
     contentTypeLiteral,
     responseTypeLiteral,
     '...config',
+    `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`,
   ]
     .filter(Boolean)
     .join(', ')} }`
@@ -114,7 +115,7 @@ export function Operation({
   const functionReturnType = eventStream ? `Promise<EventStreamResult<${eventType}>>` : signature.returnType
   const returnStatement = eventStream
     ? `return toEventStream<${eventType}>(request(${callConfig}))`
-    : buildReturnStatement({ node, types, callConfig, returnType })
+    : buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault })
 
   return (
     <File.Source name={name} isExportable={isExportable} isIndexable={isIndexable}>

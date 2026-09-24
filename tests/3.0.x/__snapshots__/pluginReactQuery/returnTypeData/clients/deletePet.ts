@@ -15,5 +15,5 @@ import { client, unwrapResult } from '../.kubb/client'
 export function deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetOptions, ThrowOnError>): Promise<UnwrappedResult<DeletePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return unwrapResult(request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }), config.throwOnError ?? request.getConfig().throwOnError) as Promise<UnwrappedResult<DeletePetResponses, ThrowOnError>>
+  return unwrapResult(request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }), config.throwOnError ?? true) as Promise<UnwrappedResult<DeletePetResponses, ThrowOnError>>
 }

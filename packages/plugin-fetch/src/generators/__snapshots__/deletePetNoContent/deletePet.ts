@@ -12,5 +12,9 @@ export function deletePet<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'DELETE', url: '/pet/{petId}', ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>)
+  return withUnwrap(
+    request({ method: 'DELETE', url: '/pet/{petId}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+      RequestResult<DeletePetResponses, ThrowOnError>
+    >,
+  )
 }

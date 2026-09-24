@@ -248,11 +248,10 @@ describe('applyHeaderStyles', () => {
 })
 
 describe('createClientCore', () => {
-  test('uses a non-throwing client default and honors a per-call override', async () => {
+  test('returns errors for a non-throwing call and honors a per-call override', async () => {
     const { instance } = fakeAxios({ data: { message: 'invalid' }, status: 405 })
     const client = createClientCore({ transport: instance })
-    client.setConfig({ throwOnError: false })
-    const result = await unwrapResult(client({ method: 'GET', url: '/pet' }), client.getConfig().throwOnError)
+    const result = await unwrapResult(client({ method: 'GET', url: '/pet', throwOnError: false }), false)
     expect(result).toMatchObject({ status: 405, error: { message: 'invalid' } })
     await expect(client({ method: 'GET', url: '/pet', throwOnError: true })).rejects.toBeInstanceOf(ResponseError)
   })

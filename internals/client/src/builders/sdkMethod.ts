@@ -12,18 +12,21 @@ import { buildValidatorHooks } from './validator.ts'
 /**
  * Builds the call config literal forwarded to the contract client, mirroring the shared `Operation`
  * component: `{ method, url, security?, validator?, ...config }`. The `...config` spread carries every
- * per-call field (including `throwOnError`), so the method stays a thin wrapper over the contract.
+ * per-call field. The plugin's `throwOnError` fallback is applied after the spread so it also wins
+ * over a client instance's runtime config when the call omits an override.
  */
 function buildCallConfig({
   node,
   validator,
   zodResolver,
   security,
+  throwOnErrorDefault,
 }: {
   node: ast.HttpOperationNode
   validator: ValidatorOptions | undefined
   zodResolver?: ResolverZod | null
   security?: Array<Auth>
+  throwOnErrorDefault: boolean
 }): string {
   const validators = buildValidatorHooks({ node, validator, zodResolver })
   const validatorEntries = [
@@ -39,6 +42,7 @@ function buildCallConfig({
     securityLiteral ? `security: ${securityLiteral}` : null,
     validatorLiteral,
     '...config',
+    `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`,
   ]
     .filter(Boolean)
     .join(', ')} }`
@@ -73,8 +77,8 @@ export function buildSdkMethod({
   if (!ast.isHttpOperationNode(node)) return ''
 
   const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault })
-  const callConfig = buildCallConfig({ node, validator, zodResolver, security })
-  const returnStatement = buildReturnStatement({ node, types, callConfig, returnType })
+  const callConfig = buildCallConfig({ node, validator, zodResolver, security, throwOnErrorDefault })
+  const returnStatement = buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault })
   const generics = signature.generics.length ? `<${signature.generics.join(', ')}>` : ''
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
