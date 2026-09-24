@@ -1,4 +1,3 @@
-export * from './.kubb/client'
 export * from './.kubb/serializers'
 export * from './.kubb/standardSchema'
 export type { FindPetsByStatusQueryKey } from './hooks/pet/useFindPetsByStatus'
