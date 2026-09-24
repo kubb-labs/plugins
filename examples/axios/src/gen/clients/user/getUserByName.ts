@@ -16,5 +16,9 @@ export function getUserByName<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<GetUserByNameResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'GET', url: '/user/{username}', ...config }) as Promise<RequestResult<GetUserByNameResponses, ThrowOnError>>)
+  return withUnwrap(
+    request({ method: 'GET', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+      RequestResult<GetUserByNameResponses, ThrowOnError>
+    >,
+  )
 }
