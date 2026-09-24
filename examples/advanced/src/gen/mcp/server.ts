@@ -36,8 +36,8 @@ import {
   createPetsQueryOffsetSchema,
   createPetsStatus201Schema,
 } from '../zod/pets/createPetsSchema'
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod'
 
 export function getServer() {

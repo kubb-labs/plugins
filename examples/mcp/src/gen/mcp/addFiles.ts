@@ -1,6 +1,6 @@
 import type { AddFilesOptions } from '../models/ts/AddFiles'
-import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
-import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol.js'
+import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types.js'
 import { addFiles } from '../clients/addFiles'
 
 /**

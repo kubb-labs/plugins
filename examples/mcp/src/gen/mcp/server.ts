@@ -43,8 +43,8 @@ import { placeOrderPatchBodySchema, placeOrderPatchStatus200Schema } from '../zo
 import { placeOrderBodySchema, placeOrderStatus200Schema } from '../zod/placeOrderSchema'
 import { updatePetBodySchema, updatePetStatus200Schema } from '../zod/updatePetSchema'
 import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from '../zod/updatePetWithFormSchema'
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod'
 
 export function getServer() {
