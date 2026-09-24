@@ -12,7 +12,7 @@ export async function addFilesHandler(
   { body }: AddFilesOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await addFiles({ body, signal: request.signal })
+  const res = await addFiles({ body, signal: request.signal, throwOnError: true })
 
   return {
     content: [
