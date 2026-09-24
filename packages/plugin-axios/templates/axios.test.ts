@@ -498,6 +498,78 @@ describe('createClientCore', () => {
     await expect(client({ method: 'POST', url: '/pet' })).rejects.toMatchObject({ status: 405, data: { message: 'invalid' } })
   })
 
+  test('names the method and URL in the ResponseError message, without the query', async () => {
+    const { instance } = fakeAxios({ status: 404, statusText: 'Not Found' })
+    const client = createClientCore({ transport: instance, baseURL: 'https://api.test' })
+    await expect(client({ method: 'GET', url: '/pet/1?api_key=secret' })).rejects.toThrow('GET https://api.test/pet/1 failed with status 404 Not Found')
+  })
+
+  test('ResponseError keeps the bare message without a method or URL', () => {
+    const error = new ResponseError({ data: undefined, status: 500, statusText: '', request: {}, response: {} as AxiosResponse })
+    expect(error.message).toBe('Request failed with status 500')
+  })
+
+  test('ResponseError formats message with only method or only URL', () => {
+    const errorMethodOnly = new ResponseError({
+      data: undefined,
+      status: 500,
+      statusText: 'Server Error',
+      request: {},
+      response: {} as AxiosResponse,
+      method: 'POST',
+    })
+    expect(errorMethodOnly.message).toBe('POST failed with status 500 Server Error')
+
+    const errorUrlOnly = new ResponseError({
+      data: undefined,
+      status: 404,
+      statusText: 'Not Found',
+      request: {},
+      response: {} as AxiosResponse,
+      url: 'https://api.test/pet',
+    })
+    expect(errorUrlOnly.message).toBe('https://api.test/pet failed with status 404 Not Found')
+  })
+
+  test('ResponseError.is matches by name, so an error from another bundled client still counts', () => {
+    const foreign = Object.assign(new Error('boom'), { name: 'ResponseError' })
+    expect(ResponseError.is(foreign)).toBe(true)
+    expect(ResponseError.is(new ResponseError({ data: undefined, status: 500, statusText: '', request: {}, response: {} as AxiosResponse }))).toBe(true)
+    expect(ResponseError.is(new Error('boom'))).toBe(false)
+    expect(ResponseError.is({ name: 'ResponseError' })).toBe(false)
+    expect(ResponseError.is(null)).toBe(false)
+    expect(ResponseError.is(undefined)).toBe(false)
+  })
+
+  test('strips query parameters and hash fragments from URL in ResponseError message', async () => {
+    const { instance } = fakeAxios({ status: 404, statusText: 'Not Found' })
+    const client = createClientCore({ transport: instance, baseURL: 'https://api.test' })
+    await expect(client({ method: 'GET', url: '/pet/1?api_key=secret#details' })).rejects.toThrow('GET https://api.test/pet/1 failed with status 404 Not Found')
+  })
+
+  test('prevents double slashes when baseURL ends with a slash', async () => {
+    const { instance } = fakeAxios({ status: 404, statusText: 'Not Found' })
+    const client = createClientCore({ transport: instance, baseURL: 'https://api.test/' })
+    await expect(client({ method: 'GET', url: '/pet/1' })).rejects.toThrow('GET https://api.test/pet/1 failed with status 404 Not Found')
+  })
+
+  test('ResponseError.is acts as a type guard narrowing data and status', () => {
+    const err: unknown = new ResponseError<{ message: string }>({
+      data: { message: 'invalid' },
+      status: 400,
+      statusText: 'Bad Request',
+      request: {},
+      response: {} as AxiosResponse,
+    })
+    if (ResponseError.is(err)) {
+      expect(err.status).toBe(400)
+      expect(err.data).toStrictEqual({ message: 'invalid' })
+      expect(err.statusText).toBe('Bad Request')
+    } else {
+      expect.fail('Expected ResponseError.is to return true')
+    }
+  })
+
   test('passes an explicit 2xx-only validateStatus to axios when throwOnError is true by default', async () => {
     const { instance, calls } = fakeAxios({ data: { id: 1 }, status: 200 })
     const client = createClientCore({ transport: instance })
