@@ -112,10 +112,18 @@ export type PrinterZodOptions = {
  */
 export type PrinterZodFactory = ast.PrinterFactoryOptions<'zod', PrinterZodOptions, string, string>
 
+/**
+ * A `oneOf` member that is an inline object is exhaustive, so it prints as a strict object.
+ * Marking the node lets `object()` build `z.strictObject(...)` itself; appending `.strict()` to the
+ * printed member instead would read `.shape` eagerly and run a self-reference's deferred getter
+ * inside the temporal dead zone.
+ */
+function strictOneOfNode(node: ast.SchemaNode): ast.SchemaNode {
+  return node.type === 'object' && node.additionalProperties === undefined ? { ...node, additionalProperties: false } : node
+}
+
 function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): string {
-  if (node.type === 'object' && node.additionalProperties === undefined) {
-    return `${member}.strict()`
-  }
+  // Inline objects are already strict through their node; only a ref needs the runtime call.
 
   if (node.type === 'ref') {
     if (member.startsWith('z.lazy(')) {
@@ -493,7 +501,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
     },
     union(node) {
       const nodeMembers = node.members ?? []
-      const members = mapSchemaMembers(node, (memberNode) => this.transform(memberNode))
+      const members = mapSchemaMembers(node, (memberNode) => this.transform(node.strategy === 'one' ? strictOneOfNode(memberNode) : memberNode))
         .map(({ schema, output }) => (output && node.strategy === 'one' ? strictOneOfMember(output, schema, cyclicSchemaNames) : output))
         .filter(Boolean)
       if (members.length === 0) return ''
