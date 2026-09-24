@@ -1,5 +1,11 @@
 # @kubb/plugin-mcp
 
+## 5.0.5
+
+### Patch Changes
+
+- [#937](https://github.com/kubb-labs/plugins/pull/937) [`50e9c29`](https://github.com/kubb-labs/plugins/commit/50e9c295afd106ba91ba09b55eed0d8169b184e5) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add `.js` extensions to generated MCP SDK imports for native Node ESM resolution.
+
 ## 5.0.4
 
 ### Patch Changes
