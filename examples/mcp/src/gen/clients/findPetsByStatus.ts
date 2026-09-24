@@ -18,8 +18,12 @@ export function findPetsByStatus<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'GET', url: '/pet/findByStatus/{step_id}', security: [{ type: 'oauth2' }], ...config }) as Promise<
-      RequestResult<FindPetsByStatusResponses, ThrowOnError>
-    >,
+    request({
+      method: 'GET',
+      url: '/pet/findByStatus/{step_id}',
+      security: [{ type: 'oauth2' }],
+      ...config,
+      throwOnError: config.throwOnError ?? true,
+    }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>,
   )
 }

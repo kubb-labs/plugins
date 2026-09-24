@@ -20,6 +20,7 @@ export function addPet<ThrowOnError extends boolean = true>(
       security: [{ type: 'oauth2' }],
       validator: { response: addPetResponseSchema, error: addPetErrorSchema },
       ...config,
+      throwOnError: config.throwOnError ?? true,
     }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>,
   )
 }
