@@ -1,5 +1,7 @@
-import type { HeadersInit, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers'
+import axios from 'axios'
+import type { HeadersInit, PathParamStyle, PathSerializer, Serializers, Styles } from './serializers'
 import type { StandardSchemaValidator } from './standardSchema'
+import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers'
 import { ParseError, validateStandardSchema } from './standardSchema'
 
