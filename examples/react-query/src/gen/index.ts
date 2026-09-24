@@ -1,3 +1,4 @@
+export * from './.kubb/client'
 export * from './.kubb/serializers'
 export * from './.kubb/standardSchema'
 export type { AddPetRequest, AddPetRequestStatusEnumKey } from './models/AddPetRequest'
