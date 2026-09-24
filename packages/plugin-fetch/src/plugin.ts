@@ -1,7 +1,8 @@
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { createSdkGenerator, defaultMacros, resolverClient } from '@internals/client'
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin, Resolver } from 'kubb/kit'
+import { ast, definePlugin, Resolver } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
@@ -90,10 +91,39 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
           copy: fetchSerializersTemplatePath,
         })
 
+        const clientPath = path.resolve(root, '.kubb/client.ts')
+        const clientSource = readFileSync(fetchClientTemplatePath, 'utf8')
+        const clientBody = clientSource.slice(clientSource.indexOf('\n\n') + 2)
+        const runtimeRoot = path.dirname(clientPath)
+
         ctx.injectFile({
           baseName: 'client.ts',
-          path: path.resolve(root, '.kubb/client.ts'),
-          copy: fetchClientTemplatePath,
+          path: clientPath,
+          imports: [
+            ast.createImport({
+              name: ['applyHeaderStyles', 'defaultBodySerializer', 'defaultPathSerializer', 'defaultQuerySerializer', 'isDefaultJsonBody', 'serializeCookies'],
+              path: path.resolve(root, '.kubb/serializers.ts'),
+              root: runtimeRoot,
+            }),
+            ast.createImport({
+              name: ['HeadersInit', 'PathParamStyle', 'PathSerializer', 'RequestBody', 'Serializers', 'Styles'],
+              path: path.resolve(root, '.kubb/serializers.ts'),
+              root: runtimeRoot,
+              isTypeOnly: true,
+            }),
+            ast.createImport({
+              name: ['ParseError', 'validateStandardSchema'],
+              path: path.resolve(root, '.kubb/standardSchema.ts'),
+              root: runtimeRoot,
+            }),
+            ast.createImport({
+              name: ['StandardSchemaValidator'],
+              path: path.resolve(root, '.kubb/standardSchema.ts'),
+              root: runtimeRoot,
+              isTypeOnly: true,
+            }),
+          ],
+          sources: [ast.createSource({ nodes: [ast.createText(clientBody)] })],
           footer: baseURLExpression ? `client.setConfig({ baseURL: ${baseURLExpression} })` : undefined,
         })
 
