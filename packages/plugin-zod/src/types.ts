@@ -148,6 +148,16 @@ export type ResolverZod = Resolver & {
   }
 }
 
+export type CompileOptions = {
+  /**
+   * Throw an error if any part of the schema cannot be compiled into flat JavaScript,
+   * preventing silent fallback to the standard interpreter.
+   *
+   * @default false
+   */
+  strict?: boolean
+}
+
 /**
  * Where the generated Zod schemas are written and how they are exported, plus the optional
  * `group` strategy. The `group` option organizes `output.mode: 'directory'` output into per-tag or per-path subdirectories.
@@ -215,6 +225,18 @@ export type Options = OutputOptions & {
    */
   regexType?: 'literal' | 'constructor'
   /**
+   * Wrap generated schemas with `z.compile(...)` to enable Zod's hyperoptimized
+   * fast-path validation logic.
+   *
+   * Set to `true` or pass `{ strict: true }` to enforce that schemas compile into
+   * flat JavaScript without silently degrading to the standard interpreter.
+   *
+   * @default false
+   * @note Only compatible with Zod v4.5.0 or above.
+   * @see https://zod.dev/blog/introducing-z-compile
+   */
+  compile?: boolean | CompileOptions
+  /**
    * Switch to Zod Mini's functional API for better tree-shaking. Also defaults
    * `importPath` to `'zod/mini'`.
    *
@@ -267,6 +289,7 @@ export type ResolvedOptions = {
   coercion: NonNullable<Options['coercion']>
   guidType: NonNullable<Options['guidType']>
   regexType: NonNullable<Options['regexType']>
+  compile: NonNullable<Options['compile']>
   mini: NonNullable<Options['mini']>
   typeGuards: NonNullable<Options['typeGuards']>
   printer: Options['printer']
