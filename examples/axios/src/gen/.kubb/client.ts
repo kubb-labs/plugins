@@ -1,8 +1,9 @@
 import axios from 'axios'
+import type { HeadersInit, PathParamStyle, PathSerializer, Serializers, Styles } from './serializers'
+import type { StandardSchemaValidator } from './standardSchema'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
-import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers.ts'
-import type { HeadersInit, PathParamStyle, PathSerializer, Serializers, Styles } from './serializers.ts'
-import { ParseError, type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
+import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers'
+import { ParseError, validateStandardSchema } from './standardSchema'
 
 /**
  * HTTP status codes treated as a success, everything else is an error.
