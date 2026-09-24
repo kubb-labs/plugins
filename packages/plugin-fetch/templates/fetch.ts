@@ -1,6 +1,6 @@
-import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers'
-import type { HeadersInit, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers'
-import { ParseError, type StandardSchemaValidator, validateStandardSchema } from './standardSchema'
+import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers.ts'
+import type { HeadersInit, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers.ts'
+import { ParseError, type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
 
 /**
  * HTTP status codes treated as a success, everything else is an error.
@@ -312,25 +312,25 @@ export type CallResult<TRequest = Request, TResponse = Response> = {
   response: TResponse
 }
 
-export type InterceptorFn<T> = (value: T) => T | Promise<T>
+export type InterceptorFn<T, TContext = never> = (value: T, context?: TContext) => T | Promise<T>
 
 /**
  * A single interceptor channel with a transport-agnostic `use` / `eject` / `update` API.
  */
-export type InterceptorStack<T> = {
-  use: (fn: InterceptorFn<T>) => number
+export type InterceptorStack<T, TContext = never> = {
+  use: (fn: InterceptorFn<T, TContext>) => number
   eject: (id: number) => void
-  update: (id: number, fn: InterceptorFn<T>) => void
-  run: (value: T) => Promise<T>
+  update: (id: number, fn: InterceptorFn<T, TContext>) => void
+  run: (value: T, context?: TContext) => Promise<T>
 }
 
 /**
  * The three interceptor channels every client instance exposes.
  */
 export type Interceptors<TRequest = Request, TResponse = Response> = {
-  request: InterceptorStack<ResolvedRequest>
-  response: InterceptorStack<TransportResult<unknown, TRequest, TResponse>>
-  error: InterceptorStack<ResponseError<unknown, TRequest, TResponse>>
+  request: InterceptorStack<ResolvedRequest, RequestConfig<unknown, TRequest, TResponse>>
+  response: InterceptorStack<TransportResult<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
+  error: InterceptorStack<ResponseError<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
 }
 
 /**
@@ -421,8 +421,8 @@ function serializeUrl({
 /**
  * Creates a transport-agnostic interceptor channel that runs interceptors in registration order.
  */
-export function createInterceptorStack<T>(): InterceptorStack<T> {
-  let entries: Array<{ id: number; fn: InterceptorFn<T> }> = []
+export function createInterceptorStack<T, TContext = never>(): InterceptorStack<T, TContext> {
+  let entries: Array<{ id: number; fn: InterceptorFn<T, TContext> }> = []
   let counter = 0
   return {
     use(fn) {
@@ -437,10 +437,10 @@ export function createInterceptorStack<T>(): InterceptorStack<T> {
       const entry = entries.find((item) => item.id === id)
       if (entry) entry.fn = fn
     },
-    async run(value) {
+    async run(value, context) {
       let result = value
       for (const entry of entries) {
-        result = await entry.fn(result)
+        result = await entry.fn(result, context)
       }
       return result
     },
@@ -635,6 +635,7 @@ async function settleResult<TRequest, TResponse>({
   validator,
   onValidationError,
   errorInterceptors,
+  requestConfig,
 }: {
   result: TransportResult<unknown, TRequest, TResponse>
   request: ResolvedRequest
@@ -642,7 +643,8 @@ async function settleResult<TRequest, TResponse>({
   throwOnError: boolean
   validator: { response?: Validator; error?: Validator } | undefined
   onValidationError: ValidationErrorHandler | undefined
-  errorInterceptors: InterceptorStack<ResponseError<unknown, TRequest, TResponse>>
+  errorInterceptors: InterceptorStack<ResponseError<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
+  requestConfig: RequestConfig<unknown, TRequest, TResponse>
 }): Promise<CallResult<TRequest, TResponse>> {
   const isSuccess = result.status >= 200 && result.status < 300
   const contentType = result.contentType ?? getResponseContentType(result.headers)
@@ -679,7 +681,7 @@ async function settleResult<TRequest, TResponse>({
       request: result.request,
       response: result.response,
     })
-    await errorInterceptors.run(responseError)
+    await errorInterceptors.run(responseError, requestConfig)
     throw responseError
   }
   return { status: result.status, data: undefined, error, contentType, request: result.request, response: result.response }
@@ -695,17 +697,17 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
   let config: ClientConfig<TRequest, TResponse> = { ...initialConfig }
 
   const interceptors: Interceptors<TRequest, TResponse> = {
-    request: createInterceptorStack<ResolvedRequest>(),
-    response: createInterceptorStack<TransportResult<unknown, TRequest, TResponse>>(),
-    error: createInterceptorStack<ResponseError<unknown, TRequest, TResponse>>(),
+    request: createInterceptorStack<ResolvedRequest, RequestConfig<unknown, TRequest, TResponse>>(),
+    response: createInterceptorStack<TransportResult<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>(),
+    error: createInterceptorStack<ResponseError<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>(),
   }
 
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
     const transport = requestConfig.transport ?? config.transport ?? defaultTransport
     const { request, codecs } = await resolveRequest({ config, requestConfig })
 
-    const resolvedRequest = await interceptors.request.run(request)
-    const result = await interceptors.response.run(await transport(resolvedRequest))
+    const resolvedRequest = await interceptors.request.run(request, requestConfig)
+    const result = await interceptors.response.run(await transport(resolvedRequest), requestConfig)
 
     return settleResult({
       result,
@@ -715,6 +717,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
       validator: requestConfig.validator,
       onValidationError: requestConfig.onValidationError ?? config.onValidationError,
       errorInterceptors: interceptors.error,
+      requestConfig,
     })
   }) as ClientInstance<TRequest, TResponse>
 

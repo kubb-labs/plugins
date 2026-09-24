@@ -112,10 +112,18 @@ export type PrinterZodOptions = {
  */
 export type PrinterZodFactory = ast.PrinterFactoryOptions<'zod', PrinterZodOptions, string, string>
 
+/**
+ * A `oneOf` member that is an inline object is exhaustive, so it prints as a strict object.
+ * Marking the node lets `object()` build `z.strictObject(...)` itself; appending `.strict()` to the
+ * printed member instead would read `.shape` eagerly and run a self-reference's deferred getter
+ * inside the temporal dead zone.
+ */
+function strictOneOfNode(node: ast.SchemaNode): ast.SchemaNode {
+  return node.type === 'object' && node.additionalProperties === undefined ? { ...node, additionalProperties: false } : node
+}
+
 function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): string {
-  if (node.type === 'object' && node.additionalProperties === undefined) {
-    return `${member}.strict()`
-  }
+  // Inline objects are already strict through their node; only a ref needs the runtime call.
 
   if (node.type === 'ref') {
     if (member.startsWith('z.lazy(')) {
@@ -442,18 +450,20 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
     },
     object(node) {
       const entries = node.properties ?? []
-      const objectBase = `z.object(${buildZodObjectShape(this, node)})`
+      const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
+      // `additionalProperties: false` still permits patternProperties keys, so only a pattern-free object is strict.
+      // `z.strictObject(...)` rather than `z.object(...).strict()`: `.strict()` reads `.shape` eagerly, which runs a
+      // self-reference's deferred getter while its own `const` is still in the temporal dead zone.
+      const isStrict = node.additionalProperties === false && patterns.length === 0
+      const objectBase = `${isStrict ? 'z.strictObject' : 'z.object'}(${buildZodObjectShape(this, node)})`
 
       const result = (() => {
-        const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
-
         if (node.additionalProperties && node.additionalProperties !== true) {
           const catchallType = this.transform(node.additionalProperties)
           return catchallType ? `${objectBase}.catchall(${catchallType})` : objectBase
         }
         if (node.additionalProperties === true) return `${objectBase}.catchall(${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
-        // `additionalProperties: false` still permits patternProperties keys, so skip `.strict()` when patterns exist.
-        if (node.additionalProperties === false && patterns.length === 0) return `${objectBase}.strict()`
+        if (isStrict) return objectBase
 
         // No fixed properties: z.record enforces the key pattern. With fixed properties a record would
         // reject the declared keys, so fall back to .catchall (value validated, key pattern not).
@@ -491,7 +501,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
     },
     union(node) {
       const nodeMembers = node.members ?? []
-      const members = mapSchemaMembers(node, (memberNode) => this.transform(memberNode))
+      const members = mapSchemaMembers(node, (memberNode) => this.transform(node.strategy === 'one' ? strictOneOfNode(memberNode) : memberNode))
         .map(({ schema, output }) => (output && node.strategy === 'one' ? strictOneOfMember(output, schema, cyclicSchemaNames) : output))
         .filter(Boolean)
       if (members.length === 0) return ''

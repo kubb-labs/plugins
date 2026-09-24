@@ -311,9 +311,9 @@ describe('printerZod', () => {
       expect(printer.print(node)).toBe('z.object({}).catchall(z.unknown())')
     })
 
-    test('object with additionalProperties: false → .strict()', () => {
+    test('object with additionalProperties: false → z.strictObject()', () => {
       const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], additionalProperties: false })
-      expect(printer.print(node)).toBe('z.object({}).strict()')
+      expect(printer.print(node)).toBe('z.strictObject({})')
     })
 
     test('object with additionalProperties schema → .catchall(schema)', () => {
@@ -496,6 +496,33 @@ describe('printerZod', () => {
       `)
     })
 
+    test('strict object with a self-ref property stays loadable (z.strictObject, not .strict())', () => {
+      // `.strict()` reads `.shape` eagerly, so it would run the getter while `TreeNode`'s own
+      // `const` is still in the temporal dead zone and the generated module would throw on import
+      // with "Cannot access 'TreeNode' before initialization".
+      const p = printerZod({ cyclicSchemas: new Set(['TreeNode']) })
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        additionalProperties: false,
+        properties: [
+          ast.factory.createProperty({
+            name: 'children',
+            required: false,
+            schema: ast.factory.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' }),
+          }),
+          ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+        ],
+      })
+
+      expect(p.print(node)).toMatchInlineSnapshot(`
+        "z.strictObject({
+          get children() { return TreeNode.optional() },
+          name: z.string(),
+        })"
+      `)
+    })
+
     test('object indirect-cycle property uses getter with bare schema name (no double z.lazy)', () => {
       // Cat → Pet → Cat: Cat is not self-referencing but Pet is cyclic, so archEnemy should be a getter
       const p = printerZod({ cyclicSchemas: new Set(['Cat', 'Pet']) })
@@ -593,6 +620,45 @@ describe('printerZod', () => {
       expect(printer.print(node)).toBe('z.union([TypeA, TypeB])')
     })
 
+    test('oneOf union with a self-referential object member stays loadable', () => {
+      // The member is strict because it is a `oneOf` variant, and it carries a deferred getter.
+      // Appending `.strict()` here would read `.shape` eagerly and throw on import.
+      const p = printerZod({ cyclicSchemas: new Set(['TreeNode']) })
+      const node = ast.factory.createSchema({
+        type: 'union',
+        strategy: 'one',
+        members: [
+          ast.factory.createSchema({
+            type: 'object',
+            primitive: 'object',
+            properties: [
+              ast.factory.createProperty({
+                name: 'children',
+                required: false,
+                schema: ast.factory.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' }),
+              }),
+            ],
+          }),
+          ast.factory.createSchema({
+            type: 'object',
+            primitive: 'object',
+            properties: [ast.factory.createProperty({ name: 'valueB', required: true, schema: ast.factory.createSchema({ type: 'number' }) })],
+          }),
+        ],
+      })
+
+      expect(p.print(node)).toMatchInlineSnapshot(`
+        "z.union([
+          z.strictObject({
+            get children() { return TreeNode.optional() },
+          }),
+          z.strictObject({
+            valueB: z.number(),
+          }),
+        ])"
+      `)
+    })
+
     test('oneOf union with object members uses strict objects', () => {
       const node = ast.factory.createSchema({
         type: 'union',
@@ -612,12 +678,12 @@ describe('printerZod', () => {
       })
       expect(printer.print(node)).toMatchInlineSnapshot(`
         "z.union([
-          z.object({
+          z.strictObject({
             valueA: z.string(),
-          }).strict(),
-          z.object({
+          }),
+          z.strictObject({
             valueB: z.number(),
-          }).strict(),
+          }),
         ])"
       `)
     })
