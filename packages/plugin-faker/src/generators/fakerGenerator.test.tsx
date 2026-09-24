@@ -28,6 +28,15 @@ const emojiSchema = ast.factory.createSchema({
   description: 'Emoji shortcode',
 })
 
+// Issue #928: a nullable scalar inlines its primitive, so the factory has to keep the
+// nullability the type plugin emitted — otherwise an msw handler with `parser: 'faker'`
+// hands it a `T | null` it cannot accept.
+const nullableNameSchema = ast.factory.createSchema({
+  type: 'string',
+  name: 'NullableName',
+  nullable: true,
+})
+
 const petSchema = ast.factory.createSchema({
   type: 'object',
   name: 'Pet',
@@ -269,6 +278,7 @@ describe('fakerGenerator — schema', () => {
     { name: 'catCycle', node: catSchema, options: {} },
     { name: 'petWithLocale', node: petSchema, options: { locale: 'de' as const } },
     { name: 'petWithSeed', node: petSchema, options: { seed: [1] as Array<number> } },
+    { name: 'nullableName', node: nullableNameSchema, options: {} },
   ] as const)('$name', async ({ name, node, options }) => {
     const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
