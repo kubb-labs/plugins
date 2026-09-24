@@ -109,21 +109,16 @@ export function withUnwrap<T extends { data: unknown; error: unknown }>(promise:
 }
 
 /**
- * The shape a generated operation returns when `returnType: 'data'` is set: the bare success body
- * once `throwOnError` (on by default) narrows away the error branch, falling back to the full
- * `RequestResult` when a call sets `throwOnError: false` and still needs `error` to discriminate a
- * failed response.
+ * The shape a generated operation returns with `returnType: 'data'`: the success body when
+ * `throwOnError` is true, or the full `RequestResult` when it is false.
  */
 export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = Request, TResponse = Response> = ThrowOnError extends true
   ? RequestResult<TResponses, true, TRequest, TResponse>['data']
   : RequestResult<TResponses, ThrowOnError, TRequest, TResponse>
 
 /**
- * Narrows a resolved call down to its success body once `throwOnError` (on by default) rules out
- * the error branch, the same default the runtime itself applies. Falls back to the full result for
- * a call that sets `throwOnError: false`, since that path still needs `error` to discriminate a
- * failed response. Backs `returnType: 'data'`, mirroring how `toEventStream` centralizes the
- * post-processing for `text/event-stream` operations.
+ * Returns the success body when `throwOnError` is true, or the full result when it is false.
+ * Backs generated operations with `returnType: 'data'`.
  */
 export function unwrapResult<T extends { data: unknown; error: unknown }>(promise: Promise<T>, throwOnError: boolean | undefined): Promise<T | T['data']> {
   return promise.then((result) => ((throwOnError ?? true) ? result.data : result))

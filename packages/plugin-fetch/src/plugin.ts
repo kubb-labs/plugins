@@ -1,7 +1,7 @@
 import path from 'node:path'
-import { createSdkGenerator, defaultMacros, resolverClient } from '@internals/client'
+import { createSdkGenerator, defaultMacros, resolverClient, runtimeTemplate } from '@internals/client'
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin, Resolver } from 'kubb/kit'
+import { ast, definePlugin, Resolver } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
@@ -96,7 +96,7 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
         ctx.injectFile({
           baseName: 'client.ts',
           path: path.resolve(root, '.kubb/client.ts'),
-          copy: fetchClientTemplatePath,
+          sources: [ast.factory.createSource({ name: 'client', nodes: [ast.factory.createText(runtimeTemplate(fetchClientTemplatePath, ctx.config))] })],
           footer: clientConfig.length ? `client.setConfig({ ${clientConfig.join(', ')} })` : undefined,
         })
 
