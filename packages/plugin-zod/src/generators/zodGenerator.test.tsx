@@ -401,6 +401,80 @@ describe('zodGenerator — Schema', () => {
     const source = rawSources(driver.fileManager.files).join('\n')
     expect(source).toContain('export const errorDetailsSchema: z.ZodType')
   })
+
+  test('dictionary schema generates z.record', async () => {
+    const dictionarySchema = ast.factory.createSchema({
+      type: 'object',
+      primitive: 'object',
+      name: 'Dictionary',
+      properties: [],
+      additionalProperties: ast.factory.createSchema({ type: 'string' }),
+    })
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'dictionary' })
+
+    await renderGeneratorSchema(zodGenerator, dictionarySchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('export const dictionarySchema = z.record(z.string(), z.string())')
+  })
+
+  test('open object schema with additionalProperties: true generates z.looseObject', async () => {
+    const openObjectSchema = ast.factory.createSchema({
+      type: 'object',
+      primitive: 'object',
+      name: 'OpenObject',
+      properties: [ast.factory.createProperty({ name: 'title', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+      additionalProperties: true,
+    })
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'openObject' })
+
+    await renderGeneratorSchema(zodGenerator, openObjectSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('export const openObjectSchema = z.looseObject(')
+    expect(source).toContain('title: z.string()')
+  })
+
+  test('dictionary with propertyNames generates z.record with key schema', async () => {
+    const propertyNamesSchema = ast.factory.createSchema({
+      type: 'object',
+      primitive: 'object',
+      name: 'UserMap',
+      properties: [],
+      propertyNames: ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }),
+      additionalProperties: ast.factory.createSchema({ type: 'integer' }),
+    } as any)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'propertyNames' })
+
+    await renderGeneratorSchema(zodGenerator, propertyNamesSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('export const userMapSchema = z.record(z.string().regex(/^[a-z]+$/), z.int())')
+  })
 })
 
 describe('zodGenerator — Operation', () => {

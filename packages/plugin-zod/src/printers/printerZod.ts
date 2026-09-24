@@ -442,16 +442,28 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
     },
     object(node) {
       const entries = node.properties ?? []
-      const objectBase = `z.object(${buildZodObjectShape(this, node)})`
+      const shape = buildZodObjectShape(this, node)
+      const objectBase = `z.object(${shape})`
 
       const result = (() => {
         const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
+        const propertyNamesNode = 'propertyNames' in node ? (node as { propertyNames?: ast.SchemaNode }).propertyNames : undefined
+        const propertyNamesKeySchema = propertyNamesNode ? this.transform(propertyNamesNode) : null
 
         if (node.additionalProperties && node.additionalProperties !== true) {
           const catchallType = this.transform(node.additionalProperties)
+          if (entries.length === 0) {
+            return catchallType ? `z.record(${propertyNamesKeySchema || 'z.string()'}, ${catchallType})` : objectBase
+          }
           return catchallType ? `${objectBase}.catchall(${catchallType})` : objectBase
         }
-        if (node.additionalProperties === true) return `${objectBase}.catchall(${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
+        if (node.additionalProperties === true) {
+          const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+          if (entries.length === 0 && propertyNamesKeySchema) {
+            return `z.record(${propertyNamesKeySchema}, ${unknownType})`
+          }
+          return `z.looseObject(${shape})`
+        }
         // `additionalProperties: false` still permits patternProperties keys, so skip `.strict()` when patterns exist.
         if (node.additionalProperties === false && patterns.length === 0) return `${objectBase}.strict()`
 
@@ -468,6 +480,11 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           if (entries.length > 0) return `${objectBase}.catchall(${value})`
           return `z.record(${patternKeySchema({ patterns: patterns.map(([pattern]) => pattern), regexType: this.options.regexType })}, ${value})`
         }
+
+        if (entries.length === 0 && propertyNamesKeySchema) {
+          return `z.record(${propertyNamesKeySchema}, ${this.transform(ast.factory.createSchema({ type: 'unknown' }))!})`
+        }
+
         return objectBase
       })()
 

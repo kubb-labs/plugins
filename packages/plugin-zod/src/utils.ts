@@ -12,13 +12,23 @@ export function shouldCoerce(coercion: PluginZod['resolvedOptions']['coercion'] 
   return !!coercion[type]
 }
 
+function hasPropertyNames(node: ast.SchemaNode): boolean {
+  return 'propertyNames' in node && Boolean((node as { propertyNames?: ast.SchemaNode }).propertyNames)
+}
+
 /**
  * Whether the node is a plain inline object whose shape can be lifted into an `.extend({ … })`
  * argument. A catchall, `patternProperties`, or a nullable/optional wrapper cannot, so those stay
  * on `.and(…)`.
  */
-function isPlainInlineObject(node: ast.SchemaNode): boolean {
-  return node.type === 'object' && !node.nullable && !node.optional && !node.nullish && node.additionalProperties === undefined && !node.patternProperties
+export function isPlainInlineObject(node: ast.SchemaNode): boolean {
+  if (node.type !== 'object') return false
+  if (node.nullable || node.optional || node.nullish) return false
+
+  const hasAdditionalProperties = node.additionalProperties !== undefined
+  const hasPatternProperties = Boolean(node.patternProperties)
+
+  return !hasAdditionalProperties && !hasPatternProperties && !hasPropertyNames(node)
 }
 
 /**
@@ -30,7 +40,15 @@ function isPlainInlineObject(node: ast.SchemaNode): boolean {
  */
 export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
   if (node.nullable || node.optional || node.nullish) return false
-  if (node.type === 'object') return true
+  if (node.type === 'object') {
+    const hasProperties = Boolean(node.properties?.length)
+    const hasTypedAdditionalProperties = Boolean(node.additionalProperties && node.additionalProperties !== true)
+    const hasPatternProperties = Boolean(node.patternProperties)
+
+    const isRecord = !hasProperties && (hasTypedAdditionalProperties || hasPatternProperties || hasPropertyNames(node))
+
+    return !isRecord
+  }
 
   if (node.type === 'ref') {
     const refName = ast.resolveRefName(node)

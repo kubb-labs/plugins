@@ -264,17 +264,29 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
       },
       object(node) {
         const entries = node.properties ?? []
-        const objectBase = `z.object(${buildZodMiniObjectShape(this, node)})`
+        const shape = buildZodMiniObjectShape(this, node)
+        const objectBase = `z.object(${shape})`
 
         // zod/mini has no chainable `.catchall()`/`.strict()`, so route through the functional forms.
         const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
+        const propertyNamesNode = 'propertyNames' in node ? (node as { propertyNames?: ast.SchemaNode }).propertyNames : undefined
+        const propertyNamesKeySchema = propertyNamesNode ? this.transform(propertyNamesNode) : null
 
         if (node.additionalProperties && node.additionalProperties !== true) {
           const catchallType = this.transform(node.additionalProperties)
+          if (entries.length === 0) {
+            return catchallType ? `z.record(${propertyNamesKeySchema || 'z.string()'}, ${catchallType})` : objectBase
+          }
           return catchallType ? `z.catchall(${objectBase}, ${catchallType})` : objectBase
         }
-        if (node.additionalProperties === true) return `z.catchall(${objectBase}, ${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
-        if (node.additionalProperties === false && patterns.length === 0) return objectBase.replace(/^z\.object\(/, 'z.strictObject(')
+        if (node.additionalProperties === true) {
+          const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+          if (entries.length === 0 && propertyNamesKeySchema) {
+            return `z.record(${propertyNamesKeySchema}, ${unknownType})`
+          }
+          return `z.looseObject(${shape})`
+        }
+        if (node.additionalProperties === false && patterns.length === 0) return `z.strictObject(${shape})`
 
         if (patterns.length > 0) {
           const values = patterns.map(([, valueSchema]) => {
@@ -287,6 +299,11 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           if (entries.length > 0) return `z.catchall(${objectBase}, ${value})`
           return `z.record(${patternKeySchemaMini({ patterns: patterns.map(([pattern]) => pattern), regexType: this.options.regexType })}, ${value})`
         }
+
+        if (entries.length === 0 && propertyNamesKeySchema) {
+          return `z.record(${propertyNamesKeySchema}, ${this.transform(ast.factory.createSchema({ type: 'unknown' }))!})`
+        }
+
         return objectBase
       },
       array(node) {
