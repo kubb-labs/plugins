@@ -311,9 +311,9 @@ describe('printerZod', () => {
       expect(printer.print(node)).toBe('z.object({}).catchall(z.unknown())')
     })
 
-    test('object with additionalProperties: false → .strict()', () => {
+    test('object with additionalProperties: false → z.strictObject()', () => {
       const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], additionalProperties: false })
-      expect(printer.print(node)).toBe('z.object({}).strict()')
+      expect(printer.print(node)).toBe('z.strictObject({})')
     })
 
     test('object with additionalProperties schema → .catchall(schema)', () => {
@@ -490,6 +490,33 @@ describe('printerZod', () => {
 
       expect(p.print(node)).toMatchInlineSnapshot(`
         "z.object({
+          get children() { return TreeNode.optional() },
+          name: z.string(),
+        })"
+      `)
+    })
+
+    test('strict object with a self-ref property stays loadable (z.strictObject, not .strict())', () => {
+      // `.strict()` reads `.shape` eagerly, so it would run the getter while `TreeNode`'s own
+      // `const` is still in the temporal dead zone and the generated module would throw on import
+      // with "Cannot access 'TreeNode' before initialization".
+      const p = printerZod({ cyclicSchemas: new Set(['TreeNode']) })
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        additionalProperties: false,
+        properties: [
+          ast.factory.createProperty({
+            name: 'children',
+            required: false,
+            schema: ast.factory.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' }),
+          }),
+          ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+        ],
+      })
+
+      expect(p.print(node)).toMatchInlineSnapshot(`
+        "z.strictObject({
           get children() { return TreeNode.optional() },
           name: z.string(),
         })"
