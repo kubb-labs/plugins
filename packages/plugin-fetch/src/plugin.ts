@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { createSdkGenerator, defaultMacros, resolverClient, runtimeTemplate } from '@internals/client'
+import { createSdkGenerator, defaultMacros, resolverClient } from '@internals/client'
 import { createGroupConfig } from '@internals/shared'
 import { definePlugin, Resolver } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -95,8 +95,7 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
         ctx.injectFile({
           baseName: 'client.ts',
           path: path.resolve(root, '.kubb/client.ts'),
-          // Keep sources empty so the barrel exports the whole runtime module.
-          banner: runtimeTemplate(fetchClientTemplatePath, ctx.config),
+          copy: fetchClientTemplatePath,
           footer: baseURLExpression ? `client.setConfig({ baseURL: ${baseURLExpression} })` : undefined,
         })
 
