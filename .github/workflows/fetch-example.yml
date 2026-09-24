@@ -60,7 +60,5 @@ jobs:
           token: ${{ secrets.KUBB_TOKEN }}
           working-directory: examples/fetch
           config: 'kubb.config.ts'
-          # The example's generated files are committed, so show when they are out of date.
-          compare-committed: true
         env:
           KUBB_STUDIO_URL: https://dev.kubb.studio
