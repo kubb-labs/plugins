@@ -1,5 +1,11 @@
 # @kubb/plugin-fetch
 
+## 5.5.1
+
+### Patch Changes
+
+- [#952](https://github.com/kubb-labs/plugins/pull/952) [`a1593ce`](https://github.com/kubb-labs/plugins/commit/a1593ce7d307d63bd2e424e1df790fe41db46bf2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Emit `.kubb/client.ts` with `copy`, so the parser's `extension` option now reaches the runtime imports through the parser `copy` hook added in kubb 5.3.15, instead of a regex over the template. The generated runtime header follows the same import order as other generated files.
+
 ## 5.5.0
 
 ### Minor Changes
