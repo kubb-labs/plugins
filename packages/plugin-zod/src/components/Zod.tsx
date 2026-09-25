@@ -1,5 +1,4 @@
-import { containsCircularRef } from 'kubb/kit'
-import type { ast } from 'kubb/kit'
+import { ast, containsCircularRef } from 'kubb/kit'
 import { Const, File, Function, Type } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { PrinterZodFactory } from '../printers/printerZod.ts'
