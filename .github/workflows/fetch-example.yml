@@ -60,5 +60,5 @@ jobs:
           token: ${{ secrets.KUBB_TOKEN }}
           working-directory: examples/fetch
           config: 'kubb.config.ts'
-        env:
+        #env:
           #KUBB_STUDIO_URL: https://dev.kubb.studio
