@@ -61,4 +61,4 @@ jobs:
           working-directory: examples/fetch
           config: 'kubb.config.ts'
         env:
-          KUBB_STUDIO_URL: https://dev.kubb.studio
+          #KUBB_STUDIO_URL: https://dev.kubb.studio
