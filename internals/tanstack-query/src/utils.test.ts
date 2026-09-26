@@ -34,12 +34,21 @@ describe('classifyOperation', () => {
     ).toStrictEqual({ isQuery: true, isMutation: false })
   })
 
-  test('query: false still marks every operation as a query', () => {
+  test('query: false still allows an operation to be classified as a mutation', () => {
     const node = ast.factory.createOperation({ operationId: 'createPet', method: 'POST', path: '/pets' })
 
     expect(
       classifyOperation(node, { query: false, mutation: { methods: ['POST', 'PUT', 'PATCH', 'DELETE'], importPath: '@tanstack/react-query' } }),
-    ).toStrictEqual({ isQuery: true, isMutation: false })
+    ).toStrictEqual({ isQuery: false, isMutation: true })
+  })
+
+  test('mutation: false still allows an operation to be classified as a query', () => {
+    const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
+
+    expect(classifyOperation(node, { query: { methods: ['GET'], importPath: '@tanstack/react-query' }, mutation: false })).toStrictEqual({
+      isQuery: true,
+      isMutation: false,
+    })
   })
 })
 
