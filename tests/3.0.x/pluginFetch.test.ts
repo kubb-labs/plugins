@@ -200,8 +200,19 @@ describe(`plugin-fetch options ${version}`, () => {
     await fs.rm(tmpDir, { recursive: true, force: true })
   })
 
-  test('emits template baseURL as a runtime expression in the client config', async () => {
-    const tmpDir = path.join(os.tmpdir(), `kubb-test-fetch-base-url-template-${Date.now()}`)
+  test.each([
+    {
+      name: 'literal',
+      baseURL: 'https://petstore3.swagger.io/api/v3',
+      expected: 'client.setConfig({ baseURL: "https://petstore3.swagger.io/api/v3" })',
+    },
+    {
+      name: 'template',
+      baseURL: '${import.meta.env.VITE_API_SERVER}',
+      expected: 'client.setConfig({ baseURL: `${import.meta.env.VITE_API_SERVER}` })',
+    },
+  ])('emits $name baseURL in the client config', async ({ name, baseURL, expected }) => {
+    const tmpDir = path.join(os.tmpdir(), `kubb-test-fetch-base-url-${name}-${Date.now()}`)
     const output = path.join(tmpDir, 'gen')
     const { files, diagnostics } = await createKubb(
       {
@@ -216,7 +227,7 @@ describe(`plugin-fetch options ${version}`, () => {
           pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
           pluginFetch({
             output: { path: './clients', barrel: false, mode: 'directory' },
-            baseURL: '${import.meta.env.VITE_API_SERVER}',
+            baseURL,
           }),
         ],
       } as Config,
@@ -230,8 +241,8 @@ describe(`plugin-fetch options ${version}`, () => {
     expect(clientRuntime).toBeDefined()
 
     const source = await fs.readFile(clientRuntime!.path, 'utf-8')
-    expect(source).toContain('client.setConfig({ baseURL: `${import.meta.env.VITE_API_SERVER}` })')
-    expect(source).not.toContain('baseURL: "${import.meta.env.VITE_API_SERVER}"')
+    expect(source).toContain(expected)
+    if (name === 'template') expect(source).not.toContain('baseURL: "${import.meta.env.VITE_API_SERVER}"')
 
     await fs.rm(tmpDir, { recursive: true, force: true })
   })
