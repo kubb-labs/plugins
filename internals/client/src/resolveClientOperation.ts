@@ -59,9 +59,7 @@ export function resolveClientOperation(options: {
     const hasOperationOptions = Boolean(exclude?.length || include?.length || override?.length)
     // Kubb's resolver always has `default`; the fallback keeps partial or custom resolvers working.
     const operationOptions =
-      hasOperationOptions && resolver.default
-        ? resolver.default.options(node, { options: pluginOptions, exclude, include, override })
-        : pluginOptions
+      hasOperationOptions && resolver.default ? resolver.default.options(node, { options: pluginOptions, exclude, include, override }) : pluginOptions
     if (!operationOptions) return null
 
     const file = resolver.file({
