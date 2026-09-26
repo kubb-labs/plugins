@@ -3,18 +3,35 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig } from '../.kubb/client'
-import type { UploadFileOptions } from '../types/UploadFile'
+import useSWRMutation from 'swr/mutation'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { UploadFileOptions, UploadFileResponse } from '../types/UploadFile'
+import type { SWRMutationConfiguration } from 'swr/mutation'
 import { uploadFile } from '../clients/uploadFile'
 
-export const uploadFileQueryKey = ({ path, query, body }: Omit<UploadFileOptions, 'headers'>) => [{ url: '/pet/:petId/uploadImage', params: path }, ...(query ? [query] : []), ...(body ? [body] : [])] as const
+export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
-type UploadFileQueryKey = ReturnType<typeof uploadFileQueryKey>
+export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
 
-export function uploadFileQueryOptions({ path, query, body }: UploadFileOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
-  return {
-    fetcher: async () => {
+export type UploadFileMutationArg = UploadFileOptions
+
+/**
+ * @summary uploads an image
+ * {@link /pet/:petId/uploadImage}
+ */
+export function useUploadFile(options: {
+  mutation?: SWRMutationConfiguration<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg> & { throwOnError?: boolean },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  shouldFetch?: boolean,
+} = {}) {
+  const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
+  const mutationKey = uploadFileMutationKey()
+
+  return useSWRMutation<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
+    shouldFetch ? mutationKey : null,
+    async (_url, { arg: { path, query, body } }) => {
       return uploadFile({ ...config, path, query, body, throwOnError: true }).unwrap()
     },
-  }
+    mutationOptions
+  )
 }
