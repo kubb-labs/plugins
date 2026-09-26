@@ -332,8 +332,21 @@ export class ResponseError<TError = unknown, TRequest = AxiosRequestConfig, TRes
   request: TRequest
   response: TResponse
 
-  constructor(config: { data: TError; status: number; statusText: string; contentType?: string; request: TRequest; response: TResponse }) {
-    super(`Request failed with status ${config.status}${config.statusText ? ` ${config.statusText}` : ''}`)
+  constructor(config: {
+    data: TError
+    status: number
+    statusText: string
+    contentType?: string
+    request: TRequest
+    response: TResponse
+    method?: string
+    url?: string
+  }) {
+    // The query and hash are left out: sensitive query parameters or fragments must not reach logs.
+    const cleanUrl = config.url?.split(/[?#]/)[0]
+    const target = [config.method, cleanUrl].filter(Boolean).join(' ')
+    const statusText = config.statusText?.trim()
+    super(`${target ? `${target} failed` : 'Request failed'} with status ${config.status}${statusText ? ` ${statusText}` : ''}`)
     this.name = 'ResponseError'
     this.data = config.data
     this.status = config.status
@@ -341,6 +354,13 @@ export class ResponseError<TError = unknown, TRequest = AxiosRequestConfig, TRes
     this.contentType = config.contentType
     this.request = config.request
     this.response = config.response
+  }
+
+  /**
+   * Matches on `name`, not `instanceof`: every generated client bundles its own `ResponseError` class.
+   */
+  static is(error: unknown): error is ResponseError<unknown, unknown, unknown> {
+    return error instanceof Error && error.name === 'ResponseError'
   }
 }
 
@@ -754,6 +774,8 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
             contentType: getResponseContentType(axiosError.response.headers as Record<string, unknown>),
             request: axiosError.config as TRequest,
             response: axiosError.response as TResponse,
+            method: axiosError.config?.method?.toUpperCase(),
+            url: [axiosError.config?.baseURL?.replace(/\/+$/, ''), axiosError.config?.url].filter(Boolean).join(''),
           })
         }
         throw error
@@ -891,5 +913,3 @@ export async function toEventStream<TData = unknown>(result: Promise<{ data: unk
 export const client = createClientCore()
 
 export const createClient = (config?: Parameters<typeof client.createClient>[0]) => client.createClient(config)
-
-client.setConfig({ baseURL: 'https://petstore3.swagger.io/api/v3' })
