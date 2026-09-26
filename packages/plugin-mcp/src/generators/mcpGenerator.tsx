@@ -64,7 +64,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
         <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
 
-        <McpHandler name={meta.name} clientName={contractOp.name} node={node} resolver={tsResolver} />
+        <McpHandler name={meta.name} clientName={contractOp.name} node={node} resolver={tsResolver} returnType={contractOp.returnType} />
       </File>
     )
   },

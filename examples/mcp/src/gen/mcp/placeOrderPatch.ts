@@ -17,7 +17,7 @@ export async function placeOrderPatchHandler(
   { body }: PlaceOrderPatchOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await placeOrderPatch({ body, signal: request.signal })
+  const res = await placeOrderPatch({ body, signal: request.signal, throwOnError: true })
 
   return {
     content: [

@@ -21,28 +21,34 @@ type Props = {
    * TypeScript resolver for resolving param/data/response type names.
    */
   resolver: ResolverTs
+  /**
+   * The registered client plugin's `returnType`, read by the caller off `resolveClientOperation`.
+   */
+  returnType?: 'full' | 'data'
 }
 
 const requestGroupOrder = ['path', 'query', 'headers', 'body'] as const
 
-export function McpHandler({ name, clientName, node, resolver }: Props): KubbReactNode {
+export function McpHandler({ name, clientName, node, resolver, returnType = 'full' }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
 
   const { signature, groups } = buildRequestParamsSignature(node, resolver, { isConfigurable: false })
   const paramsSignature = [signature, 'request: RequestHandlerExtra<ServerRequest, ServerNotification>'].filter(Boolean).join(', ')
 
-  // Forward the grouped config and MCP cancellation signal through the contract client.
+  // Forward the grouped config and MCP cancellation signal through the contract client. `throwOnError: true`
+  // pins the result shape, since `throwOnErrorDefault: false` would otherwise resolve to the full result.
   const callArgs = requestGroupOrder.filter((key) => groups[key])
-  const callConfig = `{ ${[...callArgs, 'signal: request.signal'].join(', ')} }`
+  const callConfig = `{ ${[...callArgs, 'signal: request.signal', 'throwOnError: true'].join(', ')} }`
+  const body = returnType === 'data' ? 'res' : 'res.data'
 
   const callToolResult = `return {
   content: [
     {
       type: 'text',
-      text: JSON.stringify(res.data)
+      text: JSON.stringify(${body})
     }
   ],
-  structuredContent: { data: res.data }
+  structuredContent: { data: ${body} }
 }`
 
   return (

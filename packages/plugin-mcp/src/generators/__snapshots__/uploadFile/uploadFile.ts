@@ -15,7 +15,7 @@ export async function uploadFileHandler(
   { path, body }: UploadFileOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await uploadFile({ path, body, signal: request.signal })
+  const res = await uploadFile({ path, body, signal: request.signal, throwOnError: true })
 
   return {
     content: [

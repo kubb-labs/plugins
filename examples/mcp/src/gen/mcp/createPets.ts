@@ -16,7 +16,7 @@ export async function createPetsHandler(
   { path, query, body, headers }: CreatePetsOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await createPets({ path, query, headers, body, signal: request.signal })
+  const res = await createPets({ path, query, headers, body, signal: request.signal, throwOnError: true })
 
   return {
     content: [

@@ -17,7 +17,7 @@ export async function placeOrderHandler(
   { body }: PlaceOrderOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await placeOrder({ body, signal: request.signal })
+  const res = await placeOrder({ body, signal: request.signal, throwOnError: true })
 
   return {
     content: [

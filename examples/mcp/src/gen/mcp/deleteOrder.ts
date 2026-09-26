@@ -17,7 +17,7 @@ export async function deleteOrderHandler(
   { path }: DeleteOrderOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await deleteOrder({ path, signal: request.signal })
+  const res = await deleteOrder({ path, signal: request.signal, throwOnError: true })
 
   return {
     content: [
