@@ -250,15 +250,10 @@ describe(`plugin-swr options ${version}`, () => {
     if (name === 'queryDisabled') {
       const hookFiles = files
         .map((file) => getRelativePath(output, file.path))
-        .filter((filePath) => filePath.startsWith('hooks/'))
+        .filter((filePath) => filePath.startsWith('./hooks/'))
         .sort()
 
-      expect(hookFiles).toEqual([
-        'hooks/useAddPet.ts',
-        'hooks/useDeletePet.ts',
-        'hooks/usePlaceOrder.ts',
-        'hooks/useUploadFile.ts',
-      ])
+      expect(hookFiles).toEqual(['./hooks/useAddPet.ts', './hooks/useDeletePet.ts', './hooks/usePlaceOrder.ts', './hooks/useUploadFile.ts'])
     }
 
     for (const file of files) {
