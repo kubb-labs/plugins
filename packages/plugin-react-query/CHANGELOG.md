@@ -1,5 +1,11 @@
 # @kubb/plugin-react-query
 
+## 5.1.3
+
+### Patch Changes
+
+- [#974](https://github.com/kubb-labs/plugins/pull/974) [`ce07cfb`](https://github.com/kubb-labs/plugins/commit/ce07cfba223d3a9047368094f999c5d2a32ffb2b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix custom options barrel exports when the configured function name differs from the import path.
+
 ## 5.1.2
 
 ### Patch Changes
