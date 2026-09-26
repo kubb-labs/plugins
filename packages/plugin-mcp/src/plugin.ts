@@ -1,3 +1,4 @@
+import path from 'node:path'
 import { createGroupConfig } from '@internals/shared'
 
 import { resolveContractClient } from '@internals/client'
@@ -62,6 +63,13 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
     dependencies: [pluginTsName, pluginZodName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
+        const resolvedMode = output.mode ?? (path.extname(output.path) ? 'file' : 'directory')
+        if (resolvedMode === 'file') {
+          throw new Error(
+            `[${pluginMcpName}] \`output.mode\` resolves to 'file' (from \`output.path: '${output.path}'\`), which plugin-mcp does not support. It always writes \`server.ts\` and \`.mcp.json\` as separate files under \`output.path\`, in addition to one file per operation handler, so a single-file output has nowhere to put them. Give \`output.path\` an extensionless directory name (e.g. 'mcp'), or set \`output.mode: 'directory'\` explicitly.`,
+          )
+        }
+
         const resolver = userResolver ? Resolver.merge<ResolverMcp>(resolverMcp, userResolver) : resolverMcp
 
         ctx.setOptions({
