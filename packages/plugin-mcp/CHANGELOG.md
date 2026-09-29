@@ -1,5 +1,27 @@
 # @kubb/plugin-mcp
 
+## 5.0.6
+
+### Patch Changes
+
+- [#959](https://github.com/kubb-labs/plugins/pull/959) [`9f83ed4`](https://github.com/kubb-labs/plugins/commit/9f83ed4ad7db35585b63aa9f7f88caa596a7de79) Thanks [@xeoneux](https://github.com/xeoneux)! - Honor the client plugin's per-operation `override`, `include`, and `exclude` when generating hooks and MCP handlers. A `pluginAxios` / `pluginFetch` `override` that changed `returnType`, `output`, or `group` for some operations was ignored by the dependents, which read the client plugin's global options instead. Their generated call body then no longer matched the `<op>` it called, for example a hook treating a full `RequestResult` as the response body. Operations the client plugin excludes are now skipped instead of importing an `<op>` that was never emitted.
+  
+  ```typescript
+  pluginAxios({
+    returnType: 'data',
+    // Hooks for getPetById now call `.unwrap()` to match the full result this operation returns
+    override: [{ type: 'operationId', pattern: 'getPetById', options: { returnType: 'full' } }],
+  })
+  ```
+
+- [#963](https://github.com/kubb-labs/plugins/pull/963) [`fba467c`](https://github.com/kubb-labs/plugins/commit/fba467ca8a0c4a42a129679cdb0f13fea82da05d) Thanks [@xeoneux](https://github.com/xeoneux)! - Follow the client plugin's `returnType` in generated MCP handlers. With `pluginAxios({ returnType: 'data' })` or `pluginFetch({ returnType: 'data' })` the client call already resolves to the response body, but the handler still read `res.data` off it, so tools reported the body's own `data` property, usually `undefined`. Handlers now use the call result as the body under `'data'` and keep reading `res.data` under `'full'`.
+  
+  Handlers also pass `throwOnError: true`, as the query plugins do, so a client configured with `throwOnErrorDefault: false` can't change the result shape the handler reads.
+
+- [#976](https://github.com/kubb-labs/plugins/pull/976) [`8c6c03d`](https://github.com/kubb-labs/plugins/commit/8c6c03d9c927656200fd21ef9fb6301ea54eaf32) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix per-operation handler files ignoring `output.banner`/`output.footer` by resolving and applying them the same way `serverGenerator.tsx` does.
+- Updated dependencies [[`adaf6c6`](https://github.com/kubb-labs/plugins/commit/adaf6c6674ba309224e01c4c9917ab847b9cc429), [`20cc521`](https://github.com/kubb-labs/plugins/commit/20cc521cc019e9fc501103b0d240856197d9bf18)]:
+  - @kubb/plugin-zod@5.4.0
+
 ## 5.0.5
 
 ### Patch Changes

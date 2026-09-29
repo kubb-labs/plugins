@@ -1,5 +1,27 @@
 # @kubb/plugin-fetch
 
+## 5.5.2
+
+### Patch Changes
+
+- [#961](https://github.com/kubb-labs/plugins/pull/961) [`f4d6f5e`](https://github.com/kubb-labs/plugins/commit/f4d6f5ea2202a82b25c5b9d060e0fc91307944ed) Thanks [@xeoneux](https://github.com/xeoneux)! - `ResponseError` names the request in its message and gains a `ResponseError.is` guard.
+  
+  The message was only `Request failed with status 500`, so logs and test failures that print `error.message` could not tell which call failed. It now reads `GET https://api.example.com/pet/1 failed with status 404 Not Found`. The query string is left out, since an API key can be sent as a query parameter. A `ResponseError` constructed directly without `method` / `url` keeps the old message.
+  
+  Every generated client bundles its own `ResponseError`, so `instanceof` fails for an error thrown by another client in the same app. `ResponseError.is(error)` matches on `name` instead:
+  
+  ```typescript
+  if (ResponseError.is(error) && error.status === 404) {
+    // works for errors from any Kubb-generated client
+  }
+  ```
+
+- [#978](https://github.com/kubb-labs/plugins/pull/978) [`21bd9a6`](https://github.com/kubb-labs/plugins/commit/21bd9a6d037a98d7225a018809e3ebcc99c8893a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix `sdk.mode: 'tag'` silently collapsing every tag into one class when `output.mode: 'file'`. The generator now throws `KUBB_INVALID_PLUGIN_OPTIONS` instead of merging every tag's operations into whichever controller is built first.
+  
+  Set `sdk.mode: 'flat'` to emit one class into that file, or give `output.path` an extensionless directory name (or set `output.mode: 'directory'` explicitly) so each tag gets its own file.
+- Updated dependencies [[`adaf6c6`](https://github.com/kubb-labs/plugins/commit/adaf6c6674ba309224e01c4c9917ab847b9cc429), [`20cc521`](https://github.com/kubb-labs/plugins/commit/20cc521cc019e9fc501103b0d240856197d9bf18)]:
+  - @kubb/plugin-zod@5.4.0
+
 ## 5.5.1
 
 ### Patch Changes
