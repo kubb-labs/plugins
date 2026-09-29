@@ -17,6 +17,25 @@ function hasPropertyNames(node: ast.SchemaNode): boolean {
 }
 
 /**
+ * Whether the schema node represents a closed or finite set of keys (e.g. enum, literal,
+ * or union of enums/literals).
+ *
+ * In Zod v4, passing a closed key schema to `z.record()` enforces exhaustiveness (all keys
+ * must exist in the input). OpenAPI 3.1 `propertyNames` only validates present keys without
+ * requiring all keys to exist, so closed key schemas use `z.partialRecord()` instead.
+ */
+export function isClosedKeySchema(node: ast.SchemaNode | undefined): boolean {
+  if (!node) return false
+  const resolved = syncSchemaRef(node)
+  if (resolved.type === 'enum') return true
+  if (resolved.type === 'union') {
+    const members = resolved.members ?? []
+    return members.length > 0 && members.every(isClosedKeySchema)
+  }
+  return false
+}
+
+/**
  * Whether the node is a plain inline object whose shape can be lifted into an `.extend({ … })`
  * argument. A catchall, `patternProperties`, or a nullable/optional wrapper cannot, so those stay
  * on `.and(…)`.

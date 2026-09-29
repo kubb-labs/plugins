@@ -494,6 +494,31 @@ describe('zodGenerator — Schema', () => {
     const source = rawSources(driver.fileManager.files).join('\n')
     expect(source).toContain('export const userMapSchema = z.record(z.string().regex(/^[a-z]+$/), z.int())')
   })
+
+  test('dictionary with enum propertyNames generates z.partialRecord', async () => {
+    const propertyNamesSchema = ast.factory.createSchema({
+      type: 'object',
+      primitive: 'object',
+      name: 'RoleMap',
+      properties: [],
+      propertyNames: ast.factory.createSchema({ type: 'enum', enumValues: ['admin', 'editor'] }),
+      additionalProperties: ast.factory.createSchema({ type: 'string' }),
+    } as any)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'propertyNamesEnum' })
+
+    await renderGeneratorSchema(zodGenerator, propertyNamesSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain("export const roleMapSchema = z.partialRecord(z.enum(['admin', 'editor']), z.string())")
+  })
 })
 
 describe('zodGenerator — Operation', () => {

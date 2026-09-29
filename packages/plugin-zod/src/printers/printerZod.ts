@@ -7,6 +7,7 @@ import {
   buildEnum,
   formatLiteral,
   integerFormatPattern,
+  isClosedKeySchema,
   isObjectComposableIntersection,
   isObjectSchemaNode,
   lengthConstraints,
@@ -465,23 +466,28 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       // `z.strictObject(...)` rather than `z.object(...).strict()`: `.strict()` reads `.shape` eagerly, which runs a
       // self-reference's deferred getter while its own `const` is still in the temporal dead zone.
       const isStrict = node.additionalProperties === false && patterns.length === 0
+      const isLoose = node.additionalProperties === true
+      const ctor = isStrict ? 'z.strictObject' : isLoose ? 'z.looseObject' : 'z.object'
       const shape = buildZodObjectShape(this, node)
-      const objectBase = `${isStrict ? 'z.strictObject' : 'z.object'}(${shape})`
+      const objectBase = `${ctor}(${shape})`
 
       const result = (() => {
+        // Closed key schemas (enums, literals) use z.partialRecord() so missing keys do not fail exhaustiveness.
+        const recordFn = isClosedKeySchema(propertyNamesNode) ? 'z.partialRecord' : 'z.record'
+
         if (node.additionalProperties && node.additionalProperties !== true) {
           const catchallType = this.transform(node.additionalProperties)
           if (entries.length === 0) {
-            return catchallType ? `z.record(${propertyNamesKeySchema || 'z.string()'}, ${catchallType})` : objectBase
+            return catchallType ? `${recordFn}(${propertyNamesKeySchema || 'z.string()'}, ${catchallType})` : objectBase
           }
           return catchallType ? `${objectBase}.catchall(${catchallType})` : objectBase
         }
         if (node.additionalProperties === true) {
-          const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
           if (entries.length === 0 && propertyNamesKeySchema) {
-            return `z.record(${propertyNamesKeySchema}, ${unknownType})`
+            const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+            return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
           }
-          return `z.looseObject(${shape})`
+          return objectBase
         }
         if (isStrict) return objectBase
 
@@ -500,7 +506,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         }
 
         if (entries.length === 0 && propertyNamesKeySchema) {
-          return `z.record(${propertyNamesKeySchema}, ${this.transform(ast.factory.createSchema({ type: 'unknown' }))!})`
+          return `${recordFn}(${propertyNamesKeySchema}, ${this.transform(ast.factory.createSchema({ type: 'unknown' }))!})`
         }
 
         return objectBase

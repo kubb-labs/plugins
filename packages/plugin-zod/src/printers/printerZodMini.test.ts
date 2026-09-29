@@ -283,7 +283,7 @@ describe('printerZodMini', () => {
       expect(printer.print(node)).toBe('z.record(z.string().check(z.regex(/^[a-z]+$/)), z.int())')
     })
 
-    test('propertyNames enum and additionalProperties → z.record(enumKeySchema, schema)', () => {
+    test('propertyNames enum and additionalProperties → z.partialRecord(enumKeySchema, schema)', () => {
       const node = ast.factory.createSchema({
         type: 'object',
         primitive: 'object',
@@ -291,7 +291,24 @@ describe('printerZodMini', () => {
         propertyNames: ast.factory.createSchema({ type: 'enum', enumValues: ['admin', 'user'] }),
         additionalProperties: ast.factory.createSchema({ type: 'string' }),
       } as any)
-      expect(printer.print(node)).toBe("z.record(z.enum(['admin', 'user']), z.string())")
+      expect(printer.print(node)).toBe("z.partialRecord(z.enum(['admin', 'user']), z.string())")
+    })
+
+    test('generated mini partialRecord with enum keys allows partial key subsets at runtime', async () => {
+      const zm = await import('zod/mini')
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        propertyNames: ast.factory.createSchema({ type: 'enum', enumValues: ['admin', 'user'] }),
+        additionalProperties: ast.factory.createSchema({ type: 'string' }),
+      } as any)
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(zm)
+      expect(schema.safeParse({ admin: 'Alice' }).success).toBe(true)
+      expect(schema.safeParse({ admin: 'Alice', user: 'Bob' }).success).toBe(true)
+      expect(schema.safeParse({}).success).toBe(true)
+      expect(schema.safeParse({ guest: 'Charlie' }).success).toBe(false)
     })
 
     test('propertyNames format and additionalProperties → z.record(formatKeySchema, schema)', () => {
@@ -386,7 +403,7 @@ describe('printerZodMini', () => {
           additionalProperties: true,
         }),
       } as any)
-      expect(printer.print(node)).toBe("z.record(z.enum(['admin', 'editor']), z.looseObject({\n  level: z.int(),\n}))")
+      expect(printer.print(node)).toBe("z.partialRecord(z.enum(['admin', 'editor']), z.looseObject({\n  level: z.int(),\n}))")
 
       const code = printer.print(node)
       const schema = new Function('z', `return ${code}`)(zm)
@@ -395,8 +412,28 @@ describe('printerZodMini', () => {
         editor: { level: 2, extraTag: 'content' },
       }
       expect(schema.safeParse(valid).success).toBe(true)
+      // Partial key subset is valid (admin only, editor omitted)
+      expect(schema.safeParse({ admin: { level: 1 } }).success).toBe(true)
+      // Missing required property within value schema
       expect(schema.safeParse({ admin: { extraAllowed: true } }).success).toBe(false)
+      // Unknown enum key
       expect(schema.safeParse({ viewer: { level: 3 } }).success).toBe(false)
+    })
+
+    test('object with propertyNames $ref to enum schema → z.partialRecord(RefName, schema)', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        propertyNames: ast.factory.createSchema({
+          type: 'ref',
+          name: 'RoleEnum',
+          ref: '#/components/schemas/RoleEnum',
+          schema: ast.factory.createSchema({ type: 'enum', enumValues: ['admin', 'editor'] }),
+        }),
+        additionalProperties: ast.factory.createSchema({ type: 'string' }),
+      } as any)
+      expect(printer.print(node)).toBe('z.partialRecord(RoleEnum, z.string())')
     })
 
     test('complex: object containing both a record property and a looseObject property', async () => {
