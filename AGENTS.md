@@ -63,26 +63,6 @@ Plugin docs live in the docs repo ([kubb-labs/docs](https://github.com/kubb-labs
 - Tests cover e2e, performance, and version-specific suites
 - Schemas are OpenAPI definitions for testing
 
-## Token optimized CLI (rtk)
-
-`rtk` is a CLI proxy that filters and compresses command output to cut token usage. Prefix shell
-commands with it so their output stays small:
-
-```bash
-rtk git status
-rtk git log -10
-rtk pnpm test
-```
-
-Run these meta commands directly:
-
-```bash
-rtk gain              # Token savings dashboard
-rtk gain --history    # Per-command savings history
-rtk discover          # Find missed rtk opportunities
-rtk proxy <cmd>       # Run raw without filtering but still track usage
-```
-
 ## How agents read this repo
 
 `AGENTS.md` is the canonical instruction file. Local skills live in `.agents/skills/` (open
