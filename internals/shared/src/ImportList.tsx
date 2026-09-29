@@ -4,13 +4,7 @@ import type { ast } from 'kubb/kit'
 
 type Props = {
   imports: Array<Pick<ast.ImportNode, 'name' | 'path' | 'isTypeOnly'>>
-  /**
-   * Path of the file the imports are rendered into. Import paths are made relative to it.
-   */
   root: string
-  /**
-   * Keeps React keys unique when several import lists share a parent.
-   */
   keyPrefix: string
   isTypeOnly?: boolean
 }
