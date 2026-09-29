@@ -37,7 +37,6 @@ type Props = {
 
 export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, assertName, mini, cyclic, compile }: Props): KubbReactNode {
   const output = printer.print(node)
-  // Imports that `printer.nodes` handlers declared with `this.import(...)`, for example a custom codec.
   const printerImports = printer.takeImports()
 
   if (!output) {
