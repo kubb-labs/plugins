@@ -7,6 +7,7 @@ import {
   buildEnum,
   formatLiteral,
   integerFormatPattern,
+  isClosedKeySchema,
   isObjectComposableIntersection,
   isObjectSchemaNode,
   lengthConstraints,
@@ -218,7 +219,7 @@ function buildZodObjectShape(ctx: ZodPrinterContext, node: ast.SchemaNode): stri
  */
 const CONTAINER_TYPES = new Set<ast.SchemaType>(['object', 'array', 'tuple', 'union', 'intersection', 'ref'])
 
-type DirectionProbeContext = { options: PrinterZodOptions; transform: () => null; base: () => null }
+type DirectionProbeContext = { options: PrinterZodOptions; transform: () => null; base: () => null; import: () => void }
 
 /**
  * Runs the node's effective handler (a `printer.nodes` override, else the built-in) once per
@@ -232,7 +233,7 @@ function variesByDirection({ node, printerOptions }: { node: ast.SchemaNode; pri
   if (!handler) return false
 
   const call = (direction: 'encode' | 'decode') => {
-    const context: DirectionProbeContext = { options: { ...printerOptions, direction }, transform: () => null, base: () => null }
+    const context: DirectionProbeContext = { options: { ...printerOptions, direction }, transform: () => null, base: () => null, import: () => {} }
     return (handler as (this: DirectionProbeContext, node: ast.SchemaNode) => string | null).call(context, node)
   }
 
@@ -274,6 +275,9 @@ export function containsDirectionalNode({
   if ('items' in node && node.items) children.push(...node.items)
   if ('members' in node && node.members) children.push(...node.members)
   if ('additionalProperties' in node && node.additionalProperties && node.additionalProperties !== true) children.push(node.additionalProperties)
+  if ('propertyNames' in node && (node as { propertyNames?: ast.SchemaNode }).propertyNames) {
+    children.push((node as { propertyNames?: ast.SchemaNode }).propertyNames)
+  }
 
   return children.some((child) => containsDirectionalNode({ node: child, printerOptions, seen }))
 }
@@ -458,18 +462,34 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
     object(node) {
       const entries = node.properties ?? []
       const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
+      const propertyNamesNode = 'propertyNames' in node ? (node as { propertyNames?: ast.SchemaNode }).propertyNames : undefined
+      const propertyNamesKeySchema = propertyNamesNode ? this.transform(propertyNamesNode) : null
+
       // `additionalProperties: false` still permits patternProperties keys, so only a pattern-free object is strict.
       // `z.strictObject(...)` rather than `z.object(...).strict()`: `.strict()` reads `.shape` eagerly, which runs a
       // self-reference's deferred getter while its own `const` is still in the temporal dead zone.
       const isStrict = node.additionalProperties === false && patterns.length === 0
-      const objectBase = `${isStrict ? 'z.strictObject' : 'z.object'}(${buildZodObjectShape(this, node)})`
+      const isLoose = node.additionalProperties === true
+      const ctor = isStrict ? 'z.strictObject' : isLoose ? 'z.looseObject' : 'z.object'
+      const shape = buildZodObjectShape(this, node)
+      const objectBase = `${ctor}(${shape})`
 
       const result = (() => {
+        // Closed key schemas (enums, literals) use z.partialRecord() so missing keys do not fail exhaustiveness.
+        const recordFn = isClosedKeySchema(propertyNamesNode) ? 'z.partialRecord' : 'z.record'
+
         if (node.additionalProperties && node.additionalProperties !== true) {
           const catchallType = this.transform(node.additionalProperties)
+          if (entries.length === 0) {
+            return catchallType ? `${recordFn}(${propertyNamesKeySchema || 'z.string()'}, ${catchallType})` : objectBase
+          }
           return catchallType ? `${objectBase}.catchall(${catchallType})` : objectBase
         }
-        if (node.additionalProperties === true) return `${objectBase}.catchall(${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
+        if (entries.length === 0 && patterns.length === 0 && propertyNamesKeySchema && !isStrict) {
+          const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+          return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
+        }
+        if (node.additionalProperties === true) return objectBase
         if (isStrict) return objectBase
 
         // No fixed properties: z.record enforces the key pattern. With fixed properties a record would
@@ -485,6 +505,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           if (entries.length > 0) return `${objectBase}.catchall(${value})`
           return `z.record(${patternKeySchema({ patterns: patterns.map(([pattern]) => pattern), regexType: this.options.regexType })}, ${value})`
         }
+
         return objectBase
       })()
 

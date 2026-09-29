@@ -1,5 +1,21 @@
 # @kubb/plugin-swr
 
+## 5.1.3
+
+### Patch Changes
+
+- [#959](https://github.com/kubb-labs/plugins/pull/959) [`9f83ed4`](https://github.com/kubb-labs/plugins/commit/9f83ed4ad7db35585b63aa9f7f88caa596a7de79) Thanks [@xeoneux](https://github.com/xeoneux)! - Honor the client plugin's per-operation `override`, `include`, and `exclude` when generating hooks and MCP handlers. A `pluginAxios` / `pluginFetch` `override` that changed `returnType`, `output`, or `group` for some operations was ignored by the dependents, which read the client plugin's global options instead. Their generated call body then no longer matched the `<op>` it called, for example a hook treating a full `RequestResult` as the response body. Operations the client plugin excludes are now skipped instead of importing an `<op>` that was never emitted.
+  
+  ```typescript
+  pluginAxios({
+    returnType: 'data',
+    // Hooks for getPetById now call `.unwrap()` to match the full result this operation returns
+    override: [{ type: 'operationId', pattern: 'getPetById', options: { returnType: 'full' } }],
+  })
+  ```
+
+- [#975](https://github.com/kubb-labs/plugins/pull/975) [`24e0afa`](https://github.com/kubb-labs/plugins/commit/24e0afaf45602eadb43fc578c90735a9bfa9c099) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Allow mutation generation when query generation is disabled, keeping the `query` and `mutation` options independent.
+
 ## 5.1.2
 
 ### Patch Changes
