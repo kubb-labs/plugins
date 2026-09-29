@@ -1,5 +1,11 @@
 # @kubb/plugin-zod
 
+## 5.4.1
+
+### Patch Changes
+
+- [#995](https://github.com/kubb-labs/plugins/pull/995) [`928ea0a`](https://github.com/kubb-labs/plugins/commit/928ea0a1efa3317f1e3d424c1f88d0142c70bcb3) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add the imports that `printer.nodes` handlers declare with `this.import(...)` to the generated file.
+
 ## 5.4.0
 
 ### Minor Changes
