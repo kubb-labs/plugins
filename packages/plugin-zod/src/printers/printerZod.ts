@@ -485,7 +485,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           }
           return catchallType ? `${objectBase}.catchall(${catchallType})` : objectBase
         }
-        if (entries.length === 0 && patterns.length === 0 && propertyNamesKeySchema) {
+        if (entries.length === 0 && patterns.length === 0 && propertyNamesKeySchema && !isStrict) {
           const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
           return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
         }

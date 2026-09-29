@@ -443,6 +443,17 @@ describe('printerZod', () => {
       expect(printer.print(node)).toBe('z.record(z.string().regex(/^[a-z]+$/), z.unknown())')
     })
 
+    test('object with propertyNames and additionalProperties: false → z.strictObject({})', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        propertyNames: ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }),
+        additionalProperties: false,
+      } as any)
+      expect(printer.print(node)).toBe('z.strictObject({})')
+    })
+
     test('object with propertyNames only → z.record(keySchema, z.unknown())', () => {
       const node = ast.factory.createSchema({
         type: 'object',

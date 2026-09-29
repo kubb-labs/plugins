@@ -287,7 +287,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           }
           return catchallType ? `z.catchall(${objectBase}, ${catchallType})` : objectBase
         }
-        if (entries.length === 0 && patterns.length === 0 && propertyNamesKeySchema) {
+        if (entries.length === 0 && patterns.length === 0 && propertyNamesKeySchema && !isStrict) {
           const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
           return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
         }
