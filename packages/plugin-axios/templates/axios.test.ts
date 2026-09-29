@@ -905,6 +905,118 @@ describe('createClientCore', () => {
       await client({ method: 'GET', url: '/test' })
       expect(reqFn).not.toHaveBeenCalled()
     })
+
+    test('preserves relative execution order of multiple request and response interceptors across swap', async () => {
+      const client = createClientCore()
+      const executionOrder: Array<string> = []
+
+      client.interceptors.request.use((config) => {
+        executionOrder.push('req1')
+        return config
+      })
+      client.interceptors.request.use((config) => {
+        executionOrder.push('req2')
+        return config
+      })
+      client.interceptors.response.use((response) => {
+        executionOrder.push('res1')
+        return response
+      })
+      client.interceptors.response.use((response) => {
+        executionOrder.push('res2')
+        return response
+      })
+
+      client.setConfig({ transport: realAxios() })
+      await client({ method: 'GET', url: '/order' })
+
+      // Axios executes request interceptors in LIFO order (req2 then req1) and response interceptors in FIFO order (res1 then res2)
+      expect(executionOrder).toStrictEqual(['req2', 'req1', 'res1', 'res2'])
+    })
+
+    test('safely handles update with unknown or previously ejected id after transport swap', async () => {
+      const client = createClientCore()
+      const reqFn = vi.fn((config: InternalAxiosRequestConfig) => config)
+      const id = client.interceptors.request.use(reqFn)
+
+      client.setConfig({ transport: realAxios() })
+
+      const phantomFn = vi.fn((config: InternalAxiosRequestConfig) => config)
+      expect(() => client.interceptors.request.update(9999, phantomFn)).not.toThrow()
+
+      client.interceptors.request.eject(id)
+      expect(() => client.interceptors.request.update(id, phantomFn)).not.toThrow()
+
+      await client({ method: 'GET', url: '/test' })
+      expect(reqFn).not.toHaveBeenCalled()
+      expect(phantomFn).not.toHaveBeenCalled()
+    })
+
+    test('preserves pre-existing interceptors on incoming transport during swap', async () => {
+      const customTransport = realAxios()
+      const transportCalls: Array<string> = []
+      customTransport.interceptors.request.use((config) => {
+        transportCalls.push('transport-req')
+        return config
+      })
+      customTransport.interceptors.response.use((response) => {
+        transportCalls.push('transport-res')
+        return response
+      })
+
+      const client = createClientCore()
+      client.interceptors.request.use((config) => {
+        transportCalls.push('client-req')
+        return config
+      })
+      client.interceptors.response.use((response) => {
+        transportCalls.push('client-res')
+        return response
+      })
+
+      client.setConfig({ transport: customTransport })
+      await client({ method: 'GET', url: '/test' })
+
+      expect(transportCalls).toContain('transport-req')
+      expect(transportCalls).toContain('client-req')
+      expect(transportCalls).toContain('transport-res')
+      expect(transportCalls).toContain('client-res')
+
+      // Swapping again detaches client's interceptors from customTransport without removing customTransport's own interceptors
+      client.setConfig({ transport: realAxios() })
+      transportCalls.length = 0
+      await customTransport.request({ url: '/direct' })
+      expect(transportCalls).toStrictEqual(['transport-req', 'transport-res'])
+    })
+
+    test('ejects response and error interceptors by original id after transport swap', async () => {
+      const client = createClientCore()
+      const resFn = vi.fn((res: AxiosResponse) => res)
+      const errFn = vi.fn((err: AxiosError) => err)
+
+      const resId = client.interceptors.response.use(resFn)
+      const errId = client.interceptors.error.use(errFn)
+
+      client.setConfig({ transport: realAxios() })
+      client.interceptors.response.eject(resId)
+      client.interceptors.error.eject(errId)
+
+      await client({ method: 'GET', url: '/ok' })
+      expect(resFn).not.toHaveBeenCalled()
+
+      client.setConfig({ transport: realAxios(500) })
+      await expect(client({ method: 'GET', url: '/fail' })).rejects.toThrow()
+      expect(errFn).not.toHaveBeenCalled()
+    })
+
+    test('allows error interceptor to return a transformed error on swapped transport', async () => {
+      const client = createClientCore()
+      const customError = new AxiosErrorClass('Custom transformed error', 'ERR_CUSTOM')
+      client.interceptors.error.use(() => customError)
+
+      client.setConfig({ transport: realAxios(500) })
+      await expect(client({ method: 'GET', url: '/error' })).rejects.toThrow('Custom transformed error')
+    })
   })
 
   test('createClient produces a new instance', () => {

@@ -451,7 +451,8 @@ function createInterceptorChannel<T, TRequest, TResponse>(
     },
     update(id, fn) {
       const nativeId = ids.get(id)
-      if (nativeId !== undefined) ejectNative(nativeId)
+      if (nativeId === undefined) return
+      ejectNative(nativeId)
       handlers.set(id, fn)
       ids.set(id, registerWithContext(fn))
     },
@@ -748,7 +749,10 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       setContextId,
     ),
     error: createInterceptorChannel<AxiosError, TRequest, TResponse>(
-      (fn) => instance.interceptors.response.use(undefined, (error: unknown) => Promise.resolve(fn(error as AxiosError)).then(() => Promise.reject(error))),
+      (fn) =>
+        instance.interceptors.response.use(undefined, (error: unknown) =>
+          Promise.resolve(fn(error as AxiosError)).then((result) => Promise.reject(result ?? error)),
+        ),
       (id) => instance.interceptors.response.eject(id),
       getRequestConfig,
       getContextId,
@@ -937,3 +941,5 @@ export async function toEventStream<TData = unknown>(result: Promise<{ data: unk
 export const client = createClientCore()
 
 export const createClient = (config?: Parameters<typeof client.createClient>[0]) => client.createClient(config)
+
+client.setConfig({ baseURL: 'https://petstore3.swagger.io/api/v3' })
