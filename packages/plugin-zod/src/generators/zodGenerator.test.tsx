@@ -1853,13 +1853,18 @@ describe('custom imports', () => {
     expect(files[0]?.imports.map((imp) => imp.path)).toContain('my-codec/zod')
   })
 
-  test('`output.imports` adds the import to files that use it and skips files that do not', async () => {
-    const options = { output: { path: '.', mode: 'directory' as const, imports: [codecImport] }, printer: { nodes: { bigint: () => 'myCodec.uint64()' } } }
+  test('files whose schema does not reach the handler get no import', async () => {
+    const files = await render(ast.factory.createSchema({ type: 'string', name: 'PetName' }), {
+      printer: {
+        nodes: {
+          bigint() {
+            this.import(codecImport)
+            return 'myCodec.uint64()'
+          },
+        },
+      },
+    })
 
-    const used = await render(bigintSchema, options)
-    const unused = await render(ast.factory.createSchema({ type: 'string', name: 'PetName' }), options)
-
-    expect(used[0]?.imports.map((imp) => imp.path)).toContain('my-codec/zod')
-    expect(unused[0]?.imports.map((imp) => imp.path)).not.toContain('my-codec/zod')
+    expect(files[0]?.imports.map((imp) => imp.path)).not.toContain('my-codec/zod')
   })
 })
