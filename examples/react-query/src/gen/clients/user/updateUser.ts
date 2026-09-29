@@ -17,5 +17,9 @@ export function updateUser<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<UpdateUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'PUT', url: '/user/{username}', ...config }) as Promise<RequestResult<UpdateUserResponses, ThrowOnError>>)
+  return withUnwrap(
+    request({ method: 'PUT', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+      RequestResult<UpdateUserResponses, ThrowOnError>
+    >,
+  )
 }

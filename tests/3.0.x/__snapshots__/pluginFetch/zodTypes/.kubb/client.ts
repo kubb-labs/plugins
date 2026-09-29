@@ -1,6 +1,7 @@
-import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers'
 import type { HeadersInit, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers'
-import { ParseError, type StandardSchemaValidator, validateStandardSchema } from './standardSchema'
+import type { StandardSchemaValidator } from './standardSchema'
+import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers'
+import { ParseError, validateStandardSchema } from './standardSchema'
 
 /**
  * HTTP status codes treated as a success, everything else is an error.
@@ -109,21 +110,16 @@ export function withUnwrap<T extends { data: unknown; error: unknown }>(promise:
 }
 
 /**
- * The shape a generated operation returns when `returnType: 'data'` is set: the bare success body
- * once `throwOnError` (on by default) narrows away the error branch, falling back to the full
- * `RequestResult` when a call sets `throwOnError: false` and still needs `error` to discriminate a
- * failed response.
+ * The shape a generated operation returns with `returnType: 'data'`: the success body when
+ * `throwOnError` is true, or the full `RequestResult` when it is false.
  */
 export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = Request, TResponse = Response> = ThrowOnError extends true
   ? RequestResult<TResponses, true, TRequest, TResponse>['data']
   : RequestResult<TResponses, ThrowOnError, TRequest, TResponse>
 
 /**
- * Narrows a resolved call down to its success body once `throwOnError` (on by default) rules out
- * the error branch, the same default the runtime itself applies. Falls back to the full result for
- * a call that sets `throwOnError: false`, since that path still needs `error` to discriminate a
- * failed response. Backs `returnType: 'data'`, mirroring how `toEventStream` centralizes the
- * post-processing for `text/event-stream` operations.
+ * Returns the success body when `throwOnError` is true, or the full result when it is false.
+ * Backs generated operations with `returnType: 'data'`.
  */
 export function unwrapResult<T extends { data: unknown; error: unknown }>(promise: Promise<T>, throwOnError: boolean | undefined): Promise<T | T['data']> {
   return promise.then((result) => ((throwOnError ?? true) ? result.data : result))
@@ -317,25 +313,25 @@ export type CallResult<TRequest = Request, TResponse = Response> = {
   response: TResponse
 }
 
-export type InterceptorFn<T> = (value: T) => T | Promise<T>
+export type InterceptorFn<T, TContext = never> = (value: T, context?: TContext) => T | Promise<T>
 
 /**
  * A single interceptor channel with a transport-agnostic `use` / `eject` / `update` API.
  */
-export type InterceptorStack<T> = {
-  use: (fn: InterceptorFn<T>) => number
+export type InterceptorStack<T, TContext = never> = {
+  use: (fn: InterceptorFn<T, TContext>) => number
   eject: (id: number) => void
-  update: (id: number, fn: InterceptorFn<T>) => void
-  run: (value: T) => Promise<T>
+  update: (id: number, fn: InterceptorFn<T, TContext>) => void
+  run: (value: T, context?: TContext) => Promise<T>
 }
 
 /**
  * The three interceptor channels every client instance exposes.
  */
 export type Interceptors<TRequest = Request, TResponse = Response> = {
-  request: InterceptorStack<ResolvedRequest>
-  response: InterceptorStack<TransportResult<unknown, TRequest, TResponse>>
-  error: InterceptorStack<ResponseError<unknown, TRequest, TResponse>>
+  request: InterceptorStack<ResolvedRequest, RequestConfig<unknown, TRequest, TResponse>>
+  response: InterceptorStack<TransportResult<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
+  error: InterceptorStack<ResponseError<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
 }
 
 /**
@@ -362,8 +358,21 @@ export class ResponseError<TError = unknown, TRequest = Request, TResponse = Res
   request: TRequest
   response: TResponse
 
-  constructor(config: { data: TError; status: number; statusText: string; contentType?: string; request: TRequest; response: TResponse }) {
-    super(`Request failed with status ${config.status}${config.statusText ? ` ${config.statusText}` : ''}`)
+  constructor(config: {
+    data: TError
+    status: number
+    statusText: string
+    contentType?: string
+    request: TRequest
+    response: TResponse
+    method?: string
+    url?: string
+  }) {
+    // The query and hash are left out: sensitive query parameters or fragments must not reach logs.
+    const cleanUrl = config.url?.split(/[?#]/)[0]
+    const target = [config.method, cleanUrl].filter(Boolean).join(' ')
+    const statusText = config.statusText?.trim()
+    super(`${target ? `${target} failed` : 'Request failed'} with status ${config.status}${statusText ? ` ${statusText}` : ''}`)
     this.name = 'ResponseError'
     this.data = config.data
     this.status = config.status
@@ -371,6 +380,13 @@ export class ResponseError<TError = unknown, TRequest = Request, TResponse = Res
     this.contentType = config.contentType
     this.request = config.request
     this.response = config.response
+  }
+
+  /**
+   * Matches on `name`, not `instanceof`: every generated client bundles its own `ResponseError` class.
+   */
+  static is(error: unknown): error is ResponseError<unknown, unknown, unknown> {
+    return error instanceof Error && error.name === 'ResponseError'
   }
 }
 
@@ -426,8 +442,8 @@ function serializeUrl({
 /**
  * Creates a transport-agnostic interceptor channel that runs interceptors in registration order.
  */
-export function createInterceptorStack<T>(): InterceptorStack<T> {
-  let entries: Array<{ id: number; fn: InterceptorFn<T> }> = []
+export function createInterceptorStack<T, TContext = never>(): InterceptorStack<T, TContext> {
+  let entries: Array<{ id: number; fn: InterceptorFn<T, TContext> }> = []
   let counter = 0
   return {
     use(fn) {
@@ -442,10 +458,10 @@ export function createInterceptorStack<T>(): InterceptorStack<T> {
       const entry = entries.find((item) => item.id === id)
       if (entry) entry.fn = fn
     },
-    async run(value) {
+    async run(value, context) {
       let result = value
       for (const entry of entries) {
-        result = await entry.fn(result)
+        result = await entry.fn(result, context)
       }
       return result
     },
@@ -640,6 +656,7 @@ async function settleResult<TRequest, TResponse>({
   validator,
   onValidationError,
   errorInterceptors,
+  requestConfig,
 }: {
   result: TransportResult<unknown, TRequest, TResponse>
   request: ResolvedRequest
@@ -647,7 +664,8 @@ async function settleResult<TRequest, TResponse>({
   throwOnError: boolean
   validator: { response?: Validator; error?: Validator } | undefined
   onValidationError: ValidationErrorHandler | undefined
-  errorInterceptors: InterceptorStack<ResponseError<unknown, TRequest, TResponse>>
+  errorInterceptors: InterceptorStack<ResponseError<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
+  requestConfig: RequestConfig<unknown, TRequest, TResponse>
 }): Promise<CallResult<TRequest, TResponse>> {
   const isSuccess = result.status >= 200 && result.status < 300
   const contentType = result.contentType ?? getResponseContentType(result.headers)
@@ -683,8 +701,10 @@ async function settleResult<TRequest, TResponse>({
       contentType,
       request: result.request,
       response: result.response,
+      method: request.method,
+      url: request.url,
     })
-    await errorInterceptors.run(responseError)
+    await errorInterceptors.run(responseError, requestConfig)
     throw responseError
   }
   return { status: result.status, data: undefined, error, contentType, request: result.request, response: result.response }
@@ -700,17 +720,17 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
   let config: ClientConfig<TRequest, TResponse> = { ...initialConfig }
 
   const interceptors: Interceptors<TRequest, TResponse> = {
-    request: createInterceptorStack<ResolvedRequest>(),
-    response: createInterceptorStack<TransportResult<unknown, TRequest, TResponse>>(),
-    error: createInterceptorStack<ResponseError<unknown, TRequest, TResponse>>(),
+    request: createInterceptorStack<ResolvedRequest, RequestConfig<unknown, TRequest, TResponse>>(),
+    response: createInterceptorStack<TransportResult<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>(),
+    error: createInterceptorStack<ResponseError<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>(),
   }
 
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
     const transport = requestConfig.transport ?? config.transport ?? defaultTransport
     const { request, codecs } = await resolveRequest({ config, requestConfig })
 
-    const resolvedRequest = await interceptors.request.run(request)
-    const result = await interceptors.response.run(await transport(resolvedRequest))
+    const resolvedRequest = await interceptors.request.run(request, requestConfig)
+    const result = await interceptors.response.run(await transport(resolvedRequest), requestConfig)
 
     return settleResult({
       result,
@@ -720,6 +740,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
       validator: requestConfig.validator,
       onValidationError: requestConfig.onValidationError ?? config.onValidationError,
       errorInterceptors: interceptors.error,
+      requestConfig,
     })
   }) as ClientInstance<TRequest, TResponse>
 

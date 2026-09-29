@@ -1,6 +1,6 @@
 import type { FindPetsByTagsOptions } from '../../models/ts/pet/FindPetsByTags'
-import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
-import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol.js'
+import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types.js'
 import { findPetsByTags } from '../../clients/axios/petService/findPetsByTags'
 
 /**
@@ -12,7 +12,7 @@ export async function findPetsByTagsHandler(
   { query, headers }: FindPetsByTagsOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await findPetsByTags({ query, headers, signal: request.signal })
+  const res = await findPetsByTags({ query, headers, signal: request.signal, throwOnError: true })
 
   return {
     content: [

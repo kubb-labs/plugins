@@ -3,18 +3,36 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig } from '../.kubb/client'
-import type { AddPetOptions } from '../types/AddPet'
+import useSWRMutation from 'swr/mutation'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { AddPetOptions, AddPetResponse, AddPetStatus405 } from '../types/AddPet'
+import type { SWRMutationConfiguration } from 'swr/mutation'
 import { addPet } from '../clients/addPet'
 
-export const addPetQueryKey = ({ body }: Omit<AddPetOptions, 'headers'>) => [{ url: '/pet' }, ...(body ? [body] : [])] as const
+export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
-type AddPetQueryKey = ReturnType<typeof addPetQueryKey>
+export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
 
-export function addPetQueryOptions({ body }: AddPetOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
-  return {
-    fetcher: async () => {
+export type AddPetMutationArg = AddPetOptions
+
+/**
+ * @description Add a new pet to the store
+ * @summary Add a new pet to the store
+ * {@link /pet}
+ */
+export function useAddPet(options: {
+  mutation?: SWRMutationConfiguration<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg> & { throwOnError?: boolean },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: { request?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"; response?: "application/json" | "application/xml" } },
+  shouldFetch?: boolean,
+} = {}) {
+  const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
+  const mutationKey = addPetMutationKey()
+
+  return useSWRMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg>(
+    shouldFetch ? mutationKey : null,
+    async (_url, { arg: { body } }) => {
       return addPet({ ...config, body, throwOnError: true }).unwrap()
     },
-  }
+    mutationOptions
+  )
 }

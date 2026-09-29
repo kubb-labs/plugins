@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { getOperationParameters, operationFileEntry } from '@internals/shared'
 import { camelCase } from '@internals/utils'
-import { ast, defineGenerator } from 'kubb/kit'
+import { ast, defineGenerator, Diagnostics } from 'kubb/kit'
 import type { Generator } from 'kubb/kit'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -138,9 +138,23 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
     renderer: jsxRenderer,
     operations(nodes, ctx) {
       const { config, resolver, root } = ctx
-      const { output, group, validator, returnType, sdk } = ctx.options
+      const { output, group, validator, returnType, throwOnErrorDefault, sdk } = ctx.options
 
       if (!sdk) return null
+
+      // `resolver.file(...)` resolves every tag to the same single `output.path` under `mode:
+      // 'file'`, so a tag-per-class split has nothing to split into: every tag would collapse
+      // into whichever controller `buildControllers` reduces first, silently dropping the rest.
+      if (sdk.mode === 'tag' && output.mode === 'file') {
+        throw new Diagnostics.Error({
+          code: Diagnostics.code.invalidPluginOptions,
+          severity: 'error',
+          message: `Plugin "${ctx.plugin.name}" resolves \`output.mode\` to 'file' but also configures \`sdk.mode: 'tag'\`.`,
+          help: "A single-file output has nothing to split tag classes into. Set `sdk.mode: 'flat'` to emit one class into that file, or give `output.path` an extensionless directory name (or set `output.mode: 'directory'` explicitly) so each tag gets its own file.",
+          location: { kind: 'config' },
+          plugin: ctx.plugin.name,
+        })
+      }
 
       const types = resolveOperationTypes(ctx.driver)
       if (!types) {
@@ -188,7 +202,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
                 <File.Import key={filePath} name={Array.from(set)} root={file.path} path={zodFilesByPath.get(filePath)!.path} />
               ))}
 
-            <SdkClient name={className} operations={ops} validator={validator} returnType={returnType} />
+            <SdkClient name={className} operations={ops} validator={validator} returnType={returnType} throwOnErrorDefault={throwOnErrorDefault} />
           </File>
         )
       }

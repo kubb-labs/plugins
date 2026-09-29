@@ -77,12 +77,12 @@ export type PrinterZodMiniOptions = {
  */
 export type PrinterZodMiniFactory = ast.PrinterFactoryOptions<'zod-mini', PrinterZodMiniOptions, string, string>
 
-function strictOneOfMember(member: string, node: ast.SchemaNode): string {
-  if (node.type === 'object' && (node.additionalProperties === undefined || node.additionalProperties === false)) {
-    return member.replace(/^z\.object\(/, 'z.strictObject(')
-  }
-
-  return member
+/**
+ * A `oneOf` member that is an inline object is exhaustive, so it prints as a strict object.
+ * Marking the node lets `object()` build `z.strictObject(...)` itself, with no rewrite afterwards.
+ */
+function strictOneOfNode(node: ast.SchemaNode): ast.SchemaNode {
+  return node.type === 'object' && node.additionalProperties === undefined ? { ...node, additionalProperties: false } : node
 }
 
 function getMemberConstraintMini({ member, regexType }: { member: ast.SchemaNode; regexType: PrinterZodMiniOptions['regexType'] }): string | undefined {
@@ -264,13 +264,15 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
       },
       object(node) {
         const entries = node.properties ?? []
-        const shape = buildZodMiniObjectShape(this, node)
-        const objectBase = `z.object(${shape})`
-
         // zod/mini has no chainable `.catchall()`/`.strict()`, so route through the functional forms.
         const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
         const propertyNamesNode = 'propertyNames' in node ? (node as { propertyNames?: ast.SchemaNode }).propertyNames : undefined
         const propertyNamesKeySchema = propertyNamesNode ? this.transform(propertyNamesNode) : null
+
+        // `additionalProperties: false` still permits patternProperties keys, so only a pattern-free object is strict.
+        const isStrict = node.additionalProperties === false && patterns.length === 0
+        const shape = buildZodMiniObjectShape(this, node)
+        const objectBase = `${isStrict ? 'z.strictObject' : 'z.object'}(${shape})`
 
         if (node.additionalProperties && node.additionalProperties !== true) {
           const catchallType = this.transform(node.additionalProperties)
@@ -286,7 +288,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           }
           return `z.looseObject(${shape})`
         }
-        if (node.additionalProperties === false && patterns.length === 0) return `z.strictObject(${shape})`
+        if (isStrict) return objectBase
 
         if (patterns.length > 0) {
           const values = patterns.map(([, valueSchema]) => {
@@ -324,8 +326,8 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
       },
       union(node) {
         const nodeMembers = node.members ?? []
-        const members = mapSchemaMembers(node, (memberNode) => this.transform(memberNode))
-          .map(({ schema, output }) => (output && node.strategy === 'one' ? strictOneOfMember(output, schema) : output))
+        const members = mapSchemaMembers(node, (memberNode) => this.transform(node.strategy === 'one' ? strictOneOfNode(memberNode) : memberNode))
+          .map(({ output }) => output)
           .filter(Boolean)
         if (members.length === 0) return ''
         if (members.length === 1) return members[0]!

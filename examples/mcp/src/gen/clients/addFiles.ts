@@ -17,5 +17,9 @@ export function addFiles<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<AddFilesResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'POST', url: '/pet/files', ...config }) as Promise<RequestResult<AddFilesResponses, ThrowOnError>>)
+  return withUnwrap(
+    request({ method: 'POST', url: '/pet/files', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+      RequestResult<AddFilesResponses, ThrowOnError>
+    >,
+  )
 }

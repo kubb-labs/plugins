@@ -16,5 +16,9 @@ export function logoutUser<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<LogoutUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'GET', url: '/user/logout', ...config }) as Promise<RequestResult<LogoutUserResponses, ThrowOnError>>)
+  return withUnwrap(
+    request({ method: 'GET', url: '/user/logout', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+      RequestResult<LogoutUserResponses, ThrowOnError>
+    >,
+  )
 }

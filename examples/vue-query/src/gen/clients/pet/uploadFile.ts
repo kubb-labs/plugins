@@ -17,8 +17,12 @@ export function uploadFile<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], ...config }) as Promise<
-      RequestResult<UploadFileResponses, ThrowOnError>
-    >,
+    request({
+      method: 'POST',
+      url: '/pet/{petId}/uploadImage',
+      security: [{ type: 'oauth2' }],
+      ...config,
+      throwOnError: config.throwOnError ?? true,
+    }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>,
   )
 }

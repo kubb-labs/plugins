@@ -49,7 +49,11 @@ export function Faker({ node, description, name, typeName, printer, canOverride 
       return `data && data.length === ${node.items?.length ?? 0} && !data.includes(undefined) ? data : ${fakerText}`
     }
     if (canOverride && isArray) return `[\n  ...${fakerText},\n  ...(data || []).filter((item) => item !== undefined),\n]`
-    if (canOverride && (isScalar || isUnion)) return `data ?? ${fakerText}`
+    // `??` treats an explicit `null` as "not provided", so a nullable factory could never return
+    // the `null` its own signature promises. Only `undefined` means "generate one".
+    if (canOverride && (isScalar || isUnion)) {
+      return node.nullable ? `data !== undefined ? data : ${fakerText}` : `data ?? ${fakerText}`
+    }
     return fakerText
   })()
 

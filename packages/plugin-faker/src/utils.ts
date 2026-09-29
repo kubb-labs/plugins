@@ -199,6 +199,15 @@ function getScalarType(node: ast.SchemaNode, typeName: string): string {
 }
 
 /**
+ * A nullable scalar inlines its primitive instead of naming the generated type, so the
+ * nullability the type plugin emitted has to be reapplied here. Non-scalars keep `typeName`,
+ * which already carries it.
+ */
+function withNullability(type: string, node: ast.SchemaNode): string {
+  return node.nullable ? `${type} | null` : type
+}
+
+/**
  * Resolves faker type usage information for a schema.
  * Determines the data type, return type, and whether it uses the type name.
  */
@@ -219,13 +228,13 @@ export function resolveFakerTypeUsage(
   let dataType = `Partial<${typeName}>`
 
   if (isScalar) {
-    dataType = getScalarType(node, typeName)
+    dataType = withNullability(getScalarType(node, typeName), node)
   }
 
   let returnType = canOverride ? typeName : null
 
   if (isScalar) {
-    returnType = getScalarType(node, typeName)
+    returnType = withNullability(getScalarType(node, typeName), node)
   }
 
   return {

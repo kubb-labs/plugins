@@ -19,6 +19,7 @@ export function updatePetWithForm<ThrowOnError extends boolean = true>(
       security: [{ type: 'oauth2' }],
       validator: { response: updatePetWithFormResponseSchema, error: updatePetWithFormErrorSchema },
       ...config,
+      throwOnError: config.throwOnError ?? true,
     }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>,
   )
 }

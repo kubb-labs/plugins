@@ -1,6 +1,6 @@
 import type { UpdatePetWithFormOptions } from '../../models/ts/pet/UpdatePetWithForm'
-import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
-import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol.js'
+import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types.js'
 import { updatePetWithForm } from '../../clients/axios/petService/updatePetWithForm'
 
 /**
@@ -11,7 +11,7 @@ export async function updatePetWithFormHandler(
   { path, query }: UpdatePetWithFormOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await updatePetWithForm({ path, query, signal: request.signal })
+  const res = await updatePetWithForm({ path, query, signal: request.signal, throwOnError: true })
 
   return {
     content: [

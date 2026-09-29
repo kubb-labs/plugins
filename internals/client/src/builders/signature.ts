@@ -20,7 +20,7 @@ export type GroupedOptionsSignature = {
    */
   returnType: string
   /**
-   * The function generics. One per-call `ThrowOnError` flag, defaulting to `true`.
+   * The function generics. One per-call `ThrowOnError` flag, defaulting to the plugin setting.
    */
   generics: Array<string>
 }
@@ -38,10 +38,12 @@ export function buildGroupedOptionsSignature({
   node,
   types,
   returnType,
+  throwOnErrorDefault,
 }: {
   node: ast.OperationNode
   types: OperationTypeNames
   returnType: ReturnTypeOption
+  throwOnErrorDefault: boolean
 }): GroupedOptionsSignature {
   const optionsName = types.response.options(node)
   const { isOptional } = getRequestGroupOptionality(node)
@@ -56,6 +58,6 @@ export function buildGroupedOptionsSignature({
   return {
     paramsSignature,
     returnType: buildResultType({ node, types, returnType }),
-    generics: ['ThrowOnError extends boolean = true'],
+    generics: [`ThrowOnError extends boolean = ${throwOnErrorDefault}`],
   }
 }

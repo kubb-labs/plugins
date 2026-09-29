@@ -21,9 +21,8 @@ export type Mode = 'tag' | 'flat'
 /**
  * Shape of the value a generated operation function resolves to.
  * - `'full'`: the complete `{ status, data, error, contentType, request, response }` result.
- * - `'data'`: the bare success body once `throwOnError` (on by default) narrows away the error
- *   branch, falling back to the full result when a call sets `throwOnError: false` and still
- *   needs `error` to discriminate a failed response.
+ * - `'data'`: the bare success body when `throwOnError` is true, or the full result when it is false
+ *   so callers can inspect `error`.
  */
 export type ReturnTypeOption = 'full' | 'data'
 
@@ -69,13 +68,20 @@ export type Options = OutputOptions & {
   /**
    * Apply a different options object to operations matching a pattern.
    */
-  override?: Array<Override<ResolvedOptions>>
+  override?: Array<Override<Omit<ResolvedOptions, 'throwOnErrorDefault'>>>
   /**
    * Base URL prepended to every request. When omitted, falls back to the adapter's server URL.
    * Values containing a `${...}` interpolation are emitted as template literals in the generated
    * client config, which keeps runtime environment reads dynamic.
    */
   baseURL?: string
+  /**
+   * Default error behavior for generated operations and their client. Per-call `throwOnError`
+   * takes precedence.
+   *
+   * @default true
+   */
+  throwOnErrorDefault?: boolean
   /**
    * Validate request and response bodies with schemas from `@kubb/plugin-zod`.
    *
@@ -159,9 +165,10 @@ export type ResolvedOptions = {
   output: Output
   exclude: Array<Exclude>
   include: Array<Include> | undefined
-  override: Array<Override<ResolvedOptions>>
+  override: Array<Override<Omit<ResolvedOptions, 'throwOnErrorDefault'>>>
   group: Group | null
   baseURL: Options['baseURL']
+  throwOnErrorDefault: boolean
   validator: NonNullable<Options['validator']>
   returnType: ReturnTypeOption
   sdk:

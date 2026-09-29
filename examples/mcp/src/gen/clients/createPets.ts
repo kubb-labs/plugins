@@ -16,5 +16,9 @@ export function createPets<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<CreatePetsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'POST', url: '/pets/{uuid}', ...config }) as Promise<RequestResult<CreatePetsResponses, ThrowOnError>>)
+  return withUnwrap(
+    request({ method: 'POST', url: '/pets/{uuid}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+      RequestResult<CreatePetsResponses, ThrowOnError>
+    >,
+  )
 }

@@ -18,6 +18,7 @@ export function uploadFile<ThrowOnError extends boolean = true>(
       security: [{ type: 'oauth2' }],
       contentType: { request: 'application/octet-stream' },
       ...config,
+      throwOnError: config.throwOnError ?? true,
     }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>,
   )
 }

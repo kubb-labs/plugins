@@ -1,6 +1,6 @@
 import type { DeletePetOptions } from '../../models/ts/pet/DeletePet'
-import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
-import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol.js'
+import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types.js'
 import { deletePet } from '../../clients/axios/petService/deletePet'
 
 /**
@@ -12,7 +12,7 @@ export async function deletePetHandler(
   { path, headers }: DeletePetOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await deletePet({ path, headers, signal: request.signal })
+  const res = await deletePet({ path, headers, signal: request.signal, throwOnError: true })
 
   return {
     content: [

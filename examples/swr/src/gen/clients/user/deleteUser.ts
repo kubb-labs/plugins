@@ -17,5 +17,9 @@ export function deleteUser<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<DeleteUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'DELETE', url: '/user/{username}', ...config }) as Promise<RequestResult<DeleteUserResponses, ThrowOnError>>)
+  return withUnwrap(
+    request({ method: 'DELETE', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+      RequestResult<DeleteUserResponses, ThrowOnError>
+    >,
+  )
 }

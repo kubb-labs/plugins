@@ -14,6 +14,8 @@ export function addPet<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'POST', url: '/pet', validator: { response: AddPetResponse }, ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>,
+    request({ method: 'POST', url: '/pet', validator: { response: AddPetResponse }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+      RequestResult<AddPetResponses, ThrowOnError>
+    >,
   )
 }

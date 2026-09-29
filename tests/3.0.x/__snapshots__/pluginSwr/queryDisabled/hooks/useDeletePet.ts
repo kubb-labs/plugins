@@ -3,18 +3,36 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig } from '../.kubb/client'
-import type { DeletePetOptions } from '../types/DeletePet'
+import useSWRMutation from 'swr/mutation'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { DeletePetOptions, DeletePetResponse, DeletePetStatus400 } from '../types/DeletePet'
+import type { SWRMutationConfiguration } from 'swr/mutation'
 import { deletePet } from '../clients/deletePet'
 
-export const deletePetQueryKey = ({ path }: Omit<DeletePetOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
+export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
-type DeletePetQueryKey = ReturnType<typeof deletePetQueryKey>
+export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
 
-export function deletePetQueryOptions({ path, headers }: DeletePetOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
-  return {
-    fetcher: async () => {
+export type DeletePetMutationArg = DeletePetOptions
+
+/**
+ * @description delete a pet
+ * @summary Deletes a pet
+ * {@link /pet/:petId}
+ */
+export function useDeletePet(options: {
+  mutation?: SWRMutationConfiguration<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetMutationKey | null, DeletePetMutationArg> & { throwOnError?: boolean },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  shouldFetch?: boolean,
+} = {}) {
+  const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
+  const mutationKey = deletePetMutationKey()
+
+  return useSWRMutation<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetMutationKey | null, DeletePetMutationArg>(
+    shouldFetch ? mutationKey : null,
+    async (_url, { arg: { path, headers } }) => {
       return deletePet({ ...config, path, headers, throwOnError: true }).unwrap()
     },
-  }
+    mutationOptions
+  )
 }

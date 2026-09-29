@@ -27,6 +27,7 @@ const defaultOptions: PluginAxios['resolvedOptions'] = {
   override: [],
   group: null,
   baseURL: undefined,
+  throwOnErrorDefault: true,
   validator: false,
   returnType: 'full',
   sdk: undefined,
@@ -195,6 +196,8 @@ describe('clientGenerator operation', () => {
     { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { validator: 'zod' as const } },
     // returnType: 'data' unwraps the resolved call down to the bare success body.
     { name: 'getPetByIdWithReturnTypeData', node: getPetByIdNode, options: { returnType: 'data' as const } },
+    { name: 'getPetByIdWithReturnTypeDataWithoutThrowing', node: getPetByIdNode, options: { returnType: 'data' as const, throwOnErrorDefault: false } },
+    { name: 'getPetByIdWithoutThrowing', node: getPetByIdNode, options: { throwOnErrorDefault: false } },
     // Two requirements referencing two schemes (oauth2 bearer + apiKey header).
     { name: 'getPetByIdWithSecurity', node: getPetByIdNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginAxios['resolvedOptions']>; adapter?: Adapter }>

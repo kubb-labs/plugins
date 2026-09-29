@@ -37,6 +37,7 @@ type Props = {
    * Shape of the value the generated function resolves to.
    */
   returnType: ReturnTypeOption
+  throwOnErrorDefault: boolean
   /**
    * Per-operation security, resolved from the spec into inline `Auth` objects and serialized onto the
    * call config's `security` field for the runtime `auth` resolver to consume.
@@ -52,10 +53,21 @@ type Props = {
  * type, signature, and call config are built with the AST factory, and only the jsx-renderer emits
  * the source.
  */
-export function Operation({ name, node, types, zodResolver, validator, returnType, security, isExportable = true, isIndexable = true }: Props): KubbReactNode {
+export function Operation({
+  name,
+  node,
+  types,
+  zodResolver,
+  validator,
+  returnType,
+  throwOnErrorDefault,
+  security,
+  isExportable = true,
+  isIndexable = true,
+}: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
 
-  const signature = buildGroupedOptionsSignature({ node, types, returnType })
+  const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault })
   const validators = buildValidatorHooks({ node, validator, zodResolver })
   const securityLiteral = buildSecurityMetadata({ security })
   const stylesLiteral = buildStyles({ node })
@@ -94,6 +106,7 @@ export function Operation({ name, node, types, zodResolver, validator, returnTyp
     contentTypeLiteral,
     responseTypeLiteral,
     '...config',
+    `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`,
   ]
     .filter(Boolean)
     .join(', ')} }`
@@ -102,7 +115,7 @@ export function Operation({ name, node, types, zodResolver, validator, returnTyp
   const functionReturnType = eventStream ? `Promise<EventStreamResult<${eventType}>>` : signature.returnType
   const returnStatement = eventStream
     ? `return toEventStream<${eventType}>(request(${callConfig}))`
-    : buildReturnStatement({ node, types, callConfig, returnType })
+    : buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault })
 
   return (
     <File.Source name={name} isExportable={isExportable} isIndexable={isIndexable}>

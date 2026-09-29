@@ -112,10 +112,18 @@ export type PrinterZodOptions = {
  */
 export type PrinterZodFactory = ast.PrinterFactoryOptions<'zod', PrinterZodOptions, string, string>
 
+/**
+ * A `oneOf` member that is an inline object is exhaustive, so it prints as a strict object.
+ * Marking the node lets `object()` build `z.strictObject(...)` itself; appending `.strict()` to the
+ * printed member instead would read `.shape` eagerly and run a self-reference's deferred getter
+ * inside the temporal dead zone.
+ */
+function strictOneOfNode(node: ast.SchemaNode): ast.SchemaNode {
+  return node.type === 'object' && node.additionalProperties === undefined ? { ...node, additionalProperties: false } : node
+}
+
 function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): string {
-  if (node.type === 'object' && node.additionalProperties === undefined) {
-    return `${member}.strict()`
-  }
+  // Inline objects are already strict through their node; only a ref needs the runtime call.
 
   if (node.type === 'ref') {
     if (member.startsWith('z.lazy(')) {
@@ -283,10 +291,12 @@ export function collectDirectionalRefNames({ node, printerOptions }: { node: ast
  * Handlers that never recurse into children, so {@link variesByDirection} can call one directly
  * to probe both directions without building a printer.
  *
- * `date` is the built-in two-way conversion, decoding `string → Date` on responses and encoding
- * back on requests, keeping `date` and `date-time` precision apart. Only `representation: 'date'`
- * fields convert; ISO-string fields print `z.iso.date()` either way. A `printer.nodes.date`
- * override replaces the whole handler, direction branch included.
+ * `date` and `time` are the built-in two-way conversions, decoding `string → Date` on responses
+ * and encoding back on requests. `date` keeps `date` and `date-time` precision apart. `time` has
+ * no date component, so it decodes onto `1970-01-01` UTC and encodes back to `HH:mm:ss`, dropping
+ * fractional seconds. Only `representation: 'date'` fields convert; ISO-string fields print the
+ * matching `z.iso.*()` either way. A `printer.nodes.date` or `printer.nodes.time` override
+ * replaces the whole handler, direction branch included.
  */
 const scalarNodes: PrinterZodNodes = {
   any: () => 'z.any()',
@@ -368,7 +378,12 @@ const scalarNodes: PrinterZodNodes = {
       return 'z.iso.time()'
     }
 
-    return shouldCoerce(this.options.coercion, 'dates') ? 'z.coerce.date()' : 'z.date()'
+    if (this.options.direction === 'encode') {
+      return 'z.date().transform((value) => value.toISOString().slice(11, 19))'
+    }
+
+    // No `z.coerce.date()` branch: `new Date('13:45:00')` is an Invalid Date, so coercion cannot parse a wire time.
+    return 'z.iso.time().transform((value) => new Date(`1970-01-01T${value}Z`))'
   },
   uuid(node) {
     const base = this.options.guidType === 'guid' ? 'z.guid()' : 'z.uuid()'
@@ -442,14 +457,18 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
     },
     object(node) {
       const entries = node.properties ?? []
+      const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
+      const propertyNamesNode = 'propertyNames' in node ? (node as { propertyNames?: ast.SchemaNode }).propertyNames : undefined
+      const propertyNamesKeySchema = propertyNamesNode ? this.transform(propertyNamesNode) : null
+
+      // `additionalProperties: false` still permits patternProperties keys, so only a pattern-free object is strict.
+      // `z.strictObject(...)` rather than `z.object(...).strict()`: `.strict()` reads `.shape` eagerly, which runs a
+      // self-reference's deferred getter while its own `const` is still in the temporal dead zone.
+      const isStrict = node.additionalProperties === false && patterns.length === 0
       const shape = buildZodObjectShape(this, node)
-      const objectBase = `z.object(${shape})`
+      const objectBase = `${isStrict ? 'z.strictObject' : 'z.object'}(${shape})`
 
       const result = (() => {
-        const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
-        const propertyNamesNode = 'propertyNames' in node ? (node as { propertyNames?: ast.SchemaNode }).propertyNames : undefined
-        const propertyNamesKeySchema = propertyNamesNode ? this.transform(propertyNamesNode) : null
-
         if (node.additionalProperties && node.additionalProperties !== true) {
           const catchallType = this.transform(node.additionalProperties)
           if (entries.length === 0) {
@@ -464,8 +483,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           }
           return `z.looseObject(${shape})`
         }
-        // `additionalProperties: false` still permits patternProperties keys, so skip `.strict()` when patterns exist.
-        if (node.additionalProperties === false && patterns.length === 0) return `${objectBase}.strict()`
+        if (isStrict) return objectBase
 
         // No fixed properties: z.record enforces the key pattern. With fixed properties a record would
         // reject the declared keys, so fall back to .catchall (value validated, key pattern not).
@@ -508,7 +526,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
     },
     union(node) {
       const nodeMembers = node.members ?? []
-      const members = mapSchemaMembers(node, (memberNode) => this.transform(memberNode))
+      const members = mapSchemaMembers(node, (memberNode) => this.transform(node.strategy === 'one' ? strictOneOfNode(memberNode) : memberNode))
         .map(({ schema, output }) => (output && node.strategy === 'one' ? strictOneOfMember(output, schema, cyclicSchemaNames) : output))
         .filter(Boolean)
       if (members.length === 0) return ''

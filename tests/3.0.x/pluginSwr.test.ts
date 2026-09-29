@@ -247,6 +247,15 @@ describe(`plugin-swr options ${version}`, () => {
     expect(files.length).toBeGreaterThan(0)
     expect(Diagnostics.hasError(diagnostics)).toBe(false)
 
+    if (name === 'queryDisabled') {
+      const hookFiles = files
+        .map((file) => getRelativePath(output, file.path))
+        .filter((filePath) => filePath.startsWith('./hooks/'))
+        .sort()
+
+      expect(hookFiles).toEqual(['./hooks/useAddPet.ts', './hooks/useDeletePet.ts', './hooks/usePlaceOrder.ts', './hooks/useUploadFile.ts'])
+    }
+
     for (const file of files) {
       try {
         const fileContent = await fs.readFile(file.path, 'utf-8')

@@ -1,5 +1,11 @@
 # @kubb/plugin-faker
 
+## 5.0.11
+
+### Patch Changes
+
+- [#932](https://github.com/kubb-labs/plugins/pull/932) [`2629dcb`](https://github.com/kubb-labs/plugins/commit/2629dcbba0fcc7249a9b7e656a97187b8e63b88b) Thanks [@mohammad-naji7](https://github.com/mohammad-naji7)! - Keep `nullable` on a scalar schema. A nullable scalar inlines its primitive rather than naming the generated type, so the factory declared `(data?: string): string` for a schema the type plugin emitted as `string | null`. The factory could not express or return a null fixture, and an MSW handler generated with `parser: 'faker'` failed to compile because it passes its own `T | null` straight into it. The signature now carries the nullability, and a nullable factory returns an explicitly supplied `null` instead of treating it as "not provided".
+
 ## 5.0.10
 
 ### Patch Changes

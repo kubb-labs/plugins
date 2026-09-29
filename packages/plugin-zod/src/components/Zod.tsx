@@ -1,8 +1,10 @@
-import type { ast } from 'kubb/kit'
+import { ast, containsCircularRef } from 'kubb/kit'
 import { Const, File, Function, Type } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { PrinterZodFactory } from '../printers/printerZod.ts'
 import type { PrinterZodMiniFactory } from '../printers/printerZodMini.ts'
+
+import type { CompileOptions } from '../types.ts'
 
 type Props = {
   name: string
@@ -24,9 +26,16 @@ type Props = {
    * explicit `z.ZodType` to break the inference cycle.
    */
   cyclic?: boolean
+  /**
+   * Wrap the schema initializer in `z.compile(...)` for fast-path validation.
+   * Pass `{ strict: true }` to enforce strict compilation without silent fallback.
+   *
+   * @note Only compatible with Zod v4.5.0 or above.
+   */
+  compile?: boolean | CompileOptions
 }
 
-export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, assertName, mini, cyclic }: Props): KubbReactNode {
+export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, assertName, mini, cyclic, compile }: Props): KubbReactNode {
   const output = printer.print(node)
 
   if (!output) {
@@ -38,6 +47,11 @@ export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, as
   // only strip the `ZodObject` methods (`.omit()`, `.strict()`). Only non-object cyclic schemas (a
   // union/array with a top-level `z.lazy(() => self)`) are implicitly `any` and need the annotation.
   const needsAnnotation = cyclic && node.type !== 'object'
+  const isBare = ast.isBareRef(node, printer.options.keysToOmit)
+  const isCyclic = Boolean(cyclic || (printer.options.cyclicSchemas && containsCircularRef(node, { circularSchemas: printer.options.cyclicSchemas })))
+  const shouldCompile = Boolean(compile) && !isBare && !isCyclic
+  const value = shouldCompile ? (typeof compile === 'object' && compile.strict ? `z.compile(${output}, { strict: true })` : `z.compile(${output})`) : output
+
   const targetType = inferTypeName ?? `z.infer<typeof ${name}>`
   const shouldGenerateIs = isName && (typeof typeGuards === 'object' ? (typeGuards.is ?? true) : Boolean(typeGuards))
   const shouldGenerateAssert = assertName && (typeof typeGuards === 'object' ? (typeGuards.assert ?? true) : Boolean(typeGuards))
@@ -46,7 +60,7 @@ export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, as
     <>
       <File.Source name={name} isExportable isIndexable>
         <Const export name={name} type={needsAnnotation ? 'z.ZodType' : undefined}>
-          {output}
+          {value}
         </Const>
       </File.Source>
       {inferTypeName && (

@@ -1,5 +1,31 @@
 # @kubb/plugin-zod
 
+## 5.3.0
+
+### Minor Changes
+
+- [#918](https://github.com/kubb-labs/plugins/pull/918) [`79a56d3`](https://github.com/kubb-labs/plugins/commit/79a56d38a1be217f8dd83ed5fccd41140edb0b1b) Thanks [@xeoneux](https://github.com/xeoneux)! - Add `compile` option to compile generated schemas with `z.compile(...)` for faster runtime validation.
+  
+  When `compile: true` or `compile: { strict: true }` is enabled, schemas are wrapped in `z.compile(...)`, leveraging Zod v4.5's hyperoptimized fast-path validation logic. Passing `{ strict: true }` enforces that schemas compile into flat JavaScript without silently falling back to the standard interpreter. Schemas with circular references or bare `$ref` aliases are automatically guarded and left uncompiled. Compatible with Zod v4.5.0 or above.
+
+### Patch Changes
+
+- [#804](https://github.com/kubb-labs/plugins/pull/804) [`26660b6`](https://github.com/kubb-labs/plugins/commit/26660b68c3f19744a72b5c0bb3010357f6a7d6eb) Thanks [@xeoneux](https://github.com/xeoneux)! - Resolve `$ref` schemas when computing `default` literals and keep array defaults as array literals.
+  
+  `defaultLiteral` now resolves `$ref` schema targets so that array, bigint, and enum default formatting guards apply to referenced schemas. In addition, `formatDefault` preserves array literals instead of collapsing them to `{}`.
+
+## 5.2.2
+
+### Patch Changes
+
+- [#950](https://github.com/kubb-labs/plugins/pull/950) [`38f0616`](https://github.com/kubb-labs/plugins/commit/38f0616127d6bcd7d5af33fac2a4f97069c8cb66) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - `format: time` fields with `dateType.time: 'date'` now decode a wire `HH:mm:ss` string into a `Date` on `1970-01-01` UTC and encode it back to `HH:mm:ss` on requests, instead of printing `z.date()` both ways and rejecting every real time value. A component whose only `Date` field is a `time` now gets its `InputSchema` variant, and `coercion.dates` no longer turns `time` into `z.coerce.date()`, which cannot parse a bare time.
+
+## 5.2.1
+
+### Patch Changes
+
+- [#931](https://github.com/kubb-labs/plugins/pull/931) [`e0ffc2e`](https://github.com/kubb-labs/plugins/commit/e0ffc2e090a6702e14db9a73fbdda0c129e91310) Thanks [@mohammad-naji7](https://github.com/mohammad-naji7)! - Emit `z.strictObject({ ... })` instead of `z.object({ ... }).strict()` for `additionalProperties: false`. A schema that references itself defers the self-reference as a property getter, and `.strict()` reads `.shape` eagerly, so it ran that getter while the schema's own `const` was still in the temporal dead zone — the generated module threw `ReferenceError: Cannot access 'X' before initialization` on import, taking the barrel file with it. Same validation, no eager read, and it matches what the Zod Mini printer already emits.
+
 ## 5.2.0
 
 ### Minor Changes

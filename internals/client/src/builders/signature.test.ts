@@ -30,24 +30,29 @@ const listPets = ast.factory.createOperation({
 })
 
 describe('buildGroupedOptionsSignature', () => {
+  test('uses the configured default for an omitted throwOnError option', () => {
+    const signature = buildGroupedOptionsSignature({ node: addPet, types: resolverTs, returnType: 'full', throwOnErrorDefault: false })
+    expect(signature.generics).toStrictEqual(['ThrowOnError extends boolean = false'])
+  })
+
   test('emits a single grouped options parameter with a ThrowOnError generic', () => {
-    const signature = buildGroupedOptionsSignature({ node: addPet, types: resolverTs, returnType: 'full' })
+    const signature = buildGroupedOptionsSignature({ node: addPet, types: resolverTs, returnType: 'full', throwOnErrorDefault: true })
     expect(signature.paramsSignature).toBe('options: Options<AddPetOptions, ThrowOnError>')
     expect(signature.generics).toStrictEqual(['ThrowOnError extends boolean = true'])
   })
 
   test('defaults the options parameter when the operation has no required request data', () => {
-    const signature = buildGroupedOptionsSignature({ node: listPets, types: resolverTs, returnType: 'full' })
+    const signature = buildGroupedOptionsSignature({ node: listPets, types: resolverTs, returnType: 'full', throwOnErrorDefault: true })
     expect(signature.paramsSignature).toBe('options: Options<ListPetsOptions, ThrowOnError> = {}')
   })
 
   test('keys the return type on the plugin-ts per-status responses record, wrapped in Unwrappable', () => {
-    const signature = buildGroupedOptionsSignature({ node: addPet, types: resolverTs, returnType: 'full' })
+    const signature = buildGroupedOptionsSignature({ node: addPet, types: resolverTs, returnType: 'full', throwOnErrorDefault: true })
     expect(signature.returnType).toBe('Unwrappable<RequestResult<AddPetResponses, ThrowOnError>>')
   })
 
   test('keys the return type on UnwrappedResult when returnType is data', () => {
-    const signature = buildGroupedOptionsSignature({ node: addPet, types: resolverTs, returnType: 'data' })
+    const signature = buildGroupedOptionsSignature({ node: addPet, types: resolverTs, returnType: 'data', throwOnErrorDefault: true })
     expect(signature.returnType).toBe('Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>')
   })
 })

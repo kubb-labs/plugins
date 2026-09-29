@@ -18,8 +18,12 @@ export function getPetById<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], ...config }) as Promise<
-      RequestResult<GetPetByIdResponses, ThrowOnError>
-    >,
+    request({
+      method: 'GET',
+      url: '/pet/{petId}',
+      security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }],
+      ...config,
+      throwOnError: config.throwOnError ?? true,
+    }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>,
   )
 }

@@ -20,6 +20,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
       security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }],
       validator: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema },
       ...config,
+      throwOnError: config.throwOnError ?? true,
     }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>,
   )
 }

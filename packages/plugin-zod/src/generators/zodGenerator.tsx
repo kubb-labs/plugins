@@ -98,7 +98,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, regexType, mini, inferred, typeGuards, importPath, group, printer } = ctx.options
+    const { output, coercion, guidType, regexType, compile, mini, inferred, typeGuards, importPath, group, printer } = ctx.options
     const dateType = getOasAdapter(adapter).options.dateType
 
     if (!node.name) {
@@ -163,6 +163,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
           assertName={assertName}
           mini={mini}
           cyclic={cyclicSchemas.has(node.name)}
+          compile={compile}
         />
         {hasDirectionalNode && stdPrinters && (
           <Zod
@@ -175,6 +176,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
             assertName={typeGuards ? resolver.schema.assertName(resolver.schema.inputName(node.name)) : null}
             mini={mini}
             cyclic={cyclicSchemas.has(node.name)}
+            compile={compile}
           />
         )}
       </File>
@@ -183,7 +185,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, regexType, mini, inferred, importPath, group, printer } = ctx.options
+    const { output, coercion, guidType, regexType, compile, mini, inferred, importPath, group, printer } = ctx.options
     const dateType = getOasAdapter(adapter).options.dateType
 
     const isZodImport = ZOD_NAMESPACE_IMPORTS.has(importPath as 'zod' | 'zod/mini')
@@ -246,7 +248,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
               `z.ZodType` annotation at their own definition when cyclic. Annotating the operation
               schema too would only erase its inferred type to `unknown`, breaking typed consumers
               (e.g. the MCP server's request types), so it is never marked cyclic here. */}
-          <Zod name={name} node={schema} printer={schemaPrinter} inferTypeName={inferTypeName} cyclic={false} />
+          <Zod name={name} node={schema} printer={schemaPrinter} inferTypeName={inferTypeName} cyclic={false} compile={compile} />
         </>
       )
     }

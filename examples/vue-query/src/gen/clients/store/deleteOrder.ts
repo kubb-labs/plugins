@@ -17,5 +17,9 @@ export function deleteOrder<ThrowOnError extends boolean = true>(
 ): Unwrappable<RequestResult<DeleteOrderResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'DELETE', url: '/store/order/{orderId}', ...config }) as Promise<RequestResult<DeleteOrderResponses, ThrowOnError>>)
+  return withUnwrap(
+    request({ method: 'DELETE', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+      RequestResult<DeleteOrderResponses, ThrowOnError>
+    >,
+  )
 }

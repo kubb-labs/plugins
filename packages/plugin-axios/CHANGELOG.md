@@ -1,5 +1,32 @@
 # @kubb/plugin-axios
 
+## 5.5.1
+
+### Patch Changes
+
+- [#952](https://github.com/kubb-labs/plugins/pull/952) [`a1593ce`](https://github.com/kubb-labs/plugins/commit/a1593ce7d307d63bd2e424e1df790fe41db46bf2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Emit `.kubb/client.ts` with `copy`, so the parser's `extension` option now reaches the runtime imports through the parser `copy` hook added in kubb 5.3.15, instead of a regex over the template. The generated runtime header follows the same import order as other generated files.
+
+## 5.5.0
+
+### Minor Changes
+
+- [#941](https://github.com/kubb-labs/plugins/pull/941) [`dd521c1`](https://github.com/kubb-labs/plugins/commit/dd521c12d69e5ee35268ea010f60961881a93c2b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Set generated Fetch and Axios operations' error behavior and return types together with `throwOnErrorDefault`.
+  Copied Fetch and Axios runtimes now follow the TypeScript parser's import extension setting, including `.ts` for Node's native TypeScript execution.
+  
+  ```typescript
+  pluginFetch({ throwOnErrorDefault: false })
+  // or pluginAxios({ throwOnErrorDefault: false })
+  
+  const result = await getPetById({ path: { petId: 1 } })
+  if (result.error) console.error(result.error)
+  ```
+
+## 5.4.2
+
+### Patch Changes
+
+- [#935](https://github.com/kubb-labs/plugins/pull/935) [`7215b46`](https://github.com/kubb-labs/plugins/commit/7215b465664eb082a936b0cb6564e3c2f8197c5c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Pass each call's `RequestConfig` to client interceptors and apply the configured TypeScript parser extension to runtime imports.
+
 ## 5.4.1
 
 ### Patch Changes

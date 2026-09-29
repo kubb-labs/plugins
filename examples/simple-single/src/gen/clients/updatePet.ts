@@ -18,6 +18,8 @@ export function updatePet<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'PUT', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>,
+    request({ method: 'PUT', url: '/pet', security: [{ type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+      RequestResult<UpdatePetResponses, ThrowOnError>
+    >,
   )
 }

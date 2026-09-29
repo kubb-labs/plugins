@@ -20,6 +20,7 @@ export function findPetsByStatus<ThrowOnError extends boolean = true>(
       security: [{ type: 'oauth2' }],
       validator: { response: findPetsByStatusResponseSchema, error: findPetsByStatusErrorSchema },
       ...config,
+      throwOnError: config.throwOnError ?? true,
     }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>,
   )
 }

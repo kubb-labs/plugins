@@ -18,6 +18,8 @@ export function createUsersWithListInput<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'POST', url: '/user/createWithList', ...config }) as Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>>,
+    request({ method: 'POST', url: '/user/createWithList', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+      RequestResult<CreateUsersWithListInputResponses, ThrowOnError>
+    >,
   )
 }
