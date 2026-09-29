@@ -275,6 +275,9 @@ export function containsDirectionalNode({
   if ('items' in node && node.items) children.push(...node.items)
   if ('members' in node && node.members) children.push(...node.members)
   if ('additionalProperties' in node && node.additionalProperties && node.additionalProperties !== true) children.push(node.additionalProperties)
+  if ('propertyNames' in node && (node as { propertyNames?: ast.SchemaNode }).propertyNames) {
+    children.push((node as { propertyNames?: ast.SchemaNode }).propertyNames)
+  }
 
   return children.some((child) => containsDirectionalNode({ node: child, printerOptions, seen }))
 }
@@ -482,13 +485,11 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           }
           return catchallType ? `${objectBase}.catchall(${catchallType})` : objectBase
         }
-        if (node.additionalProperties === true) {
-          if (entries.length === 0 && propertyNamesKeySchema) {
-            const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
-            return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
-          }
-          return objectBase
+        if (entries.length === 0 && propertyNamesKeySchema) {
+          const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+          return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
         }
+        if (node.additionalProperties === true) return objectBase
         if (isStrict) return objectBase
 
         // No fixed properties: z.record enforces the key pattern. With fixed properties a record would
@@ -503,10 +504,6 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
 
           if (entries.length > 0) return `${objectBase}.catchall(${value})`
           return `z.record(${patternKeySchema({ patterns: patterns.map(([pattern]) => pattern), regexType: this.options.regexType })}, ${value})`
-        }
-
-        if (entries.length === 0 && propertyNamesKeySchema) {
-          return `${recordFn}(${propertyNamesKeySchema}, ${this.transform(ast.factory.createSchema({ type: 'unknown' }))!})`
         }
 
         return objectBase

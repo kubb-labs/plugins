@@ -812,10 +812,7 @@ describe('isClosedKeySchema', () => {
   test('returns false for union containing a string schema', () => {
     const node = ast.factory.createSchema({
       type: 'union',
-      members: [
-        ast.factory.createSchema({ type: 'enum', enumValues: ['admin'] }),
-        ast.factory.createSchema({ type: 'string' }),
-      ],
+      members: [ast.factory.createSchema({ type: 'enum', enumValues: ['admin'] }), ast.factory.createSchema({ type: 'string' })],
     })
     expect(isClosedKeySchema(node)).toBe(false)
   })
@@ -853,4 +850,3 @@ describe('isClosedKeySchema', () => {
     expect(isClosedKeySchema(refToString)).toBe(false)
   })
 })
-

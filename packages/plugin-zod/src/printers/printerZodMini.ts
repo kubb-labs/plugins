@@ -287,13 +287,11 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           }
           return catchallType ? `z.catchall(${objectBase}, ${catchallType})` : objectBase
         }
-        if (node.additionalProperties === true) {
-          if (entries.length === 0 && propertyNamesKeySchema) {
-            const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
-            return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
-          }
-          return objectBase
+        if (entries.length === 0 && propertyNamesKeySchema) {
+          const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+          return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
         }
+        if (node.additionalProperties === true) return objectBase
         if (isStrict) return objectBase
 
         if (patterns.length > 0) {
@@ -306,10 +304,6 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
 
           if (entries.length > 0) return `z.catchall(${objectBase}, ${value})`
           return `z.record(${patternKeySchemaMini({ patterns: patterns.map(([pattern]) => pattern), regexType: this.options.regexType })}, ${value})`
-        }
-
-        if (entries.length === 0 && propertyNamesKeySchema) {
-          return `${recordFn}(${propertyNamesKeySchema}, ${this.transform(ast.factory.createSchema({ type: 'unknown' }))!})`
         }
 
         return objectBase

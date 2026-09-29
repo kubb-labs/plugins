@@ -624,6 +624,121 @@ describe('printerZod', () => {
       expect(printer.print(node)).toBe('z.looseObject({\n  id: z.int(),\n}).nullable()')
     })
 
+    test('object with propertyNames minLength and maxLength constraints → z.record(z.string().min(2).max(10), schema)', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        propertyNames: ast.factory.createSchema({ type: 'string', min: 2, max: 10 }),
+        additionalProperties: ast.factory.createSchema({ type: 'string' }),
+      } as any)
+      expect(printer.print(node)).toBe('z.record(z.string().min(2).max(10), z.string())')
+
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(z)
+      expect(schema.safeParse({ ab: 'hello', abcdefghij: 'world' }).success).toBe(true)
+      expect(schema.safeParse({ a: 'too short' }).success).toBe(false)
+      expect(schema.safeParse({ abcdefghijk: 'too long' }).success).toBe(false)
+    })
+
+    test('object with propertyNames enum and nullable dictionary → z.partialRecord(...).nullable()', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        propertyNames: ast.factory.createSchema({ type: 'enum', enumValues: ['read', 'write'] }),
+        additionalProperties: ast.factory.createSchema({ type: 'boolean' }),
+        nullable: true,
+      } as any)
+      expect(printer.print(node)).toBe("z.partialRecord(z.enum(['read', 'write']), z.boolean()).nullable()")
+
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(z)
+      expect(schema.safeParse(null).success).toBe(true)
+      expect(schema.safeParse({ read: true }).success).toBe(true)
+      expect(schema.safeParse({ other: true }).success).toBe(false)
+    })
+
+    test('object property with partialRecord marked optional → z.partialRecord(...).optional()', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [
+          ast.factory.createProperty({
+            name: 'permissions',
+            required: false,
+            schema: ast.factory.createSchema({
+              type: 'object',
+              primitive: 'object',
+              properties: [],
+              propertyNames: ast.factory.createSchema({ type: 'enum', enumValues: ['admin', 'guest'] }),
+              additionalProperties: ast.factory.createSchema({ type: 'boolean' }),
+            } as any),
+          }),
+        ],
+      })
+      expect(printer.print(node)).toBe("z.object({\n  permissions: z.partialRecord(z.enum(['admin', 'guest']), z.boolean()).optional(),\n})")
+    })
+
+    test('array of records → z.array(z.record(...))', () => {
+      const node = ast.factory.createSchema({
+        type: 'array',
+        items: [
+          ast.factory.createSchema({
+            type: 'object',
+            primitive: 'object',
+            properties: [],
+            additionalProperties: ast.factory.createSchema({ type: 'number' }),
+          }),
+        ],
+      })
+      expect(printer.print(node)).toBe('z.array(z.record(z.string(), z.number()))')
+
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(z)
+      expect(schema.safeParse([{ a: 1, b: 2 }, { c: 3 }]).success).toBe(true)
+      expect(schema.safeParse([{ a: 'invalid' }]).success).toBe(false)
+    })
+
+    test('array of looseObjects → z.array(z.looseObject(...))', () => {
+      const node = ast.factory.createSchema({
+        type: 'array',
+        items: [
+          ast.factory.createSchema({
+            type: 'object',
+            primitive: 'object',
+            properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+            additionalProperties: true,
+          }),
+        ],
+      })
+      expect(printer.print(node)).toBe('z.array(z.looseObject({\n  id: z.int(),\n}))')
+
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(z)
+      expect(schema.safeParse([{ id: 1, extraKey: 'allowed' }]).success).toBe(true)
+    })
+
+    test('nested dictionary: record of records → z.record(z.string(), z.record(z.string(), z.boolean()))', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        additionalProperties: ast.factory.createSchema({
+          type: 'object',
+          primitive: 'object',
+          properties: [],
+          additionalProperties: ast.factory.createSchema({ type: 'boolean' }),
+        }),
+      })
+      expect(printer.print(node)).toBe('z.record(z.string(), z.record(z.string(), z.boolean()))')
+
+      const code = printer.print(node)
+      const schema = new Function('z', `return ${code}`)(z)
+      expect(schema.safeParse({ outer: { inner: true } }).success).toBe(true)
+      expect(schema.safeParse({ outer: { inner: 'not boolean' } }).success).toBe(false)
+    })
+
     test('object with patternProperties → z.record(regex key, value)', () => {
       const node = ast.factory.createSchema({
         type: 'object',

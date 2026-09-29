@@ -519,6 +519,86 @@ describe('zodGenerator — Schema', () => {
     const source = rawSources(driver.fileManager.files).join('\n')
     expect(source).toContain("export const roleMapSchema = z.partialRecord(z.enum(['admin', 'editor']), z.string())")
   })
+
+  test('dictionary with propertyNames in mini mode generates z.record with key schema', async () => {
+    const propertyNamesSchema = ast.factory.createSchema({
+      type: 'object',
+      primitive: 'object',
+      name: 'UserMap',
+      properties: [],
+      propertyNames: ast.factory.createSchema({ type: 'string', pattern: '^[a-z]+$' }),
+      additionalProperties: ast.factory.createSchema({ type: 'integer' }),
+    } as any)
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, mini: true, importPath: 'zod/mini' }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'propertyNamesMini' })
+
+    await renderGeneratorSchema(zodGenerator, propertyNamesSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain("import * as z from 'zod/mini'")
+    expect(source).toContain('export const userMapSchema = z.record(z.string().check(z.regex(/^[a-z]+$/)), z.int())')
+  })
+
+  test('dictionary with enum propertyNames in mini mode generates z.partialRecord', async () => {
+    const propertyNamesSchema = ast.factory.createSchema({
+      type: 'object',
+      primitive: 'object',
+      name: 'RoleMap',
+      properties: [],
+      propertyNames: ast.factory.createSchema({ type: 'enum', enumValues: ['admin', 'editor'] }),
+      additionalProperties: ast.factory.createSchema({ type: 'string' }),
+    } as any)
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, mini: true, importPath: 'zod/mini' }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'propertyNamesEnumMini' })
+
+    await renderGeneratorSchema(zodGenerator, propertyNamesSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain("import * as z from 'zod/mini'")
+    expect(source).toContain("export const roleMapSchema = z.partialRecord(z.enum(['admin', 'editor']), z.string())")
+  })
+
+  test('looseObject in mini mode generates z.looseObject', async () => {
+    const looseSchema = ast.factory.createSchema({
+      type: 'object',
+      primitive: 'object',
+      name: 'DynamicConfig',
+      properties: [ast.factory.createProperty({ name: 'env', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+      additionalProperties: true,
+    })
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, mini: true, importPath: 'zod/mini' }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'looseObjectMini' })
+
+    await renderGeneratorSchema(zodGenerator, looseSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain("import * as z from 'zod/mini'")
+    expect(source).toContain('export const dynamicConfigSchema = z.looseObject({\n  env: z.string(),\n})')
+  })
 })
 
 describe('zodGenerator — Operation', () => {
@@ -1607,5 +1687,132 @@ describe('zodGenerator — Compile Option', () => {
     // Cyclic schema must NOT be wrapped in z.compile, preventing runtime strict compilation failures
     expect(source).not.toContain('z.compile(')
     expect(source).toContain('export const treeNodeSchema')
+  })
+
+  test('compile option on dictionary wraps in z.compile(z.record(...))', async () => {
+    const dictionarySchema = ast.factory.createSchema({
+      type: 'object',
+      primitive: 'object',
+      name: 'TagsMap',
+      properties: [],
+      additionalProperties: ast.factory.createSchema({ type: 'string' }),
+    })
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: true }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'compileDictionary' })
+
+    await renderGeneratorSchema(zodGenerator, dictionarySchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('export const tagsMapSchema = z.compile(z.record(z.string(), z.string()))')
+  })
+
+  test('compile option on enum propertyNames dictionary wraps in z.compile(z.partialRecord(...))', async () => {
+    const enumRecordSchema = ast.factory.createSchema({
+      type: 'object',
+      primitive: 'object',
+      name: 'PermissionsMap',
+      properties: [],
+      propertyNames: ast.factory.createSchema({ type: 'enum', enumValues: ['read', 'write'] }),
+      additionalProperties: ast.factory.createSchema({ type: 'boolean' }),
+    } as any)
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: true }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'compilePartialRecord' })
+
+    await renderGeneratorSchema(zodGenerator, enumRecordSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain("export const permissionsMapSchema = z.compile(z.partialRecord(z.enum(['read', 'write']), z.boolean()))")
+  })
+
+  test('compile option on looseObject wraps in z.compile(z.looseObject(...))', async () => {
+    const looseSchema = ast.factory.createSchema({
+      type: 'object',
+      primitive: 'object',
+      name: 'OpenPayload',
+      properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+      additionalProperties: true,
+    })
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: true }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'compileLooseObject' })
+
+    await renderGeneratorSchema(zodGenerator, looseSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('export const openPayloadSchema = z.compile(z.looseObject({')
+  })
+
+  test('compile with { strict: true } on looseObject wraps with { strict: true }', async () => {
+    const looseSchema = ast.factory.createSchema({
+      type: 'object',
+      primitive: 'object',
+      name: 'OpenConfig',
+      properties: [ast.factory.createProperty({ name: 'key', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+      additionalProperties: true,
+    })
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: { strict: true } }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'compileStrictLoose' })
+
+    await renderGeneratorSchema(zodGenerator, looseSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('export const openConfigSchema = z.compile(z.looseObject({\n  key: z.string(),\n}), { strict: true })')
+  })
+
+  test('compile option on dictionary in mini mode wraps in z.compile(z.record(...))', async () => {
+    const dictionarySchema = ast.factory.createSchema({
+      type: 'object',
+      primitive: 'object',
+      name: 'MiniMap',
+      properties: [],
+      additionalProperties: ast.factory.createSchema({ type: 'integer' }),
+    })
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: true, mini: true, importPath: 'zod/mini' }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'compileMiniDictionary' })
+
+    await renderGeneratorSchema(zodGenerator, dictionarySchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain("import * as z from 'zod/mini'")
+    expect(source).toContain('export const miniMapSchema = z.compile(z.record(z.string(), z.int()))')
   })
 })
