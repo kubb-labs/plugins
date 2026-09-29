@@ -1,10 +1,10 @@
 import { createSdkGenerator, resolverClient, type SecurityDocument } from '@internals/client'
 import type { Adapter, Config } from 'kubb/kit'
-import { ast, memoryStorage } from 'kubb/kit'
+import { ast, Diagnostics, memoryStorage } from 'kubb/kit'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperations } from 'kubb/kit/testing'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
-import { describe, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { matchFiles } from '#mocks'
 import type { PluginFetch } from '../types.ts'
 
@@ -148,5 +148,31 @@ describe('sdkGenerator operations', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('sdkGenerator operations invalid options', () => {
+  test('throws KUBB_INVALID_PLUGIN_OPTIONS for sdk.mode: "tag" with output.mode: "file"', async () => {
+    const options: PluginFetch['resolvedOptions'] = {
+      ...defaultOptions,
+      output: { ...defaultOptions.output, path: 'clients.ts', mode: 'file' },
+      sdk: { mode: 'tag', name: undefined },
+    }
+    const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options, resolver: resolverClient })
+    const driver = createMockedPluginDriver({
+      name: 'invalidSdkModeTagWithOutputModeFile',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await expect(
+      renderGeneratorOperations(createSdkGenerator<PluginFetch>(), operationNodes, {
+        config: testConfig,
+        adapter: createMockedAdapter(),
+        driver,
+        plugin,
+        options,
+        resolver: resolverClient,
+      }),
+    ).rejects.toSatisfy((error: unknown) => Diagnostics.isError(error) && error.diagnostic.code === Diagnostics.code.invalidPluginOptions)
   })
 })

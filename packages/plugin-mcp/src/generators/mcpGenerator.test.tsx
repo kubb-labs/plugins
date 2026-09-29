@@ -8,6 +8,7 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
 import { matchFiles, rawSources } from '#mocks'
+import { McpHandler } from '../components/McpHandler.tsx'
 import { resolverMcp } from '../resolvers/resolverMcp.ts'
 import type { PluginMcp } from '../types.ts'
 import { mcpGenerator } from './mcpGenerator.tsx'
@@ -45,14 +46,15 @@ const mockedAxiosPlugin = createMockedPlugin({
   resolver: resolverClient,
 })
 
-// The generator looks plugins up by name: plugin-ts for the request types, plugin-axios for the
+// The generator looks plugins up by name: plugin-ts for the request types, the client plugin for the
 // contract `<op>`. The built-in mock is name-agnostic, so dispatch on the name here.
-function createMultiPluginDriver(name: string) {
+function createMultiPluginDriver(name: string, clientPlugin: { name?: string; resolver?: unknown } = mockedAxiosPlugin) {
   const driver = createMockedPluginDriver({
     name,
     plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
   })
-  const byName = { 'plugin-ts': mockedTsPlugin, 'plugin-axios': mockedAxiosPlugin } as Record<string, { resolver?: unknown }>
+  const clientPluginName = clientPlugin.name ?? 'plugin-axios'
+  const byName = { 'plugin-ts': mockedTsPlugin, [clientPluginName]: clientPlugin } as Record<string, { resolver?: unknown }>
   return {
     ...driver,
     getPlugin: (pluginName: string) => byName[pluginName] ?? mockedTsPlugin,
@@ -167,5 +169,195 @@ describe('mcpGenerator — Operation', () => {
     }
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe("mcpGenerator — the client plugin's returnType", () => {
+  const node = ast.factory.createOperation({
+    operationId: 'getPets',
+    method: 'GET',
+    path: '/pets',
+    tags: ['pets'],
+    responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Pets' })],
+  })
+
+  async function renderHandler(returnType: 'full' | 'data' | undefined) {
+    const axiosPlugin = createMockedPlugin({
+      name: 'plugin-axios',
+      options: { output: { path: './clients', mode: 'directory' }, group: null, returnType } as unknown as PluginTs['resolvedOptions'],
+      resolver: resolverClient,
+    })
+    const driver = createMultiPluginDriver('getPets', axiosPlugin)
+    const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options: defaultOptions, resolver: resolverMcp })
+
+    await renderGeneratorOperation(mcpGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverMcp,
+    })
+
+    return rawSources(driver.fileManager.files).join('\n')
+  }
+
+  // Pinning throwOnError keeps the result shape fixed under a client `throwOnErrorDefault: false`.
+  test.each([undefined, 'full', 'data'] as const)('calls the client with throwOnError: true (returnType %s)', async (returnType) => {
+    expect(await renderHandler(returnType)).toContain('await getPets({ signal: request.signal, throwOnError: true })')
+  })
+
+  test("reads the body off the full result when the client returns 'full'", async () => {
+    const source = await renderHandler('full')
+
+    expect(source).toContain('text: JSON.stringify(res.data)')
+    expect(source).toContain('structuredContent: { data: res.data }')
+  })
+
+  test("uses the call result as the body when the client returns 'data'", async () => {
+    const source = await renderHandler('data')
+
+    expect(source).toContain('text: JSON.stringify(res)')
+    expect(source).toContain('structuredContent: { data: res }')
+    expect(source).not.toContain('res.data')
+  })
+
+  test('passes path and query params along with signal and throwOnError: true', async () => {
+    const nodeWithParams = ast.factory.createOperation({
+      operationId: 'getPetById',
+      method: 'GET',
+      path: '/pets/{id}',
+      tags: ['pets'],
+      parameters: [
+        ast.factory.createParameter({ name: 'id', in: 'path', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({ name: 'fields', in: 'query', required: false, schema: ast.factory.createSchema({ type: 'string' }) }),
+      ],
+      responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Pet' })],
+    })
+
+    const axiosPlugin = createMockedPlugin({
+      name: 'plugin-axios',
+      options: { output: { path: './clients', mode: 'directory' }, group: null, returnType: 'data' } as unknown as PluginTs['resolvedOptions'],
+      resolver: resolverClient,
+    })
+    const driver = createMultiPluginDriver('getPetById', axiosPlugin)
+    const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options: defaultOptions, resolver: resolverMcp })
+
+    await renderGeneratorOperation(mcpGenerator, nodeWithParams, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverMcp,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('await getPetById({ path, query, signal: request.signal, throwOnError: true })')
+    expect(source).toContain('text: JSON.stringify(res)')
+  })
+
+  test('resolves returnType from plugin-fetch client when plugin-fetch is registered', async () => {
+    const fetchPlugin = createMockedPlugin({
+      name: 'plugin-fetch',
+      options: { output: { path: './clients', mode: 'directory' }, group: null, returnType: 'data' } as unknown as PluginTs['resolvedOptions'],
+      resolver: resolverClient,
+    })
+    const driver = createMultiPluginDriver('getPets', fetchPlugin)
+    const plugin = createMockedPlugin<PluginMcp>({
+      name: 'plugin-mcp',
+      options: { ...defaultOptions, client: { kind: 'contract', pluginName: 'plugin-fetch' } },
+      resolver: resolverMcp,
+    })
+
+    await renderGeneratorOperation(mcpGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: { ...defaultOptions, client: { kind: 'contract', pluginName: 'plugin-fetch' } },
+      resolver: resolverMcp,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('await getPets({ signal: request.signal, throwOnError: true })')
+    expect(source).toContain('text: JSON.stringify(res)')
+    expect(source).toContain('structuredContent: { data: res }')
+  })
+
+  test('passes body along with signal and throwOnError: true for operations with a request body', async () => {
+    const nodeWithBody = ast.factory.createOperation({
+      operationId: 'createPet',
+      method: 'POST',
+      path: '/pets',
+      tags: ['pets'],
+      requestBody: {
+        description: 'Pet to add',
+        content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+      },
+      responses: [
+        ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Created' }),
+      ],
+    })
+
+    const axiosPlugin = createMockedPlugin({
+      name: 'plugin-axios',
+      options: { output: { path: './clients', mode: 'directory' }, group: null, returnType: 'data' } as unknown as PluginTs['resolvedOptions'],
+      resolver: resolverClient,
+    })
+    const driver = createMultiPluginDriver('createPet', axiosPlugin)
+    const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options: defaultOptions, resolver: resolverMcp })
+
+    await renderGeneratorOperation(mcpGenerator, nodeWithBody, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverMcp,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('await createPet({ body, signal: request.signal, throwOnError: true })')
+    expect(source).toContain('text: JSON.stringify(res)')
+  })
+
+  test('passes headers along with signal and throwOnError: true for operations with header params', async () => {
+    const nodeWithHeaders = ast.factory.createOperation({
+      operationId: 'getPetWithHeaders',
+      method: 'GET',
+      path: '/pets',
+      tags: ['pets'],
+      parameters: [
+        ast.factory.createParameter({ name: 'X-Custom-Header', in: 'header', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+      ],
+      responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Pet' })],
+    })
+
+    const axiosPlugin = createMockedPlugin({
+      name: 'plugin-axios',
+      options: { output: { path: './clients', mode: 'directory' }, group: null, returnType: 'full' } as unknown as PluginTs['resolvedOptions'],
+      resolver: resolverClient,
+    })
+    const driver = createMultiPluginDriver('getPetWithHeaders', axiosPlugin)
+    const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options: defaultOptions, resolver: resolverMcp })
+
+    await renderGeneratorOperation(mcpGenerator, nodeWithHeaders, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverMcp,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('await getPetWithHeaders({ headers, signal: request.signal, throwOnError: true })')
+    expect(source).toContain('text: JSON.stringify(res.data)')
+  })
+
+  test('McpHandler returns null for non-HTTP operation node', () => {
+    const nonHttpNode = ast.factory.createSchema({ type: 'string' }) as unknown as ast.OperationNode
+    expect(McpHandler({ name: 'test', clientName: 'testClient', node: nonHttpNode, resolver: resolverTs })).toBeNull()
   })
 })

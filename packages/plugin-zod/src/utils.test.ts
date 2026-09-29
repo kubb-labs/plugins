@@ -478,3 +478,107 @@ describe('omitUnwrapChain', () => {
     expect(omitUnwrapChain(node)).toBe('.unwrap()')
   })
 })
+
+describe('isBareRef', () => {
+  test('returns true for an unmodified ref schema', () => {
+    const node = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Pet',
+      ref: '#/components/schemas/Pet',
+    })
+    expect(ast.isBareRef(node)).toBe(true)
+  })
+
+  test('returns false when ref has nullable modifier', () => {
+    const node = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Pet',
+      ref: '#/components/schemas/Pet',
+      nullable: true,
+    })
+    expect(ast.isBareRef(node)).toBe(false)
+  })
+
+  test('returns false when ref has optional modifier', () => {
+    const node = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Pet',
+      ref: '#/components/schemas/Pet',
+      optional: true,
+    })
+    expect(ast.isBareRef(node)).toBe(false)
+  })
+
+  test('returns false when ref has nullish modifier', () => {
+    const node = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Pet',
+      ref: '#/components/schemas/Pet',
+      nullish: true,
+    })
+    expect(ast.isBareRef(node)).toBe(false)
+  })
+
+  test('returns false when ref has a default value', () => {
+    const node = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Pet',
+      ref: '#/components/schemas/Pet',
+      default: {},
+    })
+    expect(ast.isBareRef(node)).toBe(false)
+  })
+
+  test('returns false when ref has a description', () => {
+    const node = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Pet',
+      ref: '#/components/schemas/Pet',
+      description: 'A cute pet',
+    })
+    expect(ast.isBareRef(node)).toBe(false)
+  })
+
+  test('returns false when ref has examples', () => {
+    const node = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Pet',
+      ref: '#/components/schemas/Pet',
+      examples: ['dog'],
+    })
+    expect(ast.isBareRef(node)).toBe(false)
+  })
+
+  test('returns false when keysToOmit is provided', () => {
+    const node = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Pet',
+      ref: '#/components/schemas/Pet',
+    })
+    expect(ast.isBareRef(node, ['id'])).toBe(false)
+  })
+
+  test('returns false for non-ref schemas', () => {
+    expect(ast.isBareRef(ast.factory.createSchema({ type: 'object' }))).toBe(false)
+    expect(ast.isBareRef(ast.factory.createSchema({ type: 'string' }))).toBe(false)
+    expect(ast.isBareRef(ast.factory.createSchema({ type: 'union', members: [] }))).toBe(false)
+  })
+
+  test('reads modifiers from resolved ref target schema', () => {
+    const nullableTarget = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Pet',
+      ref: '#/components/schemas/Pet',
+      schema: ast.factory.createSchema({ type: 'object', nullable: true }),
+    })
+    expect(ast.isBareRef(nullableTarget)).toBe(false)
+
+    const cleanTarget = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Pet',
+      ref: '#/components/schemas/Pet',
+      schema: ast.factory.createSchema({ type: 'object' }),
+    })
+    expect(ast.isBareRef(cleanTarget)).toBe(true)
+  })
+})

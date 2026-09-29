@@ -265,11 +265,11 @@ type ClassifyOperationParams = {
 
 /**
  * Classifies an operation as a query or a mutation from the resolved `query` / `mutation` method lists.
- * `query: false` still marks the operation as a query so the query-family generators keep matching it,
- * and a method already claimed by `query` never counts as a mutation.
+ * Disabled query and mutation configs do not claim operations, and a method already claimed by an
+ * enabled query config never counts as a mutation.
  */
 export function classifyOperation(node: ast.HttpOperationNode, { query, mutation }: ClassifyOperationParams): OperationClassification {
-  const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
+  const isQuery = !!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase())
   const queryMethods = new Set(query ? query.methods : [])
   const isMutation =
     mutation !== false &&

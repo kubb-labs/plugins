@@ -12,7 +12,7 @@ export async function updatePetHandler(
   { body }: UpdatePetOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await updatePet({ body, signal: request.signal })
+  const res = await updatePet({ body, signal: request.signal, throwOnError: true })
 
   return {
     content: [

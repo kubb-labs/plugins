@@ -3,18 +3,36 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig } from '../.kubb/client'
-import type { PlaceOrderOptions } from '../types/PlaceOrder'
+import useSWRMutation from 'swr/mutation'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { PlaceOrderOptions, PlaceOrderResponse, PlaceOrderStatus405 } from '../types/PlaceOrder'
+import type { SWRMutationConfiguration } from 'swr/mutation'
 import { placeOrder } from '../clients/placeOrder'
 
-export const placeOrderQueryKey = ({ body }: Omit<PlaceOrderOptions, 'headers'>) => [{ url: '/store/order' }, ...(body ? [body] : [])] as const
+export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
-type PlaceOrderQueryKey = ReturnType<typeof placeOrderQueryKey>
+export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
 
-export function placeOrderQueryOptions({ body }: PlaceOrderOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
-  return {
-    fetcher: async () => {
+export type PlaceOrderMutationArg = PlaceOrderOptions
+
+/**
+ * @description Place a new order in the store
+ * @summary Place an order for a pet
+ * {@link /store/order}
+ */
+export function usePlaceOrder(options: {
+  mutation?: SWRMutationConfiguration<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg> & { throwOnError?: boolean },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: { request?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } },
+  shouldFetch?: boolean,
+} = {}) {
+  const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
+  const mutationKey = placeOrderMutationKey()
+
+  return useSWRMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg>(
+    shouldFetch ? mutationKey : null,
+    async (_url, { arg: { body } }) => {
       return placeOrder({ ...config, body, throwOnError: true }).unwrap()
     },
-  }
+    mutationOptions
+  )
 }
