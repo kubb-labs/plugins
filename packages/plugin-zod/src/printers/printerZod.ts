@@ -218,7 +218,7 @@ function buildZodObjectShape(ctx: ZodPrinterContext, node: ast.SchemaNode): stri
  */
 const CONTAINER_TYPES = new Set<ast.SchemaType>(['object', 'array', 'tuple', 'union', 'intersection', 'ref'])
 
-type DirectionProbeContext = { options: PrinterZodOptions; transform: () => null; base: () => null }
+type DirectionProbeContext = { options: PrinterZodOptions; transform: () => null; base: () => null; import: () => void }
 
 /**
  * Runs the node's effective handler (a `printer.nodes` override, else the built-in) once per
@@ -232,7 +232,7 @@ function variesByDirection({ node, printerOptions }: { node: ast.SchemaNode; pri
   if (!handler) return false
 
   const call = (direction: 'encode' | 'decode') => {
-    const context: DirectionProbeContext = { options: { ...printerOptions, direction }, transform: () => null, base: () => null }
+    const context: DirectionProbeContext = { options: { ...printerOptions, direction }, transform: () => null, base: () => null, import: () => {} }
     return (handler as (this: DirectionProbeContext, node: ast.SchemaNode) => string | null).call(context, node)
   }
 
