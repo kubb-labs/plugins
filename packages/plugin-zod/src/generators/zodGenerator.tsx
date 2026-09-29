@@ -7,6 +7,7 @@ import {
   getSuccessResponses,
   isSuccessStatusCode,
   resolveContentTypeVariants,
+  ImportList,
 } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
@@ -149,9 +150,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
-        {imports.map((imp) => (
-          <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
-        ))}
+        <ImportList imports={imports} root={meta.file.path} keyPrefix={node.name} />
 
         <Zod
           name={meta.name}
@@ -241,9 +240,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
       return (
         <>
-          {imports.map((imp) => (
-            <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
-          ))}
+          <ImportList imports={imports} root={meta.file.path} keyPrefix={name} />
           {/* Operation schemas reference (and import) the component schemas, which carry the
               `z.ZodType` annotation at their own definition when cyclic. Annotating the operation
               schema too would only erase its inferred type to `unknown`, breaking typed consumers

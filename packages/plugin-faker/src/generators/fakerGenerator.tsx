@@ -1,4 +1,11 @@
-import { collectRefNames, getOperationParameters, getPerContentTypeName, resolveContentTypeVariants, resolveDependencyOperationFile } from '@internals/shared'
+import {
+  collectRefNames,
+  getOperationParameters,
+  getPerContentTypeName,
+  ImportList,
+  resolveContentTypeVariants,
+  resolveDependencyOperationFile,
+} from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from 'kubb/kit'
 import { buildParams, pluginTsName } from '@kubb/plugin-ts'
@@ -82,9 +89,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
         {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[meta.typeName]} />}
-        {usedImports.map((imp) => (
-          <File.Import key={[schemaName, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
-        ))}
+        <ImportList imports={usedImports} root={meta.file.path} keyPrefix={schemaName} />
         {seed ? <File.Source name="faker-seed">{`faker.seed(${JSON.stringify(seed)})`}</File.Source> : undefined}
         <Faker
           name={meta.name}
@@ -245,9 +250,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       return (
         <>
           {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[typeName]} />}
-          {imports.map((imp) => (
-            <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
-          ))}
+          <ImportList imports={imports} root={meta.file.path} keyPrefix={name} />
           <Faker
             name={name}
             typeName={typeReference.typeName}

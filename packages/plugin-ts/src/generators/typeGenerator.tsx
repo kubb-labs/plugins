@@ -1,4 +1,4 @@
-import { buildOptionsSchema, buildResponses, collectRefNames, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
+import { buildOptionsSchema, buildResponses, collectRefNames, getOperationParameters, ImportList, resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Type } from '../components/Type.tsx'
@@ -79,9 +79,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
-        {imports.map((imp) => (
-          <File.Import key={[node.name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
-        ))}
+        <ImportList imports={imports} root={meta.file.path} keyPrefix={node.name} isTypeOnly />
         <Type name={meta.name} node={node} enum={enumOptions} resolver={resolver} printer={schemaPrinter} />
       </File>
     )
@@ -119,9 +117,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
       return (
         <>
-          {imports.map((imp) => (
-            <File.Import key={[name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
-          ))}
+          <ImportList imports={imports} root={meta.file.path} keyPrefix={name} isTypeOnly />
           <Type name={name} node={schema} enum={enumOptions} resolver={resolver} printer={schemaPrinter} />
         </>
       )
