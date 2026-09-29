@@ -37,7 +37,7 @@ type Props = {
 
 export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, assertName, mini, cyclic, compile }: Props): KubbReactNode {
   const output = printer.print(node)
-  const printerImports = printer.takeImports()
+  const printerImports = printer.drainImports()
 
   if (!output) {
     return
