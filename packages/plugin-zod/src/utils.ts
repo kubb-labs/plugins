@@ -12,13 +12,42 @@ export function shouldCoerce(coercion: PluginZod['resolvedOptions']['coercion'] 
   return !!coercion[type]
 }
 
+function hasPropertyNames(node: ast.SchemaNode): boolean {
+  return 'propertyNames' in node && Boolean((node as { propertyNames?: ast.SchemaNode }).propertyNames)
+}
+
+/**
+ * Whether the schema node represents a closed or finite set of keys (e.g. enum, literal,
+ * or union of enums/literals).
+ *
+ * In Zod v4, passing a closed key schema to `z.record()` enforces exhaustiveness (all keys
+ * must exist in the input). OpenAPI 3.1 `propertyNames` only validates present keys without
+ * requiring all keys to exist, so closed key schemas use `z.partialRecord()` instead.
+ */
+export function isClosedKeySchema(node: ast.SchemaNode | undefined): boolean {
+  if (!node) return false
+  const resolved = syncSchemaRef(node)
+  if (resolved.type === 'enum') return true
+  if (resolved.type === 'union') {
+    const members = resolved.members ?? []
+    return members.length > 0 && members.every(isClosedKeySchema)
+  }
+  return false
+}
+
 /**
  * Whether the node is a plain inline object whose shape can be lifted into an `.extend({ … })`
  * argument. A catchall, `patternProperties`, or a nullable/optional wrapper cannot, so those stay
  * on `.and(…)`.
  */
-function isPlainInlineObject(node: ast.SchemaNode): boolean {
-  return node.type === 'object' && !node.nullable && !node.optional && !node.nullish && node.additionalProperties === undefined && !node.patternProperties
+export function isPlainInlineObject(node: ast.SchemaNode): boolean {
+  if (node.type !== 'object') return false
+  if (node.nullable || node.optional || node.nullish) return false
+
+  const hasAdditionalProperties = node.additionalProperties !== undefined
+  const hasPatternProperties = Boolean(node.patternProperties)
+
+  return !hasAdditionalProperties && !hasPatternProperties && !hasPropertyNames(node)
 }
 
 /**
@@ -30,7 +59,15 @@ function isPlainInlineObject(node: ast.SchemaNode): boolean {
  */
 export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
   if (node.nullable || node.optional || node.nullish) return false
-  if (node.type === 'object') return true
+  if (node.type === 'object') {
+    const hasProperties = Boolean(node.properties?.length)
+    const hasTypedAdditionalProperties = Boolean(node.additionalProperties && node.additionalProperties !== true)
+    const hasPatternProperties = Boolean(node.patternProperties)
+
+    const isRecord = !hasProperties && (hasTypedAdditionalProperties || hasPatternProperties || hasPropertyNames(node))
+
+    return !isRecord
+  }
 
   if (node.type === 'ref') {
     const refName = ast.resolveRefName(node)

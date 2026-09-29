@@ -234,7 +234,7 @@ export const uploadFileResponseSchema = uploadFileStatus200Schema
 
 export const uploadFileBodySchema = z.instanceof(File).optional()
 
-export const getInventoryStatus200Schema = z.object({}).catchall(z.int32())
+export const getInventoryStatus200Schema = z.record(z.string(), z.int32())
 
 export const getInventoryResponseSchema = getInventoryStatus200Schema
 

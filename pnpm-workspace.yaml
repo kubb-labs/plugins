@@ -20,15 +20,15 @@ catalog:
   '@kubb/parser-ts': ^5.3.19
   '@types/node': 22.20.2
   '@types/react': ^19.3.0
-  '@vitest/coverage-v8': ^5.0.1
-  '@vitest/ui': ^5.0.1
+  '@vitest/coverage-v8': ^5.0.2
+  '@vitest/ui': ^5.0.2
   kubb: ^5.3.19
   oxfmt: ^0.67.0
   oxlint: ^1.85.0
-  prettier: ^3.9.8
+  prettier: ^3.9.9
   tsdown: ^0.23.0
   typescript: ^6.0.3
-  vitest: ^5.0.1
+  vitest: ^5.0.2
 
 #overrides: #  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
 
