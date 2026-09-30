@@ -5,7 +5,7 @@ import type { KubbReactNode } from 'kubb/jsx'
 import { buildSdkMethod } from '../builders/sdkMethod.ts'
 import type { Auth } from '../builders/security.ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
-import type { ResolvedReturnType, ValidatorOptions } from '../types.ts'
+import type { ReturnTypeOption, ValidatorOptions } from '../types.ts'
 
 type OperationData = {
   node: ast.OperationNode
@@ -21,7 +21,7 @@ type Props = {
   isIndexable?: boolean
   operations: Array<OperationData>
   validator: ValidatorOptions | undefined
-  returnType: ResolvedReturnType
+  returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
   children?: KubbReactNode
 }

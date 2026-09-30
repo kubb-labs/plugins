@@ -6,7 +6,9 @@ import { clientGenerator } from './generators/clientGenerator.tsx'
 import { defaultMacros, resolverClient } from '@internals/client'
 import type { PluginClient, ResolvedOptions, ResolverClient } from './types.ts'
 
-/** Canonical plugin name for `@kubb/plugin-client`. */
+/**
+ * Canonical plugin name for `@kubb/plugin-client`.
+ */
 export const pluginClientName = 'plugin-client' satisfies PluginClient['name']
 
 /**

@@ -23,14 +23,10 @@ export type Mode = 'tag' | 'flat'
  * - `'full'`: the complete `{ status, data, error, contentType, request, response }` result.
  * - `'data'`: the bare success body when `throwOnError` is true, or the full result when it is false
  *   so callers can inspect `error`.
+ * - `'plain'`: the client's own promise typed as `RequestResult`, with no `withUnwrap` / `unwrapResult`
+ *   helper. Backs `@kubb/plugin-client`.
  */
-export type ReturnTypeOption = 'full' | 'data'
-
-/**
- * The return shapes a generator can emit. `'plain'` is internal: it returns the client's own promise
- * as `RequestResult` with no `withUnwrap` / `unwrapResult` helper, and backs `@kubb/plugin-client`.
- */
-export type ResolvedReturnType = ReturnTypeOption | 'plain'
+export type ReturnTypeOption = 'full' | 'data' | 'plain'
 
 /**
  * The resolver shared by the client plugins. Inherits the built-in camelCase `name` and `file`;
@@ -176,7 +172,7 @@ export type ResolvedOptions = {
   baseURL: Options['baseURL']
   throwOnErrorDefault: boolean
   validator: NonNullable<Options['validator']>
-  returnType: ResolvedReturnType
+  returnType: ReturnTypeOption
   sdk:
     | {
         mode: Mode

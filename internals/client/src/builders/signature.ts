@@ -2,7 +2,7 @@ import type { ast } from 'kubb/kit'
 import { getRequestGroupOptionality } from '@internals/shared'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
-import type { ResolvedReturnType } from '../types.ts'
+import type { ReturnTypeOption } from '../types.ts'
 import { buildResultType } from './generics.ts'
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -42,7 +42,7 @@ export function buildGroupedOptionsSignature({
 }: {
   node: ast.OperationNode
   types: OperationTypeNames
-  returnType: ResolvedReturnType
+  returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
 }): GroupedOptionsSignature {
   const optionsName = types.response.options(node)
