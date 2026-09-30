@@ -1,0 +1,25 @@
+import { setBaseURL } from './client.ts'
+import { addPet, getPetById } from './gen/clients/index.ts'
+import type { Pet } from './gen/models/index.ts'
+
+// The client is yours: configure it here, or add your own auth and retries in `client.ts`.
+setBaseURL('https://petstore3.swagger.io/api/v3')
+
+export async function demo() {
+  // default (throwOnError: true): data is defined, a non-2xx status throws ResponseError
+  const created = await addPet({ body: { name: 'Odie', photoUrls: [] } })
+  console.log(created.data, created.response.status)
+
+  // throwOnError: false, errors are returned as values
+  const result = await getPetById({ path: { petId: 1n }, throwOnError: false })
+  if (result.error !== undefined) {
+    console.log('failed', result.response.status)
+  } else {
+    const pet: Pet = result.data
+    console.log('pet', pet.name)
+  }
+
+  // only the success body
+  const pet = await getPetById({ path: { petId: 2n } }).unwrap()
+  console.log(pet.name)
+}

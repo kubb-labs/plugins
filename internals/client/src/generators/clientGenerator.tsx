@@ -80,7 +80,11 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
         path: node.path,
       })
 
-      const clientPath = resolveClientPath?.(ctx.options, root) ?? path.resolve(root, '.kubb/client.ts')
+      // A custom client module is emitted verbatim, so `importPath` is used exactly as configured.
+      // The default `.kubb/client.ts` is a file path and is made relative to the operation file.
+      const customClientPath = resolveClientPath?.(ctx.options, root)
+      const clientPath = customClientPath ?? path.resolve(root, '.kubb/client.ts')
+      const clientRoot = customClientPath === undefined ? meta.file.path : undefined
       const eventStream = isEventStream(node)
 
       return (
@@ -93,7 +97,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
         >
           <File.Import
             name={eventStream ? ['client', 'toEventStream'] : ['client', returnType === 'data' ? 'unwrapResult' : 'withUnwrap']}
-            root={meta.file.path}
+            root={clientRoot}
             path={clientPath}
           />
           <File.Import
@@ -104,7 +108,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
                   ? ['Options', 'UnwrappedResult']
                   : ['Options', 'Unwrappable', 'RequestResult']
             }
-            root={meta.file.path}
+            root={clientRoot}
             path={clientPath}
             isTypeOnly
           />
