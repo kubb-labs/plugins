@@ -18,8 +18,4 @@ export async function demo() {
     const pet: Pet = result.data
     console.log('pet', pet.name)
   }
-
-  // only the success body
-  const pet = await getPetById({ path: { petId: 2n } }).unwrap()
-  console.log(pet.name)
 }

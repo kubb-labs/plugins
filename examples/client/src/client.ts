@@ -42,7 +42,8 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true> = Thr
   ? { data: DataOf<SuccessOf<TResponses>>; error: undefined; response: Response }
   : { data: DataOf<SuccessOf<TResponses>>; error: undefined; response: Response } | { data: undefined; error: ErrorBody; response: Response }
 
-export type Unwrappable<T extends { data: unknown; error: unknown }> = Promise<T> & { unwrap: () => Promise<Extract<T, { error: undefined }>['data']> }
+/** Generated operations return a plain promise here. Add helpers such as `.unwrap()` yourself if you want them. */
+export type Unwrappable<T extends { data: unknown; error: unknown }> = Promise<T>
 
 export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true> = ThrowOnError extends true
   ? RequestResult<TResponses, true>['data']
@@ -88,15 +89,9 @@ export async function client(config: RequestConfig): Promise<{ data: unknown; er
   return { data: undefined, error: body, response }
 }
 
-/** Adds `.unwrap()` to a result promise. It resolves to the success body and rejects when the result has an error. */
+/** Generated operations pass their result through this function. Here it returns the promise unchanged. */
 export function withUnwrap<T extends { data: unknown; error: unknown }>(promise: Promise<T>): Unwrappable<T> {
-  const unwrappable = promise as Unwrappable<T>
-  unwrappable.unwrap = () =>
-    promise.then((result) => {
-      if (result.error !== undefined) throw result.error
-      return result.data as Extract<T, { error: undefined }>['data']
-    })
-  return unwrappable
+  return promise
 }
 
 /** Backs operations generated with `returnType: 'data'`. */
