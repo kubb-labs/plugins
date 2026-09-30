@@ -1,9 +1,13 @@
-import type { PluginFactoryOptions } from 'kubb/kit'
+import type { Override, PluginFactoryOptions } from 'kubb/kit'
 import type { Options as ClientOptions, ResolvedOptions as ClientResolvedOptions, ResolverClient } from '@internals/client'
 
 export type { ResolverClient } from '@internals/client'
 
-export type Options = ClientOptions & {
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never
+
+export type Options = DistributiveOmit<ClientOptions, 'sdk' | 'override'> & {
+  /** Per-operation overrides. `sdk` is not available: this plugin generates standalone operations only. */
+  override?: Array<Override<Omit<ResolvedOptions, 'throwOnErrorDefault' | 'sdk'>>>
   /** Import specifier for your own client module. The module supplies the helpers imported by generated operations. */
   importPath: string
 }
