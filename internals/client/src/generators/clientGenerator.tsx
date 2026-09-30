@@ -87,6 +87,20 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
       const clientRoot = customClientPath === undefined ? meta.file.path : undefined
       const eventStream = isEventStream(node)
 
+      const clientValueImports = (() => {
+        if (eventStream) return ['client', 'toEventStream']
+        if (returnType === 'plain') return ['client']
+        if (returnType === 'data') return ['client', 'unwrapResult']
+        return ['client', 'withUnwrap']
+      })()
+
+      const clientTypeImports = (() => {
+        if (eventStream) return ['Options', 'EventStreamResult', 'SuccessOf']
+        if (returnType === 'plain') return ['Options', 'RequestResult']
+        if (returnType === 'data') return ['Options', 'UnwrappedResult']
+        return ['Options', 'Unwrappable', 'RequestResult']
+      })()
+
       return (
         <File
           baseName={meta.file.baseName}
@@ -95,31 +109,8 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
           banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
           footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         >
-          <File.Import
-            name={
-              eventStream
-                ? ['client', 'toEventStream']
-                : returnType === 'plain'
-                  ? ['client']
-                  : ['client', returnType === 'data' ? 'unwrapResult' : 'withUnwrap']
-            }
-            root={clientRoot}
-            path={clientPath}
-          />
-          <File.Import
-            name={
-              eventStream
-                ? ['Options', 'EventStreamResult', 'SuccessOf']
-                : returnType === 'data'
-                  ? ['Options', 'UnwrappedResult']
-                  : returnType === 'plain'
-                    ? ['Options', 'RequestResult']
-                    : ['Options', 'Unwrappable', 'RequestResult']
-            }
-            root={clientRoot}
-            path={clientPath}
-            isTypeOnly
-          />
+          <File.Import name={clientValueImports} root={clientRoot} path={clientPath} />
+          <File.Import name={clientTypeImports} root={clientRoot} path={clientPath} isTypeOnly />
 
           {meta.fileTypes && importedTypeNames.length > 0 && (
             <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTypes.path} isTypeOnly />
