@@ -12,4 +12,6 @@ pluginClient({ importPath: '../api/client' })
 
 If your spec has server-sent event operations, also export `toEventStream` and the `EventStreamResult` and `SuccessOf` types. Implement the behavior your application needs in that module.
 
+Set the base URL, auth, retries, and any other behavior inside your `client`. `sdk`, `returnType`, and `baseURL` are not options of this plugin. `validator: 'zod'` needs `pluginZod()` in the plugins, and generation stops with an error if it is missing. Your `client` receives the schemas on `config.validator` and runs them itself.
+
 See [`examples/client`](../../examples/client) for a minimal `client.ts` built on `fetch`.

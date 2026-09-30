@@ -53,6 +53,10 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     dependencies: [pluginTsName, pluginZodName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
+        if (validator && !ctx.config.plugins?.some((plugin) => plugin.name === pluginZodName)) {
+          throw new Error(`${pluginClientName}: \`validator\` needs ${pluginZodName}. Add pluginZod() to the plugins or set \`validator: false\`.`)
+        }
+
         ctx.setOptions(resolved)
         ctx.setResolver(resolved.resolver)
         ctx.setMacros([...defaultMacros, ...(options.macros ?? [])])

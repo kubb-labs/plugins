@@ -55,8 +55,20 @@ export class ResponseError extends Error {
 
 let baseURL = ''
 
+type GetToken = () => Promise<string | undefined>
+
+let getToken: GetToken | undefined
+
 export function setBaseURL(url: string) {
   baseURL = url
+}
+
+/**
+ * Registers an async credential source. It runs before each request that the spec marks as secured,
+ * so it can read a secrets store or refresh an expired token. Replace it with signing or any other scheme.
+ */
+export function setAuth(resolve: GetToken) {
+  getToken = resolve
 }
 
 /** The default transport: a plain `fetch` call. Replace this function to change how requests are sent. */
@@ -67,9 +79,15 @@ export async function client(config: RequestConfig): Promise<{ data: unknown; er
     if (value !== undefined) url.searchParams.set(key, String(value))
   }
 
+  const token = config.security?.length ? await getToken?.() : undefined
+
   const response = await fetch(url, {
     method: config.method,
-    headers: { ...(config.body === undefined ? {} : { 'Content-Type': 'application/json' }), ...(config.headers as Record<string, string>) },
+    headers: {
+      ...(config.body === undefined ? {} : { 'Content-Type': 'application/json' }),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(config.headers as Record<string, string>),
+    },
     body: config.body === undefined ? undefined : JSON.stringify(config.body, (_, value) => (typeof value === 'bigint' ? value.toString() : value)),
     signal: config.signal,
   })

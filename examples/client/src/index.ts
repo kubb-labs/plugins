@@ -1,9 +1,12 @@
-import { setBaseURL } from './client.ts'
+import { setAuth, setBaseURL } from './client.ts'
 import { addPet, getPetById } from './gen/clients/index.ts'
 import type { Pet } from './gen/models/index.ts'
 
 // The client is yours: configure it here, or add your own auth and retries in `client.ts`.
 setBaseURL('https://petstore3.swagger.io/api/v3')
+
+// Async auth: runs before every request the spec marks as secured. Swap in a secrets store or request signing.
+setAuth(async () => 'demo-token')
 
 export async function demo() {
   // default (throwOnError: true): data is defined, a non-2xx status throws ResponseError
