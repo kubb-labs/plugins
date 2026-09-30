@@ -18,7 +18,10 @@ import type { ContractClientFactory } from '../types.ts'
  * generator `name` differs between plugins. Every other resolution, import, and rendering step is
  * identical.
  */
-export function createClientGenerator<TFactory extends ContractClientFactory>(name: string): Generator<TFactory> {
+export function createClientGenerator<TFactory extends ContractClientFactory>(
+  name: string,
+  resolveClientPath?: (options: TFactory['resolvedOptions'], root: string) => string,
+): Generator<TFactory> {
   return defineGenerator<TFactory>({
     name,
     renderer: jsxRenderer,
@@ -77,7 +80,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
         path: node.path,
       })
 
-      const clientPath = path.resolve(root, '.kubb/client.ts')
+      const clientPath = resolveClientPath?.(ctx.options, root) ?? path.resolve(root, '.kubb/client.ts')
       const eventStream = isEventStream(node)
 
       return (
