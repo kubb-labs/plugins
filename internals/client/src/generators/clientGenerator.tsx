@@ -96,7 +96,13 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
           footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         >
           <File.Import
-            name={eventStream ? ['client', 'toEventStream'] : ['client', returnType === 'data' ? 'unwrapResult' : 'withUnwrap']}
+            name={
+              eventStream
+                ? ['client', 'toEventStream']
+                : returnType === 'plain'
+                  ? ['client']
+                  : ['client', returnType === 'data' ? 'unwrapResult' : 'withUnwrap']
+            }
             root={clientRoot}
             path={clientPath}
           />
@@ -106,7 +112,9 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
                 ? ['Options', 'EventStreamResult', 'SuccessOf']
                 : returnType === 'data'
                   ? ['Options', 'UnwrappedResult']
-                  : ['Options', 'Unwrappable', 'RequestResult']
+                  : returnType === 'plain'
+                    ? ['Options', 'RequestResult']
+                    : ['Options', 'Unwrappable', 'RequestResult']
             }
             root={clientRoot}
             path={clientPath}

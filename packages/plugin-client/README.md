@@ -8,6 +8,8 @@ import { pluginClient } from '@kubb/plugin-client'
 pluginClient({ importPath: '../api/client' })
 ```
 
-`importPath` is written into each generated import as-is, so it must resolve from the generated operation file (for example `../../../client`, or a package or alias specifier). The module must export `client`, `withUnwrap`, `unwrapResult`, and `toEventStream`, plus the matching `Options`, `RequestResult`, `UnwrappedResult`, `Unwrappable`, `EventStreamResult`, and `SuccessOf` types. Generated operations use `client` as the default request function and pass it a config containing `method`, `url`, and operation options. Implement the behavior your application needs in that module.
+`importPath` is written into each generated import as-is, so it must resolve from the generated operation file (for example `../../../client`, or a package or alias specifier). The module must export `client`, plus the `Options` and `RequestResult` types. Generated operations call `client` with a config containing `method`, `url`, and the operation options, and return its promise typed as `RequestResult`. There are no `withUnwrap` or `unwrapResult` helpers to write, and `returnType` is not an option.
+
+If your spec has server-sent event operations, also export `toEventStream` and the `EventStreamResult` and `SuccessOf` types. Implement the behavior your application needs in that module.
 
 See [`examples/client`](../../examples/client) for a minimal `client.ts` built on `fetch`.

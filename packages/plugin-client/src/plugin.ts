@@ -28,7 +28,6 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     importPath,
     throwOnErrorDefault = true,
     validator = false,
-    returnType = 'full',
     group,
     resolver: userResolver,
   } = options
@@ -43,7 +42,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     baseURL: undefined,
     throwOnErrorDefault,
     validator,
-    returnType,
+    returnType: 'plain',
     sdk: undefined,
     resolver: userResolver ? Resolver.merge<ResolverClient>(resolverClient, userResolver) : resolverClient,
   }

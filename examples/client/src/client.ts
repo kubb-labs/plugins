@@ -42,13 +42,6 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true> = Thr
   ? { data: DataOf<SuccessOf<TResponses>>; error: undefined; response: Response }
   : { data: DataOf<SuccessOf<TResponses>>; error: undefined; response: Response } | { data: undefined; error: ErrorBody; response: Response }
 
-/** Generated operations return a plain promise here. Add helpers such as `.unwrap()` yourself if you want them. */
-export type Unwrappable<T extends { data: unknown; error: unknown }> = Promise<T>
-
-export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true> = ThrowOnError extends true
-  ? RequestResult<TResponses, true>['data']
-  : RequestResult<TResponses, ThrowOnError>
-
 export type EventStreamResult<TData = unknown> = { stream: AsyncGenerator<TData>; response: Response }
 
 export class ResponseError extends Error {
@@ -87,16 +80,6 @@ export async function client(config: RequestConfig): Promise<{ data: unknown; er
   if (response.ok) return { data: body, error: undefined, response }
   if (config.throwOnError ?? true) throw new ResponseError(response.status, body)
   return { data: undefined, error: body, response }
-}
-
-/** Generated operations pass their result through this function. Here it returns the promise unchanged. */
-export function withUnwrap<T extends { data: unknown; error: unknown }>(promise: Promise<T>): Unwrappable<T> {
-  return promise
-}
-
-/** Backs operations generated with `returnType: 'data'`. */
-export function unwrapResult<T extends { data: unknown; error: unknown }>(promise: Promise<T>, throwOnError: boolean | undefined): Promise<T | T['data']> {
-  return promise.then((result) => ((throwOnError ?? true) ? result.data : result))
 }
 
 /** Backs server-sent event operations. This skeleton does not parse streams, so it throws. Implement it if you use SSE. */

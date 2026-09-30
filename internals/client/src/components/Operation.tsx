@@ -9,7 +9,7 @@ import { buildGroupedOptionsSignature } from '../builders/signature.ts'
 import { buildStyles } from '../builders/styles.ts'
 import { buildValidatorHooks } from '../builders/validator.ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
-import type { ReturnTypeOption, ValidatorOptions } from '../types.ts'
+import type { ResolvedReturnType, ValidatorOptions } from '../types.ts'
 
 type Props = {
   /**
@@ -36,7 +36,7 @@ type Props = {
   /**
    * Shape of the value the generated function resolves to.
    */
-  returnType: ReturnTypeOption
+  returnType: ResolvedReturnType
   throwOnErrorDefault: boolean
   /**
    * Per-operation security, resolved from the spec into inline `Auth` objects and serialized onto the

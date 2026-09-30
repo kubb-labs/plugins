@@ -1,6 +1,6 @@
 import type { ast } from 'kubb/kit'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
-import type { ReturnTypeOption } from '../types.ts'
+import type { ResolvedReturnType } from '../types.ts'
 import { buildRequestResultGenerics, buildResultType } from './generics.ts'
 
 /**
@@ -32,12 +32,15 @@ export function buildReturnStatement({
   node: ast.OperationNode
   types: OperationTypeNames
   callConfig: string
-  returnType: ReturnTypeOption
+  returnType: ResolvedReturnType
   throwOnErrorDefault: boolean
 }): string {
   if (returnType === 'data') {
     const resultType = buildResultType({ node, types, returnType })
     return `return unwrapResult(request(${callConfig}), config.throwOnError ?? ${throwOnErrorDefault}) as ${resultType}`
+  }
+  if (returnType === 'plain') {
+    return `return request(${callConfig}) as Promise<RequestResult<${buildRequestResultGenerics({ node, types })}>>`
   }
   return `return withUnwrap(request(${callConfig}) as Promise<RequestResult<${buildRequestResultGenerics({ node, types })}>>)`
 }

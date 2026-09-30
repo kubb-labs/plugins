@@ -1,6 +1,6 @@
 import type { ast } from 'kubb/kit'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
-import type { ReturnTypeOption } from '../types.ts'
+import type { ResolvedReturnType } from '../types.ts'
 
 /**
  * Builds the `RequestResult` generic arguments for one operation: the per-status responses record
@@ -16,14 +16,17 @@ export function buildRequestResultGenerics({ node, types }: { node: ast.Operatio
 
 /**
  * Builds the full return type an operation's function signature uses: `Unwrappable<RequestResult>`
- * for the default `returnType: 'full'`, already a promise so no further wrapping is needed, or a
+ * for the default `returnType: 'full'`, already a promise so no further wrapping is needed, a plain
+ * `Promise<RequestResult>` for the internal `'plain'` shape, or a
  * `Promise` of the runtime's `UnwrappedResult` when `returnType: 'data'` narrows a resolved call
  * down to the bare success body.
  *
  * @example
  * `buildResultType({ node, types, returnType: 'data' }) // 'Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>'`
  */
-export function buildResultType({ node, types, returnType }: { node: ast.OperationNode; types: OperationTypeNames; returnType: ReturnTypeOption }): string {
+export function buildResultType({ node, types, returnType }: { node: ast.OperationNode; types: OperationTypeNames; returnType: ResolvedReturnType }): string {
   const generics = buildRequestResultGenerics({ node, types })
-  return returnType === 'data' ? `Promise<UnwrappedResult<${generics}>>` : `Unwrappable<RequestResult<${generics}>>`
+  if (returnType === 'data') return `Promise<UnwrappedResult<${generics}>>`
+  if (returnType === 'plain') return `Promise<RequestResult<${generics}>>`
+  return `Unwrappable<RequestResult<${generics}>>`
 }

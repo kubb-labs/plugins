@@ -5,9 +5,9 @@ export type { ResolverClient } from '@internals/client'
 
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never
 
-export type Options = DistributiveOmit<ClientOptions, 'sdk' | 'override'> & {
+export type Options = DistributiveOmit<ClientOptions, 'sdk' | 'returnType' | 'override'> & {
   /** Per-operation overrides. `sdk` is not available: this plugin generates standalone operations only. */
-  override?: Array<Override<Omit<ResolvedOptions, 'throwOnErrorDefault' | 'sdk'>>>
+  override?: Array<Override<Omit<ResolvedOptions, 'throwOnErrorDefault' | 'sdk' | 'returnType'>>>
   /** Import specifier for your own client module. The module supplies the helpers imported by generated operations. */
   importPath: string
 }

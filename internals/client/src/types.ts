@@ -27,6 +27,12 @@ export type Mode = 'tag' | 'flat'
 export type ReturnTypeOption = 'full' | 'data'
 
 /**
+ * The return shapes a generator can emit. `'plain'` is internal: it returns the client's own promise
+ * as `RequestResult` with no `withUnwrap` / `unwrapResult` helper, and backs `@kubb/plugin-client`.
+ */
+export type ResolvedReturnType = ReturnTypeOption | 'plain'
+
+/**
  * The resolver shared by the client plugins. Inherits the built-in camelCase `name` and `file`;
  * classes and tag groups use PascalCase (with a `Client` suffix for groups).
  */
@@ -170,7 +176,7 @@ export type ResolvedOptions = {
   baseURL: Options['baseURL']
   throwOnErrorDefault: boolean
   validator: NonNullable<Options['validator']>
-  returnType: ReturnTypeOption
+  returnType: ResolvedReturnType
   sdk:
     | {
         mode: Mode
