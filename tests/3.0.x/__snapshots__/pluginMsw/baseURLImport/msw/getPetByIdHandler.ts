@@ -4,6 +4,7 @@
 */
 
 import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById'
+import { getBaseURL } from '../client'
 import { http } from 'msw'
 
 export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
@@ -28,7 +29,7 @@ export function getPetByIdHandlerResponse404(data?: GetPetByIdStatus404) {
 }
 
 export function getPetByIdHandler(data?: GetPetByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
-  return http.get(`${options?.baseURL ?? "http://localhost:3000"}/pet/:petId`, function handler(info) {
+  return http.get(`${options?.baseURL ?? getBaseURL() ?? ''}/pet/:petId`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return new Response(JSON.stringify(data), {

@@ -19,7 +19,7 @@ export function optionsFindPetsByStatusHandler(
   data?: OptionsFindPetsByStatusResponse | ((info: Parameters<Parameters<typeof http.options>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
-  return http.options(`${options?.baseURL ?? `http://localhost:3000`}/pet/findByStatus`, function handler(info) {
+  return http.options(`${options?.baseURL ?? 'http://localhost:3000'}/pet/findByStatus`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

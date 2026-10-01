@@ -5,6 +5,7 @@
 
 import type { PlaceOrderResponse, PlaceOrderStatus405, PlaceOrderBody } from '../types/PlaceOrder'
 import type { HttpResponseResolver } from 'msw'
+import { getBaseURL } from '../client'
 import { http } from 'msw'
 
 export function placeOrderHandlerResponse200(data: PlaceOrderResponse) {
@@ -23,7 +24,7 @@ export function placeOrderHandlerResponse405(data?: PlaceOrderStatus405) {
 }
 
 export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolver<Record<string, string>, PlaceOrderBody>, options?: { baseURL?: string }) {
-  return http.post<Record<string, string>, PlaceOrderBody>(`${options?.baseURL ?? "http://localhost:3000"}/store/order`, function handler(info) {
+  return http.post<Record<string, string>, PlaceOrderBody>(`${options?.baseURL ?? getBaseURL() ?? ''}/store/order`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return new Response(JSON.stringify(data), {

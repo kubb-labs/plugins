@@ -4,6 +4,7 @@
 */
 
 import type { FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus'
+import { getBaseURL } from '../client'
 import { http } from 'msw'
 
 export function findPetsByStatusHandlerResponse200(data: FindPetsByStatusResponse) {
@@ -22,7 +23,7 @@ export function findPetsByStatusHandlerResponse400(data?: FindPetsByStatusStatus
 }
 
 export function findPetsByStatusHandler(data?: FindPetsByStatusResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
-  return http.get(`${options?.baseURL ?? "http://localhost:3000"}/pet/findByStatus`, function handler(info) {
+  return http.get(`${options?.baseURL ?? getBaseURL() ?? ''}/pet/findByStatus`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return new Response(JSON.stringify(data), {

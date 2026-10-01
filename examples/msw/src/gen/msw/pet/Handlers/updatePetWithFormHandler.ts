@@ -16,7 +16,7 @@ export function updatePetWithFormHandler(
   data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
-  return http.post(`${options?.baseURL ?? `http://localhost:3000`}/pet/:petId\\:search`, function handler(info) {
+  return http.post(`${options?.baseURL ?? 'http://localhost:3000'}/pet/:petId\\:search`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

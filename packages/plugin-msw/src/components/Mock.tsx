@@ -4,7 +4,7 @@ import { createFunctionParameter, createFunctionParameters, functionPrinter } fr
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { BaseURLImport } from '../types.ts'
-import { getContentType, getMswMethod, hasResponseSchema } from '../utils.ts'
+import { getContentType, getMswMethod, hasResponseSchema, resolveDefaultBaseURL } from '../utils.ts'
 
 type Props = {
   name: string
@@ -52,7 +52,9 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
 
   const httpCall = requestTypeName ? `http.${method}<Record<string, string>, ${requestTypeName}>` : `http.${method}`
 
-  const defaultBaseURL = baseURL && typeof baseURL === 'object' ? `${baseURL.name}()` : baseURL ? `\`${baseURL}\`` : "''"
+  // Precedence: options?.baseURL (per-call override) > defaultBaseURL (configured base URL) > '' (relative path)
+  const defaultBaseURL = resolveDefaultBaseURL(baseURL)
+  // Non-parameterized colons (e.g. /pet/:petId:search) are escaped to avoid MSW treating them as path params.
   const urlLiteral = `\`\${options?.baseURL ?? ${defaultBaseURL}}${url.replace(/([^/]):/g, '$1\\\\:')}\``
   const responseBody = fakerName ? `JSON.stringify(data || ${fakerName}(data))` : 'JSON.stringify(data)'
   const headersBlock = headers.length ? `\n      headers: {\n        ${headers.join(', \n')}\n      },` : ''

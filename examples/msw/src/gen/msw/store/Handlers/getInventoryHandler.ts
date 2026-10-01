@@ -19,7 +19,7 @@ export function getInventoryHandler(
   data?: GetInventoryResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
-  return http.get(`${options?.baseURL ?? `http://localhost:3000`}/store/inventory`, function handler(info) {
+  return http.get(`${options?.baseURL ?? 'http://localhost:3000'}/store/inventory`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
