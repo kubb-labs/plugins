@@ -109,6 +109,17 @@ describe('infiniteQueryGenerator operation', () => {
       node: findByTagsNode,
       options: { infinite: { ...infiniteOptions, cursorParam: 'cursor' as const } },
     },
+    {
+      name: 'findInfiniteByTagsPageParamCode',
+      node: findByTagsNode,
+      options: {
+        infinite: {
+          ...infiniteOptions,
+          getNextPageParam: '(lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined)',
+          getPreviousPageParam: '(firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined)',
+        },
+      },
+    },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginVueQuery['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {
@@ -141,6 +152,28 @@ describe('infiniteQueryGenerator operation with hooks disabled', () => {
     }
     const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
     const driver = createMultiPluginDriver('hooksDisabled')
+
+    await renderGeneratorOperation(infiniteQueryGenerator, findByTagsNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverVueQuery,
+    })
+
+    expect(driver.fileManager.files).toStrictEqual([])
+  })
+})
+
+describe('infiniteQueryGenerator operation with infinite.match', () => {
+  test('returns no file when match rejects the operation', async () => {
+    const options: PluginVueQuery['resolvedOptions'] = {
+      ...defaultOptions,
+      infinite: { ...infiniteOptions, match: (node) => node.operationId !== 'findPetsByTags' },
+    }
+    const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
+    const driver = createMultiPluginDriver('matchRejected')
 
     await renderGeneratorOperation(infiniteQueryGenerator, findByTagsNode, {
       config: testConfig,

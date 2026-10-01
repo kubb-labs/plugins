@@ -1,6 +1,6 @@
-import { getOperationParameters, operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
+import { operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
-import { classifyOperation, resolvePageParamType } from '@internals/tanstack-query'
+import { classifyOperation, getDefaultPageParamsWarning, matchesInfinite, resolvePageParamType } from '@internals/tanstack-query'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
@@ -29,13 +29,10 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
     const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
 
     if (!isQuery || isMutation || !infiniteOptions || !hooks) return null
+    if (!matchesInfinite(node, infiniteOptions)) return null
 
-    // Validate queryParam exists in operation's query parameters
-    const normalizeKey = (key: string) => key.replace(/\?$/, '')
-    const queryParamKeys = getOperationParameters(node).query.map((p) => p.name)
-    const hasQueryParam = infiniteOptions.queryParam ? queryParamKeys.some((k) => normalizeKey(k) === infiniteOptions.queryParam) : false
-    // cursorParam validation against response schema keys is skipped in v5 (complex schema inspection)
-    if (!hasQueryParam) return null
+    const pageParamsWarning = getDefaultPageParamsWarning(node, infiniteOptions)
+    if (pageParamsWarning) ctx.warn(pageParamsWarning)
 
     const importPath = query ? query.importPath : '@tanstack/vue-query'
 
@@ -110,6 +107,8 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           cursorParam={infiniteOptions.cursorParam}
           nextParam={infiniteOptions.nextParam}
           previousParam={infiniteOptions.previousParam}
+          getNextPageParam={infiniteOptions.getNextPageParam}
+          getPreviousPageParam={infiniteOptions.getPreviousPageParam}
           initialPageParam={infiniteOptions.initialPageParam}
           queryParam={infiniteOptions.queryParam}
           returnType={contractOp.returnType}

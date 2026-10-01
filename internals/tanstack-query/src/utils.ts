@@ -1,4 +1,11 @@
-import { getOperationParameters, getRequestGroupOptionality, getRequestGroups, resolveErrorNames, resolveSuccessNames } from '@internals/shared'
+import {
+  getOperationParameters,
+  getPrimarySuccessResponse,
+  getRequestGroupOptionality,
+  getRequestGroups,
+  resolveErrorNames,
+  resolveSuccessNames,
+} from '@internals/shared'
 import type { ast } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
@@ -286,7 +293,48 @@ export function classifyOperation(node: ast.HttpOperationNode, { query, mutation
  */
 export function resolveInfiniteConfig(infinite: Partial<Infinite> | false): Required<Infinite> | false {
   if (!infinite) return false
-  return { queryParam: 'id', initialPageParam: 0, cursorParam: null, nextParam: null, previousParam: null, ...infinite }
+  return {
+    queryParam: 'id',
+    initialPageParam: 0,
+    cursorParam: null,
+    nextParam: null,
+    previousParam: null,
+    getNextPageParam: null,
+    getPreviousPageParam: null,
+    match: null,
+    ...infinite,
+  }
+}
+
+/**
+ * Whether the infinite hook for `node` should be generated: the operation takes the configured
+ * `queryParam` and passes the user's `match`, if any.
+ */
+export function matchesInfinite(node: ast.OperationNode, infinite: Infinite): boolean {
+  if (!infinite.queryParam) return false
+  const queryParamKeys = getOperationParameters(node).query.map((param) => param.name.replace(/\?$/, ''))
+  if (!queryParamKeys.includes(infinite.queryParam)) return false
+  return infinite.match?.(node) ?? true
+}
+
+/**
+ * Warning for an infinite hook that falls back to the built-in page params on a response that
+ * isn't an array. Those params only stop on an empty array, so `hasNextPage` never turns false.
+ */
+export function getDefaultPageParamsWarning(node: ast.OperationNode, infinite: Infinite): string | null {
+  const usesDefault =
+    infinite.getNextPageParam == null &&
+    infinite.getPreviousPageParam == null &&
+    infinite.nextParam == null &&
+    infinite.previousParam == null &&
+    !infinite.cursorParam
+  if (!usesDefault) return null
+
+  const schema = getPrimarySuccessResponse(node)?.content?.[0]?.schema
+  const resolved = schema?.type === 'ref' ? schema.schema : schema
+  if (!resolved || resolved.type === 'array') return null
+
+  return `${node.operationId}: the default infinite page params expect an array response and never end for this one. Set \`infinite.getNextPageParam\` (or \`nextParam\`) to read the next page from the response.`
 }
 
 export function transformName(name: string, type: string, transformers?: { name?: (name: string, type?: string) => string }): string {

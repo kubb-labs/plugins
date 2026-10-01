@@ -1,5 +1,6 @@
 import { getOperationParameters, operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
+import { matchesInfinite } from '@internals/tanstack-query'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
@@ -25,9 +26,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
     const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
     if (!isQuery || isMutation || !suspense || !infiniteOptions || !hooks) return false
 
-    // Validate queryParam exists in operation's query parameters, optional or not
-    const queryParamKeys = getOperationParameters(operationNode).query.map((p) => p.name)
-    return infiniteOptions.queryParam ? queryParamKeys.includes(infiniteOptions.queryParam) || queryParamKeys.includes(`${infiniteOptions.queryParam}?`) : false
+    return matchesInfinite(operationNode, infiniteOptions)
   },
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
@@ -108,6 +107,8 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
           cursorParam={infiniteOptions.cursorParam}
           nextParam={infiniteOptions.nextParam}
           previousParam={infiniteOptions.previousParam}
+          getNextPageParam={infiniteOptions.getNextPageParam}
+          getPreviousPageParam={infiniteOptions.getPreviousPageParam}
           initialPageParam={infiniteOptions.initialPageParam}
           queryParam={infiniteOptions.queryParam}
           returnType={contractOp.returnType}

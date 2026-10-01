@@ -136,6 +136,18 @@ describe('infiniteQueryGenerator operation', () => {
       options: { infinite: infiniteConfig },
     },
     { name: 'getPetIdCamelCase', node: getPetByIdNode, options: { infinite: infiniteConfig } },
+    {
+      name: 'findByTagsPageParamCode',
+      node: findByTagsNode,
+      options: {
+        infinite: {
+          ...infiniteConfig,
+          getNextPageParam: '(lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined)',
+          getPreviousPageParam: '(firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined)',
+        },
+      },
+    },
+    { name: 'findByTagsInitialPageParam', node: findByTagsNode, options: { infinite: { ...infiniteConfig, initialPageParam: 1 } } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {
@@ -168,6 +180,28 @@ describe('infiniteQueryGenerator operation with hooks disabled', () => {
     }
     const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
     const driver = createMultiPluginDriver('hooksDisabled')
+
+    await renderGeneratorOperation(infiniteQueryGenerator, findByTagsNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverReactQuery,
+    })
+
+    expect(driver.fileManager.files).toStrictEqual([])
+  })
+})
+
+describe('infiniteQueryGenerator operation with infinite.match', () => {
+  test('returns no file when match rejects the operation', async () => {
+    const options: PluginReactQuery['resolvedOptions'] = {
+      ...defaultOptions,
+      infinite: { ...infiniteConfig, match: (node) => node.operationId !== 'findPetsByTags' },
+    }
+    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
+    const driver = createMultiPluginDriver('matchRejected')
 
     await renderGeneratorOperation(infiniteQueryGenerator, findByTagsNode, {
       config: testConfig,

@@ -77,4 +77,25 @@ export type Infinite = {
    * @default 0
    */
   initialPageParam?: unknown
+  /**
+   * Source of TanStack Query's `getNextPageParam`, inlined verbatim. Use it when the next page has
+   * to be computed rather than read from a field. Takes precedence over `nextParam` and `cursorParam`.
+   *
+   * @example
+   * `'(lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined)'`
+   */
+  getNextPageParam?: string | null
+  /**
+   * Source of TanStack Query's `getPreviousPageParam`, inlined verbatim. Takes precedence over
+   * `previousParam` and `cursorParam`.
+   *
+   * @example
+   * `'(firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined)'`
+   */
+  getPreviousPageParam?: string | null
+  /**
+   * Narrows which operations get infinite hooks, on top of having the `queryParam`. Return `false`
+   * to skip an operation, for example one whose response isn't paginated.
+   */
+  match?: ((node: ast.OperationNode) => boolean) | null
 }

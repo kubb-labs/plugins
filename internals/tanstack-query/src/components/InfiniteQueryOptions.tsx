@@ -25,6 +25,8 @@ type Props = {
   cursorParam: Infinite['cursorParam']
   nextParam: Infinite['nextParam']
   previousParam: Infinite['previousParam']
+  getNextPageParam?: Infinite['getNextPageParam']
+  getPreviousPageParam?: Infinite['getPreviousPageParam']
   queryParam: Infinite['queryParam']
   /**
    * The `TQueryKey` generic written into the emitted `infiniteQueryOptions` call. react-query
@@ -59,6 +61,8 @@ export function InfiniteQueryOptions({
   cursorParam,
   nextParam,
   previousParam,
+  getNextPageParam,
+  getPreviousPageParam,
   node,
   tsResolver,
   queryParam,
@@ -81,8 +85,15 @@ export function InfiniteQueryOptions({
   const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName }), { returnType })
 
   const hasNewParams = nextParam != null || previousParam != null
+  const initialPageParamLiteral = typeof initialPageParam === 'string' ? JSON.stringify(initialPageParam) : String(initialPageParam)
 
   const [getNextPageParamExpr, getPreviousPageParamExpr] = (() => {
+    if (getNextPageParam != null || getPreviousPageParam != null) {
+      return [
+        getNextPageParam ? `getNextPageParam: ${getNextPageParam}` : null,
+        getPreviousPageParam ? `getPreviousPageParam: ${getPreviousPageParam}` : null,
+      ] as const
+    }
     if (hasNewParams) {
       const nextAccessor = nextParam ? getNestedAccessor(nextParam, 'lastPage') : null
       const prevAccessor = previousParam ? getNestedAccessor(previousParam, 'firstPage') : null
@@ -96,15 +107,11 @@ export function InfiniteQueryOptions({
     }
     return [
       'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1',
-      'getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= 1 ? undefined : firstPageParam - 1',
+      `getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= ${initialPageParamLiteral} ? undefined : firstPageParam - 1`,
     ] as const
   })()
 
-  const queryOptionsArr = [
-    `initialPageParam: ${typeof initialPageParam === 'string' ? JSON.stringify(initialPageParam) : initialPageParam}`,
-    getNextPageParamExpr,
-    getPreviousPageParamExpr,
-  ].filter(Boolean)
+  const queryOptionsArr = [`initialPageParam: ${initialPageParamLiteral}`, getNextPageParamExpr, getPreviousPageParamExpr].filter(Boolean)
 
   const infiniteOverrideParams =
     queryParam && queryParamsTypeName
