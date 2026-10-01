@@ -8,10 +8,7 @@ import { getPetById } from '../../clients/axios/petService/getPetById'
  * @summary Find pet by ID
  * {@link /pet/:petId:search}
  */
-export async function getPetByIdHandler(
-  { path }: GetPetByIdOptions,
-  request: RequestHandlerExtra<ServerRequest, ServerNotification>,
-): Promise<Promise<CallToolResult>> {
+export async function getPetByIdHandler({ path }: GetPetByIdOptions, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<CallToolResult> {
   const res = await getPetById({ path, signal: request.signal, throwOnError: true })
 
   return {

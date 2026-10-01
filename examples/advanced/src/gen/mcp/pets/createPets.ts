@@ -10,7 +10,7 @@ import { createPets } from '../../clients/axios/petsService/createPets'
 export async function createPetsHandler(
   { path, query, body, headers }: CreatePetsOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
-): Promise<Promise<CallToolResult>> {
+): Promise<CallToolResult> {
   const res = await createPets({ path, query, headers, body, signal: request.signal, throwOnError: true })
 
   return {

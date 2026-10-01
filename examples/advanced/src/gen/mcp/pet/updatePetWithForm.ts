@@ -10,7 +10,7 @@ import { updatePetWithForm } from '../../clients/axios/petService/updatePetWithF
 export async function updatePetWithFormHandler(
   { path, query }: UpdatePetWithFormOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
-): Promise<Promise<CallToolResult>> {
+): Promise<CallToolResult> {
   const res = await updatePetWithForm({ path, query, signal: request.signal, throwOnError: true })
 
   return {
