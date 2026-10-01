@@ -5,7 +5,7 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
 import { describe, expect, test } from 'vitest'
-import { matchFiles } from '#mocks'
+import { matchFiles, rawSources } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
@@ -213,5 +213,65 @@ describe('infiniteQueryGenerator operation with infinite.match', () => {
     })
 
     expect(driver.fileManager.files).toStrictEqual([])
+  })
+})
+
+describe('infiniteQueryGenerator page param resolution combinations', () => {
+  const renderWithInfinite = async (infinite: PluginReactQuery['resolvedOptions']['infinite']) => {
+    const options: PluginReactQuery['resolvedOptions'] = {
+      ...defaultOptions,
+      infinite,
+    }
+    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
+    const driver = createMultiPluginDriver('pageParamCombos')
+
+    await renderGeneratorOperation(infiniteQueryGenerator, findByTagsNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverReactQuery,
+    })
+
+    return rawSources(driver.fileManager.files)[0] ?? ''
+  }
+
+  test('only getNextPageParam is configured', async () => {
+    const source = await renderWithInfinite({
+      ...infiniteConfig,
+      getNextPageParam: '(lastPage) => lastPage.next',
+    })
+    expect(source).toContain('getNextPageParam: (lastPage) => lastPage.next')
+    expect(source).not.toContain('getPreviousPageParam')
+  })
+
+  test('mixed getNextPageParam and previousParam', async () => {
+    const source = await renderWithInfinite({
+      ...infiniteConfig,
+      getNextPageParam: '(lastPage) => lastPage.next',
+      previousParam: 'prevCursor',
+    })
+    expect(source).toContain('getNextPageParam: (lastPage) => lastPage.next')
+    expect(source).toContain("getPreviousPageParam: (firstPage) => firstPage?.['prevCursor']")
+  })
+
+  test('mixed nextParam and getPreviousPageParam', async () => {
+    const source = await renderWithInfinite({
+      ...infiniteConfig,
+      nextParam: 'nextCursor',
+      getPreviousPageParam: '(firstPage) => firstPage.prev',
+    })
+    expect(source).toContain("getNextPageParam: (lastPage) => lastPage?.['nextCursor']")
+    expect(source).toContain('getPreviousPageParam: (firstPage) => firstPage.prev')
+  })
+
+  test('only getPreviousPageParam is configured falls back to default getNextPageParam', async () => {
+    const source = await renderWithInfinite({
+      ...infiniteConfig,
+      getPreviousPageParam: '(firstPage) => firstPage.prev',
+    })
+    expect(source).toContain('getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage)')
+    expect(source).toContain('getPreviousPageParam: (firstPage) => firstPage.prev')
   })
 })

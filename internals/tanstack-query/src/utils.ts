@@ -312,8 +312,9 @@ export function resolveInfiniteConfig(infinite: Partial<Infinite> | false): Requ
  */
 export function matchesInfinite(node: ast.OperationNode, infinite: Infinite): boolean {
   if (!infinite.queryParam) return false
-  const queryParamKeys = getOperationParameters(node).query.map((param) => param.name.replace(/\?$/, ''))
-  if (!queryParamKeys.includes(infinite.queryParam)) return false
+  // Strip trailing '?' which OpenAPI specs sometimes append to parameter names to denote optionality
+  const hasQueryParam = getOperationParameters(node).query.some((param) => param.name.replace(/\?$/, '') === infinite.queryParam)
+  if (!hasQueryParam) return false
   return infinite.match?.(node) ?? true
 }
 
@@ -331,7 +332,10 @@ export function getDefaultPageParamsWarning(node: ast.OperationNode, infinite: I
   if (!usesDefault) return null
 
   const schema = getPrimarySuccessResponse(node)?.content?.[0]?.schema
-  const resolved = schema?.type === 'ref' ? schema.schema : schema
+  let resolved: ast.SchemaNode | null | undefined = schema
+  while (resolved?.type === 'ref') {
+    resolved = resolved.schema
+  }
   if (!resolved || resolved.type === 'array') return null
 
   return `${node.operationId}: the default infinite page params expect an array response and never end for this one. Set \`infinite.getNextPageParam\` (or \`nextParam\`) to read the next page from the response.`

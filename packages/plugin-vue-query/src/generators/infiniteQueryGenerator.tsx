@@ -16,23 +16,31 @@ import type { PluginVueQuery } from '../types'
 export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
   name: 'vue-query-infinite',
   renderer: jsxRenderer,
+  match(node, ctx) {
+    const operationNode = node as ast.OperationNode
+    if (!ast.isHttpOperationNode(operationNode)) return false
+    const { query, mutation, infinite, hooks } = ctx.options
+
+    const { isQuery, isMutation } = classifyOperation(operationNode, { query, mutation })
+    const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
+    if (!isQuery || isMutation || !infiniteOptions || !hooks) return false
+
+    return matchesInfinite(operationNode, infiniteOptions)
+  },
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, infinite, client, group, hooks } = ctx.options
+    const { output, query, infinite, client, group } = ctx.options
+
+    const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
+    if (!infiniteOptions) return null
+
+    const pageParamsWarning = getDefaultPageParamsWarning(node, infiniteOptions)
+    if (pageParamsWarning) ctx.warn(pageParamsWarning)
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
     const tsResolver = driver.getResolver(pluginTsName)
-
-    const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
-    const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
-
-    if (!isQuery || isMutation || !infiniteOptions || !hooks) return null
-    if (!matchesInfinite(node, infiniteOptions)) return null
-
-    const pageParamsWarning = getDefaultPageParamsWarning(node, infiniteOptions)
-    if (pageParamsWarning) ctx.warn(pageParamsWarning)
 
     const importPath = query ? query.importPath : '@tanstack/vue-query'
 

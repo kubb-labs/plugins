@@ -1,11 +1,11 @@
-import { getOperationParameters, operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
+import { operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { matchesInfinite } from '@internals/tanstack-query'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { InfiniteQuery, InfiniteQueryOptions, QueryKey } from '../components'
-import { classifyOperation } from '../utils.ts'
+import { classifyOperation, resolvePageParamType } from '../utils.ts'
 import type { PluginReactQuery } from '../types'
 
 /**
@@ -40,6 +40,8 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
     const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
     if (!infiniteOptions) return null
 
+    // Note: getDefaultPageParamsWarning is omitted here because infiniteQueryGenerator already
+    // emits the warning for this operation when infinite queries are enabled.
     const importPath = query ? query.importPath : '@tanstack/react-query'
 
     // The registered contract client plugin owns the `<op>` the hook imports and calls.
@@ -63,16 +65,20 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
       }),
     }
 
-    const rawQueryParams = getOperationParameters(node).query
-    const queryParamsTypeName =
-      rawQueryParams.length > 0 && tsResolver.param.query(node, rawQueryParams[0]!) !== tsResolver.param.name(node, rawQueryParams[0]!)
-        ? tsResolver.param.query(node, rawQueryParams[0]!)
-        : null
+    const { queryParamsTypeName } = resolvePageParamType(node, {
+      resolver: tsResolver,
+      initialPageParam: infiniteOptions.initialPageParam,
+      queryParam: infiniteOptions.queryParam,
+    })
 
     const importedTypeNames = [
       tsResolver.response.options(node),
       queryParamsTypeName,
-      ...resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first', includeParams: false }),
+      ...resolveOperationTypeNames(node, tsResolver, {
+        exclude: [queryKeyTypeName],
+        order: 'body-response-first',
+        includeParams: false,
+      }),
     ].filter((name): name is string => Boolean(name))
 
     const calledClientName = contractOp.name

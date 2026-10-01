@@ -145,6 +145,21 @@ describe('resolveInfiniteConfig', () => {
   test('clears the page param code and match by default', () => {
     expect(resolveInfiniteConfig({})).toMatchObject({ getNextPageParam: null, getPreviousPageParam: null, match: null })
   })
+
+  test('preserves configured page param code and match', () => {
+    const matchFn = () => true
+    expect(
+      resolveInfiniteConfig({
+        getNextPageParam: '(lastPage) => lastPage.next',
+        getPreviousPageParam: '(firstPage) => firstPage.prev',
+        match: matchFn,
+      }),
+    ).toMatchObject({
+      getNextPageParam: '(lastPage) => lastPage.next',
+      getPreviousPageParam: '(firstPage) => firstPage.prev',
+      match: matchFn,
+    })
+  })
 })
 
 describe('matchesInfinite', () => {
@@ -158,6 +173,17 @@ describe('matchesInfinite', () => {
 
   test('skips an operation without the queryParam', () => {
     expect(matchesInfinite(listPetsNode(pageSchema, 'cursor'), infinite())).toBe(false)
+  })
+
+  test('skips an operation with no parameters', () => {
+    const noParamsNode = ast.factory.createOperation({
+      operationId: 'listPets',
+      method: 'GET',
+      path: '/pets',
+      parameters: [],
+      responses: [ast.factory.createResponse({ statusCode: '200', schema: pageSchema })],
+    })
+    expect(matchesInfinite(noParamsNode, infinite())).toBe(false)
   })
 
   test('lets match narrow the operations', () => {
@@ -179,8 +205,31 @@ describe('getDefaultPageParamsWarning', () => {
     expect(getDefaultPageParamsWarning(listPetsNode(ref), infinite())).not.toBeNull()
   })
 
+  test('resolves chained refs to the response schema', () => {
+    const innerRef = ast.factory.createSchema({ type: 'ref', ref: '#/components/schemas/ArrayOfPets', schema: arraySchema })
+    const outerRef = ast.factory.createSchema({ type: 'ref', ref: '#/components/schemas/PetList', schema: innerRef })
+
+    expect(getDefaultPageParamsWarning(listPetsNode(outerRef), infinite())).toBeNull()
+  })
+
   test('stays quiet for an array response', () => {
     expect(getDefaultPageParamsWarning(listPetsNode(arraySchema), infinite())).toBeNull()
+  })
+
+  test('stays quiet when response has no schema', () => {
+    const noSchemaNode = ast.factory.createOperation({
+      operationId: 'listPets',
+      method: 'GET',
+      path: '/pets',
+      parameters: [ast.factory.createParameter({ name: 'page', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) })],
+      responses: [],
+    })
+    expect(getDefaultPageParamsWarning(noSchemaNode, infinite())).toBeNull()
+  })
+
+  test('warns when response schema is a primitive type', () => {
+    const stringSchema = ast.factory.createSchema({ type: 'string' })
+    expect(getDefaultPageParamsWarning(listPetsNode(stringSchema), infinite())).not.toBeNull()
   })
 
   test.each([

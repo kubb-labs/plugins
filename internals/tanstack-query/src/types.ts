@@ -78,16 +78,17 @@ export type Infinite = {
    */
   initialPageParam?: unknown
   /**
-   * Source of TanStack Query's `getNextPageParam`, inlined verbatim. Use it when the next page has
-   * to be computed rather than read from a field. Takes precedence over `nextParam` and `cursorParam`.
+   * Source of TanStack Query's `getNextPageParam`, inlined verbatim as a function expression. Use it
+   * when the next page has to be computed rather than read from a field. Takes precedence over
+   * `nextParam` and `cursorParam`.
    *
    * @example
    * `'(lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined)'`
    */
   getNextPageParam?: string | null
   /**
-   * Source of TanStack Query's `getPreviousPageParam`, inlined verbatim. Takes precedence over
-   * `previousParam` and `cursorParam`.
+   * Source of TanStack Query's `getPreviousPageParam`, inlined verbatim as a function expression.
+   * Takes precedence over `previousParam` and `cursorParam`.
    *
    * @example
    * `'(firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined)'`
