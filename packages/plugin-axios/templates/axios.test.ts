@@ -934,6 +934,115 @@ describe('createClientCore', () => {
       expect(executionOrder).toStrictEqual(['req2', 'req1', 'res1', 'res2'])
     })
 
+    test('preserves interleaved response and error interceptor order across transport swap', async () => {
+      const client = createClientCore()
+      const calls: Array<string> = []
+
+      // Register order: res1 -> err1 -> res2 (throws) -> err2
+      client.interceptors.response.use((res) => {
+        calls.push('res1')
+        return res
+      })
+      client.interceptors.error.use((err) => {
+        calls.push('err1')
+        return err
+      })
+      client.interceptors.response.use(() => {
+        calls.push('res2')
+        throw new Error('boom from res2')
+      })
+      client.interceptors.error.use((err) => {
+        calls.push('err2')
+        return err
+      })
+
+      client.setConfig({ transport: realAxios() })
+
+      await expect(client({ method: 'GET', url: '/interleaved' })).rejects.toThrow('boom from res2')
+
+      // Because err1 was registered before res2, err1 does not see the error thrown by res2.
+      // Only err2 (registered after res2) runs.
+      expect(calls).toStrictEqual(['res1', 'res2', 'err2'])
+    })
+
+    test('preserves re-ordered position of updated interceptor across transport swap', async () => {
+      const client = createClientCore()
+      const calls: Array<string> = []
+
+      const id1 = client.interceptors.response.use((res) => {
+        calls.push('res1')
+        return res
+      })
+      client.interceptors.response.use((res) => {
+        calls.push('res2')
+        return res
+      })
+
+      // Update id1 moves it to the end of the interceptor chain
+      client.interceptors.response.update(id1, (res) => {
+        calls.push('res1-updated')
+        return res
+      })
+
+      client.setConfig({ transport: realAxios() })
+      await client({ method: 'GET', url: '/update-order' })
+
+      expect(calls).toStrictEqual(['res2', 'res1-updated'])
+    })
+
+    test('preserves re-ordered position of updated error interceptor across transport swap', async () => {
+      const client = createClientCore()
+      const calls: Array<string> = []
+
+      // Register error first, then response
+      const errId = client.interceptors.error.use((err) => {
+        calls.push('err1')
+        return err
+      })
+      client.interceptors.response.use(() => {
+        calls.push('res1')
+        throw new Error('boom from res1')
+      })
+
+      // Initially, err1 was registered before res1, so err1 does not catch res1 errors.
+      // Now update errId: it moves to the end of the chain (after res1).
+      client.interceptors.error.update(errId, (err) => {
+        calls.push('err1-updated')
+        return err
+      })
+
+      client.setConfig({ transport: realAxios() })
+      await expect(client({ method: 'GET', url: '/error-update-order' })).rejects.toThrow('boom from res1')
+
+      expect(calls).toStrictEqual(['res1', 'err1-updated'])
+    })
+
+    test('preserves LIFO re-ordered position of updated request interceptor across transport swap', async () => {
+      const client = createClientCore()
+      const calls: Array<string> = []
+
+      const id1 = client.interceptors.request.use((config) => {
+        calls.push('req1')
+        return config
+      })
+      client.interceptors.request.use((config) => {
+        calls.push('req2')
+        return config
+      })
+
+      // In Axios, request interceptors are LIFO.
+      // Updating id1 moves it to the end of Axios's chain, so it now executes first.
+      client.interceptors.request.update(id1, (config) => {
+        calls.push('req1-updated')
+        return config
+      })
+
+      client.setConfig({ transport: realAxios() })
+      await client({ method: 'GET', url: '/req-update-order' })
+
+      expect(calls).toStrictEqual(['req1-updated', 'req2'])
+    })
+
     test('safely handles update with unknown or previously ejected id after transport swap', async () => {
       const client = createClientCore()
       const reqFn = vi.fn((config: InternalAxiosRequestConfig) => config)

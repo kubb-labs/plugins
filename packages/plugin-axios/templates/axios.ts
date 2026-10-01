@@ -422,10 +422,16 @@ function createInterceptorChannel<T, TRequest, TResponse>(
   getRequestConfig: (value: T) => RequestConfig<unknown, TRequest, TResponse> | undefined,
   getContextId: (value: T) => number | undefined,
   setContextId: (value: T, id: number | undefined) => void,
-): InterceptorChannel<T, TRequest, TResponse> & { detach: () => void; attach: () => void } {
+  nextSeq?: () => number,
+): InterceptorChannel<T, TRequest, TResponse> & {
+  detach: () => void
+  attach: () => void
+  getEntries: () => Array<{ seq: number; attach: () => void }>
+} {
   const ids = new Map<number, number>()
-  const handlers = new Map<number, InterceptorFn<T, TRequest, TResponse>>()
+  const handlers = new Map<number, { fn: InterceptorFn<T, TRequest, TResponse>; seq: number }>()
   let counter = 0
+  const getSeq = nextSeq ?? (() => ++counter)
   const registerWithContext = (fn: InterceptorFn<T, TRequest, TResponse>) =>
     register(async (value) => {
       const contextId = getContextId(value)
@@ -437,7 +443,8 @@ function createInterceptorChannel<T, TRequest, TResponse>(
   return {
     use(fn) {
       const id = ++counter
-      handlers.set(id, fn)
+      const seq = getSeq()
+      handlers.set(id, { fn, seq })
       ids.set(id, registerWithContext(fn))
       return id
     },
@@ -452,7 +459,8 @@ function createInterceptorChannel<T, TRequest, TResponse>(
       const nativeId = ids.get(id)
       if (nativeId === undefined) return
       ejectNative(nativeId)
-      handlers.set(id, fn)
+      const seq = getSeq()
+      handlers.set(id, { fn, seq })
       ids.set(id, registerWithContext(fn))
     },
     detach() {
@@ -460,7 +468,14 @@ function createInterceptorChannel<T, TRequest, TResponse>(
       ids.clear()
     },
     attach() {
-      for (const [id, fn] of handlers) ids.set(id, registerWithContext(fn))
+      const sorted = Array.from(handlers.entries()).sort((a, b) => a[1].seq - b[1].seq)
+      for (const [id, entry] of sorted) ids.set(id, registerWithContext(entry.fn))
+    },
+    getEntries() {
+      return Array.from(handlers.entries()).map(([id, entry]) => ({
+        seq: entry.seq,
+        attach: () => ids.set(id, registerWithContext(entry.fn)),
+      }))
     },
   }
 }
@@ -731,6 +746,9 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     else contextualConfig.__kubbRequestContext = id
   }
 
+  let sequenceCounter = 0
+  const nextSeq = () => ++sequenceCounter
+
   // Read at call time so the channels follow a transport swapped in through setConfig.
   const channels = {
     request: createInterceptorChannel<InternalAxiosRequestConfig, TRequest, TResponse>(
@@ -739,6 +757,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       getRequestConfig,
       getContextId,
       setContextId,
+      nextSeq,
     ),
     response: createInterceptorChannel<AxiosResponse, TRequest, TResponse>(
       (fn) => instance.interceptors.response.use(fn),
@@ -746,6 +765,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       getRequestConfig,
       getContextId,
       setContextId,
+      nextSeq,
     ),
     error: createInterceptorChannel<AxiosError, TRequest, TResponse>(
       (fn) =>
@@ -756,6 +776,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       getRequestConfig,
       getContextId,
       setContextId,
+      nextSeq,
     ),
   }
   const channelList = [channels.request, channels.response, channels.error]
@@ -814,7 +835,9 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     if (nextInstance !== instance) {
       for (const channel of channelList) channel.detach()
       instance = nextInstance
-      for (const channel of channelList) channel.attach()
+      channels.request.attach()
+      const responseEntries = [...channels.response.getEntries(), ...channels.error.getEntries()].sort((a, b) => a.seq - b.seq)
+      for (const entry of responseEntries) entry.attach()
     }
     return config
   }
