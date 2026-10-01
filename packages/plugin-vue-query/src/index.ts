@@ -1,3 +1,5 @@
 export { default, pluginVueQuery, pluginVueQueryName } from './plugin.ts'
 export { resolverVueQuery } from './resolvers/resolverVueQuery.ts'
+export { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
+export type { KeyVariant, Transformer } from '@internals/tanstack-query'
 export type { PluginVueQuery, ResolverVueQuery } from './types.ts'

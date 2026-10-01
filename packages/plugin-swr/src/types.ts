@@ -87,7 +87,7 @@ export type ResolverSwr = Resolver & {
 }
 
 /**
- * Customize the queryKey.
+ * Customize the queryKey. Wrap the exported `queryKeyTransformer` to extend the default key.
  */
 type QueryKey = Transformer
 

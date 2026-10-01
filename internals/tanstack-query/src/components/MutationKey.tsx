@@ -20,7 +20,7 @@ export const mutationKeyTransformer: Transformer = ({ node }) => {
 export function MutationKey({ name, node, transformer }: Props): KubbReactNode {
   const paramsNode = createFunctionParameters({ params: [] })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const keys = (transformer ?? mutationKeyTransformer)({ node, casing: 'camelcase' })
+  const keys = (transformer ?? mutationKeyTransformer)({ node, casing: 'camelcase', variant: 'mutation' })
 
   return (
     <File.Source name={name} isExportable isIndexable>

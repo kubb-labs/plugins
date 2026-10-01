@@ -4,9 +4,10 @@ import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, rend
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
-import { describe, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import { matchFiles } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
+import type { Transformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
 import { mutationGenerator } from './mutationGenerator.tsx'
@@ -192,5 +193,25 @@ describe('mutationGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('mutationGenerator mutationKey', () => {
+  test('passes the mutation variant to a custom mutationKey', async () => {
+    const mutationKey = vi.fn<Transformer>(mutationKeyTransformer)
+    const options: PluginReactQuery['resolvedOptions'] = { ...defaultOptions, mutationKey }
+    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
+    const driver = createMultiPluginDriver('customMutationKey')
+
+    await renderGeneratorOperation(mutationGenerator, updatePetByIdNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverReactQuery,
+    })
+
+    expect(mutationKey.mock.calls.map(([props]) => props.variant)).toEqual(['mutation'])
   })
 })

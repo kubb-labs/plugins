@@ -11,7 +11,7 @@ import { findPetsByTags } from './clients/findPetsByTags'
 import { infiniteQueryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 
 export const findPetsByTagsSuspenseInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'>) =>
-  [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
+  [{ url: '/pet/findByTags', infinite: true }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsByTagsSuspenseInfiniteQueryKey>
 

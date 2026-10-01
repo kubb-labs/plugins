@@ -181,7 +181,9 @@ export type ResolverReactQuery = Resolver & {
 type Suspense = object
 
 /**
- * Builds the `queryKey` used by each generated query hook.
+ * Builds the `queryKey` used by each generated query hook. `variant` tells which hook the key is for,
+ * so infinite keys can stay apart from plain ones. Wrap the exported `queryKeyTransformer` to extend
+ * the default key.
  *
  * @note String values are inlined verbatim into generated code. Wrap literal
  * strings in `JSON.stringify(...)`.

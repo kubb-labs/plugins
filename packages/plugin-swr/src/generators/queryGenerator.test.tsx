@@ -6,9 +6,10 @@ import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, rend
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
-import { describe, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import { matchFiles } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
+import type { Transformer } from '@internals/tanstack-query'
 import { resolverSwr } from '../resolvers/resolverSwr.ts'
 import type { PluginSwr } from '../types.ts'
 import { queryGenerator } from './queryGenerator.tsx'
@@ -150,5 +151,25 @@ describe('queryGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('queryGenerator queryKey', () => {
+  test('passes the query variant to a custom queryKey', async () => {
+    const queryKey = vi.fn<Transformer>(queryKeyTransformer)
+    const options: PluginSwr['resolvedOptions'] = { ...defaultOptions, queryKey }
+    const plugin = createMockedPlugin<PluginSwr>({ name: 'plugin-swr', options, resolver: resolverSwr })
+    const driver = createMultiPluginDriver('customQueryKey')
+
+    await renderGeneratorOperation(queryGenerator, findByTagsNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverSwr,
+    })
+
+    expect(queryKey.mock.calls.map(([props]) => props.variant)).toEqual(['query'])
   })
 })
