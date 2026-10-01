@@ -1,0 +1,71 @@
+{
+  "name": "@kubb/plugin-client",
+  "version": "5.5.2",
+  "description": "Generate typed API operations against your own client module.",
+  "keywords": [
+    "api-client",
+    "code-generation",
+    "http-client",
+    "kubb",
+    "openapi",
+    "swagger",
+    "typescript"
+  ],
+  "homepage": "https://kubb.dev/plugins/plugin-client",
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kubb-labs/plugins.git",
+    "directory": "packages/plugin-client"
+  },
+  "files": [
+    "src",
+    "dist",
+    "!/**/**.test.**",
+    "!/**/__tests__/**",
+    "!/**/__snapshots__/**"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "start": "tsdown --watch",
+    "test": "vitest --passWithNoTests",
+    "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@kubb/plugin-ts": "workspace:^",
+    "@kubb/plugin-zod": "workspace:^"
+  },
+  "devDependencies": {
+    "@internals/client": "workspace:*",
+    "@internals/shared": "workspace:*",
+    "kubb": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "kubb": "catalog:"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

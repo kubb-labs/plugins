@@ -7,6 +7,7 @@ import {
   buildEnum,
   formatLiteral,
   integerFormatPattern,
+  isClosedKeySchema,
   isObjectComposableIntersection,
   isObjectSchemaNode,
   lengthChecksMini,
@@ -266,15 +267,31 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         const entries = node.properties ?? []
         // zod/mini has no chainable `.catchall()`/`.strict()`, so route through the functional forms.
         const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
+        const propertyNamesNode = 'propertyNames' in node ? (node as { propertyNames?: ast.SchemaNode }).propertyNames : undefined
+        const propertyNamesKeySchema = propertyNamesNode ? this.transform(propertyNamesNode) : null
+
         // `additionalProperties: false` still permits patternProperties keys, so only a pattern-free object is strict.
         const isStrict = node.additionalProperties === false && patterns.length === 0
-        const objectBase = `${isStrict ? 'z.strictObject' : 'z.object'}(${buildZodMiniObjectShape(this, node)})`
+        const isLoose = node.additionalProperties === true
+        const ctor = isStrict ? 'z.strictObject' : isLoose ? 'z.looseObject' : 'z.object'
+        const shape = buildZodMiniObjectShape(this, node)
+        const objectBase = `${ctor}(${shape})`
+
+        // Closed key schemas (enums, literals) use z.partialRecord() so missing keys do not fail exhaustiveness.
+        const recordFn = isClosedKeySchema(propertyNamesNode) ? 'z.partialRecord' : 'z.record'
 
         if (node.additionalProperties && node.additionalProperties !== true) {
           const catchallType = this.transform(node.additionalProperties)
+          if (entries.length === 0) {
+            return catchallType ? `${recordFn}(${propertyNamesKeySchema || 'z.string()'}, ${catchallType})` : objectBase
+          }
           return catchallType ? `z.catchall(${objectBase}, ${catchallType})` : objectBase
         }
-        if (node.additionalProperties === true) return `z.catchall(${objectBase}, ${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
+        if (entries.length === 0 && patterns.length === 0 && propertyNamesKeySchema && !isStrict) {
+          const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+          return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
+        }
+        if (node.additionalProperties === true) return objectBase
         if (isStrict) return objectBase
 
         if (patterns.length > 0) {
@@ -288,6 +305,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           if (entries.length > 0) return `z.catchall(${objectBase}, ${value})`
           return `z.record(${patternKeySchemaMini({ patterns: patterns.map(([pattern]) => pattern), regexType: this.options.regexType })}, ${value})`
         }
+
         return objectBase
       },
       array(node) {

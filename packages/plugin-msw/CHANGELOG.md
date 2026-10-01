@@ -1,5 +1,11 @@
 # @kubb/plugin-msw
 
+## 5.0.5
+
+### Patch Changes
+
+- [#992](https://github.com/kubb-labs/plugins/pull/992) [`0102467`](https://github.com/kubb-labs/plugins/commit/01024679f5509f7b74c9c5bed3a8e8c0789a6c1f) Thanks [@Ericlm](https://github.com/Ericlm)! - Use exported per-status response types in MSW handlers when an operation response alias collides with an imported schema type name.
+
 ## 5.0.4
 
 ### Patch Changes

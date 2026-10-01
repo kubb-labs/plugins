@@ -16,7 +16,8 @@ export function buildRequestResultGenerics({ node, types }: { node: ast.Operatio
 
 /**
  * Builds the full return type an operation's function signature uses: `Unwrappable<RequestResult>`
- * for the default `returnType: 'full'`, already a promise so no further wrapping is needed, or a
+ * for the default `returnType: 'full'`, already a promise so no further wrapping is needed, a plain
+ * `Promise<RequestResult>` for the internal `'plain'` shape, or a
  * `Promise` of the runtime's `UnwrappedResult` when `returnType: 'data'` narrows a resolved call
  * down to the bare success body.
  *
@@ -25,5 +26,7 @@ export function buildRequestResultGenerics({ node, types }: { node: ast.Operatio
  */
 export function buildResultType({ node, types, returnType }: { node: ast.OperationNode; types: OperationTypeNames; returnType: ReturnTypeOption }): string {
   const generics = buildRequestResultGenerics({ node, types })
-  return returnType === 'data' ? `Promise<UnwrappedResult<${generics}>>` : `Unwrappable<RequestResult<${generics}>>`
+  if (returnType === 'data') return `Promise<UnwrappedResult<${generics}>>`
+  if (returnType === 'plain') return `Promise<RequestResult<${generics}>>`
+  return `Unwrappable<RequestResult<${generics}>>`
 }

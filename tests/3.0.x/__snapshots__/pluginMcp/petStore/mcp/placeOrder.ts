@@ -13,7 +13,7 @@ import { placeOrder } from '../clients/placeOrder'
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrderHandler({ body }: PlaceOrderOptions, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
+export async function placeOrderHandler({ body }: PlaceOrderOptions, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<CallToolResult> {
   const res = await placeOrder({ body, signal: request.signal, throwOnError: true })
 
   return {

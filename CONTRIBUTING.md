@@ -1,6 +1,6 @@
 # Contributing to Kubb plugins
 
-This repository is home to both official and community plugins for [Kubb](https://kubb.dev), the meta framework for code generation. We welcome contributions, and there are a few ways to get involved:
+This repository is home to both official and community plugins for [Kubb](https://kubb.dev), which turns your API spec into type-safe code. We welcome contributions, and there are a few ways to get involved:
 
 - Found a bug? File it in the [issue tracker](https://github.com/kubb-labs/plugins/issues).
 - Have an idea for a plugin or improvement? [Open an issue](https://github.com/kubb-labs/plugins/issues/new) to share it.

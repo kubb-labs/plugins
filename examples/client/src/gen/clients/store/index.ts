@@ -1,0 +1,5 @@
+export { deleteOrder } from './deleteOrder'
+export { getInventory } from './getInventory'
+export { getOrderById } from './getOrderById'
+export { placeOrder } from './placeOrder'
+export { placeOrderPatch } from './placeOrderPatch'

@@ -16,7 +16,7 @@ import { findPetsByStatus } from '../clients/findPetsByStatus'
 export async function findPetsByStatusHandler(
   { path }: FindPetsByStatusOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
-): Promise<Promise<CallToolResult>> {
+): Promise<CallToolResult> {
   const res = await findPetsByStatus({ path, signal: request.signal, throwOnError: true })
 
   return {

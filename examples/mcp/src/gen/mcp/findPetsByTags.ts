@@ -16,7 +16,7 @@ import { findPetsByTags } from '../clients/findPetsByTags'
 export async function findPetsByTagsHandler(
   { query, headers }: FindPetsByTagsOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
-): Promise<Promise<CallToolResult>> {
+): Promise<CallToolResult> {
   const res = await findPetsByTags({ query, headers, signal: request.signal, throwOnError: true })
 
   return {

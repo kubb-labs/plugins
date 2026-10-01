@@ -13,10 +13,7 @@ import { updatePet } from '../clients/updatePet'
  * @summary Update an existing pet
  * {@link /pet}
  */
-export async function updatePetHandler(
-  { body }: UpdatePetOptions,
-  request: RequestHandlerExtra<ServerRequest, ServerNotification>,
-): Promise<Promise<CallToolResult>> {
+export async function updatePetHandler({ body }: UpdatePetOptions, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<CallToolResult> {
   const res = await updatePet({ body, signal: request.signal, throwOnError: true })
 
   return {

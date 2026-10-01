@@ -16,7 +16,7 @@ import { getOrderById } from '../clients/getOrderById'
 export async function getOrderByIdHandler(
   { path }: GetOrderByIdOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
-): Promise<Promise<CallToolResult>> {
+): Promise<CallToolResult> {
   const res = await getOrderById({ path, signal: request.signal, throwOnError: true })
 
   return {

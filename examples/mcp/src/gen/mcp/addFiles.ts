@@ -13,10 +13,7 @@ import { addFiles } from '../clients/addFiles'
  * @summary Place an file for a pet
  * {@link /pet/files}
  */
-export async function addFilesHandler(
-  { body }: AddFilesOptions,
-  request: RequestHandlerExtra<ServerRequest, ServerNotification>,
-): Promise<Promise<CallToolResult>> {
+export async function addFilesHandler({ body }: AddFilesOptions, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<CallToolResult> {
   const res = await addFiles({ body, signal: request.signal, throwOnError: true })
 
   return {

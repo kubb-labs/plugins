@@ -11,6 +11,7 @@ import { buildRequestResultGenerics, buildResultType } from './generics.ts'
  * body. With `returnType: 'data'` it instead routes the call through the runtime's `unwrapResult`,
  * which narrows the resolved value down to the bare success body the same way `RequestResult`
  * already does, using the plugin default when the call leaves `throwOnError` unset.
+ * With `returnType: 'plain'` it returns the runtime call as is, cast to `RequestResult`, with no helper.
  *
  * Cast first, wrap second, for the `'full'` path. That order keeps `withUnwrap`'s generic inferred
  * as `RequestResult` instead of the runtime's own internal result type. Casting an `Unwrappable<A>`
@@ -21,6 +22,8 @@ import { buildRequestResultGenerics, buildResultType } from './generics.ts'
  * `return withUnwrap(request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>)`
  * @example
  * `return unwrapResult(request({ method: 'POST', url: '/pet', ...config }), config.throwOnError ?? false) as Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>`
+ * @example
+ * `return request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>`
  */
 export function buildReturnStatement({
   node,
@@ -38,6 +41,9 @@ export function buildReturnStatement({
   if (returnType === 'data') {
     const resultType = buildResultType({ node, types, returnType })
     return `return unwrapResult(request(${callConfig}), config.throwOnError ?? ${throwOnErrorDefault}) as ${resultType}`
+  }
+  if (returnType === 'plain') {
+    return `return request(${callConfig}) as Promise<RequestResult<${buildRequestResultGenerics({ node, types })}>>`
   }
   return `return withUnwrap(request(${callConfig}) as Promise<RequestResult<${buildRequestResultGenerics({ node, types })}>>)`
 }

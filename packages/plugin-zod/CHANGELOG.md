@@ -1,5 +1,27 @@
 # @kubb/plugin-zod
 
+## 5.4.1
+
+### Patch Changes
+
+- [#995](https://github.com/kubb-labs/plugins/pull/995) [`928ea0a`](https://github.com/kubb-labs/plugins/commit/928ea0a1efa3317f1e3d424c1f88d0142c70bcb3) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add the imports that `printer.nodes` handlers declare with `this.import(...)` to the generated file.
+
+## 5.4.0
+
+### Minor Changes
+
+- [#925](https://github.com/kubb-labs/plugins/pull/925) [`adaf6c6`](https://github.com/kubb-labs/plugins/commit/adaf6c6674ba309224e01c4c9917ab847b9cc429) Thanks [@xeoneux](https://github.com/xeoneux)! - Support `z.record(keySchema, valueSchema)`, `z.partialRecord(...)`, and `z.looseObject(...)` for OpenAPI objects and dictionaries.
+  
+  - Objects with no declared properties and `additionalProperties: <schema>` now generate `z.record(z.string(), schema)` instead of `z.object({}).catchall(schema)`.
+  - Support OpenAPI 3.1 `propertyNames` as the key schema argument in `z.record(keySchema, valueSchema)` (for both standard Zod and Zod Mini).
+  - Closed key schemas (such as enums and literals) used with `propertyNames` generate `z.partialRecord(keySchema, valueSchema)` so that absent keys do not fail Zod v4 exhaustiveness checks, accurately modeling OpenAPI `propertyNames` semantics and inferring `Partial<Record<Keys, Value>>`.
+  - Objects with `additionalProperties: true` now generate native `z.looseObject(...)` instead of catchall.
+  - Objects with declared properties and typed `additionalProperties` continue using `.catchall(schema)`.
+
+### Patch Changes
+
+- [#997](https://github.com/kubb-labs/plugins/pull/997) [`20cc521`](https://github.com/kubb-labs/plugins/commit/20cc521cc019e9fc501103b0d240856197d9bf18) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Print `z.strictObject({})` for an object with `additionalProperties: false` and `propertyNames` but no properties. It used to print a permissive `z.record(keys, z.unknown())`.
+
 ## 5.3.0
 
 ### Minor Changes

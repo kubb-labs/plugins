@@ -22,7 +22,7 @@
 
 **Official and community plugins for [Kubb](https://kubb.dev).**
 
-This monorepo is home to official and community plugins for [Kubb](https://kubb.dev), the meta framework for code generation. Point Kubb at your OpenAPI specification and it generates TypeScript types, API clients, Zod schemas, TanStack Query hooks for React, composables for Vue, SWR hooks, Faker mocks, MSW handlers, and more.
+This monorepo is home to official and community plugins for [Kubb](https://kubb.dev), which turns your API spec into type-safe code. Point Kubb at your OpenAPI specification and it generates TypeScript types, API clients, Zod schemas, TanStack Query hooks for React, composables for Vue, SWR hooks, Faker mocks, MSW handlers, and more.
 
 Want to build your own plugin? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 

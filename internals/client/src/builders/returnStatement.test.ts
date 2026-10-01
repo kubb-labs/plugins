@@ -25,4 +25,11 @@ describe('buildReturnStatement', () => {
       `return unwrapResult(request({ method: 'POST', url: '/pet', ...config }), config.throwOnError ?? ${throwOnErrorDefault}) as Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>`,
     )
   })
+
+  test('returns the client call cast to RequestResult with no helper when returnType is plain', () => {
+    const callConfig = "{ method: 'POST', url: '/pet', ...config }"
+    expect(buildReturnStatement({ node, types: resolverTs, callConfig, returnType: 'plain', throwOnErrorDefault: true })).toBe(
+      "return request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>",
+    )
+  })
 })
