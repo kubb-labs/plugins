@@ -4,10 +4,11 @@ import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, rend
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
-import { describe, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import { matchFiles } from '#mocks'
 import { mutationKeyTransformer } from '@internals/tanstack-query'
 import { queryKeyTransformer } from '@internals/tanstack-query'
+import type { Transformer } from '@internals/tanstack-query'
 import { resolverVueQuery } from '../resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from '../types.ts'
 import { mutationGenerator } from './mutationGenerator.tsx'
@@ -180,5 +181,25 @@ describe('mutationGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('mutationGenerator mutationKey', () => {
+  test('passes the mutation variant to a custom mutationKey', async () => {
+    const mutationKey = vi.fn<Transformer>(mutationKeyTransformer)
+    const options: PluginVueQuery['resolvedOptions'] = { ...defaultOptions, mutationKey }
+    const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
+    const driver = createMultiPluginDriver('customMutationKey')
+
+    await renderGeneratorOperation(mutationGenerator, updatePetWithFormNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverVueQuery,
+    })
+
+    expect(mutationKey.mock.calls.map(([props]) => props.variant)).toEqual(['mutation'])
   })
 })

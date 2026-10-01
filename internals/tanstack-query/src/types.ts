@@ -10,6 +10,10 @@ export type ParamsType = 'object' | 'inline'
  */
 export type KeyVariant = 'query' | 'suspenseQuery' | 'infiniteQuery' | 'suspenseInfiniteQuery' | 'mutation'
 
+/**
+ * Builds query or mutation key segments for an operation node.
+ * Receives `variant` indicating which hook or composable the key is built for.
+ */
 export type Transformer = (props: { node: ast.OperationNode; casing: ParamsCasing; variant: KeyVariant }) => Array<unknown>
 
 /**
