@@ -25,7 +25,7 @@ export const playwrightGenerator = defineGenerator<PluginPlaywright>({
     if (node.requestBody && !supportedBody) return null
 
     const { config, resolver, driver, root } = ctx
-    const { output, baseURL } = ctx.options
+    const { output, baseURL, group } = ctx.options
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
 
@@ -37,7 +37,7 @@ export const playwrightGenerator = defineGenerator<PluginPlaywright>({
     const headersType = header[0] ? tsResolver.param.headers(node, header[0]) : undefined
     const bodyType = content?.schema ? tsResolver.response.body(node) : undefined
     const importedTypeNames = [responseType, pathType, queryType, headersType, bodyType].filter((name) => name !== undefined)
-    const file = resolver.file({ ...operationFileEntry(node, node.operationId), root, output })
+    const file = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
     const fileTs = resolveDependencyOperationFile({
       cache: ctx.cache,
       node,

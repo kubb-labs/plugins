@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { createGroupConfig } from '@internals/shared'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { definePlugin, Resolver } from 'kubb/kit'
 import { playwrightGenerator } from './generators/playwrightGenerator.tsx'
@@ -26,7 +27,15 @@ export const pluginPlaywright = definePlugin<PluginPlaywright>((options) => ({
   hooks: {
     'kubb:plugin:setup'(ctx) {
       const resolver = options.resolver ? Resolver.merge(resolverPlaywright, options.resolver) : resolverPlaywright
-      ctx.setOptions({ output: { path: 'playwright', barrel: { type: 'named' } }, baseURL: options.baseURL, resolver })
+      ctx.setOptions({
+        output: options.output ?? { path: 'playwright', barrel: { type: 'named' } },
+        group: createGroupConfig(options.group),
+        exclude: options.exclude ?? [],
+        include: options.include,
+        override: options.override ?? [],
+        baseURL: options.baseURL,
+        resolver,
+      })
       ctx.setResolver(resolver)
       if (options.macros?.length) ctx.setMacros(options.macros)
       ctx.addGenerator(playwrightGenerator)

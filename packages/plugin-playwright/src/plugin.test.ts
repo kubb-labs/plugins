@@ -1,5 +1,5 @@
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { join, relative } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { pluginTs } from '@kubb/plugin-ts'
 import { createKubb, defineConfig } from 'kubb'
@@ -35,7 +35,11 @@ const addPet = {
   responses,
 }
 
-async function generate({ paths = { '/pets': { get: getPets } }, baseURL, resolver, macros }: { paths?: Record<string, unknown> } & Options = {}) {
+async function generate({
+  paths = { '/pets': { get: getPets } },
+  tsOptions,
+  ...options
+}: { paths?: Record<string, unknown>; tsOptions?: Parameters<typeof pluginTs>[0] } & Options = {}) {
   const root = await mkdtemp(fileURLToPath(new URL('../.test-', import.meta.url)))
   onTestFinished(() => rm(root, { recursive: true, force: true }))
   using kubb = createKubb(
@@ -48,13 +52,13 @@ async function generate({ paths = { '/pets': { get: getPets } }, baseURL, resolv
         paths,
       },
       output: { path: 'generated', defaultBanner: false, format: false, lint: false },
-      plugins: [pluginTs(), pluginPlaywright({ baseURL, resolver, macros })],
+      plugins: [pluginTs(tsOptions), pluginPlaywright(options)],
     }),
   )
   const result = await kubb.build()
   expect(Diagnostics.hasError(result.diagnostics)).toBe(false)
   const files = result.files.filter((file) => file.path.includes('/playwright/') && file.baseName !== 'index.ts').map((file) => file.baseName)
-  return { root, files }
+  return { root, files, generatedFiles: result.files.map((file) => relative(join(root, 'generated'), file.path)) }
 }
 
 async function typecheck({ root, source }: { root: string; source: string }) {
@@ -708,4 +712,112 @@ const pets: GetPetsResponse = await (await pwGetPets({ request })).json()
   const request = { fetch: vi.fn() }
   await pwGetPets({ request })
   expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/preview/pets', { method: 'POST' })
+})
+
+test.each<{ options: Options; module: string; helpers: Array<string> }>([
+  {
+    options: { output: { path: 'requests/http', barrel: { type: 'named' } } },
+    module: 'requests/http',
+    helpers: ['requests/http/pwGetPets.ts', 'requests/http/pwAddPet.ts'],
+  },
+  { options: { output: { path: 'requests.ts', mode: 'file' } }, module: 'requests', helpers: ['requests.ts'] },
+])('generates typed helpers at $options.output.path', async ({ options, module, helpers }) => {
+  const { root, generatedFiles } = await generate({ ...options, paths: { '/pets': { get: getPets, post: addPet } } })
+  expect(generatedFiles.filter((file) => file.startsWith('requests') && !file.endsWith('/index.ts')).sort()).toStrictEqual([...helpers].sort())
+  await typecheck({
+    root,
+    source: `
+import type { APIRequestContext } from '@playwright/test'
+import { pwGetPets, pwAddPet } from './generated/${module}'
+declare const request: APIRequestContext
+const names: string[] = (await (await pwGetPets({ request })).json()).map(pet => pet.name)
+pwAddPet({ request, body: { name: 'Rex' } })
+`,
+  })
+  const { pwGetPets } = await import(/* @vite-ignore */ pathToFileURL(join(root, 'generated', helpers[0]!)).href)
+  const request = { fetch: vi.fn() }
+  await pwGetPets({ request })
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', { method: 'GET' })
+})
+
+test.each<{ group: NonNullable<Options['group']>; directory: string }>([
+  { group: { type: 'tag' }, directory: 'petStore' },
+  { group: { type: 'path' }, directory: 'animals' },
+  { group: { type: 'tag', name: ({ group }) => group.replaceAll(' ', '-') }, directory: 'pet-store' },
+])('groups helpers into $directory independently of TypeScript files', async ({ group, directory }) => {
+  const { root, generatedFiles } = await generate({
+    group,
+    paths: { '/animals/pets': { get: { ...getPets, tags: ['pet store'] } } },
+    tsOptions: { output: { path: 'models/schema' }, group: { type: 'tag', name: () => 'types' } },
+  })
+  expect(generatedFiles).toContain(`playwright/${directory}/pwGetPets.ts`)
+  expect(generatedFiles).toContain('models/schema/types/GetPets.ts')
+  await typecheck({
+    root,
+    source: `
+import type { APIRequestContext } from '@playwright/test'
+import { pwGetPets } from './generated/playwright/${directory}'
+declare const request: APIRequestContext
+const names: string[] = (await (await pwGetPets({ request })).json()).map(pet => pet.name)
+`,
+  })
+  const { pwGetPets } = await loadHelper({ root, name: `${directory}/pwGetPets` })
+  const request = { fetch: vi.fn() }
+  await pwGetPets({ request })
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/animals/pets', { method: 'GET' })
+})
+
+test.each<{ include?: Options['include']; exclude?: Options['exclude']; expected: Array<string> }>([
+  { include: [{ type: 'tag', pattern: 'pets' }], expected: ['pwAddPet.ts', 'pwGetPets.ts'] },
+  { exclude: [{ type: 'path', pattern: '/users' }], expected: ['pwAddPet.ts', 'pwGetPets.ts'] },
+  { include: [{ type: 'method', pattern: /^get$/ }], exclude: [{ type: 'operationId', pattern: /^getPets$/ }], expected: ['pwGetUsers.ts'] },
+])('selects operations using include=$include and exclude=$exclude', async ({ include, exclude, expected }) => {
+  const { root, files } = await generate({
+    include,
+    exclude,
+    paths: {
+      '/pets': { get: { ...getPets, tags: ['pets'] }, post: { ...addPet, tags: ['pets'] } },
+      '/users': { get: { ...getPets, operationId: 'getUsers', tags: ['users'] } },
+    },
+  })
+  expect(files.sort()).toStrictEqual(expected)
+  const barrel = await format(await readFile(join(root, 'generated/playwright/index.ts'), 'utf8'))
+  for (const file of ['pwGetPets', 'pwAddPet', 'pwGetUsers']) {
+    expect(barrel.includes(`export { ${file} }`)).toBe(expected.includes(`${file}.ts`))
+  }
+})
+
+test('applies the first matching override and keeps other operations on global settings', async () => {
+  const { root, generatedFiles } = await generate({
+    paths: { '/pets': { get: getPets }, '/users': { get: { ...getPets, operationId: 'getUsers' } } },
+    baseURL: 'https://api.example.com',
+    override: [
+      {
+        type: 'operationId',
+        pattern: 'getPets',
+        options: { output: { path: 'special', mode: 'directory' }, baseURL: 'https://pets.example.com' },
+      },
+      { type: 'path', pattern: '/pets', options: { baseURL: 'https://second.example.com' } },
+    ],
+  })
+  expect(generatedFiles).toContain('special/pwGetPets.ts')
+  expect(generatedFiles).toContain('playwright/pwGetUsers.ts')
+  await typecheck({
+    root,
+    source: `
+import type { APIRequestContext } from '@playwright/test'
+import { pwGetPets } from './generated/special/pwGetPets'
+import { pwGetUsers } from './generated/playwright'
+declare const request: APIRequestContext
+const pets: string[] = (await (await pwGetPets({ request })).json()).map(pet => pet.name)
+const users: string[] = (await (await pwGetUsers({ request })).json()).map(user => user.name)
+`,
+  })
+  const { pwGetPets } = await import(/* @vite-ignore */ pathToFileURL(join(root, 'generated/special/pwGetPets.ts')).href)
+  const { pwGetUsers } = await loadHelper({ root, name: 'pwGetUsers' })
+  const request = { fetch: vi.fn() }
+  await pwGetPets({ request })
+  expect(request.fetch).toHaveBeenLastCalledWith('https://pets.example.com/pets', { method: 'GET' })
+  await pwGetUsers({ request })
+  expect(request.fetch).toHaveBeenLastCalledWith('https://api.example.com/users', { method: 'GET' })
 })
