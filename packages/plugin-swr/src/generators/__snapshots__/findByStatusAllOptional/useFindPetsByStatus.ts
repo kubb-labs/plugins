@@ -6,7 +6,7 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByStatusOptions, FindPetsByStatusResponse } from './FindPetsByStatus'
+import type { FindPetsByStatusOptions, FindPetsByStatusStatus200 } from './FindPetsByStatus'
 import type { SWRConfiguration } from 'swr'
 import { findPetsByStatus } from './clients/findPetsByStatus'
 
@@ -32,7 +32,7 @@ export function findPetsByStatusQueryOptions(
 export function useFindPetsByStatus(
   { query }: FindPetsByStatusOptions = {},
   options: {
-    query?: SWRConfiguration<FindPetsByStatusResponse, ResponseErrorConfig<Error>>
+    query?: SWRConfiguration<FindPetsByStatusStatus200, ResponseErrorConfig<Error>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -42,7 +42,7 @@ export function useFindPetsByStatus(
 
   const queryKey = findPetsByStatusQueryKey({ query })
 
-  return useSWR<FindPetsByStatusResponse, ResponseErrorConfig<Error>, FindPetsByStatusQueryKey | null>(shouldFetch ? queryKey : null, {
+  return useSWR<FindPetsByStatusStatus200, ResponseErrorConfig<Error>, FindPetsByStatusQueryKey | null>(shouldFetch ? queryKey : null, {
     ...findPetsByStatusQueryOptions({ query }, config),
     ...(immutable
       ? {

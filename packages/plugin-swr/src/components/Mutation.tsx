@@ -4,7 +4,7 @@ import { createFunctionParameter, createFunctionParameters, functionPrinter } fr
 import { File, Function, Type } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import { buildCallResultBody, buildGroupedRequestParam, buildClientCall } from '@internals/tanstack-query'
-import { buildRequestConfigType, getComments, resolveErrorNames } from '../utils.ts'
+import { buildRequestConfigType, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 
 type Props = {
   name: string
@@ -34,7 +34,8 @@ function buildMutationParamsNode(
   },
 ): FunctionParametersNode {
   const { mutationKeyTypeName, mutationArgTypeName, resolver } = options
-  const responseName = resolver.response.response(node)
+  const successNames = resolveSuccessNames(node, resolver)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
   const errorNames = resolveErrorNames(node, resolver)
 
   const TData = responseName
@@ -65,7 +66,8 @@ export function Mutation({
   tsResolver,
   returnType = 'full',
 }: Props): KubbReactNode {
-  const responseName = tsResolver.response.response(node)
+  const successNames = resolveSuccessNames(node, tsResolver)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.response.response(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
   const TData = responseName
