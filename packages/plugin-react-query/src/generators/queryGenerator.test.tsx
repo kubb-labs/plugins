@@ -224,4 +224,40 @@ describe('queryGenerator queryKey', () => {
 
     expect(queryKey.mock.calls.map(([props]) => props.variant)).toEqual(['query'])
   })
+
+  test('wraps queryKeyTransformer and customizes the key based on variant', async () => {
+    const queryKey: Transformer = (props) => {
+      const base = queryKeyTransformer(props)
+      return props.variant === 'query' ? ["'customPrefix'", ...base] : base
+    }
+    const options: PluginReactQuery['resolvedOptions'] = { ...defaultOptions, queryKey }
+    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
+    const driver = createMultiPluginDriver('wrappedQueryKey')
+
+    await renderGeneratorOperation(queryGenerator, findByTagsNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverReactQuery,
+    })
+
+    const file = driver.fileManager.files[0]
+    const keySource = file?.sources.find((s) => 'name' in s && s.name === 'findPetsByTagsQueryKey')
+    expect(keySource).toMatchObject({
+      name: 'findPetsByTagsQueryKey',
+      isExportable: true,
+      nodes: [
+        expect.objectContaining({
+          kind: 'ArrowFunction',
+          nodes: [
+            expect.objectContaining({
+              value: "['customPrefix', { url: '/pet/findByTags' }, ...(query ? [query] : [])] as const",
+            }),
+          ],
+        }),
+      ],
+    })
+  })
 })

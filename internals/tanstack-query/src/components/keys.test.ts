@@ -38,6 +38,17 @@ describe('queryKeyTransformer', () => {
     expect(keys('infiniteQuery', node)).toEqual(["{ url: '/pet/search', infinite: true }", '...(body ? [body] : [])'])
   })
 
+  test('builds key for an operation without parameters', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'listPets',
+      method: 'GET',
+      path: '/pet',
+    })
+
+    expect(keys('query', node)).toEqual(["{ url: '/pet' }"])
+    expect(keys('infiniteQuery', node)).toEqual(["{ url: '/pet', infinite: true }"])
+  })
+
   test('returns no entries for an operation without a path', () => {
     expect(keys('query', ast.factory.createOperation({ operationId: 'event' }))).toEqual([])
   })
@@ -46,5 +57,9 @@ describe('queryKeyTransformer', () => {
 describe('mutationKeyTransformer', () => {
   test('builds the url key', () => {
     expect(mutationKeyTransformer({ node: getPetByIdNode, casing: 'camelcase', variant: 'mutation' })).toEqual(["{ url: '/pet/:petId' }"])
+  })
+
+  test('returns no entries for an operation without a path', () => {
+    expect(mutationKeyTransformer({ node: ast.factory.createOperation({ operationId: 'event' }), casing: 'camelcase', variant: 'mutation' })).toEqual([])
   })
 })

@@ -23,16 +23,20 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export const queryKeyTransformer: Transformer = ({ node, variant }) => {
   if (!node.path) return []
-  const hasPathParams = getOperationParameters(node).path.length > 0
-  const hasQueryParams = getOperationParameters(node).query.length > 0
-  const hasRequestBody = !!node.requestBody?.content?.[0]?.schema
+  const { path, query } = getOperationParameters(node)
+  // Embedding `infinite: true` inside the URL segment separates infinite queries in the cache
+  // while preserving TanStack Query partial matching for base URL invalidation.
   const isInfinite = variant === 'infiniteQuery' || variant === 'suspenseInfiniteQuery'
 
-  const urlFields = [`url: '${Url.toPath(node.path)}'`, hasPathParams ? 'params: path' : null, isInfinite ? 'infinite: true' : null].filter(Boolean)
+  const urlFields = [`url: '${Url.toPath(node.path)}'`]
+  if (path.length > 0) urlFields.push('params: path')
+  if (isInfinite) urlFields.push('infinite: true')
 
-  return [`{ ${urlFields.join(', ')} }`, hasQueryParams ? '...(query ? [query] : [])' : null, hasRequestBody ? '...(body ? [body] : [])' : null].filter(
-    Boolean,
-  ) as Array<string>
+  const result = [`{ ${urlFields.join(', ')} }`]
+  if (query.length > 0) result.push('...(query ? [query] : [])')
+  if (node.requestBody?.content?.[0]?.schema) result.push('...(body ? [body] : [])')
+
+  return result
 }
 
 export function QueryKey({ name, node, tsResolver, typeName, transformer, variant = 'query' }: Props): KubbReactNode {
