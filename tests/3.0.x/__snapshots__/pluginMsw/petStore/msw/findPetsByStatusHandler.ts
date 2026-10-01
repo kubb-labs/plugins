@@ -21,8 +21,8 @@ export function findPetsByStatusHandlerResponse400(data?: FindPetsByStatusStatus
   })
 }
 
-export function findPetsByStatusHandler(data?: FindPetsByStatusResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
-  return http.get(`/pet/findByStatus`, function handler(info) {
+export function findPetsByStatusHandler(data?: FindPetsByStatusResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
+  return http.get(`${options?.baseURL ?? ''}/pet/findByStatus`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return new Response(JSON.stringify(data), {

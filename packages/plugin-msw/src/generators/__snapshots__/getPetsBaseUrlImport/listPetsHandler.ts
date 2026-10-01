@@ -5,6 +5,7 @@
  */
 
 import type { ListPetsResponse, ListPetsStatus400 } from './ListPets'
+import { getBaseURL } from '../client'
 import { http } from 'msw'
 
 export function listPetsHandlerResponse200(data: ListPetsResponse) {
@@ -26,7 +27,7 @@ export function listPetsHandler(
   data?: ListPetsResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
-  return http.get(`${options?.baseURL ?? ''}/pets`, function handler(info) {
+  return http.get(`${options?.baseURL ?? getBaseURL()}/pets`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
