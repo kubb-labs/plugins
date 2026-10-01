@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { UpdatePetOptions, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/pet/UpdatePet'
+import type { UpdatePetOptions, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/pet/UpdatePet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { updatePet } from '../../clients/pet/updatePet'
 
@@ -23,7 +23,7 @@ export type UpdatePetMutationArg = UpdatePetOptions
 export function useUpdatePet(
   options: {
     mutation?: SWRMutationConfiguration<
-      UpdatePetResponse,
+      UpdatePetStatus200,
       ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
       UpdatePetMutationKey | null,
       UpdatePetMutationArg
@@ -41,7 +41,7 @@ export function useUpdatePet(
   const mutationKey = updatePetMutationKey()
 
   return useSWRMutation<
-    UpdatePetResponse,
+    UpdatePetStatus200,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
     UpdatePetMutationKey | null,
     UpdatePetMutationArg

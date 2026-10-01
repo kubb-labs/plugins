@@ -5,7 +5,7 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { FindPetsByTagsOptions, FindPetsByTagsResponse, FindPetsByTagsStatus400 } from '../../models/pet/FindPetsByTags'
+import type { FindPetsByTagsOptions, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../models/pet/FindPetsByTags'
 import type { SWRConfiguration } from 'swr'
 import { findPetsByTags } from '../../clients/pet/findPetsByTags'
 
@@ -33,7 +33,7 @@ export function findPetsByTagsQueryOptions(
 export function useFindPetsByTags(
   { query }: FindPetsByTagsOptions = {},
   options: {
-    query?: SWRConfiguration<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>>
+    query?: SWRConfiguration<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -43,7 +43,7 @@ export function useFindPetsByTags(
 
   const queryKey = findPetsByTagsQueryKey({ query })
 
-  return useSWR<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsQueryKey | null>(shouldFetch ? queryKey : null, {
+  return useSWR<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsQueryKey | null>(shouldFetch ? queryKey : null, {
     ...findPetsByTagsQueryOptions({ query }, config),
     ...(immutable
       ? {
