@@ -3,11 +3,11 @@ import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { pluginTs } from '@kubb/plugin-ts'
 import { createKubb, defineConfig } from 'kubb'
-import { Diagnostics } from 'kubb/kit'
+import { ast, Diagnostics } from 'kubb/kit'
 import ts from 'typescript'
 import { expect, onTestFinished, test, vi } from 'vitest'
 import { format } from '#mocks'
-import { pluginPlaywright } from './index.ts'
+import { type Options, pluginPlaywright } from './index.ts'
 
 const responses = {
   '200': {
@@ -35,7 +35,7 @@ const addPet = {
   responses,
 }
 
-async function generate({ paths = { '/pets': { get: getPets } }, baseURL }: { paths?: Record<string, unknown>; baseURL?: string } = {}) {
+async function generate({ paths = { '/pets': { get: getPets } }, baseURL, resolver, macros }: { paths?: Record<string, unknown> } & Options = {}) {
   const root = await mkdtemp(fileURLToPath(new URL('../.test-', import.meta.url)))
   onTestFinished(() => rm(root, { recursive: true, force: true }))
   using kubb = createKubb(
@@ -48,7 +48,7 @@ async function generate({ paths = { '/pets': { get: getPets } }, baseURL }: { pa
         paths,
       },
       output: { path: 'generated', defaultBanner: false, format: false, lint: false },
-      plugins: [pluginTs(), pluginPlaywright(baseURL === undefined ? undefined : { baseURL })],
+      plugins: [pluginTs(), pluginPlaywright({ baseURL, resolver, macros })],
     }),
   )
   const result = await kubb.build()
@@ -647,4 +647,65 @@ pwAddPet({ request, body: {} })
   const multipart: FormData = request.fetch.mock.calls[0]![1].multipart
   expect(multipart.get('description')).toBe('Rex')
   expect(multipart.get('file')).toBe(file)
+})
+
+test.each([false, true])('customizes helper exports with a custom filename=%s', async (customFile) => {
+  const name = (operationId: string) => `test${operationId[0]!.toUpperCase()}${operationId.slice(1)}`
+  const { root, files } = await generate({
+    resolver: {
+      name,
+      ...(customFile ? { file: { baseName: ({ name: operationId, extname }) => `${name(operationId)}${extname}` } } : {}),
+    },
+  })
+  const file = customFile ? 'testGetPets' : 'pwGetPets'
+  expect(files).toStrictEqual([`${file}.ts`])
+  const barrel = await readFile(join(root, 'generated/playwright/index.ts'), 'utf8')
+  expect(await format(barrel)).toContain(`export { testGetPets } from './${file}'`)
+  await typecheck({
+    root,
+    source: `
+import type { APIRequestContext } from '@playwright/test'
+import type { GetPetsResponse } from './generated/types/GetPets'
+import { testGetPets } from './generated/playwright'
+declare const request: APIRequestContext
+const pets: GetPetsResponse = await (await testGetPets({ request })).json()
+`,
+  })
+  const { testGetPets } = await loadHelper({ root, name: file })
+  const request = { fetch: vi.fn() }
+  await testGetPets({ request })
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/pets', { method: 'GET' })
+})
+
+test('applies operation macros in order before generating the request', async () => {
+  const { root } = await generate({
+    macros: [
+      {
+        name: 'version-path',
+        operation(node) {
+          if (ast.isHttpOperationNode(node)) return { ...node, path: `/v2${node.path}` }
+        },
+      },
+      {
+        name: 'preview-request',
+        operation(node) {
+          if (ast.isHttpOperationNode(node)) return { ...node, path: node.path.replace('/v2/', '/preview/'), method: 'POST' }
+        },
+      },
+    ],
+  })
+  await typecheck({
+    root,
+    source: `
+import type { APIRequestContext } from '@playwright/test'
+import type { GetPetsResponse } from './generated/types/GetPets'
+import { pwGetPets } from './generated/playwright'
+declare const request: APIRequestContext
+const pets: GetPetsResponse = await (await pwGetPets({ request })).json()
+`,
+  })
+  const { pwGetPets } = await loadHelper({ root, name: 'pwGetPets' })
+  const request = { fetch: vi.fn() }
+  await pwGetPets({ request })
+  expect(request.fetch).toHaveBeenCalledExactlyOnceWith('/preview/pets', { method: 'POST' })
 })

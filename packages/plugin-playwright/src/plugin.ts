@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { definePlugin } from 'kubb/kit'
+import { definePlugin, Resolver } from 'kubb/kit'
 import { playwrightGenerator } from './generators/playwrightGenerator.tsx'
 import { resolverPlaywright } from './resolvers/resolverPlaywright.ts'
 import { playwrightTemplatePath } from './templates.ts'
@@ -25,8 +25,10 @@ export const pluginPlaywright = definePlugin<PluginPlaywright>((options) => ({
   dependencies: [pluginTsName],
   hooks: {
     'kubb:plugin:setup'(ctx) {
-      ctx.setOptions({ output: { path: 'playwright', barrel: { type: 'named' } }, baseURL: options.baseURL })
-      ctx.setResolver(resolverPlaywright)
+      const resolver = options.resolver ? Resolver.merge(resolverPlaywright, options.resolver) : resolverPlaywright
+      ctx.setOptions({ output: { path: 'playwright', barrel: { type: 'named' } }, baseURL: options.baseURL, resolver })
+      ctx.setResolver(resolver)
+      if (options.macros?.length) ctx.setMacros(options.macros)
       ctx.addGenerator(playwrightGenerator)
       ctx.injectFile({
         baseName: 'playwright.ts',
