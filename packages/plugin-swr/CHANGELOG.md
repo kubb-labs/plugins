@@ -1,5 +1,11 @@
 # @kubb/plugin-swr
 
+## 5.1.4
+
+### Patch Changes
+
+- [#1006](https://github.com/kubb-labs/plugins/pull/1006) [`65003ad`](https://github.com/kubb-labs/plugins/commit/65003ad59f58cc8765d122fdbf2915b3fc8a6bab) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Keep error response types out of SWR hook data types.
+
 ## 5.1.3
 
 ### Patch Changes
