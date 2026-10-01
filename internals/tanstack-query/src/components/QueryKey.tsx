@@ -4,7 +4,7 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import type { Transformer } from '../types.ts'
+import type { KeyVariant, Transformer } from '../types.ts'
 import { buildQueryKeyParams } from '../utils.ts'
 
 type Props = {
@@ -13,25 +13,32 @@ type Props = {
   node: ast.OperationNode
   tsResolver: PluginTs['resolver']
   transformer: Transformer | null | undefined
+  /**
+   * @default 'query'
+   */
+  variant?: KeyVariant
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export const queryKeyTransformer: Transformer = ({ node }) => {
+export const queryKeyTransformer: Transformer = ({ node, variant }) => {
   if (!node.path) return []
   const hasPathParams = getOperationParameters(node).path.length > 0
   const hasQueryParams = getOperationParameters(node).query.length > 0
   const hasRequestBody = !!node.requestBody?.content?.[0]?.schema
+  const isInfinite = variant === 'infiniteQuery' || variant === 'suspenseInfiniteQuery'
 
-  const urlObject = hasPathParams ? `{ url: '${Url.toPath(node.path)}', params: path }` : `{ url: '${Url.toPath(node.path)}' }`
+  const urlFields = [`url: '${Url.toPath(node.path)}'`, hasPathParams ? 'params: path' : null, isInfinite ? 'infinite: true' : null].filter(Boolean)
 
-  return [urlObject, hasQueryParams ? '...(query ? [query] : [])' : null, hasRequestBody ? '...(body ? [body] : [])' : null].filter(Boolean) as Array<string>
+  return [`{ ${urlFields.join(', ')} }`, hasQueryParams ? '...(query ? [query] : [])' : null, hasRequestBody ? '...(body ? [body] : [])' : null].filter(
+    Boolean,
+  ) as Array<string>
 }
 
-export function QueryKey({ name, node, tsResolver, typeName, transformer }: Props): KubbReactNode {
+export function QueryKey({ name, node, tsResolver, typeName, transformer, variant = 'query' }: Props): KubbReactNode {
   const paramsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const keys = (transformer ?? queryKeyTransformer)({ node, casing: 'camelcase' })
+  const keys = (transformer ?? queryKeyTransformer)({ node, casing: 'camelcase', variant })
 
   return (
     <>

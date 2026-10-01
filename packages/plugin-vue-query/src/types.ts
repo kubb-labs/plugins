@@ -80,7 +80,9 @@ export type ResolverVueQuery = Resolver & {
 }
 
 /**
- * Builds the `queryKey` used by each generated query composable.
+ * Builds the `queryKey` used by each generated query composable. `variant` tells which composable
+ * the key is for, so infinite keys can stay apart from plain ones. Wrap the exported
+ * `queryKeyTransformer` to extend the default key.
  *
  * @note String values are inlined verbatim into generated code. Wrap literal
  * strings in `JSON.stringify(...)`.
