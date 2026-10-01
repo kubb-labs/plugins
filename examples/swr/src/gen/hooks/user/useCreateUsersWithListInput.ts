@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponse } from '../../models/user/CreateUsersWithListInput'
+import type { CreateUsersWithListInputOptions, CreateUsersWithListInputStatus200 } from '../../models/user/CreateUsersWithListInput'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { createUsersWithListInput } from '../../clients/user/createUsersWithListInput'
 
@@ -23,7 +23,7 @@ export type CreateUsersWithListInputMutationArg = CreateUsersWithListInputOption
 export function useCreateUsersWithListInput(
   options: {
     mutation?: SWRMutationConfiguration<
-      CreateUsersWithListInputResponse,
+      CreateUsersWithListInputStatus200,
       ResponseErrorConfig<Error>,
       CreateUsersWithListInputMutationKey | null,
       CreateUsersWithListInputMutationArg
@@ -38,7 +38,7 @@ export function useCreateUsersWithListInput(
   const mutationKey = createUsersWithListInputMutationKey()
 
   return useSWRMutation<
-    CreateUsersWithListInputResponse,
+    CreateUsersWithListInputStatus200,
     ResponseErrorConfig<Error>,
     CreateUsersWithListInputMutationKey | null,
     CreateUsersWithListInputMutationArg

@@ -5,7 +5,7 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { LoginUserOptions, LoginUserResponse, LoginUserStatus400 } from '../../models/user/LoginUser'
+import type { LoginUserOptions, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser'
 import type { SWRConfiguration } from 'swr'
 import { loginUser } from '../../clients/user/loginUser'
 
@@ -31,7 +31,7 @@ export function loginUserQueryOptions(
 export function useLoginUser(
   { query }: LoginUserOptions = {},
   options: {
-    query?: SWRConfiguration<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>>
+    query?: SWRConfiguration<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -41,7 +41,7 @@ export function useLoginUser(
 
   const queryKey = loginUserQueryKey({ query })
 
-  return useSWR<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, LoginUserQueryKey | null>(shouldFetch ? queryKey : null, {
+  return useSWR<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserQueryKey | null>(shouldFetch ? queryKey : null, {
     ...loginUserQueryOptions({ query }, config),
     ...(immutable
       ? {
