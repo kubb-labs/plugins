@@ -15,8 +15,9 @@ export function deletePetsPetidHandlerResponse200(data?: DeletePetsPetidResponse
 
 export function deletePetsPetidHandler(
   data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Response | Promise<Response>),
+  options?: { baseURL?: string },
 ) {
-  return http.delete(`/pets/:petId`, function handler(info) {
+  return http.delete(`${options?.baseURL ?? ''}/pets/:petId`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

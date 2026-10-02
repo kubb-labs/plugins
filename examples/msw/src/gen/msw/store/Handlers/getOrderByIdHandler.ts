@@ -27,8 +27,11 @@ export function getOrderByIdHandlerResponse404(data?: GetOrderByIdStatus404) {
   })
 }
 
-export function getOrderByIdHandler(data?: GetOrderByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
-  return http.get(`http://localhost:3000/store/order/:orderId`, function handler(info) {
+export function getOrderByIdHandler(
+  data?: GetOrderByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  options?: { baseURL?: string },
+) {
+  return http.get(`${options?.baseURL ?? 'http://localhost:3000'}/store/order/:orderId`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

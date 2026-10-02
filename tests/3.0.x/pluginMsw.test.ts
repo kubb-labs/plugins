@@ -100,6 +100,26 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
+  // ─── baseURLImport ───────────────────────────────────────────────────────
+  {
+    name: 'baseURLImport',
+    config: {
+      root: __dirname,
+      input: '../../schemas/3.0.x/petStore.yaml',
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false, enums: 'root' }),
+      parsers: [parserTs()],
+      storage: fsStorage(),
+      plugins: [
+        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
+        pluginMsw({
+          output: { path: './msw', barrel: false, mode: 'directory' },
+          baseURL: { importPath: '../client', name: 'getBaseURL' },
+        }),
+      ],
+    },
+  },
+
   // ─── exclude / include ─────────────────────────────────────────────────
   {
     name: 'excludeByOperationId',

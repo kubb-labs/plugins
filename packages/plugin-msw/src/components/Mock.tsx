@@ -3,14 +3,15 @@ import { ast, Url } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import { getContentType, getMswMethod, hasResponseSchema } from '../utils.ts'
+import type { BaseURLImport } from '../types.ts'
+import { getContentType, getMswMethod, hasResponseSchema, resolveDefaultBaseURL } from '../utils.ts'
 
 type Props = {
   name: string
   typeName: string
   requestTypeName?: string | null
   fakerName?: string
-  baseURL: string | null | undefined
+  baseURL: string | BaseURLImport | null | undefined
   node: ast.OperationNode
 }
 
@@ -40,14 +41,21 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
           type: `${paramType} | ${callbackType}`,
           optional: true,
         }),
+        createFunctionParameter({
+          name: 'options',
+          type: '{ baseURL?: string }',
+          optional: true,
+        }),
       ],
     }),
   )
 
   const httpCall = requestTypeName ? `http.${method}<Record<string, string>, ${requestTypeName}>` : `http.${method}`
 
-  const requestUrl = `${baseURL}${url.replace(/([^/]):/g, '$1\\\\:')}`
-  const urlLiteral = fakerName ? `'${requestUrl}'` : `\`${requestUrl}\``
+  // Precedence: options?.baseURL (per-call override) > defaultBaseURL (configured base URL) > '' (relative path)
+  const defaultBaseURL = resolveDefaultBaseURL(baseURL)
+  // Non-parameterized colons (e.g. /pet/:petId:search) are escaped to avoid MSW treating them as path params.
+  const urlLiteral = `\`\${options?.baseURL ?? ${defaultBaseURL}}${url.replace(/([^/]):/g, '$1\\\\:')}\``
   const responseBody = fakerName ? `JSON.stringify(data || ${fakerName}(data))` : 'JSON.stringify(data)'
   const headersBlock = headers.length ? `\n      headers: {\n        ${headers.join(', \n')}\n      },` : ''
 

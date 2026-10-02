@@ -20,6 +20,31 @@ export type ResolverMsw = Resolver & {
 }
 
 /**
+ * A function that returns the base URL, imported into every handler file and called when a handler
+ * is created. Use it to read the base URL at runtime, for example from your API client's config.
+ *
+ * The function can return `string` or `string | undefined`. When returning `undefined` or an empty string,
+ * the handler falls back to matching relative paths.
+ *
+ * @note Base URLs should not include a trailing slash, as OpenAPI operation paths already begin with `/`.
+ * @note When `group` is enabled, module aliases (e.g. `'@/client'`) or package specifiers are recommended
+ * over relative paths, as `importPath` is written verbatim into handlers across different subdirectory depths.
+ *
+ * @example
+ * `{ importPath: '../client', name: 'getBaseURL' }` emits `import { getBaseURL } from '../client'`.
+ */
+export type BaseURLImport = {
+  /**
+   * Module specifier, written verbatim into the import.
+   */
+  importPath: string
+  /**
+   * Named export of a `() => string | undefined` or `() => string` function.
+   */
+  name: string
+}
+
+/**
  * Where the generated MSW handlers are written and how they are exported, plus the optional
  * `group` strategy. The `group` option organizes `output.mode: 'directory'` output into per-tag or per-path subdirectories.
  *
@@ -27,10 +52,16 @@ export type ResolverMsw = Resolver & {
  */
 export type Options = OutputOptions & {
   /**
-   * Base URL prepended to every handler's request URL. When omitted, falls back
-   * to the adapter's server URL (typically `servers[0].url`).
+   * Base URL prepended to every handler's request URL: a fixed string (e.g. `'https://api.example.com'`),
+   * a dynamic template string (e.g. `'${process.env.API_URL}'`), or a function imported from a module
+   * and called when the handler is created.
+   *
+   * A handler also takes `{ baseURL }` as its second argument, which overrides this option per call:
+   * `listPetsHandler(undefined, { baseURL: 'https://staging.example.com' })`.
+   *
+   * @note Do not include a trailing slash in the base URL, as OpenAPI operation paths already begin with `/`.
    */
-  baseURL?: string
+  baseURL?: string | BaseURLImport
   /**
    * Skip operations matching at least one entry in the list.
    */
