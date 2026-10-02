@@ -76,7 +76,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
         )}
 
-        <QueryKey name={queryKeyName} typeName={queryKeyTypeName} node={node} tsResolver={tsResolver} transformer={ctx.options.queryKey} />
+        <QueryKey name={queryKeyName} typeName={queryKeyTypeName} node={node} tsResolver={tsResolver} transformer={ctx.options.queryKey} variant="query" />
 
         <QueryOptions name={queryOptionsName} clientName={calledClientName} node={node} tsResolver={tsResolver} returnType={contractOp.returnType} />
 
