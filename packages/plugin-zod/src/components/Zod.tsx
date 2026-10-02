@@ -6,6 +6,11 @@ import type { PrinterZodMiniFactory } from '../printers/printerZodMini.ts'
 
 import type { CompileOptions } from '../types.ts'
 
+export type ZodTypeAlias = {
+  name: string
+  kind: 'infer' | 'input' | 'output'
+}
+
 type Props = {
   name: string
   node: ast.SchemaNode
@@ -15,7 +20,11 @@ type Props = {
    * then merges in any user-supplied `printer.nodes` overrides.
    */
   printer: ast.Printer<PrinterZodFactory> | ast.Printer<PrinterZodMiniFactory>
-  inferTypeName?: string | null
+  /**
+   * Type aliases emitted for the schema, in order. The first one also types the `is*` / `assert*`
+   * guards.
+   */
+  types?: Array<ZodTypeAlias>
   typeGuards?: boolean | { is?: boolean; assert?: boolean }
   isName?: string | null
   assertName?: string | null
@@ -35,7 +44,7 @@ type Props = {
   compile?: boolean | CompileOptions
 }
 
-export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, assertName, mini, cyclic, compile }: Props): KubbReactNode {
+export function Zod({ name, node, printer, types = [], typeGuards, isName, assertName, mini, cyclic, compile }: Props): KubbReactNode {
   const output = printer.print(node)
   const printerImports = printer.drainImports()
 
@@ -53,7 +62,7 @@ export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, as
   const shouldCompile = Boolean(compile) && !isBare && !isCyclic
   const value = shouldCompile ? (typeof compile === 'object' && compile.strict ? `z.compile(${output}, { strict: true })` : `z.compile(${output})`) : output
 
-  const targetType = inferTypeName ?? `z.infer<typeof ${name}>`
+  const targetType = types[0]?.name ?? `z.infer<typeof ${name}>`
   const shouldGenerateIs = isName && (typeof typeGuards === 'object' ? (typeGuards.is ?? true) : Boolean(typeGuards))
   const shouldGenerateAssert = assertName && (typeof typeGuards === 'object' ? (typeGuards.assert ?? true) : Boolean(typeGuards))
 
@@ -74,13 +83,13 @@ export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, as
           {value}
         </Const>
       </File.Source>
-      {inferTypeName && (
-        <File.Source name={inferTypeName} isExportable isIndexable isTypeOnly>
-          <Type export name={inferTypeName}>
-            {`z.infer<typeof ${name}>`}
+      {types.map((alias) => (
+        <File.Source key={alias.name} name={alias.name} isExportable isIndexable isTypeOnly>
+          <Type export name={alias.name}>
+            {`z.${alias.kind}<typeof ${name}>`}
           </Type>
         </File.Source>
-      )}
+      ))}
       {shouldGenerateIs && (
         <File.Source name={isName} isExportable isIndexable>
           <Const export name={isName} JSDoc={{ comments: [`Type guard for {@link ${name}}`] }}>

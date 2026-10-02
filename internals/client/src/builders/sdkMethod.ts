@@ -31,6 +31,9 @@ function buildCallConfig({
   const validators = buildValidatorHooks({ node, validator, zodResolver })
   const validatorEntries = [
     validators.request ? `request: ${validators.request}` : null,
+    validators.path ? `path: ${validators.path}` : null,
+    validators.query ? `query: ${validators.query}` : null,
+    validators.headers ? `headers: ${validators.headers}` : null,
     validators.response ? `response: ${validators.response}` : null,
   ].filter(Boolean)
   const validatorLiteral = validatorEntries.length ? `validator: { ${validatorEntries.join(', ')} }` : null

@@ -4,8 +4,9 @@ import { ast, defineGenerator } from 'kubb/kit'
 import type { Generator } from 'kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from 'kubb/jsx'
-import { buildZodErrorParse, resolveRequestValidator, resolveResponseValidator } from '../builders/validatorOptions.ts'
+import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { getOperationSecurity, type SecurityDocument } from '../builders/security.ts'
+import { buildValidatorHooks } from '../builders/validator.ts'
 import { Operation } from '../components/Operation.tsx'
 import { MISSING_OPERATION_TYPES_WARNING, resolveOperationTypes } from '../resolveOperationTypes.ts'
 import type { ContractClientFactory } from '../types.ts'
@@ -37,20 +38,13 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
         return null
       }
 
-      const validatorEnabled = resolveResponseValidator(validator) === 'zod' || resolveRequestValidator(validator) === 'zod'
-      const pluginZod = validatorEnabled ? driver.getPlugin(pluginZodName) : null
+      const pluginZod = isValidatorEnabled(validator) ? driver.getPlugin(pluginZodName) : null
       const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
-      const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
       const importedTypeNames = [types.response.options(node), types.response.responses(node)]
 
-      const importedZodNames = zodResolver
-        ? [
-            resolveResponseValidator(validator) === 'zod' ? zodResolver.response.response?.(node) : null,
-            resolveResponseValidator(validator) === 'zod' ? (buildZodErrorParse(node, zodResolver)?.expression ?? null) : null,
-            resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.response.body?.(node) : null,
-          ].filter((name): name is string => Boolean(name))
-        : []
+      const validatorHooks = buildValidatorHooks({ node, validator, zodResolver })
+      const importedZodNames = validatorHooks.importedZodNames
 
       const meta = {
         name: resolver.name(node.operationId),
@@ -85,6 +79,9 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
       const customClientPath = resolveClientPath?.(ctx.options, root)
       const clientPath = customClientPath ?? path.resolve(root, '.kubb/client.ts')
       const clientRoot = customClientPath === undefined ? meta.file.path : undefined
+      // The headers validator helper ships in `.kubb/standardSchema.ts`; a custom client module exports it
+      // alongside its other runtime helpers.
+      const standardSchemaPath = customClientPath ?? path.resolve(root, '.kubb/standardSchema.ts')
       const eventStream = isEventStream(node)
 
       const clientValueImports = (() => {
@@ -117,6 +114,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
           )}
 
           {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames} root={meta.file.path} path={meta.fileZod.path} />}
+          {validatorHooks.headers && <File.Import name={['toCaseInsensitiveLooseObjectStandardSchema']} root={clientRoot} path={standardSchemaPath} />}
 
           <Operation
             name={meta.name}

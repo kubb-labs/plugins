@@ -1,15 +1,15 @@
 import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
 /**
- * Validator applied to request and response bodies using schemas from `@kubb/plugin-zod`.
+ * Validator applied to the request and response using schemas from `@kubb/plugin-zod`.
  * - `false`: no validation.
  * - `'zod'`: validates the success (2xx) response body, and the error body when a non-2xx call does
  *   not throw (`throwOnError: false`).
- * - `{ request?: 'zod'; response?: 'zod' }`: opt in per direction. `request` validates the request
- *   body before the call; `response` validates the success response body and,
- *   on the non-throw path, the error body.
+ * - `{ request?: 'zod'; params?: 'zod'; response?: 'zod' }`: opt in per slot. `request` encodes the
+ *   request body before the call; `params` validate the path, query, and header params;
+ *   `response` validates the success response body and, on the non-throw path, the error body.
  */
-export type ValidatorOptions = false | 'zod' | { request?: 'zod'; response?: 'zod' }
+export type ValidatorOptions = false | 'zod' | { request?: 'zod'; params?: 'zod'; response?: 'zod' }
 
 /**
  * How the class-based SDK groups operations.
@@ -85,7 +85,7 @@ export type Options = OutputOptions & {
    */
   throwOnErrorDefault?: boolean
   /**
-   * Validate request and response bodies with schemas from `@kubb/plugin-zod`.
+   * Validate the request body, the request params, and the response with schemas from `@kubb/plugin-zod`.
    *
    * @default false
    */

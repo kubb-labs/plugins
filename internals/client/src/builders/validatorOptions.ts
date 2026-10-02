@@ -9,7 +9,7 @@ import type { ValidatorOptions } from '../types.ts'
 export function isValidatorEnabled(validator: ValidatorOptions | undefined): boolean {
   if (!validator) return false
   if (validator === 'zod') return true
-  return Boolean(validator.request || validator.response)
+  return Boolean(validator.request || validator.params || validator.response)
 }
 
 /**
@@ -22,12 +22,12 @@ export function resolveRequestValidator(validator: ValidatorOptions | undefined)
 }
 
 /**
- * Returns `'zod'` when query-parameters parsing is enabled, `null` otherwise. Only the object form
- * `{ request: 'zod' }` enables it.
+ * Returns `'zod'` when path, query, and header params parsing is enabled, `null` otherwise. Only the
+ * object form `{ params: 'zod' }` enables it.
  */
-export function resolveQueryParamsValidator(validator: ValidatorOptions | undefined): 'zod' | null {
+export function resolveParamsValidator(validator: ValidatorOptions | undefined): 'zod' | null {
   if (!validator || validator === 'zod') return null
-  return validator.request ?? null
+  return validator.params ?? null
 }
 
 /**
