@@ -38,8 +38,8 @@ export function findPetsByTagsInfiniteQueryOptions(
       return findPetsByTags({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
     initialPageParam: 0,
-    getNextPageParam: (lastPage, _allPages, lastPageParam) => (Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1),
-    getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => (firstPageParam <= 0 ? undefined : firstPageParam - 1),
+    getNextPageParam: (lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined),
+    getPreviousPageParam: (firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined),
   })
 }
 

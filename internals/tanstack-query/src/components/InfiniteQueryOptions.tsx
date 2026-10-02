@@ -25,6 +25,8 @@ type Props = {
   cursorParam: Infinite['cursorParam']
   nextParam: Infinite['nextParam']
   previousParam: Infinite['previousParam']
+  getNextPageParam?: Infinite['getNextPageParam']
+  getPreviousPageParam?: Infinite['getPreviousPageParam']
   queryParam: Infinite['queryParam']
   /**
    * The `TQueryKey` generic written into the emitted `infiniteQueryOptions` call. react-query
@@ -59,6 +61,8 @@ export function InfiniteQueryOptions({
   cursorParam,
   nextParam,
   previousParam,
+  getNextPageParam,
+  getPreviousPageParam,
   node,
   tsResolver,
   queryParam,
@@ -80,31 +84,29 @@ export function InfiniteQueryOptions({
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName }), { returnType })
 
-  const hasNewParams = nextParam != null || previousParam != null
+  const initialPageParamLiteral = typeof initialPageParam === 'string' ? JSON.stringify(initialPageParam) : String(initialPageParam)
 
-  const [getNextPageParamExpr, getPreviousPageParamExpr] = (() => {
-    if (hasNewParams) {
-      const nextAccessor = nextParam ? getNestedAccessor(nextParam, 'lastPage') : null
-      const prevAccessor = previousParam ? getNestedAccessor(previousParam, 'firstPage') : null
-      return [
-        nextAccessor ? `getNextPageParam: (lastPage) => ${nextAccessor}` : null,
-        prevAccessor ? `getPreviousPageParam: (firstPage) => ${prevAccessor}` : null,
-      ] as const
-    }
-    if (cursorParam) {
-      return [`getNextPageParam: (lastPage) => lastPage['${cursorParam}']`, `getPreviousPageParam: (firstPage) => firstPage['${cursorParam}']`] as const
-    }
-    return [
-      'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1',
-      'getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= 1 ? undefined : firstPageParam - 1',
-    ] as const
+  // Resolve getNextPageParam: custom source > nextParam > cursorParam > default numeric fallback.
+  // TanStack Query v5 requires getNextPageParam on infiniteQueryOptions.
+  const getNextPageParamExpr = (() => {
+    if (getNextPageParam) return `getNextPageParam: ${getNextPageParam}`
+    if (nextParam) return `getNextPageParam: (lastPage) => ${getNestedAccessor(nextParam, 'lastPage')}`
+    if (cursorParam) return `getNextPageParam: (lastPage) => lastPage['${cursorParam}']`
+    return 'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1'
   })()
 
-  const queryOptionsArr = [
-    `initialPageParam: ${typeof initialPageParam === 'string' ? JSON.stringify(initialPageParam) : initialPageParam}`,
-    getNextPageParamExpr,
-    getPreviousPageParamExpr,
-  ].filter(Boolean)
+  // Resolve getPreviousPageParam: custom source > previousParam > cursorParam > default numeric fallback.
+  // In TanStack Query, getPreviousPageParam is optional (only needed for bi-directional pagination).
+  // When next pagination is custom or cursor-based, numeric decrement is omitted unless explicitly configured.
+  const getPreviousPageParamExpr = (() => {
+    if (getPreviousPageParam) return `getPreviousPageParam: ${getPreviousPageParam}`
+    if (previousParam) return `getPreviousPageParam: (firstPage) => ${getNestedAccessor(previousParam, 'firstPage')}`
+    if (cursorParam) return `getPreviousPageParam: (firstPage) => firstPage['${cursorParam}']`
+    if (getNextPageParam || nextParam) return null
+    return `getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= ${initialPageParamLiteral} ? undefined : firstPageParam - 1`
+  })()
+
+  const queryOptionsArr = [`initialPageParam: ${initialPageParamLiteral}`, getNextPageParamExpr, getPreviousPageParamExpr].filter(Boolean)
 
   const infiniteOverrideParams =
     queryParam && queryParamsTypeName

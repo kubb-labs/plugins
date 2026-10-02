@@ -6,20 +6,20 @@
 
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { FindPetsByTagsOptions, FindPetsByTagsQuery, FindPetsByTagsStatus200 } from './FindPetsByTags'
-import type { InfiniteData, QueryKey, QueryClient, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult } from '@tanstack/react-query'
+import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { findPetsByTags } from './clients/findPetsByTags'
-import { infiniteQueryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-query'
+import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 
-export const findPetsByTagsSuspenseInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'>) =>
+export const findPetsByTagsInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'>) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
-type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsByTagsSuspenseInfiniteQueryKey>
+type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInfiniteQueryKey>
 
-export function findPetsByTagsSuspenseInfiniteQueryOptions(
+export function findPetsByTagsInfiniteQueryOptions(
   { query }: FindPetsByTagsOptions,
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
-  const queryKey = findPetsByTagsSuspenseInfiniteQueryKey({ query })
+  const queryKey = findPetsByTagsInfiniteQueryKey({ query })
   return infiniteQueryOptions<
     FindPetsByTagsStatus200,
     ResponseErrorConfig<Error>,
@@ -36,40 +36,40 @@ export function findPetsByTagsSuspenseInfiniteQueryOptions(
       return findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
     initialPageParam: 0,
-    getNextPageParam: (lastPage, _allPages, lastPageParam) => (Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1),
-    getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => (firstPageParam <= 0 ? undefined : firstPageParam - 1),
+    getNextPageParam: (lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined),
+    getPreviousPageParam: (firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined),
   })
 }
 
 /**
  * {@link /pet/findByTags}
  */
-export function useFindPetsByTagsSuspenseInfinite<
+export function useFindPetsByTagsInfinite<
   TQueryFnData = FindPetsByTagsStatus200,
   TError = ResponseErrorConfig<Error>,
   TData = InfiniteData<TQueryFnData>,
-  TQueryKey extends QueryKey = FindPetsByTagsSuspenseInfiniteQueryKey,
+  TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,
   TPageParam = NonNullable<FindPetsByTagsQuery['pageSize']>,
 >(
   { query }: { query: FindPetsByTagsOptions['query'] | (() => FindPetsByTagsOptions['query']) },
   options: {
-    query?: Partial<UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
+    query?: Partial<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const resolvedParams = { query: typeof query === 'function' ? query() : query }
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsSuspenseInfiniteQueryKey(resolvedParams)
+  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsInfiniteQueryKey(resolvedParams)
 
-  const queryResult = useSuspenseInfiniteQuery(
+  const queryResult = useInfiniteQuery(
     {
-      ...findPetsByTagsSuspenseInfiniteQueryOptions(resolvedParams, config),
+      ...findPetsByTagsInfiniteQueryOptions(resolvedParams, config),
       ...resolvedOptions,
       queryKey,
-    } as unknown as UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>,
+    } as unknown as InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>,
     queryClient,
-  ) as UseSuspenseInfiniteQueryResult<TData, TError> & { queryKey: TQueryKey }
+  ) as UseInfiniteQueryResult<TData, TError> & { queryKey: TQueryKey }
 
   queryResult.queryKey = queryKey as TQueryKey
 
