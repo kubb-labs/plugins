@@ -230,8 +230,8 @@ describe('printerFaker', () => {
 
     expect(result).toContain(`Extract<NonNullable<AddPetBody>, { "pet_type": 'cat' }>`)
     expect(result).toContain(`Extract<NonNullable<AddPetBody>, { "pet_type": 'dog' }>`)
-    expect(result).toContain('createCat<object>()')
-    expect(result).toContain('createDog<object>()')
+    expect(result).toContain('createCat()')
+    expect(result).toContain('createDog()')
   })
 
   test('guards member property access in non-discriminated unions of objects', () => {
@@ -265,7 +265,7 @@ describe('printerFaker', () => {
     )
   })
 
-  test('prevents contextual override inference for object refs in unions', () => {
+  test('renders object refs in unions without explicit type arguments', () => {
     const makeVariant = (name: string, petType: string) => {
       const schema = ast.factory.createSchema({
         type: 'object',
@@ -289,7 +289,7 @@ describe('printerFaker', () => {
     })
 
     expect(printerFaker({ resolver: resolverFaker, typeName: 'Pet', schemaName: 'Pet' }).print(node)).toBe(
-      'faker.helpers.arrayElement([createCat<object>(), createDog<object>()])',
+      'faker.helpers.arrayElement([createCat(), createDog()])',
     )
   })
 
