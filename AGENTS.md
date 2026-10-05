@@ -50,7 +50,7 @@ The `internals/` directory provides shared utilities:
 
 ### Plugin docs and metadata
 
-Plugin docs live in the docs repo ([kubb-labs/docs](https://github.com/kubb-labs/docs)). Each plugin is a single hand-written page at `plugins/<name>.md` whose frontmatter carries the registry metadata (name, category, npm package, maintainers, compatibility), published on [kubb.dev](https://kubb.dev).
+Plugin docs live in the docs repo ([kubb-labs/docs](https://github.com/kubb-labs/docs)). Each plugin has an overview at `plugins/<plugin-id>/index.md` whose frontmatter carries the registry metadata (name, category, npm package, maintainers, compatibility). Options live in `plugins/<plugin-id>/reference/options.md`. Task guides live alongside them. The docs are published on [kubb.dev](https://kubb.dev).
 
 > [!IMPORTANT]
 > **Changing a plugin's options? Update its kubb.dev page in the docs repo.**
