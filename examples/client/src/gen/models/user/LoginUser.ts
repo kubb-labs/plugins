@@ -47,4 +47,4 @@ export type LoginUserResponses = {
 /**
  * @description Union of all possible responses
  */
-export type LoginUserResponse = LoginUserStatus200 | LoginUserStatus400
+export type LoginUserResponse = LoginUserStatus200

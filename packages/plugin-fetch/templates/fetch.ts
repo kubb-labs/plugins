@@ -635,7 +635,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
       headers,
       body,
       signal: requestConfig.signal,
-      credentials: requestConfig.credentials,
+      credentials: requestConfig.credentials ?? config.credentials,
       options,
       responseType: requestConfig.responseType,
     },

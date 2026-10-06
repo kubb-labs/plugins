@@ -49,4 +49,4 @@ export type GetPetByIdResponses = {
 /**
  * @description Union of all possible responses
  */
-export type GetPetByIdResponse = GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404
+export type GetPetByIdResponse = GetPetByIdStatus200

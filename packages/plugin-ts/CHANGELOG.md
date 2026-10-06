@@ -1,5 +1,13 @@
 # @kubb/plugin-ts
 
+## 5.0.4
+
+### Patch Changes
+
+- [#1031](https://github.com/kubb-labs/plugins/pull/1031) [`bbcfb10`](https://github.com/kubb-labs/plugins/commit/bbcfb108b91956edd27fc70932d4d8493a7a21c7) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Generate the `<Operation>Response` alias from successful 2xx responses only. An `unknown` error response no longer erases the success body type in the MSW handlers. All declared statuses stay in `<Operation>Responses`.
+
+- [#1028](https://github.com/kubb-labs/plugins/pull/1028) [`c163489`](https://github.com/kubb-labs/plugins/commit/c1634894a264547489d41a57fd9b7078101536e6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Update the supported Kubb version to 5.5.2.
+
 ## 5.0.3
 
 ### Patch Changes

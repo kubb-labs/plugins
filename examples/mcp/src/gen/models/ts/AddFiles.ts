@@ -40,4 +40,4 @@ export type AddFilesResponses = {
 /**
  * @description Union of all possible responses
  */
-export type AddFilesResponse = AddFilesStatus200 | AddFilesStatus405
+export type AddFilesResponse = AddFilesStatus200

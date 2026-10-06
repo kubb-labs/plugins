@@ -99,7 +99,7 @@ describe('buildResponses', () => {
 })
 
 describe('buildResponseUnion', () => {
-  it('emits a union of all response types', () => {
+  it('emits a union of 2xx response types only', () => {
     const node = ast.factory.createOperation({
       operationId: 'listPets',
       method: 'GET',
@@ -110,7 +110,7 @@ describe('buildResponseUnion', () => {
       ],
     })
 
-    expect(printSchema(buildResponseUnion(node, { resolver: resolverTs })!)).toMatchInlineSnapshot(`"(ListPetsStatus200 | ListPetsStatus405)"`)
+    expect(printSchema(buildResponseUnion(node, { resolver: resolverTs })!)).toMatchInlineSnapshot(`"ListPetsStatus200"`)
   })
 })
 
