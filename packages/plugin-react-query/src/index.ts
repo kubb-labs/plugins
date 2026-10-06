@@ -1,5 +1,3 @@
 export { default, pluginReactQuery, pluginReactQueryName } from './plugin.ts'
 export { resolverReactQuery } from './resolvers/resolverReactQuery.ts'
-export { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
-export type { KeyVariant, Transformer } from '@internals/tanstack-query'
 export type { PluginReactQuery, ResolverReactQuery } from './types.ts'
