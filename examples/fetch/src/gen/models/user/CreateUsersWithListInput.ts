@@ -38,4 +38,4 @@ export type CreateUsersWithListInputResponses = {
 /**
  * @description Union of all possible responses
  */
-export type CreateUsersWithListInputResponse = CreateUsersWithListInputStatus200 | CreateUsersWithListInputStatusDefault
+export type CreateUsersWithListInputResponse = CreateUsersWithListInputStatus200

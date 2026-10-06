@@ -4,7 +4,7 @@ import { createFunctionParameter, createFunctionParameters, functionPrinter } fr
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import { buildGroupedRequestParam, buildQueryOptionsParams } from '@internals/tanstack-query'
-import { buildClientOptionType, buildQueryKeyParams, getComments, resolveErrorNames } from '../utils.ts'
+import { buildClientOptionType, buildQueryKeyParams, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 
 type Props = {
   name: string
@@ -25,7 +25,8 @@ function buildQueryParamsNode(
   },
 ): FunctionParametersNode {
   const { resolver } = options
-  const responseName = resolver.response.response(node)
+  const successNames = resolveSuccessNames(node, resolver)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
   const errorNames = resolveErrorNames(node, resolver)
 
   const TData = responseName
@@ -48,7 +49,8 @@ function buildQueryParamsNode(
 }
 
 export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver }: Props): KubbReactNode {
-  const responseName = tsResolver.response.response(node)
+  const successNames = resolveSuccessNames(node, tsResolver)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.response.response(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
   const TData = responseName

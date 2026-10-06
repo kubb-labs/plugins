@@ -5,7 +5,7 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { GetPetByIdOptions, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById'
+import type { GetPetByIdOptions, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById'
 import type { SWRConfiguration } from 'swr'
 import { getPetById } from '../../clients/pet/getPetById'
 
@@ -29,7 +29,7 @@ export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Part
 export function useGetPetById(
   { path }: GetPetByIdOptions,
   options: {
-    query?: SWRConfiguration<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>>
+    query?: SWRConfiguration<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -39,7 +39,7 @@ export function useGetPetById(
 
   const queryKey = getPetByIdQueryKey({ path })
 
-  return useSWR<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdQueryKey | null>(shouldFetch ? queryKey : null, {
+  return useSWR<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdQueryKey | null>(shouldFetch ? queryKey : null, {
     ...getPetByIdQueryOptions({ path }, config),
     ...(immutable
       ? {

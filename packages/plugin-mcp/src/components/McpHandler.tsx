@@ -61,7 +61,7 @@ export function McpHandler({ name, clientName, node, resolver, returnType = 'ful
         JSDoc={{
           comments: buildOperationComments(node),
         }}
-        returnType={'Promise<CallToolResult>'}
+        returnType={'CallToolResult'}
       >
         {`const res = await ${clientName}(${callConfig})`}
         <br />

@@ -8,13 +8,13 @@ export function createAnimalFaker<TData extends Partial<Animal> = object>(data?:
   const defaultFakeData = {
     ...faker.helpers.arrayElement([
       {
-        ...createCatFaker<object>(),
+        ...createCatFaker(),
         ...{
           type: faker.helpers.arrayElement<(NonNullable<Extract<NonNullable<Animal>, { type: 'cat' }>> & Record<'type', unknown>)['type']>(['cat']),
         },
       },
       {
-        ...createDogFaker<object>(),
+        ...createDogFaker(),
         ...{
           type: faker.helpers.arrayElement<(NonNullable<Extract<NonNullable<Animal>, { type: 'dog' }>> & Record<'type', unknown>)['type']>(['dog']),
         },
@@ -27,5 +27,5 @@ export function createAnimalFaker<TData extends Partial<Animal> = object>(data?:
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }

@@ -10,5 +10,5 @@ export function createApiResponseFaker<TData extends Partial<ApiResponse> = obje
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }

@@ -1,6 +1,7 @@
 import { describe, expect, test, vi } from 'vitest'
 import {
   type CallResult,
+  createClient as createFetchClient,
   createClientCore,
   createInterceptorStack,
   parseEventStream,
@@ -536,6 +537,33 @@ describe('createClientCore', () => {
     const client = createClientCore<string, string>({ defaultTransport: transport, options: { cache: 'no-store' } })
     await client({ method: 'GET', url: '/pet' })
     expect(calls[0]?.options).toStrictEqual({ cache: 'no-store' })
+  })
+
+  test('passes createClient credentials to the transport', async () => {
+    const { transport, calls } = fakeTransport()
+    const client = createFetchClient({ transport, credentials: 'include' })
+    await client({ method: 'GET', url: '/pet' })
+    expect(calls[0]?.credentials).toBe('include')
+  })
+
+  test('passes setConfig credentials to the transport', async () => {
+    const { client, calls } = createClient()
+    client.setConfig({ credentials: 'include' })
+    await client({ method: 'GET', url: '/pet' })
+    expect(calls[0]?.credentials).toBe('include')
+  })
+
+  test('prefers request-level credentials over client-level credentials', async () => {
+    const { transport, calls } = fakeTransport()
+    const client = createClientCore<string, string>({ defaultTransport: transport, credentials: 'include' })
+    await client({ method: 'GET', url: '/pet', credentials: 'omit' })
+    expect(calls[0]?.credentials).toBe('omit')
+  })
+
+  test('leaves credentials undefined when neither level sets it', async () => {
+    const { client, calls } = createClient()
+    await client({ method: 'GET', url: '/pet' })
+    expect(calls[0]?.credentials).toBeUndefined()
   })
 
   test('merges request-level options over client-level', async () => {

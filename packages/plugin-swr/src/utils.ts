@@ -1,2 +1,2 @@
 export { buildQueryKeyParams } from '@internals/tanstack-query'
-export { buildClientOptionType, buildOperationComments as getComments, buildRequestConfigType, resolveErrorNames } from '@internals/shared'
+export { buildClientOptionType, buildOperationComments as getComments, buildRequestConfigType, resolveErrorNames, resolveSuccessNames } from '@internals/shared'

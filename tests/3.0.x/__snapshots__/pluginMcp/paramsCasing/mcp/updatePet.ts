@@ -11,7 +11,7 @@ import { updatePet } from '../clients/updatePet'
 /**
  * {@link /pets/:pet_id}
  */
-export async function updatePetHandler({ path, query, body, headers }: UpdatePetOptions, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
+export async function updatePetHandler({ path, query, body, headers }: UpdatePetOptions, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<CallToolResult> {
   const res = await updatePet({ path, query, headers, body, signal: request.signal, throwOnError: true })
 
   return {

@@ -12,7 +12,7 @@ import { getInventory } from '../../clients/getInventory'
  * @summary Returns pet inventories by status
  * {@link /store/inventory}
  */
-export async function getInventoryHandler(request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
+export async function getInventoryHandler(request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<CallToolResult> {
   const res = await getInventory({ signal: request.signal, throwOnError: true })
 
   return {

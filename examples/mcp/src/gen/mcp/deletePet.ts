@@ -16,7 +16,7 @@ import { deletePet } from '../clients/deletePet'
 export async function deletePetHandler(
   { path, headers }: DeletePetOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
-): Promise<Promise<CallToolResult>> {
+): Promise<CallToolResult> {
   const res = await deletePet({ path, headers, signal: request.signal, throwOnError: true })
 
   return {

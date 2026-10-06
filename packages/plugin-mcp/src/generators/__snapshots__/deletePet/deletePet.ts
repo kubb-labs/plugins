@@ -11,10 +11,7 @@ import { deletePet } from './clients/deletePet'
 /**
  * {@link /pets/:petId}
  */
-export async function deletePetHandler(
-  { path }: DeletePetOptions,
-  request: RequestHandlerExtra<ServerRequest, ServerNotification>,
-): Promise<Promise<CallToolResult>> {
+export async function deletePetHandler({ path }: DeletePetOptions, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<CallToolResult> {
   const res = await deletePet({ path, signal: request.signal, throwOnError: true })
 
   return {

@@ -44,4 +44,4 @@ export type GetOrderByIdResponses = {
 /**
  * @description Union of all possible responses
  */
-export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400 | GetOrderByIdStatus404
+export type GetOrderByIdResponse = GetOrderByIdStatus200

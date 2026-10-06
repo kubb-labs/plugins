@@ -18,7 +18,7 @@ export function createUploadFilePath<TData extends Partial<UploadFilePath> = obj
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createUploadFileQuery<TData extends Partial<UploadFileQuery> = object>(data?: TData)
@@ -30,7 +30,7 @@ export function createUploadFileQuery<TData extends Partial<UploadFileQuery> = o
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**

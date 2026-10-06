@@ -5,7 +5,7 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { GetOrderByIdOptions, GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById'
+import type { GetOrderByIdOptions, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById'
 import type { SWRConfiguration } from 'swr'
 import { getOrderById } from '../../clients/store/getOrderById'
 
@@ -32,7 +32,7 @@ export function getOrderByIdQueryOptions(
 export function useGetOrderById(
   { path }: GetOrderByIdOptions,
   options: {
-    query?: SWRConfiguration<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>>
+    query?: SWRConfiguration<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -42,7 +42,7 @@ export function useGetOrderById(
 
   const queryKey = getOrderByIdQueryKey({ path })
 
-  return useSWR<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdQueryKey | null>(
+  return useSWR<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdQueryKey | null>(
     shouldFetch ? queryKey : null,
     {
       ...getOrderByIdQueryOptions({ path }, config),

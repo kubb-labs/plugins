@@ -13,7 +13,7 @@ import { addPet } from '../../clients/addPet'
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPetHandler({ body }: AddPetOptions, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
+export async function addPetHandler({ body }: AddPetOptions, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<CallToolResult> {
   const res = await addPet({ body, signal: request.signal, throwOnError: true })
 
   return {

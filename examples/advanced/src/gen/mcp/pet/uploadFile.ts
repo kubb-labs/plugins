@@ -10,7 +10,7 @@ import { uploadFile } from '../../clients/axios/petService/uploadFile'
 export async function uploadFileHandler(
   { path, query, body }: UploadFileOptions,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
-): Promise<Promise<CallToolResult>> {
+): Promise<CallToolResult> {
   const res = await uploadFile({ path, query, body, signal: request.signal, throwOnError: true })
 
   return {

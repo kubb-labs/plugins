@@ -1,5 +1,27 @@
 # @kubb/plugin-swr
 
+## 5.1.6
+
+### Patch Changes
+
+- [#1028](https://github.com/kubb-labs/plugins/pull/1028) [`c163489`](https://github.com/kubb-labs/plugins/commit/c1634894a264547489d41a57fd9b7078101536e6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Update the supported Kubb version to 5.5.2.
+- Updated dependencies [[`bbcfb10`](https://github.com/kubb-labs/plugins/commit/bbcfb108b91956edd27fc70932d4d8493a7a21c7), [`c163489`](https://github.com/kubb-labs/plugins/commit/c1634894a264547489d41a57fd9b7078101536e6)]:
+  - @kubb/plugin-ts@5.0.4
+
+## 5.1.5
+
+### Patch Changes
+
+- [#1011](https://github.com/kubb-labs/plugins/pull/1011) [`0621506`](https://github.com/kubb-labs/plugins/commit/0621506e03d13ff0b8112f5a089d2180a63f5ea6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb 5.4.2 or later in plugin peer dependencies.
+- Updated dependencies [[`0621506`](https://github.com/kubb-labs/plugins/commit/0621506e03d13ff0b8112f5a089d2180a63f5ea6)]:
+  - @kubb/plugin-ts@5.0.3
+
+## 5.1.4
+
+### Patch Changes
+
+- [#1006](https://github.com/kubb-labs/plugins/pull/1006) [`65003ad`](https://github.com/kubb-labs/plugins/commit/65003ad59f58cc8765d122fdbf2915b3fc8a6bab) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Keep error response types out of SWR hook data types.
+
 ## 5.1.3
 
 ### Patch Changes

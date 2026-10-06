@@ -1,4 +1,4 @@
-import { getOperationSuccessResponses, resolveDependencyOperationFile, resolveResponseTypes } from '@internals/shared'
+import { collectRefNames, getOperationSuccessResponses, resolveDependencyOperationFile, resolveResponseTypes } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -54,8 +54,26 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       responseName: tsResolver.response.response(node),
     }
 
-    const types = resolveResponseTypes(node, tsResolver)
     const successResponses = getOperationSuccessResponses(node)
+    const referencedNames = node.responses.flatMap((response) =>
+      (response.content ?? []).flatMap((entry) => (entry.schema ? collectRefNames(entry.schema) : [])),
+    )
+    const enumOptions = pluginTs.options?.enum
+    const enumNames = new Set(ctx.meta.enumNames)
+    const hasResponseNameCollision = referencedNames.some((name) => {
+      const importName =
+        enumOptions?.type === 'asConst' && enumOptions.typeSuffix && enumNames.has(name)
+          ? tsResolver.enum.keyName({ name }, enumOptions.typeSuffix)
+          : tsResolver.name(name)
+      return importName === type.responseName
+    })
+    const types = resolveResponseTypes(node, tsResolver).map(([code, typeName]) => {
+      const successResponse = successResponses.find((response) => response.statusCode === String(code))
+      return [code, hasResponseNameCollision && successResponse ? tsResolver.response.status(node, successResponse.statusCode) : typeName] as const
+    })
+    const responseTypeNames = types.map(([, typeName]) => typeName).filter((name) => !hasResponseNameCollision || name !== type.responseName)
+    const mockResponseName =
+      hasResponseNameCollision && successResponses[0] ? tsResolver.response.status(node, successResponses[0].statusCode) : type.responseName
     const hasSuccessSchema = successResponses.some((response) => hasResponseSchema(response))
 
     const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.response.body(node) : null
@@ -71,7 +89,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
         <File.Import name={['http']} path="msw" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw" />
         <File.Import
-          name={Array.from(new Set([type.responseName, ...types.map((t) => t[1]), ...(requestName ? [requestName] : [])]))}
+          name={Array.from(new Set([...(hasResponseNameCollision ? [] : [type.responseName]), ...responseTypeNames, ...(requestName ? [requestName] : [])]))}
           path={type.file.path}
           root={mock.file.path}
           isTypeOnly
@@ -87,9 +105,9 @@ export const mswGenerator = defineGenerator<PluginMsw>({
           })}
 
         {parser === 'faker' && faker && hasSuccessSchema ? (
-          <Mock name={mock.name} typeName={type.responseName} requestTypeName={requestName} fakerName={faker.name} node={node} baseURL={baseURL} />
+          <Mock name={mock.name} typeName={mockResponseName} requestTypeName={requestName} fakerName={faker.name} node={node} baseURL={baseURL} />
         ) : (
-          <Mock name={mock.name} typeName={type.responseName} requestTypeName={requestName} node={node} baseURL={baseURL} />
+          <Mock name={mock.name} typeName={mockResponseName} requestTypeName={requestName} node={node} baseURL={baseURL} />
         )}
       </File>
     )

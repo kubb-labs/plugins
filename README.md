@@ -22,13 +22,13 @@
 
 **Official and community plugins for [Kubb](https://kubb.dev).**
 
-This monorepo is home to official and community plugins for [Kubb](https://kubb.dev), the meta framework for code generation. Point Kubb at your OpenAPI specification and it generates TypeScript types, API clients, Zod schemas, TanStack Query hooks for React, composables for Vue, SWR hooks, Faker mocks, MSW handlers, and more.
+This monorepo is home to official and community plugins for [Kubb](https://kubb.dev), which turns your API spec into type-safe code. Point Kubb at your OpenAPI specification and it generates TypeScript types, API clients, Zod schemas, TanStack Query hooks for React, composables for Vue, SWR hooks, Faker mocks, MSW handlers, and more.
 
 Want to build your own plugin? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Use plugins in Kubb Studio
 
-[Kubb Studio](https://kubb.studio) lets you configure and inspect Kubb generations in the browser while your project or self-hosted agent runs Kubb. [Connect a project](https://kubb.dev/docs/5.x/guide/integrations/studio) to use these plugins in that workflow.
+[Kubb Studio](https://kubb.studio) lets you configure and inspect Kubb generations in the browser while your project or self-hosted agent runs Kubb. [Connect a project](https://kubb.dev/docs/5.x/integrations/studio) to use these plugins in that workflow.
 
 ## Official plugins
 
