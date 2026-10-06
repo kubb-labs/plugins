@@ -26,4 +26,4 @@ export type GetInventoryResponses = {
 /**
  * @description Union of all possible responses
  */
-export type GetInventoryResponse = GetInventoryStatus200 | GetInventoryStatus401
+export type GetInventoryResponse = GetInventoryStatus200

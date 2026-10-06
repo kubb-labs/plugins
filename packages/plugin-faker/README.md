@@ -10,7 +10,7 @@
 [![Node][node-src]][node-href]
 
 <h4>
-<a href="https://kubb.dev/plugins/faker" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/plugin-faker" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -38,7 +38,7 @@ npm install @kubb/plugin-faker
 
 ## Documentation
 
-See the [full documentation](https://kubb.dev/plugins/faker) for configuration options and examples.
+See the [full documentation](https://kubb.dev/plugins/plugin-faker) for configuration options and examples.
 
 ## Supporting Kubb
 

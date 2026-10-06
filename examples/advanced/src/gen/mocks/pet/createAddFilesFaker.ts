@@ -23,7 +23,7 @@ export function createAddFilesBodyFakerJson<TData extends Partial<AddFilesBodyJs
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createAddFilesBodyFakerFormData(data?: Partial<AddFilesBodyFormData>): AddFilesBodyFormData {
@@ -31,7 +31,7 @@ export function createAddFilesBodyFakerFormData(data?: Partial<AddFilesBodyFormD
 }
 
 export function createAddFilesBodyFaker(data?: Partial<AddFilesBody>): AddFilesBody {
-  return (data ?? faker.helpers.arrayElement([createAddFilesBodyFakerJson<object>(), createAddFilesBodyFakerFormData()])) as AddFilesBody
+  return (data ?? faker.helpers.arrayElement([createAddFilesBodyFakerJson(), createAddFilesBodyFakerFormData()])) as AddFilesBody
 }
 
 export function createAddFilesResponseFaker(data?: Partial<AddFilesResponse>): AddFilesResponse {

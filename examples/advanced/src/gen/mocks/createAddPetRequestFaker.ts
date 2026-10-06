@@ -16,5 +16,5 @@ export function createAddPetRequestFaker<TData extends Partial<AddPetRequest> = 
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }

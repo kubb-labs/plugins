@@ -10,7 +10,7 @@
 [![Node][node-src]][node-href]
 
 <h4>
-<a href="https://kubb.dev/plugins/ts" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/plugin-ts" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -38,7 +38,7 @@ npm install @kubb/plugin-ts
 
 ## Documentation
 
-See the [full documentation](https://kubb.dev/plugins/ts) for configuration options and examples.
+See the [full documentation](https://kubb.dev/plugins/plugin-ts) for configuration options and examples.
 
 ## Supporting Kubb
 

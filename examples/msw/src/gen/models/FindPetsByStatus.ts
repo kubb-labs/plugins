@@ -45,4 +45,4 @@ export type FindPetsByStatusResponses = {
 /**
  * @description Union of all possible responses
  */
-export type FindPetsByStatusResponse = FindPetsByStatusStatus200 | FindPetsByStatusStatus400
+export type FindPetsByStatusResponse = FindPetsByStatusStatus200

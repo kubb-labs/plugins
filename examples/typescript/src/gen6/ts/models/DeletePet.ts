@@ -38,4 +38,4 @@ export type DeletePetResponses = {
 /**
  * @description Union of all possible responses
  */
-export type DeletePetResponse = DeletePetStatus200 | DeletePetStatus400
+export type DeletePetResponse = DeletePetStatus200

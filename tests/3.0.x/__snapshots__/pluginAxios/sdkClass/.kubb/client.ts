@@ -415,6 +415,7 @@ function serializeUrl({
 
 /**
  * Wraps an axios interceptor registration behind the shared `use` / `eject` / `update` API, mapping a stable external id onto axios's own so `update` can swap a handler in place.
+ * `detach` / `attach` move every registered handler to another instance, keeping the external ids.
  */
 function createInterceptorChannel<T, TRequest, TResponse>(
   register: (fn: InterceptorFn<T, TRequest, TResponse>) => number,
@@ -422,9 +423,16 @@ function createInterceptorChannel<T, TRequest, TResponse>(
   getRequestConfig: (value: T) => RequestConfig<unknown, TRequest, TResponse> | undefined,
   getContextId: (value: T) => number | undefined,
   setContextId: (value: T, id: number | undefined) => void,
-): InterceptorChannel<T, TRequest, TResponse> {
+  nextSeq?: () => number,
+): InterceptorChannel<T, TRequest, TResponse> & {
+  detach: () => void
+  attach: () => void
+  getEntries: () => Array<{ seq: number; attach: () => void }>
+} {
   const ids = new Map<number, number>()
+  const handlers = new Map<number, { fn: InterceptorFn<T, TRequest, TResponse>; seq: number }>()
   let counter = 0
+  const getSeq = nextSeq ?? (() => ++counter)
   const registerWithContext = (fn: InterceptorFn<T, TRequest, TResponse>) =>
     register(async (value) => {
       const contextId = getContextId(value)
@@ -436,6 +444,8 @@ function createInterceptorChannel<T, TRequest, TResponse>(
   return {
     use(fn) {
       const id = ++counter
+      const seq = getSeq()
+      handlers.set(id, { fn, seq })
       ids.set(id, registerWithContext(fn))
       return id
     },
@@ -444,11 +454,29 @@ function createInterceptorChannel<T, TRequest, TResponse>(
       if (nativeId === undefined) return
       ejectNative(nativeId)
       ids.delete(id)
+      handlers.delete(id)
     },
     update(id, fn) {
       const nativeId = ids.get(id)
-      if (nativeId !== undefined) ejectNative(nativeId)
+      if (nativeId === undefined) return
+      ejectNative(nativeId)
+      const seq = getSeq()
+      handlers.set(id, { fn, seq })
       ids.set(id, registerWithContext(fn))
+    },
+    detach() {
+      for (const nativeId of ids.values()) ejectNative(nativeId)
+      ids.clear()
+    },
+    attach() {
+      const sorted = Array.from(handlers.entries()).sort((a, b) => a[1].seq - b[1].seq)
+      for (const [id, entry] of sorted) ids.set(id, registerWithContext(entry.fn))
+    },
+    getEntries() {
+      return Array.from(handlers.entries()).map(([id, entry]) => ({
+        seq: entry.seq,
+        attach: () => ids.set(id, registerWithContext(entry.fn)),
+      }))
     },
   }
 }
@@ -697,7 +725,8 @@ async function settleResponse<TRequest, TResponse>({
  */
 export function createClientCore<TRequest = AxiosRequestConfig, TResponse = AxiosResponse>(options: ClientConfig = {}): ClientInstance<TRequest, TResponse> {
   let config: ClientConfig = { ...options }
-  const instance = config.transport ?? axios.create()
+  const baseInstance = config.transport ?? axios.create()
+  let instance = baseInstance
   const requestContexts = new Map<number, RequestConfig<unknown, TRequest, TResponse>>()
   let requestContextId = 0
   const getContextId = (value: AxiosRequestConfig | AxiosResponse | AxiosError) => {
@@ -718,34 +747,48 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     else contextualConfig.__kubbRequestContext = id
   }
 
-  const requestManager = instance.interceptors.request
-  const responseManager = instance.interceptors.response
-  const interceptors: Interceptors<TRequest, TResponse> = {
+  let sequenceCounter = 0
+  const nextSeq = () => ++sequenceCounter
+
+  // Read at call time so the channels follow a transport swapped in through setConfig.
+  const channels = {
     request: createInterceptorChannel<InternalAxiosRequestConfig, TRequest, TResponse>(
-      (fn) => requestManager.use(fn),
-      (id) => requestManager.eject(id),
+      (fn) => instance.interceptors.request.use(fn),
+      (id) => instance.interceptors.request.eject(id),
       getRequestConfig,
       getContextId,
       setContextId,
+      nextSeq,
     ),
     response: createInterceptorChannel<AxiosResponse, TRequest, TResponse>(
-      (fn) => responseManager.use(fn),
-      (id) => responseManager.eject(id),
+      (fn) => instance.interceptors.response.use(fn),
+      (id) => instance.interceptors.response.eject(id),
       getRequestConfig,
       getContextId,
       setContextId,
+      nextSeq,
     ),
     error: createInterceptorChannel<AxiosError, TRequest, TResponse>(
-      (fn) => responseManager.use(undefined, (error: unknown) => Promise.resolve(fn(error as AxiosError)).then(() => Promise.reject(error))),
-      (id) => responseManager.eject(id),
+      (fn) =>
+        instance.interceptors.response.use(undefined, (error: unknown) =>
+          Promise.resolve(fn(error as AxiosError)).then((result) => Promise.reject(result ?? error)),
+        ),
+      (id) => instance.interceptors.response.eject(id),
       getRequestConfig,
       getContextId,
       setContextId,
+      nextSeq,
     ),
+  }
+  const channelList = [channels.request, channels.response, channels.error]
+  const interceptors: Interceptors<TRequest, TResponse> = {
+    request: { use: channels.request.use, eject: channels.request.eject, update: channels.request.update },
+    response: { use: channels.response.use, eject: channels.response.eject, update: channels.response.update },
+    error: { use: channels.error.use, eject: channels.error.eject, update: channels.error.update },
   }
 
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
-    const activeInstance = requestConfig.transport ?? config.transport ?? instance
+    const activeInstance = requestConfig.transport ?? instance
     const { axiosConfig, codecs, throwOnError } = await resolveRequest({ config, requestConfig })
     const contextId = ++requestContextId
     requestContexts.set(contextId, requestConfig)
@@ -789,6 +832,14 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
   client.getConfig = () => config
   client.setConfig = (next) => {
     config = { ...config, ...next, headers: { ...serializeHeaders(config.headers), ...serializeHeaders(next.headers) } }
+    const nextInstance = config.transport ?? baseInstance
+    if (nextInstance !== instance) {
+      for (const channel of channelList) channel.detach()
+      instance = nextInstance
+      channels.request.attach()
+      const responseEntries = [...channels.response.getEntries(), ...channels.error.getEntries()].sort((a, b) => a.seq - b.seq)
+      for (const entry of responseEntries) entry.attach()
+    }
     return config
   }
   client.getUrl = (requestConfig) => {

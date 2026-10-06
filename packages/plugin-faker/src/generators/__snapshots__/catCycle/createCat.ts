@@ -27,5 +27,5 @@ export function createCat<TData extends Partial<Cat> = object>(data?: TData) {
       Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
     }
   }
-  return defaultFakeData as Omit<typeof defaultFakeData, keyof TData> & TData
+  return defaultFakeData as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }

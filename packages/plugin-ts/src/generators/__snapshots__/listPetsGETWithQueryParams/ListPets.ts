@@ -27,4 +27,4 @@ export type ListPetsResponses = {
 /**
  * @description Union of all possible responses
  */
-export type ListPetsResponse = ListPetsStatus200 | ListPetsStatusDefault
+export type ListPetsResponse = ListPetsStatus200

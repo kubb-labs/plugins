@@ -17,7 +17,7 @@ export function createUpdatePetPath<TData extends Partial<UpdatePetPath> = objec
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createUpdatePetQuery<TData extends Partial<UpdatePetQuery> = object>(data?: TData)
@@ -30,7 +30,7 @@ export function createUpdatePetQuery<TData extends Partial<UpdatePetQuery> = obj
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createUpdatePetHeaders<TData extends Partial<UpdatePetHeaders> = object>(data?: TData)
@@ -42,7 +42,7 @@ export function createUpdatePetHeaders<TData extends Partial<UpdatePetHeaders> =
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
