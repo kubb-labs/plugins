@@ -19,7 +19,7 @@ export function createCreatePetsPathFaker<TData extends Partial<CreatePetsPath> 
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createCreatePetsQueryFaker<TData extends Partial<CreatePetsQuery> = object>(data?: TData) {
@@ -30,7 +30,7 @@ export function createCreatePetsQueryFaker<TData extends Partial<CreatePetsQuery
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createCreatePetsHeadersFaker<TData extends Partial<CreatePetsHeaders> = object>(data?: TData) {
@@ -40,7 +40,7 @@ export function createCreatePetsHeadersFaker<TData extends Partial<CreatePetsHea
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -65,7 +65,7 @@ export function createCreatePetsBodyFaker<TData extends Partial<CreatePetsBody> 
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createCreatePetsResponseFaker(data?: Partial<CreatePetsResponse>): CreatePetsResponse {

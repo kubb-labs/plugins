@@ -117,14 +117,14 @@ export function Faker({ node, description, name, typeName, printer, canOverride 
       Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
     }
   }
-  return defaultFakeData as Omit<typeof defaultFakeData, keyof TData> & TData
+  return defaultFakeData as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }`
     : `{
   const defaultFakeData = ${fakerText}
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }`
 
   return (

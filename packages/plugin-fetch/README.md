@@ -10,7 +10,7 @@
 [![Node][node-src]][node-href]
 
 <h4>
-<a href="https://kubb.dev/plugins/fetch" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/plugin-fetch" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -38,7 +38,7 @@ npm install @kubb/plugin-fetch
 
 ## Documentation
 
-See the [full documentation](https://kubb.dev/plugins/fetch) for configuration options and examples.
+See the [full documentation](https://kubb.dev/plugins/plugin-fetch) for configuration options and examples.
 
 ## Supporting Kubb
 

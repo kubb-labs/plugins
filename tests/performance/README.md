@@ -114,5 +114,5 @@ describe('My Benchmark Suite', () => {
 ## See Also
 
 - [Vitest Benchmark Documentation](https://vitest.dev/guide/features.html#benchmarking)
-- [Main Performance Script](../../../../package.json) - `pnpm perf:bench`
-- [Benchmark Configuration](../../../../configs/vitest.bench.config.ts)
+- [Main Performance Script](../../package.json) - `pnpm test:bench`
+- [Benchmark Configuration](../../configs/vitest.bench.config.ts)

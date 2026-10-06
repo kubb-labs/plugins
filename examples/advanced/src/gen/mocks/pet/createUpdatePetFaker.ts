@@ -46,7 +46,7 @@ export function createUpdatePetStatus202Faker<TData extends Partial<UpdatePetSta
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -103,7 +103,7 @@ export function createUpdatePetResponseFaker(data?: Partial<UpdatePetResponse>):
   return (data ??
     faker.helpers.arrayElement([
       createUpdatePetStatus200Faker(),
-      createUpdatePetStatus202Faker<object>(),
+      createUpdatePetStatus202Faker(),
       createUpdatePetStatus400Faker(),
       createUpdatePetStatus404Faker(),
       createUpdatePetStatus405Faker(),
