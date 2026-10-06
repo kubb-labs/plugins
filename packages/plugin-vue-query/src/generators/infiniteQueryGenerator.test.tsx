@@ -165,25 +165,3 @@ describe('infiniteQueryGenerator operation with hooks disabled', () => {
     expect(driver.fileManager.files).toStrictEqual([])
   })
 })
-
-describe('infiniteQueryGenerator operation with infinite.match', () => {
-  test('returns no file when match rejects the operation', async () => {
-    const options: PluginVueQuery['resolvedOptions'] = {
-      ...defaultOptions,
-      infinite: { ...infiniteOptions, match: (node) => node.operationId !== 'findPetsByTags' },
-    }
-    const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
-    const driver = createMultiPluginDriver('matchRejected')
-
-    await renderGeneratorOperation(infiniteQueryGenerator, findByTagsNode, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverVueQuery,
-    })
-
-    expect(driver.fileManager.files).toStrictEqual([])
-  })
-})

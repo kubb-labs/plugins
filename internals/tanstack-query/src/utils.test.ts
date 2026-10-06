@@ -142,22 +142,19 @@ const arraySchema = ast.factory.createSchema({ type: 'array', items: [ast.factor
 const infinite = (options: Parameters<typeof resolveInfiniteConfig>[0] = {}) => resolveInfiniteConfig({ queryParam: 'page', ...options }) || {}
 
 describe('resolveInfiniteConfig', () => {
-  test('clears the page param code and match by default', () => {
-    expect(resolveInfiniteConfig({})).toMatchObject({ getNextPageParam: null, getPreviousPageParam: null, match: null })
+  test('clears the page param code by default', () => {
+    expect(resolveInfiniteConfig({})).toMatchObject({ getNextPageParam: null, getPreviousPageParam: null })
   })
 
-  test('preserves configured page param code and match', () => {
-    const matchFn = () => true
+  test('preserves configured page param code', () => {
     expect(
       resolveInfiniteConfig({
         getNextPageParam: '(lastPage) => lastPage.next',
         getPreviousPageParam: '(firstPage) => firstPage.prev',
-        match: matchFn,
       }),
     ).toMatchObject({
       getNextPageParam: '(lastPage) => lastPage.next',
       getPreviousPageParam: '(firstPage) => firstPage.prev',
-      match: matchFn,
     })
   })
 })
@@ -184,13 +181,6 @@ describe('matchesInfinite', () => {
       responses: [ast.factory.createResponse({ statusCode: '200', schema: pageSchema })],
     })
     expect(matchesInfinite(noParamsNode, infinite())).toBe(false)
-  })
-
-  test('lets match narrow the operations', () => {
-    const node = listPetsNode(pageSchema)
-
-    expect(matchesInfinite(node, infinite({ match: () => false }))).toBe(false)
-    expect(matchesInfinite(node, infinite({ match: (candidate) => candidate.operationId === 'listPets' }))).toBe(true)
   })
 })
 

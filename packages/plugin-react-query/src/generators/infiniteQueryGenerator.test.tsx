@@ -194,28 +194,6 @@ describe('infiniteQueryGenerator operation with hooks disabled', () => {
   })
 })
 
-describe('infiniteQueryGenerator operation with infinite.match', () => {
-  test('returns no file when match rejects the operation', async () => {
-    const options: PluginReactQuery['resolvedOptions'] = {
-      ...defaultOptions,
-      infinite: { ...infiniteConfig, match: (node) => node.operationId !== 'findPetsByTags' },
-    }
-    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
-    const driver = createMultiPluginDriver('matchRejected')
-
-    await renderGeneratorOperation(infiniteQueryGenerator, findByTagsNode, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverReactQuery,
-    })
-
-    expect(driver.fileManager.files).toStrictEqual([])
-  })
-})
-
 describe('infiniteQueryGenerator page param resolution combinations', () => {
   const renderWithInfinite = async (infinite: PluginReactQuery['resolvedOptions']['infinite']) => {
     const options: PluginReactQuery['resolvedOptions'] = {

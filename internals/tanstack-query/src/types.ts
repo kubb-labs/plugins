@@ -94,9 +94,4 @@ export type Infinite = {
    * `'(firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined)'`
    */
   getPreviousPageParam?: string | null
-  /**
-   * Narrows which operations get infinite hooks, on top of having the `queryParam`. Return `false`
-   * to skip an operation, for example one whose response isn't paginated.
-   */
-  match?: ((node: ast.OperationNode) => boolean) | null
 }
