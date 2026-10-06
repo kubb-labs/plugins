@@ -2,7 +2,7 @@ import type { ClientSelector } from '@internals/client'
 import type { Transformer } from '@internals/tanstack-query'
 import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from 'kubb/kit'
 
-export type { KeyVariant, Transformer } from '@internals/tanstack-query'
+export type { Transformer } from '@internals/tanstack-query'
 
 /**
  * The concrete resolver type for `@kubb/plugin-swr`.
@@ -87,12 +87,12 @@ export type ResolverSwr = Resolver & {
 }
 
 /**
- * Customize the queryKey. Wrap the exported `queryKeyTransformer` to extend the default key.
+ * Customize the queryKey.
  */
 type QueryKey = Transformer
 
 /**
- * Customize the mutationKey. Wrap the exported `mutationKeyTransformer` to extend the default key.
+ * Customize the mutationKey.
  */
 type MutationKey = Transformer
 
