@@ -46,4 +46,4 @@ export type GetThingsResponses = {
 /**
  * @description Union of all possible responses
  */
-export type GetThingsResponse = GetThingsStatus201 | GetThingsStatusDefault
+export type GetThingsResponse = GetThingsStatus201

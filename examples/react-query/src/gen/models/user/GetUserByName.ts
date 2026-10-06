@@ -47,4 +47,4 @@ export type GetUserByNameResponses = {
 /**
  * @description Union of all possible responses
  */
-export type GetUserByNameResponse = GetUserByNameStatus200 | GetUserByNameStatus400 | GetUserByNameStatus404
+export type GetUserByNameResponse = GetUserByNameStatus200
