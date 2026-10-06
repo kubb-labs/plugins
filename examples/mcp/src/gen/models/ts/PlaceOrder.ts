@@ -32,4 +32,4 @@ export type PlaceOrderResponses = {
 /**
  * @description Union of all possible responses
  */
-export type PlaceOrderResponse = PlaceOrderStatus200 | PlaceOrderStatus405
+export type PlaceOrderResponse = PlaceOrderStatus200
