@@ -32,4 +32,4 @@ export type UpdatePetWithFormResponses = {
 /**
  * @description Union of all possible responses
  */
-export type UpdatePetWithFormResponse = UpdatePetWithFormStatus200 | UpdatePetWithFormStatus405
+export type UpdatePetWithFormResponse = UpdatePetWithFormStatus200

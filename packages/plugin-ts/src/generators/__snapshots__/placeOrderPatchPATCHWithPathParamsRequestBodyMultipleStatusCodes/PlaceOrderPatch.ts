@@ -33,4 +33,4 @@ export type PlaceOrderPatchResponses = {
 /**
  * @description Union of all possible responses
  */
-export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatchStatus405
+export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200

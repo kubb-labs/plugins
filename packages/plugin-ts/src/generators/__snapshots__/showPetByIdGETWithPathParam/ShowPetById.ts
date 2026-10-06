@@ -27,4 +27,4 @@ export type ShowPetByIdResponses = {
 /**
  * @description Union of all possible responses
  */
-export type ShowPetByIdResponse = ShowPetByIdStatus200 | ShowPetByIdStatusDefault
+export type ShowPetByIdResponse = ShowPetByIdStatus200
