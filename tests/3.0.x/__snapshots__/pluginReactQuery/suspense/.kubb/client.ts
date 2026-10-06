@@ -229,6 +229,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   headers?: unknown
   styles?: Styles
   signal?: AbortSignal
+  withCredentials?: boolean
   options?: AxiosOptions
   contentType?: ContentType
   responseType?: ResponseType
@@ -263,6 +264,7 @@ export type Options<TData extends DataShape, ThrowOnError extends boolean = true
 export type ClientConfig = {
   baseURL?: string
   headers?: HeadersInit
+  withCredentials?: boolean
   options?: AxiosOptions
   throwOnError?: boolean
   validateStatus?: (status: number) => boolean
@@ -653,6 +655,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     data: body,
     transformRequest: (data) => data,
     signal: requestConfig.signal,
+    withCredentials: requestConfig.withCredentials ?? config.withCredentials ?? options?.withCredentials,
     responseType: requestConfig.responseType,
     validateStatus,
   }

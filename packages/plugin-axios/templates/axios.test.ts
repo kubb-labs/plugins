@@ -324,6 +324,42 @@ describe('createClientCore', () => {
     expect(calls[0]?.timeout).toBe(1000)
   })
 
+  test('passes client-level withCredentials to axios', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance, withCredentials: true })
+    await client({ method: 'GET', url: '/pet' })
+    expect(calls[0]?.withCredentials).toBe(true)
+  })
+
+  test('passes setConfig withCredentials to axios', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    client.setConfig({ withCredentials: true })
+    await client({ method: 'GET', url: '/pet' })
+    expect(calls[0]?.withCredentials).toBe(true)
+  })
+
+  test('prefers request-level withCredentials over client-level', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance, withCredentials: true })
+    await client({ method: 'GET', url: '/pet', withCredentials: false })
+    expect(calls[0]?.withCredentials).toBe(false)
+  })
+
+  test('keeps withCredentials from options when no top-level value is set', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance, options: { withCredentials: true } })
+    await client({ method: 'GET', url: '/pet' })
+    expect(calls[0]?.withCredentials).toBe(true)
+  })
+
+  test('leaves withCredentials undefined when no level sets it', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/pet' })
+    expect(calls[0]?.withCredentials).toBeUndefined()
+  })
+
   test('merges request-level axiosOptions over client-level', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance, options: { timeout: 1000, maxRedirects: 5 } })
