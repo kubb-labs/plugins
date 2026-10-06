@@ -63,4 +63,4 @@ export type AddPetResponses = {
 /**
  * @description Union of all possible responses
  */
-export type AddPetResponse = AddPetStatus200 | AddPetStatus405
+export type AddPetResponse = AddPetStatus200

@@ -235,7 +235,7 @@ export type UpdatePetResponses = {
 /**
  * @description Union of all possible responses
  */
-export type UpdatePetResponse = UpdatePetStatus200 | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405
+export type UpdatePetResponse = UpdatePetStatus200
 
 export type AddPetStatus200Json = Pet
 
@@ -296,7 +296,7 @@ export type AddPetResponses = {
 /**
  * @description Union of all possible responses
  */
-export type AddPetResponse = AddPetStatus200 | AddPetStatus405
+export type AddPetResponse = AddPetStatus200
 
 export type FindPetsByStatusQuery = {
   /**
@@ -337,7 +337,7 @@ export type FindPetsByStatusResponses = {
 /**
  * @description Union of all possible responses
  */
-export type FindPetsByStatusResponse = FindPetsByStatusStatus200 | FindPetsByStatusStatus400
+export type FindPetsByStatusResponse = FindPetsByStatusStatus200
 
 export type FindPetsByTagsQuery = {
   /**
@@ -388,7 +388,7 @@ export type FindPetsByTagsResponses = {
 /**
  * @description Union of all possible responses
  */
-export type FindPetsByTagsResponse = FindPetsByTagsStatus200 | FindPetsByTagsStatus400
+export type FindPetsByTagsResponse = FindPetsByTagsStatus200
 
 export type GetPetByIdPath = {
   /**
@@ -434,7 +434,7 @@ export type GetPetByIdResponses = {
 /**
  * @description Union of all possible responses
  */
-export type GetPetByIdResponse = GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404
+export type GetPetByIdResponse = GetPetByIdStatus200
 
 export type UpdatePetWithFormPath = {
   /**
@@ -594,7 +594,7 @@ export type PlaceOrderResponses = {
 /**
  * @description Union of all possible responses
  */
-export type PlaceOrderResponse = PlaceOrderStatus200 | PlaceOrderStatus405
+export type PlaceOrderResponse = PlaceOrderStatus200
 
 export type PlaceOrderPatchStatus200 = Order
 
@@ -623,7 +623,7 @@ export type PlaceOrderPatchResponses = {
 /**
  * @description Union of all possible responses
  */
-export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatchStatus405
+export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200
 
 export type GetOrderByIdPath = {
   /**
@@ -669,7 +669,7 @@ export type GetOrderByIdResponses = {
 /**
  * @description Union of all possible responses
  */
-export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400 | GetOrderByIdStatus404
+export type GetOrderByIdResponse = GetOrderByIdStatus200
 
 export type DeleteOrderPath = {
   /**

@@ -1,3 +1,4 @@
+import { isSuccessStatusCode } from '@internals/shared'
 import { jsStringEscape, stringify } from '@internals/utils'
 import { ast, syncSchemaRef } from 'kubb/kit'
 import type { ResolverTs } from './types.ts'
@@ -106,7 +107,10 @@ export function buildParams({ params }: BuildParamsSchemaOptions): ast.SchemaNod
 }
 
 export function buildResponseUnion(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode | null {
-  const responsesWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
+  const allWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
+  // Only 2xx responses, so an `unknown` error body cannot erase the success typing. Falls back to all responses when no 2xx has a schema.
+  const successWithSchema = allWithSchema.filter((res) => isSuccessStatusCode(res.statusCode))
+  const responsesWithSchema = successWithSchema.length > 0 ? successWithSchema : allWithSchema
 
   if (responsesWithSchema.length === 0) {
     return null
