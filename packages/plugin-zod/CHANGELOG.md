@@ -1,5 +1,11 @@
 # @kubb/plugin-zod
 
+## 5.4.3
+
+### Patch Changes
+
+- [#1028](https://github.com/kubb-labs/plugins/pull/1028) [`c163489`](https://github.com/kubb-labs/plugins/commit/c1634894a264547489d41a57fd9b7078101536e6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Update the supported Kubb version to 5.5.2.
+
 ## 5.4.2
 
 ### Patch Changes
