@@ -8,7 +8,7 @@ export function createUpdatePetWithFormPathFaker<TData extends Partial<UpdatePet
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createUpdatePetWithFormQueryFaker<TData extends Partial<UpdatePetWithFormQuery> = object>(data?: TData) {
@@ -19,7 +19,7 @@ export function createUpdatePetWithFormQueryFaker<TData extends Partial<UpdatePe
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**

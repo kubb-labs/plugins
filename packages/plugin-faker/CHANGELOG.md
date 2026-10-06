@@ -1,5 +1,15 @@
 # @kubb/plugin-faker
 
+## 5.0.12
+
+### Patch Changes
+
+- [#1011](https://github.com/kubb-labs/plugins/pull/1011) [`0621506`](https://github.com/kubb-labs/plugins/commit/0621506e03d13ff0b8112f5a089d2180a63f5ea6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb 5.4.2 or later in plugin peer dependencies.
+
+- [#1023](https://github.com/kubb-labs/plugins/pull/1023) [`dd24b17`](https://github.com/kubb-labs/plugins/commit/dd24b1764996904910b3e7f8b9138e7c68810739) Thanks [@Ericlm](https://github.com/Ericlm)! - Preserve required properties when calling mock factories without overrides in nullable types, unions, and nested expressions. Infer overrides only from the data argument using `NoInfer`, removing the need for explicit `<object>` type arguments.
+- Updated dependencies [[`0621506`](https://github.com/kubb-labs/plugins/commit/0621506e03d13ff0b8112f5a089d2180a63f5ea6)]:
+  - @kubb/plugin-ts@5.0.3
+
 ## 5.0.11
 
 ### Patch Changes

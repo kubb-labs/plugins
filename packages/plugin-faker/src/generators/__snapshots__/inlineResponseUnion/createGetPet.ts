@@ -17,7 +17,7 @@ export function createGetPetStatus200<TData extends Partial<GetPetStatus200> = o
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -30,9 +30,9 @@ export function createGetPetStatus401<TData extends Partial<GetPetStatus401> = o
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createGetPetResponse(data?: Partial<GetPetResponse>): GetPetResponse {
-  return (data ?? faker.helpers.arrayElement([createGetPetStatus200<object>(), createGetPetStatus401<object>()])) as GetPetResponse
+  return (data ?? faker.helpers.arrayElement([createGetPetStatus200(), createGetPetStatus401()])) as GetPetResponse
 }

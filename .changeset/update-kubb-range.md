@@ -1,7 +1,4 @@
 ---
-'@internals/client': patch
-'@internals/shared': patch
-'@internals/tanstack-query': patch
 '@kubb/plugin-axios': patch
 '@kubb/plugin-client': patch
 '@kubb/plugin-cypress': patch
@@ -17,4 +14,4 @@
 '@kubb/plugin-zod': patch
 ---
 
-Require Kubb 5.4.2 or later in plugin peer dependencies.
+Update the supported Kubb version to 5.5.2.

@@ -15,7 +15,7 @@ export function createDeletePetPath<TData extends Partial<DeletePetPath> = objec
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createDeletePetHeaders<TData extends Partial<DeletePetHeaders> = object>(data?: TData) {
@@ -25,7 +25,7 @@ export function createDeletePetHeaders<TData extends Partial<DeletePetHeaders> =
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**

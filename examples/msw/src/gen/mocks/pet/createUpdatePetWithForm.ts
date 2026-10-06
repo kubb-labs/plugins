@@ -15,7 +15,7 @@ export function createUpdatePetWithFormPath<TData extends Partial<UpdatePetWithF
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createUpdatePetWithFormQuery<TData extends Partial<UpdatePetWithFormQuery> = object>(data?: TData) {
@@ -26,7 +26,7 @@ export function createUpdatePetWithFormQuery<TData extends Partial<UpdatePetWith
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**

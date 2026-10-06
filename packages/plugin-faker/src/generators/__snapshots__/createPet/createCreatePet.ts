@@ -27,7 +27,7 @@ export function createCreatePetBody<TData extends Partial<CreatePetBody> = objec
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createCreatePetResponse(data?: Partial<CreatePetResponse>): CreatePetResponse {

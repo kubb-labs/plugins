@@ -14,13 +14,13 @@ export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
   const defaultFakeData = {
     ...faker.helpers.arrayElement([
       {
-        ...createDog<object>(),
+        ...createDog(),
         ...{
           type: faker.helpers.arrayElement<(NonNullable<Extract<NonNullable<Pet>, { type: 'dog' }>> & Record<'type', unknown>)['type']>(['dog']),
         },
       },
       {
-        ...createCat<object>(),
+        ...createCat(),
         ...{
           type: faker.helpers.arrayElement<(NonNullable<Extract<NonNullable<Pet>, { type: 'cat' }>> & Record<'type', unknown>)['type']>(['cat']),
         },
@@ -39,5 +39,5 @@ export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
