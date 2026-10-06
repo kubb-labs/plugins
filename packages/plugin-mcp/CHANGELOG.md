@@ -1,5 +1,16 @@
 # @kubb/plugin-mcp
 
+## 5.0.7
+
+### Patch Changes
+
+- [#1011](https://github.com/kubb-labs/plugins/pull/1011) [`0621506`](https://github.com/kubb-labs/plugins/commit/0621506e03d13ff0b8112f5a089d2180a63f5ea6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb 5.4.2 or later in plugin peer dependencies.
+
+- [#1012](https://github.com/kubb-labs/plugins/pull/1012) [`0c9cd8d`](https://github.com/kubb-labs/plugins/commit/0c9cd8d9e2b7de00246e712f71d89a047605a2d3) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Generate MCP handlers with a single `Promise<CallToolResult>` return type.
+- Updated dependencies [[`0621506`](https://github.com/kubb-labs/plugins/commit/0621506e03d13ff0b8112f5a089d2180a63f5ea6)]:
+  - @kubb/plugin-ts@5.0.3
+  - @kubb/plugin-zod@5.4.2
+
 ## 5.0.6
 
 ### Patch Changes

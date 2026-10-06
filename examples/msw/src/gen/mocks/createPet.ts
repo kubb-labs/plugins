@@ -23,5 +23,5 @@ export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }

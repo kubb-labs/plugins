@@ -20,7 +20,7 @@ export function createFindPetsByTagsQueryFaker<TData extends Partial<FindPetsByT
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createFindPetsByTagsHeadersFaker<TData extends Partial<FindPetsByTagsHeaders> = object>(data?: TData) {
@@ -30,7 +30,7 @@ export function createFindPetsByTagsHeadersFaker<TData extends Partial<FindPetsB
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**

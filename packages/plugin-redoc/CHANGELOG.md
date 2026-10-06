@@ -1,5 +1,11 @@
 # @kubb/plugin-redoc
 
+## 5.0.3
+
+### Patch Changes
+
+- [#1011](https://github.com/kubb-labs/plugins/pull/1011) [`0621506`](https://github.com/kubb-labs/plugins/commit/0621506e03d13ff0b8112f5a089d2180a63f5ea6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb 5.4.2 or later in plugin peer dependencies.
+
 ## 5.0.2
 
 ### Patch Changes

@@ -9,7 +9,8 @@ import { ast, type Config, Diagnostics, type KubbHooks, fsStorage } from 'kubb/k
 import { parserTs } from '@kubb/parser-ts'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginTs } from '@kubb/plugin-ts'
-import { describe, expect, test } from 'vitest'
+import ts from 'typescript'
+import { describe, expect, onTestFinished, test } from 'vitest'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -263,4 +264,115 @@ describe(`plugin-faker options ${version}`, () => {
 
     await fs.rm(tmpDir, { recursive: true, force: true })
   })
+})
+
+test('preserves required properties in contextual factory calls and infers overrides from data', async () => {
+  const root = await fs.mkdtemp(path.join(__dirname, '.faker-inference-'))
+  onTestFinished(() => fs.rm(root, { recursive: true, force: true }))
+
+  const { diagnostics } = await createKubb({
+    root,
+    input: {
+      openapi: '3.0.3',
+      info: { title: 'Faker inference', version: '1.0.0' },
+      paths: {},
+      components: {
+        schemas: {
+          Category: {
+            type: 'object',
+            required: ['id', 'name'],
+            properties: { id: { type: 'integer', format: 'int64' }, name: { type: 'string' } },
+          },
+          Pet: {
+            type: 'object',
+            required: ['id', 'name', 'photoUrls', 'category'],
+            properties: {
+              id: { type: 'integer', format: 'int64' },
+              name: { type: 'string' },
+              photoUrls: { type: 'array', items: { type: 'string' } },
+              category: { nullable: true, allOf: [{ $ref: '#/components/schemas/Category' }] },
+            },
+          },
+          DetailedCategory: {
+            allOf: [{ $ref: '#/components/schemas/Category' }, { type: 'object', required: ['active'], properties: { active: { type: 'boolean' } } }],
+          },
+          Animal: { oneOf: [{ $ref: '#/components/schemas/Cat' }, { $ref: '#/components/schemas/Dog' }] },
+          Cat: {
+            type: 'object',
+            required: ['id'],
+            properties: { id: { type: 'integer' }, friend: { $ref: '#/components/schemas/Animal' } },
+          },
+          Dog: { type: 'object', required: ['id'], properties: { id: { type: 'integer' } } },
+        },
+      },
+    },
+    adapter: adapterOas(),
+    parsers: [parserTs()],
+    storage: fsStorage(),
+    output: { path: 'generated', clean: true, format: false, lint: false },
+    plugins: [pluginTs({ output: { path: 'types' } }), pluginFaker({ output: { path: 'mocks' } })],
+  }).safeBuild()
+
+  expect(Diagnostics.hasError(diagnostics)).toBe(false)
+  const catSource = await fs.readFile(path.join(root, 'generated/mocks/createCat.ts'), 'utf8')
+  expect(catSource).toContain('get friend()')
+
+  const usagePath = path.join(root, 'usage.ts')
+  await fs.writeFile(
+    usagePath,
+    `import { faker } from '@faker-js/faker'
+import type { Animal } from './generated/types/Animal'
+import type { Cat } from './generated/types/Cat'
+import type { Category } from './generated/types/Category'
+import type { DetailedCategory } from './generated/types/DetailedCategory'
+import type { Pet } from './generated/types/Pet'
+import { createAnimal } from './generated/mocks/createAnimal'
+import { createCat } from './generated/mocks/createCat'
+import { createCategory } from './generated/mocks/createCategory'
+import { createDetailedCategory } from './generated/mocks/createDetailedCategory'
+import { createPet } from './generated/mocks/createPet'
+
+declare function acceptCategory(category: Category): void
+acceptCategory(createCategory())
+const nullable: Category | null | undefined = createCategory()
+const nested: Pick<Pet, 'category'> = { category: createCategory() }
+const categories: Category[] = [createCategory()]
+const selected: Category | null = faker.helpers.arrayElement([createCategory(), null])
+const multiple: Category[] = faker.helpers.multiple(() => createCategory())
+const pet: Pet = createPet()
+const detailed: DetailedCategory | null = createDetailedCategory()
+const cat: Cat | null = createCat()
+const animal: Animal = createAnimal()
+const selectedAnimal: Animal | null = faker.helpers.arrayElement([createCat(), null])
+
+const overridden = createCategory({ name: 'fixed' as const })
+const literalName: 'fixed' = overridden.name
+const requiredId: bigint = overridden.id
+const overriddenIntersection = createDetailedCategory({ active: true as const })
+const literalActive: true = overriddenIntersection.active
+const intersectionId: bigint = overriddenIntersection.id
+const overriddenCat = createCat({ id: 42 as const })
+const literalCatId: 42 = overriddenCat.id
+declare const data: Partial<Category>
+const partial = createCategory(data)
+const optionalId: bigint | undefined = partial.id
+// @ts-expect-error Partial overrides can contain undefined for required properties.
+const partialId: bigint = partial.id
+// @ts-expect-error Overrides must match the schema property type.
+createCategory({ id: 'invalid' })
+const explicit: Category = createCategory<object>()
+`,
+  )
+
+  const program = ts.createProgram([usagePath], {
+    noEmit: true,
+    strict: true,
+    skipLibCheck: true,
+    target: ts.ScriptTarget.ES2022,
+    module: ts.ModuleKind.ESNext,
+    moduleResolution: ts.ModuleResolutionKind.Bundler,
+    allowImportingTsExtensions: true,
+    types: [],
+  })
+  expect(ts.getPreEmitDiagnostics(program).map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'))).toStrictEqual([])
 })

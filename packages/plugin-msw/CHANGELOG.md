@@ -1,5 +1,14 @@
 # @kubb/plugin-msw
 
+## 5.0.6
+
+### Patch Changes
+
+- [#1011](https://github.com/kubb-labs/plugins/pull/1011) [`0621506`](https://github.com/kubb-labs/plugins/commit/0621506e03d13ff0b8112f5a089d2180a63f5ea6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb 5.4.2 or later in plugin peer dependencies.
+- Updated dependencies [[`0621506`](https://github.com/kubb-labs/plugins/commit/0621506e03d13ff0b8112f5a089d2180a63f5ea6), [`dd24b17`](https://github.com/kubb-labs/plugins/commit/dd24b1764996904910b3e7f8b9138e7c68810739)]:
+  - @kubb/plugin-faker@5.0.12
+  - @kubb/plugin-ts@5.0.3
+
 ## 5.0.5
 
 ### Patch Changes
