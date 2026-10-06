@@ -1,8 +1,9 @@
 import axios from 'axios'
+import type { HeadersInit, PathParamStyle, PathSerializer, Serializers, Styles } from './serializers'
+import type { StandardSchemaValidator } from './standardSchema'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
-import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers.ts'
-import type { HeadersInit, PathParamStyle, PathSerializer, Serializers, Styles } from './serializers.ts'
-import { ParseError, type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
+import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers'
+import { ParseError, validateStandardSchema } from './standardSchema'
 
 /**
  * HTTP status codes treated as a success, everything else is an error.
@@ -228,6 +229,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   headers?: unknown
   styles?: Styles
   signal?: AbortSignal
+  withCredentials?: boolean
   options?: AxiosOptions
   contentType?: ContentType
   responseType?: ResponseType
@@ -262,6 +264,7 @@ export type Options<TData extends DataShape, ThrowOnError extends boolean = true
 export type ClientConfig = {
   baseURL?: string
   headers?: HeadersInit
+  withCredentials?: boolean
   options?: AxiosOptions
   throwOnError?: boolean
   validateStatus?: (status: number) => boolean
@@ -652,6 +655,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     data: body,
     transformRequest: (data) => data,
     signal: requestConfig.signal,
+    withCredentials: requestConfig.withCredentials ?? config.withCredentials ?? options?.withCredentials,
     responseType: requestConfig.responseType,
     validateStatus,
   }
