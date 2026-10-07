@@ -40,7 +40,9 @@ describe('buildSdkMethod', () => {
       tags: ['foo'],
       requestBody: {
         required: true,
-        content: [ast.factory.createContent({ contentType: 'application/x-www-form-urlencoded', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+        content: [
+          ast.factory.createContent({ contentType: 'application/x-www-form-urlencoded', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }),
+        ],
       },
       responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'ok' })],
     })
