@@ -74,6 +74,6 @@ export class PetClient {
     public uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], validator: { response: uploadFileResponseSchema }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>>)
+    return withUnwrap(request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], validator: { response: uploadFileResponseSchema }, contentType: { request: 'application/octet-stream' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<UploadFileResponsesSchemaType, ThrowOnError>>)
   }
 }
