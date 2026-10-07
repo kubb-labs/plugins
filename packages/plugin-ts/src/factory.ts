@@ -1,10 +1,17 @@
+import { createRequire } from 'node:module'
 import { camelCase, pascalCase, screamingSnakeCase, snakeCase } from '@internals/utils'
 import { syncSchemaRef } from 'kubb/kit'
 import type { ast } from 'kubb/kit'
-import ts from 'typescript'
+import type ts from 'typescript'
 import { OPTIONAL_ADDS_UNDEFINED } from './constants.ts'
 
-const { SyntaxKind, factory } = ts
+/**
+ * Loaded with `require`, not `import`. When ESM imports a CommonJS package, Node keeps a second
+ * copy of its source to detect named exports, and for TypeScript that copy is about 9 MB.
+ */
+const typescript: typeof ts = createRequire(import.meta.url)('typescript')
+
+const { SyntaxKind, factory } = typescript
 
 /**
  * Compares two strings by UTF-16 code unit, keeping sorted output identical across platforms
@@ -26,10 +33,10 @@ function isNumber(value: unknown): value is number {
  * TypeScript AST modifiers for common keywords (async, export, const, static).
  */
 export const modifiers = {
-  async: factory.createModifier(ts.SyntaxKind.AsyncKeyword),
-  export: factory.createModifier(ts.SyntaxKind.ExportKeyword),
-  const: factory.createModifier(ts.SyntaxKind.ConstKeyword),
-  static: factory.createModifier(ts.SyntaxKind.StaticKeyword),
+  async: factory.createModifier(typescript.SyntaxKind.AsyncKeyword),
+  export: factory.createModifier(typescript.SyntaxKind.ExportKeyword),
+  const: factory.createModifier(typescript.SyntaxKind.ConstKeyword),
+  static: factory.createModifier(typescript.SyntaxKind.StaticKeyword),
 } as const
 
 /**
@@ -50,17 +57,17 @@ function isValidIdentifier(str: string): boolean {
     return false
   }
 
-  // Mirrors `ts.isIdentifierText`, which is not in the public type declarations.
+  // Mirrors `typescript.isIdentifierText`, which is not in the public type declarations.
   // Walking by code point with `isIdentifierStart`/`isIdentifierPart` rejects
   // invalid names such as private identifiers (`#FOO`), forcing `propertyName`
   // to quote them.
   let ch = str.codePointAt(0)!
-  if (!ts.isIdentifierStart(ch, ts.ScriptTarget.Latest)) {
+  if (!typescript.isIdentifierStart(ch, typescript.ScriptTarget.Latest)) {
     return false
   }
   for (let i = ch > 0xffff ? 2 : 1; i < str.length; i += ch > 0xffff ? 2 : 1) {
     ch = str.codePointAt(i)!
-    if (!ts.isIdentifierPart(ch, ts.ScriptTarget.Latest)) {
+    if (!typescript.isIdentifierPart(ch, typescript.ScriptTarget.Latest)) {
       return false
     }
   }
@@ -75,7 +82,7 @@ function propertyName(name: string | ts.PropertyName): ts.PropertyName {
   return name
 }
 
-const questionToken = factory.createToken(ts.SyntaxKind.QuestionToken)
+const questionToken = factory.createToken(typescript.SyntaxKind.QuestionToken)
 
 /**
  * Creates a question token for optional type annotations.
@@ -189,7 +196,7 @@ export function createPropertySignature({
   type?: ts.TypeNode
 }) {
   return factory.createPropertySignature(
-    [...modifiers, readOnly ? factory.createToken(ts.SyntaxKind.ReadonlyKeyword) : undefined].filter(
+    [...modifiers, readOnly ? factory.createToken(typescript.SyntaxKind.ReadonlyKeyword) : undefined].filter(
       (modifier): modifier is ts.Modifier => modifier !== undefined,
     ),
     propertyName(name),
@@ -261,7 +268,7 @@ export function appendJSDocToNode<TNode extends ts.Node>({ node, comments }: { n
 
   // Use the node directly instead of spreading to avoid creating Unknown nodes
   // TypeScript's addSyntheticLeadingComment accepts the node as-is
-  return ts.addSyntheticLeadingComment(node, ts.SyntaxKind.MultiLineCommentTrivia, `${text || '*'}\n`, true)
+  return typescript.addSyntheticLeadingComment(node, typescript.SyntaxKind.MultiLineCommentTrivia, `${text || '*'}\n`, true)
 }
 
 /**
@@ -273,7 +280,7 @@ function createIndexSignature(
   {
     modifiers,
     indexName = 'key',
-    indexType = factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+    indexType = factory.createKeywordTypeNode(typescript.SyntaxKind.StringKeyword),
   }: {
     indexName?: string
     indexType?: ts.TypeNode
@@ -335,7 +342,7 @@ export function createTypeDeclaration({
   name: string | ts.Identifier
   type: ts.TypeNode
 }) {
-  if (syntax === 'interface' && ts.isTypeLiteralNode(type)) {
+  if (syntax === 'interface' && typescript.isTypeLiteralNode(type)) {
     const node = createInterfaceDeclaration({
       members: [...type.members],
       modifiers: isExportable ? [modifiers.export] : [],
@@ -544,7 +551,7 @@ export function createEnumDeclaration({
     return [
       undefined,
       factory.createTypeAliasDeclaration(
-        [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+        [factory.createToken(typescript.SyntaxKind.ExportKeyword)],
         factory.createIdentifier(typeName),
         undefined,
         factory.createUnionTypeNode(
@@ -553,7 +560,7 @@ export function createEnumDeclaration({
               if (isNumber(value)) {
                 if (value < 0) {
                   return factory.createLiteralTypeNode(
-                    factory.createPrefixUnaryExpression(ts.SyntaxKind.MinusToken, factory.createNumericLiteral(Math.abs(value))),
+                    factory.createPrefixUnaryExpression(typescript.SyntaxKind.MinusToken, factory.createNumericLiteral(Math.abs(value))),
                   )
                 }
                 return factory.createLiteralTypeNode(factory.createNumericLiteral(value?.toString()))
@@ -578,7 +585,10 @@ export function createEnumDeclaration({
     return [
       undefined,
       factory.createEnumDeclaration(
-        [factory.createToken(ts.SyntaxKind.ExportKeyword), type === 'constEnum' ? factory.createToken(ts.SyntaxKind.ConstKeyword) : undefined].filter(
+        [
+          factory.createToken(typescript.SyntaxKind.ExportKeyword),
+          type === 'constEnum' ? factory.createToken(typescript.SyntaxKind.ConstKeyword) : undefined,
+        ].filter(
           (modifier): modifier is ts.ModifierToken<ts.SyntaxKind.ExportKeyword> | ts.ModifierToken<ts.SyntaxKind.ConstKeyword> => modifier !== undefined,
         ),
         factory.createIdentifier(typeName),
@@ -589,7 +599,7 @@ export function createEnumDeclaration({
 
             if (isExactNumber && isNumber(value)) {
               if (value < 0) {
-                initializer = factory.createPrefixUnaryExpression(ts.SyntaxKind.MinusToken, factory.createNumericLiteral(Math.abs(value)))
+                initializer = factory.createPrefixUnaryExpression(typescript.SyntaxKind.MinusToken, factory.createNumericLiteral(Math.abs(value)))
               } else {
                 initializer = factory.createNumericLiteral(value)
               }
@@ -628,17 +638,17 @@ export function createEnumDeclaration({
     return [
       undefined,
       factory.createTypeAliasDeclaration(
-        [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+        [factory.createToken(typescript.SyntaxKind.ExportKeyword)],
         factory.createIdentifier(typeName),
         undefined,
-        factory.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword),
+        factory.createKeywordTypeNode(typescript.SyntaxKind.NeverKeyword),
       ),
     ]
   }
 
   return [
     factory.createVariableStatement(
-      [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+      [factory.createToken(typescript.SyntaxKind.ExportKeyword)],
       factory.createVariableDeclarationList(
         [
           factory.createVariableDeclaration(
@@ -657,7 +667,7 @@ export function createEnumDeclaration({
                       // or those combined with createPrefixUnaryExpression.
                       // Therefore, we need to ensure that the number is not negative.
                       if (value < 0) {
-                        initializer = factory.createPrefixUnaryExpression(ts.SyntaxKind.MinusToken, factory.createNumericLiteral(Math.abs(value)))
+                        initializer = factory.createPrefixUnaryExpression(typescript.SyntaxKind.MinusToken, factory.createNumericLiteral(Math.abs(value)))
                       } else {
                         initializer = factory.createNumericLiteral(value)
                       }
@@ -681,16 +691,16 @@ export function createEnumDeclaration({
             ),
           ),
         ],
-        ts.NodeFlags.Const,
+        typescript.NodeFlags.Const,
       ),
     ),
     factory.createTypeAliasDeclaration(
-      [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+      [factory.createToken(typescript.SyntaxKind.ExportKeyword)],
       factory.createIdentifier(typeName),
       undefined,
       factory.createIndexedAccessTypeNode(
         factory.createParenthesizedType(factory.createTypeQueryNode(factory.createIdentifier(identifierName), undefined)),
-        factory.createTypeOperatorNode(ts.SyntaxKind.KeyOfKeyword, factory.createTypeQueryNode(factory.createIdentifier(identifierName), undefined)),
+        factory.createTypeOperatorNode(typescript.SyntaxKind.KeyOfKeyword, factory.createTypeQueryNode(factory.createIdentifier(identifierName), undefined)),
       ),
     ),
   ]
@@ -722,18 +732,18 @@ export function createOmitDeclaration({ keys, type, nonNullable }: { keys: Array
  * Use these to avoid repeatedly creating the same type nodes.
  */
 export const keywordTypeNodes = {
-  any: factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-  unknown: factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
-  void: factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-  number: factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
-  integer: factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
-  bigint: factory.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword),
-  object: factory.createKeywordTypeNode(ts.SyntaxKind.ObjectKeyword),
-  string: factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-  boolean: factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword),
-  undefined: factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
-  null: factory.createLiteralTypeNode(factory.createToken(ts.SyntaxKind.NullKeyword)),
-  never: factory.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword),
+  any: factory.createKeywordTypeNode(typescript.SyntaxKind.AnyKeyword),
+  unknown: factory.createKeywordTypeNode(typescript.SyntaxKind.UnknownKeyword),
+  void: factory.createKeywordTypeNode(typescript.SyntaxKind.VoidKeyword),
+  number: factory.createKeywordTypeNode(typescript.SyntaxKind.NumberKeyword),
+  integer: factory.createKeywordTypeNode(typescript.SyntaxKind.NumberKeyword),
+  bigint: factory.createKeywordTypeNode(typescript.SyntaxKind.BigIntKeyword),
+  object: factory.createKeywordTypeNode(typescript.SyntaxKind.ObjectKeyword),
+  string: factory.createKeywordTypeNode(typescript.SyntaxKind.StringKeyword),
+  boolean: factory.createKeywordTypeNode(typescript.SyntaxKind.BooleanKeyword),
+  undefined: factory.createKeywordTypeNode(typescript.SyntaxKind.UndefinedKeyword),
+  null: factory.createLiteralTypeNode(factory.createToken(typescript.SyntaxKind.NullKeyword)),
+  never: factory.createKeywordTypeNode(typescript.SyntaxKind.NeverKeyword),
 } as const
 
 /**
@@ -766,17 +776,17 @@ export function createUrlTemplateType(path: string): ts.TypeNode {
     }
   })
 
-  const head = ts.factory.createTemplateHead(parts[0] || '')
+  const head = typescript.factory.createTemplateHead(parts[0] || '')
   const templateSpans: Array<ts.TemplateLiteralTypeSpan> = []
 
   parameterIndices.forEach((paramIndex, i) => {
     const isLast = i === parameterIndices.length - 1
     const nextPart = parts[paramIndex + 1] || ''
-    const literal = isLast ? ts.factory.createTemplateTail(nextPart) : ts.factory.createTemplateMiddle(nextPart)
-    templateSpans.push(ts.factory.createTemplateLiteralTypeSpan(keywordTypeNodes.string, literal))
+    const literal = isLast ? typescript.factory.createTemplateTail(nextPart) : typescript.factory.createTemplateMiddle(nextPart)
+    templateSpans.push(typescript.factory.createTemplateLiteralTypeSpan(keywordTypeNodes.string, literal))
   })
 
-  return ts.factory.createTemplateLiteralType(head, templateSpans)
+  return typescript.factory.createTemplateLiteralType(head, templateSpans)
 }
 
 /**
@@ -933,8 +943,8 @@ export function buildPropertyType(
   return type
 }
 
-const indexSignaturePrinter = ts.createPrinter()
-const indexSignatureSource = ts.createSourceFile('', '', ts.ScriptTarget.Latest)
+const indexSignaturePrinter = typescript.createPrinter()
+const indexSignatureSource = typescript.createSourceFile('', '', typescript.ScriptTarget.Latest)
 
 /**
  * Creates a TypeScript index signature for `additionalProperties` and `patternProperties` on an
@@ -965,7 +975,7 @@ export function buildIndexSignatures(
 
   const seen = new Set<string>()
   const distinct = valueTypes.filter((type) => {
-    const key = indexSignaturePrinter.printNode(ts.EmitHint.Unspecified, type, indexSignatureSource)
+    const key = indexSignaturePrinter.printNode(typescript.EmitHint.Unspecified, type, indexSignatureSource)
     return seen.has(key) ? false : (seen.add(key), true)
   })
 
