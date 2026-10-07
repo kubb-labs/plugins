@@ -1,5 +1,11 @@
 # @kubb/plugin-axios
 
+## 5.5.6
+
+### Patch Changes
+
+- [#1041](https://github.com/kubb-labs/plugins/pull/1041) [`a6ec11d`](https://github.com/kubb-labs/plugins/commit/a6ec11db92a62f89655713ed449e62c6361d86e1) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Keep the request `contentType` in generated SDK methods when `sdk.mode` is `'tag'`, so operations with a non-JSON request body such as `application/x-www-form-urlencoded` send the right content type.
+
 ## 5.5.5
 
 ### Patch Changes
