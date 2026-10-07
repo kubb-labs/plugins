@@ -62,7 +62,7 @@ jobs:
           node-version: '22.22.3'
 
       - name: Build
-        run: pnpm build
+        run: pnpm build --concurrency=3
 
   typecheck:
     name: Typecheck
@@ -84,7 +84,7 @@ jobs:
           node-version: '22.22.3'
 
       - name: Build
-        run: pnpm build
+        run: pnpm build --concurrency=3
 
       - name: Typecheck
         run: pnpm typecheck
@@ -163,7 +163,7 @@ jobs:
           node-version: '22.22.3'
 
       - name: Build
-        run: pnpm build
+        run: pnpm build --concurrency=3
 
       - name: Run Vitest benchmarks
         run: pnpm run test:bench
@@ -190,7 +190,7 @@ jobs:
           node-version: '22.22.3'
 
       - name: Build
-        run: pnpm run build
+        run: pnpm run build --concurrency=3
 
       - name: Publish preview packages
         run: pnpx pkg-pr-new publish --pnpm --owner=stijnvanhulle --repo=https://github.com/kubb-labs/plugins.git './packages/*' --template './examples/*'
@@ -266,7 +266,7 @@ jobs:
           node-version: '22.22.3'
 
       - name: Build
-        run: pnpm run build
+        run: pnpm run build --concurrency=3
 
       - name: Generate examples
         id: generate
@@ -326,7 +326,7 @@ jobs:
           node-version: '22.22.3'
 
       - name: Build
-        run: pnpm run build
+        run: pnpm run build --concurrency=3
 
       - name: Run E2E tests
         working-directory: ./tests/e2e

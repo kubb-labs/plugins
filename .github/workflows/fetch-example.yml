@@ -51,7 +51,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build plugins
-        run: pnpm build
+        run: pnpm build --concurrency=3
 
       - name: Generate Kubb Studio snapshot
         uses: kubb-labs/action@main # feat: support working directory

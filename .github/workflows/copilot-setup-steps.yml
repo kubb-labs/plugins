@@ -31,4 +31,4 @@ jobs:
           node-version: '22.22.3'
 
       - name: Build
-        run: pnpm run build
+        run: pnpm run build --concurrency=3
