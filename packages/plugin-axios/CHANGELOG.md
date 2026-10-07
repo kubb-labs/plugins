@@ -1,5 +1,26 @@
 # @kubb/plugin-axios
 
+## 5.5.6
+
+### Patch Changes
+
+- [#1041](https://github.com/kubb-labs/plugins/pull/1041) [`a6ec11d`](https://github.com/kubb-labs/plugins/commit/a6ec11db92a62f89655713ed449e62c6361d86e1) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Keep the request `contentType` in generated SDK methods when `sdk.mode` is `'tag'`, so operations with a non-JSON request body such as `application/x-www-form-urlencoded` send the right content type.
+
+## 5.5.5
+
+### Patch Changes
+
+- [#957](https://github.com/kubb-labs/plugins/pull/957) [`9f55bde`](https://github.com/kubb-labs/plugins/commit/9f55bdee0cd558c42b54fac849d92af4bf06def8) Thanks [@xeoneux](https://github.com/xeoneux)! - Interceptors registered through `client.interceptors` now follow a transport set later with `client.setConfig({ transport })`. They were registered on the Axios instance the client started with, while requests went through the new transport, so they silently never ran. Their ids stay valid for `eject` and `update`, and clearing `transport` moves them back to the client's original instance.
+  
+  ```typescript
+  client.interceptors.request.use(addAuthHeader)
+  client.setConfig({ transport: sharedAxiosInstance }) // addAuthHeader now runs on sharedAxiosInstance
+  ```
+  
+  A per-call `transport` still bypasses them, since the interceptors live on the client's own instance.
+- Updated dependencies [[`1b41106`](https://github.com/kubb-labs/plugins/commit/1b41106399e76d9b1f14bd7ec80da8f461dfe9c1)]:
+  - @kubb/plugin-ts@5.0.5
+
 ## 5.5.4
 
 ### Patch Changes

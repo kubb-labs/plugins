@@ -44,7 +44,7 @@ jobs:
           force-install: 'true'
 
       - name: Build
-        run: pnpm run build
+        run: pnpm run build --concurrency=3
 
       - name: Test
         run: pnpm run test --coverage
@@ -78,7 +78,7 @@ jobs:
             echo "Version that will be published: ${canary_version}"
             pnpm --no-git-tag-version version "${canary_version}" --allow-same-version --no-git-checks
           '
-          pnpm run build
+          pnpm run build --concurrency=3
           pnpm exec changeset publish --tag canary
 
   promote:
