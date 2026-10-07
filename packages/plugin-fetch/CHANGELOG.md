@@ -1,5 +1,13 @@
 # @kubb/plugin-fetch
 
+## 5.5.5
+
+### Patch Changes
+
+- [#1003](https://github.com/kubb-labs/plugins/pull/1003) [`baa54fd`](https://github.com/kubb-labs/plugins/commit/baa54fdf99e839b0cf16c6518a45a30f208f5d40) Thanks [@georgialoper](https://github.com/georgialoper)! - Honor client-level fetch credentials when resolving requests.
+- Updated dependencies [[`1b41106`](https://github.com/kubb-labs/plugins/commit/1b41106399e76d9b1f14bd7ec80da8f461dfe9c1)]:
+  - @kubb/plugin-ts@5.0.5
+
 ## 5.5.4
 
 ### Patch Changes
