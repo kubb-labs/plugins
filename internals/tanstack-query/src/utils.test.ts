@@ -1,6 +1,14 @@
 import { ast } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { buildCallResultBody, classifyOperation, definePageParam, getDefaultPageParamsWarning, hasQueryKeyParams, matchesInfinite, resolveInfiniteConfig } from './utils.ts'
+import {
+  buildCallResultBody,
+  classifyOperation,
+  definePageParam,
+  getDefaultPageParamsWarning,
+  hasQueryKeyParams,
+  matchesInfinite,
+  resolveInfiniteConfig,
+} from './utils.ts'
 
 describe('classifyOperation', () => {
   test('classifies a GET as a query when methods include it', () => {
@@ -166,6 +174,10 @@ describe('resolveInfiniteConfig', () => {
       initialPageParam: 1,
       hasExplicitInitialPageParam: true,
     })
+    expect(resolveInfiniteConfig({ initialPageParam: null })).toMatchObject({
+      initialPageParam: null,
+      hasExplicitInitialPageParam: true,
+    })
   })
 
   test('preserves configured page param code and serializes function expressions', () => {
@@ -235,6 +247,35 @@ describe('getDefaultPageParamsWarning', () => {
 
   test('stays quiet for an array response', () => {
     expect(getDefaultPageParamsWarning(listPetsNode(arraySchema), infinite())).toBeNull()
+  })
+
+  test('resolves single-element intersection (allOf) wrapping array response', () => {
+    const intersectionSchema = ast.factory.createSchema({ type: 'intersection', members: [arraySchema] })
+    expect(getDefaultPageParamsWarning(listPetsNode(intersectionSchema), infinite())).toBeNull()
+  })
+
+  test('warns when single-element intersection (allOf) wraps object response', () => {
+    const intersectionSchema = ast.factory.createSchema({ type: 'intersection', members: [pageSchema] })
+    expect(getDefaultPageParamsWarning(listPetsNode(intersectionSchema), infinite())).not.toBeNull()
+  })
+
+  test('prioritizes application/json content schema over non-json content', () => {
+    const multiContentNode = ast.factory.createOperation({
+      operationId: 'listPets',
+      method: 'GET',
+      path: '/pets',
+      parameters: [ast.factory.createParameter({ name: 'page', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [
+            ast.factory.createContent({ contentType: 'text/plain', schema: pageSchema }),
+            ast.factory.createContent({ contentType: 'application/json', schema: arraySchema }),
+          ],
+        }),
+      ],
+    })
+    expect(getDefaultPageParamsWarning(multiContentNode, infinite())).toBeNull()
   })
 
   test('stays quiet when response has no schema', () => {

@@ -97,16 +97,26 @@ export type Infinite = {
    * when the next page has to be computed rather than read from a field. Takes precedence over
    * `nextParam` and `cursorParam`.
    *
+   * Note: Because functions are inlined verbatim into generated code via `.toString()`, they cannot
+   * reference local closures or external variables from the config file.
+   *
    * @example
    * `'(lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined)'`
+   * // or with definePageParam:
+   * `definePageParam<MyResponse, number>((lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined))`
    */
   getNextPageParam?: string | PageParamFn | null
   /**
    * Source of TanStack Query's `getPreviousPageParam`, inlined verbatim as a function expression.
    * Takes precedence over `previousParam` and `cursorParam`.
    *
+   * Note: Because functions are inlined verbatim into generated code via `.toString()`, they cannot
+   * reference local closures or external variables from the config file.
+   *
    * @example
    * `'(firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined)'`
+   * // or with definePageParam:
+   * `definePageParam<MyResponse, number>((firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined))`
    */
   getPreviousPageParam?: string | PageParamFn | null
 }

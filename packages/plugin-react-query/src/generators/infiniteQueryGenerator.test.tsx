@@ -307,4 +307,14 @@ describe('infiniteQueryGenerator page param resolution combinations', () => {
     })
     expect(source).toContain('getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= 0 ? undefined : firstPageParam - 1')
   })
+
+  test('explicit initialPageParam: null sets initialPageParam: null', async () => {
+    const source = await renderWithInfinite({
+      ...infiniteConfig,
+      initialPageParam: null,
+      hasExplicitInitialPageParam: true,
+      getNextPageParam: '(lastPage) => lastPage.next',
+    })
+    expect(source).toContain('initialPageParam: null')
+  })
 })

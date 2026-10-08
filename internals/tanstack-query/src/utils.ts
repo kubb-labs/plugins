@@ -289,6 +289,10 @@ export function classifyOperation(node: ast.HttpOperationNode, { query, mutation
 /**
  * Helper to define a typed page param function for `infinite.getNextPageParam` or
  * `infinite.getPreviousPageParam`. Serializes the function to a string for inlining in generated code.
+ *
+ * Note: Because the function is inlined verbatim into the generated file via `.toString()`,
+ * it must be self-contained and cannot reference local closures or external variables from
+ * the config file.
  */
 export function definePageParam<TPage = any, TParam = any>(fn: PageParamFn<TPage, TParam>): string {
   return fn.toString()
@@ -351,10 +355,13 @@ export function getDefaultPageParamsWarning(node: ast.OperationNode, infinite: I
     !infinite.cursorParam
   if (!usesDefault) return null
 
-  const schema = getPrimarySuccessResponse(node)?.content?.[0]?.schema
+  const content = getPrimarySuccessResponse(node)?.content
+  const jsonContent = content?.find((item) => item.contentType?.includes('json')) ?? content?.[0]
+  const schema = jsonContent?.schema
+
   let resolved: ast.SchemaNode | null | undefined = schema
-  while (resolved?.type === 'ref') {
-    resolved = resolved.schema
+  while (resolved?.type === 'ref' || (resolved?.type === 'intersection' && resolved.members?.length === 1)) {
+    resolved = resolved.type === 'ref' ? resolved.schema : resolved.members?.[0]
   }
   if (!resolved || resolved.type === 'array') return null
 

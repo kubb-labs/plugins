@@ -86,7 +86,10 @@ export function InfiniteQueryOptions({
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName }), { returnType })
 
-  const initialPageParamLiteral = typeof initialPageParam === 'string' ? JSON.stringify(initialPageParam) : String(initialPageParam ?? 0)
+  const initialPageParamLiteral =
+    typeof initialPageParam === 'string' || (typeof initialPageParam === 'object' && initialPageParam !== null)
+      ? JSON.stringify(initialPageParam)
+      : String(initialPageParam === undefined ? 0 : initialPageParam)
 
   // Resolve getNextPageParam: custom source > nextParam > cursorParam > default numeric fallback.
   // TanStack Query v5 requires getNextPageParam on infiniteQueryOptions.
