@@ -23,7 +23,7 @@
     "@kubb/plugin-fetch": "workspace:*",
     "@kubb/plugin-react-query": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
-    "@tanstack/react-query": "^5.104.0",
+    "@tanstack/react-query": "^5.104.1",
     "kubb": "catalog:",
     "react": "^19.3.0"
   },
