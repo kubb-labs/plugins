@@ -481,6 +481,18 @@ describe('createClientCore', () => {
     expect(headers['Content-Type']).toBeUndefined()
   })
 
+  test('sends a form-urlencoded body as a string axios can transmit on Node', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'POST', url: '/foo', body: { foo: 'a b' }, contentType: 'application/x-www-form-urlencoded' })
+    await client({ method: 'POST', url: '/foo', body: new URLSearchParams({ foo: 'a b' }) })
+    for (const call of calls) {
+      const transform = call.transformRequest as (data: unknown) => unknown
+      expect(transform(call.data)).toBe('foo=a+b')
+    }
+    for (const call of calls) expect((call.headers as Record<string, string>)['Content-Type']).toBe('application/x-www-form-urlencoded')
+  })
+
   test('omits Content-Type when a pre-built FormData body is sent', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance })
