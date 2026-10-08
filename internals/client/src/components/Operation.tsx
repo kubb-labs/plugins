@@ -1,8 +1,9 @@
-import { buildOperationComments, getContentTypeInfo, getResponseContentTypeInfo, getResponseType, isEventStream } from '@internals/shared'
+import { buildOperationComments, getResponseType, isEventStream } from '@internals/shared'
 import { ast } from 'kubb/kit'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
+import { buildContentType } from '../builders/contentType.ts'
 import { buildReturnStatement } from '../builders/returnStatement.ts'
 import { type Auth, buildSecurityMetadata } from '../builders/security.ts'
 import { buildGroupedOptionsSignature } from '../builders/signature.ts'
@@ -72,19 +73,7 @@ export function Operation({
   const securityLiteral = buildSecurityMetadata({ security })
   const stylesLiteral = buildStyles({ node })
 
-  const { defaultContentType } = getContentTypeInfo(node)
-  const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
-  // Bake the request body content type only when it is not the JSON default. The first declared type is
-  // the default for an operation with several request types; the caller overrides it on `contentType`.
-  const bakedRequestContentType = hasRequestBody && defaultContentType !== 'application/json' ? defaultContentType : null
-  // When the caller can also pick a response content type, a partial `{ response }` would replace the
-  // baked request default through `...config`, so merge the caller's choice over it instead.
-  const mergeContentType = Boolean(bakedRequestContentType) && getResponseContentTypeInfo(node).isMultipleContentTypes
-  const contentTypeLiteral = !bakedRequestContentType
-    ? null
-    : mergeContentType
-      ? `contentType: { request: '${bakedRequestContentType}', ...(typeof contentType === 'string' ? { request: contentType } : contentType) }`
-      : `contentType: { request: '${bakedRequestContentType}' }`
+  const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node })
 
   const eventStream = isEventStream(node)
   const responseType = getResponseType(node)

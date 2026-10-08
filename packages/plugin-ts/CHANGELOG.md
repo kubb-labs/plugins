@@ -1,5 +1,11 @@
 # @kubb/plugin-ts
 
+## 5.0.5
+
+### Patch Changes
+
+- [#1037](https://github.com/kubb-labs/plugins/pull/1037) [`1b41106`](https://github.com/kubb-labs/plugins/commit/1b41106399e76d9b1f14bd7ec80da8f461dfe9c1) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Load `typescript` with `require` instead of `import`. When ESM code imports a CommonJS package, Node keeps a second copy of its source, and for TypeScript that copy is about 9 MB. Together with the same change in `@kubb/parser-ts`, this lowers heap by about 9 MB and RSS by about 25 MB when `plugin-ts` is loaded.
+
 ## 5.0.4
 
 ### Patch Changes

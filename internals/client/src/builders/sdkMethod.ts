@@ -4,6 +4,7 @@ import { ast } from 'kubb/kit'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption, ValidatorOptions } from '../types.ts'
+import { buildContentType } from './contentType.ts'
 import { buildReturnStatement } from './returnStatement.ts'
 import { type Auth, buildSecurityMetadata } from './security.ts'
 import { buildGroupedOptionsSignature } from './signature.ts'
@@ -35,12 +36,14 @@ function buildCallConfig({
   ].filter(Boolean)
   const validatorLiteral = validatorEntries.length ? `validator: { ${validatorEntries.join(', ')} }` : null
   const securityLiteral = buildSecurityMetadata({ security })
+  const { literal: contentTypeLiteral } = buildContentType({ node })
 
   return `{ ${[
     `method: '${node.method.toUpperCase()}'`,
     `url: '${node.path}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
     validatorLiteral,
+    contentTypeLiteral,
     '...config',
     `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`,
   ]
@@ -82,7 +85,10 @@ export function buildSdkMethod({
   const generics = signature.generics.length ? `<${signature.generics.join(', ')}>` : ''
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
-  const methodBody = ['const { client: request = this.client, ...config } = options', '', returnStatement].map((line) => (line ? `    ${line}` : '')).join('\n')
+  const destructure = buildContentType({ node }).merge
+    ? 'const { client: request = this.client, contentType, ...config } = options'
+    : 'const { client: request = this.client, ...config } = options'
+  const methodBody = [destructure, '', returnStatement].map((line) => (line ? `    ${line}` : '')).join('\n')
 
   return `${jsdoc}  public ${name}${generics}(${signature.paramsSignature}): ${signature.returnType} {\n${methodBody}\n  }`
 }

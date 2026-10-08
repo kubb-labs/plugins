@@ -71,7 +71,7 @@ export class PetStore {
     public uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileOptions, ThrowOnError>): Unwrappable<RequestResult<UploadFileResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>)
+    return withUnwrap(request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], contentType: { request: 'application/octet-stream' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>)
   }
 
 /**
