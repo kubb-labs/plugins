@@ -4,7 +4,17 @@ export type ParamsCasing = 'camelcase' | undefined
 export type PathParamsType = 'object' | 'inline'
 export type ParamsType = 'object' | 'inline'
 
-export type Transformer = (props: { node: ast.OperationNode; casing: ParamsCasing }) => Array<unknown>
+/**
+ * The hook a key is built for. Plain and suspense queries can share a key, but an infinite query
+ * caches `InfiniteData` and must never share one with a plain query.
+ */
+export type KeyVariant = 'query' | 'suspenseQuery' | 'infiniteQuery' | 'suspenseInfiniteQuery' | 'mutation'
+
+/**
+ * Builds query or mutation key segments for an operation node.
+ * Receives `variant` indicating which hook or composable the key is built for.
+ */
+export type Transformer = (props: { node: ast.OperationNode; casing: ParamsCasing; variant: KeyVariant }) => Array<unknown>
 
 /**
  * Configures the query side of a TanStack-family plugin: which HTTP methods produce query

@@ -6,9 +6,10 @@ import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, rend
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
-import { describe, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import { matchFiles } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
+import type { Transformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
 import { queryGenerator } from './queryGenerator.tsx'
@@ -202,5 +203,61 @@ describe('queryGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('queryGenerator queryKey', () => {
+  test('passes the query variant to a custom queryKey', async () => {
+    const queryKey = vi.fn<Transformer>(queryKeyTransformer)
+    const options: PluginReactQuery['resolvedOptions'] = { ...defaultOptions, queryKey }
+    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
+    const driver = createMultiPluginDriver('customQueryKey')
+
+    await renderGeneratorOperation(queryGenerator, findByTagsNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverReactQuery,
+    })
+
+    expect(queryKey.mock.calls.map(([props]) => props.variant)).toEqual(['query'])
+  })
+
+  test('wraps queryKeyTransformer and customizes the key based on variant', async () => {
+    const queryKey: Transformer = (props) => {
+      const base = queryKeyTransformer(props)
+      return props.variant === 'query' ? ["'customPrefix'", ...base] : base
+    }
+    const options: PluginReactQuery['resolvedOptions'] = { ...defaultOptions, queryKey }
+    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
+    const driver = createMultiPluginDriver('wrappedQueryKey')
+
+    await renderGeneratorOperation(queryGenerator, findByTagsNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverReactQuery,
+    })
+
+    const file = driver.fileManager.files[0]
+    const keySource = file?.sources.find((s) => 'name' in s && s.name === 'findPetsByTagsQueryKey')
+    expect(keySource).toMatchObject({
+      name: 'findPetsByTagsQueryKey',
+      isExportable: true,
+      nodes: [
+        expect.objectContaining({
+          kind: 'ArrowFunction',
+          nodes: [
+            expect.objectContaining({
+              value: "['customPrefix', { url: '/pet/findByTags' }, ...(query ? [query] : [])] as const",
+            }),
+          ],
+        }),
+      ],
+    })
   })
 })

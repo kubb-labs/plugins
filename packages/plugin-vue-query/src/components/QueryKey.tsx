@@ -4,6 +4,7 @@ import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import { buildGroupedRequestParam, queryKeyGroupOrder, queryKeyTransformer } from '@internals/tanstack-query'
+import type { KeyVariant } from '@internals/tanstack-query'
 import type { Transformer } from '../types.ts'
 import { maybeRefOrGetter } from '../utils.ts'
 
@@ -13,6 +14,10 @@ type Props = {
   node: ast.OperationNode
   tsResolver: ResolverTs
   transformer: Transformer | null | undefined
+  /**
+   * @default 'query'
+   */
+  variant?: KeyVariant
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -23,12 +28,13 @@ export function buildQueryKeyParamsNode(node: ast.OperationNode, options: { reso
   return createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
 }
 
-export function QueryKey({ name, node, tsResolver, typeName, transformer }: Props): KubbReactNode {
+export function QueryKey({ name, node, tsResolver, typeName, transformer, variant = 'query' }: Props): KubbReactNode {
   const paramsNode = buildQueryKeyParamsNode(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = (transformer ?? queryKeyTransformer)({
     node,
     casing: 'camelcase',
+    variant,
   })
 
   return (
