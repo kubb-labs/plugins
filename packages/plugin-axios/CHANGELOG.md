@@ -1,5 +1,11 @@
 # @kubb/plugin-axios
 
+## 5.5.7
+
+### Patch Changes
+
+- [#1046](https://github.com/kubb-labs/plugins/pull/1046) [`8cc1dd4`](https://github.com/kubb-labs/plugins/commit/8cc1dd4b967ca0baca7493abf4f3bf1d12db6fe1) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Send `application/x-www-form-urlencoded` bodies on Node. A `URLSearchParams` body is now stringified before axios sends it, and gets the urlencoded `Content-Type` when none is set.
+
 ## 5.5.6
 
 ### Patch Changes
