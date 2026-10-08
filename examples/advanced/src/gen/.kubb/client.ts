@@ -627,6 +627,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     }
   } else if (requestContentTypeOption) {
     headers['Content-Type'] = requestContentTypeOption
+  } else if (body instanceof URLSearchParams && !hasHeader(headers, 'content-type')) {
+    headers['Content-Type'] = 'application/x-www-form-urlencoded'
   } else if (usesDefaultBodySerializer && isDefaultJsonBody(validatedBody) && !hasHeader(headers, 'content-type')) {
     headers['Content-Type'] = 'application/json'
   }
@@ -651,7 +653,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     params: query,
     paramsSerializer: (params) => querySerializer(params as Record<string, unknown>, requestConfig.styles?.query),
     data: body,
-    transformRequest: (data) => data,
+    // Kubb already serialized the body; only URLSearchParams needs a string, since axios's Node adapter rejects it.
+    transformRequest: (data) => (data instanceof URLSearchParams ? data.toString() : data),
     signal: requestConfig.signal,
     responseType: requestConfig.responseType,
     validateStatus,
