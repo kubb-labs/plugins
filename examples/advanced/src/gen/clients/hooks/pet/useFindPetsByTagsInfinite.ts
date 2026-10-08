@@ -5,7 +5,7 @@ import { infiniteQueryOptions, useInfiniteQuery } from '../../../../tanstack-que
 import { findPetsByTags } from '../../axios/petService/findPetsByTags'
 
 export const findPetsByTagsInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'> = {}) =>
-  [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
+  [{ url: '/pet/findByTags', infinite: true }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInfiniteQueryKey>
 
