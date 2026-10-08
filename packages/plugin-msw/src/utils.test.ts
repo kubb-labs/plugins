@@ -23,11 +23,6 @@ describe('resolveDefaultBaseURL', () => {
     expect(resolveDefaultBaseURL('')).toBe("''")
   })
 
-  test('returns function call with fallback for BaseURLImport object', () => {
-    expect(resolveDefaultBaseURL({ importPath: '../client', name: 'getBaseURL' })).toBe("getBaseURL() ?? ''")
-    expect(resolveDefaultBaseURL({ importPath: '@/api', name: 'readBaseUrl' })).toBe("readBaseUrl() ?? ''")
-  })
-
   test('returns template literal for dynamic template expressions', () => {
     expect(resolveDefaultBaseURL('${process.env.API_URL}')).toBe('`${process.env.API_URL}`')
     expect(resolveDefaultBaseURL('${123456}')).toBe('`${123456}`')
@@ -41,28 +36,18 @@ describe('resolveDefaultBaseURL', () => {
 })
 
 describe('runtime MSW path resolution', () => {
-  test('resolves relative path when options is undefined and baseURL helper returns undefined', () => {
-    const getBaseURL = () => undefined
+  test('resolves relative path when options is undefined', () => {
     const options = undefined as { baseURL?: string } | undefined
-    const handler = http.get(`${options?.baseURL ?? getBaseURL() ?? ''}/pets`, () => new Response(null))
+    const handler = http.get(`${options?.baseURL ?? ''}/pets`, () => new Response(null))
 
     expect(handler.info.path).toBe('/pets')
   })
 
-  test('resolves helper base URL when options is undefined', () => {
-    const getBaseURL = () => 'https://api.example.com'
-    const options = undefined as { baseURL?: string } | undefined
-    const handler = http.get(`${options?.baseURL ?? getBaseURL() ?? ''}/pets`, () => new Response(null))
+  test('resolves options.baseURL when provided', () => {
+    const options = { baseURL: 'https://api.example.com' }
+    const handler = http.get(`${options?.baseURL ?? ''}/pets`, () => new Response(null))
 
     expect(handler.info.path).toBe('https://api.example.com/pets')
-  })
-
-  test('options.baseURL overrides helper base URL', () => {
-    const getBaseURL = () => 'https://api.example.com'
-    const options = { baseURL: 'https://staging.example.com' }
-    const handler = http.get(`${options?.baseURL ?? getBaseURL() ?? ''}/pets`, () => new Response(null))
-
-    expect(handler.info.path).toBe('https://staging.example.com/pets')
   })
 
   test('options.baseURL overrides static base URL', () => {

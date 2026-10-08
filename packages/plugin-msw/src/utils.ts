@@ -1,20 +1,16 @@
 import { ast } from 'kubb/kit'
 import type { ResolverFaker } from '@kubb/plugin-faker'
-import type { BaseURLImport, PluginMsw } from './types.ts'
+import type { PluginMsw } from './types.ts'
 
 /**
  * Resolves the default base URL expression embedded in the generated handler.
- * - Object (`BaseURLImport`): emits a function call with a defensive fallback to `''` (`getBaseURL() ?? ''`).
  * - Template string with interpolation (`${...}`): emits a template literal preserving dynamic runtime evaluation.
  * - Static string: emits a JSON-stringified string literal.
  * - Empty / falsy: emits empty string `''`.
  */
-export function resolveDefaultBaseURL(baseURL: string | BaseURLImport | null | undefined): string {
+export function resolveDefaultBaseURL(baseURL: string | null | undefined): string {
   if (!baseURL) {
     return "''"
-  }
-  if (typeof baseURL === 'object') {
-    return `${baseURL.name}() ?? ''`
   }
   if (baseURL.includes('${')) {
     return `\`${baseURL.replaceAll('`', '\\`')}\``

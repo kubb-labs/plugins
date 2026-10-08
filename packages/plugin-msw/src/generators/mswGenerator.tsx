@@ -95,8 +95,6 @@ export const mswGenerator = defineGenerator<PluginMsw>({
           isTypeOnly
         />
         {parser === 'faker' && faker && hasSuccessSchema && <File.Import name={[faker.name]} root={mock.file.path} path={faker.file.path} />}
-        {/* Import the runtime base URL function verbatim from the user-specified module */}
-        {baseURL && typeof baseURL === 'object' && <File.Import name={[baseURL.name]} path={baseURL.importPath} />}
 
         {types
           .filter(([code]) => code !== 'default')

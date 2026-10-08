@@ -16,32 +16,11 @@ export type ResolverMsw = Resolver & {
      * Resolves the exported handlers collection name.
      */
     listName(): string
+    /**
+     * Resolves the exported factory function name that creates the handlers collection.
+     */
+    createListName?(): string
   }
-}
-
-/**
- * A function that returns the base URL, imported into every handler file and called when a handler
- * is created. Use it to read the base URL at runtime, for example from your API client's config.
- *
- * The function can return `string` or `string | undefined`. When returning `undefined` or an empty string,
- * the handler falls back to matching relative paths.
- *
- * @note Base URLs should not include a trailing slash, as OpenAPI operation paths already begin with `/`.
- * @note When `group` is enabled, module aliases (e.g. `'@/client'`) or package specifiers are recommended
- * over relative paths, as `importPath` is written verbatim into handlers across different subdirectory depths.
- *
- * @example
- * `{ importPath: '../client', name: 'getBaseURL' }` emits `import { getBaseURL } from '../client'`.
- */
-export type BaseURLImport = {
-  /**
-   * Module specifier, written verbatim into the import.
-   */
-  importPath: string
-  /**
-   * Named export of a `() => string | undefined` or `() => string` function.
-   */
-  name: string
 }
 
 /**
@@ -52,16 +31,18 @@ export type BaseURLImport = {
  */
 export type Options = OutputOptions & {
   /**
-   * Base URL prepended to every handler's request URL: a fixed string (e.g. `'https://api.example.com'`),
-   * a dynamic template string (e.g. `'${process.env.API_URL}'`), or a function imported from a module
-   * and called when the handler is created.
+   * Base URL prepended to every handler's request URL: a fixed string (e.g. `'https://api.example.com'`)
+   * or a dynamic template string (e.g. `'${process.env.API_URL}'`).
    *
    * A handler also takes `{ baseURL }` as its second argument, which overrides this option per call:
    * `listPetsHandler(undefined, { baseURL: 'https://staging.example.com' })`.
    *
+   * When `handlers: true` is configured, `createHandlers({ baseURL })` can be used to pass
+   * a runtime base URL to all handlers at once.
+   *
    * @note Do not include a trailing slash in the base URL, as OpenAPI operation paths already begin with `/`.
    */
-  baseURL?: string | BaseURLImport
+  baseURL?: string
   /**
    * Skip operations matching at least one entry in the list.
    */
@@ -84,7 +65,8 @@ export type Options = OutputOptions & {
   macros?: Array<ast.Macro>
   /**
    * Emit a `handlers.ts` file that re-exports every handler in operation order.
-   * Drop the file into `setupServer(...handlers)` or `setupWorker(...handlers)`.
+   * Exports `createHandlers(options?: { baseURL?: string })` factory and `handlers` default collection.
+   * Drop the file into `setupServer(...handlers)` or `setupServer(...createHandlers({ baseURL }))`.
    *
    * @default false
    */

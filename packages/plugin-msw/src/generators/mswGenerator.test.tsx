@@ -158,7 +158,6 @@ describe('mswGenerator operation', () => {
     { name: 'showPetById', node: showPetByIdNode, options: {} },
     { name: 'getPets', node: listPetsNode, options: {} },
     { name: 'getPetsTemplateBaseUrl', node: listPetsNode, options: { baseURL: '${123456}' } },
-    { name: 'getPetsBaseUrlImport', node: listPetsNode, options: { baseURL: { importPath: '../client', name: 'getBaseURL' } } },
     { name: 'getPetsFakerTemplateBaseUrl', node: listPetsNode, options: { parser: 'faker' as const, baseURL: '${123456}' } },
     { name: 'getPetsFaker', node: listPetsNode, options: { parser: 'faker' as const } },
     { name: 'createPet', node: createPetsNode, options: {} },

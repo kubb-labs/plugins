@@ -3,7 +3,6 @@ import { ast, Url } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import type { BaseURLImport } from '../types.ts'
 import { getContentType, getMswMethod, hasResponseSchema, resolveDefaultBaseURL } from '../utils.ts'
 
 type Props = {
@@ -11,7 +10,7 @@ type Props = {
   typeName: string
   requestTypeName?: string | null
   fakerName?: string
-  baseURL: string | BaseURLImport | null | undefined
+  baseURL: string | null | undefined
   node: ast.OperationNode
 }
 

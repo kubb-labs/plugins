@@ -84,24 +84,4 @@ describe('handlersGenerator operations', () => {
 
     await matchFiles(driver.fileManager.files, 'findByTags')
   })
-
-  test('findByTagsWithBaseUrlImport', async () => {
-    const options: PluginMsw['resolvedOptions'] = {
-      ...defaultOptions,
-      baseURL: { importPath: '../client', name: 'getBaseURL' },
-    }
-    const plugin = createMockedPlugin<PluginMsw>({ name: 'plugin-msw', options, resolver: resolverMsw })
-    const driver = createMockedPluginDriver({ name: 'findByTagsWithBaseUrlImport' })
-
-    await renderGeneratorOperations(handlersGenerator, operationNodes, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverMsw,
-    })
-
-    await matchFiles(driver.fileManager.files, 'findByTagsWithBaseUrlImport')
-  })
 })

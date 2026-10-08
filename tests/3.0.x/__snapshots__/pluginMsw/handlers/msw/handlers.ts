@@ -11,4 +11,8 @@ import { getPetByIdHandler } from './getPetByIdHandler'
 import { placeOrderHandler } from './placeOrderHandler'
 import { uploadFileHandler } from './uploadFileHandler'
 
-export const handlers = [addPetHandler(),findPetsByStatusHandler(),getPetByIdHandler(),deletePetHandler(),uploadFileHandler(),getInventoryHandler(),placeOrderHandler()] as const
+export function createHandlers(options?: { baseURL?: string }) {
+  return [addPetHandler(undefined, options), findPetsByStatusHandler(undefined, options), getPetByIdHandler(undefined, options), deletePetHandler(undefined, options), uploadFileHandler(undefined, options), getInventoryHandler(undefined, options), placeOrderHandler(undefined, options)] as const
+}
+
+export const handlers = createHandlers()
