@@ -57,4 +57,25 @@ describe('runtime MSW path resolution', () => {
 
     expect(handler.info.path).toBe('https://override.example.com/pets')
   })
+
+  test('options.baseURL empty string overrides static base URL to relative path', () => {
+    const staticBaseURL = 'http://localhost:3000'
+    const options = { baseURL: '' }
+    const handler = http.get(`${options?.baseURL ?? staticBaseURL}/pets`, () => new Response(null))
+
+    expect(handler.info.path).toBe('/pets')
+  })
+
+  test('createHandlers factory propagates baseURL option across all handlers', () => {
+    const createHandlers = (options?: { baseURL?: string }) =>
+      [http.get(`${options?.baseURL ?? ''}/pets`, () => new Response(null)), http.post(`${options?.baseURL ?? ''}/pets`, () => new Response(null))] as const
+
+    const defaultHandlers = createHandlers()
+    expect(defaultHandlers[0].info.path).toBe('/pets')
+    expect(defaultHandlers[1].info.path).toBe('/pets')
+
+    const customHandlers = createHandlers({ baseURL: 'https://api.example.com' })
+    expect(customHandlers[0].info.path).toBe('https://api.example.com/pets')
+    expect(customHandlers[1].info.path).toBe('https://api.example.com/pets')
+  })
 })

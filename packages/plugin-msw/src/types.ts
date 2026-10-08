@@ -19,7 +19,7 @@ export type ResolverMsw = Resolver & {
     /**
      * Resolves the exported factory function name that creates the handlers collection.
      */
-    createListName?(): string
+    createListName?(name?: string): string
   }
 }
 

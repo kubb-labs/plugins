@@ -29,8 +29,8 @@ export const resolverMsw = createResolver<PluginMsw>({
     listName() {
       return 'handlers'
     },
-    createListName() {
-      return 'createHandlers'
+    createListName(name?: string) {
+      return camelCase(name ?? this.listName(), { prefix: 'create' })
     },
   },
 })

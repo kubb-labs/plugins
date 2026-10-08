@@ -1,4 +1,4 @@
-import { pascalCase } from '@internals/utils'
+import { camelCase } from '@internals/utils'
 import { ast, defineGenerator } from 'kubb/kit'
 import type { PluginMsw } from '../types'
 
@@ -15,7 +15,7 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
     const { output, group } = ctx.options
 
     const handlersName = resolver.handler.listName()
-    const createHandlersName = resolver.handler.createListName ? resolver.handler.createListName() : `create${pascalCase(handlersName)}`
+    const createHandlersName = resolver.handler.createListName ? resolver.handler.createListName(handlersName) : camelCase(handlersName, { prefix: 'create' })
     const file = resolver.file({ name: handlersName, extname: '.ts', root, output, group: group ?? undefined })
 
     const imports = nodes.map((node) => {
