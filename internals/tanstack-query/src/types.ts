@@ -88,6 +88,11 @@ export type Infinite = {
    */
   initialPageParam?: unknown
   /**
+   * Whether `initialPageParam` was explicitly configured rather than defaulted.
+   * When omitted or false, the default previous page threshold remains 1 (legacy 1-based default).
+   */
+  hasExplicitInitialPageParam?: boolean
+  /**
    * Source of TanStack Query's `getNextPageParam`, inlined verbatim as a function expression. Use it
    * when the next page has to be computed rather than read from a field. Takes precedence over
    * `nextParam` and `cursorParam`.
@@ -95,7 +100,7 @@ export type Infinite = {
    * @example
    * `'(lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined)'`
    */
-  getNextPageParam?: string | null
+  getNextPageParam?: string | PageParamFn | null
   /**
    * Source of TanStack Query's `getPreviousPageParam`, inlined verbatim as a function expression.
    * Takes precedence over `previousParam` and `cursorParam`.
@@ -103,5 +108,12 @@ export type Infinite = {
    * @example
    * `'(firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined)'`
    */
-  getPreviousPageParam?: string | null
+  getPreviousPageParam?: string | PageParamFn | null
 }
+
+export type PageParamFn<TPage = any, TParam = any> = (
+  page: TPage,
+  allPages: Array<TPage>,
+  pageParam: TParam,
+  allPageParams: Array<TParam>,
+) => TParam | undefined | null

@@ -1,3 +1,5 @@
 export { default, pluginReactQuery, pluginReactQueryName } from './plugin.ts'
 export { resolverReactQuery } from './resolvers/resolverReactQuery.ts'
+export { definePageParam } from '@internals/tanstack-query'
+export type { PageParamFn } from '@internals/tanstack-query'
 export type { PluginReactQuery, ResolverReactQuery } from './types.ts'

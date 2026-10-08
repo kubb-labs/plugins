@@ -6,7 +6,7 @@ import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
 import { describe, expect, test, vi } from 'vitest'
 import { matchFiles, rawSources } from '#mocks'
-import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
+import { definePageParam, mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import type { Transformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
@@ -272,5 +272,39 @@ describe('infiniteQueryGenerator page param resolution combinations', () => {
     })
     expect(source).toContain('getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage)')
     expect(source).toContain('getPreviousPageParam: (firstPage) => firstPage.prev')
+  })
+
+  test('supports definePageParam helper', async () => {
+    const source = await renderWithInfinite({
+      ...infiniteConfig,
+      getNextPageParam: definePageParam<{ next?: number }>((lastPage) => lastPage.next),
+    })
+    expect(source).toContain('getNextPageParam: (lastPage) => lastPage.next')
+  })
+
+  test('supports function expression directly in config', async () => {
+    const source = await renderWithInfinite({
+      ...infiniteConfig,
+      getNextPageParam: (lastPage: any) => lastPage.cursor,
+    })
+    expect(source).toContain('getNextPageParam: (lastPage) => lastPage.cursor')
+  })
+
+  test('default initialPageParam keeps legacy <= 1 previous page check', async () => {
+    const source = await renderWithInfinite({
+      ...infiniteConfig,
+      initialPageParam: 0,
+      hasExplicitInitialPageParam: false,
+    })
+    expect(source).toContain('getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= 1 ? undefined : firstPageParam - 1')
+  })
+
+  test('explicit initialPageParam: 0 sets <= 0 previous page check', async () => {
+    const source = await renderWithInfinite({
+      ...infiniteConfig,
+      initialPageParam: 0,
+      hasExplicitInitialPageParam: true,
+    })
+    expect(source).toContain('getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= 0 ? undefined : firstPageParam - 1')
   })
 })

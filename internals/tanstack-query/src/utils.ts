@@ -9,7 +9,7 @@ import {
 import type { ast } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
-import type { Infinite, Mutation, Query } from './types.ts'
+import type { Infinite, Mutation, PageParamFn, Query } from './types.ts'
 
 /**
  * The grouped request options, ordered for both the destructured signature and the
@@ -287,21 +287,44 @@ export function classifyOperation(node: ast.HttpOperationNode, { query, mutation
 }
 
 /**
+ * Helper to define a typed page param function for `infinite.getNextPageParam` or
+ * `infinite.getPreviousPageParam`. Serializes the function to a string for inlining in generated code.
+ */
+export function definePageParam<TPage = any, TParam = any>(fn: PageParamFn<TPage, TParam>): string {
+  return fn.toString()
+}
+
+/**
  * Applies the shared infinite-query defaults during plugin setup: a falsy value disables infinite
  * queries, and an object merges over `queryParam: 'id'` and `initialPageParam: 0` with the cursor
  * paths cleared.
  */
 export function resolveInfiniteConfig(infinite: Partial<Infinite> | false): Required<Infinite> | false {
   if (!infinite) return false
+  const hasExplicitInitialPageParam = infinite.hasExplicitInitialPageParam ?? infinite.initialPageParam !== undefined
+  const getNextPageParam = infinite.getNextPageParam
+    ? typeof infinite.getNextPageParam === 'function'
+      ? infinite.getNextPageParam.toString()
+      : infinite.getNextPageParam
+    : null
+  const getPreviousPageParam = infinite.getPreviousPageParam
+    ? typeof infinite.getPreviousPageParam === 'function'
+      ? infinite.getPreviousPageParam.toString()
+      : infinite.getPreviousPageParam
+    : null
+
   return {
     queryParam: 'id',
     initialPageParam: 0,
+    hasExplicitInitialPageParam,
     cursorParam: null,
     nextParam: null,
     previousParam: null,
-    getNextPageParam: null,
-    getPreviousPageParam: null,
+    getNextPageParam,
+    getPreviousPageParam,
     ...infinite,
+    ...(getNextPageParam ? { getNextPageParam } : {}),
+    ...(getPreviousPageParam ? { getPreviousPageParam } : {}),
   }
 }
 

@@ -1,6 +1,6 @@
 import { ast } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { buildCallResultBody, classifyOperation, getDefaultPageParamsWarning, hasQueryKeyParams, matchesInfinite, resolveInfiniteConfig } from './utils.ts'
+import { buildCallResultBody, classifyOperation, definePageParam, getDefaultPageParamsWarning, hasQueryKeyParams, matchesInfinite, resolveInfiniteConfig } from './utils.ts'
 
 describe('classifyOperation', () => {
   test('classifies a GET as a query when methods include it', () => {
@@ -141,12 +141,34 @@ const arraySchema = ast.factory.createSchema({ type: 'array', items: [ast.factor
 
 const infinite = (options: Parameters<typeof resolveInfiniteConfig>[0] = {}) => resolveInfiniteConfig({ queryParam: 'page', ...options }) || {}
 
+describe('definePageParam', () => {
+  test('serializes a function expression to string', () => {
+    const fn = definePageParam((lastPage: { next?: number }) => lastPage.next)
+    expect(fn).toBe('(lastPage) => lastPage.next')
+  })
+})
+
 describe('resolveInfiniteConfig', () => {
-  test('clears the page param code by default', () => {
-    expect(resolveInfiniteConfig({})).toMatchObject({ getNextPageParam: null, getPreviousPageParam: null })
+  test('clears the page param code by default and marks explicit initialPageParam false', () => {
+    expect(resolveInfiniteConfig({})).toMatchObject({
+      getNextPageParam: null,
+      getPreviousPageParam: null,
+      hasExplicitInitialPageParam: false,
+    })
   })
 
-  test('preserves configured page param code', () => {
+  test('marks hasExplicitInitialPageParam true when initialPageParam is provided', () => {
+    expect(resolveInfiniteConfig({ initialPageParam: 0 })).toMatchObject({
+      initialPageParam: 0,
+      hasExplicitInitialPageParam: true,
+    })
+    expect(resolveInfiniteConfig({ initialPageParam: 1 })).toMatchObject({
+      initialPageParam: 1,
+      hasExplicitInitialPageParam: true,
+    })
+  })
+
+  test('preserves configured page param code and serializes function expressions', () => {
     expect(
       resolveInfiniteConfig({
         getNextPageParam: '(lastPage) => lastPage.next',
@@ -155,6 +177,15 @@ describe('resolveInfiniteConfig', () => {
     ).toMatchObject({
       getNextPageParam: '(lastPage) => lastPage.next',
       getPreviousPageParam: '(firstPage) => firstPage.prev',
+    })
+
+    const fn = (lastPage: any) => lastPage.next
+    expect(
+      resolveInfiniteConfig({
+        getNextPageParam: fn,
+      }),
+    ).toMatchObject({
+      getNextPageParam: fn.toString(),
     })
   })
 })

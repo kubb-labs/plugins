@@ -12,6 +12,7 @@ type Props = {
   node: ast.OperationNode
   tsResolver: ResolverTs
   initialPageParam: Infinite['initialPageParam']
+  hasExplicitInitialPageParam?: boolean
   cursorParam: Infinite['cursorParam']
   nextParam: Infinite['nextParam']
   previousParam: Infinite['previousParam']

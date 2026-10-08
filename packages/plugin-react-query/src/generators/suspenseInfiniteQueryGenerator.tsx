@@ -123,6 +123,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
           getNextPageParam={infiniteOptions.getNextPageParam}
           getPreviousPageParam={infiniteOptions.getPreviousPageParam}
           initialPageParam={infiniteOptions.initialPageParam}
+          hasExplicitInitialPageParam={infiniteOptions.hasExplicitInitialPageParam}
           queryParam={infiniteOptions.queryParam}
           returnType={contractOp.returnType}
         />

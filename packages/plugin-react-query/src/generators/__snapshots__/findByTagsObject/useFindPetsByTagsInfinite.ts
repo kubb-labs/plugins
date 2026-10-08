@@ -37,7 +37,7 @@ export function findPetsByTagsInfiniteQueryOptions(
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => (Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1),
-    getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => (firstPageParam <= 0 ? undefined : firstPageParam - 1),
+    getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => (firstPageParam <= 1 ? undefined : firstPageParam - 1),
   })
 }
 
