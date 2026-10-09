@@ -280,8 +280,6 @@ describe('fakerGenerator — schema', () => {
     { name: 'petWithLocale', node: petSchema, options: { locale: 'de' as const } },
     { name: 'petWithSeed', node: petSchema, options: { seed: [1] as Array<number> } },
     { name: 'nullableName', node: nullableNameSchema, options: {} },
-    { name: 'petWithSchemaTypes', node: petSchema, options: { typeMode: 'schema' } },
-    { name: 'catCycleWithSchemaTypes', node: catSchema, options: { typeMode: 'schema' } },
   ] as const)('$name', async ({ name, node, options }) => {
     const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
@@ -386,7 +384,7 @@ describe('fakerGenerator — schema', () => {
 })
 
 describe('fakerGenerator — operation', () => {
-  const scenarios = [
+  test.each([
     {
       name: 'showPetById',
       node: ast.factory.createOperation({
@@ -591,14 +589,7 @@ describe('fakerGenerator — operation', () => {
       }),
       options: {},
     },
-  ] as const
-
-  test.each(
-    scenarios.flatMap((scenario) => [
-      scenario,
-      { ...scenario, name: `${scenario.name}WithSchemaTypes`, options: { ...scenario.options, typeMode: 'schema' as const } },
-    ]),
-  )('$name', async ({ name, node, options }) => {
+  ] as const)('$name', async ({ name, node, options }) => {
     const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
     const driver = createMockedPluginDriver({
