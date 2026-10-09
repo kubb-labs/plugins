@@ -189,7 +189,6 @@ type EnumOptions =
        * site (`'inlineLiteral'`).
        *
        * @default 'asConst'
-       * @note In Kubb v5, 'inlineLiteral' becomes the default.
        */
       type?: 'literal' | 'inlineLiteral'
       /**
