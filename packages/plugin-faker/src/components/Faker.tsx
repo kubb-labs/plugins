@@ -5,6 +5,7 @@ import { createFunctionParameter, createFunctionParameters, functionPrinter } fr
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
+import type { PluginFaker } from '../types.ts'
 import { resolveFakerTypeUsage } from '../utils.ts'
 
 type Props = {
@@ -14,6 +15,7 @@ type Props = {
   printer: ast.Printer<PrinterFakerFactory>
   description?: string
   canOverride: boolean
+  typeMode?: PluginFaker['resolvedOptions']['typeMode']
 }
 
 const OBJECT_TYPES = new Set<ast.SchemaNode['type']>(['object', 'intersection'])
@@ -34,7 +36,7 @@ const SCALAR_TYPES = new Set<ast.SchemaNode['type']>([
 ])
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export function Faker({ node, description, name, typeName, printer, canOverride }: Props): KubbReactNode {
+export function Faker({ node, description, name, typeName, printer, canOverride, typeMode = 'inferred' }: Props): KubbReactNode {
   const fakerText = printer.print(node) ?? 'undefined'
 
   const isArray = node.type === 'array'
@@ -43,7 +45,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride 
   const isScalar = SCALAR_TYPES.has(node.type)
   const isUnion = node.type === 'union'
 
-  const useGenericOverride = canOverride && isObject
+  const useObjectOverride = canOverride && isObject
   const fakerTextWithOverride = (() => {
     if (canOverride && node.type === 'tuple') {
       return `data && data.length === ${node.items?.length ?? 0} && !data.includes(undefined) ? data : ${fakerText}`
@@ -59,7 +61,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride 
 
   const { dataType, returnType: resolvedReturnType } = resolveFakerTypeUsage(node, typeName, canOverride)
 
-  if (!useGenericOverride) {
+  if (!useObjectOverride) {
     const usesData = /\bdata\b/.test(fakerTextWithOverride)
     const dataParamName = usesData ? 'data' : '_data'
     const params = createFunctionParameters({
@@ -96,7 +98,11 @@ export function Faker({ node, description, name, typeName, printer, canOverride 
 
   // Generate function with defaultFakeData structure
   const jsdoc = description ? `/**\n   * @description ${jsStringEscape(description)}\n   */\n  ` : ''
-  const functionSignature = `${jsdoc}export function ${name}<TData extends Partial<${typeName}> = object>(data?: TData)`
+  const functionSignature =
+    typeMode === 'schema'
+      ? `${jsdoc}export function ${name}(data?: Partial<${typeName}>): ${typeName}`
+      : `${jsdoc}export function ${name}<TData extends Partial<${typeName}> = object>(data?: TData)`
+  const returnType = typeMode === 'schema' ? typeName : 'Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>'
 
   // When the object node has properties that transitively reference a cyclic schema,
   // the printer emits memoizing getters for those properties. Spreading the object
@@ -117,14 +123,14 @@ export function Faker({ node, description, name, typeName, printer, canOverride 
       Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
     }
   }
-  return defaultFakeData as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  return defaultFakeData as ${returnType}
 }`
     : `{
   const defaultFakeData = ${fakerText}
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as ${returnType}
 }`
 
   return (

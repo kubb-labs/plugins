@@ -96,6 +96,13 @@ export type Options = OutputOptions & {
    */
   override?: Array<Override<ResolvedOptions>>
   /**
+   * Type object factories from generated values and overrides (`'inferred'`) or
+   * from the declared API model (`'schema'`).
+   *
+   * @default 'inferred'
+   */
+  typeMode?: 'inferred' | 'schema'
+  /**
    * Library used to format string-represented date, time, and datetime fields.
    * Any library exporting a default function works; Kubb adds the import for you.
    *
@@ -151,6 +158,7 @@ export type ResolvedOptions = {
   exclude: NonNullable<Options['exclude']>
   include: Options['include']
   override: NonNullable<Options['override']>
+  typeMode: NonNullable<Options['typeMode']>
   dateParser: NonNullable<Options['dateParser']>
   regexGenerator: NonNullable<Options['regexGenerator']>
   seed: NonNullable<Options['seed']> | undefined

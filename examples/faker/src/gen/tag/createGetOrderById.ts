@@ -15,14 +15,14 @@ import type {
 import { createOrder } from './createOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createGetOrderByIdPath<TData extends Partial<GetOrderByIdPath> = object>(data?: TData) {
+export function createGetOrderByIdPath(data?: Partial<GetOrderByIdPath>): GetOrderByIdPath {
   const defaultFakeData = {
     orderId: faker.number.bigInt(),
   }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as GetOrderByIdPath
 }
 
 /**

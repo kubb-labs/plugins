@@ -9,25 +9,25 @@ import { fakerEN as faker } from '@faker-js/faker'
 /**
  * @description successful operation
  */
-export function createGetInventoryStatus200<TData extends Partial<GetInventoryStatus200> = object>(data?: TData) {
+export function createGetInventoryStatus200(data?: Partial<GetInventoryStatus200>): GetInventoryStatus200 {
   const defaultFakeData = {}
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as GetInventoryStatus200
 }
 
 /**
  * @description unauthorized
  */
-export function createGetInventoryStatus401<TData extends Partial<GetInventoryStatus401> = object>(data?: TData) {
+export function createGetInventoryStatus401(data?: Partial<GetInventoryStatus401>): GetInventoryStatus401 {
   const defaultFakeData = {
     error: faker.helpers.arrayElement<NonNullable<GetInventoryStatus401>['error']>(['unauthorized']),
   }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as GetInventoryStatus401
 }
 
 export function createGetInventoryResponse(data?: Partial<GetInventoryResponse>): GetInventoryResponse {
