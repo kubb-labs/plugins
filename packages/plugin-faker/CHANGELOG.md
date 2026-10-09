@@ -1,5 +1,11 @@
 # @kubb/plugin-faker
 
+## 5.1.0
+
+### Minor Changes
+
+- [#1052](https://github.com/kubb-labs/plugins/pull/1052) [`b793fb0`](https://github.com/kubb-labs/plugins/commit/b793fb0329e95eaa7a2265edfc4ece36b5f15129) Thanks [@Ericlm](https://github.com/Ericlm)! - Add `typeMode: 'schema'` to generate object factories that accept `Partial<Model>` overrides and return the declared model type. This allows fixtures to be modified according to the API model and rejects unknown properties in inline overrides. The default `'inferred'` mode preserves literal overrides and precise generated field types.
+
 ## 5.0.13
 
 ### Patch Changes

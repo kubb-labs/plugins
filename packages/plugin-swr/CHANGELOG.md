@@ -1,5 +1,14 @@
 # @kubb/plugin-swr
 
+## 5.2.0
+
+### Minor Changes
+
+- [#1016](https://github.com/kubb-labs/plugins/pull/1016) [`14794c0`](https://github.com/kubb-labs/plugins/commit/14794c00aef0280c98102c4c246f1555ae2d4c1b) Thanks [@xeoneux](https://github.com/xeoneux)! - Give infinite queries their own query key and tell custom `queryKey`/`mutationKey` builders which hook the key is for.
+  
+  - The default infinite query key adds `infinite: true` to its first segment. It previously equalled the plain query's key, so using both hooks for one request stored `InfiniteData` and the plain response under the same cache entry. Invalidating with the plain key still matches the infinite query.
+  - `queryKey` and `mutationKey` receive `variant` (`'query'`, `'suspenseQuery'`, `'infiniteQuery'`, `'suspenseInfiniteQuery'` or `'mutation'`).
+
 ## 5.1.6
 
 ### Patch Changes
