@@ -155,8 +155,8 @@ export type Options = OutputOptions & {
    */
   resolver?: ResolverPatch<ResolverVueQuery>
   /**
-   * Set to `false` to skip generating `use*` composable functions. `queryOptions`,
-   * `queryKey`, and `mutationKey` helpers are still emitted.
+   * Set to `true` to also generate `use*` composable functions. By default only the
+   * `queryOptions`, `queryKey`, and `mutationKey` helpers are emitted.
    *
    * @default false
    */
