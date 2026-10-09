@@ -250,6 +250,7 @@ const defaultOptions: PluginFaker['resolvedOptions'] = {
   exclude: [],
   include: undefined,
   override: [],
+  typeMode: 'inferred',
   group: null,
   dateParser: 'faker',
   regexGenerator: 'faker',

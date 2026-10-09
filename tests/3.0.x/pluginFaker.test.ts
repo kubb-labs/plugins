@@ -376,3 +376,48 @@ const explicit: Category = createCategory<object>()
   })
   expect(ts.getPreEmitDiagnostics(program).map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'))).toStrictEqual([])
 })
+
+test('creates mutable schema-typed fixtures and rejects unknown overrides', async () => {
+  const root = await fs.mkdtemp(path.join(__dirname, '.faker-schema-'))
+  onTestFinished(() => fs.rm(root, { recursive: true, force: true }))
+
+  const { diagnostics } = await createKubb({
+    root,
+    input: path.join(__dirname, '../../schemas/3.0.x/petStore.yaml'),
+    adapter: adapterOas(),
+    parsers: [parserTs()],
+    storage: fsStorage(),
+    output: { path: 'generated', clean: true, format: false, lint: false },
+    plugins: [pluginTs({ output: { path: 'types' } }), pluginFaker({ output: { path: 'mocks' }, typeMode: 'schema' })],
+  }).safeBuild()
+
+  expect(Diagnostics.hasError(diagnostics)).toBe(false)
+  const orderSource = await fs.readFile(path.join(root, 'generated/mocks/createOrder.ts'), 'utf8')
+  await expect(orderSource).toMatchFileSnapshot(path.join(__dirname, '__snapshots__', 'pluginFaker', 'schema', 'createOrder.ts'))
+
+  const usagePath = path.join(root, 'usage.ts')
+  await fs.writeFile(
+    usagePath,
+    `import { createOrder } from './generated/mocks/createOrder'
+
+const order = createOrder({ quantity: 2, complete: true })
+order.complete = false
+order.complete = true
+
+// @ts-expect-error Unknown properties are rejected.
+createOrder({ quantity: 2, foo: '' })
+`,
+  )
+
+  const program = ts.createProgram([usagePath], {
+    noEmit: true,
+    strict: true,
+    skipLibCheck: true,
+    target: ts.ScriptTarget.ES2022,
+    module: ts.ModuleKind.ESNext,
+    moduleResolution: ts.ModuleResolutionKind.Bundler,
+    allowImportingTsExtensions: true,
+    types: [],
+  })
+  expect(ts.getPreEmitDiagnostics(program)).toStrictEqual([])
+})

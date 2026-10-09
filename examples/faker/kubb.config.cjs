@@ -36,7 +36,7 @@ module.exports = defineConfig(() => {
               pattern: 'store',
             },
           ],
-          dataReturnType: 'full',
+          typeMode: 'schema',
         }),
       ],
     },

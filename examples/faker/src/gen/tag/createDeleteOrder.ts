@@ -6,14 +6,14 @@
 import type { DeleteOrderPath, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../models/DeleteOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createDeleteOrderPath<TData extends Partial<DeleteOrderPath> = object>(data?: TData) {
+export function createDeleteOrderPath(data?: Partial<DeleteOrderPath>): DeleteOrderPath {
   const defaultFakeData = {
     orderId: faker.number.bigInt(),
   }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as DeleteOrderPath
 }
 
 /**

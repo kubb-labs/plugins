@@ -19,7 +19,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { config, resolver, root } = ctx
-    const { output, group, dateParser, regexGenerator, seed, locale, printer } = ctx.options
+    const { output, group, dateParser, regexGenerator, seed, locale, printer, typeMode } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
     if (!node.name || !pluginTs) {
@@ -93,13 +93,14 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
           node={node}
           printer={printerInstance}
           canOverride={canOverride}
+          typeMode={typeMode}
         />
       </File>
     )
   },
   operation(node, ctx) {
     const { config, resolver, root } = ctx
-    const { output, group, dateParser, regexGenerator, seed, locale, printer } = ctx.options
+    const { output, group, dateParser, regexGenerator, seed, locale, printer, typeMode } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
     if (!pluginTs) {
@@ -255,6 +256,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             node={schema}
             printer={{ ...printerInstance, print: () => rewrittenFakerText }}
             canOverride={canOverride}
+            typeMode={typeMode}
           />
         </>
       )
