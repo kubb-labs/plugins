@@ -6,10 +6,11 @@ import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, rend
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
-import { describe, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import { matchFiles } from '#mocks'
 import { mutationKeyTransformer } from '@internals/tanstack-query'
 import { queryKeyTransformer } from '@internals/tanstack-query'
+import type { Transformer } from '@internals/tanstack-query'
 import { resolverVueQuery } from '../resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from '../types.ts'
 import { queryGenerator } from './queryGenerator.tsx'
@@ -167,5 +168,25 @@ describe('queryGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('queryGenerator queryKey', () => {
+  test('passes the query variant to a custom queryKey', async () => {
+    const queryKey = vi.fn<Transformer>(queryKeyTransformer)
+    const options: PluginVueQuery['resolvedOptions'] = { ...defaultOptions, queryKey }
+    const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
+    const driver = createMultiPluginDriver('customQueryKey')
+
+    await renderGeneratorOperation(queryGenerator, findByTagsNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverVueQuery,
+    })
+
+    expect(queryKey.mock.calls.map(([props]) => props.variant)).toEqual(['query'])
   })
 })

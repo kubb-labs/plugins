@@ -13,7 +13,7 @@ import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 import { toValue } from 'vue'
 
 export const findPetsByTagsInfiniteQueryKey = ({ query }: { query: MaybeRefOrGetter<Omit<FindPetsByTagsOptions, 'headers'>['query']> }) =>
-  [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
+  [{ url: '/pet/findByTags', infinite: true }, ...(query ? [query] : [])] as const
 
 export type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInfiniteQueryKey>
 
