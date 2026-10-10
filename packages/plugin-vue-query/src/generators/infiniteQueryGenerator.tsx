@@ -1,6 +1,6 @@
-import { getOperationParameters, operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
+import { operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
-import { classifyOperation, resolvePageParamType } from '@internals/tanstack-query'
+import { classifyOperation, getDefaultPageParamsWarning, matchesInfinite, resolvePageParamType } from '@internals/tanstack-query'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
@@ -16,26 +16,31 @@ import type { PluginVueQuery } from '../types'
 export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
   name: 'vue-query-infinite',
   renderer: jsxRenderer,
+  match(node, ctx) {
+    const operationNode = node as ast.OperationNode
+    if (!ast.isHttpOperationNode(operationNode)) return false
+    const { query, mutation, infinite, hooks } = ctx.options
+
+    const { isQuery, isMutation } = classifyOperation(operationNode, { query, mutation })
+    const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
+    if (!isQuery || isMutation || !infiniteOptions || !hooks) return false
+
+    return matchesInfinite(operationNode, infiniteOptions)
+  },
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, infinite, client, group, hooks } = ctx.options
+    const { output, query, infinite, client, group } = ctx.options
+
+    const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
+    if (!infiniteOptions) return null
+
+    const pageParamsWarning = getDefaultPageParamsWarning(node, infiniteOptions)
+    if (pageParamsWarning) ctx.warn(pageParamsWarning)
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
     const tsResolver = driver.getResolver(pluginTsName)
-
-    const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
-    const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
-
-    if (!isQuery || isMutation || !infiniteOptions || !hooks) return null
-
-    // Validate queryParam exists in operation's query parameters
-    const normalizeKey = (key: string) => key.replace(/\?$/, '')
-    const queryParamKeys = getOperationParameters(node).query.map((p) => p.name)
-    const hasQueryParam = infiniteOptions.queryParam ? queryParamKeys.some((k) => normalizeKey(k) === infiniteOptions.queryParam) : false
-    // cursorParam validation against response schema keys is skipped in v5 (complex schema inspection)
-    if (!hasQueryParam) return null
 
     const importPath = query ? query.importPath : '@tanstack/vue-query'
 
@@ -117,7 +122,10 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           cursorParam={infiniteOptions.cursorParam}
           nextParam={infiniteOptions.nextParam}
           previousParam={infiniteOptions.previousParam}
+          getNextPageParam={infiniteOptions.getNextPageParam}
+          getPreviousPageParam={infiniteOptions.getPreviousPageParam}
           initialPageParam={infiniteOptions.initialPageParam}
+          hasExplicitInitialPageParam={infiniteOptions.hasExplicitInitialPageParam}
           queryParam={infiniteOptions.queryParam}
           returnType={contractOp.returnType}
         />

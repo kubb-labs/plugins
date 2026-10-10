@@ -87,4 +87,43 @@ export type Infinite = {
    * @default 0
    */
   initialPageParam?: unknown
+  /**
+   * Whether `initialPageParam` was explicitly configured rather than defaulted.
+   * When omitted or false, the default previous page threshold remains 1 (legacy 1-based default).
+   */
+  hasExplicitInitialPageParam?: boolean
+  /**
+   * Source of TanStack Query's `getNextPageParam`, inlined verbatim as a function expression. Use it
+   * when the next page has to be computed rather than read from a field. Takes precedence over
+   * `nextParam` and `cursorParam`.
+   *
+   * Note: Because functions are inlined verbatim into generated code via `.toString()`, they cannot
+   * reference local closures or external variables from the config file.
+   *
+   * @example
+   * `'(lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined)'`
+   * // or with definePageParam:
+   * `definePageParam<MyResponse, number>((lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined))`
+   */
+  getNextPageParam?: string | PageParamFn | null
+  /**
+   * Source of TanStack Query's `getPreviousPageParam`, inlined verbatim as a function expression.
+   * Takes precedence over `previousParam` and `cursorParam`.
+   *
+   * Note: Because functions are inlined verbatim into generated code via `.toString()`, they cannot
+   * reference local closures or external variables from the config file.
+   *
+   * @example
+   * `'(firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined)'`
+   * // or with definePageParam:
+   * `definePageParam<MyResponse, number>((firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined))`
+   */
+  getPreviousPageParam?: string | PageParamFn | null
 }
+
+export type PageParamFn<TPage = any, TParam = any> = (
+  page: TPage,
+  allPages: Array<TPage>,
+  pageParam: TParam,
+  allPageParams: Array<TParam>,
+) => TParam | undefined | null

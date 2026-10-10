@@ -12,9 +12,12 @@ type Props = {
   node: ast.OperationNode
   tsResolver: ResolverTs
   initialPageParam: Infinite['initialPageParam']
+  hasExplicitInitialPageParam?: boolean
   cursorParam: Infinite['cursorParam']
   nextParam: Infinite['nextParam']
   previousParam: Infinite['previousParam']
+  getNextPageParam?: Infinite['getNextPageParam']
+  getPreviousPageParam?: Infinite['getPreviousPageParam']
   queryParam: Infinite['queryParam']
   /**
    * The registered client plugin's `returnType`, read by the caller off `resolveClientOperation`.

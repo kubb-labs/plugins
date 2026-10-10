@@ -1,8 +1,15 @@
-import { getOperationParameters, getRequestGroupOptionality, getRequestGroups, resolveErrorNames, resolveSuccessNames } from '@internals/shared'
+import {
+  getOperationParameters,
+  getPrimarySuccessResponse,
+  getRequestGroupOptionality,
+  getRequestGroups,
+  resolveErrorNames,
+  resolveSuccessNames,
+} from '@internals/shared'
 import type { ast } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
-import type { Infinite, Mutation, Query } from './types.ts'
+import type { Infinite, Mutation, PageParamFn, Query } from './types.ts'
 
 /**
  * The grouped request options, ordered for both the destructured signature and the
@@ -280,13 +287,85 @@ export function classifyOperation(node: ast.HttpOperationNode, { query, mutation
 }
 
 /**
+ * Helper to define a typed page param function for `infinite.getNextPageParam` or
+ * `infinite.getPreviousPageParam`. Serializes the function to a string for inlining in generated code.
+ *
+ * Note: Because the function is inlined verbatim into the generated file via `.toString()`,
+ * it must be self-contained and cannot reference local closures or external variables from
+ * the config file.
+ */
+export function definePageParam<TPage = any, TParam = any>(fn: PageParamFn<TPage, TParam>): string {
+  return fn.toString()
+}
+
+/**
  * Applies the shared infinite-query defaults during plugin setup: a falsy value disables infinite
  * queries, and an object merges over `queryParam: 'id'` and `initialPageParam: 0` with the cursor
  * paths cleared.
  */
 export function resolveInfiniteConfig(infinite: Partial<Infinite> | false): Required<Infinite> | false {
   if (!infinite) return false
-  return { queryParam: 'id', initialPageParam: 0, cursorParam: null, nextParam: null, previousParam: null, ...infinite }
+  const hasExplicitInitialPageParam = infinite.hasExplicitInitialPageParam ?? infinite.initialPageParam !== undefined
+  const getNextPageParam = infinite.getNextPageParam
+    ? typeof infinite.getNextPageParam === 'function'
+      ? infinite.getNextPageParam.toString()
+      : infinite.getNextPageParam
+    : null
+  const getPreviousPageParam = infinite.getPreviousPageParam
+    ? typeof infinite.getPreviousPageParam === 'function'
+      ? infinite.getPreviousPageParam.toString()
+      : infinite.getPreviousPageParam
+    : null
+
+  return {
+    queryParam: 'id',
+    initialPageParam: 0,
+    hasExplicitInitialPageParam,
+    cursorParam: null,
+    nextParam: null,
+    previousParam: null,
+    getNextPageParam,
+    getPreviousPageParam,
+    ...infinite,
+    ...(getNextPageParam ? { getNextPageParam } : {}),
+    ...(getPreviousPageParam ? { getPreviousPageParam } : {}),
+  }
+}
+
+/**
+ * Whether the infinite hook for `node` should be generated: the operation takes the configured
+ * `queryParam`.
+ */
+export function matchesInfinite(node: ast.OperationNode, infinite: Infinite): boolean {
+  if (!infinite.queryParam) return false
+  // Strip trailing '?' which OpenAPI specs sometimes append to parameter names to denote optionality
+  return getOperationParameters(node).query.some((param) => param.name.replace(/\?$/, '') === infinite.queryParam)
+}
+
+/**
+ * Warning for an infinite hook that falls back to the built-in page params on a response that
+ * isn't an array. Those params only stop on an empty array, so `hasNextPage` never turns false.
+ */
+export function getDefaultPageParamsWarning(node: ast.OperationNode, infinite: Infinite): string | null {
+  const usesDefault =
+    infinite.getNextPageParam == null &&
+    infinite.getPreviousPageParam == null &&
+    infinite.nextParam == null &&
+    infinite.previousParam == null &&
+    !infinite.cursorParam
+  if (!usesDefault) return null
+
+  const content = getPrimarySuccessResponse(node)?.content
+  const jsonContent = content?.find((item) => item.contentType?.includes('json')) ?? content?.[0]
+  const schema = jsonContent?.schema
+
+  let resolved: ast.SchemaNode | null | undefined = schema
+  while (resolved?.type === 'ref' || (resolved?.type === 'intersection' && resolved.members?.length === 1)) {
+    resolved = resolved.type === 'ref' ? resolved.schema : resolved.members?.[0]
+  }
+  if (!resolved || resolved.type === 'array') return null
+
+  return `${node.operationId}: the default infinite page params expect an array response and never end for this one. Set \`infinite.getNextPageParam\` (or \`nextParam\`) to read the next page from the response.`
 }
 
 export function transformName(name: string, type: string, transformers?: { name?: (name: string, type?: string) => string }): string {

@@ -1,6 +1,14 @@
 import { ast } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { buildCallResultBody, classifyOperation, hasQueryKeyParams } from './utils.ts'
+import {
+  buildCallResultBody,
+  classifyOperation,
+  definePageParam,
+  getDefaultPageParamsWarning,
+  hasQueryKeyParams,
+  matchesInfinite,
+  resolveInfiniteConfig,
+} from './utils.ts'
 
 describe('classifyOperation', () => {
   test('classifies a GET as a query when methods include it', () => {
@@ -121,5 +129,177 @@ describe('buildCallResultBody', () => {
 
   test('returns the call directly when the client already resolves to bare data', () => {
     expect(buildCallResultBody('getPetById({ throwOnError: true })', { returnType: 'data' })).toBe('return await getPetById({ throwOnError: true })')
+  })
+})
+
+const listPetsNode = (schema: ast.SchemaNode, paramName = 'page') =>
+  ast.factory.createOperation({
+    operationId: 'listPets',
+    method: 'GET',
+    path: '/pets',
+    parameters: [ast.factory.createParameter({ name: paramName, in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) })],
+    responses: [ast.factory.createResponse({ statusCode: '200', schema })],
+  })
+
+const pageSchema = ast.factory.createSchema({
+  type: 'object',
+  properties: [ast.factory.createProperty({ name: 'hasNext', schema: ast.factory.createSchema({ type: 'boolean' }), required: true })],
+})
+const arraySchema = ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] })
+
+const infinite = (options: Parameters<typeof resolveInfiniteConfig>[0] = {}) => resolveInfiniteConfig({ queryParam: 'page', ...options }) || {}
+
+describe('definePageParam', () => {
+  test('serializes a function expression to string', () => {
+    const fn = definePageParam((lastPage: { next?: number }) => lastPage.next)
+    expect(fn).toBe('(lastPage) => lastPage.next')
+  })
+})
+
+describe('resolveInfiniteConfig', () => {
+  test('clears the page param code by default and marks explicit initialPageParam false', () => {
+    expect(resolveInfiniteConfig({})).toMatchObject({
+      getNextPageParam: null,
+      getPreviousPageParam: null,
+      hasExplicitInitialPageParam: false,
+    })
+  })
+
+  test('marks hasExplicitInitialPageParam true when initialPageParam is provided', () => {
+    expect(resolveInfiniteConfig({ initialPageParam: 0 })).toMatchObject({
+      initialPageParam: 0,
+      hasExplicitInitialPageParam: true,
+    })
+    expect(resolveInfiniteConfig({ initialPageParam: 1 })).toMatchObject({
+      initialPageParam: 1,
+      hasExplicitInitialPageParam: true,
+    })
+    expect(resolveInfiniteConfig({ initialPageParam: null })).toMatchObject({
+      initialPageParam: null,
+      hasExplicitInitialPageParam: true,
+    })
+  })
+
+  test('preserves configured page param code and serializes function expressions', () => {
+    expect(
+      resolveInfiniteConfig({
+        getNextPageParam: '(lastPage) => lastPage.next',
+        getPreviousPageParam: '(firstPage) => firstPage.prev',
+      }),
+    ).toMatchObject({
+      getNextPageParam: '(lastPage) => lastPage.next',
+      getPreviousPageParam: '(firstPage) => firstPage.prev',
+    })
+
+    const fn = (lastPage: any) => lastPage.next
+    expect(
+      resolveInfiniteConfig({
+        getNextPageParam: fn,
+      }),
+    ).toMatchObject({
+      getNextPageParam: fn.toString(),
+    })
+  })
+})
+
+describe('matchesInfinite', () => {
+  test('matches an operation that takes the queryParam', () => {
+    expect(matchesInfinite(listPetsNode(pageSchema), infinite())).toBe(true)
+  })
+
+  test('matches an optional queryParam declared with a trailing ?', () => {
+    expect(matchesInfinite(listPetsNode(pageSchema, 'page?'), infinite())).toBe(true)
+  })
+
+  test('skips an operation without the queryParam', () => {
+    expect(matchesInfinite(listPetsNode(pageSchema, 'cursor'), infinite())).toBe(false)
+  })
+
+  test('skips an operation with no parameters', () => {
+    const noParamsNode = ast.factory.createOperation({
+      operationId: 'listPets',
+      method: 'GET',
+      path: '/pets',
+      parameters: [],
+      responses: [ast.factory.createResponse({ statusCode: '200', schema: pageSchema })],
+    })
+    expect(matchesInfinite(noParamsNode, infinite())).toBe(false)
+  })
+})
+
+describe('getDefaultPageParamsWarning', () => {
+  test('warns when the default page params meet an object response', () => {
+    expect(getDefaultPageParamsWarning(listPetsNode(pageSchema), infinite())).toContain('listPets: the default infinite page params expect an array response')
+  })
+
+  test('resolves a ref to the response schema', () => {
+    const ref = ast.factory.createSchema({ type: 'ref', ref: '#/components/schemas/PetPage', schema: pageSchema })
+
+    expect(getDefaultPageParamsWarning(listPetsNode(ref), infinite())).not.toBeNull()
+  })
+
+  test('resolves chained refs to the response schema', () => {
+    const innerRef = ast.factory.createSchema({ type: 'ref', ref: '#/components/schemas/ArrayOfPets', schema: arraySchema })
+    const outerRef = ast.factory.createSchema({ type: 'ref', ref: '#/components/schemas/PetList', schema: innerRef })
+
+    expect(getDefaultPageParamsWarning(listPetsNode(outerRef), infinite())).toBeNull()
+  })
+
+  test('stays quiet for an array response', () => {
+    expect(getDefaultPageParamsWarning(listPetsNode(arraySchema), infinite())).toBeNull()
+  })
+
+  test('resolves single-element intersection (allOf) wrapping array response', () => {
+    const intersectionSchema = ast.factory.createSchema({ type: 'intersection', members: [arraySchema] })
+    expect(getDefaultPageParamsWarning(listPetsNode(intersectionSchema), infinite())).toBeNull()
+  })
+
+  test('warns when single-element intersection (allOf) wraps object response', () => {
+    const intersectionSchema = ast.factory.createSchema({ type: 'intersection', members: [pageSchema] })
+    expect(getDefaultPageParamsWarning(listPetsNode(intersectionSchema), infinite())).not.toBeNull()
+  })
+
+  test('prioritizes application/json content schema over non-json content', () => {
+    const multiContentNode = ast.factory.createOperation({
+      operationId: 'listPets',
+      method: 'GET',
+      path: '/pets',
+      parameters: [ast.factory.createParameter({ name: 'page', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [
+            ast.factory.createContent({ contentType: 'text/plain', schema: pageSchema }),
+            ast.factory.createContent({ contentType: 'application/json', schema: arraySchema }),
+          ],
+        }),
+      ],
+    })
+    expect(getDefaultPageParamsWarning(multiContentNode, infinite())).toBeNull()
+  })
+
+  test('stays quiet when response has no schema', () => {
+    const noSchemaNode = ast.factory.createOperation({
+      operationId: 'listPets',
+      method: 'GET',
+      path: '/pets',
+      parameters: [ast.factory.createParameter({ name: 'page', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) })],
+      responses: [],
+    })
+    expect(getDefaultPageParamsWarning(noSchemaNode, infinite())).toBeNull()
+  })
+
+  test('warns when response schema is a primitive type', () => {
+    const stringSchema = ast.factory.createSchema({ type: 'string' })
+    expect(getDefaultPageParamsWarning(listPetsNode(stringSchema), infinite())).not.toBeNull()
+  })
+
+  test.each([
+    { getNextPageParam: '(lastPage) => lastPage.next' },
+    { getPreviousPageParam: '(firstPage) => firstPage.previous' },
+    { nextParam: 'next' },
+    { cursorParam: 'cursor' },
+  ])('stays quiet when the page params are configured: %o', (options) => {
+    expect(getDefaultPageParamsWarning(listPetsNode(pageSchema), infinite(options))).toBeNull()
   })
 })

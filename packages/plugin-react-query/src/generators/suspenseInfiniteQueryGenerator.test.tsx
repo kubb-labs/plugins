@@ -5,8 +5,8 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
 import { describe, expect, test, vi } from 'vitest'
-import { matchFiles } from '#mocks'
-import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
+import { matchFiles, rawSources } from '#mocks'
+import { definePageParam, mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import type { Transformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
@@ -203,5 +203,37 @@ describe('suspenseInfiniteQueryGenerator queryKey', () => {
     })
 
     expect(queryKey.mock.calls.map(([props]) => props.variant)).toEqual(['suspenseInfiniteQuery'])
+  })
+})
+
+describe('suspenseInfiniteQueryGenerator page param resolution combinations', () => {
+  const renderWithInfinite = async (infinite: PluginReactQuery['resolvedOptions']['infinite']) => {
+    const options: PluginReactQuery['resolvedOptions'] = {
+      ...defaultOptions,
+      suspense: {},
+      infinite,
+    }
+    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
+    const driver = createMultiPluginDriver('suspensePageParamCombos')
+
+    await renderGeneratorOperation(suspenseInfiniteQueryGenerator, findByTagsNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverReactQuery,
+    })
+
+    return rawSources(driver.fileManager.files)[0] ?? ''
+  }
+
+  test('supports custom getNextPageParam and definePageParam', async () => {
+    const source = await renderWithInfinite({
+      ...suspenseInfiniteConfig.infinite,
+      getNextPageParam: definePageParam<{ next?: number }>((lastPage) => lastPage.next),
+    })
+    expect(source).toContain('getNextPageParam: (lastPage) => lastPage.next')
+    expect(source).not.toContain('getPreviousPageParam')
   })
 })
