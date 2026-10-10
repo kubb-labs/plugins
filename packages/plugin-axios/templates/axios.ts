@@ -165,17 +165,20 @@ export type ContentType = string | { request?: string; response?: string }
  * A Standard Schema validator (zod, valibot, arktype) that parses a value before it is sent or after
  * it is received. `runValidator` runs it through `validateStandardSchema`. Wired through the per-call
  * `validator.request` / `validator.response` / `validator.error` hooks (`error` runs on the error body when a
- * non-2xx call does not throw).
+ * non-2xx call does not throw), and `validator.path` / `validator.query` / `validator.headers` for the
+ * request params.
  */
 export type Validator<T = unknown> = StandardSchemaValidator<T>
 
 /**
- * The failing body and the call it came from, handed to `onValidationError` alongside the `ParseError`.
- * `direction` says which slot rejected it: the request body, the success body, or the error body.
+ * The failing value and the call it came from, handed to `onValidationError` alongside the `ParseError`.
+ * `direction` says which side rejected it: the request, the success body, or the error body. `source`
+ * says which part of it: the body, or one of the request param groups.
  */
 export type ValidationErrorContext = {
   value: unknown
   direction: 'request' | 'response' | 'error'
+  source: 'body' | 'path' | 'query' | 'headers'
   method?: string
   url?: string
   status?: number
@@ -237,7 +240,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   transport?: AxiosInstance
   serializer?: Serializers
   codecs?: Record<string, Codec>
-  validator?: { request?: Validator; response?: Validator; error?: Validator }
+  validator?: { request?: Validator; path?: Validator; query?: Validator; headers?: Validator; response?: Validator; error?: Validator }
   onValidationError?: ValidationErrorHandler
   security?: Array<Auth>
   auth?: AuthResolver
@@ -307,6 +310,8 @@ export type Interceptors<TRequest = AxiosRequestConfig, TResponse = AxiosRespons
   error: InterceptorChannel<AxiosError, TRequest, TResponse>
 }
 
+export type UrlConfig = Pick<RequestConfig, 'baseURL' | 'url' | 'path' | 'query' | 'params' | 'serializer' | 'styles'>
+
 /**
  * A client instance: the callable send plus configuration, interceptors, and an isolated
  * `createClient` factory.
@@ -315,7 +320,7 @@ export type ClientInstance<TRequest = AxiosRequestConfig, TResponse = AxiosRespo
   <TBody = unknown>(config: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>>
   getConfig: () => ClientConfig
   setConfig: (config: ClientConfig) => ClientConfig
-  getUrl: <TBody = unknown>(config: RequestConfig<TBody, TRequest, TResponse>) => string
+  getUrl: (config: UrlConfig) => string
   interceptors: Interceptors<TRequest, TResponse>
   createClient: (config?: ClientConfig) => ClientInstance<TRequest, TResponse>
 }
@@ -378,6 +383,24 @@ function serializeHeaders(headers: HeadersInit | undefined): Record<string, stri
 
 function mergeHeaders(...sources: Array<HeadersInit | undefined>): Record<string, string> {
   return Object.assign({}, ...sources.map(serializeHeaders))
+}
+
+function collectHeadersCaseInsensitive(...sources: Array<unknown>): Record<string, unknown> {
+  const keys = new Map<string, string>()
+  const result: Record<string, unknown> = {}
+  for (const source of sources) {
+    if (!source) continue
+    const entries: Array<[string, unknown]> = Array.isArray(source) ? source : Object.entries(source)
+    for (const [key, value] of entries) {
+      if (value === undefined || value === null) continue
+      const lowerCase = key.toLowerCase()
+      const previous = keys.get(lowerCase)
+      if (previous !== undefined) delete result[previous]
+      keys.set(lowerCase, key)
+      result[key] = value
+    }
+  }
+  return result
 }
 
 function getHeader(headers: Record<string, string>, name: string): string | undefined {
@@ -585,15 +608,39 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 }): Promise<{ axiosConfig: AxiosRequestConfig; codecs: Record<string, Codec>; throwOnError: boolean }> {
   const { querySerializer, bodySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
   const codecs = { ...config.codecs, ...requestConfig.codecs }
+  const onValidationError = requestConfig.onValidationError ?? config.onValidationError
+  const validationContext = { direction: 'request', method: requestConfig.method, url: requestConfig.url } as const
 
-  const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers as HeadersInit | undefined, requestConfig.styles?.header))
+  // Params are encoded before anything reads them: headers before styling, query before auth adds its values.
+  const [validatedPath, validatedQuery, validatedHeaders] = await Promise.all([
+    runValidator({
+      validator: requestConfig.validator?.path,
+      value: { ...(requestConfig.path as Record<string, unknown> | undefined) },
+      context: { ...validationContext, source: 'path' },
+      onValidationError,
+    }),
+    runValidator({
+      validator: requestConfig.validator?.query,
+      value: { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) },
+      context: { ...validationContext, source: 'query' },
+      onValidationError,
+    }),
+    runValidator({
+      validator: requestConfig.validator?.headers,
+      value: collectHeadersCaseInsensitive(config.headers, requestConfig.headers),
+      context: { ...validationContext, source: 'headers' },
+      onValidationError,
+    }),
+  ])
+
+  const headers = mergeHeaders(applyHeaderStyles(validatedHeaders as HeadersInit | undefined, requestConfig.styles?.header))
   const { request: requestContentTypeOption, response: responseContentType } = resolveContentType(requestConfig.contentType)
   const requestContentType = requestContentTypeOption ?? getHeader(headers, 'content-type')
   if (responseContentType && !hasHeader(headers, 'accept')) {
     headers['Accept'] = responseContentType
   }
 
-  const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
+  const query: Record<string, unknown> = { ...(validatedQuery as Record<string, unknown> | undefined) }
 
   await resolveAuth({
     security: requestConfig.security,
@@ -610,8 +657,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   const validatedBody = await runValidator({
     validator: requestConfig.validator?.request,
     value: requestConfig.body,
-    context: { direction: 'request', method: requestConfig.method, url: requestConfig.url },
-    onValidationError: requestConfig.onValidationError ?? config.onValidationError,
+    context: { ...validationContext, source: 'body' },
+    onValidationError,
   })
   const requestContentTypeBase = baseContentType(requestContentType)
   const contentCodec = requestContentTypeBase ? codecs[requestContentTypeBase] : undefined
@@ -632,7 +679,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     headers['Content-Type'] = 'application/json'
   }
 
-  const pathParams = (requestConfig.path ?? {}) as Record<string, unknown>
+  const pathParams = (validatedPath ?? {}) as Record<string, unknown>
   const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) =>
     pathSerializer({ name: key, value: pathParams[key], options: requestConfig.styles?.path?.[key] }),
   )
@@ -700,7 +747,7 @@ async function settleResponse<TRequest, TResponse>({
     ? await runValidator({
         validator: validator?.response,
         value: decoded,
-        context: { direction: 'response', ...validationContext },
+        context: { direction: 'response', source: 'body', ...validationContext },
         onValidationError,
       })
     : undefined
@@ -709,7 +756,7 @@ async function settleResponse<TRequest, TResponse>({
     : await runValidator({
         validator: validator?.error,
         value: decoded,
-        context: { direction: 'error', ...validationContext },
+        context: { direction: 'error', source: 'body', ...validationContext },
         onValidationError,
       })
   return {

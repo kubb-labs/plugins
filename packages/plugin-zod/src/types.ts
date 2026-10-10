@@ -185,10 +185,11 @@ export type Options = OutputOptions & {
    */
   importPath?: 'zod' | 'zod/mini' | (string & {})
   /**
-   * Export a `z.infer<typeof schema>` type alias next to every generated schema.
-   * Lets the Zod schema act as the single source of truth.
+   * Export a type alias next to every generated schema, so the Zod schema acts as the single sourcemof truth.
+   * - `true`: The alias is `z.infer<typeof schema>`.
+   * - `'direction'`: If the schema is part of a request `z.input`, and if the schema is part of a response `z.output`.
    */
-  inferred?: boolean
+  inferred?: boolean | 'direction'
   /**
    * Wrap schemas in `z.coerce` so input is coerced before validation. Useful for
    * form data and query params where everything arrives as a string.

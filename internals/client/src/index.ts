@@ -2,7 +2,7 @@ export { buildSdkMethod } from './builders/sdkMethod.ts'
 export {
   buildZodErrorParse,
   isValidatorEnabled,
-  resolveQueryParamsValidator,
+  resolveParamsValidator,
   resolveRequestValidator,
   resolveResponseValidator,
 } from './builders/validatorOptions.ts'
