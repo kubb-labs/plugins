@@ -1,12 +1,12 @@
 import path from 'node:path'
 import { createSdkGenerator, defaultMacros, resolverClient } from '@internals/client'
 import { createGroupConfig } from '@internals/shared'
-import { definePlugin, Resolver } from 'kubb/kit'
+import { definePlugin, type Plugin, Resolver } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
 import { fetchClientTemplatePath, fetchSerializersTemplatePath, standardSchemaTemplatePath } from './templates.ts'
-import type { PluginFetch, ResolvedOptions, ResolverClient } from './types.ts'
+import type { Options, PluginFetch, ResolvedOptions, ResolverClient } from './types.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-fetch`. Used for driver lookups and cross-plugin
@@ -36,7 +36,7 @@ export const pluginFetchName = 'plugin-fetch' satisfies PluginFetch['name']
  * })
  * ```
  */
-export const pluginFetch = definePlugin<PluginFetch>((options) => {
+export const pluginFetch: (options?: Options) => Plugin<PluginFetch> = definePlugin<PluginFetch>((options) => {
   const {
     output = { path: 'clients', barrel: { type: 'named' } },
     exclude = [],
