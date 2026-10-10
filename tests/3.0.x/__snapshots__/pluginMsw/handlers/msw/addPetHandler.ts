@@ -22,8 +22,8 @@ export function addPetHandlerResponse405(data?: AddPetStatus405) {
   })
 }
 
-export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Record<string, string>, AddPetBody>) {
-  return http.post<Record<string, string>, AddPetBody>(`/pet`, function handler(info) {
+export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Record<string, string>, AddPetBody>, options?: { baseURL?: string }) {
+  return http.post<Record<string, string>, AddPetBody>(`${options?.baseURL ?? ''}/pet`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return new Response(JSON.stringify(data), {

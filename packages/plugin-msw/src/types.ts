@@ -16,6 +16,10 @@ export type ResolverMsw = Resolver & {
      * Resolves the exported handlers collection name.
      */
     listName(): string
+    /**
+     * Resolves the exported factory function name that creates the handlers collection.
+     */
+    createListName?(name?: string): string
   }
 }
 
@@ -27,8 +31,16 @@ export type ResolverMsw = Resolver & {
  */
 export type Options = OutputOptions & {
   /**
-   * Base URL prepended to every handler's request URL. When omitted, falls back
-   * to the adapter's server URL (typically `servers[0].url`).
+   * Base URL prepended to every handler's request URL: a fixed string (e.g. `'https://api.example.com'`)
+   * or a dynamic template string (e.g. `'${process.env.API_URL}'`).
+   *
+   * A handler also takes `{ baseURL }` as its second argument, which overrides this option per call:
+   * `listPetsHandler(undefined, { baseURL: 'https://staging.example.com' })`.
+   *
+   * When `handlers: true` is configured, `createHandlers({ baseURL })` can be used to pass
+   * a runtime base URL to all handlers at once.
+   *
+   * @note Do not include a trailing slash in the base URL, as OpenAPI operation paths already begin with `/`.
    */
   baseURL?: string
   /**
@@ -53,7 +65,8 @@ export type Options = OutputOptions & {
   macros?: Array<ast.Macro>
   /**
    * Emit a `handlers.ts` file that re-exports every handler in operation order.
-   * Drop the file into `setupServer(...handlers)` or `setupWorker(...handlers)`.
+   * Exports `createHandlers(options?: { baseURL?: string })` factory and `handlers` default collection.
+   * Drop the file into `setupServer(...handlers)` or `setupServer(...createHandlers({ baseURL }))`.
    *
    * @default false
    */

@@ -1,3 +1,4 @@
+import { camelCase } from '@internals/utils'
 import { ast, defineGenerator } from 'kubb/kit'
 import type { PluginMsw } from '../types'
 
@@ -14,6 +15,7 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
     const { output, group } = ctx.options
 
     const handlersName = resolver.handler.listName()
+    const createHandlersName = resolver.handler.createListName ? resolver.handler.createListName(handlersName) : camelCase(handlersName, { prefix: 'create' })
     const file = resolver.file({ name: handlersName, extname: '.ts', root, output, group: group ?? undefined })
 
     const imports = nodes.map((node) => {
@@ -30,7 +32,7 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
       return ast.factory.createImport({ name: [operationName], root: file.path, path: operationFile.path })
     })
 
-    const handlers = nodes.map((node) => `${resolver.handler.name(node)}()`)
+    const handlers = nodes.map((node) => `${resolver.handler.name(node)}(undefined, options)`)
 
     return [
       ast.factory.createFile({
@@ -42,10 +44,20 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
         imports,
         sources: [
           ast.factory.createSource({
+            name: createHandlersName,
+            isIndexable: true,
+            isExportable: true,
+            nodes: [
+              ast.factory.createText(`export function ${createHandlersName}(options?: { baseURL?: string }) {
+  return [${handlers.join(', ')}] as const
+}`),
+            ],
+          }),
+          ast.factory.createSource({
             name: handlersName,
             isIndexable: true,
             isExportable: true,
-            nodes: [ast.factory.createText(`export const ${handlersName} = ${JSON.stringify(handlers).replaceAll('"', '')} as const`)],
+            nodes: [ast.factory.createText(`export const ${handlersName} = ${createHandlersName}()`)],
           }),
         ],
       }),

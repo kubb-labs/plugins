@@ -3,6 +3,22 @@ import type { ResolverFaker } from '@kubb/plugin-faker'
 import type { PluginMsw } from './types.ts'
 
 /**
+ * Resolves the default base URL expression embedded in the generated handler.
+ * - Template string with interpolation (`${...}`): emits a template literal preserving dynamic runtime evaluation.
+ * - Static string: emits a JSON-stringified string literal.
+ * - Empty / falsy: emits empty string `''`.
+ */
+export function resolveDefaultBaseURL(baseURL: string | null | undefined): string {
+  if (!baseURL) {
+    return "''"
+  }
+  if (baseURL.includes('${')) {
+    return `\`${baseURL.replaceAll('`', '\\`')}\``
+  }
+  return JSON.stringify(baseURL)
+}
+
+/**
  * Gets the content type from a response, defaulting to 'application/json' if a schema exists.
  */
 export function getContentType(response: ast.ResponseNode | null | undefined): string | null {

@@ -16,8 +16,8 @@ export function uploadFileHandlerResponse200(data: UploadFileResponse) {
   })
 }
 
-export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, UploadFileBody>) {
-  return http.post<Record<string, string>, UploadFileBody>(`http://localhost:3000/pet/:petId/uploadImage`, function handler(info) {
+export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, UploadFileBody>, options?: { baseURL?: string }) {
+  return http.post<Record<string, string>, UploadFileBody>(`${options?.baseURL ?? 'http://localhost:3000'}/pet/:petId/uploadImage`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
