@@ -15,7 +15,7 @@ export default defineConfig(() => {
       format: false,
       postGenerate: ['npm run typecheck'],
     },
-    adapter: adapterOas({ unknownType: 'unknown', collisionDetection: false, enums: 'root' }),
+    adapter: adapterOas({ unknownType: 'unknown', enums: 'root' }),
     plugins: [
       pluginTs({
         output: {
@@ -30,7 +30,9 @@ export default defineConfig(() => {
         },
         group: {
           type: 'tag',
-          output: './mocks/{{tag}}Mocks',
+          name({ group }) {
+            return `${group}Mocks`
+          },
         },
         seed: [220],
       }),

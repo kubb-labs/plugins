@@ -28,7 +28,6 @@ module.exports = defineConfig(() => {
           output: {
             path: './tag',
             mode: 'directory',
-            barrelType: 'propagate',
           },
           include: [
             {
@@ -49,7 +48,7 @@ module.exports = defineConfig(() => {
         format: false,
         postGenerate: ['npm run typecheck'],
       },
-      adapter: adapterOas({ unknownType: 'unknown' }),
+      adapter: adapterOas({ unknownType: 'unknown', dateType: 'string' }),
       plugins: [
         pluginTs({
           output: {
@@ -61,29 +60,6 @@ module.exports = defineConfig(() => {
           output: {
             path: './faker',
             mode: 'directory',
-          },
-          transformers: {
-            schema({ schema: _schema, name, parentName }, defaultSchemas) {
-              /* override a property with name 'name'
-               Pet:
-                  required:
-                    - name
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                      example: doggie
-            */
-              if (parentName === 'Pet' && name === 'name') {
-                // see mapper where we map `productionName` to `faker.commerce.productName`, the original name will be kept.
-                return [...defaultSchemas, { keyword: 'name', args: 'productName' }]
-              }
-              return undefined
-            },
-          },
-          mapper: {
-            productName: 'faker.commerce.productName()',
-            message: 'faker.string.alpha({casing: "lower"})',
           },
           include: [
             {
@@ -102,7 +78,6 @@ module.exports = defineConfig(() => {
               type: 'schemaName',
               pattern: /Order/i,
               options: {
-                dateType: 'string',
                 dateParser: 'dayjs',
               },
             },

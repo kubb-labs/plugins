@@ -20,7 +20,7 @@ export default defineConfig([
       format: 'auto',
       postGenerate: ['npm run typecheck'],
     },
-    adapter: adapterOas({ unknownType: 'unknown', collisionDetection: false, enums: 'root' }),
+    adapter: adapterOas({ unknownType: 'unknown', enums: 'root' }),
     parsers: [parserTs({ extension: { '.ts': '' } }), parserTsx()],
     plugins: [
       pluginRedoc({
@@ -29,7 +29,7 @@ export default defineConfig([
         },
       }),
       pluginTs({
-        output: { path: 'models.ts', mode: 'file', clean: true },
+        output: { path: 'models.ts', mode: 'file' },
       }),
       pluginFetch({
         output: { path: './clients', mode: 'directory', barrel: { type: 'named' } },
