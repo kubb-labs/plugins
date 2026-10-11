@@ -1285,6 +1285,51 @@ describe('printerZodMini', () => {
     })
   })
 
+  describe('coercion', () => {
+    test('coercion: true coerces strings, numbers, and dates', () => {
+      const p = printerZodMini({ coercion: true })
+      expect(p.print(ast.factory.createSchema({ type: 'string' }))).toBe('z.coerce.string()')
+      expect(p.print(ast.factory.createSchema({ type: 'number' }))).toBe('z.coerce.number()')
+      expect(p.print(ast.factory.createSchema({ type: 'integer' }))).toBe('z.coerce.number().check(z.int())')
+      expect(p.print(ast.factory.createSchema({ type: 'date', representation: 'date' }))).toBe('z.coerce.date()')
+    })
+
+    test('granular coercion only coerces the selected primitives', () => {
+      const p = printerZodMini({ coercion: { strings: true, numbers: false } })
+      expect(p.print(ast.factory.createSchema({ type: 'string' }))).toBe('z.coerce.string()')
+      expect(p.print(ast.factory.createSchema({ type: 'number' }))).toBe('z.number()')
+      expect(p.print(ast.factory.createSchema({ type: 'date', representation: 'date' }))).toBe('z.date()')
+    })
+
+    test('string coercion keeps length checks and replaces format helpers', () => {
+      const p = printerZodMini({ coercion: { strings: true } })
+      expect(p.print(ast.factory.createSchema({ type: 'string', min: 1, max: 10 }))).toBe('z.coerce.string().check(z.minLength(1), z.maxLength(10))')
+      expect(p.print(ast.factory.createSchema({ type: 'string', format: 'base64' }))).toBe('z.coerce.string()')
+    })
+
+    test('integer coercion replaces the int32 helper and keeps number checks', () => {
+      const p = printerZodMini({ coercion: { numbers: true } })
+      expect(p.print(ast.factory.createSchema({ type: 'integer', format: 'int32', min: 1 }))).toBe('z.coerce.number().check(z.int()).check(z.minimum(1))')
+    })
+
+    test('ISO string dates and times are never coerced', () => {
+      const p = printerZodMini({ coercion: true })
+      expect(p.print(ast.factory.createSchema({ type: 'date', representation: 'string' }))).toBe('z.iso.date()')
+      expect(p.print(ast.factory.createSchema({ type: 'time', representation: 'string' }))).toBe('z.iso.time()')
+    })
+
+    test('coerced schemas parse string input at runtime', () => {
+      const p = printerZodMini({ coercion: true })
+      const integer = new Function('z', `return ${p.print(ast.factory.createSchema({ type: 'integer', min: 1 }))}`)(z)
+      const date = new Function('z', `return ${p.print(ast.factory.createSchema({ type: 'date', representation: 'date' }))}`)(z)
+
+      expect(z.parse(integer, '5')).toBe(5)
+      expect(z.safeParse(integer, '1.5').success).toBe(false)
+      expect(z.safeParse(integer, '0').success).toBe(false)
+      expect(z.parse(date, '2024-01-02')).toBeInstanceOf(Date)
+    })
+  })
+
   describe('nodes override', () => {
     test('overrides a single node type', () => {
       const p = printerZodMini({ nodes: { date: () => 'z.iso.date()' } })

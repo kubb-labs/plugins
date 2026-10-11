@@ -14,6 +14,7 @@ import {
   numberChecksMini,
   omitUnwrapChain,
   patternKeySchemaMini,
+  shouldCoerce,
 } from '../utils.ts'
 
 /**
@@ -41,6 +42,10 @@ import {
 export type PrinterZodMiniNodes = ast.PrinterPartial<string, PrinterZodMiniOptions>
 
 export type PrinterZodMiniOptions = {
+  /**
+   * Enable automatic type coercion for strings, numbers, and dates through `z.coerce.*()`.
+   */
+  coercion?: PluginZod['resolvedOptions']['coercion']
   /**
    * Use `z.guid()` or `z.uuid()` for UUID/GUID validation.
    *
@@ -165,33 +170,43 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
       boolean: () => 'z.boolean()',
       null: () => 'z.null()',
       string(node) {
-        if (node.format === 'byte' || node.format === 'base64') {
-          return `z.base64()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
-        }
-        if (node.format === 'base64url') {
-          return `z.base64url()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
-        }
-        if (node.format === 'jwt') {
-          return `z.jwt()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
-        }
-        if (node.format === 'ulid') {
-          return `z.ulid()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
-        }
-        if (node.format === 'iban') {
-          return `z.iban()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
-        }
-        if (node.format === 'duration') {
-          return `z.iso.duration()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
+        const coerce = shouldCoerce(this.options.coercion, 'strings')
+
+        if (!coerce) {
+          if (node.format === 'byte' || node.format === 'base64') {
+            return `z.base64()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
+          }
+          if (node.format === 'base64url') {
+            return `z.base64url()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
+          }
+          if (node.format === 'jwt') {
+            return `z.jwt()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
+          }
+          if (node.format === 'ulid') {
+            return `z.ulid()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
+          }
+          if (node.format === 'iban') {
+            return `z.iban()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
+          }
+          if (node.format === 'duration') {
+            return `z.iso.duration()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
+          }
         }
 
+        const base = coerce ? 'z.coerce.string()' : 'z.string()'
         const pattern = node.pattern ?? integerFormatPattern(node.format)
 
-        return `z.string()${lengthChecksMini({ ...node, pattern, regexType: this.options.regexType })}`
+        return `${base}${lengthChecksMini({ ...node, pattern, regexType: this.options.regexType })}`
       },
       number(node) {
-        return `z.number()${numberChecksMini(node)}`
+        const base = shouldCoerce(this.options.coercion, 'numbers') ? 'z.coerce.number()' : 'z.number()'
+
+        return `${base}${numberChecksMini(node)}`
       },
       integer(node) {
+        if (shouldCoerce(this.options.coercion, 'numbers')) {
+          return `z.coerce.number().check(z.int())${numberChecksMini(node)}`
+        }
         if (node.format === 'int32') {
           return `z.int32()${numberChecksMini(node)}`
         }
@@ -209,7 +224,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           return 'z.iso.date()'
         }
 
-        return 'z.date()'
+        return shouldCoerce(this.options.coercion, 'dates') ? 'z.coerce.date()' : 'z.date()'
       },
       datetime() {
         // Mini mode: datetime validation via z.string() (z.iso.datetime not available in mini)
