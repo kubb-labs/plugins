@@ -20,7 +20,7 @@
     "generate:debug": "NODE_OPTIONS='--inspect-brk' KUBB_DISABLE_TELEMETRY=1 kubb generate",
     "init": "kubb init -y",
     "generate:ts": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config configs/kubb.config.ts",
-    "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@faker-js/faker": "^10.6.0",

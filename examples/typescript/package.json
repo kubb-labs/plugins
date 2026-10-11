@@ -15,7 +15,7 @@
     "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate",
     "generate:debug": "NODE_OPTIONS='--inspect-brk' KUBB_DISABLE_TELEMETRY=1 kubb generate",
     "validate": "kubb validate petStore.yaml",
-    "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@kubb/adapter-oas": "catalog:",

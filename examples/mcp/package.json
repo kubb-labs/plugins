@@ -13,7 +13,7 @@
   "sideEffects": false,
   "scripts": {
     "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.ts",
-    "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@kubb/adapter-oas": "catalog:",

@@ -13,7 +13,7 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@kubb/adapter-oas": "catalog:",

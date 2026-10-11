@@ -16,7 +16,7 @@
     "generate": "kubb generate",
     "generate:petstore": "kubb generate --config kubb-petstore.config.js",
     "generate:debug": "KUBB_DISABLE_TELEMETRY=1 NODE_OPTIONS='--inspect-brk' kubb generate",
-    "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@faker-js/faker": "^10.6.0",
