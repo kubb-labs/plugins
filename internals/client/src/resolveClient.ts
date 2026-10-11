@@ -7,8 +7,8 @@
  *
  * - `contract` — a registered contract client plugin owns the `<op>` functions and the consumer
  *   imports and calls them.
- * - `error` — no client plugin is registered, several are registered without a selector, or the
- *   requested one is missing.
+ * - `error` — no client plugin is registered, several are registered without a selector, the
+ *   requested one is missing, or `client` is not a known selector.
  *
  * The `client` string selects explicitly (`'fetch'` / `'axios'`); when it is unset a lone registered
  * contract client plugin is picked up automatically.
@@ -76,6 +76,14 @@ export function resolveClient(options: { client: ClientSelector | undefined; plu
       }
     }
     return { kind: 'contract', pluginName }
+  }
+
+  // A JS config bypasses the `ClientSelector` type, so reject unknown selectors instead of auto-detecting.
+  if (client !== undefined) {
+    return {
+      kind: 'error',
+      message: `Option \`client\` is ${typeof client === 'string' ? `'${client}'` : String(client)}, but it must be one of 'fetch', 'axios'. Drop \`client\` to use the registered client plugin.`,
+    }
   }
 
   // `client` unset: auto-detect a lone registered contract client plugin.
