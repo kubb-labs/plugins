@@ -6,13 +6,11 @@
 import type { Tag } from '../types/Tag'
 import { fakerDE as faker } from '@faker-js/faker'
 
-export function createTag<TData extends Partial<Tag> = object>(data?: TData)
-
-{
+export function createTag<TData extends Partial<Tag> = object>(data?: TData) {
   const defaultFakeData = {
-  id: faker.number.bigInt(),
-  name: faker.string.alpha(),
-}
+    id: faker.number.bigInt(),
+    name: faker.string.alpha(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

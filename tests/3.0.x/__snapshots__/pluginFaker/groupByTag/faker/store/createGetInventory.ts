@@ -6,11 +6,9 @@
 import type { GetInventoryResponse, GetInventoryStatus200 } from '../../types/GetInventory'
 
 /**
-   * @description successful operation
-   */
-  export function createGetInventoryStatus200<TData extends Partial<GetInventoryStatus200> = object>(data?: TData)
-
-{
+ * @description successful operation
+ */
+export function createGetInventoryStatus200<TData extends Partial<GetInventoryStatus200> = object>(data?: TData) {
   const defaultFakeData = {}
   return {
     ...defaultFakeData,

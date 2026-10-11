@@ -7,24 +7,20 @@ import type { UploadFilePath, UploadFileQuery, UploadFileResponse, UploadFileSta
 import { createApiResponse } from './createApiResponse'
 import { fakerDE as faker } from '@faker-js/faker'
 
-export function createUploadFilePath<TData extends Partial<UploadFilePath> = object>(data?: TData)
-
-{
+export function createUploadFilePath<TData extends Partial<UploadFilePath> = object>(data?: TData) {
   const defaultFakeData = {
-  petId: faker.number.bigInt(),
-}
+    petId: faker.number.bigInt(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createUploadFileQuery<TData extends Partial<UploadFileQuery> = object>(data?: TData)
-
-{
+export function createUploadFileQuery<TData extends Partial<UploadFileQuery> = object>(data?: TData) {
   const defaultFakeData = {
-  additionalMetadata: faker.string.alpha(),
-}
+    additionalMetadata: faker.string.alpha(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

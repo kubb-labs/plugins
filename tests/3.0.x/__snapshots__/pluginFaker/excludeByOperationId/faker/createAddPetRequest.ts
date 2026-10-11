@@ -9,17 +9,15 @@ import { createCategory } from './createCategory'
 import { createTag } from './createTag'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createAddPetRequest<TData extends Partial<AddPetRequest> = object>(data?: TData)
-
-{
+export function createAddPetRequest<TData extends Partial<AddPetRequest> = object>(data?: TData) {
   const defaultFakeData = {
-  id: faker.number.bigInt(),
-  name: faker.string.alpha(),
-  category: createCategory(),
-  photoUrls: faker.helpers.multiple(() => (faker.string.alpha())),
-  tags: faker.helpers.multiple(() => (createTag())),
-  status: createAddPetRequestStatusEnum(),
-}
+    id: faker.number.bigInt(),
+    name: faker.string.alpha(),
+    category: createCategory(),
+    photoUrls: faker.helpers.multiple(() => (faker.string.alpha())),
+    tags: faker.helpers.multiple(() => (createTag())),
+    status: createAddPetRequestStatusEnum(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

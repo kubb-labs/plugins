@@ -8,37 +8,31 @@ import { createPet } from './createPet'
 import { createPetUpdate } from './createPetUpdate'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createUpdatePetPath<TData extends Partial<UpdatePetPath> = object>(data?: TData)
-
-{
+export function createUpdatePetPath<TData extends Partial<UpdatePetPath> = object>(data?: TData) {
   const defaultFakeData = {
-  pet_id: faker.string.alpha(),
-}
+    pet_id: faker.string.alpha(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createUpdatePetQuery<TData extends Partial<UpdatePetQuery> = object>(data?: TData)
-
-{
+export function createUpdatePetQuery<TData extends Partial<UpdatePetQuery> = object>(data?: TData) {
   const defaultFakeData = {
-  include_deleted: faker.datatype.boolean(),
-  request_source: faker.string.alpha(),
-}
+    include_deleted: faker.datatype.boolean(),
+    request_source: faker.string.alpha(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createUpdatePetHeaders<TData extends Partial<UpdatePetHeaders> = object>(data?: TData)
-
-{
+export function createUpdatePetHeaders<TData extends Partial<UpdatePetHeaders> = object>(data?: TData) {
   const defaultFakeData = {
-  'X-Request-ID': faker.string.alpha(),
-}
+    'X-Request-ID': faker.string.alpha(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

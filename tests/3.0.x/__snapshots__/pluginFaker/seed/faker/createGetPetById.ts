@@ -9,12 +9,10 @@ import { fakerEN as faker } from '@faker-js/faker'
 
 faker.seed([42])
 
-export function createGetPetByIdPath<TData extends Partial<GetPetByIdPath> = object>(data?: TData)
-
-{
+export function createGetPetByIdPath<TData extends Partial<GetPetByIdPath> = object>(data?: TData) {
   const defaultFakeData = {
-  petId: faker.number.bigInt(),
-}
+    petId: faker.number.bigInt(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

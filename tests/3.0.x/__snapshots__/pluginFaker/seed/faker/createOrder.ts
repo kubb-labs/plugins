@@ -9,17 +9,15 @@ import { fakerEN as faker } from '@faker-js/faker'
 
 faker.seed([42])
 
-export function createOrder<TData extends Partial<Order> = object>(data?: TData)
-
-{
+export function createOrder<TData extends Partial<Order> = object>(data?: TData) {
   const defaultFakeData = {
-  id: faker.number.bigInt(),
-  petId: faker.number.bigInt(),
-  quantity: faker.number.int(),
-  shipDate: faker.date.anytime().toISOString(),
-  status: createOrderStatusEnum(),
-  complete: faker.datatype.boolean(),
-}
+    id: faker.number.bigInt(),
+    petId: faker.number.bigInt(),
+    quantity: faker.number.int(),
+    shipDate: faker.date.anytime().toISOString(),
+    status: createOrderStatusEnum(),
+    complete: faker.datatype.boolean(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

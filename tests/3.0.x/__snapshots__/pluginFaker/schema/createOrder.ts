@@ -6,17 +6,15 @@
 import type { Order } from '../types/Order'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createOrder(data?: Partial<Order>): Order
-
-{
+export function createOrder(data?: Partial<Order>): Order {
   const defaultFakeData = {
-  id: faker.number.bigInt(),
-  petId: faker.number.bigInt(),
-  quantity: faker.number.int(),
-  shipDate: faker.date.anytime().toISOString(),
-  status: faker.helpers.arrayElement<NonNullable<Order>["status"]>(['placed', 'approved', 'delivered']),
-  complete: faker.datatype.boolean(),
-}
+    id: faker.number.bigInt(),
+    petId: faker.number.bigInt(),
+    quantity: faker.number.int(),
+    shipDate: faker.date.anytime().toISOString(),
+    status: faker.helpers.arrayElement<NonNullable<Order>["status"]>(['placed', 'approved', 'delivered']),
+    complete: faker.datatype.boolean(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

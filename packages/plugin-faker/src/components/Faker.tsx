@@ -97,11 +97,6 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
   }
 
   // Generate function with defaultFakeData structure
-  const jsdoc = description ? `/**\n   * @description ${jsStringEscape(description)}\n   */\n  ` : ''
-  const functionSignature =
-    typeMode === 'schema'
-      ? `${jsdoc}export function ${name}(data?: Partial<${typeName}>): ${typeName}`
-      : `${jsdoc}export function ${name}<TData extends Partial<${typeName}> = object>(data?: TData)`
   const returnType = typeMode === 'schema' ? typeName : 'Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>'
 
   // When the object node has properties that transitively reference a cyclic schema,
@@ -116,27 +111,31 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
     (node.properties ?? []).some((p) => containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
 
   const functionBody = hasGetters
-    ? `{
-  const defaultFakeData = ${fakerText}
-  if (data) {
-    for (const [key, value] of Object.entries(data)) {
-      Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
-    }
+    ? `const defaultFakeData = ${fakerText}
+if (data) {
+  for (const [key, value] of Object.entries(data)) {
+    Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
   }
-  return defaultFakeData as ${returnType}
-}`
-    : `{
-  const defaultFakeData = ${fakerText}
-  return {
-    ...defaultFakeData,
-    ...(data || {}),
-  } as ${returnType}
-}`
+}
+return defaultFakeData as ${returnType}`
+    : `const defaultFakeData = ${fakerText}
+return {
+  ...defaultFakeData,
+  ...(data || {}),
+} as ${returnType}`
 
   return (
     <File.Source name={name} isExportable isIndexable>
-      {functionSignature}
-      {functionBody}
+      <Function
+        export
+        name={name}
+        JSDoc={{ comments: description ? [`@description ${jsStringEscape(description)}`] : [] }}
+        generics={typeMode === 'schema' ? undefined : `TData extends Partial<${typeName}> = object`}
+        params={typeMode === 'schema' ? `data?: Partial<${typeName}>` : 'data?: TData'}
+        returnType={typeMode === 'schema' ? typeName : undefined}
+      >
+        {functionBody}
+      </Function>
     </File.Source>
   )
 }

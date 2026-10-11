@@ -7,17 +7,15 @@ import type { Order } from '../types/Order'
 import { createOrderStatusEnum } from './createOrderStatusEnum'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createOrder<TData extends Partial<Order> = object>(data?: TData)
-
-{
+export function createOrder<TData extends Partial<Order> = object>(data?: TData) {
   const defaultFakeData = {
-  id: faker.number.bigInt(),
-  petId: faker.number.bigInt(),
-  quantity: faker.number.int(),
-  shipDate: faker.date.anytime().toISOString(),
-  status: createOrderStatusEnum(),
-  complete: faker.datatype.boolean(),
-}
+    id: faker.number.bigInt(),
+    petId: faker.number.bigInt(),
+    quantity: faker.number.int(),
+    shipDate: faker.date.anytime().toISOString(),
+    status: createOrderStatusEnum(),
+    complete: faker.datatype.boolean(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

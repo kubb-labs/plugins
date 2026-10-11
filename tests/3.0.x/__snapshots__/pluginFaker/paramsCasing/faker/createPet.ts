@@ -6,13 +6,11 @@
 import type { Pet } from '../types/Pet'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createPet<TData extends Partial<Pet> = object>(data?: TData)
-
-{
+export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
   const defaultFakeData = {
-  id: faker.string.alpha(),
-  name: faker.string.alpha(),
-}
+    id: faker.string.alpha(),
+    name: faker.string.alpha(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

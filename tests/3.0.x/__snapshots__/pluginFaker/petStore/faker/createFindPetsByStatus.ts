@@ -8,12 +8,10 @@ import { createFindPetsByStatusStatus } from './createFindPetsByStatusStatus'
 import { createPet } from './createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createFindPetsByStatusQuery<TData extends Partial<FindPetsByStatusQuery> = object>(data?: TData)
-
-{
+export function createFindPetsByStatusQuery<TData extends Partial<FindPetsByStatusQuery> = object>(data?: TData) {
   const defaultFakeData = {
-  status: createFindPetsByStatusStatus(),
-}
+    status: createFindPetsByStatusStatus(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

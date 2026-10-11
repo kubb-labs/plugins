@@ -381,6 +381,37 @@ describe('fakerGenerator — schema', () => {
     expect(output).toContain('export function createEmoji(data?: string): string')
     expect(output).not.toContain('import type { Emoji }')
   })
+
+  test.each([
+    { typeMode: 'inferred' as const, signature: 'export function createPet<TData extends Partial<Pet> = object>(data?: TData) {' },
+    { typeMode: 'schema' as const, signature: 'export function createPet(data?: Partial<Pet>): Pet {' },
+  ])('object factory keeps its opening brace on the signature line before formatting ($typeMode)', async ({ typeMode, signature }) => {
+    const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, typeMode }
+    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
+    const driver = createMockedPluginDriver({
+      name: 'pet',
+      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorSchema(
+      fakerGenerator,
+      { ...petSchema, description: 'A pet' },
+      {
+        config: testConfig,
+        adapter: createMockedAdapter(),
+        driver,
+        plugin,
+        options: resolvedOptions,
+        resolver: resolverFaker,
+      },
+    )
+
+    const file = driver.fileManager.files.find((item) => item.baseName === 'createPet.ts')
+    const output = await parserTs().parse(file!)
+
+    expect(output).toContain(`/**\n * @description A pet\n */\n${signature}`)
+    expect(output).not.toMatch(/^\s+export function/m)
+  })
 })
 
 describe('fakerGenerator — operation', () => {

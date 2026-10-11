@@ -10,12 +10,10 @@ import { fakerEN as faker } from '@faker-js/faker'
 
 faker.seed([42])
 
-export function createFindPetsByStatusQuery<TData extends Partial<FindPetsByStatusQuery> = object>(data?: TData)
-
-{
+export function createFindPetsByStatusQuery<TData extends Partial<FindPetsByStatusQuery> = object>(data?: TData) {
   const defaultFakeData = {
-  status: createFindPetsByStatusStatus(),
-}
+    status: createFindPetsByStatusStatus(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

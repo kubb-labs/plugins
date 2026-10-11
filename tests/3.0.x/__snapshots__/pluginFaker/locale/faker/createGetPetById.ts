@@ -7,12 +7,10 @@ import type { GetPetByIdPath, GetPetByIdResponse, GetPetByIdStatus200, GetPetByI
 import { createPet } from './createPet'
 import { fakerDE as faker } from '@faker-js/faker'
 
-export function createGetPetByIdPath<TData extends Partial<GetPetByIdPath> = object>(data?: TData)
-
-{
+export function createGetPetByIdPath<TData extends Partial<GetPetByIdPath> = object>(data?: TData) {
   const defaultFakeData = {
-  petId: faker.number.bigInt(),
-}
+    petId: faker.number.bigInt(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

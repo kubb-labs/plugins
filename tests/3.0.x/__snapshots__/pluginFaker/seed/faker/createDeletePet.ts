@@ -8,24 +8,20 @@ import { fakerEN as faker } from '@faker-js/faker'
 
 faker.seed([42])
 
-export function createDeletePetPath<TData extends Partial<DeletePetPath> = object>(data?: TData)
-
-{
+export function createDeletePetPath<TData extends Partial<DeletePetPath> = object>(data?: TData) {
   const defaultFakeData = {
-  petId: faker.number.bigInt(),
-}
+    petId: faker.number.bigInt(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createDeletePetHeaders<TData extends Partial<DeletePetHeaders> = object>(data?: TData)
-
-{
+export function createDeletePetHeaders<TData extends Partial<DeletePetHeaders> = object>(data?: TData) {
   const defaultFakeData = {
-  api_key: faker.string.alpha(),
-}
+    api_key: faker.string.alpha(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),
