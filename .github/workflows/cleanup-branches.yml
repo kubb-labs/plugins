@@ -8,23 +8,18 @@ permissions: {}
 
 jobs:
   delete-branch:
-    # Bot-generated `chore/update-generated-examples-*` branches are excepted from the
-    # merged-only guard: their PR targets the source PR's own branch (see pr.yml), so when
-    # that source branch merges or closes first, GitHub auto-closes this PR unmerged and
-    # the branch would otherwise never get cleaned up.
-    if: >-
-      github.event.pull_request.merged == true ||
-      startsWith(github.event.pull_request.head.ref, 'chore/update-generated-examples-')
+    # GitHub deletes merged branches. A bot PR from pr.yml targets the source PR's branch,
+    # so GitHub closes it unmerged once that branch merges or closes, and keeps its branch.
+    if: startsWith(github.event.pull_request.head.ref, 'chore/update-generated-examples-')
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Delete merged branch
+      - name: Delete bot branch
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
           script: |
             const branch = context.payload.pull_request.head.ref;
-            if (['master', 'next'].includes(branch)) return;
             try {
               await github.rest.git.deleteRef({
                 owner: context.repo.owner,
