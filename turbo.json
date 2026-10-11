@@ -12,8 +12,6 @@
       "cache": false
     },
     "start": {
-      "dependsOn": ["^start"],
-      "outputs": ["dist/**"],
       "cache": false,
       "persistent": true
     },

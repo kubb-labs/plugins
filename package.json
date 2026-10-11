@@ -29,7 +29,7 @@
     "lint": "oxlint -c oxlint.config.ts ./packages ./examples",
     "lint:fix": "oxlint -c oxlint.config.ts --fix ./packages ./examples",
     "postgenerate": "pnpm run lint:fix && pnpm run format",
-    "start": "turbo run start --filter=./packages/*",
+    "start": "turbo run start --filter='./packages/*...' --concurrency=20",
     "test": "vitest run --config ./configs/vitest.config.ts",
     "test:bench": "vitest bench --config ./configs/vitest.bench.config.ts",
     "test:watch": "vitest --config ./configs/vitest.config.ts",
