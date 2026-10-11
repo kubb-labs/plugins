@@ -27,8 +27,8 @@ export type ResolverMsw = Resolver & {
  */
 export type Options = OutputOptions & {
   /**
-   * Base URL prepended to every handler's request URL. When omitted, falls back
-   * to the adapter's server URL (typically `servers[0].url`).
+   * Base URL prepended to every handler's request URL. When omitted, handlers match the
+   * operation path only (for example `/pets/:petId`). The adapter's server URL is not used.
    */
   baseURL?: string
   /**

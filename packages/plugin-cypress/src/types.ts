@@ -13,8 +13,8 @@ export type ResolverCypress = Resolver
  */
 export type Options = OutputOptions & {
   /**
-   * Base URL prepended to every request URL. When omitted, falls back to the
-   * adapter's server URL (typically `servers[0].url`).
+   * Base URL prepended to every request URL. When omitted, requests use the operation path
+   * only, so Cypress resolves it against its own `baseUrl`. The adapter's server URL is not used.
    */
   baseURL?: string
   /**
