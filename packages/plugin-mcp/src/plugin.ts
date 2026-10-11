@@ -1,4 +1,4 @@
-import { createGroupConfig } from '@internals/shared'
+import { assertPluginRegistered, createGroupConfig } from '@internals/shared'
 
 import { resolveContractClient } from '@internals/client'
 import { definePlugin, Resolver } from 'kubb/kit'
@@ -62,6 +62,13 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
     dependencies: [pluginTsName, pluginZodName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
+        assertPluginRegistered({
+          plugins: ctx.config.plugins,
+          pluginName: pluginZodName,
+          requiredBy: pluginMcpName,
+          reason: 'to build the tool schemas in `server.ts`',
+        })
+
         const resolver = userResolver ? Resolver.merge<ResolverMcp>(resolverMcp, userResolver) : resolverMcp
 
         ctx.setOptions({

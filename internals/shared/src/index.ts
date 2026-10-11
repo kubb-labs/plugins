@@ -55,3 +55,4 @@ export {
 export { collectRefNames } from './refs.ts'
 export { createGroupConfig } from './group.ts'
 export { mapSchemaItems, mapSchemaMembers, mapSchemaProperties } from './schemaTraversal.ts'
+export { assertPluginRegistered } from './plugins.ts'

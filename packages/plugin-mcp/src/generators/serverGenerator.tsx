@@ -22,8 +22,9 @@ export const serverGenerator = defineGenerator<PluginMcp>({
 
     const pluginZod = driver.getPlugin(pluginZodName)
 
+    // `kubb:plugin:setup` already fails when plugin-zod is missing, so this only guards direct generator use.
     if (!pluginZod) {
-      return
+      throw new Error(`\`@kubb/${plugin.name}\` needs \`@kubb/${pluginZodName}\` to build \`server.ts\`, but it is not registered in \`plugins\`.`)
     }
 
     const zodResolver = driver.getResolver(pluginZodName)
