@@ -14,9 +14,6 @@
   "sideEffects": false,
   "scripts": {
     "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.js -l info",
-    "generate:bun": "bun node_modules/@kubb/cli/bin/kubb.js generate --config kubb.config.js",
-    "generate:js": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config .kubbrc",
-    "generate:json": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.json",
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {

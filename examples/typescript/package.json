@@ -12,7 +12,6 @@
   },
   "sideEffects": false,
   "scripts": {
-    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
     "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate",
     "generate:debug": "NODE_OPTIONS='--inspect-brk' KUBB_DISABLE_TELEMETRY=1 kubb generate",
     "validate": "kubb validate petStore.yaml",
