@@ -4,7 +4,7 @@ name: Fetch Studio Connection
 on:
   workflow_dispatch:
   pull_request:
-    paths:
+    paths: &paths
       - 'examples/fetch/**'
       - 'packages/**'
       - 'internals/**'
@@ -14,13 +14,7 @@ on:
   # A snapshot of main is what pull requests compare with.
   push:
     branches: [main]
-    paths:
-      - 'examples/fetch/**'
-      - 'packages/**'
-      - 'internals/**'
-      - 'configs/**'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/fetch-example.yml'
+    paths: *paths
   # Snapshots expire after a week, so refresh main's even without a push.
   schedule:
     - cron: '17 6 * * 1,4'
@@ -47,9 +41,6 @@ jobs:
         with:
           node-version: '22.22.3'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
       - name: Build plugins
         run: pnpm build --concurrency=3
 
@@ -60,5 +51,3 @@ jobs:
           token: ${{ secrets.KUBB_TOKEN }}
           working-directory: examples/fetch
           config: 'kubb.config.ts'
-        #env:
-          #KUBB_STUDIO_URL: https://dev.kubb.studio
