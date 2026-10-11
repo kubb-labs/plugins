@@ -1,5 +1,13 @@
 # @kubb/plugin-react-query
 
+## 5.2.1
+
+### Patch Changes
+
+- [#1054](https://github.com/kubb-labs/plugins/pull/1054) [`e4f599f`](https://github.com/kubb-labs/plugins/commit/e4f599fb5f516054a8faa12873296f9245733da2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Correct the `hooks` and `enum.type` doc comments so they match the defaults the plugins apply: `hooks` is off unless set to `true`, and `enum.type` stays `'asConst'`.
+- Updated dependencies [[`e4f599f`](https://github.com/kubb-labs/plugins/commit/e4f599fb5f516054a8faa12873296f9245733da2)]:
+  - @kubb/plugin-ts@5.0.6
+
 ## 5.2.0
 
 ### Minor Changes
