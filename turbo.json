@@ -20,22 +20,6 @@
       "cache": false,
       "persistent": true
     },
-    "test": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"],
-      "inputs": ["src/**/*.ts", "src/**/*.tsx", "test/**/*.ts", "test/**/*.tsx", "vitest.config.ts"]
-    },
-    "lint": {
-      "outputs": [],
-      "inputs": ["src/**/*.ts", "src/**/*.tsx", "package.json"],
-      "cache": false
-    },
-    "lint:fix": {
-      "outputs": ["src/**"],
-      "inputs": ["src/**/*.ts", "src/**/*.tsx", "package.json"],
-      "cache": false,
-      "outputLogs": "new-only"
-    },
     "typecheck": {
       "dependsOn": [],
       "inputs": ["src/**/*.ts", "src/**/*.tsx", "tsconfig.json"],

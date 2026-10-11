@@ -18,7 +18,6 @@
     "generate:js": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config .kubbrc",
     "generate:json": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.json",
     "generate:ts": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.js",
-    "test": "vitest --passWithNoTests",
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {

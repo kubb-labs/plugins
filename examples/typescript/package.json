@@ -16,7 +16,6 @@
     "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate",
     "generate:debug": "NODE_OPTIONS='--inspect-brk' KUBB_DISABLE_TELEMETRY=1 kubb generate",
     "validate": "kubb validate petStore.yaml",
-    "test": "vitest",
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {

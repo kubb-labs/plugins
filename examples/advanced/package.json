@@ -21,7 +21,6 @@
     "generate:debug": "NODE_OPTIONS='--inspect-brk' KUBB_DISABLE_TELEMETRY=1 kubb generate",
     "init": "kubb init -y",
     "generate:ts": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config configs/kubb.config.ts",
-    "test": "vitest",
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
