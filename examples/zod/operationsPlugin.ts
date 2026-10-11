@@ -85,6 +85,9 @@ export const pluginZodOperations = definePlugin(() => ({
             const output = zodOptions.output ?? { path: 'zod' }
             const group = zodOptions.group ?? undefined
             const importPath = zodOptions.importPath ?? 'zod'
+            // Match the `z` import plugin-zod emits, so a single-file `output.mode: 'file'` merges both into one import.
+            const isNamespaceImport = importPath === 'zod' || importPath === 'zod/mini'
+            const zodImport = ast.factory.createImport({ name: isNamespaceImport ? 'z' : ['z'], path: importPath, isNameSpace: isNamespaceImport })
 
             const operationsFile = resolver.file({ name: 'operations', extname: '.ts', root: gctx.root, output, group })
             const transformed = nodes.filter(ast.isHttpOperationNode).map((node) => ({ node, data: buildSchemaNames(node, resolver) }))
@@ -115,7 +118,7 @@ export const pluginZodOperations = definePlugin(() => ({
               ast.factory.createFile({
                 baseName: operationsFile.baseName,
                 path: operationsFile.path,
-                imports: [ast.factory.createImport({ name: ['z'], path: importPath, isTypeOnly: true }), ...imports],
+                imports: [zodImport, ...imports],
                 sources: [
                   ast.factory.createSource({
                     name: 'OperationSchema',
