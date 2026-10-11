@@ -20,12 +20,10 @@
   "type": "module",
   "scripts": {
     "build": "turbo run build --filter=./packages/*",
-    "build:examples": "turbo run build --filter=./examples/*",
     "changeset": "changeset",
     "clean": "turbo run clean",
     "format": "oxfmt -c oxfmt.config.ts packages internals configs examples",
-    "generate": "KUBB_DISABLE_TELEMETRY=1 turbo run generate --filter=./examples/* --continue --concurrency=5",
-    "graph": "npx nx graph ",
+    "generate": "turbo run generate --filter=./examples/* --continue --concurrency=5",
     "lint": "oxlint -c oxlint.config.ts ./packages ./examples",
     "lint:fix": "oxlint -c oxlint.config.ts --fix ./packages ./examples",
     "postgenerate": "pnpm run lint:fix && pnpm run format",

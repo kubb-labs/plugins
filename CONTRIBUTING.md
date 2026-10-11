@@ -83,7 +83,6 @@ Most plugins under `packages/` follow the same shape: `src/plugin.ts` defines th
 
 ```bash
 pnpm build               # Build all plugins
-pnpm build:examples      # Build the examples
 pnpm generate            # Regenerate every example against local plugins
 pnpm test                # Run all tests once
 pnpm test:watch          # Run tests in watch mode
