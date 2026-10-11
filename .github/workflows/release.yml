@@ -17,7 +17,7 @@ concurrency:
 jobs:
   release:
     name: Release
-    if: github.repository_owner == 'kubb-labs' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    if: github.repository_owner == 'kubb-labs'
     timeout-minutes: 15
     runs-on: ubuntu-latest
     # id-token: write enables npm OIDC trusted publishing — no NPM_TOKEN needed.
