@@ -6,7 +6,7 @@ This repository is home to both official and community plugins for [Kubb](https:
 - Have an idea for a plugin or improvement? [Open an issue](https://github.com/kubb-labs/plugins/issues/new) to share it.
 - Need help? Ask the community on [Discord](https://discord.gg/4dQjA6vrWX).
 
-Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating. Search the [issue tracker](https://github.com/kubb-labs/plugins/issues) before opening a new issue or PR. For significant changes, open an issue first and wait for maintainer feedback. Small fixes (typos, docs, tests) can go straight to a PR.
+Please read our [Code of Conduct](https://github.com/kubb-labs/.github/blob/main/CODE_OF_CONDUCT.md) before participating. Search the [issue tracker](https://github.com/kubb-labs/plugins/issues) before opening a new issue or PR. For significant changes, open an issue first and wait for maintainer feedback. Small fixes (typos, docs, tests) can go straight to a PR.
 
 ## Prerequisites
 
