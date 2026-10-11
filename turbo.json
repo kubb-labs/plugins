@@ -5,14 +5,11 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "*.d.ts", "*.d.cts", ".output/**"],
-      "inputs": ["src/**/*.ts", "server/**/*.ts", "src/**/*.tsx", "tsdown.config.ts", "nitro.config.ts", "package.json", "tsconfig.json"]
+      "outputs": ["dist/**"],
+      "inputs": ["src/**/*.ts", "src/**/*.tsx", "tsdown.config.ts", "package.json", "tsconfig.json"]
     },
     "clean": {
-      "dependsOn": ["^clean"],
-      "outputs": [],
-      "cache": false,
-      "outputLogs": "new-only"
+      "cache": false
     },
     "start": {
       "dependsOn": ["^start"],
@@ -21,15 +18,9 @@
       "persistent": true
     },
     "typecheck": {
-      "dependsOn": [],
-      "inputs": ["src/**/*.ts", "src/**/*.tsx", "tsconfig.json"],
-      "outputs": [],
       "cache": false
     },
     "generate": {
-      "dependsOn": [],
-      "outputs": ["src/gen/**"],
-      "inputs": ["kubb.config.ts", "package.json"],
       "cache": false
     }
   }
