@@ -1,14 +1,19 @@
-import { createGroupConfig } from '@internals/shared'
+import { assertOptionValue, createGroupConfig } from '@internals/shared'
 import { definePlugin, Resolver } from 'kubb/kit'
 import { typeGenerator } from './generators/typeGenerator.tsx'
 import { resolverTs } from './resolvers/resolverTs.ts'
-import type { PluginTs } from './types.ts'
+import type { PluginTs, ResolvedOptions } from './types.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-ts`. Used for driver lookups and
  * cross-plugin dependency references.
  */
 export const pluginTsName = 'plugin-ts' satisfies PluginTs['name']
+
+const allowedEnumTypes = ['asConst', 'enum', 'constEnum', 'literal', 'inlineLiteral'] satisfies Array<ResolvedOptions['enum']['type']>
+const allowedSyntaxTypes = ['type', 'interface'] satisfies Array<ResolvedOptions['syntaxType']>
+const allowedArrayTypes = ['array', 'generic'] satisfies Array<ResolvedOptions['arrayType']>
+const allowedOptionalTypes = ['questionToken', 'undefined', 'questionTokenAndUndefined'] satisfies Array<ResolvedOptions['optionalType']>
 
 /**
  * Generates TypeScript `type` aliases and `interface` declarations from an
@@ -64,6 +69,11 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
     options,
     hooks: {
       'kubb:plugin:setup'(ctx) {
+        assertOptionValue({ pluginName: pluginTsName, option: 'enum.type', value: resolvedEnum.type, allowed: allowedEnumTypes })
+        assertOptionValue({ pluginName: pluginTsName, option: 'syntaxType', value: syntaxType, allowed: allowedSyntaxTypes })
+        assertOptionValue({ pluginName: pluginTsName, option: 'arrayType', value: arrayType, allowed: allowedArrayTypes })
+        assertOptionValue({ pluginName: pluginTsName, option: 'optionalType', value: optionalType, allowed: allowedOptionalTypes })
+
         ctx.setOptions({
           output,
           exclude,
