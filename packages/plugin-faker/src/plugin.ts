@@ -60,6 +60,8 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
     dependencies: [pluginTsName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
+        ctx.requirePlugin(pluginTsName)
+
         ctx.setOptions({
           output,
           seed,

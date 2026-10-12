@@ -1,4 +1,4 @@
-import { assertPluginRegistered, createGroupConfig } from '@internals/shared'
+import { createGroupConfig } from '@internals/shared'
 import { definePlugin, Resolver } from 'kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -60,14 +60,8 @@ export const pluginMsw = definePlugin<PluginMsw>((options) => {
     dependencies: [pluginTsName, parser === 'faker' ? pluginFakerName : null].filter((dependency): dependency is string => Boolean(dependency)),
     hooks: {
       'kubb:plugin:setup'(ctx) {
-        if (parser === 'faker') {
-          assertPluginRegistered({
-            plugins: ctx.config.plugins,
-            pluginName: pluginFakerName,
-            requiredBy: pluginMswName,
-            reason: "for `parser: 'faker'`",
-          })
-        }
+        ctx.requirePlugin(pluginTsName)
+        if (parser === 'faker') ctx.requirePlugin(pluginFakerName)
 
         const resolver = userResolver ? Resolver.merge<ResolverMsw>(resolverMsw, userResolver) : resolverMsw
 

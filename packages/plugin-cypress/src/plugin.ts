@@ -54,6 +54,8 @@ export const pluginCypress = definePlugin<PluginCypress>((options) => {
     dependencies: [pluginTsName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
+        ctx.requirePlugin(pluginTsName)
+
         const resolver = userResolver ? Resolver.merge<ResolverCypress>(resolverCypress, userResolver) : resolverCypress
 
         ctx.setOptions({

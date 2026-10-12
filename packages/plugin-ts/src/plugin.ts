@@ -1,5 +1,5 @@
-import { assertOptionValue, createGroupConfig } from '@internals/shared'
-import { definePlugin, Resolver } from 'kubb/kit'
+import { createGroupConfig } from '@internals/shared'
+import { assertPluginOption, definePlugin, Resolver } from 'kubb/kit'
 import { typeGenerator } from './generators/typeGenerator.tsx'
 import { resolverTs } from './resolvers/resolverTs.ts'
 import type { PluginTs, ResolvedOptions } from './types.ts'
@@ -32,7 +32,7 @@ function assertEnumLikeOptions({
     { option: 'optionalType', value: options.optionalType, allowed: allowedOptionalTypes },
   ]
   for (const { option, value, allowed } of checks) {
-    if (value !== undefined) assertOptionValue({ pluginName: pluginTsName, option: `${prefix}${option}`, value, allowed })
+    if (value !== undefined) assertPluginOption({ plugin: pluginTsName, option: `${prefix}${option}`, value, allowed })
   }
 }
 

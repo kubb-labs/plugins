@@ -20,9 +20,9 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   schema(node, ctx) {
     const { config, resolver, root } = ctx
     const { output, group, dateParser, regexGenerator, seed, locale, printer, typeMode } = ctx.options
-    const pluginTs = ctx.driver.getPlugin(pluginTsName)
+    const pluginTs = ctx.requirePlugin(pluginTsName)
 
-    if (!node.name || !pluginTs) {
+    if (!node.name) {
       return
     }
 
@@ -101,11 +101,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   operation(node, ctx) {
     const { config, resolver, root } = ctx
     const { output, group, dateParser, regexGenerator, seed, locale, printer, typeMode } = ctx.options
-    const pluginTs = ctx.driver.getPlugin(pluginTsName)
-
-    if (!pluginTs) {
-      return
-    }
+    const pluginTs = ctx.requirePlugin(pluginTsName)
 
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 

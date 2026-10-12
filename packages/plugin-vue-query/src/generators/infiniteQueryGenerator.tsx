@@ -21,8 +21,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
     const { config, driver, resolver, root } = ctx
     const { output, query, mutation, infinite, client, group, hooks } = ctx.options
 
-    const pluginTs = driver.getPlugin(pluginTsName)
-    if (!pluginTs) return null
+    const pluginTs = ctx.requirePlugin(pluginTsName)
     const tsResolver = driver.getResolver(pluginTsName)
 
     const { isQuery, isMutation } = classifyOperation(node, { query, mutation })

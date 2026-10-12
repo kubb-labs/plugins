@@ -27,8 +27,7 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
     const { config, driver, resolver, root } = ctx
     const { output, query, client, group, customOptions, hooks } = ctx.options
 
-    const pluginTs = driver.getPlugin(pluginTsName)
-    if (!pluginTs) return null
+    const pluginTs = ctx.requirePlugin(pluginTsName)
     const tsResolver = driver.getResolver(pluginTsName)
 
     const importPath = query ? query.importPath : '@tanstack/react-query'

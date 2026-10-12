@@ -18,11 +18,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     const { config, resolver, driver, root } = ctx
     const { output, baseURL, group } = ctx.options
 
-    const pluginTs = driver.getPlugin(pluginTsName)
-
-    if (!pluginTs) {
-      return null
-    }
+    const pluginTs = ctx.requirePlugin(pluginTsName)
 
     const tsResolver = driver.getResolver(pluginTsName)
 

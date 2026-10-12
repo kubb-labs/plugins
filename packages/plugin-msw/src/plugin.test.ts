@@ -1,20 +1,11 @@
-import type { Config, KubbPluginSetupContext } from 'kubb/kit'
-import { describe, expect, test, vi } from 'vitest'
+import { createMockedSetupContext } from 'kubb/kit/testing'
+import { describe, expect, test } from 'vitest'
 import { pluginMsw } from './plugin.ts'
 import type { Options, PluginMsw } from './types.ts'
 
 function setup(options: Options, pluginNames: Array<string>) {
   const plugin = pluginMsw(options)
-  const ctx = {
-    config: { plugins: pluginNames.map((name) => ({ name })) } as unknown as Config,
-    options: {},
-    addGenerator: vi.fn(),
-    setResolver: vi.fn(),
-    addMacro: vi.fn(),
-    setMacros: vi.fn(),
-    setOptions: vi.fn(),
-    injectFile: vi.fn(),
-  } as unknown as KubbPluginSetupContext<PluginMsw>
+  const ctx = createMockedSetupContext<PluginMsw>({ plugins: pluginNames })
 
   return { run: () => plugin.hooks?.['kubb:plugin:setup']?.(ctx), ctx }
 }
@@ -39,7 +30,14 @@ describe('pluginMsw setup', () => {
   test("parser: 'faker' throws when plugin-faker is not registered", () => {
     const { run, ctx } = setup({ parser: 'faker' }, ['plugin-ts', 'plugin-msw'])
 
-    expect(run).toThrow("`@kubb/plugin-msw` needs `@kubb/plugin-faker` for `parser: 'faker'`")
+    expect(run).toThrow('Plugin "plugin-faker" is required but not found.')
+    expect(ctx.addGenerator).not.toHaveBeenCalled()
+  })
+
+  test('throws when plugin-ts is not registered', () => {
+    const { run, ctx } = setup({ parser: 'data' }, ['plugin-msw'])
+
+    expect(run).toThrow('Plugin "plugin-ts" is required but not found.')
     expect(ctx.addGenerator).not.toHaveBeenCalled()
   })
 })

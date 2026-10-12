@@ -60,6 +60,8 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
     dependencies: [pluginTsName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
+        ctx.requirePlugin(pluginTsName)
+
         const resolver = userResolver ? Resolver.merge<ResolverSwr>(resolverSwr, userResolver) : resolverSwr
 
         ctx.setOptions({

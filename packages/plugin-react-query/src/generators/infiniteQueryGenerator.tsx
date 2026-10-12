@@ -36,8 +36,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
     const { config, driver, resolver, root } = ctx
     const { output, query, infinite, client, group, customOptions } = ctx.options
 
-    const pluginTs = driver.getPlugin(pluginTsName)
-    if (!pluginTs) return null
+    const pluginTs = ctx.requirePlugin(pluginTsName)
     const tsResolver = driver.getResolver(pluginTsName)
 
     const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null

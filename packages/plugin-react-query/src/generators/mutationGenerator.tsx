@@ -26,8 +26,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
     const { config, driver, resolver, root } = ctx
     const { output, mutation, client, group, customOptions, hooks } = ctx.options
 
-    const pluginTs = driver.getPlugin(pluginTsName)
-    if (!pluginTs) return null
+    const pluginTs = ctx.requirePlugin(pluginTsName)
     const tsResolver = driver.getResolver(pluginTsName)
 
     const importPath = mutation ? mutation.importPath : '@tanstack/react-query'

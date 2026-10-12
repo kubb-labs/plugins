@@ -20,11 +20,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     const { resolver, driver, root, config } = ctx
     const { output, client, group } = ctx.options
 
-    const pluginTs = driver.getPlugin(pluginTsName)
-
-    if (!pluginTs) {
-      return null
-    }
+    const pluginTs = ctx.requirePlugin(pluginTsName)
 
     const tsResolver = driver.getResolver(pluginTsName)
 

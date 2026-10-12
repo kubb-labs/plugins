@@ -27,11 +27,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       file: resolver.file({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
     }
 
-    const fakerPlugin = parser === 'faker' ? driver.getPlugin(pluginFakerName) : null
-    // `kubb:plugin:setup` already fails when plugin-faker is missing, so this only guards direct generator use.
-    if (parser === 'faker' && !fakerPlugin) {
-      throw new Error(`\`@kubb/${ctx.plugin.name}\` with \`parser: 'faker'\` needs \`@kubb/${pluginFakerName}\`, but it is not registered in \`plugins\`.`)
-    }
+    const fakerPlugin = parser === 'faker' ? ctx.requirePlugin(pluginFakerName) : null
     const faker = fakerPlugin
       ? resolveFakerMeta(node, {
           root,
@@ -41,8 +37,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
         })
       : null
 
-    const pluginTs = driver.getPlugin(pluginTsName)
-    if (!pluginTs) return null
+    const pluginTs = ctx.requirePlugin(pluginTsName)
     const tsResolver = driver.getResolver(pluginTsName)
 
     const type = {

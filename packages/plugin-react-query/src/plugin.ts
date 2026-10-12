@@ -84,6 +84,8 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     dependencies: [pluginTsName],
     hooks: {
       'kubb:plugin:setup'(ctx) {
+        ctx.requirePlugin(pluginTsName)
+
         const resolver = userResolver ? Resolver.merge<ResolverReactQuery>(resolverReactQuery, userResolver) : resolverReactQuery
 
         ctx.setOptions({
