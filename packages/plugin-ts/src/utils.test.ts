@@ -124,6 +124,12 @@ describe('buildPropertyJSDocComments', () => {
     expect(comments).toContain("@default 'Fluffy'")
   })
 
+  it('emits object and array defaults as JSON', () => {
+    expect(buildPropertyJSDocComments(ast.factory.createSchema({ type: 'object', default: { path: 'types' } }))).toContain('@default {"path":"types"}')
+    expect(buildPropertyJSDocComments(ast.factory.createSchema({ type: 'array', primitive: 'array', default: [] }))).toContain('@default []')
+    expect(buildPropertyJSDocComments(ast.factory.createSchema({ type: 'object', default: { note: '*/' } }))).toContain('@default {"note":"*\\/"}')
+  })
+
   it('does not emit @minLength/@maxLength for array schemas', () => {
     const schema = ast.factory.createSchema({ type: 'array', primitive: 'array', min: 1, max: 10 })
     const comments = buildPropertyJSDocComments(schema)

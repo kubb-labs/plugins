@@ -99,14 +99,12 @@ export function isObjectComposableIntersection(node: ast.SchemaNode, cyclicSchem
 
 /**
  * Format a default value as a code-level literal.
- * Arrays keep their contents, other objects become `{}`, primitives become their string
+ * Arrays and objects keep their contents as a JSON literal, primitives become their string
  * representation, strings are quoted.
  */
 export function formatDefault(value: unknown): string {
   if (typeof value === 'string') return stringify(value)
-  // An array is also `typeof 'object'`, so it has to be handled before the object case.
-  if (Array.isArray(value)) return JSON.stringify(value)
-  if (typeof value === 'object' && value !== null) return '{}'
+  if (typeof value === 'object' && value !== null) return JSON.stringify(value)
 
   return String(value ?? '')
 }

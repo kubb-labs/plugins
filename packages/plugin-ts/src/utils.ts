@@ -64,7 +64,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
     !isArray && meta && 'max' in meta && meta.max !== undefined ? `@maxLength ${meta.max}` : null,
     meta && 'pattern' in meta && meta.pattern ? `@pattern ${meta.pattern}` : null,
     meta && 'default' in meta && meta.default !== undefined
-      ? `@default ${'primitive' in meta && meta.primitive === 'string' && typeof meta.default === 'string' ? stringify(meta.default) : meta.default}`
+      ? `@default ${'primitive' in meta && meta.primitive === 'string' && typeof meta.default === 'string' ? stringify(meta.default) : formatExample(meta.default)}`
       : null,
     ...exampleValues.map((example) => `@example ${formatExample(example)}`),
   ].filter(Boolean)

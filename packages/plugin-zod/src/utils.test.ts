@@ -33,11 +33,12 @@ describe('formatDefault', () => {
     expect(formatDefault(false)).toBe('false')
   })
 
-  test('object value becomes empty object literal', () => {
-    expect(formatDefault({ a: 1 })).toBe('{}')
+  test('object value keeps its contents', () => {
+    expect(formatDefault({})).toBe('{}')
+    expect(formatDefault({ path: 'types', barrel: { type: 'named' } })).toBe('{"path":"types","barrel":{"type":"named"}}')
   })
 
-  test('array value keeps its contents instead of collapsing to an object literal', () => {
+  test('array value keeps its contents', () => {
     expect(formatDefault([])).toBe('[]')
     expect(formatDefault(['content'])).toBe('["content"]')
   })
@@ -324,6 +325,7 @@ describe('applyModifiers', () => {
 
   test('default value (object)', () => {
     expect(applyModifiers({ value: 'z.object({})', defaultValue: {} })).toBe('z.object({}).default({})')
+    expect(applyModifiers({ value: 'outputSchema', optional: true, defaultValue: { path: 'types' } })).toBe('outputSchema.optional().default({"path":"types"})')
   })
 
   test('bigint schema coerces a numeric default to a BigInt literal', () => {
