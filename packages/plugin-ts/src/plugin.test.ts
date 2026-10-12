@@ -45,4 +45,17 @@ describe('pluginTs setup', () => {
     expect(run).toThrow(`\`@kubb/plugin-ts\` option \`${option}\` is 'bogus', but it must be one of ${allowed}.`)
     expect(ctx.setOptions).not.toHaveBeenCalled()
   })
+
+  test('throws on an invalid value inside an override', () => {
+    const { run, ctx } = setup({ override: [{ type: 'operationId', pattern: 'listPets', options: { syntaxType: 'bogus' } }] } as unknown as Options)
+
+    expect(run).toThrow("`@kubb/plugin-ts` option `override[0].options.syntaxType` is 'bogus', but it must be one of 'type', 'interface'.")
+    expect(ctx.setOptions).not.toHaveBeenCalled()
+  })
+
+  test('accepts an override that leaves the enum-like options out', () => {
+    const { run } = setup({ override: [{ type: 'operationId', pattern: 'listPets', options: { enum: { type: 'literal' } } }] } as unknown as Options)
+
+    expect(run).not.toThrow()
+  })
 })

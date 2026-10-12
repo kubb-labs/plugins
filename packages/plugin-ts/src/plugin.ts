@@ -16,6 +16,27 @@ const allowedArrayTypes = ['array', 'generic'] satisfies Array<ResolvedOptions['
 const allowedOptionalTypes = ['questionToken', 'undefined', 'questionTokenAndUndefined'] satisfies Array<ResolvedOptions['optionalType']>
 
 /**
+ * Throws when an enum-like option holds a value outside its allowed set. Options left out are skipped.
+ */
+function assertEnumLikeOptions({
+  prefix,
+  options,
+}: {
+  prefix: string
+  options: Partial<Pick<ResolvedOptions, 'enum' | 'syntaxType' | 'arrayType' | 'optionalType'>>
+}): void {
+  const checks = [
+    { option: 'enum.type', value: options.enum?.type, allowed: allowedEnumTypes },
+    { option: 'syntaxType', value: options.syntaxType, allowed: allowedSyntaxTypes },
+    { option: 'arrayType', value: options.arrayType, allowed: allowedArrayTypes },
+    { option: 'optionalType', value: options.optionalType, allowed: allowedOptionalTypes },
+  ]
+  for (const { option, value, allowed } of checks) {
+    if (value !== undefined) assertOptionValue({ pluginName: pluginTsName, option: `${prefix}${option}`, value, allowed })
+  }
+}
+
+/**
  * Generates TypeScript `type` aliases and `interface` declarations from an
  * OpenAPI spec. The foundation that every other Kubb plugin builds on:
  * clients, query hooks, mocks, and validators all reference the names this
@@ -69,10 +90,11 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
     options,
     hooks: {
       'kubb:plugin:setup'(ctx) {
-        assertOptionValue({ pluginName: pluginTsName, option: 'enum.type', value: resolvedEnum.type, allowed: allowedEnumTypes })
-        assertOptionValue({ pluginName: pluginTsName, option: 'syntaxType', value: syntaxType, allowed: allowedSyntaxTypes })
-        assertOptionValue({ pluginName: pluginTsName, option: 'arrayType', value: arrayType, allowed: allowedArrayTypes })
-        assertOptionValue({ pluginName: pluginTsName, option: 'optionalType', value: optionalType, allowed: allowedOptionalTypes })
+        assertEnumLikeOptions({ prefix: '', options: { enum: resolvedEnum, syntaxType, arrayType, optionalType } })
+        // An override replaces these per operation or schema, so its values are checked too.
+        for (const [index, entry] of override.entries()) {
+          assertEnumLikeOptions({ prefix: `override[${index}].options.`, options: entry.options })
+        }
 
         ctx.setOptions({
           output,
