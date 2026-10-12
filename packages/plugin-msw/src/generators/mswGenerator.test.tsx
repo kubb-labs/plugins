@@ -158,6 +158,7 @@ describe('mswGenerator operation', () => {
     { name: 'showPetById', node: showPetByIdNode, options: {} },
     { name: 'getPets', node: listPetsNode, options: {} },
     { name: 'getPetsTemplateBaseUrl', node: listPetsNode, options: { baseURL: '${123456}' } },
+    { name: 'getPetsFakerTemplateBaseUrl', node: listPetsNode, options: { parser: 'faker' as const, baseURL: '${123456}' } },
     { name: 'getPetsFaker', node: listPetsNode, options: { parser: 'faker' as const } },
     { name: 'createPet', node: createPetsNode, options: {} },
     { name: 'deletePet', node: deletePetsPetidNode, options: {} },

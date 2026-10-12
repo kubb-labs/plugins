@@ -22,8 +22,11 @@ export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatchStatus40
   })
 }
 
-export function placeOrderPatchHandler(data?: PlaceOrderPatchResponse | HttpResponseResolver<Record<string, string>, PlaceOrderPatchBody>) {
-  return http.patch<Record<string, string>, PlaceOrderPatchBody>(`http://localhost:3000/store/order`, function handler(info) {
+export function placeOrderPatchHandler(
+  data?: PlaceOrderPatchResponse | HttpResponseResolver<Record<string, string>, PlaceOrderPatchBody>,
+  options?: { baseURL?: string },
+) {
+  return http.patch<Record<string, string>, PlaceOrderPatchBody>(`${options?.baseURL ?? 'http://localhost:3000'}/store/order`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

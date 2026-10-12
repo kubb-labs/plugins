@@ -1,7 +1,7 @@
 import type { Config } from 'kubb/kit'
-import { ast, memoryStorage } from 'kubb/kit'
+import { ast, createResolver, memoryStorage } from 'kubb/kit'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperations } from 'kubb/kit/testing'
-import { describe, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { matchFiles } from '#mocks'
 import { resolverMsw } from '../resolvers/resolverMsw.ts'
 import type { PluginMsw } from '../types.ts'
@@ -83,5 +83,41 @@ describe('handlersGenerator operations', () => {
     })
 
     await matchFiles(driver.fileManager.files, 'findByTags')
+  })
+
+  test('custom listName resolver generates custom createListName', async () => {
+    const customResolver = createResolver<PluginMsw>({
+      pluginName: 'plugin-msw',
+      handler: {
+        name(node) {
+          return resolverMsw.handler.name(node)
+        },
+        listName: () => 'petHandlers',
+      },
+    })
+    const options: PluginMsw['resolvedOptions'] = {
+      ...defaultOptions,
+      resolver: customResolver,
+    }
+    const plugin = createMockedPlugin<PluginMsw>({ name: 'plugin-msw', options, resolver: customResolver })
+    const driver = createMockedPluginDriver({ name: 'customListName' })
+
+    await renderGeneratorOperations(handlersGenerator, operationNodes, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: customResolver,
+    })
+
+    const handlersFile = driver.fileManager.files[0]
+    const content =
+      handlersFile?.sources
+        ?.flatMap((s) => s.nodes)
+        .map((n) => ('value' in n ? (n as { value: string }).value : ''))
+        .join('\n') ?? ''
+    expect(content).toContain('export function createPetHandlers(options?: { baseURL?: string })')
+    expect(content).toContain('export const petHandlers = createPetHandlers()')
   })
 })

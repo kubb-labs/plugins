@@ -18,19 +18,23 @@ import { getOrderByIdHandler } from './store/Handlers/getOrderByIdHandler'
 import { placeOrderHandler } from './store/Handlers/placeOrderHandler'
 import { placeOrderPatchHandler } from './store/Handlers/placeOrderPatchHandler'
 
-export const handlers = [
-  updatePetHandler(),
-  addPetHandler(),
-  optionsFindPetsByStatusHandler(),
-  findPetsByStatusHandler(),
-  findPetsByTagsHandler(),
-  getPetByIdHandler(),
-  updatePetWithFormHandler(),
-  deletePetHandler(),
-  uploadFileHandler(),
-  getInventoryHandler(),
-  placeOrderHandler(),
-  placeOrderPatchHandler(),
-  getOrderByIdHandler(),
-  deleteOrderHandler(),
-] as const
+export function createHandlers(options?: { baseURL?: string }) {
+  return [
+    updatePetHandler(undefined, options),
+    addPetHandler(undefined, options),
+    optionsFindPetsByStatusHandler(undefined, options),
+    findPetsByStatusHandler(undefined, options),
+    findPetsByTagsHandler(undefined, options),
+    getPetByIdHandler(undefined, options),
+    updatePetWithFormHandler(undefined, options),
+    deletePetHandler(undefined, options),
+    uploadFileHandler(undefined, options),
+    getInventoryHandler(undefined, options),
+    placeOrderHandler(undefined, options),
+    placeOrderPatchHandler(undefined, options),
+    getOrderByIdHandler(undefined, options),
+    deleteOrderHandler(undefined, options),
+  ] as const
+}
+
+export const handlers = createHandlers()

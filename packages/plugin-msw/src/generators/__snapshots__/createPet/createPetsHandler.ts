@@ -14,8 +14,11 @@ export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
   })
 }
 
-export function createPetsHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, CreatePetsBody>) {
-  return http.post<Record<string, string>, CreatePetsBody>(`/pets`, function handler(info) {
+export function createPetsHandler(
+  data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, CreatePetsBody>,
+  options?: { baseURL?: string },
+) {
+  return http.post<Record<string, string>, CreatePetsBody>(`${options?.baseURL ?? ''}/pets`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

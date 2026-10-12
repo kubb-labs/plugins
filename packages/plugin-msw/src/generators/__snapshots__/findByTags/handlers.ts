@@ -8,4 +8,8 @@ import { createPetsHandler } from './createPetsHandler'
 import { listPetsHandler } from './listPetsHandler'
 import { showPetByIdHandler } from './showPetByIdHandler'
 
-export const handlers = [listPetsHandler(), createPetsHandler(), showPetByIdHandler()] as const
+export function createHandlers(options?: { baseURL?: string }) {
+  return [listPetsHandler(undefined, options), createPetsHandler(undefined, options), showPetByIdHandler(undefined, options)] as const
+}
+
+export const handlers = createHandlers()
