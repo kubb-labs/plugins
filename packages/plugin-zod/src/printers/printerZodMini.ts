@@ -12,7 +12,7 @@ import {
   isObjectSchemaNode,
   lengthChecksMini,
   numberChecksMini,
-  omitUnwrapChain,
+  omitInnerTypeChain,
   patternKeySchemaMini,
   shouldCoerce,
 } from '../utils.ts'
@@ -391,18 +391,18 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
 
       const base = (() => {
         if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed
-        // Discriminated unions (z.discriminatedUnion) do not support .omit(), so skip them.
+        // Discriminated unions (z.discriminatedUnion) do not support z.omit, so skip them.
 
-        // A nullable/optional ref resolves to a ZodMiniNullable/ZodMiniOptional variable; .omit() lives
-        // on the inner object, so unwrap down to it first (mirrors printerTs `Omit<NonNullable<T>, …>`).
+        // A nullable/optional ref resolves to a ZodMiniNullable/ZodMiniOptional variable; z.omit needs
+        // the inner object, so access innerType down to it first (mirrors printerTs `Omit<NonNullable<T>, …>`).
         // applyMiniModifiers re-applies the nullable/optional wrapper after the omit.
-        const unwrap = omitUnwrapChain(node)
-        const omit = `.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} })`
+        const unwrap = omitInnerTypeChain(node)
+        const mask = `{ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} }`
 
         // If this is a lazy reference, apply omit inside the lazy function
         const lazyMatch = transformed.match(/^z\.lazy\(\(\)\s*=>\s*(.+)\)$/)
-        if (lazyMatch) return `z.lazy(() => ${lazyMatch[1]}${unwrap}${omit})`
-        return `${transformed}${unwrap}${omit}`
+        if (lazyMatch) return `z.lazy(() => z.omit(${lazyMatch[1]}${unwrap}, ${mask}))`
+        return `z.omit(${transformed}${unwrap}, ${mask})`
       })()
 
       return applyMiniModifiers({

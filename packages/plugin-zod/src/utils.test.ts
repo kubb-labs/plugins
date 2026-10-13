@@ -16,6 +16,7 @@ import {
   lengthConstraints,
   numberChecksMini,
   numberConstraints,
+  omitInnerTypeChain,
   omitUnwrapChain,
   shouldCoerce,
 } from './utils.ts'
@@ -482,6 +483,50 @@ describe('omitUnwrapChain', () => {
       schema: ast.factory.createSchema({ type: 'object', nullable: true }),
     })
     expect(omitUnwrapChain(node)).toBe('.unwrap()')
+  })
+})
+
+describe('omitInnerTypeChain', () => {
+  test('non-ref schema needs no innerType access', () => {
+    expect(omitInnerTypeChain(ast.factory.createSchema({ type: 'object', nullable: true }))).toBe('')
+  })
+
+  test('plain ref needs no innerType access', () => {
+    expect(omitInnerTypeChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }))).toBe('')
+  })
+
+  test('nullable ref accesses innerType once', () => {
+    expect(omitInnerTypeChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet', nullable: true }))).toBe(
+      '._zod.def.innerType',
+    )
+  })
+
+  test('optional ref accesses innerType once', () => {
+    expect(omitInnerTypeChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet', optional: true }))).toBe(
+      '._zod.def.innerType',
+    )
+  })
+
+  test('nullish ref accesses innerType twice', () => {
+    expect(omitInnerTypeChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet', nullish: true }))).toBe(
+      '._zod.def.innerType._zod.def.innerType',
+    )
+  })
+
+  test('nullable ref with a default accesses innerType twice', () => {
+    expect(omitInnerTypeChain(ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet', nullable: true, default: {} }))).toBe(
+      '._zod.def.innerType._zod.def.innerType',
+    )
+  })
+
+  test('reads modifiers from the resolved ref target, not the usage site', () => {
+    const node = ast.factory.createSchema({
+      type: 'ref',
+      name: 'Pet',
+      ref: '#/components/schemas/Pet',
+      schema: ast.factory.createSchema({ type: 'object', nullable: true }),
+    })
+    expect(omitInnerTypeChain(node)).toBe('._zod.def.innerType')
   })
 })
 

@@ -349,6 +349,19 @@ export function omitUnwrapChain(node: ast.SchemaNode): string {
 }
 
 /**
+ * Build the `._zod.def.innerType` access chain to navigate down to the inner object before calling `z.omit()`
+ * when the schema is a `$ref` in Zod Mini.
+ */
+export function omitInnerTypeChain(node: ast.SchemaNode): string {
+  const ref = ast.narrowSchema(node, 'ref')
+  if (!ref) return ''
+
+  const target = ref.schema ?? ref
+  const depth = modifierDepth(target) + (target.default !== undefined ? 1 : 0)
+  return '._zod.def.innerType'.repeat(depth)
+}
+
+/**
  * Apply nullable / optional / nullish modifiers using the functional `zod/mini` API
  * (`z.nullable()`, `z.optional()`, `z.nullish()`).
  */

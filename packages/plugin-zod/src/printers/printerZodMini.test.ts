@@ -1223,10 +1223,10 @@ describe('printerZodMini', () => {
         ],
       })
       expect(p.print(node)).toMatchInlineSnapshot(`
-        "z.object({
+        "z.omit(z.object({
           id: z.int(),
           name: z.string(),
-        }).omit({ "id": true })"
+        }), { "id": true })"
       `)
     })
 
@@ -1242,11 +1242,11 @@ describe('printerZodMini', () => {
         ],
       })
       expect(p.print(node)).toMatchInlineSnapshot(`
-        "z.object({
+        "z.omit(z.object({
           id: z.int(),
           createdAt: z.string(),
           name: z.string(),
-        }).omit({ "id": true, "createdAt": true })"
+        }), { "id": true, "createdAt": true })"
       `)
     })
 
@@ -1270,9 +1270,7 @@ describe('printerZodMini', () => {
       expect(p.print(node)).toMatchInlineSnapshot(`"z.discriminatedUnion('petType', [Cat, Dog])"`)
     })
 
-    test('unwraps a nullable ref before omit so .omit() targets the inner object', () => {
-      // https://github.com/kubb-labs/plugins/issues/567 (bug 4): a $ref to a nullable schema
-      // resolves to a ZodMiniNullable variable, and .omit() only exists on the inner object.
+    test('accesses innerType on a nullable ref before omit so z.omit targets the inner object', () => {
       const p = printerZodMini({ keysToOmit: ['pending'] })
       const node = ast.factory.createSchema({
         type: 'ref',
@@ -1281,7 +1279,18 @@ describe('printerZodMini', () => {
         nullable: true,
         primitive: 'object',
       })
-      expect(p.print(node)).toBe('z.nullable(maintenance_window.unwrap().omit({ "pending": true }))')
+      expect(p.print(node)).toBe('z.nullable(z.omit(maintenance_window._zod.def.innerType, { "pending": true }))')
+    })
+
+    test('omits keys inside lazy reference', () => {
+      const p = printerZodMini({ keysToOmit: ['id'], cyclicSchemas: new Set(['User']) })
+      const node = ast.factory.createSchema({
+        type: 'ref',
+        name: 'User',
+        ref: '#/components/schemas/User',
+        primitive: 'object',
+      })
+      expect(p.print(node)).toBe('z.lazy(() => z.omit(User, { "id": true }))')
     })
   })
 
