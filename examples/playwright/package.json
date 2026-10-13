@@ -1,0 +1,27 @@
+{
+  "name": "playwright-pet-store",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Playwright PetStore example with local HTTP tests",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate",
+    "test": "vitest run",
+    "typecheck": "tsc -p ./tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@kubb/adapter-oas": "catalog:",
+    "@kubb/plugin-playwright": "workspace:*",
+    "@kubb/plugin-ts": "workspace:*",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "catalog:",
+    "kubb": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=11.0.0"
+  }
+}

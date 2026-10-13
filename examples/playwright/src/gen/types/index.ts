@@ -1,0 +1,8 @@
+export type { AddPetBody, AddPetOptions, AddPetResponse, AddPetResponses, AddPetStatus201 } from './AddPet'
+export type { DeletePetOptions, DeletePetPath, DeletePetResponse, DeletePetResponses, DeletePetStatus204 } from './DeletePet'
+export type { GetPetByIdHeaders, GetPetByIdOptions, GetPetByIdPath, GetPetByIdQuery, GetPetByIdResponse, GetPetByIdResponses, GetPetByIdStatus200, GetPetByIdStatus404 } from './GetPetById'
+export type { Pet } from './Pet'
+export type { PetDetails } from './PetDetails'
+export type { PetError } from './PetError'
+export type { UpdatePetDetailsBody, UpdatePetDetailsOptions, UpdatePetDetailsPath, UpdatePetDetailsResponse, UpdatePetDetailsResponses, UpdatePetDetailsStatus204 } from './UpdatePetDetails'
+export type { UploadPetPhotoBody, UploadPetPhotoOptions, UploadPetPhotoPath, UploadPetPhotoResponse, UploadPetPhotoResponses, UploadPetPhotoStatus204 } from './UploadPetPhoto'

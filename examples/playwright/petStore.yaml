@@ -1,0 +1,140 @@
+openapi: 3.0.3
+info:
+  title: Playwright PetStore
+  version: 1.0.0
+paths:
+  /pets/{petId}:
+    parameters:
+      - name: petId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getPetById
+      parameters:
+        - name: tags
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: X-Attempt
+          in: header
+          schema:
+            type: integer
+        - name: X-Request-ID
+          in: header
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pet found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '404':
+          description: Pet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PetError'
+    delete:
+      operationId: deletePet
+      responses:
+        '204':
+          description: Pet deleted
+  /pets:
+    post:
+      operationId: addPet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetDetails'
+      responses:
+        '201':
+          description: Pet created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+  /pets/{petId}/details:
+    post:
+      operationId: updatePetDetails
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PetDetails'
+      responses:
+        '204':
+          description: Pet details updated
+  /pets/{petId}/photo:
+    post:
+      operationId: uploadPetPhoto
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                tags:
+                  type: array
+                  items:
+                    type: string
+                description:
+                  type: string
+      responses:
+        '204':
+          description: Photo uploaded
+components:
+  schemas:
+    PetDetails:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    Pet:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    PetError:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
