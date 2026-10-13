@@ -1,5 +1,13 @@
 # @kubb/plugin-react-query
 
+## 5.3.1
+
+### Patch Changes
+
+- [#1071](https://github.com/kubb-labs/plugins/pull/1071) [`bd76f8f`](https://github.com/kubb-labs/plugins/commit/bd76f8fc5654770e1ca5c92f106e75ac0fa2c18d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Ship `kubb-extension.json` and `OVERVIEW.md`. The plugin reads its `meta` from the manifest, and Kubb Studio renders its options from it.
+- Updated dependencies [[`bd76f8f`](https://github.com/kubb-labs/plugins/commit/bd76f8fc5654770e1ca5c92f106e75ac0fa2c18d)]:
+  - @kubb/plugin-ts@5.0.8
+
 ## 5.3.0
 
 ### Minor Changes
