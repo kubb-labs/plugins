@@ -1,5 +1,13 @@
 # @kubb/plugin-vue-query
 
+## 5.3.2
+
+### Patch Changes
+
+- [#1077](https://github.com/kubb-labs/plugins/pull/1077) [`1d2a0f5`](https://github.com/kubb-labs/plugins/commit/1d2a0f5b5233dc362dd0d540341e6689dcd2a07e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Define each plugin with `defineExtension` instead of the deprecated `definePlugin`. The plugins now require Kubb 5.8.2 or later.
+- Updated dependencies [[`1d2a0f5`](https://github.com/kubb-labs/plugins/commit/1d2a0f5b5233dc362dd0d540341e6689dcd2a07e)]:
+  - @kubb/plugin-ts@5.0.9
+
 ## 5.3.1
 
 ### Patch Changes
