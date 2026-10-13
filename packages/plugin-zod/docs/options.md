@@ -13,6 +13,7 @@ Pass these options to `pluginZod()`. Shared options link to [Shared plugin optio
 | [`coercion`](#coercion)                                                   | Coerce input before validation.                                        | `false`                                      |
 | [`guidType`](#guidtype)                                                   | Validator for `format: uuid` properties.                               | `'uuid'`                                     |
 | [`regexType`](#regextype)                                                 | How an OpenAPI `pattern` is written.                                   | `'literal'`                                  |
+| [`oneOfType`](#oneoftype)                                                 | How a `oneOf` without a discriminator is validated.                    | `'strict'`                                   |
 | [`compile`](#compile)                                                     | Wrap schemas in `z.compile` for fast-path validation.                  | `false`                                      |
 | [`mini`](#mini)                                                           | Generate Zod Mini schemas.                                             | `false`                                      |
 | [`typeGuards`](#typeguards)                                               | Generate `is*` type guards and `assert*` assertions.                   | `false`                                      |
@@ -125,6 +126,18 @@ Emits the `RegExp` constructor, such as `.regex(new RegExp('^[a-z]+$'))`.
 :::
 
 ::
+
+### oneOfType
+
+How a `oneOf` without a discriminator is validated.
+
+- `'strict'` (default) prints `z.union([...])` with inline object members as `z.strictObject(...)`, so a value carrying another member's keys fails that member. Extra keys the spec allows fail too.
+- `'xor'` prints `z.xor([...])`, which passes only when exactly one member matches, as `oneOf` requires. Members keep their own `additionalProperties`.
+
+A `oneOf` with a discriminator prints `z.discriminatedUnion(...)` either way, and `anyOf` stays `z.union(...)`.
+
+> [!NOTE]
+> `'xor'` needs Zod v4.2.0 or above.
 
 ### compile
 

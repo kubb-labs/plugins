@@ -73,6 +73,13 @@ export type PrinterZodOptions = {
    */
   regexType?: PluginZod['resolvedOptions']['regexType']
   /**
+   * How a `oneOf` without a discriminator is validated: `z.union` with strict object members
+   * (`'strict'`) or `z.xor` (`'xor'`).
+   *
+   * @default 'strict'
+   */
+  oneOfType?: PluginZod['resolvedOptions']['oneOfType']
+  /**
    * Date format in the OpenAPI spec (`'date'` or `'date-time'`).
    */
   dateType?: AdapterOas['resolvedOptions']['dateType']
@@ -529,8 +536,11 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
     },
     union(node) {
       const nodeMembers = node.members ?? []
-      const members = mapSchemaMembers(node, (memberNode) => this.transform(node.strategy === 'one' ? strictOneOfNode(memberNode) : memberNode))
-        .map(({ schema, output }) => (output && node.strategy === 'one' ? strictOneOfMember(output, schema, cyclicSchemaNames) : output))
+      const isXor = node.strategy === 'one' && this.options.oneOfType === 'xor'
+      // `z.xor` already rejects a value matching several members, so its members stay as declared.
+      const isStrict = node.strategy === 'one' && !isXor
+      const members = mapSchemaMembers(node, (memberNode) => this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode))
+        .map(({ schema, output }) => (output && isStrict ? strictOneOfMember(output, schema, cyclicSchemaNames) : output))
         .filter(Boolean)
       if (members.length === 0) return ''
       if (members.length === 1) return members[0]!
@@ -541,6 +551,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       if (node.discriminatorPropertyName && allDiscriminable) {
         return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
       }
+      if (isXor) return `z.xor(${buildList(members)})`
 
       return `z.union(${buildList(members)})`
     },

@@ -60,6 +60,13 @@ export type PrinterZodMiniOptions = {
    */
   regexType?: PluginZod['resolvedOptions']['regexType']
   /**
+   * How a `oneOf` without a discriminator is validated: `z.union` with strict object members
+   * (`'strict'`) or `z.xor` (`'xor'`).
+   *
+   * @default 'strict'
+   */
+  oneOfType?: PluginZod['resolvedOptions']['oneOfType']
+  /**
    * Transforms raw schema names into valid JavaScript identifiers.
    */
   resolver?: ResolverZod
@@ -341,7 +348,10 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
       },
       union(node) {
         const nodeMembers = node.members ?? []
-        const members = mapSchemaMembers(node, (memberNode) => this.transform(node.strategy === 'one' ? strictOneOfNode(memberNode) : memberNode))
+        const isXor = node.strategy === 'one' && this.options.oneOfType === 'xor'
+        // `z.xor` already rejects a value matching several members, so its members stay as declared.
+        const isStrict = node.strategy === 'one' && !isXor
+        const members = mapSchemaMembers(node, (memberNode) => this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode))
           .map(({ output }) => output)
           .filter(Boolean)
         if (members.length === 0) return ''
@@ -353,6 +363,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         if (node.discriminatorPropertyName && allDiscriminable) {
           return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
         }
+        if (isXor) return `z.xor(${buildList(members)})`
 
         return `z.union(${buildList(members)})`
       },

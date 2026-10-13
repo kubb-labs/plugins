@@ -36,6 +36,7 @@ const defaultOptions: PluginZod['resolvedOptions'] = {
   coercion: false,
   guidType: 'uuid',
   regexType: 'literal',
+  oneOfType: 'strict',
   mini: false,
   output: { path: '.', mode: 'directory' },
   exclude: [],
@@ -443,6 +444,32 @@ describe('zodGenerator — Schema', () => {
 
     const source = rawSources(driver.fileManager.files).join('\n')
     expect(source).toContain('export const dictionarySchema = z.record(z.string(), z.string())')
+  })
+
+  test("oneOfType: 'xor' prints a oneOf schema with z.xor", async () => {
+    const contactBy = (key: string) =>
+      ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [ast.factory.createProperty({ name: key, required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+      })
+    const contactSchema = ast.factory.createSchema({ type: 'union', strategy: 'one', name: 'Contact', members: [contactBy('email'), contactBy('phone')] })
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, oneOfType: 'xor' }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'oneOfXor' })
+
+    await renderGeneratorSchema(zodGenerator, contactSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain('export const contactSchema = z.xor([')
+    expect(source).not.toContain('z.strictObject(')
   })
 
   test('open object schema with additionalProperties: true generates z.looseObject', async () => {

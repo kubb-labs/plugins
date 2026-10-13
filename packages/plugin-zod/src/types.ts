@@ -225,6 +225,19 @@ export type Options = OutputOptions & {
    */
   regexType?: 'literal' | 'constructor'
   /**
+   * How a `oneOf` without a discriminator is validated.
+   * - `'strict'`: `z.union([...])` with inline object members printed as `z.strictObject(...)`, so a
+   *   value carrying another member's keys fails that member. Extra keys the spec allows fail too.
+   * - `'xor'`: `z.xor([...])`, which passes only when exactly one member matches, as `oneOf` requires.
+   *   Members keep their own `additionalProperties`.
+   *
+   * A `oneOf` with a discriminator prints `z.discriminatedUnion(...)` either way.
+   *
+   * @default 'strict'
+   * @note `'xor'` is only compatible with Zod v4.2.0 or above.
+   */
+  oneOfType?: 'strict' | 'xor'
+  /**
    * Wrap generated schemas with `z.compile(...)` to enable Zod's hyperoptimized
    * fast-path validation logic.
    *
@@ -289,6 +302,7 @@ export type ResolvedOptions = {
   coercion: NonNullable<Options['coercion']>
   guidType: NonNullable<Options['guidType']>
   regexType: NonNullable<Options['regexType']>
+  oneOfType: NonNullable<Options['oneOfType']>
   compile: NonNullable<Options['compile']>
   mini: NonNullable<Options['mini']>
   typeGuards: NonNullable<Options['typeGuards']>

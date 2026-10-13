@@ -17,6 +17,7 @@ The client plugins `@kubb/plugin-fetch`, `@kubb/plugin-axios`, and `@kubb/plugin
 - `coercion` wraps schemas in `z.coerce`, so input is converted before validation. Pass an object to coerce only dates, strings, or numbers.
 - `guidType` picks `z.uuid()` (default) or `z.guid()` for `format: uuid`.
 - `regexType` writes a `pattern` as a regex literal (default) or a `RegExp` constructor.
+- `oneOfType` validates a `oneOf` with strict object members (default) or with `z.xor`, which needs exactly one member to match.
 - `typeGuards` adds `is*` type guards and `assert*` assertions.
 - `compile` wraps schemas in `z.compile` for faster validation. Circular schemas are left as they are.
 

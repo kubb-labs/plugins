@@ -1064,6 +1064,73 @@ describe('printerZod', () => {
       expect(printer.print(node)).toBe('z.union([TypeA, TypeB])')
     })
 
+    describe("oneOfType: 'xor'", () => {
+      const xorPrinter = printerZod({ oneOfType: 'xor' })
+      const contactBy = (key: string) =>
+        ast.factory.createSchema({
+          type: 'object',
+          primitive: 'object',
+          properties: [ast.factory.createProperty({ name: key, required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+        })
+      // A contact is reachable by email or by phone, but not both.
+      const contact = ast.factory.createSchema({ type: 'union', strategy: 'one', members: [contactBy('email'), contactBy('phone')] })
+
+      test('prints z.xor with members as declared', () => {
+        expect(xorPrinter.print(contact)).toMatchInlineSnapshot(`
+          "z.xor([
+            z.object({
+              email: z.string(),
+            }),
+            z.object({
+              phone: z.string(),
+            }),
+          ])"
+        `)
+      })
+
+      test('passes when exactly one member matches, extra keys included', () => {
+        const schema = new Function('z', `return ${xorPrinter.print(contact)}`)(z) as z.ZodType
+
+        expect(schema.safeParse({ email: 'ann@example.com' }).success).toBe(true)
+        expect(schema.safeParse({ phone: '555-0100', name: 'Ann' }).success).toBe(true)
+        expect(schema.safeParse({ email: 'ann@example.com', phone: '555-0100' }).success).toBe(false)
+        expect(schema.safeParse({ name: 'Ann' }).success).toBe(false)
+      })
+
+      test('does not append .strict() to ref members', () => {
+        const node = ast.factory.createSchema({
+          type: 'union',
+          strategy: 'one',
+          members: [
+            ast.factory.createSchema({ type: 'ref', name: 'EmailContact', ref: '#/components/schemas/EmailContact', schema: contactBy('email') }),
+            ast.factory.createSchema({ type: 'ref', name: 'PhoneContact', ref: '#/components/schemas/PhoneContact', schema: contactBy('phone') }),
+          ],
+        })
+
+        expect(xorPrinter.print(node)).toBe('z.xor([EmailContact, PhoneContact])')
+      })
+
+      test('keeps z.discriminatedUnion for a discriminated oneOf', () => {
+        const node = ast.factory.createSchema({
+          type: 'union',
+          strategy: 'one',
+          discriminatorPropertyName: 'channel',
+          members: [
+            ast.factory.createSchema({ type: 'ref', name: 'EmailContact', ref: '#/components/schemas/EmailContact' }),
+            ast.factory.createSchema({ type: 'ref', name: 'PhoneContact', ref: '#/components/schemas/PhoneContact' }),
+          ],
+        })
+
+        expect(xorPrinter.print(node)).toBe(`z.discriminatedUnion('channel', [EmailContact, PhoneContact])`)
+      })
+
+      test('keeps z.union for anyOf', () => {
+        const node = ast.factory.createSchema({ type: 'union', strategy: 'any', members: [contactBy('email'), contactBy('phone')] })
+
+        expect(xorPrinter.print(node)).toMatch(/^z\.union\(/)
+      })
+    })
+
     test('oneOf union with a self-referential object member stays loadable', () => {
       // The member is strict because it is a `oneOf` variant, and it carries a deferred getter.
       // Appending `.strict()` here would read `.shape` eagerly and throw on import.
