@@ -1,10 +1,8 @@
-import path from 'node:path'
 import { createGroupConfig } from '@internals/shared'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { definePlugin, Resolver } from 'kubb/kit'
 import { playwrightGenerator } from './generators/playwrightGenerator.tsx'
 import { resolverPlaywright } from './resolvers/resolverPlaywright.ts'
-import { playwrightTemplatePath } from './templates.ts'
 import type { PluginPlaywright } from './types.ts'
 
 /**
@@ -14,10 +12,10 @@ export const pluginPlaywrightName = 'plugin-playwright' satisfies PluginPlaywrig
 
 /**
  * Generates native Playwright responses for HTTP operations with parameters, JSON bodies, and forms.
- * Query arrays use repeated keys. Null and undefined query and header values are omitted.
- * Native config options override generated values, except the operation's HTTP method.
+ * Adapts query arrays and values incompatible with Playwright's native parameter and form types.
+ * Native options are spread over generated values, except the operation's HTTP method.
  * Supports JSON, URL-encoded forms, and multipart bodies. Other body media types and cookie parameters are skipped.
- * Use native config for nested form values and custom serialization.
+ * Playwright handles body serialization, Content-Type, and errors. Use options for custom serialization.
  * Requires `pluginTs()` for the response types.
  */
 export const pluginPlaywright = definePlugin<PluginPlaywright>((options) => ({
@@ -39,11 +37,6 @@ export const pluginPlaywright = definePlugin<PluginPlaywright>((options) => ({
       ctx.setResolver(resolver)
       if (options.macros?.length) ctx.setMacros(options.macros)
       ctx.addGenerator(playwrightGenerator)
-      ctx.injectFile({
-        baseName: 'playwright.ts',
-        path: path.resolve(ctx.config.root, ctx.config.output.path, '.kubb/playwright.ts'),
-        copy: playwrightTemplatePath,
-      })
     },
   },
 }))

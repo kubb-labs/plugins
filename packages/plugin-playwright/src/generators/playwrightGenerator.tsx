@@ -1,4 +1,3 @@
-import { resolve } from 'node:path'
 import { getOperationParameters, operationFileEntry, resolveDependencyOperationFile } from '@internals/shared'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
@@ -57,8 +56,6 @@ export const playwrightGenerator = defineGenerator<PluginPlaywright>({
       >
         <File.Import name={['APIRequestContext', 'APIResponse']} path="@playwright/test" isTypeOnly />
         <File.Import name={importedTypeNames} root={file.path} path={fileTs.path} isTypeOnly />
-        <File.Import name={['playwrightRequest']} root={file.path} path={resolve(root, '.kubb/playwright.ts')} />
-        <File.Import name={['RequestConfig']} root={file.path} path={resolve(root, '.kubb/playwright.ts')} isTypeOnly />
         <Request
           name={resolver.name(node.operationId)}
           node={node}
