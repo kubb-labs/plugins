@@ -5,16 +5,19 @@ import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyModifiers,
   buildEnum,
+  collectNegatedSchemas,
   formatLiteral,
   integerFormatPattern,
   isClosedKeySchema,
   isObjectComposableIntersection,
   isObjectSchemaNode,
   lengthConstraints,
+  NOT_MESSAGE,
   numberConstraints,
   omitUnwrapChain,
   patternKeySchema,
   shouldCoerce,
+  withNotRefinement,
 } from '../utils.ts'
 import type { AdapterOas } from '@kubb/adapter-oas'
 
@@ -152,6 +155,13 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
   return member
 }
 
+/**
+ * Appends the refinement for a schema's `not` keyword: a value that matches the negated schema fails.
+ */
+function refineNot(output: string, negated: string): string {
+  return `${output}.refine((value) => !${negated}.safeParse(value).success, { message: ${stringify(NOT_MESSAGE)} })`
+}
+
 function getMemberConstraint({ member, regexType }: { member: ast.SchemaNode; regexType: PrinterZodOptions['regexType'] }): string | undefined {
   if (member.primitive === 'string') return lengthConstraints({ ...(ast.narrowSchema(member, 'string') ?? {}), regexType }) || undefined
   if (member.primitive === 'number' || member.primitive === 'integer')
@@ -278,6 +288,7 @@ export function containsDirectionalNode({
   if ('propertyNames' in node && (node as { propertyNames?: ast.SchemaNode }).propertyNames) {
     children.push((node as { propertyNames?: ast.SchemaNode }).propertyNames)
   }
+  if (node.not) children.push(node.not)
 
   return children.some((child) => containsDirectionalNode({ node: child, printerOptions, seen }))
 }
@@ -286,9 +297,11 @@ export function containsDirectionalNode({
  * Names of the `$ref` schemas the generator should route to their input (encode) variant.
  */
 export function collectDirectionalRefNames({ node, printerOptions }: { node: ast.SchemaNode; printerOptions: PrinterZodOptions }): Array<string> {
-  return ast.collectSync<string>(node, {
-    schema: (n) => (n.type === 'ref' && n.ref && containsDirectionalNode({ node: n, printerOptions }) ? (ast.resolveRefName(n) ?? undefined) : undefined),
-  })
+  return [node, ...collectNegatedSchemas(node)].flatMap((schema) =>
+    ast.collectSync<string>(schema, {
+      schema: (n) => (n.type === 'ref' && n.ref && containsDirectionalNode({ node: n, printerOptions }) ? (ast.resolveRefName(n) ?? undefined) : undefined),
+    }),
+  )
 }
 
 /**
@@ -437,7 +450,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
   // getter body (to suppress nested `z.lazy()`), so capture a stable reference for the `.strict()`
   // skip decision, which must still see cyclic members inside those getter bodies.
   const cyclicSchemaNames = options.cyclicSchemas
-  const nodes: PrinterZodNodes = {
+  const nodes: PrinterZodNodes = withNotRefinement<PrinterZodOptions>(refineNot, {
     ...scalarNodes,
     ref(node) {
       if (!node.name) return null
@@ -562,12 +575,13 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
 
       return rest.reduce((acc, member) => {
         const constraint = getMemberConstraint({ member, regexType: this.options.regexType })
-        if (constraint) return acc + constraint
+        // A member with `not` goes through `.and(…)` so its refinement is printed.
+        if (constraint && !member.not) return acc + constraint
         const transformed = this.transform(member)
         return transformed ? `${acc}.and(${transformed})` : acc
       }, firstBase)
     },
-  }
+  })
 
   return {
     name: 'zod',
@@ -591,6 +605,15 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         // applyModifiers re-applies the nullable/optional wrapper after the omit.
         const unwrap = omitUnwrapChain(node)
         const omit = `.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} })`
+
+        // Zod rejects `.omit()` on a refined object, so omit from the object printed without its `not`
+        // and re-apply the refinement. A `$ref` target is inlined for this, since its schema is refined.
+        if (meta.not) {
+          const { not: negatedNode, ...unrefinedNode } = meta
+          const unrefined = this.transform(unrefinedNode)
+          const negated = this.transform(negatedNode)
+          if (unrefined && negated) return refineNot(`${unrefined}${omit}`, negated)
+        }
 
         // If this is a lazy reference, apply omit inside the lazy function
         const lazyMatch = transformed.match(/^z\.lazy\(\(\)\s*=>\s*(.+)\)$/)

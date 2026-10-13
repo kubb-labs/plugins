@@ -1211,6 +1211,39 @@ describe('printerZodMini', () => {
     })
   })
 
+  describe('not', () => {
+    const evaluate = (code: string) => new Function('z', `return ${code}`)(z) as z.ZodMiniType
+
+    test('appends a check that rejects values matching the negated schema', () => {
+      const node = ast.factory.createSchema({ type: 'string', not: ast.factory.createSchema({ type: 'enum', enumValues: ['admin', 'root'] }) })
+
+      const code = printer.print(node)!
+      expect(code).toBe(
+        `z.string().check(z.refine((value) => !z.enum(['admin', 'root']).safeParse(value).success, { message: 'Value must not match the schema in "not"' }))`,
+      )
+
+      const schema = evaluate(code)
+      expect(schema.safeParse('alice').success).toBe(true)
+      expect(schema.safeParse('admin').success).toBe(false)
+    })
+
+    test('rejects an object that has every key the negated schema requires', () => {
+      const unknownProperty = (name: string) => ast.factory.createProperty({ name, required: true, schema: ast.factory.createSchema({ type: 'unknown' }) })
+      const optionalString = (name: string) => ast.factory.createProperty({ name, required: false, schema: ast.factory.createSchema({ type: 'string' }) })
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [optionalString('query'), optionalString('id')],
+        not: ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [unknownProperty('query'), unknownProperty('id')] }),
+      })
+
+      const schema = evaluate(printer.print(node)!)
+      expect(schema.safeParse({ query: 'shoes' }).success).toBe(true)
+      expect(schema.safeParse({ id: '42' }).success).toBe(true)
+      expect(schema.safeParse({ query: 'shoes', id: '42' }).success).toBe(false)
+    })
+  })
+
   describe('keysToOmit', () => {
     test('omits single key from object schema', () => {
       const p = printerZodMini({ keysToOmit: ['id'] })

@@ -16,7 +16,7 @@ import { collectDirectionalRefNames, containsDirectionalNode, printerZod } from 
 import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
-import { buildGroupedParamsSchema } from '../utils.ts'
+import { buildGroupedParamsSchema, collectNegatedSchemas } from '../utils.ts'
 
 type StdPrinters = { decode: ReturnType<typeof printerZod>; encode: ReturnType<typeof printerZod> }
 type ZodPrinterEntry = StdPrinters & { coercion: unknown; guidType: unknown; regexType: unknown; dateType: unknown; nodes: unknown }
@@ -121,7 +121,10 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const hasDirectionalNode = !mini && containsDirectionalNode({ node, printerOptions })
 
     const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node, printerOptions }) : [])
-    const importEntries = resolver.imports({ node, root, output, group: group ?? undefined })
+    // `resolver.imports` skips `not` subtrees, which this printer prints as a refinement.
+    const importEntries = [node, ...collectNegatedSchemas(node)].flatMap((schema) =>
+      resolver.imports({ node: schema, root, output, group: group ?? undefined }),
+    )
     const inputImportEntries = hasDirectionalNode
       ? [...directionalRefNames].map((schemaName) => ({
           name: [resolver.schema.inputName(schemaName)],
@@ -221,13 +224,24 @@ export const zodGenerator = defineGenerator<PluginZod>({
       const inferTypeName = inferred ? resolver.schema.type(name) : null
 
       const directionalRefNames = direction === 'encode' && !mini ? new Set(collectDirectionalRefNames({ node: schema, printerOptions })) : null
-      const imports = resolver.imports({
-        node: schema,
-        root,
-        output,
-        group: group ?? undefined,
-        name: (schemaName) => (directionalRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
-      })
+      const seenImports = new Set<string>()
+      // `resolver.imports` skips `not` subtrees, which this printer prints as a refinement.
+      const imports = [schema, ...collectNegatedSchemas(schema)]
+        .flatMap((importedSchema) =>
+          resolver.imports({
+            node: importedSchema,
+            root,
+            output,
+            group: group ?? undefined,
+            name: (schemaName) => (directionalRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
+          }),
+        )
+        .filter((imp) => {
+          const key = `${imp.name}|${imp.path}`
+          if (seenImports.has(key)) return false
+          seenImports.add(key)
+          return true
+        })
 
       const schemaPrinter = mini
         ? keysToOmit?.length

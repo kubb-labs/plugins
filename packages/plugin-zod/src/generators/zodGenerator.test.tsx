@@ -421,6 +421,29 @@ describe('zodGenerator — Schema', () => {
     expect(source).toContain('export const errorDetailsSchema: z.ZodType')
   })
 
+  test('imports a schema that is only referenced inside `not`', async () => {
+    const usernameSchema = ast.factory.createSchema({
+      type: 'string',
+      name: 'Username',
+      not: ast.factory.createSchema({ type: 'ref', name: 'ReservedName', ref: '#/components/schemas/ReservedName' }),
+    })
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'notRef' })
+
+    await renderGeneratorSchema(zodGenerator, usernameSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverZod,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toMatch(/import \{ reservedNameSchema \} from '.+reservedNameSchema(\.ts)?'/)
+    expect(source).toContain('export const usernameSchema = z.string().refine((value) => !reservedNameSchema.safeParse(value).success')
+  })
+
   test('dictionary schema generates z.record', async () => {
     const dictionarySchema = ast.factory.createSchema({
       type: 'object',

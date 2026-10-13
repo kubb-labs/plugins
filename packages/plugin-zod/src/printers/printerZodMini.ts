@@ -11,10 +11,12 @@ import {
   isObjectComposableIntersection,
   isObjectSchemaNode,
   lengthChecksMini,
+  NOT_MESSAGE,
   numberChecksMini,
   omitUnwrapChain,
   patternKeySchemaMini,
   shouldCoerce,
+  withNotRefinement,
 } from '../utils.ts'
 
 /**
@@ -91,6 +93,13 @@ function strictOneOfNode(node: ast.SchemaNode): ast.SchemaNode {
   return node.type === 'object' && node.additionalProperties === undefined ? { ...node, additionalProperties: false } : node
 }
 
+/**
+ * Appends the check for a schema's `not` keyword: a value that matches the negated schema fails.
+ */
+function checkNot(output: string, negated: string): string {
+  return `${output}.check(z.refine((value) => !${negated}.safeParse(value).success, { message: ${stringify(NOT_MESSAGE)} }))`
+}
+
 function getMemberConstraintMini({ member, regexType }: { member: ast.SchemaNode; regexType: PrinterZodMiniOptions['regexType'] }): string | undefined {
   if (member.primitive === 'string') return lengthChecksMini({ ...(ast.narrowSchema(member, 'string') ?? {}), regexType }) || undefined
   if (member.primitive === 'number' || member.primitive === 'integer')
@@ -162,7 +171,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
   return {
     name: 'zod-mini',
     options,
-    nodes: {
+    nodes: withNotRefinement<PrinterZodMiniOptions>(checkNot, {
       any: () => 'z.any()',
       unknown: () => 'z.unknown()',
       void: () => 'z.void()',
@@ -374,12 +383,13 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
 
         return rest.reduce((acc, member) => {
           const constraint = getMemberConstraintMini({ member, regexType: this.options.regexType })
-          if (constraint) return acc + constraint
+          // A member with `not` goes through `z.intersection(…)` so its check is printed.
+          if (constraint && !member.not) return acc + constraint
           const transformed = this.transform(member)
           return transformed ? `z.intersection(${acc}, ${transformed})` : acc
         }, firstBase)
       },
-    },
+    }),
     overrides: options.nodes,
     print(node) {
       const { keysToOmit } = this.options

@@ -43,6 +43,8 @@ export function isClosedKeySchema(node: ast.SchemaNode | undefined): boolean {
 export function isPlainInlineObject(node: ast.SchemaNode): boolean {
   if (node.type !== 'object') return false
   if (node.nullable || node.optional || node.nullish) return false
+  // A `not` prints as a refinement on the member, which an `.extend({ … })` shape would drop.
+  if (node.not) return false
 
   const hasAdditionalProperties = node.additionalProperties !== undefined
   const hasPatternProperties = Boolean(node.patternProperties)
@@ -94,7 +96,55 @@ export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: Readonl
 export function isObjectComposableIntersection(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
   if (node.type !== 'intersection') return false
   const [first, ...rest] = node.members ?? []
-  return !!first && isObjectSchemaNode(first, cyclicSchemas) && rest.every(isPlainInlineObject)
+  // Zod rejects `.extend()` that overrides a key of a refined object, so a base with `not` stays on `.and(…)`.
+  return !!first && isObjectSchemaNode(first, cyclicSchemas) && !hasNot(first) && rest.every(isPlainInlineObject)
+}
+
+/**
+ * Message of the refinement that rejects a value matching a schema's `not` keyword.
+ */
+export const NOT_MESSAGE = 'Value must not match the schema in "not"'
+
+/**
+ * Whether the node, or the schema a `$ref` points at, has a `not` keyword. Such a schema prints with
+ * a refinement, and Zod rejects `.omit()` and key-overriding `.extend()` on a refined object.
+ */
+export function hasNot(node: ast.SchemaNode): boolean {
+  return Boolean(node.not ?? syncSchemaRef(node).not)
+}
+
+/**
+ * Collects every `not` schema in the tree, including ones nested inside another `not`. Visitors
+ * don't walk `not`, so code that prints it (imports, directional refs) adds these subtrees itself.
+ */
+export function collectNegatedSchemas(node: ast.SchemaNode): Array<ast.SchemaNode> {
+  return ast.collectSync<ast.SchemaNode>(node, { schema: (schemaNode) => schemaNode.not }).flatMap((negated) => [negated, ...collectNegatedSchemas(negated)])
+}
+
+type PrinterHandlerThis<TOptions extends object> = ThisParameterType<NonNullable<ast.PrinterPartial<string, TOptions>['string']>>
+
+/**
+ * Wraps each handler so a node with a `not` keyword gets `refine(output, negated)` appended, where
+ * `negated` is the printed `not` schema. An override that calls `this.base(node)` keeps the refinement.
+ */
+export function withNotRefinement<TOptions extends object>(
+  refine: (output: string, negated: string) => string,
+  handlers: ast.PrinterPartial<string, TOptions>,
+): ast.PrinterPartial<string, TOptions> {
+  type Handler = (this: PrinterHandlerThis<TOptions>, node: ast.SchemaNode) => string | null
+
+  const wrapped: Record<string, Handler> = {}
+  for (const [type, handler] of Object.entries(handlers) as Array<[string, Handler]>) {
+    wrapped[type] = function (node) {
+      const output = handler.call(this, node)
+      if (!output || !node.not) return output
+
+      const negated = this.transform(node.not)
+      return negated ? refine(output, negated) : output
+    }
+  }
+
+  return wrapped as ast.PrinterPartial<string, TOptions>
 }
 
 /**

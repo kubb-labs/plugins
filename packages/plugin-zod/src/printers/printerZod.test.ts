@@ -1490,6 +1490,161 @@ describe('printerZod', () => {
     })
   })
 
+  describe('not', () => {
+    const evaluate = (code: string) => new Function('z', `return ${code}`)(z) as z.ZodType
+    const unknownProperty = (name: string) => ast.factory.createProperty({ name, required: true, schema: ast.factory.createSchema({ type: 'unknown' }) })
+    const optionalString = (name: string) => ast.factory.createProperty({ name, required: false, schema: ast.factory.createSchema({ type: 'string' }) })
+    // A search takes a `query` or an `id`, but not both.
+    const notBoth = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [unknownProperty('query'), unknownProperty('id')] })
+    const search = ast.factory.createSchema({
+      type: 'object',
+      primitive: 'object',
+      properties: [optionalString('query'), optionalString('id'), optionalString('locale')],
+      not: notBoth,
+    })
+
+    test('appends a refinement that rejects values matching the negated schema', () => {
+      const node = ast.factory.createSchema({ type: 'string', not: ast.factory.createSchema({ type: 'enum', enumValues: ['admin', 'root'] }) })
+
+      const code = printer.print(node)!
+      expect(code).toBe(
+        `z.string().refine((value) => !z.enum(['admin', 'root']).safeParse(value).success, { message: 'Value must not match the schema in "not"' })`,
+      )
+
+      const schema = evaluate(code)
+      expect(schema.safeParse('alice').success).toBe(true)
+      expect(schema.safeParse('admin').success).toBe(false)
+    })
+
+    test('rejects an object that has every key the negated schema requires', () => {
+      const schema = evaluate(printer.print(search)!)
+
+      expect(schema.safeParse({}).success).toBe(true)
+      expect(schema.safeParse({ query: 'shoes' }).success).toBe(true)
+      expect(schema.safeParse({ id: '42', locale: 'en' }).success).toBe(true)
+      expect(schema.safeParse({ query: 'shoes', id: '42' }).success).toBe(false)
+    })
+
+    test('refines a property before its modifiers', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [
+          ast.factory.createProperty({
+            name: 'username',
+            required: false,
+            schema: ast.factory.createSchema({ type: 'string', not: ast.factory.createSchema({ type: 'enum', enumValues: ['admin'] }) }),
+          }),
+        ],
+      })
+
+      const code = printer.print(node)!
+      expect(code).toContain(`.safeParse(value).success, { message: 'Value must not match the schema in "not"' }).optional()`)
+
+      const schema = evaluate(code)
+      expect(schema.safeParse({}).success).toBe(true)
+      expect(schema.safeParse({ username: 'admin' }).success).toBe(false)
+    })
+
+    test('prints a ref inside the negated schema', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        not: ast.factory.createSchema({ type: 'ref', name: 'Banned', ref: '#/components/schemas/Banned' }),
+      })
+
+      expect(printer.print(node)).toContain('!Banned.safeParse(value).success')
+    })
+
+    test('keeps the refinement of an allOf member by intersecting it instead of extending', () => {
+      const node = ast.factory.createSchema({
+        type: 'intersection',
+        members: [ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [optionalString('locale')] }), search],
+      })
+
+      const code = printer.print(node)!
+      expect(code).not.toContain('.extend(')
+
+      const schema = evaluate(code)
+      expect(schema.safeParse({ locale: 'en', query: 'shoes' }).success).toBe(true)
+      expect(schema.safeParse({ locale: 'en', query: 'shoes', id: '42' }).success).toBe(false)
+    })
+
+    test('does not extend a refined allOf base, since Zod rejects overriding its keys', () => {
+      const node = ast.factory.createSchema({
+        type: 'intersection',
+        members: [
+          search,
+          ast.factory.createSchema({
+            type: 'object',
+            primitive: 'object',
+            properties: [
+              ast.factory.createProperty({ name: 'locale', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: ['en', 'nl'] }) }),
+            ],
+          }),
+        ],
+      })
+
+      const code = printer.print(node)!
+      expect(code).not.toContain('.extend(')
+
+      const schema = evaluate(code)
+      expect(schema.safeParse({ locale: 'en', id: '42' }).success).toBe(true)
+      expect(schema.safeParse({ locale: 'fr', id: '42' }).success).toBe(false)
+      expect(schema.safeParse({ locale: 'en', query: 'shoes', id: '42' }).success).toBe(false)
+    })
+
+    test('keeps the refinement of an allOf member that only adds constraints', () => {
+      const node = ast.factory.createSchema({
+        type: 'intersection',
+        members: [
+          ast.factory.createSchema({ type: 'string' }),
+          ast.factory.createSchema({ type: 'string', primitive: 'string', min: 3, not: ast.factory.createSchema({ type: 'enum', enumValues: ['admin'] }) }),
+        ],
+      })
+
+      const schema = evaluate(printer.print(node)!)
+      expect(schema.safeParse('alice').success).toBe(true)
+      expect(schema.safeParse('al').success).toBe(false)
+      expect(schema.safeParse('admin').success).toBe(false)
+    })
+
+    test('omits keys before the refinement, since Zod rejects .omit() on a refined object', () => {
+      const p = printerZod({ keysToOmit: ['locale'] })
+
+      const code = p.print(search)!
+      expect(code.indexOf('.omit(')).toBeLessThan(code.indexOf('.refine('))
+
+      const schema = evaluate(code)
+      expect(schema.safeParse({ query: 'shoes', locale: 'en' }).data).toEqual({ query: 'shoes' })
+      expect(schema.safeParse({ query: 'shoes', id: '42' }).success).toBe(false)
+    })
+
+    test('inlines a refined $ref target to omit keys from it', () => {
+      const p = printerZod({ keysToOmit: ['locale'] })
+      const node = ast.factory.createSchema({ type: 'ref', name: 'Search', ref: '#/components/schemas/Search', schema: { ...search, name: 'Search' } })
+
+      const code = p.print(node)!
+      expect(code.startsWith('z.object(')).toBe(true)
+      expect(code.indexOf('.omit(')).toBeLessThan(code.indexOf('.refine('))
+      expect(evaluate(code).safeParse({ query: 'shoes', id: '42' }).success).toBe(false)
+    })
+
+    test('keeps the refinement when an override calls this.base', () => {
+      const p = printerZod({
+        nodes: {
+          string(node) {
+            return `${this.base(node)}.trim()`
+          },
+        },
+      })
+      const node = ast.factory.createSchema({ type: 'string', not: ast.factory.createSchema({ type: 'enum', enumValues: ['admin'] }) })
+
+      expect(p.print(node)).toMatch(/^z\.string\(\)\.refine\(.+\)\.trim\(\)$/)
+    })
+  })
+
   describe('discriminator properties with external refs', () => {
     test('discriminator property with enum override should not apply ref description', () => {
       // This test verifies the fix for: https://github.com/kubb-labs/plugins/issues/15

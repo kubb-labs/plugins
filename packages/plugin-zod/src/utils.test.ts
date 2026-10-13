@@ -5,9 +5,11 @@ import {
   applyModifiers,
   buildEnum,
   buildGroupedParamsSchema,
+  collectNegatedSchemas,
   defaultLiteral,
   formatDefault,
   formatLiteral,
+  hasNot,
   isClosedKeySchema,
   isObjectComposableIntersection,
   isObjectSchemaNode,
@@ -19,6 +21,38 @@ import {
   omitUnwrapChain,
   shouldCoerce,
 } from './utils.ts'
+
+describe('not helpers', () => {
+  const banned = ast.factory.createSchema({ type: 'enum', enumValues: ['admin'] })
+  const notRoot = ast.factory.createSchema({ type: 'enum', enumValues: ['root'] })
+  const username = ast.factory.createSchema({ type: 'string', not: { ...banned, not: notRoot } })
+  const account = ast.factory.createSchema({
+    type: 'object',
+    primitive: 'object',
+    properties: [ast.factory.createProperty({ name: 'username', required: true, schema: username })],
+  })
+
+  test('collectNegatedSchemas finds `not` schemas on nested nodes and inside other `not` schemas', () => {
+    expect(collectNegatedSchemas(account).map((node) => ast.narrowSchema(node, 'enum')?.enumValues)).toEqual([['admin'], ['root']])
+  })
+
+  test('hasNot reads the node and the schema a $ref points at', () => {
+    expect(hasNot(username)).toBe(true)
+    expect(hasNot(account)).toBe(false)
+    expect(hasNot(ast.factory.createSchema({ type: 'ref', name: 'Username', ref: '#/components/schemas/Username', schema: username }))).toBe(true)
+  })
+
+  test('an object with `not` is not a plain inline object, so .extend() does not drop its refinement', () => {
+    expect(isPlainInlineObject({ ...account, not: banned })).toBe(false)
+  })
+
+  test('an allOf whose base has `not` is not object-composable, since Zod rejects overriding keys of a refined object', () => {
+    const member = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [] })
+
+    expect(isObjectComposableIntersection(ast.factory.createSchema({ type: 'intersection', members: [account, member] }))).toBe(true)
+    expect(isObjectComposableIntersection(ast.factory.createSchema({ type: 'intersection', members: [{ ...account, not: banned }, member] }))).toBe(false)
+  })
+})
 
 describe('formatDefault', () => {
   test('string value is quoted', () => {
