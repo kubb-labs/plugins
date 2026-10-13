@@ -1,5 +1,11 @@
 # @kubb/plugin-redoc
 
+## 5.0.9
+
+### Patch Changes
+
+- [#1098](https://github.com/kubb-labs/plugins/pull/1098) [`868dacd`](https://github.com/kubb-labs/plugins/commit/868dacd513fe7c3c92583a6b1df31d5ffc44a82e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Type each plugin with `PluginType` from `kubb/kit`, the new name of `PluginFactoryOptions`.
+
 ## 5.0.8
 
 ### Patch Changes
