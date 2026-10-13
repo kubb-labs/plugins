@@ -1,5 +1,11 @@
 # @kubb/plugin-msw
 
+## 5.0.13
+
+### Patch Changes
+
+- [#1093](https://github.com/kubb-labs/plugins/pull/1093) [`6dff4fe`](https://github.com/kubb-labs/plugins/commit/6dff4fe783ae851205baa226cb411bf4cbccceba) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - List `optionalDependencies` in `kubb-extension.json`.
+
 ## 5.0.12
 
 ### Patch Changes

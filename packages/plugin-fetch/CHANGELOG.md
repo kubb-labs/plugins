@@ -1,5 +1,13 @@
 # @kubb/plugin-fetch
 
+## 5.5.12
+
+### Patch Changes
+
+- [#1095](https://github.com/kubb-labs/plugins/pull/1095) [`f8aae34`](https://github.com/kubb-labs/plugins/commit/f8aae34f33f34a21d88bf53f18fc42a2657fefea) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the "See also" sections from the guides. Each guide links what it needs inline.
+
+- [#1093](https://github.com/kubb-labs/plugins/pull/1093) [`6dff4fe`](https://github.com/kubb-labs/plugins/commit/6dff4fe783ae851205baa226cb411bf4cbccceba) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - List `optionalDependencies` in `kubb-extension.json`.
+
 ## 5.5.11
 
 ### Patch Changes
