@@ -1,6 +1,6 @@
 # Call operations
 
-`@kubb/plugin-swr` generates a typed SWR hook for each operation. `GET` operations get `useSWR` hooks such as `useGetPetById`, and `POST`, `PUT`, `PATCH`, and `DELETE` operations get `useSWRMutation` hooks such as `useCreatePet`. Each hook calls the client function from `@kubb/plugin-fetch` or `@kubb/plugin-axios`.
+`@kubb/plugin-swr` generates a typed SWR hook for each operation. `GET` operations get `useSWR` hooks such as `useGetPetById`, and `POST`, `PUT`, `PATCH`, and `DELETE` operations get `useSWRMutation` hooks such as `useCreatePet`. Each hook calls the client function from `@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`.
 
 ## Queries
 
@@ -48,7 +48,7 @@ A `mutationKey` helper is exported next to the hook.
 
 ## Errors and transport
 
-Each generated hook calls the client function with `throwOnError: true`. A failed request sets SWR's `error`, typed from the error responses in the spec. Set the base URL, authentication, interceptors, serialization, and validation on the client plugin. See the [plugin-fetch](https://kubb.dev/extensions/kubb-labs/plugin-fetch) or [plugin-axios](https://kubb.dev/extensions/kubb-labs/plugin-axios) guide.
+Each generated hook calls the client function with `throwOnError: true`. A failed request sets SWR's `error`, typed from the error responses in the spec. Set the base URL, authentication, interceptors, serialization, and validation on the client plugin. See the [plugin-fetch](https://kubb.dev/extensions/kubb-labs/plugin-fetch) or [plugin-axios](https://kubb.dev/extensions/kubb-labs/plugin-axios) guide, or your own module with [plugin-client](https://kubb.dev/extensions/kubb-labs/plugin-client).
 
 ## Skip requests until ready
 

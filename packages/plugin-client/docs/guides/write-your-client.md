@@ -12,6 +12,15 @@ The generated functions import your module through [`importPath`](https://kubb.d
 
 If your spec has server-sent event operations, also export `toEventStream` and the `EventStreamResult` and `SuccessOf` types.
 
+The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-swr`) and `@kubb/plugin-mcp` call the generated functions with `throwOnError: true` and read `data` off the result. The query plugins also import two more types from your module:
+
+| Export                | Kind | Purpose                                                                 |
+| --------------------- | ---- | ----------------------------------------------------------------------- |
+| `RequestConfig`       | type | The per-call `client` options a hook accepts, minus the request fields. |
+| `ResponseErrorConfig` | type | The error type of a failed hook, given the spec's error type.           |
+
+With a relative `importPath`, the hooks resolve it from the generated operation file, so one path serves both.
+
 ## What a generated function looks like
 
 ```typescript
@@ -63,6 +72,9 @@ export type Options<TData extends DataShape, ThrowOnError extends boolean = true
 export type RequestResult<TResponses, ThrowOnError extends boolean = true> = ThrowOnError extends true
   ? { data: TResponses[keyof TResponses]; error: undefined; response: Response }
   : { data: TResponses[keyof TResponses]; error: undefined; response: Response } | { data: undefined; error: {}; response: Response }
+
+// Only needed by the query plugins: what a failed hook rejects with.
+export type ResponseErrorConfig<TError = unknown> = Error & { body?: TError }
 
 // Set this to your API host. `new URL()` needs an absolute URL.
 export const settings = { baseURL: 'https://petstore3.swagger.io/api/v3' }

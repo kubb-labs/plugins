@@ -24,7 +24,7 @@ type Props = {
    *
    * @default 'full'
    */
-  returnType?: 'full' | 'data'
+  returnType?: 'full' | 'data' | 'plain'
 }
 
 /**

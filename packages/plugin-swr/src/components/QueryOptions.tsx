@@ -15,7 +15,7 @@ type Props = {
    *
    * @default 'full'
    */
-  returnType?: 'full' | 'data'
+  returnType?: 'full' | 'data' | 'plain'
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })

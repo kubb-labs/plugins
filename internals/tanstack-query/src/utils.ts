@@ -162,7 +162,8 @@ export function buildClientCall(node: ast.OperationNode, options: { clientName: 
  * success body. `returnType` mirrors the registered client plugin's own `returnType` option: with
  * `'data'` the call already resolves to the bare body, so it is returned directly; with `'full'`
  * (the default) the call carries `unwrap()`, so the body calls it instead of destructuring `data`
- * off the full result by hand.
+ * off the full result by hand; with `'plain'` (plugin-client) the call resolves to the user's
+ * `RequestResult`, so the body awaits it and reads `data`.
  *
  * @example
  * ```ts
@@ -170,10 +171,13 @@ export function buildClientCall(node: ast.OperationNode, options: { clientName: 
  * // return getPetById({ ...config, throwOnError: true }).unwrap()
  * ```
  */
-export function buildCallResultBody(call: string, options: { returnType?: 'full' | 'data' } = {}): string {
+export function buildCallResultBody(call: string, options: { returnType?: 'full' | 'data' | 'plain' } = {}): string {
   const { returnType = 'full' } = options
   if (returnType === 'data') {
     return `return await ${call}`
+  }
+  if (returnType === 'plain') {
+    return `return (await ${call}).data`
   }
   return `return ${call}.unwrap()`
 }

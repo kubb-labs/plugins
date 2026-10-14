@@ -63,6 +63,11 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true> = Thr
 export type EventStreamResult<TData = unknown> = { stream: AsyncGenerator<TData>; response: Response }
 
 /**
+ * What a failed query hook rejects with. Only the query plugins and `@kubb/plugin-mcp` import it.
+ */
+export type ResponseErrorConfig<TError = unknown> = ResponseError & { body: TError }
+
+/**
  * Thrown by `client` for a non-2xx status when `throwOnError` is true.
  */
 export class ResponseError extends Error {

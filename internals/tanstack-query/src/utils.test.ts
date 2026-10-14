@@ -130,6 +130,10 @@ describe('buildCallResultBody', () => {
   test('returns the call directly when the client already resolves to bare data', () => {
     expect(buildCallResultBody('getPetById({ throwOnError: true })', { returnType: 'data' })).toBe('return await getPetById({ throwOnError: true })')
   })
+
+  test('reads data off the plain result of a plugin-client operation', () => {
+    expect(buildCallResultBody('getPetById({ throwOnError: true })', { returnType: 'plain' })).toBe('return (await getPetById({ throwOnError: true })).data')
+  })
 })
 
 const listPetsNode = (schema: ast.SchemaNode, paramName = 'page') =>

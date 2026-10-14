@@ -1,6 +1,6 @@
 # Call operations
 
-`@kubb/plugin-vue-query` can generate a typed TanStack Query composable for each operation. `GET` operations get query composables such as `useGetPetById`, and `POST`, `PUT`, `PATCH`, and `DELETE` operations get mutation composables such as `useUpdatePetWithForm`. Each composable calls the client function from `@kubb/plugin-fetch` or `@kubb/plugin-axios`.
+`@kubb/plugin-vue-query` can generate a typed TanStack Query composable for each operation. `GET` operations get query composables such as `useGetPetById`, and `POST`, `PUT`, `PATCH`, and `DELETE` operations get mutation composables such as `useUpdatePetWithForm`. Each composable calls the client function from `@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`.
 
 > [!IMPORTANT]
 > By default the plugin emits only the factory helpers (`queryOptions`, `queryKey`, `mutationKey`). Set [`hooks: true`](https://kubb.dev/extensions/kubb-labs/plugin-vue-query/options#hooks) in the plugin options to also generate the `use*` composables shown below.
@@ -64,7 +64,7 @@ mutate({ path: { petId: 1n }, query: { name: 'Fluffy' } })
 
 ## Errors and transport
 
-Each generated composable calls the client function with `throwOnError: true`. A failed request sets TanStack Query's `error`, typed from the error responses in the spec. Set the base URL, authentication, interceptors, serialization, and validation on the client plugin. See the [plugin-fetch](https://kubb.dev/extensions/kubb-labs/plugin-fetch) or [plugin-axios](https://kubb.dev/extensions/kubb-labs/plugin-axios) guide.
+Each generated composable calls the client function with `throwOnError: true`. A failed request sets TanStack Query's `error`, typed from the error responses in the spec. Set the base URL, authentication, interceptors, serialization, and validation on the client plugin. See the [plugin-fetch](https://kubb.dev/extensions/kubb-labs/plugin-fetch) or [plugin-axios](https://kubb.dev/extensions/kubb-labs/plugin-axios) guide, or your own module with [plugin-client](https://kubb.dev/extensions/kubb-labs/plugin-client).
 
 ## Customize cache keys
 

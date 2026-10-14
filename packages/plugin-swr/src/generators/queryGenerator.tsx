@@ -69,7 +69,12 @@ export const queryGenerator = defineGenerator<PluginSwr>({
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
-        <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
+        <File.Import
+          name={['RequestConfig', 'ResponseErrorConfig']}
+          root={contractOp.clientPathIsFile ? meta.file.path : undefined}
+          path={contractOp.clientPath}
+          isTypeOnly
+        />
 
         {meta.fileTs && importedTypeNames.length > 0 && (
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />

@@ -59,7 +59,47 @@ describe('resolveClientOperation', () => {
       cache: createTestCache(),
     })
 
-    expect(result).toStrictEqual({ name: 'getPetById', path: '/root/getPetById.ts', clientPath: '/root/.kubb/client.ts', returnType: 'full' })
+    expect(result).toStrictEqual({
+      name: 'getPetById',
+      path: '/root/getPetById.ts',
+      clientPath: '/root/.kubb/client.ts',
+      clientPathIsFile: true,
+      returnType: 'full',
+    })
+  })
+
+  test("resolves plugin-client's relative importPath against the operation file", () => {
+    const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
+    const driver = createDriver()
+    driver.getPlugin.mockReturnValueOnce({ options: { importPath: '../client', returnType: 'plain' } })
+
+    const result = resolveClientOperation({
+      clientPlugin: { pluginName: 'plugin-client' },
+      driver,
+      node,
+      root: '/root',
+      output: { path: '.' },
+      cache: createTestCache(),
+    })
+
+    expect(result).toStrictEqual({ name: 'getPetById', path: '/root/getPetById.ts', clientPath: '/client', clientPathIsFile: true, returnType: 'plain' })
+  })
+
+  test("keeps plugin-client's package importPath verbatim", () => {
+    const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
+    const driver = createDriver()
+    driver.getPlugin.mockReturnValueOnce({ options: { importPath: '@my-org/api-client' } })
+
+    const result = resolveClientOperation({
+      clientPlugin: { pluginName: 'plugin-client' },
+      driver,
+      node,
+      root: '/root',
+      output: { path: '.' },
+      cache: createTestCache(),
+    })
+
+    expect(result).toMatchObject({ clientPath: '@my-org/api-client', clientPathIsFile: false })
   })
 
   test("reads the client plugin's returnType, defaulting to 'full' when unset", () => {

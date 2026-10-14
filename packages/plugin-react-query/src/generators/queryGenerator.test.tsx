@@ -61,14 +61,28 @@ const mockedAxiosPlugin = createMockedPlugin({
   resolver: resolverClient,
 })
 
-// The generator looks plugins up by name: plugin-ts for the request types, plugin-axios for the
-// contract <op>. The built-in mock is name-agnostic, so dispatch on the name here.
+const mockedClientPlugin = createMockedPlugin({
+  name: 'plugin-client',
+  options: {
+    output: { path: './clients', mode: 'directory' },
+    group: null,
+    importPath: '../../client',
+    returnType: 'plain',
+  } as unknown as PluginTs['resolvedOptions'],
+  resolver: resolverClient,
+})
+
+// The generator looks plugins up by name: plugin-ts for the request types, the client plugin for
+// the contract <op>. The built-in mock is name-agnostic, so dispatch on the name here.
 function createMultiPluginDriver(name: string) {
   const driver = createMockedPluginDriver({
     name,
     plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
   })
-  const byName = { 'plugin-ts': mockedTsPlugin, 'plugin-axios': mockedAxiosPlugin } as Record<string, { resolver?: unknown }>
+  const byName = { 'plugin-ts': mockedTsPlugin, 'plugin-axios': mockedAxiosPlugin, 'plugin-client': mockedClientPlugin } as Record<
+    string,
+    { resolver?: unknown }
+  >
   return {
     ...driver,
     getPlugin: (pluginName: string) => byName[pluginName] ?? mockedTsPlugin,
@@ -176,6 +190,7 @@ describe('queryGenerator operation', () => {
       options: { client: { kind: 'contract', pluginName: 'plugin-axios' } },
     },
     { name: 'getPetById', node: getPetByIdNode, options: {} },
+    { name: 'pluginClient', node: getPetByIdNode, options: { client: { kind: 'contract', pluginName: 'plugin-client' } } },
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
     {
       name: 'createUsersWithListInputAsQuery',

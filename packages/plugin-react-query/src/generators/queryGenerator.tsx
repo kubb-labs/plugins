@@ -73,7 +73,12 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
-        <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
+        <File.Import
+          name={['RequestConfig', 'ResponseErrorConfig']}
+          root={contractOp.clientPathIsFile ? meta.file.path : undefined}
+          path={contractOp.clientPath}
+          isTypeOnly
+        />
 
         {customOptions && <File.Import name={[customOptions.name]} path={customOptions.importPath} />}
         {meta.fileTs && importedTypeNames.length > 0 && (

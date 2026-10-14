@@ -24,7 +24,7 @@ type Props = {
   /**
    * The registered client plugin's `returnType`, read by the caller off `resolveClientOperation`.
    */
-  returnType?: 'full' | 'data'
+  returnType?: 'full' | 'data' | 'plain'
 }
 
 const requestGroupOrder = ['path', 'query', 'headers', 'body'] as const

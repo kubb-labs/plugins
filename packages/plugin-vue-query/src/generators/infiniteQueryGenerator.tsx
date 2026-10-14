@@ -91,7 +91,12 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
-        <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
+        <File.Import
+          name={['RequestConfig', 'ResponseErrorConfig']}
+          root={contractOp.clientPathIsFile ? meta.file.path : undefined}
+          path={contractOp.clientPath}
+          isTypeOnly
+        />
 
         <File.Import name={['toValue']} path="vue" />
         <File.Import name={['MaybeRefOrGetter']} path="vue" isTypeOnly />

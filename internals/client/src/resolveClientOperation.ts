@@ -1,13 +1,19 @@
 import path from 'node:path'
 import { operationFileEntry } from '@internals/shared'
 import type { ast, Exclude, Group, Include, NodeCache, Output, Override, Resolver } from 'kubb/kit'
+import type { ReturnTypeOption } from './types.ts'
 
 /**
  * The resolved contract `<op>` for one operation: the generated function name, the file it lives in,
- * the contract runtime's `.kubb/client.ts` path (where `RequestConfig` / `ResponseErrorConfig`
- * come from), and the registered client plugin's `returnType`.
+ * the client module path (where `RequestConfig` / `ResponseErrorConfig` come from), and the
+ * registered client plugin's `returnType`.
+ *
+ * `clientPath` is the absolute `.kubb/client.ts` path for plugin-fetch / plugin-axios, or
+ * plugin-client's `importPath`: a relative one is resolved against the `<op>` file to an absolute
+ * path, a package name or alias is kept verbatim. `clientPathIsFile` tells a consumer whether to
+ * make it relative to the importing file.
  */
-export type ClientOperation = { name: string; path: string; clientPath: string; returnType: 'full' | 'data' }
+export type ClientOperation = { name: string; path: string; clientPath: string; clientPathIsFile: boolean; returnType: ReturnTypeOption }
 
 /**
  * The client plugin options a dependent reads, including the filters that scope them per operation.
@@ -15,7 +21,8 @@ export type ClientOperation = { name: string; path: string; clientPath: string; 
 type ClientPluginOptions = {
   output?: Output
   group?: Group | null
-  returnType?: 'full' | 'data'
+  returnType?: ReturnTypeOption
+  importPath?: string
   exclude?: Array<Exclude>
   include?: Array<Include>
   override?: Array<Override<Omit<ClientPluginOptions, 'override'>>>
@@ -24,10 +31,11 @@ type ClientPluginOptions = {
 /**
  * Resolves the contract client `<op>` a consumer (query hook, MCP handler) imports, by looking up
  * the registered contract client plugin's resolver and output. Works for any contract client plugin
- * (plugin-fetch or plugin-axios). Returns `null` when no contract plugin is in play (the inline
+ * (plugin-fetch, plugin-axios, or plugin-client). Returns `null` when no contract plugin is in play (the inline
  * path), or when the client plugin's `exclude` / `include` leaves this operation out, since it then
- * emits no `<op>` to import. The plugin injects `.kubb/client.ts` at the global output root, the
- * same path consumers read `RequestConfig` / `ResponseErrorConfig` from.
+ * emits no `<op>` to import. plugin-fetch / plugin-axios inject `.kubb/client.ts` at the global
+ * output root, the same path consumers read `RequestConfig` / `ResponseErrorConfig` from;
+ * plugin-client reads them from the user's `importPath` module instead.
  *
  * The result is cached in the current node's `cache` (`ctx.cache`) under the client plugin's name,
  * so several dependents reading the same client plugin for one operation in a single pass
@@ -69,10 +77,15 @@ export function resolveClientOperation(options: {
       group: operationOptions.group ?? undefined,
     })
 
+    const { importPath } = pluginOptions
+    const isRelativeImport = importPath?.startsWith('.') ?? false
+
     return {
       name: resolver.name(node.operationId),
       path: file.path,
-      clientPath: path.resolve(root, '.kubb/client.ts'),
+      clientPath:
+        importPath === undefined ? path.resolve(root, '.kubb/client.ts') : isRelativeImport ? path.resolve(path.dirname(file.path), importPath) : importPath,
+      clientPathIsFile: importPath === undefined || isRelativeImport,
       returnType: operationOptions.returnType ?? 'full',
     }
   })

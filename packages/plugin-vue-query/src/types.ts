@@ -107,8 +107,8 @@ export type Options = OutputOptions & {
    * Selects the HTTP client the generated composables call. Every client plugin speaks the `RequestResult`
    * contract, so the composables call a contract `<op>` that takes one grouped `options` object.
    *
-   * - `'fetch'` / `'axios'` calls the `@kubb/plugin-fetch` / `@kubb/plugin-axios` functions. When a
-   *   single client plugin (plugin-fetch or plugin-axios) is registered it is
+   * - `'fetch'` / `'axios'` / `'client'` calls the `@kubb/plugin-fetch` / `@kubb/plugin-axios` /
+   *   `@kubb/plugin-client` functions. When a single client plugin is registered it is
    *   auto-detected, so the string is only needed to disambiguate several client plugins.
    *
    * A client plugin must be registered. The composables always call its `<op>`.

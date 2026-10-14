@@ -31,10 +31,10 @@ export type Options = OutputOptions & {
    * contract, so each handler calls a contract `<op>` that takes one grouped `{ path, query, headers,
    * body }` object.
    *
-   * `'fetch'` / `'axios'` calls the `@kubb/plugin-fetch` / `@kubb/plugin-axios` functions. When a
-   * single client plugin (plugin-fetch or plugin-axios) is registered it is auto-detected, so the
+   * `'fetch'` / `'axios'` / `'client'` calls the `@kubb/plugin-fetch` / `@kubb/plugin-axios` /
+   * `@kubb/plugin-client` functions. When a single client plugin is registered it is auto-detected, so the
    * string is only needed to disambiguate several client plugins. Register one of those plugins.
-   * Options such as `baseURL` live there.
+   * Options such as `baseURL` live there, or in your own module with `@kubb/plugin-client`.
    */
   client?: ClientSelector
   /**

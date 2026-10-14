@@ -10,6 +10,10 @@ describe('resolveClient', () => {
     expect(resolveClient({ client: 'axios', pluginNames: ['plugin-ts', 'plugin-axios'] })).toStrictEqual({ kind: 'contract', pluginName: 'plugin-axios' })
   })
 
+  test("client: 'client' selects plugin-client when it is registered", () => {
+    expect(resolveClient({ client: 'client', pluginNames: ['plugin-ts', 'plugin-client'] })).toStrictEqual({ kind: 'contract', pluginName: 'plugin-client' })
+  })
+
   test("client: 'fetch' without plugin-fetch returns a diagnostic naming the package", () => {
     const result = resolveClient({ client: 'fetch', pluginNames: ['plugin-ts'] })
     expect(result.kind).toBe('error')
@@ -20,19 +24,20 @@ describe('resolveClient', () => {
     const result = resolveClient({ client: 'bogus' as unknown as 'fetch', pluginNames: ['plugin-ts', 'plugin-fetch'] })
     expect(result).toStrictEqual({
       kind: 'error',
-      message: "Option `client` is 'bogus', but it must be one of 'fetch', 'axios'. Drop `client` to use the registered client plugin.",
+      message: "Option `client` is 'bogus', but it must be one of 'fetch', 'axios', 'client'. Drop `client` to use the registered client plugin.",
     })
   })
 
   test('auto-detects a lone contract client plugin when client is unset', () => {
     expect(resolveClient({ client: undefined, pluginNames: ['plugin-ts', 'plugin-fetch'] })).toStrictEqual({ kind: 'contract', pluginName: 'plugin-fetch' })
     expect(resolveClient({ client: undefined, pluginNames: ['plugin-ts', 'plugin-axios'] })).toStrictEqual({ kind: 'contract', pluginName: 'plugin-axios' })
+    expect(resolveClient({ client: undefined, pluginNames: ['plugin-ts', 'plugin-client'] })).toStrictEqual({ kind: 'contract', pluginName: 'plugin-client' })
   })
 
   test('two contract client plugins without a selector is ambiguous', () => {
     const result = resolveClient({ client: undefined, pluginNames: ['plugin-fetch', 'plugin-axios'] })
     expect(result.kind).toBe('error')
-    if (result.kind === 'error') expect(result.message).toContain("client: 'fetch' | 'axios'")
+    if (result.kind === 'error') expect(result.message).toContain("client: 'fetch' | 'axios' | 'client'")
   })
 
   test('no client plugin registered returns a diagnostic asking to add one', () => {
@@ -41,6 +46,7 @@ describe('resolveClient', () => {
     if (result.kind === 'error') {
       expect(result.message).toContain('@kubb/plugin-axios')
       expect(result.message).toContain('@kubb/plugin-fetch')
+      expect(result.message).toContain('@kubb/plugin-client')
     }
   })
 })
