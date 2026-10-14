@@ -4,6 +4,12 @@ const entry = {
   index: 'src/index.ts',
 }
 
+const templateEntry = {
+  axios: 'templates/axios.ts',
+  serializers: 'templates/serializers.ts',
+  standardSchema: 'templates/standardSchema.ts',
+}
+
 const shared: Partial<UserConfig> = {
   platform: 'node',
   sourcemap: true,
@@ -30,5 +36,17 @@ export default defineConfig([
     format: 'cjs',
     dts: false,
     ...shared,
+  },
+  {
+    // Declarations for the copied runtime templates, so `@kubb/plugin-axios/templates/*` types
+    // resolve without the consumer type-checking the raw `.ts` sources.
+    ...shared,
+    entry: templateEntry,
+    format: 'esm',
+    dts: { emitDtsOnly: true },
+    outDir: 'dist/templates',
+    clean: false,
+    // Declarations only: no `__name` helper import pointing at a runtime chunk this build does not emit.
+    outputOptions: {},
   },
 ])
