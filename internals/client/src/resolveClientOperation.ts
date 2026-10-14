@@ -77,7 +77,7 @@ export function resolveClientOperation(options: {
       group: operationOptions.group ?? undefined,
     })
 
-    const { importPath } = pluginOptions
+    const { importPath } = operationOptions
     const isRelativeImport = importPath?.startsWith('.') ?? false
 
     return {
