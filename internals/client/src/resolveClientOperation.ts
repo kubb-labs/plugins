@@ -28,14 +28,24 @@ type ClientPluginOptions = {
   override?: Array<Override<Omit<ClientPluginOptions, 'override'>>>
 }
 
+function isRelativeImport(importPath: string): boolean {
+  return importPath.startsWith('.')
+}
+
+// plugin-client resolves a relative `importPath` from its `<op>` file, so do the same here.
+function resolveImportPath(options: { importPath: string; operationFile: string }): string {
+  const { importPath, operationFile } = options
+  return isRelativeImport(importPath) ? path.resolve(path.dirname(operationFile), importPath) : importPath
+}
+
 /**
  * Resolves the contract client `<op>` a consumer (query hook, MCP handler) imports, by looking up
  * the registered contract client plugin's resolver and output. Works for any contract client plugin
  * (plugin-fetch, plugin-axios, or plugin-client). Returns `null` when no contract plugin is in play (the inline
  * path), or when the client plugin's `exclude` / `include` leaves this operation out, since it then
  * emits no `<op>` to import. plugin-fetch / plugin-axios inject `.kubb/client.ts` at the global
- * output root, the same path consumers read `RequestConfig` / `ResponseErrorConfig` from;
- * plugin-client reads them from the user's `importPath` module instead.
+ * output root, the same path consumers read `RequestConfig` / `ResponseErrorConfig` from.
+ * With plugin-client they come from the user's `importPath` module instead.
  *
  * The result is cached in the current node's `cache` (`ctx.cache`) under the client plugin's name,
  * so several dependents reading the same client plugin for one operation in a single pass
@@ -78,14 +88,12 @@ export function resolveClientOperation(options: {
     })
 
     const { importPath } = operationOptions
-    const isRelativeImport = importPath?.startsWith('.') ?? false
 
     return {
       name: resolver.name(node.operationId),
       path: file.path,
-      clientPath:
-        importPath === undefined ? path.resolve(root, '.kubb/client.ts') : isRelativeImport ? path.resolve(path.dirname(file.path), importPath) : importPath,
-      clientPathIsFile: importPath === undefined || isRelativeImport,
+      clientPath: importPath === undefined ? path.resolve(root, '.kubb/client.ts') : resolveImportPath({ importPath, operationFile: file.path }),
+      clientPathIsFile: importPath === undefined || isRelativeImport(importPath),
       returnType: operationOptions.returnType ?? 'full',
     }
   })

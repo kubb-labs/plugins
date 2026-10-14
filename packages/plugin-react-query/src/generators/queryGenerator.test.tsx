@@ -6,6 +6,7 @@ import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, rend
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
+import type { ResolvedOptions as ClientResolvedOptions } from '@internals/client'
 import { describe, expect, test, vi } from 'vitest'
 import { matchFiles } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
@@ -68,7 +69,7 @@ const mockedClientPlugin = createMockedPlugin({
     group: null,
     importPath: '../../client',
     returnType: 'plain',
-  } as unknown as PluginTs['resolvedOptions'],
+  } as ClientResolvedOptions & { importPath: string },
   resolver: resolverClient,
 })
 

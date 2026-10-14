@@ -2,7 +2,7 @@
 
 The Client plugin turns each operation in your OpenAPI spec into a typed function that calls a client module you write. The generated code has no Fetch, axios, or Kubb runtime dependency.
 
-Each function takes grouped `path`, `query`, `headers`, and `body` parameters and passes the operation's auth requirements to your client in a `security` list. A single call can pass its own `client` to replace the default. For a ready-made client, use `@kubb/plugin-fetch` or `@kubb/plugin-axios` instead. The query plugins and `@kubb/plugin-mcp` work with this plugin too. Their hooks and handlers then call your client module.
+Each function takes grouped `path`, `query`, `headers`, and `body` parameters and passes the operation's auth requirements to your client in a `security` list. A single call can pass its own `client` to replace the default. For a ready-made client, use `@kubb/plugin-fetch` or `@kubb/plugin-axios` instead. The query plugins and `@kubb/plugin-mcp` work with this plugin too, and their hooks and handlers then call your client module.
 
 ## Setup
 

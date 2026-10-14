@@ -64,7 +64,7 @@ Each mutation also exports a `mutationOptions` factory and a `mutationKey` helpe
 
 ## Errors and transport
 
-Each generated hook calls the client function with `throwOnError: true`. A failed request sets TanStack Query's `error`, typed from the error responses in the spec. Set the base URL, authentication, interceptors, serialization, and validation on the client plugin. See the [plugin-fetch](https://kubb.dev/extensions/kubb-labs/plugin-fetch) or [plugin-axios](https://kubb.dev/extensions/kubb-labs/plugin-axios) guide, or your own module with [plugin-client](https://kubb.dev/extensions/kubb-labs/plugin-client).
+Each generated hook calls the client function with `throwOnError: true`. A failed request sets TanStack Query's `error`, typed from the error responses in the spec. Set the base URL, authentication, interceptors, serialization, and validation on the client plugin. See the [plugin-fetch](https://kubb.dev/extensions/kubb-labs/plugin-fetch) or [plugin-axios](https://kubb.dev/extensions/kubb-labs/plugin-axios) guide. With [plugin-client](https://kubb.dev/extensions/kubb-labs/plugin-client), set these in your own client module.
 
 ## Customize cache keys
 
