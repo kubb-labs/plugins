@@ -1,5 +1,15 @@
 # @kubb/plugin-faker
 
+## 5.1.6
+
+### Patch Changes
+
+- [#1109](https://github.com/kubb-labs/plugins/pull/1109) [`2b8645f`](https://github.com/kubb-labs/plugins/commit/2b8645f514d874f5bfc93c19d3bcddbaf127611e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Print `pattern` as a regex literal in `faker.helpers.fromRegExp(...)`. Backslashes, `^` and `$` anchors, and double quotes in the pattern now survive. Faker still does not support shorthand classes such as `\d`, so use `regexGenerator: 'randexp'` for those patterns.
+
+- [#1098](https://github.com/kubb-labs/plugins/pull/1098) [`868dacd`](https://github.com/kubb-labs/plugins/commit/868dacd513fe7c3c92583a6b1df31d5ffc44a82e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Type each plugin with `PluginType` from `kubb/kit`, the new name of `PluginFactoryOptions`.
+- Updated dependencies [[`868dacd`](https://github.com/kubb-labs/plugins/commit/868dacd513fe7c3c92583a6b1df31d5ffc44a82e)]:
+  - @kubb/plugin-ts@5.0.11
+
 ## 5.1.5
 
 ### Patch Changes
