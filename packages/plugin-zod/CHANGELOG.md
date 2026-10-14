@@ -1,5 +1,11 @@
 # @kubb/plugin-zod
 
+## 5.4.10
+
+### Patch Changes
+
+- [#1122](https://github.com/kubb-labs/plugins/pull/1122) [`be793ae`](https://github.com/kubb-labs/plugins/commit/be793ae1f9c73c3a3a6723733564c8f0cb2c0cf2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Internal cleanup. Generated output is unchanged.
+
 ## 5.4.9
 
 ### Patch Changes
