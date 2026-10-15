@@ -1,5 +1,16 @@
 # @kubb/plugin-mcp
 
+## 5.2.1
+
+### Patch Changes
+
+- [#1122](https://github.com/kubb-labs/plugins/pull/1122) [`94dcb86`](https://github.com/kubb-labs/plugins/commit/94dcb86a6625f98305da7bbbd747ac36ff460673) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Internal cleanup: remove unused code. Generated output is unchanged.
+
+- [#1122](https://github.com/kubb-labs/plugins/pull/1122) [`be793ae`](https://github.com/kubb-labs/plugins/commit/be793ae1f9c73c3a3a6723733564c8f0cb2c0cf2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Internal cleanup. Generated output is unchanged.
+- Updated dependencies [[`d333749`](https://github.com/kubb-labs/plugins/commit/d33374925860b5b3dfe0762eb4b3926c4f9fef59), [`94dcb86`](https://github.com/kubb-labs/plugins/commit/94dcb86a6625f98305da7bbbd747ac36ff460673), [`be793ae`](https://github.com/kubb-labs/plugins/commit/be793ae1f9c73c3a3a6723733564c8f0cb2c0cf2)]:
+  - @kubb/plugin-ts@5.0.12
+  - @kubb/plugin-zod@5.4.10
+
 ## 5.2.0
 
 ### Minor Changes

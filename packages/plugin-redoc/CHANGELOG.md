@@ -1,5 +1,11 @@
 # @kubb/plugin-redoc
 
+## 5.0.10
+
+### Patch Changes
+
+- [#1122](https://github.com/kubb-labs/plugins/pull/1122) [`94dcb86`](https://github.com/kubb-labs/plugins/commit/94dcb86a6625f98305da7bbbd747ac36ff460673) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Internal cleanup: remove unused code. Generated output is unchanged.
+
 ## 5.0.9
 
 ### Patch Changes
