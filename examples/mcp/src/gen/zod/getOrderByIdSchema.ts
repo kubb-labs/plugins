@@ -21,3 +21,7 @@ export const getOrderByIdStatus404Schema = z.unknown()
 export const getOrderByIdResponseSchema = getOrderByIdStatus200Schema
 
 export const getOrderByIdErrorSchema = z.union([getOrderByIdStatus400Schema, getOrderByIdStatus404Schema])
+
+export const getOrderByIdPathSchema = z.object({
+  orderId: z.int().describe('ID of order that needs to be fetched'),
+})

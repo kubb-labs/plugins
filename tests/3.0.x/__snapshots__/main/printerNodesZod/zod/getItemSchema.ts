@@ -11,3 +11,7 @@ export const getItemPathIdSchema = z.coerce.bigint()
 export const getItemStatus200Schema = itemSchema.describe('A simple item')
 
 export const getItemResponseSchema = getItemStatus200Schema
+
+export const getItemPathSchema = z.object({
+  id: z.coerce.bigint(),
+})

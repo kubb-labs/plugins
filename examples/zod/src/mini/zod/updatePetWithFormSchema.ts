@@ -16,3 +16,12 @@ export const updatePetWithFormStatus405Schema = z.unknown()
 export const updatePetWithFormResponseSchema = z.unknown()
 
 export const updatePetWithFormErrorSchema = updatePetWithFormStatus405Schema
+
+export const updatePetWithFormPathSchema = z.object({
+  petId: z.coerce.bigint(),
+})
+
+export const updatePetWithFormQuerySchema = z.object({
+  name: z.optional(z.string()),
+  status: z.optional(z.string()),
+})

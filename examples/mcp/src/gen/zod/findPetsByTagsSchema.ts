@@ -26,3 +26,13 @@ export const findPetsByTagsStatus400Schema = z.unknown()
 export const findPetsByTagsResponseSchema = findPetsByTagsStatus200Schema
 
 export const findPetsByTagsErrorSchema = findPetsByTagsStatus400Schema
+
+export const findPetsByTagsQuerySchema = z.object({
+  tags: z.array(z.string()).optional().describe('Tags to filter by'),
+  page: z.string().optional().describe('to request with required page number or pagination'),
+  pageSize: z.string().optional().describe('to request with required page size'),
+})
+
+export const findPetsByTagsHeadersSchema = z.object({
+  'X-EXAMPLE': findPetsByTagsXEXAMPLESchema.describe('Header parameters'),
+})

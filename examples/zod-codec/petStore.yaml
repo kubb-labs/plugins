@@ -1,0 +1,129 @@
+openapi: 3.0.3
+info:
+  title: Codec Pet Store
+  description: Dates, int64 ids, and URIs in every request slot and in the responses, to show custom zod codecs end to end.
+  version: 1.0.0
+servers:
+  - url: https://petstore.example.com/api
+paths:
+  /pets:
+    get:
+      operationId: listPets
+      tags: [pet]
+      summary: List pets born after a date
+      parameters:
+        - name: bornAfter
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The pets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+  /pets/{petId}/visits/{day}:
+    put:
+      operationId: scheduleVisit
+      tags: [pet]
+      summary: Schedule a vet visit on a day
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: day
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: callback
+          in: query
+          schema:
+            type: string
+            format: uri
+        - name: X-Requested-At
+          in: header
+          schema:
+            type: string
+            format: date-time
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitRequest'
+      responses:
+        '200':
+          description: The scheduled visit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visit'
+        '409':
+          description: The slot is taken
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [nextFreeAt]
+                properties:
+                  nextFreeAt:
+                    type: string
+                    format: date-time
+components:
+  schemas:
+    Pet:
+      type: object
+      required: [id, name, birthDate, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        homepage:
+          type: string
+          format: uri
+        birthDate:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+    VisitRequest:
+      type: object
+      required: [startsAt]
+      properties:
+        startsAt:
+          type: string
+          format: date-time
+        notes:
+          type: string
+    Visit:
+      type: object
+      required: [petId, day, startsAt]
+      properties:
+        petId:
+          type: integer
+          format: int64
+        day:
+          type: string
+          format: date
+        startsAt:
+          type: string
+          format: date-time
+        notes:
+          type: string

@@ -20,3 +20,16 @@ export const updatePetStatus200Schema = petSchema
 export const updatePetResponseSchema = updatePetStatus200Schema
 
 export const updatePetBodySchema = petUpdateSchema
+
+export const updatePetPathSchema = z.object({
+  pet_id: z.string(),
+})
+
+export const updatePetQuerySchema = z.object({
+  include_deleted: z.boolean().optional(),
+  request_source: z.string().optional(),
+})
+
+export const updatePetHeadersSchema = z.object({
+  'X-Request-ID': z.string().optional(),
+})

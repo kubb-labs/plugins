@@ -1,0 +1,123 @@
+openapi: 3.0.3
+info:
+  title: Codec params
+  description: "Date params and bodies that round-trip through zod codecs with `dateType: 'date'`."
+  version: 1.0.0
+paths:
+  /events/{day}:
+    put:
+      operationId: putEvent
+      tags: [event]
+      parameters:
+        - name: day
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: after
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: X-Since
+          in: header
+          schema:
+            type: string
+            format: date-time
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '409':
+          description: conflict
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [conflictsAt]
+                properties:
+                  conflictsAt:
+                    type: string
+                    format: date-time
+  /events:
+    get:
+      operationId: listEvents
+      tags: [event]
+      parameters:
+        - name: ids
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+  /resources/{resource}:
+    get:
+      operationId: getResource
+      tags: [event]
+      parameters:
+        - name: resource
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uri
+        - name: callback
+          in: query
+          schema:
+            type: string
+            format: uri
+        - name: revision
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: X-Origin
+          in: header
+          schema:
+            type: string
+            format: uri
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [resource, revision]
+                properties:
+                  resource:
+                    type: string
+                    format: uri
+                  revision:
+                    type: integer
+                    format: int64
+components:
+  schemas:
+    Event:
+      type: object
+      required: [startsAt]
+      properties:
+        startsAt:
+          type: string
+          format: date-time
+        title:
+          type: string

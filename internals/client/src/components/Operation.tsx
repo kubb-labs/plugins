@@ -68,6 +68,9 @@ export function Operation({ name, node, types, zodResolver, validator, returnTyp
 
   const validatorEntries = [
     validators.request ? `request: ${validators.request}` : null,
+    validators.path ? `path: ${validators.path}` : null,
+    validators.query ? `query: ${validators.query}` : null,
+    validators.headers ? `headers: ${validators.headers}` : null,
     validators.response ? `response: ${validators.response}` : null,
     validators.error ? `error: ${validators.error}` : null,
   ].filter(Boolean)

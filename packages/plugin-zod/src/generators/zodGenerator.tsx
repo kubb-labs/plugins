@@ -15,6 +15,15 @@ import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
 
+/**
+ * The helper an inferred alias is printed with. `'direction'` reads a request (encode) schema from its
+ * input and a response (decode) schema from its output; `true` keeps `z.infer` for both.
+ */
+function aliasKind(inferred: PluginZod['resolvedOptions']['inferred'], direction: 'encode' | 'decode'): 'infer' | 'input' | 'output' {
+  if (inferred !== 'direction') return 'infer'
+  return direction === 'encode' ? 'input' : 'output'
+}
+
 type StdPrinters = { decode: ReturnType<typeof printerZod>; encode: ReturnType<typeof printerZod> }
 type ZodPrinterEntry = StdPrinters & { coercion: unknown; guidType: unknown; regexType: unknown; dateType: unknown; nodes: unknown }
 type ZodMiniPrinterEntry = { printer: ReturnType<typeof printerZodMini>; coercion: unknown; guidType: unknown; regexType: unknown; nodes: unknown }
@@ -136,7 +145,6 @@ export const zodGenerator = defineGenerator<PluginZod>({
       file: resolver.file({ name: node.name, extname: '.ts', root, output, group: group ?? undefined }),
     } as const
 
-    const inferTypeName = inferred ? resolver.schema.typeName(node.name) : null
     const isName = typeGuards ? resolver.schema.isName(node.name) : null
     const assertName = typeGuards ? resolver.schema.assertName(node.name) : null
 
@@ -160,7 +168,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
           name={meta.name}
           node={node}
           printer={schemaPrinter}
-          inferTypeName={inferTypeName}
+          inferTypeName={inferred ? resolver.schema.typeName(node.name) : null}
+          inferKind={aliasKind(inferred, 'decode')}
           typeGuards={typeGuards}
           isName={isName}
           assertName={assertName}
@@ -174,6 +183,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
             node={node}
             printer={stdPrinters.encode}
             inferTypeName={inferred ? resolver.schema.inputTypeName(node.name) : null}
+            inferKind={aliasKind(inferred, 'encode')}
             typeGuards={typeGuards}
             isName={typeGuards ? resolver.schema.isName(resolver.schema.inputName(node.name)) : null}
             assertName={typeGuards ? resolver.schema.assertName(resolver.schema.inputName(node.name)) : null}
@@ -213,8 +223,6 @@ export const zodGenerator = defineGenerator<PluginZod>({
     }) {
       if (!schema) return null
 
-      const inferTypeName = inferred ? resolver.schema.type(name) : null
-
       const directionalRefNames = direction === 'encode' && !mini ? new Set(collectDirectionalRefNames({ node: schema, printerOptions })) : null
       const imports = resolver.imports({
         node: schema,
@@ -251,7 +259,15 @@ export const zodGenerator = defineGenerator<PluginZod>({
               `z.ZodType` annotation at their own definition when cyclic. Annotating the operation
               schema too would only erase its inferred type to `unknown`, breaking typed consumers
               (e.g. the MCP server's request types), so it is never marked cyclic here. */}
-          <Zod name={name} node={schema} printer={schemaPrinter} inferTypeName={inferTypeName} cyclic={false} compile={compile} />
+          <Zod
+            name={name}
+            node={schema}
+            printer={schemaPrinter}
+            inferTypeName={inferred ? resolver.schema.type(name) : null}
+            inferKind={aliasKind(inferred, direction)}
+            cyclic={false}
+            compile={compile}
+          />
         </>
       )
     }
@@ -371,34 +387,35 @@ export const zodGenerator = defineGenerator<PluginZod>({
       )
     })()
 
-    // Grouped path/query/headers schemas plus the combined `{ body, path, query, headers }` options
-    // and per-status `responses` schemas exist only to back `resolver.response.options(node)` and
-    // `resolver.response.responses(node)` for consumers sourcing types from this plugin instead of
-    // `plugin-ts`. Not worth generating when nothing will import them.
+    // Grouped path/query/headers schemas, one object per group: what a client's `validator.path` /
+    // `query` / `headers` runs at request time, and what the options schema below references.
     const { path, query, header } = getOperationParameters(node)
 
-    const paramGroupSchemas = inferred
-      ? (
-          [
-            { kind: 'path', params: path },
-            { kind: 'query', params: query },
-            { kind: 'headers', params: header },
-          ] as const
-        )
-          .filter(({ params }) => params.length > 0)
-          .map(({ kind, params }) =>
-            renderSchemaEntry({
-              schema: ast.factory.createSchema({
-                type: 'object',
-                // `primitive: 'object'` makes the printer emit `z.object(…)` rather than a record.
-                primitive: 'object',
-                properties: params.map((param) => ast.factory.createProperty({ name: param.name, required: param.required, schema: param.schema })),
-              }),
-              name: resolver.param[kind](node, params[0]!),
-              direction: 'encode',
-            }),
-          )
-      : []
+    const paramGroupSchemas = (
+      [
+        { kind: 'path', params: path },
+        { kind: 'query', params: query },
+        { kind: 'headers', params: header },
+      ] as const
+    )
+      .filter(({ params }) => params.length > 0)
+      .map(({ kind, params }) =>
+        renderSchemaEntry({
+          schema: ast.factory.createSchema({
+            type: 'object',
+            // `primitive: 'object'` makes the printer emit `z.object(…)` rather than a record.
+            primitive: 'object',
+            properties: params.map((param) => ast.factory.createProperty({ name: param.name, required: param.required, schema: param.schema })),
+          }),
+          name: resolver.param[kind](node, params[0]!),
+          direction: 'encode',
+        }),
+      )
+
+    // The combined `{ body, path, query, headers }` options and per-status `responses` schemas exist
+    // only to back `resolver.response.options(node)` and `resolver.response.responses(node)` for
+    // consumers sourcing types from this plugin instead of `plugin-ts`. Not worth generating when
+    // nothing will import them.
 
     const optionsSchema = inferred
       ? renderSchemaEntry({ schema: buildOptionsSchema(node, resolver), name: resolver.name(`${node.operationId} Options`), direction: 'encode' })

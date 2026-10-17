@@ -694,6 +694,134 @@ describe('zodGenerator — transformers', () => {
   })
 })
 
+describe('zodGenerator — inferred aliases', () => {
+  const slotSchema = ast.factory.createSchema({
+    type: 'object',
+    primitive: 'object',
+    name: 'Slot',
+    properties: [
+      ast.factory.createProperty({ name: 'startsAt', required: true, schema: ast.factory.createSchema({ type: 'time', representation: 'string' }) }),
+    ],
+  })
+
+  const bookSlot = ast.factory.createOperation({
+    operationId: 'bookSlot',
+    method: 'POST',
+    path: '/slots/{day}',
+    tags: ['slots'],
+    parameters: [ast.factory.createParameter({ name: 'day', in: 'path', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+    requestBody: { content: [ast.factory.createContent({ contentType: 'application/json', schema: slotSchema })] },
+    responses: [ast.factory.createResponse({ statusCode: '200', schema: slotSchema, description: 'ok' })],
+  })
+
+  function resolveOptions(inferred: PluginZod['resolvedOptions']['inferred']): PluginZod['resolvedOptions'] {
+    return { ...defaultOptions, inferred, printer: { nodes: temporalNodes } }
+  }
+
+  async function renderSchema(node: ast.SchemaNode, options: PluginZod['resolvedOptions']) {
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: `alias-${node.name}` })
+    await renderGeneratorSchema(zodGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+    return rawSources(driver.fileManager.files)[0]
+  }
+
+  async function renderOperation(node: ast.OperationNode, options: PluginZod['resolvedOptions']) {
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: `alias-${node.operationId}` })
+    await renderGeneratorOperation(zodGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+    return rawSources(driver.fileManager.files)[0]
+  }
+
+  // A custom `format: uri` codec: `URL` is the domain value, its string the wire value. Request schemas take
+  // the `URL` and transform it to the wire string, response schemas transform the wire string back.
+  const encodeUrl = 'z.instanceof(URL).transform((url) => url.href)'
+  const decodeUrl = 'z.url().transform((value) => new URL(value))'
+  const urlCodec: PrinterZodNodes = {
+    url() {
+      return this.options.direction === 'encode' ? encodeUrl : decodeUrl
+    },
+  }
+
+  const getResource = ast.factory.createOperation({
+    operationId: 'getResource',
+    method: 'GET',
+    path: '/resources/{resource}',
+    tags: ['resources'],
+    parameters: [ast.factory.createParameter({ name: 'resource', in: 'path', required: true, schema: ast.factory.createSchema({ type: 'url' }) })],
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '200',
+        description: 'ok',
+        schema: ast.factory.createSchema({
+          type: 'object',
+          primitive: 'object',
+          properties: [ast.factory.createProperty({ name: 'resource', required: true, schema: ast.factory.createSchema({ type: 'url' }) })],
+        }),
+      }),
+    ],
+  })
+
+  test('a custom codec printer node prints the encode transform for request schemas and the decode transform for responses', async () => {
+    const source = await renderOperation(getResource, { ...defaultOptions, inferred: 'direction', printer: { nodes: urlCodec } })
+    expect(source).toContain(`export const getResourcePathResourceSchema = ${encodeUrl}`)
+    expect(source).toContain(`resource: ${encodeUrl},`)
+    expect(source).toContain(`resource: ${decodeUrl},`)
+  })
+
+  test("a custom codec printer node: 'direction' types the request side from z.input and the response from z.output, true keeps z.infer", async () => {
+    const direction = await renderOperation(getResource, { ...defaultOptions, inferred: 'direction', printer: { nodes: urlCodec } })
+    expect(direction).toContain('export type GetResourcePathSchemaType = z.input<typeof getResourcePathSchema>')
+    expect(direction).toContain('export type GetResourceStatus200SchemaType = z.output<typeof getResourceStatus200Schema>')
+
+    const infer = await renderOperation(getResource, { ...defaultOptions, inferred: true, printer: { nodes: urlCodec } })
+    expect(infer).toContain('export type GetResourcePathSchemaType = z.infer<typeof getResourcePathSchema>')
+    expect(infer).toContain('export type GetResourceStatus200SchemaType = z.infer<typeof getResourceStatus200Schema>')
+    expect(infer).toContain(`resource: ${encodeUrl},`)
+  })
+
+  test('inferred: true keeps z.infer for a codec component and its encode variant', async () => {
+    const source = await renderSchema(slotSchema, resolveOptions(true))
+    expect(source).toContain('export type SlotSchemaType = z.infer<typeof slotSchema>')
+    expect(source).toContain('export type SlotInputSchemaType = z.infer<typeof slotInputSchema>')
+  })
+
+  test("inferred: 'direction' reads the encode variant from its input and the component from its output", async () => {
+    const source = await renderSchema(slotSchema, resolveOptions('direction'))
+    expect(source).toContain('export type SlotSchemaType = z.output<typeof slotSchema>')
+    expect(source).toContain('export type SlotInputSchemaType = z.input<typeof slotInputSchema>')
+  })
+
+  test('inferred: true keeps z.infer for every operation schema', async () => {
+    const source = await renderOperation(bookSlot, resolveOptions(true))
+    expect(source).not.toMatch(/z\.(input|output)</)
+    expect(source).toContain('export type BookSlotOptionsSchemaType = z.infer<typeof bookSlotOptionsSchema>')
+  })
+
+  test("inferred: 'direction' reads request schemas from their input and response schemas from their output", async () => {
+    const source = await renderOperation(bookSlot, resolveOptions('direction'))
+    expect(source).toContain('export type BookSlotBodySchemaType = z.input<typeof bookSlotBodySchema>')
+    expect(source).toContain('export type BookSlotPathSchemaType = z.input<typeof bookSlotPathSchema>')
+    expect(source).toContain('export type BookSlotOptionsSchemaType = z.input<typeof bookSlotOptionsSchema>')
+    expect(source).toContain('export type BookSlotStatus200SchemaType = z.output<typeof bookSlotStatus200Schema>')
+    expect(source).toContain('export type BookSlotResponsesSchemaType = z.output<typeof bookSlotResponsesSchema>')
+    expect(source).not.toContain('z.infer')
+  })
+})
+
 describe('zodGenerator — Type Guards', () => {
   const testSchema = ast.factory.createSchema({
     type: 'object',
