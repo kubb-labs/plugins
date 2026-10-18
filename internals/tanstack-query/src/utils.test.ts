@@ -8,6 +8,7 @@ import {
   matchesInfinite,
   resolveInfiniteConfig,
   resolveMutationConfig,
+  resolveOperationOverrides,
   resolveQueryConfig,
 } from './utils.ts'
 
@@ -256,5 +257,14 @@ describe('getDefaultPageParamsWarning', () => {
     { cursorParam: 'cursor' },
   ])('stays quiet when the page params are configured: %o', (options) => {
     expect(getDefaultPageParamsWarning(listPetsNode(pageSchema), infinite(options))).toBeNull()
+  })
+})
+
+describe('resolveOperationOverrides', () => {
+  test('matches an extension override by key and value', () => {
+    const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets', extensions: { 'x-internal': true } })
+
+    expect(resolveOperationOverrides(node, [{ type: 'extension', key: 'x-internal', value: false, options: { hooks: false } }])).toStrictEqual({})
+    expect(resolveOperationOverrides(node, [{ type: 'extension', key: 'x-internal', options: { hooks: false } }])).toStrictEqual({ hooks: false })
   })
 })

@@ -6,7 +6,7 @@ import {
   resolveErrorNames,
   resolveSuccessNames,
 } from '@internals/shared'
-import type { ast } from 'kubb/kit'
+import type { ast, Include } from 'kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
 import type { Infinite, Mutation, PageParamFn, Query } from './types.ts'
@@ -373,13 +373,16 @@ export function getDefaultPageParamsWarning(node: ast.OperationNode, infinite: I
   return `${node.operationId}: the default infinite page params expect an array response and never end for this one. Set \`infinite.getNextPageParam\` (or \`nextParam\`) to read the next page from the response.`
 }
 
-type OverrideEntry<TOptions> = {
-  type: string
-  pattern: string | RegExp
+// `Include` is the `Filter` union from @kubb/core, which kubb/kit does not export by that name.
+type OverrideEntry<TOptions> = Include & {
   options?: Partial<TOptions>
 }
 
-function matchesPattern(node: ast.OperationNode, ov: { type: string; pattern: string | RegExp }): boolean {
+function matchesPattern(node: ast.OperationNode, ov: Include): boolean {
+  if (ov.type === 'extension') {
+    const { extensions } = node
+    return extensions !== undefined && Object.hasOwn(extensions, ov.key) && (ov.value === undefined || extensions[ov.key] === ov.value)
+  }
   const { type, pattern } = ov
   const matches = (value: string) => (typeof pattern === 'string' ? value === pattern : pattern.test(value))
   if (type === 'operationId') return matches(node.operationId)
