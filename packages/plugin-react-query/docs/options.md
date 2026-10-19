@@ -12,9 +12,9 @@ Pass these options to `pluginReactQuery()`. Shared options link to [Shared plugi
 | [`infinite`](#infinite)                                                   | Generate `useInfiniteQuery` hooks for pagination.                      | `false`                                                                                |
 | [`suspense`](#suspense)                                                   | Generate `useSuspenseQuery` hooks.                                     | `false`                                                                                |
 | [`query`](#query)                                                         | Configure the query hooks.                                             | `{ methods: ['GET', 'QUERY'], importPath: '@tanstack/react-query' }`                   |
-| [`queryKey`](#querykey)                                                   | Build the `queryKey` for each query hook.                              | Built-in `queryKeyTransformer`                                                         |
+| [`queryKey`](#querykey)                                                   | Build the `queryKey` for each query hook.                              | Exported `queryKeyTransformer`                                                         |
 | [`mutation`](#mutation)                                                   | Configure the mutation hooks.                                          | `{ methods: ['POST', 'PUT', 'PATCH', 'DELETE'], importPath: '@tanstack/react-query' }` |
-| [`mutationKey`](#mutationkey)                                             | Build the `mutationKey` for each mutation hook.                        | Built-in `mutationKeyTransformer`                                                      |
+| [`mutationKey`](#mutationkey)                                             | Build the `mutationKey` for each mutation hook.                        | Exported `mutationKeyTransformer`                                                      |
 | [`customOptions`](#customoptions)                                         | Route every hook through your own options function.                    | None                                                                                   |
 | [`hooks`](#hooks)                                                         | Emit `use*` hook functions on top of the factories.                    | `false`                                                                                |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                       | None                                                                                   |
@@ -190,12 +190,20 @@ Builds the `queryKey` for each hook from the operation `node`, `casing` and `var
 | -------- | ------------------------------------------------------ |
 | Type     | `(props: { node, casing, variant }) => Array<unknown>` |
 | Required | `false`                                                |
-| Default  | Built-in `queryKeyTransformer`                         |
+| Default  | Exported `queryKeyTransformer`                         |
 
 `variant` is `'query'`, `'suspenseQuery'`, `'infiniteQuery'` or `'suspenseInfiniteQuery'`. The default key adds `infinite: true` to infinite variants so they never share a cache entry with the plain query.
 
 ```typescript
 queryKey: ({ node, variant }) => [JSON.stringify({ variant, operationId: node.operationId })]
+```
+
+To extend the default key instead of replacing it, import `queryKeyTransformer` and spread its result. The default segments can change between releases, so spread them instead of reading single entries.
+
+```typescript
+import { queryKeyTransformer } from '@kubb/plugin-react-query'
+
+queryKey: (props) => [JSON.stringify(props.node.operationId), ...queryKeyTransformer(props)]
 ```
 
 ### mutation
@@ -236,7 +244,15 @@ Builds the `mutationKey` for each mutation hook, for batched invalidations or `u
 | -------- | ------------------------------------------------------ |
 | Type     | `(props: { node, casing, variant }) => Array<unknown>` |
 | Required | `false`                                                |
-| Default  | Built-in `mutationKeyTransformer`                      |
+| Default  | Exported `mutationKeyTransformer`                      |
+
+Extend the default the same way with `mutationKeyTransformer`:
+
+```typescript
+import { mutationKeyTransformer } from '@kubb/plugin-react-query'
+
+mutationKey: (props) => [JSON.stringify(props.node.operationId), ...mutationKeyTransformer(props)]
+```
 
 ### customOptions
 

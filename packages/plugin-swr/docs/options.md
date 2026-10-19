@@ -10,9 +10,9 @@ Pass these options to `pluginSwr()`, all of them optional. Shared options link t
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path: `type`, `name`.                           | None                                                                          |
 | [`client`](#client)                                                       | Which registered client plugin the hooks call.                         | Auto-detected                                                                 |
 | [`query`](#query)                                                         | Configure the `useSWR` hooks, or turn them off.                        | `{ methods: ['GET', 'QUERY'], importPath: 'swr' }`                            |
-| [`queryKey`](#querykey)                                                   | Build the SWR key for each query hook.                                 | Built-in `queryKeyTransformer`                                                |
+| [`queryKey`](#querykey)                                                   | Build the SWR key for each query hook.                                 | Exported `queryKeyTransformer`                                                |
 | [`mutation`](#mutation)                                                   | Configure the `useSWRMutation` hooks, or turn them off.                | `{ methods: ['POST', 'PUT', 'PATCH', 'DELETE'], importPath: 'swr/mutation' }` |
-| [`mutationKey`](#mutationkey)                                             | Build the SWR key for each mutation hook.                              | Built-in `mutationKeyTransformer`                                             |
+| [`mutationKey`](#mutationkey)                                             | Build the SWR key for each mutation hook.                              | Exported `mutationKeyTransformer`                                             |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                       | None                                                                          |
 | [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                                            | `[]`                                                                          |
 | [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                   | `[]`                                                                          |
@@ -86,10 +86,18 @@ Builds the SWR key for each query hook. The callback receives the operation `nod
 | -------- | ------------------------------------------------------ |
 | Type     | `(props: { node, casing, variant }) => Array<unknown>` |
 | Required | `false`                                                |
-| Default  | Built-in `queryKeyTransformer`                         |
+| Default  | Exported `queryKeyTransformer`                         |
 
 ```typescript
 queryKey: ({ node, variant }) => [JSON.stringify({ variant, operationId: node.operationId })]
+```
+
+To extend the default key instead of replacing it, import `queryKeyTransformer` and spread its result. The default segments can change between releases, so spread them instead of reading single entries.
+
+```typescript
+import { queryKeyTransformer } from '@kubb/plugin-swr'
+
+queryKey: (props) => [JSON.stringify(props.node.operationId), ...queryKeyTransformer(props)]
 ```
 
 ### mutation
@@ -130,7 +138,15 @@ Builds the SWR key for each mutation hook. Like `queryKey`, the callback receive
 | -------- | ------------------------------------------------------ |
 | Type     | `(props: { node, casing, variant }) => Array<unknown>` |
 | Required | `false`                                                |
-| Default  | Built-in `mutationKeyTransformer`                      |
+| Default  | Exported `mutationKeyTransformer`                      |
+
+Extend the default the same way with `mutationKeyTransformer`:
+
+```typescript
+import { mutationKeyTransformer } from '@kubb/plugin-swr'
+
+mutationKey: (props) => [JSON.stringify(props.node.operationId), ...mutationKeyTransformer(props)]
+```
 
 ### resolver
 
