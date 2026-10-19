@@ -1,5 +1,19 @@
 # @kubb/plugin-swr
 
+## 5.4.4
+
+### Patch Changes
+
+- [#1147](https://github.com/kubb-labs/plugins/pull/1147) [`3545fe6`](https://github.com/kubb-labs/plugins/commit/3545fe6c42e1524a5de5d35a653753153c136865) Thanks [@DesselBane](https://github.com/DesselBane)! - Export the default `queryKeyTransformer` and `mutationKeyTransformer` so a custom `queryKey` or `mutationKey` builder can extend the default key instead of copying it. `@kubb/plugin-vue-query` and `@kubb/plugin-react-query` also export the `Transformer` type now. Generated output is unchanged.
+  
+  ```ts
+  import { queryKeyTransformer } from '@kubb/plugin-vue-query'
+  
+  pluginVueQuery({
+    queryKey: (props) => [JSON.stringify(props.node.operationId), ...queryKeyTransformer(props)],
+  })
+  ```
+
 ## 5.4.3
 
 ### Patch Changes
