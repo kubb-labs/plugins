@@ -1,5 +1,5 @@
 export { default, pluginVueQuery, pluginVueQueryName } from './plugin.ts'
 export { resolverVueQuery } from './resolvers/resolverVueQuery.ts'
-export { definePageParam } from '@internals/tanstack-query'
+export { definePageParam, mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 export type { PageParamFn } from '@internals/tanstack-query'
-export type { PluginVueQuery, ResolverVueQuery } from './types.ts'
+export type { PluginVueQuery, ResolverVueQuery, Transformer } from './types.ts'

@@ -1,6 +1,6 @@
 import { ast } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
-import type { KeyVariant } from '../types.ts'
+import type { KeyVariant, Transformer } from '../types.ts'
 import { mutationKeyTransformer } from './MutationKey.tsx'
 import { queryKeyTransformer } from './QueryKey.tsx'
 
@@ -70,6 +70,16 @@ describe('queryKeyTransformer', () => {
   test('returns no entries for an operation without a path', () => {
     expect(keys('query', ast.factory.createOperation({ operationId: 'event' }))).toEqual([])
   })
+
+  test('can be extended by a custom builder', () => {
+    const queryKey: Transformer = (props) => [JSON.stringify(props.node.operationId), ...queryKeyTransformer(props)]
+
+    expect(queryKey({ node: getPetByIdNode, casing: 'camelcase', variant: 'query' })).toEqual([
+      '"getPetById"',
+      "{ url: '/pet/:petId', params: path }",
+      '...(query ? [query] : [])',
+    ])
+  })
 })
 
 describe('mutationKeyTransformer', () => {
@@ -79,5 +89,11 @@ describe('mutationKeyTransformer', () => {
 
   test('returns no entries for an operation without a path', () => {
     expect(mutationKeyTransformer({ node: ast.factory.createOperation({ operationId: 'event' }), casing: 'camelcase', variant: 'mutation' })).toEqual([])
+  })
+
+  test('can be extended by a custom builder', () => {
+    const mutationKey: Transformer = (props) => [JSON.stringify(props.node.operationId), ...mutationKeyTransformer(props)]
+
+    expect(mutationKey({ node: getPetByIdNode, casing: 'camelcase', variant: 'mutation' })).toEqual(['"getPetById"', "{ url: '/pet/:petId' }"])
   })
 })

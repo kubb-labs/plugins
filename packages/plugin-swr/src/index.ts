@@ -1,3 +1,4 @@
 export { default, pluginSwr, pluginSwrName } from './plugin.ts'
 export { resolverSwr } from './resolvers/resolverSwr.ts'
+export { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 export type { PluginSwr, ResolverSwr, Transformer } from './types.ts'

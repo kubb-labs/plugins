@@ -16,6 +16,16 @@ type Props = {
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
+/**
+ * Default `mutationKey` builder. Call it from a custom builder to extend the default key.
+ *
+ * @remarks The returned segments may change between releases. Spread them instead of reading single entries.
+ *
+ * @example
+ * ```ts
+ * mutationKey: (props) => [JSON.stringify(props.node.operationId), ...mutationKeyTransformer(props)]
+ * ```
+ */
 export const mutationKeyTransformer: Transformer = ({ node }) => {
   if (!node.path) return []
   return [`{ url: '${Url.toPath(node.path)}' }`]
