@@ -24,10 +24,10 @@ A generated `Pet` becomes `ApiPet`. File names stay unchanged unless you also cu
 
 ## Map schema types
 
-Replace [printer handlers](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#printer) with TypeScript AST nodes.
+Replace [printer handlers](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#printer) with TypeScript AST nodes. Install `@typescript/typescript6` first, because `typescript` 7 no longer exports the compiler API.
 
 ```typescript [kubb.config.ts]
-import ts from 'typescript'
+import ts from '@typescript/typescript6'
 import { pluginTs } from '@kubb/plugin-ts'
 
 pluginTs({

@@ -282,7 +282,7 @@ export type Options = OutputOptions & {
    *
    * @example Use the JavaScript `Date` object for date schemas
    * ```ts
-   * import ts from 'typescript'
+   * import ts from '@typescript/typescript6'
    * pluginTs({
    *   printer: {
    *     nodes: {

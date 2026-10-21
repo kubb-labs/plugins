@@ -1,7 +1,7 @@
 import { mapSchemaItems, mapSchemaProperties } from '@internals/shared'
 import { ast, isStringType, syncSchemaRef } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
-import type ts from 'typescript'
+import type ts from '@typescript/typescript6'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { buildPropertyJSDocComments, enumTypeName, isInlineConstEnum } from '../utils.ts'

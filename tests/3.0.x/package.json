@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^10.6.0",
+    "@typescript/typescript6": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
