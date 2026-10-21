@@ -22,7 +22,7 @@ export default defineConfig([
   {
     entry,
     format: 'esm',
-    dts: true,
+    dts: { tsconfig: '../../tsconfig.dts.json' },
     ...shared,
   },
   {

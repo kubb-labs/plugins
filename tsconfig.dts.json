@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.json",
+  "include": ["packages/*/src/**/*", "packages/*/templates/**/*", "internals/*/src/**/*"],
+  "exclude": ["node_modules", "dist", "tmp", "coverage", "**/__snapshots__/**", "**/.kubb/**", "**/*.test.*"]
+}

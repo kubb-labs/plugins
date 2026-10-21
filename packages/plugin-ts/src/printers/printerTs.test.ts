@@ -1,6 +1,6 @@
 import { ast } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
-import ts from 'typescript'
+import ts from '@typescript/typescript6'
 import { describe, expect, it } from 'vitest'
 import { format } from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'

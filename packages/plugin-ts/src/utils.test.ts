@@ -1,6 +1,6 @@
 import { buildResponses } from '@internals/shared'
 import { ast } from 'kubb/kit'
-import ts from 'typescript'
+import ts from '@typescript/typescript6'
 import { describe, expect, it } from 'vitest'
 import { printerTs } from './printers/printerTs.ts'
 import { resolverTs } from './resolvers/resolverTs.ts'

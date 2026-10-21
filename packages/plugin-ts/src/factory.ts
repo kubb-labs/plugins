@@ -2,13 +2,13 @@ import { createRequire } from 'node:module'
 import { camelCase, pascalCase, screamingSnakeCase, snakeCase } from '@internals/utils'
 import { syncSchemaRef } from 'kubb/kit'
 import type { ast } from 'kubb/kit'
-import type ts from 'typescript'
+import type ts from '@typescript/typescript6'
 
 /**
  * Loaded with `require`, not `import`. When ESM imports a CommonJS package, Node keeps a second
  * copy of its source to detect named exports, and for TypeScript that copy is about 9 MB.
  */
-const typescript: typeof ts = createRequire(import.meta.url)('typescript')
+const typescript: typeof ts = createRequire(import.meta.url)('@typescript/typescript6')
 
 const { SyntaxKind, factory } = typescript
 

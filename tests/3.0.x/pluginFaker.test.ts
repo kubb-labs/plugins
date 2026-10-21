@@ -9,7 +9,7 @@ import { ast, type Config, Diagnostics, type KubbHooks, fsStorage } from 'kubb/k
 import { parserTs } from '@kubb/parser-ts'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginTs } from '@kubb/plugin-ts'
-import ts from 'typescript'
+import ts from '@typescript/typescript6'
 import { describe, expect, onTestFinished, test } from 'vitest'
 
 const __filename = fileURLToPath(import.meta.url)
