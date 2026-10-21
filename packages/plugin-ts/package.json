@@ -79,10 +79,12 @@
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "typescript": "catalog:"
   },
   "peerDependencies": {
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "typescript": "catalog:"
   },
   "engines": {
     "node": ">=22.12"
