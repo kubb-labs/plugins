@@ -94,7 +94,7 @@
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*",
-    "@tanstack/react-query": "^5.104.3",
+    "@tanstack/react-query": "^5.104.4",
     "kubb": "catalog:"
   },
   "peerDependencies": {

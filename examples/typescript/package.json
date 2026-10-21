@@ -13,6 +13,7 @@
   "sideEffects": false,
   "scripts": {
     "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate",
+    "studio": "KUBB_DISABLE_TELEMETRY=1 kubb studio",
     "generate:debug": "NODE_OPTIONS='--inspect-brk' KUBB_DISABLE_TELEMETRY=1 kubb generate",
     "validate": "kubb validate petStore.yaml",
     "typecheck": "tsc"
