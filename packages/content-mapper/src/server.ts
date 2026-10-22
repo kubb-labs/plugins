@@ -1,3 +1,4 @@
+import { cacheTransform } from './cache.ts'
 import { type Options, parseOptions } from './options.ts'
 import { createDecoder, encode, type Message } from './rpc.ts'
 import { transform, type TransformParams } from './transform.ts'
@@ -8,6 +9,8 @@ const writeProtocol = process.stdout.write.bind(process.stdout)
 process.stdout.write = process.stderr.write.bind(process.stderr) as typeof process.stdout.write
 
 const projects = new Map<string, Options>()
+
+const cachedTransform = cacheTransform(transform)
 
 const handlers: Record<string, (params: never) => unknown> = {
   initialize: () => ({ protocolVersion: 1, positionEncoding: 'utf-16', diagnosticSource: 'kubb' }),
@@ -21,7 +24,7 @@ const handlers: Record<string, (params: never) => unknown> = {
     projects.delete(projectHandle)
     return null
   },
-  transform: (params: TransformParams & { projectHandle: string }) => transform(params, projects.get(params.projectHandle)),
+  transform: (params: TransformParams & { projectHandle: string }) => cachedTransform(params, projects.get(params.projectHandle)),
 }
 
 async function handle({ id, method = '', params }: Message): Promise<void> {
