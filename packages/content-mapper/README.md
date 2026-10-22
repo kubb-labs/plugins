@@ -37,6 +37,8 @@ tsc --noEmit --runExternalCode
 
 VS Code passes `--runExternalCode` to the TypeScript language server only in trusted workspaces.
 
+See [`examples/content-mapper`](https://github.com/kubb-labs/plugins/tree/main/examples/content-mapper) for a working setup.
+
 ## Limits
 
 - Only `@kubb/plugin-ts` runs, with its default options. `kubb.config.ts` is not read.

@@ -1,0 +1,29 @@
+{
+  "name": "content-mapper-pet-store",
+  "version": "0.0.0",
+  "private": true,
+  "description": "PetStore example that imports types straight from the spec with @kubb/content-mapper",
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kubb-labs/plugins.git",
+    "directory": "examples/content-mapper"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "typecheck": "tsc --runExternalCode"
+  },
+  "dependencies": {
+    "@kubb/content-mapper": "workspace:*",
+    "kubb": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "7.1.0-dev.20261020.3"
+  },
+  "engines": {
+    "node": ">=22.12",
+    "pnpm": ">=11.0.0"
+  }
+}
