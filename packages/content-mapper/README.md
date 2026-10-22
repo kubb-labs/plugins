@@ -81,4 +81,4 @@ See [`examples/content-mapper`](https://github.com/kubb-labs/plugins/tree/main/e
 
 - Only `@kubb/plugin-ts` runs, and `arrayType` is its only option you can set. `kubb.config.ts` is not read.
 - Properties of operation types (path parameters, inline response bodies) do not link to the spec, and renaming a type does not rename the key in the spec.
-- A changed spec runs a full Kubb build: about 0.4 s and 150 MB for a 10 KB spec, about 4.5 s and 400 MB for a 2 MB spec. A repeated request for unchanged content reuses the last result.
+- A changed spec runs a full Kubb build: about 0.4 s and 155 MB for a 10 KB spec, about 2.6 s and 245 MB for a 1.4 MB spec. A repeated request for unchanged content reuses the last result.
