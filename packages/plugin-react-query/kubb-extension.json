@@ -232,9 +232,8 @@
       "key": "customOptionsName",
       "path": ["customOptions", "name"],
       "label": "Custom Options Name",
-      "description": "Exported name of that hook. Needs the import path",
-      "type": "text",
-      "default": "useCustomHookOptions"
+      "description": "Exported name of that hook, useCustomHookOptions when empty. Needs the import path",
+      "type": "text"
     },
     {
       "key": "banner",
