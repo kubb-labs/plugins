@@ -220,6 +220,34 @@
       "description": "Module specifier the generated mutation hook imports from",
       "type": "text",
       "default": "@tanstack/react-query"
+    },
+    {
+      "key": "customOptionsImportPath",
+      "path": ["customOptions", "importPath"],
+      "label": "Custom Options Import Path",
+      "description": "Module of your hook that adds options to every generated query and mutation",
+      "type": "text"
+    },
+    {
+      "key": "customOptionsName",
+      "path": ["customOptions", "name"],
+      "label": "Custom Options Name",
+      "description": "Exported name of that hook, useCustomHookOptions when empty. Needs the import path",
+      "type": "text"
+    },
+    {
+      "key": "banner",
+      "path": ["output", "banner"],
+      "label": "Banner",
+      "description": "Text added at the top of every generated file",
+      "type": "text"
+    },
+    {
+      "key": "footer",
+      "path": ["output", "footer"],
+      "label": "Footer",
+      "description": "Text added at the end of every generated file",
+      "type": "text"
     }
   ]
 }
