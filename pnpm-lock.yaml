@@ -750,6 +750,34 @@ importers:
         specifier: ^4.6.7
         version: 4.6.7
 
+  examples/zod-codec:
+    dependencies:
+      '@kubb/adapter-oas':
+        specifier: 'catalog:'
+        version: 5.10.3(openapi-types@12.1.3)(vitest@5.0.3)
+      '@kubb/parser-ts':
+        specifier: 'catalog:'
+        version: 5.10.3(vitest@5.0.3)
+      '@kubb/plugin-fetch':
+        specifier: workspace:*
+        version: link:../../packages/plugin-fetch
+      '@kubb/plugin-zod':
+        specifier: workspace:*
+        version: link:../../packages/plugin-zod
+      kubb:
+        specifier: 'catalog:'
+        version: 5.10.3(openapi-types@12.1.3)(rolldown@1.2.13)(typescript@6.0.3)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.3)
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.20.2
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
   internals/client:
     dependencies:
       '@internals/shared':
@@ -1115,6 +1143,9 @@ importers:
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
+      '@kubb/plugin-client':
+        specifier: workspace:*
+        version: link:../../packages/plugin-client
       '@kubb/plugin-cypress':
         specifier: workspace:*
         version: link:../../packages/plugin-cypress

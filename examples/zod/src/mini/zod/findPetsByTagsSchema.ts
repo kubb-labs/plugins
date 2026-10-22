@@ -27,3 +27,13 @@ export const findPetsByTagsStatus400Schema = z.unknown()
 export const findPetsByTagsResponseSchema = findPetsByTagsStatus200Schema
 
 export const findPetsByTagsErrorSchema = findPetsByTagsStatus400Schema
+
+export const findPetsByTagsQuerySchema = z.object({
+  tags: z.optional(z.array(z.string()).check(z.refine((items) => new Set(items).size === items.length, { message: 'Array entries must be unique' }))),
+  page: z.optional(z.string()),
+  pageSize: z.optional(z.string()),
+})
+
+export const findPetsByTagsHeadersSchema = z.object({
+  'X-EXAMPLE': z.enum(['ONE', 'TWO', 'THREE']),
+})

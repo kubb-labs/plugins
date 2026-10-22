@@ -9,7 +9,7 @@ Pass these options to `pluginZod()`. Shared options link to [Shared plugin optio
 | [`output`](https://kubb.dev/docs/5.x/reference/plugin-options#output)     | Where files are written: `path`, `mode`, `barrel`, `banner`, `footer`. | `{ path: 'zod', barrel: { type: 'named' } }` |
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path: `type`, `name`.                           | None                                         |
 | [`importPath`](#importpath)                                               | Module the generated files import `z` from.                            | `'zod'`, or `'zod/mini'` with `mini`         |
-| [`inferred`](#inferred)                                                   | Emit a `z.infer` alias next to each schema.                            | `false`                                      |
+| [`inferred`](#inferred)                                                   | Emit a `z.infer` (or `z.input`/`z.output`) alias next to each schema.  | `false`                                      |
 | [`coercion`](#coercion)                                                   | Coerce input before validation.                                        | `false`                                      |
 | [`guidType`](#guidtype)                                                   | Validator for `format: uuid` properties.                               | `'uuid'`                                     |
 | [`regexType`](#regextype)                                                 | How an OpenAPI `pattern` is written.                                   | `'literal'`                                  |
@@ -39,17 +39,41 @@ Module the generated files import `z` from. Point it at your own module to re-ex
 
 ### inferred
 
-Exports a `z.infer<typeof schema>` type next to each schema, so you do not need `@kubb/plugin-ts`. The type takes the PascalCase schema name plus `SchemaType`, so `petSchema` gets `PetSchemaType`.
+Exports a type alias next to each schema, so you do not need `@kubb/plugin-ts`. The type takes the PascalCase schema name plus `SchemaType`, so `petSchema` gets `PetSchemaType`.
 
-|          |           |
-| -------- | --------- |
-| Type     | `boolean` |
-| Required | `false`   |
-| Default  | `false`   |
+|          |                          |
+| -------- | ------------------------ |
+| Type     | `boolean \| 'direction'` |
+| Required | `false`                  |
+| Default  | `false`                  |
+
+::field-group
+
+:::field{name="false"}
+Default value. Emits no type aliases.
+:::
+
+:::field{name="true"}
+Emits `z.infer<typeof schema>` for every schema.
+:::
+
+:::field{name="'direction'"}
+Emits `z.input<typeof schema>` for request schemas (bodies and params) and `z.output<typeof schema>` for response schemas. Use it with codecs, where a request takes the domain value (a `Date`) that the schema encodes and a response returns the decoded value.
+:::
+
+::
 
 ```typescript
 export type PetSchemaType = z.infer<typeof petSchema>
 ```
+
+With `'direction'`, request types read the schema's input:
+
+```typescript
+export type PutEventBodySchemaType = z.input<typeof putEventBodySchema>
+```
+
+Pair `'direction'` with `validator: { request: 'zod', params: 'zod' }` in [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/options#validator) or [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#validator). Without request validation, the client sends the domain value unencoded.
 
 It also writes a `ResponsesSchema` for each operation (one schema per status code) and its inferred type. [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch) and [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios) key their `RequestResult` on it when `@kubb/plugin-ts` is absent.
 

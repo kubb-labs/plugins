@@ -15,3 +15,7 @@ export const listPetsStatusDefaultSchema = z.object({})
 export const listPetsResponseSchema = listPetsStatus200Schema
 
 export const listPetsErrorSchema = listPetsStatusDefaultSchema
+
+export const listPetsQuerySchema = z.object({
+  limit: z.int().optional(),
+})

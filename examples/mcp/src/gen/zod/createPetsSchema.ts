@@ -25,3 +25,15 @@ export const createPetsBodySchema = z.object({
   name: z.string(),
   tag: z.string(),
 })
+
+export const createPetsPathSchema = z.object({
+  uuid: z.string().describe('UUID'),
+})
+
+export const createPetsQuerySchema = z.object({
+  offset: z.int().optional().describe('Offset */'),
+})
+
+export const createPetsHeadersSchema = z.object({
+  'X-EXAMPLE': createPetsXEXAMPLESchema.describe('Header parameters'),
+})

@@ -16,6 +16,13 @@ type Props = {
    */
   printer: ast.Printer<PrinterZodFactory> | ast.Printer<PrinterZodMiniFactory>
   inferTypeName?: string | null
+  /**
+   * The helper the `inferTypeName` alias is printed with. `infer` and `output` name the parsed value,
+   * `input` the value the schema accepts; they differ only for a codec.
+   *
+   * @default 'infer'
+   */
+  inferKind?: 'infer' | 'input' | 'output'
   typeGuards?: boolean | { is?: boolean; assert?: boolean }
   isName?: string | null
   assertName?: string | null
@@ -35,7 +42,7 @@ type Props = {
   compile?: boolean | CompileOptions
 }
 
-export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, assertName, mini, cyclic, compile }: Props): KubbReactNode {
+export function Zod({ name, node, printer, inferTypeName, inferKind = 'infer', typeGuards, isName, assertName, mini, cyclic, compile }: Props): KubbReactNode {
   const output = printer.print(node)
   const printerImports = printer.drainImports()
 
@@ -77,7 +84,7 @@ export function Zod({ name, node, printer, inferTypeName, typeGuards, isName, as
       {inferTypeName && (
         <File.Source name={inferTypeName} isExportable isIndexable isTypeOnly>
           <Type export name={inferTypeName}>
-            {`z.infer<typeof ${name}>`}
+            {`z.${inferKind}<typeof ${name}>`}
           </Type>
         </File.Source>
       )}

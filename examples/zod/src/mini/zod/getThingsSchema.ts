@@ -17,3 +17,8 @@ export const getThingsStatusDefaultSchema = petNotFoundSchema
 export const getThingsResponseSchema = getThingsStatus201Schema
 
 export const getThingsErrorSchema = getThingsStatusDefaultSchema
+
+export const getThingsQuerySchema = z.object({
+  limit: z._default(z.optional(z.int().check(z.minimum(1), z.maximum(100))), 100),
+  skip: z._default(z.optional(z.int().check(z.minimum(0))), 0),
+})

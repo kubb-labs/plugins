@@ -4,9 +4,9 @@ import { ast, defineGenerator } from 'kubb/kit'
 import type { Generator } from 'kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from 'kubb/jsx'
-import { buildValidatorHooks } from '../builders/validator.ts'
-import { resolveRequestValidator, resolveResponseValidator } from '../builders/validatorOptions.ts'
+import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { getOperationSecurity, type SecurityDocument } from '../builders/security.ts'
+import { buildValidatorHooks } from '../builders/validator.ts'
 import { Operation } from '../components/Operation.tsx'
 import { resolveOperationTypes } from '../resolveOperationTypes.ts'
 import type { ContractClientFactory } from '../types.ts'
@@ -34,12 +34,13 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
 
       const types = resolveOperationTypes(driver, ctx.plugin.name)
 
-      const validatorEnabled = resolveResponseValidator(validator) === 'zod' || resolveRequestValidator(validator) === 'zod'
-      const pluginZod = validatorEnabled ? driver.getPlugin(pluginZodName) : null
+      const pluginZod = isValidatorEnabled(validator) ? driver.getPlugin(pluginZodName) : null
       const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
       const importedTypeNames = [types.response.options(node), types.response.responses(node)]
-      const importedZodNames = buildValidatorHooks({ node, validator, zodResolver }).importedZodNames
+
+      const validatorHooks = buildValidatorHooks({ node, validator, zodResolver })
+      const importedZodNames = validatorHooks.importedZodNames
 
       const meta = {
         name: resolver.name(node.operationId),
@@ -74,6 +75,9 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
       const customClientPath = resolveClientPath?.(ctx.options, root)
       const clientPath = customClientPath ?? path.resolve(root, '.kubb/client.ts')
       const clientRoot = customClientPath === undefined ? meta.file.path : undefined
+      // The headers validator helper ships in `.kubb/standardSchema.ts`; a custom client module exports it
+      // alongside its other runtime helpers.
+      const standardSchemaPath = customClientPath ?? path.resolve(root, '.kubb/standardSchema.ts')
       const eventStream = isEventStream(node)
 
       const clientValueImports = (() => {
@@ -106,6 +110,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
           )}
 
           {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames} root={meta.file.path} path={meta.fileZod.path} />}
+          {validatorHooks.headers && <File.Import name={['toHeadersStandardSchema']} root={clientRoot} path={standardSchemaPath} />}
 
           <Operation
             name={meta.name}

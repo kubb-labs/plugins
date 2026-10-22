@@ -14,3 +14,11 @@ export const deletePetStatus400Schema = z.unknown()
 export const deletePetResponseSchema = z.unknown()
 
 export const deletePetErrorSchema = deletePetStatus400Schema
+
+export const deletePetPathSchema = z.object({
+  petId: z.int().describe('Pet id to delete'),
+})
+
+export const deletePetHeadersSchema = z.object({
+  api_key: z.string().optional(),
+})
