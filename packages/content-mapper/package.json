@@ -1,0 +1,79 @@
+{
+  "name": "@kubb/content-mapper",
+  "version": "0.0.0",
+  "description": "Import OpenAPI specs in TypeScript with types from Kubb, through TypeScript 7.1 content mappers. No generated files.",
+  "keywords": [
+    "code-generation",
+    "codegen",
+    "content-mapper",
+    "kubb",
+    "openapi",
+    "typescript"
+  ],
+  "homepage": "https://kubb.dev",
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kubb-labs/plugins.git",
+    "directory": "packages/content-mapper"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/stijnvanhulle"
+    },
+    {
+      "type": "opencollective",
+      "url": "https://opencollective.com/kubb"
+    },
+    {
+      "type": "custom",
+      "url": "https://kubb.dev/sponsors"
+    }
+  ],
+  "files": [
+    "dist",
+    "!/**/**.test.**",
+    "!/**/__tests__/**",
+    "!/**/__snapshots__/**"
+  ],
+  "type": "module",
+  "sideEffects": true,
+  "exports": {
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
+    "start": "tsdown --watch",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@kubb/adapter-oas": "catalog:",
+    "@kubb/core": "catalog:",
+    "@kubb/parser-ts": "catalog:",
+    "@kubb/plugin-ts": "workspace:^"
+  },
+  "devDependencies": {
+    "kubb": "catalog:"
+  },
+  "peerDependencies": {
+    "kubb": "catalog:"
+  },
+  "typescript": {
+    "contentMapper": {
+      "exec": [
+        "node",
+        "dist/server.js"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">=22.12"
+  }
+}

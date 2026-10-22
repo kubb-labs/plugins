@@ -23,6 +23,10 @@ bundle_analysis:
 
 component_management:
   individual_components:
+    - component_id: content-mapper
+      name: '@kubb/content-mapper'
+      paths:
+        - packages/content-mapper/**
     - component_id: plugin-axios
       name: '@kubb/plugin-axios'
       paths:
