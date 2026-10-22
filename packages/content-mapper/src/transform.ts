@@ -1,8 +1,9 @@
 import { dirname } from 'node:path'
 import { adapterOas } from '@kubb/adapter-oas'
-import { createKubb, memoryStorage } from '@kubb/core'
+import { type Adapter, createKubb, Diagnostics, memoryStorage } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginTs } from '@kubb/plugin-ts'
+import { createMappings, type Segment, type Targets } from './mappings.ts'
 import type { Options } from './options.ts'
 
 /**
@@ -15,11 +16,12 @@ export type TransformParams = {
 
 /**
  * Result of the content mapper `transform` request: the virtual TypeScript module TypeScript
- * checks in place of the spec file.
+ * checks in place of the spec file, and the segments linking its names back to the spec.
  */
 export type TransformResult = {
   text: string
   extension: '.ts'
+  mappings?: Array<Segment>
   diagnostics?: Array<{ messageText: string; start: number; length: number }>
 }
 
@@ -28,33 +30,46 @@ export type TransformResult = {
  *
  * The spec text comes from the request, not the disk, so unsaved editor changes are typed too.
  * Nothing is written: the build runs into a memory storage. A failed build returns an empty
- * module with the error-level diagnostics placed at the start of the spec.
+ * module with the error-level diagnostics placed on the spec key they point at.
  */
 export async function transform({ fileName, content }: TransformParams, { arrayType }: Options = {}): Promise<TransformResult> {
   const storage = memoryStorage()
+  const adapter = adapterOas()
   const kubb = createKubb({
     root: dirname(fileName),
     input: content,
     output: { path: '.kubb', barrel: false, format: false, lint: false },
-    adapter: adapterOas(),
+    adapter,
     parsers: [parserTs()],
     plugins: [pluginTs({ arrayType, output: { path: 'index.ts' } })],
     storage,
   })
 
+  const targets: Targets = { schemas: new Map(), operations: new Map() }
+  kubb.hooks.hook('kubb:generate:schema', (node, { resolver }) => {
+    if (node.name) targets.schemas.set(resolver.name(node.name), node.name)
+  })
+  kubb.hooks.hook('kubb:generate:operation', (node, { resolver }) => {
+    if ('path' in node && node.path && node.method) targets.operations.set(resolver.name(node.operationId), { path: node.path, method: node.method })
+  })
+
   const { diagnostics } = await kubb.safeBuild()
-  const errors = diagnostics.filter((diagnostic) => diagnostic.severity === 'error')
+  const errors = diagnostics.filter(Diagnostics.isProblem).filter((diagnostic) => diagnostic.severity === 'error')
   const [key] = await storage.readKeys()
   const text = key ? await storage.readItem(key) : null
 
+  const locate = (location: Parameters<NonNullable<Adapter['locate']>>[1] | undefined) => (location ? adapter.locate?.(content, location) : undefined)
+
   if (errors.length || !text) {
-    // shortcut: diagnostics point at offset 0, upgrade once adapter-oas tracks source ranges
     return {
       text: 'export {}',
       extension: '.ts',
-      diagnostics: errors.map((error) => ({ messageText: error.message, start: 0, length: 0 })),
+      diagnostics: errors.map((error) => {
+        const range = locate(error.location)
+        return { messageText: error.message, start: range?.start ?? 0, length: range ? range.end - range.start : 0 }
+      }),
     }
   }
 
-  return { text, extension: '.ts' }
+  return { text, extension: '.ts', mappings: createMappings(text, (pointer) => locate({ kind: 'schema', pointer }), targets) }
 }

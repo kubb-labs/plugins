@@ -840,6 +840,9 @@ importers:
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
+      '@typescript/typescript6':
+        specifier: 'catalog:'
+        version: 6.0.2
     devDependencies:
       kubb:
         specifier: 'catalog:'

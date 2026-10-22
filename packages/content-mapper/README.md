@@ -37,6 +37,22 @@ Run the type check with external code allowed:
 tsc --noEmit --runExternalCode
 ```
 
+## Editor support
+
+Generated names link back to the keys they came from in the spec. Go to definition and find references cross from TypeScript into the YAML, and hovering a key in the YAML shows its generated type.
+
+| Generated name                                                | Jumps to                                                                  |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `Pet`                                                         | `components.schemas.Pet`                                                  |
+| `Pet['name']`                                                 | `properties.name` under `Pet`, nested objects and arrays of them included |
+| `orderStatusEnum`, `OrderStatusEnumKey`                       | the `status` property the enum came from                                  |
+| `GetPetByIdResponse`, `GetPetByIdOptions`                     | the `get` operation under `/pet/{petId}`                                  |
+| `GetPetByIdPath`, `FindPetsByStatusQuery`, `DeletePetHeaders` | the operation's `parameters`                                              |
+| `GetPetByIdStatus404`                                         | `responses.404`                                                           |
+| `AddPetBody`                                                  | the operation's `requestBody`                                             |
+
+Spec errors, such as an unresolved `$ref`, show on the key or value they point at.
+
 ## Options
 
 Set options on the `contentMappers` entry. TypeScript reports an unknown key or an invalid value on `tsconfig.json`.
@@ -64,5 +80,5 @@ See [`examples/content-mapper`](https://github.com/kubb-labs/plugins/tree/main/e
 ## Limits
 
 - Only `@kubb/plugin-ts` runs, and `arrayType` is its only option you can set. `kubb.config.ts` is not read.
-- Go to definition does not jump into the spec, and spec errors are reported at the start of the file.
+- Properties of operation types (path parameters, inline response bodies) do not link to the spec, and renaming a type does not rename the key in the spec.
 - Each transform runs a full Kubb build of the spec.

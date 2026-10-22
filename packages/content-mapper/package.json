@@ -57,7 +57,8 @@
     "@kubb/adapter-oas": "catalog:",
     "@kubb/core": "catalog:",
     "@kubb/parser-ts": "catalog:",
-    "@kubb/plugin-ts": "workspace:^"
+    "@kubb/plugin-ts": "workspace:^",
+    "@typescript/typescript6": "catalog:"
   },
   "devDependencies": {
     "kubb": "catalog:"

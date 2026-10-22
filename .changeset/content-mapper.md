@@ -15,3 +15,5 @@ import type { Pet } from './petStore.openapi.yaml'
 ```
 
 Run `tsc --runExternalCode` on a TypeScript build that supports content mappers (`typescript@next` today). Imports are type-only, and only `@kubb/plugin-ts` runs. Set `options.arrayType` on the `contentMappers` entry to choose `T[]` or `Array<T>`.
+
+Go to definition, find references and hover link generated types and properties to their keys in the spec, and spec errors show on the key they point at.
