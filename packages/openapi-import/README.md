@@ -3,7 +3,7 @@
 Import an OpenAPI spec straight into TypeScript and get the types Kubb generates, with no generated files on disk.
 
 ```ts
-import type { Order, Pet } from './petStore.openapi.yaml'
+import type { Pet } from './petStore.openapi.yaml'
 
 const pet: Pet = { name: 'Rex', photoUrls: [] }
 ```
@@ -36,6 +36,8 @@ Run the type check with external code allowed:
 ```bash
 tsc --noEmit --runExternalCode
 ```
+
+VS Code passes `--runExternalCode` to the TypeScript language server only in trusted workspaces.
 
 ## Editor support
 
@@ -72,8 +74,6 @@ Set options on the `contentMappers` entry. TypeScript reports an unknown key or 
 | Option      | Values                 | Default   | Description                                                              |
 | ----------- | ---------------------- | --------- | ------------------------------------------------------------------------ |
 | `arrayType` | `'array'`, `'generic'` | `'array'` | Prints arrays as `T[]` or `Array<T>`, like the `@kubb/plugin-ts` option. |
-
-VS Code passes `--runExternalCode` to the TypeScript language server only in trusted workspaces.
 
 See [`examples/openapi-import`](https://github.com/kubb-labs/plugins/tree/main/examples/openapi-import) for a working setup.
 

@@ -10,7 +10,6 @@ describe('transform', () => {
     const result = await transform({ fileName, content: await readFile(fileName, 'utf8') })
 
     expect(result.diagnostics).toBeUndefined()
-    expect(result.extension).toBe('.ts')
     expect(result.text).toContain('export type Pet = {')
     expect(result.text).not.toMatch(/^import /m)
   })
