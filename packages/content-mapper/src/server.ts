@@ -2,8 +2,10 @@ import { type Options, parseOptions } from './options.ts'
 import { createDecoder, encode, type Message } from './rpc.ts'
 import { transform, type TransformParams } from './transform.ts'
 
-// stdout carries the protocol, so logs from Kubb or its plugins go to stderr.
-console.log = console.info = console.warn = console.error
+// stdout carries the protocol, so every other stdout write (any console method, direct writes from
+// Kubb or its plugins) goes to stderr.
+const writeProtocol = process.stdout.write.bind(process.stdout)
+process.stdout.write = process.stderr.write.bind(process.stderr) as typeof process.stdout.write
 
 const projects = new Map<string, Options>()
 
@@ -28,13 +30,13 @@ async function handle({ id, method = '', params }: Message): Promise<void> {
 
   try {
     if (!handler) {
-      process.stdout.write(encode({ id, error: { code: -32601, message: `Unknown method "${method}"` } }))
+      writeProtocol(encode({ id, error: { code: -32601, message: `Unknown method "${method}"` } }))
       return
     }
     const result = await handler(params as never)
-    process.stdout.write(encode({ id, result: result ?? null }))
+    writeProtocol(encode({ id, result: result ?? null }))
   } catch (error) {
-    process.stdout.write(encode({ id, error: { code: -32603, message: error instanceof Error ? (error.stack ?? error.message) : String(error) } }))
+    writeProtocol(encode({ id, error: { code: -32603, message: error instanceof Error ? (error.stack ?? error.message) : String(error) } }))
   }
 }
 
