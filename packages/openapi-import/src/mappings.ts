@@ -76,6 +76,12 @@ function objectLiteral(type: ts.TypeNode | undefined): { node: ts.TypeLiteralNod
   return undefined
 }
 
+/** The members of an interface, or of a type alias for an object literal. */
+function typeMembers(statement: ts.TypeAliasDeclaration | ts.InterfaceDeclaration): ts.NodeArray<ts.TypeElement> | undefined {
+  if (ts.isInterfaceDeclaration(statement)) return statement.members
+  return ts.isTypeLiteralNode(statement.type) ? statement.type.members : undefined
+}
+
 /**
  * Builds span map segments that link generated declaration and property names to the keys they
  * came from in the spec, so go to definition, hover and find references cross between the two.
@@ -121,23 +127,9 @@ export function createMappings(text: string, locate: Locate, targets: Targets): 
     // Property names only resolve under a schema, not under operation parameters or responses.
     const pointer = pointers[0]
     if (!pointer || !targets.schemas.has(statement.name.text)) continue
-    if (ts.isInterfaceDeclaration(statement)) addMembers(statement.members, pointer)
-    else if (ts.isTypeLiteralNode(statement.type)) addMembers(statement.type.members, pointer)
+    const members = typeMembers(statement)
+    if (members) addMembers(members, pointer)
   }
 
-  return withoutOriginalOverlaps(segments)
-}
-
-/**
- * TypeScript rejects original ranges that overlap unless they are identical, so a segment whose
- * spec range cuts into an earlier one is dropped. Segments come back ordered by virtual start.
- */
-function withoutOriginalOverlaps(segments: Array<Segment>): Array<Segment> {
-  const kept: Array<Segment> = []
-  for (const segment of [...segments].sort((a, b) => a[2] - b[2] || a[3] - b[3])) {
-    const last = kept.at(-1)
-    const identical = last && last[2] === segment[2] && last[3] === segment[3]
-    if (!last || identical || segment[2] >= last[2] + last[3]) kept.push(segment)
-  }
-  return kept.sort((a, b) => a[0] - b[0])
+  return segments
 }
