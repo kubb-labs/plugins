@@ -1,8 +1,10 @@
 import { dirname } from 'node:path'
 import { adapterOas } from '@kubb/adapter-oas'
-import { type Adapter, createKubb, Diagnostics, memoryStorage } from '@kubb/core'
+import { createKubb, Diagnostics, memoryStorage } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginTs } from '@kubb/plugin-ts'
+import { parseDocument } from 'yaml'
+import { createLocator } from './locate.ts'
 import { createMappings, type Segment, type Targets } from './mappings.ts'
 import type { Options } from './options.ts'
 
@@ -29,17 +31,26 @@ export type TransformResult = {
  * Generates the `@kubb/plugin-ts` types for one OpenAPI document as a single module.
  *
  * The spec text comes from the request, not the disk, so unsaved editor changes are typed too.
- * Nothing is written: the build runs into a memory storage. A failed build returns an empty
- * module with the error-level diagnostics placed on the spec key they point at.
+ * It is parsed once: Kubb builds from the parsed object, and the same document places diagnostics
+ * and mappings. Nothing is written: the build runs into a memory storage. A failed build returns
+ * an empty module with the error-level diagnostics placed on the spec key they point at.
  */
 export async function transform({ fileName, content }: TransformParams, { arrayType }: Options = {}): Promise<TransformResult> {
+  const document = parseDocument(content)
+  if (document.errors.length) {
+    return {
+      text: 'export {}',
+      extension: '.ts',
+      diagnostics: document.errors.map((error) => ({ messageText: error.message, start: error.pos[0], length: error.pos[1] - error.pos[0] })),
+    }
+  }
+
   const storage = memoryStorage()
-  const adapter = adapterOas()
   const kubb = createKubb({
     root: dirname(fileName),
-    input: content,
+    input: document.toJS(),
     output: { path: '.kubb', barrel: false, format: false, lint: false },
-    adapter,
+    adapter: adapterOas(),
     parsers: [parserTs()],
     plugins: [pluginTs({ arrayType, output: { path: 'index.ts' } })],
     storage,
@@ -58,18 +69,18 @@ export async function transform({ fileName, content }: TransformParams, { arrayT
   const [key] = await storage.readKeys()
   const text = key ? await storage.readItem(key) : null
 
-  const locate = (location: Parameters<NonNullable<Adapter['locate']>>[1] | undefined) => (location ? adapter.locate?.(content, location) : undefined)
+  const locate = createLocator(document)
 
   if (errors.length || !text) {
     return {
       text: 'export {}',
       extension: '.ts',
       diagnostics: errors.map((error) => {
-        const range = locate(error.location)
+        const range = error.location && 'pointer' in error.location ? locate(error.location) : undefined
         return { messageText: error.message, start: range?.start ?? 0, length: range ? range.end - range.start : 0 }
       }),
     }
   }
 
-  return { text, extension: '.ts', mappings: createMappings(text, (pointer) => locate({ kind: 'schema', pointer }), targets) }
+  return { text, extension: '.ts', mappings: createMappings(text, (pointer) => locate({ pointer }), targets) }
 }

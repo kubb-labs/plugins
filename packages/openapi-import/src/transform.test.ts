@@ -21,12 +21,15 @@ describe('transform', () => {
     expect((await transform({ fileName, content }, { arrayType: 'generic' })).text).toContain('photoUrls: Array<string>')
   })
 
-  test('returns an empty module and a diagnostic for an invalid spec', async () => {
-    const result = await transform({ fileName, content: 'openapi: 3.0.0\ninfo: [oops\n' })
+  test('returns an empty module and a diagnostic at the syntax error for an invalid spec', async () => {
+    const content = 'openapi: 3.0.0\ninfo: [oops\n'
+    const result = await transform({ fileName, content })
+    const [diagnostic] = result.diagnostics ?? []
 
     expect(result.text).toBe('export {}')
     expect(result.diagnostics).toHaveLength(1)
-    expect(result.diagnostics?.[0]?.messageText).toContain('JSON or YAML')
+    expect(diagnostic?.messageText).toContain('Flow sequence')
+    expect(diagnostic!.start).toBeGreaterThan(content.indexOf('info'))
   })
 
   test('places a spec error on the key it points at', async () => {
