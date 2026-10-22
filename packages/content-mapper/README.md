@@ -3,7 +3,7 @@
 Import an OpenAPI spec straight into TypeScript and get the types Kubb generates, with no generated files on disk.
 
 ```ts
-import type { Order, Pet } from './petStore.yaml'
+import type { Order, Pet } from './petStore.openapi.yaml'
 
 const pet: Pet = { name: 'Rex', photoUrls: [] }
 ```
@@ -21,13 +21,15 @@ pnpm add -D kubb @kubb/content-mapper typescript@next
 
 npm rejects `typescript@next` against the `typescript@^7.0.2` peer range of `@kubb/plugin-ts`, so add `--legacy-peer-deps` there.
 
-Register the mapper for your spec extensions in `tsconfig.json`:
+Name your specs with an `.openapi.yaml` extension, such as `petStore.openapi.yaml`, and register that extension in `tsconfig.json`:
 
 ```json
 {
-  "contentMappers": [{ "package": "@kubb/content-mapper", "extensions": [".yaml"] }]
+  "contentMappers": [{ "package": "@kubb/content-mapper", "extensions": [".openapi.yaml", ".openapi.yml"] }]
 }
 ```
+
+TypeScript sends every file with a registered extension that `include` matches to the mapper, not only the files you import. A plain `.yaml` would also pick up files such as `docker-compose.yaml` and fail on them, and it would block other content mappers from `.yaml`. JSON specs cannot be mapped: TypeScript treats any extension ending in `.json` as built-in.
 
 Run the type check with external code allowed:
 
@@ -44,7 +46,7 @@ Set options on the `contentMappers` entry. TypeScript reports an unknown key or 
   "contentMappers": [
     {
       "package": "@kubb/content-mapper",
-      "extensions": [".yaml"],
+      "extensions": [".openapi.yaml"],
       "options": { "arrayType": "generic" }
     }
   ]

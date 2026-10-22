@@ -10,7 +10,7 @@
   "contentMappers": [
     {
       "package": "@kubb/content-mapper",
-      "extensions": [".yaml"],
+      "extensions": [".openapi.yaml", ".openapi.yml"],
       "options": {
         "arrayType": "generic"
       }

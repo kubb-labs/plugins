@@ -6,12 +6,12 @@ Add `@kubb/content-mapper`, an experimental TypeScript 7.1 content mapper. Regis
 
 ```json
 {
-  "contentMappers": [{ "package": "@kubb/content-mapper", "extensions": [".yaml"] }]
+  "contentMappers": [{ "package": "@kubb/content-mapper", "extensions": [".openapi.yaml"] }]
 }
 ```
 
 ```ts
-import type { Pet } from './petStore.yaml'
+import type { Pet } from './petStore.openapi.yaml'
 ```
 
 Run `tsc --runExternalCode` on a TypeScript build that supports content mappers (`typescript@next` today). Imports are type-only, and only `@kubb/plugin-ts` runs. Set `options.arrayType` on the `contentMappers` entry to choose `T[]` or `Array<T>`.
