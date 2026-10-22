@@ -54,7 +54,7 @@ minimumReleaseAgeExclude:
   - 'unplugin-kubb'
   - '@types/*'
   - '@clack/core'
-  # examples/content-mapper needs a TypeScript 7.1 dev build with content mapper support
+  # examples/openapi-import needs a TypeScript 7.1 dev build with content mapper support
   - 'typescript@7.1.0-dev.20261022.1'
   - '@typescript/typescript-darwin-arm64@7.1.0-dev.20261022.1'
   - '@typescript/typescript-darwin-x64@7.1.0-dev.20261022.1'

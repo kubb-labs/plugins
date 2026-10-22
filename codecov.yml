@@ -23,10 +23,10 @@ bundle_analysis:
 
 component_management:
   individual_components:
-    - component_id: content-mapper
-      name: '@kubb/content-mapper'
+    - component_id: openapi-import
+      name: 'openapi-import'
       paths:
-        - packages/content-mapper/**
+        - packages/openapi-import/**
     - component_id: plugin-axios
       name: '@kubb/plugin-axios'
       paths:

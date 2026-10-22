@@ -1,12 +1,12 @@
 ---
-'@kubb/content-mapper': minor
+'openapi-import': minor
 ---
 
-Add `@kubb/content-mapper`, an experimental TypeScript 7.1 content mapper. Register it in `tsconfig.json` and import types straight from an OpenAPI spec, with no generated files on disk.
+Add `openapi-import`, an experimental TypeScript 7.1 content mapper. Register it in `tsconfig.json` and import types straight from an OpenAPI spec, with no generated files on disk.
 
 ```json
 {
-  "contentMappers": [{ "package": "@kubb/content-mapper", "extensions": [".openapi.yaml"] }]
+  "contentMappers": [{ "package": "openapi-import", "extensions": [".openapi.yaml"] }]
 }
 ```
 

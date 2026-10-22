@@ -1,4 +1,4 @@
-// The types come from `petStore.openapi.yaml` through `@kubb/content-mapper`, with no generated files.
+// The types come from `petStore.openapi.yaml` through `openapi-import`, with no generated files.
 import type { FindPetsByStatusQuery, FindPetsByStatusResponse, GetPetByIdPath, GetPetByIdResponse, Pet } from '../petStore.openapi.yaml'
 
 const baseUrl = 'https://petstore3.swagger.io/api/v3'

@@ -1,5 +1,5 @@
 {
-  "name": "@kubb/content-mapper",
+  "name": "openapi-import",
   "version": "0.0.0",
   "description": "Import OpenAPI specs in TypeScript with types from Kubb, through TypeScript 7.1 content mappers. No generated files.",
   "keywords": [
@@ -8,15 +8,16 @@
     "content-mapper",
     "kubb",
     "openapi",
+    "openapi-import",
     "typescript"
   ],
-  "homepage": "https://kubb.dev",
+  "homepage": "https://github.com/kubb-labs/plugins/tree/main/packages/openapi-import#readme",
   "license": "MIT",
   "author": "stijnvanhulle",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kubb-labs/plugins.git",
-    "directory": "packages/content-mapper"
+    "directory": "packages/openapi-import"
   },
   "funding": [
     {

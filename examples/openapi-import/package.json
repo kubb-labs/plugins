@@ -1,14 +1,14 @@
 {
-  "name": "content-mapper-pet-store",
+  "name": "openapi-import-pet-store",
   "version": "0.0.0",
   "private": true,
-  "description": "PetStore example that imports types straight from the spec with @kubb/content-mapper",
+  "description": "PetStore example that imports types straight from the spec with openapi-import",
   "license": "MIT",
   "author": "stijnvanhulle",
   "repository": {
     "type": "git",
     "url": "https://github.com/kubb-labs/plugins.git",
-    "directory": "examples/content-mapper"
+    "directory": "examples/openapi-import"
   },
   "type": "module",
   "sideEffects": false,
@@ -16,8 +16,8 @@
     "typecheck": "tsc --runExternalCode"
   },
   "dependencies": {
-    "@kubb/content-mapper": "workspace:*",
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "openapi-import": "workspace:*"
   },
   "devDependencies": {
     "typescript": "7.1.0-dev.20261022.1"
