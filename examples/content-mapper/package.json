@@ -20,7 +20,7 @@
     "kubb": "catalog:"
   },
   "devDependencies": {
-    "typescript": "7.1.0-dev.20261020.3"
+    "typescript": "7.1.0-dev.20261022.1"
   },
   "engines": {
     "node": ">=22.12",

@@ -54,5 +54,14 @@ minimumReleaseAgeExclude:
   - 'unplugin-kubb'
   - '@types/*'
   - '@clack/core'
+  # examples/content-mapper needs a TypeScript 7.1 dev build with content mapper support
+  - 'typescript@7.1.0-dev.20261022.1'
+  - '@typescript/typescript-darwin-arm64@7.1.0-dev.20261022.1'
+  - '@typescript/typescript-darwin-x64@7.1.0-dev.20261022.1'
+  - '@typescript/typescript-linux-arm@7.1.0-dev.20261022.1'
+  - '@typescript/typescript-linux-arm64@7.1.0-dev.20261022.1'
+  - '@typescript/typescript-linux-x64@7.1.0-dev.20261022.1'
+  - '@typescript/typescript-win32-arm64@7.1.0-dev.20261022.1'
+  - '@typescript/typescript-win32-x64@7.1.0-dev.20261022.1'
 pmOnFail: warn
 resolutionMode: highest
