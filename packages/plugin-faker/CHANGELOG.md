@@ -1,5 +1,20 @@
 # @kubb/plugin-faker
 
+## 5.1.10
+
+### Patch Changes
+
+- [#1165](https://github.com/kubb-labs/plugins/pull/1165) [`5d76f27`](https://github.com/kubb-labs/plugins/commit/5d76f2736eabb43ab72b5b7cc6880d54f09e5712) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Studio can now edit more plugin options, because each `kubb-extension.json` lists them:
+  
+  - Every plugin: `output.banner` and `output.footer` as text.
+  - `@kubb/plugin-axios` and `@kubb/plugin-fetch`: `returnType` and `throwOnErrorDefault`.
+  - `@kubb/plugin-client`: `throwOnErrorDefault`.
+  - `@kubb/plugin-faker`: `typeMode`.
+  - `@kubb/plugin-zod`: `compile` and `typeGuards` as on or off.
+  - `@kubb/plugin-react-query`: `customOptions.importPath` and `customOptions.name`.
+- Updated dependencies [[`5d76f27`](https://github.com/kubb-labs/plugins/commit/5d76f2736eabb43ab72b5b7cc6880d54f09e5712), [`07c62dd`](https://github.com/kubb-labs/plugins/commit/07c62dd57990afbfb12e0c937d446710fbcdc009)]:
+  - @kubb/plugin-ts@5.0.15
+
 ## 5.1.9
 
 ### Patch Changes
