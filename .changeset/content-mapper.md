@@ -14,4 +14,4 @@ Add `@kubb/content-mapper`, an experimental TypeScript 7.1 content mapper. Regis
 import type { Pet } from './petStore.yaml'
 ```
 
-Run `tsc --runExternalCode` on a TypeScript build that supports content mappers (`typescript@next` today). Imports are type-only, and only `@kubb/plugin-ts` runs, with its default options.
+Run `tsc --runExternalCode` on a TypeScript build that supports content mappers (`typescript@next` today). Imports are type-only, and only `@kubb/plugin-ts` runs. Set `options.arrayType` on the `contentMappers` entry to choose `T[]` or `Array<T>`.

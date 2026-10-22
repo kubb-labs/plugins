@@ -15,6 +15,13 @@ describe('transform', () => {
     expect(result.text).not.toMatch(/^import /m)
   })
 
+  test('prints arrays as `Array<T>` with `arrayType: generic`', async () => {
+    const content = await readFile(fileName, 'utf8')
+
+    expect((await transform({ fileName, content })).text).toContain('photoUrls: string[]')
+    expect((await transform({ fileName, content }, { arrayType: 'generic' })).text).toContain('photoUrls: Array<string>')
+  })
+
   test('returns an empty module and a diagnostic for an invalid spec', async () => {
     const result = await transform({ fileName, content: 'openapi: 3.0.0\ninfo: [oops\n' })
 

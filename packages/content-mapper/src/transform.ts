@@ -3,6 +3,7 @@ import { adapterOas } from '@kubb/adapter-oas'
 import { createKubb, memoryStorage } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginTs } from '@kubb/plugin-ts'
+import type { Options } from './options.ts'
 
 /**
  * Parameters of the content mapper `transform` request.
@@ -29,7 +30,7 @@ export type TransformResult = {
  * Nothing is written: the build runs into a memory storage. A failed build returns an empty
  * module with the error-level diagnostics placed at the start of the spec.
  */
-export async function transform({ fileName, content }: TransformParams): Promise<TransformResult> {
+export async function transform({ fileName, content }: TransformParams, { arrayType }: Options = {}): Promise<TransformResult> {
   const storage = memoryStorage()
   const kubb = createKubb({
     root: dirname(fileName),
@@ -37,7 +38,7 @@ export async function transform({ fileName, content }: TransformParams): Promise
     output: { path: '.kubb', barrel: false, format: false, lint: false },
     adapter: adapterOas(),
     parsers: [parserTs()],
-    plugins: [pluginTs({ output: { path: 'index.ts' } })],
+    plugins: [pluginTs({ arrayType, output: { path: 'index.ts' } })],
     storage,
   })
 

@@ -35,12 +35,32 @@ Run the type check with external code allowed:
 tsc --noEmit --runExternalCode
 ```
 
+## Options
+
+Set options on the `contentMappers` entry. TypeScript reports an unknown key or an invalid value on `tsconfig.json`.
+
+```json
+{
+  "contentMappers": [
+    {
+      "package": "@kubb/content-mapper",
+      "extensions": [".yaml"],
+      "options": { "arrayType": "generic" }
+    }
+  ]
+}
+```
+
+| Option      | Values                 | Default   | Description                                                              |
+| ----------- | ---------------------- | --------- | ------------------------------------------------------------------------ |
+| `arrayType` | `'array'`, `'generic'` | `'array'` | Prints arrays as `T[]` or `Array<T>`, like the `@kubb/plugin-ts` option. |
+
 VS Code passes `--runExternalCode` to the TypeScript language server only in trusted workspaces.
 
 See [`examples/content-mapper`](https://github.com/kubb-labs/plugins/tree/main/examples/content-mapper) for a working setup.
 
 ## Limits
 
-- Only `@kubb/plugin-ts` runs, with its default options. `kubb.config.ts` is not read.
+- Only `@kubb/plugin-ts` runs, and `arrayType` is its only option you can set. `kubb.config.ts` is not read.
 - Go to definition does not jump into the spec, and spec errors are reported at the start of the file.
 - Each transform runs a full Kubb build of the spec.
