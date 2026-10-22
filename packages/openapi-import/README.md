@@ -1,4 +1,4 @@
-# @kubb/content-mapper
+# openapi-import
 
 Import an OpenAPI spec straight into TypeScript and get the types Kubb generates, with no generated files on disk.
 
@@ -16,7 +16,7 @@ It is a [TypeScript content mapper](https://github.com/microsoft/typescript-go/p
 ## Setup
 
 ```bash
-pnpm add -D kubb @kubb/content-mapper typescript@next
+pnpm add -D kubb openapi-import typescript@next
 ```
 
 npm rejects `typescript@next` against the `typescript@^7.0.2` peer range of `@kubb/plugin-ts`, so add `--legacy-peer-deps` there.
@@ -25,7 +25,7 @@ Name your specs with an `.openapi.yaml` extension, such as `petStore.openapi.yam
 
 ```json
 {
-  "contentMappers": [{ "package": "@kubb/content-mapper", "extensions": [".openapi.yaml", ".openapi.yml"] }]
+  "contentMappers": [{ "package": "openapi-import", "extensions": [".openapi.yaml", ".openapi.yml"] }]
 }
 ```
 
@@ -61,7 +61,7 @@ Set options on the `contentMappers` entry. TypeScript reports an unknown key or 
 {
   "contentMappers": [
     {
-      "package": "@kubb/content-mapper",
+      "package": "openapi-import",
       "extensions": [".openapi.yaml"],
       "options": { "arrayType": "generic" }
     }
@@ -75,7 +75,7 @@ Set options on the `contentMappers` entry. TypeScript reports an unknown key or 
 
 VS Code passes `--runExternalCode` to the TypeScript language server only in trusted workspaces.
 
-See [`examples/content-mapper`](https://github.com/kubb-labs/plugins/tree/main/examples/content-mapper) for a working setup.
+See [`examples/openapi-import`](https://github.com/kubb-labs/plugins/tree/main/examples/openapi-import) for a working setup.
 
 ## Limits
 
