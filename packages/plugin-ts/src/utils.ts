@@ -1,5 +1,5 @@
 import { isSuccessStatusCode } from '@internals/shared'
-import { jsStringEscape, stringify } from '@internals/utils'
+import { stringify } from '@internals/utils'
 import { ast, syncSchemaRef } from 'kubb/kit'
 import type { ResolverTs } from './types.ts'
 
@@ -72,7 +72,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   const exampleValues = meta?.examples ?? []
 
   const comments = [
-    hasDescription ? `@description ${jsStringEscape(meta.description)}` : null,
+    hasDescription ? `@description ${meta.description}` : null,
     ...formatComment,
     meta && 'deprecated' in meta && meta.deprecated ? '@deprecated' : null,
     // minItems/maxItems on arrays should not be emitted as @minLength/@maxLength
