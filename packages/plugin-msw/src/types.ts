@@ -30,11 +30,6 @@ export type Options = OutputOptions & {
    * Base URL prepended to every handler's request URL. A `${...}` expression runs at runtime.
    * Pass `{ baseURL }` as a handler's second argument to override it per call.
    *
-   * @example
-   * ```ts
-   * baseURL: '${process.env.API_URL}'
-   * listPetsHandler(undefined, { baseURL: 'https://staging.example.com' })
-   * ```
    * @note Leave off the trailing slash. Operation paths already start with `/`.
    */
   baseURL?: string
@@ -61,11 +56,6 @@ export type Options = OutputOptions & {
   /**
    * Emit a `handlers.ts` file with every handler in operation order, as `handlers` and as
    * `createHandlers({ baseURL })` for a runtime base URL.
-   *
-   * @example
-   * ```ts
-   * setupServer(...createHandlers({ baseURL: getBaseURL() }))
-   * ```
    */
   handlers?: boolean
   /**
