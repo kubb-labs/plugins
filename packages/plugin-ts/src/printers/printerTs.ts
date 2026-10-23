@@ -14,9 +14,6 @@ const { isNonNullable } = factory
  * replaces the built-in handler for that node type and returns the TypeScript type as a string.
  * Use `this.transform` to recurse into nested schema nodes, and `this.options` to read printer options.
  *
- * Returning a TypeScript compiler node still works but is deprecated: it needs `@typescript/typescript6`
- * installed and is removed in the next major.
- *
  * @example Override the `date` handler
  * ```ts
  * pluginTs({
@@ -32,11 +29,7 @@ const { isNonNullable } = factory
  */
 export type PrinterTsNodes = ast.PrinterPartial<string | DeprecatedTsNode, PrinterTsOptions>
 
-/**
- * A TypeScript compiler node returned by a printer override.
- *
- * @deprecated Return the type as a string instead. Support is removed in the next major.
- */
+/** @deprecated A TypeScript compiler node returned by an override. Return a string; removed in the next major. */
 type DeprecatedTsNode = { readonly kind: number }
 
 export type PrinterTsOptions = {
@@ -106,9 +99,7 @@ export type PrinterTsFactory = ast.PrinterFactoryOptions<'typescript', PrinterTs
 
 type PrinterTs = PrinterTsFactory
 
-/**
- * Wraps user overrides so a deprecated compiler node result is printed to a string through `@kubb/parser-ts`.
- */
+/** Prints a deprecated compiler node returned by a user override to a string. */
 function toStringHandlers(nodes: PrinterTsNodes | undefined): ast.PrinterPartial<string, PrinterTsOptions> {
   return Object.fromEntries(
     Object.entries(nodes ?? {}).map(([type, handler]) => [
@@ -132,8 +123,6 @@ function toStringHandlers(nodes: PrinterTsNodes | undefined): ast.PrinterPartial
  * - **`printer.print(node)`** — when `options.name` is set, returns a full
  *   `type Name = …` or `interface Name { … }` declaration.
  *   Without `name`, returns the type for the schema, such as `string | null`.
- *
- * It builds strings directly instead of loading the TypeScript compiler, so it also runs in edge runtimes.
  *
  * Dispatches on `node.type` to the appropriate handler in `nodes`. Options are closed
  * over per printer instance, so each call to `printerTs(options)` produces an independent printer.
