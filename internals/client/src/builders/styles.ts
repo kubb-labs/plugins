@@ -17,14 +17,14 @@ function toKey(name: string, location: StyledLocation): string {
  * Serializes one parameter's metadata into a `{ style, explode, allowReserved, contentType }` literal, or `null`
  * when the parameter carries none. Path and query carry the serialization `style`; header and cookie
  * use a fixed style (`simple` and `form`), so only `explode` is emitted for them. `allowReserved`
- * and `contentType` only apply to query parameters.
+ * only applies to query parameters, and `contentType` to every location except path.
  */
 function serializeParameter(parameter: ast.ParameterNode): string | null {
   const parts: Array<string> = []
   if ((parameter.in === 'path' || parameter.in === 'query') && parameter.style) parts.push(`style: '${parameter.style}'`)
   if (parameter.explode !== undefined) parts.push(`explode: ${parameter.explode}`)
   if (parameter.in === 'query' && parameter.allowReserved !== undefined) parts.push(`allowReserved: ${parameter.allowReserved}`)
-  if (parameter.in === 'query' && parameter.contentType) parts.push(`contentType: '${parameter.contentType}'`)
+  if (parameter.in !== 'path' && parameter.contentType) parts.push(`contentType: '${parameter.contentType}'`)
   return parts.length > 0 ? `{ ${parts.join(', ')} }` : null
 }
 

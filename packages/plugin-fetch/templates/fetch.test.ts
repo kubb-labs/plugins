@@ -246,6 +246,10 @@ describe('defaultBodySerializer', () => {
 })
 
 describe('serializeCookies', () => {
+  test('JSON-encodes a cookie with a JSON content type', () => {
+    expect(serializeCookies({ prefs: { a: [1, 2] } }, { prefs: { contentType: 'application/json' } })).toBe(`prefs=${encodeURIComponent('{"a":[1,2]}')}`)
+  })
+
   test('serializes primitives and arrays in form style', () => {
     expect(serializeCookies({ session: 'abc', ids: [1, 2] })).toBe('session=abc; ids=1,2')
   })
@@ -261,6 +265,14 @@ describe('serializeCookies', () => {
 })
 
 describe('applyHeaderStyles', () => {
+  test('sends a header with a JSON content type as its JSON string', () => {
+    const result = applyHeaderStyles(
+      { 'X-Meta': { a: 1 }, 'X-Name': 'odie' },
+      { 'X-Meta': { contentType: 'application/json' }, 'X-Name': { contentType: 'application/json' } },
+    )
+    expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-Meta': '{"a":1}', 'X-Name': '"odie"' })
+  })
+
   test('serializes array and object headers with the simple style', () => {
     const result = applyHeaderStyles({ 'X-Ids': [3, 4], 'X-Filter': { role: 'admin' } }, { 'X-Ids': { explode: false }, 'X-Filter': { explode: true } })
     expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-Ids': '3,4', 'X-Filter': 'role=admin' })
