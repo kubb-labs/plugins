@@ -448,7 +448,7 @@ function serializeHeaderValue(value: unknown, explode: boolean): string {
     .join(',')
 }
 
-// Header values must be Latin-1, so non-ASCII characters become JSON `\uXXXX` escapes.
+/** Header values must be Latin-1, so non-ASCII characters become JSON `\uXXXX` escapes. */
 function toAsciiJson(value: unknown): string {
   return JSON.stringify(value, jsonReplacer).replace(/[\u007f-\uffff]/g, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`)
 }
