@@ -18,15 +18,15 @@ export type PlaceOrderBodyFormUrlEncoded = Order | undefined
 export type PlaceOrderBody = (PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrderBodyFormUrlEncoded)
 
 export type PlaceOrderOptions = {
-  body: PlaceOrderBody
-  path?: never
-  query?: never
-  headers?: never
+  body: PlaceOrderBody;
+  path?: never;
+  query?: never;
+  headers?: never;
 }
 
 export type PlaceOrderResponses = {
-  '200': PlaceOrderStatus200
-  '405': PlaceOrderStatus405
+  '200': PlaceOrderStatus200;
+  '405': PlaceOrderStatus405;
 }
 
 /**

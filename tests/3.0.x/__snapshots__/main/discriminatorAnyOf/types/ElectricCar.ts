@@ -7,12 +7,12 @@ import type { TypeEnumKey } from './TypeEnum'
 import type { Vehicle } from './Vehicle'
 
 export type ElectricCar = (Vehicle & {
-  type?: TypeEnumKey
+  type?: TypeEnumKey;
   /**
    * @description Battery capacity in kWh
    *
    * Format: `float`
    * @type number | undefined
    */
-  batteryCapacity?: number
+  batteryCapacity?: number;
 })

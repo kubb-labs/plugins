@@ -14,17 +14,17 @@ export type AddPetRequest = {
    * @example 10
    * @type integer | undefined
    */
-  id?: bigint
+  id?: bigint;
   /**
    * @example doggie
    * @type string
    */
-  name: string
-  category?: Category
-  photoUrls: string[]
-  tags?: Tag[]
+  name: string;
+  category?: Category;
+  photoUrls: string[];
+  tags?: Tag[];
   /**
    * @description pet status in the store
    */
-  status?: AddPetRequestStatusEnumKey
+  status?: AddPetRequestStatusEnumKey;
 }

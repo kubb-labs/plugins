@@ -10,10 +10,10 @@ export type Category = {
    * @example 1
    * @type integer | undefined
    */
-  id?: bigint
+  id?: bigint;
   /**
    * @example Dogs
    * @type string | undefined
    */
-  name?: string
+  name?: string;
 }

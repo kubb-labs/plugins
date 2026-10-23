@@ -7,8 +7,8 @@ import type { PriorityKey } from './Priority'
 import type { StatusKey } from './Status'
 
 export type Task = {
-  id: string
-  status: StatusKey
-  priority?: PriorityKey
-  title?: string
+  id: string;
+  status: StatusKey;
+  priority?: PriorityKey;
+  title?: string;
 }

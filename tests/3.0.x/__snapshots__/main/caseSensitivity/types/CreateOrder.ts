@@ -12,19 +12,19 @@ export type CreateOrderStatus201 = OrderSchema
  * @type object | undefined
  */
 export type CreateOrderBody = {
-  userId?: string
-  productIds?: string[]
+  userId?: string;
+  productIds?: string[];
 } | undefined
 
 export type CreateOrderOptions = {
-  body: CreateOrderBody
-  path?: never
-  query?: never
-  headers?: never
+  body: CreateOrderBody;
+  path?: never;
+  query?: never;
+  headers?: never;
 }
 
 export type CreateOrderResponses = {
-  '201': CreateOrderStatus201
+  '201': CreateOrderStatus201;
 }
 
 /**

@@ -11,7 +11,7 @@ export type FindPetsByStatusQuery = {
    * @description Status values that need to be considered for filter
    * @default available
    */
-  status?: FindPetsByStatusStatusKey
+  status?: FindPetsByStatusStatusKey;
 }
 
 export type FindPetsByStatusStatus200Json = Pet[]
@@ -23,21 +23,21 @@ export type FindPetsByStatusStatus200 = (FindPetsByStatusStatus200Json | FindPet
 export type FindPetsByStatusStatus400 = unknown
 
 export type FindPetsByStatusOptions = {
-  body?: never
-  path?: never
-  query?: FindPetsByStatusQuery
-  headers?: never
+  body?: never;
+  path?: never;
+  query?: FindPetsByStatusQuery;
+  headers?: never;
 }
 
 export type FindPetsByStatusResponses = {
   '200': ({
-    contentType: 'application/json'
-    data: FindPetsByStatusStatus200Json
+    contentType: 'application/json';
+    data: FindPetsByStatusStatus200Json;
   } | {
-    contentType: 'application/xml'
-    data: FindPetsByStatusStatus200Xml
-  })
-  '400': FindPetsByStatusStatus400
+    contentType: 'application/xml';
+    data: FindPetsByStatusStatus200Xml;
+  });
+  '400': FindPetsByStatusStatus400;
 }
 
 /**

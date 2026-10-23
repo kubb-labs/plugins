@@ -9,6 +9,6 @@ export type Tag = {
    * Format: `int64`
    * @type integer | undefined
    */
-  id?: bigint
-  name?: string
+  id?: bigint;
+  name?: string;
 }

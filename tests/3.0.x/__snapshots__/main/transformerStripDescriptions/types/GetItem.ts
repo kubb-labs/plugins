@@ -11,20 +11,20 @@ export type GetItemPath = {
    * Format: `int64`
    * @type integer
    */
-  id: bigint
+  id: bigint;
 }
 
 export type GetItemStatus200 = Item
 
 export type GetItemOptions = {
-  body?: never
-  path: GetItemPath
-  query?: never
-  headers?: never
+  body?: never;
+  path: GetItemPath;
+  query?: never;
+  headers?: never;
 }
 
 export type GetItemResponses = {
-  '200': GetItemStatus200
+  '200': GetItemStatus200;
 }
 
 /**

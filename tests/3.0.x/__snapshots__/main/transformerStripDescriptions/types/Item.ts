@@ -9,12 +9,12 @@ export type Item = {
    * Format: `int64`
    * @type integer
    */
-  id: bigint
-  name: string
+  id: bigint;
+  name: string;
   /**
    * @description
    * Format: `int32`
    * @type integer | undefined
    */
-  count?: number
+  count?: number;
 }

@@ -12,31 +12,31 @@ export type Order = {
    * @example 10
    * @type integer | undefined
    */
-  id?: bigint
+  id?: bigint;
   /**
    * @description
    * Format: `int64`
    * @example 198772
    * @type integer | undefined
    */
-  petId?: bigint
+  petId?: bigint;
   /**
    * @description
    * Format: `int32`
    * @example 7
    * @type integer | undefined
    */
-  quantity?: number
+  quantity?: number;
   /**
    * @description
    * Format: `date-time`
    * @type string | undefined
    */
-  shipDate?: string
+  shipDate?: string;
   /**
    * @description Order Status
    * @example approved
    */
-  status?: OrderStatusEnumKey
-  complete?: boolean
+  status?: OrderStatusEnumKey;
+  complete?: boolean;
 }

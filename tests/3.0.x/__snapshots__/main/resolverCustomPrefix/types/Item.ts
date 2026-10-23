@@ -11,16 +11,16 @@ export type CustomItem = {
    * Format: `int64`
    * @type integer
    */
-  id: bigint
+  id: bigint;
   /**
    * @description Display name
    * @type string
    */
-  name: string
+  name: string;
   /**
    * @description
    * Format: `int32`
    * @type integer | undefined
    */
-  count?: number
+  count?: number;
 }

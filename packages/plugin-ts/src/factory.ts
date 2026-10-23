@@ -1,6 +1,12 @@
 import { camelCase, pascalCase, screamingSnakeCase, snakeCase } from '@internals/utils'
 import { syncSchemaRef } from 'kubb/kit'
 import type { ast } from 'kubb/kit'
+import { generate } from 'yuku-codegen'
+
+/**
+ * A TS-ESTree node, the AST shape `yuku-codegen` prints. Nodes built here carry no source positions.
+ */
+export type TsNode = { type: string; [key: string]: unknown }
 
 function isNumber(value: unknown): value is number {
   return typeof value === 'number' && !Number.isNaN(value)
@@ -10,24 +16,49 @@ export function isNonNullable<T>(value: T | null | undefined): value is T {
   return value !== null && value !== undefined
 }
 
-const controlCharacters: Record<string, string> = { '\b': '\\b', '\t': '\\t', '\n': '\\n', '\v': '\\v', '\f': '\\f', '\r': '\\r' }
-
 /**
- * Escapes backslashes, `quote` and control characters so `text` can sit between two `quote` characters.
+ * Prints `node` as TypeScript source with single quotes and two-space indentation.
  */
-function escapeText(text: string, quote: string): string {
-  // oxlint-disable-next-line no-control-regex -- control characters are exactly what needs escaping
-  return text.replace(new RegExp(`[\\\\${quote}\\u0000-\\u001f\\u2028\\u2029]`, 'g'), (char) => {
-    if (char === '\\' || char === quote) return `\\${char}`
-    return controlCharacters[char] ?? `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`
-  })
+export function print(node: TsNode): string {
+  return generate(node as unknown as Parameters<typeof generate>[0], { quotes: 'single' }).code
 }
 
 /**
- * Prints `text` as a single-quoted string literal.
+ * Wraps already printed TypeScript, such as a user override result, so it can sit inside a node tree.
+ * Parentheses keep a union or function type intact when it lands inside an array or intersection.
  */
-export function createStringLiteral(text: string): string {
-  return `'${escapeText(text, "'")}'`
+export function createRaw(text: string): TsNode {
+  const name = { type: 'TSTypeReference', typeName: identifier(text), typeArguments: null }
+  return /[|&?]|=>/.test(text) ? { type: 'TSParenthesizedType', typeAnnotation: name } : name
+}
+
+function identifier(name: string): TsNode {
+  return { type: 'Identifier', name }
+}
+
+function literal(value: string | number | boolean): TsNode {
+  if (typeof value === 'number' && value < 0) {
+    return { type: 'UnaryExpression', operator: '-', prefix: true, argument: { type: 'Literal', value: -value } }
+  }
+  return { type: 'Literal', value }
+}
+
+function createLiteralType(value: string | number | boolean): TsNode {
+  return { type: 'TSLiteralType', literal: literal(value) }
+}
+
+/**
+ * Whether `name` can be written as a bare property name instead of a quoted string.
+ */
+function isValidIdentifier(name: string): boolean {
+  return /^[\p{ID_Start}$_][\p{ID_Continue}$‌‍]*$/u.test(name)
+}
+
+/**
+ * A property or enum member name, quoted when it is not a valid identifier.
+ */
+function propertyName(name: string): TsNode {
+  return isValidIdentifier(name) ? identifier(name) : literal(name)
 }
 
 /**
@@ -41,63 +72,10 @@ function indent(text: string): string {
 }
 
 /**
- * Walks `type` and reports the top-level characters, skipping string literals, template literals, comments and
- * anything nested in brackets. Returns the depth-0 text with nested parts blanked out, plus whether the whole type is
- * one bracketed block that starts at index 0.
- */
-function scanTopLevel(type: string): { topLevel: string; closesAt: number } {
-  let depth = 0
-  let topLevel = ''
-  let closesAt = -1
-
-  for (let i = 0; i < type.length; i++) {
-    const char = type[i]!
-
-    if (char === "'" || char === '"' || char === '`') {
-      let end = i + 1
-      while (end < type.length && type[end] !== char) end += type[end] === '\\' ? 2 : 1
-      i = end
-      if (depth === 0) topLevel += ' '
-      continue
-    }
-    if (char === '/' && type[i + 1] === '*') {
-      i = type.indexOf('*/', i + 2) + 1 || type.length
-      continue
-    }
-    if (char === '{' || char === '(' || char === '[' || char === '<') depth++
-    if (char === '}' || char === ')' || char === ']' || (char === '>' && type[i - 1] !== '=')) {
-      depth--
-      if (depth === 0 && closesAt === -1) closesAt = i
-      continue
-    }
-    if (depth === 0) topLevel += char
-  }
-
-  return { topLevel, closesAt }
-}
-
-/**
- * Whether `type` is an anonymous object type such as `{ a: string }`.
- */
-export function isTypeLiteral(type: string): boolean {
-  return type.startsWith('{') && scanTopLevel(type).closesAt === type.length - 1
-}
-
-/**
- * Wraps `type` in parentheses when it is a union, intersection, function, `keyof`, `typeof` or conditional type, so a
- * postfix such as `[]` or `?` binds to the whole type.
- */
-function parenthesize(type: string): string {
-  const { topLevel } = scanTopLevel(type)
-  if (/[|&?]|=>|^\s*(?:keyof|typeof|unique|readonly|infer|new)\s/.test(topLevel)) return `(${type})`
-  return type
-}
-
-/**
  * Creates a TypeScript intersection type.
- * Returns the single type if only one is provided, or wraps in parentheses if requested.
+ * Returns the single type if only one is provided. `yuku-codegen` adds the parentheses a union member needs.
  */
-export function createIntersectionDeclaration({ nodes, withParentheses }: { nodes: Array<string>; withParentheses?: boolean }): string | null {
+export function createIntersectionDeclaration({ nodes, withParentheses }: { nodes: Array<TsNode>; withParentheses?: boolean }): TsNode | null {
   if (!nodes.length) {
     return null
   }
@@ -106,10 +84,9 @@ export function createIntersectionDeclaration({ nodes, withParentheses }: { node
     return nodes[0] || null
   }
 
-  // Union members of an intersection need parentheses to keep their meaning
-  const node = nodes.map((member) => (/[|]/.test(scanTopLevel(member).topLevel) ? `(${member})` : member)).join(' & ')
+  const node = { type: 'TSIntersectionType', types: nodes }
 
-  return withParentheses ? `(${node})` : node
+  return withParentheses ? { type: 'TSParenthesizedType', typeAnnotation: node } : node
 }
 
 /**
@@ -117,19 +94,19 @@ export function createIntersectionDeclaration({ nodes, withParentheses }: { node
  * Use `arrayType: 'array'` for bracket syntax (`T[]`), or `'generic'` for `Array<T>`.
  *
  * @example Array bracket syntax
- * `createArrayDeclaration({ nodes: ['string'], arrayType: 'array' }) // → string[]`
+ * `createArrayDeclaration({ nodes: [string], arrayType: 'array' }) // → string[]`
  *
  * @example Generic Array syntax
- * `createArrayDeclaration({ nodes: ['string'], arrayType: 'generic' }) // → Array<string>`
+ * `createArrayDeclaration({ nodes: [string], arrayType: 'generic' }) // → Array<string>`
  */
-export function createArrayDeclaration({ nodes, arrayType = 'array' }: { nodes: Array<string>; arrayType?: 'array' | 'generic' }): string {
+export function createArrayDeclaration({ nodes, arrayType = 'array' }: { nodes: Array<TsNode>; arrayType?: 'array' | 'generic' }): TsNode {
   if (!nodes.length) {
-    return '[]'
+    return { type: 'TSTupleType', elementTypes: [] }
   }
 
-  const node = nodes.length === 1 ? nodes[0]! : nodes.join(' | ')
+  const node = nodes.length === 1 ? nodes[0]! : { type: 'TSUnionType', types: nodes }
 
-  return arrayType === 'generic' ? `Array<${node}>` : `${parenthesize(node)}[]`
+  return arrayType === 'generic' ? createTypeReferenceNode('Array', [node]) : { type: 'TSArrayType', elementType: node }
 }
 
 /**
@@ -137,7 +114,7 @@ export function createArrayDeclaration({ nodes, arrayType = 'array' }: { nodes: 
  * @example Union type example
  * `string | number`
  */
-export function createUnionDeclaration({ nodes, withParentheses }: { nodes: Array<string>; withParentheses?: boolean }): string {
+export function createUnionDeclaration({ nodes, withParentheses }: { nodes: Array<TsNode>; withParentheses?: boolean }): TsNode {
   if (!nodes.length) {
     return keywordTypeNodes.any
   }
@@ -146,23 +123,9 @@ export function createUnionDeclaration({ nodes, withParentheses }: { nodes: Arra
     return nodes[0]!
   }
 
-  const node = nodes.join(' | ')
+  const node = { type: 'TSUnionType', types: nodes }
 
-  return withParentheses ? `(${node})` : node
-}
-
-/**
- * Whether `name` can be written as a bare property name instead of a quoted string.
- */
-function isValidIdentifier(name: string): boolean {
-  return /^[\p{ID_Start}$_][\p{ID_Continue}$‌‍]*$/u.test(name)
-}
-
-/**
- * Prints a property or enum member name, quoting it when it is not a valid identifier.
- */
-function propertyName(name: string): string {
-  return isValidIdentifier(name) ? name : createStringLiteral(name)
+  return withParentheses ? { type: 'TSParenthesizedType', typeAnnotation: node } : node
 }
 
 /**
@@ -178,44 +141,59 @@ export function createPropertySignature({
   readOnly?: boolean
   name: string
   questionToken?: boolean
-  type?: string
-}): string {
-  return `${readOnly ? 'readonly ' : ''}${propertyName(name)}${questionToken ? '?' : ''}${type ? `: ${type}` : ''}`
+  type?: TsNode
+}): TsNode {
+  return {
+    type: 'TSPropertySignature',
+    key: propertyName(name),
+    computed: false,
+    optional: !!questionToken,
+    readonly: !!readOnly,
+    static: false,
+    typeAnnotation: type ? { type: 'TSTypeAnnotation', typeAnnotation: type } : null,
+  }
 }
 
 /**
- * Puts a JSDoc block built from `comments` above `node`, dropping empty comments.
+ * Attaches a JSDoc block built from `comments` to `node`, dropping empty comments.
  */
-export function appendJSDocToNode({ node, comments }: { node: string; comments: Array<string | undefined> }): string {
+export function appendJSDocToNode<TNode extends TsNode>({ node, comments }: { node: TNode; comments: Array<string | undefined> }): TNode {
   const lines = comments.filter(Boolean).flatMap((comment = '') => comment.split(/\r?\n/))
 
   if (!lines.length) {
     return node
   }
 
-  return ['/**', ...lines.map((line) => ` * ${line.replaceAll('*/', '*\\/')}`.trimEnd()), ' */', node].join('\n')
+  // `yuku-codegen` prints the comment text as is, so a `*/` inside it would end the block early
+  const value = `*\n${lines.map((line) => ` * ${line.replaceAll('*/', '*\\/')}`.trimEnd()).join('\n')}\n `
+
+  return { ...node, comments: [{ type: 'Block', value, position: 'before', sameLine: false }] }
 }
 
 /**
  * Creates a TypeScript type literal (anonymous object type) with one member per line.
  */
-export function createTypeLiteralNode(members: Array<string>): string {
-  if (!members.length) {
-    return '{}'
-  }
-
-  return `{\n${members.map(indent).join('\n')}\n}`
+export function createTypeLiteralNode(members: Array<TsNode>): TsNode {
+  return { type: 'TSTypeLiteral', members }
 }
 
 /**
  * Creates a TypeScript type reference (e.g., `Array<string>`, `Record<K, V>`).
  */
-export function createTypeReferenceNode(name: string, typeArguments?: Array<string>): string {
-  return typeArguments?.length ? `${name}<${typeArguments.join(', ')}>` : name
+export function createTypeReferenceNode(name: string, typeArguments?: Array<TsNode>): TsNode {
+  return {
+    type: 'TSTypeReference',
+    typeName: identifier(name),
+    typeArguments: typeArguments?.length ? { type: 'TSTypeParameterInstantiation', params: typeArguments } : null,
+  }
+}
+
+function exportNamed(declaration: TsNode, exportKind: 'type' | 'value'): TsNode {
+  return { type: 'ExportNamedDeclaration', declaration, specifiers: [], source: null, attributes: [], exportKind }
 }
 
 /**
- * Creates a TypeScript type declaration as either a type alias or interface.
+ * Prints a TypeScript type declaration as either a type alias or interface.
  * Uses interface syntax only when requested and the type is an object literal, and attaches JSDoc comments.
  */
 export function createTypeDeclaration({
@@ -229,26 +207,32 @@ export function createTypeDeclaration({
   comments: Array<string | undefined>
   isExportable?: boolean
   name: string
-  type: string
+  type: TsNode
 }): string {
-  const exportKeyword = isExportable ? 'export ' : ''
-  const node = syntax === 'interface' && isTypeLiteral(type) ? `${exportKeyword}interface ${name} ${type}` : `${exportKeyword}type ${name} = ${type}`
+  const declaration =
+    syntax === 'interface' && type.type === 'TSTypeLiteral'
+      ? {
+          type: 'TSInterfaceDeclaration',
+          declare: false,
+          id: identifier(name),
+          typeParameters: null,
+          extends: [],
+          body: { type: 'TSInterfaceBody', body: type.members },
+        }
+      : { type: 'TSTypeAliasDeclaration', declare: false, id: identifier(name), typeParameters: null, typeAnnotation: type }
 
-  return appendJSDocToNode({ node, comments })
+  return print(appendJSDocToNode({ node: isExportable ? exportNamed(declaration, 'type') : declaration, comments })).replace(/;$/, '')
 }
 
 /**
  * Converts an enum member value to a literal. Numbers become numeric literals unless `asNumber` is `false`,
  * which emits the string form.
  */
-function valueToExpression(value: string | number | boolean, asNumber = isNumber(value)): string {
-  if (typeof value === 'boolean') {
-    return String(value)
+function valueToExpression(value: string | number | boolean, asNumber = isNumber(value)): TsNode {
+  if (typeof value === 'boolean' || (asNumber && isNumber(value))) {
+    return literal(value)
   }
-  if (asNumber && isNumber(value)) {
-    return String(value)
-  }
-  return createStringLiteral(value.toString())
+  return literal(value.toString())
 }
 
 /**
@@ -318,34 +302,37 @@ export function createEnumDeclaration({
    */
   enumKeyCasing?: 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'
 }): [name: string | undefined, type: string] {
-  if (type === 'literal' || type === 'inlineLiteral') {
-    const members = enums.map(([_key, value]) => (isNonNullable(value) ? valueToExpression(value) : undefined)).filter(isNonNullable)
+  const typeAlias = (annotation: TsNode) => createTypeDeclaration({ syntax: 'type', isExportable: true, name: typeName, comments: [], type: annotation })
 
-    return [undefined, `export type ${typeName} = ${members.join(' | ') || keywordTypeNodes.never}`]
+  if (type === 'literal' || type === 'inlineLiteral') {
+    const members = enums
+      .map(([_key, value]) => (isNonNullable(value) ? { type: 'TSLiteralType', literal: valueToExpression(value) } : undefined))
+      .filter(isNonNullable)
+
+    return [undefined, typeAlias(members.length ? createUnionDeclaration({ nodes: members }) : keywordTypeNodes.never)]
   }
 
   if (type === 'enum' || type === 'constEnum') {
     const members = enums
       .map(([key, value, description]) => {
         const initializer = valueToExpression(value, Number.parseInt(value.toString(), 10) === value)
+        const memberName = isNumber(Number.parseInt(key.toString(), 10)) ? `${typeName}_${key}` : key?.toString()
+        if (memberName === undefined) return undefined
 
-        if (isNumber(Number.parseInt(key.toString(), 10))) {
-          const casingKey = applyEnumKeyCasing(`${typeName}_${key}`, enumKeyCasing)
-          return appendJSDocToNode({ node: `${propertyName(casingKey)} = ${initializer}`, comments: [description] })
-        }
-
-        if (key !== null && key !== undefined) {
-          const casingKey = applyEnumKeyCasing(key.toString(), enumKeyCasing)
-          return appendJSDocToNode({ node: `${propertyName(casingKey)} = ${initializer}`, comments: [description] })
-        }
-
-        return undefined
+        const id = propertyName(applyEnumKeyCasing(memberName, enumKeyCasing))
+        return appendJSDocToNode({ node: { type: 'TSEnumMember', id, initializer }, comments: [description] })
       })
       .filter(isNonNullable)
 
-    const body = members.length ? `{\n${members.map(indent).join(',\n')},\n}` : '{}'
+    const declaration = {
+      type: 'TSEnumDeclaration',
+      declare: false,
+      const: type === 'constEnum',
+      id: identifier(typeName),
+      body: { type: 'TSEnumBody', members },
+    }
 
-    return [undefined, `export ${type === 'constEnum' ? 'const ' : ''}enum ${typeName} ${body}`]
+    return [undefined, print(exportNamed(declaration, 'value'))]
   }
 
   // used when using `as const` instead of an TypeScript enum.
@@ -357,23 +344,36 @@ export function createEnumDeclaration({
   // Return undefined for nameNode so the barrel won't try to export a non-existent symbol.
   // Use `never` as the type alias to keep references valid without creating a broken const.
   if (enums.length === 0) {
-    return [undefined, `export type ${typeName} = ${keywordTypeNodes.never}`]
+    return [undefined, typeAlias(keywordTypeNodes.never)]
   }
 
+  // `yuku-codegen` prints object literals on one line, so each property prints on its own and the lines join here
   const properties = enums
     .map(([key, value, description]) => {
-      if (key !== null && key !== undefined) {
-        const casingKey = applyEnumKeyCasing(key.toString(), enumKeyCasing)
-        return appendJSDocToNode({ node: `${propertyName(casingKey)}: ${valueToExpression(value)}`, comments: [description] })
-      }
+      if (key === null || key === undefined) return undefined
 
-      return undefined
+      const property = {
+        type: 'Property',
+        kind: 'init',
+        key: propertyName(applyEnumKeyCasing(key.toString(), enumKeyCasing)),
+        value: valueToExpression(value),
+        computed: false,
+        method: false,
+        shorthand: false,
+      }
+      return print(appendJSDocToNode({ node: property, comments: [description] }))
     })
     .filter(isNonNullable)
 
+  const query = { type: 'TSTypeQuery', exprName: identifier(identifierName), typeArguments: null }
+
   return [
     `export const ${identifierName} = {\n${properties.map(indent).join(',\n')},\n} as const`,
-    `export type ${typeName} = (typeof ${identifierName})[keyof typeof ${identifierName}]`,
+    typeAlias({
+      type: 'TSIndexedAccessType',
+      objectType: { type: 'TSParenthesizedType', typeAnnotation: query },
+      indexType: { type: 'TSTypeOperator', operator: 'keyof', typeAnnotation: query },
+    }),
   ]
 }
 
@@ -381,50 +381,50 @@ export function createEnumDeclaration({
  * Creates a TypeScript `Omit<T, Keys>` type reference.
  * Optionally wraps the type in `NonNullable<T>` if `nonNullable` is true.
  */
-export function createOmitDeclaration({ keys, type, nonNullable }: { keys: Array<string> | string; type: string; nonNullable?: boolean }): string {
+export function createOmitDeclaration({ keys, type, nonNullable }: { keys: Array<string> | string; type: TsNode; nonNullable?: boolean }): TsNode {
   const node = nonNullable ? createTypeReferenceNode('NonNullable', [type]) : type
-  const omitted = [keys].flat().map(createStringLiteral).join(' | ')
 
-  return createTypeReferenceNode('Omit', [node, omitted])
+  return createTypeReferenceNode('Omit', [node, createUnionDeclaration({ nodes: [keys].flat().map(createLiteralType) })])
 }
 
 /**
  * TypeScript keyword types for common primitive types.
  */
 export const keywordTypeNodes = {
-  any: 'any',
-  unknown: 'unknown',
-  void: 'void',
-  number: 'number',
-  integer: 'number',
-  bigint: 'bigint',
-  object: 'object',
-  string: 'string',
-  boolean: 'boolean',
-  undefined: 'undefined',
-  null: 'null',
-  never: 'never',
-} as const
+  any: { type: 'TSAnyKeyword' },
+  unknown: { type: 'TSUnknownKeyword' },
+  void: { type: 'TSVoidKeyword' },
+  number: { type: 'TSNumberKeyword' },
+  integer: { type: 'TSNumberKeyword' },
+  bigint: { type: 'TSBigIntKeyword' },
+  object: { type: 'TSObjectKeyword' },
+  string: { type: 'TSStringKeyword' },
+  boolean: { type: 'TSBooleanKeyword' },
+  undefined: { type: 'TSUndefinedKeyword' },
+  null: { type: 'TSNullKeyword' },
+  never: { type: 'TSNeverKeyword' },
+} as const satisfies Record<string, TsNode>
 
 /**
  * Converts an OAS-style path (e.g. `/pets/{petId}`) or an Express-style path
  * (e.g. `/pets/:petId`) to a TypeScript template literal type
  * like `` `/pets/${string}` ``.
  */
-export function createUrlTemplateType(path: string): string {
+export function createUrlTemplateType(path: string): TsNode {
   // normalized Express `:param` → OAS `{param}` so a single regex handles both.
   const normalized = path.replace(/:([^/]+)/g, '{$1}')
 
   if (!normalized.includes('{')) {
-    return createStringLiteral(normalized)
+    return createLiteralType(normalized)
   }
 
-  const template = normalized
-    .split(/(\{[^}]+\})/)
-    .map((segment) => (segment.startsWith('{') && segment.endsWith('}') ? `\${${keywordTypeNodes.string}}` : escapeText(segment, '`').replaceAll('${', '\\${')))
-    .join('')
+  const segments = normalized.split(/\{[^}]+\}/)
+  const quasis = segments.map((segment, i) => {
+    const raw = segment.replace(/[`\\]|\$(?=\{)/g, '\\$&')
+    return { type: 'TemplateElement', value: { raw, cooked: segment }, tail: i === segments.length - 1 }
+  })
 
-  return `\`${template}\``
+  return { type: 'TSTemplateLiteralType', quasis, types: segments.slice(1).map(() => keywordTypeNodes.string) }
 }
 
 // ─── Printer helpers ──────────────────────────────────────────────────────────
@@ -432,25 +432,24 @@ export function createUrlTemplateType(path: string): string {
 /**
  * Converts a primitive const value to a TypeScript literal type.
  */
-export function constToTypeNode(value: string | number | boolean, format: 'string' | 'number' | 'boolean'): string | undefined {
+export function constToTypeNode(value: string | number | boolean, format: 'string' | 'number' | 'boolean'): TsNode | undefined {
   if (format === 'boolean') {
-    return String(value === true)
+    return createLiteralType(value === true)
   }
-  const literal = format === 'number' && typeof value === 'number' ? value : String(value)
-  return valueToExpression(literal)
+  return createLiteralType(format === 'number' && typeof value === 'number' ? value : String(value))
 }
 
 /**
  * Returns a `Date` reference type when `representation` is `'date'`, otherwise falls back to `string`.
  */
-export function dateOrStringNode(node: { representation?: string }): string {
+export function dateOrStringNode(node: { representation?: string }): TsNode {
   return node.representation === 'date' ? createTypeReferenceNode('Date') : keywordTypeNodes.string
 }
 
 /**
  * Maps an array of `SchemaNode`s through the printer, filtering out `null` and `undefined` results.
  */
-export function buildMemberNodes(members: Array<ast.SchemaNode> | undefined, print: (node: ast.SchemaNode) => string | null | undefined): Array<string> {
+export function buildMemberNodes(members: Array<ast.SchemaNode> | undefined, print: (node: ast.SchemaNode) => TsNode | null | undefined): Array<TsNode> {
   return (members ?? []).map(print).filter(isNonNullable)
 }
 
@@ -458,7 +457,7 @@ export function buildMemberNodes(members: Array<ast.SchemaNode> | undefined, pri
  * Builds a TypeScript tuple type from an array schema's `items`,
  * applying min/max slice and optional/rest element rules.
  */
-export function buildTupleNode(node: ast.ArraySchemaNode, print: (node: ast.SchemaNode) => string | null | undefined): string {
+export function buildTupleNode(node: ast.ArraySchemaNode, print: (node: ast.SchemaNode) => TsNode | null | undefined): TsNode {
   let items = (node.items ?? []).map(print).filter(isNonNullable)
 
   const restNode = node.rest ? (print(node.rest) ?? undefined) : undefined
@@ -472,20 +471,20 @@ export function buildTupleNode(node: ast.ArraySchemaNode, print: (node: ast.Sche
   }
 
   if (min !== undefined) {
-    items = items.map((item, i) => (i >= min ? `${parenthesize(item)}?` : item))
+    items = items.map((item, i) => (i >= min ? { type: 'TSOptionalType', typeAnnotation: item } : item))
   }
 
   if (max === undefined && restNode) {
-    items.push(`...${parenthesize(restNode)}[]`)
+    items.push({ type: 'TSRestType', typeAnnotation: { type: 'TSArrayType', elementType: restNode } })
   }
 
-  return `[${items.join(', ')}]`
+  return { type: 'TSTupleType', elementTypes: items }
 }
 
 /**
  * Appends `| null` and then `| undefined` to a type when requested.
  */
-export function wrapNullableOptional(type: string, nullable: boolean, addsUndefined: boolean): string {
+export function wrapNullableOptional(type: TsNode, nullable: boolean, addsUndefined: boolean): TsNode {
   const withNullable = nullable ? createUnionDeclaration({ nodes: [type, keywordTypeNodes.null] }) : type
   return addsUndefined ? createUnionDeclaration({ nodes: [withNullable, keywordTypeNodes.undefined] }) : withNullable
 }
@@ -495,10 +494,10 @@ export function wrapNullableOptional(type: string, nullable: boolean, addsUndefi
  */
 export function buildPropertyType(
   schema: ast.SchemaNode,
-  baseType: string,
+  baseType: TsNode,
   optionalType: 'questionToken' | 'undefined' | 'questionTokenAndUndefined',
   optional?: boolean,
-): string {
+): TsNode {
   const addsUndefined = optionalType === 'undefined' || optionalType === 'questionTokenAndUndefined'
   const meta = syncSchemaRef(schema)
 
@@ -515,24 +514,35 @@ export function buildPropertyType(
 export function buildIndexSignatures(
   node: { additionalProperties?: ast.SchemaNode | boolean; patternProperties?: Record<string, ast.SchemaNode> },
   propertyCount: number,
-  print: (node: ast.SchemaNode) => string | null | undefined,
-): Array<string> {
-  const valueTypes: Array<string> = []
+  printNode: (node: ast.SchemaNode) => TsNode | null | undefined,
+): Array<TsNode> {
+  const valueTypes: Array<TsNode> = []
 
   if (node.additionalProperties && node.additionalProperties !== true) {
-    valueTypes.push(print(node.additionalProperties) ?? keywordTypeNodes.unknown)
+    valueTypes.push(printNode(node.additionalProperties) ?? keywordTypeNodes.unknown)
   } else if (node.additionalProperties === true) {
     valueTypes.push(keywordTypeNodes.unknown)
   }
 
   for (const schema of Object.values(node.patternProperties ?? {})) {
-    const patternType = print(schema) ?? keywordTypeNodes.unknown
+    const patternType = printNode(schema) ?? keywordTypeNodes.unknown
     valueTypes.push(schema.nullable ? createUnionDeclaration({ nodes: [patternType, keywordTypeNodes.null] }) : patternType)
   }
 
   if (valueTypes.length === 0) return []
 
-  const type = propertyCount > 0 ? keywordTypeNodes.unknown : createUnionDeclaration({ nodes: [...new Set(valueTypes)] })
+  // Deduplicate by printed text, since equal types are separate node objects
+  const distinct = [...new Map(valueTypes.map((type) => [print(type), type])).values()]
+  const valueType = propertyCount > 0 ? keywordTypeNodes.unknown : createUnionDeclaration({ nodes: distinct })
 
-  return [`[key: string]: ${type}`]
+  return [
+    {
+      type: 'TSIndexSignature',
+      parameters: [{ type: 'Identifier', name: 'key', typeAnnotation: { type: 'TSTypeAnnotation', typeAnnotation: keywordTypeNodes.string } }],
+      typeAnnotation: { type: 'TSTypeAnnotation', typeAnnotation: valueType },
+      readonly: false,
+      static: false,
+      accessibility: null,
+    },
+  ]
 }

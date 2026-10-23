@@ -7,10 +7,10 @@ import type { SedanTypeEnumKey } from './SedanTypeEnum'
 import type { Vehicle } from './Vehicle'
 
 export type Sedan = (Vehicle & {
-  type?: SedanTypeEnumKey
+  type?: SedanTypeEnumKey;
   /**
    * @description Number of seats
    * @type integer | undefined
    */
-  seats?: number
+  seats?: number;
 })

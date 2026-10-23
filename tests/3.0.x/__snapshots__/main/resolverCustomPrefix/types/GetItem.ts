@@ -8,7 +8,7 @@ export type CustomGetItemPath = {
    * Format: `int64`
    * @type integer
    */
-  id: bigint
+  id: bigint;
 }
 
 /**
@@ -18,14 +18,14 @@ export type CustomGetItemPath = {
 export type CustomGetItemStatus200 = CustomItem
 
 export type CustomGetItemOptions = {
-  body?: never
-  path: CustomGetItemPath
-  query?: never
-  headers?: never
+  body?: never;
+  path: CustomGetItemPath;
+  query?: never;
+  headers?: never;
 }
 
 export type CustomGetItemResponses = {
-  '200': CustomGetItemStatus200
+  '200': CustomGetItemStatus200;
 }
 
 /**

@@ -4,6 +4,6 @@
 */
 
 export type OrderRequest = {
-  userId?: string
-  productIds?: string[]
+  userId?: string;
+  productIds?: string[];
 }

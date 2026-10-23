@@ -1,6 +1,7 @@
 import { buildResponses } from '@internals/shared'
 import { ast } from 'kubb/kit'
 import { describe, expect, it } from 'vitest'
+import { print } from './factory.ts'
 import { printerTs } from './printers/printerTs.ts'
 import { resolverTs } from './resolvers/resolverTs.ts'
 import { buildParams, buildPropertyJSDocComments, buildResponseUnion } from './utils.ts'
@@ -12,7 +13,8 @@ const printer = printerTs({
   enum: { type: 'inlineLiteral', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' },
 })
 function printSchema(schema: ReturnType<typeof buildParams>): string {
-  return printer.transform(schema) ?? ''
+  const node = printer.transform(schema)
+  return node ? print(node) : ''
 }
 
 describe('buildParams', () => {
@@ -21,7 +23,7 @@ describe('buildParams', () => {
 
     expect(printSchema(buildParams({ params }))).toMatchInlineSnapshot(`
       "{
-        petId: string
+        petId: string;
       }"
     `)
   })
@@ -31,7 +33,7 @@ describe('buildParams', () => {
 
     expect(printSchema(buildParams({ params }))).toMatchInlineSnapshot(`
       "{
-        limit?: number
+        limit?: number;
       }"
     `)
   })
@@ -52,7 +54,7 @@ describe('buildParams', () => {
          * @description Maximum number of results
          * @type integer | undefined
          */
-        limit?: number
+        limit?: number;
       }"
     `)
   })
@@ -72,8 +74,8 @@ describe('buildResponses', () => {
 
     expect(printSchema(buildResponses(node, resolverTs))).toMatchInlineSnapshot(`
       "{
-        '200': ListPetsStatus200
-        default: ListPetsStatusDefault
+        '200': ListPetsStatus200;
+        default: ListPetsStatusDefault;
       }"
     `)
   })

@@ -8,14 +8,14 @@ import type { Employer } from './Employer'
 export type GetEmployersStatus200 = Employer[]
 
 export type GetEmployersOptions = {
-  body?: never
-  path?: never
-  query?: never
-  headers?: never
+  body?: never;
+  path?: never;
+  query?: never;
+  headers?: never;
 }
 
 export type GetEmployersResponses = {
-  '200': GetEmployersStatus200
+  '200': GetEmployersStatus200;
 }
 
 /**

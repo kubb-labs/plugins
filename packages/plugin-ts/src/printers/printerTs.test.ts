@@ -3,6 +3,7 @@ import ts from '@typescript/typescript6'
 import { describe, expect, it } from 'vitest'
 import { format } from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'
+import { print, type TsNode } from '../factory.ts'
 import { printerTs } from './printerTs.ts'
 
 const inlineLiteralEnum = { type: 'inlineLiteral', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
@@ -15,10 +16,10 @@ const constEnumEnum = { type: 'constEnum', constCasing: 'camelCase', typeSuffix:
  * Wraps a printed type in `type _ = <type>` so prettier can parse it as a
  * valid TypeScript statement, then strips the wrapper from the result.
  */
-const formatTS = async (type: string | null | undefined): Promise<string> => {
+const formatTS = async (type: TsNode | string | null | undefined): Promise<string> => {
   if (!type) return ''
 
-  const formatted = await format(`type _ = ${type}`)
+  const formatted = await format(`type _ = ${typeof type === 'string' ? type : print(type)}`)
 
   return formatted
     .replace(/^type _ = /, '')
@@ -878,7 +879,7 @@ describe('printerTs', () => {
         enum: inlineLiteralEnum,
         nodes: { date: () => ts.factory.createTypeReferenceNode('Date', []) },
       })
-      expect(p.transform(ast.factory.createSchema({ type: 'date', representation: 'string' }))).toBe('Date')
+      expect(await formatTS(p.transform(ast.factory.createSchema({ type: 'date', representation: 'string' })))).toBe('Date')
     })
 
     it('override does not affect other node types', async () => {

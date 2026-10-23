@@ -6,5 +6,5 @@
 import type { PaymentMethod } from './PaymentMethod'
 
 export type WalletPayment = (PaymentMethod & {
-  walletId?: string
+  walletId?: string;
 })

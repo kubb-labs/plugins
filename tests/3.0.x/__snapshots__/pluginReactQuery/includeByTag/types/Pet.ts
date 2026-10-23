@@ -14,12 +14,12 @@ export type Pet = {
    * @example 10
    * @type integer | undefined
    */
-  id?: bigint
+  id?: bigint;
   /**
    * @example doggie
    * @type string
    */
-  name: string
+  name: string;
   /**
    * @minLength 2
    * @maxLength 42
@@ -27,12 +27,12 @@ export type Pet = {
    * @example my_log_destination
    * @type string | undefined
    */
-  log?: string
-  category?: Category
-  photoUrls: string[]
-  tags?: Tag[]
+  log?: string;
+  category?: Category;
+  photoUrls: string[];
+  tags?: Tag[];
   /**
    * @description pet status in the store
    */
-  status?: PetStatusEnumKey
+  status?: PetStatusEnumKey;
 }

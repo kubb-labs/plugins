@@ -6,20 +6,20 @@
 import type { Config } from './Config'
 
 export type GetConfigIdV20250Path = {
-  config_id: string
+  config_id: string;
 }
 
 export type GetConfigIdV20250Status200 = Config
 
 export type GetConfigIdV20250Options = {
-  body?: never
-  path: GetConfigIdV20250Path
-  query?: never
-  headers?: never
+  body?: never;
+  path: GetConfigIdV20250Path;
+  query?: never;
+  headers?: never;
 }
 
 export type GetConfigIdV20250Responses = {
-  '200': GetConfigIdV20250Status200
+  '200': GetConfigIdV20250Status200;
 }
 
 /**

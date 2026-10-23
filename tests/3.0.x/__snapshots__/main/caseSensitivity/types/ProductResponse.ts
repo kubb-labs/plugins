@@ -4,7 +4,7 @@
 */
 
 export type ProductResponse = {
-  productId?: string
-  productName?: string
-  stock?: number
+  productId?: string;
+  productName?: string;
+  stock?: number;
 }

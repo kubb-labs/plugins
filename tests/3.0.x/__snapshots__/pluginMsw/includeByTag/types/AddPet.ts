@@ -35,21 +35,21 @@ export type AddPetBodyFormUrlEncoded = Pet
 export type AddPetBody = (AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded)
 
 export type AddPetOptions = {
-  body: AddPetBody
-  path?: never
-  query?: never
-  headers?: never
+  body: AddPetBody;
+  path?: never;
+  query?: never;
+  headers?: never;
 }
 
 export type AddPetResponses = {
   '200': ({
-    contentType: 'application/json'
-    data: AddPetStatus200Json
+    contentType: 'application/json';
+    data: AddPetStatus200Json;
   } | {
-    contentType: 'application/xml'
-    data: AddPetStatus200Xml
-  })
-  '405': AddPetStatus405
+    contentType: 'application/xml';
+    data: AddPetStatus200Xml;
+  });
+  '405': AddPetStatus405;
 }
 
 /**

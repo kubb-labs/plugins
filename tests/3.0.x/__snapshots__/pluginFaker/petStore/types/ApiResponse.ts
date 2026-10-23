@@ -9,7 +9,7 @@ export type ApiResponse = {
    * Format: `int32`
    * @type integer | undefined
    */
-  code?: number
-  type?: string
-  message?: string
+  code?: number;
+  type?: string;
+  message?: string;
 }

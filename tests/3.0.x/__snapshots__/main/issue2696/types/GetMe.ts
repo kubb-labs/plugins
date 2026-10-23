@@ -8,14 +8,14 @@ import type { User } from './User'
 export type GetMeStatus200 = User
 
 export type GetMeOptions = {
-  body?: never
-  path?: never
-  query?: never
-  headers?: never
+  body?: never;
+  path?: never;
+  query?: never;
+  headers?: never;
 }
 
 export type GetMeResponses = {
-  '200': GetMeStatus200
+  '200': GetMeStatus200;
 }
 
 /**

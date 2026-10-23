@@ -12,7 +12,7 @@ export type GetPetByIdPath = {
    * Format: `int64`
    * @type integer
    */
-  petId: bigint
+  petId: bigint;
 }
 
 export type GetPetByIdStatus200Json = Pet
@@ -26,22 +26,22 @@ export type GetPetByIdStatus400 = unknown
 export type GetPetByIdStatus404 = unknown
 
 export type GetPetByIdOptions = {
-  body?: never
-  path: GetPetByIdPath
-  query?: never
-  headers?: never
+  body?: never;
+  path: GetPetByIdPath;
+  query?: never;
+  headers?: never;
 }
 
 export type GetPetByIdResponses = {
   '200': ({
-    contentType: 'application/json'
-    data: GetPetByIdStatus200Json
+    contentType: 'application/json';
+    data: GetPetByIdStatus200Json;
   } | {
-    contentType: 'application/xml'
-    data: GetPetByIdStatus200Xml
-  })
-  '400': GetPetByIdStatus400
-  '404': GetPetByIdStatus404
+    contentType: 'application/xml';
+    data: GetPetByIdStatus200Xml;
+  });
+  '400': GetPetByIdStatus400;
+  '404': GetPetByIdStatus404;
 }
 
 /**

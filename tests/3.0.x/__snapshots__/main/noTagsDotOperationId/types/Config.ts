@@ -4,7 +4,7 @@
 */
 
 export type Config = {
-  id?: string
-  name?: string
-  version?: string
+  id?: string;
+  name?: string;
+  version?: string;
 }

@@ -8,14 +8,14 @@ import type { Variant } from './Variant'
 export type GetVariantsStatus200 = Variant
 
 export type GetVariantsOptions = {
-  body?: never
-  path?: never
-  query?: never
-  headers?: never
+  body?: never;
+  path?: never;
+  query?: never;
+  headers?: never;
 }
 
 export type GetVariantsResponses = {
-  '200': GetVariantsStatus200
+  '200': GetVariantsStatus200;
 }
 
 /**

@@ -93,24 +93,36 @@ export type PrinterTsOptions = {
 }
 
 /**
- * TypeScript printer factory options: maps `SchemaNode` → a TypeScript type string (raw) or a full declaration string.
+ * TypeScript printer factory options: maps `SchemaNode` → a TS-ESTree node, printed to a type string or a full declaration string.
  */
-export type PrinterTsFactory = ast.PrinterFactoryOptions<'typescript', PrinterTsOptions, string, string>
+export type PrinterTsFactory = ast.PrinterFactoryOptions<'typescript', PrinterTsOptions, factory.TsNode, string>
 
 type PrinterTs = PrinterTsFactory
 
-/** Prints a deprecated compiler node returned by a user override to a string. */
-function toStringHandlers(nodes: PrinterTsNodes | undefined): ast.PrinterPartial<string, PrinterTsOptions> {
+type HandlerContext = { transform: (node: ast.SchemaNode) => factory.TsNode | null }
+
+/**
+ * Adapts user overrides, which work in strings, to the node-based printer: `this.transform` hands them printed
+ * strings and their result is wrapped back into a node. A deprecated compiler node prints through `@kubb/parser-ts`.
+ */
+function toNodeHandlers(nodes: PrinterTsNodes | undefined): ast.PrinterPartial<factory.TsNode, PrinterTsOptions> {
   return Object.fromEntries(
     Object.entries(nodes ?? {}).map(([type, handler]) => [
       type,
-      function (this: unknown, node: ast.SchemaNode) {
-        const result = (handler as (this: unknown, node: ast.SchemaNode) => string | DeprecatedTsNode | null | undefined).call(this, node)
-        return result === null || result === undefined || typeof result === 'string'
-          ? result
-          : parserTs()
-              .print(result as never)
-              .trimEnd()
+      function (this: HandlerContext, node: ast.SchemaNode) {
+        const transform = (child: ast.SchemaNode) => {
+          const output = this.transform(child)
+          return output ? factory.print(output) : null
+        }
+        const result = (handler as (this: unknown, node: ast.SchemaNode) => string | DeprecatedTsNode | null | undefined).call({ ...this, transform }, node)
+        if (result === null || result === undefined) return result
+        return factory.createRaw(
+          typeof result === 'string'
+            ? result
+            : parserTs()
+                .print(result as never)
+                .trimEnd(),
+        )
       },
     ]),
   )
@@ -258,7 +270,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
 
         const addsQuestionToken = options.optionalType === 'questionToken' || options.optionalType === 'questionTokenAndUndefined'
 
-        const propertyNodes: Array<string> = mapSchemaProperties(node, (schema) => transform(schema)).map(({ name, property, output }) => {
+        const propertyNodes: Array<factory.TsNode> = mapSchemaProperties(node, (schema) => transform(schema)).map(({ name, property, output }) => {
           const baseType = output ?? factory.keywordTypeNodes.unknown
           const optional = !property.required || !!property.schema.optional || !!property.schema.nullish
           const type = factory.buildPropertyType(property.schema, baseType, options.optionalType, optional)
@@ -282,7 +294,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
 
         return factory.createTypeLiteralNode(allElements)
       },
-      ...toStringHandlers(options.nodes),
+      ...toNodeHandlers(options.nodes),
     },
     print(node) {
       const { name, syntaxType = 'type', description, keysToOmit } = this.options
@@ -295,8 +307,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
 
       // Without name, apply modifiers inline and return.
       if (!name) {
-        const result = factory.wrapNullableOptional(transformed, !!meta.nullable, !!(meta.nullish || meta.optional) && addsUndefined)
-        return result
+        return factory.print(factory.wrapNullableOptional(transformed, !!meta.nullable, !!(meta.nullish || meta.optional) && addsUndefined))
       }
 
       // When keysToOmit is present, wrap with Omit first, then apply nullable/optional
