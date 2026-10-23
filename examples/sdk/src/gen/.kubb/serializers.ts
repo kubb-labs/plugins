@@ -26,9 +26,17 @@ export type SerializationStyle<TStyle = string> = {
 }
 
 /**
+ * The media type of a parameter described with `content` instead of `schema`. A JSON media type
+ * sends the value as one JSON-encoded string.
+ */
+export type ParamContentType = {
+  contentType?: string
+}
+
+/**
  * The per-parameter query serialization metadata carried by the generated request.
  */
-export type QueryParamStyle = SerializationStyle<QueryStyle>
+export type QueryParamStyle = SerializationStyle<QueryStyle> & ParamContentType
 
 /**
  * Serializes the query object into a search string. The optional second argument carries the
@@ -41,7 +49,7 @@ export type QuerySerializer = (params: Record<string, unknown>, options?: Record
  * The per-parameter cookie serialization metadata carried by the generated request. Cookies use the
  * OpenAPI `form` style, so only `explode` is configurable.
  */
-export type CookieParamStyle = {
+export type CookieParamStyle = ParamContentType & {
   explode?: boolean
 }
 
@@ -55,7 +63,7 @@ export type CookieParamStyle = {
  * // styles.header: { 'X-Filter': { explode: true } }, header { role: 'admin' } -> 'X-Filter: role=admin'
  * ```
  */
-export type HeaderParamStyle = {
+export type HeaderParamStyle = ParamContentType & {
   explode?: boolean
 }
 
@@ -195,6 +203,10 @@ function serializeUrlencodedBody(body: Record<string, unknown>, encoding: Record
   return parts.join('&')
 }
 
+function isJsonMediaType(contentType: string | undefined): boolean {
+  return !!contentType && (contentType.includes('application/json') || contentType.includes('+json'))
+}
+
 function serializeCookie({ name, value, explode }: { name: string; value: unknown; explode: boolean }): string {
   if (Array.isArray(value)) {
     const items = value.filter(notNullish).map((item) => encodeURIComponent(toValue(item)))
@@ -219,13 +231,16 @@ function serializeCookie({ name, value, explode }: { name: string; value: unknow
  * ```ts
  * serializeCookies({ session: 'abc', ids: [1, 2] }) // 'session=abc; ids=1,2'
  * serializeCookies({ ids: [1, 2] }, { ids: { explode: true } }) // 'ids=1; ids=2'
+ * serializeCookies({ prefs: { a: 1 } }, { prefs: { contentType: 'application/json' } }) // 'prefs=%7B%22a%22%3A1%7D'
  * ```
  */
 export function serializeCookies(cookies: Record<string, unknown>, styles?: Record<string, CookieParamStyle>): string {
   const parts: Array<string> = []
   for (const [name, value] of Object.entries(cookies)) {
     if (value === undefined || value === null) continue
-    parts.push(serializeCookie({ name, value, explode: styles?.[name]?.explode ?? false }))
+    const style = styles?.[name]
+    if (isJsonMediaType(style?.contentType)) parts.push(`${name}=${encodeURIComponent(JSON.stringify(value, jsonReplacer))}`)
+    else parts.push(serializeCookie({ name, value, explode: style?.explode ?? false }))
   }
   return parts.join('; ')
 }
@@ -337,6 +352,7 @@ function serializeStyledQueryObject({
 function serializeStyledQueryParam({ key, value, options }: { key: string; value: unknown; options: QueryParamStyle }): Array<string> {
   if (value === undefined || value === null) return []
   const encode = options.allowReserved ? encodeReserved : encodeComponent
+  if (isJsonMediaType(options.contentType)) return [`${encode(key)}=${encode(JSON.stringify(value, jsonReplacer))}`]
   if (Array.isArray(value)) return serializeStyledQueryArray({ key, value, options, encode })
   if (isRecord(value)) return serializeStyledQueryObject({ key, value, options, encode })
   return [`${encode(key)}=${encode(value)}`]
@@ -362,6 +378,7 @@ function serializeDefaultQueryParam(key: string, value: unknown): Array<string> 
  * defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'pipeDelimited', explode: false } }) // 'id=3|4|5'
  * defaultQuerySerializer({ a: { b: 1 } }, { a: { style: 'deepObject' } }) // 'a%5Bb%5D=1'
  * defaultQuerySerializer({ a: { b: { c: 1 } } }, { a: { style: 'deepObject' } }) // 'a%5Bb%5D%5Bc%5D=1'
+ * defaultQuerySerializer({ filter: { a: 1 } }, { filter: { contentType: 'application/json' } }) // 'filter=%7B%22a%22%3A1%7D'
  * ```
  */
 export const defaultQuerySerializer: QuerySerializer = (params, options) => {
@@ -431,15 +448,17 @@ function serializeHeaderValue(value: unknown, explode: boolean): string {
 
 /**
  * Serializes array and object header parameters with the OpenAPI `simple` style before they are
- * merged. Header values are not URL-encoded. Primitive values and headers without metadata pass
- * through untouched.
+ * merged. Header values are not URL-encoded. A header with a JSON `contentType` is sent as its
+ * JSON string. Other primitive values and headers without metadata pass through untouched.
  */
 export function applyHeaderStyles(headers: HeadersInit | undefined, styles: Record<string, HeaderParamStyle> | undefined): HeadersInit | undefined {
   if (!headers || !styles) return headers
   const entries = Array.isArray(headers) ? headers : Object.entries(headers)
   return entries.map(([key, value]) => {
     const style = styles[key]
-    if (!style || value === undefined || value === null || typeof value !== 'object') return [key, value] as [string, HeaderValue]
+    if (!style || value === undefined || value === null) return [key, value] as [string, HeaderValue]
+    if (isJsonMediaType(style.contentType)) return [key, JSON.stringify(value, jsonReplacer)] as [string, HeaderValue]
+    if (typeof value !== 'object') return [key, value] as [string, HeaderValue]
     return [key, serializeHeaderValue(value, style.explode ?? false)] as [string, HeaderValue]
   })
 }
