@@ -1,5 +1,16 @@
 # @kubb/plugin-msw
 
+## 5.2.1
+
+### Patch Changes
+
+- [#1189](https://github.com/kubb-labs/plugins/pull/1189) [`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the setup checks that threw `KUBB_INVALID_PLUGIN_OPTIONS` when an option such as `returnType`, `syntaxType`, or `parser` held a value outside its allowed list. The option types already reject those values. Checks that depend on another option, such as `sdk.mode: 'tag'` with single-file output, still throw.
+
+- [#1185](https://github.com/kubb-labs/plugins/pull/1185) [`dea9d65`](https://github.com/kubb-labs/plugins/commit/dea9d65a58e3d8cf77a630a891cf608d2b9988d3) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Document `createHandlers` and the per-handler `{ baseURL }` argument.
+- Updated dependencies [[`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69), [`9c6e3e8`](https://github.com/kubb-labs/plugins/commit/9c6e3e8f9eee37b60c2a6cd44e24555f9397c2ac), [`2501fe8`](https://github.com/kubb-labs/plugins/commit/2501fe8086b277dcee65991cef71ed654949b967), [`e2c3c57`](https://github.com/kubb-labs/plugins/commit/e2c3c57a89852e41d100f149ce4b7b12fbdfcafb)]:
+  - @kubb/plugin-ts@5.0.16
+  - @kubb/plugin-faker@5.1.11
+
 ## 5.2.0
 
 ### Minor Changes

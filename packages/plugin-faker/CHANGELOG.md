@@ -1,5 +1,19 @@
 # @kubb/plugin-faker
 
+## 5.1.11
+
+### Patch Changes
+
+- [#1189](https://github.com/kubb-labs/plugins/pull/1189) [`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the setup checks that threw `KUBB_INVALID_PLUGIN_OPTIONS` when an option such as `returnType`, `syntaxType`, or `parser` held a value outside its allowed list. The option types already reject those values. Checks that depend on another option, such as `sdk.mode: 'tag'` with single-file output, still throw.
+
+- [#1188](https://github.com/kubb-labs/plugins/pull/1188) [`9c6e3e8`](https://github.com/kubb-labs/plugins/commit/9c6e3e8f9eee37b60c2a6cd44e24555f9397c2ac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Stop importing the status type for a bodyless response (for example `204`). Its factory returns `undefined` without using the type, so the import failed `noUnusedLocals` (TS6196).
+
+- [#1187](https://github.com/kubb-labs/plugins/pull/1187) [`2501fe8`](https://github.com/kubb-labs/plugins/commit/2501fe8086b277dcee65991cef71ed654949b967) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix mocks for a union whose discriminator property is optional. Each branch now narrows with `Extract<T, { key?: value }>`, so the mock no longer resolves to `never` and fails with TS2322.
+
+- [#1190](https://github.com/kubb-labs/plugins/pull/1190) [`e2c3c57`](https://github.com/kubb-labs/plugins/commit/e2c3c57a89852e41d100f149ce4b7b12fbdfcafb) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Call a factory without `data` when its `$ref` points to an untyped schema, so a status factory no longer fails with TS2554 against a zero-argument factory.
+- Updated dependencies [[`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69)]:
+  - @kubb/plugin-ts@5.0.16
+
 ## 5.1.10
 
 ### Patch Changes
