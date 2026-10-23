@@ -4,7 +4,7 @@
 */
 
 export type Employer = {
-    id: string;
-    name: string;
-    industry?: string;
-};
+  id: string
+  name: string
+  industry?: string
+}

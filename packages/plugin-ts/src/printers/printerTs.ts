@@ -1,7 +1,6 @@
 import { mapSchemaItems, mapSchemaProperties } from '@internals/shared'
 import { ast, isStringType, syncSchemaRef } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
-import type ts from '@typescript/typescript6'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { buildPropertyJSDocComments, enumTypeName, isInlineConstEnum } from '../utils.ts'
@@ -12,8 +11,11 @@ const { isNonNullable } = factory
  * Partial map of node-type overrides for the TypeScript printer.
  *
  * Each key is a `SchemaType` string (e.g. `'date'`, `'string'`). The function
- * replaces the built-in handler for that node type. Use `this.transform` to
- * recurse into nested schema nodes, and `this.options` to read printer options.
+ * replaces the built-in handler for that node type and returns the TypeScript type as a string.
+ * Use `this.transform` to recurse into nested schema nodes, and `this.options` to read printer options.
+ *
+ * Returning a TypeScript compiler node still works but is deprecated: it needs `@typescript/typescript6`
+ * installed and is removed in the next major.
  *
  * @example Override the `date` handler
  * ```ts
@@ -21,14 +23,21 @@ const { isNonNullable } = factory
  *   printer: {
  *     nodes: {
  *       date(node) {
- *         return ts.factory.createTypeReferenceNode('Date', [])
+ *         return 'Date'
  *       },
  *     },
  *   },
  * })
  * ```
  */
-export type PrinterTsNodes = ast.PrinterPartial<ts.TypeNode, PrinterTsOptions>
+export type PrinterTsNodes = ast.PrinterPartial<string | DeprecatedTsNode, PrinterTsOptions>
+
+/**
+ * A TypeScript compiler node returned by a printer override.
+ *
+ * @deprecated Return the type as a string instead. Support is removed in the next major.
+ */
+type DeprecatedTsNode = { readonly kind: number }
 
 export type PrinterTsOptions = {
   /**
@@ -91,19 +100,40 @@ export type PrinterTsOptions = {
 }
 
 /**
- * TypeScript printer factory options: maps `SchemaNode` → `ts.TypeNode` (raw) or `ts.Node` (full declaration).
+ * TypeScript printer factory options: maps `SchemaNode` → a TypeScript type string (raw) or a full declaration string.
  */
-export type PrinterTsFactory = ast.PrinterFactoryOptions<'typescript', PrinterTsOptions, ts.TypeNode, string>
+export type PrinterTsFactory = ast.PrinterFactoryOptions<'typescript', PrinterTsOptions, string, string>
 
 type PrinterTs = PrinterTsFactory
 
 /**
+ * Wraps user overrides so a deprecated compiler node result is printed to a string through `@kubb/parser-ts`.
+ */
+function toStringHandlers(nodes: PrinterTsNodes | undefined): ast.PrinterPartial<string, PrinterTsOptions> {
+  return Object.fromEntries(
+    Object.entries(nodes ?? {}).map(([type, handler]) => [
+      type,
+      function (this: unknown, node: ast.SchemaNode) {
+        const result = (handler as (this: unknown, node: ast.SchemaNode) => string | DeprecatedTsNode | null | undefined).call(this, node)
+        return result === null || result === undefined || typeof result === 'string'
+          ? result
+          : parserTs()
+              .print(result as never)
+              .trimEnd()
+      },
+    ]),
+  )
+}
+
+/**
  * TypeScript type printer built with `definePrinter`.
  *
- * Converts a `SchemaNode` AST node into a TypeScript AST node:
- * - **`printer.print(node)`** — when `options.typeName` is set, returns a full
- *   `type Name = …` or `interface Name { … }` declaration (`ts.Node`).
- *   Without `typeName`, returns the raw `ts.TypeNode` for the schema.
+ * Converts a `SchemaNode` AST node into TypeScript source:
+ * - **`printer.print(node)`** — when `options.name` is set, returns a full
+ *   `type Name = …` or `interface Name { … }` declaration.
+ *   Without `name`, returns the type for the schema, such as `string | null`.
+ *
+ * It builds strings directly instead of loading the TypeScript compiler, so it also runs in edge runtimes.
  *
  * Dispatches on `node.type` to the appropriate handler in `nodes`. Options are closed
  * over per printer instance, so each call to `printerTs(options)` produces an independent printer.
@@ -111,13 +141,13 @@ type PrinterTs = PrinterTsFactory
  * @example Raw type node (no `typeName`)
  * ```ts
  * const printer = printerTs({ optionalType: 'questionToken', arrayType: 'array', enum: { type: 'inlineLiteral' } })
- * const typeNode = printer.print(schemaNode) // ts.TypeNode
+ * const type = printer.print(schemaNode) // 'string | null'
  * ```
  *
  * @example Full declaration (with `typeName`)
  * ```ts
  * const printer = printerTs({ optionalType: 'questionToken', arrayType: 'array', enum: { type: 'inlineLiteral' }, typeName: 'MyType' })
- * const declaration = printer.print(schemaNode) // ts.TypeAliasDeclaration | ts.InterfaceDeclaration
+ * const declaration = printer.print(schemaNode) // 'export type MyType = …'
  * ```
  */
 export const printerTs = ast.createPrinter<PrinterTs>((options) => {
@@ -133,7 +163,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       never: () => factory.keywordTypeNodes.never,
       boolean: () => factory.keywordTypeNodes.boolean,
       null: () => factory.keywordTypeNodes.null,
-      blob: () => factory.createTypeReferenceNode('Blob', []),
+      blob: () => factory.createTypeReferenceNode('Blob'),
       string: () => factory.keywordTypeNodes.string,
       uuid: () => factory.keywordTypeNodes.string,
       email: () => factory.keywordTypeNodes.string,
@@ -173,7 +203,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
             })
           : refName
 
-        return factory.createTypeReferenceNode(name, undefined)
+        return factory.createTypeReferenceNode(name)
       },
       enum(node) {
         const values = ast.getSchemaLiteralValues(node)
@@ -191,7 +221,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
 
         const resolvedName = enumTypeName({ resolver: this.options.resolver, name: node.name, enumOptions: this.options.enum, isEnum: true })
 
-        return factory.createTypeReferenceNode(resolvedName, undefined)
+        return factory.createTypeReferenceNode(resolvedName)
       },
       union(node) {
         const members = node.members ?? []
@@ -239,7 +269,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
 
         const addsQuestionToken = options.optionalType === 'questionToken' || options.optionalType === 'questionTokenAndUndefined'
 
-        const propertyNodes: Array<ts.TypeElement> = mapSchemaProperties(node, (schema) => transform(schema)).map(({ name, property, output }) => {
+        const propertyNodes: Array<string> = mapSchemaProperties(node, (schema) => transform(schema)).map(({ name, property, output }) => {
           const baseType = output ?? factory.keywordTypeNodes.unknown
           const optional = !property.required || !!property.schema.optional || !!property.schema.nullish
           const type = factory.buildPropertyType(property.schema, baseType, options.optionalType, optional)
@@ -263,7 +293,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
 
         return factory.createTypeLiteralNode(allElements)
       },
-      ...options.nodes,
+      ...toStringHandlers(options.nodes),
     },
     print(node) {
       const { name, syntaxType = 'type', description, keysToOmit } = this.options
@@ -277,23 +307,21 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       // Without name, apply modifiers inline and return.
       if (!name) {
         const result = factory.wrapNullableOptional(transformed, !!meta.nullable, !!(meta.nullish || meta.optional) && addsUndefined)
-        return parserTs().print(result)
+        return result
       }
 
       // When keysToOmit is present, wrap with Omit first, then apply nullable/optional
       // modifiers so they are not swallowed by NonNullable inside createOmitDeclaration.
       const inner = (() => {
-        const omitted: ts.TypeNode = keysToOmit?.length
-          ? factory.createOmitDeclaration({ keys: keysToOmit, type: transformed, nonNullable: true })
-          : transformed
+        const omitted = keysToOmit?.length ? factory.createOmitDeclaration({ keys: keysToOmit, type: transformed, nonNullable: true }) : transformed
         // For named type declarations (type aliases), optional/nullish always produces | undefined
         // regardless of optionalType — the questionToken ? modifier only applies to object properties.
         return factory.wrapNullableOptional(omitted, !!meta.nullable, !!(meta.nullish || meta.optional))
       })()
 
-      const useTypeGeneration = syntaxType === 'type' || factory.isUnionTypeNode(inner) || !!keysToOmit?.length
+      const useTypeGeneration = syntaxType === 'type' || !!keysToOmit?.length
 
-      const typeNode = factory.createTypeDeclaration({
+      return factory.createTypeDeclaration({
         name,
         isExportable: true,
         type: inner,
@@ -303,8 +331,6 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
           description,
         }),
       })
-
-      return parserTs().print(typeNode)
     },
   }
 })

@@ -4,33 +4,33 @@
 */
 
 export type DeletePetPath = {
-    /**
-     * @description Pet id to delete
-     *
-     * Format: `int64`
-     * @type integer
-    */
-    petId: bigint;
-};
+  /**
+   * @description Pet id to delete
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  petId: bigint
+}
 
 export type DeletePetHeaders = {
-    api_key?: string;
-};
+  api_key?: string
+}
 
-export type DeletePetStatus400 = unknown;
+export type DeletePetStatus400 = unknown
 
 export type DeletePetOptions = {
-    body?: never;
-    path: DeletePetPath;
-    query?: never;
-    headers?: DeletePetHeaders;
-};
+  body?: never
+  path: DeletePetPath
+  query?: never
+  headers?: DeletePetHeaders
+}
 
 export type DeletePetResponses = {
-    "400": DeletePetStatus400;
-};
+  '400': DeletePetStatus400
+}
 
 /**
  * @description Union of all possible responses
-*/
-export type DeletePetResponse = DeletePetStatus400;
+ */
+export type DeletePetResponse = DeletePetStatus400

@@ -4,9 +4,9 @@
 */
 
 export const status = {
-    active: "active",
-    inactive: "inactive",
-    pending: "pending"
-} as const;
+  active: 'active',
+  inactive: 'inactive',
+  pending: 'pending',
+} as const
 
-export type StatusKey = (typeof status)[keyof typeof status];
+export type StatusKey = (typeof status)[keyof typeof status]

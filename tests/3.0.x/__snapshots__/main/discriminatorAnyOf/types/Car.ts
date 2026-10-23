@@ -7,7 +7,7 @@ import type { SUV } from './SUV'
 import type { Sedan } from './Sedan'
 
 export type Car = ((Sedan & {
-    type: "Sedan";
+  type: 'Sedan'
 }) | (SUV & {
-    type: "SUV";
-}));
+  type: 'SUV'
+}))

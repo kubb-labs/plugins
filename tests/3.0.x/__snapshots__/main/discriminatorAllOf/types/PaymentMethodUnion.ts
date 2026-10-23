@@ -7,7 +7,7 @@ import type { BankTransferPaymentUnion } from './BankTransferPaymentUnion'
 import type { CardPaymentUnion } from './CardPaymentUnion'
 
 export type PaymentMethodUnion = ((CardPaymentUnion & {
-    type: "card";
+  type: 'card'
 }) | (BankTransferPaymentUnion & {
-    type: "bank_transfer";
-}));
+  type: 'bank_transfer'
+}))

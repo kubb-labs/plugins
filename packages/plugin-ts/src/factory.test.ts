@@ -1,7 +1,5 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: just for testing */
 
-import { parserTs } from '@kubb/parser-ts'
-import ts from '@typescript/typescript6'
 import { describe, expect, it } from 'vitest'
 import { format } from '#mocks'
 import {
@@ -10,92 +8,73 @@ import {
   createEnumDeclaration,
   createIntersectionDeclaration,
   createPropertySignature,
+  createStringLiteral,
+  createTypeDeclaration,
+  createTypeLiteralNode,
   createUnionDeclaration,
   createUrlTemplateType,
+  isTypeLiteral,
 } from './factory.ts'
 
-const { factory } = ts
-
-const formatTS = (elements: ts.Node | Array<ts.Node | undefined>) => {
-  return format(parserTs().print(...[elements].flat().filter(Boolean)))
+const formatTS = (elements: string | Array<string | undefined>) => {
+  return format([elements].flat().filter(Boolean).join('\n'))
 }
 
 describe('Code Generation', () => {
-  const node = factory.createVariableStatement(
-    undefined,
-    factory.createVariableDeclarationList(
-      [factory.createVariableDeclaration(factory.createIdentifier('hello'), undefined, undefined, factory.createStringLiteral('world'))],
-      ts.NodeFlags.Const,
-    ),
-  )
+  const node = "const hello = 'world'"
 
   it('should create array declaration', () => {
     // Default arrayType: 'array' - generates (string | number)[]
     expect(
-      parserTs().print(
-        createArrayDeclaration({
-          nodes: [factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword), factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)],
-        })!,
-      ),
+      createArrayDeclaration({
+        nodes: ['string', 'number'],
+      }),
     ).toMatchSnapshot()
 
     // arrayType: 'generic' - generates Array<string | number>
     expect(
-      parserTs().print(
-        createArrayDeclaration({
-          nodes: [factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword), factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)],
-          arrayType: 'generic',
-        })!,
-      ),
+      createArrayDeclaration({
+        nodes: ['string', 'number'],
+        arrayType: 'generic',
+      }),
     ).toMatchSnapshot()
 
     // Single node with default arrayType: 'array' - generates string[]
     expect(
-      parserTs().print(
-        createArrayDeclaration({
-          nodes: [factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)],
-        })!,
-      ),
+      createArrayDeclaration({
+        nodes: ['string'],
+      }),
     ).toMatchSnapshot()
 
     // Single node with arrayType: 'generic' - generates Array<string>
     expect(
-      parserTs().print(
-        createArrayDeclaration({
-          nodes: [factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)],
-          arrayType: 'generic',
-        })!,
-      ),
+      createArrayDeclaration({
+        nodes: ['string'],
+        arrayType: 'generic',
+      }),
     ).toMatchSnapshot()
   })
 
   it('should create intersection declaration', () => {
     expect(
-      parserTs().print(
-        createIntersectionDeclaration({
-          nodes: [factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword), factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)],
-        })!,
-      ),
+      createIntersectionDeclaration({
+        nodes: ['string', 'number'],
+      }),
     ).toMatchSnapshot()
   })
   it('should create union declaration', () => {
     expect(
-      parserTs().print(
-        createUnionDeclaration({
-          nodes: [factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword), factory.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword)],
-        })!,
-      ),
+      createUnionDeclaration({
+        nodes: ['string', 'number'],
+      }),
     ).toMatchSnapshot()
   })
   it('should create property signature', () => {
     expect(
-      parserTs().print(
-        createPropertySignature({
-          modifiers: [factory.createModifier(ts.SyntaxKind.ConstKeyword)],
-          name: 'hello',
-          type: factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-        })!,
-      ),
+      createPropertySignature({
+        name: 'hello',
+        type: 'string',
+      }),
     ).toMatchSnapshot()
   })
 
@@ -103,7 +82,7 @@ describe('Code Generation', () => {
     expect(
       await formatTS(
         appendJSDocToNode({
-          node: { ...node },
+          node,
           comments: ['@description description', undefined, '@example example'],
         }),
       ),
@@ -112,7 +91,7 @@ describe('Code Generation', () => {
     expect(
       await formatTS(
         appendJSDocToNode({
-          node: { ...node },
+          node,
           comments: [],
         }),
       ),
@@ -199,7 +178,7 @@ describe('Code Generation', () => {
 
 describe('createUrlTemplateType', () => {
   it.each([
-    ['/pets', '"/pets"'],
+    ['/pets', "'/pets'"],
     ['/pets/{petId}', '`/pets/${string}`'],
     ['/pets/{petId}/owner/{ownerId}', '`/pets/${string}/owner/${string}`'],
     ['/{category}/pets', '`/${string}/pets`'],
@@ -210,6 +189,71 @@ describe('createUrlTemplateType', () => {
     ['/store/:storeId/order/:orderId', '`/store/${string}/order/${string}`'],
     ['/pets/:petId/photos', '`/pets/${string}/photos`'],
   ])('should create URL template type for %s', (path, expected) => {
-    expect(parserTs().print(createUrlTemplateType(path)).trim()).toBe(expected)
+    expect(createUrlTemplateType(path)).toBe(expected)
+  })
+})
+
+describe('createStringLiteral', () => {
+  it.each([
+    ['plain', "'plain'"],
+    ["it's", "'it\\'s'"],
+    ['back\\slash', "'back\\\\slash'"],
+    ['line\nbreak', "'line\\nbreak'"],
+    ['\u0001', "'\\u0001'"],
+    ['café', "'café'"],
+  ])('escapes %j', (text, expected) => {
+    expect(createStringLiteral(text)).toBe(expected)
+  })
+})
+
+describe('isTypeLiteral', () => {
+  it.each([
+    ['{}', true],
+    ['{\n  a: string\n}', true],
+    ["{\n  '}': string\n}", true],
+    ["{\n  /** don't } */\n  a: string\n}", true],
+    ['{\n  a: string\n} | null', false],
+    ['{\n  a: string\n} & {\n  b: number\n}', false],
+    ['string', false],
+  ])('returns %s for %j', (type, expected) => {
+    expect(isTypeLiteral(type)).toBe(expected)
+  })
+})
+
+describe('parenthesization', () => {
+  it.each([
+    [['string | number'], '(string | number)[]'],
+    [["'a|b'"], "'a|b'[]"],
+    [['Record<string, number | null>'], 'Record<string, number | null>[]'],
+    [['(a: string) => void'], '((a: string) => void)[]'],
+  ])('wraps array items that need it: %j', (nodes, expected) => {
+    expect(createArrayDeclaration({ nodes })).toBe(expected)
+  })
+
+  it('wraps union members of an intersection', () => {
+    expect(createIntersectionDeclaration({ nodes: ['A | B', 'C'] })).toBe('(A | B) & C')
+  })
+})
+
+describe('createTypeDeclaration', () => {
+  it('prints an interface only for an object literal', () => {
+    expect(createTypeDeclaration({ syntax: 'interface', name: 'Pet', type: '{\n  a: string\n}', comments: [], isExportable: true })).toBe(
+      'export interface Pet {\n  a: string\n}',
+    )
+    expect(createTypeDeclaration({ syntax: 'interface', name: 'Pet', type: '{\n  a: string\n} | null', comments: [], isExportable: true })).toBe(
+      'export type Pet = {\n  a: string\n} | null',
+    )
+  })
+})
+
+describe('createTypeLiteralNode', () => {
+  it('indents nested object types', () => {
+    expect(createTypeLiteralNode(['a: {\n  b: string\n}'])).toBe('{\n  a: {\n    b: string\n  }\n}')
+  })
+})
+
+describe('createUrlTemplateType escaping', () => {
+  it('escapes backticks and backslashes in path segments', () => {
+    expect(createUrlTemplateType('/a`b\\c/{id}')).toBe('`/a\\`b\\\\c/${string}`')
   })
 })

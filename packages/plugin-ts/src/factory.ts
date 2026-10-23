@@ -1,87 +1,103 @@
-import { createRequire } from 'node:module'
 import { camelCase, pascalCase, screamingSnakeCase, snakeCase } from '@internals/utils'
 import { syncSchemaRef } from 'kubb/kit'
 import type { ast } from 'kubb/kit'
-import type ts from '@typescript/typescript6'
-
-/**
- * Loaded with `require`, not `import`. When ESM imports a CommonJS package, Node keeps a second
- * copy of its source to detect named exports, and for TypeScript that copy is about 9 MB.
- */
-const typescript: typeof ts = createRequire(import.meta.url)('@typescript/typescript6')
-
-const { SyntaxKind, factory } = typescript
 
 function isNumber(value: unknown): value is number {
   return typeof value === 'number' && !Number.isNaN(value)
 }
 
-// https://ts-ast-viewer.com/
-
-/**
- * TypeScript AST modifiers for the `export` keyword.
- */
-export const modifiers = {
-  export: factory.createModifier(typescript.SyntaxKind.ExportKeyword),
-} as const
-
-export const isUnionTypeNode = typescript.isUnionTypeNode
-
 export function isNonNullable<T>(value: T | null | undefined): value is T {
   return value !== null && value !== undefined
 }
 
-function isValidIdentifier(str: string): boolean {
-  if (!str.length || str.trim() !== str) {
-    return false
-  }
+const controlCharacters: Record<string, string> = { '\b': '\\b', '\t': '\\t', '\n': '\\n', '\v': '\\v', '\f': '\\f', '\r': '\\r' }
 
-  // Mirrors `typescript.isIdentifierText`, which is not in the public type declarations.
-  // Walking by code point with `isIdentifierStart`/`isIdentifierPart` rejects
-  // invalid names such as private identifiers (`#FOO`), forcing `propertyName`
-  // to quote them.
-  let ch = str.codePointAt(0)!
-  if (!typescript.isIdentifierStart(ch, typescript.ScriptTarget.Latest)) {
-    return false
-  }
-  for (let i = ch > 0xffff ? 2 : 1; i < str.length; i += ch > 0xffff ? 2 : 1) {
-    ch = str.codePointAt(i)!
-    if (!typescript.isIdentifierPart(ch, typescript.ScriptTarget.Latest)) {
-      return false
+/**
+ * Escapes backslashes, `quote` and control characters so `text` can sit between two `quote` characters.
+ */
+function escapeText(text: string, quote: string): string {
+  // oxlint-disable-next-line no-control-regex -- control characters are exactly what needs escaping
+  return text.replace(new RegExp(`[\\\\${quote}\\u0000-\\u001f\\u2028\\u2029]`, 'g'), (char) => {
+    if (char === '\\' || char === quote) return `\\${char}`
+    return controlCharacters[char] ?? `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`
+  })
+}
+
+/**
+ * Prints `text` as a single-quoted string literal.
+ */
+export function createStringLiteral(text: string): string {
+  return `'${escapeText(text, "'")}'`
+}
+
+/**
+ * Indents every non-empty line of `text` by two spaces.
+ */
+function indent(text: string): string {
+  return text
+    .split('\n')
+    .map((line) => (line ? `  ${line}` : line))
+    .join('\n')
+}
+
+/**
+ * Walks `type` and reports the top-level characters, skipping string literals, template literals, comments and
+ * anything nested in brackets. Returns the depth-0 text with nested parts blanked out, plus whether the whole type is
+ * one bracketed block that starts at index 0.
+ */
+function scanTopLevel(type: string): { topLevel: string; closesAt: number } {
+  let depth = 0
+  let topLevel = ''
+  let closesAt = -1
+
+  for (let i = 0; i < type.length; i++) {
+    const char = type[i]!
+
+    if (char === "'" || char === '"' || char === '`') {
+      let end = i + 1
+      while (end < type.length && type[end] !== char) end += type[end] === '\\' ? 2 : 1
+      i = end
+      if (depth === 0) topLevel += ' '
+      continue
     }
+    if (char === '/' && type[i + 1] === '*') {
+      i = type.indexOf('*/', i + 2) + 1 || type.length
+      continue
+    }
+    if (char === '{' || char === '(' || char === '[' || char === '<') depth++
+    if (char === '}' || char === ')' || char === ']' || (char === '>' && type[i - 1] !== '=')) {
+      depth--
+      if (depth === 0 && closesAt === -1) closesAt = i
+      continue
+    }
+    if (depth === 0) topLevel += char
   }
-  return true
-}
 
-function propertyName(name: string | ts.PropertyName): ts.PropertyName {
-  if (typeof name === 'string') {
-    const isValid = isValidIdentifier(name)
-    return isValid ? factory.createIdentifier(name) : factory.createStringLiteral(name)
-  }
-  return name
-}
-
-const questionToken = factory.createToken(typescript.SyntaxKind.QuestionToken)
-
-/**
- * Creates a question token for optional type annotations.
- * Pass `true` to use the cached token, or provide a pre-created token.
- */
-function createQuestionToken(token?: boolean | ts.QuestionToken) {
-  if (!token) {
-    return undefined
-  }
-  if (token === true) {
-    return questionToken
-  }
-  return token
+  return { topLevel, closesAt }
 }
 
 /**
- * Creates a TypeScript intersection type node from multiple type nodes.
- * Returns the single node if only one is provided, or wraps in parentheses if requested.
+ * Whether `type` is an anonymous object type such as `{ a: string }`.
  */
-export function createIntersectionDeclaration({ nodes, withParentheses }: { nodes: Array<ts.TypeNode>; withParentheses?: boolean }): ts.TypeNode | null {
+export function isTypeLiteral(type: string): boolean {
+  return type.startsWith('{') && scanTopLevel(type).closesAt === type.length - 1
+}
+
+/**
+ * Wraps `type` in parentheses when it is a union, intersection, function, `keyof`, `typeof` or conditional type, so a
+ * postfix such as `[]` or `?` binds to the whole type.
+ */
+function parenthesize(type: string): string {
+  const { topLevel } = scanTopLevel(type)
+  if (/[|&?]|=>|^\s*(?:keyof|typeof|unique|readonly|infer|new)\s/.test(topLevel)) return `(${type})`
+  return type
+}
+
+/**
+ * Creates a TypeScript intersection type.
+ * Returns the single type if only one is provided, or wraps in parentheses if requested.
+ */
+export function createIntersectionDeclaration({ nodes, withParentheses }: { nodes: Array<string>; withParentheses?: boolean }): string | null {
   if (!nodes.length) {
     return null
   }
@@ -90,45 +106,30 @@ export function createIntersectionDeclaration({ nodes, withParentheses }: { node
     return nodes[0] || null
   }
 
-  const node = factory.createIntersectionTypeNode(nodes)
+  // Union members of an intersection need parentheses to keep their meaning
+  const node = nodes.map((member) => (/[|]/.test(scanTopLevel(member).topLevel) ? `(${member})` : member)).join(' & ')
 
-  if (withParentheses) {
-    return factory.createParenthesizedType(node)
-  }
-
-  return node
+  return withParentheses ? `(${node})` : node
 }
 
 /**
- * Creates a TypeScript array type node.
+ * Creates a TypeScript array type.
  * Use `arrayType: 'array'` for bracket syntax (`T[]`), or `'generic'` for `Array<T>`.
  *
  * @example Array bracket syntax
- * `createArrayDeclaration({ nodes: [stringType], arrayType: 'array' }) // → string[]`
+ * `createArrayDeclaration({ nodes: ['string'], arrayType: 'array' }) // → string[]`
  *
  * @example Generic Array syntax
- * `createArrayDeclaration({ nodes: [stringType], arrayType: 'generic' }) // → Array<string>`
+ * `createArrayDeclaration({ nodes: ['string'], arrayType: 'generic' }) // → Array<string>`
  */
-export function createArrayDeclaration({ nodes, arrayType = 'array' }: { nodes: Array<ts.TypeNode>; arrayType?: 'array' | 'generic' }): ts.TypeNode {
+export function createArrayDeclaration({ nodes, arrayType = 'array' }: { nodes: Array<string>; arrayType?: 'array' | 'generic' }): string {
   if (!nodes.length) {
-    return factory.createTupleTypeNode([])
+    return '[]'
   }
 
-  if (nodes.length === 1) {
-    const node = nodes[0]!
-    if (arrayType === 'generic') {
-      return factory.createTypeReferenceNode(factory.createIdentifier('Array'), [node])
-    }
-    return factory.createArrayTypeNode(node)
-  }
+  const node = nodes.length === 1 ? nodes[0]! : nodes.join(' | ')
 
-  // For union types (multiple nodes), respect arrayType preference
-  const unionType = factory.createUnionTypeNode(nodes)
-  if (arrayType === 'generic') {
-    return factory.createTypeReferenceNode(factory.createIdentifier('Array'), [unionType])
-  }
-  // For array syntax with unions, we need parentheses: (string | number)[]
-  return factory.createArrayTypeNode(factory.createParenthesizedType(unionType))
+  return arrayType === 'generic' ? `Array<${node}>` : `${parenthesize(node)}[]`
 }
 
 /**
@@ -136,22 +137,32 @@ export function createArrayDeclaration({ nodes, arrayType = 'array' }: { nodes: 
  * @example Union type example
  * `string | number`
  */
-export function createUnionDeclaration({ nodes, withParentheses }: { nodes: Array<ts.TypeNode>; withParentheses?: boolean }): ts.TypeNode {
+export function createUnionDeclaration({ nodes, withParentheses }: { nodes: Array<string>; withParentheses?: boolean }): string {
   if (!nodes.length) {
     return keywordTypeNodes.any
   }
 
   if (nodes.length === 1) {
-    return nodes[0] as ts.TypeNode
+    return nodes[0]!
   }
 
-  const node = factory.createUnionTypeNode(nodes)
+  const node = nodes.join(' | ')
 
-  if (withParentheses) {
-    return factory.createParenthesizedType(node)
-  }
+  return withParentheses ? `(${node})` : node
+}
 
-  return node
+/**
+ * Whether `name` can be written as a bare property name instead of a quoted string.
+ */
+function isValidIdentifier(name: string): boolean {
+  return /^[\p{ID_Start}$_][\p{ID_Continue}$‌‍]*$/u.test(name)
+}
+
+/**
+ * Prints a property or enum member name, quoting it when it is not a valid identifier.
+ */
+function propertyName(name: string): string {
+  return isValidIdentifier(name) ? name : createStringLiteral(name)
 }
 
 /**
@@ -160,75 +171,52 @@ export function createUnionDeclaration({ nodes, withParentheses }: { nodes: Arra
  */
 export function createPropertySignature({
   readOnly,
-  modifiers = [],
   name,
   questionToken,
   type,
 }: {
   readOnly?: boolean
-  modifiers?: Array<ts.Modifier>
-  name: ts.PropertyName | string
-  questionToken?: ts.QuestionToken | boolean
-  type?: ts.TypeNode
-}) {
-  return factory.createPropertySignature(
-    [...modifiers, readOnly ? factory.createToken(typescript.SyntaxKind.ReadonlyKeyword) : undefined].filter(
-      (modifier): modifier is ts.Modifier => modifier !== undefined,
-    ),
-    propertyName(name),
-    createQuestionToken(questionToken),
-    type,
-  )
+  name: string
+  questionToken?: boolean
+  type?: string
+}): string {
+  return `${readOnly ? 'readonly ' : ''}${propertyName(name)}${questionToken ? '?' : ''}${type ? `: ${type}` : ''}`
 }
 
 /**
- * Attaches JSDoc comments to an AST node as synthetic leading comments.
- * Filters out undefined comments before attaching.
- *
- * @see https://github.com/microsoft/TypeScript/issues/44151
+ * Puts a JSDoc block built from `comments` above `node`, dropping empty comments.
  */
-export function appendJSDocToNode<TNode extends ts.Node>({ node, comments }: { node: TNode; comments: Array<string | undefined> }) {
-  const filteredComments = comments.filter(Boolean)
+export function appendJSDocToNode({ node, comments }: { node: string; comments: Array<string | undefined> }): string {
+  const lines = comments.filter(Boolean).flatMap((comment = '') => comment.split(/\r?\n/))
 
-  if (!filteredComments.length) {
+  if (!lines.length) {
     return node
   }
 
-  // A description can span lines; each one needs its own ` * ` prefix.
-  const text = filteredComments
-    .flatMap((comment = '') => comment.split(/\r?\n/))
-    .reduce((acc = '', comment = '') => {
-      return `${acc}\n * ${comment.replaceAll('*/', '*\\/')}`
-    }, '*')
-
-  // Use the node directly instead of spreading to avoid creating Unknown nodes
-  // TypeScript's addSyntheticLeadingComment accepts the node as-is
-  return typescript.addSyntheticLeadingComment(node, typescript.SyntaxKind.MultiLineCommentTrivia, `${text || '*'}\n`, true)
+  return ['/**', ...lines.map((line) => ` * ${line.replaceAll('*/', '*\\/')}`.trimEnd()), ' */', node].join('\n')
 }
 
 /**
- * Creates a TypeScript index signature for dynamic property access.
- * Defines the key type (default: `string`) and value type on an object.
+ * Creates a TypeScript type literal (anonymous object type) with one member per line.
  */
-function createIndexSignature(
-  type: ts.TypeNode,
-  {
-    modifiers,
-    indexName = 'key',
-    indexType = factory.createKeywordTypeNode(typescript.SyntaxKind.StringKeyword),
-  }: {
-    indexName?: string
-    indexType?: ts.TypeNode
-    decorators?: Array<ts.Decorator>
-    modifiers?: Array<ts.Modifier>
-  } = {},
-) {
-  return factory.createIndexSignature(modifiers, [factory.createParameterDeclaration(undefined, undefined, indexName, undefined, indexType)], type)
+export function createTypeLiteralNode(members: Array<string>): string {
+  if (!members.length) {
+    return '{}'
+  }
+
+  return `{\n${members.map(indent).join('\n')}\n}`
+}
+
+/**
+ * Creates a TypeScript type reference (e.g., `Array<string>`, `Record<K, V>`).
+ */
+export function createTypeReferenceNode(name: string, typeArguments?: Array<string>): string {
+  return typeArguments?.length ? `${name}<${typeArguments.join(', ')}>` : name
 }
 
 /**
  * Creates a TypeScript type declaration as either a type alias or interface.
- * Intelligently selects the syntax based on the type structure and attaches JSDoc comments.
+ * Uses interface syntax only when requested and the type is an object literal, and attaches JSDoc comments.
  */
 export function createTypeDeclaration({
   syntax,
@@ -240,40 +228,27 @@ export function createTypeDeclaration({
   syntax: 'type' | 'interface'
   comments: Array<string | undefined>
   isExportable?: boolean
-  name: string | ts.Identifier
-  type: ts.TypeNode
-}) {
-  if (syntax === 'interface' && typescript.isTypeLiteralNode(type)) {
-    const node = factory.createInterfaceDeclaration(isExportable ? [modifiers.export] : [], name, undefined, undefined, [...type.members])
+  name: string
+  type: string
+}): string {
+  const exportKeyword = isExportable ? 'export ' : ''
+  const node = syntax === 'interface' && isTypeLiteral(type) ? `${exportKeyword}interface ${name} ${type}` : `${exportKeyword}type ${name} = ${type}`
 
-    return appendJSDocToNode({
-      node,
-      comments,
-    })
-  }
-
-  const node = factory.createTypeAliasDeclaration(isExportable ? [modifiers.export] : [], name, undefined, type)
-
-  return appendJSDocToNode({
-    node,
-    comments,
-  })
+  return appendJSDocToNode({ node, comments })
 }
 
 /**
- * Converts an enum member value to a literal expression. Numbers become numeric literals (negatives use a prefix
- * minus, as `createNumericLiteral` rejects them) unless `asNumber` is `false`, which emits the string form.
+ * Converts an enum member value to a literal. Numbers become numeric literals unless `asNumber` is `false`,
+ * which emits the string form.
  */
-function valueToExpression(value: string | number | boolean, asNumber = isNumber(value)): ts.Expression {
+function valueToExpression(value: string | number | boolean, asNumber = isNumber(value)): string {
   if (typeof value === 'boolean') {
-    return value ? factory.createTrue() : factory.createFalse()
+    return String(value)
   }
   if (asNumber && isNumber(value)) {
-    return value < 0
-      ? factory.createPrefixUnaryExpression(SyntaxKind.MinusToken, factory.createNumericLiteral(Math.abs(value)))
-      : factory.createNumericLiteral(value)
+    return String(value)
   }
-  return factory.createStringLiteral(value.toString())
+  return createStringLiteral(value.toString())
 }
 
 /**
@@ -300,7 +275,7 @@ function applyEnumKeyCasing(key: string, casing: 'screamingSnakeCase' | 'snakeCa
 
 /**
  * Creates a TypeScript enum declaration or equivalent construct in various formats.
- * Returns a tuple of [name node, type node] - name node may be undefined for certain types.
+ * Returns a tuple of [name declaration, type declaration] - the name declaration may be undefined for certain types.
  *
  * @example
  * ```ts
@@ -342,71 +317,35 @@ export function createEnumDeclaration({
    * @default 'none'
    */
   enumKeyCasing?: 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'
-}): [name: ts.Node | undefined, type: ts.Node] {
+}): [name: string | undefined, type: string] {
   if (type === 'literal' || type === 'inlineLiteral') {
-    return [
-      undefined,
-      factory.createTypeAliasDeclaration(
-        [factory.createToken(typescript.SyntaxKind.ExportKeyword)],
-        factory.createIdentifier(typeName),
-        undefined,
-        factory.createUnionTypeNode(
-          enums
-            .map(([_key, value]) => {
-              if (isNumber(value)) {
-                if (value < 0) {
-                  return factory.createLiteralTypeNode(
-                    factory.createPrefixUnaryExpression(typescript.SyntaxKind.MinusToken, factory.createNumericLiteral(Math.abs(value))),
-                  )
-                }
-                return factory.createLiteralTypeNode(factory.createNumericLiteral(value?.toString()))
-              }
+    const members = enums.map(([_key, value]) => (isNonNullable(value) ? valueToExpression(value) : undefined)).filter(isNonNullable)
 
-              if (typeof value === 'boolean') {
-                return factory.createLiteralTypeNode(value ? factory.createTrue() : factory.createFalse())
-              }
-              if (value !== null && value !== undefined) {
-                return factory.createLiteralTypeNode(factory.createStringLiteral(value.toString()))
-              }
-
-              return undefined
-            })
-            .filter((node): node is ts.LiteralTypeNode => node !== undefined),
-        ),
-      ),
-    ]
+    return [undefined, `export type ${typeName} = ${members.join(' | ') || keywordTypeNodes.never}`]
   }
 
   if (type === 'enum' || type === 'constEnum') {
-    return [
-      undefined,
-      factory.createEnumDeclaration(
-        [
-          factory.createToken(typescript.SyntaxKind.ExportKeyword),
-          type === 'constEnum' ? factory.createToken(typescript.SyntaxKind.ConstKeyword) : undefined,
-        ].filter(
-          (modifier): modifier is ts.ModifierToken<ts.SyntaxKind.ExportKeyword> | ts.ModifierToken<ts.SyntaxKind.ConstKeyword> => modifier !== undefined,
-        ),
-        factory.createIdentifier(typeName),
-        enums
-          .map(([key, value, description]) => {
-            const initializer = valueToExpression(value, Number.parseInt(value.toString(), 10) === value)
+    const members = enums
+      .map(([key, value, description]) => {
+        const initializer = valueToExpression(value, Number.parseInt(value.toString(), 10) === value)
 
-            if (isNumber(Number.parseInt(key.toString(), 10))) {
-              const casingKey = applyEnumKeyCasing(`${typeName}_${key}`, enumKeyCasing)
-              return appendJSDocToNode({ node: factory.createEnumMember(propertyName(casingKey), initializer), comments: [description] })
-            }
+        if (isNumber(Number.parseInt(key.toString(), 10))) {
+          const casingKey = applyEnumKeyCasing(`${typeName}_${key}`, enumKeyCasing)
+          return appendJSDocToNode({ node: `${propertyName(casingKey)} = ${initializer}`, comments: [description] })
+        }
 
-            if (key !== null && key !== undefined) {
-              const casingKey = applyEnumKeyCasing(key.toString(), enumKeyCasing)
-              return appendJSDocToNode({ node: factory.createEnumMember(propertyName(casingKey), initializer), comments: [description] })
-            }
+        if (key !== null && key !== undefined) {
+          const casingKey = applyEnumKeyCasing(key.toString(), enumKeyCasing)
+          return appendJSDocToNode({ node: `${propertyName(casingKey)} = ${initializer}`, comments: [description] })
+        }
 
-            return undefined
-          })
-          .filter((member): member is ts.EnumMember => member !== undefined),
-      ),
-    ]
+        return undefined
+      })
+      .filter(isNonNullable)
+
+    const body = members.length ? `{\n${members.map(indent).join(',\n')},\n}` : '{}'
+
+    return [undefined, `export ${type === 'constEnum' ? 'const ' : ''}enum ${typeName} ${body}`]
   }
 
   // used when using `as const` instead of an TypeScript enum.
@@ -418,190 +357,108 @@ export function createEnumDeclaration({
   // Return undefined for nameNode so the barrel won't try to export a non-existent symbol.
   // Use `never` as the type alias to keep references valid without creating a broken const.
   if (enums.length === 0) {
-    return [
-      undefined,
-      factory.createTypeAliasDeclaration(
-        [factory.createToken(typescript.SyntaxKind.ExportKeyword)],
-        factory.createIdentifier(typeName),
-        undefined,
-        factory.createKeywordTypeNode(typescript.SyntaxKind.NeverKeyword),
-      ),
-    ]
+    return [undefined, `export type ${typeName} = ${keywordTypeNodes.never}`]
   }
 
+  const properties = enums
+    .map(([key, value, description]) => {
+      if (key !== null && key !== undefined) {
+        const casingKey = applyEnumKeyCasing(key.toString(), enumKeyCasing)
+        return appendJSDocToNode({ node: `${propertyName(casingKey)}: ${valueToExpression(value)}`, comments: [description] })
+      }
+
+      return undefined
+    })
+    .filter(isNonNullable)
+
   return [
-    factory.createVariableStatement(
-      [factory.createToken(typescript.SyntaxKind.ExportKeyword)],
-      factory.createVariableDeclarationList(
-        [
-          factory.createVariableDeclaration(
-            factory.createIdentifier(identifierName),
-            undefined,
-            undefined,
-            factory.createAsExpression(
-              factory.createObjectLiteralExpression(
-                enums
-                  .map(([key, value, description]) => {
-                    const initializer = valueToExpression(value)
-
-                    if (key !== null && key !== undefined) {
-                      const casingKey = applyEnumKeyCasing(key.toString(), enumKeyCasing)
-                      return appendJSDocToNode({ node: factory.createPropertyAssignment(propertyName(casingKey), initializer), comments: [description] })
-                    }
-
-                    return undefined
-                  })
-                  .filter((property): property is ts.PropertyAssignment => property !== undefined),
-                true,
-              ),
-              factory.createTypeReferenceNode(factory.createIdentifier('const'), undefined),
-            ),
-          ),
-        ],
-        typescript.NodeFlags.Const,
-      ),
-    ),
-    factory.createTypeAliasDeclaration(
-      [factory.createToken(typescript.SyntaxKind.ExportKeyword)],
-      factory.createIdentifier(typeName),
-      undefined,
-      factory.createIndexedAccessTypeNode(
-        factory.createParenthesizedType(factory.createTypeQueryNode(factory.createIdentifier(identifierName), undefined)),
-        factory.createTypeOperatorNode(typescript.SyntaxKind.KeyOfKeyword, factory.createTypeQueryNode(factory.createIdentifier(identifierName), undefined)),
-      ),
-    ),
+    `export const ${identifierName} = {\n${properties.map(indent).join(',\n')},\n} as const`,
+    `export type ${typeName} = (typeof ${identifierName})[keyof typeof ${identifierName}]`,
   ]
 }
 
 /**
- * Creates a TypeScript `Omit<T, Keys>` type reference node.
+ * Creates a TypeScript `Omit<T, Keys>` type reference.
  * Optionally wraps the type in `NonNullable<T>` if `nonNullable` is true.
  */
-export function createOmitDeclaration({ keys, type, nonNullable }: { keys: Array<string> | string; type: ts.TypeNode; nonNullable?: boolean }) {
-  const node = nonNullable ? factory.createTypeReferenceNode(factory.createIdentifier('NonNullable'), [type]) : type
+export function createOmitDeclaration({ keys, type, nonNullable }: { keys: Array<string> | string; type: string; nonNullable?: boolean }): string {
+  const node = nonNullable ? createTypeReferenceNode('NonNullable', [type]) : type
+  const omitted = [keys].flat().map(createStringLiteral).join(' | ')
 
-  if (Array.isArray(keys)) {
-    return factory.createTypeReferenceNode(factory.createIdentifier('Omit'), [
-      node,
-      factory.createUnionTypeNode(
-        keys.map((key) => {
-          return factory.createLiteralTypeNode(factory.createStringLiteral(key))
-        }),
-      ),
-    ])
-  }
-
-  return factory.createTypeReferenceNode(factory.createIdentifier('Omit'), [node, factory.createLiteralTypeNode(factory.createStringLiteral(keys))])
+  return createTypeReferenceNode('Omit', [node, omitted])
 }
 
 /**
- * Pre-built TypeScript keyword type nodes for common primitive types.
- * Use these to avoid repeatedly creating the same type nodes.
+ * TypeScript keyword types for common primitive types.
  */
 export const keywordTypeNodes = {
-  any: factory.createKeywordTypeNode(typescript.SyntaxKind.AnyKeyword),
-  unknown: factory.createKeywordTypeNode(typescript.SyntaxKind.UnknownKeyword),
-  void: factory.createKeywordTypeNode(typescript.SyntaxKind.VoidKeyword),
-  number: factory.createKeywordTypeNode(typescript.SyntaxKind.NumberKeyword),
-  integer: factory.createKeywordTypeNode(typescript.SyntaxKind.NumberKeyword),
-  bigint: factory.createKeywordTypeNode(typescript.SyntaxKind.BigIntKeyword),
-  object: factory.createKeywordTypeNode(typescript.SyntaxKind.ObjectKeyword),
-  string: factory.createKeywordTypeNode(typescript.SyntaxKind.StringKeyword),
-  boolean: factory.createKeywordTypeNode(typescript.SyntaxKind.BooleanKeyword),
-  undefined: factory.createKeywordTypeNode(typescript.SyntaxKind.UndefinedKeyword),
-  null: factory.createLiteralTypeNode(factory.createToken(typescript.SyntaxKind.NullKeyword)),
-  never: factory.createKeywordTypeNode(typescript.SyntaxKind.NeverKeyword),
+  any: 'any',
+  unknown: 'unknown',
+  void: 'void',
+  number: 'number',
+  integer: 'number',
+  bigint: 'bigint',
+  object: 'object',
+  string: 'string',
+  boolean: 'boolean',
+  undefined: 'undefined',
+  null: 'null',
+  never: 'never',
 } as const
 
-/**
- * Converts a path like '/pet/{petId}/uploadImage' to a template literal type
- * like `/pet/${string}/uploadImage`
- */
 /**
  * Converts an OAS-style path (e.g. `/pets/{petId}`) or an Express-style path
  * (e.g. `/pets/:petId`) to a TypeScript template literal type
  * like `` `/pets/${string}` ``.
  */
-export function createUrlTemplateType(path: string): ts.TypeNode {
+export function createUrlTemplateType(path: string): string {
   // normalized Express `:param` → OAS `{param}` so a single regex handles both.
   const normalized = path.replace(/:([^/]+)/g, '{$1}')
 
   if (!normalized.includes('{')) {
-    return factory.createLiteralTypeNode(factory.createStringLiteral(normalized))
+    return createStringLiteral(normalized)
   }
 
-  const segments = normalized.split(/(\{[^}]+\})/)
-  const parts: Array<string> = []
-  const parameterIndices: Array<number> = []
+  const template = normalized
+    .split(/(\{[^}]+\})/)
+    .map((segment) => (segment.startsWith('{') && segment.endsWith('}') ? `\${${keywordTypeNodes.string}}` : escapeText(segment, '`').replaceAll('${', '\\${')))
+    .join('')
 
-  segments.forEach((segment) => {
-    if (segment.startsWith('{') && segment.endsWith('}')) {
-      parameterIndices.push(parts.length)
-      parts.push(segment)
-    } else if (segment) {
-      parts.push(segment)
-    }
-  })
-
-  const head = typescript.factory.createTemplateHead(parts[0] || '')
-  const templateSpans: Array<ts.TemplateLiteralTypeSpan> = []
-
-  parameterIndices.forEach((paramIndex, i) => {
-    const isLast = i === parameterIndices.length - 1
-    const nextPart = parts[paramIndex + 1] || ''
-    const literal = isLast ? typescript.factory.createTemplateTail(nextPart) : typescript.factory.createTemplateMiddle(nextPart)
-    templateSpans.push(typescript.factory.createTemplateLiteralTypeSpan(keywordTypeNodes.string, literal))
-  })
-
-  return typescript.factory.createTemplateLiteralType(head, templateSpans)
+  return `\`${template}\``
 }
-
-/**
- * Creates a TypeScript type literal node (anonymous object type).
- */
-export const createTypeLiteralNode = factory.createTypeLiteralNode
-
-/**
- * Creates a TypeScript type reference node (e.g., `Array<string>`, `Record<K, V>`).
- */
-export const createTypeReferenceNode = factory.createTypeReferenceNode
 
 // ─── Printer helpers ──────────────────────────────────────────────────────────
 
 /**
- * Converts a primitive const value to a TypeScript literal type node.
- * Handles negative numbers via a prefix unary expression.
+ * Converts a primitive const value to a TypeScript literal type.
  */
-export function constToTypeNode(value: string | number | boolean, format: 'string' | 'number' | 'boolean'): ts.TypeNode | undefined {
+export function constToTypeNode(value: string | number | boolean, format: 'string' | 'number' | 'boolean'): string | undefined {
   if (format === 'boolean') {
-    return factory.createLiteralTypeNode(value === true ? factory.createTrue() : factory.createFalse())
+    return String(value === true)
   }
   const literal = format === 'number' && typeof value === 'number' ? value : String(value)
-  return factory.createLiteralTypeNode(valueToExpression(literal) as ts.LiteralTypeNode['literal'])
+  return valueToExpression(literal)
 }
 
 /**
- * Returns a `Date` reference type node when `representation` is `'date'`, otherwise falls back to `string`.
+ * Returns a `Date` reference type when `representation` is `'date'`, otherwise falls back to `string`.
  */
-export function dateOrStringNode(node: { representation?: string }): ts.TypeNode {
-  return node.representation === 'date' ? createTypeReferenceNode(factory.createIdentifier('Date')) : keywordTypeNodes.string
+export function dateOrStringNode(node: { representation?: string }): string {
+  return node.representation === 'date' ? createTypeReferenceNode('Date') : keywordTypeNodes.string
 }
 
 /**
  * Maps an array of `SchemaNode`s through the printer, filtering out `null` and `undefined` results.
  */
-export function buildMemberNodes(
-  members: Array<ast.SchemaNode> | undefined,
-  print: (node: ast.SchemaNode) => ts.TypeNode | null | undefined,
-): Array<ts.TypeNode> {
+export function buildMemberNodes(members: Array<ast.SchemaNode> | undefined, print: (node: ast.SchemaNode) => string | null | undefined): Array<string> {
   return (members ?? []).map(print).filter(isNonNullable)
 }
 
 /**
- * Builds a TypeScript tuple type node from an array schema's `items`,
+ * Builds a TypeScript tuple type from an array schema's `items`,
  * applying min/max slice and optional/rest element rules.
  */
-export function buildTupleNode(node: ast.ArraySchemaNode, print: (node: ast.SchemaNode) => ts.TypeNode | null | undefined): ts.TypeNode {
+export function buildTupleNode(node: ast.ArraySchemaNode, print: (node: ast.SchemaNode) => string | null | undefined): string {
   let items = (node.items ?? []).map(print).filter(isNonNullable)
 
   const restNode = node.rest ? (print(node.rest) ?? undefined) : undefined
@@ -615,20 +472,20 @@ export function buildTupleNode(node: ast.ArraySchemaNode, print: (node: ast.Sche
   }
 
   if (min !== undefined) {
-    items = items.map((item, i) => (i >= min ? factory.createOptionalTypeNode(item) : item))
+    items = items.map((item, i) => (i >= min ? `${parenthesize(item)}?` : item))
   }
 
   if (max === undefined && restNode) {
-    items.push(factory.createRestTypeNode(factory.createArrayTypeNode(restNode)))
+    items.push(`...${parenthesize(restNode)}[]`)
   }
 
-  return factory.createTupleTypeNode(items)
+  return `[${items.join(', ')}]`
 }
 
 /**
  * Appends `| null` and then `| undefined` to a type when requested.
  */
-export function wrapNullableOptional(type: ts.TypeNode, nullable: boolean, addsUndefined: boolean): ts.TypeNode {
+export function wrapNullableOptional(type: string, nullable: boolean, addsUndefined: boolean): string {
   const withNullable = nullable ? createUnionDeclaration({ nodes: [type, keywordTypeNodes.null] }) : type
   return addsUndefined ? createUnionDeclaration({ nodes: [withNullable, keywordTypeNodes.undefined] }) : withNullable
 }
@@ -638,18 +495,15 @@ export function wrapNullableOptional(type: ts.TypeNode, nullable: boolean, addsU
  */
 export function buildPropertyType(
   schema: ast.SchemaNode,
-  baseType: ts.TypeNode,
+  baseType: string,
   optionalType: 'questionToken' | 'undefined' | 'questionTokenAndUndefined',
   optional?: boolean,
-): ts.TypeNode {
+): string {
   const addsUndefined = optionalType === 'undefined' || optionalType === 'questionTokenAndUndefined'
   const meta = syncSchemaRef(schema)
 
   return wrapNullableOptional(baseType, !!meta.nullable, addsUndefined && !!(optional || meta.nullish || meta.optional))
 }
-
-const indexSignaturePrinter = typescript.createPrinter()
-const indexSignatureSource = typescript.createSourceFile('', '', typescript.ScriptTarget.Latest)
 
 /**
  * Creates a TypeScript index signature for `additionalProperties` and `patternProperties` on an
@@ -661,9 +515,9 @@ const indexSignatureSource = typescript.createSourceFile('', '', typescript.Scri
 export function buildIndexSignatures(
   node: { additionalProperties?: ast.SchemaNode | boolean; patternProperties?: Record<string, ast.SchemaNode> },
   propertyCount: number,
-  print: (node: ast.SchemaNode) => ts.TypeNode | null | undefined,
-): Array<ts.TypeElement> {
-  const valueTypes: Array<ts.TypeNode> = []
+  print: (node: ast.SchemaNode) => string | null | undefined,
+): Array<string> {
+  const valueTypes: Array<string> = []
 
   if (node.additionalProperties && node.additionalProperties !== true) {
     valueTypes.push(print(node.additionalProperties) ?? keywordTypeNodes.unknown)
@@ -678,11 +532,7 @@ export function buildIndexSignatures(
 
   if (valueTypes.length === 0) return []
 
-  const seen = new Set<string>()
-  const distinct = valueTypes.filter((type) => {
-    const key = indexSignaturePrinter.printNode(typescript.EmitHint.Unspecified, type, indexSignatureSource)
-    return seen.has(key) ? false : (seen.add(key), true)
-  })
+  const type = propertyCount > 0 ? keywordTypeNodes.unknown : createUnionDeclaration({ nodes: [...new Set(valueTypes)] })
 
-  return [createIndexSignature(propertyCount > 0 ? keywordTypeNodes.unknown : createUnionDeclaration({ nodes: distinct }))]
+  return [`[key: string]: ${type}`]
 }

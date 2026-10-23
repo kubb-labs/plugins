@@ -4,6 +4,6 @@
 */
 
 export type CardPaymentUnion = {
-    type?: string;
-    cardNumber?: string;
-};
+  type?: string
+  cardNumber?: string
+}

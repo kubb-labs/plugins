@@ -1,6 +1,5 @@
 import { buildResponses } from '@internals/shared'
 import { ast } from 'kubb/kit'
-import ts from '@typescript/typescript6'
 import { describe, expect, it } from 'vitest'
 import { printerTs } from './printers/printerTs.ts'
 import { resolverTs } from './resolvers/resolverTs.ts'
@@ -12,15 +11,8 @@ const printer = printerTs({
   arrayType: 'array',
   enum: { type: 'inlineLiteral', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' },
 })
-const tsPrinter = ts.createPrinter()
-const sourceFile = ts.createSourceFile('', '', ts.ScriptTarget.Latest)
-
 function printSchema(schema: ReturnType<typeof buildParams>): string {
-  const node = printer.transform(schema)
-
-  if (!node) return ''
-
-  return tsPrinter.printNode(ts.EmitHint.Unspecified, node, sourceFile)
+  return printer.transform(schema) ?? ''
 }
 
 describe('buildParams', () => {
@@ -29,7 +21,7 @@ describe('buildParams', () => {
 
     expect(printSchema(buildParams({ params }))).toMatchInlineSnapshot(`
       "{
-          petId: string;
+        petId: string
       }"
     `)
   })
@@ -39,7 +31,7 @@ describe('buildParams', () => {
 
     expect(printSchema(buildParams({ params }))).toMatchInlineSnapshot(`
       "{
-          limit?: number;
+        limit?: number
       }"
     `)
   })
@@ -56,11 +48,11 @@ describe('buildParams', () => {
 
     expect(printSchema(buildParams({ params }))).toMatchInlineSnapshot(`
       "{
-          /**
-           * @description Maximum number of results
-           * @type integer | undefined
-          */
-          limit?: number;
+        /**
+         * @description Maximum number of results
+         * @type integer | undefined
+         */
+        limit?: number
       }"
     `)
   })
@@ -80,8 +72,8 @@ describe('buildResponses', () => {
 
     expect(printSchema(buildResponses(node, resolverTs))).toMatchInlineSnapshot(`
       "{
-          "200": ListPetsStatus200;
-          default: ListPetsStatusDefault;
+        '200': ListPetsStatus200
+        default: ListPetsStatusDefault
       }"
     `)
   })

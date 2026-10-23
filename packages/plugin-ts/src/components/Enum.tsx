@@ -1,6 +1,5 @@
 import { camelCase, trimQuotes } from '@internals/utils'
 import type { ast } from 'kubb/kit'
-import { parserTs } from '@kubb/parser-ts'
 import { File } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import * as factory from '../factory.ts'
@@ -69,7 +68,7 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
     <>
       {nameNode && (
         <File.Source name={enumName} isExportable isIndexable isTypeOnly={false}>
-          {parserTs().print(nameNode)}
+          {nameNode}
         </File.Source>
       )}
       <File.Source
@@ -78,7 +77,7 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
         isExportable={!namesMerge && enumOptions.type !== 'inlineLiteral'}
         isTypeOnly={['asConst', 'literal', undefined].includes(enumOptions.type)}
       >
-        {parserTs().print(typeNode)}
+        {typeNode}
       </File.Source>
     </>
   )

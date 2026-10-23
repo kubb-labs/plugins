@@ -7,6 +7,6 @@ import type { Employer } from './Employer'
 import type { User } from './User'
 
 export type AppState = {
-    currentUser?: User;
-    employers?: Employer[];
-};
+  currentUser?: User
+  employers?: Employer[]
+}

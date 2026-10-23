@@ -4,9 +4,9 @@
 */
 
 export const addPetRequestStatusEnum = {
-    available: "available",
-    pending: "pending",
-    sold: "sold"
-} as const;
+  available: 'available',
+  pending: 'pending',
+  sold: 'sold',
+} as const
 
-export type AddPetRequestStatusEnumKey = (typeof addPetRequestStatusEnum)[keyof typeof addPetRequestStatusEnum];
+export type AddPetRequestStatusEnumKey = (typeof addPetRequestStatusEnum)[keyof typeof addPetRequestStatusEnum]

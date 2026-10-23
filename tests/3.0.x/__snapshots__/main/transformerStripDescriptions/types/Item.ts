@@ -4,17 +4,17 @@
 */
 
 export type Item = {
-    /**
-     * @description
-     * Format: `int64`
-     * @type integer
-    */
-    id: bigint;
-    name: string;
-    /**
-     * @description
-     * Format: `int32`
-     * @type integer | undefined
-    */
-    count?: number;
-};
+  /**
+   * @description
+   * Format: `int64`
+   * @type integer
+   */
+  id: bigint
+  name: string
+  /**
+   * @description
+   * Format: `int32`
+   * @type integer | undefined
+   */
+  count?: number
+}

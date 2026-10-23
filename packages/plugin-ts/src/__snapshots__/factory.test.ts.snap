@@ -14,37 +14,16 @@ exports[`Code Generation > should append JSDoc to node 2`] = `
 "
 `;
 
-exports[`Code Generation > should create array declaration 1`] = `
-"(string | number)[]
-"
-`;
+exports[`Code Generation > should create array declaration 1`] = `"(string | number)[]"`;
 
-exports[`Code Generation > should create array declaration 2`] = `
-"Array<string | number>
-"
-`;
+exports[`Code Generation > should create array declaration 2`] = `"Array<string | number>"`;
 
-exports[`Code Generation > should create array declaration 3`] = `
-"string[]
-"
-`;
+exports[`Code Generation > should create array declaration 3`] = `"string[]"`;
 
-exports[`Code Generation > should create array declaration 4`] = `
-"Array<string>
-"
-`;
+exports[`Code Generation > should create array declaration 4`] = `"Array<string>"`;
 
-exports[`Code Generation > should create intersection declaration 1`] = `
-"string & number
-"
-`;
+exports[`Code Generation > should create intersection declaration 1`] = `"string & number"`;
 
-exports[`Code Generation > should create property signature 1`] = `
-"const hello: string;
-"
-`;
+exports[`Code Generation > should create property signature 1`] = `"hello: string"`;
 
-exports[`Code Generation > should create union declaration 1`] = `
-"string | number
-"
-`;
+exports[`Code Generation > should create union declaration 1`] = `"string | number"`;

@@ -73,12 +73,12 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/parser-ts": "catalog:",
-    "@typescript/typescript6": "catalog:"
+    "@kubb/parser-ts": "catalog:"
   },
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
+    "@typescript/typescript6": "catalog:",
     "kubb": "catalog:",
     "typescript": "catalog:"
   },
