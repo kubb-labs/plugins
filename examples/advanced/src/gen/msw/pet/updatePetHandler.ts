@@ -38,8 +38,8 @@ export function updatePetHandlerResponse405(data?: UpdatePetStatus405) {
   })
 }
 
-export function updatePetHandler(data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, UpdatePetBody>) {
-  return http.put<Record<string, string>, UpdatePetBody>(`/pet`, function handler(info) {
+export function updatePetHandler(data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, UpdatePetBody>, options?: { baseURL?: string }) {
+  return http.put<Record<string, string>, UpdatePetBody>(`${options?.baseURL ?? ''}/pet`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

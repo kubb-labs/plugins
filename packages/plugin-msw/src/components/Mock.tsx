@@ -3,7 +3,7 @@ import type { ast } from 'kubb/kit'
 import { Url } from 'kubb/kit'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import { getContentType, getMswMethod, hasResponseSchema, responseLiteral } from '../utils.ts'
+import { getContentType, getMswMethod, hasResponseSchema, resolveDefaultBaseURL, responseLiteral } from '../utils.ts'
 
 type Props = {
   name: string
@@ -31,12 +31,12 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
     ? `HttpResponseResolver<Record<string, string>, ${requestTypeName}>`
     : `((info: Parameters<Parameters<typeof http.${method}>[1]>[0]) => Response | Promise<Response>)`
 
-  const params = `data?: ${paramType} | ${callbackType}`
+  const params = `data?: ${paramType} | ${callbackType}, options?: { baseURL?: string }`
 
   const httpCall = requestTypeName ? `http.${method}<Record<string, string>, ${requestTypeName}>` : `http.${method}`
 
-  const requestUrl = `${baseURL}${url.replace(/([^/]):/g, '$1\\\\:')}`
-  const urlLiteral = fakerName ? `'${requestUrl}'` : `\`${requestUrl}\``
+  // `options.baseURL` overrides the configured one per call. Colons outside params (`/pet/:petId:search`) are escaped so MSW does not read them as params.
+  const urlLiteral = `\`\${options?.baseURL ?? ${resolveDefaultBaseURL(baseURL)}}${url.replace(/([^/]):/g, '$1\\\\:')}\``
   const responseBody = fakerName ? `JSON.stringify(data ?? ${fakerName}(data))` : 'JSON.stringify(data)'
 
   return (

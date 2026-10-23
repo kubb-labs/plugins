@@ -12,8 +12,9 @@ export function streamPetEventsHandlerResponse200(data: StreamPetEventsResponse)
 
 export function streamPetEventsHandler(
   data?: StreamPetEventsResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  options?: { baseURL?: string },
 ) {
-  return http.get(`/pet/:petId/events`, function handler(info) {
+  return http.get(`${options?.baseURL ?? ''}/pet/:petId/events`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
