@@ -23,6 +23,9 @@ function getImportNames(entry: ImportEntry): Array<string> {
 
 export function filterUsedImports(imports: Array<ImportEntry>, text: string, skipImportNames: Array<string> = []): Array<ImportEntry> {
   const skip = new Set(skipImportNames)
+  // One scan of `text` instead of a new RegExp per import name. Generated helpers can use explicit
+  // type arguments, such as `createPet<object>()`.
+  const called = new Set(text.match(/\b\w+(?=\s*[<(])/g))
 
   return imports.filter((entry) => {
     const names = getImportNames(entry)
@@ -32,8 +35,7 @@ export function filterUsedImports(imports: Array<ImportEntry>, text: string, ski
         return false
       }
 
-      // Generated helpers can use explicit type arguments, such as `createPet<object>()`.
-      return new RegExp(`\\b${escapeRegExp(name)}\\b(?=\\s*[<(])`).test(text)
+      return /^\w+$/.test(name) ? called.has(name) : new RegExp(`\\b${escapeRegExp(name)}\\b(?=\\s*[<(])`).test(text)
     })
   })
 }
