@@ -52,6 +52,7 @@ export const pluginZod = defineExtension<PluginZod>({
       mini = false,
       guidType = 'uuid',
       regexType = 'literal',
+      oneOfType = 'union',
       importPath = mini ? 'zod/mini' : 'zod',
       coercion = false,
       inferred = false,
@@ -73,6 +74,12 @@ export const pluginZod = defineExtension<PluginZod>({
       value: regexType,
       allowed: ['literal', 'constructor'] satisfies Array<PluginZod['resolvedOptions']['regexType']>,
     })
+    assertPluginOption({
+      plugin: pluginZodName,
+      option: 'oneOfType',
+      value: oneOfType,
+      allowed: ['union', 'xor'] satisfies Array<PluginZod['resolvedOptions']['oneOfType']>,
+    })
 
     setResolver(userResolver ? Resolver.merge(resolverZod, userResolver) : resolverZod)
     if (userMacros?.length) {
@@ -91,6 +98,7 @@ export const pluginZod = defineExtension<PluginZod>({
       inferred,
       guidType,
       regexType,
+      oneOfType,
       compile,
       mini,
       typeGuards,

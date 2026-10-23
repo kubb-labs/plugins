@@ -191,6 +191,24 @@
       ]
     },
     {
+      "key": "oneOfType",
+      "path": ["oneOfType"],
+      "label": "oneOf Type",
+      "description": "How a oneOf is validated: z.union with strict object members, or z.xor (Zod v4.2.0+)",
+      "type": "select",
+      "default": "union",
+      "choices": [
+        {
+          "label": "union",
+          "value": "union"
+        },
+        {
+          "label": "xor",
+          "value": "xor"
+        }
+      ]
+    },
+    {
       "key": "inferred",
       "path": ["inferred"],
       "label": "Inferred",

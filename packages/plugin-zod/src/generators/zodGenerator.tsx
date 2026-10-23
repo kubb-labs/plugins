@@ -16,8 +16,15 @@ import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
 
 type StdPrinters = { decode: ReturnType<typeof printerZod>; encode: ReturnType<typeof printerZod> }
-type ZodPrinterEntry = StdPrinters & { coercion: unknown; guidType: unknown; regexType: unknown; dateType: unknown; nodes: unknown }
-type ZodMiniPrinterEntry = { printer: ReturnType<typeof printerZodMini>; coercion: unknown; guidType: unknown; regexType: unknown; nodes: unknown }
+type ZodPrinterEntry = StdPrinters & { coercion: unknown; guidType: unknown; regexType: unknown; oneOfType: unknown; dateType: unknown; nodes: unknown }
+type ZodMiniPrinterEntry = {
+  printer: ReturnType<typeof printerZodMini>
+  coercion: unknown
+  guidType: unknown
+  regexType: unknown
+  oneOfType: unknown
+  nodes: unknown
+}
 
 // Per-build caches: keyed on resolver (unique per plugin instance per build, GC'd when released)
 const zodPrinterCache = new WeakMap<ResolverZod, ZodPrinterEntry>()
@@ -27,6 +34,7 @@ type StdPrinterParams = {
   coercion: unknown
   guidType: unknown
   regexType: unknown
+  oneOfType: unknown
   dateType: unknown
   cyclicSchemas: ReadonlySet<string>
   nodes: unknown
@@ -49,6 +57,7 @@ function getStdPrinters(resolver: ResolverZod, params: StdPrinterParams): StdPri
     cached.coercion === params.coercion &&
     cached.guidType === params.guidType &&
     cached.regexType === params.regexType &&
+    cached.oneOfType === params.oneOfType &&
     cached.dateType === params.dateType &&
     cached.nodes === params.nodes
   ) {
@@ -62,6 +71,7 @@ function getStdPrinters(resolver: ResolverZod, params: StdPrinterParams): StdPri
     coercion: params.coercion,
     guidType: params.guidType,
     regexType: params.regexType,
+    oneOfType: params.oneOfType,
     dateType: params.dateType,
     nodes: params.nodes,
   })
@@ -74,6 +84,7 @@ function getMiniPrinter(
     coercion: unknown
     guidType: unknown
     regexType: unknown
+    oneOfType: unknown
     cyclicSchemas: ReadonlySet<string>
     nodes: unknown
   },
@@ -84,11 +95,19 @@ function getMiniPrinter(
     cached.coercion === params.coercion &&
     cached.guidType === params.guidType &&
     cached.regexType === params.regexType &&
+    cached.oneOfType === params.oneOfType &&
     cached.nodes === params.nodes
   )
     return cached.printer
   const p = printerZodMini({ ...params, resolver } as Parameters<typeof printerZodMini>[0])
-  zodMiniPrinterCache.set(resolver, { printer: p, coercion: params.coercion, guidType: params.guidType, regexType: params.regexType, nodes: params.nodes })
+  zodMiniPrinterCache.set(resolver, {
+    printer: p,
+    coercion: params.coercion,
+    guidType: params.guidType,
+    regexType: params.regexType,
+    oneOfType: params.oneOfType,
+    nodes: params.nodes,
+  })
   return p
 }
 
@@ -103,7 +122,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, regexType, compile, mini, inferred, typeGuards, importPath, group, printer } = ctx.options
+    const { output, coercion, guidType, regexType, oneOfType, compile, mini, inferred, typeGuards, importPath, group, printer } = ctx.options
     const dateType = getOasAdapter(adapter).options.dateType
 
     if (!node.name) {
@@ -112,7 +131,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
-    const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
 
     // Rendered twice: the canonical schema decodes, the `${name}InputSchema` variant encodes.
     const hasDirectionalNode = !mini && containsDirectionalNode({ node, printerOptions })
@@ -140,8 +159,10 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const isName = typeGuards ? resolver.schema.isName(node.name) : null
     const assertName = typeGuards ? resolver.schema.assertName(node.name) : null
 
-    const stdPrinters = mini ? null : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, cyclicSchemas, nodes: printer?.nodes })
-    const schemaPrinter = mini ? getMiniPrinter(resolver, { coercion, guidType, regexType, cyclicSchemas, nodes: printer?.nodes }) : stdPrinters!.decode
+    const stdPrinters = mini ? null : getStdPrinters(resolver, { coercion, guidType, regexType, oneOfType, dateType, cyclicSchemas, nodes: printer?.nodes })
+    const schemaPrinter = mini
+      ? getMiniPrinter(resolver, { coercion, guidType, regexType, oneOfType, cyclicSchemas, nodes: printer?.nodes })
+      : stdPrinters!.decode
 
     return (
       <File
@@ -188,7 +209,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, regexType, compile, mini, inferred, importPath, group, printer } = ctx.options
+    const { output, coercion, guidType, regexType, oneOfType, compile, mini, inferred, importPath, group, printer } = ctx.options
     const dateType = getOasAdapter(adapter).options.dateType
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
@@ -198,7 +219,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     } as const
 
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
-    const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
 
     function renderSchemaEntry({
       schema,
@@ -226,13 +247,14 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
       const schemaPrinter = mini
         ? keysToOmit?.length
-          ? printerZodMini({ coercion, guidType, regexType, resolver, keysToOmit, cyclicSchemas, nodes: printer?.nodes })
-          : getMiniPrinter(resolver, { coercion, guidType, regexType, cyclicSchemas, nodes: printer?.nodes })
+          ? printerZodMini({ coercion, guidType, regexType, oneOfType, resolver, keysToOmit, cyclicSchemas, nodes: printer?.nodes })
+          : getMiniPrinter(resolver, { coercion, guidType, regexType, oneOfType, cyclicSchemas, nodes: printer?.nodes })
         : keysToOmit?.length
           ? printerZod({
               coercion,
               guidType,
               regexType,
+              oneOfType,
               dateType,
               resolver,
               keysToOmit,
@@ -240,7 +262,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
               nodes: printer?.nodes,
               direction,
             })
-          : getStdPrinters(resolver, { coercion, guidType, regexType, dateType, cyclicSchemas, nodes: printer?.nodes })[direction]
+          : getStdPrinters(resolver, { coercion, guidType, regexType, oneOfType, dateType, cyclicSchemas, nodes: printer?.nodes })[direction]
 
       return (
         <>
