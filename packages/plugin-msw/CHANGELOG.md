@@ -1,5 +1,17 @@
 # @kubb/plugin-msw
 
+## 5.2.0
+
+### Minor Changes
+
+- [#1181](https://github.com/kubb-labs/plugins/pull/1181) [`849bcc7`](https://github.com/kubb-labs/plugins/commit/849bcc79a564207e77371c3c567d76c5a031705b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Handlers take an optional `{ baseURL }` second argument that overrides the configured `baseURL`. With `handlers: true`, `handlers.ts` also exports `createHandlers({ baseURL })`:
+  
+  ```ts
+  setupServer(...createHandlers({ baseURL: getBaseURL() }))
+  ```
+  
+  A `${...}` expression in `baseURL` now also works with `parser: 'faker'`.
+
 ## 5.1.4
 
 ### Patch Changes

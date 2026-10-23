@@ -1,5 +1,11 @@
 # @kubb/plugin-zod
 
+## 5.4.14
+
+### Patch Changes
+
+- [#1178](https://github.com/kubb-labs/plugins/pull/1178) [`125999c`](https://github.com/kubb-labs/plugins/commit/125999c0dcd310d62e6cd05a361bff7a98f7358a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Print `z.hostname()` for `format: hostname`. It takes effect once `@kubb/adapter-oas` maps `hostname` to a `string` node (kubb-labs/kubb#4410), which keeps the format. Until then `hostname` prints `z.url()` as before.
+
 ## 5.4.13
 
 ### Patch Changes
