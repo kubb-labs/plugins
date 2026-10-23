@@ -1,5 +1,13 @@
 # @kubb/plugin-faker
 
+## 5.1.11
+
+### Patch Changes
+
+- [#1188](https://github.com/kubb-labs/plugins/pull/1188) [`9c6e3e8`](https://github.com/kubb-labs/plugins/commit/9c6e3e8f9eee37b60c2a6cd44e24555f9397c2ac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Stop importing the status type for a bodyless response (for example `204`). Its factory returns `undefined` without using the type, so the import failed `noUnusedLocals` (TS6196).
+
+- [#1187](https://github.com/kubb-labs/plugins/pull/1187) [`2501fe8`](https://github.com/kubb-labs/plugins/commit/2501fe8086b277dcee65991cef71ed654949b967) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix mocks for a union whose discriminator property is optional. Each branch now narrows with `Extract<T, { key?: value }>`, so the mock no longer resolves to `never` and fails with TS2322.
+
 ## 5.1.10
 
 ### Patch Changes

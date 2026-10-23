@@ -1,5 +1,13 @@
 # @kubb/plugin-msw
 
+## 5.2.1
+
+### Patch Changes
+
+- [#1185](https://github.com/kubb-labs/plugins/pull/1185) [`dea9d65`](https://github.com/kubb-labs/plugins/commit/dea9d65a58e3d8cf77a630a891cf608d2b9988d3) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Document `createHandlers` and the per-handler `{ baseURL }` argument.
+- Updated dependencies [[`9c6e3e8`](https://github.com/kubb-labs/plugins/commit/9c6e3e8f9eee37b60c2a6cd44e24555f9397c2ac), [`2501fe8`](https://github.com/kubb-labs/plugins/commit/2501fe8086b277dcee65991cef71ed654949b967)]:
+  - @kubb/plugin-faker@5.1.11
+
 ## 5.2.0
 
 ### Minor Changes
