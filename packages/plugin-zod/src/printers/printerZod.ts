@@ -77,10 +77,7 @@ export type PrinterZodOptions = {
    */
   regexType?: PluginZod['resolvedOptions']['regexType']
   /**
-   * How a `oneOf` is validated when it does not print as `z.discriminatedUnion(...)`:
-   * `z.union` with strict object members (`'union'`) or `z.xor` (`'xor'`).
-   *
-   * @default 'union'
+   * How a non-discriminated `oneOf` is printed: `z.union` with strict members or `z.xor`.
    */
   oneOfType?: PluginZod['resolvedOptions']['oneOfType']
   /**

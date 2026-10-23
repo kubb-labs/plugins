@@ -225,17 +225,11 @@ export type Options = OutputOptions & {
    */
   regexType?: 'literal' | 'constructor'
   /**
-   * How a `oneOf` is validated when it does not print as `z.discriminatedUnion(...)`.
-   * - `'union'`: `z.union([...])`. Inline object members without `additionalProperties` print as
-   *   `z.strictObject(...)`, so a value carrying another member's keys fails that member. Extra keys
-   *   the spec allows fail too.
-   * - `'xor'`: `z.xor([...])`, which passes only when exactly one member matches, as `oneOf` requires.
-   *   Members keep their own `additionalProperties`.
-   *
-   * A `oneOf` with a discriminator whose members are all objects prints `z.discriminatedUnion(...)` either way.
+   * How a `oneOf` is validated, unless it prints as `z.discriminatedUnion(...)`.
+   * - `'union'`: `z.union([...])` with strict object members, which also rejects extra keys the spec allows.
+   * - `'xor'`: `z.xor([...])`, which passes only when exactly one member matches. Needs Zod v4.2.0 or above.
    *
    * @default 'union'
-   * @note `'xor'` needs Zod v4.2.0 or above.
    */
   oneOfType?: 'union' | 'xor'
   /**
