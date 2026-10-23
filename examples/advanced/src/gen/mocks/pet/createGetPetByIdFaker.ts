@@ -1,12 +1,4 @@
-import type {
-  GetPetByIdPath,
-  GetPetByIdResponse,
-  GetPetByIdStatus200,
-  GetPetByIdStatus200Json,
-  GetPetByIdStatus200Xml,
-  GetPetByIdStatus400,
-  GetPetByIdStatus404,
-} from '../../models/ts/pet/GetPetById'
+import type { GetPetByIdPath, GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus200Json, GetPetByIdStatus200Xml } from '../../models/ts/pet/GetPetById'
 import { createPetFaker } from '../createPetFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 

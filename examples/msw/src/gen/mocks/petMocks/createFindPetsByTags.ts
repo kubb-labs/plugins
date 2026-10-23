@@ -9,7 +9,6 @@ import type {
   FindPetsByTagsStatus200,
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
-  FindPetsByTagsStatus400,
 } from '../../models/FindPetsByTags'
 import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'

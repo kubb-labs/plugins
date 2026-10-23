@@ -12,9 +12,6 @@ import type {
   UpdatePetStatus200,
   UpdatePetStatus200Json,
   UpdatePetStatus200Xml,
-  UpdatePetStatus400,
-  UpdatePetStatus404,
-  UpdatePetStatus405,
 } from '../models/UpdatePet'
 import { createPet } from './createPet'
 import { fakerEN as faker } from '@faker-js/faker'

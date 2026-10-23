@@ -5,7 +5,6 @@ import type {
   FindPetsByTagsStatus200,
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
-  FindPetsByTagsStatus400,
 } from '../../models/ts/pet/FindPetsByTags'
 import { createFindPetsByTagsXEXAMPLEFaker } from '../createFindPetsByTagsXEXAMPLEFaker'
 import { createPetFaker } from '../createPetFaker'

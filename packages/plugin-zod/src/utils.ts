@@ -326,7 +326,8 @@ function modifierDepth(schema: ast.SchemaNode): number {
  * `.optional()` / `.nullish()` / `.default()` wrappers. `.omit()` lives on the inner `ZodObject`,
  * not on those `ZodNullable` / `ZodOptional` / `ZodDefault` wrappers, so the omit has to unwrap
  * down to the object first. This mirrors plugin-ts emitting `Omit<NonNullable<T>, …>`. Inline
- * objects need no unwrap because the printer adds their modifiers after `.omit()`.
+ * objects need no unwrap because the printer adds their modifiers after `.omit()`. Zod Mini has no
+ * `.unwrap()`, so its printer passes `._zod.def.innerType` as the `step`.
  */
 export function omitUnwrapChain(node: ast.SchemaNode, step = '.unwrap()'): string {
   const ref = ast.narrowSchema(node, 'ref')

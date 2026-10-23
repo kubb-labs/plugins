@@ -9,7 +9,6 @@ import type {
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
-  FindPetsByStatusStatus400,
 } from '../../models/FindPetsByStatus'
 import { createFindPetsByStatusStatus } from '../createFindPetsByStatusStatus'
 import { createPet } from '../createPet'
