@@ -1,17 +1,17 @@
 # openapi-import
 
-Import an OpenAPI spec straight into TypeScript and get the types Kubb generates, with no generated files on disk.
+Import an OpenAPI spec straight into TypeScript and get what the plugins in your `kubb.config.ts` generate, with no generated files on disk.
 
 ```ts
-import type { Pet } from './petStore.openapi.yaml'
+import { type Pet, petSchema } from './petStore.openapi.yaml'
 
-const pet: Pet = { name: 'Rex', photoUrls: [] }
+const pet: Pet = petSchema.parse({ name: 'Rex', photoUrls: [] })
 ```
 
-It is a [TypeScript content mapper](https://github.com/microsoft/typescript-go/pull/4712). TypeScript 7.1 calls it for each spec file and type-checks the `@kubb/plugin-ts` output in its place.
+It is a [TypeScript content mapper](https://github.com/microsoft/typescript-go/pull/4712). TypeScript 7.1 calls it for each spec file and type-checks the output of every plugin in `kubb.config.ts`, merged into one module, in its place.
 
 > [!WARNING]
-> Experimental. Content mappers need a TypeScript 7.1 build that supports `--runExternalCode` (`typescript@next` today). Imports are type-only: content-mapped files are not emitted to JavaScript, so values such as enum objects do not exist at run time.
+> Experimental. Content mappers need a TypeScript 7.1 build that supports `--runExternalCode` (`typescript@next` today). TypeScript does not emit content-mapped files to JavaScript, so values such as `petSchema` only exist at run time when a bundler loads the spec with [`unplugin-kubb`](https://github.com/kubb-labs/kubb/tree/main/packages/unplugin-kubb). Both use `generateModule` from `unplugin-kubb`, so the import has the same exports in `tsc` and in the bundle.
 
 ## Setup
 
@@ -31,6 +31,26 @@ Name your specs with an `.openapi.yaml` extension, such as `petStore.openapi.yam
 
 TypeScript sends every file with a registered extension that `include` matches to the mapper, not only the files you import. A plain `.yaml` would also pick up files such as `docker-compose.yaml` and fail on them, and it would block other content mappers from `.yaml`. JSON specs cannot be mapped: TypeScript treats any extension ending in `.json` as built-in.
 
+Add a `kubb.config.ts` with the plugins you want, the way the Kubb CLI finds it (from the `tsconfig.json` folder up):
+
+```ts
+import { pluginTs } from '@kubb/plugin-ts'
+import { pluginZod } from '@kubb/plugin-zod'
+import { defineConfig } from 'kubb/config'
+
+export default defineConfig({
+  input: './petStore.openapi.yaml',
+  output: { path: './src/gen' },
+  plugins: [pluginTs(), pluginZod()],
+})
+```
+
+The config's adapter and plugins run on each imported spec. Its `output` and hooks are not used, and the barrel plugin is left out. With several configs, a spec uses the one whose `input` is that spec, else the first. Without a `kubb.config.ts`, only `@kubb/plugin-ts` runs.
+
+TypeScript watches the config file and types every spec again when it changes.
+
+For values at run time, add `kubb()` from `kubb/vite` (or another bundler entry) without arguments. It loads the same `kubb.config.ts`.
+
 Run the type check with external code allowed:
 
 ```bash
@@ -41,7 +61,7 @@ VS Code passes `--runExternalCode` to the TypeScript language server only in tru
 
 ## Editor support
 
-Generated names link back to the keys they came from in the spec. Go to definition and find references cross from TypeScript into the YAML, and hovering a key in the YAML shows its generated type.
+Generated names link back to the keys they came from in the spec. Go to definition and find references cross from TypeScript into the YAML, and hovering a key in the YAML shows its generated type. Renaming a schema type that is named exactly like its key, such as `Pet`, renames the key in the spec. Update the `$ref`s to it yourself: each one left behind shows as an unresolved `$ref`.
 
 | Generated name                                                | Jumps to                                                                  |
 | ------------------------------------------------------------- | ------------------------------------------------------------------------- |
@@ -57,7 +77,7 @@ Spec errors, such as an unresolved `$ref`, show on the key or value they point a
 
 ## Options
 
-Set options on the `contentMappers` entry. TypeScript reports an unknown key or an invalid value on `tsconfig.json`.
+Set options on the `contentMappers` entry. They apply only without a `kubb.config.ts`; with one, set plugin options there. TypeScript reports an unknown key or an invalid value on `tsconfig.json`.
 
 ```json
 {
@@ -79,8 +99,8 @@ See [`examples/openapi-import`](https://github.com/kubb-labs/plugins/tree/main/e
 
 ## Limits
 
-- Only `@kubb/plugin-ts` runs, and `arrayType` is its only option you can set. `kubb.config.ts` is not read.
-- Properties of operation types (path parameters, inline response bodies) do not link to the spec, and renaming a type does not rename the key in the spec.
+- The module only holds the file each plugin writes its code to. Code a plugin writes to another file, such as a bundled client runtime, is left out, so point imports like the client's `importPath` at a package or a path relative to the spec.
+- Properties of operation types (path parameters, inline response bodies) do not link to the spec, and renaming a property does not rename its key in the spec.
 - A changed spec runs a full Kubb build: about 0.4 s and 155 MB for a 10 KB spec, about 2.6 s and 245 MB for a 1.4 MB spec. A repeated request for unchanged content reuses the last result.
 
 ## Supporting Kubb

@@ -1,5 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import { pluginTs } from '@kubb/plugin-ts'
+import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
 import { transform } from './transform.ts'
 
@@ -12,6 +14,21 @@ describe('transform', () => {
     expect(result.diagnostics).toBeUndefined()
     expect(result.text).toContain('export type Pet = {')
     expect(result.text).not.toMatch(/^import /m)
+  })
+
+  test('runs every plugin of the Kubb config into the one module', async () => {
+    const config = {
+      output: { path: './gen' },
+      plugins: [pluginTs({ output: { path: 'types' }, group: { type: 'tag' } }), pluginZod({ output: { path: 'zod' } })],
+    }
+    const result = await transform({ fileName, content: await readFile(fileName, 'utf8') }, { config })
+    const mapped = (result.mappings ?? []).map(([start, length]) => result.text.slice(start, start + length))
+
+    expect(result.diagnostics).toBeUndefined()
+    expect(result.text).toContain('export type Pet = {')
+    expect(result.text).toContain('export const petSchema = z.object(')
+    expect(result.text).toMatch(/^import \* as z from 'zod'$/m)
+    expect(mapped).toContain('petSchema')
   })
 
   test('prints arrays as `Array<T>` with `arrayType: generic`', async () => {
@@ -88,6 +105,16 @@ describe('transform mappings', async () => {
     expect(mapped.find((entry) => entry.name === 'GetPetByIdPath')).toMatchObject({ key: 'parameters' })
     expect(mapped.find((entry) => entry.name === 'GetPetByIdStatus404')).toMatchObject({ key: "'404'" })
     expect(mapped.find((entry) => entry.name === 'AddPetBody')).toMatchObject({ key: 'requestBody' })
+  })
+
+  test('lets a schema type rename its key, but not a property', () => {
+    const segment = (name: string) => (result.mappings ?? []).find(([start, length]) => result.text.slice(start, start + length) === name)
+    const rename = 256
+
+    expect(segment('Pet')?.[4]).toBe(0)
+    expect(segment('Pet')![5] & rename).toBe(rename)
+    expect(segment('photoUrls')?.[4]).toBe(2)
+    expect(segment('photoUrls')![5] & rename).toBe(0)
   })
 
   test('keeps segments ordered by virtual start', () => {

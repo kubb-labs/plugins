@@ -22,10 +22,14 @@ export type Targets = {
 
 type Locate = (pointer: string) => { start: number; end: number } | undefined
 
+const kindVerbatim = 0
 const kindAlias = 2
-// Hover, Definition, TypeDefinition, Implementation, References, DocumentHighlights. Rename stays off
-// because only verbatim segments can write edits back to the spec.
+// Hover, Definition, TypeDefinition, Implementation, References, DocumentHighlights.
 const features = 1 | 8 | 16 | 32 | 64 | 128
+// Only verbatim segments can write a rename back to the spec. Schema names get it: a `$ref` the
+// rename leaves behind shows as an unresolved-ref error. Property keys do not, since a `required`
+// list it leaves behind would silently make the property optional.
+const renameFeature = 256
 
 const escapeToken = (token: string) => token.replaceAll('~', '~0').replaceAll('/', '~1')
 
@@ -89,15 +93,31 @@ function typeMembers(statement: ts.TypeAliasDeclaration | ts.InterfaceDeclaratio
  * Declarations of component schemas map to `components.schemas.<name>`, their properties to
  * `properties.<name>` (nested object literals and arrays of them included), and operation types to
  * the operation, its parameters, request body or response. A name `locate` cannot place is left
- * synthesized.
+ * synthesized. A schema type named exactly like its key is a verbatim segment, so renaming it in
+ * TypeScript renames the key in the spec.
  */
-export function createMappings(text: string, locate: Locate, targets: Targets): Array<Segment> {
+export function createMappings(text: string, content: string, locate: Locate, targets: Targets): Array<Segment> {
   const sourceFile = ts.createSourceFile('index.ts', text, ts.ScriptTarget.Latest, true)
   const segments: Array<Segment> = []
 
   const add = (name: ts.Node, ...pointers: Array<string>) => {
     const range = pointers.map(locate).find(Boolean)
     if (range) segments.push([name.getStart(sourceFile), name.getWidth(sourceFile), range.start, range.end - range.start, kindAlias, features])
+  }
+
+  /** A component schema declared under its own key, such as `Pet`, renames that key in the spec. */
+  const addSchema = (name: ts.Identifier, pointer: string) => {
+    const range = locate(pointer)
+    if (!range) return
+    const verbatim = content.slice(range.start, range.end) === name.text
+    segments.push([
+      name.getStart(sourceFile),
+      name.getWidth(sourceFile),
+      range.start,
+      range.end - range.start,
+      verbatim ? kindVerbatim : kindAlias,
+      verbatim ? features | renameFeature : features,
+    ])
   }
 
   const addMembers = (members: ts.NodeArray<ts.TypeElement>, pointer: string) => {
@@ -116,17 +136,19 @@ export function createMappings(text: string, locate: Locate, targets: Targets): 
       for (const declaration of statement.declarationList.declarations) {
         if (!ts.isIdentifier(declaration.name)) continue
         const name = declaration.name.text
-        add(declaration.name, ...declarationPointers(name[0]!.toUpperCase() + name.slice(1), targets))
+        add(declaration.name, ...declarationPointers(name, targets), ...declarationPointers(name[0]!.toUpperCase() + name.slice(1), targets))
       }
       continue
     }
     if (!ts.isTypeAliasDeclaration(statement) && !ts.isInterfaceDeclaration(statement)) continue
     const pointers = declarationPointers(statement.name.text, targets)
-    add(statement.name, ...pointers)
+    const isSchema = targets.schemas.has(statement.name.text)
+    const pointer = pointers[0]
+    if (isSchema && pointer) addSchema(statement.name, pointer)
+    else add(statement.name, ...pointers)
 
     // Property names only resolve under a schema, not under operation parameters or responses.
-    const pointer = pointers[0]
-    if (!pointer || !targets.schemas.has(statement.name.text)) continue
+    if (!pointer || !isSchema) continue
     const members = typeMembers(statement)
     if (members) addMembers(members, pointer)
   }

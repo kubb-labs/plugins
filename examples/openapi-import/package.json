@@ -2,7 +2,7 @@
   "name": "openapi-import-pet-store",
   "version": "0.0.0",
   "private": true,
-  "description": "PetStore example that imports types straight from the spec with openapi-import",
+  "description": "PetStore example that imports types and Zod schemas straight from the spec with openapi-import",
   "license": "MIT",
   "author": "stijnvanhulle",
   "repository": {
@@ -16,8 +16,11 @@
     "typecheck": "tsc --runExternalCode"
   },
   "dependencies": {
+    "@kubb/plugin-ts": "workspace:*",
+    "@kubb/plugin-zod": "workspace:*",
     "kubb": "catalog:",
-    "openapi-import": "workspace:*"
+    "openapi-import": "workspace:*",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "typescript": "7.1.0-dev.20261022.1"

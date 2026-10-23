@@ -55,14 +55,14 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/adapter-oas": "catalog:",
     "@kubb/core": "catalog:",
-    "@kubb/parser-ts": "catalog:",
     "@kubb/plugin-ts": "workspace:^",
     "@typescript/typescript6": "catalog:",
+    "unplugin-kubb": "catalog:",
     "yaml": "^2.9.1"
   },
   "devDependencies": {
+    "@kubb/plugin-zod": "workspace:^",
     "kubb": "catalog:"
   },
   "peerDependencies": {
@@ -70,6 +70,7 @@
   },
   "typescript": {
     "contentMapper": {
+      "dynamicConfig": true,
       "exec": [
         "node",
         "dist/server.js"
