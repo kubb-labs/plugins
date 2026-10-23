@@ -1,7 +1,7 @@
 import type { ast } from 'kubb/kit'
 
 /**
- * Returns the configured base URL as a code expression; a value with `${...}` stays a template literal so it runs at runtime.
+ * Returns the base URL as source code. A `${...}` value stays a template literal.
  */
 export function resolveDefaultBaseURL(baseURL: string | null | undefined): string {
   if (!baseURL) {

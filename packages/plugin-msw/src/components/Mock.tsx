@@ -35,7 +35,7 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
 
   const httpCall = requestTypeName ? `http.${method}<Record<string, string>, ${requestTypeName}>` : `http.${method}`
 
-  // `options.baseURL` overrides the configured one per call. Colons outside params (`/pet/:petId:search`) are escaped so MSW does not read them as params.
+  // Escape colons that do not start a param, such as the second one in `/pet/:petId:search`.
   const urlLiteral = `\`\${options?.baseURL ?? ${resolveDefaultBaseURL(baseURL)}}${url.replace(/([^/]):/g, '$1\\\\:')}\``
   const responseBody = fakerName ? `JSON.stringify(data ?? ${fakerName}(data))` : 'JSON.stringify(data)'
 

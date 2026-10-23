@@ -27,14 +27,15 @@ export type ResolverMsw = Resolver & {
  */
 export type Options = OutputOptions & {
   /**
-   * Base URL prepended to every handler's request URL: a fixed string (e.g. `'https://api.example.com'`)
-   * or a dynamic template string (e.g. `'${process.env.API_URL}'`).
+   * Base URL prepended to every handler's request URL. A `${...}` expression runs at runtime.
+   * Pass `{ baseURL }` as a handler's second argument to override it per call.
    *
-   * A handler also takes `{ baseURL }` as its second argument, which overrides this option per call:
-   * `listPetsHandler(undefined, { baseURL: 'https://staging.example.com' })`.
-   *
-   * When `handlers: true` is configured, `createHandlers({ baseURL })` can be used to pass
-   * a runtime base URL to all handlers at once. Leave off the trailing slash: operation paths already start with `/`.
+   * @example
+   * ```ts
+   * baseURL: '${process.env.API_URL}'
+   * listPetsHandler(undefined, { baseURL: 'https://staging.example.com' })
+   * ```
+   * @note Leave off the trailing slash. Operation paths already start with `/`.
    */
   baseURL?: string
   /**
@@ -58,11 +59,13 @@ export type Options = OutputOptions & {
    */
   macros?: Array<ast.Macro>
   /**
-   * Emit a `handlers.ts` file that re-exports every handler in operation order.
-   * Exports `createHandlers(options?: { baseURL?: string })` factory and `handlers` default collection.
-   * Drop the file into `setupServer(...handlers)` or `setupServer(...createHandlers({ baseURL }))`.
+   * Emit a `handlers.ts` file with every handler in operation order, as `handlers` and as
+   * `createHandlers({ baseURL })` for a runtime base URL.
    *
-   * @default false
+   * @example
+   * ```ts
+   * setupServer(...createHandlers({ baseURL: getBaseURL() }))
+   * ```
    */
   handlers?: boolean
   /**

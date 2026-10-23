@@ -2,8 +2,10 @@
 '@kubb/plugin-msw': minor
 ---
 
-Let generated handlers resolve their base URL at runtime.
+Handlers take an optional `{ baseURL }` second argument that overrides the configured `baseURL`. With `handlers: true`, `handlers.ts` also exports `createHandlers({ baseURL })`:
 
-- Every handler takes an optional second argument, `{ baseURL }`, which overrides the configured `baseURL`: `listPetsHandler(undefined, { baseURL: 'https://pets.example.com' })`. Two services that share a path can now be mocked side by side.
-- With `handlers: true`, `handlers.ts` also exports `createHandlers({ baseURL })`, so you can pass a runtime base URL to every handler: `setupServer(...createHandlers({ baseURL: getBaseURL() }))`.
-- Handlers built with `parser: 'faker'` now write the URL as a template literal, so a `${...}` expression in `baseURL` works with both parsers.
+```ts
+setupServer(...createHandlers({ baseURL: getBaseURL() }))
+```
+
+A `${...}` expression in `baseURL` now also works with `parser: 'faker'`.
