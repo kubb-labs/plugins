@@ -159,6 +159,10 @@ describe('printerZodMini', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'base64' }))).toBe('z.base64()')
     })
 
+    test('hostname format', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'hostname' }))).toBe('z.hostname()')
+    })
+
     test('base64url format', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'base64url' }))).toBe('z.base64url()')
     })

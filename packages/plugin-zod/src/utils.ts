@@ -362,6 +362,7 @@ export const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
   ['ulid', 'z.ulid()'],
   ['iban', 'z.iban()'],
   ['duration', 'z.iso.duration()'],
+  ['hostname', 'z.hostname()'],
 ])
 
 /**
