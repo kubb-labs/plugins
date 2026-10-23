@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { PlaceOrderBody, PlaceOrderBodyFormUrlEncoded, PlaceOrderBodyJson, PlaceOrderBodyXml, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder'
+import type { PlaceOrderBody, PlaceOrderBodyFormUrlEncoded, PlaceOrderBodyJson, PlaceOrderBodyXml, PlaceOrderResponse, PlaceOrderStatus200 } from '../types/PlaceOrder'
 import { createOrder } from './createOrder'
 import { fakerDE as faker } from '@faker-js/faker'
 

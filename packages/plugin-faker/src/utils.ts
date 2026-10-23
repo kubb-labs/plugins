@@ -186,6 +186,7 @@ export function resolveFakerTypeUsage(
   return {
     dataType,
     returnType,
-    usesTypeName: dataType.includes(typeName) || Boolean(returnType?.includes(typeName)),
+    // A non-overridable factory has no `data` param, so `dataType` never reaches the output.
+    usesTypeName: (canOverride && dataType.includes(typeName)) || Boolean(returnType?.includes(typeName)),
   }
 }
