@@ -1,5 +1,11 @@
 # @kubb/plugin-ts
 
+## 5.0.16
+
+### Patch Changes
+
+- [#1189](https://github.com/kubb-labs/plugins/pull/1189) [`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the setup checks that threw `KUBB_INVALID_PLUGIN_OPTIONS` when an option such as `returnType`, `syntaxType`, or `parser` held a value outside its allowed list. The option types already reject those values. Checks that depend on another option, such as `sdk.mode: 'tag'` with single-file output, still throw.
+
 ## 5.0.15
 
 ### Patch Changes

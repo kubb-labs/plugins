@@ -1,5 +1,16 @@
 # @kubb/plugin-axios
 
+## 5.7.2
+
+### Patch Changes
+
+- [#1189](https://github.com/kubb-labs/plugins/pull/1189) [`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the setup checks that threw `KUBB_INVALID_PLUGIN_OPTIONS` when an option such as `returnType`, `syntaxType`, or `parser` held a value outside its allowed list. The option types already reject those values. Checks that depend on another option, such as `sdk.mode: 'tag'` with single-file output, still throw.
+
+- [#1182](https://github.com/kubb-labs/plugins/pull/1182) [`c56998c`](https://github.com/kubb-labs/plugins/commit/c56998ce224e496489fa9739132fd687fdfde2c7) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Send parameters described with `content: application/json` (or a `+json` media type) as one JSON-encoded value. A query parameter becomes `?filter=%7B%22status%22%3A%22open%22%7D` instead of the `deepObject` style, a cookie is JSON-encoded and URL-encoded, and a header carries the JSON string. The generated request passes the media type as `contentType` in `styles.query`, `styles.header`, and `styles.cookie`. Requires `@kubb/adapter-oas` with `ParameterNode.contentType` support.
+- Updated dependencies [[`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69), [`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69), [`eb89e09`](https://github.com/kubb-labs/plugins/commit/eb89e0939f50d5cebc65a9b988a7f28baacf6324)]:
+  - @kubb/plugin-ts@5.0.16
+  - @kubb/plugin-zod@5.5.0
+
 ## 5.7.1
 
 ### Patch Changes

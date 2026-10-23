@@ -1,5 +1,17 @@
 # @kubb/plugin-zod
 
+## 5.5.0
+
+### Minor Changes
+
+- [#1189](https://github.com/kubb-labs/plugins/pull/1189) [`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add the `oneOfType` option. Set it to `'xor'` to print a `oneOf` as `z.xor([...])`, which passes only when exactly one member matches. Members keep their own `additionalProperties`. The default `'union'` keeps the current output: `z.union([...])` with strict object members. A `oneOf` that prints as `z.discriminatedUnion(...)` is unchanged. `'xor'` needs Zod v4.2.0 or higher.
+
+### Patch Changes
+
+- [#1189](https://github.com/kubb-labs/plugins/pull/1189) [`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the setup checks that threw `KUBB_INVALID_PLUGIN_OPTIONS` when an option such as `returnType`, `syntaxType`, or `parser` held a value outside its allowed list. The option types already reject those values. Checks that depend on another option, such as `sdk.mode: 'tag'` with single-file output, still throw.
+
+- [#1195](https://github.com/kubb-labs/plugins/pull/1195) [`eb89e09`](https://github.com/kubb-labs/plugins/commit/eb89e0939f50d5cebc65a9b988a7f28baacf6324) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - With `mini: true`, emit `z.omit(schema, mask)` for `readOnly` / `writeOnly` keys instead of `.omit()`, and reach a nullable or optional `$ref` through `._zod.def.innerType` instead of `.unwrap()`. Zod Mini schemas have neither method, so the generated code failed to typecheck and threw at load.
+
 ## 5.4.14
 
 ### Patch Changes
