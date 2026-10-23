@@ -567,4 +567,46 @@ describe('fakerGenerator — operation', () => {
 
     await matchFiles(driver.fileManager.files, name)
   })
+
+  test('bodyless response omits unused status type import', async () => {
+    const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
+    const driver = createMockedPluginDriver({
+      name: 'archiveBook',
+      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+    const node = ast.factory.createOperation({
+      operationId: 'archiveBook',
+      method: 'POST',
+      path: '/books/{bookId}/archive',
+      tags: ['books'],
+      responses: [
+        ast.factory.createResponse({ statusCode: '204', description: 'Archived', schema: ast.factory.createSchema({ type: 'void' }) }),
+        ast.factory.createResponse({
+          statusCode: '404',
+          description: 'Not found',
+          schema: ast.factory.createSchema({ type: 'ref', name: 'ApiError', ref: '#/components/schemas/ApiError' }),
+        }),
+      ],
+    })
+
+    await renderGeneratorOperation(fakerGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      meta: { circularNames: [], enumNames: [] },
+      driver,
+      plugin,
+      options: resolvedOptions,
+      resolver: resolverFaker,
+    })
+
+    const file = driver.fileManager.files.find((item) => item.baseName === 'createArchiveBook.ts')
+    expect(file).toBeDefined()
+
+    const output = await format(parserTs().parse(file!))
+
+    expect(output).toContain('export function createArchiveBookStatus204() {')
+    expect(output).not.toContain('ArchiveBookStatus204,')
+    expect(output).toContain('ArchiveBookStatus404')
+  })
 })
