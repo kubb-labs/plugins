@@ -1,3 +1,4 @@
+import { jsDocEscape } from '@internals/utils'
 import { containsCircularRef } from 'kubb/kit'
 import type { ast } from 'kubb/kit'
 import { File, Function } from 'kubb/jsx'
@@ -58,7 +59,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
         <Function
           export
           name={name}
-          JSDoc={{ comments: description ? [`@description ${description}`] : [] }}
+          JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
           params={canOverride ? paramsSignature : undefined}
           returnType={returnType ?? undefined}
         >
@@ -101,7 +102,7 @@ return {
       <Function
         export
         name={name}
-        JSDoc={{ comments: description ? [`@description ${description}`] : [] }}
+        JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
         generics={typeMode === 'schema' ? undefined : `TData extends Partial<${typeName}> = object`}
         params={typeMode === 'schema' ? `data?: Partial<${typeName}>` : 'data?: TData'}
         returnType={typeMode === 'schema' ? typeName : undefined}

@@ -761,7 +761,7 @@ describe('printerTs', () => {
         arrayType: 'array',
         enum: inlineLiteralEnum,
         name: 'Described',
-        description: 'Provides:\n- `user_permissions`, e.g. ["write"]',
+        description: 'Provides:\n- `user_permissions`, e.g. ["write"]\n@example is text, not a tag',
       })
       const result = p.print(ast.factory.createSchema({ type: 'string' }))
 
@@ -769,6 +769,7 @@ describe('printerTs', () => {
         "/**
          * @description Provides:
          * - \`user_permissions\`, e.g. ["write"]
+         * \\@example is text, not a tag
          * @type string
          */
         export type Described = string
