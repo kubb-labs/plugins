@@ -1,5 +1,20 @@
 # @kubb/plugin-zod
 
+## 5.4.13
+
+### Patch Changes
+
+- [#1165](https://github.com/kubb-labs/plugins/pull/1165) [`5d76f27`](https://github.com/kubb-labs/plugins/commit/5d76f2736eabb43ab72b5b7cc6880d54f09e5712) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Studio can now edit more plugin options, because each `kubb-extension.json` lists them:
+  
+  - Every plugin: `output.banner` and `output.footer` as text.
+  - `@kubb/plugin-axios` and `@kubb/plugin-fetch`: `returnType` and `throwOnErrorDefault`.
+  - `@kubb/plugin-client`: `throwOnErrorDefault`.
+  - `@kubb/plugin-faker`: `typeMode`.
+  - `@kubb/plugin-zod`: `compile` and `typeGuards` as on or off.
+  - `@kubb/plugin-react-query`: `customOptions.importPath` and `customOptions.name`.
+
+- [#1171](https://github.com/kubb-labs/plugins/pull/1171) [`60cc33e`](https://github.com/kubb-labs/plugins/commit/60cc33e99e72bcf5408738d207434d25ebb6dbdb) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Cache the results of `camelCase` and `pascalCase`. A build resolves the same names many times, about 35,000 calls from `@kubb/plugin-ts` and `@kubb/plugin-zod` alone for a spec with 1,000 schemas, and each call ran four regular expressions. The cache holds up to 10,000 entries and then starts over.
+
 ## 5.4.12
 
 ### Patch Changes
