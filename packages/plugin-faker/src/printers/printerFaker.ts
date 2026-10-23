@@ -2,7 +2,7 @@ import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildObject, objectKey, stringify, toRegExpString } from '@internals/utils'
 import { ast, containsCircularRef, Diagnostics } from 'kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
-import { canOverrideSchema } from '../utils.ts'
+import { canOverrideSchema, resolveRefTarget } from '../utils.ts'
 
 /**
  * Partial map of node-type overrides for the Faker printer. Each key is a
@@ -233,12 +233,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // emitted with resolver output and should not be transformed twice.
         const resolvedName = node.ref ? this.options.resolver.name(refName) : refName
 
-        // Follow alias chains: a target without a `data` parameter must be called without arguments.
-        let target = node.schema
-        while (target?.type === 'ref') target = target.schema
-        const targetTakesData = !target || canOverrideSchema(target)
-
-        if (!this.options.nestedInObject && targetTakesData) {
+        if (!this.options.nestedInObject && canOverrideSchema(resolveRefTarget(node))) {
           return `${resolvedName}(data)`
         }
 
