@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { DeleteOrderPath, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../models/DeleteOrder'
+import type { DeleteOrderPath, DeleteOrderResponse } from '../models/DeleteOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createDeleteOrderPath(data?: Partial<DeleteOrderPath>): DeleteOrderPath {

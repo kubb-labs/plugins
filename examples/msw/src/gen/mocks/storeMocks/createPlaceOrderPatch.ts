@@ -10,7 +10,6 @@ import type {
   PlaceOrderPatchBodyXml,
   PlaceOrderPatchResponse,
   PlaceOrderPatchStatus200,
-  PlaceOrderPatchStatus405,
 } from '../../models/PlaceOrderPatch'
 import { createOrder } from '../createOrder'
 import { fakerEN as faker } from '@faker-js/faker'

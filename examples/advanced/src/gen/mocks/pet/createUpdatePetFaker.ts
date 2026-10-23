@@ -8,9 +8,6 @@ import type {
   UpdatePetStatus200Json,
   UpdatePetStatus200Xml,
   UpdatePetStatus202,
-  UpdatePetStatus400,
-  UpdatePetStatus404,
-  UpdatePetStatus405,
 } from '../../models/ts/pet/UpdatePet'
 import { createPetFaker } from '../createPetFaker'
 import { fakerEN as faker } from '@faker-js/faker'
