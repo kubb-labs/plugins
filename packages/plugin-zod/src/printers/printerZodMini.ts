@@ -66,6 +66,8 @@ export type PrinterZodMiniOptions = {
   regexType?: PluginZod['resolvedOptions']['regexType']
   /**
    * How a non-discriminated `oneOf` is printed: `z.union` with strict members or `z.xor`.
+   *
+   * @default 'union'
    */
   oneOfType?: PluginZod['resolvedOptions']['oneOfType']
   /**
