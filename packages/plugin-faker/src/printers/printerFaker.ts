@@ -257,7 +257,8 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           const discriminator = discriminatorPropertyName ? getDiscriminator(member, discriminatorPropertyName) : undefined
 
           if (baseTypeName && discriminator) {
-            // An optional discriminator (`strategy?: 'a'`) does not extend `{ strategy: 'a' }`, so match it as optional too.
+            // An optional discriminator (`strategy?: 'a'`) does not extend `{ strategy: 'a' }`,
+            // so match it as optional too.
             const key = `${JSON.stringify(discriminatorPropertyName)}${discriminator.required ? '' : '?'}`
             const typeName = `Extract<NonNullable<${baseTypeName}>, { ${key}: ${parseEnumValue(discriminator.value)} }>`
 
