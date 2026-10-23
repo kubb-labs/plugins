@@ -23,6 +23,10 @@ describe('import utilities', () => {
     expect(filterUsedImports([{ name: 'createPet', path: './pet.ts' }], 'createPetList(data); recreatePet()')).toStrictEqual([])
   })
 
+  test('keeps no imports when the text calls nothing', () => {
+    expect(filterUsedImports([{ name: 'createPet', path: './pet.ts' }], 'undefined')).toStrictEqual([])
+  })
+
   test('skips selected import names', () => {
     expect(filterUsedImports([{ name: 'createPet', path: './pet.ts' }], 'createPet(data)', ['createPet'])).toStrictEqual([])
   })
