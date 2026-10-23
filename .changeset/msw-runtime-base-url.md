@@ -1,5 +1,5 @@
 ---
-'@kubb/plugin-msw': minor
+'@kubb/plugin-msw': patch
 ---
 
 Handlers take an optional `{ baseURL }` second argument that overrides the configured `baseURL`. With `handlers: true`, `handlers.ts` also exports `createHandlers({ baseURL })`:
