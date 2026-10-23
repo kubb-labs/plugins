@@ -21,9 +21,6 @@ const version = '3.0.x'
 
 const tscPath = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
 
-/**
- * Type-checks `file` with the native TypeScript 7 compiler and returns its diagnostics, one per line.
- */
 async function typecheck(file: string): Promise<Array<string>> {
   const compilerOptions = {
     noEmit: true,

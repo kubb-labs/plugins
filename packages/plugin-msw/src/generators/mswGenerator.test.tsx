@@ -224,9 +224,6 @@ describe('mswGenerator operation', () => {
   })
 })
 
-/**
- * Writes the generated handler next to `stubs` and imports it, so Vitest compiles the TypeScript and resolves its imports.
- */
 async function importGenerated(source: string, stubs: Record<string, string> = {}): Promise<Record<string, any>> {
   const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.msw-'))
   onTestFinished(() => fs.rm(dir, { recursive: true, force: true }))
