@@ -79,6 +79,14 @@ describe('printerFaker', () => {
     expect(printerFaker({ resolver: resolverFaker }).print(node)).toMatchInlineSnapshot(`"createOrderSchema(data)"`)
   })
 
+  test('calls a ref to an untyped schema without data', () => {
+    const anyJson = ast.factory.createSchema({ type: 'unknown' })
+    const eventPayload = ast.factory.createSchema({ type: 'ref', name: 'AnyJson', ref: '#/components/schemas/AnyJson', schema: anyJson })
+    const node = ast.factory.createSchema({ type: 'ref', name: 'EventPayload', ref: '#/components/schemas/EventPayload', schema: eventPayload })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('createEventPayload()')
+  })
+
   test('uses tuple item types for nested enum members', () => {
     const node = ast.factory.createSchema({
       type: 'tuple',

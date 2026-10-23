@@ -45,6 +45,13 @@ export function canOverrideSchema(node: ast.SchemaNode): boolean {
   return !NON_OVERRIDABLE_TYPES.has(node.type)
 }
 
+/**
+ * Follows a ref, including alias chains, to the schema it resolves to. Unresolved refs are returned as is.
+ */
+export function resolveRefTarget(node: ast.SchemaNode): ast.SchemaNode {
+  return node.type === 'ref' && node.schema ? resolveRefTarget(node.schema) : node
+}
+
 function shouldInlineSingleResponseSchema(schema: ast.SchemaNode): boolean {
   return !NON_INLINABLE_RESPONSE_TYPES.has(schema.type)
 }
