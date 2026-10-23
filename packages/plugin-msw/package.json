@@ -97,7 +97,6 @@
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "@typescript/typescript6": "catalog:",
     "kubb": "catalog:",
     "msw": "^2.15.0"
   },

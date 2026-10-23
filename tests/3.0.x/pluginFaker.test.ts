@@ -1,7 +1,10 @@
+import { execFile } from 'node:child_process'
 import fs from 'node:fs/promises'
+import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { promisify } from 'node:util'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
 import { Hookable, createKubb } from '@kubb/core'
@@ -9,13 +12,41 @@ import { ast, type Config, Diagnostics, type KubbHooks, fsStorage } from 'kubb/k
 import { parserTs } from '@kubb/parser-ts'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginTs } from '@kubb/plugin-ts'
-import ts from '@typescript/typescript6'
 import { describe, expect, onTestFinished, test } from 'vitest'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const version = '3.0.x'
+
+const tscPath = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
+
+/**
+ * Type-checks `file` with the native TypeScript 7 compiler and returns its diagnostics, one per line.
+ */
+async function typecheck(file: string): Promise<Array<string>> {
+  const compilerOptions = {
+    noEmit: true,
+    strict: true,
+    skipLibCheck: true,
+    target: 'es2022',
+    module: 'esnext',
+    moduleResolution: 'bundler',
+    allowImportingTsExtensions: true,
+    types: [],
+  }
+  const project = path.join(path.dirname(file), 'tsconfig.json')
+  await fs.writeFile(project, JSON.stringify({ compilerOptions, files: [path.basename(file)] }))
+
+  try {
+    await promisify(execFile)(process.execPath, [tscPath, '-p', project])
+    return []
+  } catch (error) {
+    return String((error as { stdout?: string }).stdout || error)
+      .trim()
+      .split('\n')
+  }
+}
 
 type BuildConfig = Omit<Config, 'plugins' | 'reporters'> & { plugins: unknown }
 
@@ -364,17 +395,7 @@ const explicit: Category = createCategory<object>()
 `,
   )
 
-  const program = ts.createProgram([usagePath], {
-    noEmit: true,
-    strict: true,
-    skipLibCheck: true,
-    target: ts.ScriptTarget.ES2022,
-    module: ts.ModuleKind.ESNext,
-    moduleResolution: ts.ModuleResolutionKind.Bundler,
-    allowImportingTsExtensions: true,
-    types: [],
-  })
-  expect(ts.getPreEmitDiagnostics(program).map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'))).toStrictEqual([])
+  expect(await typecheck(usagePath)).toStrictEqual([])
 })
 
 test('creates mutable schema-typed fixtures and rejects unknown overrides', async () => {
@@ -409,15 +430,5 @@ createOrder({ quantity: 2, foo: '' })
 `,
   )
 
-  const program = ts.createProgram([usagePath], {
-    noEmit: true,
-    strict: true,
-    skipLibCheck: true,
-    target: ts.ScriptTarget.ES2022,
-    module: ts.ModuleKind.ESNext,
-    moduleResolution: ts.ModuleResolutionKind.Bundler,
-    allowImportingTsExtensions: true,
-    types: [],
-  })
-  expect(ts.getPreEmitDiagnostics(program)).toStrictEqual([])
+  expect(await typecheck(usagePath)).toStrictEqual([])
 })
