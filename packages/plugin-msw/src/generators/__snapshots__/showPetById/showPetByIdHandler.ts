@@ -16,8 +16,11 @@ export function showPetByIdHandlerResponse200(data: ShowPetByIdResponse) {
   })
 }
 
-export function showPetByIdHandler(data?: ShowPetByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
-  return http.get(`/pets/:petId`, function handler(info) {
+export function showPetByIdHandler(
+  data?: ShowPetByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  options?: { baseURL?: string },
+) {
+  return http.get(`${options?.baseURL ?? ''}/pets/:petId`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

@@ -1,4 +1,4 @@
-export { handlers } from './handlers'
+export { createHandlers, handlers } from './handlers'
 export { addFilesHandler, addFilesHandlerResponse200, addFilesHandlerResponse405 } from './pet/addFilesHandler'
 export { addPetHandler, addPetHandlerResponse405 } from './pet/addPetHandler'
 export { deletePetHandler, deletePetHandlerResponse400 } from './pet/deletePetHandler'

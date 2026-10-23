@@ -194,6 +194,8 @@ describe('mswGenerator operation', () => {
     { name: 'showPetById', node: showPetByIdNode, options: {} },
     { name: 'getPets', node: listPetsNode, options: {} },
     { name: 'getPetsFaker', node: listPetsNode, options: { parser: 'faker' as const } },
+    { name: 'getPetsBaseUrl', node: listPetsNode, options: { baseURL: 'https://petstore.swagger.io/v1' } },
+    { name: 'getPetsFakerTemplateBaseUrl', node: listPetsNode, options: { parser: 'faker' as const, baseURL: '${process.env.API_URL}' } },
     { name: 'createPet', node: createPetsNode, options: {} },
     { name: 'createPetFaker', node: createPetsNode, options: { parser: 'faker' as const } },
     { name: 'searchPets', node: searchPetsNode, options: {} },
