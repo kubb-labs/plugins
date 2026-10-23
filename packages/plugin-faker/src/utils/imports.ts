@@ -21,6 +21,9 @@ function getImportNames(entry: ImportEntry): Array<string> {
     .filter((name): name is string => Boolean(name))
 }
 
+/**
+ * Keeps the imports whose names `text` calls, as `name(` or `name<`, minus `skipImportNames`.
+ */
 export function filterUsedImports(imports: Array<ImportEntry>, text: string, skipImportNames: Array<string> = []): Array<ImportEntry> {
   const skip = new Set(skipImportNames)
   // One scan of `text` instead of a new RegExp per import name. Generated helpers can use explicit
