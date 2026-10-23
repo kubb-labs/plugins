@@ -335,8 +335,12 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
     },
     overrides: options.nodes,
     print(node) {
-      return printWithOmit(this, node, (value, meta) =>
-        applyMiniModifiers({ value, schema: node, nullable: meta.nullable, optional: meta.optional, nullish: meta.nullish, defaultValue: meta.default }),
+      return printWithOmit(
+        this,
+        node,
+        (value, meta) =>
+          applyMiniModifiers({ value, schema: node, nullable: meta.nullable, optional: meta.optional, nullish: meta.nullish, defaultValue: meta.default }),
+        true,
       )
     },
   }

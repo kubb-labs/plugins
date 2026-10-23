@@ -3,15 +3,7 @@
  * Do not edit manually.
  */
 
-import type {
-  GetOrderByIdPath,
-  GetOrderByIdResponse,
-  GetOrderByIdStatus200,
-  GetOrderByIdStatus200Json,
-  GetOrderByIdStatus200Xml,
-  GetOrderByIdStatus400,
-  GetOrderByIdStatus404,
-} from '../models/GetOrderById'
+import type { GetOrderByIdPath, GetOrderByIdResponse, GetOrderByIdStatus200, GetOrderByIdStatus200Json, GetOrderByIdStatus200Xml } from '../models/GetOrderById'
 import { createOrder } from './createOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
