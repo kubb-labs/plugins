@@ -606,7 +606,8 @@ describe('fakerGenerator — operation', () => {
     const output = await format(parserTs().parse(file!))
 
     expect(output).toContain('export function createArchiveBookStatus204() {')
-    expect(output).not.toContain('ArchiveBookStatus204,')
-    expect(output).toContain('ArchiveBookStatus404')
+    const typeImport = output.split('\n').find((line) => line.startsWith('import type'))
+    expect(typeImport).toContain('ArchiveBookStatus404')
+    expect(typeImport).not.toMatch(/\bArchiveBookStatus204\b/)
   })
 })
