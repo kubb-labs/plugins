@@ -203,6 +203,7 @@ describe('printerZod', () => {
       [{ type: 'string', format: 'ulid' }, 'z.ulid()'],
       [{ type: 'string', format: 'iban' }, 'z.iban()'],
       [{ type: 'string', format: 'duration' }, 'z.iso.duration()'],
+      [{ type: 'string', format: 'hostname' }, 'z.hostname()'],
     ] as const)('format %j', (schema, expected) => {
       expect(printer.print(ast.factory.createSchema(schema))).toBe(expected)
     })
