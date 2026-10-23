@@ -973,6 +973,24 @@ describe('printerZodMini', () => {
       expect(printer.print(node)).toBe('z.union([TypeA, TypeB])')
     })
 
+    test("oneOfType: 'xor' prints z.xor, which passes only when exactly one member matches", () => {
+      const contactBy = (key: string) =>
+        ast.factory.createSchema({
+          type: 'object',
+          primitive: 'object',
+          properties: [ast.factory.createProperty({ name: key, required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+        })
+      const node = ast.factory.createSchema({ type: 'union', strategy: 'one', members: [contactBy('email'), contactBy('phone')] })
+
+      const code = printerZodMini({ oneOfType: 'xor' }).print(node)
+      expect(code).toMatch(/^z\.xor\(\[\s+z\.object\(/)
+
+      const schema = new Function('z', `return ${code}`)(z) as z.ZodMiniType
+      expect(schema.safeParse({ email: 'ann@example.com', name: 'Ann' }).success).toBe(true)
+      expect(schema.safeParse({ email: 'ann@example.com', phone: '555-0100' }).success).toBe(false)
+      expect(schema.safeParse({}).success).toBe(false)
+    })
+
     test('oneOf union with object members uses strict objects', () => {
       const node = ast.factory.createSchema({
         type: 'union',

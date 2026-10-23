@@ -13,6 +13,7 @@ Pass these options to `pluginZod()`. Shared options link to [Shared plugin optio
 | [`coercion`](#coercion)                                                   | Coerce input before validation.                                        | `false`                                      |
 | [`guidType`](#guidtype)                                                   | Validator for `format: uuid` properties.                               | `'uuid'`                                     |
 | [`regexType`](#regextype)                                                 | How an OpenAPI `pattern` is written.                                   | `'literal'`                                  |
+| [`oneOfType`](#oneoftype)                                                 | How a `oneOf` is validated.                                            | `'union'`                                    |
 | [`compile`](#compile)                                                     | Wrap schemas in `z.compile` for fast-path validation.                  | `false`                                      |
 | [`mini`](#mini)                                                           | Generate Zod Mini schemas.                                             | `false`                                      |
 | [`typeGuards`](#typeguards)                                               | Generate `is*` type guards and `assert*` assertions.                   | `false`                                      |
@@ -125,6 +126,30 @@ Emits the `RegExp` constructor, such as `.regex(new RegExp('^[a-z]+$'))`.
 :::
 
 ::
+
+### oneOfType
+
+Controls how a `oneOf` is validated. Use `'xor'` when values may carry extra keys, or when members have no `required` keys.
+
+|          |                    |
+| -------- | ------------------ |
+| Type     | `'union' \| 'xor'` |
+| Required | `false`            |
+| Default  | `'union'`          |
+
+::field-group
+
+:::field{name="'union'"}
+Emits `z.union([...])`. Inline object members without `additionalProperties` print as `z.strictObject(...)`, so a value with another member's keys fails that member. Extra keys that the spec allows fail too.
+:::
+
+:::field{name="'xor'"}
+Emits `z.xor([...])`, which passes only when exactly one member matches, as `oneOf` requires. Members keep their own `additionalProperties`. Needs Zod v4.2.0 or higher.
+:::
+
+::
+
+A `oneOf` with a discriminator, where every member is an object, prints `z.discriminatedUnion(...)` with either value. An `anyOf` always prints `z.union(...)`.
 
 ### compile
 

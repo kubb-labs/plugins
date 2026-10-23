@@ -1,5 +1,5 @@
 import { createGroupConfig } from '@internals/shared'
-import { addGenerator, assertPluginOption, defineExtension, Resolver, setMacros, setResolver } from 'kubb/kit'
+import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from 'kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginFakerName } from '@kubb/plugin-faker'
@@ -58,13 +58,6 @@ export const pluginMsw = defineExtension<PluginMsw>({
       resolver: userResolver,
       macros: userMacros,
     } = options
-
-    assertPluginOption({
-      plugin: pluginMswName,
-      option: 'parser',
-      value: parser,
-      allowed: ['data', 'faker'] satisfies Array<PluginMsw['resolvedOptions']['parser']>,
-    })
 
     const resolver = userResolver ? Resolver.merge<ResolverMsw>(resolverMsw, userResolver) : resolverMsw
 

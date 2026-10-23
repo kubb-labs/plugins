@@ -1,5 +1,5 @@
 import { createGroupConfig } from '@internals/shared'
-import { addGenerator, assertPluginOption, defineExtension, Resolver, setMacros, setResolver } from 'kubb/kit'
+import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from 'kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -57,19 +57,6 @@ export const pluginFaker = defineExtension<PluginFaker>({
       resolver: userResolver,
       macros: userMacros,
     } = options
-
-    assertPluginOption({
-      plugin: pluginFakerName,
-      option: 'typeMode',
-      value: typeMode,
-      allowed: ['inferred', 'schema'] satisfies Array<PluginFaker['resolvedOptions']['typeMode']>,
-    })
-    assertPluginOption({
-      plugin: pluginFakerName,
-      option: 'regexGenerator',
-      value: regexGenerator,
-      allowed: ['faker', 'randexp'] satisfies Array<PluginFaker['resolvedOptions']['regexGenerator']>,
-    })
 
     setResolver(userResolver ? Resolver.merge(resolverFaker, userResolver) : resolverFaker)
     if (userMacros?.length) {
