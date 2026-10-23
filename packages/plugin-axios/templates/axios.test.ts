@@ -2,6 +2,7 @@ import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, Inte
 import axios, { AxiosError as AxiosErrorClass } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
 import { type CallResult, createClientCore, parseEventStream, ResponseError, resolveAuth, unwrapResult, withUnwrap } from './axios.ts'
+import { applyHeaderStyles, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
 
@@ -1254,5 +1255,15 @@ describe('parseEventStream', () => {
   test('consumes an async iterable of byte chunks, as the axios stream response yields', async () => {
     const events = await collect(parseEventStream(asyncIterableOf(['data: {"n":1}\n\n'])))
     expect(events).toStrictEqual([{ data: { n: 1 } }])
+  })
+})
+
+describe('JSON content parameters', () => {
+  const json = { contentType: 'application/json' }
+
+  test('encodes query, header, and cookie values as JSON', () => {
+    expect(defaultQuerySerializer({ filter: { a: 1 } }, { filter: json })).toBe(`filter=${encodeURIComponent('{"a":1}')}`)
+    expect(applyHeaderStyles({ 'X-Meta': { name: '日本' } }, { 'X-Meta': json })).toStrictEqual([['X-Meta', '{"name":"\\u65e5\\u672c"}']])
+    expect(serializeCookies({ prefs: { a: 1 } }, { prefs: json })).toBe(`prefs=${encodeURIComponent('{"a":1}')}`)
   })
 })
