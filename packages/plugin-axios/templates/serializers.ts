@@ -26,9 +26,13 @@ export type SerializationStyle<TStyle = string> = {
 }
 
 /**
- * The per-parameter query serialization metadata carried by the generated request.
+ * The per-parameter query serialization metadata carried by the generated request. `contentType` is
+ * set for a parameter described with `content`; a JSON media type sends the value as one
+ * JSON-encoded string.
  */
-export type QueryParamStyle = SerializationStyle<QueryStyle>
+export type QueryParamStyle = SerializationStyle<QueryStyle> & {
+  contentType?: string
+}
 
 /**
  * Serializes the query object into a search string. The optional second argument carries the
@@ -334,9 +338,14 @@ function serializeStyledQueryObject({
   ]
 }
 
+function isJsonMediaType(contentType: string): boolean {
+  return contentType.includes('application/json') || contentType.includes('+json')
+}
+
 function serializeStyledQueryParam({ key, value, options }: { key: string; value: unknown; options: QueryParamStyle }): Array<string> {
   if (value === undefined || value === null) return []
   const encode = options.allowReserved ? encodeReserved : encodeComponent
+  if (options.contentType && isJsonMediaType(options.contentType)) return [`${encode(key)}=${encode(JSON.stringify(value, jsonReplacer))}`]
   if (Array.isArray(value)) return serializeStyledQueryArray({ key, value, options, encode })
   if (isRecord(value)) return serializeStyledQueryObject({ key, value, options, encode })
   return [`${encode(key)}=${encode(value)}`]
@@ -362,6 +371,7 @@ function serializeDefaultQueryParam(key: string, value: unknown): Array<string> 
  * defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'pipeDelimited', explode: false } }) // 'id=3|4|5'
  * defaultQuerySerializer({ a: { b: 1 } }, { a: { style: 'deepObject' } }) // 'a%5Bb%5D=1'
  * defaultQuerySerializer({ a: { b: { c: 1 } } }, { a: { style: 'deepObject' } }) // 'a%5Bb%5D%5Bc%5D=1'
+ * defaultQuerySerializer({ filter: { a: 1 } }, { filter: { contentType: 'application/json' } }) // 'filter=%7B%22a%22%3A1%7D'
  * ```
  */
 export const defaultQuerySerializer: QuerySerializer = (params, options) => {

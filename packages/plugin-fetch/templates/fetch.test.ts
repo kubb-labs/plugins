@@ -78,6 +78,13 @@ describe('defaultQuerySerializer', () => {
     expect(defaultQuerySerializer({ tags: ['a', 'b'] })).toBe('tags=a&tags=b')
   })
 
+  test('JSON-encodes a parameter with a JSON content type as one value', () => {
+    const filter = { root: { nested: ['!#=~[]', 1] } }
+    const query = defaultQuerySerializer({ filter, page: 2 }, { filter: { contentType: 'application/json' } })
+    expect(query).toBe(`filter=${encodeURIComponent(JSON.stringify(filter))}&page=2`)
+    expect(new URLSearchParams(query).get('filter')).toBe(JSON.stringify(filter))
+  })
+
   test('serializes nested objects with the deepObject style', () => {
     expect(defaultQuerySerializer({ filter: { name: 'odie' } })).toBe('filter%5Bname%5D=odie')
   })

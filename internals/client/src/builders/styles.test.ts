@@ -38,6 +38,11 @@ describe('buildStyles', () => {
     expect(buildStyles({ node })).toBe('{ query: { path: { allowReserved: true }, tags: { explode: false, allowReserved: false } } }')
   })
 
+  test('emits the contentType of a query parameter described with content', () => {
+    const node = createOperation([{ name: 'filter', in: 'query', schema: stringSchema(), contentType: 'application/json' }])
+    expect(buildStyles({ node })).toBe("{ query: { filter: { contentType: 'application/json' } } }")
+  })
+
   test('quotes a query key that is not a bare identifier', () => {
     const node = createOperation([{ name: '2fa', in: 'query', schema: stringSchema(), explode: true }])
     expect(buildStyles({ node })).toBe('{ query: { "2fa": { explode: true } } }')
