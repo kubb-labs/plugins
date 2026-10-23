@@ -1,5 +1,5 @@
 import { createGroupConfig } from '@internals/shared'
-import { addGenerator, assertPluginOption, defineExtension, Resolver, setMacros, setResolver } from 'kubb/kit'
+import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from 'kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { zodGenerator } from './generators/zodGenerator.tsx'
@@ -61,25 +61,6 @@ export const pluginZod = defineExtension<PluginZod>({
       resolver: userResolver,
       macros: userMacros,
     } = options
-
-    assertPluginOption({
-      plugin: pluginZodName,
-      option: 'guidType',
-      value: guidType,
-      allowed: ['uuid', 'guid'] satisfies Array<PluginZod['resolvedOptions']['guidType']>,
-    })
-    assertPluginOption({
-      plugin: pluginZodName,
-      option: 'regexType',
-      value: regexType,
-      allowed: ['literal', 'constructor'] satisfies Array<PluginZod['resolvedOptions']['regexType']>,
-    })
-    assertPluginOption({
-      plugin: pluginZodName,
-      option: 'oneOfType',
-      value: oneOfType,
-      allowed: ['union', 'xor'] satisfies Array<PluginZod['resolvedOptions']['oneOfType']>,
-    })
 
     setResolver(userResolver ? Resolver.merge(resolverZod, userResolver) : resolverZod)
     if (userMacros?.length) {

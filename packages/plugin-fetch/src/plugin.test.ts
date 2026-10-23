@@ -1,9 +1,8 @@
 import { createKubb } from 'kubb'
-import { defineExtension, kubbContext } from 'kubb/kit'
-import { createMockedSetupContext } from 'kubb/kit/testing'
+import { defineExtension } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
 import { pluginFetch } from './plugin.ts'
-import type { Options, PluginFetch } from './types.ts'
+import type { Options } from './types.ts'
 
 function setupKubb(options: Options, pluginNames: Array<string>) {
   const plugins = pluginNames.map((name) => defineExtension({ kind: 'plugin', meta: { name } })())
@@ -24,20 +23,5 @@ describe('pluginFetch setup', () => {
     await expect(setupKubb({ validator: 'zod' }, ['plugin-ts'])).rejects.toMatchObject({
       diagnostic: { code: 'KUBB_MISSING_DEPENDENCY', message: 'Plugin "plugin-zod" is required by "plugin-fetch" but not found.' },
     })
-  })
-
-  test.each([
-    { option: 'returnType', options: { returnType: 'bogus' } },
-    { option: 'sdk.mode', options: { sdk: { mode: 'bogus' } } },
-    { option: 'override[0].options.returnType', options: { override: [{ type: 'tag', pattern: 'pet', options: { returnType: 'bogus' } }] } },
-  ])('throws KUBB_INVALID_PLUGIN_OPTIONS on an invalid $option', ({ option, options }) => {
-    const plugin = pluginFetch(options as unknown as Options)
-    const ctx = createMockedSetupContext<PluginFetch>()
-
-    expect(() => kubbContext.run(ctx, () => plugin.setup?.(plugin.options ?? {}, ctx))).toThrow(
-      expect.objectContaining({
-        diagnostic: expect.objectContaining({ code: 'KUBB_INVALID_PLUGIN_OPTIONS', message: expect.stringContaining(`option \`${option}\` is "bogus"`) }),
-      }),
-    )
   })
 })

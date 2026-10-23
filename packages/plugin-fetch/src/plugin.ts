@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { createSdkGenerator, defaultMacros, isValidatorEnabled, resolverClient } from '@internals/client'
 import { createGroupConfig } from '@internals/shared'
-import { addGenerator, assertPluginOption, defineExtension, injectFile, Resolver, setMacros, setResolver, useConfig } from 'kubb/kit'
+import { addGenerator, defineExtension, injectFile, Resolver, setMacros, setResolver, useConfig } from 'kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -72,27 +72,6 @@ export const pluginFetch = defineExtension<PluginFetch>({
       returnType,
       sdk: sdk ? { mode: sdk.mode ?? 'tag', name: sdk.name } : undefined,
       resolver: userResolver ? Resolver.merge<ResolverClient>(resolverClient, userResolver) : resolverClient,
-    }
-
-    const allowedReturnTypes = ['full', 'data', 'plain'] satisfies Array<ResolvedOptions['returnType']>
-    assertPluginOption({ plugin: pluginFetchName, option: 'returnType', value: returnType, allowed: allowedReturnTypes })
-    // An override replaces `returnType` per operation, so its values are checked too.
-    for (const [index, entry] of override.entries()) {
-      if (entry.options.returnType === undefined) continue
-      assertPluginOption({
-        plugin: pluginFetchName,
-        option: `override[${index}].options.returnType`,
-        value: entry.options.returnType,
-        allowed: allowedReturnTypes,
-      })
-    }
-    if (resolved.sdk) {
-      assertPluginOption({
-        plugin: pluginFetchName,
-        option: 'sdk.mode',
-        value: resolved.sdk.mode,
-        allowed: ['tag', 'flat'] satisfies Array<NonNullable<ResolvedOptions['sdk']>['mode']>,
-      })
     }
 
     setResolver(resolved.resolver)
