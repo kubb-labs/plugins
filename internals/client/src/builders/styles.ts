@@ -14,10 +14,11 @@ function toKey(name: string, location: StyledLocation): string {
 }
 
 /**
- * Serializes one parameter's metadata into a `{ style, explode, allowReserved, contentType }` literal, or `null`
- * when the parameter carries none. Path and query carry the serialization `style`; header and cookie
- * use a fixed style (`simple` and `form`), so only `explode` is emitted for them. `allowReserved`
- * only applies to query parameters, and `contentType` to every location except path.
+ * Serializes one parameter's metadata into a `{ style, explode, allowReserved, contentType }`
+ * literal, or `null` when the parameter carries none. Path and query carry the serialization
+ * `style`; header and cookie use a fixed style (`simple` and `form`), so only `explode` is emitted
+ * for them. `allowReserved` only applies to query parameters, and `contentType` to every location
+ * except path.
  */
 function serializeParameter(parameter: ast.ParameterNode): string | null {
   const parts: Array<string> = []
@@ -32,9 +33,9 @@ function serializeParameter(parameter: ast.ParameterNode): string | null {
  * Builds the per-operation `styles` literal from the operation's parameters, grouped by location.
  * Path entries are keyed by the camelCased name to match the URL template placeholders; query,
  * header, and cookie entries keep the spec name to match the keys the runtime serializes.
- * Only parameters whose source defines `style`, `explode`, `allowReserved`, or `contentType` are emitted, so calls without
- * serialization metadata keep the runtime defaults and existing output is unchanged. Returns `null`
- * when no parameter carries metadata.
+ * Only parameters whose source defines `style`, `explode`, `allowReserved`, or `contentType` are
+ * emitted, so calls without serialization metadata keep the runtime defaults and existing output
+ * is unchanged. Returns `null` when no parameter carries metadata.
  *
  * @example
  * ```ts

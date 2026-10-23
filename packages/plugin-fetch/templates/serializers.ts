@@ -239,8 +239,11 @@ export function serializeCookies(cookies: Record<string, unknown>, styles?: Reco
   for (const [name, value] of Object.entries(cookies)) {
     if (value === undefined || value === null) continue
     const style = styles?.[name]
-    if (isJsonMediaType(style?.contentType)) parts.push(`${name}=${encodeURIComponent(JSON.stringify(value, jsonReplacer))}`)
-    else parts.push(serializeCookie({ name, value, explode: style?.explode ?? false }))
+    if (isJsonMediaType(style?.contentType)) {
+      parts.push(`${name}=${encodeURIComponent(JSON.stringify(value, jsonReplacer))}`)
+      continue
+    }
+    parts.push(serializeCookie({ name, value, explode: style?.explode ?? false }))
   }
   return parts.join('; ')
 }
