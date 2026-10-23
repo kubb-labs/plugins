@@ -84,8 +84,7 @@
     "typescript": "catalog:"
   },
   "peerDependencies": {
-    "kubb": "catalog:",
-    "typescript": "catalog:"
+    "kubb": "catalog:"
   },
   "engines": {
     "node": ">=22.12"
