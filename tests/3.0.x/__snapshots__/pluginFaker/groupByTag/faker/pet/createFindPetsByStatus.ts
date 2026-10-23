@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByStatusQuery, FindPetsByStatusResponse, FindPetsByStatusStatus200, FindPetsByStatusStatus200Json, FindPetsByStatusStatus200Xml, FindPetsByStatusStatus400 } from '../../types/FindPetsByStatus'
+import type { FindPetsByStatusQuery, FindPetsByStatusResponse, FindPetsByStatusStatus200, FindPetsByStatusStatus200Json, FindPetsByStatusStatus200Xml } from '../../types/FindPetsByStatus'
 import { createFindPetsByStatusStatus } from '../createFindPetsByStatusStatus'
 import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
