@@ -9,8 +9,6 @@ import type {
   GetOrderByIdStatus200,
   GetOrderByIdStatus200Json,
   GetOrderByIdStatus200Xml,
-  GetOrderByIdStatus400,
-  GetOrderByIdStatus404,
 } from '../../models/GetOrderById'
 import { createOrder } from '../createOrder'
 import { fakerEN as faker } from '@faker-js/faker'

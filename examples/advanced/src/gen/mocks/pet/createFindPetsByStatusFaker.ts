@@ -4,7 +4,6 @@ import type {
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
-  FindPetsByStatusStatus400,
 } from '../../models/ts/pet/FindPetsByStatus'
 import { createPetFaker } from '../createPetFaker'
 import { fakerEN as faker } from '@faker-js/faker'

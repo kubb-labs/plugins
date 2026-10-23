@@ -4,7 +4,6 @@ import type {
   CreatePetsPath,
   CreatePetsQuery,
   CreatePetsResponse,
-  CreatePetsStatus201,
   CreatePetsStatusDefault,
 } from '../../models/ts/pets/CreatePets'
 import { createCreatePetsBoolParamFaker } from '../createCreatePetsBoolParamFaker'
