@@ -6,4 +6,4 @@
 export type BankTransferPaymentUnion = {
   type?: string;
   iban?: string;
-}
+};

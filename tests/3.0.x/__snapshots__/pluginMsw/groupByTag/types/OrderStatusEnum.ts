@@ -9,4 +9,4 @@ export const orderStatusEnum = {
   delivered: 'delivered',
 } as const
 
-export type OrderStatusEnumKey = (typeof orderStatusEnum)[keyof typeof orderStatusEnum]
+export type OrderStatusEnumKey = (typeof orderStatusEnum)[keyof typeof orderStatusEnum];

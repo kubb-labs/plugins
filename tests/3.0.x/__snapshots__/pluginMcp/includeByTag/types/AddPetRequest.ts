@@ -27,4 +27,4 @@ export type AddPetRequest = {
    * @description pet status in the store
    */
   status?: AddPetRequestStatusEnumKey;
-}
+};

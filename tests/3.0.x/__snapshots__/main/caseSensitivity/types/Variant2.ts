@@ -9,4 +9,4 @@ export type Variant2 = {
   id?: string;
   label?: string;
   category?: Variant2CategoryEnumKey;
-}
+};

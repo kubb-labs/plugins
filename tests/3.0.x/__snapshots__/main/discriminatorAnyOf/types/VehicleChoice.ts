@@ -13,4 +13,4 @@ export type VehicleChoice = ((Sedan & {
   type: 'SUV';
 }) | (ElectricCar & {
   type: 'ElectricCar';
-}))
+}));

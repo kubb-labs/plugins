@@ -15,4 +15,4 @@ export type ElectricCar = (Vehicle & {
    * @type number | undefined
    */
   batteryCapacity?: number;
-})
+});

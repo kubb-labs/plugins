@@ -14,4 +14,4 @@ export type Vehicle = {
    * @type string
    */
   type: string;
-}
+};

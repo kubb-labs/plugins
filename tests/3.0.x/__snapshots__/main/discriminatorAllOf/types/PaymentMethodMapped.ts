@@ -7,4 +7,4 @@ import type { PaymentMethodMappedTypeEnumKey } from './PaymentMethodMappedTypeEn
 
 export type PaymentMethodMapped = {
   type: PaymentMethodMappedTypeEnumKey;
-}
+};

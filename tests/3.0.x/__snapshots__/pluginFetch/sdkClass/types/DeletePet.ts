@@ -11,26 +11,26 @@ export type DeletePetPath = {
    * @type integer
    */
   petId: bigint;
-}
+};
 
 export type DeletePetHeaders = {
   api_key?: string;
-}
+};
 
-export type DeletePetStatus400 = unknown
+export type DeletePetStatus400 = unknown;
 
 export type DeletePetOptions = {
   body?: never;
   path: DeletePetPath;
   query?: never;
   headers?: DeletePetHeaders;
-}
+};
 
 export type DeletePetResponses = {
   '400': DeletePetStatus400;
-}
+};
 
 /**
  * @description Union of all possible responses
  */
-export type DeletePetResponse = DeletePetStatus400
+export type DeletePetResponse = DeletePetStatus400;

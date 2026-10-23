@@ -5,7 +5,7 @@
 
 import type { OrderSchema } from './OrderSchema'
 
-export type CreateOrderStatus201 = OrderSchema
+export type CreateOrderStatus201 = OrderSchema;
 
 /**
  * @description Order request body
@@ -14,20 +14,20 @@ export type CreateOrderStatus201 = OrderSchema
 export type CreateOrderBody = {
   userId?: string;
   productIds?: string[];
-} | undefined
+} | undefined;
 
 export type CreateOrderOptions = {
   body: CreateOrderBody;
   path?: never;
   query?: never;
   headers?: never;
-}
+};
 
 export type CreateOrderResponses = {
   '201': CreateOrderStatus201;
-}
+};
 
 /**
  * @description Union of all possible responses
  */
-export type CreateOrderResponse = CreateOrderStatus201
+export type CreateOrderResponse = CreateOrderStatus201;

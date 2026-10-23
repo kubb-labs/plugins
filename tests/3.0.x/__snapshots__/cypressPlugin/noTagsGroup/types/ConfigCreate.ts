@@ -5,4 +5,4 @@
 
 export type ConfigCreate = {
   name: string;
-}
+};

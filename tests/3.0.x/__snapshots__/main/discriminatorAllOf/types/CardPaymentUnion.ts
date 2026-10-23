@@ -6,4 +6,4 @@
 export type CardPaymentUnion = {
   type?: string;
   cardNumber?: string;
-}
+};

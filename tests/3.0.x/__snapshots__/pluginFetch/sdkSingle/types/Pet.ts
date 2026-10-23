@@ -35,4 +35,4 @@ export type Pet = {
    * @description pet status in the store
    */
   status?: PetStatusEnumKey;
-}
+};

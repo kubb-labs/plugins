@@ -10,4 +10,4 @@ export type PaymentMethodUnion = ((CardPaymentUnion & {
   type: 'card';
 }) | (BankTransferPaymentUnion & {
   type: 'bank_transfer';
-}))
+}));

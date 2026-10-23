@@ -7,20 +7,20 @@ export type GetProductsStatus200 = {
   productId?: string;
   productName?: string;
   stock?: number;
-}
+};
 
 export type GetProductsOptions = {
   body?: never;
   path?: never;
   query?: never;
   headers?: never;
-}
+};
 
 export type GetProductsResponses = {
   '200': GetProductsStatus200;
-}
+};
 
 /**
  * @description Union of all possible responses
  */
-export type GetProductsResponse = GetProductsStatus200
+export type GetProductsResponse = GetProductsStatus200;

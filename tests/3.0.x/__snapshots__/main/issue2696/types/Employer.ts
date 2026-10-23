@@ -7,4 +7,4 @@ export type Employer = {
   id: string;
   name: string;
   industry?: string;
-}
+};

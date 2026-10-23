@@ -13,7 +13,7 @@ export type UploadFilePath = {
    * @type integer
    */
   petId: bigint;
-}
+};
 
 export type UploadFileQuery = {
   /**
@@ -21,24 +21,24 @@ export type UploadFileQuery = {
    * @type string | undefined
    */
   additionalMetadata?: string;
-}
+};
 
-export type UploadFileStatus200 = ApiResponse
+export type UploadFileStatus200 = ApiResponse;
 
-export type UploadFileBody = Blob | undefined
+export type UploadFileBody = Blob | undefined;
 
 export type UploadFileOptions = {
   body: UploadFileBody;
   path: UploadFilePath;
   query?: UploadFileQuery;
   headers?: never;
-}
+};
 
 export type UploadFileResponses = {
   '200': UploadFileStatus200;
-}
+};
 
 /**
  * @description Union of all possible responses
  */
-export type UploadFileResponse = UploadFileStatus200
+export type UploadFileResponse = UploadFileStatus200;

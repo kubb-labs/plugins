@@ -10,4 +10,4 @@ export type Car = ((Sedan & {
   type: 'Sedan';
 }) | (SUV & {
   type: 'SUV';
-}))
+}));

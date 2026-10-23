@@ -6,20 +6,20 @@
 import type { NotificationTypeA } from './NotificationTypeA'
 import type { NotificationTypeB } from './NotificationTypeB'
 
-export type GetNotificationsStatus200 = (NotificationTypeA | NotificationTypeB)[]
+export type GetNotificationsStatus200 = (NotificationTypeA | NotificationTypeB)[];
 
 export type GetNotificationsOptions = {
   body?: never;
   path?: never;
   query?: never;
   headers?: never;
-}
+};
 
 export type GetNotificationsResponses = {
   '200': GetNotificationsStatus200;
-}
+};
 
 /**
  * @description Union of all possible responses
  */
-export type GetNotificationsResponse = GetNotificationsStatus200
+export type GetNotificationsResponse = GetNotificationsStatus200;

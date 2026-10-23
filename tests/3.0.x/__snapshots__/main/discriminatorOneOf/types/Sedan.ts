@@ -13,4 +13,4 @@ export type Sedan = (Vehicle & {
    * @type integer | undefined
    */
   seats?: number;
-})
+});

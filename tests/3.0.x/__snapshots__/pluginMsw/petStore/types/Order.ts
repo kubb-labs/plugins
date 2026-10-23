@@ -39,4 +39,4 @@ export type Order = {
    */
   status?: OrderStatusEnumKey;
   complete?: boolean;
-}
+};

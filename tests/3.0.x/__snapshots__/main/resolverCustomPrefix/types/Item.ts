@@ -23,4 +23,4 @@ export type CustomItem = {
    * @type integer | undefined
    */
   count?: number;
-}
+};

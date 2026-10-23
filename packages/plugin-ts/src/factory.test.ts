@@ -46,7 +46,7 @@ describe('Code Generation', () => {
     const type = createTypeDeclaration({ syntax: 'type', name: 'Hello', type: string, comments: ['@description description', undefined, '@example example'] })
 
     expect(await format(type)).toBe(['/**', ' * @description description', ' * @example example', ' */', 'type Hello = string', ''].join('\n'))
-    expect(createTypeDeclaration({ syntax: 'type', name: 'Hello', type: string, comments: [] })).toBe('type Hello = string')
+    expect(createTypeDeclaration({ syntax: 'type', name: 'Hello', type: string, comments: [] })).toBe('type Hello = string;')
   })
 
   it('escapes a closing comment marker inside JSDoc', () => {
@@ -128,7 +128,7 @@ describe('Code Generation', () => {
   it('prints an asConst enum with one member per line and its key type', () => {
     expect(createEnumDeclaration({ type: 'asConst', name: 'petStatus', typeName: 'PetStatusKey', enums: [['available', 'available']] })).toEqual([
       "export const petStatus = {\n  available: 'available',\n} as const",
-      'export type PetStatusKey = (typeof petStatus)[keyof typeof petStatus]',
+      'export type PetStatusKey = (typeof petStatus)[keyof typeof petStatus];',
     ])
   })
 })
@@ -195,7 +195,7 @@ describe('createTypeDeclaration', () => {
         comments: [],
         isExportable: true,
       }),
-    ).toBe('export type Pet = {\n  a: string;\n} | null')
+    ).toBe('export type Pet = {\n  a: string;\n} | null;')
   })
 
   it('indents nested object types', () => {

@@ -9,26 +9,26 @@ export type CustomGetItemPath = {
    * @type integer
    */
   id: bigint;
-}
+};
 
 /**
  * @description A simple item
  * @type object
  */
-export type CustomGetItemStatus200 = CustomItem
+export type CustomGetItemStatus200 = CustomItem;
 
 export type CustomGetItemOptions = {
   body?: never;
   path: CustomGetItemPath;
   query?: never;
   headers?: never;
-}
+};
 
 export type CustomGetItemResponses = {
   '200': CustomGetItemStatus200;
-}
+};
 
 /**
  * @description Union of all possible responses
  */
-export type CustomGetItemResponse = CustomGetItemStatus200
+export type CustomGetItemResponse = CustomGetItemStatus200;

@@ -8,4 +8,4 @@ export const notificationTypeBParamsChannelEnum = {
   collaborators: 'collaborators',
 } as const
 
-export type NotificationTypeBParamsChannelEnumKey = (typeof notificationTypeBParamsChannelEnum)[keyof typeof notificationTypeBParamsChannelEnum]
+export type NotificationTypeBParamsChannelEnumKey = (typeof notificationTypeBParamsChannelEnum)[keyof typeof notificationTypeBParamsChannelEnum];

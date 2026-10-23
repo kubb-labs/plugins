@@ -37,9 +37,6 @@ function identifier(name: string): TsNode {
 }
 
 function literal(value: string | number | boolean): TsNode {
-  if (typeof value === 'number' && value < 0) {
-    return { type: 'UnaryExpression', operator: '-', prefix: true, argument: { type: 'Literal', value: -value } }
-  }
   return { type: 'Literal', value }
 }
 
@@ -221,7 +218,7 @@ export function createTypeDeclaration({
         }
       : { type: 'TSTypeAliasDeclaration', declare: false, id: identifier(name), typeParameters: null, typeAnnotation: type }
 
-  return print(appendJSDocToNode({ node: isExportable ? exportNamed(declaration, 'type') : declaration, comments })).replace(/;$/, '')
+  return print(appendJSDocToNode({ node: isExportable ? exportNamed(declaration, 'type') : declaration, comments }))
 }
 
 /**
@@ -229,10 +226,7 @@ export function createTypeDeclaration({
  * which emits the string form.
  */
 function valueToExpression(value: string | number | boolean, asNumber = isNumber(value)): TsNode {
-  if (typeof value === 'boolean' || (asNumber && isNumber(value))) {
-    return literal(value)
-  }
-  return literal(value.toString())
+  return literal(typeof value === 'boolean' || (asNumber && isNumber(value)) ? value : value.toString())
 }
 
 /**
@@ -419,10 +413,8 @@ export function createUrlTemplateType(path: string): TsNode {
   }
 
   const segments = normalized.split(/\{[^}]+\}/)
-  const quasis = segments.map((segment, i) => {
-    const raw = segment.replace(/[`\\]|\$(?=\{)/g, '\\$&')
-    return { type: 'TemplateElement', value: { raw, cooked: segment }, tail: i === segments.length - 1 }
-  })
+  // `yuku-codegen` escapes the cooked text itself when no raw text is given
+  const quasis = segments.map((cooked, i) => ({ type: 'TemplateElement', value: { cooked }, tail: i === segments.length - 1 }))
 
   return { type: 'TSTemplateLiteralType', quasis, types: segments.slice(1).map(() => keywordTypeNodes.string) }
 }

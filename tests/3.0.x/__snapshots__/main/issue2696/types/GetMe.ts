@@ -5,20 +5,20 @@
 
 import type { User } from './User'
 
-export type GetMeStatus200 = User
+export type GetMeStatus200 = User;
 
 export type GetMeOptions = {
   body?: never;
   path?: never;
   query?: never;
   headers?: never;
-}
+};
 
 export type GetMeResponses = {
   '200': GetMeStatus200;
-}
+};
 
 /**
  * @description Union of all possible responses
  */
-export type GetMeResponse = GetMeStatus200
+export type GetMeResponse = GetMeStatus200;

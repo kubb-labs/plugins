@@ -11,4 +11,4 @@ export type NotificationTypeA = {
     channel: NotificationTypeAParamsChannelEnumKey;
     messageA: string;
   };
-}
+};

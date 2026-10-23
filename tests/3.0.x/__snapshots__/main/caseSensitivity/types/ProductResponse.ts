@@ -7,4 +7,4 @@ export type ProductResponse = {
   productId?: string;
   productName?: string;
   stock?: number;
-}
+};

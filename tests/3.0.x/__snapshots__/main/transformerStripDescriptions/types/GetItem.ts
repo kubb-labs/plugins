@@ -12,22 +12,22 @@ export type GetItemPath = {
    * @type integer
    */
   id: bigint;
-}
+};
 
-export type GetItemStatus200 = Item
+export type GetItemStatus200 = Item;
 
 export type GetItemOptions = {
   body?: never;
   path: GetItemPath;
   query?: never;
   headers?: never;
-}
+};
 
 export type GetItemResponses = {
   '200': GetItemStatus200;
-}
+};
 
 /**
  * @description Union of all possible responses
  */
-export type GetItemResponse = GetItemStatus200
+export type GetItemResponse = GetItemStatus200;

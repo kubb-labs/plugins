@@ -17,4 +17,4 @@ export type Item = {
    * @type integer | undefined
    */
   count?: number;
-}
+};

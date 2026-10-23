@@ -6,4 +6,4 @@
 export type OrderRequest = {
   userId?: string;
   productIds?: string[];
-}
+};

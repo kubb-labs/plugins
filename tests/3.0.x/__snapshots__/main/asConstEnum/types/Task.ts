@@ -11,4 +11,4 @@ export type Task = {
   status: StatusKey;
   priority?: PriorityKey;
   title?: string;
-}
+};

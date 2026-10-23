@@ -6,4 +6,4 @@
 export type PetUpdate = {
   name: string;
   description?: string;
-}
+};

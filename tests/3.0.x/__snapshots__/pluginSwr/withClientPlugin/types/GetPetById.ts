@@ -13,24 +13,24 @@ export type GetPetByIdPath = {
    * @type integer
    */
   petId: bigint;
-}
+};
 
-export type GetPetByIdStatus200Json = Pet
+export type GetPetByIdStatus200Json = Pet;
 
-export type GetPetByIdStatus200Xml = Pet
+export type GetPetByIdStatus200Xml = Pet;
 
-export type GetPetByIdStatus200 = (GetPetByIdStatus200Json | GetPetByIdStatus200Xml)
+export type GetPetByIdStatus200 = (GetPetByIdStatus200Json | GetPetByIdStatus200Xml);
 
-export type GetPetByIdStatus400 = unknown
+export type GetPetByIdStatus400 = unknown;
 
-export type GetPetByIdStatus404 = unknown
+export type GetPetByIdStatus404 = unknown;
 
 export type GetPetByIdOptions = {
   body?: never;
   path: GetPetByIdPath;
   query?: never;
   headers?: never;
-}
+};
 
 export type GetPetByIdResponses = {
   '200': ({
@@ -42,9 +42,9 @@ export type GetPetByIdResponses = {
   });
   '400': GetPetByIdStatus400;
   '404': GetPetByIdStatus404;
-}
+};
 
 /**
  * @description Union of all possible responses
  */
-export type GetPetByIdResponse = GetPetByIdStatus200
+export type GetPetByIdResponse = GetPetByIdStatus200;

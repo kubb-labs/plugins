@@ -9,4 +9,4 @@ export const petStatusEnum = {
   sold: 'sold',
 } as const
 
-export type PetStatusEnumKey = (typeof petStatusEnum)[keyof typeof petStatusEnum]
+export type PetStatusEnumKey = (typeof petStatusEnum)[keyof typeof petStatusEnum];

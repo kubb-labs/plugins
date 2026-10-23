@@ -5,4 +5,4 @@
 
 export type PaymentMethod = {
   type: string;
-}
+};

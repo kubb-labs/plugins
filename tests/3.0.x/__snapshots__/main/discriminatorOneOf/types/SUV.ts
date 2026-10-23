@@ -13,4 +13,4 @@ export type SUV = (Vehicle & {
    * @type boolean | undefined
    */
   offroadCapability?: boolean;
-})
+});

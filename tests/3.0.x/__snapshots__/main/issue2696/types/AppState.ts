@@ -9,4 +9,4 @@ import type { User } from './User'
 export type AppState = {
   currentUser?: User;
   employers?: Employer[];
-}
+};
