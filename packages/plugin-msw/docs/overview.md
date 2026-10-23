@@ -13,7 +13,7 @@ Each handler returns the data you pass to it. With `parser: 'faker'`, a handler 
 ## Options worth knowing
 
 - `parser` sets where the response body comes from: `data` (default) or `faker`.
-- `handlers` writes a `handlers.ts` file that exports every handler, ready to spread into `setupServer` or `setupWorker`.
+- `handlers` writes a `handlers.ts` file that exports every handler, ready to spread into `setupServer` or `setupWorker`, plus `createHandlers({ baseURL })` to set the base URL at runtime.
 - `baseURL` is prepended to the path each handler matches.
 
 See [Options](https://kubb.dev/extensions/kubb-labs/plugin-msw/options) for every option and its default.

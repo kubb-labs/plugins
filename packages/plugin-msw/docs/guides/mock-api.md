@@ -83,3 +83,23 @@ export const worker = setupWorker(...handlers)
 ::
 
 Call `server.listen()` in your test setup, or `await worker.start()` in your browser entry.
+
+## Set the base URL at runtime
+
+The `baseURL` option is fixed when Kubb generates the handlers. When the host is only known at runtime, such as from your API client's config, call `createHandlers` with it:
+
+```typescript [test-server.ts]
+import { setupServer } from 'msw/node'
+import { createHandlers } from './src/gen/handlers/handlers'
+
+export const server = setupServer(...createHandlers({ baseURL: getBaseURL() }))
+```
+
+Each handler also takes `{ baseURL }` as its second argument, which overrides the configured one for that handler. Pass `undefined` as the first argument to keep the default response. This lets you mock two services that share a path:
+
+```typescript [test-server.ts]
+export const server = setupServer(
+  listPetsHandler(undefined, { baseURL: 'https://pets.example.com' }),
+  listPetsHandler(undefined, { baseURL: 'https://staging.example.com' }),
+)
+```
