@@ -754,6 +754,29 @@ describe('printerTs', () => {
       `)
     })
 
+    it('with a multi-line description keeps each line in the JSDoc', async () => {
+      const p = printerTs({
+        resolver: resolverTs,
+        optionalType: 'questionToken',
+        arrayType: 'array',
+        enum: inlineLiteralEnum,
+        name: 'Described',
+        description: 'Provides:\n- `user_permissions`, e.g. ["write"]\n@example is text, not a tag',
+      })
+      const result = p.print(ast.factory.createSchema({ type: 'string' }))
+
+      expect(await format(result ?? '')).toMatchInlineSnapshot(`
+        "/**
+         * @description Provides:
+         * - \`user_permissions\`, e.g. ["write"]
+         * \\@example is text, not a tag
+         * @type string
+         */
+        export type Described = string
+        "
+      `)
+    })
+
     it('with keysToOmit wraps in Omit<Type, Keys>', async () => {
       const p = printerTs({
         resolver: resolverTs,

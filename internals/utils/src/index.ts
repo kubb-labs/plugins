@@ -2,4 +2,4 @@ export { camelCase, capitalize, pascalCase, screamingSnakeCase, snakeCase } from
 export { buildJSDoc, buildList, buildObject, lazyGetter, objectKey } from './codegen.ts'
 export { getRelativePath, toFilePath } from './fs.ts'
 export { ensureValidVarName, isValidVarName } from './reserved.ts'
-export { getNestedAccessor, jsStringEscape, stringify, toRegExpString, trimQuotes } from './strings.ts'
+export { getNestedAccessor, jsDocEscape, jsStringEscape, stringify, toRegExpString, trimQuotes } from './strings.ts'

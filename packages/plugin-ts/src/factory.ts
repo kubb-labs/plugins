@@ -194,9 +194,12 @@ export function appendJSDocToNode<TNode extends ts.Node>({ node, comments }: { n
     return node
   }
 
-  const text = filteredComments.reduce((acc = '', comment = '') => {
-    return `${acc}\n * ${comment.replaceAll('*/', '*\\/')}`
-  }, '*')
+  // A description can span lines; each one needs its own ` * ` prefix.
+  const text = filteredComments
+    .flatMap((comment = '') => comment.split(/\r?\n/))
+    .reduce((acc = '', comment = '') => {
+      return `${acc}\n * ${comment.replaceAll('*/', '*\\/')}`
+    }, '*')
 
   // Use the node directly instead of spreading to avoid creating Unknown nodes
   // TypeScript's addSyntheticLeadingComment accepts the node as-is
