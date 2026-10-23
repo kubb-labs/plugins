@@ -53,8 +53,8 @@ export function createCreatePetsStatus201Faker() {
 /**
  * @description unexpected error
  */
-export function createCreatePetsStatusDefaultFaker(data?: Partial<CreatePetsStatusDefault>): CreatePetsStatusDefault {
-  return createPetNotFoundFaker(data) as CreatePetsStatusDefault
+export function createCreatePetsStatusDefaultFaker(_data?: Partial<CreatePetsStatusDefault>): CreatePetsStatusDefault {
+  return createPetNotFoundFaker() as CreatePetsStatusDefault
 }
 
 export function createCreatePetsBodyFaker<TData extends Partial<CreatePetsBody> = object>(data?: TData) {
