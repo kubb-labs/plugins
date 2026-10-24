@@ -8,6 +8,6 @@ export const priority = {
   medium: 'medium',
   high: 'high',
   critical: 'critical',
-} as const
+} as const;
 
 export type PriorityKey = (typeof priority)[keyof typeof priority];

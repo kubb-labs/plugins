@@ -5,6 +5,6 @@
 
 export const variantTypeEnum = {
   uppercase: 'uppercase',
-} as const
+} as const;
 
 export type VariantTypeEnumKey = (typeof variantTypeEnum)[keyof typeof variantTypeEnum];

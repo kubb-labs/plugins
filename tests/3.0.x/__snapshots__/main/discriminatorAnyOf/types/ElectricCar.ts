@@ -6,7 +6,7 @@
 import type { TypeEnumKey } from './TypeEnum'
 import type { Vehicle } from './Vehicle'
 
-export type ElectricCar = (Vehicle & {
+export type ElectricCar = Vehicle & {
   type?: TypeEnumKey;
   /**
    * @description Battery capacity in kWh
@@ -15,4 +15,4 @@ export type ElectricCar = (Vehicle & {
    * @type number | undefined
    */
   batteryCapacity?: number;
-});
+};

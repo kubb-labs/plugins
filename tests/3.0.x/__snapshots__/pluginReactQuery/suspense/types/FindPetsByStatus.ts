@@ -18,7 +18,7 @@ export type FindPetsByStatusStatus200Json = Pet[];
 
 export type FindPetsByStatusStatus200Xml = Pet[];
 
-export type FindPetsByStatusStatus200 = (FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml);
+export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml;
 
 export type FindPetsByStatusStatus400 = unknown;
 
@@ -30,13 +30,13 @@ export type FindPetsByStatusOptions = {
 };
 
 export type FindPetsByStatusResponses = {
-  '200': ({
+  '200': {
     contentType: 'application/json';
     data: FindPetsByStatusStatus200Json;
   } | {
     contentType: 'application/xml';
     data: FindPetsByStatusStatus200Xml;
-  });
+  };
   '400': FindPetsByStatusStatus400;
 };
 

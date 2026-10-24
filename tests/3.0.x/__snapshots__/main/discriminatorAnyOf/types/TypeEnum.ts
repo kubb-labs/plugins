@@ -5,6 +5,6 @@
 
 export const typeEnum = {
   Sedan: 'Sedan',
-} as const
+} as const;
 
 export type TypeEnumKey = (typeof typeEnum)[keyof typeof typeEnum];

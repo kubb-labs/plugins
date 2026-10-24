@@ -6,6 +6,6 @@
 export const paymentMethodMappedTypeEnum = {
   card: 'card',
   bank_transfer: 'bank_transfer',
-} as const
+} as const;
 
 export type PaymentMethodMappedTypeEnumKey = (typeof paymentMethodMappedTypeEnum)[keyof typeof paymentMethodMappedTypeEnum];

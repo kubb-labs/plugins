@@ -15,7 +15,7 @@ export type PlaceOrderBodyXml = Order | undefined;
 
 export type PlaceOrderBodyFormUrlEncoded = Order | undefined;
 
-export type PlaceOrderBody = (PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrderBodyFormUrlEncoded);
+export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrderBodyFormUrlEncoded;
 
 export type PlaceOrderOptions = {
   body: PlaceOrderBody;

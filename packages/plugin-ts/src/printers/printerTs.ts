@@ -217,7 +217,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
             .map((value) => factory.constToTypeNode(value, typeof value as 'string' | 'number' | 'boolean'))
             .filter(isNonNullable)
 
-          return factory.createUnionDeclaration({ withParentheses: true, nodes: literalNodes })
+          return factory.createUnionDeclaration({ nodes: literalNodes })
         }
 
         const resolvedName = enumTypeName({ resolver: this.options.resolver, name: node.name, enumOptions: this.options.enum, isEnum: true })
@@ -239,7 +239,6 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
               if (isStringType(m)) {
                 return factory.createIntersectionDeclaration({
                   nodes: [factory.keywordTypeNodes.string, factory.createTypeLiteralNode([])],
-                  withParentheses: true,
                 })
               }
 
@@ -247,13 +246,13 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
             })
             .filter(isNonNullable)
 
-          return factory.createUnionDeclaration({ withParentheses: true, nodes: memberNodes })
+          return factory.createUnionDeclaration({ nodes: memberNodes })
         }
 
-        return factory.createUnionDeclaration({ withParentheses: true, nodes: factory.buildMemberNodes(members, this.transform) })
+        return factory.createUnionDeclaration({ nodes: factory.buildMemberNodes(members, this.transform) })
       },
       intersection(node) {
-        return factory.createIntersectionDeclaration({ withParentheses: true, nodes: factory.buildMemberNodes(node.members, this.transform) })
+        return factory.createIntersectionDeclaration({ nodes: factory.buildMemberNodes(node.members, this.transform) })
       },
       array(node) {
         const itemNodes = mapSchemaItems(node, (item) => this.transform(item))

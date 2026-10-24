@@ -10,7 +10,7 @@ export type AddPetStatus200Json = Pet;
 
 export type AddPetStatus200Xml = Pet;
 
-export type AddPetStatus200 = (AddPetStatus200Json | AddPetStatus200Xml);
+export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml;
 
 export type AddPetStatus405 = unknown;
 
@@ -32,7 +32,7 @@ export type AddPetBodyXml = Pet;
  */
 export type AddPetBodyFormUrlEncoded = Pet;
 
-export type AddPetBody = (AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded);
+export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded;
 
 export type AddPetOptions = {
   body: AddPetBody;
@@ -42,13 +42,13 @@ export type AddPetOptions = {
 };
 
 export type AddPetResponses = {
-  '200': ({
+  '200': {
     contentType: 'application/json';
     data: AddPetStatus200Json;
   } | {
     contentType: 'application/xml';
     data: AddPetStatus200Xml;
-  });
+  };
   '405': AddPetStatus405;
 };
 

@@ -5,6 +5,6 @@
 
 export const SUVTypeEnum = {
   SUV: 'SUV',
-} as const
+} as const;
 
 export type SUVTypeEnumKey = (typeof SUVTypeEnum)[keyof typeof SUVTypeEnum];

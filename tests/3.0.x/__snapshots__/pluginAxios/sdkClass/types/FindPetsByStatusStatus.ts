@@ -7,6 +7,6 @@ export const findPetsByStatusStatus = {
   available: 'available',
   pending: 'pending',
   sold: 'sold',
-} as const
+} as const;
 
 export type FindPetsByStatusStatusKey = (typeof findPetsByStatusStatus)[keyof typeof findPetsByStatusStatus];

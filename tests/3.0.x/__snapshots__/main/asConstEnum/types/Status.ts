@@ -7,6 +7,6 @@ export const status = {
   active: 'active',
   inactive: 'inactive',
   pending: 'pending',
-} as const
+} as const;
 
 export type StatusKey = (typeof status)[keyof typeof status];

@@ -127,7 +127,7 @@ describe('Code Generation', () => {
 
   it('prints an asConst enum with one member per line and its key type', () => {
     expect(createEnumDeclaration({ type: 'asConst', name: 'petStatus', typeName: 'PetStatusKey', enums: [['available', 'available']] })).toEqual([
-      "export const petStatus = {\n  available: 'available',\n} as const",
+      "export const petStatus = {\n  available: 'available',\n} as const;",
       'export type PetStatusKey = (typeof petStatus)[keyof typeof petStatus];',
     ])
   })

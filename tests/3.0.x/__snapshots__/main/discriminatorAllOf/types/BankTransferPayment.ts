@@ -5,6 +5,6 @@
 
 import type { PaymentMethod } from './PaymentMethod'
 
-export type BankTransferPayment = (PaymentMethod & {
+export type BankTransferPayment = PaymentMethod & {
   iban?: string;
-});
+};
