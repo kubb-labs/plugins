@@ -26,8 +26,8 @@ export type ValidatorHooks = {
    */
   query: string | null
   /**
-   * Schema reference for the `validator.headers` hook, or `null` when params validation is off or the
-   * operation has no header params.
+   * The headers schema wrapped in `toHeadersStandardSchema` for the `validator.headers` hook, or `null`
+   * when params validation is off or the operation has no header params.
    */
   headers: string | null
   /**

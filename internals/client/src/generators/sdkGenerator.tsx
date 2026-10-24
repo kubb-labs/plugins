@@ -3,7 +3,6 @@ import { operationFileEntry } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import { ast, defineGenerator, Diagnostics } from 'kubb/kit'
 import type { Generator } from 'kubb/kit'
-import type { ResolverZod } from '@kubb/plugin-zod'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
@@ -20,7 +19,6 @@ type OperationData = {
   node: ast.OperationNode
   name: string
   types: OperationTypeNames
-  zodResolver: ResolverZod | null
   typeFile: ast.FileNode
   zodFile: ast.FileNode | null
   /**
@@ -75,7 +73,7 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
 
     const validatorHooks = zodResolver ? buildValidatorHooks({ node, validator, zodResolver }) : null
 
-    return { node, name: resolver.name(node.operationId), types, zodResolver, typeFile, zodFile, validatorHooks, security }
+    return { node, name: resolver.name(node.operationId), types, typeFile, zodFile, validatorHooks, security }
   }
 
   return nodes.reduce((acc, operationNode) => {
