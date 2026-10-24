@@ -2,7 +2,7 @@ import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildObject, objectKey, stringify, toRegExpString } from '@internals/utils'
 import { ast, containsCircularRef, Diagnostics } from 'kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
-import { canOverrideSchema, resolveRefTarget } from '../utils.ts'
+import { canOverrideSchema } from '../utils.ts'
 
 /**
  * Partial map of node-type overrides for the Faker printer. Each key is a
@@ -237,7 +237,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // emitted with resolver output and should not be transformed twice.
         const resolvedName = node.ref ? this.options.resolver.name(refName) : refName
 
-        if (!this.options.nestedInObject && canOverrideSchema(resolveRefTarget(node))) {
+        if (!this.options.nestedInObject && canOverrideSchema(ast.resolveRef(node))) {
           return `${resolvedName}(data)`
         }
 

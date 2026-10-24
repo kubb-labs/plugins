@@ -16,7 +16,6 @@ import {
   numberChecksMini,
   patternKeySchemaMini,
   printWithOmit,
-  propertyNamesOf,
   shouldCoerce,
   strictOneOfNode,
   STRING_FORMAT_CALLS,
@@ -231,7 +230,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         const entries = node.properties ?? []
         // zod/mini has no chainable `.catchall()`/`.strict()`, so route through the functional forms.
         const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
-        const propertyNamesNode = propertyNamesOf(node)
+        const propertyNamesNode = node.propertyNames
         const propertyNamesKeySchema = propertyNamesNode ? this.transform(propertyNamesNode) : null
 
         // `additionalProperties: false` still permits patternProperties keys, so only a pattern-free object is strict.
