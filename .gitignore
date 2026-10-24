@@ -71,3 +71,6 @@ packages/ui/static/**
 codecov
 codecov.*
 !codecov.yml
+
+# codecParams.test.ts output, left behind when a run fails before cleanup
+tests/**/.codec-*
