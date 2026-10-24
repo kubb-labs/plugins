@@ -6,7 +6,7 @@ import { ast, Resolver } from 'kubb/kit'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from 'kubb/kit/testing'
 import { describe, expect, test } from 'vitest'
 import { matchFiles, rawSources, testConfig } from '#mocks'
-import { refResolverTs, resolverTs } from '../resolvers/resolverTs.ts'
+import { createRefResolverTs, resolverTs } from '../resolvers/resolverTs.ts'
 import type { PluginTs } from '../types.ts'
 import { typeGenerator } from './typeGenerator.tsx'
 
@@ -132,8 +132,8 @@ describe('typeGenerator — custom resolver', () => {
 })
 
 describe('typeGenerator — operationTypes: false', () => {
-  test('re-exports the referenced type instead of a $ref-backed alias', async () => {
-    const resolver = Resolver.merge(resolverTs, refResolverTs, { name: apiResolver.name })
+  test('references the $ref target instead of declaring a per-operation alias', async () => {
+    const resolver = Resolver.merge(resolverTs, createRefResolverTs(defaultOptions.enum), { name: apiResolver.name })
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver })
     const driver = createMockedPluginDriver({ name: 'operationTypes false' })
@@ -157,17 +157,36 @@ describe('typeGenerator — operationTypes: false', () => {
           description: 'Created',
         }),
         ast.factory.createResponse({ statusCode: '400', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Bad request' }),
+        ast.factory.createResponse({
+          statusCode: '409',
+          schema: ast.factory.createSchema({ type: 'ref', name: 'PetStatus', ref: '#/components/schemas/PetStatus', schema: enumSchema }),
+          description: 'Conflict',
+        }),
       ],
     })
 
-    await renderGeneratorOperation(typeGenerator, node, { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver })
+    await renderGeneratorOperation(typeGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver,
+      meta: { enumNames: ['PetStatus'], circularNames: [] },
+    })
 
     const source = rawSources(driver.fileManager.files).join('\n')
 
     expect(resolver.response.status(node, '201')).toBe('ApiPet')
     expect(resolver.response.body(node)).toBe('ApiNewPet')
-    expect(source).toContain("export type { ApiPet } from './Pet'")
-    expect(source).toContain("export type { ApiNewPet } from './NewPet'")
+    expect(resolver.response.status(node, '409')).toBe('ApiPetStatusKey')
+    expect(resolver.response.ref?.(node, 'ApiPet')).toBe('Pet')
+    expect(resolver.response.ref?.(node, 'ApiCreatePetStatus400')).toBeNull()
+    expect(source).toContain("import type { ApiPet } from './Pet'")
+    expect(source).toContain("import type { ApiNewPet } from './NewPet'")
+    expect(source).toContain("import type { ApiPetStatusKey } from './PetStatus'")
+    expect(source).not.toContain('export type ApiPetStatusKey')
+    expect(source).not.toContain('export type { ApiPet }')
     expect(source).toContain('export type ApiCreatePetStatus400')
     expect(source).not.toContain('ApiCreatePetStatus201')
     expect(source).not.toContain('ApiCreatePetBody')

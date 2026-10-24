@@ -1,4 +1,10 @@
-import { getOperationParameters, getPerContentTypeName, resolveContentTypeVariants, resolveDependencyOperationFile } from '@internals/shared'
+import {
+  getOperationParameters,
+  getPerContentTypeName,
+  resolveContentTypeVariants,
+  resolveDependencyOperationFile,
+  resolveOperationTypePath,
+} from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
 import { ast, defineGenerator } from 'kubb/kit'
 import { buildParams, enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -233,7 +239,13 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         name,
         typeName,
         filePath: meta.file.path,
-        typeFilePath: meta.typeFile.path,
+        typeFilePath: resolveOperationTypePath(node, typeName, {
+          resolver: tsResolver,
+          file: meta.typeFile,
+          root,
+          output: pluginTs.options?.output ?? output,
+          group: pluginTs.options?.group,
+        }),
       })
 
       return (

@@ -81,6 +81,10 @@ export type ResolverTs = Resolver & {
      * `resolver.response.body(node) // → 'CreatePetBody'`
      */
     body(node: ast.OperationNode): string
+    /**
+     * Schema behind a body or status name that `operationTypes: false` resolved to a `$ref` target, so consumers import it from that schema's file.
+     */
+    ref?(node: ast.OperationNode, name: string): string | null
   }
   /**
    * Naming for enum schemas.
@@ -255,7 +259,7 @@ export type Options = OutputOptions & {
   /**
    * Whether a body or response backed by a single `$ref` gets a per-operation alias.
    * - `true` — `AddPetStatus200` aliases `Pet`.
-   * - `false` — the name resolves to `Pet`, re-exported from the operation file, so clients and hooks use `Pet` too.
+   * - `false` — the name resolves to `Pet`, so hooks, mocks, and Cypress requests import `Pet` from its own file.
    * @default true
    */
   operationTypes?: boolean

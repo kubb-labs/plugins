@@ -46,6 +46,35 @@ export function resolveDependencyOperationFile(options: {
   )
 }
 
+type OperationTypeFileOptions = {
+  resolver: Pick<Resolver, 'file'> & { response: { ref?(node: ast.OperationNode, name: string): string | null } }
+  file: { path: string }
+  root: string
+  output: Output
+  group?: Group | null
+}
+
+/**
+ * Path of the file exporting an operation type name: the schema's own file when `pluginTs({ operationTypes: false })` resolved it to a `$ref` target, otherwise `file`.
+ */
+export function resolveOperationTypePath(node: ast.OperationNode, name: string, { resolver, file, root, output, group }: OperationTypeFileOptions): string {
+  const schemaName = resolver.response.ref?.(node, name)
+  return schemaName ? resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path : file.path
+}
+
+export function groupOperationTypeImports(
+  node: ast.OperationNode,
+  names: Iterable<string>,
+  options: OperationTypeFileOptions,
+): Array<{ path: string; names: Array<string> }> {
+  const groups = new Map<string, Array<string>>()
+  for (const name of new Set(names)) {
+    const path = resolveOperationTypePath(node, name, options)
+    groups.set(path, [...(groups.get(path) ?? []), name])
+  }
+  return Array.from(groups, ([path, names]) => ({ path, names }))
+}
+
 export type ContentTypeInfo = {
   contentTypes: string[]
   isMultipleContentTypes: boolean

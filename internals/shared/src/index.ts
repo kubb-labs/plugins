@@ -15,6 +15,7 @@ export {
   getResponseContentTypeInfo,
   getResponseType,
   getSuccessResponses,
+  groupOperationTypeImports,
   isEventStream,
   isSuccessStatusCode,
   operationFileEntry,
@@ -22,6 +23,7 @@ export {
   resolveDependencyOperationFile,
   resolveErrorNames,
   resolveOperationTypeNames,
+  resolveOperationTypePath,
   resolveResponseTypes,
   resolveSuccessNames,
 } from './operation.ts'

@@ -1,4 +1,4 @@
-import { getOperationSuccessResponses, resolveDependencyOperationFile, resolveResponseTypes } from '@internals/shared'
+import { getOperationSuccessResponses, groupOperationTypeImports, resolveDependencyOperationFile, resolveResponseTypes } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -91,12 +91,19 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       >
         <File.Import name={['http', 'HttpResponse']} path="msw/http" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw/http" />
-        <File.Import
-          name={Array.from(new Set([...(hasResponseNameCollision ? [] : [type.responseName]), ...responseTypeNames, ...(requestName ? [requestName] : [])]))}
-          path={type.file.path}
-          root={mock.file.path}
-          isTypeOnly
-        />
+        {groupOperationTypeImports(
+          node,
+          [...(hasResponseNameCollision ? [] : [type.responseName]), ...responseTypeNames, ...(requestName ? [requestName] : [])],
+          {
+            resolver: tsResolver,
+            file: type.file,
+            root,
+            output: pluginTs.options?.output ?? output,
+            group: pluginTs.options?.group,
+          },
+        ).map((imp) => (
+          <File.Import key={imp.path} name={imp.names} path={imp.path} root={mock.file.path} isTypeOnly />
+        ))}
         {faker && hasSuccessSchema && <File.Import name={[faker.name]} root={mock.file.path} path={faker.file.path} />}
 
         {types

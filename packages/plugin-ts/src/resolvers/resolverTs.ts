@@ -1,7 +1,8 @@
 import { createCasedFile, createOperationParamResolver, createOperationResponseResolver } from '@internals/shared'
 import { ensureValidVarName, pascalCase } from '@internals/utils'
 import { ast, createResolver, type ResolverPatch } from 'kubb/kit'
-import type { PluginTs, ResolverTs } from '../types.ts'
+import type { PluginTs, ResolvedOptions, ResolverTs } from '../types.ts'
+import { enumTypeName } from '../utils.ts'
 
 /**
  * Default resolver used by `@kubb/plugin-ts`. Decides the names and file paths
@@ -44,26 +45,33 @@ export const resolverTs = createResolver<PluginTs>({
 
 const responseResolver = createOperationResponseResolver()
 
-// shortcut: a `$ref` to an `asConst` enum resolves to `PetStatus`, not the emitted `PetStatusKey`, so the operation file keeps an alias under that name; skip enum refs here if two operations sharing one enum collide in a barrel.
-function refName(content: Array<ast.ContentNode> | undefined): string | null {
-  const entries = content?.filter((entry) => entry.schema) ?? []
-  if (entries.length !== 1 || entries[0]!.keysToOmit?.length) return null
-  const ref = ast.narrowSchema(entries[0]!.schema, 'ref')
-  return ref?.ref ? ast.resolveRefName(ref) : null
-}
-
 /**
  * Patch for `pluginTs({ operationTypes: false })`: a body or response backed by a single `$ref` resolves to the referenced type (`Pet`).
  */
-export const refResolverTs = {
-  response: {
-    body(node) {
-      const name = refName(node.requestBody?.content)
-      return name ? this.name(name) : responseResolver.body.call(this, node)
+export function createRefResolverTs(enumOptions: ResolvedOptions['enum']) {
+  function refType(resolver: ResolverTs, content: Array<ast.ContentNode> | undefined) {
+    const entries = content?.filter((entry) => entry.schema) ?? []
+    const entry = entries.length === 1 ? entries[0]! : null
+    const schemaName = entry && ast.isBareRef(entry.schema, entry.keysToOmit) ? ast.resolveRefName(entry.schema) : null
+    if (!schemaName) return null
+    const isEnum = ast.narrowSchema(ast.narrowSchema(entry!.schema, 'ref')?.schema ?? undefined, ast.schemaTypes.enum) !== null
+    return { schemaName, typeName: enumTypeName({ resolver, name: schemaName, enumOptions, isEnum }) }
+  }
+
+  return {
+    response: {
+      body(node) {
+        return refType(this, node.requestBody?.content)?.typeName ?? responseResolver.body.call(this, node)
+      },
+      status(node, statusCode) {
+        return (
+          refType(this, node.responses.find((res) => res.statusCode === statusCode)?.content)?.typeName ?? responseResolver.status.call(this, node, statusCode)
+        )
+      },
+      ref(node, name) {
+        const contents = [node.requestBody?.content, ...node.responses.map((res) => res.content)]
+        return contents.map((content) => refType(this, content)).find((ref) => ref?.typeName === name)?.schemaName ?? null
+      },
     },
-    status(node, statusCode) {
-      const name = refName(node.responses.find((res) => res.statusCode === statusCode)?.content)
-      return name ? this.name(name) : responseResolver.status.call(this, node, statusCode)
-    },
-  },
-} satisfies ResolverPatch<ResolverTs>
+  } satisfies ResolverPatch<ResolverTs>
+}
