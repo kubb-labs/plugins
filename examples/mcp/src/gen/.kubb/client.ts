@@ -383,10 +383,6 @@ function serializeHeaders(headers: HeadersInit | undefined): Record<string, stri
   return result
 }
 
-function mergeHeaders(...sources: Array<HeadersInit | undefined>): Record<string, string> {
-  return Object.assign({}, ...sources.map(serializeHeaders))
-}
-
 function collectHeadersCaseInsensitive(...sources: Array<unknown>): Record<string, unknown> {
   const keys = new Map<string, string>()
   const result: Record<string, unknown> = {}
@@ -635,7 +631,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     }),
   ])
 
-  const headers = mergeHeaders(applyHeaderStyles(validatedHeaders as HeadersInit | undefined, requestConfig.styles?.header))
+  const headers = serializeHeaders(applyHeaderStyles(validatedHeaders as HeadersInit | undefined, requestConfig.styles?.header))
   const { request: requestContentTypeOption, response: responseContentType } = resolveContentType(requestConfig.contentType)
   const requestContentType = requestContentTypeOption ?? getHeader(headers, 'content-type')
   if (responseContentType && !hasHeader(headers, 'accept')) {
