@@ -1,4 +1,4 @@
-import { createServer } from '@mswjs/http-middleware'
+import { createServer } from '@msw/serve'
 import { setupServer } from 'msw/node'
 
 import { handlers } from './gen/msw/handlers'
