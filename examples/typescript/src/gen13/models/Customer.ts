@@ -27,5 +27,5 @@ export type Customer = {
    * @type string | undefined
    */
   username?: string
-  address?: Address[]
+  address?: Array<Address>
 }
