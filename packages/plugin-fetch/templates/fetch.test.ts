@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from 'vitest'
 import {
+  type Auth,
   type CallResult,
   createClient as createFetchClient,
   createClientCore,
@@ -927,7 +928,17 @@ describe('resolveAuth', () => {
 
   test('resolves oauth2 as a bearer token', async () => {
     const headers: Record<string, string> = {}
-    await resolveAuth({ security: [{ type: 'oauth2' }], auth: () => 'token-123', headers, query: {} })
+    let receivedAuth: Auth | undefined
+    await resolveAuth({
+      security: [{ type: 'oauth2', scopes: ['read:pets'] }],
+      auth: (auth) => {
+        receivedAuth = auth
+        return 'token-123'
+      },
+      headers,
+      query: {},
+    })
+    expect(receivedAuth?.scopes).toStrictEqual(['read:pets'])
     expect(headers.Authorization).toBe('Bearer token-123')
   })
 

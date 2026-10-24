@@ -16,7 +16,10 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
     request({
       method: 'GET',
       url: '/pet/{petId}/events',
-      security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }],
+      security: [
+        { type: 'apiKey', name: 'api_key', in: 'header' },
+        { type: 'oauth2', scopes: ['read:pets'] },
+      ],
       responseType: 'stream',
       ...config,
       throwOnError: config.throwOnError ?? true,

@@ -15,7 +15,7 @@ export function uploadFile<ThrowOnError extends boolean = true>(
     request({
       method: 'POST',
       url: '/pet/{petId}/uploadImage',
-      security: [{ type: 'oauth2' }],
+      security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       contentType: { request: 'application/octet-stream' },
       ...config,
       throwOnError: config.throwOnError ?? true,

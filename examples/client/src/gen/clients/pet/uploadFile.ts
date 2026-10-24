@@ -19,7 +19,7 @@ export function uploadFile<ThrowOnError extends boolean = true>(
   return request({
     method: 'POST',
     url: '/pet/{petId}/uploadImage',
-    security: [{ type: 'oauth2' }],
+    security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
     ...config,
     throwOnError: config.throwOnError ?? true,
   }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>

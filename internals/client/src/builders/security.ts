@@ -9,6 +9,7 @@ export type Auth = {
   scheme?: 'bearer' | 'basic'
   name?: string
   in?: 'header' | 'query' | 'cookie'
+  scopes?: Array<string>
 }
 
 /**
@@ -36,6 +37,7 @@ function serializeAuth(auth: Auth): string {
   if (auth.scheme) parts.push(`scheme: '${auth.scheme}'`)
   if (auth.name) parts.push(`name: '${auth.name}'`)
   if (auth.in) parts.push(`in: '${auth.in}'`)
+  if (auth.scopes?.length) parts.push(`scopes: [${auth.scopes.map((scope) => `'${scope}'`).join(', ')}]`)
   return `{ ${parts.join(', ')} }`
 }
 
@@ -85,11 +87,11 @@ export function getOperationSecurity({
   const security: Array<Auth> = []
   const seen = new Set<string>()
   for (const requirement of requirements) {
-    for (const schemeName of Object.keys(requirement)) {
+    for (const [schemeName, scopes] of Object.entries(requirement)) {
       if (seen.has(schemeName)) continue
       seen.add(schemeName)
       const auth = resolveSecurityScheme(definitions[schemeName])
-      if (auth) security.push(auth)
+      if (auth) security.push(scopes.length ? { ...auth, scopes } : auth)
     }
   }
 

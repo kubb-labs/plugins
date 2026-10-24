@@ -60,7 +60,7 @@ export type RequestConfig = {
   body?: unknown
   signal?: AbortSignal
   throwOnError?: boolean
-  security?: Array<{ type: string; name?: string; in?: string }>
+  security?: Array<{ type: string; name?: string; in?: string; scopes?: Array<string> }>
   client?: typeof client
 }
 
