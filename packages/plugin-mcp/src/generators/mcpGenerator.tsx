@@ -19,7 +19,6 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     const { resolver, driver, root, config } = ctx
     const { output, client, group } = ctx.options
 
-    // `pluginZod({ inferred: 'codec' })` types the handler like the client it calls; otherwise `plugin-ts` does.
     const types = resolveTypeResolver(driver, resolver.pluginName)
     const tsResolver = types.resolver
 

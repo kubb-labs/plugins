@@ -88,21 +88,17 @@ export function resolveTypeResolver(
   }
 
   if (!pluginZod?.options?.inferred) {
-    throw missingTypeSource(pluginName)
+    throw new Diagnostics.Error({
+      code: Diagnostics.code.missingDependency,
+      severity: 'error',
+      message: `Plugin "${pluginName}" has no source for operation types.`,
+      help: `Add \`pluginTs()\` before "${pluginName}", or add \`pluginZod({ inferred: true })\`.`,
+      location: { kind: 'config' },
+      plugin: pluginName,
+    })
   }
 
   return { resolver: toZodTypeResolver(driver.getResolver(pluginZodName)), output: pluginZod.options.output, group: pluginZod.options.group }
-}
-
-function missingTypeSource(pluginName: string) {
-  return new Diagnostics.Error({
-    code: Diagnostics.code.missingDependency,
-    severity: 'error',
-    message: `Plugin "${pluginName}" has no source for operation types.`,
-    help: `Add \`pluginTs()\` before "${pluginName}", or add \`pluginZod({ inferred: true })\`.`,
-    location: { kind: 'config' },
-    plugin: pluginName,
-  })
 }
 
 /**
