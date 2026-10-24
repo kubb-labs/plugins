@@ -16,3 +16,12 @@ export const updatePetWithFormStatus405Schema = z.unknown()
 export const updatePetWithFormResponseSchema = z.unknown()
 
 export const updatePetWithFormErrorSchema = updatePetWithFormStatus405Schema
+
+export const updatePetWithFormPathSchema = z.object({
+  petId: z.int().describe('ID of pet that needs to be updated'),
+})
+
+export const updatePetWithFormQuerySchema = z.object({
+  name: z.string().optional().describe('Name of pet that needs to be updated'),
+  status: z.string().optional().describe('Status of pet that needs to be updated'),
+})

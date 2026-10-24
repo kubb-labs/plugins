@@ -1,19 +1,27 @@
+import { getOperationParameters } from '@internals/shared'
 import type { ast } from 'kubb/kit'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import type { ValidatorOptions } from '../types.ts'
-import { buildZodErrorParse, resolveRequestValidator, resolveResponseValidator } from './validatorOptions.ts'
+import { buildZodErrorParse, resolveParamsValidator, resolveRequestValidator, resolveResponseValidator } from './validatorOptions.ts'
 
 /**
  * The per-call validator references a generated function wires into its request config. Each hook is
- * the bare schema reference passed to the runtime's `validator.request` / `validator.response` /
- * `validator.error` slot; `client.ts` runs it through `validateStandardSchema`. The response validator
- * only ever sees success (2xx) bodies.
+ * the bare schema reference passed to the runtime's `validator.request` / `validator.path` /
+ * `validator.query` / `validator.headers` / `validator.response` / `validator.error` slot; `client.ts`
+ * runs it through `validateStandardSchema`. The response validator only ever sees success (2xx) bodies.
  */
 export type ValidatorHooks = {
   /**
    * Schema reference for the `validator.request` hook, or `null` when request validation is off.
    */
   request: string | null
+  /**
+   * Schema references for the `validator.path` / `query` / `headers` hooks (`headers` wrapped in
+   * `toHeadersStandardSchema`), or `null` when params validation is off or the group is empty.
+   */
+  path: string | null
+  query: string | null
+  headers: string | null
   /**
    * Schema reference for the `validator.response` hook, or `null` when response validation is off.
    */
@@ -31,8 +39,8 @@ export type ValidatorHooks = {
 }
 
 /**
- * Builds the validator-hook references for one operation. Request validation runs before the send;
- * response validation runs on the success body only. Returns `null` references when the matching
+ * Builds the validator-hook references for one operation. Request body and params validation run before the send.
+ * Response validation runs on the success body only. Returns `null` references when the matching
  * direction is disabled or the schema is absent.
  */
 export function buildValidatorHooks({
@@ -52,8 +60,25 @@ export function buildValidatorHooks({
   const error = parsesResponse ? buildZodErrorParse(node, zodResolver) : null
   const request = zodResolver && resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.response.body(node) || null : null
 
-  // Order is output: the generated file imports the response schema, then the error schema, then the request body schema.
-  const importedZodNames = [response, error, request].filter((name): name is string => Boolean(name))
+  const paramGroups = getOperationParameters(node)
+  const resolveParamsName = (kind: 'path' | 'query' | 'headers', params: Array<ast.ParameterNode>): string | null =>
+    zodResolver && resolveParamsValidator(validator) === 'zod' && params.length > 0 ? zodResolver.param[kind](node, params[0]!) : null
+  const path = resolveParamsName('path', paramGroups.path)
+  const query = resolveParamsName('query', paramGroups.query)
+  const headers = resolveParamsName('headers', paramGroups.header)
 
-  return { request, response, error, importedZodNames }
+  // Order is output: the generated file imports the response schema, then the error schema, then the request body and params schemas.
+  const importedZodNames = [response, error, request, path, query, headers].filter((name): name is string => Boolean(name))
+
+  const headersValidator = headers ? `toHeadersStandardSchema(${headers}, ${headers}.shape)` : null
+
+  return { request, path, query, headers: headersValidator, response, error, importedZodNames }
+}
+
+/**
+ * Prints the `validator: { … }` entry of a call config from the hooks named in `keys`, or `null` when none is set.
+ */
+export function buildValidatorLiteral(hooks: ValidatorHooks | null, keys: ReadonlyArray<keyof Omit<ValidatorHooks, 'importedZodNames'>>): string | null {
+  const entries = keys.flatMap((key) => (hooks?.[key] ? [`${key}: ${hooks[key]}`] : []))
+  return entries.length ? `validator: { ${entries.join(', ')} }` : null
 }

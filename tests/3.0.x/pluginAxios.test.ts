@@ -101,6 +101,22 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
+  // ─── zodParams (codec params and bodies encoded, typed with inferred: 'direction') ──
+  {
+    name: 'zodParams',
+    config: {
+      root: __dirname,
+      input: '../../schemas/3.0.x/codecParams.yaml',
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false, dateType: 'date', enums: 'root' }),
+      parsers: [parserTs()],
+      plugins: [
+        pluginZod({ inferred: 'direction', output: { path: './zod', barrel: false, mode: 'directory' } }),
+        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' }, validator: { request: 'zod', params: 'zod', response: 'zod' } }),
+      ],
+    },
+  },
+
   // ─── paramsCasing (query, path, and header names match the spec exactly) ──
   {
     name: 'paramsCasing',

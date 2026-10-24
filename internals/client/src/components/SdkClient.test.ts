@@ -18,7 +18,7 @@ describe('buildSdkMethod', () => {
       },
       responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'ok' })],
     })
-    const method = buildSdkMethod({ node: formNode, name: 'postFoo', types: resolverTs, validator: undefined, returnType: 'full', throwOnErrorDefault: true })
+    const method = buildSdkMethod({ node: formNode, name: 'postFoo', types: resolverTs, validatorHooks: null, returnType: 'full', throwOnErrorDefault: true })
 
     expect(method).toContain("url: '/foo', contentType: { request: 'application/x-www-form-urlencoded' }, ...config")
   })

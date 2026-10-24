@@ -21,6 +21,7 @@
     "@kubb/core": "catalog:",
     "@kubb/parser-ts": "catalog:",
     "@kubb/plugin-axios": "workspace:*",
+    "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-cypress": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-fetch": "workspace:*",
@@ -32,7 +33,8 @@
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-vue-query": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.6.0",

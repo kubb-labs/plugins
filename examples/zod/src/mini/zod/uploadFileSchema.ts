@@ -15,3 +15,11 @@ export const uploadFileStatus200Schema = apiResponseSchema
 export const uploadFileResponseSchema = uploadFileStatus200Schema
 
 export const uploadFileBodySchema = z.optional(z.instanceof(File))
+
+export const uploadFilePathSchema = z.object({
+  petId: z.coerce.bigint(),
+})
+
+export const uploadFileQuerySchema = z.object({
+  additionalMetadata: z.optional(z.string()),
+})

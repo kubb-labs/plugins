@@ -11,3 +11,7 @@ export const deletePetPathPetIdSchema = z.string()
 export const deletePetStatus204Schema = z.void()
 
 export const deletePetResponseSchema = deletePetStatus204Schema
+
+export const deletePetPathSchema = z.object({
+  petId: z.string(),
+})

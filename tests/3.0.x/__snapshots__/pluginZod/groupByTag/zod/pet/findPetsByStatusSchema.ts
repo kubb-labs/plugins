@@ -20,3 +20,7 @@ export const findPetsByStatusStatus400Schema = z.unknown()
 export const findPetsByStatusResponseSchema = findPetsByStatusStatus200Schema
 
 export const findPetsByStatusErrorSchema = findPetsByStatusStatus400Schema
+
+export const findPetsByStatusQuerySchema = z.object({
+  status: findPetsByStatusStatusSchema.optional().default('available').describe('Status values that need to be considered for filter'),
+})

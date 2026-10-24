@@ -10,7 +10,7 @@ Pass these options to `pluginFetch()`. Shared options link to [Shared plugin opt
 | [`group`](https://kubb.dev/docs/5.x/reference/plugin-options#group)       | Split output by tag or path: `type`, `name`.                           | None                                             |
 | [`baseURL`](#baseurl)                                                     | Base URL prepended to every request.                                   | None                                             |
 | [`throwOnErrorDefault`](#throwonerrordefault)                             | Default error behavior and return type for generated operations.       | `true`                                           |
-| [`validator`](#validator)                                                 | Validate request and response bodies with Zod.                         | `false`                                          |
+| [`validator`](#validator)                                                 | Validate request bodies, params, and responses with Zod.               | `false`                                          |
 | [`sdk`](#sdk)                                                             | Generate a class-based SDK instead of functions.                       | None                                             |
 | [`returnType`](#returntype)                                               | Shape of the value a generated call resolves to.                       | `'full'`                                         |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                       | None                                             |
@@ -48,13 +48,13 @@ if (result.status !== 200) console.error(result.status, result.error)
 
 ### validator
 
-Validates request and response bodies with schemas from `@kubb/plugin-zod`, so add `pluginZod()` too. An invalid body makes the generated function throw a `ParseError`.
+Validates request bodies, path, query, and header params, and response bodies with schemas from `@kubb/plugin-zod`, so add `pluginZod()` too. An invalid value makes the generated function throw a `ParseError`.
 
-|          |                                                           |
-| -------- | --------------------------------------------------------- |
-| Type     | `false \| 'zod' \| { request?: 'zod'; response?: 'zod' }` |
-| Required | `false`                                                   |
-| Default  | `false`                                                   |
+|          |                                                                           |
+| -------- | ------------------------------------------------------------------------- |
+| Type     | `false \| 'zod' \| { request?: 'zod'; params?: 'zod'; response?: 'zod' }` |
+| Required | `false`                                                                   |
+| Default  | `false`                                                                   |
 
 ::field-group
 
@@ -66,8 +66,8 @@ Default value. Does no validation and returns the response cast to the generated
 Validates the success response body, and the error body when a non-2xx call does not throw.
 :::
 
-:::field{name="{ request?: 'zod', response?: 'zod' }"}
-Opts in per direction. `request` validates the request body before the call, and `response` validates the response body after it.
+:::field{name="{ request?: 'zod', params?: 'zod', response?: 'zod' }"}
+Opts in per direction. `request` validates the request body and `params` validates the path, query, and header params before the call. `response` validates the response body after it.
 :::
 
 ::
@@ -84,10 +84,16 @@ export default defineConfig({
   plugins: [
     pluginTs(),
     pluginZod(),
-    pluginFetch({ validator: { request: 'zod', response: 'zod' } }),
+    pluginFetch({ validator: { request: 'zod', params: 'zod', response: 'zod' } }),
   ],
 })
 ```
+
+`params` runs each group through its generated `<operation>PathSchema`, `QuerySchema`, or `HeadersSchema`, and sends what the schema returns. A codec param such as a `Date` goes out in its wire form, and an invalid param fails before the request. Values added by `auth` are not validated.
+
+Only the params your OpenAPI spec declares are sent. Path and query keys the spec does not declare are stripped, so a key such as an undocumented filter or a cache-buster never reaches the URL. Declare it in the spec, or leave `params` off. Headers are the exception: client-level `headers` (such as `Authorization` or tracing headers) are merged with the call's headers before validation, so headers the spec does not declare pass through unchanged, and declared header params match in any casing.
+
+Pair `request` and `params` with `pluginZod({ inferred: 'direction' })` when the schemas use codecs, so the request types accept the domain values (such as a `Date`) that the validators encode. See [`inferred`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#inferred).
 
 ### sdk
 

@@ -53,11 +53,11 @@ The setting applies to the whole plugin, so you cannot set it in `override`.
 
 Passes Zod schemas from `@kubb/plugin-zod` to your client on `config.validator`. The plugin does not run the schemas. Your client reads `config.validator` and runs them. See [validate requests and responses](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/validate-requests-and-responses).
 
-|          |                                                           |
-| -------- | --------------------------------------------------------- |
-| Type     | `false \| 'zod' \| { request?: 'zod'; response?: 'zod' }` |
-| Required | `false`                                                   |
-| Default  | `false`                                                   |
+|          |                                                                           |
+| -------- | ------------------------------------------------------------------------- |
+| Type     | `false \| 'zod' \| { request?: 'zod'; params?: 'zod'; response?: 'zod' }` |
+| Required | `false`                                                                   |
+| Default  | `false`                                                                   |
 
 ::field-group
 
@@ -69,11 +69,13 @@ Default value. Passes nothing.
 Passes the response and error schemas.
 :::
 
-:::field{name="{ request?: 'zod', response?: 'zod' }"}
-Opts in per direction.
+:::field{name="{ request?: 'zod', params?: 'zod', response?: 'zod' }"}
+Opts in per direction. `request` passes the request body schema, `params` the path, query, and header params schemas, and `response` the response and error schemas.
 :::
 
 ::
 
 > [!IMPORTANT]
 > Add `pluginZod()` to the plugins list when `validator` is set. Generation stops with an error if it is missing.
+
+With `params: 'zod'`, generated calls also import `toHeadersStandardSchema` from your [`importPath`](#importpath) module, so that module must export it. See [validate requests and responses](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/validate-requests-and-responses).

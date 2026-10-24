@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from 'vitest'
 import {
   type Auth,
   type CallResult,
+  type ClientConfig,
   createClient as createFetchClient,
   createClientCore,
   createInterceptorStack,
@@ -683,7 +684,7 @@ describe('createClientCore', () => {
     const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError })
     const result = (await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })) as CallResult<string, string>
     expect(result.data).toStrictEqual({ id: 1 })
-    expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'response', method: 'GET', status: 200, value: { id: 1 } })
+    expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'response', source: 'body', method: 'GET', status: 200, value: { id: 1 } })
   })
 
   test('rethrows when onValidationError returns nothing', async () => {
@@ -699,7 +700,7 @@ describe('createClientCore', () => {
     const onValidationError = vi.fn(() => ({ value: { name: 'odie' } }))
     const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError })
     await client({ method: 'POST', url: '/pet', body: { name: 1 }, validator: { request: toFailingSchema() } })
-    expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'request', method: 'POST', url: '/pet', value: { name: 1 } })
+    expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'request', source: 'body', method: 'POST', url: '/pet', value: { name: 1 } })
   })
 
   test('prefers the per-call onValidationError over the client one', async () => {
@@ -751,11 +752,182 @@ describe('createClientCore', () => {
     expect(client.getConfig().baseURL).toBe('https://example.com')
   })
 
+  test('setConfig keeps the entries of a Headers instance', () => {
+    const { client } = createClient()
+    client.setConfig({ headers: new Headers({ Authorization: 'Bearer t' }) })
+    expect(client.getConfig().headers).toStrictEqual({ authorization: 'Bearer t' })
+  })
+
   test('createClient produces an instance with isolated interceptors', () => {
     const { client } = createClient()
     const child = client.createClient()
     child.interceptors.request.use((request) => request)
     expect(child).not.toBe(client)
+  })
+})
+
+describe('header merging', () => {
+  // Client defaults and call headers are merged into one set for every request, with or without a headers
+  // validator. Header names are case-insensitive, so each header is sent once.
+  async function send(clientHeaders: unknown, request: Record<string, unknown>) {
+    const { transport, calls } = fakeTransport()
+    const client = createClientCore<string, string>({ defaultTransport: transport, headers: clientHeaders as ClientConfig['headers'] })
+    await client({ method: 'POST', url: '/pets', ...request })
+    return calls[0]?.headers as Record<string, string>
+  }
+
+  test('sends client and call headers with distinct names, without a headers validator', async () => {
+    const headers = await send({ 'X-Client': 'a' }, { headers: { 'X-Call': 'b' } })
+    expect(headers).toMatchObject({ 'X-Client': 'a', 'X-Call': 'b' })
+  })
+
+  test('sends one header per name, the call winning over the client, without a headers validator', async () => {
+    const headers = await send({ authorization: 'Bearer client' }, { headers: { Authorization: 'Bearer call' } })
+    expect(Object.keys(headers).filter((key) => key.toLowerCase() === 'authorization')).toStrictEqual(['Authorization'])
+    expect(headers.Authorization).toBe('Bearer call')
+  })
+
+  test('accepts array-form headers on the client and the call', async () => {
+    const headers = await send([['X-Client', 'a']], { headers: [['X-Call', 'b']] })
+    expect(headers).toMatchObject({ 'X-Client': 'a', 'X-Call': 'b' })
+  })
+
+  test('accepts Headers instances on the client and the call', async () => {
+    const headers = await send(new Headers({ 'X-Client': 'a' }), { headers: new Headers({ 'X-Call': 'b' }) })
+    expect(headers).toMatchObject({ 'x-client': 'a', 'x-call': 'b' })
+  })
+
+  test.each([undefined, null])('keeps the client value when the call sets the header to %s', async (value) => {
+    const headers = await send({ 'X-Tenant': 'client' }, { headers: { 'X-Tenant': value } })
+    expect(headers['X-Tenant']).toBe('client')
+  })
+
+  test('does not duplicate Content-Type when the client sets it in another casing', async () => {
+    const headers = await send({ 'content-type': 'application/vnd.api+json' }, { body: { name: 'odie' } })
+    expect(Object.keys(headers).filter((key) => key.toLowerCase() === 'content-type')).toStrictEqual(['content-type'])
+    expect(headers['content-type']).toBe('application/vnd.api+json')
+  })
+})
+
+describe('params validators', () => {
+  // Stands in for a generated encode schema: a `Date` goes in, its wire string comes out, and keys it
+  // does not declare are dropped, the way a `z.object` strips them.
+  const encodeDates = (keys: Array<string>, format: (date: Date) => string = (date) => date.toISOString()) =>
+    toSchema((value) => Object.fromEntries(keys.filter((key) => key in (value as object)).map((key) => [key, format((value as Record<string, Date>)[key]!)])))
+  // The same, keeping the keys it does not declare, as the generated `toHeadersStandardSchema(...)` validator does.
+  const encodeDatesLoose = (keys: Array<string>) =>
+    toSchema((value) => ({
+      ...(value as object),
+      ...Object.fromEntries(keys.filter((key) => key in (value as object)).map((key) => [key, (value as Record<string, Date>)[key]!.toISOString()])),
+    }))
+
+  test('encodes the path, query, and headers before they are serialized', async () => {
+    const { client, calls } = createClient()
+    await client({
+      method: 'PUT',
+      url: '/events/{day}',
+      path: { day: new Date('2026-10-01T00:00:00.000Z') },
+      query: { after: new Date('2026-09-01T09:00:00.000Z') },
+      headers: { 'X-Since': new Date('2026-08-01T00:00:00.000Z') },
+      validator: {
+        path: encodeDates(['day'], (date) => date.toISOString().slice(0, 10)),
+        query: encodeDates(['after']),
+        headers: encodeDates(['X-Since']),
+      },
+    })
+    expect(calls[0]?.url).toBe('/events/2026-10-01?after=2026-09-01T09%3A00%3A00.000Z')
+    expect(calls[0]?.headers['X-Since']).toBe('2026-08-01T00:00:00.000Z')
+  })
+
+  test('sends exactly what the query validator returns, so a key the schema drops stays dropped', async () => {
+    const { client, calls } = createClient()
+    await client({
+      method: 'GET',
+      url: '/events',
+      query: { after: new Date('2026-09-01T00:00:00.000Z'), page: 2 },
+      validator: { query: encodeDates(['after']) },
+    })
+    expect(calls[0]?.url).toBe('/events?after=2026-09-01T00%3A00%3A00.000Z')
+  })
+
+  test('sends the undeclared headers a headers validator keeps', async () => {
+    const { client, calls } = createClient()
+    await client({
+      method: 'GET',
+      url: '/events',
+      headers: { 'X-Since': new Date('2026-08-01T00:00:00.000Z'), 'X-Trace': 'abc' },
+      validator: { headers: encodeDatesLoose(['X-Since']) },
+    })
+    expect(calls[0]?.headers).toMatchObject({ 'X-Since': '2026-08-01T00:00:00.000Z', 'X-Trace': 'abc' })
+  })
+
+  test('validates the client headers together with the call headers', async () => {
+    const { transport, calls } = fakeTransport()
+    const client = createClientCore<string, string>({ defaultTransport: transport, headers: { 'X-Tenant': 'acme', Authorization: 'Bearer token' } })
+    const headers = vi.fn((value: unknown) => value)
+    await client({ method: 'GET', url: '/events', headers: { 'X-Trace': 'abc' }, validator: { headers: toSchema(headers) } })
+    expect(headers).toHaveBeenCalledWith({ 'X-Tenant': 'acme', Authorization: 'Bearer token', 'X-Trace': 'abc' })
+    expect(calls[0]?.headers).toMatchObject({ 'X-Tenant': 'acme', Authorization: 'Bearer token', 'X-Trace': 'abc' })
+  })
+
+  test('collapses every spelling of a header into one key, the call winning', async () => {
+    const { transport, calls } = fakeTransport()
+    const client = createClientCore<string, string>({ defaultTransport: transport, headers: { 'x-tenant': 'client' } })
+    const headers = vi.fn((value: unknown) => value)
+    await client({
+      method: 'GET',
+      url: '/events',
+      headers: { 'X-TENANT': 'call', 'x-trace': 'abc' },
+      validator: { headers: toSchema(headers) },
+    })
+    expect(headers).toHaveBeenCalledWith({ 'X-TENANT': 'call', 'x-trace': 'abc' })
+  })
+
+  test('sends the onValidationError substitute as is, without restoring the rejected params', async () => {
+    const { transport, calls } = fakeTransport()
+    const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError: () => ({ value: {} }) })
+    await client({ method: 'GET', url: '/pets', query: { limit: 'invalid' }, validator: { query: toFailingSchema() } })
+    expect(calls[0]?.url).toBe('/pets')
+  })
+
+  test('validates an absent group as an empty object, so a missing required param still fails', async () => {
+    const { client, calls } = createClient()
+    const path = vi.fn((value: unknown) => value)
+    await expect(client({ method: 'GET', url: '/events/{day}', validator: { path: toFailingSchema() } })).rejects.toMatchObject({ name: 'ParseError' })
+    await client({ method: 'GET', url: '/events', validator: { query: toSchema(path) } })
+    expect(path).toHaveBeenCalledWith({})
+    expect(calls).toHaveLength(1)
+  })
+
+  test('adds apiKey query auth after the query is validated, so it never reaches the schema', async () => {
+    const { client, calls } = createClient()
+    const query = vi.fn((value: unknown) => value)
+    await client({
+      method: 'GET',
+      url: '/events',
+      query: { page: 1 },
+      security: [{ type: 'apiKey', in: 'query', name: 'api_key' }],
+      auth: 'secret',
+      validator: { query: toSchema(query) },
+    })
+    expect(query).toHaveBeenCalledWith({ page: 1 })
+    expect(calls[0]?.url).toBe('/events?page=1&api_key=secret')
+  })
+
+  test('reports a failing param with the request direction and its source', async () => {
+    const { transport } = fakeTransport()
+    const onValidationError = vi.fn(() => ({ value: { page: 1 } }))
+    const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError })
+    await client({ method: 'GET', url: '/events', query: { page: 'x' }, validator: { query: toFailingSchema() } })
+    expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'request', source: 'query', method: 'GET', url: '/events', value: { page: 'x' } })
+  })
+
+  test('getUrl serializes the params as passed, without running the validators', () => {
+    const { client } = createClient()
+    const path = vi.fn((value: unknown) => value)
+    // @ts-expect-error getUrl takes no validator: it serializes the params as passed
+    expect(client.getUrl({ url: '/events/{day}', path: { day: '2026-10-01' }, validator: { path: toSchema(path) } })).toBe('/events/2026-10-01')
+    expect(path).not.toHaveBeenCalled()
   })
 })
 

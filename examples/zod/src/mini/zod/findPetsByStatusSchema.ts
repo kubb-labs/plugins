@@ -19,3 +19,7 @@ export const findPetsByStatusStatus400Schema = z.unknown()
 export const findPetsByStatusResponseSchema = findPetsByStatusStatus200Schema
 
 export const findPetsByStatusErrorSchema = findPetsByStatusStatus400Schema
+
+export const findPetsByStatusQuerySchema = z.object({
+  status: z._default(z.optional(z.enum(['available', 'pending', 'sold'])), 'available'),
+})
