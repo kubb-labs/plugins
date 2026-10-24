@@ -473,18 +473,23 @@ export async function resolveAuth(params: {
     const token = typeof auth === 'function' ? await auth(scheme) : auth
     if (token === undefined) continue
 
-    if (scheme.type === 'apiKey') {
-      const name = scheme.name ?? 'Authorization'
-      if (scheme.in === 'query') {
-        if (query[name] === undefined) query[name] = token
-      } else if (scheme.in === 'cookie') {
-        headers['Cookie'] = [headers['Cookie'], `${name}=${token}`].filter(Boolean).join('; ')
-      } else if (getHeader(headers, name) === undefined) {
-        headers[name] = token
+    if (scheme.type !== 'apiKey') {
+      if (getHeader(headers, 'Authorization') === undefined) {
+        headers['Authorization'] = scheme.scheme === 'basic' ? `Basic ${btoa(token)}` : `Bearer ${token}`
       }
-    } else if (getHeader(headers, 'Authorization') === undefined) {
-      headers['Authorization'] = scheme.scheme === 'basic' ? `Basic ${btoa(token)}` : `Bearer ${token}`
+      return
     }
+
+    const name = scheme.name ?? 'Authorization'
+    if (scheme.in === 'query') {
+      if (query[name] === undefined) query[name] = token
+      return
+    }
+    if (scheme.in === 'cookie') {
+      headers['Cookie'] = [headers['Cookie'], `${name}=${token}`].filter(Boolean).join('; ')
+      return
+    }
+    if (getHeader(headers, name) === undefined) headers[name] = token
     return
   }
 }
@@ -588,15 +593,15 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   const body = contentCodec?.serialize
     ? contentCodec.serialize(validatedBody, requestContentType)
     : bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.styles?.body })
-  // A FormData body must keep its Content-Type unset so the runtime appends the multipart boundary.
+  if (requestContentTypeOption) headers['Content-Type'] = requestContentTypeOption
+  if (usesDefaultBodySerializer && isDefaultJsonBody(validatedBody) && getHeader(headers, 'content-type') === undefined) {
+    headers['Content-Type'] = 'application/json'
+  }
+  // The transport must set the multipart boundary, even when a content type was explicitly provided.
   if (body instanceof FormData) {
     for (const key of Object.keys(headers)) {
       if (key.toLowerCase() === 'content-type') delete headers[key]
     }
-  } else if (requestContentTypeOption) {
-    headers['Content-Type'] = requestContentTypeOption
-  } else if (usesDefaultBodySerializer && isDefaultJsonBody(validatedBody) && getHeader(headers, 'content-type') === undefined) {
-    headers['Content-Type'] = 'application/json'
   }
 
   const url = serializeUrl({
@@ -812,10 +817,20 @@ function parseEvent<TData>(raw: string): ServerSentEvent<TData> | undefined {
     const index = line.indexOf(':')
     const field = index === -1 ? line : line.slice(0, index)
     const value = index === -1 ? '' : line.slice(index + 1).replace(/^ /, '')
-    if (field === 'data') data.push(value)
-    else if (field === 'event') event.event = value
-    else if (field === 'id') event.id = value
-    else if (field === 'retry' && Number.isFinite(Number(value))) event.retry = Number(value)
+    switch (field) {
+      case 'data':
+        data.push(value)
+        break
+      case 'event':
+        event.event = value
+        break
+      case 'id':
+        event.id = value
+        break
+      case 'retry':
+        if (Number.isFinite(Number(value))) event.retry = Number(value)
+        break
+    }
   }
 
   if (!seen) return undefined

@@ -474,6 +474,22 @@ describe('createClientCore', () => {
     expect(calls[0]?.headers['Content-Type']).toBeUndefined()
   })
 
+  test('removes every content-type spelling when a custom serializer returns FormData', async () => {
+    const { transport, calls } = fakeTransport()
+    const client = createClientCore<string, string>({ defaultTransport: transport, headers: { 'cOnTeNt-TyPe': 'application/xml' } })
+    const formData = new FormData()
+    formData.append('field', 'x')
+    await client({
+      method: 'POST',
+      url: '/pet',
+      body: { field: 'x' },
+      contentType: 'application/json',
+      serializer: { body: () => formData },
+    })
+    expect(calls[0]?.body).toBe(formData)
+    expect(calls[0]?.headers).toStrictEqual({})
+  })
+
   test('omits Content-Type when a pre-built FormData body is sent', async () => {
     const { client, calls } = createClient()
     const formData = new FormData()
@@ -1298,6 +1314,11 @@ describe('parseEventStream', () => {
     for await (const event of stream) events.push(event)
     return events
   }
+
+  test('keeps the last valid retry and ignores unknown event fields', async () => {
+    const events = await collect(parseEventStream(streamOf(['retry: 1000\nretry: 2000\nretry: invalid\nunknown: ignored\ndata: ok\n\n'])))
+    expect(events).toStrictEqual([{ data: 'ok', retry: 2000 }])
+  })
 
   test('parses JSON data events split on a blank line', async () => {
     const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n', 'data: {"n":2}\n\n'])))
