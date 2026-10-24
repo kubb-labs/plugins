@@ -1,5 +1,22 @@
 # @kubb/plugin-msw
 
+## 6.0.0
+
+### Major Changes
+
+- [#1212](https://github.com/kubb-labs/plugins/pull/1212) [`7a22ed3`](https://github.com/kubb-labs/plugins/commit/7a22ed38abed223d9473ed43295b91db83e83422) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Generate handlers for MSW 3. The plugin now needs `msw@^3.0.0`.
+  
+  - Imports `http`, `HttpResponse`, and `HttpResponseResolver` from `msw/http` instead of `msw`. MSW 3 deprecates these root exports and plans to remove them in its next major, and MSW 2 has no `msw/http` entry.
+  - Returns `HttpResponse` instead of the plain Fetch `Response`, so mocks use the MSW response class.
+  
+  To upgrade, install MSW 3 and regenerate your handlers:
+  
+  ```sh
+  npm install msw@^3.0.0
+  ```
+  
+  MSW 3 is ESM-only and requires Node.js 22 or later. Code you wrote by hand that imports from `msw` needs the same move to subpaths, see the [MSW 2.x to 3.x migration guide](https://mswjs.io/docs/migrations/2.x-to-3.x).
+
 ## 5.3.0
 
 ### Minor Changes
