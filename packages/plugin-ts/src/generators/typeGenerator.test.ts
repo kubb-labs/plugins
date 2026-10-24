@@ -604,6 +604,54 @@ describe('typeGenerator — Operation — output.mode', () => {
     ],
   })
 
+  test('links parameter and response types to the spec entry they come from', async () => {
+    const operation = ast.factory.createOperation({
+      operationId: 'getPet',
+      method: 'GET',
+      path: '/pets/{id}',
+      pointer: '#/paths/~1pets~1{id}/get',
+      parameters: [
+        ast.factory.createParameter({
+          name: 'id',
+          in: 'path',
+          required: true,
+          pointer: '#/paths/~1pets~1{id}/get/parameters/0',
+          schema: ast.factory.createSchema({ type: 'string', pointer: '#/paths/~1pets~1{id}/get/parameters/0/schema' }),
+        }),
+      ],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          pointer: '#/paths/~1pets~1{id}/get/responses/200',
+          content: [
+            ast.factory.createContent({
+              contentType: 'application/json',
+              schema: ast.factory.createSchema({ type: 'string', pointer: '#/paths/~1pets~1{id}/get/responses/200/content/application~1json/schema' }),
+            }),
+          ],
+        }),
+      ],
+    })
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: defaultOptions, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'getPet', config: testConfig })
+
+    await renderGeneratorOperation(typeGenerator, operation, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverTs,
+    })
+
+    const pointers = Object.fromEntries(driver.fileManager.files.flatMap((file) => file.sources.map((source) => [source.name, source.pointer])))
+    // Types built from the whole operation, such as `GetPetResponses`, get the operation's pointer from the build.
+    expect(pointers).toMatchObject({
+      GetPetPath: '#/paths/~1pets~1{id}/get/parameters',
+      GetPetStatus200: '#/paths/~1pets~1{id}/get/responses/200',
+    })
+  })
+
   test("mode 'file' writes the operation into the single output file", async () => {
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions, output: { path: 'types.ts', mode: 'file' } }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })

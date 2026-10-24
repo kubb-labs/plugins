@@ -116,11 +116,13 @@ export const typeGenerator = defineGenerator<PluginTs>({
     function buildContentTypeVariants(
       entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
       baseName: string,
+      pointer: string | undefined,
       decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
     ) {
       const variants = resolveContentTypeVariants(entries, baseName)
       const unionSchema = ast.factory.createSchema({
         type: 'union',
+        pointer,
         members: variants.map((variant) => ast.factory.createSchema({ type: 'ref', name: variant.name })),
       })
       return (
@@ -155,6 +157,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         return renderSchemaType({
           schema: {
             ...entry.schema,
+            pointer: node.requestBody!.pointer ?? entry.schema.pointer,
             description: node.requestBody!.description ?? entry.schema.description,
           },
           name: resolver.response.body(node),
@@ -162,7 +165,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         })
       }
       // Multiple content types — generate individual types + union alias
-      return buildContentTypeVariants(requestBodyContent, resolver.response.body(node), (schema) => ({
+      return buildContentTypeVariants(requestBodyContent, resolver.response.body(node), node.requestBody!.pointer, (schema) => ({
         ...schema,
         description: node.requestBody!.description ?? schema.description,
       }))
@@ -175,11 +178,11 @@ export const typeGenerator = defineGenerator<PluginTs>({
       // Multiple content types for a single status code — generate per-variant types + a plain union.
       // The `<Name>Responses` record discriminates them by content type (see buildResponses).
       if (variants.length > 1) {
-        return buildContentTypeVariants(variants, resolver.response.status(node, res.statusCode))
+        return buildContentTypeVariants(variants, resolver.response.status(node, res.statusCode), res.pointer)
       }
       const primary = variants[0] ?? res.content?.[0]
       return renderSchemaType({
-        schema: primary?.schema ?? null,
+        schema: primary?.schema ? { ...primary.schema, pointer: res.pointer ?? primary.schema.pointer } : null,
         name: resolver.response.status(node, res.statusCode),
         keysToOmit: primary?.keysToOmit,
       })

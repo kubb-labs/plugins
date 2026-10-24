@@ -49,7 +49,7 @@ export function Type({ name, node, printer, enum: enumOptions, resolver }: Props
     <>
       {shouldExportEnums && enums.map(({ node }) => <Enum key={node.name} node={node} enum={enumOptions} resolver={resolver} />)}
       {shouldExportType && (
-        <File.Source name={name} isTypeOnly isExportable isIndexable>
+        <File.Source name={name} pointer={node.pointer} isTypeOnly isExportable isIndexable>
           {output}
         </File.Source>
       )}

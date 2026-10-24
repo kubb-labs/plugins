@@ -67,12 +67,13 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
   return (
     <>
       {nameNode && (
-        <File.Source name={enumName} isExportable isIndexable isTypeOnly={false}>
+        <File.Source name={enumName} pointer={node.pointer} isExportable isIndexable isTypeOnly={false}>
           {nameNode}
         </File.Source>
       )}
       <File.Source
         name={typeName}
+        pointer={node.pointer}
         isIndexable={!namesMerge}
         isExportable={!namesMerge && enumOptions.type !== 'inlineLiteral'}
         isTypeOnly={['asConst', 'literal', undefined].includes(enumOptions.type)}
