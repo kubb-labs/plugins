@@ -32,8 +32,8 @@ export type Pet = (
    */
   name: string
   category?: Category
-  photoUrls: string[]
-  readonly tags?: Tag[]
+  photoUrls: Array<string>
+  readonly tags?: Array<Tag>
   /**
    * @description pet status in the store
    */
