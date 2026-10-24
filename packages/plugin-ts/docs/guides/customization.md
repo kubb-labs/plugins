@@ -43,7 +43,7 @@ pluginTs({
 })
 ```
 
-Handlers that return TypeScript compiler nodes still work when your project installs `@typescript/typescript6`, an optional peer dependency. That form is deprecated and is removed in the next major.
+Handlers that return TypeScript compiler nodes still work when your project installs `typescript` 5 or 6, or `@typescript/typescript6` next to TypeScript 7. Both are optional peer dependencies. That form is deprecated and is removed in the next major.
 
 This maps `date` fields to `Date` and `int32` integers to `bigint`. The separate `bigint` handler controls `int64` fields, which already use `bigint` by default. A `date-time` field uses the `datetime` handler.
 
