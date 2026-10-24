@@ -1,5 +1,16 @@
 # @kubb/plugin-zod
 
+## 5.7.1
+
+### Patch Changes
+
+- [#1210](https://github.com/kubb-labs/plugins/pull/1210) [`0ecc416`](https://github.com/kubb-labs/plugins/commit/0ecc4169c2a5a5d36489c52e7c3d0daec12d6222) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Type clients, query hooks, and MCP handlers from `pluginZod({ inferred: 'codec' })` when it is set, so a custom codec param takes its domain value.
+  
+  - Types a codec param such as a `URL` with the value the encode schema accepts, instead of the wire `string`, also next to `pluginTs()`.
+  - Types the decoded response, such as a `URL` or `bigint`, in `data`.
+  - Makes `pluginTs()` optional for React Query, SWR, Vue Query, and MCP when `pluginZod({ inferred })` supplies the types.
+  - Renames `inferred: 'direction'` to `inferred: 'codec'`. `'direction'` still works as a deprecated alias.
+
 ## 5.7.0
 
 ### Minor Changes
