@@ -1,4 +1,6 @@
+import path from 'node:path'
 import { buildOptionsSchema, buildResponses, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
+import { getRelativePath } from '@internals/utils'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Type } from '../components/Type.tsx'
@@ -83,6 +85,16 @@ export const typeGenerator = defineGenerator<PluginTs>({
       if (!schema) return null
 
       const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, name: importName })
+      // `operationTypes: false` names a `$ref`-backed slot after the referenced type, so re-export it instead of `type Pet = Pet`.
+      const reExport = imports.find((imp) => imp.name?.includes(name))
+      if (reExport) {
+        return (
+          <>
+            <File.Import root={meta.file.path} path={reExport.path} name={[name]} isTypeOnly />
+            <File.Export path={getRelativePath(path.dirname(meta.file.path), reExport.path)} name={[name]} isTypeOnly />
+          </>
+        )
+      }
 
       const schemaPrinter = printerTs({
         optionalType,

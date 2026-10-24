@@ -253,6 +253,17 @@ export type Options = OutputOptions & {
    */
   arrayType?: 'generic' | 'array'
   /**
+   * Whether a request body or response backed by a single `$ref` gets its own per-operation alias.
+   * - `true` — `AddPetData` / `AddPetStatus200` aliases point at `Pet`.
+   * - `false` — the operation names resolve to `Pet` itself, which the operation file re-exports.
+   *   Clients and query hooks read these names, so they reference `Pet` too.
+   *
+   * Inline, array, union, `Omit`-based, and multi-content-type schemas keep their alias.
+   *
+   * @default true
+   */
+  operationTypes?: boolean
+  /**
    * Override how names and file paths are built for generated symbols.
    * Methods you omit fall back to the default `resolverTs`. `this` is bound to the
    * full resolver, so `this.default.name(name)` delegates to the built-in implementation.

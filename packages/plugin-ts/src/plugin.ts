@@ -3,7 +3,7 @@ import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from 
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { typeGenerator } from './generators/typeGenerator.tsx'
-import { resolverTs } from './resolvers/resolverTs.ts'
+import { refResolverTs, resolverTs } from './resolvers/resolverTs.ts'
 import type { PluginTs } from './types.ts'
 
 /**
@@ -50,6 +50,7 @@ export const pluginTs = defineExtension<PluginTs>({
       optionalType = 'questionToken',
       arrayType = 'array',
       syntaxType = 'type',
+      operationTypes = true,
       printer,
       resolver: userResolver,
       macros: userMacros,
@@ -62,7 +63,8 @@ export const pluginTs = defineExtension<PluginTs>({
       keyCasing: enumOptions.keyCasing ?? 'none',
     }
 
-    setResolver(userResolver ? Resolver.merge(resolverTs, userResolver) : resolverTs)
+    const baseResolver = operationTypes ? resolverTs : Resolver.merge(resolverTs, refResolverTs)
+    setResolver(userResolver ? Resolver.merge(baseResolver, userResolver) : baseResolver)
     if (userMacros?.length) {
       setMacros(userMacros)
     }

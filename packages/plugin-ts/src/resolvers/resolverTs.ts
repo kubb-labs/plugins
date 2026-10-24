@@ -1,7 +1,7 @@
 import { createCasedFile, createOperationParamResolver, createOperationResponseResolver } from '@internals/shared'
 import { ensureValidVarName, pascalCase } from '@internals/utils'
-import { createResolver } from 'kubb/kit'
-import type { PluginTs } from '../types.ts'
+import { ast, createResolver, type ResolverPatch } from 'kubb/kit'
+import type { PluginTs, ResolverTs } from '../types.ts'
 
 /**
  * Default resolver used by `@kubb/plugin-ts`. Decides the names and file paths
@@ -41,3 +41,31 @@ export const resolverTs = createResolver<PluginTs>({
     },
   },
 })
+
+const responseResolver = createOperationResponseResolver()
+
+// shortcut: a `$ref` to an `asConst` enum resolves to `PetStatus`, not the emitted `PetStatusKey`, so the operation file keeps an alias under that name; skip enum refs here if two operations sharing one enum collide in a barrel.
+function refName(content: Array<ast.ContentNode> | undefined): string | null {
+  const entries = content?.filter((entry) => entry.schema) ?? []
+  if (entries.length !== 1 || entries[0]!.keysToOmit?.length) return null
+  const ref = ast.narrowSchema(entries[0]!.schema, 'ref')
+  return ref?.ref ? ast.resolveRefName(ref) : null
+}
+
+/**
+ * Patch that `pluginTs({ operationTypes: false })` merges onto {@link resolverTs}. A request body or
+ * response backed by a single `$ref` resolves to the referenced type (`Pet`) instead of its
+ * per-operation alias, so every plugin reading this resolver references `Pet` directly.
+ */
+export const refResolverTs = {
+  response: {
+    body(node) {
+      const name = refName(node.requestBody?.content)
+      return name ? this.name(name) : responseResolver.body.call(this, node)
+    },
+    status(node, statusCode) {
+      const name = refName(node.responses.find((res) => res.statusCode === statusCode)?.content)
+      return name ? this.name(name) : responseResolver.status.call(this, node, statusCode)
+    },
+  },
+} satisfies ResolverPatch<ResolverTs>

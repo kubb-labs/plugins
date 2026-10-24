@@ -12,6 +12,7 @@ Pass these options to `pluginTs()`. Shared options link to [Shared plugin option
 | [`syntaxType`](#syntaxtype)                                               | Emit object schemas as type aliases or interfaces.                     | `'type'`                                                                              |
 | [`optionalType`](#optionaltype)                                           | How optional properties are written.                                   | `'questionToken'`                                                                     |
 | [`arrayType`](#arraytype)                                                 | `Type[]` or `Array<Type>`.                                             | `'array'`                                                                             |
+| [`operationTypes`](#operationtypes)                                       | Keep per-operation aliases for `$ref`-backed bodies and responses.     | `true`                                                                                |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations and schemas that match.                           | None                                                                                  |
 | [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations and schemas that match.                                | `[]`                                                                                  |
 | [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                   | `[]`                                                                                  |
@@ -232,6 +233,32 @@ Uses `tags: Array<string>`, which reads better for complex elements like `Array<
 :::
 
 ::
+
+### operationTypes
+
+Whether a request body or response backed by a single `$ref` gets its own per-operation alias.
+
+|          |           |
+| -------- | --------- |
+| Type     | `boolean` |
+| Required | `false`   |
+| Default  | `true`    |
+
+::field-group
+
+:::field{name="true"}
+Emits an alias per slot, `export type AddPetStatus200 = Pet`.
+:::
+
+:::field{name="false"}
+Drops that alias and re-exports the referenced type from the operation file, `export type { Pet } from './Pet'`. The `AddPetResponses` and `AddPetResponse` types reference `Pet`, and clients and query hooks read their names from `pluginTs`, so they use `Pet` too. Inline, array, union, `Omit`-based, and multi-content-type schemas keep their alias because there is no single type to point at.
+:::
+
+::
+
+```ts [kubb.config.ts]
+pluginTs({ operationTypes: false })
+```
 
 ### resolver
 
