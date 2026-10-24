@@ -438,7 +438,6 @@ export const zodGenerator = defineGenerator<PluginZod>({
     // only to back `resolver.response.options(node)` and `resolver.response.responses(node)` for
     // consumers sourcing types from this plugin instead of `plugin-ts`. Not worth generating when
     // nothing will import them.
-
     const optionsSchema = inferred
       ? renderSchemaEntry({ schema: buildOptionsSchema(node, resolver), name: resolver.name(`${node.operationId} Options`), direction: 'encode' })
       : null
