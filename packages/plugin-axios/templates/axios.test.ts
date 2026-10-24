@@ -323,6 +323,22 @@ describe('createClientCore', () => {
     for (const call of calls) expect((call.headers as Record<string, string>)['Content-Type']).toBe('application/x-www-form-urlencoded')
   })
 
+  test('removes every content-type spelling when a custom serializer returns FormData', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance, headers: { 'cOnTeNt-TyPe': 'application/xml' } })
+    const formData = new FormData()
+    formData.append('field', 'x')
+    await client({
+      method: 'POST',
+      url: '/pet',
+      body: { field: 'x' },
+      contentType: 'application/json',
+      serializer: { body: () => formData },
+    })
+    expect(calls[0]?.data).toBe(formData)
+    expect(calls[0]?.headers as Record<string, string>).toStrictEqual({})
+  })
+
   test('omits Content-Type when a pre-built FormData body is sent', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance })
@@ -685,6 +701,55 @@ describe('createClientCore', () => {
       await client({ method: 'GET', url: '/pet', path: { test: '123' } })
 
       expect(capturedContext).toMatchObject({ path: { test: '123' } })
+    })
+
+    test('keeps concurrent request contexts separate and clears them from returned configs', async () => {
+      const client = createClientCore({ transport: realAxios() })
+      const contexts: Array<unknown> = []
+      client.interceptors.request.use(async (config, context) => {
+        await Promise.resolve()
+        contexts.push(context)
+        return config
+      })
+      const first = { url: '/first', path: { id: 1 } }
+      const second = { url: '/second', path: { id: 2 } }
+      const results = await Promise.all([client(first), client(second)])
+
+      expect(contexts).toStrictEqual([first, second])
+      for (const result of results) expect(result.request).not.toHaveProperty('__kubbRequestContext')
+    })
+
+    test('clears request context from errors before rethrowing', async () => {
+      const client = createClientCore({ transport: realAxios(500) })
+      const responseError = await client({ url: '/pet' }).catch((error: unknown) => error)
+      expect(responseError).toBeInstanceOf(ResponseError)
+      if (!(responseError instanceof ResponseError)) throw responseError
+      expect(responseError.request).not.toHaveProperty('__kubbRequestContext')
+      expect(responseError.response.config).not.toHaveProperty('__kubbRequestContext')
+    })
+
+    test.each([200, 500])('passes context through a replacement request config after a transport swap (status %s)', async (status) => {
+      const client = createClientCore({ transport: realAxios() })
+      const contexts: Array<unknown> = []
+      client.interceptors.request.use((config, context) => {
+        contexts.push(context)
+        return { url: config.url, method: config.method, headers: config.headers, adapter: config.adapter, validateStatus: config.validateStatus }
+      })
+      client.interceptors.response.use((response, context) => {
+        contexts.push(context)
+        return response
+      })
+      client.interceptors.error.use((error, context) => {
+        contexts.push(context)
+        return error
+      })
+      client.setConfig({ transport: realAxios(status) })
+
+      const options = { url: '/pet', path: { id: 1 } }
+      const result = client(options)
+      if (status === 200) await expect(result).resolves.toMatchObject({ status })
+      if (status === 500) await expect(result).rejects.toMatchObject({ status })
+      expect(contexts).toStrictEqual([options, options])
     })
 
     test('does not detach and re-attach when setConfig does not change transport', async () => {
@@ -1199,12 +1264,75 @@ describe('content type negotiation', () => {
     expect(calls[0]?.headers?.['Accept']).toBe('application/json')
   })
 
+  test('preserves empty explicit headers over auth and content-type defaults', async () => {
+    const { instance, calls } = fakeAxiosWith({})
+    const client = createClientCore({ transport: instance })
+    await client({
+      method: 'POST',
+      url: '/pet',
+      body: { name: 'odie' },
+      headers: { authorization: '', accept: '', 'content-type': '' },
+      contentType: { response: 'application/xml' },
+      security: [{ type: 'http', scheme: 'bearer' }],
+      auth: 'token',
+    })
+    expect(calls[0]?.headers as Record<string, string>).toStrictEqual({ authorization: '', accept: '', 'content-type': '' })
+  })
+
   test('carries the negotiated content type onto result.contentType, charset stripped', async () => {
     const { instance } = fakeAxiosWith({ data: { id: 1 }, contentType: 'application/xml; charset=utf-8' })
     const client = createClientCore({ transport: instance })
     const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<AxiosRequestConfig, AxiosResponse>
     expect(result.contentType).toBe('application/xml')
     expect(result.data).toStrictEqual({ id: 1 })
+  })
+
+  test.each([200, 422])('validates a codec-produced undefined value for status %s', async (status) => {
+    const { instance } = fakeAxiosWith({ data: 'raw', status, contentType: 'application/xml' })
+    const client = createClientCore({ transport: instance })
+    const response = vi.fn(() => 'success')
+    const error = vi.fn(() => 'failure')
+    const result = await client({
+      url: '/pet',
+      throwOnError: false,
+      codecs: { 'application/xml': { deserialize: async () => undefined } },
+      validator: { response: toSchema(response), error: toSchema(error) },
+    })
+    const selected = status === 200 ? response : error
+    const skipped = status === 200 ? error : response
+    expect(selected).toHaveBeenCalledExactlyOnceWith(undefined)
+    expect(skipped).not.toHaveBeenCalled()
+    expect(result).toMatchObject({
+      data: status === 200 ? 'success' : undefined,
+      error: status === 200 ? undefined : 'failure',
+    })
+  })
+
+  test.each([false, true])('keeps the selected validation recovery when a codec changes config (per-call: %s)', async (perCall) => {
+    const { instance } = fakeAxiosWith({ contentType: 'application/xml' })
+    const initial = vi.fn(() => ({ value: 'initial' }))
+    const override = vi.fn(() => ({ value: 'override' }))
+    const replacement = vi.fn(() => ({ value: 'replacement' }))
+    const client = createClientCore({ transport: instance, onValidationError: initial })
+    const result = await client({
+      url: '/pet',
+      onValidationError: perCall ? override : undefined,
+      validator: { response: toFailingSchema() },
+      codecs: {
+        'application/xml': {
+          async deserialize(value) {
+            client.setConfig({ onValidationError: replacement })
+            await Promise.resolve()
+            return value
+          },
+        },
+      },
+    })
+
+    expect(result.data).toBe(perCall ? 'override' : 'initial')
+    expect(perCall ? override : initial).toHaveBeenCalledOnce()
+    expect(perCall ? initial : override).not.toHaveBeenCalled()
+    expect(replacement).not.toHaveBeenCalled()
   })
 
   test('runs the matching deserializer before validation and feeds result.data', async () => {
@@ -1431,6 +1559,11 @@ describe('parseEventStream', () => {
     for await (const event of stream) events.push(event)
     return events
   }
+
+  test('keeps the last valid retry and ignores unknown event fields', async () => {
+    const events = await collect(parseEventStream(streamOf(['retry: 1000\nretry: 2000\nretry: invalid\nunknown: ignored\ndata: ok\n\n'])))
+    expect(events).toStrictEqual([{ data: 'ok', retry: 2000 }])
+  })
 
   test('parses JSON data events split on a blank line', async () => {
     const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n', 'data: {"n":2}\n\n'])))
