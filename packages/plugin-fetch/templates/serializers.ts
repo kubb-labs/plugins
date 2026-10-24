@@ -150,12 +150,17 @@ function jsonReplacer(_key: string, value: unknown): unknown {
 
 function appendFormDataValue({ formData, key, value, contentType }: { formData: FormData; key: string; value: unknown; contentType?: string }): void {
   if (value === undefined || value === null) return
-  if (value instanceof Blob) formData.append(key, value)
-  else if (typeof value === 'object' && !(value instanceof Date)) {
+  if (value instanceof Blob) {
+    formData.append(key, value)
+    return
+  }
+  if (typeof value === 'object' && !(value instanceof Date)) {
     const json = JSON.stringify(value, jsonReplacer)
     // A part's media type can only be set by wrapping the value in a typed Blob.
     formData.append(key, contentType ? new Blob([json], { type: contentType }) : json)
-  } else formData.append(key, toValue(value))
+    return
+  }
+  formData.append(key, toValue(value))
 }
 
 /**
@@ -179,8 +184,11 @@ export const defaultBodySerializer: BodySerializer = ({ body, contentType, encod
     const formData = new FormData()
     for (const [key, value] of Object.entries(body as Record<string, unknown>)) {
       const partContentType = encoding?.[key]?.contentType
-      if (Array.isArray(value)) for (const item of value) appendFormDataValue({ formData, key, value: item, contentType: partContentType })
-      else appendFormDataValue({ formData, key, value, contentType: partContentType })
+      if (Array.isArray(value)) {
+        for (const item of value) appendFormDataValue({ formData, key, value: item, contentType: partContentType })
+        continue
+      }
+      appendFormDataValue({ formData, key, value, contentType: partContentType })
     }
     return formData
   }
