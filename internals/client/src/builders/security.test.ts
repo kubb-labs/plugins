@@ -6,6 +6,10 @@ describe('buildSecurityMetadata', () => {
     expect(buildSecurityMetadata({ security: undefined })).toBeNull()
     expect(buildSecurityMetadata({ security: [] })).toBeNull()
   })
+
+  test('serializes security schemes with scopes', () => {
+    expect(buildSecurityMetadata({ security: [{ type: 'oauth2', scopes: ['read:pets'] }] })).toBe("[{ type: 'oauth2', scopes: ['read:pets'] }]")
+  })
 })
 
 describe('resolveSecurityScheme', () => {
@@ -51,7 +55,7 @@ describe('getOperationSecurity', () => {
 
   test('resolves every scheme referenced across multiple requirements', () => {
     expect(getOperationSecurity({ document, method: 'GET', path: '/pet/{petId}' })).toStrictEqual([
-      { type: 'oauth2' },
+      { type: 'oauth2', scopes: ['read:pets'] },
       { type: 'apiKey', name: 'api_key', in: 'header' },
     ])
   })

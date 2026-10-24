@@ -17,7 +17,10 @@ export function getPetById<ThrowOnError extends boolean = true>(
     request({
       method: 'GET',
       url: '/pet/{petId}:search',
-      security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }],
+      security: [
+        { type: 'apiKey', name: 'api_key', in: 'header' },
+        { type: 'oauth2', scopes: ['write:pets', 'read:pets'] },
+      ],
       validator: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema },
       ...config,
       throwOnError: config.throwOnError ?? true,

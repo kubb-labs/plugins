@@ -32,9 +32,13 @@ export class pet {
     const { client: request = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'PUT', url: '/pet', security: [{ type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-        RequestResult<UpdatePetResponses, ThrowOnError>
-      >,
+      request({
+        method: 'PUT',
+        url: '/pet',
+        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        ...config,
+        throwOnError: config.throwOnError ?? true,
+      }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>,
     )
   }
 
@@ -47,9 +51,13 @@ export class pet {
     const { client: request = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-        RequestResult<AddPetResponses, ThrowOnError>
-      >,
+      request({
+        method: 'POST',
+        url: '/pet',
+        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        ...config,
+        throwOnError: config.throwOnError ?? true,
+      }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>,
     )
   }
 
@@ -64,9 +72,13 @@ export class pet {
     const { client: request = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-        RequestResult<FindPetsByStatusResponses, ThrowOnError>
-      >,
+      request({
+        method: 'GET',
+        url: '/pet/findByStatus',
+        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        ...config,
+        throwOnError: config.throwOnError ?? true,
+      }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>,
     )
   }
 
@@ -81,9 +93,13 @@ export class pet {
     const { client: request = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'GET', url: '/pet/findByTags', security: [{ type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-        RequestResult<FindPetsByTagsResponses, ThrowOnError>
-      >,
+      request({
+        method: 'GET',
+        url: '/pet/findByTags',
+        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        ...config,
+        throwOnError: config.throwOnError ?? true,
+      }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>,
     )
   }
 
@@ -101,7 +117,10 @@ export class pet {
       request({
         method: 'GET',
         url: '/pet/{petId}',
-        security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }],
+        security: [
+          { type: 'apiKey', name: 'api_key', in: 'header' },
+          { type: 'oauth2', scopes: ['write:pets', 'read:pets'] },
+        ],
         ...config,
         throwOnError: config.throwOnError ?? true,
       }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>,
@@ -118,9 +137,13 @@ export class pet {
     const { client: request = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'POST', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-        RequestResult<UpdatePetWithFormResponses, ThrowOnError>
-      >,
+      request({
+        method: 'POST',
+        url: '/pet/{petId}',
+        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        ...config,
+        throwOnError: config.throwOnError ?? true,
+      }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>,
     )
   }
 
@@ -135,9 +158,13 @@ export class pet {
     const { client: request = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-        RequestResult<DeletePetResponses, ThrowOnError>
-      >,
+      request({
+        method: 'DELETE',
+        url: '/pet/{petId}',
+        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        ...config,
+        throwOnError: config.throwOnError ?? true,
+      }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>,
     )
   }
 
@@ -154,7 +181,7 @@ export class pet {
       request({
         method: 'POST',
         url: '/pet/{petId}/uploadImage',
-        security: [{ type: 'oauth2' }],
+        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
         ...config,
         throwOnError: config.throwOnError ?? true,
       }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>,
