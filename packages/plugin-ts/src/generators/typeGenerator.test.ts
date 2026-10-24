@@ -192,6 +192,27 @@ describe('typeGenerator — operationTypes: false', () => {
     expect(source).not.toContain('ApiCreatePetBody')
     expect(source).toMatch(/'201': ApiPet/)
   })
+
+  test('keeps the alias when a $ref body sits next to a schema-less content entry', () => {
+    const resolver = Resolver.merge(resolverTs, createRefResolverTs(defaultOptions.enum))
+    const node = ast.factory.createOperation({
+      operationId: 'createPet',
+      method: 'POST',
+      path: '/pets',
+      requestBody: {
+        content: [
+          ast.factory.createContent({
+            contentType: 'application/json',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          }),
+          ast.factory.createContent({ contentType: 'application/octet-stream' }),
+        ],
+      },
+      responses: [],
+    })
+
+    expect(resolver.response.body(node)).toBe('CreatePetBody')
+  })
 })
 
 describe('typeGenerator — Operation', () => {

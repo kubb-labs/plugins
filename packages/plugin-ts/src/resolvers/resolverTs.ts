@@ -50,8 +50,7 @@ const responseResolver = createOperationResponseResolver()
  */
 export function createRefResolverTs(enumOptions: ResolvedOptions['enum']) {
   function refType(resolver: ResolverTs, content: Array<ast.ContentNode> | undefined) {
-    const entries = content?.filter((entry) => entry.schema) ?? []
-    const entry = entries.length === 1 ? entries[0]! : null
+    const entry = content?.length === 1 ? content[0]! : null
     const schemaName = entry && ast.isBareRef(entry.schema, entry.keysToOmit) ? ast.resolveRefName(entry.schema) : null
     if (!schemaName) return null
     const isEnum = ast.narrowSchema(ast.narrowSchema(entry!.schema, 'ref')?.schema ?? undefined, ast.schemaTypes.enum) !== null
