@@ -51,7 +51,7 @@ export type TypeImportsParams = { root: string; output: Output; group?: Group }
 /**
  * A resolver that knows where each operation type name is imported from, see `ResolverTs['typeImports']`.
  */
-export type TypeImportsResolver = {
+type TypeImportsResolver = {
   typeImports(node: ast.OperationNode, name: string, params: TypeImportsParams): Array<ast.ImportNode>
 }
 
@@ -463,7 +463,6 @@ export function buildOptionsSchema(
   const { path, query, header } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const bodyName = hasBody ? resolver.response.body(node) : null
-  // A body printed by `pluginTs({ operationTypes: false })` is the bare schema type, so an optional body becomes an optional key.
   const bodyRequired = hasBody && (Boolean(node.requestBody?.required) || !inline)
   const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
   const groups = [
@@ -529,7 +528,6 @@ function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode
           ast.factory.createProperty({
             name: 'data',
             required: true,
-            // `pluginTs({ operationTypes: false })` declares no per-content-type types, so the variant's own schema is printed.
             schema: inline ? variant.schema : ast.factory.createSchema({ type: 'ref', name: variant.name }),
           }),
         ],

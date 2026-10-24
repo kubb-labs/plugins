@@ -7,7 +7,7 @@ import type { KubbReactNode } from 'kubb/jsx'
 
 type ContractOperation = { name: string; path: string; clientPath: string; clientPathIsFile: boolean }
 
-type HookFileContext = Pick<GeneratorContext, 'config' | 'root' | 'cache' | 'meta' | 'driver' | 'requirePlugin' | 'resolver'>
+type HookFileContext = Pick<GeneratorContext, 'config' | 'root' | 'meta' | 'driver' | 'requirePlugin' | 'resolver'>
 
 type ResolveHookFileOptions = {
   name: string

@@ -149,10 +149,12 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
 
       const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
         const typeNamesByPath = new Map<string, Set<string>>()
+        const typeImportOptions = { resolver: types.resolver, root, output: types.output ?? output, group: types.group }
         for (const op of ops) {
-          const options = { resolver: types.resolver, root, output: types.output ?? output, group: types.group }
-          for (const imp of groupOperationTypeImports(op.node, resolveTypeImportNames(op.node, op.types), options)) {
-            typeNamesByPath.set(imp.path, new Set([...(typeNamesByPath.get(imp.path) ?? []), ...imp.names]))
+          for (const imp of groupOperationTypeImports(op.node, resolveTypeImportNames(op.node, op.types), typeImportOptions)) {
+            const names = typeNamesByPath.get(imp.path) ?? new Set<string>()
+            imp.names.forEach((name) => names.add(name))
+            typeNamesByPath.set(imp.path, names)
           }
         }
         const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = isValidatorEnabled(validator)
