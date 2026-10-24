@@ -4,12 +4,12 @@
 */
 
 import type { PlaceOrderResponse, PlaceOrderStatus405, PlaceOrderBody } from '../types/PlaceOrder'
-import type { HttpResponseResolver } from 'msw'
+import type { HttpResponseResolver } from 'msw/http'
 import { createPlaceOrderResponse } from '../faker/createPlaceOrder'
-import { http } from 'msw'
+import { http, HttpResponse } from 'msw/http'
 
 export function placeOrderHandlerResponse200(data: PlaceOrderResponse) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -18,7 +18,7 @@ export function placeOrderHandlerResponse200(data: PlaceOrderResponse) {
 }
 
 export function placeOrderHandlerResponse405(data?: PlaceOrderStatus405) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 405,
   })
 }
@@ -27,7 +27,7 @@ export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolv
   return http.post<Record<string, string>, PlaceOrderBody>(`${options?.baseURL ?? ''}/store/order`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new Response(JSON.stringify(data ?? createPlaceOrderResponse(data)), {
+      return new HttpResponse(JSON.stringify(data ?? createPlaceOrderResponse(data)), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'

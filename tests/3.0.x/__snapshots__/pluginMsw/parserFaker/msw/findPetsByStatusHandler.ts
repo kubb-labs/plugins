@@ -5,10 +5,10 @@
 
 import type { FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus'
 import { createFindPetsByStatusResponse } from '../faker/createFindPetsByStatus'
-import { http } from 'msw'
+import { http, HttpResponse } from 'msw/http'
 
 export function findPetsByStatusHandlerResponse200(data: FindPetsByStatusResponse) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -17,7 +17,7 @@ export function findPetsByStatusHandlerResponse200(data: FindPetsByStatusRespons
 }
 
 export function findPetsByStatusHandlerResponse400(data?: FindPetsByStatusStatus400) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 400,
   })
 }
@@ -26,7 +26,7 @@ export function findPetsByStatusHandler(data?: FindPetsByStatusResponse | ((info
   return http.get(`${options?.baseURL ?? ''}/pet/findByStatus`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new Response(JSON.stringify(data ?? createFindPetsByStatusResponse(data)), {
+      return new HttpResponse(JSON.stringify(data ?? createFindPetsByStatusResponse(data)), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'
