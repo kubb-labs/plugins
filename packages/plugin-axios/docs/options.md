@@ -93,7 +93,7 @@ export default defineConfig({
 
 Only the params your OpenAPI spec declares are sent. Path and query keys the spec does not declare are stripped, so a key such as an undocumented filter or a cache-buster never reaches the URL. Declare it in the spec, or leave `params` off. Headers are the exception: client-level `headers` (such as `Authorization` or tracing headers) are merged with the call's headers before validation, so headers the spec does not declare pass through unchanged, and declared header params match in any casing.
 
-Pair `request` and `params` with `pluginZod({ inferred: 'direction' })` when the schemas use codecs, so the request types accept the domain values (such as a `Date`) that the validators encode. See [`inferred`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#inferred).
+Pair `request` and `params` with `pluginZod({ inferred: 'codec' })` when the schemas use codecs, so the request types accept the domain values (such as a `Date`) that the validators encode. See [`inferred`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#inferred).
 
 ### sdk
 

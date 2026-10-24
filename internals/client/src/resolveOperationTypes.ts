@@ -70,7 +70,7 @@ function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
 /**
  * The resolver, `output`, and `group` a generated hook names its operation types with.
  *
- * `pluginZod({ inferred: 'direction' })` wins over `plugin-ts`: its request types read `z.input` and its
+ * `pluginZod({ inferred: 'codec' })` wins over `plugin-ts`: its request types read `z.input` and its
  * response types `z.output`, so a codec param takes its domain value. Otherwise `plugin-ts` supplies them,
  * and without it any `pluginZod({ inferred })` does. Throws `KUBB_MISSING_DEPENDENCY` for `pluginName`
  * when neither is available.
@@ -82,7 +82,7 @@ export function resolveTypeResolver(
   const pluginTs = driver.getPlugin(pluginTsName)
   const pluginZod = driver.getPlugin(pluginZodName)
 
-  if (pluginTs && pluginZod?.options?.inferred !== 'direction') {
+  if (pluginTs && pluginZod?.options?.inferred !== 'codec') {
     return { resolver: driver.getResolver(pluginTsName), output: pluginTs.options?.output, group: pluginTs.options?.group }
   }
 
@@ -107,7 +107,7 @@ function missingTypeSource(pluginName: string) {
 /**
  * Picks the plugin a generated client takes its `Options` and `Responses` types from.
  *
- * `pluginZod({ inferred: 'direction' })` wins, so a codec param takes its domain value (see
+ * `pluginZod({ inferred: 'codec' })` wins, so a codec param takes its domain value (see
  * {@link resolveTypeResolver}). Otherwise `plugin-ts` wins whenever it is in the pipeline, so existing
  * configs keep the types they generate today. Without it, `pluginZod({ inferred: true })` takes over:
  * its inferred options and responses types are built from the same shared schemas as the `plugin-ts`
@@ -124,7 +124,7 @@ export function resolveOperationTypes(driver: GeneratorDriver, pluginName: strin
   const pluginTs = driver.getPlugin(pluginTsName)
   const pluginZod = driver.getPlugin(pluginZodName)
 
-  if (pluginTs && pluginZod?.options?.inferred !== 'direction') {
+  if (pluginTs && pluginZod?.options?.inferred !== 'codec') {
     const resolver = driver.getResolver(pluginTsName)
 
     return {

@@ -187,9 +187,11 @@ export type Options = OutputOptions & {
   /**
    * Export a type alias next to every generated schema, so the Zod schema acts as the single source of truth.
    * - `true`: the alias is `z.infer<typeof schema>`.
-   * - `'direction'`: request and params schemas use `z.input`, response and error schemas use `z.output`.
+   * - `'codec'`: request and params schemas use `z.input`, response and error schemas use `z.output`, so a
+   *   codec types both sides with its domain value. Clients and query hooks then take their types from here.
+   * - `'direction'`: deprecated alias of `'codec'`.
    */
-  inferred?: boolean | 'direction'
+  inferred?: boolean | 'codec' | 'direction'
   /**
    * Wrap schemas in `z.coerce` so input is coerced before validation. Useful for
    * form data and query params where everything arrives as a string.
@@ -293,7 +295,7 @@ export type ResolvedOptions = {
   include: Array<Include> | undefined
   override: Array<Override<ResolvedOptions>>
   group: Group | null
-  inferred: NonNullable<Options['inferred']>
+  inferred: boolean | 'codec'
   importPath: NonNullable<Options['importPath']>
   coercion: NonNullable<Options['coercion']>
   guidType: NonNullable<Options['guidType']>

@@ -7,6 +7,7 @@ import { adapterOas } from '@kubb/adapter-oas'
 import { Hookable, createKubb } from '@kubb/core'
 import { type Config, Diagnostics, fsStorage, type KubbHooks } from 'kubb/kit'
 import { pluginFetch } from '@kubb/plugin-fetch'
+import { pluginMcp } from '@kubb/plugin-mcp'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginSwr } from '@kubb/plugin-swr'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -129,14 +130,14 @@ async function expectRejected(client: Client, call: (onValidationError: unknown)
 }
 
 // Codecs with params validation: every param slot takes the domain value and is encoded before sending.
-// `'direction'` types the request side from `z.input`, exactly the domain value the encode schemas accept,
+// `'codec'` types the request side from `z.input`, exactly the domain value the encode schemas accept,
 // so the types and the runtime agree.
-describe("directional codec: pluginZod({ inferred: 'direction' }) + validator.params: 'zod'", () => {
+describe("directional codec: pluginZod({ inferred: 'codec' }) + validator.params: 'zod'", () => {
   let client: Client
 
   beforeAll(async () => {
     client = await loadClient('infer-direction-params', [
-      pluginZod({ inferred: 'direction', output: { path: './zod', barrel: false }, printer: { nodes: customCodecs } }),
+      pluginZod({ inferred: 'codec', output: { path: './zod', barrel: false }, printer: { nodes: customCodecs } }),
       pluginFetch({ output: { path: './clients', barrel: false }, validator: { request: 'zod', params: 'zod', response: 'zod' } }),
     ])
   })
@@ -149,6 +150,16 @@ describe("directional codec: pluginZod({ inferred: 'direction' }) + validator.pa
 
   test('generates the client, schemas, and runtime', async () => {
     await matchGeneratedFiles(client)
+  })
+
+  test("keeps the deprecated inferred: 'direction' working as 'codec'", async () => {
+    const deprecated = await loadClient('infer-direction-deprecated', [
+      pluginZod({ inferred: 'direction', output: { path: './zod', barrel: false }, printer: { nodes: customCodecs } }),
+      pluginFetch({ output: { path: './clients', barrel: false } }),
+    ])
+    const schemas = await readSchemas(deprecated, 'putEventSchema.ts')
+    await fs.rm(deprecated.output, { recursive: true, force: true })
+    expect(schemas).toContain('export type PutEventPathSchemaType = z.input<typeof putEventPathSchema>')
   })
 
   test('types the request side with z.input, the domain value the encode schemas accept', async () => {
@@ -206,15 +217,15 @@ describe("directional codec: pluginZod({ inferred: 'direction' }) + validator.pa
   })
 })
 
-// `pluginZod({ inferred: 'direction' })` next to `pluginTs()`: clients and query hooks take their operation types
+// `pluginZod({ inferred: 'codec' })` next to `pluginTs()`: clients and query hooks take their operation types
 // from zod instead of plugin-ts, so a custom codec param takes its domain value there too.
-describe("zod types beside plugin-ts: pluginTs() + pluginZod({ inferred: 'direction' })", () => {
+describe("zod types beside plugin-ts: pluginTs() + pluginZod({ inferred: 'codec' })", () => {
   let client: Client
 
   beforeAll(async () => {
     client = await loadClient('ts-and-zod-direction', [
       pluginTs({ output: { path: './types', barrel: false } }),
-      pluginZod({ inferred: 'direction', output: { path: './zod', barrel: false }, printer: { nodes: customCodecs } }),
+      pluginZod({ inferred: 'codec', output: { path: './zod', barrel: false }, printer: { nodes: customCodecs } }),
       pluginFetch({ output: { path: './clients', barrel: false }, validator: { request: 'zod', params: 'zod', response: 'zod' } }),
       pluginReactQuery({ output: { path: './hooks', barrel: false } }),
     ])
@@ -262,20 +273,28 @@ describe("zod types beside plugin-ts: pluginTs() + pluginZod({ inferred: 'direct
   })
 })
 
-// Without `pluginTs()`, the query hook plugins take every operation type from `pluginZod({ inferred: 'direction' })`.
-describe("zod types without plugin-ts: pluginZod({ inferred: 'direction' }) + React Query, SWR, and Vue Query", () => {
+// Without `pluginTs()`, the query hook plugins take every operation type from `pluginZod({ inferred: 'codec' })`.
+describe("zod types without plugin-ts: pluginZod({ inferred: 'codec' }) + React Query, SWR, and Vue Query", () => {
   let client: Client
 
   beforeAll(async () => {
     client = await loadClient('zod-direction-hooks', [
-      pluginZod({ inferred: 'direction', output: { path: './zod', barrel: false }, printer: { nodes: customCodecs } }),
+      pluginZod({ inferred: 'codec', output: { path: './zod', barrel: false }, printer: { nodes: customCodecs } }),
       pluginFetch({ output: { path: './clients', barrel: false }, validator: { request: 'zod', params: 'zod', response: 'zod' } }),
       pluginReactQuery({ output: { path: './react-query', barrel: false } }),
       pluginSwr({ output: { path: './swr', barrel: false } }),
       pluginVueQuery({ output: { path: './vue-query', barrel: false } }),
+      pluginMcp({ output: { path: './mcp', barrel: false } }),
     ])
   })
   afterAll(async () => fs.rm(client.output, { recursive: true, force: true }))
+
+  test('generates MCP handlers typed by the zod operation types', async () => {
+    const files = await fs.readdir(path.join(client.output, 'mcp'))
+    const handler = files.find((file) => file.toLowerCase().includes('getresource'))!
+    const source = await fs.readFile(path.join(client.output, 'mcp', handler), 'utf-8')
+    expect(source).toContain("import type { GetResourceOptionsSchemaType } from '../zod/getResourceSchema'")
+  })
 
   test.each(['react-query', 'swr', 'vue-query'])('generates %s hooks typed by the zod operation types', async (dir) => {
     const hookFile = await fs.readFile(path.join(client.output, dir, 'useGetResource.ts'), 'utf-8')

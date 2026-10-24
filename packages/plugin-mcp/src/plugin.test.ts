@@ -14,11 +14,13 @@ describe('pluginMcp setup', () => {
     await expect(setupKubb(['plugin-ts', 'plugin-zod', 'plugin-fetch'])).resolves.toBeUndefined()
   })
 
-  test.each(['plugin-ts', 'plugin-zod'])('fails with KUBB_MISSING_DEPENDENCY when %s is not registered', async (missing) => {
-    const registered = ['plugin-ts', 'plugin-zod', 'plugin-fetch'].filter((name) => name !== missing)
+  test('passes without plugin-ts, since pluginZod({ inferred }) can supply the handler types', async () => {
+    await expect(setupKubb(['plugin-zod', 'plugin-fetch'])).resolves.toBeUndefined()
+  })
 
-    await expect(setupKubb(registered)).rejects.toMatchObject({
-      diagnostic: { code: 'KUBB_MISSING_DEPENDENCY', message: `Plugin "${missing}" is required by "plugin-mcp" but not found.` },
+  test('fails with KUBB_MISSING_DEPENDENCY when plugin-zod is not registered', async () => {
+    await expect(setupKubb(['plugin-ts', 'plugin-fetch'])).rejects.toMatchObject({
+      diagnostic: { code: 'KUBB_MISSING_DEPENDENCY', message: 'Plugin "plugin-zod" is required by "plugin-mcp" but not found.' },
     })
   })
 })

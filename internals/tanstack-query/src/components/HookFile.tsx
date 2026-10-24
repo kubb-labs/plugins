@@ -36,7 +36,7 @@ type ResolvedHookFile = {
 
 /**
  * Resolves what every TanStack hook file shares: its file, the operation types file and names (`@kubb/plugin-ts`, or
- * `pluginZod({ inferred: 'direction' })`), banner and footer.
+ * `pluginZod({ inferred: 'codec' })`), banner and footer.
  */
 export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, options: ResolveHookFileOptions): ResolvedHookFile {
   const { name, output, group, contractOp, keyTypeName, extraTypeNames = [] } = options

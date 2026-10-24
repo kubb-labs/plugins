@@ -118,7 +118,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
-  // ─── zodParams (codec params and bodies encoded, typed with inferred: 'direction') ──
+  // ─── zodParams (codec params and bodies encoded, typed with inferred: 'codec') ──
   {
     name: 'zodParams',
     config: {
@@ -128,7 +128,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, dateType: 'date', enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginZod({ inferred: 'direction', output: { path: './zod', barrel: false, mode: 'directory' } }),
+        pluginZod({ inferred: 'codec', output: { path: './zod', barrel: false, mode: 'directory' } }),
         pluginFetch({ output: { path: './clients', barrel: false, mode: 'directory' }, validator: { request: 'zod', params: 'zod', response: 'zod' } }),
       ],
     },
@@ -144,7 +144,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       adapter: adapterOas({ validate: false, dateType: 'date', enums: 'root' }),
       parsers: [parserTs()],
       plugins: [
-        pluginZod({ inferred: 'direction', output: { path: './zod', barrel: false, mode: 'directory' } }),
+        pluginZod({ inferred: 'codec', output: { path: './zod', barrel: false, mode: 'directory' } }),
         pluginFetch({
           output: { path: './clients', barrel: false, mode: 'directory' },
           validator: { request: 'zod', params: 'zod', response: 'zod' },

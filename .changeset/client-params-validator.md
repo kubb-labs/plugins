@@ -13,6 +13,6 @@ Add `validator.params: 'zod'` to validate and encode path, query, and header par
 - Requires a custom `@kubb/plugin-client` module to export `toHeadersStandardSchema` when `params` is on.
 
 ```typescript
-pluginZod({ inferred: 'direction' })
+pluginZod({ inferred: 'codec' })
 pluginFetch({ validator: { request: 'zod', params: 'zod', response: 'zod' } })
 ```

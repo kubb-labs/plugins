@@ -777,14 +777,14 @@ describe('zodGenerator — inferred aliases', () => {
   })
 
   test('a custom codec printer node prints the encode transform for request schemas and the decode transform for responses', async () => {
-    const source = await renderOperation(getResource, { ...defaultOptions, inferred: 'direction', printer: { nodes: urlCodec } })
+    const source = await renderOperation(getResource, { ...defaultOptions, inferred: 'codec', printer: { nodes: urlCodec } })
     expect(source).toContain(`export const getResourcePathResourceSchema = ${encodeUrl}`)
     expect(source).toContain(`resource: ${encodeUrl},`)
     expect(source).toContain(`resource: ${decodeUrl},`)
   })
 
-  test("a custom codec printer node: 'direction' types the request side from z.input and the response from z.output, true keeps z.infer", async () => {
-    const direction = await renderOperation(getResource, { ...defaultOptions, inferred: 'direction', printer: { nodes: urlCodec } })
+  test("a custom codec printer node: 'codec' types the request side from z.input and the response from z.output, true keeps z.infer", async () => {
+    const direction = await renderOperation(getResource, { ...defaultOptions, inferred: 'codec', printer: { nodes: urlCodec } })
     expect(direction).toContain('export type GetResourcePathSchemaType = z.input<typeof getResourcePathSchema>')
     expect(direction).toContain('export type GetResourceStatus200SchemaType = z.output<typeof getResourceStatus200Schema>')
 
@@ -800,8 +800,8 @@ describe('zodGenerator — inferred aliases', () => {
     expect(source).toContain('export type SlotInputSchemaType = z.infer<typeof slotInputSchema>')
   })
 
-  test("inferred: 'direction' reads the encode variant from its input and the component from its output", async () => {
-    const source = await renderSchema(slotSchema, resolveOptions('direction'))
+  test("inferred: 'codec' reads the encode variant from its input and the component from its output", async () => {
+    const source = await renderSchema(slotSchema, resolveOptions('codec'))
     expect(source).toContain('export type SlotSchemaType = z.output<typeof slotSchema>')
     expect(source).toContain('export type SlotInputSchemaType = z.input<typeof slotInputSchema>')
   })
@@ -812,8 +812,8 @@ describe('zodGenerator — inferred aliases', () => {
     expect(source).toContain('export type BookSlotOptionsSchemaType = z.infer<typeof bookSlotOptionsSchema>')
   })
 
-  test("inferred: 'direction' reads request schemas from their input and response schemas from their output", async () => {
-    const source = await renderOperation(bookSlot, resolveOptions('direction'))
+  test("inferred: 'codec' reads request schemas from their input and response schemas from their output", async () => {
+    const source = await renderOperation(bookSlot, resolveOptions('codec'))
     expect(source).toContain('export type BookSlotBodySchemaType = z.input<typeof bookSlotBodySchema>')
     expect(source).toContain('export type BookSlotPathSchemaType = z.input<typeof bookSlotPathSchema>')
     expect(source).toContain('export type BookSlotOptionsSchemaType = z.input<typeof bookSlotOptionsSchema>')

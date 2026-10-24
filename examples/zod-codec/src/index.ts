@@ -2,7 +2,7 @@
  * Custom zod codecs end to end. `pnpm generate` writes one client from `petStore.yaml` with:
  * - `customCodecs` (`codecs.ts`): every `date` / `date-time` field is a `Date`, every `int64` a `bigint`,
  *   and every `uri` a `URL` in application code, while the wire keeps their string forms
- * - `pluginZod({ inferred: 'direction' })`: request types take the domain value the encode schemas accept
+ * - `pluginZod({ inferred: 'codec' })`: request types take the domain value the encode schemas accept
  *   (`z.input`), response types return the one the decode schemas produce (`z.output`)
  * - `validator: { request, params, response }`: the client encodes the body, path, query, and headers
  *   before sending and decodes the responses
