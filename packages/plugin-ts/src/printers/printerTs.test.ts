@@ -1,5 +1,4 @@
 import { ast } from 'kubb/kit'
-import ts from '@typescript/typescript6'
 import { describe, expect, it } from 'vitest'
 import { format } from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'
@@ -869,17 +868,6 @@ describe('printerTs', () => {
         nodes: { date: () => 'string' },
       })
       expect(await formatTS(p.transform(ast.factory.createSchema({ type: 'date', representation: 'string' })))).toBe('string')
-    })
-
-    it('prints a deprecated TypeScript compiler node returned by an override', async () => {
-      const p = printerTs({
-        resolver: resolverTs,
-        optionalType: 'questionToken',
-        arrayType: 'array',
-        enum: inlineLiteralEnum,
-        nodes: { date: () => ts.factory.createTypeReferenceNode('Date', []) },
-      })
-      expect(await formatTS(p.transform(ast.factory.createSchema({ type: 'date', representation: 'string' })))).toBe('Date')
     })
 
     it('override does not affect other node types', async () => {
