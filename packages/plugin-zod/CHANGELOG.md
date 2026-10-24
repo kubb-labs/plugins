@@ -1,5 +1,14 @@
 # @kubb/plugin-zod
 
+## 5.7.0
+
+### Minor Changes
+
+- [#1208](https://github.com/kubb-labs/plugins/pull/1208) [`01c618d`](https://github.com/kubb-labs/plugins/commit/01c618d6f5b0a090abfb834952ec3d7833481bd6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add `inferred: 'direction'`, which types request schemas with `z.input` and response schemas with `z.output`, so both use the domain value of a codec.
+  
+  - Keeps `z.infer` for every alias with `inferred: true`.
+  - Emits the grouped `<operation>PathSchema`, `QuerySchema`, and `HeadersSchema` for every operation with params, not only with `inferred`.
+
 ## 5.6.0
 
 ### Minor Changes
