@@ -86,7 +86,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
       const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, name: importName })
       // `operationTypes: false` names a `$ref`-backed slot after the referenced type, so re-export it instead of `type Pet = Pet`.
-      const reExport = imports.find((imp) => imp.name?.includes(name))
+      const reExport = imports.find((imp) => [imp.name].flat().includes(name))
       if (reExport) {
         return (
           <>
