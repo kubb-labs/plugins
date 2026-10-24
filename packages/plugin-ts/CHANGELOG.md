@@ -1,5 +1,15 @@
 # @kubb/plugin-ts
 
+## 5.1.0
+
+### Minor Changes
+
+- [#1201](https://github.com/kubb-labs/plugins/pull/1201) [`c023c0f`](https://github.com/kubb-labs/plugins/commit/c023c0f3f801f5a6a1c0f8211b41f9b139a7ca4e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Node.js 22.22 or newer, to match `kubb` and `@kubb/core`.
+
+- [#1200](https://github.com/kubb-labs/plugins/pull/1200) [`9f72b82`](https://github.com/kubb-labs/plugins/commit/9f72b82802e28766433316475dcffdee7916046a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Link each emitted type to the spec entry it comes from: parameter groups to their `parameters` list, status types to their response, body types to the request body, and extracted enums to their property. Editor tools such as `openapi-import` use it for go to definition.
+
+- [#1198](https://github.com/kubb-labs/plugins/pull/1198) [`726eb48`](https://github.com/kubb-labs/plugins/commit/726eb481716135048c03de79d264ae0472e563c6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Drop the TypeScript compiler dependency. `this.transform` in `printer.nodes` handlers now returns a string. Returning a TypeScript compiler node is deprecated and needs `typescript` 5 or 6, or `@typescript/typescript6`, installed.
+
 ## 5.0.16
 
 ### Patch Changes
