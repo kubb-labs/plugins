@@ -77,6 +77,12 @@ export type PrinterZodOptions = {
    */
   regexType?: PluginZod['resolvedOptions']['regexType']
   /**
+   * How a non-discriminated `oneOf` is printed: `z.union` with strict members or `z.xor`.
+   *
+   * @default 'union'
+   */
+  oneOfType?: PluginZod['resolvedOptions']['oneOfType']
+  /**
    * Date format in the OpenAPI spec (`'date'` or `'date-time'`).
    */
   dateType?: ast.ParserOptions['dateType']
@@ -464,18 +470,22 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
     },
     union(node) {
       const nodeMembers = node.members ?? []
-      const members = mapSchemaMembers(node, (memberNode) => this.transform(node.strategy === 'one' ? strictOneOfNode(memberNode) : memberNode))
-        .map(({ schema, output }) => (output && node.strategy === 'one' ? strictOneOfMember(output, schema, cyclicSchemaNames) : output))
-        .filter(Boolean)
-      if (members.length === 0) return ''
-      if (members.length === 1) return members[0]!
       // z.discriminatedUnion needs every option to be a ZodObject. Object variants (refs or
       // `.extend(…)`-composed `allOf`) qualify; intersections, cyclic `z.lazy(…)` refs, and
       // non-objects fall back to z.union.
-      const allDiscriminable = nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemaNames))
-      if (node.discriminatorPropertyName && allDiscriminable) {
+      const isDiscriminated = !!node.discriminatorPropertyName && nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemaNames))
+      const isXor = node.strategy === 'one' && !isDiscriminated && this.options.oneOfType === 'xor'
+      // `z.xor` already rejects a value matching several members, so its members stay as declared.
+      const isStrict = node.strategy === 'one' && !isXor
+      const members = mapSchemaMembers(node, (memberNode) => this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode))
+        .map(({ schema, output }) => (output && isStrict ? strictOneOfMember(output, schema, cyclicSchemaNames) : output))
+        .filter(Boolean)
+      if (members.length === 0) return ''
+      if (members.length === 1) return members[0]!
+      if (isDiscriminated) {
         return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
       }
+      if (isXor) return `z.xor(${buildList(members)})`
 
       return `z.union(${buildList(members)})`
     },

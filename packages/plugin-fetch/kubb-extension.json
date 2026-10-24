@@ -21,7 +21,7 @@
   "optionalDependencies": ["plugin-zod"],
   "compatibility": {
     "kubb": ">=5.8.3",
-    "node": ">=22.12"
+    "node": ">=22.22"
   },
   "role": "client",
   "options": [
@@ -193,6 +193,47 @@
       "path": ["sdk", "name"],
       "label": "SDK Name",
       "description": "Root client name for the generated SDK",
+      "type": "text"
+    },
+    {
+      "key": "returnType",
+      "path": ["returnType"],
+      "label": "Return Type",
+      "description": "What a generated function resolves to. full is the whole result with status and error, data is only the success body when it throws, and plain is the client's own promise",
+      "type": "select",
+      "default": "full",
+      "choices": [
+        {
+          "value": "full"
+        },
+        {
+          "value": "data"
+        },
+        {
+          "value": "plain"
+        }
+      ]
+    },
+    {
+      "key": "throwOnErrorDefault",
+      "path": ["throwOnErrorDefault"],
+      "label": "Throw on Error",
+      "description": "Throw when a request fails. A per-call throwOnError overrides it",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "key": "banner",
+      "path": ["output", "banner"],
+      "label": "Banner",
+      "description": "Text added at the top of every generated file",
+      "type": "text"
+    },
+    {
+      "key": "footer",
+      "path": ["output", "footer"],
+      "label": "Footer",
+      "description": "Text added at the end of every generated file",
       "type": "text"
     }
   ]

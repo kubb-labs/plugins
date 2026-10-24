@@ -1,6 +1,19 @@
 import type { ast } from 'kubb/kit'
 
 /**
+ * Returns the base URL as source code. A `${...}` value stays a template literal.
+ */
+export function resolveDefaultBaseURL(baseURL: string | null | undefined): string {
+  if (!baseURL) {
+    return "''"
+  }
+  if (baseURL.includes('${')) {
+    return `\`${baseURL.replaceAll('`', '\\`')}\``
+  }
+  return JSON.stringify(baseURL)
+}
+
+/**
  * Gets the content type from a response, defaulting to 'application/json' if a schema exists.
  */
 export function getContentType(response: ast.ResponseNode | null | undefined): string | null {

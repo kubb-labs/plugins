@@ -27,8 +27,10 @@ export type ResolverMsw = Resolver & {
  */
 export type Options = OutputOptions & {
   /**
-   * Base URL prepended to every handler's request URL. When omitted, handlers match the
-   * operation path only (for example `/pets/:petId`). The adapter's server URL is not used.
+   * Base URL prepended to every handler's request URL. A `${...}` expression runs at runtime.
+   * Pass `{ baseURL }` as a handler's second argument to override it per call.
+   *
+   * @note Leave off the trailing slash. Operation paths already start with `/`.
    */
   baseURL?: string
   /**
@@ -52,10 +54,8 @@ export type Options = OutputOptions & {
    */
   macros?: Array<ast.Macro>
   /**
-   * Emit a `handlers.ts` file that re-exports every handler in operation order.
-   * Drop the file into `setupServer(...handlers)` or `setupWorker(...handlers)`.
-   *
-   * @default false
+   * Emit a `handlers.ts` file with every handler in operation order, as `handlers` and as
+   * `createHandlers({ baseURL })` for a runtime base URL.
    */
   handlers?: boolean
   /**

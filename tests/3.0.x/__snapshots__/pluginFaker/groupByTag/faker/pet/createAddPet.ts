@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { AddPetBody, AddPetBodyFormUrlEncoded, AddPetBodyJson, AddPetBodyXml, AddPetResponse, AddPetStatus200, AddPetStatus200Json, AddPetStatus200Xml, AddPetStatus405 } from '../../types/AddPet'
+import type { AddPetBody, AddPetBodyFormUrlEncoded, AddPetBodyJson, AddPetBodyXml, AddPetResponse, AddPetStatus200, AddPetStatus200Json, AddPetStatus200Xml } from '../../types/AddPet'
 import { createAddPetRequest } from '../createAddPetRequest'
 import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'

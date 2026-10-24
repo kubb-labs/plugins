@@ -17,7 +17,7 @@ export function addPet<ThrowOnError extends boolean = true>(
     request({
       method: 'POST',
       url: '/pet',
-      security: [{ type: 'oauth2' }],
+      security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       validator: { response: addPetResponseSchema, error: addPetErrorSchema },
       ...config,
       throwOnError: config.throwOnError ?? true,

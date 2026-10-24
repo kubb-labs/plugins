@@ -31,7 +31,7 @@ export default defineConfig([
     format: ['esm', 'cjs'],
     ...shared,
     outputOptions: (options, format, { cjsDts }) => ({ ...options, keepNames: format === 'cjs' && !cjsDts }),
-    dts: { emitDtsOnly: true, compilerOptions: { baseUrl: '../..' } },
+    dts: { emitDtsOnly: true, tsconfig: '../../tsconfig.dts.json' },
   },
   {
     // Declarations for the raw templates so consumers can import their types without `allowImportingTsExtensions`.
@@ -42,6 +42,6 @@ export default defineConfig([
     },
     format: 'esm',
     fixedExtension: false,
-    dts: { emitDtsOnly: true, compilerOptions: { baseUrl: '../..' } },
+    dts: { emitDtsOnly: true, tsconfig: '../../tsconfig.dts.json' },
   },
 ])

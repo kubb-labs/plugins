@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { adapterOas } from '@kubb/adapter-oas'
-import { Hookable, createKubb } from '@kubb/core'
+import { Hookable, createKubb, memoryStorage } from '@kubb/core'
 import { type Plugin } from 'kubb/kit'
 import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginFaker } from '@kubb/plugin-faker'
@@ -30,12 +30,12 @@ describe('Plugin Generation Performance', () => {
       async () => {
         const config = defineConfig({
           root: '.',
+          storage: memoryStorage(),
           input: petStorePath,
           adapter: adapterOas({ validate: false }),
           output: {
             path: './src/gen',
             clean: false,
-            write: false,
           },
           plugins: [
             pluginTs({
@@ -61,12 +61,12 @@ describe('Plugin Generation Performance', () => {
       async () => {
         const config = defineConfig({
           root: '.',
+          storage: memoryStorage(),
           input: petStorePath,
           adapter: adapterOas({ validate: false }),
           output: {
             path: './src/gen',
             clean: false,
-            write: false,
           },
           plugins: [
             pluginTs({
@@ -98,12 +98,12 @@ describe('Plugin Generation Performance', () => {
       async () => {
         const config = defineConfig({
           root: '.',
+          storage: memoryStorage(),
           input: petStorePath,
           adapter: adapterOas({ validate: false }),
           output: {
             path: './src/gen',
             clean: false,
-            write: false,
           },
           plugins: [
             pluginTs({

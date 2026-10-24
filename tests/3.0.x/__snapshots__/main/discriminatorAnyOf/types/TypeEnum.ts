@@ -4,7 +4,7 @@
 */
 
 export const typeEnum = {
-    Sedan: "Sedan"
+  Sedan: 'Sedan',
 } as const;
 
 export type TypeEnumKey = (typeof typeEnum)[keyof typeof typeEnum];

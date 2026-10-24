@@ -56,6 +56,19 @@ export function stringify(value: string | number | boolean | undefined): string 
 }
 
 /**
+ * Escapes an `@` at the start of a line, so a multi-line description can't start a new JSDoc tag.
+ * Editors render `\@` as `@` in hovers.
+ *
+ * @example
+ * ```ts
+ * jsDocEscape('intro\n@example value') // 'intro\n\\@example value'
+ * ```
+ */
+export function jsDocEscape(input: unknown): string {
+  return `${input}`.replace(/^(\s*)@/gm, '$1\\@')
+}
+
+/**
  * Escapes characters that are not allowed inside JS string literals, covering quotes, backslashes,
  * and the Unicode line terminators U+2028 and U+2029.
  *

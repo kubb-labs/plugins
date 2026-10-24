@@ -19,7 +19,7 @@
   ],
   "compatibility": {
     "kubb": ">=5.8.3",
-    "node": ">=22.12"
+    "node": ">=22.22"
   },
   "options": [
     {
@@ -29,6 +29,20 @@
       "description": "Path of the generated HTML file. End it in .html.",
       "type": "text",
       "default": "docs.html"
+    },
+    {
+      "key": "banner",
+      "path": ["output", "banner"],
+      "label": "Banner",
+      "description": "Text added at the top of every generated file",
+      "type": "text"
+    },
+    {
+      "key": "footer",
+      "path": ["output", "footer"],
+      "label": "Footer",
+      "description": "Text added at the end of every generated file",
+      "type": "text"
     }
   ]
 }

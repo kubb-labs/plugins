@@ -200,6 +200,7 @@ export type Auth = {
   scheme?: 'bearer' | 'basic'
   name?: string
   in?: 'header' | 'query' | 'cookie'
+  scopes?: Array<string>
 }
 
 /**

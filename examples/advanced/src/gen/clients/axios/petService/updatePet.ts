@@ -17,7 +17,7 @@ export function updatePet<ThrowOnError extends boolean = true>(
     request({
       method: 'PUT',
       url: '/pet',
-      security: [{ type: 'oauth2' }],
+      security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       validator: { response: updatePetResponseSchema, error: updatePetErrorSchema },
       ...config,
       throwOnError: config.throwOnError ?? true,

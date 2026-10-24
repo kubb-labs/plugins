@@ -1,5 +1,44 @@
 # @kubb/plugin-zod
 
+## 5.6.0
+
+### Minor Changes
+
+- [#1201](https://github.com/kubb-labs/plugins/pull/1201) [`c023c0f`](https://github.com/kubb-labs/plugins/commit/c023c0f3f801f5a6a1c0f8211b41f9b139a7ca4e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Node.js 22.22 or newer, to match `kubb` and `@kubb/core`.
+
+## 5.5.0
+
+### Minor Changes
+
+- [#1189](https://github.com/kubb-labs/plugins/pull/1189) [`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add the `oneOfType` option. Set it to `'xor'` to print a `oneOf` as `z.xor([...])`, which passes only when exactly one member matches. Members keep their own `additionalProperties`. The default `'union'` keeps the current output: `z.union([...])` with strict object members. A `oneOf` that prints as `z.discriminatedUnion(...)` is unchanged. `'xor'` needs Zod v4.2.0 or higher.
+
+### Patch Changes
+
+- [#1189](https://github.com/kubb-labs/plugins/pull/1189) [`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the setup checks that threw `KUBB_INVALID_PLUGIN_OPTIONS` when an option such as `returnType`, `syntaxType`, or `parser` held a value outside its allowed list. The option types already reject those values. Checks that depend on another option, such as `sdk.mode: 'tag'` with single-file output, still throw.
+
+- [#1195](https://github.com/kubb-labs/plugins/pull/1195) [`eb89e09`](https://github.com/kubb-labs/plugins/commit/eb89e0939f50d5cebc65a9b988a7f28baacf6324) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - With `mini: true`, emit `z.omit(schema, mask)` for `readOnly` / `writeOnly` keys instead of `.omit()`, and reach a nullable or optional `$ref` through `._zod.def.innerType` instead of `.unwrap()`. Zod Mini schemas have neither method, so the generated code failed to typecheck and threw at load.
+
+## 5.4.14
+
+### Patch Changes
+
+- [#1178](https://github.com/kubb-labs/plugins/pull/1178) [`125999c`](https://github.com/kubb-labs/plugins/commit/125999c0dcd310d62e6cd05a361bff7a98f7358a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Print `z.hostname()` for `format: hostname`. It takes effect once `@kubb/adapter-oas` maps `hostname` to a `string` node (kubb-labs/kubb#4410), which keeps the format. Until then `hostname` prints `z.url()` as before.
+
+## 5.4.13
+
+### Patch Changes
+
+- [#1165](https://github.com/kubb-labs/plugins/pull/1165) [`5d76f27`](https://github.com/kubb-labs/plugins/commit/5d76f2736eabb43ab72b5b7cc6880d54f09e5712) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Studio can now edit more plugin options, because each `kubb-extension.json` lists them:
+  
+  - Every plugin: `output.banner` and `output.footer` as text.
+  - `@kubb/plugin-axios` and `@kubb/plugin-fetch`: `returnType` and `throwOnErrorDefault`.
+  - `@kubb/plugin-client`: `throwOnErrorDefault`.
+  - `@kubb/plugin-faker`: `typeMode`.
+  - `@kubb/plugin-zod`: `compile` and `typeGuards` as on or off.
+  - `@kubb/plugin-react-query`: `customOptions.importPath` and `customOptions.name`.
+
+- [#1171](https://github.com/kubb-labs/plugins/pull/1171) [`60cc33e`](https://github.com/kubb-labs/plugins/commit/60cc33e99e72bcf5408738d207434d25ebb6dbdb) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Cache the results of `camelCase` and `pascalCase`. A build resolves the same names many times, about 35,000 calls from `@kubb/plugin-ts` and `@kubb/plugin-zod` alone for a spec with 1,000 schemas, and each call ran four regular expressions. The cache holds up to 10,000 entries and then starts over.
+
 ## 5.4.12
 
 ### Patch Changes

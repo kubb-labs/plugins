@@ -11,9 +11,9 @@ Pass these options to `pluginVueQuery()`. Shared options link to [Shared plugin 
 | [`client`](#client)                                                       | Which registered client plugin the composables call.                   | Auto-detected                                                                        |
 | [`infinite`](#infinite)                                                   | Add `useInfiniteQuery` composables for paginated reads.                | `false`                                                                              |
 | [`query`](#query)                                                         | Configure or disable query composables.                                | `{ methods: ['GET', 'QUERY'], importPath: '@tanstack/vue-query' }`                   |
-| [`queryKey`](#querykey)                                                   | Build the `queryKey` for each query composable.                        | Built-in `queryKeyTransformer`                                                       |
+| [`queryKey`](#querykey)                                                   | Build the `queryKey` for each query composable.                        | Exported `queryKeyTransformer`                                                       |
 | [`mutation`](#mutation)                                                   | Configure or disable mutation composables.                             | `{ methods: ['POST', 'PUT', 'PATCH', 'DELETE'], importPath: '@tanstack/vue-query' }` |
-| [`mutationKey`](#mutationkey)                                             | Build the `mutationKey` for each mutation composable.                  | Built-in `mutationKeyTransformer`                                                    |
+| [`mutationKey`](#mutationkey)                                             | Build the `mutationKey` for each mutation composable.                  | Exported `mutationKeyTransformer`                                                    |
 | [`hooks`](#hooks)                                                         | Emit `use*` composables on top of the factory helpers.                 | `false`                                                                              |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations that match.                                       | None                                                                                 |
 | [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations that match.                                            | `[]`                                                                                 |
@@ -180,7 +180,7 @@ Builds the `queryKey` for each query composable. The callback receives the opera
 | -------- | ------------------------------------------------------ |
 | Type     | `(props: { node, casing, variant }) => Array<unknown>` |
 | Required | `false`                                                |
-| Default  | Built-in `queryKeyTransformer`                         |
+| Default  | Exported `queryKeyTransformer`                         |
 
 ::code-group
 
@@ -193,6 +193,14 @@ export const getUserByNameQueryKey = () => [{ variant: 'query', operationId: 'ge
 ```
 
 ::
+
+To extend the default key instead of replacing it, import `queryKeyTransformer` and spread its result. The default segments can change between releases, so spread them instead of reading single entries.
+
+```typescript
+import { queryKeyTransformer } from '@kubb/plugin-vue-query'
+
+queryKey: (props) => [JSON.stringify(props.node.operationId), ...queryKeyTransformer(props)]
+```
 
 ### mutation
 
@@ -232,7 +240,15 @@ Builds the `mutationKey` for each mutation composable, useful for batching inval
 | -------- | ------------------------------------------------------ |
 | Type     | `(props: { node, casing, variant }) => Array<unknown>` |
 | Required | `false`                                                |
-| Default  | Built-in `mutationKeyTransformer`                      |
+| Default  | Exported `mutationKeyTransformer`                      |
+
+Extend the default the same way with `mutationKeyTransformer`:
+
+```typescript
+import { mutationKeyTransformer } from '@kubb/plugin-vue-query'
+
+mutationKey: (props) => [JSON.stringify(props.node.operationId), ...mutationKeyTransformer(props)]
+```
 
 ### hooks
 

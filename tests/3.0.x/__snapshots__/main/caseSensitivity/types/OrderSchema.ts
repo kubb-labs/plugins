@@ -4,7 +4,7 @@
 */
 
 export type OrderSchema = {
-    id?: string;
-    customerId?: string;
-    items?: string[];
+  id?: string;
+  customerId?: string;
+  items?: string[];
 };

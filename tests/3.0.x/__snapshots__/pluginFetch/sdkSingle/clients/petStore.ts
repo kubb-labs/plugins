@@ -28,7 +28,7 @@ export class PetStore {
     public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptions, ThrowOnError>): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>)
+    return withUnwrap(request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>)
   }
 
 /**
@@ -39,7 +39,7 @@ export class PetStore {
     public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptions, ThrowOnError> = {}): Unwrappable<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>)
+    return withUnwrap(request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>)
   }
 
 /**
@@ -50,7 +50,7 @@ export class PetStore {
     public getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptions, ThrowOnError>): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>)
+    return withUnwrap(request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>)
   }
 
 /**
@@ -61,7 +61,7 @@ export class PetStore {
     public deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetOptions, ThrowOnError>): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>)
+    return withUnwrap(request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>)
   }
 
 /**
@@ -71,7 +71,7 @@ export class PetStore {
     public uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileOptions, ThrowOnError>): Unwrappable<RequestResult<UploadFileResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], contentType: { request: 'application/octet-stream' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>)
+    return withUnwrap(request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], contentType: { request: 'application/octet-stream' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>)
   }
 
 /**

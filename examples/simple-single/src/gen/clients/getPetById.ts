@@ -21,7 +21,10 @@ export function getPetById<ThrowOnError extends boolean = true>(
     request({
       method: 'GET',
       url: '/pet/{petId}',
-      security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }],
+      security: [
+        { type: 'apiKey', name: 'api_key', in: 'header' },
+        { type: 'oauth2', scopes: ['write:pets', 'read:pets'] },
+      ],
       ...config,
       throwOnError: config.throwOnError ?? true,
     }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>,

@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-react-query",
-  "version": "5.5.3",
+  "version": "5.6.0",
   "description": "Generate type-safe TanStack Query (React Query) hooks with Kubb. Covers useQuery, useMutation, useInfiniteQuery, and queryOptions with full TypeScript support.",
   "keywords": [
     "code-generation",
@@ -94,7 +94,7 @@
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*",
-    "@tanstack/react-query": "^5.104.3",
+    "@tanstack/react-query": "^5.104.5",
     "kubb": "catalog:"
   },
   "peerDependencies": {
@@ -107,6 +107,6 @@
     }
   },
   "engines": {
-    "node": ">=22.12"
+    "node": ">=22.22"
   }
 }

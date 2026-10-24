@@ -1,4 +1,6 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
+import fs from 'node:fs/promises'
+import path from 'node:path'
 import { ast } from 'kubb/kit'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from 'kubb/kit/testing'
 import type { PluginFaker } from '@kubb/plugin-faker'
@@ -6,8 +8,7 @@ import { pluginFakerName, resolverFaker } from '@kubb/plugin-faker'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import * as msw from 'msw'
-import ts from 'typescript'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, onTestFinished, test } from 'vitest'
 import { matchFiles, rawSources, testConfig } from '#mocks'
 import { resolverMsw } from '../resolvers/resolverMsw.ts'
 import type { PluginMsw } from '../types.ts'
@@ -194,6 +195,8 @@ describe('mswGenerator operation', () => {
     { name: 'showPetById', node: showPetByIdNode, options: {} },
     { name: 'getPets', node: listPetsNode, options: {} },
     { name: 'getPetsFaker', node: listPetsNode, options: { parser: 'faker' as const } },
+    { name: 'getPetsBaseUrl', node: listPetsNode, options: { baseURL: 'https://petstore.swagger.io/v1' } },
+    { name: 'getPetsFakerTemplateBaseUrl', node: listPetsNode, options: { parser: 'faker' as const, baseURL: '${process.env.API_URL}' } },
     { name: 'createPet', node: createPetsNode, options: {} },
     { name: 'createPetFaker', node: createPetsNode, options: { parser: 'faker' as const } },
     { name: 'searchPets', node: searchPetsNode, options: {} },
@@ -221,14 +224,21 @@ describe('mswGenerator operation', () => {
   })
 })
 
+async function importGenerated(source: string, stubs: Record<string, string> = {}): Promise<Record<string, any>> {
+  const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.msw-'))
+  onTestFinished(() => fs.rm(dir, { recursive: true, force: true }))
+  for (const [name, code] of Object.entries(stubs)) await fs.writeFile(path.join(dir, `${name}.ts`), code)
+  await fs.writeFile(path.join(dir, 'handler.ts'), source)
+
+  return import(path.join(dir, 'handler.ts'))
+}
+
 describe('mswGenerator QUERY handler', () => {
   // MSW has no `http.query`, so the handler is registered with `http.all` and answers QUERY only.
   async function getResponse(method: string) {
     const files = await renderOperation({ name: 'searchPets', node: searchPetsNode, options: {} })
     const [source] = rawSources(files)
-    const { outputText } = ts.transpileModule(source!, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } })
-    const handlers: Record<string, any> = {}
-    new Function('require', 'exports', outputText)((id: string) => ({ msw })[id], handlers)
+    const handlers = await importGenerated(source!)
 
     return msw.getResponse([handlers.searchPetsHandler([{ id: 1 }])], new Request('http://localhost/pets/search', { method, body: '{}' }), {
       baseUrl: 'http://localhost',
@@ -253,10 +263,7 @@ describe('mswGenerator faker fallback', () => {
   async function getResponseBody(data: unknown) {
     const files = await renderOperation({ name: 'getPetsFaker', node: listPetsNode, options: { parser: 'faker' } })
     const [source] = rawSources(files)
-    const { outputText } = ts.transpileModule(source!, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } })
-    const modules: Record<string, unknown> = { msw, './createListPets': { createListPetsResponse: () => fakerData } }
-    const handlers: Record<string, any> = {}
-    new Function('require', 'exports', outputText)((id: string) => modules[id], handlers)
+    const handlers = await importGenerated(source!, { createListPets: `export const createListPetsResponse = () => (${JSON.stringify(fakerData)})` })
 
     const response = await msw.getResponse([handlers.listPetsHandler(data)], new Request('http://localhost/pets'), { baseUrl: 'http://localhost' })
 

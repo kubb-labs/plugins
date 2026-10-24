@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-fetch",
-  "version": "5.7.0",
+  "version": "5.8.0",
   "description": "Generate a slim, type-safe HTTP client with Kubb based on the native Fetch api.",
   "keywords": [
     "api-client",
@@ -99,6 +99,6 @@
     "kubb": "catalog:"
   },
   "engines": {
-    "node": ">=22.12"
+    "node": ">=22.22"
   }
 }

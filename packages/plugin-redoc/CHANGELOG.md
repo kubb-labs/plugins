@@ -1,5 +1,24 @@
 # @kubb/plugin-redoc
 
+## 5.1.0
+
+### Minor Changes
+
+- [#1201](https://github.com/kubb-labs/plugins/pull/1201) [`c023c0f`](https://github.com/kubb-labs/plugins/commit/c023c0f3f801f5a6a1c0f8211b41f9b139a7ca4e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Node.js 22.22 or newer, to match `kubb` and `@kubb/core`.
+
+## 5.0.13
+
+### Patch Changes
+
+- [#1165](https://github.com/kubb-labs/plugins/pull/1165) [`5d76f27`](https://github.com/kubb-labs/plugins/commit/5d76f2736eabb43ab72b5b7cc6880d54f09e5712) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Studio can now edit more plugin options, because each `kubb-extension.json` lists them:
+  
+  - Every plugin: `output.banner` and `output.footer` as text.
+  - `@kubb/plugin-axios` and `@kubb/plugin-fetch`: `returnType` and `throwOnErrorDefault`.
+  - `@kubb/plugin-client`: `throwOnErrorDefault`.
+  - `@kubb/plugin-faker`: `typeMode`.
+  - `@kubb/plugin-zod`: `compile` and `typeGuards` as on or off.
+  - `@kubb/plugin-react-query`: `customOptions.importPath` and `customOptions.name`.
+
 ## 5.0.12
 
 ### Patch Changes

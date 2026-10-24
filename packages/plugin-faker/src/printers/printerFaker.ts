@@ -2,6 +2,7 @@ import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildObject, objectKey, stringify, toRegExpString } from '@internals/utils'
 import { ast, containsCircularRef, Diagnostics } from 'kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
+import { canOverrideSchema, resolveRefTarget } from '../utils.ts'
 
 /**
  * Partial map of node-type overrides for the Faker printer. Each key is a
@@ -121,16 +122,20 @@ function parseEnumValue(value: string | number | boolean | null | undefined) {
 }
 
 /**
- * Reads the discriminator literal off a variant, or `undefined` when it can't be determined.
+ * Reads the discriminator literal off a variant, with whether its property is required, or
+ * `undefined` when it can't be determined.
  *
  * A variant carries exactly one discriminator value, so a property resolving to several literals
  * (a `ref` to the enum shared by every branch, say) identifies no branch and narrows nothing.
  */
-function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string): string | number | boolean | null | undefined {
+function getDiscriminator(
+  member: ast.SchemaNode,
+  discriminatorPropertyName: string,
+): { value: string | number | boolean | null; required: boolean } | undefined {
   for (const property of ast.resolveSchemaProperties({ node: member, propertyName: discriminatorPropertyName })) {
     const values = ast.getSchemaLiteralValues(property.schema)
     if (values.length === 1) {
-      return values[0]
+      return { value: values[0]!, required: property.required }
     }
   }
 
@@ -232,7 +237,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // emitted with resolver output and should not be transformed twice.
         const resolvedName = node.ref ? this.options.resolver.name(refName) : refName
 
-        if (!this.options.nestedInObject) {
+        if (!this.options.nestedInObject && canOverrideSchema(resolveRefTarget(node))) {
           return `${resolvedName}(data)`
         }
 
@@ -250,10 +255,13 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const items: Array<string> = mapSchemaMembers(node, (member) => {
           // For a discriminated union, narrow each variant to its own branch so nested
           // `NonNullable<T>[K]` indexes resolve against that branch instead of the whole union.
-          const value = discriminatorPropertyName ? getDiscriminatorValue(member, discriminatorPropertyName) : undefined
+          const discriminator = discriminatorPropertyName ? getDiscriminator(member, discriminatorPropertyName) : undefined
 
-          if (baseTypeName && value !== undefined) {
-            const typeName = `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
+          if (baseTypeName && discriminator) {
+            // An optional discriminator (`strategy?: 'a'`) does not extend `{ strategy: 'a' }`,
+            // so match it as optional too.
+            const key = `${JSON.stringify(discriminatorPropertyName)}${discriminator.required ? '' : '?'}`
+            const typeName = `Extract<NonNullable<${baseTypeName}>, { ${key}: ${parseEnumValue(discriminator.value)} }>`
 
             return printNested(member, { typeName, nestedInObject: true, nestedInUnion: true })
           }

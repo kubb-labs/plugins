@@ -18,8 +18,12 @@ export function deletePet<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-      RequestResult<DeletePetResponses, ThrowOnError>
-    >,
+    request({
+      method: 'DELETE',
+      url: '/pet/{petId}',
+      security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+      ...config,
+      throwOnError: config.throwOnError ?? true,
+    }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>,
   )
 }

@@ -74,3 +74,11 @@ describe('casing', () => {
     expect(screamingSnakeCase('tag', { suffix: 'schema' })).toBe('TAG_SCHEMA')
   })
 })
+
+describe('casing cache', () => {
+  test('keeps camelCase and PascalCase results for the same text apart', () => {
+    expect(camelCase('pet-store')).toBe('petStore')
+    expect(pascalCase('pet-store')).toBe('PetStore')
+    expect(camelCase('pet-store')).toBe('petStore')
+  })
+})

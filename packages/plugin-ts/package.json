@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-ts",
-  "version": "5.0.14",
+  "version": "5.1.0",
   "description": "Generate TypeScript types, interfaces, and enums with Kubb. The base plugin other Kubb plugins build on for type safety.",
   "keywords": [
     "code-generation",
@@ -74,17 +74,28 @@
   },
   "dependencies": {
     "@kubb/parser-ts": "catalog:",
-    "typescript": "catalog:"
+    "yuku-codegen": "^0.19.0"
   },
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "typescript": "catalog:"
   },
   "peerDependencies": {
-    "kubb": "catalog:"
+    "@typescript/typescript6": "^6.0.2",
+    "kubb": "catalog:",
+    "typescript": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@typescript/typescript6": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    }
   },
   "engines": {
-    "node": ">=22.12"
+    "node": ">=22.22"
   }
 }

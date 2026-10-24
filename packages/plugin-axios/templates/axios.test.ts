@@ -1,7 +1,18 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios, { AxiosError as AxiosErrorClass } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import { type CallResult, type ClientConfig, createClientCore, parseEventStream, ResponseError, resolveAuth, unwrapResult, withUnwrap } from './axios.ts'
+import {
+  type Auth,
+  type CallResult,
+  type ClientConfig,
+  createClientCore,
+  parseEventStream,
+  ResponseError,
+  resolveAuth,
+  unwrapResult,
+  withUnwrap,
+} from './axios.ts'
+import { applyHeaderStyles, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
 
@@ -1308,7 +1319,17 @@ describe('resolveAuth', () => {
 
   test('resolves oauth2 as a bearer token', async () => {
     const headers: Record<string, string> = {}
-    await resolveAuth({ security: [{ type: 'oauth2' }], auth: () => 'token-123', headers, query: {} })
+    let receivedAuth: Auth | undefined
+    await resolveAuth({
+      security: [{ type: 'oauth2', scopes: ['read:pets'] }],
+      auth: (auth) => {
+        receivedAuth = auth
+        return 'token-123'
+      },
+      headers,
+      query: {},
+    })
+    expect(receivedAuth?.scopes).toStrictEqual(['read:pets'])
     expect(headers.Authorization).toBe('Bearer token-123')
   })
 
@@ -1422,5 +1443,15 @@ describe('parseEventStream', () => {
   test('consumes an async iterable of byte chunks, as the axios stream response yields', async () => {
     const events = await collect(parseEventStream(asyncIterableOf(['data: {"n":1}\n\n'])))
     expect(events).toStrictEqual([{ data: { n: 1 } }])
+  })
+})
+
+describe('JSON content parameters', () => {
+  const json = { contentType: 'application/json' }
+
+  test('encodes query, header, and cookie values as JSON', () => {
+    expect(defaultQuerySerializer({ filter: { a: 1 } }, { filter: json })).toBe(`filter=${encodeURIComponent('{"a":1}')}`)
+    expect(applyHeaderStyles({ 'X-Meta': { name: '日本' } }, { 'X-Meta': json })).toStrictEqual([['X-Meta', '{"name":"\\u65e5\\u672c"}']])
+    expect(serializeCookies({ prefs: { a: 1 } }, { prefs: json })).toBe(`prefs=${encodeURIComponent('{"a":1}')}`)
   })
 })

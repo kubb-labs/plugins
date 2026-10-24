@@ -159,6 +159,10 @@ describe('printerZodMini', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'base64' }))).toBe('z.base64()')
     })
 
+    test('hostname format', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'hostname' }))).toBe('z.hostname()')
+    })
+
     test('base64url format', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'string', format: 'base64url' }))).toBe('z.base64url()')
     })
@@ -969,6 +973,24 @@ describe('printerZodMini', () => {
       expect(printer.print(node)).toBe('z.union([TypeA, TypeB])')
     })
 
+    test("oneOfType: 'xor' prints z.xor, which passes only when exactly one member matches", () => {
+      const contactBy = (key: string) =>
+        ast.factory.createSchema({
+          type: 'object',
+          primitive: 'object',
+          properties: [ast.factory.createProperty({ name: key, required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+        })
+      const node = ast.factory.createSchema({ type: 'union', strategy: 'one', members: [contactBy('email'), contactBy('phone')] })
+
+      const code = printerZodMini({ oneOfType: 'xor' }).print(node)
+      expect(code).toMatch(/^z\.xor\(\[\s+z\.object\(/)
+
+      const schema = new Function('z', `return ${code}`)(z) as z.ZodMiniType
+      expect(schema.safeParse({ email: 'ann@example.com', name: 'Ann' }).success).toBe(true)
+      expect(schema.safeParse({ email: 'ann@example.com', phone: '555-0100' }).success).toBe(false)
+      expect(schema.safeParse({}).success).toBe(false)
+    })
+
     test('oneOf union with object members uses strict objects', () => {
       const node = ast.factory.createSchema({
         type: 'union',
@@ -1223,10 +1245,10 @@ describe('printerZodMini', () => {
         ],
       })
       expect(p.print(node)).toMatchInlineSnapshot(`
-        "z.object({
+        "z.omit(z.object({
           id: z.int(),
           name: z.string(),
-        }).omit({ "id": true })"
+        }), { "id": true })"
       `)
     })
 
@@ -1242,11 +1264,11 @@ describe('printerZodMini', () => {
         ],
       })
       expect(p.print(node)).toMatchInlineSnapshot(`
-        "z.object({
+        "z.omit(z.object({
           id: z.int(),
           createdAt: z.string(),
           name: z.string(),
-        }).omit({ "id": true, "createdAt": true })"
+        }), { "id": true, "createdAt": true })"
       `)
     })
 
@@ -1270,9 +1292,8 @@ describe('printerZodMini', () => {
       expect(p.print(node)).toMatchInlineSnapshot(`"z.discriminatedUnion('petType', [Cat, Dog])"`)
     })
 
-    test('unwraps a nullable ref before omit so .omit() targets the inner object', () => {
-      // https://github.com/kubb-labs/plugins/issues/567 (bug 4): a $ref to a nullable schema
-      // resolves to a ZodMiniNullable variable, and .omit() only exists on the inner object.
+    test('unwraps a nullable ref through _zod.def.innerType before z.omit()', () => {
+      // https://github.com/kubb-labs/plugins/issues/1102: Zod Mini has no .unwrap() or .omit() methods.
       const p = printerZodMini({ keysToOmit: ['pending'] })
       const node = ast.factory.createSchema({
         type: 'ref',
@@ -1281,7 +1302,7 @@ describe('printerZodMini', () => {
         nullable: true,
         primitive: 'object',
       })
-      expect(p.print(node)).toBe('z.nullable(maintenance_window.unwrap().omit({ "pending": true }))')
+      expect(p.print(node)).toBe('z.nullable(z.omit(maintenance_window._zod.def.innerType, { "pending": true }))')
     })
   })
 

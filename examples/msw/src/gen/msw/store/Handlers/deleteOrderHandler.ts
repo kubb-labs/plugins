@@ -20,8 +20,9 @@ export function deleteOrderHandlerResponse404(data?: DeleteOrderStatus404) {
 
 export function deleteOrderHandler(
   data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Response | Promise<Response>),
+  options?: { baseURL?: string },
 ) {
-  return http.delete(`http://localhost:3000/store/order/:orderId`, function handler(info) {
+  return http.delete(`${options?.baseURL ?? 'http://localhost:3000'}/store/order/:orderId`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

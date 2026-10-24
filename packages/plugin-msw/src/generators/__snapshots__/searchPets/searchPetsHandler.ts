@@ -16,8 +16,11 @@ export function searchPetsHandlerResponse200(data: SearchPetsResponse) {
   })
 }
 
-export function searchPetsHandler(data?: SearchPetsResponse | ((info: Parameters<Parameters<typeof http.all>[1]>[0]) => Response | Promise<Response>)) {
-  return http.all(`/pets/search`, function handler(info) {
+export function searchPetsHandler(
+  data?: SearchPetsResponse | ((info: Parameters<Parameters<typeof http.all>[1]>[0]) => Response | Promise<Response>),
+  options?: { baseURL?: string },
+) {
+  return http.all(`${options?.baseURL ?? ''}/pets/search`, function handler(info) {
     if (info.request.method !== 'QUERY') return
 
     if (typeof data === 'function') return data(info)

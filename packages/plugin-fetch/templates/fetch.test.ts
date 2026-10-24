@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from 'vitest'
 import {
+  type Auth,
   type CallResult,
   type ClientConfig,
   createClient as createFetchClient,
@@ -77,6 +78,27 @@ describe('createInterceptorStack', () => {
 describe('defaultQuerySerializer', () => {
   test('explodes arrays into repeated keys', () => {
     expect(defaultQuerySerializer({ tags: ['a', 'b'] })).toBe('tags=a&tags=b')
+  })
+
+  test('JSON-encodes a parameter with a JSON content type as one value', () => {
+    const filter = { root: { nested: ['!#=~[]', 1] } }
+    const query = defaultQuerySerializer({ filter, page: 2 }, { filter: { contentType: 'application/json' } })
+    expect(query).toBe(`filter=${encodeURIComponent(JSON.stringify(filter))}&page=2`)
+    expect(new URLSearchParams(query).get('filter')).toBe(JSON.stringify(filter))
+  })
+
+  test('fully encodes a JSON value even when allowReserved is set', () => {
+    expect(defaultQuerySerializer({ f: { q: 'a&b#c' } }, { f: { contentType: 'application/json', allowReserved: true } })).toBe(
+      `f=${encodeURIComponent('{"q":"a&b#c"}')}`,
+    )
+  })
+
+  test('only treats application/json and +json media types as JSON', () => {
+    const value = { a: 1 }
+    expect(defaultQuerySerializer({ value }, { value: { contentType: 'application/vnd.api+json; charset=utf-8' } })).toBe(
+      `value=${encodeURIComponent('{"a":1}')}`,
+    )
+    expect(defaultQuerySerializer({ value }, { value: { contentType: 'application/jsonl' } })).toBe('a=1')
   })
 
   test('serializes nested objects with the deepObject style', () => {
@@ -166,6 +188,11 @@ describe('defaultPathSerializer', () => {
 })
 
 describe('defaultBodySerializer', () => {
+  test('ignores a JSON part contentType for urlencoded bodies', () => {
+    const encoding = { meta: { contentType: 'application/json' } }
+    expect(defaultBodySerializer({ body: { meta: { a: 1 } }, contentType: 'application/x-www-form-urlencoded', encoding })).toBe('a=1')
+  })
+
   test('JSON-serializes plain objects', () => {
     expect(defaultBodySerializer({ body: { name: 'odie' } })).toBe('{"name":"odie"}')
   })
@@ -240,6 +267,10 @@ describe('defaultBodySerializer', () => {
 })
 
 describe('serializeCookies', () => {
+  test('JSON-encodes a cookie with a JSON content type', () => {
+    expect(serializeCookies({ prefs: { a: [1, 2] } }, { prefs: { contentType: 'application/json' } })).toBe(`prefs=${encodeURIComponent('{"a":[1,2]}')}`)
+  })
+
   test('serializes primitives and arrays in form style', () => {
     expect(serializeCookies({ session: 'abc', ids: [1, 2] })).toBe('session=abc; ids=1,2')
   })
@@ -255,6 +286,20 @@ describe('serializeCookies', () => {
 })
 
 describe('applyHeaderStyles', () => {
+  test('sends a header with a JSON content type as its JSON string', () => {
+    const result = applyHeaderStyles(
+      { 'X-Meta': { a: 1 }, 'X-Name': 'odie' },
+      { 'X-Meta': { contentType: 'application/json' }, 'X-Name': { contentType: 'application/json' } },
+    )
+    expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-Meta': '{"a":1}', 'X-Name': '"odie"' })
+  })
+
+  test('escapes non-ASCII characters in a JSON header so it stays a valid header value', () => {
+    const result = applyHeaderStyles({ 'X-Meta': { name: '日本' } }, { 'X-Meta': { contentType: 'application/json' } }) as Array<[string, string]>
+    expect(result[0]?.[1]).toBe('{"name":"\\u65e5\\u672c"}')
+    expect(JSON.parse(result[0]?.[1] ?? '')).toStrictEqual({ name: '日本' })
+  })
+
   test('serializes array and object headers with the simple style', () => {
     const result = applyHeaderStyles({ 'X-Ids': [3, 4], 'X-Filter': { role: 'admin' } }, { 'X-Ids': { explode: false }, 'X-Filter': { explode: true } })
     expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-Ids': '3,4', 'X-Filter': 'role=admin' })
@@ -1044,7 +1089,17 @@ describe('resolveAuth', () => {
 
   test('resolves oauth2 as a bearer token', async () => {
     const headers: Record<string, string> = {}
-    await resolveAuth({ security: [{ type: 'oauth2' }], auth: () => 'token-123', headers, query: {} })
+    let receivedAuth: Auth | undefined
+    await resolveAuth({
+      security: [{ type: 'oauth2', scopes: ['read:pets'] }],
+      auth: (auth) => {
+        receivedAuth = auth
+        return 'token-123'
+      },
+      headers,
+      query: {},
+    })
+    expect(receivedAuth?.scopes).toStrictEqual(['read:pets'])
     expect(headers.Authorization).toBe('Bearer token-123')
   })
 

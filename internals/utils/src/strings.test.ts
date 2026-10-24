@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getNestedAccessor, jsStringEscape, stringify, toRegExpString, trimQuotes } from './strings.ts'
+import { getNestedAccessor, jsDocEscape, jsStringEscape, stringify, toRegExpString, trimQuotes } from './strings.ts'
 
 describe('trimQuotes', () => {
   it('strips a balanced double-quote pair', () => {
@@ -36,6 +36,12 @@ describe('stringify', () => {
     expect(stringify(42)).toBe("'42'")
     expect(stringify(true)).toBe("'true'")
     expect(stringify(undefined)).toBe("''")
+  })
+})
+
+describe('jsDocEscape', () => {
+  it('escapes an @ that starts a line and keeps the rest', () => {
+    expect(jsDocEscape('intro\n  @example value\nmail me@example.com')).toBe('intro\n  \\@example value\nmail me@example.com')
   })
 })
 

@@ -47,19 +47,19 @@
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
-    "bun-types": "^1.4.3",
+    "bun-types": "^1.4.4",
     "kubb": "catalog:",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
     "prettier": "catalog:",
     "taze": "^21.3.0",
     "tsdown": "catalog:",
-    "turbo": "2.11.7",
+    "turbo": "2.11.10",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
   "engines": {
-    "node": ">=22.12",
+    "node": ">=22.22",
     "pnpm": ">=11.0.0"
   },
   "packageManager": "pnpm@12.11.2",

@@ -21,7 +21,7 @@
   "optionalDependencies": ["plugin-faker"],
   "compatibility": {
     "kubb": ">=5.8.3",
-    "node": ">=22.12"
+    "node": ">=22.22"
   },
   "options": [
     {
@@ -170,6 +170,20 @@
       "path": ["baseURL"],
       "label": "Base URL",
       "description": "Custom base URL for handlers",
+      "type": "text"
+    },
+    {
+      "key": "banner",
+      "path": ["output", "banner"],
+      "label": "Banner",
+      "description": "Text added at the top of every generated file",
+      "type": "text"
+    },
+    {
+      "key": "footer",
+      "path": ["output", "footer"],
+      "label": "Footer",
+      "description": "Text added at the end of every generated file",
       "type": "text"
     }
   ]

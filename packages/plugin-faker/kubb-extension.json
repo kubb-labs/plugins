@@ -20,7 +20,7 @@
   "dependencies": ["plugin-ts"],
   "compatibility": {
     "kubb": ">=5.8.3",
-    "node": ">=22.12"
+    "node": ">=22.22"
   },
   "options": [
     {
@@ -191,6 +191,36 @@
       "label": "Seed",
       "description": "Fixed seed for consistent output",
       "type": "number"
+    },
+    {
+      "key": "typeMode",
+      "path": ["typeMode"],
+      "label": "Type Mode",
+      "description": "Type the factories from the generated values (inferred) or from the API model (schema)",
+      "type": "select",
+      "default": "inferred",
+      "choices": [
+        {
+          "value": "inferred"
+        },
+        {
+          "value": "schema"
+        }
+      ]
+    },
+    {
+      "key": "banner",
+      "path": ["output", "banner"],
+      "label": "Banner",
+      "description": "Text added at the top of every generated file",
+      "type": "text"
+    },
+    {
+      "key": "footer",
+      "path": ["output", "footer"],
+      "label": "Footer",
+      "description": "Text added at the end of every generated file",
+      "type": "text"
     }
   ]
 }

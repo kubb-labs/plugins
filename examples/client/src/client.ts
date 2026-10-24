@@ -40,7 +40,7 @@ export type RequestConfig = {
   /**
    * The security schemes of the operation. Generated for reference. This skeleton ignores them, use them to add auth.
    */
-  security?: Array<{ type: string; name?: string; in?: string }>
+  security?: Array<{ type: string; name?: string; in?: string; scopes?: Array<string> }>
   client?: typeof client
 }
 

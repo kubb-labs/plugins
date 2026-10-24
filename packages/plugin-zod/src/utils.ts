@@ -326,15 +326,16 @@ function modifierDepth(schema: ast.SchemaNode): number {
  * `.optional()` / `.nullish()` / `.default()` wrappers. `.omit()` lives on the inner `ZodObject`,
  * not on those `ZodNullable` / `ZodOptional` / `ZodDefault` wrappers, so the omit has to unwrap
  * down to the object first. This mirrors plugin-ts emitting `Omit<NonNullable<T>, …>`. Inline
- * objects need no unwrap because the printer adds their modifiers after `.omit()`.
+ * objects need no unwrap because the printer adds their modifiers after `.omit()`. Zod Mini has no
+ * `.unwrap()`, so its printer passes `._zod.def.innerType` as the `step`.
  */
-export function omitUnwrapChain(node: ast.SchemaNode): string {
+export function omitUnwrapChain(node: ast.SchemaNode, step = '.unwrap()'): string {
   const ref = ast.narrowSchema(node, 'ref')
   if (!ref) return ''
 
   const target = ref.schema ?? ref
   const depth = modifierDepth(target) + (target.default !== undefined ? 1 : 0)
-  return '.unwrap()'.repeat(depth)
+  return step.repeat(depth)
 }
 
 /**
@@ -362,6 +363,7 @@ export const STRING_FORMAT_CALLS = new Map<string | undefined, string>([
   ['ulid', 'z.ulid()'],
   ['iban', 'z.iban()'],
   ['duration', 'z.iso.duration()'],
+  ['hostname', 'z.hostname()'],
 ])
 
 /**
@@ -429,12 +431,13 @@ export function buildObjectShape(
 }
 
 /**
- * Shared `print` body: transforms the node, applies `keysToOmit` as `.omit(...)`, then `modify` adds the modifiers.
+ * Shared `print` body: transforms the node, applies `keysToOmit` as `.omit(...)` (or `z.omit(...)` when `mini`), then `modify` adds the modifiers.
  */
 export function printWithOmit(
   ctx: { transform: (node: ast.SchemaNode) => string | null; options: { keysToOmit?: Array<string> | null } },
   node: ast.SchemaNode,
   modify: (value: string, meta: ReturnType<typeof syncSchemaRef>) => string,
+  mini = false,
 ): string | null {
   const { keysToOmit } = ctx.options
 
@@ -446,13 +449,15 @@ export function printWithOmit(
   const base = (() => {
     if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed
 
-    // A ref resolves to a wrapper variable; unwrap to the inner object before .omit().
-    const unwrap = omitUnwrapChain(node)
-    const omit = `.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} })`
+    // A ref resolves to a wrapper variable; unwrap to the inner object before omitting.
+    // Zod Mini schemas have no `.unwrap()` / `.omit()`, so walk `_zod.def.innerType` and call `z.omit()`.
+    const unwrap = omitUnwrapChain(node, mini ? '._zod.def.innerType' : '.unwrap()')
+    const mask = `{ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} }`
+    const omit = (target: string) => (mini ? `z.omit(${target}${unwrap}, ${mask})` : `${target}${unwrap}.omit(${mask})`)
 
     const lazyMatch = transformed.match(/^z\.lazy\(\(\)\s*=>\s*(.+)\)$/)
-    if (lazyMatch) return `z.lazy(() => ${lazyMatch[1]}${unwrap}${omit})`
-    return `${transformed}${unwrap}${omit}`
+    if (lazyMatch) return `z.lazy(() => ${omit(lazyMatch[1]!)})`
+    return omit(transformed)
   })()
 
   return modify(base, meta)

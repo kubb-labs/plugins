@@ -1,5 +1,58 @@
 # @kubb/plugin-msw
 
+## 5.3.0
+
+### Minor Changes
+
+- [#1201](https://github.com/kubb-labs/plugins/pull/1201) [`c023c0f`](https://github.com/kubb-labs/plugins/commit/c023c0f3f801f5a6a1c0f8211b41f9b139a7ca4e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Node.js 22.22 or newer, to match `kubb` and `@kubb/core`.
+
+### Patch Changes
+
+- Updated dependencies [[`d7d8910`](https://github.com/kubb-labs/plugins/commit/d7d89105fe03987bfbb0ad21e5b71fbc85a6fd9c), [`c023c0f`](https://github.com/kubb-labs/plugins/commit/c023c0f3f801f5a6a1c0f8211b41f9b139a7ca4e), [`9f72b82`](https://github.com/kubb-labs/plugins/commit/9f72b82802e28766433316475dcffdee7916046a), [`726eb48`](https://github.com/kubb-labs/plugins/commit/726eb481716135048c03de79d264ae0472e563c6)]:
+  - @kubb/plugin-faker@5.2.0
+  - @kubb/plugin-ts@5.1.0
+
+## 5.2.1
+
+### Patch Changes
+
+- [#1189](https://github.com/kubb-labs/plugins/pull/1189) [`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the setup checks that threw `KUBB_INVALID_PLUGIN_OPTIONS` when an option such as `returnType`, `syntaxType`, or `parser` held a value outside its allowed list. The option types already reject those values. Checks that depend on another option, such as `sdk.mode: 'tag'` with single-file output, still throw.
+
+- [#1185](https://github.com/kubb-labs/plugins/pull/1185) [`dea9d65`](https://github.com/kubb-labs/plugins/commit/dea9d65a58e3d8cf77a630a891cf608d2b9988d3) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Document `createHandlers` and the per-handler `{ baseURL }` argument.
+- Updated dependencies [[`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69), [`9c6e3e8`](https://github.com/kubb-labs/plugins/commit/9c6e3e8f9eee37b60c2a6cd44e24555f9397c2ac), [`2501fe8`](https://github.com/kubb-labs/plugins/commit/2501fe8086b277dcee65991cef71ed654949b967), [`e2c3c57`](https://github.com/kubb-labs/plugins/commit/e2c3c57a89852e41d100f149ce4b7b12fbdfcafb)]:
+  - @kubb/plugin-ts@5.0.16
+  - @kubb/plugin-faker@5.1.11
+
+## 5.2.0
+
+### Minor Changes
+
+- [#1181](https://github.com/kubb-labs/plugins/pull/1181) [`849bcc7`](https://github.com/kubb-labs/plugins/commit/849bcc79a564207e77371c3c567d76c5a031705b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Handlers take an optional `{ baseURL }` second argument that overrides the configured `baseURL`. With `handlers: true`, `handlers.ts` also exports `createHandlers({ baseURL })`:
+  
+  ```ts
+  setupServer(...createHandlers({ baseURL: getBaseURL() }))
+  ```
+  
+  A `${...}` expression in `baseURL` now also works with `parser: 'faker'`.
+
+## 5.1.4
+
+### Patch Changes
+
+- [#1165](https://github.com/kubb-labs/plugins/pull/1165) [`5d76f27`](https://github.com/kubb-labs/plugins/commit/5d76f2736eabb43ab72b5b7cc6880d54f09e5712) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Studio can now edit more plugin options, because each `kubb-extension.json` lists them:
+  
+  - Every plugin: `output.banner` and `output.footer` as text.
+  - `@kubb/plugin-axios` and `@kubb/plugin-fetch`: `returnType` and `throwOnErrorDefault`.
+  - `@kubb/plugin-client`: `throwOnErrorDefault`.
+  - `@kubb/plugin-faker`: `typeMode`.
+  - `@kubb/plugin-zod`: `compile` and `typeGuards` as on or off.
+  - `@kubb/plugin-react-query`: `customOptions.importPath` and `customOptions.name`.
+
+- [#1171](https://github.com/kubb-labs/plugins/pull/1171) [`60cc33e`](https://github.com/kubb-labs/plugins/commit/60cc33e99e72bcf5408738d207434d25ebb6dbdb) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Cache the results of `camelCase` and `pascalCase`. A build resolves the same names many times, about 35,000 calls from `@kubb/plugin-ts` and `@kubb/plugin-zod` alone for a spec with 1,000 schemas, and each call ran four regular expressions. The cache holds up to 10,000 entries and then starts over.
+- Updated dependencies [[`ccce85d`](https://github.com/kubb-labs/plugins/commit/ccce85d735d2ac92c42011d4bdf11431de12a7c1), [`5d76f27`](https://github.com/kubb-labs/plugins/commit/5d76f2736eabb43ab72b5b7cc6880d54f09e5712), [`07c62dd`](https://github.com/kubb-labs/plugins/commit/07c62dd57990afbfb12e0c937d446710fbcdc009), [`60cc33e`](https://github.com/kubb-labs/plugins/commit/60cc33e99e72bcf5408738d207434d25ebb6dbdb)]:
+  - @kubb/plugin-ts@5.0.15
+  - @kubb/plugin-faker@5.1.10
+
 ## 5.1.3
 
 ### Patch Changes

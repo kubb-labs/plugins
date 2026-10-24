@@ -77,7 +77,7 @@ export type Order = {
    */
   status?: OrderStatusEnumKey
   /**
-   * @description HTTP Status\'s and item of this
+   * @description HTTP Status's and item of this
    * @example 200
    */
   http_status?: OrderHttpStatusEnumKey

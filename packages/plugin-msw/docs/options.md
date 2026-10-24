@@ -21,7 +21,9 @@ Pass these options to `pluginMsw()`. Shared options link to [Shared plugin optio
 
 ### baseURL
 
-Base URL prepended to every handler's request. When omitted, no host is prepended and each handler matches the operation's relative path from the spec. Set it to point at a different environment than the spec.
+Base URL prepended to every handler's request. When omitted, no host is prepended and each handler matches the operation's relative path from the spec. Set it to point at a different environment than the spec. Leave off the trailing slash, because operation paths already start with `/`.
+
+A value with a template expression, such as `'${process.env.API_URL}'`, is evaluated when the handler is created. To set the base URL at runtime instead, pass `{ baseURL }` to a handler or to [`createHandlers`](#handlers).
 
 |          |          |
 | -------- | -------- |
@@ -30,7 +32,10 @@ Base URL prepended to every handler's request. When omitted, no host is prepende
 
 ### handlers
 
-Emits a `handlers.ts` file that re-exports every generated handler in operation order. Spread it into your MSW `setupServer(...handlers)` or `setupWorker(...handlers)` call.
+Emits a `handlers.ts` file with every generated handler in operation order. It exports two things:
+
+- `handlers`: the collection with the configured `baseURL`. Spread it into `setupServer(...handlers)` or `setupWorker(...handlers)`.
+- `createHandlers(options?)`: builds the same collection with a `baseURL` you pass at runtime.
 
 |          |           |
 | -------- | --------- |
@@ -42,7 +47,11 @@ Emits a `handlers.ts` file that re-exports every generated handler in operation 
 import { getPetHandler } from './getPetHandler'
 import { addPetHandler } from './addPetHandler'
 
-export const handlers = [getPetHandler(), addPetHandler()] as const
+export function createHandlers(options?: { baseURL?: string }) {
+  return [getPetHandler(undefined, options), addPetHandler(undefined, options)] as const
+}
+
+export const handlers = createHandlers()
 ```
 
 ### parser

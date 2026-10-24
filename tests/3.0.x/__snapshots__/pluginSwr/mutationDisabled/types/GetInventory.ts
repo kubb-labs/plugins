@@ -4,21 +4,21 @@
 */
 
 export type GetInventoryStatus200 = {
-    [key: string]: number;
+  [key: string]: number;
 };
 
 export type GetInventoryOptions = {
-    body?: never;
-    path?: never;
-    query?: never;
-    headers?: never;
+  body?: never;
+  path?: never;
+  query?: never;
+  headers?: never;
 };
 
 export type GetInventoryResponses = {
-    "200": GetInventoryStatus200;
+  '200': GetInventoryStatus200;
 };
 
 /**
  * @description Union of all possible responses
-*/
+ */
 export type GetInventoryResponse = GetInventoryStatus200;

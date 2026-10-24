@@ -79,6 +79,14 @@ describe('printerFaker', () => {
     expect(printerFaker({ resolver: resolverFaker }).print(node)).toMatchInlineSnapshot(`"createOrderSchema(data)"`)
   })
 
+  test('calls a ref to an untyped schema without data', () => {
+    const anyJson = ast.factory.createSchema({ type: 'unknown' })
+    const eventPayload = ast.factory.createSchema({ type: 'ref', name: 'AnyJson', ref: '#/components/schemas/AnyJson', schema: anyJson })
+    const node = ast.factory.createSchema({ type: 'ref', name: 'EventPayload', ref: '#/components/schemas/EventPayload', schema: eventPayload })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('createEventPayload()')
+  })
+
   test('uses tuple item types for nested enum members', () => {
     const node = ast.factory.createSchema({
       type: 'tuple',
@@ -129,6 +137,27 @@ describe('printerFaker', () => {
     expect(result).toContain(`Extract<NonNullable<NodeBalancerConfig>, { "protocol": 'udp' }>`)
     expect(result).toContain(`Extract<NonNullable<NodeBalancerConfig>, { "protocol": 'tcp' }>`)
     expect(result).not.toContain('NonNullable<NodeBalancerConfig>["algorithm"]')
+  })
+
+  test('narrows variants with an optional discriminator as optional', () => {
+    const makeVariant = (strategy: string) =>
+      ast.factory.createSchema({
+        type: 'object',
+        properties: [
+          ast.factory.createProperty({ name: 'strategy', schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: [strategy] }) }),
+        ],
+      })
+
+    const node = ast.factory.createSchema({
+      type: 'union',
+      discriminatorPropertyName: 'strategy',
+      members: [makeVariant('constant'), makeVariant('exponential')],
+    })
+
+    const result = printerFaker({ resolver: resolverFaker, typeName: 'Backoff' }).print(node)
+
+    expect(result).toContain(`Extract<NonNullable<Backoff>, { "strategy"?: 'constant' }>`)
+    expect(result).toContain(`Extract<NonNullable<Backoff>, { "strategy"?: 'exponential' }>`)
   })
 
   test('narrows referenced discriminated oneOf variants to their own branch', () => {

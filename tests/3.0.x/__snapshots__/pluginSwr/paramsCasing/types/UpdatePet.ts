@@ -7,16 +7,16 @@ import type { Pet } from './Pet'
 import type { PetUpdate } from './PetUpdate'
 
 export type UpdatePetPath = {
-    pet_id: string;
+  pet_id: string;
 };
 
 export type UpdatePetQuery = {
-    include_deleted?: boolean;
-    request_source?: string;
+  include_deleted?: boolean;
+  request_source?: string;
 };
 
 export type UpdatePetHeaders = {
-    "X-Request-ID"?: string;
+  'X-Request-ID'?: string;
 };
 
 export type UpdatePetStatus200 = Pet;
@@ -24,17 +24,17 @@ export type UpdatePetStatus200 = Pet;
 export type UpdatePetBody = PetUpdate;
 
 export type UpdatePetOptions = {
-    body: UpdatePetBody;
-    path: UpdatePetPath;
-    query?: UpdatePetQuery;
-    headers?: UpdatePetHeaders;
+  body: UpdatePetBody;
+  path: UpdatePetPath;
+  query?: UpdatePetQuery;
+  headers?: UpdatePetHeaders;
 };
 
 export type UpdatePetResponses = {
-    "200": UpdatePetStatus200;
+  '200': UpdatePetStatus200;
 };
 
 /**
  * @description Union of all possible responses
-*/
+ */
 export type UpdatePetResponse = UpdatePetStatus200;

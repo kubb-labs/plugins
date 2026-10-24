@@ -1,5 +1,44 @@
 # @kubb/plugin-fetch
 
+## 5.8.0
+
+### Minor Changes
+
+- [#1201](https://github.com/kubb-labs/plugins/pull/1201) [`c023c0f`](https://github.com/kubb-labs/plugins/commit/c023c0f3f801f5a6a1c0f8211b41f9b139a7ca4e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Node.js 22.22 or newer, to match `kubb` and `@kubb/core`.
+
+### Patch Changes
+
+- Updated dependencies [[`c023c0f`](https://github.com/kubb-labs/plugins/commit/c023c0f3f801f5a6a1c0f8211b41f9b139a7ca4e), [`9f72b82`](https://github.com/kubb-labs/plugins/commit/9f72b82802e28766433316475dcffdee7916046a), [`726eb48`](https://github.com/kubb-labs/plugins/commit/726eb481716135048c03de79d264ae0472e563c6)]:
+  - @kubb/plugin-ts@5.1.0
+  - @kubb/plugin-zod@5.6.0
+
+## 5.7.2
+
+### Patch Changes
+
+- [#1189](https://github.com/kubb-labs/plugins/pull/1189) [`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the setup checks that threw `KUBB_INVALID_PLUGIN_OPTIONS` when an option such as `returnType`, `syntaxType`, or `parser` held a value outside its allowed list. The option types already reject those values. Checks that depend on another option, such as `sdk.mode: 'tag'` with single-file output, still throw.
+
+- [#1182](https://github.com/kubb-labs/plugins/pull/1182) [`c56998c`](https://github.com/kubb-labs/plugins/commit/c56998ce224e496489fa9739132fd687fdfde2c7) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Send parameters described with `content: application/json` (or a `+json` media type) as one JSON-encoded value. A query parameter becomes `?filter=%7B%22status%22%3A%22open%22%7D` instead of the `deepObject` style, a cookie is JSON-encoded and URL-encoded, and a header carries the JSON string. The generated request passes the media type as `contentType` in `styles.query`, `styles.header`, and `styles.cookie`. Requires `@kubb/adapter-oas` with `ParameterNode.contentType` support.
+- Updated dependencies [[`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69), [`1d40fdf`](https://github.com/kubb-labs/plugins/commit/1d40fdf183ada98abf02da0ad611a1c82e50fe69), [`eb89e09`](https://github.com/kubb-labs/plugins/commit/eb89e0939f50d5cebc65a9b988a7f28baacf6324)]:
+  - @kubb/plugin-ts@5.0.16
+  - @kubb/plugin-zod@5.5.0
+
+## 5.7.1
+
+### Patch Changes
+
+- [#1165](https://github.com/kubb-labs/plugins/pull/1165) [`5d76f27`](https://github.com/kubb-labs/plugins/commit/5d76f2736eabb43ab72b5b7cc6880d54f09e5712) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Studio can now edit more plugin options, because each `kubb-extension.json` lists them:
+  
+  - Every plugin: `output.banner` and `output.footer` as text.
+  - `@kubb/plugin-axios` and `@kubb/plugin-fetch`: `returnType` and `throwOnErrorDefault`.
+  - `@kubb/plugin-client`: `throwOnErrorDefault`.
+  - `@kubb/plugin-faker`: `typeMode`.
+  - `@kubb/plugin-zod`: `compile` and `typeGuards` as on or off.
+  - `@kubb/plugin-react-query`: `customOptions.importPath` and `customOptions.name`.
+- Updated dependencies [[`ccce85d`](https://github.com/kubb-labs/plugins/commit/ccce85d735d2ac92c42011d4bdf11431de12a7c1), [`5d76f27`](https://github.com/kubb-labs/plugins/commit/5d76f2736eabb43ab72b5b7cc6880d54f09e5712), [`07c62dd`](https://github.com/kubb-labs/plugins/commit/07c62dd57990afbfb12e0c937d446710fbcdc009), [`60cc33e`](https://github.com/kubb-labs/plugins/commit/60cc33e99e72bcf5408738d207434d25ebb6dbdb)]:
+  - @kubb/plugin-ts@5.0.15
+  - @kubb/plugin-zod@5.4.13
+
 ## 5.7.0
 
 ### Minor Changes

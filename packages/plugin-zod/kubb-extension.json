@@ -19,7 +19,7 @@
   ],
   "compatibility": {
     "kubb": ">=5.8.3",
-    "node": ">=22.12"
+    "node": ">=22.22"
   },
   "options": [
     {
@@ -191,6 +191,24 @@
       ]
     },
     {
+      "key": "oneOfType",
+      "path": ["oneOfType"],
+      "label": "oneOf Type",
+      "description": "How a oneOf is validated: z.union with strict object members, or z.xor (Zod v4.2.0+)",
+      "type": "select",
+      "default": "union",
+      "choices": [
+        {
+          "label": "union",
+          "value": "union"
+        },
+        {
+          "label": "xor",
+          "value": "xor"
+        }
+      ]
+    },
+    {
       "key": "inferred",
       "path": ["inferred"],
       "label": "Inferred",
@@ -205,6 +223,36 @@
       "description": "Wrap schemas in z.coerce so input is coerced before validation",
       "type": "boolean",
       "default": false
+    },
+    {
+      "key": "compile",
+      "path": ["compile"],
+      "label": "Compile",
+      "description": "Wrap schemas with z.compile(...) for faster validation. Needs Zod 4.5 or later",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "key": "typeGuards",
+      "path": ["typeGuards"],
+      "label": "Type Guards",
+      "description": "Generate is* type guards and assert* functions for each schema. Needs Zod 4.6 or later",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "key": "banner",
+      "path": ["output", "banner"],
+      "label": "Banner",
+      "description": "Text added at the top of every generated file",
+      "type": "text"
+    },
+    {
+      "key": "footer",
+      "path": ["output", "footer"],
+      "label": "Footer",
+      "description": "Text added at the end of every generated file",
+      "type": "text"
     }
   ]
 }

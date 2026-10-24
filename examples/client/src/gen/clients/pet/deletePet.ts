@@ -17,7 +17,11 @@ export function deletePet<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<DeletePetResponses, ThrowOnError>
-  >
+  return request({
+    method: 'DELETE',
+    url: '/pet/{petId}',
+    security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+    ...config,
+    throwOnError: config.throwOnError ?? true,
+  }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
 }

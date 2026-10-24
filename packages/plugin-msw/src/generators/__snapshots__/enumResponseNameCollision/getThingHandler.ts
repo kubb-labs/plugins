@@ -16,8 +16,11 @@ export function getThingHandlerResponse200(data: GetThingStatus200) {
   })
 }
 
-export function getThingHandler(data?: GetThingStatus200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
-  return http.get(`/thing`, function handler(info) {
+export function getThingHandler(
+  data?: GetThingStatus200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  options?: { baseURL?: string },
+) {
+  return http.get(`${options?.baseURL ?? ''}/thing`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
