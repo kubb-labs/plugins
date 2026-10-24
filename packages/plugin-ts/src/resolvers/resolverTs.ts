@@ -53,9 +53,7 @@ function refName(content: Array<ast.ContentNode> | undefined): string | null {
 }
 
 /**
- * Patch that `pluginTs({ operationTypes: false })` merges onto {@link resolverTs}. A request body or
- * response backed by a single `$ref` resolves to the referenced type (`Pet`) instead of its
- * per-operation alias, so every plugin reading this resolver references `Pet` directly.
+ * Patch for `pluginTs({ operationTypes: false })`: a body or response backed by a single `$ref` resolves to the referenced type (`Pet`).
  */
 export const refResolverTs = {
   response: {
