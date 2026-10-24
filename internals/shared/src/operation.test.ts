@@ -431,7 +431,7 @@ describe('groupOperationTypeImports', () => {
       response: { ref: (_node: ast.OperationNode, name: string) => (name === 'Pet' ? 'Pet' : null) },
     } as unknown as Parameters<typeof groupOperationTypeImports>[2]['resolver']
 
-    const groups = groupOperationTypeImports(node, ['AddPetOptions', 'Pet', 'AddPetStatus405', 'Pet'], {
+    const groups = groupOperationTypeImports(node, ['AddPetOptions', 'Pet', 'AddPetStatus405', 'unknown', 'Pet'], {
       resolver,
       file: { path: '/models/AddPet.ts' },
       root: '/',

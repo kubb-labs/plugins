@@ -157,6 +157,7 @@ describe('typeGenerator — operationTypes: false', () => {
           description: 'Created',
         }),
         ast.factory.createResponse({ statusCode: '400', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Bad request' }),
+        ast.factory.createResponse({ statusCode: '404', schema: ast.factory.createSchema({ type: 'unknown' }), description: 'Not found' }),
         ast.factory.createResponse({
           statusCode: '409',
           schema: ast.factory.createSchema({ type: 'ref', name: 'PetStatus', ref: '#/components/schemas/PetStatus', schema: enumSchema }),
@@ -188,6 +189,9 @@ describe('typeGenerator — operationTypes: false', () => {
     expect(source).not.toContain('export type ApiPetStatusKey')
     expect(source).not.toContain('export type { ApiPet }')
     expect(source).toContain('export type ApiCreatePetStatus400')
+    expect(resolver.response.status(node, '404')).toBe('unknown')
+    expect(source).not.toContain('ApiCreatePetStatus404')
+    expect(source).toMatch(/'404': unknown/)
     expect(source).not.toContain('ApiCreatePetStatus201')
     expect(source).not.toContain('ApiCreatePetBody')
     expect(source).toMatch(/'201': ApiPet/)

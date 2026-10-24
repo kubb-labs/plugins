@@ -233,24 +233,25 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       const usedImports = filterUsedImports(resolveMockImports(schema), fakerText, skipImportNames)
       const { imports, aliases } = aliasConflictingImports(usedImports, localHelperNames)
       const rewrittenFakerText = rewriteAliasedImports(fakerText, aliases)
+      const typeFilePath = resolveOperationTypePath(node, typeName, {
+        resolver: tsResolver,
+        file: meta.typeFile,
+        root,
+        output: pluginTs.options?.output ?? output,
+        group: pluginTs.options?.group,
+      })
       const typeReference = resolveTypeReference({
         node: schema,
         canOverride,
         name,
         typeName,
         filePath: meta.file.path,
-        typeFilePath: resolveOperationTypePath(node, typeName, {
-          resolver: tsResolver,
-          file: meta.typeFile,
-          root,
-          output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group,
-        }),
+        typeFilePath: typeFilePath ?? meta.typeFile.path,
       })
 
       return (
         <>
-          {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[typeName]} />}
+          {typeFilePath && typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[typeName]} />}
           {imports.map((imp) => (
             <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
           ))}

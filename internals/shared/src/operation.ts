@@ -54,10 +54,18 @@ type OperationTypeFileOptions = {
   group?: Group | null
 }
 
+// Schema types that print as a TypeScript keyword: `pluginTs({ operationTypes: false })` names such a slot after the keyword, which is never imported.
+export const typeKeywords: ReadonlySet<string> = new Set(['any', 'unknown', 'void', 'never', 'null'])
+
 /**
  * Path of the file exporting an operation type name: the schema's own file when `pluginTs({ operationTypes: false })` resolved it to a `$ref` target, otherwise `file`.
  */
-export function resolveOperationTypePath(node: ast.OperationNode, name: string, { resolver, file, root, output, group }: OperationTypeFileOptions): string {
+export function resolveOperationTypePath(
+  node: ast.OperationNode,
+  name: string,
+  { resolver, file, root, output, group }: OperationTypeFileOptions,
+): string | null {
+  if (typeKeywords.has(name)) return null
   const schemaName = resolver.response.ref?.(node, name)
   return schemaName ? resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path : file.path
 }
@@ -70,7 +78,7 @@ export function groupOperationTypeImports(
   const groups = new Map<string, Array<string>>()
   for (const name of new Set(names)) {
     const path = resolveOperationTypePath(node, name, options)
-    groups.set(path, [...(groups.get(path) ?? []), name])
+    if (path) groups.set(path, [...(groups.get(path) ?? []), name])
   }
   return Array.from(groups, ([path, names]) => ({ path, names }))
 }

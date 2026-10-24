@@ -1,4 +1,4 @@
-import { createCasedFile, createOperationParamResolver, createOperationResponseResolver } from '@internals/shared'
+import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, typeKeywords } from '@internals/shared'
 import { ensureValidVarName, pascalCase } from '@internals/utils'
 import { ast, createResolver, type ResolverPatch } from 'kubb/kit'
 import type { PluginTs, ResolvedOptions, ResolverTs } from '../types.ts'
@@ -51,6 +51,7 @@ const responseResolver = createOperationResponseResolver()
 export function createRefResolverTs(enumOptions: ResolvedOptions['enum']) {
   function refType(resolver: ResolverTs, content: Array<ast.ContentNode> | undefined) {
     const entry = content?.length === 1 ? content[0]! : null
+    if (entry?.schema && typeKeywords.has(entry.schema.type)) return { schemaName: null, typeName: entry.schema.type }
     const schemaName = entry && ast.isBareRef(entry.schema, entry.keysToOmit) ? ast.resolveRefName(entry.schema) : null
     if (!schemaName) return null
     const isEnum = ast.narrowSchema(ast.narrowSchema(entry!.schema, 'ref')?.schema ?? undefined, ast.schemaTypes.enum) !== null

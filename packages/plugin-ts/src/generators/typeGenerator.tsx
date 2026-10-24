@@ -80,7 +80,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const importName = (schemaName: string) => enumTypeName({ resolver, name: schemaName, enumOptions, isEnum: enumSchemaNames.has(schemaName) })
 
     function renderSchemaType({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
-      if (!schema) return null
+      // `operationTypes: false` names a keyword-typed slot after the keyword itself (`unknown`), which needs no declaration.
+      if (!schema || name === schema.type) return null
 
       const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, name: importName })
       // `operationTypes: false` names a `$ref`-backed slot after the referenced type, so import it instead of declaring `type Pet = Pet`.

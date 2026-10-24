@@ -251,7 +251,7 @@ Emits an alias per slot, `export type AddPetStatus200 = Pet`.
 :::
 
 :::field{name="false"}
-Drops that alias. The `AddPetResponses` and `AddPetResponse` types reference `Pet`, and query hooks, MSW handlers, Faker mocks, and Cypress requests read their names from `pluginTs`, so they use `Pet` too and import it from `models/Pet`. A `$ref` to an `asConst` enum resolves to its `Key` type. Inline, array, union, `Omit`-based, multi-content-type, and modified `$ref` schemas (for example `nullable` at the usage site) keep their alias because there is no single type to point at.
+Drops that alias. The `AddPetResponses` and `AddPetResponse` types reference `Pet`, and query hooks, MSW handlers, Faker mocks, and Cypress requests read their names from `pluginTs`, so they use `Pet` too and import it from `models/Pet`. A `$ref` to an `asConst` enum resolves to its `Key` type, and a response without a body resolves to `unknown` (or `any`, `void`). Inline, array, union, `Omit`-based, multi-content-type, and modified `$ref` schemas (for example `nullable` at the usage site) keep their alias because there is no single type to point at.
 :::
 
 ::
