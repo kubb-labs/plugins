@@ -62,10 +62,10 @@ function headersBlock(contentType: string | null): string {
 }
 
 /**
- * The `new Response(...)` expression a mocked handler returns.
+ * The `new HttpResponse(...)` expression a mocked handler returns.
  */
 export function responseLiteral(body: string, status: number, contentType: string | null): string {
-  return `new Response(${body}, {
+  return `new HttpResponse(${body}, {
       status: ${status},${headersBlock(contentType)}
     })`
 }

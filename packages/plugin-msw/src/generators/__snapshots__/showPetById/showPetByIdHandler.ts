@@ -5,10 +5,10 @@
  */
 
 import type { ShowPetByIdResponse } from './ShowPetById'
-import { http } from 'msw'
+import { http, HttpResponse } from 'msw/http'
 
 export function showPetByIdHandlerResponse200(data: ShowPetByIdResponse) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
@@ -23,7 +23,7 @@ export function showPetByIdHandler(
   return http.get(`${options?.baseURL ?? ''}/pets/:petId`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new Response(JSON.stringify(data), {
+    return new HttpResponse(JSON.stringify(data), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

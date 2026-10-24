@@ -4,12 +4,12 @@
 */
 
 import type { UploadFileResponse, UploadFileBody } from '../types/UploadFile'
-import type { HttpResponseResolver } from 'msw'
+import type { HttpResponseResolver } from 'msw/http'
 import { createUploadFileResponse } from '../faker/createUploadFile'
-import { http } from 'msw'
+import { http, HttpResponse } from 'msw/http'
 
 export function uploadFileHandlerResponse200(data: UploadFileResponse) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -21,7 +21,7 @@ export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolv
   return http.post<Record<string, string>, UploadFileBody>(`${options?.baseURL ?? ''}/pet/:petId/uploadImage`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new Response(JSON.stringify(data ?? createUploadFileResponse(data)), {
+      return new HttpResponse(JSON.stringify(data ?? createUploadFileResponse(data)), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'

@@ -98,11 +98,11 @@
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
     "kubb": "catalog:",
-    "msw": "^2.15.0"
+    "msw": "^3.0.3"
   },
   "peerDependencies": {
     "kubb": "catalog:",
-    "msw": "^2.0.0"
+    "msw": "^3.0.0"
   },
   "peerDependenciesMeta": {
     "msw": {
