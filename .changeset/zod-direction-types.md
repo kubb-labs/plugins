@@ -1,12 +1,12 @@
 ---
-'@kubb/plugin-fetch': minor
-'@kubb/plugin-axios': minor
-'@kubb/plugin-client': minor
-'@kubb/plugin-react-query': minor
-'@kubb/plugin-swr': minor
-'@kubb/plugin-vue-query': minor
-'@kubb/plugin-zod': minor
-'@kubb/plugin-mcp': minor
+'@kubb/plugin-fetch': patch
+'@kubb/plugin-axios': patch
+'@kubb/plugin-client': patch
+'@kubb/plugin-react-query': patch
+'@kubb/plugin-swr': patch
+'@kubb/plugin-vue-query': patch
+'@kubb/plugin-zod': patch
+'@kubb/plugin-mcp': patch
 ---
 
 Type clients, query hooks, and MCP handlers from `pluginZod({ inferred: 'codec' })` when it is set, so a custom codec param takes its domain value.

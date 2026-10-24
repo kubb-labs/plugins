@@ -48,7 +48,6 @@ export const pluginMcpName = 'plugin-mcp' satisfies PluginMcp['name']
 export const pluginMcp = defineExtension<PluginMcp>({
   kind: 'plugin',
   meta: { name: pluginMcpName, version, compatibility },
-  // `plugin-ts` is optional: `pluginZod({ inferred })` can supply the handler types instead.
   dependencies: { [pluginTsName]: { optional: true }, [pluginZodName]: {} },
   setup(options) {
     const {

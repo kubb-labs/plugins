@@ -47,15 +47,16 @@ export type OperationTypeSource = OperationTypeNames & {
  */
 function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
   const type = (name: string) => resolver.schema.type(name)
-  const param = (pick: (node: ast.OperationNode, param: ast.ParameterNode) => string) => (node: ast.OperationNode, p: ast.ParameterNode) => type(pick(node, p))
 
   return {
     ...resolver,
+    // A class method, so a spread drops it, and it reads private fields, so it must run on `resolver`.
+    file: resolver.file.bind(resolver),
     param: {
-      name: param((node, p) => resolver.param.name(node, p)),
-      path: param((node, p) => resolver.param.path(node, p)),
-      query: param((node, p) => resolver.param.query(node, p)),
-      headers: param((node, p) => resolver.param.headers(node, p)),
+      name: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.name(node, p)),
+      path: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.path(node, p)),
+      query: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.query(node, p)),
+      headers: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.headers(node, p)),
     },
     response: {
       body: (node: ast.OperationNode) => type(resolver.response.body(node)),
@@ -121,34 +122,7 @@ function missingTypeSource(pluginName: string) {
  * ```
  */
 export function resolveOperationTypes(driver: GeneratorDriver, pluginName: string): OperationTypeSource {
-  const pluginTs = driver.getPlugin(pluginTsName)
-  const pluginZod = driver.getPlugin(pluginZodName)
+  const { resolver, output, group } = resolveTypeResolver(driver, pluginName)
 
-  if (pluginTs && pluginZod?.options?.inferred !== 'codec') {
-    const resolver = driver.getResolver(pluginTsName)
-
-    return {
-      response: resolver.response,
-      resolver,
-      output: pluginTs.options?.output,
-      group: pluginTs.options?.group,
-    }
-  }
-
-  if (!pluginZod?.options?.inferred) {
-    throw missingTypeSource(pluginName)
-  }
-
-  const resolver = driver.getResolver(pluginZodName)
-
-  return {
-    response: {
-      options: resolver.response.options,
-      // `response.responses` names the schema; the client needs the type inferred from it.
-      responses: (node) => resolver.schema.type(resolver.response.responses(node)),
-    },
-    resolver,
-    output: pluginZod.options.output,
-    group: pluginZod.options.group,
-  }
+  return { response: resolver.response, resolver, output, group: group ?? undefined }
 }
