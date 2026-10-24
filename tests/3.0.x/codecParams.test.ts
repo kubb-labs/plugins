@@ -7,6 +7,7 @@ import { adapterOas } from '@kubb/adapter-oas'
 import { Hookable, createKubb } from '@kubb/core'
 import { type Config, Diagnostics, fsStorage, type KubbHooks } from 'kubb/kit'
 import { pluginFetch } from '@kubb/plugin-fetch'
+import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginTs } from '@kubb/plugin-ts'
 import { parserTs } from '@kubb/parser-ts'
 import { type PrinterZodNodes, pluginZod } from '@kubb/plugin-zod'
@@ -203,28 +204,30 @@ describe("directional codec: pluginZod({ inferred: 'direction' }) + validator.pa
   })
 })
 
-// `pluginTs({ zod: true })` next to the zod codecs: clients and hooks keep typing off plugin-ts, whose operation
-// types now alias the zod inferred types, so a custom codec param takes its domain value there too.
-describe("plugin-ts aliasing zod: pluginTs({ zod: true }) + pluginZod({ inferred: 'direction' })", () => {
+// `pluginZod({ inferred: 'direction' })` next to `pluginTs()`: clients and query hooks take their operation types
+// from zod instead of plugin-ts, so a custom codec param takes its domain value there too.
+describe("zod types beside plugin-ts: pluginTs() + pluginZod({ inferred: 'direction' })", () => {
   let client: Client
 
   beforeAll(async () => {
-    client = await loadClient('ts-zod-alias', [
-      pluginTs({ output: { path: './types', barrel: false }, zod: true }),
+    client = await loadClient('ts-and-zod-direction', [
+      pluginTs({ output: { path: './types', barrel: false } }),
       pluginZod({ inferred: 'direction', output: { path: './zod', barrel: false }, printer: { nodes: customCodecs } }),
       pluginFetch({ output: { path: './clients', barrel: false }, validator: { request: 'zod', params: 'zod', response: 'zod' } }),
+      pluginReactQuery({ output: { path: './hooks', barrel: false } }),
     ])
   })
   afterAll(async () => fs.rm(client.output, { recursive: true, force: true }))
 
-  test('aliases the param, body, and status types to the zod inferred types', async () => {
-    const types = await fs.readFile(path.join(client.output, 'types/GetResource.ts'), 'utf-8')
-    expect(types).toContain('export type GetResourcePath = GetResourcePathSchemaType')
-    expect(types).toContain('export type GetResourceQuery = GetResourceQuerySchemaType')
-    expect(types).toContain('export type GetResourceStatus200 = GetResourceStatus200SchemaType')
+  test('imports the zod operation types in the client and the query hook', async () => {
+    const clientFile = await fs.readFile(path.join(client.output, 'clients/getResource.ts'), 'utf-8')
+    expect(clientFile).toContain("import type { GetResourceOptionsSchemaType, GetResourceResponsesSchemaType } from '../zod/getResourceSchema'")
+    const hookFile = await fs.readFile(path.join(client.output, 'hooks/useGetResource.ts'), 'utf-8')
+    expect(hookFile).toContain("from '../zod/getResourceSchema'")
+    expect(hookFile).not.toContain("from '../types/")
   })
 
-  test('types a custom codec param with its domain value in the plugin-ts typed client', async () => {
+  test('types a custom codec param with its domain value', async () => {
     await fs.writeFile(
       path.join(client.output, 'check.ts'),
       [
@@ -254,30 +257,6 @@ describe("plugin-ts aliasing zod: pluginTs({ zod: true }) + pluginZod({ inferred
     expect(() =>
       execFileSync(path.join(__dirname, 'node_modules/.bin/tsc'), ['-p', path.join(client.output, 'tsconfig.json')], { encoding: 'utf8' }),
     ).not.toThrow()
-  })
-
-  test('reports a missing dependency when no pluginZod({ inferred }) exports the types', async () => {
-    const output = path.join(__dirname, `.codec-ts-zod-missing-${Date.now()}`)
-    const { diagnostics } = await createKubb(
-      {
-        root: __dirname,
-        input: '../../schemas/3.0.x/codecParams.yaml',
-        output: { path: output },
-        adapter: adapterOas({ validate: false }),
-        parsers: [parserTs()],
-        reporters: [],
-        storage: fsStorage(),
-        plugins: [pluginTs({ zod: true })],
-      } as Config,
-      { hooks: new Hookable<KubbHooks>() },
-    ).safeBuild()
-    await fs.rm(output, { recursive: true, force: true })
-    expect(diagnostics).toContainEqual(expect.objectContaining({ code: Diagnostics.code.missingDependency, plugin: 'plugin-ts' }))
-  })
-
-  test('sends the custom codec param in its wire form', async () => {
-    await client.getResource({ path: { resource: new URL('https://docs.test/guide') } })
-    expect(client.requests[0]?.url).toBe('https://api.test/resources/https%3A%2F%2Fdocs.test%2Fguide')
   })
 })
 

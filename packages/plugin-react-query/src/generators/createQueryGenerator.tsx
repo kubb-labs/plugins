@@ -1,4 +1,4 @@
-import { resolveClientOperation } from '@internals/client'
+import { resolveClientOperation, resolveTypeResolver } from '@internals/client'
 import {
   classifyOperation,
   getDefaultPageParamsWarning,
@@ -9,7 +9,6 @@ import {
   resolveHookFile,
   resolvePageParamType,
 } from '@internals/tanstack-query'
-import { pluginTsName } from '@kubb/plugin-ts'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Query } from '../components/Query.tsx'
@@ -75,7 +74,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
       const queryOptionsName = variantResolver.optionsName(node)
       const queryKeyName = variantResolver.keyName(node)
       const queryKeyTypeName = variantResolver.keyTypeName(node)
-      const tsResolver = driver.getResolver(pluginTsName)
+      const tsResolver = resolveTypeResolver(driver).resolver
 
       const hook = resolveHookFile(node, ctx, {
         name: queryName,

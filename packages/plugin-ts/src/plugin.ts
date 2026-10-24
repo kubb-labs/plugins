@@ -53,7 +53,6 @@ export const pluginTs = defineExtension<PluginTs>({
       printer,
       resolver: userResolver,
       macros: userMacros,
-      zod = false,
     } = options
 
     const resolvedEnum = {
@@ -80,7 +79,6 @@ export const pluginTs = defineExtension<PluginTs>({
       enum: resolvedEnum,
       syntaxType,
       printer,
-      zod,
     }
   },
 })

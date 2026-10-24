@@ -1,6 +1,6 @@
+import { resolveTypeResolver } from '@internals/client'
 import { operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
 import type { ast, GeneratorContext, Group, Output } from 'kubb/kit'
-import { pluginTsName } from '@kubb/plugin-ts'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
@@ -35,13 +35,14 @@ type ResolvedHookFile = {
 }
 
 /**
- * Resolves what every TanStack hook file shares: its file, the `@kubb/plugin-ts` file and type names, banner and footer.
+ * Resolves what every TanStack hook file shares: its file, the operation types file and names (`@kubb/plugin-ts`, or
+ * `pluginZod({ inferred: 'direction' })`), banner and footer.
  */
 export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, options: ResolveHookFileOptions): ResolvedHookFile {
   const { name, output, group, contractOp, keyTypeName, extraTypeNames = [] } = options
   const { config, root, resolver } = ctx
-  const pluginTs = ctx.requirePlugin(pluginTsName)
-  const tsResolver = ctx.driver.getResolver(pluginTsName)
+  const types = resolveTypeResolver(ctx.driver)
+  const tsResolver = types.resolver
 
   const file = resolver.file({ ...operationFileEntry(node, name), root, output, group: group ?? undefined })
   const fileTs = resolveDependencyOperationFile({
@@ -49,8 +50,8 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
     node,
     resolver: tsResolver,
     root,
-    output: pluginTs.options?.output ?? output,
-    group: pluginTs.options?.group,
+    output: types.output ?? output,
+    group: types.group,
   })
   const importedTypeNames = [
     tsResolver.response.options(node),

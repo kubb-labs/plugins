@@ -1,18 +1,10 @@
-import { buildOptionsSchema, buildResponses, getOperationParameters, operationFileEntry, resolveContentTypeVariants } from '@internals/shared'
-import { ast, defineGenerator, Diagnostics, type Group, type Output } from 'kubb/kit'
-import { File, jsxRenderer, Type as TypeAlias } from 'kubb/jsx'
+import { buildOptionsSchema, buildResponses, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
+import { ast, defineGenerator } from 'kubb/kit'
+import { File, jsxRenderer } from 'kubb/jsx'
 import { Type } from '../components/Type.tsx'
 import { printerTs } from '../printers/printerTs.ts'
-import type { PluginTs, ResolverTs } from '../types'
+import type { PluginTs } from '../types'
 import { buildParams, buildResponseUnion, enumTypeName, isInlineConstEnum } from '../utils.ts'
-
-/**
- * The `@kubb/plugin-zod` names the `zod` option aliases to. Typed structurally so `@kubb/plugin-ts` does not depend on `@kubb/plugin-zod`.
- */
-type ResolverZodNames = Pick<ResolverTs, 'file' | 'param'> & {
-  response: Pick<ResolverTs['response'], 'body' | 'status'>
-  schema: { type(name: string): string }
-}
 
 /**
  * Built-in generator for `@kubb/plugin-ts`. Emits one TypeScript file per
@@ -82,62 +74,13 @@ export const typeGenerator = defineGenerator<PluginTs>({
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
     } as const
 
-    const zodOptions = ctx.options.zod
-      ? (ctx.driver.getPlugin('plugin-zod')?.options as { inferred?: unknown; output: Output; group: Group | null } | undefined)
-      : undefined
-    if (ctx.options.zod && !zodOptions?.inferred) {
-      throw new Diagnostics.Error({
-        code: Diagnostics.code.missingDependency,
-        severity: 'error',
-        message: 'Option `zod` of "plugin-ts" needs the types `pluginZod({ inferred })` exports.',
-        help: "Add `pluginZod({ inferred: 'direction' })`, or turn `zod` off.",
-        location: { kind: 'config' },
-        plugin: 'plugin-ts',
-      })
-    }
-    const zodResolver = zodOptions ? (ctx.driver.getResolver('plugin-zod') as unknown as ResolverZodNames) : null
-    const zodFile = zodResolver
-      ? zodResolver.file({
-          ...operationFileEntry(node, node.operationId),
-          root,
-          output: zodOptions!.output,
-          group: zodOptions!.group ?? undefined,
-        })
-      : null
-
-    // With `zod` on, a leaf type aliases the type `@kubb/plugin-zod` infers from `zodSchemaName`, so codecs give it the domain value.
-    function renderZodAlias(name: string, zodSchemaName: string) {
-      const zodTypeName = zodResolver!.schema.type(zodSchemaName)
-      return (
-        <>
-          <File.Import name={[zodTypeName]} root={meta.file.path} path={zodFile!.path} isTypeOnly />
-          <File.Source name={name} isTypeOnly isExportable isIndexable>
-            <TypeAlias export name={name}>
-              {zodTypeName}
-            </TypeAlias>
-          </File.Source>
-        </>
-      )
-    }
-
     // Build a set of schema names that are enums so the ref handler and the imports
     // name callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
     const enumSchemaNames = new Set<string>(ctx.meta.enumNames)
     const importName = (schemaName: string) => enumTypeName({ resolver, name: schemaName, enumOptions, isEnum: enumSchemaNames.has(schemaName) })
 
-    function renderSchemaType({
-      schema,
-      name,
-      keysToOmit,
-      zodSchemaName,
-    }: {
-      schema: ast.SchemaNode | null
-      name: string
-      keysToOmit?: Array<string> | null
-      zodSchemaName?: string
-    }) {
+    function renderSchemaType({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
       if (!schema) return null
-      if (zodResolver && zodSchemaName) return renderZodAlias(name, zodSchemaName)
 
       const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, name: importName })
 
@@ -198,21 +141,11 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
 
-    const paramGroupTypes = (
-      [
-        { kind: 'path', params: pathParams },
-        { kind: 'query', params: queryParams },
-        { kind: 'headers', params: headerParams },
-      ] as const
-    )
-      .filter(({ params }) => params.length > 0)
-      .map(({ kind, params }) =>
-        renderSchemaType({
-          schema: buildParams({ params }),
-          name: resolver.param[kind](node, params[0]!),
-          zodSchemaName: zodResolver?.param[kind](node, params[0]!),
-        }),
-      )
+    const paramGroupTypes = [
+      pathParams.length > 0 && renderSchemaType({ schema: buildParams({ params: pathParams }), name: resolver.param.path(node, pathParams[0]!) }),
+      queryParams.length > 0 && renderSchemaType({ schema: buildParams({ params: queryParams }), name: resolver.param.query(node, queryParams[0]!) }),
+      headerParams.length > 0 && renderSchemaType({ schema: buildParams({ params: headerParams }), name: resolver.param.headers(node, headerParams[0]!) }),
+    ]
 
     const requestBodyContent = node.requestBody?.content ?? []
 
@@ -229,7 +162,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
           },
           name: resolver.response.body(node),
           keysToOmit: entry.keysToOmit,
-          zodSchemaName: zodResolver?.response.body(node),
         })
       }
       // Multiple content types — generate individual types + union alias
@@ -253,7 +185,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
         schema: primary?.schema ? { ...primary.schema, pointer: res.pointer ?? primary.schema.pointer } : null,
         name: resolver.response.status(node, res.statusCode),
         keysToOmit: primary?.keysToOmit,
-        zodSchemaName: zodResolver?.response.status(node, res.statusCode),
       })
     })
 

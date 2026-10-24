@@ -51,6 +51,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",

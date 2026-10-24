@@ -59,7 +59,7 @@ Emits `z.infer<typeof schema>` for every schema.
 :::
 
 :::field{name="'direction'"}
-Emits `z.input<typeof schema>` for request schemas (bodies and params) and `z.output<typeof schema>` for response schemas. Use it with codecs, where a request takes the domain value (a `Date`) that the schema encodes and a response returns the decoded value.
+Emits `z.input<typeof schema>` for request schemas (bodies and params) and `z.output<typeof schema>` for response schemas. Use it with codecs, where a request takes the domain value (a `Date`) that the schema encodes and a response returns the decoded value. Clients and query hooks then take their operation types from these aliases instead of `@kubb/plugin-ts`.
 :::
 
 ::

@@ -300,14 +300,6 @@ export type Options = OutputOptions & {
    * How OpenAPI enums are represented in the generated TypeScript, and how their names are cased.
    */
   enum?: EnumOptions
-  /**
-   * Alias each operation's path, query, and header param types, request body type, and status
-   * types to the matching `@kubb/plugin-zod` inferred types, so codecs type them with the domain
-   * value. Requires `pluginZod({ inferred })`, best with `inferred: 'direction'`.
-   *
-   * @default false
-   */
-  zod?: boolean
 }
 
 export type ResolvedEnumOptions = {
@@ -328,7 +320,6 @@ export type ResolvedOptions = {
   arrayType: NonNullable<Options['arrayType']>
   syntaxType: NonNullable<Options['syntaxType']>
   printer: Options['printer']
-  zod: boolean
 }
 
 export type PluginTs = PluginType<'plugin-ts', Options, ResolvedOptions, ResolverTs>
