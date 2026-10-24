@@ -250,25 +250,12 @@ describe("zod types beside plugin-ts: pluginTs() + pluginZod({ inferred: 'codec'
         "void getResource({ path: { resource: 'https://docs.test/guide' } })",
       ].join('\n'),
     )
-    await fs.writeFile(
-      path.join(client.output, 'tsconfig.json'),
-      JSON.stringify({
-        compilerOptions: {
-          strict: true,
-          noEmit: true,
-          module: 'preserve',
-          moduleResolution: 'bundler',
-          target: 'es2022',
-          lib: ['es2022', 'dom'],
-          allowImportingTsExtensions: true,
-          skipLibCheck: true,
-          types: [],
-        },
-        files: ['check.ts'],
-      }),
-    )
+    const flags =
+      '--ignoreConfig --noEmit --strict --skipLibCheck --allowImportingTsExtensions --module preserve --moduleResolution bundler --target es2022 --lib es2022,dom'.split(
+        ' ',
+      )
     expect(() =>
-      execFileSync(path.join(__dirname, 'node_modules/.bin/tsc'), ['-p', path.join(client.output, 'tsconfig.json')], { encoding: 'utf8' }),
+      execFileSync(path.join(__dirname, 'node_modules/.bin/tsc'), [...flags, path.join(client.output, 'check.ts')], { encoding: 'utf8' }),
     ).not.toThrow()
   })
 })

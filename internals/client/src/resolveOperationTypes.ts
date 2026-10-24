@@ -1,4 +1,4 @@
-import { type ast, Diagnostics, type Generator, type Group, type Output, type Resolver } from 'kubb/kit'
+import { type ast, Diagnostics, type Generator, type Group, type Output } from 'kubb/kit'
 import { pluginTsName, type ResolverTs } from '@kubb/plugin-ts'
 import { pluginZodName, type ResolverZod } from '@kubb/plugin-zod'
 import type { ContractClientFactory } from './types.ts'
@@ -28,9 +28,9 @@ export type OperationTypeNames = {
  */
 export type OperationTypeSource = OperationTypeNames & {
   /**
-   * Resolver of the plugin supplying the names, used to resolve the file they are exported from.
+   * `plugin-ts` shaped resolver of the plugin supplying the names, also used to resolve the file they are exported from.
    */
-  resolver: Pick<Resolver, 'file' | 'pluginName'>
+  resolver: ResolverTs
   /**
    * The supplying plugin's own `output`, when it configured one.
    */
@@ -69,22 +69,25 @@ function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
 }
 
 /**
- * The resolver, `output`, and `group` a generated hook names its operation types with.
+ * Picks the plugin generated clients, query hooks, and MCP handlers take their operation types from.
  *
- * `pluginZod({ inferred: 'codec' })` wins over `plugin-ts`: its request types read `z.input` and its
- * response types `z.output`, so a codec param takes its domain value. Otherwise `plugin-ts` supplies them,
- * and without it any `pluginZod({ inferred })` does. Throws `KUBB_MISSING_DEPENDENCY` for `pluginName`
- * when neither is available.
+ * `pluginZod({ inferred: 'codec' })` wins, so a codec param takes its domain value. Otherwise `plugin-ts`
+ * wins when it is in the pipeline, and without it any `pluginZod({ inferred })`. Throws
+ * `KUBB_MISSING_DEPENDENCY` for `pluginName` when neither is available.
+ *
+ * @example
+ * ```ts
+ * const types = resolveOperationTypes(ctx.driver, ctx.plugin.name)
+ * types.response.options(node) // 'GetPetByIdOptions', or 'GetPetByIdOptionsSchemaType' from zod
+ * ```
  */
-export function resolveTypeResolver(
-  driver: GeneratorDriver,
-  pluginName: string,
-): { resolver: ResolverTs; output: Output | undefined; group: Group | null | undefined } {
+export function resolveOperationTypes(driver: GeneratorDriver, pluginName: string): OperationTypeSource {
   const pluginTs = driver.getPlugin(pluginTsName)
   const pluginZod = driver.getPlugin(pluginZodName)
 
   if (pluginTs && pluginZod?.options?.inferred !== 'codec') {
-    return { resolver: driver.getResolver(pluginTsName), output: pluginTs.options?.output, group: pluginTs.options?.group }
+    const resolver = driver.getResolver(pluginTsName)
+    return { response: resolver.response, resolver, output: pluginTs.options?.output, group: pluginTs.options?.group ?? undefined }
   }
 
   if (!pluginZod?.options?.inferred) {
@@ -98,27 +101,6 @@ export function resolveTypeResolver(
     })
   }
 
-  return { resolver: toZodTypeResolver(driver.getResolver(pluginZodName)), output: pluginZod.options.output, group: pluginZod.options.group }
-}
-
-/**
- * Picks the plugin a generated client takes its `Options` and `Responses` types from.
- *
- * `pluginZod({ inferred: 'codec' })` wins, so a codec param takes its domain value (see
- * {@link resolveTypeResolver}). Otherwise `plugin-ts` wins whenever it is in the pipeline, so existing
- * configs keep the types they generate today. Without it, `pluginZod({ inferred: true })` takes over:
- * its inferred options and responses types are built from the same shared schemas as the `plugin-ts`
- * ones. Throws `KUBB_MISSING_DEPENDENCY` for `pluginName` when neither is available, since the client
- * has nothing to type against.
- *
- * @example
- * ```ts
- * const types = resolveOperationTypes(ctx.driver, ctx.plugin.name)
- * types.response.options(node) // 'GetPetByIdOptions', or 'GetPetByIdOptionsSchemaType' from zod
- * ```
- */
-export function resolveOperationTypes(driver: GeneratorDriver, pluginName: string): OperationTypeSource {
-  const { resolver, output, group } = resolveTypeResolver(driver, pluginName)
-
-  return { response: resolver.response, resolver, output, group: group ?? undefined }
+  const resolver = toZodTypeResolver(driver.getResolver(pluginZodName))
+  return { response: resolver.response, resolver, output: pluginZod.options.output, group: pluginZod.options.group ?? undefined }
 }

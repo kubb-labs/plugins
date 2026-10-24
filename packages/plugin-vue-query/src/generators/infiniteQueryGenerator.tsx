@@ -1,4 +1,4 @@
-import { resolveClientOperation, resolveTypeResolver } from '@internals/client'
+import { resolveClientOperation, resolveOperationTypes } from '@internals/client'
 import {
   classifyOperation,
   getDefaultPageParamsWarning,
@@ -65,7 +65,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
       keyTypeName: queryKeyTypeName,
       extraTypeNames: [
         resolvePageParamType(node, {
-          resolver: resolveTypeResolver(ctx.driver, ctx.resolver.pluginName).resolver,
+          resolver: resolveOperationTypes(ctx.driver, ctx.resolver.pluginName).resolver,
           initialPageParam: infiniteOptions.initialPageParam,
           queryParam: infiniteOptions.queryParam,
         }).queryParamsTypeName,

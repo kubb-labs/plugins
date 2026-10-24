@@ -1,4 +1,4 @@
-import { resolveClientOperation, resolveTypeResolver } from '@internals/client'
+import { resolveClientOperation, resolveOperationTypes } from '@internals/client'
 import { operationFileEntry, resolveDependencyOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
@@ -19,7 +19,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     const { resolver, driver, root, config } = ctx
     const { output, client, group } = ctx.options
 
-    const types = resolveTypeResolver(driver, resolver.pluginName)
+    const types = resolveOperationTypes(driver, resolver.pluginName)
     const tsResolver = types.resolver
 
     // The registered contract client plugin owns the `<op>` the handler imports and calls.
