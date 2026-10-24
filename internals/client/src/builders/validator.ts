@@ -16,19 +16,11 @@ export type ValidatorHooks = {
    */
   request: string | null
   /**
-   * Schema reference for the `validator.path` hook, or `null` when params validation is off or the
-   * operation has no path params.
+   * Schema references for the `validator.path` / `query` / `headers` hooks (`headers` wrapped in
+   * `toHeadersStandardSchema`), or `null` when params validation is off or the group is empty.
    */
   path: string | null
-  /**
-   * Schema reference for the `validator.query` hook, or `null` when params validation is off or the
-   * operation has no query params.
-   */
   query: string | null
-  /**
-   * The headers schema wrapped in `toHeadersStandardSchema` for the `validator.headers` hook, or `null`
-   * when params validation is off or the operation has no header params.
-   */
   headers: string | null
   /**
    * Schema reference for the `validator.response` hook, or `null` when response validation is off.
@@ -81,4 +73,12 @@ export function buildValidatorHooks({
   const headersValidator = headers ? `toHeadersStandardSchema(${headers}, ${headers}.shape)` : null
 
   return { request, path, query, headers: headersValidator, response, error, importedZodNames }
+}
+
+/**
+ * Prints the `validator: { … }` entry of a call config from the hooks named in `keys`, or `null` when none is set.
+ */
+export function buildValidatorLiteral(hooks: ValidatorHooks | null, keys: ReadonlyArray<keyof Omit<ValidatorHooks, 'importedZodNames'>>): string | null {
+  const entries = keys.flatMap((key) => (hooks?.[key] ? [`${key}: ${hooks[key]}`] : []))
+  return entries.length ? `validator: { ${entries.join(', ')} }` : null
 }

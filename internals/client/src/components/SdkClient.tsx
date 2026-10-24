@@ -7,7 +7,7 @@ import { buildContentType } from '../builders/contentType.ts'
 import { buildReturnStatement } from '../builders/returnStatement.ts'
 import { type Auth, buildSecurityMetadata } from '../builders/security.ts'
 import { buildGroupedOptionsSignature } from '../builders/signature.ts'
-import type { ValidatorHooks } from '../builders/validator.ts'
+import { buildValidatorLiteral, type ValidatorHooks } from '../builders/validator.ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption } from '../types.ts'
 
@@ -25,14 +25,7 @@ function buildCallConfig({
   security?: Array<Auth>
   throwOnErrorDefault: boolean
 }): string {
-  const validatorEntries = [
-    validatorHooks?.request ? `request: ${validatorHooks.request}` : null,
-    validatorHooks?.path ? `path: ${validatorHooks.path}` : null,
-    validatorHooks?.query ? `query: ${validatorHooks.query}` : null,
-    validatorHooks?.headers ? `headers: ${validatorHooks.headers}` : null,
-    validatorHooks?.response ? `response: ${validatorHooks.response}` : null,
-  ].filter(Boolean)
-  const validatorLiteral = validatorEntries.length ? `validator: { ${validatorEntries.join(', ')} }` : null
+  const validatorLiteral = buildValidatorLiteral(validatorHooks, ['request', 'path', 'query', 'headers', 'response'])
   const securityLiteral = buildSecurityMetadata({ security })
   const { literal: contentTypeLiteral } = buildContentType({ node })
 

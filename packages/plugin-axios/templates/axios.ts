@@ -609,26 +609,16 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   const validationContext = { direction: 'request', method: requestConfig.method, url: requestConfig.url } as const
 
   // Params are encoded before anything reads them: headers before styling, query before auth adds its values.
-  const [validatedPath, validatedQuery, validatedHeaders] = await Promise.all([
-    runValidator({
-      validator: requestConfig.validator?.path,
-      value: { ...(requestConfig.path as Record<string, unknown> | undefined) },
-      context: { ...validationContext, source: 'path' },
-      onValidationError,
-    }),
-    runValidator({
-      validator: requestConfig.validator?.query,
-      value: { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) },
-      context: { ...validationContext, source: 'query' },
-      onValidationError,
-    }),
-    runValidator({
-      validator: requestConfig.validator?.headers,
-      value: collectHeadersCaseInsensitive(config.headers, requestConfig.headers),
-      context: { ...validationContext, source: 'headers' },
-      onValidationError,
-    }),
-  ])
+  const paramValues = {
+    path: { ...(requestConfig.path as Record<string, unknown> | undefined) },
+    query: { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) },
+    headers: collectHeadersCaseInsensitive(config.headers, requestConfig.headers),
+  }
+  const [validatedPath, validatedQuery, validatedHeaders] = await Promise.all(
+    (['path', 'query', 'headers'] as const).map((source) =>
+      runValidator({ validator: requestConfig.validator?.[source], value: paramValues[source], context: { ...validationContext, source }, onValidationError }),
+    ),
+  )
 
   const headers = serializeHeaders(applyHeaderStyles(validatedHeaders as HeadersInit | undefined, requestConfig.styles?.header))
   const { request: requestContentTypeOption, response: responseContentType } = resolveContentType(requestConfig.contentType)

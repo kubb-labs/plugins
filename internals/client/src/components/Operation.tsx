@@ -8,7 +8,7 @@ import { buildReturnStatement } from '../builders/returnStatement.ts'
 import { type Auth, buildSecurityMetadata } from '../builders/security.ts'
 import { buildGroupedOptionsSignature } from '../builders/signature.ts'
 import { buildStyles } from '../builders/styles.ts'
-import { buildValidatorHooks } from '../builders/validator.ts'
+import { buildValidatorHooks, buildValidatorLiteral } from '../builders/validator.ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption, ValidatorOptions } from '../types.ts'
 
@@ -66,15 +66,7 @@ export function Operation({ name, node, types, zodResolver, validator, returnTyp
   const responseType = getResponseType(node)
   const responseTypeLiteral = responseType ? `responseType: '${responseType}'` : null
 
-  const validatorEntries = [
-    validators.request ? `request: ${validators.request}` : null,
-    validators.path ? `path: ${validators.path}` : null,
-    validators.query ? `query: ${validators.query}` : null,
-    validators.headers ? `headers: ${validators.headers}` : null,
-    validators.response ? `response: ${validators.response}` : null,
-    validators.error ? `error: ${validators.error}` : null,
-  ].filter(Boolean)
-  const validatorLiteral = validatorEntries.length ? `validator: { ${validatorEntries.join(', ')} }` : null
+  const validatorLiteral = buildValidatorLiteral(validators, ['request', 'path', 'query', 'headers', 'response', 'error'])
 
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
