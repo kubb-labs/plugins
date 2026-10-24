@@ -196,6 +196,7 @@ export type Auth = {
   scheme?: 'bearer' | 'basic'
   name?: string
   in?: 'header' | 'query' | 'cookie'
+  scopes?: Array<string>
 }
 
 /**
@@ -219,7 +220,7 @@ export type FetchOptions = RequestInit & { next?: Record<string, unknown> }
 export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Response> = {
   baseURL?: string
   url?: string
-  method?: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD'
+  method?: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'QUERY'
   path?: unknown
   query?: unknown
   params?: unknown
@@ -406,10 +407,6 @@ function serializeHeaders(headers: HeadersInit | undefined): Record<string, stri
     result[key] = typeof value === 'string' ? value : typeof value === 'object' ? JSON.stringify(value) : String(value)
   }
   return result
-}
-
-function mergeHeaders(...sources: Array<HeadersInit | undefined>): Record<string, string> {
-  return Object.assign({}, ...sources.map(serializeHeaders))
 }
 
 function collectHeadersCaseInsensitive(...sources: Array<unknown>): Record<string, unknown> {
@@ -621,7 +618,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     }),
   ])
 
-  const headers = mergeHeaders(applyHeaderStyles(validatedHeaders as HeadersInit | undefined, requestConfig.styles?.header))
+  const headers = serializeHeaders(applyHeaderStyles(validatedHeaders as HeadersInit | undefined, requestConfig.styles?.header))
   const { request: requestContentTypeOption, response: responseContentType } = resolveContentType(requestConfig.contentType)
   const requestContentType = requestContentTypeOption ?? getHeader(headers, 'content-type')
   if (responseContentType && !hasHeader(headers, 'accept')) {
@@ -862,7 +859,7 @@ async function parseResponse(response: Response, responseType?: ResponseType): P
 /**
  * The default transport that sends the resolved request through `globalThis.fetch` and returns the parsed body with the native request and response.
  */
-const defaultTransport: Transport = async (request: ResolvedRequest): Promise<TransportResult> => {
+export const defaultTransport: Transport = async (request: ResolvedRequest): Promise<TransportResult> => {
   const init: RequestInit = {
     ...request.options, // cache, mode, redirect, keepalive, duplex, next, …
     method: request.method,
