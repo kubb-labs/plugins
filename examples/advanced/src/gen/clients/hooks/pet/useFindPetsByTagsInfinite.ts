@@ -1,32 +1,76 @@
 import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '../../../../tanstack-query-hook'
 import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
-import type { FindPetsByTagsOptions, FindPetsByTagsQuery, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../../models/ts/pet/FindPetsByTags'
+import type { FindPetsByTagsXEXAMPLEKey } from '../../../models/ts/FindPetsByTagsXEXAMPLE'
+import type { Pet } from '../../../models/ts/Pet'
 import { infiniteQueryOptions, useInfiniteQuery } from '../../../../tanstack-query-hook'
 import { findPetsByTags } from '../../axios/petService/findPetsByTags'
 
-export const findPetsByTagsInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'> = {}) =>
-  [{ url: '/pet/findByTags', infinite: true }, ...(query ? [query] : [])] as const
+export const findPetsByTagsInfiniteQueryKey = ({
+  query,
+}: Omit<
+  {
+    body?: never
+    path?: never
+    query?: {
+      tags?: Array<string>
+      page?: string
+      pageSize?: number
+    }
+    headers: {
+      'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+    }
+  },
+  'headers'
+> = {}) => [{ url: '/pet/findByTags', infinite: true }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInfiniteQueryKey>
 
 export function findPetsByTagsInfiniteQueryOptions(
-  { query, headers }: FindPetsByTagsOptions,
+  {
+    query,
+    headers,
+  }: {
+    body?: never
+    path?: never
+    query?: {
+      tags?: Array<string>
+      page?: string
+      pageSize?: number
+    }
+    headers: {
+      'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+    }
+  },
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey({ query })
   return infiniteQueryOptions<
-    FindPetsByTagsStatus200,
-    ResponseErrorConfig<FindPetsByTagsStatus400>,
-    InfiniteData<FindPetsByTagsStatus200>,
+    Array<Pet>,
+    ResponseErrorConfig<unknown>,
+    InfiniteData<Array<Pet>>,
     typeof queryKey,
-    NonNullable<FindPetsByTagsQuery['pageSize']>
+    NonNullable<
+      {
+        tags?: Array<string>
+        page?: string
+        pageSize?: number
+      }['pageSize']
+    >
   >({
     queryKey,
     queryFn: async ({ signal, pageParam }) => {
       query = {
         ...(query ?? {}),
-        ['pageSize']: pageParam as unknown as FindPetsByTagsQuery['pageSize'],
-      } as FindPetsByTagsQuery
+        ['pageSize']: pageParam as unknown as {
+          tags?: Array<string>
+          page?: string
+          pageSize?: number
+        }['pageSize'],
+      } as {
+        tags?: Array<string>
+        page?: string
+        pageSize?: number
+      }
       return findPetsByTags({ ...config, query, headers, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
     initialPageParam: 0,
@@ -41,18 +85,72 @@ export function findPetsByTagsInfiniteQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsInfinite<
-  TQueryFnData = FindPetsByTagsStatus200,
-  TError = ResponseErrorConfig<FindPetsByTagsStatus400>,
+  TQueryFnData = Array<Pet>,
+  TError = ResponseErrorConfig<unknown>,
   TData = InfiniteData<TQueryFnData>,
   TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,
-  TPageParam = NonNullable<FindPetsByTagsQuery['pageSize']>,
+  TPageParam = NonNullable<
+    {
+      tags?: Array<string>
+      page?: string
+      pageSize?: number
+    }['pageSize']
+  >,
 >(
   {
     headers,
     query,
   }: {
-    headers: FindPetsByTagsOptions['headers'] | (() => FindPetsByTagsOptions['headers'])
-    query?: FindPetsByTagsOptions['query'] | (() => FindPetsByTagsOptions['query'])
+    headers:
+      | {
+          body?: never
+          path?: never
+          query?: {
+            tags?: Array<string>
+            page?: string
+            pageSize?: number
+          }
+          headers: {
+            'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+          }
+        }['headers']
+      | (() => {
+          body?: never
+          path?: never
+          query?: {
+            tags?: Array<string>
+            page?: string
+            pageSize?: number
+          }
+          headers: {
+            'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+          }
+        }['headers'])
+    query?:
+      | {
+          body?: never
+          path?: never
+          query?: {
+            tags?: Array<string>
+            page?: string
+            pageSize?: number
+          }
+          headers: {
+            'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+          }
+        }['query']
+      | (() => {
+          body?: never
+          path?: never
+          query?: {
+            tags?: Array<string>
+            page?: string
+            pageSize?: number
+          }
+          headers: {
+            'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+          }
+        }['query'])
   },
   options: {
     query?: Partial<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }

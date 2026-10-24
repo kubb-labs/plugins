@@ -1,12 +1,5 @@
 import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
-import type {
-  UpdatePetOptions,
-  UpdatePetStatus200,
-  UpdatePetStatus202,
-  UpdatePetStatus400,
-  UpdatePetStatus404,
-  UpdatePetStatus405,
-} from '../../../models/ts/pet/UpdatePet'
+import type { Pet } from '../../../models/ts/Pet'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { updatePet } from '../../axios/petService/updatePet'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -20,9 +13,17 @@ export function updatePetMutationOptions<TContext = unknown>(
 ) {
   const mutationKey = updatePetMutationKey()
   return mutationOptions<
-    UpdatePetStatus200 | UpdatePetStatus202,
-    ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    UpdatePetOptions,
+    | Omit<NonNullable<Pet>, 'name'>
+    | {
+        id?: number
+      },
+    ResponseErrorConfig<unknown | unknown | unknown>,
+    {
+      body: Omit<NonNullable<Pet>, 'id'>
+      path?: never
+      query?: never
+      headers?: never
+    },
     TContext
   >({
     mutationKey,
@@ -40,9 +41,17 @@ export function updatePetMutationOptions<TContext = unknown>(
 export function useUpdatePet<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      UpdatePetStatus200 | UpdatePetStatus202,
-      ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-      UpdatePetOptions,
+      | Omit<NonNullable<Pet>, 'name'>
+      | {
+          id?: number
+        },
+      ResponseErrorConfig<unknown | unknown | unknown>,
+      {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+      },
       TContext
     > & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
@@ -58,16 +67,32 @@ export function useUpdatePet<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? updatePetMutationKey()
 
   const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<
-    UpdatePetStatus200 | UpdatePetStatus202,
-    ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    UpdatePetOptions,
+    | Omit<NonNullable<Pet>, 'name'>
+    | {
+        id?: number
+      },
+    ResponseErrorConfig<unknown | unknown | unknown>,
+    {
+      body: Omit<NonNullable<Pet>, 'id'>
+      path?: never
+      query?: never
+      headers?: never
+    },
     TContext
   >
 
   return useMutation<
-    UpdatePetStatus200 | UpdatePetStatus202,
-    ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    UpdatePetOptions,
+    | Omit<NonNullable<Pet>, 'name'>
+    | {
+        id?: number
+      },
+    ResponseErrorConfig<unknown | unknown | unknown>,
+    {
+      body: Omit<NonNullable<Pet>, 'id'>
+      path?: never
+      query?: never
+      headers?: never
+    },
     TContext
   >(
     {
@@ -77,9 +102,17 @@ export function useUpdatePet<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    UpdatePetStatus200 | UpdatePetStatus202,
-    ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    UpdatePetOptions,
+    | Omit<NonNullable<Pet>, 'name'>
+    | {
+        id?: number
+      },
+    ResponseErrorConfig<unknown | unknown | unknown>,
+    {
+      body: Omit<NonNullable<Pet>, 'id'>
+      path?: never
+      query?: never
+      headers?: never
+    },
     TContext
   >
 }

@@ -1,5 +1,5 @@
 import type { Options, EventStreamResult, SuccessOf } from '../../../.kubb/client'
-import type { StreamPetEventsOptions, StreamPetEventsResponses } from '../../../models/ts/stream/StreamPetEvents'
+import type { PetEvent } from '../../../models/ts/PetEvent'
 import { client, toEventStream } from '../../../.kubb/client'
 
 /**
@@ -8,11 +8,31 @@ import { client, toEventStream } from '../../../.kubb/client'
  * {@link /pet/:petId/events}
  */
 export function streamPetEvents<ThrowOnError extends boolean = true>(
-  options: Options<StreamPetEventsOptions, ThrowOnError>,
-): Promise<EventStreamResult<SuccessOf<StreamPetEventsResponses>>> {
+  options: Options<
+    {
+      body?: never
+      path: {
+        petId: number
+      }
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  >,
+): Promise<
+  EventStreamResult<
+    SuccessOf<{
+      '200': PetEvent
+    }>
+  >
+> {
   const { client: request = client, ...config } = options
 
-  return toEventStream<SuccessOf<StreamPetEventsResponses>>(
+  return toEventStream<
+    SuccessOf<{
+      '200': PetEvent
+    }>
+  >(
     request({
       method: 'GET',
       url: '/pet/{petId}/events',

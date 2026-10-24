@@ -1,11 +1,22 @@
-import type { UpdatePetWithFormOptions, UpdatePetWithFormResponse } from '../../models/ts/pet/UpdatePetWithForm'
-
 export function updatePetWithForm(
-  { path, query }: UpdatePetWithFormOptions,
+  {
+    path,
+    query,
+  }: {
+    body?: never
+    path: {
+      petId: number
+    }
+    query?: {
+      name?: string
+      status?: string
+    }
+    headers?: never
+  },
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<UpdatePetWithFormResponse> {
+): Cypress.Chainable<unknown> {
   return cy
-    .request<UpdatePetWithFormResponse>({
+    .request<unknown>({
       method: 'POST',
       url: `/pet/${path.petId}:search`,
       qs: query,

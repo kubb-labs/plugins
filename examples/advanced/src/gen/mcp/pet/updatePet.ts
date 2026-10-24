@@ -1,4 +1,4 @@
-import type { UpdatePetOptions } from '../../models/ts/pet/UpdatePet'
+import type { Pet } from '../../models/ts/Pet'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { updatePet } from '../../clients/axios/petService/updatePet'
 
@@ -7,7 +7,17 @@ import { updatePet } from '../../clients/axios/petService/updatePet'
  * @summary Update an existing pet
  * {@link /pet}
  */
-export async function updatePetHandler({ body }: UpdatePetOptions, ctx: ServerContext): Promise<CallToolResult> {
+export async function updatePetHandler(
+  {
+    body,
+  }: {
+    body: Omit<NonNullable<Pet>, 'id'>
+    path?: never
+    query?: never
+    headers?: never
+  },
+  ctx: ServerContext,
+): Promise<CallToolResult> {
   const res = await updatePet({ body, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

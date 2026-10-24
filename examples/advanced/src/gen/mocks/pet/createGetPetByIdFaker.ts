@@ -1,8 +1,12 @@
-import type { GetPetByIdPath, GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus200Json, GetPetByIdStatus200Xml } from '../../models/ts/pet/GetPetById'
+import type { Pet } from '../../models/ts/Pet'
 import { createPetFaker } from '../createPetFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createGetPetByIdPathFaker<TData extends Partial<GetPetByIdPath> = object>(data?: TData) {
+export function createGetPetByIdPathFaker<
+  TData extends Partial<{
+    petId: number
+  }> = object,
+>(data?: TData) {
   const defaultFakeData = {
     petId: faker.number.int(),
   }
@@ -15,22 +19,22 @@ export function createGetPetByIdPathFaker<TData extends Partial<GetPetByIdPath> 
 /**
  * @description successful operation
  */
-export function createGetPetByIdStatus200FakerJson(data?: Partial<GetPetByIdStatus200Json>): GetPetByIdStatus200Json {
-  return createPetFaker(data) as GetPetByIdStatus200Json
+export function createGetPetByIdStatus200FakerJson(data?: Partial<Omit<NonNullable<Pet>, 'name'>>): Omit<NonNullable<Pet>, 'name'> {
+  return createPetFaker(data) as Omit<NonNullable<Pet>, 'name'>
 }
 
 /**
  * @description successful operation
  */
-export function createGetPetByIdStatus200FakerXml(data?: Partial<GetPetByIdStatus200Xml>): GetPetByIdStatus200Xml {
-  return createPetFaker(data) as GetPetByIdStatus200Xml
+export function createGetPetByIdStatus200FakerXml(data?: Partial<Omit<NonNullable<Pet>, 'name'>>): Omit<NonNullable<Pet>, 'name'> {
+  return createPetFaker(data) as Omit<NonNullable<Pet>, 'name'>
 }
 
 /**
  * @description successful operation
  */
-export function createGetPetByIdStatus200Faker(data?: Partial<GetPetByIdStatus200>): GetPetByIdStatus200 {
-  return (data ?? faker.helpers.arrayElement([createGetPetByIdStatus200FakerJson(), createGetPetByIdStatus200FakerXml()])) as GetPetByIdStatus200
+export function createGetPetByIdStatus200Faker(data?: Partial<Omit<NonNullable<Pet>, 'name'>>): Omit<NonNullable<Pet>, 'name'> {
+  return (data ?? faker.helpers.arrayElement([createGetPetByIdStatus200FakerJson(), createGetPetByIdStatus200FakerXml()])) as Omit<NonNullable<Pet>, 'name'>
 }
 
 /**
@@ -47,7 +51,9 @@ export function createGetPetByIdStatus404Faker() {
   return undefined
 }
 
-export function createGetPetByIdResponseFaker(data?: Partial<GetPetByIdResponse>): GetPetByIdResponse {
-  return (data ??
-    faker.helpers.arrayElement([createGetPetByIdStatus200Faker(), createGetPetByIdStatus400Faker(), createGetPetByIdStatus404Faker()])) as GetPetByIdResponse
+export function createGetPetByIdResponseFaker(data?: Partial<Omit<NonNullable<Pet>, 'name'>>): Omit<NonNullable<Pet>, 'name'> {
+  return (data ?? faker.helpers.arrayElement([createGetPetByIdStatus200Faker(), createGetPetByIdStatus400Faker(), createGetPetByIdStatus404Faker()])) as Omit<
+    NonNullable<Pet>,
+    'name'
+  >
 }

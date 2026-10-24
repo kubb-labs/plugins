@@ -1,8 +1,31 @@
-import type { AddPetOptions, AddPetResponse } from '../../models/ts/pet/AddPet'
+import type { AddPetRequest } from '../../models/ts/AddPetRequest'
+import type { Pet } from '../../models/ts/Pet'
 
-export function addPet({ body }: AddPetOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<AddPetResponse> {
+export function addPet(
+  {
+    body,
+  }: {
+    body: AddPetRequest | Omit<NonNullable<Pet>, 'id'>
+    path?: never
+    query?: never
+    headers?: never
+  },
+  options: Partial<Cypress.RequestOptions> = {},
+): Cypress.Chainable<
+  | {
+      code?: number
+      message?: string
+    }
+  | Omit<NonNullable<Pet>, 'name'>
+> {
   return cy
-    .request<AddPetResponse>({
+    .request<
+      | {
+          code?: number
+          message?: string
+        }
+      | Omit<NonNullable<Pet>, 'name'>
+    >({
       method: 'POST',
       url: `/pet`,
       body,

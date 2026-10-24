@@ -1,5 +1,5 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
-import type { UpdatePetOptions, UpdatePetResponses } from '../../../models/ts/pet/UpdatePet'
+import type { Pet } from '../../../models/ts/Pet'
 import { client, withUnwrap } from '../../../.kubb/client'
 import { updatePetResponseSchema, updatePetErrorSchema } from '../../../zod/pet/updatePetSchema'
 
@@ -9,8 +9,37 @@ import { updatePetResponseSchema, updatePetErrorSchema } from '../../../zod/pet/
  * {@link /pet}
  */
 export function updatePet<ThrowOnError extends boolean = true>(
-  options: Options<UpdatePetOptions, ThrowOnError>,
-): Unwrappable<RequestResult<UpdatePetResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body: Omit<NonNullable<Pet>, 'id'>
+      path?: never
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  >,
+): Unwrappable<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Pet
+          }
+        | {
+            contentType: 'application/xml'
+            data: Pet
+          }
+      '202': {
+        id?: number
+      }
+      '400': unknown
+      '404': unknown
+      '405': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: request = client, ...config } = options
 
   return withUnwrap(
@@ -21,6 +50,27 @@ export function updatePet<ThrowOnError extends boolean = true>(
       validator: { response: updatePetResponseSchema, error: updatePetErrorSchema },
       ...config,
       throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>,
+    }) as Promise<
+      RequestResult<
+        {
+          '200':
+            | {
+                contentType: 'application/json'
+                data: Pet
+              }
+            | {
+                contentType: 'application/xml'
+                data: Pet
+              }
+          '202': {
+            id?: number
+          }
+          '400': unknown
+          '404': unknown
+          '405': unknown
+        },
+        ThrowOnError
+      >
+    >,
   )
 }
