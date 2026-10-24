@@ -1,5 +1,28 @@
 # @kubb/plugin-client
 
+## 5.7.0
+
+### Minor Changes
+
+- [#1208](https://github.com/kubb-labs/plugins/pull/1208) [`01c618d`](https://github.com/kubb-labs/plugins/commit/01c618d6f5b0a090abfb834952ec3d7833481bd6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add `validator.params: 'zod'` to validate and encode path, query, and header params before a request is sent.
+  
+  - Sends codec params in their wire form, such as a `Date` as `2026-10-01`, and rejects an invalid param before the request.
+  - Merges client and call `headers` case-insensitively, with the call winning.
+  - Adds a required `source` field to `ValidationErrorContext`.
+  - Narrows `client.getUrl` to a `UrlConfig` instead of a full `RequestConfig`.
+  - Requires a custom `@kubb/plugin-client` module to export `toHeadersStandardSchema` when `params` is on.
+  
+  ```typescript
+  pluginZod({ inferred: 'direction' })
+  pluginFetch({ validator: { request: 'zod', params: 'zod', response: 'zod' } })
+  ```
+
+### Patch Changes
+
+- [#1205](https://github.com/kubb-labs/plugins/pull/1205) [`e50c36e`](https://github.com/kubb-labs/plugins/commit/e50c36e4f9a2a13993fd3271fe161666c12f9ace) Thanks [@xeoneux](https://github.com/xeoneux)! - Pass the operation's OAuth scopes to the `auth` resolver via `Auth.scopes`.
+- Updated dependencies [[`01c618d`](https://github.com/kubb-labs/plugins/commit/01c618d6f5b0a090abfb834952ec3d7833481bd6)]:
+  - @kubb/plugin-zod@5.7.0
+
 ## 5.6.0
 
 ### Minor Changes
