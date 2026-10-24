@@ -13,10 +13,6 @@ export function shouldCoerce(coercion: PluginZod['resolvedOptions']['coercion'] 
   return !!coercion[type]
 }
 
-export function propertyNamesOf(node: ast.SchemaNode): ast.SchemaNode | undefined {
-  return 'propertyNames' in node ? (node as { propertyNames?: ast.SchemaNode }).propertyNames : undefined
-}
-
 /**
  * Whether the schema node represents a closed or finite set of keys (e.g. enum, literal,
  * or union of enums/literals).
@@ -48,7 +44,7 @@ export function isPlainInlineObject(node: ast.SchemaNode): boolean {
   const hasAdditionalProperties = node.additionalProperties !== undefined
   const hasPatternProperties = Boolean(node.patternProperties)
 
-  return !hasAdditionalProperties && !hasPatternProperties && !propertyNamesOf(node)
+  return !hasAdditionalProperties && !hasPatternProperties && !node.propertyNames
 }
 
 /**
@@ -65,7 +61,7 @@ export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: Readonl
     const hasTypedAdditionalProperties = Boolean(node.additionalProperties && node.additionalProperties !== true)
     const hasPatternProperties = Boolean(node.patternProperties)
 
-    const isRecord = !hasProperties && (hasTypedAdditionalProperties || hasPatternProperties || propertyNamesOf(node))
+    const isRecord = !hasProperties && (hasTypedAdditionalProperties || hasPatternProperties || node.propertyNames)
 
     return !isRecord
   }
