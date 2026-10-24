@@ -59,7 +59,7 @@
     "vitest": "catalog:"
   },
   "engines": {
-    "node": ">=22.12",
+    "node": ">=22.22",
     "pnpm": ">=11.0.0"
   },
   "packageManager": "pnpm@12.11.2",

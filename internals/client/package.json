@@ -64,6 +64,6 @@
     "kubb": "catalog:"
   },
   "engines": {
-    "node": ">=22.12"
+    "node": ">=22.22"
   }
 }
