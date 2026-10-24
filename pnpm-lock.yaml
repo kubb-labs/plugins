@@ -1032,6 +1032,9 @@ importers:
       '@kubb/parser-ts':
         specifier: 'catalog:'
         version: 5.12.8(vitest@5.0.5)
+      '@typescript/typescript6':
+        specifier: ^6.0.2
+        version: 6.0.2
       yuku-codegen:
         specifier: ^0.19.0
         version: 0.19.0

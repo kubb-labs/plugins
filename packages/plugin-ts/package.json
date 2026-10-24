@@ -83,7 +83,13 @@
     "typescript": "catalog:"
   },
   "peerDependencies": {
+    "@typescript/typescript6": "^6.0.2",
     "kubb": "catalog:"
+  },
+  "peerDependenciesMeta": {
+    "@typescript/typescript6": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22.12"
