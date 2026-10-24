@@ -964,12 +964,48 @@ describe('content type negotiation', () => {
     expect(calls[0]?.headers['Accept']).toBe('application/json')
   })
 
+  test('preserves empty explicit headers over auth and content-type defaults', async () => {
+    const { transport, calls } = transportWith({})
+    const client = createClientCore<string, string>({ defaultTransport: transport })
+    await client({
+      method: 'POST',
+      url: '/pet',
+      body: { name: 'odie' },
+      headers: { authorization: '', accept: '', 'content-type': '' },
+      contentType: { response: 'application/xml' },
+      security: [{ type: 'http', scheme: 'bearer' }],
+      auth: 'token',
+    })
+    expect(calls[0]?.headers).toStrictEqual({ authorization: '', accept: '', 'content-type': '' })
+  })
+
   test('carries the negotiated content type onto result.contentType, charset stripped', async () => {
     const { transport } = transportWith({ data: { id: 1 }, contentType: 'application/xml; charset=utf-8' })
     const client = createClientCore<string, string>({ defaultTransport: transport })
     const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<string, string>
     expect(result.contentType).toBe('application/xml')
     expect(result.data).toStrictEqual({ id: 1 })
+  })
+
+  test.each([200, 422])('validates a codec-produced undefined value for status %s', async (status) => {
+    const { transport } = transportWith({ data: 'raw', status, contentType: 'application/xml' })
+    const client = createClientCore<string, string>({ defaultTransport: transport })
+    const response = vi.fn(() => 'success')
+    const error = vi.fn(() => 'failure')
+    const result = await client({
+      url: '/pet',
+      throwOnError: false,
+      codecs: { 'application/xml': { deserialize: async () => undefined } },
+      validator: { response: toSchema(response), error: toSchema(error) },
+    })
+    const selected = status === 200 ? response : error
+    const skipped = status === 200 ? error : response
+    expect(selected).toHaveBeenCalledExactlyOnceWith(undefined)
+    expect(skipped).not.toHaveBeenCalled()
+    expect(result).toMatchObject({
+      data: status === 200 ? 'success' : undefined,
+      error: status === 200 ? undefined : 'failure',
+    })
   })
 
   test('runs the matching deserializer before validation and feeds result.data', async () => {
