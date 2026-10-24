@@ -4,11 +4,11 @@
  */
 
 import type { PlaceOrderPatchResponse, PlaceOrderPatchStatus405, PlaceOrderPatchBody } from '../../../models/PlaceOrderPatch'
-import type { HttpResponseResolver } from 'msw'
-import { http } from 'msw'
+import type { HttpResponseResolver } from 'msw/http'
+import { http, HttpResponse } from 'msw/http'
 
 export function placeOrderPatchHandlerResponse200(data: PlaceOrderPatchResponse) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
@@ -17,7 +17,7 @@ export function placeOrderPatchHandlerResponse200(data: PlaceOrderPatchResponse)
 }
 
 export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatchStatus405) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 405,
   })
 }
@@ -29,7 +29,7 @@ export function placeOrderPatchHandler(
   return http.patch<Record<string, string>, PlaceOrderPatchBody>(`${options?.baseURL ?? 'http://localhost:3000'}/store/order`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new Response(JSON.stringify(data), {
+    return new HttpResponse(JSON.stringify(data), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

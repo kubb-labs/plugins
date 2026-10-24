@@ -4,10 +4,10 @@
  */
 
 import type { GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../../models/GetOrderById'
-import { http } from 'msw'
+import { http, HttpResponse } from 'msw/http'
 
 export function getOrderByIdHandlerResponse200(data: GetOrderByIdResponse) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
@@ -16,13 +16,13 @@ export function getOrderByIdHandlerResponse200(data: GetOrderByIdResponse) {
 }
 
 export function getOrderByIdHandlerResponse400(data?: GetOrderByIdStatus400) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 400,
   })
 }
 
 export function getOrderByIdHandlerResponse404(data?: GetOrderByIdStatus404) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 404,
   })
 }
@@ -34,7 +34,7 @@ export function getOrderByIdHandler(
   return http.get(`${options?.baseURL ?? 'http://localhost:3000'}/store/order/:orderId`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new Response(JSON.stringify(data), {
+    return new HttpResponse(JSON.stringify(data), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

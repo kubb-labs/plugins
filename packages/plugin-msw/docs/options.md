@@ -67,7 +67,7 @@ Source of the response body each handler returns.
 ::field-group
 
 :::field{name="'data'"}
-Default value. Returns the data you pass to the handler, typed with the `@kubb/plugin-ts` types. The handler uses `new Response(JSON.stringify(data), ...)`.
+Default value. Returns the data you pass to the handler, typed with the `@kubb/plugin-ts` types. The handler uses `new HttpResponse(JSON.stringify(data), ...)`.
 :::
 
 :::field{name="'faker'"}
@@ -81,7 +81,7 @@ export function getPetHandler(data?: GetPetQueryResponse | ((info: Parameters<Pa
   return http.get('/pet/:petId', function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new Response(JSON.stringify(data ?? createGetPetQueryResponse(data)), {
+    return new HttpResponse(JSON.stringify(data ?? createGetPetQueryResponse(data)), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })

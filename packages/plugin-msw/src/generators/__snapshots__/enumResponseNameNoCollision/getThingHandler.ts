@@ -5,10 +5,10 @@
  */
 
 import type { GetThingResponse } from './GetThing'
-import { http } from 'msw'
+import { http, HttpResponse } from 'msw/http'
 
 export function getThingHandlerResponse200(data: GetThingResponse) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
@@ -23,7 +23,7 @@ export function getThingHandler(
   return http.get(`${options?.baseURL ?? ''}/thing`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new Response(JSON.stringify(data), {
+    return new HttpResponse(JSON.stringify(data), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

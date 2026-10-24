@@ -4,10 +4,10 @@
  */
 
 import type { UpdatePetWithFormStatus405 } from '../../../models/UpdatePetWithForm'
-import { http } from 'msw'
+import { http, HttpResponse } from 'msw/http'
 
 export function updatePetWithFormHandlerResponse405(data?: UpdatePetWithFormStatus405) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 405,
   })
 }
@@ -19,7 +19,7 @@ export function updatePetWithFormHandler(
   return http.post(`${options?.baseURL ?? 'http://localhost:3000'}/pet/:petId\\:search`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new Response(JSON.stringify(data), {
+    return new HttpResponse(JSON.stringify(data), {
       status: 200,
     })
   })

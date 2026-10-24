@@ -89,8 +89,8 @@ export const mswGenerator = defineGenerator<PluginMsw>({
         banner={resolver.default.banner(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: mock.file.path, baseName: mock.file.baseName } })}
       >
-        <File.Import name={['http']} path="msw" />
-        <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw" />
+        <File.Import name={['http', 'HttpResponse']} path="msw/http" />
+        <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw/http" />
         <File.Import
           name={Array.from(new Set([...(hasResponseNameCollision ? [] : [type.responseName]), ...responseTypeNames, ...(requestName ? [requestName] : [])]))}
           path={type.file.path}

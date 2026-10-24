@@ -1,9 +1,9 @@
 import type { AddFilesResponse, AddFilesStatus405, AddFilesBody } from '../../models/ts/pet/AddFiles'
-import type { HttpResponseResolver } from 'msw'
-import { http } from 'msw'
+import type { HttpResponseResolver } from 'msw/http'
+import { http, HttpResponse } from 'msw/http'
 
 export function addFilesHandlerResponse200(data: AddFilesResponse) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
@@ -12,7 +12,7 @@ export function addFilesHandlerResponse200(data: AddFilesResponse) {
 }
 
 export function addFilesHandlerResponse405(data?: AddFilesStatus405) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 405,
   })
 }
@@ -21,7 +21,7 @@ export function addFilesHandler(data?: AddFilesResponse | HttpResponseResolver<R
   return http.post<Record<string, string>, AddFilesBody>(`${options?.baseURL ?? ''}/pet/files`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new Response(JSON.stringify(data), {
+    return new HttpResponse(JSON.stringify(data), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

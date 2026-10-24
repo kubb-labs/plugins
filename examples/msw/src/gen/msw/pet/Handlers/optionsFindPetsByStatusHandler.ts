@@ -4,10 +4,10 @@
  */
 
 import type { OptionsFindPetsByStatusResponse } from '../../../models/OptionsFindPetsByStatus'
-import { http } from 'msw'
+import { http, HttpResponse } from 'msw/http'
 
 export function optionsFindPetsByStatusHandlerResponse200(data: OptionsFindPetsByStatusResponse) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
@@ -22,7 +22,7 @@ export function optionsFindPetsByStatusHandler(
   return http.options(`${options?.baseURL ?? 'http://localhost:3000'}/pet/findByStatus`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new Response(JSON.stringify(data), {
+    return new HttpResponse(JSON.stringify(data), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

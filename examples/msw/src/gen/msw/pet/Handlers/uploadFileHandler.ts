@@ -4,11 +4,11 @@
  */
 
 import type { UploadFileResponse, UploadFileBody } from '../../../models/UploadFile'
-import type { HttpResponseResolver } from 'msw'
-import { http } from 'msw'
+import type { HttpResponseResolver } from 'msw/http'
+import { http, HttpResponse } from 'msw/http'
 
 export function uploadFileHandlerResponse200(data: UploadFileResponse) {
-  return new Response(JSON.stringify(data), {
+  return new HttpResponse(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
@@ -20,7 +20,7 @@ export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolv
   return http.post<Record<string, string>, UploadFileBody>(`${options?.baseURL ?? 'http://localhost:3000'}/pet/:petId/uploadImage`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new Response(JSON.stringify(data), {
+    return new HttpResponse(JSON.stringify(data), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
