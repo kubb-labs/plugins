@@ -408,16 +408,10 @@ function serializeUrl({
 function createInterceptorChannel<T, TRequest, TResponse>({
   register,
   ejectNative,
-  getRequestConfig,
-  getContextId,
-  setContextId,
   nextSeq,
 }: {
   register: (fn: InterceptorFn<T, TRequest, TResponse>) => number
   ejectNative: (id: number) => void
-  getRequestConfig: (value: T) => RequestConfig<unknown, TRequest, TResponse> | undefined
-  getContextId: (value: T) => number | undefined
-  setContextId: (value: T, id: number | undefined) => void
   nextSeq: () => number
 }): InterceptorChannel<T, TRequest, TResponse> & {
   detach: () => void
@@ -425,18 +419,11 @@ function createInterceptorChannel<T, TRequest, TResponse>({
 } {
   const handlers = new Map<number, { fn: InterceptorFn<T, TRequest, TResponse>; seq: number; nativeId: number }>()
   let counter = 0
-  const registerWithContext = (fn: InterceptorFn<T, TRequest, TResponse>) =>
-    register(async (value) => {
-      const contextId = getContextId(value)
-      const result = await fn(value, getRequestConfig(value))
-      if (contextId !== undefined) setContextId(result, contextId)
-      return result
-    })
 
   return {
     use(fn) {
       const id = ++counter
-      handlers.set(id, { fn, seq: nextSeq(), nativeId: registerWithContext(fn) })
+      handlers.set(id, { fn, seq: nextSeq(), nativeId: register(fn) })
       return id
     },
     eject(id) {
@@ -449,7 +436,7 @@ function createInterceptorChannel<T, TRequest, TResponse>({
       const entry = handlers.get(id)
       if (!entry) return
       ejectNative(entry.nativeId)
-      handlers.set(id, { fn, seq: nextSeq(), nativeId: registerWithContext(fn) })
+      handlers.set(id, { fn, seq: nextSeq(), nativeId: register(fn) })
     },
     detach() {
       for (const entry of handlers.values()) ejectNative(entry.nativeId)
@@ -458,7 +445,7 @@ function createInterceptorChannel<T, TRequest, TResponse>({
       return Array.from(handlers.values(), (entry) => ({
         seq: entry.seq,
         attach() {
-          entry.nativeId = registerWithContext(entry.fn)
+          entry.nativeId = register(entry.fn)
         },
       }))
     },
@@ -645,43 +632,6 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   return { axiosConfig, codecs, throwOnError }
 }
 
-async function settleResponse<TRequest, TResponse>({
-  response,
-  codecs,
-  validator,
-  onValidationError,
-}: {
-  response: AxiosResponse
-  codecs: Record<string, Codec>
-  validator: { response?: Validator; error?: Validator } | undefined
-  onValidationError: ValidationErrorHandler | undefined
-}): Promise<CallResult<TRequest, TResponse>> {
-  const isSuccess = response.status >= 200 && response.status < 300
-  const contentType = getResponseContentType(response.headers as Record<string, unknown>)
-  const codec = contentType ? codecs[contentType] : undefined
-  const decoded: unknown = contentType && codec?.deserialize ? await codec.deserialize(response.data, contentType) : response.data
-  const data = await runValidator({
-    validator: isSuccess ? validator?.response : validator?.error,
-    value: decoded,
-    context: {
-      direction: isSuccess ? 'response' : 'error',
-      source: 'body',
-      method: response.config?.method?.toUpperCase(),
-      url: response.config?.url,
-      status: response.status,
-    },
-    onValidationError,
-  })
-  return {
-    status: response.status,
-    data: isSuccess ? data : undefined,
-    error: isSuccess ? undefined : data,
-    contentType,
-    request: response.config as TRequest,
-    response: response as TResponse,
-  }
-}
-
 /**
  * Uses the configured axios instance or creates one. `throwOnError` sets axios's default `validateStatus`.
  */
@@ -699,10 +649,6 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     const axiosConfig = 'config' in value ? value.config : value
     return (axiosConfig as (AxiosRequestConfig & { __kubbRequestContext?: number }) | undefined)?.__kubbRequestContext
   }
-  const getRequestConfig = (value: AxiosRequestConfig | AxiosResponse | AxiosError) => {
-    const id = getContextId(value)
-    return id === undefined ? undefined : requestContexts.get(id)
-  }
   const setContextId = (value: AxiosRequestConfig | AxiosResponse | AxiosError, id: number | undefined) => {
     if (!value || typeof value !== 'object') return
     const axiosConfig = 'config' in value ? value.config : value
@@ -712,28 +658,40 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     else contextualConfig.__kubbRequestContext = id
   }
 
+  const withContext =
+    <T extends AxiosRequestConfig | AxiosResponse | AxiosError>(fn: InterceptorFn<T, TRequest, TResponse>) =>
+    async (value: T) => {
+      const contextId = getContextId(value)
+      const requestConfig = contextId === undefined ? undefined : requestContexts.get(contextId)
+      const result = await fn(value, requestConfig)
+      if (contextId !== undefined) setContextId(result, contextId)
+      return result
+    }
+
   let sequenceCounter = 0
   const nextSeq = () => ++sequenceCounter
 
   // Read at call time so the channels follow a transport swapped in through setConfig.
-  const context = { getRequestConfig, getContextId, setContextId, nextSeq }
   const channels = {
     request: createInterceptorChannel<InternalAxiosRequestConfig, TRequest, TResponse>({
-      ...context,
-      register: (fn) => instance.interceptors.request.use(fn),
+      nextSeq,
+      register: (fn) => instance.interceptors.request.use(withContext(fn)),
       ejectNative: (id) => instance.interceptors.request.eject(id),
     }),
     response: createInterceptorChannel<AxiosResponse, TRequest, TResponse>({
-      ...context,
-      register: (fn) => instance.interceptors.response.use(fn),
+      nextSeq,
+      register: (fn) => instance.interceptors.response.use(withContext(fn)),
       ejectNative: (id) => instance.interceptors.response.eject(id),
     }),
     error: createInterceptorChannel<AxiosError, TRequest, TResponse>({
-      ...context,
-      register: (fn) =>
-        instance.interceptors.response.use(undefined, (error: unknown) =>
-          Promise.resolve(fn(error as AxiosError)).then((result) => Promise.reject(result ?? error)),
-        ),
+      nextSeq,
+      register: (fn) => {
+        const onError = withContext(fn)
+        return instance.interceptors.response.use(undefined, async (error: unknown) => {
+          const result = await onError(error as AxiosError)
+          throw result ?? error
+        })
+      },
       ejectNative: (id) => instance.interceptors.response.eject(id),
     }),
   }
@@ -753,12 +711,32 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
 
     try {
       const response = await activeInstance.request<unknown, AxiosResponse>(axiosConfig)
-      const result = await settleResponse<TRequest, TResponse>({
-        response,
-        codecs,
-        validator: requestConfig.validator,
-        onValidationError: requestConfig.onValidationError ?? config.onValidationError,
+      const validator = requestConfig.validator
+      const onValidationError = requestConfig.onValidationError ?? config.onValidationError
+      const isSuccess = response.status >= 200 && response.status < 300
+      const contentType = getResponseContentType(response.headers as Record<string, unknown>)
+      const codec = contentType ? codecs[contentType] : undefined
+      const decoded: unknown = contentType && codec?.deserialize ? await codec.deserialize(response.data, contentType) : response.data
+      const data = await runValidator({
+        validator: isSuccess ? validator?.response : validator?.error,
+        value: decoded,
+        context: {
+          direction: isSuccess ? 'response' : 'error',
+          source: 'body',
+          method: response.config?.method?.toUpperCase(),
+          url: response.config?.url,
+          status: response.status,
+        },
+        onValidationError,
       })
+      const result = {
+        status: response.status,
+        data: isSuccess ? data : undefined,
+        error: isSuccess ? undefined : data,
+        contentType,
+        request: response.config as TRequest,
+        response: response as TResponse,
+      }
       setContextId(response, undefined)
       return result
     } catch (error) {

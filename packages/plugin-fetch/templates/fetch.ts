@@ -623,59 +623,6 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   }
 }
 
-async function settleResult<TRequest, TResponse>({
-  result,
-  request,
-  codecs,
-  throwOnError,
-  validator,
-  onValidationError,
-  errorInterceptors,
-  requestConfig,
-}: {
-  result: TransportResult<unknown, TRequest, TResponse>
-  request: ResolvedRequest
-  codecs: Record<string, Codec>
-  throwOnError: boolean
-  validator: { response?: Validator; error?: Validator } | undefined
-  onValidationError: ValidationErrorHandler | undefined
-  errorInterceptors: InterceptorStack<ResponseError<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
-  requestConfig: RequestConfig<unknown, TRequest, TResponse>
-}): Promise<CallResult<TRequest, TResponse>> {
-  const isSuccess = result.status >= 200 && result.status < 300
-  const contentType = result.contentType ?? getResponseContentType(result.headers)
-  const codec = contentType ? codecs[contentType] : undefined
-  const decoded = contentType && codec?.deserialize ? await codec.deserialize(result.data, contentType) : result.data
-  const data = await runValidator({
-    validator: isSuccess ? validator?.response : validator?.error,
-    value: decoded,
-    context: { direction: isSuccess ? 'response' : 'error', source: 'body', method: request.method, url: request.url, status: result.status },
-    onValidationError,
-  })
-  if (!isSuccess && throwOnError) {
-    const responseError = new ResponseError({
-      data,
-      status: result.status,
-      statusText: result.statusText,
-      contentType,
-      request: result.request,
-      response: result.response,
-      method: request.method,
-      url: request.url,
-    })
-    await errorInterceptors.run(responseError, requestConfig)
-    throw responseError
-  }
-  return {
-    status: result.status,
-    data: isSuccess ? data : undefined,
-    error: isSuccess ? undefined : data,
-    contentType,
-    request: result.request,
-    response: result.response,
-  }
-}
-
 /**
  * Creates an isolated client using the supplied default transport.
  */
@@ -698,16 +645,41 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     const resolvedRequest = await interceptors.request.run(request, requestConfig)
     const result = await interceptors.response.run(await transport(resolvedRequest), requestConfig)
 
-    return settleResult({
-      result,
-      request: resolvedRequest,
-      codecs,
-      throwOnError: requestConfig.throwOnError ?? config.throwOnError ?? true,
-      validator: requestConfig.validator,
-      onValidationError: requestConfig.onValidationError ?? config.onValidationError,
-      errorInterceptors: interceptors.error,
-      requestConfig,
+    const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
+    const validator = requestConfig.validator
+    const onValidationError = requestConfig.onValidationError ?? config.onValidationError
+    const isSuccess = result.status >= 200 && result.status < 300
+    const contentType = result.contentType ?? getResponseContentType(result.headers)
+    const codec = contentType ? codecs[contentType] : undefined
+    const decoded = contentType && codec?.deserialize ? await codec.deserialize(result.data, contentType) : result.data
+    const data = await runValidator({
+      validator: isSuccess ? validator?.response : validator?.error,
+      value: decoded,
+      context: { direction: isSuccess ? 'response' : 'error', source: 'body', method: resolvedRequest.method, url: resolvedRequest.url, status: result.status },
+      onValidationError,
     })
+    if (!isSuccess && throwOnError) {
+      const responseError = new ResponseError({
+        data,
+        status: result.status,
+        statusText: result.statusText,
+        contentType,
+        request: result.request,
+        response: result.response,
+        method: resolvedRequest.method,
+        url: resolvedRequest.url,
+      })
+      await interceptors.error.run(responseError, requestConfig)
+      throw responseError
+    }
+    return {
+      status: result.status,
+      data: isSuccess ? data : undefined,
+      error: isSuccess ? undefined : data,
+      contentType,
+      request: result.request,
+      response: result.response,
+    }
   }) as ClientInstance<TRequest, TResponse>
 
   client.getConfig = () => config

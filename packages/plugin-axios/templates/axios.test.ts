@@ -712,6 +712,30 @@ describe('createClientCore', () => {
       expect(responseError.response.config).not.toHaveProperty('__kubbRequestContext')
     })
 
+    test.each([200, 500])('passes context through a replacement request config after a transport swap (status %s)', async (status) => {
+      const client = createClientCore({ transport: realAxios() })
+      const contexts: Array<unknown> = []
+      client.interceptors.request.use((config, context) => {
+        contexts.push(context)
+        return { url: config.url, method: config.method, headers: config.headers, adapter: config.adapter, validateStatus: config.validateStatus }
+      })
+      client.interceptors.response.use((response, context) => {
+        contexts.push(context)
+        return response
+      })
+      client.interceptors.error.use((error, context) => {
+        contexts.push(context)
+        return error
+      })
+      client.setConfig({ transport: realAxios(status) })
+
+      const options = { url: '/pet', path: { id: 1 } }
+      const result = client(options)
+      if (status === 200) await expect(result).resolves.toMatchObject({ status })
+      if (status === 500) await expect(result).rejects.toMatchObject({ status })
+      expect(contexts).toStrictEqual([options, options])
+    })
+
     test('does not detach and re-attach when setConfig does not change transport', async () => {
       const transport = realAxios()
       const client = createClientCore({ transport })
@@ -1266,6 +1290,33 @@ describe('content type negotiation', () => {
       data: status === 200 ? 'success' : undefined,
       error: status === 200 ? undefined : 'failure',
     })
+  })
+
+  test.each([false, true])('keeps the selected validation recovery when a codec changes config (per-call: %s)', async (perCall) => {
+    const { instance } = fakeAxiosWith({ contentType: 'application/xml' })
+    const initial = vi.fn(() => ({ value: 'initial' }))
+    const override = vi.fn(() => ({ value: 'override' }))
+    const replacement = vi.fn(() => ({ value: 'replacement' }))
+    const client = createClientCore({ transport: instance, onValidationError: initial })
+    const result = await client({
+      url: '/pet',
+      onValidationError: perCall ? override : undefined,
+      validator: { response: toFailingSchema() },
+      codecs: {
+        'application/xml': {
+          async deserialize(value) {
+            client.setConfig({ onValidationError: replacement })
+            await Promise.resolve()
+            return value
+          },
+        },
+      },
+    })
+
+    expect(result.data).toBe(perCall ? 'override' : 'initial')
+    expect(perCall ? override : initial).toHaveBeenCalledOnce()
+    expect(perCall ? initial : override).not.toHaveBeenCalled()
+    expect(replacement).not.toHaveBeenCalled()
   })
 
   test('runs the matching deserializer before validation and feeds result.data', async () => {

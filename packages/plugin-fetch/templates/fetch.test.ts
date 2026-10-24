@@ -1008,6 +1008,56 @@ describe('content type negotiation', () => {
     })
   })
 
+  test.each([false, true])('keeps the selected validation recovery when a codec changes config (per-call: %s)', async (perCall) => {
+    const { transport } = transportWith({ contentType: 'application/xml' })
+    const initial = vi.fn(() => ({ value: 'initial' }))
+    const override = vi.fn(() => ({ value: 'override' }))
+    const replacement = vi.fn(() => ({ value: 'replacement' }))
+    const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError: initial })
+    const result = await client({
+      url: '/pet',
+      onValidationError: perCall ? override : undefined,
+      validator: { response: toFailingSchema() },
+      codecs: {
+        'application/xml': {
+          async deserialize(value) {
+            client.setConfig({ onValidationError: replacement })
+            await Promise.resolve()
+            return value
+          },
+        },
+      },
+    })
+
+    expect(result.data).toBe(perCall ? 'override' : 'initial')
+    expect(perCall ? override : initial).toHaveBeenCalledOnce()
+    expect(perCall ? initial : override).not.toHaveBeenCalled()
+    expect(replacement).not.toHaveBeenCalled()
+  })
+
+  test.each([false, true])('keeps throwOnError=%s when a codec changes the client default', async (throwOnError) => {
+    const { transport } = transportWith({ status: 422, contentType: 'application/xml' })
+    const client = createClientCore<string, string>({ defaultTransport: transport, throwOnError })
+    const result = client({
+      url: '/pet',
+      codecs: {
+        'application/xml': {
+          async deserialize() {
+            client.setConfig({ throwOnError: !throwOnError })
+            await Promise.resolve()
+            return 'decoded error'
+          },
+        },
+      },
+    })
+
+    if (throwOnError) {
+      await expect(result).rejects.toMatchObject({ name: 'ResponseError', data: 'decoded error', status: 422 })
+      return
+    }
+    await expect(result).resolves.toMatchObject({ data: undefined, error: 'decoded error', status: 422 })
+  })
+
   test('runs the matching deserializer before validation and feeds result.data', async () => {
     const { transport } = transportWith({ data: '<pet><id>1</id></pet>', contentType: 'application/xml' })
     const parseXml = vi.fn(() => ({ id: 1 }))
