@@ -67,8 +67,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
     )
   },
   operation(node, ctx) {
-    // `operationTypes: false` prints every operation type inline in its consumers, so there is no operation file.
-    if (!ctx.options.operationTypes) return null
+    // `operations: 'inline'` prints every operation type inline in its consumers, so there is no operation file.
+    if (ctx.options.operations === 'inline') return null
     const { enum: enumOptions, optionalType, arrayType, syntaxType, group, output, printer } = ctx.options
     const { config, resolver, root } = ctx
 

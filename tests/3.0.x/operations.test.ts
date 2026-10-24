@@ -17,7 +17,7 @@ import { afterAll, beforeAll, describe, expect, test } from 'vitest'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const output = path.join(__dirname, `.operation-types-${Date.now()}`)
 
-describe('pluginTs({ operationTypes: false }) with its consumers', () => {
+describe("pluginTs({ operations: 'inline' }) with its consumers", () => {
   beforeAll(async () => {
     const { diagnostics } = await createKubb(
       {
@@ -29,7 +29,7 @@ describe('pluginTs({ operationTypes: false }) with its consumers', () => {
         reporters: [],
         storage: fsStorage(),
         plugins: [
-          pluginTs({ output: { path: './types', barrel: false }, operationTypes: false }),
+          pluginTs({ output: { path: './types', barrel: false }, operations: 'inline' }),
           pluginFetch({ output: { path: './clients', barrel: false } }),
           pluginReactQuery({ output: { path: './hooks', barrel: false }, hooks: true, infinite: { queryParam: 'status', initialPageParam: 'available' } }),
           pluginFaker({ output: { path: './mocks', barrel: false } }),

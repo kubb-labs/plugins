@@ -39,7 +39,7 @@ export default defineConfig({
       arrayType: 'generic',
       enum: { type: 'asConst' },
       // Only schema types: consumers print operation types such as `AddPetOptions` inline.
-      operationTypes: false,
+      operations: 'inline',
       override: [
         {
           type: 'operationId',

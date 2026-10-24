@@ -15,7 +15,7 @@ const defaultOptions: PluginTs['resolvedOptions'] = {
   optionalType: 'questionToken',
   arrayType: 'array',
   syntaxType: 'type',
-  operationTypes: true,
+  operations: 'export',
   output: { path: '.', mode: 'directory' },
   exclude: [],
   include: undefined,
@@ -132,7 +132,7 @@ describe('typeGenerator — custom resolver', () => {
   })
 })
 
-describe('typeGenerator — operationTypes: false', () => {
+describe("typeGenerator — operations: 'inline'", () => {
   // The adapter resolves each `$ref` target onto `schema`; a documented target must still be referenced by name.
   const ref = (name: string, schema: ast.SchemaNode = { ...objectSchema, name, description: `A ${name}` }, extra: Partial<ast.SchemaNode> = {}) =>
     ast.factory.createSchema({ type: 'ref', name, ref: `#/components/schemas/${name}`, schema, ...extra } as ast.SchemaNode)
@@ -179,9 +179,9 @@ describe('typeGenerator — operationTypes: false', () => {
   })
 
   test('emits no operation file', async () => {
-    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, operationTypes: false }
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, operations: 'inline' }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver })
-    const driver = createMockedPluginDriver({ name: 'operationTypes false' })
+    const driver = createMockedPluginDriver({ name: 'operations inline' })
 
     await renderGeneratorOperation(typeGenerator, node, { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver })
 

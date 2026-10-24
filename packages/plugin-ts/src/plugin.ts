@@ -50,7 +50,7 @@ export const pluginTs = defineExtension<PluginTs>({
       optionalType = 'questionToken',
       arrayType = 'array',
       syntaxType = 'type',
-      operationTypes = true,
+      operations = 'export',
       printer,
       resolver: userResolver,
       macros: userMacros,
@@ -63,9 +63,10 @@ export const pluginTs = defineExtension<PluginTs>({
       keyCasing: enumOptions.keyCasing ?? 'none',
     }
 
-    const baseResolver = operationTypes
-      ? resolverTs
-      : Resolver.merge(resolverTs, createInlineResolverTs({ optionalType, arrayType, enum: resolvedEnum, nodes: printer?.nodes }))
+    const baseResolver =
+      operations === 'inline'
+        ? Resolver.merge(resolverTs, createInlineResolverTs({ optionalType, arrayType, enum: resolvedEnum, nodes: printer?.nodes }))
+        : resolverTs
     setResolver(userResolver ? Resolver.merge(baseResolver, userResolver) : baseResolver)
     if (userMacros?.length) {
       setMacros(userMacros)
@@ -82,7 +83,7 @@ export const pluginTs = defineExtension<PluginTs>({
       arrayType,
       enum: resolvedEnum,
       syntaxType,
-      operationTypes,
+      operations,
       printer,
     }
   },

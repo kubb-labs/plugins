@@ -148,8 +148,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         ...variants.map((variant) => ({
           schema: decorate ? decorate(variant.schema) : variant.schema,
           name: variant.name,
-          // `pluginTs({ operationTypes: false })` declares no per-content-type types, so each variant uses the printed union.
-          typeName: pluginTs.options?.operationTypes === false ? tsBaseName : getPerContentTypeName(tsBaseName, variant.suffix),
+          // `pluginTs({ operations: 'inline' })` declares no per-content-type types, so each variant uses the printed union.
+          typeName: pluginTs.options?.operations === 'inline' ? tsBaseName : getPerContentTypeName(tsBaseName, variant.suffix),
           description,
           skipImportNames: [],
         })),

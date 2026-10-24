@@ -59,7 +59,7 @@ type InlineResolverOptions = Pick<ResolvedOptions, 'optionalType' | 'arrayType' 
 type TypeSource = { schema: ast.SchemaNode; keysToOmit?: Array<string> | null }
 
 /**
- * Patch for `pluginTs({ operationTypes: false })`: every operation type name resolves to the printed type itself
+ * Patch for `pluginTs({ operations: 'inline' })`: every operation type name resolves to the printed type itself
  * (`Pet`, `{ body?: Order; path?: never }`), so no operation file is emitted and consumers reuse the schema types.
  */
 export function createInlineResolverTs({ nodes, ...options }: InlineResolverOptions) {

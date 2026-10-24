@@ -57,9 +57,9 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     )
     const enumOptions = pluginTs.options?.enum
     const enumNames = new Set(ctx.meta.enumNames)
-    // A type printed by `pluginTs({ operationTypes: false })` is the referenced schema itself, not a colliding alias.
+    // A type printed by `pluginTs({ operations: 'inline' })` is the referenced schema itself, not a colliding alias.
     const hasResponseNameCollision =
-      pluginTs.options?.operationTypes !== false &&
+      pluginTs.options?.operations !== 'inline' &&
       referencedNames.some((name) => {
         return enumTypeName({ resolver: tsResolver, name, enumOptions, isEnum: enumNames.has(name) }) === type.responseName
       })

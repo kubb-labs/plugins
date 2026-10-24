@@ -442,7 +442,7 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
 
 type BuildOperationTypeOptions = {
   /**
-   * Set by `pluginTs({ operationTypes: false })`, which prints these types inline: an optional body becomes the `body?` key
+   * Set by `pluginTs({ operations: 'inline' })`, which prints these types inline: an optional body becomes the `body?` key
    * and a per-content-type response embeds its schema instead of naming a per-content-type type.
    */
   inline?: boolean

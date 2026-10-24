@@ -12,10 +12,10 @@
 '@kubb/plugin-vue-query': patch
 ---
 
-Add `operationTypes` to `pluginTs`. Set it to `false` to emit only the schema types: no per-operation file with `XxxOptions`, `XxxResponses`, or `XxxStatus200` aliases. Clients, query hooks, MSW handlers, Faker mocks, Cypress requests, and MCP handlers reference the schema types directly and print the rest inline.
+Add `operations` to `pluginTs`. Set it to `'inline'` to emit only the schema types: no per-operation file with `XxxOptions`, `XxxResponses`, or `XxxStatus200` aliases. Clients, query hooks, MSW handlers, Faker mocks, Cypress requests, and MCP handlers reference the schema types directly and print the rest inline.
 
 ```ts
-pluginTs({ operationTypes: false })
+pluginTs({ operations: 'inline' })
 ```
 
 ```diff
@@ -25,4 +25,4 @@ pluginTs({ operationTypes: false })
 +mutationOptions<Order, ResponseErrorConfig<unknown>, { body?: Order; path?: never; query?: never; headers?: never }, TContext>
 ```
 
-The default, `true`, keeps the current output.
+The default, `'export'`, keeps the current output.

@@ -8,7 +8,7 @@ import type { PrinterTsNodes } from './printers/printerTs.ts'
  */
 export type ResolverTs = Resolver & {
   /**
-   * Where an operation type name is imported from. Defaults to the operation's file; `operationTypes: false` returns the
+   * Where an operation type name is imported from. Defaults to the operation's file; `operations: 'inline'` returns the
    * schema files a printed type references. Override it to take types from elsewhere, for example a shared package.
    */
   typeImports(node: ast.OperationNode, name: string, params: { root: string; output: Output; group?: Group }): Array<ast.ImportNode>
@@ -258,12 +258,12 @@ export type Options = OutputOptions & {
    */
   arrayType?: 'generic' | 'array'
   /**
-   * Whether operations get their own types (`AddPetOptions`, `AddPetStatus200`).
-   * - `true` — one file per operation with its aliases and aggregates.
-   * - `false` — no operation types: clients, hooks, and mocks reference `Pet` and print the rest inline (`{ body?: Pet }`).
-   * @default true
+   * How operation types (`AddPetOptions`, `AddPetStatus200`) are emitted.
+   * - `'export'` — one file per operation with its aliases and aggregates.
+   * - `'inline'` — no operation types: clients, hooks, and mocks reference `Pet` and print the rest inline (`{ body?: Pet }`).
+   * @default 'export'
    */
-  operationTypes?: boolean
+  operations?: 'export' | 'inline'
   /**
    * Override how names and file paths are built for generated symbols.
    * Methods you omit fall back to the default `resolverTs`. `this` is bound to the
@@ -331,7 +331,7 @@ export type ResolvedOptions = {
   optionalType: NonNullable<Options['optionalType']>
   arrayType: NonNullable<Options['arrayType']>
   syntaxType: NonNullable<Options['syntaxType']>
-  operationTypes: NonNullable<Options['operationTypes']>
+  operations: NonNullable<Options['operations']>
   printer: Options['printer']
 }
 
