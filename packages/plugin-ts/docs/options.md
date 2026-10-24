@@ -18,6 +18,7 @@ Pass these options to `pluginTs()`. Shared options link to [Shared plugin option
 | [`resolver`](#resolver)                                                   | Customize generated names and file paths.                              | `resolverTs`                                                                          |
 | [`macros`](https://kubb.dev/docs/5.x/reference/plugin-options#macros)     | Rewrite AST nodes before printing.                                     | `[]`                                                                                  |
 | [`printer`](#printer)                                                     | Replace the handler for a schema type.                                 | None                                                                                  |
+| [`zod`](#zod)                                                             | Alias operation types to the `@kubb/plugin-zod` inferred types.        | `false`                                                                               |
 
 ## Option details
 
@@ -278,3 +279,22 @@ Replaces the node handler for a schema type such as `'integer'` or `'date'` with
 | Required | `false`                      |
 
 See [Map schema types](https://kubb.dev/extensions/kubb-labs/plugin-ts/guides/customization#map-schema-types) for an example.
+
+### zod
+
+Aliases each operation's path, query, and header param types, request body type, and status types to the types `@kubb/plugin-zod` infers, so a codec types them with its domain value. Clients, query hooks, and mocks that read `@kubb/plugin-ts` then take a `URL` or `Date` where the codec encodes one. Needs [`pluginZod({ inferred })`](https://kubb.dev/extensions/kubb-labs/plugin-zod/options#inferred), and works best with `inferred: 'direction'`.
+
+|          |           |
+| -------- | --------- |
+| Type     | `boolean` |
+| Required | `false`   |
+| Default  | `false`   |
+
+```typescript
+pluginTs({ zod: true })
+pluginZod({ inferred: 'direction' })
+
+export type GetResourcePath = GetResourcePathSchemaType // { resource: URL }
+```
+
+Component schemas and request bodies or responses with several content types keep their own `@kubb/plugin-ts` types.

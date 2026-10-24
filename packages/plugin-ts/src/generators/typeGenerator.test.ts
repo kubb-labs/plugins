@@ -21,6 +21,7 @@ const defaultOptions: PluginTs['resolvedOptions'] = {
   override: [],
   group: null,
   printer: undefined,
+  zod: false,
 }
 
 const enumSchema = ast.factory.createSchema({
