@@ -148,7 +148,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         ...variants.map((variant) => ({
           schema: decorate ? decorate(variant.schema) : variant.schema,
           name: variant.name,
-          typeName: getPerContentTypeName(tsBaseName, variant.suffix),
+          typeName: tsResolver.response.ref?.(node, tsBaseName) ? tsBaseName : getPerContentTypeName(tsBaseName, variant.suffix),
           description,
           skipImportNames: [],
         })),

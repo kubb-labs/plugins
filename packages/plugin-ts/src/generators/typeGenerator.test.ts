@@ -132,6 +132,10 @@ describe('typeGenerator — custom resolver', () => {
 })
 
 describe('typeGenerator — operationTypes: false', () => {
+  // The adapter resolves each `$ref` target onto `schema`; a documented target must still inline.
+  const ref = (name: string, schema: ast.SchemaNode = { ...objectSchema, name, description: `A ${name}` }, extra: Partial<ast.SchemaNode> = {}) =>
+    ast.factory.createSchema({ type: 'ref', name, ref: `#/components/schemas/${name}`, schema, ...extra } as ast.SchemaNode)
+
   test('references the $ref target instead of declaring a per-operation alias', async () => {
     const resolver = Resolver.merge(resolverTs, createRefResolverTs(defaultOptions.enum), { name: apiResolver.name })
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
@@ -144,24 +148,27 @@ describe('typeGenerator — operationTypes: false', () => {
       tags: ['pets'],
       requestBody: {
         content: [
-          ast.factory.createContent({
-            contentType: 'application/json',
-            schema: ast.factory.createSchema({ type: 'ref', name: 'NewPet', ref: '#/components/schemas/NewPet' }),
-          }),
+          ast.factory.createContent({ contentType: 'application/json', schema: ref('NewPet') }),
+          ast.factory.createContent({ contentType: 'application/xml', schema: ref('NewPet') }),
         ],
       },
       responses: [
         ast.factory.createResponse({
           statusCode: '201',
-          schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          content: [
+            ast.factory.createContent({ contentType: 'application/json', schema: ref('Pet') }),
+            ast.factory.createContent({ contentType: 'application/xml', schema: ref('Pet') }),
+          ],
           description: 'Created',
         }),
         ast.factory.createResponse({ statusCode: '400', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Bad request' }),
         ast.factory.createResponse({ statusCode: '404', schema: ast.factory.createSchema({ type: 'unknown' }), description: 'Not found' }),
+        ast.factory.createResponse({ statusCode: '409', schema: ref('PetStatus', enumSchema), description: 'Conflict' }),
+        ast.factory.createResponse({ statusCode: '410', schema: ref('Pet', undefined, { nullable: true }), description: 'Gone' }),
         ast.factory.createResponse({
-          statusCode: '409',
-          schema: ast.factory.createSchema({ type: 'ref', name: 'PetStatus', ref: '#/components/schemas/PetStatus', schema: enumSchema }),
-          description: 'Conflict',
+          statusCode: '422',
+          schema: ast.factory.createSchema({ type: 'ref', name: 'Promoted', ref: '#/components/schemas/Promoted' }),
+          description: 'Invalid',
         }),
       ],
     })
@@ -178,44 +185,58 @@ describe('typeGenerator — operationTypes: false', () => {
 
     const source = rawSources(driver.fileManager.files).join('\n')
 
-    expect(resolver.response.status(node, '201')).toBe('ApiPet')
     expect(resolver.response.body(node)).toBe('ApiNewPet')
+    expect(resolver.response.status(node, '201')).toBe('ApiPet')
+    expect(resolver.response.status(node, '404')).toBe('unknown')
     expect(resolver.response.status(node, '409')).toBe('ApiPetStatusKey')
+    expect(resolver.response.status(node, '410')).toBe('ApiCreatePetStatus410')
+    expect(resolver.response.status(node, '422')).toBe('ApiCreatePetStatus422')
     expect(resolver.response.ref?.(node, 'ApiPet')).toBe('Pet')
     expect(resolver.response.ref?.(node, 'ApiCreatePetStatus400')).toBeNull()
-    expect(source).toContain("import type { ApiPet } from './Pet'")
-    expect(source).toContain("import type { ApiNewPet } from './NewPet'")
-    expect(source).toContain("import type { ApiPetStatusKey } from './PetStatus'")
-    expect(source).not.toContain('export type ApiPetStatusKey')
-    expect(source).not.toContain('export type { ApiPet }')
-    expect(source).toContain('export type ApiCreatePetStatus400')
-    expect(resolver.response.status(node, '404')).toBe('unknown')
-    expect(source).not.toContain('ApiCreatePetStatus404')
+    expect(source).toContain("export type { ApiPet } from './Pet'")
+    expect(source).toContain("export type { ApiNewPet } from './NewPet'")
+    expect(source).toContain("export type { ApiPetStatusKey } from './PetStatus'")
+    expect(source).toMatch(/'201':\s*\|?\s*\{\s*contentType: 'application\/json';?\s*data: ApiPet/)
     expect(source).toMatch(/'404': unknown/)
-    expect(source).not.toContain('ApiCreatePetStatus201')
-    expect(source).not.toContain('ApiCreatePetBody')
-    expect(source).toMatch(/'201': ApiPet/)
+    expect(source).toContain('export type ApiCreatePetStatus400')
+    expect(source).toContain('export type ApiCreatePetStatus410')
+    expect(source).not.toMatch(/ApiCreatePetStatus201|ApiCreatePetStatus404|ApiCreatePetBody|ApiPetJson|ApiNewPetJson/)
   })
 
-  test('keeps the alias when a $ref body sits next to a schema-less content entry', () => {
+  test('keeps the alias when the content types reference different targets or one has no schema', () => {
     const resolver = Resolver.merge(resolverTs, createRefResolverTs(defaultOptions.enum))
+    const body = (content: Array<ast.ContentNode>) =>
+      resolver.response.body(ast.factory.createOperation({ operationId: 'createPet', method: 'POST', path: '/pets', requestBody: { content }, responses: [] }))
+
+    expect(
+      body([
+        ast.factory.createContent({ contentType: 'application/json', schema: ref('AddPetRequest') }),
+        ast.factory.createContent({ contentType: 'application/xml', schema: ref('Pet') }),
+      ]),
+    ).toBe('CreatePetBody')
+    expect(
+      body([
+        ast.factory.createContent({ contentType: 'application/json', schema: ref('Pet') }),
+        ast.factory.createContent({ contentType: 'application/octet-stream' }),
+      ]),
+    ).toBe('CreatePetBody')
+  })
+
+  test('leaves the default resolver output alone when a component shares a slot name', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'operationTypes true collision' })
     const node = ast.factory.createOperation({
       operationId: 'createPet',
       method: 'POST',
       path: '/pets',
-      requestBody: {
-        content: [
-          ast.factory.createContent({
-            contentType: 'application/json',
-            schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
-          }),
-          ast.factory.createContent({ contentType: 'application/octet-stream' }),
-        ],
-      },
+      requestBody: { content: [ast.factory.createContent({ contentType: 'application/json', schema: ref('CreatePetBody') })] },
       responses: [],
     })
 
-    expect(resolver.response.body(node)).toBe('CreatePetBody')
+    await renderGeneratorOperation(typeGenerator, node, { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: resolverTs })
+
+    expect(rawSources(driver.fileManager.files).join('\n')).not.toContain('export type { CreatePetBody }')
   })
 })
 

@@ -100,6 +100,7 @@ export type RequestConfigResolver = {
 export type ResponseStatusNameResolver = {
   response: {
     status(node: ast.OperationNode, statusCode: ast.StatusCode): string
+    ref?(node: ast.OperationNode, name: string): string | null
   }
 }
 
@@ -447,6 +448,9 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
 export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver): ast.SchemaNode {
   const { path, query, header } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
+  const bodyName = hasBody ? resolver.response.body(node) : null
+  // A body inlined by `pluginTs({ operationTypes: false })` is the bare schema type, so an optional body becomes an optional key.
+  const bodyRequired = hasBody && (Boolean(node.requestBody?.required) || !resolver.response.ref?.(node, bodyName!))
   const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
   const groups = [
     { name: 'path', params: path, resolve: resolver.param.path },
@@ -464,8 +468,8 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
     properties: [
       ast.factory.createProperty({
         name: 'body',
-        required: hasBody,
-        schema: hasBody ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) }) : createNever(),
+        required: bodyRequired,
+        schema: bodyName ? ast.factory.createSchema({ type: 'ref', name: bodyName, optional: bodyRequired ? undefined : true }) : createNever(),
       }),
       ...groups.map(({ name, params, resolve }) => {
         const required = params.some((param) => param.required)
@@ -511,7 +515,8 @@ function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode
           ast.factory.createProperty({
             name: 'data',
             required: true,
-            schema: ast.factory.createSchema({ type: 'ref', name: variant.name }),
+            // Every content type of an inlined status shares the one `$ref` target.
+            schema: ast.factory.createSchema({ type: 'ref', name: resolver.response.ref?.(node, statusName) ? statusName : variant.name }),
           }),
         ],
       }),

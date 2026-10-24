@@ -46,31 +46,51 @@ export const resolverTs = createResolver<PluginTs>({
 const responseResolver = createOperationResponseResolver()
 
 /**
- * Patch for `pluginTs({ operationTypes: false })`: a body or response backed by a single `$ref` resolves to the referenced type (`Pet`).
+ * Patch for `pluginTs({ operationTypes: false })`: a body or response whose content types all reference one `$ref` resolves to the referenced type (`Pet`).
  */
 export function createRefResolverTs(enumOptions: ResolvedOptions['enum']) {
-  function refType(resolver: ResolverTs, content: Array<ast.ContentNode> | undefined) {
-    const entry = content?.length === 1 ? content[0]! : null
-    if (entry?.schema && typeKeywords.has(entry.schema.type)) return { schemaName: null, typeName: entry.schema.type }
-    const schemaName = entry && ast.isBareRef(entry.schema, entry.keysToOmit) ? ast.resolveRefName(entry.schema) : null
-    if (!schemaName) return null
-    const isEnum = ast.narrowSchema(ast.narrowSchema(entry!.schema, 'ref')?.schema ?? undefined, ast.schemaTypes.enum) !== null
+  type RefType = { schemaName: string | null; typeName: string }
+  const refsByNode = new WeakMap<ast.OperationNode, { body: RefType | null; status: Map<ast.StatusCode, RefType | null> }>()
+
+  function refType(resolver: ResolverTs, content: Array<ast.ContentNode> | undefined, { body = false } = {}): RefType | null {
+    const [first] = content ?? []
+    if (content?.length === 1 && first?.schema && typeKeywords.has(first.schema.type)) return { schemaName: null, typeName: first.schema.type }
+    // Only fields that change the TS type block inlining (a body's `optional` moves to the `body?` key of `XxxOptions`), and a
+    // ref without a resolved target (an adapter-promoted enum) keeps its alias.
+    const refs = (content ?? []).map((entry) => {
+      const ref = ast.narrowSchema(entry.schema, 'ref')
+      return ref && ref.schema !== undefined && !entry.keysToOmit?.length && !ref.nullable && !ref.nullish && (body || !ref.optional) ? ref : null
+    })
+    const schemaNames = new Set(refs.map((ref) => ast.resolveRefName(ref)))
+    const [schemaName] = schemaNames
+    if (!refs.length || schemaNames.size !== 1 || !schemaName) return null
+    const isEnum = ast.narrowSchema(refs[0]!.schema ?? undefined, ast.schemaTypes.enum) !== null
     return { schemaName, typeName: enumTypeName({ resolver, name: schemaName, enumOptions, isEnum }) }
+  }
+
+  function refsOf(resolver: ResolverTs, node: ast.OperationNode) {
+    let refs = refsByNode.get(node)
+    if (!refs) {
+      refs = {
+        body: refType(resolver, node.requestBody?.content, { body: true }),
+        status: new Map(node.responses.map((res) => [res.statusCode, refType(resolver, res.content)])),
+      }
+      refsByNode.set(node, refs)
+    }
+    return refs
   }
 
   return {
     response: {
       body(node) {
-        return refType(this, node.requestBody?.content)?.typeName ?? responseResolver.body.call(this, node)
+        return refsOf(this, node).body?.typeName ?? responseResolver.body.call(this, node)
       },
       status(node, statusCode) {
-        return (
-          refType(this, node.responses.find((res) => res.statusCode === statusCode)?.content)?.typeName ?? responseResolver.status.call(this, node, statusCode)
-        )
+        return refsOf(this, node).status.get(statusCode)?.typeName ?? responseResolver.status.call(this, node, statusCode)
       },
       ref(node, name) {
-        const contents = [node.requestBody?.content, ...node.responses.map((res) => res.content)]
-        return contents.map((content) => refType(this, content)).find((ref) => ref?.typeName === name)?.schemaName ?? null
+        const { body, status } = refsOf(this, node)
+        return [body, ...status.values()].find((ref) => ref?.typeName === name)?.schemaName ?? null
       },
     },
   } satisfies ResolverPatch<ResolverTs>
