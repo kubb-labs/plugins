@@ -371,9 +371,14 @@ export class ResponseError<TError = unknown, TRequest = AxiosRequestConfig, TRes
 
 export type ResponseErrorConfig<TError = unknown> = ResponseError<TError>
 
+function headerEntries(headers: object): Array<[string, unknown]> {
+  if (Array.isArray(headers)) return headers
+  return headers instanceof Headers ? [...headers] : Object.entries(headers)
+}
+
 function serializeHeaders(headers: HeadersInit | undefined): Record<string, string> {
   if (!headers) return {}
-  const entries = Array.isArray(headers) ? headers : Object.entries(headers)
+  const entries = headerEntries(headers)
   const result: Record<string, string> = {}
   for (const [key, value] of entries) {
     if (value === undefined || value === null) continue
@@ -387,7 +392,7 @@ function collectHeadersCaseInsensitive(...sources: Array<unknown>): Record<strin
   const result: Record<string, unknown> = {}
   for (const source of sources) {
     if (!source) continue
-    const entries: Array<[string, unknown]> = Array.isArray(source) ? source : Object.entries(source)
+    const entries = headerEntries(source)
     for (const [key, value] of entries) {
       if (value === undefined || value === null) continue
       const lowerCase = key.toLowerCase()

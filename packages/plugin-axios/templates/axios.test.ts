@@ -585,6 +585,13 @@ describe('createClientCore', () => {
     expect(client.getConfig().baseURL).toBe('https://example.com')
   })
 
+  test('setConfig keeps the entries of a Headers instance', () => {
+    const { instance } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    client.setConfig({ headers: new Headers({ Authorization: 'Bearer t' }) })
+    expect(client.getConfig().headers).toStrictEqual({ authorization: 'Bearer t' })
+  })
+
   describe('interceptors across a transport set through setConfig', () => {
     // Real instances, so the interceptors run through axios's own managers.
     function realAxios(status = 200) {
@@ -1003,6 +1010,11 @@ describe('header merging', () => {
   test('accepts array-form headers on the client and the call', async () => {
     const headers = await send([['X-Client', 'a']], { headers: [['X-Call', 'b']] })
     expect(headers).toMatchObject({ 'X-Client': 'a', 'X-Call': 'b' })
+  })
+
+  test('accepts Headers instances on the client and the call', async () => {
+    const headers = await send(new Headers({ 'X-Client': 'a' }), { headers: new Headers({ 'X-Call': 'b' }) })
+    expect(headers).toMatchObject({ 'x-client': 'a', 'x-call': 'b' })
   })
 
   test.each([undefined, null])('keeps the client value when the call sets the header to %s', async (value) => {
