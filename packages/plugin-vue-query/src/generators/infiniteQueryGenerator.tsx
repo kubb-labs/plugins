@@ -65,7 +65,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
       keyTypeName: queryKeyTypeName,
       extraTypeNames: [
         resolvePageParamType(node, {
-          resolver: resolveTypeResolver(ctx.driver).resolver,
+          resolver: resolveTypeResolver(ctx.driver, ctx.resolver.pluginName).resolver,
           initialPageParam: infiniteOptions.initialPageParam,
           queryParam: infiniteOptions.queryParam,
         }).queryParamsTypeName,

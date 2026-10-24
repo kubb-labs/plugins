@@ -8,7 +8,9 @@ import { Hookable, createKubb } from '@kubb/core'
 import { type Config, Diagnostics, fsStorage, type KubbHooks } from 'kubb/kit'
 import { pluginFetch } from '@kubb/plugin-fetch'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
+import { pluginSwr } from '@kubb/plugin-swr'
 import { pluginTs } from '@kubb/plugin-ts'
+import { pluginVueQuery } from '@kubb/plugin-vue-query'
 import { parserTs } from '@kubb/parser-ts'
 import { type PrinterZodNodes, pluginZod } from '@kubb/plugin-zod'
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'vitest'
@@ -257,6 +259,27 @@ describe("zod types beside plugin-ts: pluginTs() + pluginZod({ inferred: 'direct
     expect(() =>
       execFileSync(path.join(__dirname, 'node_modules/.bin/tsc'), ['-p', path.join(client.output, 'tsconfig.json')], { encoding: 'utf8' }),
     ).not.toThrow()
+  })
+})
+
+// Without `pluginTs()`, the query hook plugins take every operation type from `pluginZod({ inferred: 'direction' })`.
+describe("zod types without plugin-ts: pluginZod({ inferred: 'direction' }) + React Query, SWR, and Vue Query", () => {
+  let client: Client
+
+  beforeAll(async () => {
+    client = await loadClient('zod-direction-hooks', [
+      pluginZod({ inferred: 'direction', output: { path: './zod', barrel: false }, printer: { nodes: customCodecs } }),
+      pluginFetch({ output: { path: './clients', barrel: false }, validator: { request: 'zod', params: 'zod', response: 'zod' } }),
+      pluginReactQuery({ output: { path: './react-query', barrel: false } }),
+      pluginSwr({ output: { path: './swr', barrel: false } }),
+      pluginVueQuery({ output: { path: './vue-query', barrel: false } }),
+    ])
+  })
+  afterAll(async () => fs.rm(client.output, { recursive: true, force: true }))
+
+  test.each(['react-query', 'swr', 'vue-query'])('generates %s hooks typed by the zod operation types', async (dir) => {
+    const hookFile = await fs.readFile(path.join(client.output, dir, 'useGetResource.ts'), 'utf-8')
+    expect(hookFile).toContain("import type { GetResourceOptionsSchemaType, GetResourceStatus200SchemaType } from '../zod/getResourceSchema'")
   })
 })
 

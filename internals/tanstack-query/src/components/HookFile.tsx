@@ -41,7 +41,7 @@ type ResolvedHookFile = {
 export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, options: ResolveHookFileOptions): ResolvedHookFile {
   const { name, output, group, contractOp, keyTypeName, extraTypeNames = [] } = options
   const { config, root, resolver } = ctx
-  const types = resolveTypeResolver(ctx.driver)
+  const types = resolveTypeResolver(ctx.driver, resolver.pluginName)
   const tsResolver = types.resolver
 
   const file = resolver.file({ ...operationFileEntry(node, name), root, output, group: group ?? undefined })

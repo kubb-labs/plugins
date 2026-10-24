@@ -39,7 +39,8 @@ export const pluginSwrName = 'plugin-swr' satisfies PluginSwr['name']
 export const pluginSwr = defineExtension<PluginSwr>({
   kind: 'plugin',
   meta: { name: pluginSwrName, version, compatibility },
-  dependencies: { [pluginTsName]: {} },
+  // `plugin-ts` is optional: `pluginZod({ inferred })` can supply the operation types instead.
+  dependencies: { [pluginTsName]: { optional: true } },
   setup(options) {
     const {
       output = { path: 'hooks', barrel: { type: 'named' } },

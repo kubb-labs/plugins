@@ -51,7 +51,8 @@ export const pluginReactQueryName = 'plugin-react-query' satisfies PluginReactQu
 export const pluginReactQuery = defineExtension<PluginReactQuery>({
   kind: 'plugin',
   meta: { name: pluginReactQueryName, version, compatibility },
-  dependencies: { [pluginTsName]: {} },
+  // `plugin-ts` is optional: `pluginZod({ inferred })` can supply the operation types instead.
+  dependencies: { [pluginTsName]: { optional: true } },
   setup(options) {
     const {
       output = { path: 'hooks', barrel: { type: 'named' } },

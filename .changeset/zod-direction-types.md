@@ -8,8 +8,8 @@
 '@kubb/plugin-zod': minor
 ---
 
-Type clients and query hooks from `pluginZod({ inferred: 'direction' })` when it is set, also next to `pluginTs()`, so a custom codec param takes its domain value.
+Type clients and query hooks from `pluginZod({ inferred: 'direction' })` when it is set, so a custom codec param takes its domain value.
 
-- Types a codec param such as a `URL` with the value the encode schema accepts, instead of the wire `string`.
+- Types a codec param such as a `URL` with the value the encode schema accepts, instead of the wire `string`, also next to `pluginTs()`.
 - Types the decoded response, such as a `URL` or `bigint`, in `data`.
-- Keeps `@kubb/plugin-ts` types for every other config.
+- Makes `pluginTs()` optional for React Query, SWR, and Vue Query when `pluginZod({ inferred })` supplies the types.

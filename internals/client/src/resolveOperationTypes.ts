@@ -71,18 +71,37 @@ function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
  * The resolver, `output`, and `group` a generated hook names its operation types with.
  *
  * `pluginZod({ inferred: 'direction' })` wins over `plugin-ts`: its request types read `z.input` and its
- * response types `z.output`, so a codec param takes its domain value. Otherwise `plugin-ts` supplies them.
+ * response types `z.output`, so a codec param takes its domain value. Otherwise `plugin-ts` supplies them,
+ * and without it any `pluginZod({ inferred })` does. Throws `KUBB_MISSING_DEPENDENCY` for `pluginName`
+ * when neither is available.
  */
-export function resolveTypeResolver(driver: GeneratorDriver): { resolver: ResolverTs; output: Output | undefined; group: Group | null | undefined } {
+export function resolveTypeResolver(
+  driver: GeneratorDriver,
+  pluginName: string,
+): { resolver: ResolverTs; output: Output | undefined; group: Group | null | undefined } {
+  const pluginTs = driver.getPlugin(pluginTsName)
   const pluginZod = driver.getPlugin(pluginZodName)
 
-  if (pluginZod?.options?.inferred === 'direction') {
-    return { resolver: toZodTypeResolver(driver.getResolver(pluginZodName)), output: pluginZod.options.output, group: pluginZod.options.group }
+  if (pluginTs && pluginZod?.options?.inferred !== 'direction') {
+    return { resolver: driver.getResolver(pluginTsName), output: pluginTs.options?.output, group: pluginTs.options?.group }
   }
 
-  const pluginTs = driver.getPlugin(pluginTsName)
+  if (!pluginZod?.options?.inferred) {
+    throw missingTypeSource(pluginName)
+  }
 
-  return { resolver: driver.getResolver(pluginTsName), output: pluginTs?.options?.output, group: pluginTs?.options?.group }
+  return { resolver: toZodTypeResolver(driver.getResolver(pluginZodName)), output: pluginZod.options.output, group: pluginZod.options.group }
+}
+
+function missingTypeSource(pluginName: string) {
+  return new Diagnostics.Error({
+    code: Diagnostics.code.missingDependency,
+    severity: 'error',
+    message: `Plugin "${pluginName}" has no source for operation types.`,
+    help: `Add \`pluginTs()\` before "${pluginName}", or add \`pluginZod({ inferred: true })\`.`,
+    location: { kind: 'config' },
+    plugin: pluginName,
+  })
 }
 
 /**
@@ -117,14 +136,7 @@ export function resolveOperationTypes(driver: GeneratorDriver, pluginName: strin
   }
 
   if (!pluginZod?.options?.inferred) {
-    throw new Diagnostics.Error({
-      code: Diagnostics.code.missingDependency,
-      severity: 'error',
-      message: `Plugin "${pluginName}" has no source for operation types.`,
-      help: `Add \`pluginTs()\` before "${pluginName}", or add \`pluginZod({ inferred: true })\`.`,
-      location: { kind: 'config' },
-      plugin: pluginName,
-    })
+    throw missingTypeSource(pluginName)
   }
 
   const resolver = driver.getResolver(pluginZodName)
