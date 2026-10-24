@@ -126,7 +126,8 @@ jobs:
           token: ${{ secrets.PLATFORM_DISPATCH_TOKEN }}
           repository: kubb-labs/platform
           event-type: content-updated
-          client-payload: '{"source": "plugins", "tag": "${{ github.ref_name }}"}'
+          # version lists every released package as {name, version}, since each plugin has its own version.
+          client-payload: '{"source": "plugins", "tag": "${{ github.ref_name }}", "version": ${{ needs.release.outputs.staged_packages }}}'
 
   bump-registry:
     name: Dispatch plugins-released to registry
