@@ -191,6 +191,20 @@ export default defineConfig([
       }),
     ],
   },
+  // Only schema types: no `AddPetOptions` / `AddPetStatus200` operation files. Consumers print those inline.
+  {
+    root: '.',
+    input,
+    output: { path: './src/gen13', clean: true, format: false, lint: false },
+    adapter: adapterOas({ unknownType: 'unknown', validate: false, enums: 'root' }),
+    plugins: [
+      pluginTs({
+        output: { path: 'models', mode: 'directory' },
+        group: { type: 'tag' },
+        operationTypes: false,
+      }),
+    ],
+  },
   {
     root: '.',
     input,
