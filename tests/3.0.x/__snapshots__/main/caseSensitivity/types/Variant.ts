@@ -6,7 +6,7 @@
 import type { VariantTypeEnumKey } from './VariantTypeEnum'
 
 export type Variant = {
-    id?: string;
-    name?: string;
-    type?: VariantTypeEnumKey;
+  id?: string;
+  name?: string;
+  type?: VariantTypeEnumKey;
 };

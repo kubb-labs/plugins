@@ -5,6 +5,6 @@
 
 import type { PaymentMethod } from './PaymentMethod'
 
-export type WalletPayment = (PaymentMethod & {
-    walletId?: string;
-});
+export type WalletPayment = PaymentMethod & {
+  walletId?: string;
+};

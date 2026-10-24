@@ -4,11 +4,11 @@
 */
 
 export type Tag = {
-    /**
-     * @description
-     * Format: `int64`
-     * @type integer | undefined
-    */
-    id?: bigint;
-    name?: string;
+  /**
+   * @description
+   * Format: `int64`
+   * @type integer | undefined
+   */
+  id?: bigint;
+  name?: string;
 };

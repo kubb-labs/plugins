@@ -6,11 +6,11 @@
 import type { SUVTypeEnumKey } from './SUVTypeEnum'
 import type { Vehicle } from './Vehicle'
 
-export type SUV = (Vehicle & {
-    type?: SUVTypeEnumKey;
-    /**
-     * @description Can handle offroad terrain
-     * @type boolean | undefined
-    */
-    offroadCapability?: boolean;
-});
+export type SUV = Vehicle & {
+  type?: SUVTypeEnumKey;
+  /**
+   * @description Can handle offroad terrain
+   * @type boolean | undefined
+   */
+  offroadCapability?: boolean;
+};

@@ -277,17 +277,16 @@ export type Options = OutputOptions & {
   macros?: Array<ast.Macro>
   /**
    * Replace the TypeScript handler for a specific schema type (`'integer'`, `'date'`, ...).
-   * Each handler returns a TypeScript AST node for that schema type. Use `this.transform`
-   * to recurse into nested schema nodes.
+   * Each handler returns the TypeScript type for that schema type as a string. Use `this.transform`
+   * to recurse into nested schema nodes. Returning a TypeScript compiler node is deprecated.
    *
    * @example Use the JavaScript `Date` object for date schemas
    * ```ts
-   * import ts from '@typescript/typescript6'
    * pluginTs({
    *   printer: {
    *     nodes: {
    *       date() {
-   *         return ts.factory.createTypeReferenceNode('Date', [])
+   *         return 'Date'
    *       },
    *     },
    *   },

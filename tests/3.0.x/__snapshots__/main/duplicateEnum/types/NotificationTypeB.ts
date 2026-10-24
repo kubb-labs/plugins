@@ -6,9 +6,9 @@
 import type { NotificationTypeBParamsChannelEnumKey } from './NotificationTypeBParamsChannelEnum'
 
 export type NotificationTypeB = {
-    type: string;
-    params: {
-        channel: NotificationTypeBParamsChannelEnumKey;
-        messageB: string;
-    };
+  type: string;
+  params: {
+    channel: NotificationTypeBParamsChannelEnumKey;
+    messageB: string;
+  };
 };

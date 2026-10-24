@@ -8,23 +8,23 @@ import type { Category } from './Category'
 import type { Tag } from './Tag'
 
 export type AddPetRequest = {
-    /**
-     * @description
-     * Format: `int64`
-     * @example 10
-     * @type integer | undefined
-    */
-    id?: bigint;
-    /**
-     * @example doggie
-     * @type string
-    */
-    name: string;
-    category?: Category;
-    photoUrls: string[];
-    tags?: Tag[];
-    /**
-     * @description pet status in the store
-    */
-    status?: AddPetRequestStatusEnumKey;
+  /**
+   * @description
+   * Format: `int64`
+   * @example 10
+   * @type integer | undefined
+   */
+  id?: bigint;
+  /**
+   * @example doggie
+   * @type string
+   */
+  name: string;
+  category?: Category;
+  photoUrls: string[];
+  tags?: Tag[];
+  /**
+   * @description pet status in the store
+   */
+  status?: AddPetRequestStatusEnumKey;
 };

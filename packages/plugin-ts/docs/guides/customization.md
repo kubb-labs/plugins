@@ -24,25 +24,26 @@ A generated `Pet` becomes `ApiPet`. File names stay unchanged unless you also cu
 
 ## Map schema types
 
-Replace [printer handlers](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#printer) with TypeScript AST nodes. Install `@typescript/typescript6` first, because `typescript` 7 no longer exports the compiler API.
+Replace [printer handlers](https://kubb.dev/extensions/kubb-labs/plugin-ts/options#printer) with your own. Each handler returns the TypeScript type as a string.
 
 ```typescript [kubb.config.ts]
-import ts from '@typescript/typescript6'
 import { pluginTs } from '@kubb/plugin-ts'
 
 pluginTs({
   printer: {
     nodes: {
       date() {
-        return ts.factory.createTypeReferenceNode('Date', [])
+        return 'Date'
       },
       integer() {
-        return ts.factory.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword)
+        return 'bigint'
       },
     },
   },
 })
 ```
+
+Handlers that return TypeScript compiler nodes still work when your project installs `typescript` 5 or 6, or `@typescript/typescript6` next to TypeScript 7. Both are optional peer dependencies. That form is deprecated and is removed in the next major.
 
 This maps `date` fields to `Date` and `int32` integers to `bigint`. The separate `bigint` handler controls `int64` fields, which already use `bigint` by default. A `date-time` field uses the `datetime` handler.
 

@@ -6,7 +6,7 @@
 import type { Variant2CategoryEnumKey } from './Variant2CategoryEnum'
 
 export type Variant2 = {
-    id?: string;
-    label?: string;
-    category?: Variant2CategoryEnumKey;
+  id?: string;
+  label?: string;
+  category?: Variant2CategoryEnumKey;
 };

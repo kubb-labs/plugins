@@ -74,7 +74,7 @@
   },
   "dependencies": {
     "@kubb/parser-ts": "catalog:",
-    "@typescript/typescript6": "catalog:"
+    "yuku-codegen": "^0.19.0"
   },
   "devDependencies": {
     "@internals/shared": "workspace:*",
@@ -83,8 +83,17 @@
     "typescript": "catalog:"
   },
   "peerDependencies": {
+    "@typescript/typescript6": "^6.0.2",
     "kubb": "catalog:",
-    "typescript": "catalog:"
+    "typescript": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@typescript/typescript6": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22.12"

@@ -1,9 +1,8 @@
 import { ast } from 'kubb/kit'
-import { parserTs } from '@kubb/parser-ts'
-import ts from '@typescript/typescript6'
 import { describe, expect, it } from 'vitest'
 import { format } from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'
+import { print, type TsNode } from '../factory.ts'
 import { printerTs } from './printerTs.ts'
 
 const inlineLiteralEnum = { type: 'inlineLiteral', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
@@ -13,15 +12,13 @@ const literalEnum = { type: 'literal', constCasing: 'camelCase', typeSuffix: 'Ke
 const constEnumEnum = { type: 'constEnum', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
 
 /**
- * Wraps a `ts.TypeNode` in `type _ = <node>` so prettier can parse it as a
+ * Wraps a printed type in `type _ = <type>` so prettier can parse it as a
  * valid TypeScript statement, then strips the wrapper from the result.
  */
-const formatTS = async (node: ts.Node | null | undefined): Promise<string> => {
-  if (!node) return ''
+const formatTS = async (type: TsNode | string | null | undefined): Promise<string> => {
+  if (!type) return ''
 
-  const alias = ts.factory.createTypeAliasDeclaration(undefined, '_', undefined, node as ts.TypeNode)
-  const source = parserTs().print(alias)
-  const formatted = await format(source)
+  const formatted = await format(`type _ = ${typeof type === 'string' ? type : print(type)}`)
 
   return formatted
     .replace(/^type _ = /, '')
@@ -868,7 +865,7 @@ describe('printerTs', () => {
         optionalType: 'questionToken',
         arrayType: 'array',
         enum: inlineLiteralEnum,
-        nodes: { date: () => ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword) },
+        nodes: { date: () => 'string' },
       })
       expect(await formatTS(p.transform(ast.factory.createSchema({ type: 'date', representation: 'string' })))).toBe('string')
     })
@@ -879,7 +876,7 @@ describe('printerTs', () => {
         optionalType: 'questionToken',
         arrayType: 'array',
         enum: inlineLiteralEnum,
-        nodes: { date: () => ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword) },
+        nodes: { date: () => 'string' },
       })
       expect(await formatTS(p.transform(ast.factory.createSchema({ type: 'number' })))).toBe('number')
     })
@@ -892,8 +889,8 @@ describe('printerTs', () => {
         enum: inlineLiteralEnum,
         nodes: {
           array(node) {
-            const itemNodes = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean) as Array<ts.TypeNode>
-            return ts.factory.createTypeReferenceNode('Set', [ts.factory.createUnionTypeNode(itemNodes)])
+            const itemNodes = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean)
+            return `Set<${itemNodes.join(' | ')}>`
           },
         },
       })
@@ -910,9 +907,7 @@ describe('printerTs', () => {
         syntaxType: 'type',
         nodes: {
           string() {
-            return this.options.syntaxType === 'interface'
-              ? ts.factory.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword)
-              : ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
+            return this.options.syntaxType === 'interface' ? 'never' : 'string'
           },
         },
       })

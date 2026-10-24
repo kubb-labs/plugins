@@ -10,24 +10,24 @@ export type CreateOrderStatus201 = OrderSchema;
 /**
  * @description Order request body
  * @type object | undefined
-*/
+ */
 export type CreateOrderBody = {
-    userId?: string;
-    productIds?: string[];
+  userId?: string;
+  productIds?: string[];
 } | undefined;
 
 export type CreateOrderOptions = {
-    body: CreateOrderBody;
-    path?: never;
-    query?: never;
-    headers?: never;
+  body: CreateOrderBody;
+  path?: never;
+  query?: never;
+  headers?: never;
 };
 
 export type CreateOrderResponses = {
-    "201": CreateOrderStatus201;
+  '201': CreateOrderStatus201;
 };
 
 /**
  * @description Union of all possible responses
-*/
+ */
 export type CreateOrderResponse = CreateOrderStatus201;
