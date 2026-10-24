@@ -21,7 +21,7 @@
   "optionalDependencies": ["plugin-zod"],
   "compatibility": {
     "kubb": ">=5.8.3",
-    "node": ">=22.12"
+    "node": ">=22.22"
   },
   "options": [
     {
