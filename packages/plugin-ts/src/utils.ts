@@ -112,6 +112,8 @@ type BuildOperationSchemaOptions = {
 export function buildParams({ params }: BuildParamsSchemaOptions): ast.SchemaNode {
   return ast.factory.createSchema({
     type: 'object',
+    // The group points at the `parameters` list that declares its first parameter.
+    pointer: params[0]?.pointer?.replace(/\/\d+$/, ''),
     properties: params.map((param) =>
       ast.factory.createProperty({
         name: param.name,
