@@ -28,7 +28,7 @@ async function generate(name: string, validator: NonNullable<Parameters<typeof p
       reporters: [],
       storage: fsStorage(),
       plugins: [
-        pluginZod({ inferred: 'direction', output: { path: './zod', barrel: false } }),
+        pluginZod({ inferred: 'codec', output: { path: './zod', barrel: false } }),
         pluginClient({ importPath: '../api/client', output: { path: './clients', barrel: false }, validator }),
       ],
     } as Config,

@@ -1,6 +1,6 @@
-import { type ast, Diagnostics, type Generator, type Group, type Output, type Resolver } from 'kubb/kit'
-import { pluginTsName } from '@kubb/plugin-ts'
-import { pluginZodName } from '@kubb/plugin-zod'
+import { type ast, Diagnostics, type Generator, type Group, type Output } from 'kubb/kit'
+import { pluginTsName, type ResolverTs } from '@kubb/plugin-ts'
+import { pluginZodName, type ResolverZod } from '@kubb/plugin-zod'
 import type { ContractClientFactory } from './types.ts'
 
 type GeneratorDriver = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]['driver']
@@ -28,9 +28,9 @@ export type OperationTypeNames = {
  */
 export type OperationTypeSource = OperationTypeNames & {
   /**
-   * Resolver of the plugin supplying the names, used to resolve the file they are exported from.
+   * `plugin-ts` shaped resolver of the plugin supplying the names, also used to resolve the file they are exported from.
    */
-  resolver: Pick<Resolver, 'file' | 'pluginName'>
+  resolver: ResolverTs
   /**
    * The supplying plugin's own `output`, when it configured one.
    */
@@ -42,14 +42,38 @@ export type OperationTypeSource = OperationTypeNames & {
 }
 
 /**
- * Picks the plugin a generated client takes its `Options` and `Responses` types from.
+ * A `plugin-ts` shaped resolver whose operation type names point at the types `pluginZod({ inferred })`
+ * exports next to each schema, so code written against `plugin-ts` names picks up the zod types.
+ */
+function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
+  const type = (name: string) => resolver.schema.type(name)
+
+  return {
+    ...resolver,
+    // A class method, so a spread drops it, and it reads private fields, so it must run on `resolver`.
+    file: resolver.file.bind(resolver),
+    param: {
+      name: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.name(node, p)),
+      path: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.path(node, p)),
+      query: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.query(node, p)),
+      headers: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.headers(node, p)),
+    },
+    response: {
+      body: (node: ast.OperationNode) => type(resolver.response.body(node)),
+      status: (node: ast.OperationNode, statusCode: ast.StatusCode) => type(resolver.response.status(node, statusCode)),
+      response: (node: ast.OperationNode) => type(resolver.response.response(node)),
+      responses: (node: ast.OperationNode) => type(resolver.response.responses(node)),
+      options: (node: ast.OperationNode) => resolver.response.options(node),
+    },
+  } as unknown as ResolverTs
+}
+
+/**
+ * Picks the plugin generated clients, query hooks, and MCP handlers take their operation types from.
  *
- * `plugin-ts` wins whenever it is in the pipeline, so existing configs keep the types they generate
- * today. Without it, `pluginZod({ inferred: true })` takes over: its inferred options and responses
- * types are built from the same shared schemas as the `plugin-ts` ones, so a client typed off
- * `z.infer` carries what the codecs decode to (a `Temporal` instance, a `Date`) rather than the raw
- * wire type. Throws `KUBB_MISSING_DEPENDENCY` for `pluginName` when neither is available, since the
- * client has nothing to type against.
+ * `pluginZod({ inferred: 'codec' })` wins, so a codec param takes its domain value. Otherwise `plugin-ts`
+ * wins when it is in the pipeline, and without it any `pluginZod({ inferred })`. Throws
+ * `KUBB_MISSING_DEPENDENCY` for `pluginName` when neither is available.
  *
  * @example
  * ```ts
@@ -59,19 +83,12 @@ export type OperationTypeSource = OperationTypeNames & {
  */
 export function resolveOperationTypes(driver: GeneratorDriver, pluginName: string): OperationTypeSource {
   const pluginTs = driver.getPlugin(pluginTsName)
-
-  if (pluginTs) {
-    const resolver = driver.getResolver(pluginTsName)
-
-    return {
-      response: resolver.response,
-      resolver,
-      output: pluginTs.options?.output,
-      group: pluginTs.options?.group,
-    }
-  }
-
   const pluginZod = driver.getPlugin(pluginZodName)
+
+  if (pluginTs && pluginZod?.options?.inferred !== 'codec') {
+    const resolver = driver.getResolver(pluginTsName)
+    return { response: resolver.response, resolver, output: pluginTs.options?.output, group: pluginTs.options?.group ?? undefined }
+  }
 
   if (!pluginZod?.options?.inferred) {
     throw new Diagnostics.Error({
@@ -84,16 +101,6 @@ export function resolveOperationTypes(driver: GeneratorDriver, pluginName: strin
     })
   }
 
-  const resolver = driver.getResolver(pluginZodName)
-
-  return {
-    response: {
-      options: resolver.response.options,
-      // `response.responses` names the schema; the client needs the type inferred from it.
-      responses: (node) => resolver.schema.type(resolver.response.responses(node)),
-    },
-    resolver,
-    output: pluginZod.options.output,
-    group: pluginZod.options.group,
-  }
+  const resolver = toZodTypeResolver(driver.getResolver(pluginZodName))
+  return { response: resolver.response, resolver, output: pluginZod.options.output, group: pluginZod.options.group ?? undefined }
 }

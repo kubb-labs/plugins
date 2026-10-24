@@ -20,7 +20,7 @@ export default defineConfig({
   plugins: [
     pluginZod({
       // infer codec types per direction (request & params: domain -> wire, response: wire -> domain)
-      inferred: 'direction',
+      inferred: 'codec',
       output: {
         path: './zod',
         barrel: false,

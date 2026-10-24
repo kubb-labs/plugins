@@ -16,11 +16,11 @@ import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
 
 /**
- * The helper an inferred alias is printed with. `'direction'` reads a request (encode) schema from its
+ * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
  * input and a response (decode) schema from its output; `true` keeps `z.infer` for both.
  */
 function aliasKind(inferred: PluginZod['resolvedOptions']['inferred'], direction: 'encode' | 'decode'): 'infer' | 'input' | 'output' {
-  if (inferred !== 'direction') return 'infer'
+  if (inferred !== 'codec') return 'infer'
   return direction === 'encode' ? 'input' : 'output'
 }
 

@@ -76,7 +76,8 @@ export const pluginZod = defineExtension<PluginZod>({
       group: createGroupConfig(group),
       importPath,
       coercion,
-      inferred,
+      // `'direction'` is the deprecated name of `'codec'`.
+      inferred: inferred === 'direction' ? 'codec' : inferred,
       guidType,
       regexType,
       oneOfType,

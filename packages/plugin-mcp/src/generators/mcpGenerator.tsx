@@ -1,7 +1,6 @@
-import { resolveClientOperation } from '@internals/client'
+import { resolveClientOperation, resolveOperationTypes } from '@internals/client'
 import { operationFileEntry, resolveDependencyOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
-import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
 import type { PluginMcp } from '../types.ts'
@@ -20,9 +19,8 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     const { resolver, driver, root, config } = ctx
     const { output, client, group } = ctx.options
 
-    const pluginTs = ctx.requirePlugin(pluginTsName)
-
-    const tsResolver = driver.getResolver(pluginTsName)
+    const types = resolveOperationTypes(driver, resolver.pluginName)
+    const tsResolver = types.resolver
 
     // The registered contract client plugin owns the `<op>` the handler imports and calls.
     const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, cache: ctx.cache })
@@ -41,8 +39,8 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
         node,
         resolver: tsResolver,
         root,
-        output: pluginTs.options?.output ?? output,
-        group: pluginTs.options?.group,
+        output: types.output ?? output,
+        group: types.group,
       }),
     } as const
 

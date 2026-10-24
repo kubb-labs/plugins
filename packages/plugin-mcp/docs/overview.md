@@ -6,7 +6,7 @@ Each tool handler calls the function a client plugin generates for that operatio
 
 ## Setup
 
-- Add `@kubb/plugin-ts`, `@kubb/plugin-zod`, and a client plugin: `@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`. Leave `sdk` unset on the client plugin.
+- Add `@kubb/plugin-zod`, `@kubb/plugin-ts` (optional with `pluginZod({ inferred: 'codec' })`), and a client plugin: `@kubb/plugin-fetch`, `@kubb/plugin-axios`, or `@kubb/plugin-client`. Leave `sdk` unset on the client plugin.
 - Install `@modelcontextprotocol/server` v2 and `zod` 4.2 or a later v4 release in the app that runs the server. Add `axios` too when you use `@kubb/plugin-axios`.
 - Install a TypeScript runner such as `tsx`. The generated `.mcp.json` runs `npx tsx`, which downloads `tsx` from npm when it is missing.
 - Copy the server entry from the generated `.mcp.json` into the `.mcp.json` your MCP client reads, such as the one at the project root for Claude Code.

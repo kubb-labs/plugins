@@ -42,7 +42,7 @@ export const pluginVueQueryName = 'plugin-vue-query' satisfies PluginVueQuery['n
 export const pluginVueQuery = defineExtension<PluginVueQuery>({
   kind: 'plugin',
   meta: { name: pluginVueQueryName, version, compatibility },
-  dependencies: { [pluginTsName]: {} },
+  dependencies: { [pluginTsName]: { optional: true } },
   setup(options) {
     const {
       output = { path: 'hooks', barrel: { type: 'named' } },

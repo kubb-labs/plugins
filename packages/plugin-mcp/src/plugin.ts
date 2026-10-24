@@ -48,7 +48,7 @@ export const pluginMcpName = 'plugin-mcp' satisfies PluginMcp['name']
 export const pluginMcp = defineExtension<PluginMcp>({
   kind: 'plugin',
   meta: { name: pluginMcpName, version, compatibility },
-  dependencies: { [pluginTsName]: {}, [pluginZodName]: {} },
+  dependencies: { [pluginTsName]: { optional: true }, [pluginZodName]: {} },
   setup(options) {
     const {
       output = { path: 'mcp', barrel: { type: 'named' } },

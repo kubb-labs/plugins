@@ -42,11 +42,11 @@ Module the generated files import `z` from. Point it at your own module to re-ex
 
 Exports a type alias next to each schema, so you do not need `@kubb/plugin-ts`. The type takes the PascalCase schema name plus `SchemaType`, so `petSchema` gets `PetSchemaType`.
 
-|          |                          |
-| -------- | ------------------------ |
-| Type     | `boolean \| 'direction'` |
-| Required | `false`                  |
-| Default  | `false`                  |
+|          |                      |
+| -------- | -------------------- |
+| Type     | `boolean \| 'codec'` |
+| Required | `false`              |
+| Default  | `false`              |
 
 ::field-group
 
@@ -58,8 +58,8 @@ Default value. Emits no type aliases.
 Emits `z.infer<typeof schema>` for every schema.
 :::
 
-:::field{name="'direction'"}
-Emits `z.input<typeof schema>` for request schemas (bodies and params) and `z.output<typeof schema>` for response schemas. Use it with codecs, where a request takes the domain value (a `Date`) that the schema encodes and a response returns the decoded value.
+:::field{name="'codec'"}
+Emits `z.input<typeof schema>` for request schemas (bodies and params) and `z.output<typeof schema>` for response schemas. Use it with codecs, where a request takes the domain value (a `Date`) that the schema encodes and a response returns the decoded value. Clients and query hooks then take their operation types from these aliases instead of `@kubb/plugin-ts`. `'direction'` still works as a deprecated name for `'codec'`.
 :::
 
 ::
@@ -68,13 +68,13 @@ Emits `z.input<typeof schema>` for request schemas (bodies and params) and `z.ou
 export type PetSchemaType = z.infer<typeof petSchema>
 ```
 
-With `'direction'`, request types read the schema's input:
+With `'codec'`, request types read the schema's input:
 
 ```typescript
 export type PutEventBodySchemaType = z.input<typeof putEventBodySchema>
 ```
 
-Pair `'direction'` with `validator: { request: 'zod', params: 'zod' }` in [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/options#validator) or [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#validator). Without request validation, the client sends the domain value unencoded.
+Pair `'codec'` with `validator: { request: 'zod', params: 'zod' }` in [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch/options#validator) or [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios/options#validator). Without request validation, the client sends the domain value unencoded.
 
 It also writes a `ResponsesSchema` for each operation (one schema per status code) and its inferred type. [`@kubb/plugin-fetch`](https://kubb.dev/extensions/kubb-labs/plugin-fetch) and [`@kubb/plugin-axios`](https://kubb.dev/extensions/kubb-labs/plugin-axios) key their `RequestResult` on it when `@kubb/plugin-ts` is absent.
 

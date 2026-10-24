@@ -815,6 +815,9 @@ importers:
 
   internals/tanstack-query:
     dependencies:
+      '@internals/client':
+        specifier: workspace:*
+        version: link:../client
       '@internals/shared':
         specifier: workspace:*
         version: link:../shared
