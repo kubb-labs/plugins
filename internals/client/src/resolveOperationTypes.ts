@@ -1,6 +1,7 @@
 import { type ast, Diagnostics, type Generator, type Group, type Output } from 'kubb/kit'
 import { pluginTsName, type ResolverTs } from '@kubb/plugin-ts'
 import { pluginZodName, type ResolverZod } from '@kubb/plugin-zod'
+import { operationTypeImports, type TypeImportsParams } from '@internals/shared'
 import type { ContractClientFactory } from './types.ts'
 
 type GeneratorDriver = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]['driver']
@@ -52,6 +53,8 @@ function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
     ...resolver,
     // A class method, so a spread drops it, and it reads private fields, so it must run on `resolver`.
     file: resolver.file.bind(resolver),
+    // The zod types live next to each operation's schemas, in the zod operation file.
+    typeImports: (node: ast.OperationNode, name: string, params: TypeImportsParams) => operationTypeImports(resolver, node, name, params),
     param: {
       name: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.name(node, p)),
       path: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.path(node, p)),

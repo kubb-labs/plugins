@@ -1,5 +1,5 @@
 import { resolveOperationTypes } from '@internals/client'
-import { groupOperationTypeImports, operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
+import { groupOperationTypeImports, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import type { ast, GeneratorContext, Group, Output } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from 'kubb/jsx'
@@ -44,15 +44,6 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
   const tsResolver = types.resolver
 
   const file = resolver.file({ ...operationFileEntry(node, name), root, output, group: group ?? undefined })
-  const typesOutput = types.output ?? output
-  const fileTs = resolveDependencyOperationFile({
-    cache: ctx.cache,
-    node,
-    resolver: tsResolver,
-    root,
-    output: typesOutput,
-    group: types.group,
-  })
   const importedTypeNames = [
     tsResolver.response.options(node),
     ...extraTypeNames,
@@ -62,7 +53,7 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
       includeParams: false,
     }),
   ].filter((typeName): typeName is string => Boolean(typeName))
-  const typeImports = groupOperationTypeImports(node, importedTypeNames, { resolver: tsResolver, file: fileTs, root, output: typesOutput, group: types.group })
+  const typeImports = groupOperationTypeImports(node, importedTypeNames, { resolver: tsResolver, root, output: types.output ?? output, group: types.group })
   const fileMeta = { path: file.path, baseName: file.baseName }
 
   return {

@@ -19,7 +19,6 @@ type OperationData = {
   node: ast.OperationNode
   name: string
   types: OperationTypeNames
-  typeFile: ast.FileNode
   zodFile: ast.FileNode | null
   /**
    * The operation's validator hooks, computed once and shared by the zod imports, the helper import, and the SDK methods.
@@ -53,12 +52,6 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
   const document = ctx.adapter.document as SecurityDocument | null | undefined
 
   function buildOperationData(node: ast.OperationNode): OperationData {
-    const typeFile = types.resolver.file({
-      ...operationFileEntry(node, node.operationId),
-      root,
-      output: types.output ?? output,
-      group: types.group,
-    })
     const zodFile =
       zodResolver && pluginZod?.options
         ? zodResolver.file({
@@ -73,7 +66,7 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
 
     const validatorHooks = zodResolver ? buildValidatorHooks({ node, validator, zodResolver }) : null
 
-    return { node, name: resolver.name(node.operationId), types, typeFile, zodFile, validatorHooks, security }
+    return { node, name: resolver.name(node.operationId), types, zodFile, validatorHooks, security }
   }
 
   return nodes.reduce((acc, operationNode) => {
@@ -157,7 +150,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
       const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
         const typeNamesByPath = new Map<string, Set<string>>()
         for (const op of ops) {
-          const options = { resolver: types.resolver, file: op.typeFile, root, output: types.output ?? output, group: types.group }
+          const options = { resolver: types.resolver, root, output: types.output ?? output, group: types.group }
           for (const imp of groupOperationTypeImports(op.node, resolveTypeImportNames(op.node, op.types), options)) {
             typeNamesByPath.set(imp.path, new Set([...(typeNamesByPath.get(imp.path) ?? []), ...imp.names]))
           }

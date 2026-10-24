@@ -46,37 +46,42 @@ export function resolveDependencyOperationFile(options: {
   )
 }
 
-type TypeImportsParams = { root: string; output: Output; group?: Group }
+export type TypeImportsParams = { root: string; output: Output; group?: Group }
 
 /**
- * `pluginTs({ operationTypes: false })` adds `response.typeImports`, which returns the imports a printed operation type
- * needs, or `null` for a name it did not print. Without it every operation type lives in the operation file.
+ * A resolver that knows where each operation type name is imported from, see `ResolverTs['typeImports']`.
  */
-export type InlineTypeResolver = {
-  response: { typeImports?(node: ast.OperationNode, name: string, params: TypeImportsParams): Array<ast.ImportNode> | null }
-}
-
-type OperationTypeImportsOptions = TypeImportsParams & {
-  resolver: InlineTypeResolver
-  file: { path: string }
-  group?: Group | null
+export type TypeImportsResolver = {
+  typeImports(node: ast.OperationNode, name: string, params: TypeImportsParams): Array<ast.ImportNode>
 }
 
 /**
- * Groups operation type names by the file that exports them: the operation file, or the schema files a printed
- * `pluginTs({ operationTypes: false })` type references.
+ * The default `typeImports`: an operation type name is exported from its operation's file.
+ */
+export function operationTypeImports(
+  resolver: Pick<Resolver, 'file'>,
+  node: ast.OperationNode,
+  name: string,
+  params: TypeImportsParams,
+): Array<ast.ImportNode> {
+  return [ast.factory.createImport({ name: [name], path: resolver.file({ ...operationFileEntry(node, node.operationId), ...params }).path })]
+}
+
+/**
+ * Groups the imports of operation type names by file, so each consumer emits one `File.Import` per file.
  */
 export function groupOperationTypeImports(
   node: ast.OperationNode,
   names: Iterable<string>,
-  { resolver, file, root, output, group }: OperationTypeImportsOptions,
+  { resolver, root, output, group }: TypeImportsParams & { resolver: TypeImportsResolver; group?: Group | null },
 ): Array<{ path: string; names: Array<string> }> {
   const groups = new Map<string, Set<string>>()
-  const add = (path: string, name: string) => groups.set(path, (groups.get(path) ?? new Set()).add(name))
   for (const name of new Set(names)) {
-    const imports = resolver.response.typeImports?.(node, name, { root, output, group: group ?? undefined })
-    if (!imports) add(file.path, name)
-    for (const imp of imports ?? []) for (const importName of [imp.name].flat()) if (typeof importName === 'string') add(imp.path, importName)
+    for (const imp of resolver.typeImports(node, name, { root, output, group: group ?? undefined })) {
+      for (const importName of [imp.name].flat()) {
+        if (typeof importName === 'string') groups.set(imp.path, (groups.get(imp.path) ?? new Set()).add(importName))
+      }
+    }
   }
   return Array.from(groups, ([path, names]) => ({ path, names: [...names] }))
 }
@@ -99,7 +104,7 @@ export type ResponseStatusNameResolver = {
   response: {
     status(node: ast.OperationNode, statusCode: ast.StatusCode): string
   }
-} & InlineTypeResolver
+}
 
 export type ResponseNameResolver = ResponseStatusNameResolver & {
   response: {
@@ -435,6 +440,14 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
   return groups
 }
 
+type BuildOperationTypeOptions = {
+  /**
+   * Set by `pluginTs({ operationTypes: false })`, which prints these types inline: an optional body becomes the `body?` key
+   * and a per-content-type response embeds its schema instead of naming a per-content-type type.
+   */
+  inline?: boolean
+}
+
 /**
  * Builds the combined `{ body, path, query, headers }` options object schema for an operation,
  * referencing the already-resolved body and grouped param names. Shared by `@kubb/plugin-ts`'s
@@ -442,12 +455,16 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
  * shape from the same inputs. `primitive: 'object'` is a no-op for the TS printer and tells the Zod
  * printer to emit `z.object(…)` rather than a record.
  */
-export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver): ast.SchemaNode {
+export function buildOptionsSchema(
+  node: ast.OperationNode,
+  resolver: OperationTypeNameResolver,
+  { inline = false }: BuildOperationTypeOptions = {},
+): ast.SchemaNode {
   const { path, query, header } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const bodyName = hasBody ? resolver.response.body(node) : null
   // A body printed by `pluginTs({ operationTypes: false })` is the bare schema type, so an optional body becomes an optional key.
-  const bodyRequired = hasBody && (Boolean(node.requestBody?.required) || !resolver.response.typeImports)
+  const bodyRequired = hasBody && (Boolean(node.requestBody?.required) || !inline)
   const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
   const groups = [
     { name: 'path', params: path, resolve: resolver.param.path },
@@ -490,7 +507,7 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
  * on `result.parsed`, while the standalone `<Name>StatusNNN` alias stays the plain body union that the
  * query hooks and `result.data` use.
  */
-function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode, resolver: ResponseStatusNameResolver): ast.SchemaNode {
+function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode, resolver: ResponseStatusNameResolver, inline: boolean): ast.SchemaNode {
   const statusName = resolver.response.status(node, res.statusCode)
   const variants = (res.content ?? []).filter((entry) => entry.schema)
   if (variants.length <= 1) {
@@ -513,7 +530,7 @@ function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode
             name: 'data',
             required: true,
             // `pluginTs({ operationTypes: false })` declares no per-content-type types, so the variant's own schema is printed.
-            schema: resolver.response.typeImports ? variant.schema : ast.factory.createSchema({ type: 'ref', name: variant.name }),
+            schema: inline ? variant.schema : ast.factory.createSchema({ type: 'ref', name: variant.name }),
           }),
         ],
       }),
@@ -530,7 +547,11 @@ function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode
  * responses renders as an empty object, which keeps every consumer's import (for example the axios
  * SDK's `RequestResult<XResponses>`) resolvable instead of pointing at a missing export.
  */
-export function buildResponses(node: ast.OperationNode, resolver: ResponseStatusNameResolver): ast.SchemaNode {
+export function buildResponses(
+  node: ast.OperationNode,
+  resolver: ResponseStatusNameResolver,
+  { inline = false }: BuildOperationTypeOptions = {},
+): ast.SchemaNode {
   return ast.factory.createSchema({
     type: 'object',
     primitive: 'object',
@@ -538,7 +559,7 @@ export function buildResponses(node: ast.OperationNode, resolver: ResponseStatus
       ast.factory.createProperty({
         name: String(res.statusCode),
         required: true,
-        schema: buildResponseRecordEntry(node, res, resolver),
+        schema: buildResponseRecordEntry(node, res, resolver, inline),
       }),
     ),
   })

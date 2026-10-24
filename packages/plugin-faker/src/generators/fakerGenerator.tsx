@@ -149,7 +149,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
           schema: decorate ? decorate(variant.schema) : variant.schema,
           name: variant.name,
           // `pluginTs({ operationTypes: false })` declares no per-content-type types, so each variant uses the printed union.
-          typeName: tsResolver.response.typeImports ? tsBaseName : getPerContentTypeName(tsBaseName, variant.suffix),
+          typeName: pluginTs.options?.operationTypes === false ? tsBaseName : getPerContentTypeName(tsBaseName, variant.suffix),
           description,
           skipImportNames: [],
         })),
@@ -236,7 +236,6 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       const rewrittenFakerText = rewriteAliasedImports(fakerText, aliases)
       const typeImports = groupOperationTypeImports(node, [typeName], {
         resolver: tsResolver,
-        file: meta.typeFile,
         root,
         output: pluginTs.options?.output ?? output,
         group: pluginTs.options?.group,

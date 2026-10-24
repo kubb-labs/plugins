@@ -8,6 +8,11 @@ import type { PrinterTsNodes } from './printers/printerTs.ts'
  */
 export type ResolverTs = Resolver & {
   /**
+   * Where an operation type name is imported from. Defaults to the operation's file; `operationTypes: false` returns the
+   * schema files a printed type references. Override it to take types from elsewhere, for example a shared package.
+   */
+  typeImports(node: ast.OperationNode, name: string, params: { root: string; output: Output; group?: Group }): Array<ast.ImportNode>
+  /**
    * Naming for an operation's parameters, grouped by location.
    */
   param: {
@@ -81,10 +86,6 @@ export type ResolverTs = Resolver & {
      * `resolver.response.body(node) // → 'CreatePetBody'`
      */
     body(node: ast.OperationNode): string
-    /**
-     * Imports a type printed by `operationTypes: false` needs (its `$ref` targets), or `null` for a name it did not print.
-     */
-    typeImports?(node: ast.OperationNode, name: string, params: { root: string; output: Output; group?: Group }): Array<ast.ImportNode> | null
   }
   /**
    * Naming for enum schemas.

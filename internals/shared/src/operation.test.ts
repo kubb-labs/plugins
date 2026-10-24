@@ -424,22 +424,24 @@ describe('resolveDependencyOperationFile', () => {
 })
 
 describe('groupOperationTypeImports', () => {
-  const node = ast.factory.createOperation({ operationId: 'addPet', method: 'POST', path: '/pet', responses: [] })
-  const options = { file: { path: '/models/AddPet.ts' }, root: '/', output: { path: 'models' } }
-
-  test('imports every name from the operation file without typeImports', () => {
-    expect(groupOperationTypeImports(node, ['AddPetOptions', 'AddPetStatus405', 'AddPetOptions'], { ...options, resolver: { response: {} } })).toEqual([
-      { path: '/models/AddPet.ts', names: ['AddPetOptions', 'AddPetStatus405'] },
-    ])
-  })
-
-  test('imports the schemas a printed type references', () => {
+  test('groups the imports a resolver returns for each name by file', () => {
+    const node = ast.factory.createOperation({ operationId: 'addPet', method: 'POST', path: '/pet', responses: [] })
     const typeImports = (_node: ast.OperationNode, name: string) =>
-      name === '{ body: Pet }' ? [ast.factory.createImport({ name: ['Pet'], path: '/models/Pet.ts' })] : name === 'unknown' ? [] : null
+      name === '{ body: Pet }'
+        ? [ast.factory.createImport({ name: ['Pet'], path: '/models/Pet.ts' })]
+        : name === 'unknown'
+          ? []
+          : [ast.factory.createImport({ name: [name], path: '/models/AddPet.ts' })]
 
-    expect(groupOperationTypeImports(node, ['{ body: Pet }', 'unknown', 'AddPetStatus405'], { ...options, resolver: { response: { typeImports } } })).toEqual([
+    expect(
+      groupOperationTypeImports(node, ['{ body: Pet }', 'unknown', 'AddPetStatus405', 'AddPetOptions', 'AddPetOptions'], {
+        resolver: { typeImports },
+        root: '/',
+        output: { path: 'models' },
+      }),
+    ).toEqual([
       { path: '/models/Pet.ts', names: ['Pet'] },
-      { path: '/models/AddPet.ts', names: ['AddPetStatus405'] },
+      { path: '/models/AddPet.ts', names: ['AddPetStatus405', 'AddPetOptions'] },
     ])
   })
 })

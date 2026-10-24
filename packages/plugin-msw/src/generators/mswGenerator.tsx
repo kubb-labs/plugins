@@ -1,4 +1,4 @@
-import { getOperationSuccessResponses, groupOperationTypeImports, resolveDependencyOperationFile, resolveResponseTypes } from '@internals/shared'
+import { getOperationSuccessResponses, groupOperationTypeImports, resolveResponseTypes } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -49,17 +49,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const pluginTs = ctx.requirePlugin(pluginTsName)
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const type = {
-      file: resolveDependencyOperationFile({
-        cache: ctx.cache,
-        node,
-        resolver: tsResolver,
-        root,
-        output: pluginTs.options?.output ?? output,
-        group: pluginTs.options?.group,
-      }),
-      responseName: tsResolver.response.response(node),
-    }
+    const type = { responseName: tsResolver.response.response(node) }
 
     const successResponses = getOperationSuccessResponses(node)
     const referencedNames = node.responses.flatMap((response) =>
@@ -69,7 +59,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const enumNames = new Set(ctx.meta.enumNames)
     // A type printed by `pluginTs({ operationTypes: false })` is the referenced schema itself, not a colliding alias.
     const hasResponseNameCollision =
-      !tsResolver.response.typeImports &&
+      pluginTs.options?.operationTypes !== false &&
       referencedNames.some((name) => {
         return enumTypeName({ resolver: tsResolver, name, enumOptions, isEnum: enumNames.has(name) }) === type.responseName
       })
@@ -99,7 +89,6 @@ export const mswGenerator = defineGenerator<PluginMsw>({
           [...(hasResponseNameCollision ? [] : [type.responseName]), ...responseTypeNames, ...(requestName ? [requestName] : [])],
           {
             resolver: tsResolver,
-            file: type.file,
             root,
             output: pluginTs.options?.output ?? output,
             group: pluginTs.options?.group,

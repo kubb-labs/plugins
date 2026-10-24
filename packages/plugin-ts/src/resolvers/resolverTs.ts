@@ -5,6 +5,7 @@ import {
   createOperationParamResolver,
   createOperationResponseResolver,
   getOperationParameters,
+  operationTypeImports,
 } from '@internals/shared'
 import { ensureValidVarName, pascalCase } from '@internals/utils'
 import { ast, createResolver, type ResolverPatch } from 'kubb/kit'
@@ -37,6 +38,9 @@ export const resolverTs = createResolver<PluginTs>({
     return ensureValidVarName(pascalCase(name))
   },
   file: createCasedFile(pascalCase),
+  typeImports(node, name, params) {
+    return operationTypeImports(this, node, name, params)
+  },
   param: createOperationParamResolver(),
   response: {
     ...createOperationResponseResolver(),
@@ -117,10 +121,10 @@ export function createInlineResolverTs({ nodes, ...options }: InlineResolverOpti
         return cached(node, `status ${statusCode}`, () => print(this, contentSources(node.responses.find((res) => res.statusCode === statusCode)?.content)))
       },
       options(node) {
-        return cached(node, 'options', () => print(this, [{ schema: buildOptionsSchema(node, this) }]))
+        return cached(node, 'options', () => print(this, [{ schema: buildOptionsSchema(node, this, { inline: true }) }]))
       },
       responses(node) {
-        return cached(node, 'responses', () => print(this, [{ schema: buildResponses(node, this) }]))
+        return cached(node, 'responses', () => print(this, [{ schema: buildResponses(node, this, { inline: true }) }]))
       },
       response(node) {
         return cached(node, 'response', () => {
@@ -128,28 +132,30 @@ export function createInlineResolverTs({ nodes, ...options }: InlineResolverOpti
           return union ? print(this, [{ schema: union }]) : 'unknown'
         })
       },
-      typeImports(node, name, { root, output, group }) {
-        const schemas = sourcesByType.get(name)
-        if (!schemas) return null
-        // Composite types (`XxxOptions`) reference other printed types by name, so follow those to their sources.
-        const nested = schemas.flatMap((schema) =>
-          ast.collectSync<string>(schema, {
-            schema: (child) =>
-              child.type === 'ref' && !child.ref && child.name && child.name !== name && sourcesByType.has(child.name) ? child.name : undefined,
-          }),
-        )
-        const enumNames = enumNamesOf(schemas)
-        const imports = schemas.flatMap((schema) =>
-          this.imports({
-            node: schema,
-            root,
-            output,
-            group,
-            name: (schemaName) => enumTypeName({ resolver: this, name: schemaName, enumOptions: options.enum, isEnum: enumNames.has(schemaName) }),
-          }),
-        )
-        return [...imports, ...nested.flatMap((type) => this.response.typeImports?.(node, type, { root, output, group }) ?? [])]
-      },
+    },
+
+    typeImports(node, name, { root, output, group }) {
+      const schemas = sourcesByType.get(name)
+      // Every operation type name comes from this patch, so an unknown name has nothing to import.
+      if (!schemas) return []
+      // Composite types (`XxxOptions`) reference other printed types by name, so follow those to their sources.
+      const nested = schemas.flatMap((schema) =>
+        ast.collectSync<string>(schema, {
+          schema: (child) =>
+            child.type === 'ref' && !child.ref && child.name && child.name !== name && sourcesByType.has(child.name) ? child.name : undefined,
+        }),
+      )
+      const enumNames = enumNamesOf(schemas)
+      const imports = schemas.flatMap((schema) =>
+        this.imports({
+          node: schema,
+          root,
+          output,
+          group,
+          name: (schemaName) => enumTypeName({ resolver: this, name: schemaName, enumOptions: options.enum, isEnum: enumNames.has(schemaName) }),
+        }),
+      )
+      return [...imports, ...nested.flatMap((type) => this.typeImports(node, type, { root, output, group }))]
     },
   } satisfies ResolverPatch<ResolverTs>
 }

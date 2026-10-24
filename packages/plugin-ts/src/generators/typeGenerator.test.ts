@@ -205,13 +205,14 @@ describe('typeGenerator — operationTypes: false', () => {
   test('imports the schema types a printed operation type references', () => {
     const params = { root: '/', output: { path: 'types', mode: 'directory' as const } }
     const imports = (name: string) => {
-      const found = resolver.response.typeImports?.(node, name, params)
-      return found && [...new Set(found.map((imp) => `${imp.name} ${imp.path}`))]
+      return [...new Set(resolver.typeImports(node, name, params).map((imp) => `${imp.name} ${imp.path}`))]
     }
 
     expect(imports(resolver.response.options(node))).toEqual(['ApiNewPet /types/NewPet.ts'])
     expect(imports(resolver.response.status(node, '409'))).toEqual(['ApiPetStatusKey /types/PetStatus.ts'])
-    expect(imports('ApiCreatePetOptions')).toBeNull()
+    expect(imports('ApiCreatePetOptions')).toEqual([])
+    // The default resolver imports operation types from the operation's file.
+    expect(resolverTs.typeImports(node, 'CreatePetOptions', params).map((imp) => imp.path)).toEqual(['/types/CreatePet.ts'])
   })
 })
 
