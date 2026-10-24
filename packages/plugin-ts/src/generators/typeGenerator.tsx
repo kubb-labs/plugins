@@ -1,6 +1,4 @@
-import path from 'node:path'
-import { buildOptionsSchema, buildResponses, getOperationParameters, resolveContentTypeVariants, typeKeywords } from '@internals/shared'
-import { getRelativePath } from '@internals/utils'
+import { buildOptionsSchema, buildResponses, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Type } from '../components/Type.tsx'
@@ -69,6 +67,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
     )
   },
   operation(node, ctx) {
+    // `operationTypes: false` prints every operation type inline in its consumers, so there is no operation file.
+    if (!ctx.options.operationTypes) return null
     const { enum: enumOptions, optionalType, arrayType, syntaxType, group, output, printer } = ctx.options
     const { config, resolver, root } = ctx
 
@@ -149,26 +149,10 @@ export const typeGenerator = defineGenerator<PluginTs>({
       headerParams.length > 0 && renderSchemaType({ schema: buildParams({ params: headerParams }), name: resolver.param.headers(node, headerParams[0]!) }),
     ]
 
-    // `operationTypes: false` resolves a slot to its `$ref` target (`Pet`) or keyword (`unknown`): import and re-export
-    // the target instead of declaring `type Pet = Pet`, so imports of the operation file keep working.
-    const isInlined = (name: string) => typeKeywords.has(name) || Boolean(resolver.response.ref?.(node, name))
-    function renderInlinedType(name: string) {
-      const schemaName = resolver.response.ref?.(node, name)
-      const filePath = schemaName ? resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path : null
-      if (!filePath || filePath === meta.file.path) return null
-      return (
-        <>
-          <File.Import root={meta.file.path} path={filePath} name={[name]} isTypeOnly />
-          <File.Export path={getRelativePath(path.dirname(meta.file.path), filePath)} name={[name]} isTypeOnly />
-        </>
-      )
-    }
-
     const requestBodyContent = node.requestBody?.content ?? []
 
     function buildRequestType() {
       if (requestBodyContent.length === 0) return null
-      if (isInlined(resolver.response.body(node))) return renderInlinedType(resolver.response.body(node))
       if (requestBodyContent.length === 1) {
         const entry = requestBodyContent[0]!
         if (!entry.schema) return null
@@ -192,7 +176,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const requestType = buildRequestType()
 
     const responseTypes = node.responses.map((res) => {
-      if (isInlined(resolver.response.status(node, res.statusCode))) return renderInlinedType(resolver.response.status(node, res.statusCode))
       const variants = (res.content ?? []).filter((entry) => entry.schema)
       // Multiple content types for a single status code — generate per-variant types + a plain union.
       // The `<Name>Responses` record discriminates them by content type (see buildResponses).

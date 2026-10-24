@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { operationFileEntry } from '@internals/shared'
+import { groupOperationTypeImports, operationFileEntry } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import { ast, defineGenerator, Diagnostics } from 'kubb/kit'
 import type { Generator } from 'kubb/kit'
@@ -155,10 +155,13 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
       const footer = (file: ast.FileNode) => resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
 
       const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
-        const { namesByPath: typeNamesByPath, filesByPath: typeFilesByPath } = collectImportsByFile(ops, (op) => ({
-          file: op.typeFile,
-          names: resolveTypeImportNames(op.node, op.types),
-        }))
+        const typeNamesByPath = new Map<string, Set<string>>()
+        for (const op of ops) {
+          const options = { resolver: types.resolver, file: op.typeFile, root, output: types.output ?? output, group: types.group }
+          for (const imp of groupOperationTypeImports(op.node, resolveTypeImportNames(op.node, op.types), options)) {
+            typeNamesByPath.set(imp.path, new Set([...(typeNamesByPath.get(imp.path) ?? []), ...imp.names]))
+          }
+        }
         const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = isValidatorEnabled(validator)
           ? collectImportsByFile(ops, (op) => ({
               file: op.zodFile,
@@ -184,7 +187,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
             {validator === 'zod' && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
 
             {Array.from(typeNamesByPath.entries()).map(([filePath, set]) => (
-              <File.Import key={filePath} name={Array.from(set)} root={file.path} path={typeFilesByPath.get(filePath)!.path} isTypeOnly />
+              <File.Import key={filePath} name={Array.from(set)} root={file.path} path={filePath} isTypeOnly />
             ))}
 
             {isValidatorEnabled(validator) &&

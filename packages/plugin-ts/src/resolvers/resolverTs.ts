@@ -1,8 +1,16 @@
-import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, typeKeywords } from '@internals/shared'
+import {
+  buildOptionsSchema,
+  buildResponses,
+  createCasedFile,
+  createOperationParamResolver,
+  createOperationResponseResolver,
+  getOperationParameters,
+} from '@internals/shared'
 import { ensureValidVarName, pascalCase } from '@internals/utils'
 import { ast, createResolver, type ResolverPatch } from 'kubb/kit'
+import { printerTs, type PrinterTsNodes } from '../printers/printerTs.ts'
 import type { PluginTs, ResolvedOptions, ResolverTs } from '../types.ts'
-import { enumTypeName } from '../utils.ts'
+import { buildParams, buildResponseUnion, enumTypeName } from '../utils.ts'
 
 /**
  * Default resolver used by `@kubb/plugin-ts`. Decides the names and file paths
@@ -43,54 +51,104 @@ export const resolverTs = createResolver<PluginTs>({
   },
 })
 
-const responseResolver = createOperationResponseResolver()
+type InlineResolverOptions = Pick<ResolvedOptions, 'optionalType' | 'arrayType' | 'enum'> & { nodes?: PrinterTsNodes }
+type TypeSource = { schema: ast.SchemaNode; keysToOmit?: Array<string> | null }
 
 /**
- * Patch for `pluginTs({ operationTypes: false })`: a body or response whose content types all reference one `$ref` resolves to the referenced type (`Pet`).
+ * Patch for `pluginTs({ operationTypes: false })`: every operation type name resolves to the printed type itself
+ * (`Pet`, `{ body?: Order; path?: never }`), so no operation file is emitted and consumers reuse the schema types.
  */
-export function createRefResolverTs(enumOptions: ResolvedOptions['enum']) {
-  type RefType = { schemaName: string | null; typeName: string }
-  const refsByNode = new WeakMap<ast.OperationNode, { body: RefType | null; status: Map<ast.StatusCode, RefType | null> }>()
+export function createInlineResolverTs({ nodes, ...options }: InlineResolverOptions) {
+  // Printed type → the schemas it was printed from, so `typeImports` can import their `$ref` targets.
+  const sourcesByType = new Map<string, Array<ast.SchemaNode>>()
+  const typesByNode = new WeakMap<ast.OperationNode, Map<string, string>>()
 
-  function refType(resolver: ResolverTs, content: Array<ast.ContentNode> | undefined, { body = false } = {}): RefType | null {
-    const [first] = content ?? []
-    if (content?.length === 1 && first?.schema && typeKeywords.has(first.schema.type)) return { schemaName: null, typeName: first.schema.type }
-    // Only fields that change the TS type block inlining (a body's `optional` moves to the `body?` key of `XxxOptions`), and a
-    // ref without a resolved target (an adapter-promoted enum) keeps its alias.
-    const refs = (content ?? []).map((entry) => {
-      const ref = ast.narrowSchema(entry.schema, 'ref')
-      return ref && ref.schema !== undefined && !entry.keysToOmit?.length && !ref.nullable && !ref.nullish && (body || !ref.optional) ? ref : null
+  function enumNamesOf(schemas: Array<ast.SchemaNode>) {
+    return new Set(
+      schemas.flatMap((schema) =>
+        ast.collectSync<string>(schema, {
+          schema(node) {
+            const ref = ast.narrowSchema(node, 'ref')
+            // A ref without a resolved target is an adapter-promoted enum.
+            const isEnum = ref?.ref && (ref.schema === undefined || ast.narrowSchema(ref.schema ?? undefined, ast.schemaTypes.enum))
+            return isEnum ? (ast.resolveRefName(ref) ?? undefined) : undefined
+          },
+        }),
+      ),
+    )
+  }
+
+  function print(resolver: ResolverTs, sources: Array<TypeSource>): string {
+    const schemas = sources.map(({ schema }) => schema)
+    const printer = printerTs({ ...options, syntaxType: 'type', resolver, enumSchemaNames: enumNamesOf(schemas), nodes })
+    const types = sources.map(({ schema, keysToOmit }) => {
+      // Inline enums have no operation file to be declared in, so they print as literal unions.
+      const printed = printer.print(ast.transform(schema, { schema: (node) => (node.type === 'enum' && node.name ? { ...node, name: undefined } : undefined) }))
+      // Property JSDoc would repeat in every consumer that prints this type; the schema files keep theirs.
+      const type = printed?.replace(/\/\*\*[\s\S]*?\*\/\s*/g, '') ?? 'unknown'
+      return keysToOmit?.length ? `Omit<NonNullable<${type}>, ${keysToOmit.map((key) => `'${key}'`).join(' | ')}>` : type
     })
-    const schemaNames = new Set(refs.map((ref) => ast.resolveRefName(ref)))
-    const [schemaName] = schemaNames
-    if (!refs.length || schemaNames.size !== 1 || !schemaName) return null
-    const isEnum = ast.narrowSchema(refs[0]!.schema ?? undefined, ast.schemaTypes.enum) !== null
-    return { schemaName, typeName: enumTypeName({ resolver, name: schemaName, enumOptions, isEnum }) }
+    const type = [...new Set(types)].join(' | ') || 'unknown'
+    if (!sourcesByType.has(type)) sourcesByType.set(type, schemas)
+    return type
   }
 
-  function refsOf(resolver: ResolverTs, node: ast.OperationNode) {
-    let refs = refsByNode.get(node)
-    if (!refs) {
-      refs = {
-        body: refType(resolver, node.requestBody?.content, { body: true }),
-        status: new Map(node.responses.map((res) => [res.statusCode, refType(resolver, res.content)])),
-      }
-      refsByNode.set(node, refs)
-    }
-    return refs
+  function cached(node: ast.OperationNode, key: string, build: () => string): string {
+    const types = typesByNode.get(node) ?? new Map<string, string>()
+    typesByNode.set(node, types)
+    if (!types.has(key)) types.set(key, build())
+    return types.get(key)!
   }
+
+  const contentSources = (content: Array<ast.ContentNode> | undefined): Array<TypeSource> =>
+    (content ?? []).flatMap(({ schema, keysToOmit }) => (schema ? [{ schema, keysToOmit }] : []))
+  const paramType = (location: 'path' | 'query' | 'header') =>
+    function (this: ResolverTs, node: ast.OperationNode) {
+      return cached(node, location, () => print(this, [{ schema: buildParams({ params: getOperationParameters(node)[location] }) }]))
+    }
 
   return {
+    param: { path: paramType('path'), query: paramType('query'), headers: paramType('header') },
     response: {
       body(node) {
-        return refsOf(this, node).body?.typeName ?? responseResolver.body.call(this, node)
+        return cached(node, 'body', () => print(this, contentSources(node.requestBody?.content)))
       },
       status(node, statusCode) {
-        return refsOf(this, node).status.get(statusCode)?.typeName ?? responseResolver.status.call(this, node, statusCode)
+        return cached(node, `status ${statusCode}`, () => print(this, contentSources(node.responses.find((res) => res.statusCode === statusCode)?.content)))
       },
-      ref(node, name) {
-        const { body, status } = refsOf(this, node)
-        return [body, ...status.values()].find((ref) => ref?.typeName === name)?.schemaName ?? null
+      options(node) {
+        return cached(node, 'options', () => print(this, [{ schema: buildOptionsSchema(node, this) }]))
+      },
+      responses(node) {
+        return cached(node, 'responses', () => print(this, [{ schema: buildResponses(node, this) }]))
+      },
+      response(node) {
+        return cached(node, 'response', () => {
+          const union = buildResponseUnion(node, { resolver: this })
+          return union ? print(this, [{ schema: union }]) : 'unknown'
+        })
+      },
+      typeImports(node, name, { root, output, group }) {
+        const schemas = sourcesByType.get(name)
+        if (!schemas) return null
+        // Composite types (`XxxOptions`) reference other printed types by name, so follow those to their sources.
+        const nested = schemas.flatMap((schema) =>
+          ast.collectSync<string>(schema, {
+            schema: (child) =>
+              child.type === 'ref' && !child.ref && child.name && child.name !== name && sourcesByType.has(child.name) ? child.name : undefined,
+          }),
+        )
+        const enumNames = enumNamesOf(schemas)
+        const imports = schemas.flatMap((schema) =>
+          this.imports({
+            node: schema,
+            root,
+            output,
+            group,
+            name: (schemaName) => enumTypeName({ resolver: this, name: schemaName, enumOptions: options.enum, isEnum: enumNames.has(schemaName) }),
+          }),
+        )
+        return [...imports, ...nested.flatMap((type) => this.response.typeImports?.(node, type, { root, output, group }) ?? [])]
       },
     },
   } satisfies ResolverPatch<ResolverTs>

@@ -12,7 +12,7 @@ Pass these options to `pluginTs()`. Shared options link to [Shared plugin option
 | [`syntaxType`](#syntaxtype)                                               | Emit object schemas as type aliases or interfaces.                     | `'type'`                                                                              |
 | [`optionalType`](#optionaltype)                                           | How optional properties are written.                                   | `'questionToken'`                                                                     |
 | [`arrayType`](#arraytype)                                                 | `Type[]` or `Array<Type>`.                                             | `'array'`                                                                             |
-| [`operationTypes`](#operationtypes)                                       | Keep per-operation aliases for `$ref`-backed bodies and responses.     | `true`                                                                                |
+| [`operationTypes`](#operationtypes)                                       | Emit per-operation types, or print them inline in consumers.           | `true`                                                                                |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations and schemas that match.                           | None                                                                                  |
 | [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations and schemas that match.                                | `[]`                                                                                  |
 | [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                   | `[]`                                                                                  |
@@ -236,7 +236,7 @@ Uses `tags: Array<string>`, which reads better for complex elements like `Array<
 
 ### operationTypes
 
-Whether a request body or response backed by a single `$ref` gets its own per-operation alias.
+Whether each operation gets its own types file (`AddPetOptions`, `AddPetResponses`, `AddPetStatus200`, `AddPetPath`).
 
 |          |           |
 | -------- | --------- |
@@ -247,11 +247,11 @@ Whether a request body or response backed by a single `$ref` gets its own per-op
 ::field-group
 
 :::field{name="true"}
-Emits an alias per slot, `export type AddPetStatus200 = Pet`.
+Emits one file per operation with its aliases and aggregates, for example `export type AddPetStatus200 = Pet`.
 :::
 
 :::field{name="false"}
-Drops that alias. The `AddPetResponses` and `AddPetResponse` types reference `Pet`, and query hooks, MSW handlers, Faker mocks, and Cypress requests read their names from `pluginTs`, so they use `Pet` too and import it from `models/Pet`. A `$ref` to an `asConst` enum resolves to its `Key` type, and a response without a body resolves to `unknown` (or `any`, `void`). Inline, array, union, `Omit`-based, multi-content-type, and modified `$ref` schemas (for example `nullable` at the usage site) keep their alias because there is no single type to point at.
+Emits only the schema types. Clients, query hooks, MSW handlers, Faker mocks, Cypress requests, and MCP handlers reference those directly and print the rest inline, for example `Options<{ body?: Order; path?: never; query?: never; headers?: never }>` and `mutationOptions<Order, ResponseErrorConfig<unknown>, …>`. A response without a body becomes `unknown`, an inline enum becomes a literal union such as `'available' | 'pending' | 'sold'`, and a body the spec does not mark `required` becomes the optional `body?` key. Per-operation `override` options do not change these inline types, which use the plugin-level options.
 :::
 
 ::

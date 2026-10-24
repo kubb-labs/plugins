@@ -23,10 +23,8 @@ export {
   resolveDependencyOperationFile,
   resolveErrorNames,
   resolveOperationTypeNames,
-  resolveOperationTypePath,
   resolveResponseTypes,
   resolveSuccessNames,
-  typeKeywords,
 } from './operation.ts'
 export { getOasAdapter } from './adapter.ts'
 export { createCasedFile, createOperationParamResolver, createOperationResponseResolver } from './resolver.ts'

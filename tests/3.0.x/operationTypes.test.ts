@@ -31,7 +31,7 @@ describe('pluginTs({ operationTypes: false }) with its consumers', () => {
         plugins: [
           pluginTs({ output: { path: './types', barrel: false }, operationTypes: false }),
           pluginFetch({ output: { path: './clients', barrel: false } }),
-          pluginReactQuery({ output: { path: './hooks', barrel: false } }),
+          pluginReactQuery({ output: { path: './hooks', barrel: false }, hooks: true, infinite: { queryParam: 'status', initialPageParam: 'available' } }),
           pluginFaker({ output: { path: './mocks', barrel: false } }),
           pluginMsw({ output: { path: './msw', barrel: false }, parser: 'faker' }),
           pluginCypress({ output: { path: './cypress', barrel: false } }),
@@ -44,17 +44,15 @@ describe('pluginTs({ operationTypes: false }) with its consumers', () => {
 
   afterAll(() => fs.rm(output, { recursive: true, force: true }))
 
-  test('imports $ref targets from their own file and inlines body-less responses', async () => {
-    const hook = await fs.readFile(path.join(output, 'hooks/usePlaceOrder.ts'), 'utf-8')
+  test('emits only schema types and prints operation types inline', async () => {
+    expect((await fs.readdir(path.join(output, 'types'))).sort()).toEqual(['AddPetRequest.ts', 'ApiResponse.ts', 'Category.ts', 'Order.ts', 'Pet.ts', 'Tag.ts'])
 
+    const hook = await fs.readFile(path.join(output, 'hooks/usePlaceOrder.ts'), 'utf-8')
     expect(hook).toContain("import type { Order } from '../types/Order'")
-    expect(hook).toContain('mutationOptions<Order, ResponseErrorConfig<unknown>, PlaceOrderOptions, TContext>')
-    const placeOrder = await fs.readFile(path.join(output, 'types/PlaceOrder.ts'), 'utf-8')
     // `placeOrder`'s body is not `required`: the optionality moves to the `body?` key.
-    expect(placeOrder).toMatch(/body\?: Order;/)
-    expect(placeOrder).not.toContain('PlaceOrderBody')
-    // Both content types of `addPet`'s 200 reference `Pet`.
-    expect(await fs.readFile(path.join(output, 'types/AddPet.ts'), 'utf-8')).toMatch(/contentType: 'application\/xml';\s*data: Pet;/)
+    expect(hook).toMatch(/mutationOptions<\s*Order,\s*ResponseErrorConfig<unknown>,\s*\{\s*body\?: Order;/)
+    // The infinite query indexes the printed query type for its page param.
+    expect(await fs.readFile(path.join(output, 'hooks/useFindPetsByStatusInfinite.ts'), 'utf-8')).toMatch(/\}\['status'\]/)
   })
 
   function tsc(dirs: Array<string>, flags: string): Array<string> {

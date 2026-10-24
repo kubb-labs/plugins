@@ -82,9 +82,9 @@ export type ResolverTs = Resolver & {
      */
     body(node: ast.OperationNode): string
     /**
-     * Schema behind a body or status name that `operationTypes: false` resolved to a `$ref` target, so consumers import it from that schema's file.
+     * Imports a type printed by `operationTypes: false` needs (its `$ref` targets), or `null` for a name it did not print.
      */
-    ref?(node: ast.OperationNode, name: string): string | null
+    typeImports?(node: ast.OperationNode, name: string, params: { root: string; output: Output; group?: Group }): Array<ast.ImportNode> | null
   }
   /**
    * Naming for enum schemas.
@@ -257,9 +257,9 @@ export type Options = OutputOptions & {
    */
   arrayType?: 'generic' | 'array'
   /**
-   * Whether a body or response backed by a single `$ref` gets a per-operation alias.
-   * - `true` — `AddPetStatus200` aliases `Pet`.
-   * - `false` — the name resolves to `Pet`, so hooks, mocks, and Cypress requests import `Pet` from its own file.
+   * Whether operations get their own types (`AddPetOptions`, `AddPetStatus200`).
+   * - `true` — one file per operation with its aliases and aggregates.
+   * - `false` — no operation types: clients, hooks, and mocks reference `Pet` and print the rest inline (`{ body?: Pet }`).
    * @default true
    */
   operationTypes?: boolean
@@ -330,6 +330,7 @@ export type ResolvedOptions = {
   optionalType: NonNullable<Options['optionalType']>
   arrayType: NonNullable<Options['arrayType']>
   syntaxType: NonNullable<Options['syntaxType']>
+  operationTypes: NonNullable<Options['operationTypes']>
   printer: Options['printer']
 }
 

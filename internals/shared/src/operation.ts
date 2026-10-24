@@ -46,41 +46,39 @@ export function resolveDependencyOperationFile(options: {
   )
 }
 
-type OperationTypeFileOptions = {
-  resolver: Pick<Resolver, 'file'> & { response: { ref?(node: ast.OperationNode, name: string): string | null } }
+type TypeImportsParams = { root: string; output: Output; group?: Group }
+
+/**
+ * `pluginTs({ operationTypes: false })` adds `response.typeImports`, which returns the imports a printed operation type
+ * needs, or `null` for a name it did not print. Without it every operation type lives in the operation file.
+ */
+export type InlineTypeResolver = {
+  response: { typeImports?(node: ast.OperationNode, name: string, params: TypeImportsParams): Array<ast.ImportNode> | null }
+}
+
+type OperationTypeImportsOptions = TypeImportsParams & {
+  resolver: InlineTypeResolver
   file: { path: string }
-  root: string
-  output: Output
   group?: Group | null
 }
 
-// Schema types that print as a TypeScript keyword: `pluginTs({ operationTypes: false })` names such a slot after the keyword, which is never imported.
-export const typeKeywords: ReadonlySet<string> = new Set(['any', 'unknown', 'void', 'never', 'null'])
-
 /**
- * Path of the file exporting an operation type name: the schema's own file when `pluginTs({ operationTypes: false })` resolved it to a `$ref` target, otherwise `file`.
+ * Groups operation type names by the file that exports them: the operation file, or the schema files a printed
+ * `pluginTs({ operationTypes: false })` type references.
  */
-export function resolveOperationTypePath(
-  node: ast.OperationNode,
-  name: string,
-  { resolver, file, root, output, group }: OperationTypeFileOptions,
-): string | null {
-  if (typeKeywords.has(name)) return null
-  const schemaName = resolver.response.ref?.(node, name)
-  return schemaName ? resolver.file({ name: schemaName, extname: '.ts', root, output, group: group ?? undefined }).path : file.path
-}
-
 export function groupOperationTypeImports(
   node: ast.OperationNode,
   names: Iterable<string>,
-  options: OperationTypeFileOptions,
+  { resolver, file, root, output, group }: OperationTypeImportsOptions,
 ): Array<{ path: string; names: Array<string> }> {
-  const groups = new Map<string, Array<string>>()
+  const groups = new Map<string, Set<string>>()
+  const add = (path: string, name: string) => groups.set(path, (groups.get(path) ?? new Set()).add(name))
   for (const name of new Set(names)) {
-    const path = resolveOperationTypePath(node, name, options)
-    if (path) groups.set(path, [...(groups.get(path) ?? []), name])
+    const imports = resolver.response.typeImports?.(node, name, { root, output, group: group ?? undefined })
+    if (!imports) add(file.path, name)
+    for (const imp of imports ?? []) for (const importName of [imp.name].flat()) if (typeof importName === 'string') add(imp.path, importName)
   }
-  return Array.from(groups, ([path, names]) => ({ path, names }))
+  return Array.from(groups, ([path, names]) => ({ path, names: [...names] }))
 }
 
 export type ContentTypeInfo = {
@@ -100,9 +98,8 @@ export type RequestConfigResolver = {
 export type ResponseStatusNameResolver = {
   response: {
     status(node: ast.OperationNode, statusCode: ast.StatusCode): string
-    ref?(node: ast.OperationNode, name: string): string | null
   }
-}
+} & InlineTypeResolver
 
 export type ResponseNameResolver = ResponseStatusNameResolver & {
   response: {
@@ -449,8 +446,8 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
   const { path, query, header } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const bodyName = hasBody ? resolver.response.body(node) : null
-  // A body inlined by `pluginTs({ operationTypes: false })` is the bare schema type, so an optional body becomes an optional key.
-  const bodyRequired = hasBody && (Boolean(node.requestBody?.required) || !resolver.response.ref?.(node, bodyName!))
+  // A body printed by `pluginTs({ operationTypes: false })` is the bare schema type, so an optional body becomes an optional key.
+  const bodyRequired = hasBody && (Boolean(node.requestBody?.required) || !resolver.response.typeImports)
   const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
   const groups = [
     { name: 'path', params: path, resolve: resolver.param.path },
@@ -515,8 +512,8 @@ function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode
           ast.factory.createProperty({
             name: 'data',
             required: true,
-            // Every content type of an inlined status shares the one `$ref` target.
-            schema: ast.factory.createSchema({ type: 'ref', name: resolver.response.ref?.(node, statusName) ? statusName : variant.name }),
+            // `pluginTs({ operationTypes: false })` declares no per-content-type types, so the variant's own schema is printed.
+            schema: resolver.response.typeImports ? variant.schema : ast.factory.createSchema({ type: 'ref', name: variant.name }),
           }),
         ],
       }),

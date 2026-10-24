@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { isEventStream, operationFileEntry, resolveDependencyOperationFile } from '@internals/shared'
+import { groupOperationTypeImports, isEventStream, operationFileEntry, resolveDependencyOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import type { Generator } from 'kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -105,9 +105,15 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
           <File.Import name={clientValueImports} root={clientRoot} path={clientPath} />
           <File.Import name={clientTypeImports} root={clientRoot} path={clientPath} isTypeOnly />
 
-          {meta.fileTypes && importedTypeNames.length > 0 && (
-            <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTypes.path} isTypeOnly />
-          )}
+          {groupOperationTypeImports(node, importedTypeNames, {
+            resolver: types.resolver,
+            file: meta.fileTypes,
+            root,
+            output: types.output ?? output,
+            group: types.group,
+          }).map((imp) => (
+            <File.Import key={imp.path} name={imp.names} root={meta.file.path} path={imp.path} isTypeOnly />
+          ))}
 
           {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames} root={meta.file.path} path={meta.fileZod.path} />}
           {validatorHooks.headers && <File.Import name={['toHeadersStandardSchema']} root={clientRoot} path={standardSchemaPath} />}
