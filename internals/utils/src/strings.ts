@@ -100,6 +100,42 @@ export function jsStringEscape(input: unknown): string {
   })
 }
 
+// `\p{`, `\P{` or `\u{` behind an odd number of backslashes, or a character outside the BMP: both need the `u` flag.
+const NEEDS_UNICODE = /(?<!\\)(?:\\\\)*\\[pPu]\{|[\u{10000}-\u{10FFFF}]/u
+// Escapes the `u` flag accepts. `\-` only counts inside a class.
+const KEPT_ESCAPE = /[A-Za-z0-9^$\\.*+?()[\]{}|/]/
+
+/**
+ * Drops the backslash from escapes that the `u` flag rejects: an escaped punctuation character that is
+ * not a syntax character, and `\-` outside a class. Both match the same character without the backslash.
+ */
+function dropIdentityEscapes(pattern: string): string {
+  let inClass = false
+
+  return pattern.replace(/\\(.)|[[\]]/gs, (match, escaped?: string) => {
+    if (escaped === undefined) {
+      inClass = match === '['
+      return match
+    }
+
+    return KEPT_ESCAPE.test(escaped) || (escaped === '-' && inClass) ? match : escaped
+  })
+}
+
+/**
+ * Builds the `RegExp` for a pattern, adding the `u` flag when it uses `\p{...}`, `\P{...}` or `\u{...}`, or
+ * holds a character outside the BMP. A pattern that is not valid under `u` keeps the flags it came with.
+ */
+function toRegExp(pattern: string, flags: string | undefined): RegExp {
+  if (flags?.includes('u') || !NEEDS_UNICODE.test(pattern)) return new RegExp(pattern, flags)
+
+  try {
+    return new RegExp(dropIdentityEscapes(pattern), `${flags ?? ''}u`)
+  } catch {
+    return new RegExp(pattern, flags)
+  }
+}
+
 /**
  * Converts a pattern string into a `new RegExp(...)` constructor call or a regex literal string.
  * Inline flags expressed as a `^(?im)` prefix are extracted and applied to the resulting expression.
@@ -122,7 +158,7 @@ export function toRegExpString(text: string, func: string | null = 'RegExp'): st
     .replace(/\\?\/$/, '')
     .replace(replacementTarget, '')
 
-  const { source, flags } = new RegExp(cleaned, matchedFlags)
+  const { source, flags } = toRegExp(cleaned, matchedFlags)
 
   if (func === null) return `/${source}/${flags}`
 
