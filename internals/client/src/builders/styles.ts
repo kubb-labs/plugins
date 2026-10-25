@@ -30,12 +30,32 @@ function serializeParameter(parameter: ast.ParameterNode): string | null {
 }
 
 /**
+ * Serializes the `encoding` of the request body's default content type into a `{ property: { ... } }`
+ * literal, or `null` when it carries none. The default content type is the first declared one, the
+ * same entry `buildContentType` bakes into the call.
+ */
+function serializeBodyEncoding(node: ast.HttpOperationNode): string | null {
+  const entries = Object.entries(node.requestBody?.content?.[0]?.encoding ?? {}).map(([property, { contentType, style, explode, allowReserved }]) => {
+    const parts = [
+      style && `style: '${style}'`,
+      explode !== undefined && `explode: ${explode}`,
+      allowReserved !== undefined && `allowReserved: ${allowReserved}`,
+      contentType && `contentType: '${contentType}'`,
+    ].filter(Boolean)
+    return `${isValidVarName(property) ? property : JSON.stringify(property)}: { ${parts.join(', ')} }`
+  })
+
+  return entries.length > 0 ? `body: { ${entries.join(', ')} }` : null
+}
+
+/**
  * Builds the per-operation `styles` literal from the operation's parameters, grouped by location.
  * Path entries are keyed by the camelCased name to match the URL template placeholders; query,
  * header, and cookie entries keep the spec name to match the keys the runtime serializes.
  * Only parameters whose source defines `style`, `explode`, `allowReserved`, or `contentType` are
  * emitted, so calls without serialization metadata keep the runtime defaults and existing output
- * is unchanged. Returns `null` when no parameter carries metadata.
+ * is unchanged. A form request body adds a `body` group keyed by property name from its `encoding`.
+ * Returns `null` when nothing carries metadata.
  *
  * @example
  * ```ts
@@ -54,8 +74,12 @@ export function buildStyles({ node }: { node: ast.OperationNode }): string | nul
     groups[parameter.in].push(`${toKey(parameter.name, parameter.in)}: ${literal}`)
   }
 
-  const locations = (Object.keys(groups) as Array<StyledLocation>).filter((location) => groups[location].length > 0)
-  if (locations.length === 0) return null
+  const entries = [
+    ...(Object.keys(groups) as Array<StyledLocation>)
+      .filter((location) => groups[location].length > 0)
+      .map((location) => `${location}: { ${groups[location].join(', ')} }`),
+    serializeBodyEncoding(node),
+  ].filter(Boolean)
 
-  return `{ ${locations.map((location) => `${location}: { ${groups[location].join(', ')} }`).join(', ')} }`
+  return entries.length > 0 ? `{ ${entries.join(', ')} }` : null
 }

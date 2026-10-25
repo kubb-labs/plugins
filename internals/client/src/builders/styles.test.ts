@@ -53,4 +53,28 @@ describe('buildStyles', () => {
     const node = createOperation([{ name: '2fa', in: 'query', schema: stringSchema(), explode: true }])
     expect(buildStyles({ node })).toBe('{ query: { "2fa": { explode: true } } }')
   })
+
+  test('emits the encoding of the default request content type as a body group', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'search',
+      method: 'POST',
+      path: '/search',
+      tags: ['pet'],
+      parameters: [ast.factory.createParameter({ name: 'page', in: 'query', schema: stringSchema(), explode: false })],
+      requestBody: ast.factory.createRequestBody({
+        content: [
+          ast.factory.createContent({
+            contentType: 'application/x-www-form-urlencoded',
+            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+            encoding: { filter: { style: 'deepObject', explode: true }, 'x-meta': { contentType: 'application/json', allowReserved: true } },
+          }),
+        ],
+      }),
+      responses: [ast.factory.createResponse({ statusCode: '200', schema: stringSchema(), description: 'ok' })],
+    })
+
+    expect(buildStyles({ node })).toBe(
+      "{ query: { page: { explode: false } }, body: { filter: { style: 'deepObject', explode: true }, \"x-meta\": { allowReserved: true, contentType: 'application/json' } } }",
+    )
+  })
 })
