@@ -54,6 +54,22 @@ export function mapSchemaProperties<TOutput>(node: ast.ObjectSchemaNode, transfo
 }
 
 /**
+ * Drops union members that repeat an earlier one, ignoring the source `pointer` so equal schemas
+ * from different places in the spec still match.
+ */
+export function uniqueSchemaMembers(members: ReadonlyArray<ast.SchemaNode> = []): Array<ast.SchemaNode> {
+  const seen = new Set<string>()
+
+  return members.filter((member) => {
+    const key = JSON.stringify(member, (name, value) => (name === 'pointer' ? undefined : value))
+    if (seen.has(key)) return false
+    seen.add(key)
+
+    return true
+  })
+}
+
+/**
  * Maps each member of a union or intersection schema to its transformed output, pairing every
  * result with the original member.
  */
@@ -61,7 +77,9 @@ export function mapSchemaMembers<TOutput>(
   node: ast.UnionSchemaNode | ast.IntersectionSchemaNode,
   transform: SchemaTransform<TOutput>,
 ): Array<MappedSchema<TOutput>> {
-  return (node.members ?? []).map((schema) => ({ schema, output: transform(schema) }))
+  const members = node.type === 'union' ? uniqueSchemaMembers(node.members) : (node.members ?? [])
+
+  return members.map((schema) => ({ schema, output: transform(schema) }))
 }
 
 /**

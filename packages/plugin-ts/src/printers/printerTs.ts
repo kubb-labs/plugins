@@ -1,4 +1,4 @@
-import { mapSchemaItems, mapSchemaProperties } from '@internals/shared'
+import { mapSchemaItems, mapSchemaProperties, uniqueSchemaMembers } from '@internals/shared'
 import { ast, isStringType, syncSchemaRef } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
 import * as factory from '../factory.ts'
@@ -225,7 +225,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         return factory.createTypeReferenceNode(resolvedName)
       },
       union(node) {
-        const members = node.members ?? []
+        const members = uniqueSchemaMembers(node.members)
 
         const hasStringLiteral = members.some((m) => {
           const enumNode = ast.narrowSchema(m, ast.schemaTypes.enum)

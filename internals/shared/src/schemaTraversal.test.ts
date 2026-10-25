@@ -35,6 +35,20 @@ describe('mapSchemaMembers', () => {
 
     expect(mapSchemaMembers(node, label).map((entry) => entry.output)).toStrictEqual(['<string>', '<number>'])
   })
+
+  it('drops repeated union members, ignoring the source pointer', () => {
+    const node = ast.factory.createSchema({
+      type: 'union',
+      members: [
+        ast.factory.createSchema({ type: 'string', pointer: '#/a' }),
+        ast.factory.createSchema({ type: 'string', pointer: '#/b' }),
+        ast.factory.createSchema({ type: 'number' }),
+      ],
+    })
+    if (node.type !== 'union') return
+
+    expect(mapSchemaMembers(node, label).map((entry) => entry.output)).toStrictEqual(['<string>', '<number>'])
+  })
 })
 
 describe('mapSchemaItems', () => {

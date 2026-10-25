@@ -28,4 +28,4 @@ export {
 export { getOasAdapter } from './adapter.ts'
 export { createCasedFile, createOperationParamResolver, createOperationResponseResolver } from './resolver.ts'
 export { createGroupConfig } from './group.ts'
-export { mapSchemaItems, mapSchemaMembers, mapSchemaProperties } from './schemaTraversal.ts'
+export { mapSchemaItems, mapSchemaMembers, mapSchemaProperties, uniqueSchemaMembers } from './schemaTraversal.ts'

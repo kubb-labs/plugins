@@ -222,6 +222,17 @@ describe('printerTs', () => {
       expect(await formatTS(result)).toBe('string | number')
     })
 
+    it('drops repeated members', async () => {
+      const result = printer.transform(
+        ast.factory.createSchema({
+          type: 'union',
+          members: [ast.factory.createSchema({ type: 'string' }), ast.factory.createSchema({ type: 'string' }), ast.factory.createSchema({ type: 'number' })],
+        }),
+      )
+
+      expect(await formatTS(result)).toBe('string | number')
+    })
+
     it('renders nested union', async () => {
       const result = printer.transform(
         ast.factory.createSchema({
