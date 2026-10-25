@@ -1,0 +1,48 @@
+openapi: 3.0.3
+info:
+  title: Event streams
+  version: '1'
+paths:
+  /stream:
+    get:
+      operationId: streamGet
+      responses:
+        '200':
+          description: Event stream
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+    post:
+      operationId: streamPost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                q:
+                  type: string
+      responses:
+        '200':
+          description: Event stream
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+  /health:
+    get:
+      operationId: healthGet
+      responses:
+        '200':
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                type: string

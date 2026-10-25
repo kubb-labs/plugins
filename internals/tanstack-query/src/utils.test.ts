@@ -12,6 +12,28 @@ import {
 } from './utils.ts'
 
 describe('classifyOperation', () => {
+  test.each(['GET', 'POST'] as const)('skips %s event streams for queries and mutations', (method) => {
+    const node = ast.factory.createOperation({
+      operationId: 'streamEvents',
+      method,
+      path: '/events',
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          mediaType: 'text/event-stream; charset=utf-8',
+          schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+        }),
+      ],
+    })
+
+    expect(
+      classifyOperation(node, {
+        query: resolveQueryConfig({}, { importPath: '@tanstack/react-query' }),
+        mutation: resolveMutationConfig({}, { importPath: '@tanstack/react-query' }),
+      }),
+    ).toStrictEqual({ isQuery: false, isMutation: false })
+  })
+
   test('classifies a GET as a query when methods include it', () => {
     const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 

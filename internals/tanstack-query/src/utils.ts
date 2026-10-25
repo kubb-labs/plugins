@@ -5,6 +5,7 @@ import {
   getRequestGroupOptionality,
   getRequestGroups,
   hasRequestContentTypeChoice,
+  isEventStream,
   resolveErrorNames,
   resolveSuccessNames,
 } from '@internals/shared'
@@ -291,9 +292,12 @@ type ClassifyOperationParams = {
 /**
  * Classifies an operation as a query or a mutation from the resolved `query` / `mutation` method lists.
  * Disabled query and mutation configs do not claim operations, and a method already claimed by an
- * enabled query config never counts as a mutation.
+ * enabled query config never counts as a mutation. Event streams are consumed through the client
+ * directly, so they do not generate query or mutation hooks.
  */
 export function classifyOperation(node: ast.HttpOperationNode, { query, mutation }: ClassifyOperationParams): OperationClassification {
+  if (isEventStream(node)) return { isQuery: false, isMutation: false }
+
   const isQuery = !!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase())
   const queryMethods = new Set(query ? query.methods : [])
   const isMutation =
