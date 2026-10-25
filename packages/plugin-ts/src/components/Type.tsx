@@ -32,10 +32,10 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
       ?.replace(/\/\*\*[\s\S]*?\*\/\s*/g, '')
     if (!expression) return
 
-    // The declaration is never written, but keeps the file's imports in use.
+    // The file is never written; the expression as its text keeps the imports it needs in use.
     return (
       <File.Source name={name} isTypeOnly isExportable isIndexable inline={{ expression }}>
-        {printer.print(withoutEnums)}
+        {expression}
       </File.Source>
     )
   }

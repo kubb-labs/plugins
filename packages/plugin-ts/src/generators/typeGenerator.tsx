@@ -67,8 +67,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
     )
   },
   operation(node, ctx) {
-    const { enum: enumOptions, optionalType, arrayType, syntaxType, group, output, printer } = ctx.options
+    const { enum: enumOptions, optionalType, arrayType, syntaxType, group, output, printer, operations } = ctx.options
     const { config, resolver, root } = ctx
+    const inline = operations === 'inline'
 
     const meta = {
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
@@ -78,7 +79,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
     // name callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
     const enumSchemaNames = new Set<string>(ctx.meta.enumNames)
     const importName = (schemaName: string) => enumTypeName({ resolver, name: schemaName, enumOptions, isEnum: enumSchemaNames.has(schemaName) })
-    const variantPrinter = printerTs({ optionalType, arrayType, enum: enumOptions, syntaxType, resolver, enumSchemaNames, nodes: printer?.nodes })
+    const inlinePrinter = inline
+      ? printerTs({ optionalType, arrayType, enum: enumOptions, syntaxType, resolver, enumSchemaNames, nodes: printer?.nodes })
+      : null
 
     function renderSchemaType({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
       if (!schema) return null
@@ -103,7 +106,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
           {imports.map((imp) => (
             <File.Import key={[name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
           ))}
-          <Type name={name} node={schema} enum={enumOptions} resolver={resolver} printer={schemaPrinter} inline={ctx.options.operations === 'inline'} />
+          <Type name={name} node={schema} enum={enumOptions} resolver={resolver} printer={schemaPrinter} inline={inline} />
         </>
       )
     }
@@ -122,12 +125,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
     ) {
       const variants = resolveContentTypeVariants(entries, baseName)
       // Inline, content types that print the same type would repeat it in the union (`Order | Order`).
-      const seen = new Set<string>()
-      const members = variants.filter((variant) => {
-        if (ctx.options.operations !== 'inline') return true
-        const key = `${variantPrinter.print(variant.schema)}:${variant.keysToOmit ?? ''}`
-        return !seen.has(key) && Boolean(seen.add(key))
-      })
+      const keys = variants.map((variant) => (inlinePrinter ? `${inlinePrinter.print(variant.schema)}:${variant.keysToOmit ?? ''}` : variant.name))
+      const members = variants.filter((_, index) => keys.indexOf(keys[index]!) === index)
       const unionSchema = ast.factory.createSchema({
         type: 'union',
         pointer,
