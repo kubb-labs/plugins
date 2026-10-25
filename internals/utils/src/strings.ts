@@ -100,6 +100,23 @@ export function jsStringEscape(input: unknown): string {
   })
 }
 
+// An odd number of backslashes before `p{`, `P{` or `u{` is a Unicode escape that only means something under the `u` flag.
+const UNICODE_ESCAPE = /(?<!\\)(?:\\\\)*\\(?:[pP]|u)\{/
+
+/**
+ * Builds the `RegExp` for a pattern, adding the `u` flag when it uses `\p{...}`, `\P{...}` or `\u{...}`.
+ * A pattern that is not valid under `u` keeps the flags it came with.
+ */
+function toRegExp(pattern: string, flags: string | undefined): RegExp {
+  if (!UNICODE_ESCAPE.test(pattern) || flags?.includes('u')) return new RegExp(pattern, flags)
+
+  try {
+    return new RegExp(pattern, `${flags ?? ''}u`)
+  } catch {
+    return new RegExp(pattern, flags)
+  }
+}
+
 /**
  * Converts a pattern string into a `new RegExp(...)` constructor call or a regex literal string.
  * Inline flags expressed as a `^(?im)` prefix are extracted and applied to the resulting expression.
@@ -122,7 +139,7 @@ export function toRegExpString(text: string, func: string | null = 'RegExp'): st
     .replace(/\\?\/$/, '')
     .replace(replacementTarget, '')
 
-  const { source, flags } = new RegExp(cleaned, matchedFlags)
+  const { source, flags } = toRegExp(cleaned, matchedFlags)
 
   if (func === null) return `/${source}/${flags}`
 

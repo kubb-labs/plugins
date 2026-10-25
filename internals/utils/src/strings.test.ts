@@ -74,6 +74,23 @@ describe('toRegExpString', () => {
   it('strips surrounding quotes before parsing', () => {
     expect(toRegExpString('"foo"')).toBe('new RegExp("foo")')
   })
+
+  it('adds the u flag to a literal that uses a Unicode property escape', () => {
+    expect(toRegExpString('^[\\p{L}][\\p{L} -]{0,99}$', null)).toBe('/^[\\p{L}][\\p{L} -]{0,99}$/u')
+  })
+
+  it('adds the u flag for \\P{...} and \\u{...} and keeps inline flags', () => {
+    expect(toRegExpString('^(?i)\\P{L}', null)).toBe('/^\\P{L}/iu')
+    expect(toRegExpString('\\u{1F600}')).toBe('new RegExp("\\\\u{1F600}", "u")')
+  })
+
+  it('leaves a literal backslash followed by p{ without the u flag', () => {
+    expect(toRegExpString('a\\\\p{2}', null)).toBe('/a\\\\p{2}/')
+  })
+
+  it('keeps the original flags when the pattern is not valid under u', () => {
+    expect(toRegExpString('\\p{L}\\-', null)).toBe('/\\p{L}\\-/')
+  })
 })
 
 describe('getNestedAccessor', () => {
