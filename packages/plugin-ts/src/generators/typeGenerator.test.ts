@@ -79,6 +79,41 @@ const apiResolver = Resolver.merge(resolverTs, {
   },
 })
 
+describe('typeGenerator — response alias', () => {
+  test.each([
+    { name: 'no responses', responses: [], expected: 'unknown' },
+    { name: 'a default response without a schema', responses: [ast.factory.createResponse({ statusCode: 'default' })], expected: 'unknown' },
+    { name: 'a 204 response without a schema', responses: [ast.factory.createResponse({ statusCode: '204' })], expected: 'unknown' },
+    { name: 'an error response without a schema', responses: [ast.factory.createResponse({ statusCode: '400' })], expected: 'unknown' },
+    {
+      name: 'a default response with a schema',
+      responses: [ast.factory.createResponse({ statusCode: 'default', schema: ast.factory.createSchema({ type: 'string' }) })],
+      expected: 'ProvidersListStatusDefault',
+    },
+  ])('exports the response alias for $name', async ({ responses, expected }) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'response alias' })
+    const node = ast.factory.createOperation({ operationId: 'providers.list', method: 'GET', path: '/v1/providers', responses })
+
+    await renderGeneratorOperation(typeGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+
+    expect(source).toContain(`export type ProvidersListResponse = ${expected}`)
+    for (const response of responses.filter((res) => !res.content?.some((entry) => entry.schema))) {
+      expect(source).toContain(`export type ${resolverTs.response.status(node, response.statusCode)} = unknown`)
+    }
+  })
+})
+
 describe('typeGenerator — custom resolver', () => {
   test('uses name consistently for imported schema refs', async () => {
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions }

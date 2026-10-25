@@ -189,7 +189,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       }
       const primary = variants[0] ?? res.content?.[0]
       return renderSchemaType({
-        schema: primary?.schema ? { ...primary.schema, pointer: res.pointer ?? primary.schema.pointer } : null,
+        schema: primary?.schema ? { ...primary.schema, pointer: res.pointer ?? primary.schema.pointer } : ast.factory.createSchema({ type: 'unknown' }),
         name: resolver.response.status(node, res.statusCode),
         keysToOmit: primary?.keysToOmit,
       })
@@ -207,10 +207,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     function buildResponseType() {
       const hasSchema = (res: ast.ResponseNode) => (res.content ?? []).some((entry) => entry.schema)
-      if (!node.responses.some(hasSchema)) {
-        return null
-      }
-
       const responseName = resolver.response.response(node)
 
       const responsesWithSchema = node.responses.filter(hasSchema)
@@ -226,7 +222,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
       return renderSchemaType({
         schema: {
-          ...buildResponseUnion(node, { resolver })!,
+          ...(buildResponseUnion(node, { resolver }) ?? ast.factory.createSchema({ type: 'unknown' })),
           description: 'Union of all possible responses',
         },
         name: responseName,
