@@ -1,4 +1,4 @@
-import { camelCase, trimQuotes } from '@internals/utils'
+import { camelCase, ensureValidVarName, trimQuotes } from '@internals/utils'
 import type { ast } from 'kubb/kit'
 import { File } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
@@ -29,7 +29,7 @@ export function getEnumNames({ node, enum: enumOptions, resolver }: { node: ast.
   typeName: string
 } {
   const resolved = resolver.name(node.name!)
-  const enumName = enumOptions.constCasing === 'pascalCase' ? resolved : camelCase(node.name!)
+  const enumName = enumOptions.constCasing === 'pascalCase' ? resolved : ensureValidVarName(camelCase(node.name!))
   const typeName = enumOptions.type === 'asConst' ? resolver.enum.keyName(node, enumOptions.typeSuffix) : resolved
 
   return { enumName, typeName }

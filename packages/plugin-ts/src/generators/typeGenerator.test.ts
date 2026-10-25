@@ -1063,6 +1063,29 @@ describe('typeGenerator — enumTypeSuffix', () => {
 })
 
 describe('typeGenerator — enumConstCasing', () => {
+  test.each(['camelCase', 'pascalCase'] as const)('exports valid enum identifiers for digit-leading names with %s', async (constCasing) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, constCasing } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: `digit-leading enum ${constCasing}` })
+    const schema = ast.factory.createSchema({ type: 'enum', name: '1-10', primitive: 'string', enumValues: ['1-10', '11-20'] })
+
+    await renderGeneratorSchema(typeGenerator, schema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+
+    expect(source).toContain('export const _110 =')
+    expect(source).toContain('export type _110Key = (typeof _110)[keyof typeof _110]')
+    const exports = driver.fileManager.files?.flatMap((file) => file.sources.filter((source) => source.isIndexable).map((source) => source.name))
+    expect(exports).toStrictEqual(['_110', '_110Key'])
+  })
+
   test('constCasing pascalCase keeps the Key-suffixed type', async () => {
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: 'asConst', constCasing: 'pascalCase' } }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
