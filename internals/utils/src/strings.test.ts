@@ -88,9 +88,45 @@ describe('toRegExpString', () => {
     expect(toRegExpString('a\\\\p{2}', null)).toBe('/a\\\\p{2}/')
   })
 
-  it('keeps the original flags when the pattern is not valid under u', () => {
-    expect(toRegExpString('\\p{L}\\-', null)).toBe('/\\p{L}\\-/')
+  it('drops an escape the u flag rejects instead of giving up on the flag', () => {
+    expect(toRegExpString('\\p{L}\\-', null)).toBe('/\\p{L}-/u')
   })
+
+  it('keeps the original flags when the pattern is not valid under u', () => {
+    expect(toRegExpString('\\p{L}+{', null)).toBe('/\\p{L}+{/')
+  })
+})
+
+describe('toRegExpString on real patterns', () => {
+  const cases: Array<{ name: string; pattern: string; yes: Array<string>; no: Array<string>; unicode: boolean }> = [
+    { name: 'email', pattern: '^[^@\\s]+@[^@\\s]+\\.[a-z]{2,}$', yes: ['a@b.co'], no: ['ab.co'], unicode: false },
+    { name: 'escaped slash', pattern: '^\\/api\\/v1$', yes: ['/api/v1'], no: ['/api/v2'], unicode: false },
+    { name: 'inline i flag', pattern: '^(?i)abc$', yes: ['ABC'], no: ['abd'], unicode: false },
+    { name: 'lookahead', pattern: '^(?=.*\\d)(?=.*[a-z]).{6,}$', yes: ['abc123'], no: ['abcdef'], unicode: false },
+    { name: 'named group', pattern: '^(?<year>\\d{4})-(?<m>\\d{2})$', yes: ['2026-10'], no: ['26-10'], unicode: false },
+    { name: 'four digit unicode escape', pattern: '^\\u00e9$', yes: ['é'], no: ['e'], unicode: false },
+    { name: 'letters and marks', pattern: "^[\\p{L}\\p{M}' -]+$", yes: ['José', "O'Neil", 'Łukasz'], no: ['a1'], unicode: true },
+    { name: 'negated property', pattern: '^\\P{L}+$', yes: ['123'], no: ['abc'], unicode: true },
+    { name: 'script property', pattern: '^\\p{Script=Greek}+$', yes: ['αβγ'], no: ['abc'], unicode: true },
+    { name: 'inline i flag with a property', pattern: '^(?i)\\p{Lu}$', yes: ['a', 'A'], no: ['1'], unicode: true },
+    { name: 'code point escape', pattern: '^\\u{1F600}$', yes: ['😀'], no: ['a'], unicode: true },
+    { name: 'property with an escaped dash outside a class', pattern: '^\\p{L}+\\-\\p{L}+$', yes: ['ab-cd'], no: ['ab'], unicode: true },
+    { name: 'property with escaped punctuation', pattern: "^\\p{L}+\\'\\ \\@\\_\\p{L}+$", yes: ["ab' @_cd"], no: ['ab'], unicode: true },
+    { name: 'property with an escaped dash in a class', pattern: '^[\\p{L}\\-\\.]+$', yes: ['a-b.c'], no: ['1'], unicode: true },
+    { name: 'astral character in a class', pattern: '^[😀]$', yes: ['😀'], no: ['a'], unicode: true },
+  ]
+
+  for (const { name, pattern, yes, no, unicode } of cases) {
+    it(`${name}: the literal and the constructor behave the same`, () => {
+      for (const func of [null, 'RegExp']) {
+        const regexp = new Function(`return ${toRegExpString(pattern, func)}`)() as RegExp
+
+        expect(regexp.flags.includes('u')).toBe(unicode)
+        for (const text of yes) expect(regexp.test(text)).toBe(true)
+        for (const text of no) expect(regexp.test(text)).toBe(false)
+      }
+    })
+  }
 })
 
 describe('getNestedAccessor', () => {

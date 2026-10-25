@@ -102,19 +102,52 @@ export function jsStringEscape(input: unknown): string {
 
 // An odd number of backslashes before `p{`, `P{` or `u{` is a Unicode escape that only means something under the `u` flag.
 const UNICODE_ESCAPE = /(?<!\\)(?:\\\\)*\\(?:[pP]|u)\{/
+// A character outside the BMP is two code units without the `u` flag, so a class holding one never matches it whole.
+const ASTRAL_CHARACTER = /[\u{10000}-\u{10FFFF}]/u
+// What an escape may stand for under `u`: a letter or digit (an escape class), a syntax character or `/`. `-` is only valid inside a class.
+const SYNTAX_CHARACTER = /[A-Za-z0-9^$\\.*+?()[\]{}|/]/
 
 /**
- * Builds the `RegExp` for a pattern, adding the `u` flag when it uses `\p{...}`, `\P{...}` or `\u{...}`.
- * A pattern that is not valid under `u` keeps the flags it came with.
+ * Drops the backslash from escapes that the `u` flag rejects: an escaped punctuation character that is
+ * not a syntax character, and `\-` outside a class. Both match the same character without the backslash.
+ */
+function dropIdentityEscapes(pattern: string): string {
+  let result = ''
+  let inClass = false
+
+  for (let index = 0; index < pattern.length; index++) {
+    const char = pattern[index]!
+
+    if (char === '\\' && index + 1 < pattern.length) {
+      const next = pattern[++index]!
+      result += SYNTAX_CHARACTER.test(next) || (next === '-' && inClass) ? `\\${next}` : next
+      continue
+    }
+
+    if (char === '[') inClass = true
+    else if (char === ']') inClass = false
+    result += char
+  }
+
+  return result
+}
+
+/**
+ * Builds the `RegExp` for a pattern, adding the `u` flag when it uses `\p{...}`, `\P{...}` or `\u{...}`, or
+ * holds a character outside the BMP. A pattern that is not valid under `u` keeps the flags it came with.
  */
 function toRegExp(pattern: string, flags: string | undefined): RegExp {
-  if (!UNICODE_ESCAPE.test(pattern) || flags?.includes('u')) return new RegExp(pattern, flags)
+  if (flags?.includes('u') || !(UNICODE_ESCAPE.test(pattern) || ASTRAL_CHARACTER.test(pattern))) return new RegExp(pattern, flags)
 
-  try {
-    return new RegExp(pattern, `${flags ?? ''}u`)
-  } catch {
-    return new RegExp(pattern, flags)
+  for (const candidate of [pattern, dropIdentityEscapes(pattern)]) {
+    try {
+      return new RegExp(candidate, `${flags ?? ''}u`)
+    } catch {
+      // Try the next candidate, then fall back to the original flags.
+    }
   }
+
+  return new RegExp(pattern, flags)
 }
 
 /**
