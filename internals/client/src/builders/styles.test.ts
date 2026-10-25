@@ -78,7 +78,7 @@ describe('buildStyles', () => {
     })
 
     expect(buildStyles({ node })).toBe(
-      '{ query: { page: { explode: false } }, body: { filter: { style: \'deepObject\', explode: true }, "x-meta": { allowReserved: true, contentType: "application/json" }, quoted: { contentType: "text/plain; name=O\'Reilly" } } }',
+      '{ query: { page: { explode: false } }, body: { filter: { style: "deepObject", explode: true }, "x-meta": { allowReserved: true, contentType: "application/json" }, quoted: { contentType: "text/plain; name=O\'Reilly" } } }',
     )
   })
 

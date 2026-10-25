@@ -39,7 +39,7 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): string | null {
   const entries = Object.entries(content?.length === 1 ? (content[0]?.encoding ?? {}) : {}).map(
     ([property, { contentType, style, explode, allowReserved }]) => {
       const parts = [
-        style && `style: '${style}'`,
+        style && `style: ${JSON.stringify(style)}`,
         explode !== undefined && `explode: ${explode}`,
         allowReserved !== undefined && `allowReserved: ${allowReserved}`,
         contentType && `contentType: ${JSON.stringify(contentType)}`,
