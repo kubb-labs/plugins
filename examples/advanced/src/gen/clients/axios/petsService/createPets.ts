@@ -44,6 +44,7 @@ export function createPets<ThrowOnError extends boolean = true>(
       method: 'POST',
       url: '/pets/{uuid}',
       validator: { response: createPetsResponseSchema, error: createPetsErrorSchema },
+      contentType: { request: 'application/json' },
       ...config,
       throwOnError: config.throwOnError ?? true,
     }) as Promise<

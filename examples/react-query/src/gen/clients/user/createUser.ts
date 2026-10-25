@@ -18,8 +18,12 @@ export function createUser<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request<CreateUserOptions['body']>({ method: 'POST', url: '/user', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-      RequestResult<CreateUserResponses, ThrowOnError>
-    >,
+    request<CreateUserOptions['body']>({
+      method: 'POST',
+      url: '/user',
+      contentType: { request: 'application/json' },
+      ...config,
+      throwOnError: config.throwOnError ?? true,
+    }) as Promise<RequestResult<CreateUserResponses, ThrowOnError>>,
   )
 }

@@ -17,7 +17,11 @@ export function placeOrder<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/store/order', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<PlaceOrderResponses, ThrowOnError>
-  >
+  return request({
+    method: 'POST',
+    url: '/store/order',
+    contentType: { request: 'application/json' },
+    ...config,
+    throwOnError: config.throwOnError ?? true,
+  }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>
 }

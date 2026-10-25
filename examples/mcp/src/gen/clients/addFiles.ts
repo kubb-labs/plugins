@@ -18,8 +18,12 @@ export function addFiles<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request<AddFilesOptions['body']>({ method: 'POST', url: '/pet/files', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-      RequestResult<AddFilesResponses, ThrowOnError>
-    >,
+    request<AddFilesOptions['body']>({
+      method: 'POST',
+      url: '/pet/files',
+      contentType: { request: 'application/json' },
+      ...config,
+      throwOnError: config.throwOnError ?? true,
+    }) as Promise<RequestResult<AddFilesResponses, ThrowOnError>>,
   )
 }

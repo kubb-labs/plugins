@@ -15,13 +15,14 @@ import { client, withUnwrap } from '../../.kubb/client'
 export function updatePet<ThrowOnError extends boolean = true>(
   options: Options<UpdatePetOptions, ThrowOnError>,
 ): Unwrappable<RequestResult<UpdatePetResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: request = client, contentType, ...config } = options
 
   return withUnwrap(
     request<UpdatePetOptions['body']>({
       method: 'PUT',
       url: '/pet',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+      contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
       ...config,
       throwOnError: config.throwOnError ?? true,
     }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>,

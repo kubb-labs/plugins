@@ -15,11 +15,15 @@ import { client, withUnwrap } from '../../.kubb/client'
 export function createUsersWithListInput<ThrowOnError extends boolean = true>(
   options: Options<CreateUsersWithListInputOptions, ThrowOnError>,
 ): Unwrappable<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: request = client, contentType, ...config } = options
 
   return withUnwrap(
-    request({ method: 'POST', url: '/user/createWithList', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-      RequestResult<CreateUsersWithListInputResponses, ThrowOnError>
-    >,
+    request({
+      method: 'POST',
+      url: '/user/createWithList',
+      contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
+      ...config,
+      throwOnError: config.throwOnError ?? true,
+    }) as Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>>,
   )
 }

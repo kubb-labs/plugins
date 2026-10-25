@@ -37,6 +37,7 @@ export function scheduleVisit<ThrowOnError extends boolean = true>(
         response: scheduleVisitResponseSchema,
         error: scheduleVisitErrorSchema,
       },
+      contentType: { request: 'application/json' },
       ...config,
       throwOnError: config.throwOnError ?? true,
     }) as Promise<RequestResult<ScheduleVisitResponsesSchemaType, ThrowOnError>>,
