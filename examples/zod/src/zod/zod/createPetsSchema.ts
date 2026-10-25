@@ -4,7 +4,6 @@
  */
 
 import { z } from '../../zod.ts'
-import { petNotFoundSchema } from './petNotFoundSchema'
 
 export const createPetsPathUuidSchema = z.string().describe('UUID')
 
@@ -22,7 +21,7 @@ export const createPetsStatus201Schema = z.unknown()
 
 export type CreatePetsStatus201SchemaType = z.infer<typeof createPetsStatus201Schema>
 
-export const createPetsStatusDefaultSchema = petNotFoundSchema.describe('Pet not found')
+export const createPetsStatusDefaultSchema = z.unknown().describe('Pet not found')
 
 export type CreatePetsStatusDefaultSchemaType = z.infer<typeof createPetsStatusDefaultSchema>
 

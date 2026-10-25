@@ -3,8 +3,6 @@
  * Do not edit manually.
  */
 
-import type { PetNotFound } from './PetNotFound'
-
 export type GetThingsQuery = {
   /**
    * @description Maximum number of things to return
@@ -29,7 +27,7 @@ export type GetThingsStatus201 = unknown
  * @description Pet not found
  * @type unknown
  */
-export type GetThingsStatusDefault = PetNotFound
+export type GetThingsStatusDefault = unknown
 
 export type GetThingsOptions = {
   body?: never

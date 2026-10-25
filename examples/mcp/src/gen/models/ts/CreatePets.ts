@@ -4,7 +4,6 @@
  */
 
 import type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE'
-import type { PetNotFound } from './PetNotFound'
 
 export type CreatePetsPath = {
   /**
@@ -35,7 +34,7 @@ export type CreatePetsStatus201 = unknown
  * @description Pet not found
  * @type unknown
  */
-export type CreatePetsStatusDefault = PetNotFound
+export type CreatePetsStatusDefault = unknown
 
 export type CreatePetsBody = {
   name: string

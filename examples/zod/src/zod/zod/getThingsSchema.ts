@@ -4,7 +4,6 @@
  */
 
 import { z } from '../../zod.ts'
-import { petNotFoundSchema } from './petNotFoundSchema'
 
 export const getThingsQueryLimitSchema = z.int().min(1).max(100).optional().default(100).describe('Maximum number of things to return')
 
@@ -18,7 +17,7 @@ export const getThingsStatus201Schema = z.unknown()
 
 export type GetThingsStatus201SchemaType = z.infer<typeof getThingsStatus201Schema>
 
-export const getThingsStatusDefaultSchema = petNotFoundSchema.describe('Pet not found')
+export const getThingsStatusDefaultSchema = z.unknown().describe('Pet not found')
 
 export type GetThingsStatusDefaultSchemaType = z.infer<typeof getThingsStatusDefaultSchema>
 
