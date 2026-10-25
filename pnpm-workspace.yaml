@@ -22,7 +22,7 @@ catalog:
   '@types/react': ^19.3.0
   '@vitest/coverage-v8': ^5.0.5
   '@vitest/ui': ^5.0.5
-  kubb: ^5.14.0
+  kubb: ^5.14.1
   oxfmt: ^0.74.0
   oxlint: ^1.89.0
   prettier: ^3.9.10
