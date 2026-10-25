@@ -4,7 +4,7 @@ export function placeOrder(
   {
     body,
   }: {
-    body?: Order
+    body: Order
     path?: never
     query?: never
     headers?: never

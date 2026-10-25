@@ -306,7 +306,8 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
 
       // Without name, apply modifiers inline and return.
       if (!name) {
-        return factory.print(factory.wrapNullableOptional(transformed, !!meta.nullable, !!(meta.nullish || meta.optional) && addsUndefined))
+        const omitted = keysToOmit?.length ? factory.createOmitDeclaration({ keys: keysToOmit, type: transformed, nonNullable: true }) : transformed
+        return factory.print(factory.wrapNullableOptional(omitted, !!meta.nullable, !!(meta.nullish || meta.optional) && addsUndefined))
       }
 
       // When keysToOmit is present, wrap with Omit first, then apply nullable/optional

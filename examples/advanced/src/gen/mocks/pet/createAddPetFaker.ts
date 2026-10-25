@@ -47,24 +47,22 @@ export function createAddPetStatusDefaultFaker(data?: Partial<Omit<NonNullable<P
 /**
  * @description Create a new pet in the store
  */
-export function createAddPetBodyFakerJson(data?: Partial<AddPetRequest | Omit<NonNullable<Pet>, 'id'>>): AddPetRequest | Omit<NonNullable<Pet>, 'id'> {
-  return createAddPetRequestFaker(data) as AddPetRequest | Omit<NonNullable<Pet>, 'id'>
+export function createAddPetBodyFakerJson(data?: Partial<AddPetRequest>): AddPetRequest {
+  return createAddPetRequestFaker(data) as AddPetRequest
 }
 
 /**
  * @description Create a new pet in the store
  */
-export function createAddPetBodyFakerXml(data?: Partial<AddPetRequest | Omit<NonNullable<Pet>, 'id'>>): AddPetRequest | Omit<NonNullable<Pet>, 'id'> {
-  return createPetFaker(data) as AddPetRequest | Omit<NonNullable<Pet>, 'id'>
+export function createAddPetBodyFakerXml(data?: Partial<Omit<NonNullable<Pet>, 'id'>>): Omit<NonNullable<Pet>, 'id'> {
+  return createPetFaker(data) as Omit<NonNullable<Pet>, 'id'>
 }
 
 /**
  * @description Create a new pet in the store
  */
-export function createAddPetBodyFakerFormUrlEncoded(
-  data?: Partial<AddPetRequest | Omit<NonNullable<Pet>, 'id'>>,
-): AddPetRequest | Omit<NonNullable<Pet>, 'id'> {
-  return createPetFaker(data) as AddPetRequest | Omit<NonNullable<Pet>, 'id'>
+export function createAddPetBodyFakerFormUrlEncoded(data?: Partial<Omit<NonNullable<Pet>, 'id'>>): Omit<NonNullable<Pet>, 'id'> {
+  return createPetFaker(data) as Omit<NonNullable<Pet>, 'id'>
 }
 
 /**

@@ -15,18 +15,15 @@ export {
   getResponseContentTypeInfo,
   getResponseType,
   getSuccessResponses,
-  groupOperationTypeImports,
   isEventStream,
   isSuccessStatusCode,
   operationFileEntry,
-  operationTypeImports,
   resolveContentTypeVariants,
   resolveDependencyOperationFile,
   resolveErrorNames,
   resolveOperationTypeNames,
   resolveResponseTypes,
   resolveSuccessNames,
-  type TypeImportsParams,
 } from './operation.ts'
 export { getOasAdapter } from './adapter.ts'
 export { createCasedFile, createOperationParamResolver, createOperationResponseResolver } from './resolver.ts'

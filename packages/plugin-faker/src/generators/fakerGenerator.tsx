@@ -1,10 +1,4 @@
-import {
-  getOperationParameters,
-  getPerContentTypeName,
-  groupOperationTypeImports,
-  resolveContentTypeVariants,
-  resolveDependencyOperationFile,
-} from '@internals/shared'
+import { getOperationParameters, getPerContentTypeName, resolveContentTypeVariants, resolveDependencyOperationFile } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
 import { ast, defineGenerator } from 'kubb/kit'
 import { buildParams, enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -148,8 +142,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         ...variants.map((variant) => ({
           schema: decorate ? decorate(variant.schema) : variant.schema,
           name: variant.name,
-          // `pluginTs({ operations: 'inline' })` declares no per-content-type types, so each variant uses the printed union.
-          typeName: pluginTs.options?.operations === 'inline' ? tsBaseName : getPerContentTypeName(tsBaseName, variant.suffix),
+          typeName: getPerContentTypeName(tsBaseName, variant.suffix),
           description,
           skipImportNames: [],
         })),
@@ -234,25 +227,18 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       const usedImports = filterUsedImports(resolveMockImports(schema), fakerText, skipImportNames)
       const { imports, aliases } = aliasConflictingImports(usedImports, localHelperNames)
       const rewrittenFakerText = rewriteAliasedImports(fakerText, aliases)
-      const typeImports = groupOperationTypeImports(node, [typeName], {
-        resolver: tsResolver,
-        root,
-        output: pluginTs.options?.output ?? output,
-        group: pluginTs.options?.group,
-      })
       const typeReference = resolveTypeReference({
         node: schema,
         canOverride,
         name,
         typeName,
         filePath: meta.file.path,
-        typeFilePath: typeImports[0]?.path ?? meta.typeFile.path,
+        typeFilePath: meta.typeFile.path,
       })
 
       return (
         <>
-          {typeReference.importPath &&
-            typeImports.map((imp) => <File.Import key={imp.path} isTypeOnly root={meta.file.path} path={imp.path} name={imp.names} />)}
+          {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[typeName]} />}
           {imports.map((imp) => (
             <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
           ))}

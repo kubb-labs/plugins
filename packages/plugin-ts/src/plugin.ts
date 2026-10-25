@@ -3,7 +3,7 @@ import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from 
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { typeGenerator } from './generators/typeGenerator.tsx'
-import { createInlineResolverTs, resolverTs } from './resolvers/resolverTs.ts'
+import { resolverTs } from './resolvers/resolverTs.ts'
 import type { PluginTs } from './types.ts'
 
 /**
@@ -63,11 +63,7 @@ export const pluginTs = defineExtension<PluginTs>({
       keyCasing: enumOptions.keyCasing ?? 'none',
     }
 
-    const baseResolver =
-      operations === 'inline'
-        ? Resolver.merge(resolverTs, createInlineResolverTs({ optionalType, arrayType, enum: resolvedEnum, nodes: printer?.nodes }))
-        : resolverTs
-    setResolver(userResolver ? Resolver.merge(baseResolver, userResolver) : baseResolver)
+    setResolver(userResolver ? Resolver.merge(resolverTs, userResolver) : resolverTs)
     if (userMacros?.length) {
       setMacros(userMacros)
     }

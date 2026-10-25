@@ -1,4 +1,4 @@
-import { getOperationSuccessResponses, groupOperationTypeImports, resolveResponseTypes } from '@internals/shared'
+import { getOperationSuccessResponses, resolveDependencyOperationFile, resolveResponseTypes } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -49,7 +49,17 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const pluginTs = ctx.requirePlugin(pluginTsName)
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const type = { responseName: tsResolver.response.response(node) }
+    const type = {
+      file: resolveDependencyOperationFile({
+        cache: ctx.cache,
+        node,
+        resolver: tsResolver,
+        root,
+        output: pluginTs.options?.output ?? output,
+        group: pluginTs.options?.group,
+      }),
+      responseName: tsResolver.response.response(node),
+    }
 
     const successResponses = getOperationSuccessResponses(node)
     const referencedNames = node.responses.flatMap((response) =>
@@ -57,12 +67,9 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     )
     const enumOptions = pluginTs.options?.enum
     const enumNames = new Set(ctx.meta.enumNames)
-    // A type printed by `pluginTs({ operations: 'inline' })` is the referenced schema itself, not a colliding alias.
-    const hasResponseNameCollision =
-      pluginTs.options?.operations !== 'inline' &&
-      referencedNames.some((name) => {
-        return enumTypeName({ resolver: tsResolver, name, enumOptions, isEnum: enumNames.has(name) }) === type.responseName
-      })
+    const hasResponseNameCollision = referencedNames.some((name) => {
+      return enumTypeName({ resolver: tsResolver, name, enumOptions, isEnum: enumNames.has(name) }) === type.responseName
+    })
     const types = resolveResponseTypes(node, tsResolver).map(([code, typeName]) => {
       const successResponse = successResponses.find((response) => response.statusCode === String(code))
       return [code, hasResponseNameCollision && successResponse ? tsResolver.response.status(node, successResponse.statusCode) : typeName] as const
@@ -84,18 +91,12 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       >
         <File.Import name={['http', 'HttpResponse']} path="msw/http" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw/http" />
-        {groupOperationTypeImports(
-          node,
-          [...(hasResponseNameCollision ? [] : [type.responseName]), ...responseTypeNames, ...(requestName ? [requestName] : [])],
-          {
-            resolver: tsResolver,
-            root,
-            output: pluginTs.options?.output ?? output,
-            group: pluginTs.options?.group,
-          },
-        ).map((imp) => (
-          <File.Import key={imp.path} name={imp.names} path={imp.path} root={mock.file.path} isTypeOnly />
-        ))}
+        <File.Import
+          name={Array.from(new Set([...(hasResponseNameCollision ? [] : [type.responseName]), ...responseTypeNames, ...(requestName ? [requestName] : [])]))}
+          path={type.file.path}
+          root={mock.file.path}
+          isTypeOnly
+        />
         {faker && hasSuccessSchema && <File.Import name={[faker.name]} root={mock.file.path} path={faker.file.path} />}
 
         {types

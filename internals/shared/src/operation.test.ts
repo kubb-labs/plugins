@@ -11,7 +11,6 @@ import {
   getPrimarySuccessResponse,
   getResponseType,
   getSuccessResponses,
-  groupOperationTypeImports,
   isErrorStatusCode,
   isEventStream,
   isSuccessStatusCode,
@@ -420,28 +419,5 @@ describe('resolveDependencyOperationFile', () => {
 
     expect(tsResolver.file).toHaveBeenCalledOnce()
     expect(zodResolver.file).toHaveBeenCalledOnce()
-  })
-})
-
-describe('groupOperationTypeImports', () => {
-  test('groups the imports a resolver returns for each name by file', () => {
-    const node = ast.factory.createOperation({ operationId: 'addPet', method: 'POST', path: '/pet', responses: [] })
-    const typeImports = (_node: ast.OperationNode, name: string) =>
-      name === '{ body: Pet }'
-        ? [ast.factory.createImport({ name: ['Pet'], path: '/models/Pet.ts' })]
-        : name === 'unknown'
-          ? []
-          : [ast.factory.createImport({ name: [name], path: '/models/AddPet.ts' })]
-
-    expect(
-      groupOperationTypeImports(node, ['{ body: Pet }', 'unknown', 'AddPetStatus405', 'AddPetOptions', 'AddPetOptions'], {
-        resolver: { typeImports },
-        root: '/',
-        output: { path: 'models' },
-      }),
-    ).toEqual([
-      { path: '/models/Pet.ts', names: ['Pet'] },
-      { path: '/models/AddPet.ts', names: ['AddPetStatus405', 'AddPetOptions'] },
-    ])
   })
 })

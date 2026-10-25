@@ -1,7 +1,7 @@
 import { ast } from 'kubb/kit'
 import { File } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import type { PrinterTsFactory } from '../printers/printerTs.ts'
+import { printerTs, type PrinterTsFactory } from '../printers/printerTs.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { isInlineConstEnum } from '../utils.ts'
 import { Enum, getEnumNames } from './Enum.tsx'
@@ -16,9 +16,30 @@ type Props = {
   printer: ast.Printer<PrinterTsFactory>
   enum: PluginTs['resolvedOptions']['enum']
   resolver: ResolverTs
+  /**
+   * Marks the source inline, so importing files absorb the type. Set by `pluginTs({ operations: 'inline' })`.
+   */
+  inline?: boolean
 }
 
-export function Type({ name, node, printer, enum: enumOptions, resolver }: Props): KubbReactNode {
+export function Type({ name, node, printer, enum: enumOptions, resolver, inline }: Props): KubbReactNode {
+  if (inline) {
+    // An inline type has no file to declare its enums in, so they print as literal unions.
+    const withoutEnums = ast.transform(node, { schema: (n) => (n.type === 'enum' && n.name ? { ...n, name: undefined } : undefined) })
+    // Property JSDoc would repeat in every file that absorbs the type; the schema files keep theirs.
+    const expression = printerTs({ ...printer.options, name: undefined })
+      .print(withoutEnums)
+      ?.replace(/\/\*\*[\s\S]*?\*\/\s*/g, '')
+    if (!expression) return
+
+    // The declaration is never written, but keeps the file's imports in use.
+    return (
+      <File.Source name={name} isTypeOnly isExportable isIndexable inline={{ expression }}>
+        {printer.print(withoutEnums)}
+      </File.Source>
+    )
+  }
+
   const enumSchemaNodes = ast.collectSync<ast.EnumSchemaNode>(node, {
     schema(n): ast.EnumSchemaNode | undefined {
       const enumNode = ast.narrowSchema(n, ast.schemaTypes.enum)

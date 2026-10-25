@@ -29,11 +29,11 @@ export function addPet<ThrowOnError extends boolean = true>(
       default:
         | {
             contentType: 'application/json'
-            data: Pet
+            data: Omit<NonNullable<Pet>, 'name'>
           }
         | {
             contentType: 'application/xml'
-            data: Pet
+            data: Omit<NonNullable<Pet>, 'name'>
           }
     },
     ThrowOnError
@@ -59,11 +59,11 @@ export function addPet<ThrowOnError extends boolean = true>(
           default:
             | {
                 contentType: 'application/json'
-                data: Pet
+                data: Omit<NonNullable<Pet>, 'name'>
               }
             | {
                 contentType: 'application/xml'
-                data: Pet
+                data: Omit<NonNullable<Pet>, 'name'>
               }
         },
         ThrowOnError

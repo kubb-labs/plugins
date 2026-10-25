@@ -251,7 +251,7 @@ Emits one file per operation with its aliases and aggregates, for example `expor
 :::
 
 :::field{name="'inline'"}
-Emits only the schema types. Clients, query hooks, MSW handlers, Faker mocks, Cypress requests, and MCP handlers reference those directly and print the rest inline, for example `Options<{ body?: Order; path?: never; query?: never; headers?: never }>` and `mutationOptions<Order, ResponseErrorConfig<unknown>, …>`. A response without a body becomes `unknown`, an inline enum becomes a literal union such as `'available' | 'pending' | 'sold'`, and a body the spec does not mark `required` becomes the optional `body?` key. Per-operation `override` options do not change these inline types, which use the plugin-level options.
+Emits only the schema types. Clients, query hooks, MSW handlers, Faker mocks, Cypress requests, and MCP handlers reference those directly and print the rest inline, for example `Options<{ body: Order; path?: never; query?: never; headers?: never }>` and `mutationOptions<Order, ResponseErrorConfig<unknown>, …>`. An enum declared inside an operation becomes a literal union such as `'available' | 'pending' | 'sold'`. Kubb moves each operation type into the files that use it, so this needs a Kubb version with inline sources.
 :::
 
 ::

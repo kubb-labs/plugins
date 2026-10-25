@@ -6,7 +6,7 @@ import { ast, Resolver } from 'kubb/kit'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from 'kubb/kit/testing'
 import { describe, expect, test } from 'vitest'
 import { matchFiles, rawSources, testConfig } from '#mocks'
-import { createInlineResolverTs, resolverTs } from '../resolvers/resolverTs.ts'
+import { resolverTs } from '../resolvers/resolverTs.ts'
 import type { PluginTs } from '../types.ts'
 import { typeGenerator } from './typeGenerator.tsx'
 
@@ -136,9 +136,6 @@ describe("typeGenerator — operations: 'inline'", () => {
   // The adapter resolves each `$ref` target onto `schema`; a documented target must still be referenced by name.
   const ref = (name: string, schema: ast.SchemaNode = { ...objectSchema, name, description: `A ${name}` }, extra: Partial<ast.SchemaNode> = {}) =>
     ast.factory.createSchema({ type: 'ref', name, ref: `#/components/schemas/${name}`, schema, ...extra } as ast.SchemaNode)
-  const resolver = Resolver.merge(resolverTs, createInlineResolverTs({ optionalType: 'questionToken', arrayType: 'array', enum: defaultOptions.enum }), {
-    name: apiResolver.name,
-  })
   const node = ast.factory.createOperation({
     operationId: 'createPet',
     method: 'POST',
@@ -170,49 +167,56 @@ describe("typeGenerator — operations: 'inline'", () => {
       ast.factory.createResponse({ statusCode: '404', schema: ast.factory.createSchema({ type: 'unknown' }), description: 'Not found' }),
       ast.factory.createResponse({ statusCode: '409', schema: ref('PetStatus', enumSchema), description: 'Conflict' }),
       ast.factory.createResponse({ statusCode: '410', schema: ref('Pet', undefined, { nullable: true }), description: 'Gone' }),
-      ast.factory.createResponse({
-        statusCode: '422',
-        schema: ast.factory.createSchema({ type: 'ref', name: 'Promoted', ref: '#/components/schemas/Promoted' }),
-        description: 'Invalid',
-      }),
     ],
   })
 
-  test('emits no operation file', async () => {
+  test('marks every operation source inline, printed without enum declarations or property JSDoc', async () => {
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions, operations: 'inline' }
-    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver })
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: apiResolver })
     const driver = createMockedPluginDriver({ name: 'operations inline' })
 
-    await renderGeneratorOperation(typeGenerator, node, { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver })
+    await renderGeneratorOperation(typeGenerator, node, { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: apiResolver })
 
-    expect(driver.fileManager.files).toHaveLength(0)
-  })
-
-  test('resolves every operation type to the printed schema type', () => {
-    expect(resolver.response.body(node)).toBe('ApiNewPet')
-    expect(resolver.response.status(node, '201')).toBe('ApiPet')
-    expect(resolver.response.status(node, '404')).toBe('unknown')
-    expect(resolver.response.status(node, '409')).toBe('ApiPetStatusKey')
-    expect(resolver.response.status(node, '410')).toBe('ApiPet | null')
-    // A ref without a resolved target is an adapter-promoted enum.
-    expect(resolver.response.status(node, '422')).toBe('ApiPromotedKey')
-    expect(resolver.param.query(node, node.parameters[1]!)).toMatch(/status\?: 'a' \| 'b'/)
-    expect(resolver.response.options(node)).toMatch(/body\?: ApiNewPet;[\s\S]*path: \{\s*petId: string;\s*\};[\s\S]*query\?: \{/)
-    expect(resolver.response.responses(node)).toMatch(/'201':[\s\S]*contentType: 'application\/xml';[\s\S]*?data: ApiPet;/)
-    expect(resolver.response.response(node)).toBe('ApiPet')
-  })
-
-  test('imports the schema types a printed operation type references', () => {
-    const params = { root: '/', output: { path: 'types', mode: 'directory' as const } }
-    const imports = (name: string) => {
-      return [...new Set(resolver.typeImports(node, name, params).map((imp) => `${imp.name} ${imp.path}`))]
-    }
-
-    expect(imports(resolver.response.options(node))).toEqual(['ApiNewPet /types/NewPet.ts'])
-    expect(imports(resolver.response.status(node, '409'))).toEqual(['ApiPetStatusKey /types/PetStatus.ts'])
-    expect(imports('ApiCreatePetOptions')).toEqual([])
-    // The default resolver imports operation types from the operation's file.
-    expect(resolverTs.typeImports(node, 'CreatePetOptions', params).map((imp) => imp.path)).toEqual(['/types/CreatePet.ts'])
+    const [file] = driver.fileManager.files
+    expect(ast.isVirtualFile(file!)).toBe(true)
+    expect(Object.fromEntries(file!.sources.map((source) => [source.name, source.inline?.expression]))).toMatchInlineSnapshot(`
+      {
+        "ApiCreatePetBody": "ApiCreatePetBodyJson",
+        "ApiCreatePetBodyJson": "ApiNewPet",
+        "ApiCreatePetBodyXml": "ApiNewPet",
+        "ApiCreatePetOptions": "{
+        body: ApiCreatePetBody;
+        path: ApiCreatePetPath;
+        query?: ApiCreatePetQuery;
+        headers?: never;
+      }",
+        "ApiCreatePetPath": "{
+        petId: string;
+      }",
+        "ApiCreatePetQuery": "{
+        status?: 'a' | 'b';
+      }",
+        "ApiCreatePetResponse": "ApiCreatePetStatus201",
+        "ApiCreatePetResponses": "{
+        '201': {
+          contentType: 'application/json';
+          data: ApiCreatePetStatus201Json;
+        } | {
+          contentType: 'application/xml';
+          data: ApiCreatePetStatus201Xml;
+        };
+        '404': ApiCreatePetStatus404;
+        '409': ApiCreatePetStatus409;
+        '410': ApiCreatePetStatus410;
+      }",
+        "ApiCreatePetStatus201": "ApiCreatePetStatus201Json",
+        "ApiCreatePetStatus201Json": "ApiPet",
+        "ApiCreatePetStatus201Xml": "ApiPet",
+        "ApiCreatePetStatus404": "unknown",
+        "ApiCreatePetStatus409": "ApiPetStatus",
+        "ApiCreatePetStatus410": "ApiPet | null",
+      }
+    `)
   })
 })
 

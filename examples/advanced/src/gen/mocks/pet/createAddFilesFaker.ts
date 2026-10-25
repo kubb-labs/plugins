@@ -17,12 +17,9 @@ export function createAddFilesStatus405Faker() {
 }
 
 export function createAddFilesBodyFakerJson<
-  TData extends Partial<
-    | {
-        url: string
-      }
-    | Omit<NonNullable<Pet>, 'id'>
-  > = object,
+  TData extends Partial<{
+    url: string
+  }> = object,
 >(data?: TData) {
   const defaultFakeData = {
     url: faker.internet.url(),
@@ -33,23 +30,8 @@ export function createAddFilesBodyFakerJson<
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createAddFilesBodyFakerFormData(
-  data?: Partial<
-    | {
-        url: string
-      }
-    | Omit<NonNullable<Pet>, 'id'>
-  >,
-):
-  | {
-      url: string
-    }
-  | Omit<NonNullable<Pet>, 'id'> {
-  return createPetFaker(data) as
-    | {
-        url: string
-      }
-    | Omit<NonNullable<Pet>, 'id'>
+export function createAddFilesBodyFakerFormData(data?: Partial<Omit<NonNullable<Pet>, 'id'>>): Omit<NonNullable<Pet>, 'id'> {
+  return createPetFaker(data) as Omit<NonNullable<Pet>, 'id'>
 }
 
 export function createAddFilesBodyFaker(

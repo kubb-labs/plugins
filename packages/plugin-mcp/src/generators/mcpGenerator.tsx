@@ -1,5 +1,5 @@
 import { resolveClientOperation, resolveOperationTypes } from '@internals/client'
-import { groupOperationTypeImports, operationFileEntry } from '@internals/shared'
+import { operationFileEntry, resolveDependencyOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
@@ -34,6 +34,14 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     const meta = {
       name: resolver.handler.name(node),
       file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
+      fileTs: resolveDependencyOperationFile({
+        cache: ctx.cache,
+        node,
+        resolver: tsResolver,
+        root,
+        output: types.output ?? output,
+        group: types.group,
+      }),
     } as const
 
     return (
@@ -44,14 +52,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
         banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
-        {groupOperationTypeImports(node, optionsName ? [optionsName] : [], {
-          resolver: tsResolver,
-          root,
-          output: types.output ?? output,
-          group: types.group,
-        }).map((imp) => (
-          <File.Import key={imp.path} name={imp.names} root={meta.file.path} path={imp.path} isTypeOnly />
-        ))}
+        {meta.fileTs && optionsName && <File.Import name={[optionsName]} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
         <File.Import name={['CallToolResult', 'ServerContext']} path={'@modelcontextprotocol/server'} isTypeOnly />
 
         <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />

@@ -1,5 +1,5 @@
 import { resolveOperationTypes } from '@internals/client'
-import { groupOperationTypeImports, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
+import { operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
 import type { ast, GeneratorContext, Group, Output } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from 'kubb/jsx'
@@ -7,7 +7,7 @@ import type { KubbReactNode } from 'kubb/jsx'
 
 type ContractOperation = { name: string; path: string; clientPath: string; clientPathIsFile: boolean }
 
-type HookFileContext = Pick<GeneratorContext, 'config' | 'root' | 'meta' | 'driver' | 'requirePlugin' | 'resolver'>
+type HookFileContext = Pick<GeneratorContext, 'config' | 'root' | 'cache' | 'meta' | 'driver' | 'requirePlugin' | 'resolver'>
 
 type ResolveHookFileOptions = {
   name: string
@@ -26,9 +26,10 @@ type ResolveHookFileOptions = {
 
 type ResolvedHookFile = {
   file: ast.FileNode
+  fileTs: ast.FileNode
   tsResolver: ResolverTs
   contractOp: ContractOperation
-  typeImports: Array<{ path: string; names: Array<string> }>
+  importedTypeNames: Array<string>
   banner: string | null
   footer: string | null
 }
@@ -44,6 +45,14 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
   const tsResolver = types.resolver
 
   const file = resolver.file({ ...operationFileEntry(node, name), root, output, group: group ?? undefined })
+  const fileTs = resolveDependencyOperationFile({
+    cache: ctx.cache,
+    node,
+    resolver: tsResolver,
+    root,
+    output: types.output ?? output,
+    group: types.group,
+  })
   const importedTypeNames = [
     tsResolver.response.options(node),
     ...extraTypeNames,
@@ -53,14 +62,14 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
       includeParams: false,
     }),
   ].filter((typeName): typeName is string => Boolean(typeName))
-  const typeImports = groupOperationTypeImports(node, importedTypeNames, { resolver: tsResolver, root, output: types.output ?? output, group: types.group })
   const fileMeta = { path: file.path, baseName: file.baseName }
 
   return {
     file,
+    fileTs,
     tsResolver,
     contractOp,
-    typeImports,
+    importedTypeNames,
     banner: resolver.default.banner(ctx.meta, { output, config, file: fileMeta }),
     footer: resolver.default.footer(ctx.meta, { output, config, file: fileMeta }),
   }
@@ -79,7 +88,7 @@ type HookFileProps = {
  * The `<File>` shell shared by the TanStack hook generators; renders `children` after the imports.
  */
 export function HookFile({ hook, imports, children }: HookFileProps): KubbReactNode {
-  const { file, contractOp, typeImports, banner, footer } = hook
+  const { file, fileTs, contractOp, importedTypeNames, banner, footer } = hook
 
   return (
     <File baseName={file.baseName} path={file.path} meta={file.meta} banner={banner} footer={footer}>
@@ -92,9 +101,7 @@ export function HookFile({ hook, imports, children }: HookFileProps): KubbReactN
       />
 
       {imports}
-      {typeImports.map((imp) => (
-        <File.Import key={imp.path} name={imp.names} root={file.path} path={imp.path} isTypeOnly />
-      ))}
+      {fileTs && importedTypeNames.length > 0 && <File.Import name={Array.from(new Set(importedTypeNames))} root={file.path} path={fileTs.path} isTypeOnly />}
 
       {children}
     </File>

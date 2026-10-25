@@ -8,11 +8,6 @@ import type { PrinterTsNodes } from './printers/printerTs.ts'
  */
 export type ResolverTs = Resolver & {
   /**
-   * Where an operation type name is imported from. Defaults to the operation's file; `operations: 'inline'` returns the
-   * schema files a printed type references. Override it to take types from elsewhere, for example a shared package.
-   */
-  typeImports(node: ast.OperationNode, name: string, params: { root: string; output: Output; group?: Group }): Array<ast.ImportNode>
-  /**
    * Naming for an operation's parameters, grouped by location.
    */
   param: {
@@ -260,7 +255,7 @@ export type Options = OutputOptions & {
   /**
    * How operation types (`AddPetOptions`, `AddPetStatus200`) are emitted.
    * - `'export'` — one file per operation with its aliases and aggregates.
-   * - `'inline'` — no operation types: clients, hooks, and mocks reference `Pet` and print the rest inline (`{ body?: Pet }`).
+   * - `'inline'` — no operation files: clients, hooks, and mocks reference `Pet` and print the rest inline (`{ body: Pet }`).
    * @default 'export'
    */
   operations?: 'export' | 'inline'

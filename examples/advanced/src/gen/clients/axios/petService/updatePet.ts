@@ -24,11 +24,11 @@ export function updatePet<ThrowOnError extends boolean = true>(
       '200':
         | {
             contentType: 'application/json'
-            data: Pet
+            data: Omit<NonNullable<Pet>, 'name'>
           }
         | {
             contentType: 'application/xml'
-            data: Pet
+            data: Omit<NonNullable<Pet>, 'name'>
           }
       '202': {
         id?: number
@@ -56,11 +56,11 @@ export function updatePet<ThrowOnError extends boolean = true>(
           '200':
             | {
                 contentType: 'application/json'
-                data: Pet
+                data: Omit<NonNullable<Pet>, 'name'>
               }
             | {
                 contentType: 'application/xml'
-                data: Pet
+                data: Omit<NonNullable<Pet>, 'name'>
               }
           '202': {
             id?: number

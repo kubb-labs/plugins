@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { groupOperationTypeImports, operationFileEntry } from '@internals/shared'
+import { operationFileEntry } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import { ast, defineGenerator, Diagnostics } from 'kubb/kit'
 import type { Generator } from 'kubb/kit'
@@ -19,6 +19,7 @@ type OperationData = {
   node: ast.OperationNode
   name: string
   types: OperationTypeNames
+  typeFile: ast.FileNode
   zodFile: ast.FileNode | null
   /**
    * The operation's validator hooks, computed once and shared by the zod imports, the helper import, and the SDK methods.
@@ -52,6 +53,12 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
   const document = ctx.adapter.document as SecurityDocument | null | undefined
 
   function buildOperationData(node: ast.OperationNode): OperationData {
+    const typeFile = types.resolver.file({
+      ...operationFileEntry(node, node.operationId),
+      root,
+      output: types.output ?? output,
+      group: types.group,
+    })
     const zodFile =
       zodResolver && pluginZod?.options
         ? zodResolver.file({
@@ -66,7 +73,7 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
 
     const validatorHooks = zodResolver ? buildValidatorHooks({ node, validator, zodResolver }) : null
 
-    return { node, name: resolver.name(node.operationId), types, zodFile, validatorHooks, security }
+    return { node, name: resolver.name(node.operationId), types, typeFile, zodFile, validatorHooks, security }
   }
 
   return nodes.reduce((acc, operationNode) => {
@@ -148,15 +155,10 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
       const footer = (file: ast.FileNode) => resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
 
       const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
-        const typeNamesByPath = new Map<string, Set<string>>()
-        const typeImportOptions = { resolver: types.resolver, root, output: types.output ?? output, group: types.group }
-        for (const op of ops) {
-          for (const imp of groupOperationTypeImports(op.node, resolveTypeImportNames(op.node, op.types), typeImportOptions)) {
-            const names = typeNamesByPath.get(imp.path) ?? new Set<string>()
-            imp.names.forEach((name) => names.add(name))
-            typeNamesByPath.set(imp.path, names)
-          }
-        }
+        const { namesByPath: typeNamesByPath, filesByPath: typeFilesByPath } = collectImportsByFile(ops, (op) => ({
+          file: op.typeFile,
+          names: resolveTypeImportNames(op.node, op.types),
+        }))
         const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = isValidatorEnabled(validator)
           ? collectImportsByFile(ops, (op) => ({
               file: op.zodFile,
@@ -182,7 +184,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
             {validator === 'zod' && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
 
             {Array.from(typeNamesByPath.entries()).map(([filePath, set]) => (
-              <File.Import key={filePath} name={Array.from(set)} root={file.path} path={filePath} isTypeOnly />
+              <File.Import key={filePath} name={Array.from(set)} root={file.path} path={typeFilesByPath.get(filePath)!.path} isTypeOnly />
             ))}
 
             {isValidatorEnabled(validator) &&

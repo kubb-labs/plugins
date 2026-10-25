@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { groupOperationTypeImports, isEventStream, operationFileEntry } from '@internals/shared'
+import { isEventStream, operationFileEntry, resolveDependencyOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import type { Generator } from 'kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -45,6 +45,14 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
       const meta = {
         name: resolver.name(node.operationId),
         file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
+        fileTypes: resolveDependencyOperationFile({
+          cache: ctx.cache,
+          node,
+          resolver: types.resolver,
+          root,
+          output: types.output ?? output,
+          group: types.group,
+        }),
         fileZod:
           zodResolver && pluginZod?.options
             ? zodResolver.file({
@@ -97,14 +105,9 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
           <File.Import name={clientValueImports} root={clientRoot} path={clientPath} />
           <File.Import name={clientTypeImports} root={clientRoot} path={clientPath} isTypeOnly />
 
-          {groupOperationTypeImports(node, importedTypeNames, {
-            resolver: types.resolver,
-            root,
-            output: types.output ?? output,
-            group: types.group,
-          }).map((imp) => (
-            <File.Import key={imp.path} name={imp.names} root={meta.file.path} path={imp.path} isTypeOnly />
-          ))}
+          {meta.fileTypes && importedTypeNames.length > 0 && (
+            <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTypes.path} isTypeOnly />
+          )}
 
           {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames} root={meta.file.path} path={meta.fileZod.path} />}
           {validatorHooks.headers && <File.Import name={['toHeadersStandardSchema']} root={clientRoot} path={standardSchemaPath} />}

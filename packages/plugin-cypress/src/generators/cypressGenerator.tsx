@@ -1,4 +1,4 @@
-import { groupOperationTypeImports, resolveOperationTypeNames } from '@internals/shared'
+import { resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from 'kubb/jsx'
@@ -27,6 +27,14 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     const meta = {
       name: resolver.name(node.operationId),
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
+      fileTs: resolveDependencyOperationFile({
+        cache: ctx.cache,
+        node,
+        resolver: tsResolver,
+        root,
+        output: pluginTs.options?.output ?? output,
+        group: pluginTs.options?.group,
+      }),
     } as const
 
     return (
@@ -37,14 +45,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         banner={resolver.default.banner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         footer={resolver.default.footer(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
-        {groupOperationTypeImports(node, importedTypeNames, {
-          resolver: tsResolver,
-          root,
-          output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group,
-        }).map((imp) => (
-          <File.Import key={imp.path} name={imp.names} root={meta.file.path} path={imp.path} isTypeOnly />
-        ))}
+        <File.Import name={importedTypeNames} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
         <Request name={meta.name} node={node} resolver={tsResolver} baseURL={baseURL} />
       </File>
     )

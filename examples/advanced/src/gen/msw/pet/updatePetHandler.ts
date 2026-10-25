@@ -52,10 +52,12 @@ export function updatePetHandlerResponse405(data?: unknown) {
 
 export function updatePetHandler(
   data?:
-    | Omit<NonNullable<Pet>, 'name'>
-    | {
-        id?: number
-      }
+    | (
+        | Omit<NonNullable<Pet>, 'name'>
+        | {
+            id?: number
+          }
+      )
     | HttpResponseResolver<Record<string, string>, Omit<NonNullable<Pet>, 'id'>>,
   options?: { baseURL?: string },
 ) {

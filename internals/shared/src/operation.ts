@@ -46,46 +46,6 @@ export function resolveDependencyOperationFile(options: {
   )
 }
 
-export type TypeImportsParams = { root: string; output: Output; group?: Group }
-
-/**
- * A resolver that knows where each operation type name is imported from, see `ResolverTs['typeImports']`.
- */
-type TypeImportsResolver = {
-  typeImports(node: ast.OperationNode, name: string, params: TypeImportsParams): Array<ast.ImportNode>
-}
-
-/**
- * The default `typeImports`: an operation type name is exported from its operation's file.
- */
-export function operationTypeImports(
-  resolver: Pick<Resolver, 'file'>,
-  node: ast.OperationNode,
-  name: string,
-  params: TypeImportsParams,
-): Array<ast.ImportNode> {
-  return [ast.factory.createImport({ name: [name], path: resolver.file({ ...operationFileEntry(node, node.operationId), ...params }).path })]
-}
-
-/**
- * Groups the imports of operation type names by file, so each consumer emits one `File.Import` per file.
- */
-export function groupOperationTypeImports(
-  node: ast.OperationNode,
-  names: Iterable<string>,
-  { resolver, root, output, group }: TypeImportsParams & { resolver: TypeImportsResolver; group?: Group | null },
-): Array<{ path: string; names: Array<string> }> {
-  const groups = new Map<string, Set<string>>()
-  for (const name of new Set(names)) {
-    for (const imp of resolver.typeImports(node, name, { root, output, group: group ?? undefined })) {
-      for (const importName of [imp.name].flat()) {
-        if (typeof importName === 'string') groups.set(imp.path, (groups.get(imp.path) ?? new Set()).add(importName))
-      }
-    }
-  }
-  return Array.from(groups, ([path, names]) => ({ path, names: [...names] }))
-}
-
 export type ContentTypeInfo = {
   contentTypes: string[]
   isMultipleContentTypes: boolean
@@ -440,14 +400,6 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
   return groups
 }
 
-type BuildOperationTypeOptions = {
-  /**
-   * Set by `pluginTs({ operations: 'inline' })`, which prints these types inline: an optional body becomes the `body?` key
-   * and a per-content-type response embeds its schema instead of naming a per-content-type type.
-   */
-  inline?: boolean
-}
-
 /**
  * Builds the combined `{ body, path, query, headers }` options object schema for an operation,
  * referencing the already-resolved body and grouped param names. Shared by `@kubb/plugin-ts`'s
@@ -455,15 +407,9 @@ type BuildOperationTypeOptions = {
  * shape from the same inputs. `primitive: 'object'` is a no-op for the TS printer and tells the Zod
  * printer to emit `z.object(…)` rather than a record.
  */
-export function buildOptionsSchema(
-  node: ast.OperationNode,
-  resolver: OperationTypeNameResolver,
-  { inline = false }: BuildOperationTypeOptions = {},
-): ast.SchemaNode {
+export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver): ast.SchemaNode {
   const { path, query, header } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
-  const bodyName = hasBody ? resolver.response.body(node) : null
-  const bodyRequired = hasBody && (Boolean(node.requestBody?.required) || !inline)
   const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
   const groups = [
     { name: 'path', params: path, resolve: resolver.param.path },
@@ -481,8 +427,8 @@ export function buildOptionsSchema(
     properties: [
       ast.factory.createProperty({
         name: 'body',
-        required: bodyRequired,
-        schema: bodyName ? ast.factory.createSchema({ type: 'ref', name: bodyName, optional: bodyRequired ? undefined : true }) : createNever(),
+        required: hasBody,
+        schema: hasBody ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) }) : createNever(),
       }),
       ...groups.map(({ name, params, resolve }) => {
         const required = params.some((param) => param.required)
@@ -506,7 +452,7 @@ export function buildOptionsSchema(
  * on `result.parsed`, while the standalone `<Name>StatusNNN` alias stays the plain body union that the
  * query hooks and `result.data` use.
  */
-function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode, resolver: ResponseStatusNameResolver, inline: boolean): ast.SchemaNode {
+function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode, resolver: ResponseStatusNameResolver): ast.SchemaNode {
   const statusName = resolver.response.status(node, res.statusCode)
   const variants = (res.content ?? []).filter((entry) => entry.schema)
   if (variants.length <= 1) {
@@ -528,7 +474,7 @@ function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode
           ast.factory.createProperty({
             name: 'data',
             required: true,
-            schema: inline ? variant.schema : ast.factory.createSchema({ type: 'ref', name: variant.name }),
+            schema: ast.factory.createSchema({ type: 'ref', name: variant.name }),
           }),
         ],
       }),
@@ -545,11 +491,7 @@ function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode
  * responses renders as an empty object, which keeps every consumer's import (for example the axios
  * SDK's `RequestResult<XResponses>`) resolvable instead of pointing at a missing export.
  */
-export function buildResponses(
-  node: ast.OperationNode,
-  resolver: ResponseStatusNameResolver,
-  { inline = false }: BuildOperationTypeOptions = {},
-): ast.SchemaNode {
+export function buildResponses(node: ast.OperationNode, resolver: ResponseStatusNameResolver): ast.SchemaNode {
   return ast.factory.createSchema({
     type: 'object',
     primitive: 'object',
@@ -557,7 +499,7 @@ export function buildResponses(
       ast.factory.createProperty({
         name: String(res.statusCode),
         required: true,
-        schema: buildResponseRecordEntry(node, res, resolver, inline),
+        schema: buildResponseRecordEntry(node, res, resolver),
       }),
     ),
   })
