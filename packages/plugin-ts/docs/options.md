@@ -12,6 +12,7 @@ Pass these options to `pluginTs()`. Shared options link to [Shared plugin option
 | [`syntaxType`](#syntaxtype)                                               | Emit object schemas as type aliases or interfaces.                     | `'type'`                                                                              |
 | [`optionalType`](#optionaltype)                                           | How optional properties are written.                                   | `'questionToken'`                                                                     |
 | [`arrayType`](#arraytype)                                                 | `Type[]` or `Array<Type>`.                                             | `'array'`                                                                             |
+| [`operations`](#operations)                                               | Emit per-operation types, or print them inline in consumers.           | `'export'`                                                                            |
 | [`include`](https://kubb.dev/docs/5.x/reference/plugin-options#include)   | Keep only operations and schemas that match.                           | None                                                                                  |
 | [`exclude`](https://kubb.dev/docs/5.x/reference/plugin-options#exclude)   | Skip operations and schemas that match.                                | `[]`                                                                                  |
 | [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override) | Apply different options per pattern.                                   | `[]`                                                                                  |
@@ -232,6 +233,32 @@ Uses `tags: Array<string>`, which reads better for complex elements like `Array<
 :::
 
 ::
+
+### operations
+
+Whether each operation gets its own types file (`AddPetOptions`, `AddPetResponses`, `AddPetStatus200`, `AddPetPath`).
+
+|          |                        |
+| -------- | ---------------------- |
+| Type     | `'export' \| 'inline'` |
+| Required | `false`                |
+| Default  | `'export'`             |
+
+::field-group
+
+:::field{name="'export'"}
+Emits one file per operation with its aliases and aggregates, for example `export type AddPetStatus200 = Pet`.
+:::
+
+:::field{name="'inline'"}
+Emits only the schema types. Clients, query hooks, MSW handlers, Faker mocks, Cypress requests, and MCP handlers reference those directly and print the rest inline, for example `Options<{ body: Order; path?: never; query?: never; headers?: never }>` and `mutationOptions<Order, ResponseErrorConfig<unknown>, …>`. An enum declared inside an operation becomes a literal union such as `'available' | 'pending' | 'sold'`. Kubb moves each operation type into the files that use it, so this needs a Kubb version with inline sources.
+:::
+
+::
+
+```ts [kubb.config.ts]
+pluginTs({ operations: 'inline' })
+```
 
 ### resolver
 

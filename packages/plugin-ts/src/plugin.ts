@@ -50,6 +50,7 @@ export const pluginTs = defineExtension<PluginTs>({
       optionalType = 'questionToken',
       arrayType = 'array',
       syntaxType = 'type',
+      operations = 'export',
       printer,
       resolver: userResolver,
       macros: userMacros,
@@ -78,6 +79,7 @@ export const pluginTs = defineExtension<PluginTs>({
       arrayType,
       enum: resolvedEnum,
       syntaxType,
+      operations,
       printer,
     }
   },

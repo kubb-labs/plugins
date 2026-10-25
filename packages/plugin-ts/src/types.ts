@@ -253,6 +253,13 @@ export type Options = OutputOptions & {
    */
   arrayType?: 'generic' | 'array'
   /**
+   * How operation types (`AddPetOptions`, `AddPetStatus200`) are emitted.
+   * - `'export'` — one file per operation with its aliases and aggregates.
+   * - `'inline'` — no operation files: clients, hooks, and mocks reference `Pet` and print the rest inline (`{ body: Pet }`).
+   * @default 'export'
+   */
+  operations?: 'export' | 'inline'
+  /**
    * Override how names and file paths are built for generated symbols.
    * Methods you omit fall back to the default `resolverTs`. `this` is bound to the
    * full resolver, so `this.default.name(name)` delegates to the built-in implementation.
@@ -319,6 +326,7 @@ export type ResolvedOptions = {
   optionalType: NonNullable<Options['optionalType']>
   arrayType: NonNullable<Options['arrayType']>
   syntaxType: NonNullable<Options['syntaxType']>
+  operations: NonNullable<Options['operations']>
   printer: Options['printer']
 }
 

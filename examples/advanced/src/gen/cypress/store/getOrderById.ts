@@ -1,8 +1,20 @@
-import type { GetOrderByIdOptions, GetOrderByIdResponse } from '../../models/ts/store/GetOrderById'
+import type { Order } from '../../models/ts/Order'
 
-export function getOrderById({ path }: GetOrderByIdOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetOrderByIdResponse> {
+export function getOrderById(
+  {
+    path,
+  }: {
+    body?: never
+    path: {
+      orderId: number
+    }
+    query?: never
+    headers?: never
+  },
+  options: Partial<Cypress.RequestOptions> = {},
+): Cypress.Chainable<Order> {
   return cy
-    .request<GetOrderByIdResponse>({
+    .request<Order>({
       method: 'GET',
       url: `/store/order/${path.orderId}`,
       ...options,

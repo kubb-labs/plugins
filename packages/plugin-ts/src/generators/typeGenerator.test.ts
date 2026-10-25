@@ -15,6 +15,7 @@ const defaultOptions: PluginTs['resolvedOptions'] = {
   optionalType: 'questionToken',
   arrayType: 'array',
   syntaxType: 'type',
+  operations: 'export',
   output: { path: '.', mode: 'directory' },
   exclude: [],
   include: undefined,
@@ -128,6 +129,94 @@ describe('typeGenerator — custom resolver', () => {
     expect(source).toContain("import type { ApiPet } from './Pet'")
     expect(source).toContain("import type { ApiErrorResponse } from './ErrorResponse'")
     expect(source).toContain("import type { ApiNewPet } from './NewPet'")
+  })
+})
+
+describe("typeGenerator — operations: 'inline'", () => {
+  // The adapter resolves each `$ref` target onto `schema`; a documented target must still be referenced by name.
+  const ref = (name: string, schema: ast.SchemaNode = { ...objectSchema, name, description: `A ${name}` }, extra: Partial<ast.SchemaNode> = {}) =>
+    ast.factory.createSchema({ type: 'ref', name, ref: `#/components/schemas/${name}`, schema, ...extra } as ast.SchemaNode)
+  const node = ast.factory.createOperation({
+    operationId: 'createPet',
+    method: 'POST',
+    path: '/pets/{petId}',
+    tags: ['pets'],
+    parameters: [
+      ast.factory.createParameter({ name: 'petId', in: 'path', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+      ast.factory.createParameter({
+        name: 'status',
+        in: 'query',
+        schema: ast.factory.createSchema({ type: 'enum', name: 'createPetStatus', primitive: 'string', enumValues: ['a', 'b'] }),
+      }),
+    ],
+    requestBody: {
+      content: [
+        ast.factory.createContent({ contentType: 'application/json', schema: ref('NewPet') }),
+        ast.factory.createContent({ contentType: 'application/xml', schema: ref('NewPet') }),
+      ],
+    },
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '201',
+        content: [
+          ast.factory.createContent({ contentType: 'application/json', schema: ref('Pet') }),
+          ast.factory.createContent({ contentType: 'application/xml', schema: ref('Pet') }),
+        ],
+        description: 'Created',
+      }),
+      ast.factory.createResponse({ statusCode: '404', schema: ast.factory.createSchema({ type: 'unknown' }), description: 'Not found' }),
+      ast.factory.createResponse({ statusCode: '409', schema: ref('PetStatus', enumSchema), description: 'Conflict' }),
+      ast.factory.createResponse({ statusCode: '410', schema: ref('Pet', undefined, { nullable: true }), description: 'Gone' }),
+    ],
+  })
+
+  test('marks every operation source inline, printed without enum declarations or property JSDoc', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, operations: 'inline' }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: apiResolver })
+    const driver = createMockedPluginDriver({ name: 'operations inline' })
+
+    await renderGeneratorOperation(typeGenerator, node, { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: apiResolver })
+
+    const [file] = driver.fileManager.files
+    expect(ast.isVirtualFile(file!)).toBe(true)
+    expect(Object.fromEntries(file!.sources.map((source) => [source.name, source.inline?.expression]))).toMatchInlineSnapshot(`
+      {
+        "ApiCreatePetBody": "ApiCreatePetBodyJson",
+        "ApiCreatePetBodyJson": "ApiNewPet",
+        "ApiCreatePetBodyXml": "ApiNewPet",
+        "ApiCreatePetOptions": "{
+        body: ApiCreatePetBody;
+        path: ApiCreatePetPath;
+        query?: ApiCreatePetQuery;
+        headers?: never;
+      }",
+        "ApiCreatePetPath": "{
+        petId: string;
+      }",
+        "ApiCreatePetQuery": "{
+        status?: 'a' | 'b';
+      }",
+        "ApiCreatePetResponse": "ApiCreatePetStatus201",
+        "ApiCreatePetResponses": "{
+        '201': {
+          contentType: 'application/json';
+          data: ApiCreatePetStatus201Json;
+        } | {
+          contentType: 'application/xml';
+          data: ApiCreatePetStatus201Xml;
+        };
+        '404': ApiCreatePetStatus404;
+        '409': ApiCreatePetStatus409;
+        '410': ApiCreatePetStatus410;
+      }",
+        "ApiCreatePetStatus201": "ApiCreatePetStatus201Json",
+        "ApiCreatePetStatus201Json": "ApiPet",
+        "ApiCreatePetStatus201Xml": "ApiPet",
+        "ApiCreatePetStatus404": "unknown",
+        "ApiCreatePetStatus409": "ApiPetStatus",
+        "ApiCreatePetStatus410": "ApiPet | null",
+      }
+    `)
   })
 })
 

@@ -1,12 +1,12 @@
-import type { AddFilesBody, AddFilesBodyFormData, AddFilesBodyJson, AddFilesResponse, AddFilesStatus200 } from '../../models/ts/pet/AddFiles'
+import type { Pet } from '../../models/ts/Pet'
 import { createPetFaker } from '../createPetFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description successful operation
  */
-export function createAddFilesStatus200Faker(data?: Partial<AddFilesStatus200>): AddFilesStatus200 {
-  return createPetFaker(data) as AddFilesStatus200
+export function createAddFilesStatus200Faker(data?: Partial<Omit<NonNullable<Pet>, 'name'>>): Omit<NonNullable<Pet>, 'name'> {
+  return createPetFaker(data) as Omit<NonNullable<Pet>, 'name'>
 }
 
 /**
@@ -16,7 +16,11 @@ export function createAddFilesStatus405Faker() {
   return undefined
 }
 
-export function createAddFilesBodyFakerJson<TData extends Partial<AddFilesBodyJson> = object>(data?: TData) {
+export function createAddFilesBodyFakerJson<
+  TData extends Partial<{
+    url: string
+  }> = object,
+>(data?: TData) {
   const defaultFakeData = {
     url: faker.internet.url(),
   }
@@ -26,14 +30,29 @@ export function createAddFilesBodyFakerJson<TData extends Partial<AddFilesBodyJs
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createAddFilesBodyFakerFormData(data?: Partial<AddFilesBodyFormData>): AddFilesBodyFormData {
-  return createPetFaker(data) as AddFilesBodyFormData
+export function createAddFilesBodyFakerFormData(data?: Partial<Omit<NonNullable<Pet>, 'id'>>): Omit<NonNullable<Pet>, 'id'> {
+  return createPetFaker(data) as Omit<NonNullable<Pet>, 'id'>
 }
 
-export function createAddFilesBodyFaker(data?: Partial<AddFilesBody>): AddFilesBody {
-  return (data ?? faker.helpers.arrayElement([createAddFilesBodyFakerJson(), createAddFilesBodyFakerFormData()])) as AddFilesBody
+export function createAddFilesBodyFaker(
+  data?: Partial<
+    | {
+        url: string
+      }
+    | Omit<NonNullable<Pet>, 'id'>
+  >,
+):
+  | {
+      url: string
+    }
+  | Omit<NonNullable<Pet>, 'id'> {
+  return (data ?? faker.helpers.arrayElement([createAddFilesBodyFakerJson(), createAddFilesBodyFakerFormData()])) as
+    | {
+        url: string
+      }
+    | Omit<NonNullable<Pet>, 'id'>
 }
 
-export function createAddFilesResponseFaker(data?: Partial<AddFilesResponse>): AddFilesResponse {
-  return (data ?? faker.helpers.arrayElement([createAddFilesStatus200Faker(), createAddFilesStatus405Faker()])) as AddFilesResponse
+export function createAddFilesResponseFaker(data?: Partial<Omit<NonNullable<Pet>, 'name'>>): Omit<NonNullable<Pet>, 'name'> {
+  return (data ?? faker.helpers.arrayElement([createAddFilesStatus200Faker(), createAddFilesStatus405Faker()])) as Omit<NonNullable<Pet>, 'name'>
 }

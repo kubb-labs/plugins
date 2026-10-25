@@ -1,5 +1,5 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
-import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../../../models/ts/pet/FindPetsByStatus'
+import type { Pet } from '../../../models/ts/Pet'
 import { client, withUnwrap } from '../../../.kubb/client'
 import { findPetsByStatusResponseSchema, findPetsByStatusErrorSchema } from '../../../zod/pet/findPetsByStatusSchema'
 
@@ -9,8 +9,34 @@ import { findPetsByStatusResponseSchema, findPetsByStatusErrorSchema } from '../
  * {@link /pet/findByStatus/:step_id}
  */
 export function findPetsByStatus<ThrowOnError extends boolean = true>(
-  options: Options<FindPetsByStatusOptions, ThrowOnError>,
-): Unwrappable<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path: {
+        step_id: string
+      }
+      query?: never
+      headers?: never
+    },
+    ThrowOnError
+  >,
+): Unwrappable<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Array<Pet>
+          }
+        | {
+            contentType: 'application/xml'
+            data: Array<Pet>
+          }
+      '400': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: request = client, ...config } = options
 
   return withUnwrap(
@@ -21,6 +47,22 @@ export function findPetsByStatus<ThrowOnError extends boolean = true>(
       validator: { response: findPetsByStatusResponseSchema, error: findPetsByStatusErrorSchema },
       ...config,
       throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>,
+    }) as Promise<
+      RequestResult<
+        {
+          '200':
+            | {
+                contentType: 'application/json'
+                data: Array<Pet>
+              }
+            | {
+                contentType: 'application/xml'
+                data: Array<Pet>
+              }
+          '400': unknown
+        },
+        ThrowOnError
+      >
+    >,
   )
 }

@@ -1,5 +1,6 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
-import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from '../../../models/ts/pet/FindPetsByTags'
+import type { FindPetsByTagsXEXAMPLEKey } from '../../../models/ts/FindPetsByTagsXEXAMPLE'
+import type { Pet } from '../../../models/ts/Pet'
 import { client, withUnwrap } from '../../../.kubb/client'
 import { findPetsByTagsResponseSchema, findPetsByTagsErrorSchema } from '../../../zod/pet/findPetsByTagsSchema'
 
@@ -9,8 +10,38 @@ import { findPetsByTagsResponseSchema, findPetsByTagsErrorSchema } from '../../.
  * {@link /pet/findByTags}
  */
 export function findPetsByTags<ThrowOnError extends boolean = true>(
-  options: Options<FindPetsByTagsOptions, ThrowOnError>,
-): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
+  options: Options<
+    {
+      body?: never
+      path?: never
+      query?: {
+        tags?: Array<string>
+        page?: string
+        pageSize?: number
+      }
+      headers: {
+        'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+      }
+    },
+    ThrowOnError
+  >,
+): Unwrappable<
+  RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Array<Pet>
+          }
+        | {
+            contentType: 'application/xml'
+            data: Array<Pet>
+          }
+      '400': unknown
+    },
+    ThrowOnError
+  >
+> {
   const { client: request = client, ...config } = options
 
   return withUnwrap(
@@ -22,6 +53,22 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
       validator: { response: findPetsByTagsResponseSchema, error: findPetsByTagsErrorSchema },
       ...config,
       throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>,
+    }) as Promise<
+      RequestResult<
+        {
+          '200':
+            | {
+                contentType: 'application/json'
+                data: Array<Pet>
+              }
+            | {
+                contentType: 'application/xml'
+                data: Array<Pet>
+              }
+          '400': unknown
+        },
+        ThrowOnError
+      >
+    >,
   )
 }

@@ -1,8 +1,18 @@
-import type { PlaceOrderOptions, PlaceOrderResponse } from '../../models/ts/store/PlaceOrder'
+import type { Order } from '../../models/ts/Order'
 
-export function placeOrder({ body }: PlaceOrderOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderResponse> {
+export function placeOrder(
+  {
+    body,
+  }: {
+    body: Order
+    path?: never
+    query?: never
+    headers?: never
+  },
+  options: Partial<Cypress.RequestOptions> = {},
+): Cypress.Chainable<Order> {
   return cy
-    .request<PlaceOrderResponse>({
+    .request<Order>({
       method: 'POST',
       url: `/store/order`,
       body,

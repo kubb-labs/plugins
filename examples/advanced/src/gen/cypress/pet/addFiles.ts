@@ -1,8 +1,22 @@
-import type { AddFilesOptions, AddFilesResponse } from '../../models/ts/pet/AddFiles'
+import type { Pet } from '../../models/ts/Pet'
 
-export function addFiles({ body }: AddFilesOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<AddFilesResponse> {
+export function addFiles(
+  {
+    body,
+  }: {
+    body:
+      | {
+          url: string
+        }
+      | Omit<NonNullable<Pet>, 'id'>
+    path?: never
+    query?: never
+    headers?: never
+  },
+  options: Partial<Cypress.RequestOptions> = {},
+): Cypress.Chainable<Omit<NonNullable<Pet>, 'name'>> {
   return cy
-    .request<AddFilesResponse>({
+    .request<Omit<NonNullable<Pet>, 'name'>>({
       method: 'POST',
       url: `/pet/files`,
       body,

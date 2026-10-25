@@ -1,8 +1,14 @@
-import type { UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405, UpdatePetBody } from '../../models/ts/pet/UpdatePet'
+import type { Pet } from '../../models/ts/Pet'
 import type { HttpResponseResolver } from 'msw/http'
 import { http, HttpResponse } from 'msw/http'
 
-export function updatePetHandlerResponse200(data: UpdatePetResponse) {
+export function updatePetHandlerResponse200(
+  data:
+    | Omit<NonNullable<Pet>, 'name'>
+    | {
+        id?: number
+      },
+) {
   return new HttpResponse(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -11,7 +17,13 @@ export function updatePetHandlerResponse200(data: UpdatePetResponse) {
   })
 }
 
-export function updatePetHandlerResponse202(data: UpdatePetResponse) {
+export function updatePetHandlerResponse202(
+  data:
+    | Omit<NonNullable<Pet>, 'name'>
+    | {
+        id?: number
+      },
+) {
   return new HttpResponse(JSON.stringify(data), {
     status: 202,
     headers: {
@@ -20,26 +32,36 @@ export function updatePetHandlerResponse202(data: UpdatePetResponse) {
   })
 }
 
-export function updatePetHandlerResponse400(data?: UpdatePetStatus400) {
+export function updatePetHandlerResponse400(data?: unknown) {
   return new HttpResponse(JSON.stringify(data), {
     status: 400,
   })
 }
 
-export function updatePetHandlerResponse404(data?: UpdatePetStatus404) {
+export function updatePetHandlerResponse404(data?: unknown) {
   return new HttpResponse(JSON.stringify(data), {
     status: 404,
   })
 }
 
-export function updatePetHandlerResponse405(data?: UpdatePetStatus405) {
+export function updatePetHandlerResponse405(data?: unknown) {
   return new HttpResponse(JSON.stringify(data), {
     status: 405,
   })
 }
 
-export function updatePetHandler(data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, UpdatePetBody>, options?: { baseURL?: string }) {
-  return http.put<Record<string, string>, UpdatePetBody>(`${options?.baseURL ?? ''}/pet`, function handler(info) {
+export function updatePetHandler(
+  data?:
+    | (
+        | Omit<NonNullable<Pet>, 'name'>
+        | {
+            id?: number
+          }
+      )
+    | HttpResponseResolver<Record<string, string>, Omit<NonNullable<Pet>, 'id'>>,
+  options?: { baseURL?: string },
+) {
+  return http.put<Record<string, string>, Omit<NonNullable<Pet>, 'id'>>(`${options?.baseURL ?? ''}/pet`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new HttpResponse(JSON.stringify(data), {

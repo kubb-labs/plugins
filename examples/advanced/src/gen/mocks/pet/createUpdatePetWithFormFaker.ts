@@ -1,7 +1,10 @@
-import type { UpdatePetWithFormPath, UpdatePetWithFormQuery } from '../../models/ts/pet/UpdatePetWithForm'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createUpdatePetWithFormPathFaker<TData extends Partial<UpdatePetWithFormPath> = object>(data?: TData) {
+export function createUpdatePetWithFormPathFaker<
+  TData extends Partial<{
+    petId: number
+  }> = object,
+>(data?: TData) {
   const defaultFakeData = {
     petId: faker.number.int(),
   }
@@ -11,7 +14,12 @@ export function createUpdatePetWithFormPathFaker<TData extends Partial<UpdatePet
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createUpdatePetWithFormQueryFaker<TData extends Partial<UpdatePetWithFormQuery> = object>(data?: TData) {
+export function createUpdatePetWithFormQueryFaker<
+  TData extends Partial<{
+    name?: string
+    status?: string
+  }> = object,
+>(data?: TData) {
   const defaultFakeData = {
     name: faker.string.alpha(),
     status: faker.string.alpha(),

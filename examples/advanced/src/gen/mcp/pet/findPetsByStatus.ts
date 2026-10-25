@@ -1,4 +1,3 @@
-import type { FindPetsByStatusOptions } from '../../models/ts/pet/FindPetsByStatus'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { findPetsByStatus } from '../../clients/axios/petService/findPetsByStatus'
 
@@ -7,7 +6,19 @@ import { findPetsByStatus } from '../../clients/axios/petService/findPetsByStatu
  * @summary Finds Pets by status
  * {@link /pet/findByStatus/:step_id}
  */
-export async function findPetsByStatusHandler({ path }: FindPetsByStatusOptions, ctx: ServerContext): Promise<CallToolResult> {
+export async function findPetsByStatusHandler(
+  {
+    path,
+  }: {
+    body?: never
+    path: {
+      step_id: string
+    }
+    query?: never
+    headers?: never
+  },
+  ctx: ServerContext,
+): Promise<CallToolResult> {
   const res = await findPetsByStatus({ path, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

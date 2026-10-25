@@ -1,7 +1,7 @@
-import type { StreamPetEventsResponse } from '../../models/ts/stream/StreamPetEvents'
+import type { PetEvent } from '../../models/ts/PetEvent'
 import { http, HttpResponse } from 'msw/http'
 
-export function streamPetEventsHandlerResponse200(data: StreamPetEventsResponse) {
+export function streamPetEventsHandlerResponse200(data: PetEvent) {
   return new HttpResponse(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -11,7 +11,7 @@ export function streamPetEventsHandlerResponse200(data: StreamPetEventsResponse)
 }
 
 export function streamPetEventsHandler(
-  data?: StreamPetEventsResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  data?: PetEvent | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
   return http.get(`${options?.baseURL ?? ''}/pet/:petId/events`, function handler(info) {

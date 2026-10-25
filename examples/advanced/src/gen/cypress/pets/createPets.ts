@@ -1,11 +1,32 @@
-import type { CreatePetsOptions, CreatePetsResponse } from '../../models/ts/pets/CreatePets'
+import type { CreatePetsBoolParamKey } from '../../models/ts/CreatePetsBoolParam'
+import type { CreatePetsXEXAMPLEKey } from '../../models/ts/CreatePetsXEXAMPLE'
 
 export function createPets(
-  { path, query, body, headers }: CreatePetsOptions,
+  {
+    path,
+    query,
+    body,
+    headers,
+  }: {
+    body: {
+      name: string
+      tag: string
+    }
+    path: {
+      uuid: string
+    }
+    query?: {
+      bool_param?: CreatePetsBoolParamKey
+      offset?: number
+    }
+    headers: {
+      'X-EXAMPLE': CreatePetsXEXAMPLEKey
+    }
+  },
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<CreatePetsResponse> {
+): Cypress.Chainable<unknown> {
   return cy
-    .request<CreatePetsResponse>({
+    .request<unknown>({
       method: 'POST',
       url: `/pets/${path.uuid}`,
       qs: query,
