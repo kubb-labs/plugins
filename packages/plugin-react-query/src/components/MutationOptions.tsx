@@ -42,13 +42,13 @@ export function MutationOptions({ name, clientName, node, tsResolver, mutationKe
   const configParamsNode = buildMutationConfigParamsNode(node)
   const paramsSignature = declarationPrinter.print(configParamsNode) ?? ''
 
-  const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver })
+  const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver, withContentType: true })
   const hasMutationParams = groupedParam !== null
 
   const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const TRequest = hasMutationParams ? tsResolver.response.options(node) : 'undefined'
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : '_'
-  const mutationFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false }), { returnType })
+  const mutationFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false, withContentType: true, returnType }), { returnType })
 
   return (
     <File.Source name={name} isExportable isIndexable>

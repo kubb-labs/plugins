@@ -10,19 +10,32 @@ import { addFiles } from '../../clients/axios/petService/addFiles'
 export async function addFilesHandler(
   {
     body,
-  }: {
-    body:
-      | {
+  }: Pick<
+    | {
+        body: {
           url: string
         }
-      | Omit<NonNullable<Pet>, 'id'>
-    path?: never
-    query?: never
-    headers?: never
-  },
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'multipart/form-data'
+        }
+      },
+    'body'
+  >,
   ctx: ServerContext,
 ): Promise<CallToolResult> {
-  const res = await addFiles({ body, signal: ctx.mcpReq.signal, throwOnError: true })
+  const res = await addFiles({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof addFiles<true>>[0])
 
   return {
     content: [

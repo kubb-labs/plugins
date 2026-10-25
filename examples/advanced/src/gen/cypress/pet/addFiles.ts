@@ -3,16 +3,29 @@ import type { Pet } from '../../models/ts/Pet'
 export function addFiles(
   {
     body,
-  }: {
-    body:
-      | {
+  }: Pick<
+    | {
+        body: {
           url: string
         }
-      | Omit<NonNullable<Pet>, 'id'>
-    path?: never
-    query?: never
-    headers?: never
-  },
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'multipart/form-data'
+        }
+      },
+    'body'
+  >,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<Omit<NonNullable<Pet>, 'name'>> {
   return cy

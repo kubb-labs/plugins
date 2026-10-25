@@ -37,12 +37,34 @@ export type UpdatePetBodyFormUrlEncoded = Pet
 
 export type UpdatePetBody = UpdatePetBodyJson | UpdatePetBodyXml | UpdatePetBodyFormUrlEncoded
 
-export type UpdatePetOptions = {
-  body: UpdatePetBody
-  path?: never
-  query?: never
-  headers?: never
-}
+export type UpdatePetOptions =
+  | {
+      body: UpdatePetBodyJson
+      path?: never
+      query?: never
+      headers?: never
+      contentType?: {
+        request: 'application/json'
+      }
+    }
+  | {
+      body: UpdatePetBodyXml
+      path?: never
+      query?: never
+      headers?: never
+      contentType: {
+        request: 'application/xml'
+      }
+    }
+  | {
+      body: UpdatePetBodyFormUrlEncoded
+      path?: never
+      query?: never
+      headers?: never
+      contentType: {
+        request: 'application/x-www-form-urlencoded'
+      }
+    }
 
 export type UpdatePetResponses = {
   '200':

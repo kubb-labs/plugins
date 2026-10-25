@@ -3,12 +3,36 @@ import type { Pet } from '../../models/ts/Pet'
 export function updatePet(
   {
     body,
-  }: {
-    body: Omit<NonNullable<Pet>, 'id'>
-    path?: never
-    query?: never
-    headers?: never
-  },
+  }: Pick<
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/xml'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/x-www-form-urlencoded'
+        }
+      },
+    'body'
+  >,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<
   | Omit<NonNullable<Pet>, 'name'>

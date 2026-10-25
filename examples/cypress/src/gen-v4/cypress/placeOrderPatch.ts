@@ -5,7 +5,10 @@
 
 import type { PlaceOrderPatchOptions, PlaceOrderPatchResponse } from '../models'
 
-export function placeOrderPatch({ body }: PlaceOrderPatchOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderPatchResponse> {
+export function placeOrderPatch(
+  { body }: Pick<PlaceOrderPatchOptions, 'body'>,
+  options: Partial<Cypress.RequestOptions> = {},
+): Cypress.Chainable<PlaceOrderPatchResponse> {
   return cy
     .request<PlaceOrderPatchResponse>({
       method: 'PATCH',

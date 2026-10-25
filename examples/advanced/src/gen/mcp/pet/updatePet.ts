@@ -10,15 +10,39 @@ import { updatePet } from '../../clients/axios/petService/updatePet'
 export async function updatePetHandler(
   {
     body,
-  }: {
-    body: Omit<NonNullable<Pet>, 'id'>
-    path?: never
-    query?: never
-    headers?: never
-  },
+  }: Pick<
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/xml'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/x-www-form-urlencoded'
+        }
+      },
+    'body'
+  >,
   ctx: ServerContext,
 ): Promise<CallToolResult> {
-  const res = await updatePet({ body, signal: ctx.mcpReq.signal, throwOnError: true })
+  const res = await updatePet({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof updatePet<true>>[0])
 
   return {
     content: [

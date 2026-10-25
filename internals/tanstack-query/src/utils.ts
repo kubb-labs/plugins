@@ -3,6 +3,7 @@ import {
   getPrimarySuccessResponse,
   getRequestGroupOptionality,
   getRequestGroups,
+  hasRequestContentTypeChoice,
   resolveErrorNames,
   resolveSuccessNames,
 } from '@internals/shared'
@@ -54,9 +55,14 @@ export function buildGroupedRequestParam(
     resolver: ResolverTs
     keys?: ReadonlyArray<RequestGroupKey>
     memberTypeWrapper?: (type: string) => string
+    /**
+     * Binds the variables whole, for a body offered in several media types. Only mutations set it:
+     * destructuring would split the `body` / `contentType` pairing and drop the chosen media type.
+     */
+    withContentType?: boolean
   },
 ): FunctionParameterNode | null {
-  const { resolver, keys = requestGroupOrder, memberTypeWrapper } = options
+  const { resolver, keys = requestGroupOrder, memberTypeWrapper, withContentType = false } = options
   const { groups, hasRequiredPath, hasRequiredQuery, hasRequiredHeader } = getRequestGroupOptionality(node)
   const names = keys.filter((key) => groups[key])
 
@@ -78,6 +84,10 @@ export function buildGroupedRequestParam(
   // Drop the groups this binding never destructures (the query key omits `headers`), so a group
   // that is required elsewhere does not leak into a binding that does not carry it.
   const optionsName = resolver.response.options(node)
+  if (withContentType && hasRequestContentTypeChoice(node)) {
+    return createFunctionParameter({ name: 'variables', type: optionsName, optional: false })
+  }
+
   const omittedKeys = requestGroupOrder.filter((key) => !keys.includes(key))
   const optionsType = omittedKeys.length > 0 ? `Omit<${optionsName}, ${omittedKeys.map((key) => `'${key}'`).join(' | ')}>` : optionsName
 
@@ -142,17 +152,25 @@ export function buildQueryOptionsParams(
  * // getPetById({ path, ...config, signal: config.signal ?? signal, throwOnError: true })
  * ```
  */
-export function buildClientCall(node: ast.OperationNode, options: { clientName: string; signal?: boolean; unwrapName?: (name: string) => string }): string {
-  const { clientName, signal = false, unwrapName } = options
+export function buildClientCall(
+  node: ast.OperationNode,
+  options: { clientName: string; signal?: boolean; unwrapName?: (name: string) => string; withContentType?: boolean; returnType?: 'full' | 'data' | 'plain' },
+): string {
+  const { clientName, signal = false, unwrapName, withContentType = false, returnType = 'full' } = options
   const { groups } = getRequestGroupOptionality(node)
   const names = requestGroupOrder.filter((key) => groups[key])
 
   const args = [
     '...config',
-    ...names.map((name) => (unwrapName ? `${name}: ${unwrapName(name)}` : name)),
+    ...(withContentType && hasRequestContentTypeChoice(node) ? ['...variables'] : names.map((name) => (unwrapName ? `${name}: ${unwrapName(name)}` : name))),
     signal ? 'signal: config.signal ?? signal' : null,
     'throwOnError: true',
   ].filter((part): part is string => part !== null)
+
+  // `config` types the media type more loosely than the variables pair it with the body, so the
+  // spread no longer proves the pairing to the compiler.
+  if (withContentType && hasRequestContentTypeChoice(node))
+    return `${clientName}({ ${args.join(', ')} } as Parameters<typeof ${clientName}${returnType === 'plain' ? '' : '<true>'}>[0])`
 
   return `${clientName}({ ${args.join(', ')} })`
 }

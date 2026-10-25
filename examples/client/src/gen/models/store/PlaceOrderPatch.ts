@@ -17,12 +17,34 @@ export type PlaceOrderPatchBodyFormUrlEncoded = Order | undefined
 
 export type PlaceOrderPatchBody = PlaceOrderPatchBodyJson | PlaceOrderPatchBodyXml | PlaceOrderPatchBodyFormUrlEncoded
 
-export type PlaceOrderPatchOptions = {
-  body: PlaceOrderPatchBody
-  path?: never
-  query?: never
-  headers?: never
-}
+export type PlaceOrderPatchOptions =
+  | {
+      body: PlaceOrderPatchBodyJson
+      path?: never
+      query?: never
+      headers?: never
+      contentType?: {
+        request: 'application/json'
+      }
+    }
+  | {
+      body: PlaceOrderPatchBodyXml
+      path?: never
+      query?: never
+      headers?: never
+      contentType: {
+        request: 'application/xml'
+      }
+    }
+  | {
+      body: PlaceOrderPatchBodyFormUrlEncoded
+      path?: never
+      query?: never
+      headers?: never
+      contentType: {
+        request: 'application/x-www-form-urlencoded'
+      }
+    }
 
 export type PlaceOrderPatchResponses = {
   '200': PlaceOrderPatchStatus200

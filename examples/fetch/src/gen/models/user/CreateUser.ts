@@ -31,12 +31,34 @@ export type CreateUserBodyFormUrlEncoded = User | undefined
 
 export type CreateUserBody = CreateUserBodyJson | CreateUserBodyXml | CreateUserBodyFormUrlEncoded
 
-export type CreateUserOptions = {
-  body: CreateUserBody
-  path?: never
-  query?: never
-  headers?: never
-}
+export type CreateUserOptions =
+  | {
+      body: CreateUserBodyJson
+      path?: never
+      query?: never
+      headers?: never
+      contentType?: {
+        request: 'application/json'
+      }
+    }
+  | {
+      body: CreateUserBodyXml
+      path?: never
+      query?: never
+      headers?: never
+      contentType: {
+        request: 'application/xml'
+      }
+    }
+  | {
+      body: CreateUserBodyFormUrlEncoded
+      path?: never
+      query?: never
+      headers?: never
+      contentType: {
+        request: 'application/x-www-form-urlencoded'
+      }
+    }
 
 export type CreateUserResponses = {
   default:

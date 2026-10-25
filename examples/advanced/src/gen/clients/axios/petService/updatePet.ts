@@ -10,12 +10,33 @@ import { updatePetResponseSchema, updatePetErrorSchema } from '../../../zod/pet/
  */
 export function updatePet<ThrowOnError extends boolean = true>(
   options: Options<
-    {
-      body: Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/xml'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/x-www-form-urlencoded'
+        }
+      },
     ThrowOnError
   >,
 ): Unwrappable<
@@ -43,7 +64,37 @@ export function updatePet<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request({
+    request<
+      (
+        | {
+            body: Omit<NonNullable<Pet>, 'id'>
+            path?: never
+            query?: never
+            headers?: never
+            contentType?: {
+              request: 'application/json'
+            }
+          }
+        | {
+            body: Omit<NonNullable<Pet>, 'id'>
+            path?: never
+            query?: never
+            headers?: never
+            contentType: {
+              request: 'application/xml'
+            }
+          }
+        | {
+            body: Omit<NonNullable<Pet>, 'id'>
+            path?: never
+            query?: never
+            headers?: never
+            contentType: {
+              request: 'application/x-www-form-urlencoded'
+            }
+          }
+      )['body']
+    >({
       method: 'PUT',
       url: '/pet',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],

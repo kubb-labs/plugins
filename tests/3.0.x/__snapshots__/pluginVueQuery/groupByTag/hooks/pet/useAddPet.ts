@@ -8,7 +8,6 @@ import type { AddPetOptions, AddPetStatus200, AddPetStatus405 } from '../../type
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { addPet } from '../../clients/addPet'
 import { useMutation } from '@tanstack/vue-query'
-import { toValue } from 'vue'
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
@@ -26,8 +25,8 @@ export function useAddPet<TContext>(options: {
   const mutationKey = mutationOptions?.mutationKey ?? addPetMutationKey()
 
   return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
-    mutationFn: async({ body }) => {
-      return addPet({ ...config, body: toValue<AddPetOptions['body']>(body), throwOnError: true }).unwrap()
+    mutationFn: async(variables) => {
+      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0]).unwrap()
     },
     mutationKey,
     ...mutationOptions

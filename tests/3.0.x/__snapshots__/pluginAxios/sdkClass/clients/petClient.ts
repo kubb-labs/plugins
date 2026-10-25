@@ -26,7 +26,7 @@ export class PetClient {
     public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptions, ThrowOnError>): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>)
+    return withUnwrap(request<AddPetOptions['body']>({ method: 'POST', url: '/pet', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>)
   }
 
 /**

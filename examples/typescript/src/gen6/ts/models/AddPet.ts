@@ -40,12 +40,34 @@ export type AddPetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'type' | 'tags'>
 
 export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded
 
-export type AddPetOptions = {
-  body: AddPetBody
-  path?: never
-  query?: never
-  headers?: never
-}
+export type AddPetOptions =
+  | {
+      body: AddPetBodyJson
+      path?: never
+      query?: never
+      headers?: never
+      contentType?: {
+        request: 'application/json'
+      }
+    }
+  | {
+      body: AddPetBodyXml
+      path?: never
+      query?: never
+      headers?: never
+      contentType: {
+        request: 'application/xml'
+      }
+    }
+  | {
+      body: AddPetBodyFormUrlEncoded
+      path?: never
+      query?: never
+      headers?: never
+      contentType: {
+        request: 'application/x-www-form-urlencoded'
+      }
+    }
 
 export type AddPetResponses = {
   '200':

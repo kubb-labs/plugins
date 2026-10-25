@@ -35,12 +35,34 @@ export type UpdateUserBodyFormUrlEncoded = User | undefined
 
 export type UpdateUserBody = UpdateUserBodyJson | UpdateUserBodyXml | UpdateUserBodyFormUrlEncoded
 
-export type UpdateUserOptions = {
-  body: UpdateUserBody
-  path: UpdateUserPath
-  query?: never
-  headers?: never
-}
+export type UpdateUserOptions =
+  | {
+      body: UpdateUserBodyJson
+      path: UpdateUserPath
+      query?: never
+      headers?: never
+      contentType?: {
+        request: 'application/json'
+      }
+    }
+  | {
+      body: UpdateUserBodyXml
+      path: UpdateUserPath
+      query?: never
+      headers?: never
+      contentType: {
+        request: 'application/xml'
+      }
+    }
+  | {
+      body: UpdateUserBodyFormUrlEncoded
+      path: UpdateUserPath
+      query?: never
+      headers?: never
+      contentType: {
+        request: 'application/x-www-form-urlencoded'
+      }
+    }
 
 export type UpdateUserResponses = {
   default: UpdateUserStatusDefault

@@ -5,7 +5,7 @@
 
 import type { AddPetOptions, AddPetResponse } from '../../models'
 
-export function addPet({ body }: AddPetOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<AddPetResponse> {
+export function addPet({ body }: Pick<AddPetOptions, 'body'>, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<AddPetResponse> {
   return cy
     .request<AddPetResponse>({
       method: 'POST',

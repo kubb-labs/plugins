@@ -25,12 +25,25 @@ export type AddFilesBodyFormData = Omit<NonNullable<Pet>, 'id'> | undefined
 
 export type AddFilesBody = AddFilesBodyJson | AddFilesBodyFormData
 
-export type AddFilesOptions = {
-  body: AddFilesBody
-  path?: never
-  query?: never
-  headers?: never
-}
+export type AddFilesOptions =
+  | {
+      body: AddFilesBodyJson
+      path?: never
+      query?: never
+      headers?: never
+      contentType?: {
+        request: 'application/json'
+      }
+    }
+  | {
+      body: AddFilesBodyFormData
+      path?: never
+      query?: never
+      headers?: never
+      contentType: {
+        request: 'multipart/form-data'
+      }
+    }
 
 export type AddFilesResponses = {
   '200': AddFilesStatus200

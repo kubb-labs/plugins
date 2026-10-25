@@ -63,12 +63,12 @@ export function Mutation({
 }: Props): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver)
 
-  const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver })
+  const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver, withContentType: true })
   const hasMutationParams = groupedParam !== null
   const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const argTypeBody = hasMutationParams ? tsResolver.response.options(node) : ''
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
-  const mutationFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false }), { returnType })
+  const mutationFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false, withContentType: true, returnType }), { returnType })
 
   const generics = [TData, TError, `${mutationKeyTypeName} | null`, mutationArgTypeName]
 

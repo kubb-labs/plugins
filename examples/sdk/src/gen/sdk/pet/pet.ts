@@ -32,7 +32,7 @@ export class pet {
     const { client: request = this.client, ...config } = options
 
     return withUnwrap(
-      request({
+      request<UpdatePetOptions['body']>({
         method: 'PUT',
         url: '/pet',
         security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
@@ -51,7 +51,7 @@ export class pet {
     const { client: request = this.client, ...config } = options
 
     return withUnwrap(
-      request({
+      request<AddPetOptions['body']>({
         method: 'POST',
         url: '/pet',
         security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
@@ -178,7 +178,7 @@ export class pet {
     const { client: request = this.client, ...config } = options
 
     return withUnwrap(
-      request({
+      request<UploadFileOptions['body']>({
         method: 'POST',
         url: '/pet/{petId}/uploadImage',
         security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],

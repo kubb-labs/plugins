@@ -50,7 +50,7 @@ export class store {
     const { client: request = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'POST', url: '/store/order', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+      request<PlaceOrderOptions['body']>({ method: 'POST', url: '/store/order', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
         RequestResult<PlaceOrderResponses, ThrowOnError>
       >,
     )
@@ -67,7 +67,7 @@ export class store {
     const { client: request = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'PATCH', url: '/store/order', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+      request<PlaceOrderPatchOptions['body']>({ method: 'PATCH', url: '/store/order', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
         RequestResult<PlaceOrderPatchResponses, ThrowOnError>
       >,
     )

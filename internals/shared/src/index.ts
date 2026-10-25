@@ -12,6 +12,7 @@ export {
   getPrimarySuccessResponse,
   getRequestGroupOptionality,
   getRequestGroups,
+  hasRequestContentTypeChoice,
   getResponseContentTypeInfo,
   getResponseType,
   getSuccessResponses,

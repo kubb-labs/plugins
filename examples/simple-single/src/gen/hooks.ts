@@ -72,8 +72,8 @@ export function updatePetMutationOptions<TContext = unknown>(
   const mutationKey = updatePetMutationKey()
   return mutationOptions<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetOptions, TContext>({
     mutationKey,
-    mutationFn: async ({ body }) => {
-      return updatePet({ ...config, body, throwOnError: true }).unwrap()
+    mutationFn: async (variables) => {
+      return updatePet({ ...config, ...variables, throwOnError: true } as Parameters<typeof updatePet<true>>[0]).unwrap()
     },
   })
 }
@@ -88,8 +88,8 @@ export function addPetMutationOptions<TContext = unknown>(
   const mutationKey = addPetMutationKey()
   return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
     mutationKey,
-    mutationFn: async ({ body }) => {
-      return addPet({ ...config, body, throwOnError: true }).unwrap()
+    mutationFn: async (variables) => {
+      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0]).unwrap()
     },
   })
 }
@@ -204,8 +204,8 @@ export function placeOrderMutationOptions<TContext = unknown>(
   const mutationKey = placeOrderMutationKey()
   return mutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>({
     mutationKey,
-    mutationFn: async ({ body }) => {
-      return placeOrder({ ...config, body, throwOnError: true }).unwrap()
+    mutationFn: async (variables) => {
+      return placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0]).unwrap()
     },
   })
 }
@@ -220,8 +220,8 @@ export function placeOrderPatchMutationOptions<TContext = unknown>(
   const mutationKey = placeOrderPatchMutationKey()
   return mutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchOptions, TContext>({
     mutationKey,
-    mutationFn: async ({ body }) => {
-      return placeOrderPatch({ ...config, body, throwOnError: true }).unwrap()
+    mutationFn: async (variables) => {
+      return placeOrderPatch({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrderPatch<true>>[0]).unwrap()
     },
   })
 }

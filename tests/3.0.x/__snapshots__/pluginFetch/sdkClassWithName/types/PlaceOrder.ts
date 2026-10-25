@@ -18,10 +18,29 @@ export type PlaceOrderBodyFormUrlEncoded = Order | undefined;
 export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrderBodyFormUrlEncoded;
 
 export type PlaceOrderOptions = {
-  body: PlaceOrderBody;
+  body: PlaceOrderBodyJson;
   path?: never;
   query?: never;
   headers?: never;
+  contentType?: {
+    request: 'application/json';
+  };
+} | {
+  body: PlaceOrderBodyXml;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: {
+    request: 'application/xml';
+  };
+} | {
+  body: PlaceOrderBodyFormUrlEncoded;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: {
+    request: 'application/x-www-form-urlencoded';
+  };
 };
 
 export type PlaceOrderResponses = {

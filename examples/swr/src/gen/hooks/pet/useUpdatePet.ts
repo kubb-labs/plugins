@@ -47,8 +47,8 @@ export function useUpdatePet(
     UpdatePetMutationArg
   >(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { body } }) => {
-      return updatePet({ ...config, body, throwOnError: true }).unwrap()
+    async (_url, { arg: variables }) => {
+      return updatePet({ ...config, ...variables, throwOnError: true } as Parameters<typeof updatePet<true>>[0]).unwrap()
     },
     mutationOptions,
   )

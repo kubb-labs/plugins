@@ -1,4 +1,4 @@
-import { buildOperationComments, buildRequestParamsSignature } from '@internals/shared'
+import { buildOperationComments, buildRequestParamsSignature, hasRequestContentTypeChoice } from '@internals/shared'
 import type { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
@@ -37,6 +37,10 @@ export function McpHandler({ name, clientName, node, resolver, returnType = 'ful
   // pins the result shape, since `throwOnErrorDefault: false` would otherwise resolve to the full result.
   const callArgs = requestGroupOrder.filter((key) => groups[key])
   const callConfig = `{ ${[...callArgs, 'signal: ctx.mcpReq.signal', 'throwOnError: true'].join(', ')} }`
+  // Tool arguments carry no media type, so the call takes the client's default one.
+  const callArg = hasRequestContentTypeChoice(node)
+    ? `${callConfig} as Parameters<typeof ${clientName}${returnType === 'plain' ? '' : '<true>'}>[0]`
+    : callConfig
   const body = returnType === 'data' ? 'res' : 'res.data'
 
   const callToolResult = `return {
@@ -61,7 +65,7 @@ export function McpHandler({ name, clientName, node, resolver, returnType = 'ful
         }}
         returnType={'CallToolResult'}
       >
-        {`const res = await ${clientName}(${callConfig})`}
+        {`const res = await ${clientName}(${callArg})`}
         <br />
         {callToolResult}
       </Function>

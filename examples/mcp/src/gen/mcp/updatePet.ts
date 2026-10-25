@@ -12,8 +12,8 @@ import { updatePet } from '../clients/updatePet'
  * @summary Update an existing pet
  * {@link /pet}
  */
-export async function updatePetHandler({ body }: UpdatePetOptions, ctx: ServerContext): Promise<CallToolResult> {
-  const res = await updatePet({ body, signal: ctx.mcpReq.signal, throwOnError: true })
+export async function updatePetHandler({ body }: Pick<UpdatePetOptions, 'body'>, ctx: ServerContext): Promise<CallToolResult> {
+  const res = await updatePet({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof updatePet<true>>[0])
 
   return {
     content: [

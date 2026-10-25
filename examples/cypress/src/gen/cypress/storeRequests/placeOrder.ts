@@ -5,7 +5,7 @@
 
 import type { PlaceOrderOptions, PlaceOrderResponse } from '../../models'
 
-export function placeOrder({ body }: PlaceOrderOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderResponse> {
+export function placeOrder({ body }: Pick<PlaceOrderOptions, 'body'>, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderResponse> {
   return cy
     .request<PlaceOrderResponse>({
       method: 'POST',

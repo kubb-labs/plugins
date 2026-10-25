@@ -11,15 +11,39 @@ import { addPet } from '../../clients/axios/petService/addPet'
 export async function addPetHandler(
   {
     body,
-  }: {
-    body: AddPetRequest | Omit<NonNullable<Pet>, 'id'>
-    path?: never
-    query?: never
-    headers?: never
-  },
+  }: Pick<
+    | {
+        body: AddPetRequest
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/xml'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/x-www-form-urlencoded'
+        }
+      },
+    'body'
+  >,
   ctx: ServerContext,
 ): Promise<CallToolResult> {
-  const res = await addPet({ body, signal: ctx.mcpReq.signal, throwOnError: true })
+  const res = await addPet({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof addPet<true>>[0])
 
   return {
     content: [

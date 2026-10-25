@@ -30,8 +30,8 @@ export function useAddPet(options: {
 
   return useSWRMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { body } }) => {
-      return addPet({ ...config, body, throwOnError: true }).unwrap()
+    async (_url, { arg: variables }) => {
+      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0]).unwrap()
     },
     mutationOptions
   )

@@ -18,8 +18,8 @@ export function addPetMutationOptions<TContext = unknown>(
   const mutationKey = addPetMutationKey()
   return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
     mutationKey,
-    mutationFn: async ({ body }) => {
-      return addPet({ ...config, body, throwOnError: true }).unwrap()
+    mutationFn: async (variables) => {
+      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0]).unwrap()
     },
   })
 }

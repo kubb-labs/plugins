@@ -15,8 +15,8 @@ export function placeOrderMutationOptions<TContext = unknown>(config: Partial<Om
   const mutationKey = placeOrderMutationKey()
   return mutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>({
     mutationKey,
-    mutationFn: async({ body }) => {
-      return placeOrder({ ...config, body, throwOnError: true }).unwrap()
+    mutationFn: async(variables) => {
+      return placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0]).unwrap()
     },
   })
 }

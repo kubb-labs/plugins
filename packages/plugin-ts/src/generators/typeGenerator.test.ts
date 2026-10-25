@@ -185,10 +185,21 @@ describe("typeGenerator — operations: 'inline'", () => {
         "ApiCreatePetBodyJson": "ApiNewPet",
         "ApiCreatePetBodyXml": "ApiNewPet",
         "ApiCreatePetOptions": "{
-        body: ApiCreatePetBody;
+        body: ApiCreatePetBodyJson;
         path: ApiCreatePetPath;
         query?: ApiCreatePetQuery;
         headers?: never;
+        contentType?: {
+          request: 'application/json';
+        };
+      } | {
+        body: ApiCreatePetBodyXml;
+        path: ApiCreatePetPath;
+        query?: ApiCreatePetQuery;
+        headers?: never;
+        contentType: {
+          request: 'application/xml';
+        };
       }",
         "ApiCreatePetPath": "{
         petId: string;
