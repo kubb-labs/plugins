@@ -343,8 +343,7 @@ export function buildRequestParamsSignature(
 
   const names = (['path', 'query', 'body', 'headers'] as const).filter((key) => groups[key])
 
-  // A body offered in several media types pairs each variant with a required `contentType`, which
-  // these callers never carry, so only the groups they destructure are taken from the options.
+  // These callers never carry the `contentType` that several media types require.
   const optionsType = hasRequestContentTypeChoice(node)
     ? `Pick<${resolver.response.options(node)}, ${names.map((name) => `'${name}'`).join(' | ')}>`
     : resolver.response.options(node)
@@ -417,9 +416,7 @@ export function hasRequestContentTypeChoice(node: ast.OperationNode): boolean {
 }
 
 /**
- * Casts a client call's argument to the client's own parameter type. The options of a body offered in
- * several media types pair the body with `contentType`, which a spread of loosely typed pieces cannot
- * prove to the compiler. A `'plain'` client is the caller's own, non-generic function.
+ * Casts a call argument to the client's parameter type; a `'plain'` client is non-generic.
  */
 export function castToClientOptions(callArg: string, clientName: string, returnType: 'full' | 'data' | 'plain' = 'full'): string {
   return `${callArg} as Parameters<typeof ${clientName}${returnType === 'plain' ? '' : '<true>'}>[0]`
@@ -467,8 +464,7 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
     return createOptions(hasBody ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) }) : createNever())
   }
 
-  // One member per media type, so a body variant narrows `contentType.request`. The first type is the
-  // runtime default and stays optional; picking any other one has to be explicit.
+  // The first media type is the runtime default, so only the others must pass `contentType`.
   return ast.factory.createSchema({
     type: 'union',
     members: variants.map((variant, index) =>

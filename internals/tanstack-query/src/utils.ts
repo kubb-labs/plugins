@@ -56,10 +56,7 @@ export function buildGroupedRequestParam(
     resolver: ResolverTs
     keys?: ReadonlyArray<RequestGroupKey>
     memberTypeWrapper?: (type: string) => string
-    /**
-     * Binds the variables whole, for a body offered in several media types. Only mutations set it:
-     * destructuring would split the `body` / `contentType` pairing and drop the chosen media type.
-     */
+    /** Binds the variables whole, so destructuring does not drop the chosen media type. */
     withContentType?: boolean
   },
 ): FunctionParameterNode | null {
@@ -168,8 +165,6 @@ export function buildClientCall(
     'throwOnError: true',
   ].filter((part): part is string => part !== null)
 
-  // `config` types the media type more loosely than the variables pair it with the body, so the
-  // spread no longer proves the pairing to the compiler.
   if (withContentType && hasRequestContentTypeChoice(node)) return `${clientName}(${castToClientOptions(`{ ${args.join(', ')} }`, clientName, returnType)})`
 
   return `${clientName}({ ${args.join(', ')} })`
