@@ -104,8 +104,8 @@ export function jsStringEscape(input: unknown): string {
 const UNICODE_ESCAPE = /(?<!\\)(?:\\\\)*\\(?:[pP]|u)\{/
 // A character outside the BMP is two code units without the `u` flag, so a class holding one never matches it whole.
 const ASTRAL_CHARACTER = /[\u{10000}-\u{10FFFF}]/u
-// What an escape may stand for under `u`: a letter or digit (an escape class), a syntax character or `/`. `-` is only valid inside a class.
-const SYNTAX_CHARACTER = /[A-Za-z0-9^$\\.*+?()[\]{}|/]/
+// Escapes the `u` flag accepts. `\-` only counts inside a class.
+const KEPT_ESCAPE = /[A-Za-z0-9^$\\.*+?()[\]{}|/]/
 
 /**
  * Drops the backslash from escapes that the `u` flag rejects: an escaped punctuation character that is
@@ -120,7 +120,7 @@ function dropIdentityEscapes(pattern: string): string {
 
     if (char === '\\' && index + 1 < pattern.length) {
       const next = pattern[++index]!
-      result += SYNTAX_CHARACTER.test(next) || (next === '-' && inClass) ? `\\${next}` : next
+      result += KEPT_ESCAPE.test(next) || (next === '-' && inClass) ? `\\${next}` : next
       continue
     }
 
