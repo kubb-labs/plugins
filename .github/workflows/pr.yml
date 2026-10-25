@@ -248,7 +248,15 @@ jobs:
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
           KUBB_DISABLE_TELEMETRY: '1'
-        run: pnpm run generate
+        run: pnpm run generate --reporter file
+
+      - name: Upload Kubb logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: e2e-kubb-logs-${{ matrix.os }}
+          path: tests/e2e/.kubb/*.log
+          if-no-files-found: ignore
 
   comment-ratio:
     name: Comment ratio
