@@ -66,7 +66,11 @@ describe('buildStyles', () => {
           ast.factory.createContent({
             contentType: 'application/x-www-form-urlencoded',
             schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-            encoding: { filter: { style: 'deepObject', explode: true }, 'x-meta': { contentType: 'application/json', allowReserved: true } },
+            encoding: {
+              filter: { style: 'deepObject', explode: true },
+              'x-meta': { contentType: 'application/json', allowReserved: true },
+              quoted: { contentType: "text/plain; name=O'Reilly" },
+            },
           }),
         ],
       }),
@@ -74,7 +78,7 @@ describe('buildStyles', () => {
     })
 
     expect(buildStyles({ node })).toBe(
-      "{ query: { page: { explode: false } }, body: { filter: { style: 'deepObject', explode: true }, \"x-meta\": { allowReserved: true, contentType: 'application/json' } } }",
+      '{ query: { page: { explode: false } }, body: { filter: { style: \'deepObject\', explode: true }, "x-meta": { allowReserved: true, contentType: "application/json" }, quoted: { contentType: "text/plain; name=O\'Reilly" } } }',
     )
   })
 

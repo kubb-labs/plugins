@@ -42,7 +42,7 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): string | null {
         style && `style: '${style}'`,
         explode !== undefined && `explode: ${explode}`,
         allowReserved !== undefined && `allowReserved: ${allowReserved}`,
-        contentType && `contentType: '${contentType}'`,
+        contentType && `contentType: ${JSON.stringify(contentType)}`,
       ].filter(Boolean)
       return `${isValidVarName(property) ? property : JSON.stringify(property)}: { ${parts.join(', ')} }`
     },
