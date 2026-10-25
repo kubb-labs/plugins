@@ -31,19 +31,22 @@ function serializeParameter(parameter: ast.ParameterNode): string | null {
 
 /**
  * Serializes the `encoding` of the request body's default content type into a `{ property: { ... } }`
- * literal, or `null` when it carries none. The default content type is the first declared one, the
- * same entry `buildContentType` bakes into the call.
+ * literal, or `null` when it carries none. Only an operation with a single request content type
+ * emits it, because the runtime applies `styles.body` to whichever type the caller selects.
  */
 function serializeBodyEncoding(node: ast.HttpOperationNode): string | null {
-  const entries = Object.entries(node.requestBody?.content?.[0]?.encoding ?? {}).map(([property, { contentType, style, explode, allowReserved }]) => {
-    const parts = [
-      style && `style: '${style}'`,
-      explode !== undefined && `explode: ${explode}`,
-      allowReserved !== undefined && `allowReserved: ${allowReserved}`,
-      contentType && `contentType: '${contentType}'`,
-    ].filter(Boolean)
-    return `${isValidVarName(property) ? property : JSON.stringify(property)}: { ${parts.join(', ')} }`
-  })
+  const content = node.requestBody?.content
+  const entries = Object.entries(content?.length === 1 ? (content[0]?.encoding ?? {}) : {}).map(
+    ([property, { contentType, style, explode, allowReserved }]) => {
+      const parts = [
+        style && `style: '${style}'`,
+        explode !== undefined && `explode: ${explode}`,
+        allowReserved !== undefined && `allowReserved: ${allowReserved}`,
+        contentType && `contentType: '${contentType}'`,
+      ].filter(Boolean)
+      return `${isValidVarName(property) ? property : JSON.stringify(property)}: { ${parts.join(', ')} }`
+    },
+  )
 
   return entries.length > 0 ? `body: { ${entries.join(', ')} }` : null
 }

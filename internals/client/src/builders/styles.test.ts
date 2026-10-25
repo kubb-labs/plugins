@@ -54,7 +54,7 @@ describe('buildStyles', () => {
     expect(buildStyles({ node })).toBe('{ query: { "2fa": { explode: true } } }')
   })
 
-  test('emits the encoding of the default request content type as a body group', () => {
+  test('emits the encoding of a single request content type as a body group', () => {
     const node = ast.factory.createOperation({
       operationId: 'search',
       method: 'POST',
@@ -76,5 +76,25 @@ describe('buildStyles', () => {
     expect(buildStyles({ node })).toBe(
       "{ query: { page: { explode: false } }, body: { filter: { style: 'deepObject', explode: true }, \"x-meta\": { allowReserved: true, contentType: 'application/json' } } }",
     )
+  })
+
+  test('omits the body group when the request has several content types', () => {
+    const content = (contentType: string) =>
+      ast.factory.createContent({
+        contentType,
+        schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+        encoding: { filter: { explode: true } },
+      })
+    const node = ast.factory.createOperation({
+      operationId: 'search',
+      method: 'POST',
+      path: '/search',
+      tags: ['pet'],
+      parameters: [],
+      requestBody: ast.factory.createRequestBody({ content: [content('application/x-www-form-urlencoded'), content('multipart/form-data')] }),
+      responses: [ast.factory.createResponse({ statusCode: '200', schema: stringSchema(), description: 'ok' })],
+    })
+
+    expect(buildStyles({ node })).toBeNull()
   })
 })
