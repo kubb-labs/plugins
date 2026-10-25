@@ -17,6 +17,7 @@ export function addPet<ThrowOnError extends boolean = true>(
       method: 'POST',
       url: '/pet',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+      contentType: { request: 'application/json' },
       ...config,
       throwOnError: config.throwOnError ?? true,
     }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>,

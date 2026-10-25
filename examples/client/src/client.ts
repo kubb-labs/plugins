@@ -32,6 +32,10 @@ export type RequestConfig = {
   query?: object
   body?: unknown
   /**
+   * Media type hints from the operation. This skeleton assumes JSON.
+   */
+  contentType?: string | { request?: string; response?: string }
+  /**
    * Serialization hints for query and header values, generated for reference. This skeleton ignores them.
    */
   styles?: unknown

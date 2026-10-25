@@ -14,7 +14,7 @@ import { addPetResponseSchema, addPetErrorSchema } from '../zod/addPetSchema'
  * {@link /pet}
  */
 export function addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptions, ThrowOnError>): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: request = client, contentType, ...config } = options
 
-  return withUnwrap(request<AddPetOptions['body']>({ method: 'POST', url: '/pet', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], validator: { response: addPetResponseSchema, error: addPetErrorSchema }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>)
+  return withUnwrap(request<AddPetOptions['body']>({ method: 'POST', url: '/pet', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], validator: { response: addPetResponseSchema, error: addPetErrorSchema }, contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>)
 }

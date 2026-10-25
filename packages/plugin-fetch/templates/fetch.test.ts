@@ -188,6 +188,15 @@ describe('defaultPathSerializer', () => {
 })
 
 describe('defaultBodySerializer', () => {
+  test.each(['application/json', 'application/json; charset=utf-8', 'application/vnd.api+json'])('JSON-encodes strings for %s', (contentType) => {
+    expect(defaultBodySerializer({ body: 'a"b\nc', contentType })).toBe('"a\\"b\\nc"')
+    expect(defaultBodySerializer({ body: '', contentType })).toBe('""')
+  })
+
+  test.each([undefined, 'text/plain', 'application/jsonl'])('passes strings through for %s', (contentType) => {
+    expect(defaultBodySerializer({ body: 'abc', contentType })).toBe('abc')
+  })
+
   test('ignores a JSON part contentType for urlencoded bodies', () => {
     const encoding = { meta: { contentType: 'application/json' } }
     expect(defaultBodySerializer({ body: { meta: { a: 1 } }, contentType: 'application/x-www-form-urlencoded', encoding })).toBe('a=1')
@@ -385,6 +394,13 @@ describe('createClientCore', () => {
       styles: { query: { id: { style: 'pipeDelimited', explode: false }, filter: { style: 'deepObject' } } },
     })
     expect(calls[0]?.url).toBe('/pets?id=3|4&filter%5Ba%5D=1')
+  })
+
+  test('JSON-encodes a string body and sets Content-Type', async () => {
+    const { client, calls } = createClient()
+    await client({ method: 'POST', url: '/x', body: 'abc', contentType: { request: 'application/json' } })
+    expect(calls[0]?.body).toBe('"abc"')
+    expect(calls[0]?.headers['Content-Type']).toBe('application/json')
   })
 
   test('serializes the body and sets Content-Type', async () => {

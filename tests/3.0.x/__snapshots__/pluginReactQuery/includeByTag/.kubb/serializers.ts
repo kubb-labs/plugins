@@ -179,6 +179,7 @@ function appendFormDataValue({ formData, key, value, contentType }: { formData: 
  */
 export const defaultBodySerializer: BodySerializer = ({ body, contentType, encoding }) => {
   if (body === undefined || body === null) return undefined
+  if (typeof body === 'string' && isJsonMediaType(contentType)) return JSON.stringify(body)
   if (isFormBody(body)) return body as RequestBody
   if (contentType?.includes('multipart/form-data')) {
     const formData = new FormData()

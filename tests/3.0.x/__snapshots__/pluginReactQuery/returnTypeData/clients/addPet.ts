@@ -13,7 +13,7 @@ import { client, unwrapResult } from '../.kubb/client'
  * {@link /pet}
  */
 export function addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptions, ThrowOnError>): Promise<UnwrappedResult<AddPetResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: request = client, contentType, ...config } = options
 
-  return unwrapResult(request<AddPetOptions['body']>({ method: 'POST', url: '/pet', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, throwOnError: config.throwOnError ?? true }), config.throwOnError ?? true) as Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>
+  return unwrapResult(request<AddPetOptions['body']>({ method: 'POST', url: '/pet', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) }, ...config, throwOnError: config.throwOnError ?? true }), config.throwOnError ?? true) as Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>
 }
