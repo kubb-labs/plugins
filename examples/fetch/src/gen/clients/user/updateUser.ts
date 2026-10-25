@@ -18,7 +18,7 @@ export function updateUser<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'PUT', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+    request<UpdateUserOptions['body']>({ method: 'PUT', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
       RequestResult<UpdateUserResponses, ThrowOnError>
     >,
   )

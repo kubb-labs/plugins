@@ -15,21 +15,31 @@ export function addFilesMutationOptions<TContext = unknown>(
   return mutationOptions<
     Omit<NonNullable<Pet>, 'name'>,
     ResponseErrorConfig<unknown>,
-    {
-      body:
-        | {
-            url: string
-          }
-        | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    | {
+        body: {
+          url: string
+        }
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'multipart/form-data'
+        }
+      },
     TContext
   >({
     mutationKey,
-    mutationFn: async ({ body }) => {
-      return addFiles({ ...config, body, throwOnError: true }).unwrap()
+    mutationFn: async (variables) => {
+      return addFiles({ ...config, ...variables, throwOnError: true } as Parameters<typeof addFiles<true>>[0]).unwrap()
     },
   })
 }
@@ -44,16 +54,26 @@ export function useAddFiles<TContext>(
     mutation?: UseMutationOptions<
       Omit<NonNullable<Pet>, 'name'>,
       ResponseErrorConfig<unknown>,
-      {
-        body:
-          | {
-              url: string
-            }
-          | Omit<NonNullable<Pet>, 'id'>
-        path?: never
-        query?: never
-        headers?: never
-      },
+      | {
+          body: {
+            url: string
+          }
+          path?: never
+          query?: never
+          headers?: never
+          contentType?: {
+            request: 'application/json'
+          }
+        }
+      | {
+          body: Omit<NonNullable<Pet>, 'id'>
+          path?: never
+          query?: never
+          headers?: never
+          contentType: {
+            request: 'multipart/form-data'
+          }
+        },
       TContext
     > & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
@@ -68,32 +88,52 @@ export function useAddFiles<TContext>(
   const baseOptions = addFilesMutationOptions(config) as UseMutationOptions<
     Omit<NonNullable<Pet>, 'name'>,
     ResponseErrorConfig<unknown>,
-    {
-      body:
-        | {
-            url: string
-          }
-        | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    | {
+        body: {
+          url: string
+        }
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'multipart/form-data'
+        }
+      },
     TContext
   >
 
   return useMutation<
     Omit<NonNullable<Pet>, 'name'>,
     ResponseErrorConfig<unknown>,
-    {
-      body:
-        | {
-            url: string
-          }
-        | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    | {
+        body: {
+          url: string
+        }
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'multipart/form-data'
+        }
+      },
     TContext
   >(
     {
@@ -105,16 +145,26 @@ export function useAddFiles<TContext>(
   ) as UseMutationResult<
     Omit<NonNullable<Pet>, 'name'>,
     ResponseErrorConfig<unknown>,
-    {
-      body:
-        | {
-            url: string
-          }
-        | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    | {
+        body: {
+          url: string
+        }
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'multipart/form-data'
+        }
+      },
     TContext
   >
 }

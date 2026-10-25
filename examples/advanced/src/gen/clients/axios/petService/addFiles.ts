@@ -9,16 +9,26 @@ import { client, withUnwrap } from '../../../.kubb/client'
  */
 export function addFiles<ThrowOnError extends boolean = true>(
   options: Options<
-    {
-      body:
-        | {
-            url: string
-          }
-        | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    | {
+        body: {
+          url: string
+        }
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'multipart/form-data'
+        }
+      },
     ThrowOnError
   >,
 ): Unwrappable<
@@ -33,7 +43,30 @@ export function addFiles<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'POST', url: '/pet/files', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+    request<
+      (
+        | {
+            body: {
+              url: string
+            }
+            path?: never
+            query?: never
+            headers?: never
+            contentType?: {
+              request: 'application/json'
+            }
+          }
+        | {
+            body: Omit<NonNullable<Pet>, 'id'>
+            path?: never
+            query?: never
+            headers?: never
+            contentType: {
+              request: 'multipart/form-data'
+            }
+          }
+      )['body']
+    >({ method: 'POST', url: '/pet/files', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
       RequestResult<
         {
           '200': Omit<NonNullable<Pet>, 'name'>

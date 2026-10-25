@@ -196,7 +196,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     })
 
     const optionsType = renderSchemaType({
-      schema: buildOptionsSchema(node, resolver),
+      schema: buildOptionsSchema(node, resolver, { pairContentTypes: true }),
       name: resolver.response.options(node),
     })
 

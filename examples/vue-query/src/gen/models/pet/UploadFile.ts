@@ -41,12 +41,25 @@ export type UploadFileBodyFormData = {
 
 export type UploadFileBody = UploadFileBodyJson | UploadFileBodyFormData
 
-export type UploadFileOptions = {
-  body: UploadFileBody
-  path: UploadFilePath
-  query?: UploadFileQuery
-  headers?: never
-}
+export type UploadFileOptions =
+  | {
+      body: UploadFileBodyJson
+      path: UploadFilePath
+      query?: UploadFileQuery
+      headers?: never
+      contentType?: {
+        request: 'application/json'
+      }
+    }
+  | {
+      body: UploadFileBodyFormData
+      path: UploadFilePath
+      query?: UploadFileQuery
+      headers?: never
+      contentType: {
+        request: 'multipart/form-data'
+      }
+    }
 
 export type UploadFileResponses = {
   '200': UploadFileStatus200

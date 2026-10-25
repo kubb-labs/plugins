@@ -35,10 +35,29 @@ export type AddPetBodyFormUrlEncoded = Pet;
 export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded;
 
 export type AddPetOptions = {
-  body: AddPetBody;
+  body: AddPetBodyJson;
   path?: never;
   query?: never;
   headers?: never;
+  contentType?: {
+    request: 'application/json';
+  };
+} | {
+  body: AddPetBodyXml;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: {
+    request: 'application/xml';
+  };
+} | {
+  body: AddPetBodyFormUrlEncoded;
+  path?: never;
+  query?: never;
+  headers?: never;
+  contentType: {
+    request: 'application/x-www-form-urlencoded';
+  };
 };
 
 export type AddPetResponses = {

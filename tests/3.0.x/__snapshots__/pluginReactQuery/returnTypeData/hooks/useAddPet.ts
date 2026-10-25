@@ -15,8 +15,8 @@ export function addPetMutationOptions<TContext = unknown>(config: Partial<Omit<R
   const mutationKey = addPetMutationKey()
   return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
     mutationKey,
-    mutationFn: async({ body }) => {
-      return await addPet({ ...config, body, throwOnError: true })
+    mutationFn: async(variables) => {
+      return await addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0])
     },
   })
 }

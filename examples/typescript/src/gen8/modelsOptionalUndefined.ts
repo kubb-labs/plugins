@@ -305,12 +305,36 @@ export type UpdatePetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'type' | 'tags'
 
 export type UpdatePetBody = UpdatePetBodyJson | UpdatePetBodyXml | UpdatePetBodyFormUrlEncoded
 
-export type UpdatePetOptions = {
-  body: UpdatePetBody
-  path: never | undefined
-  query: never | undefined
-  headers: never | undefined
-}
+export type UpdatePetOptions =
+  | {
+      body: UpdatePetBodyJson
+      path: never | undefined
+      query: never | undefined
+      headers: never | undefined
+      contentType:
+        | {
+            request: 'application/json'
+          }
+        | undefined
+    }
+  | {
+      body: UpdatePetBodyXml
+      path: never | undefined
+      query: never | undefined
+      headers: never | undefined
+      contentType: {
+        request: 'application/xml'
+      }
+    }
+  | {
+      body: UpdatePetBodyFormUrlEncoded
+      path: never | undefined
+      query: never | undefined
+      headers: never | undefined
+      contentType: {
+        request: 'application/x-www-form-urlencoded'
+      }
+    }
 
 export type UpdatePetResponses = {
   '200':
@@ -366,12 +390,36 @@ export type AddPetBodyFormUrlEncoded = Omit<NonNullable<Pet>, 'type' | 'tags'>
 
 export type AddPetBody = AddPetBodyJson | AddPetBodyXml | AddPetBodyFormUrlEncoded
 
-export type AddPetOptions = {
-  body: AddPetBody
-  path: never | undefined
-  query: never | undefined
-  headers: never | undefined
-}
+export type AddPetOptions =
+  | {
+      body: AddPetBodyJson
+      path: never | undefined
+      query: never | undefined
+      headers: never | undefined
+      contentType:
+        | {
+            request: 'application/json'
+          }
+        | undefined
+    }
+  | {
+      body: AddPetBodyXml
+      path: never | undefined
+      query: never | undefined
+      headers: never | undefined
+      contentType: {
+        request: 'application/xml'
+      }
+    }
+  | {
+      body: AddPetBodyFormUrlEncoded
+      path: never | undefined
+      query: never | undefined
+      headers: never | undefined
+      contentType: {
+        request: 'application/x-www-form-urlencoded'
+      }
+    }
 
 export type AddPetResponses = {
   '200':
@@ -684,12 +732,36 @@ export type PlaceOrderBodyFormUrlEncoded = Order | undefined
 
 export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrderBodyFormUrlEncoded
 
-export type PlaceOrderOptions = {
-  body: PlaceOrderBody
-  path: never | undefined
-  query: never | undefined
-  headers: never | undefined
-}
+export type PlaceOrderOptions =
+  | {
+      body: PlaceOrderBodyJson
+      path: never | undefined
+      query: never | undefined
+      headers: never | undefined
+      contentType:
+        | {
+            request: 'application/json'
+          }
+        | undefined
+    }
+  | {
+      body: PlaceOrderBodyXml
+      path: never | undefined
+      query: never | undefined
+      headers: never | undefined
+      contentType: {
+        request: 'application/xml'
+      }
+    }
+  | {
+      body: PlaceOrderBodyFormUrlEncoded
+      path: never | undefined
+      query: never | undefined
+      headers: never | undefined
+      contentType: {
+        request: 'application/x-www-form-urlencoded'
+      }
+    }
 
 export type PlaceOrderResponses = {
   '200': PlaceOrderStatus200
@@ -713,12 +785,36 @@ export type PlaceOrderPatchBodyFormUrlEncoded = Order | undefined
 
 export type PlaceOrderPatchBody = PlaceOrderPatchBodyJson | PlaceOrderPatchBodyXml | PlaceOrderPatchBodyFormUrlEncoded
 
-export type PlaceOrderPatchOptions = {
-  body: PlaceOrderPatchBody
-  path: never | undefined
-  query: never | undefined
-  headers: never | undefined
-}
+export type PlaceOrderPatchOptions =
+  | {
+      body: PlaceOrderPatchBodyJson
+      path: never | undefined
+      query: never | undefined
+      headers: never | undefined
+      contentType:
+        | {
+            request: 'application/json'
+          }
+        | undefined
+    }
+  | {
+      body: PlaceOrderPatchBodyXml
+      path: never | undefined
+      query: never | undefined
+      headers: never | undefined
+      contentType: {
+        request: 'application/xml'
+      }
+    }
+  | {
+      body: PlaceOrderPatchBodyFormUrlEncoded
+      path: never | undefined
+      query: never | undefined
+      headers: never | undefined
+      contentType: {
+        request: 'application/x-www-form-urlencoded'
+      }
+    }
 
 export type PlaceOrderPatchResponses = {
   '200': PlaceOrderPatchStatus200

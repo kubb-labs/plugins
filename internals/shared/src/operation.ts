@@ -343,7 +343,11 @@ export function buildRequestParamsSignature(
 
   const names = (['path', 'query', 'body', 'headers'] as const).filter((key) => groups[key])
 
-  const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: ${resolver.response.options(node)}${isOptional ? ' = {}' : ''}` : null
+  // These callers never carry the `contentType` that several media types require.
+  const optionsType = hasRequestContentTypeChoice(node)
+    ? `Pick<${resolver.response.options(node)}, ${names.map((name) => `'${name}'`).join(' | ')}>`
+    : resolver.response.options(node)
+  const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: ${optionsType}${isOptional ? ' = {}' : ''}` : null
   const configParam = isConfigurable ? `config: ${buildRequestConfigType(node)} = {}` : null
 
   return {
@@ -407,7 +411,18 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
  * shape from the same inputs. `primitive: 'object'` is a no-op for the TS printer and tells the Zod
  * printer to emit `z.object(…)` rather than a record.
  */
-export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver): ast.SchemaNode {
+export function hasRequestContentTypeChoice(node: ast.OperationNode): boolean {
+  return (node.requestBody?.content ?? []).filter((entry) => entry.schema).length > 1
+}
+
+/**
+ * Casts a call argument to the client's parameter type; a `'plain'` client is non-generic.
+ */
+export function castToClientOptions(callArg: string, clientName: string, returnType: 'full' | 'data' | 'plain' = 'full'): string {
+  return `${callArg} as Parameters<typeof ${clientName}${returnType === 'plain' ? '' : '<true>'}>[0]`
+}
+
+export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver, { pairContentTypes = false } = {}): ast.SchemaNode {
   const { path, query, header } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
@@ -417,32 +432,60 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
     { name: 'headers', params: header, resolve: resolver.param.headers },
   ] as const
 
-  // NOTE(v5-stable): the fields were renamed from the legacy beta shape
-  // (`data`/`pathParams`/`queryParams`/`headerParams`) to `body`/`path`/`query`/`headers` so the
-  // type matches the runtime client. Drop this note once v5 leaves beta.
-  return ast.factory.createSchema({
-    type: 'object',
-    primitive: 'object',
-    deprecated: node.deprecated,
-    properties: [
-      ast.factory.createProperty({
-        name: 'body',
-        required: hasBody,
-        schema: hasBody ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) }) : createNever(),
-      }),
-      ...groups.map(({ name, params, resolve }) => {
-        const required = params.some((param) => param.required)
+  const createOptions = (body: ast.SchemaNode, extra: Array<ast.PropertyNode> = []) =>
+    // NOTE(v5-stable): the fields were renamed from the legacy beta shape
+    // (`data`/`pathParams`/`queryParams`/`headerParams`) to `body`/`path`/`query`/`headers` so the
+    // type matches the runtime client. Drop this note once v5 leaves beta.
+    ast.factory.createSchema({
+      type: 'object',
+      primitive: 'object',
+      deprecated: node.deprecated,
+      properties: [
+        ast.factory.createProperty({ name: 'body', required: hasBody, schema: body }),
+        ...groups.map(({ name, params, resolve }) => {
+          const required = params.some((param) => param.required)
 
-        return ast.factory.createProperty({
-          name,
-          required,
-          schema:
-            params.length > 0
-              ? ast.factory.createSchema({ type: 'ref', name: resolve.call(resolver.param, node, params[0]!), optional: !required })
-              : createNever(),
-        })
-      }),
-    ],
+          return ast.factory.createProperty({
+            name,
+            required,
+            schema:
+              params.length > 0
+                ? ast.factory.createSchema({ type: 'ref', name: resolve.call(resolver.param, node, params[0]!), optional: !required })
+                : createNever(),
+          })
+        }),
+        ...extra,
+      ],
+    })
+
+  const variants =
+    pairContentTypes && hasRequestContentTypeChoice(node) ? resolveContentTypeVariants(node.requestBody?.content ?? [], resolver.response.body(node)) : []
+  if (variants.length < 2) {
+    return createOptions(hasBody ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) }) : createNever())
+  }
+
+  // The first media type is the runtime default, so only the others must pass `contentType`.
+  return ast.factory.createSchema({
+    type: 'union',
+    members: variants.map((variant, index) =>
+      createOptions(ast.factory.createSchema({ type: 'ref', name: variant.name }), [
+        ast.factory.createProperty({
+          name: 'contentType',
+          required: index > 0,
+          schema: ast.factory.createSchema({
+            type: 'object',
+            primitive: 'object',
+            properties: [
+              ast.factory.createProperty({
+                name: 'request',
+                required: true,
+                schema: ast.factory.createSchema({ type: 'enum', enumValues: [variant.contentType] }),
+              }),
+            ],
+          }),
+        }),
+      ]),
+    ),
   })
 }
 

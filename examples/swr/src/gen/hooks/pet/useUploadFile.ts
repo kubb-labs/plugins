@@ -35,8 +35,8 @@ export function useUploadFile(
 
   return useSWRMutation<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { path, query, body } }) => {
-      return uploadFile({ ...config, path, query, body, throwOnError: true }).unwrap()
+    async (_url, { arg: variables }) => {
+      return uploadFile({ ...config, ...variables, throwOnError: true } as Parameters<typeof uploadFile<true>>[0]).unwrap()
     },
     mutationOptions,
   )

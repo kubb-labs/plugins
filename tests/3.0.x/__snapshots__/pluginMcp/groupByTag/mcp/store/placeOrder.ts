@@ -12,8 +12,8 @@ import { placeOrder } from '../../clients/placeOrder'
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrderHandler({ body }: PlaceOrderOptions, ctx: ServerContext): Promise<CallToolResult> {
-  const res = await placeOrder({ body, signal: ctx.mcpReq.signal, throwOnError: true })
+export async function placeOrderHandler({ body }: Pick<PlaceOrderOptions, 'body'>, ctx: ServerContext): Promise<CallToolResult> {
+  const res = await placeOrder({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof placeOrder<true>>[0])
 
   return {
     content: [

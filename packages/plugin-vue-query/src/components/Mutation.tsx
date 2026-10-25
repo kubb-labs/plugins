@@ -47,7 +47,7 @@ function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: R
 export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, returnType = 'full' }: Props): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver)
 
-  const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver })
+  const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver, withContentType: true })
   const hasMutationParams = groupedParam !== null
   const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
@@ -56,6 +56,8 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, 
     buildClientCall(node, {
       clientName,
       signal: false,
+      withContentType: true,
+      returnType,
       // Pin the payload type: an optional `value` property can otherwise drive Vue's ref inference.
       unwrapName: (name) => `toValue<${TRequest}['${name}']>(${name})`,
     }),

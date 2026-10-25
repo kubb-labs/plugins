@@ -18,8 +18,8 @@ export function createUserMutationOptions<TContext = unknown>(
   const mutationKey = createUserMutationKey()
   return mutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserOptions, TContext>({
     mutationKey,
-    mutationFn: async ({ body }) => {
-      return createUser({ ...config, body, throwOnError: true }).unwrap()
+    mutationFn: async (variables) => {
+      return createUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof createUser<true>>[0]).unwrap()
     },
   })
 }

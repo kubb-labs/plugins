@@ -31,7 +31,7 @@ export class PetClient {
     public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<AddPetResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], validator: { response: addPetResponseSchema }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<AddPetResponsesSchemaType, ThrowOnError>>)
+    return withUnwrap(request<AddPetOptionsSchemaType['body']>({ method: 'POST', url: '/pet', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], validator: { response: addPetResponseSchema }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<AddPetResponsesSchemaType, ThrowOnError>>)
   }
 
 /**

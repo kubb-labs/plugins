@@ -6,6 +6,7 @@ import {
   buildOptionsSchema,
   buildRequestConfigType,
   getContentTypeInfo,
+  hasRequestContentTypeChoice,
   getOperationParameters,
   getOperationSuccessResponses,
   getPrimarySuccessResponse,
@@ -84,6 +85,40 @@ describe('getContentTypeInfo', () => {
       defaultContentType: 'application/json',
       hasFormData: true,
     })
+  })
+})
+
+describe('buildOptionsSchema with several request content types', () => {
+  const node = ast.factory.createOperation({
+    operationId: 'patchF',
+    method: 'PATCH',
+    path: '/f',
+    requestBody: {
+      content: [
+        ast.factory.createContent({ contentType: 'multipart/form-data', schema: ast.factory.createSchema({ type: 'object' }) }),
+        ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) }),
+      ],
+    },
+  })
+
+  test('pairs each body variant with its media type when asked to', () => {
+    const schema = buildOptionsSchema(node, resolver, { pairContentTypes: true })
+    if (schema.type !== 'union') throw new Error('expected a union')
+
+    const contentTypes = (schema.members ?? []).map((member) => {
+      const props = ast.narrowSchema(member, 'object')?.properties ?? []
+      return { required: props.find((p) => p.name === 'contentType')?.required, body: props.find((p) => p.name === 'body')?.schema.type }
+    })
+
+    expect(contentTypes).toStrictEqual([
+      { required: false, body: 'ref' },
+      { required: true, body: 'ref' },
+    ])
+    expect(hasRequestContentTypeChoice(node)).toBe(true)
+  })
+
+  test('keeps the plain object without the flag', () => {
+    expect(buildOptionsSchema(node, resolver).type).toBe('object')
   })
 })
 

@@ -18,8 +18,8 @@ export function updateUserMutationOptions<TContext = unknown>(
   const mutationKey = updateUserMutationKey()
   return mutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserOptions, TContext>({
     mutationKey,
-    mutationFn: async ({ path, body }) => {
-      return updateUser({ ...config, path, body, throwOnError: true }).unwrap()
+    mutationFn: async (variables) => {
+      return updateUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof updateUser<true>>[0]).unwrap()
     },
   })
 }

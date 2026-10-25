@@ -1,3 +1,4 @@
+import { hasRequestContentTypeChoice } from '@internals/shared'
 import type { ast } from 'kubb/kit'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption } from '../types.ts'
@@ -38,12 +39,15 @@ export function buildReturnStatement({
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
 }): string {
+  // The options of a body offered in several media types are a union, so the body type cannot be inferred from `config`.
+  // A `'plain'` client is the caller's own function, which takes no type argument.
+  const request = returnType !== 'plain' && hasRequestContentTypeChoice(node) ? `request<${types.response.options(node)}['body']>` : 'request'
   if (returnType === 'data') {
     const resultType = buildResultType({ node, types, returnType })
-    return `return unwrapResult(request(${callConfig}), config.throwOnError ?? ${throwOnErrorDefault}) as ${resultType}`
+    return `return unwrapResult(${request}(${callConfig}), config.throwOnError ?? ${throwOnErrorDefault}) as ${resultType}`
   }
   if (returnType === 'plain') {
-    return `return request(${callConfig}) as Promise<RequestResult<${buildRequestResultGenerics({ node, types })}>>`
+    return `return ${request}(${callConfig}) as Promise<RequestResult<${buildRequestResultGenerics({ node, types })}>>`
   }
-  return `return withUnwrap(request(${callConfig}) as Promise<RequestResult<${buildRequestResultGenerics({ node, types })}>>)`
+  return `return withUnwrap(${request}(${callConfig}) as Promise<RequestResult<${buildRequestResultGenerics({ node, types })}>>)`
 }

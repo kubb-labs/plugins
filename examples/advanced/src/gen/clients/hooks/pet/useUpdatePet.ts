@@ -18,17 +18,38 @@ export function updatePetMutationOptions<TContext = unknown>(
         id?: number
       },
     ResponseErrorConfig<unknown | unknown | unknown>,
-    {
-      body: Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/xml'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/x-www-form-urlencoded'
+        }
+      },
     TContext
   >({
     mutationKey,
-    mutationFn: async ({ body }) => {
-      return updatePet({ ...config, body, throwOnError: true }).unwrap()
+    mutationFn: async (variables) => {
+      return updatePet({ ...config, ...variables, throwOnError: true } as Parameters<typeof updatePet<true>>[0]).unwrap()
     },
   })
 }
@@ -46,12 +67,33 @@ export function useUpdatePet<TContext>(
           id?: number
         },
       ResponseErrorConfig<unknown | unknown | unknown>,
-      {
-        body: Omit<NonNullable<Pet>, 'id'>
-        path?: never
-        query?: never
-        headers?: never
-      },
+      | {
+          body: Omit<NonNullable<Pet>, 'id'>
+          path?: never
+          query?: never
+          headers?: never
+          contentType?: {
+            request: 'application/json'
+          }
+        }
+      | {
+          body: Omit<NonNullable<Pet>, 'id'>
+          path?: never
+          query?: never
+          headers?: never
+          contentType: {
+            request: 'application/xml'
+          }
+        }
+      | {
+          body: Omit<NonNullable<Pet>, 'id'>
+          path?: never
+          query?: never
+          headers?: never
+          contentType: {
+            request: 'application/x-www-form-urlencoded'
+          }
+        },
       TContext
     > & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
@@ -72,12 +114,33 @@ export function useUpdatePet<TContext>(
         id?: number
       },
     ResponseErrorConfig<unknown | unknown | unknown>,
-    {
-      body: Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/xml'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/x-www-form-urlencoded'
+        }
+      },
     TContext
   >
 
@@ -87,12 +150,33 @@ export function useUpdatePet<TContext>(
         id?: number
       },
     ResponseErrorConfig<unknown | unknown | unknown>,
-    {
-      body: Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/xml'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/x-www-form-urlencoded'
+        }
+      },
     TContext
   >(
     {
@@ -107,12 +191,33 @@ export function useUpdatePet<TContext>(
         id?: number
       },
     ResponseErrorConfig<unknown | unknown | unknown>,
-    {
-      body: Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/xml'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/x-www-form-urlencoded'
+        }
+      },
     TContext
   >
 }

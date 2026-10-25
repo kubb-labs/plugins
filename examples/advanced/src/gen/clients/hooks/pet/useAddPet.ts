@@ -23,17 +23,38 @@ export function addPetMutationOptions<TContext = unknown>(
       code?: number
       message?: string
     }>,
-    {
-      body: AddPetRequest | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    | {
+        body: AddPetRequest
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/xml'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/x-www-form-urlencoded'
+        }
+      },
     TContext
   >({
     mutationKey,
-    mutationFn: async ({ body }) => {
-      return addPet({ ...config, body, throwOnError: true }).unwrap()
+    mutationFn: async (variables) => {
+      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0]).unwrap()
     },
   })
 }
@@ -55,12 +76,33 @@ export function useAddPet<TContext>(
         code?: number
         message?: string
       }>,
-      {
-        body: AddPetRequest | Omit<NonNullable<Pet>, 'id'>
-        path?: never
-        query?: never
-        headers?: never
-      },
+      | {
+          body: AddPetRequest
+          path?: never
+          query?: never
+          headers?: never
+          contentType?: {
+            request: 'application/json'
+          }
+        }
+      | {
+          body: Omit<NonNullable<Pet>, 'id'>
+          path?: never
+          query?: never
+          headers?: never
+          contentType: {
+            request: 'application/xml'
+          }
+        }
+      | {
+          body: Omit<NonNullable<Pet>, 'id'>
+          path?: never
+          query?: never
+          headers?: never
+          contentType: {
+            request: 'application/x-www-form-urlencoded'
+          }
+        },
       TContext
     > & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
@@ -82,12 +124,33 @@ export function useAddPet<TContext>(
       code?: number
       message?: string
     }>,
-    {
-      body: AddPetRequest | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    | {
+        body: AddPetRequest
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/xml'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/x-www-form-urlencoded'
+        }
+      },
     TContext
   >
 
@@ -101,12 +164,33 @@ export function useAddPet<TContext>(
       code?: number
       message?: string
     }>,
-    {
-      body: AddPetRequest | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    | {
+        body: AddPetRequest
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/xml'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/x-www-form-urlencoded'
+        }
+      },
     TContext
   >(
     {
@@ -125,12 +209,33 @@ export function useAddPet<TContext>(
       code?: number
       message?: string
     }>,
-    {
-      body: AddPetRequest | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    | {
+        body: AddPetRequest
+        path?: never
+        query?: never
+        headers?: never
+        contentType?: {
+          request: 'application/json'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/xml'
+        }
+      }
+    | {
+        body: Omit<NonNullable<Pet>, 'id'>
+        path?: never
+        query?: never
+        headers?: never
+        contentType: {
+          request: 'application/x-www-form-urlencoded'
+        }
+      },
     TContext
   >
 }

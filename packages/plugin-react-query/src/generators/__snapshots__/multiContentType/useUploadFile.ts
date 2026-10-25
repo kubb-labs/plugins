@@ -20,8 +20,8 @@ export function uploadFileMutationOptions<TContext = unknown>(
   const mutationKey = uploadFileMutationKey()
   return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
     mutationKey,
-    mutationFn: async ({ path, body }) => {
-      return uploadFile({ ...config, path, body, throwOnError: true }).unwrap()
+    mutationFn: async (variables) => {
+      return uploadFile({ ...config, ...variables, throwOnError: true } as Parameters<typeof uploadFile<true>>[0]).unwrap()
     },
   })
 }

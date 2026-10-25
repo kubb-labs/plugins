@@ -39,8 +39,8 @@ export function usePlaceOrderPatch(
 
   return useSWRMutation<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchMutationKey | null, PlaceOrderPatchMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { body } }) => {
-      return placeOrderPatch({ ...config, body, throwOnError: true }).unwrap()
+    async (_url, { arg: variables }) => {
+      return placeOrderPatch({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrderPatch<true>>[0]).unwrap()
     },
     mutationOptions,
   )

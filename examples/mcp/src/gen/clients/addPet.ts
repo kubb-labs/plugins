@@ -18,7 +18,7 @@ export function addPet<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    request({
+    request<AddPetOptions['body']>({
       method: 'POST',
       url: '/pet',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
