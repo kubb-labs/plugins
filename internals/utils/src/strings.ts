@@ -100,10 +100,8 @@ export function jsStringEscape(input: unknown): string {
   })
 }
 
-// An odd number of backslashes before `p{`, `P{` or `u{` is a Unicode escape that only means something under the `u` flag.
-const UNICODE_ESCAPE = /(?<!\\)(?:\\\\)*\\(?:[pP]|u)\{/
-// A character outside the BMP is two code units without the `u` flag, so a class holding one never matches it whole.
-const ASTRAL_CHARACTER = /[\u{10000}-\u{10FFFF}]/u
+// `\p{`, `\P{` or `\u{` behind an odd number of backslashes, or a character outside the BMP: both need the `u` flag.
+const NEEDS_UNICODE = /(?<!\\)(?:\\\\)*\\[pPu]\{|[\u{10000}-\u{10FFFF}]/u
 // Escapes the `u` flag accepts. `\-` only counts inside a class.
 const KEPT_ESCAPE = /[A-Za-z0-9^$\\.*+?()[\]{}|/]/
 
@@ -112,28 +110,16 @@ const KEPT_ESCAPE = /[A-Za-z0-9^$\\.*+?()[\]{}|/]/
  * not a syntax character, and `\-` outside a class. Both match the same character without the backslash.
  */
 function dropIdentityEscapes(pattern: string): string {
-  let result = ''
   let inClass = false
-  let escaped = false
 
-  for (const char of pattern) {
-    if (escaped) {
-      result += KEPT_ESCAPE.test(char) || (char === '-' && inClass) ? `\\${char}` : char
-      escaped = false
-      continue
+  return pattern.replace(/\\(.)|[[\]]/gs, (match, escaped?: string) => {
+    if (escaped === undefined) {
+      inClass = match === '['
+      return match
     }
 
-    if (char === '\\') {
-      escaped = true
-      continue
-    }
-
-    if (char === '[') inClass = true
-    if (char === ']') inClass = false
-    result += char
-  }
-
-  return escaped ? `${result}\\` : result
+    return KEPT_ESCAPE.test(escaped) || (escaped === '-' && inClass) ? match : escaped
+  })
 }
 
 /**
@@ -141,17 +127,13 @@ function dropIdentityEscapes(pattern: string): string {
  * holds a character outside the BMP. A pattern that is not valid under `u` keeps the flags it came with.
  */
 function toRegExp(pattern: string, flags: string | undefined): RegExp {
-  if (flags?.includes('u') || !(UNICODE_ESCAPE.test(pattern) || ASTRAL_CHARACTER.test(pattern))) return new RegExp(pattern, flags)
+  if (flags?.includes('u') || !NEEDS_UNICODE.test(pattern)) return new RegExp(pattern, flags)
 
-  for (const candidate of [pattern, dropIdentityEscapes(pattern)]) {
-    try {
-      return new RegExp(candidate, `${flags ?? ''}u`)
-    } catch {
-      // Try the next candidate, then fall back to the original flags.
-    }
+  try {
+    return new RegExp(dropIdentityEscapes(pattern), `${flags ?? ''}u`)
+  } catch {
+    return new RegExp(pattern, flags)
   }
-
-  return new RegExp(pattern, flags)
 }
 
 /**
