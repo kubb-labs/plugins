@@ -77,6 +77,7 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
 
 type HookFileProps = {
   hook: ResolvedHookFile
+  clientName?: string
   /**
    * Framework imports rendered between the client imports and the type import.
    */
@@ -87,12 +88,12 @@ type HookFileProps = {
 /**
  * The `<File>` shell shared by the TanStack hook generators; renders `children` after the imports.
  */
-export function HookFile({ hook, imports, children }: HookFileProps): KubbReactNode {
+export function HookFile({ hook, clientName, imports, children }: HookFileProps): KubbReactNode {
   const { file, fileTs, contractOp, importedTypeNames, banner, footer } = hook
 
   return (
     <File baseName={file.baseName} path={file.path} meta={file.meta} banner={banner} footer={footer}>
-      <File.Import name={[contractOp.name]} root={file.path} path={contractOp.path} />
+      <File.Import name={[clientName ? { propertyName: contractOp.name, name: clientName } : contractOp.name]} root={file.path} path={contractOp.path} />
       <File.Import
         name={['RequestConfig', 'ResponseErrorConfig']}
         root={contractOp.clientPathIsFile ? file.path : undefined}

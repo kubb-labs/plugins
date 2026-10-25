@@ -37,10 +37,10 @@ export const queryGenerator = defineGenerator<PluginSwr>({
     const { tsResolver } = hook
 
     return (
-      <HookFile hook={hook}>
+      <HookFile hook={hook} clientName="clientOperation">
         <QueryKey name={queryKeyName} typeName={queryKeyTypeName} node={node} tsResolver={tsResolver} transformer={ctx.options.queryKey} variant="query" />
 
-        <QueryOptions name={queryOptionsName} clientName={contractOp.name} node={node} tsResolver={tsResolver} returnType={contractOp.returnType} />
+        <QueryOptions name={queryOptionsName} clientName="clientOperation" node={node} tsResolver={tsResolver} returnType={contractOp.returnType} />
 
         {query && (
           <>

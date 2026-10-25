@@ -7,7 +7,7 @@ import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
 import type { UpdatePetOptions, UpdatePetStatus200 } from '../types/UpdatePet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { updatePet } from '../clients/updatePet'
+import { updatePet as clientOperation } from '../clients/updatePet'
 
 export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
 
@@ -29,7 +29,7 @@ export function useUpdatePet(options: {
   return useSWRMutation<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetMutationKey | null, UpdatePetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, query, body, headers } }) => {
-      return updatePet({ ...config, path, query, body, headers, throwOnError: true }).unwrap()
+      return clientOperation({ ...config, path, query, body, headers, throwOnError: true }).unwrap()
     },
     mutationOptions
   )

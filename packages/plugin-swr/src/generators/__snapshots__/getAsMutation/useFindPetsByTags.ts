@@ -8,7 +8,7 @@ import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { FindPetsByTagsOptions, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { findPetsByTags } from './clients/findPetsByTags'
+import { findPetsByTags as clientOperation } from './clients/findPetsByTags'
 
 export const findPetsByTagsMutationKey = () => [{ url: '/pet/findByTags' }] as const
 
@@ -34,7 +34,7 @@ export function useFindPetsByTags(
   return useSWRMutation<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, FindPetsByTagsMutationKey | null, FindPetsByTagsMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { query } }) => {
-      return findPetsByTags({ ...config, query, throwOnError: true }).unwrap()
+      return clientOperation({ ...config, query, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

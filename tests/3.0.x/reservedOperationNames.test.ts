@@ -53,8 +53,9 @@ describe('reserved operation names', () => {
         const hookName = `use${name[0]!.toUpperCase()}${name.slice(1)}`
         for (const dir of ['react', 'vue', 'swr']) {
           const hook = await fs.readFile(path.join(output, dir, `${hookName}.ts`), 'utf8')
-          expect(hook).toContain(`import { _${name} }`)
-          expect(hook).toContain(`_${name}(`)
+          const clientName = dir === 'swr' ? 'clientOperation' : `_${name}`
+          expect(hook).toContain(`import { _${name}${dir === 'swr' ? ' as clientOperation' : ''} }`)
+          expect(hook).toContain(`${clientName}(`)
         }
       }
 

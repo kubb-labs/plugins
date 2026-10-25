@@ -7,7 +7,7 @@ import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { GetInventoryStatus200 } from '../../types/GetInventory'
 import type { SWRConfiguration } from 'swr'
-import { getInventory } from '../../clients/getInventory'
+import { getInventory as clientOperation } from '../../clients/getInventory'
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
@@ -16,7 +16,7 @@ type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return getInventory({ ...config, throwOnError: true }).unwrap()
+      return clientOperation({ ...config, throwOnError: true }).unwrap()
     },
   }
 }

@@ -36,7 +36,7 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
     const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp })
 
     return (
-      <HookFile hook={hook}>
+      <HookFile hook={hook} clientName="clientOperation">
         <MutationKey name={mutationKeyName} typeName={mutationKeyTypeName} node={node} transformer={ctx.options.mutationKey} />
 
         {mutation && (
@@ -45,7 +45,7 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
             <File.Import name={['SWRMutationConfiguration']} path={importPath} isTypeOnly />
             <Mutation
               name={mutationHookName}
-              clientName={contractOp.name}
+              clientName="clientOperation"
               mutationKeyName={mutationKeyName}
               mutationKeyTypeName={mutationKeyTypeName}
               mutationArgTypeName={mutationArgTypeName}

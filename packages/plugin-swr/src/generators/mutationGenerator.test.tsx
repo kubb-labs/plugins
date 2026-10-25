@@ -4,7 +4,7 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
 import { describe, expect, test, vi } from 'vitest'
-import { createMultiPluginDriver, matchFiles, testConfig } from '#mocks'
+import { createMultiPluginDriver, matchFiles, rawSources, testConfig } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import type { Transformer } from '@internals/tanstack-query'
 import { resolverSwr } from '../resolvers/resolverSwr.ts'
@@ -145,6 +145,50 @@ describe('mutationGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('mutationGenerator client imports', () => {
+  test.each([
+    'options',
+    'config',
+    'mutation',
+    'client',
+    'path',
+    'query',
+    'body',
+    'headers',
+    'variables',
+    'mutationOptions',
+    'mutationKey',
+    '_url',
+    'useSWR',
+    'useSWRMutation',
+    'clientOperation',
+  ])('calls the imported operation when its name is %s', async (operationId) => {
+    const node = ast.factory.createOperation({
+      operationId,
+      method: 'POST',
+      path: '/pet/{petId}',
+      parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+      responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'string' }) })],
+    })
+    const options = defaultOptions
+    const plugin = createMockedPlugin<PluginSwr>({ name: 'plugin-swr', options, resolver: resolverSwr })
+    const driver = createMultiPluginDriver(operationId, plugins)
+
+    await renderGeneratorOperation(mutationGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverSwr,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain(`import { ${resolverClient.default.name(operationId)} as clientOperation } from`)
+    expect(source).toContain('return clientOperation({ ...config, path, throwOnError: true }).unwrap()')
   })
 })
 
