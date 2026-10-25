@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs/promises'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { adapterOas } from '@kubb/adapter-oas'
@@ -58,13 +59,15 @@ describe('reserved operation names', () => {
       }
 
       const files = (await fs.readdir(output, { recursive: true })).filter((file) => file.endsWith('.ts')).map((file) => path.join(output, file))
-      const compiler = path.join(dirname, 'node_modules/.bin/tsc')
+      const compiler = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
       const flags = ['--ignoreConfig', '--noEmit', '--skipLibCheck', '--module', 'preserve', '--moduleResolution', 'bundler', '--target', 'es2022']
       if (name === 'fetch') {
-        execFileSync(compiler, [...flags, '--strict', ...files.filter((file) => file.startsWith(path.join(output, 'clients')))], { stdio: 'inherit' })
+        execFileSync(process.execPath, [compiler, ...flags, '--strict', ...files.filter((file) => file.startsWith(path.join(output, 'clients')))], {
+          stdio: 'inherit',
+        })
       }
       // Syntax checking covers Axios and hooks whose runtime dependencies are not installed in this test workspace.
-      execFileSync(compiler, [...flags, '--noCheck', ...files], { stdio: 'inherit' })
+      execFileSync(process.execPath, [compiler, ...flags, '--noCheck', ...files], { stdio: 'inherit' })
     } finally {
       await fs.rm(output, { recursive: true, force: true })
     }
