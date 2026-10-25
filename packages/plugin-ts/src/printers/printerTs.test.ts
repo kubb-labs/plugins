@@ -386,6 +386,59 @@ describe('printerTs', () => {
   })
 
   describe('object', () => {
+    it('restricts an optional nested record to propertyNames enum keys', async () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        properties: [
+          ast.factory.createProperty({
+            name: 'keys',
+            schema: ast.factory.createSchema({
+              type: 'object',
+              propertyNames: ast.factory.createSchema({ type: 'enum', enumValues: ['x', 'y'] }),
+              additionalProperties: ast.factory.createSchema({ type: 'string' }),
+            }),
+          }),
+        ],
+      })
+
+      expect(await formatTS(printer.print(node))).toBe("{\n  keys?: Partial<Record<'x' | 'y', string>>\n}")
+    })
+
+    it('preserves referenced key enums and nullable record values', async () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        propertyNames: ast.factory.createSchema({
+          type: 'ref',
+          name: 'Keys',
+          ref: '#/components/schemas/Keys',
+          schema: ast.factory.createSchema({ type: 'enum', enumValues: ['x', 'y'] }),
+        }),
+        additionalProperties: ast.factory.createSchema({ type: 'string', nullable: true }),
+      })
+
+      expect(await formatTS(printer.print(node))).toBe('Partial<Record<Keys, string | null>>')
+    })
+
+    it.each([true, undefined] as const)('uses unknown for unconstrained enum-keyed values (%s)', async (additionalProperties) => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        propertyNames: ast.factory.createSchema({ type: 'enum', enumValues: ['x', 'y'] }),
+        additionalProperties,
+      })
+
+      expect(await formatTS(printer.print(node))).toBe("Partial<Record<'x' | 'y', unknown>>")
+    })
+
+    it('does not add enum-keyed values when additional properties are forbidden', async () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        propertyNames: ast.factory.createSchema({ type: 'enum', enumValues: ['x', 'y'] }),
+        additionalProperties: false,
+      })
+
+      expect(await formatTS(printer.print(node))).toBe('object')
+    })
+
     it('empty object returns object keyword', async () => {
       const result = printer.transform(ast.factory.createSchema({ type: 'object' }))
 

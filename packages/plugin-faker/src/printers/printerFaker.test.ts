@@ -4,6 +4,40 @@ import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import { printerFaker } from './printerFaker.ts'
 
 describe('printerFaker', () => {
+  test.each([false, true])('populates propertyNames enum records (referenced: %s)', (referenced) => {
+    const keys = ast.factory.createSchema({ type: 'enum', enumValues: ['x', 'y'] })
+    const node = ast.factory.createSchema({
+      type: 'object',
+      propertyNames: referenced ? ast.factory.createSchema({ type: 'ref', name: 'Keys', ref: '#/components/schemas/Keys', schema: keys }) : keys,
+      additionalProperties: ast.factory.createSchema({ type: 'string' }),
+    })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('{\n  x: faker.string.alpha(),\n  y: faker.string.alpha(),\n}')
+  })
+
+  test('does not populate enum keys when additional properties are forbidden', () => {
+    const node = ast.factory.createSchema({
+      type: 'object',
+      propertyNames: ast.factory.createSchema({ type: 'enum', enumValues: ['x', 'y'] }),
+      additionalProperties: false,
+    })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('{}')
+  })
+
+  test('preserves fixed properties and indexes enum record values by their quoted keys', () => {
+    const node = ast.factory.createSchema({
+      type: 'object',
+      properties: [ast.factory.createProperty({ name: 'x', schema: ast.factory.createSchema({ type: 'integer' }) })],
+      propertyNames: ast.factory.createSchema({ type: 'enum', enumValues: ['x', 'a-b'] }),
+      additionalProperties: ast.factory.createSchema({ type: 'enum', enumValues: ['on', 'off'] }),
+    })
+
+    expect(printerFaker({ resolver: resolverFaker, typeName: 'Settings' }).print(node)).toBe(
+      "{\n  x: faker.number.int(),\n  'a-b': faker.helpers.arrayElement<NonNullable<Settings>[\"a-b\"]>(['on', 'off']),\n}",
+    )
+  })
+
   test('falls back to the base string printer from a node override', () => {
     const printer = printerFaker({
       resolver: resolverFaker,
