@@ -200,6 +200,14 @@ describe('createClientCore', () => {
     expect(calls[0]?.adapter).toBeUndefined()
   })
 
+  test('JSON-encodes a string body and sets Content-Type', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'POST', url: '/x', body: 'abc', contentType: { request: 'application/json' } })
+    expect(calls[0]?.data).toBe('"abc"')
+    expect(calls[0]?.headers?.['Content-Type']).toBe('application/json')
+  })
+
   test('serializes the body before axios and sets Content-Type', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance })

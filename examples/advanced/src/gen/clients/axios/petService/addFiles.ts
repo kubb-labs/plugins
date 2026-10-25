@@ -66,7 +66,7 @@ export function addFiles<ThrowOnError extends boolean = true>(
             }
           }
       )['body']
-    >({ method: 'POST', url: '/pet/files', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
+    >({ method: 'POST', url: '/pet/files', contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<
       RequestResult<
         {
           '200': Omit<NonNullable<Pet>, 'name'>

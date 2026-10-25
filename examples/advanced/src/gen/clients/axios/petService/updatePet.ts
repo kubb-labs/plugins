@@ -61,7 +61,7 @@ export function updatePet<ThrowOnError extends boolean = true>(
     ThrowOnError
   >
 > {
-  const { client: request = client, ...config } = options
+  const { client: request = client, contentType, ...config } = options
 
   return withUnwrap(
     request<
@@ -99,6 +99,7 @@ export function updatePet<ThrowOnError extends boolean = true>(
       url: '/pet',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       validator: { response: updatePetResponseSchema, error: updatePetErrorSchema },
+      contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
       ...config,
       throwOnError: config.throwOnError ?? true,
     }) as Promise<

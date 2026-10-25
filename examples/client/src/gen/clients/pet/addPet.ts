@@ -15,12 +15,13 @@ import { client } from '../../../client'
 export function addPet<ThrowOnError extends boolean = true>(
   options: Options<AddPetOptions, ThrowOnError>,
 ): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: request = client, contentType, ...config } = options
 
   return request({
     method: 'POST',
     url: '/pet',
     security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+    contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
     ...config,
     throwOnError: config.throwOnError ?? true,
   }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
