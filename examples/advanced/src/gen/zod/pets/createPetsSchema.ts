@@ -1,7 +1,6 @@
 import * as z from 'zod'
 import { createPetsBoolParamSchema } from '../createPetsBoolParamSchema'
 import { createPetsXEXAMPLESchema } from '../createPetsXEXAMPLESchema'
-import { petNotFoundSchema } from '../petNotFoundSchema'
 
 export const createPetsQueryBoolParamSchema = createPetsBoolParamSchema.optional()
 
@@ -23,7 +22,7 @@ export const createPetsStatus201Schema = z.unknown()
 
 export type CreatePetsStatus201SchemaType = z.infer<typeof createPetsStatus201Schema>
 
-export const createPetsStatusDefaultSchema = petNotFoundSchema.describe('Pet not found')
+export const createPetsStatusDefaultSchema = z.unknown().describe('Pet not found')
 
 export type CreatePetsStatusDefaultSchemaType = z.infer<typeof createPetsStatusDefaultSchema>
 

@@ -4,7 +4,6 @@
  */
 
 import * as z from 'zod/mini'
-import { petNotFoundSchema } from './petNotFoundSchema'
 
 export const createPetsPathUuidSchema = z.string()
 
@@ -14,7 +13,7 @@ export const createPetsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE'])
 
 export const createPetsStatus201Schema = z.unknown()
 
-export const createPetsStatusDefaultSchema = petNotFoundSchema
+export const createPetsStatusDefaultSchema = z.unknown()
 
 export const createPetsResponseSchema = createPetsStatus201Schema
 

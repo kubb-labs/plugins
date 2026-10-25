@@ -5,7 +5,6 @@
 
 import * as z from 'zod'
 import { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema'
-import { petNotFoundSchema } from './petNotFoundSchema'
 
 export const createPetsPathUuidSchema = z.string().describe('UUID')
 
@@ -15,7 +14,7 @@ export const createPetsHeaderXEXAMPLESchema = createPetsXEXAMPLESchema.describe(
 
 export const createPetsStatus201Schema = z.unknown()
 
-export const createPetsStatusDefaultSchema = petNotFoundSchema.describe('Pet not found')
+export const createPetsStatusDefaultSchema = z.unknown().describe('Pet not found')
 
 export const createPetsResponseSchema = createPetsStatus201Schema
 

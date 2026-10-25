@@ -3,8 +3,6 @@
  * Do not edit manually.
  */
 
-import type { PetNotFound } from './PetNotFound'
-
 export type CreatePetsPath = {
   /**
    * @description UUID
@@ -43,7 +41,7 @@ export type CreatePetsStatus201 = unknown
  * @description Pet not found
  * @type unknown
  */
-export type CreatePetsStatusDefault = PetNotFound
+export type CreatePetsStatusDefault = unknown
 
 export type CreatePetsBody = {
   name: string

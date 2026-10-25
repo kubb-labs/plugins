@@ -1,9 +1,7 @@
 import type { CreatePetsBoolParamKey } from '../../models/ts/CreatePetsBoolParam'
 import type { CreatePetsXEXAMPLEKey } from '../../models/ts/CreatePetsXEXAMPLE'
-import type { PetNotFound } from '../../models/ts/PetNotFound'
 import { createCreatePetsBoolParamFaker } from '../createCreatePetsBoolParamFaker'
 import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLEFaker'
-import { createPetNotFoundFaker } from '../createPetNotFoundFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createCreatePetsPathFaker<
@@ -60,8 +58,8 @@ export function createCreatePetsStatus201Faker() {
 /**
  * @description unexpected error
  */
-export function createCreatePetsStatusDefaultFaker(_data?: Partial<PetNotFound>): PetNotFound {
-  return createPetNotFoundFaker() as PetNotFound
+export function createCreatePetsStatusDefaultFaker() {
+  return undefined
 }
 
 export function createCreatePetsBodyFaker<
