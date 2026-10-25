@@ -4,6 +4,7 @@ export {
   buildOptionsSchema,
   buildRequestConfigType,
   buildRequestParamsSignature,
+  castToClientOptions,
   buildResponses,
   getContentTypeInfo,
   getOperationParameters,

@@ -1,4 +1,4 @@
-import { buildOperationComments, buildRequestParamsSignature, hasRequestContentTypeChoice } from '@internals/shared'
+import { buildOperationComments, buildRequestParamsSignature, castToClientOptions, hasRequestContentTypeChoice } from '@internals/shared'
 import type { ast } from 'kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File, Function } from 'kubb/jsx'
@@ -38,9 +38,7 @@ export function McpHandler({ name, clientName, node, resolver, returnType = 'ful
   const callArgs = requestGroupOrder.filter((key) => groups[key])
   const callConfig = `{ ${[...callArgs, 'signal: ctx.mcpReq.signal', 'throwOnError: true'].join(', ')} }`
   // Tool arguments carry no media type, so the call takes the client's default one.
-  const callArg = hasRequestContentTypeChoice(node)
-    ? `${callConfig} as Parameters<typeof ${clientName}${returnType === 'plain' ? '' : '<true>'}>[0]`
-    : callConfig
+  const callArg = hasRequestContentTypeChoice(node) ? castToClientOptions(callConfig, clientName, returnType) : callConfig
   const body = returnType === 'data' ? 'res' : 'res.data'
 
   const callToolResult = `return {

@@ -1,4 +1,5 @@
 import {
+  castToClientOptions,
   getOperationParameters,
   getPrimarySuccessResponse,
   getRequestGroupOptionality,
@@ -169,8 +170,7 @@ export function buildClientCall(
 
   // `config` types the media type more loosely than the variables pair it with the body, so the
   // spread no longer proves the pairing to the compiler.
-  if (withContentType && hasRequestContentTypeChoice(node))
-    return `${clientName}({ ${args.join(', ')} } as Parameters<typeof ${clientName}${returnType === 'plain' ? '' : '<true>'}>[0])`
+  if (withContentType && hasRequestContentTypeChoice(node)) return `${clientName}(${castToClientOptions(`{ ${args.join(', ')} }`, clientName, returnType)})`
 
   return `${clientName}({ ${args.join(', ')} })`
 }

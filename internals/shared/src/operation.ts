@@ -416,6 +416,15 @@ export function hasRequestContentTypeChoice(node: ast.OperationNode): boolean {
   return (node.requestBody?.content ?? []).filter((entry) => entry.schema).length > 1
 }
 
+/**
+ * Casts a client call's argument to the client's own parameter type. The options of a body offered in
+ * several media types pair the body with `contentType`, which a spread of loosely typed pieces cannot
+ * prove to the compiler. A `'plain'` client is the caller's own, non-generic function.
+ */
+export function castToClientOptions(callArg: string, clientName: string, returnType: 'full' | 'data' | 'plain' = 'full'): string {
+  return `${callArg} as Parameters<typeof ${clientName}${returnType === 'plain' ? '' : '<true>'}>[0]`
+}
+
 export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver, { pairContentTypes = false } = {}): ast.SchemaNode {
   const { path, query, header } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)

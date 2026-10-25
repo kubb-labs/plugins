@@ -9,4 +9,4 @@
 "@kubb/plugin-mcp": patch
 ---
 
-Tie a request body's media type to its body variant. When a request body offers several media types, `<Name>Options` becomes a union that pairs each body variant with its `contentType.request`: the first media type stays the default and `contentType` is optional for it, while any other variant now requires `contentType: { request: '…' }`. Passing the JSON body of a multipart-first operation without it is a type error instead of being sent as multipart. Mutation hooks forward the chosen `contentType` to the client call.
+A request body offered in several media types now pairs each body variant with its `contentType.request`. The first media type stays the default; any other variant must pass `contentType`, so sending the JSON body of a multipart-first operation as multipart is a type error.
