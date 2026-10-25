@@ -49,6 +49,17 @@ describe('buildStyles', () => {
     )
   })
 
+  test('keys path styles by the spec name, quoted when it is not a bare identifier', () => {
+    const node = createOperation([
+      { name: 'pet_id', in: 'path', schema: stringSchema(), style: 'matrix', explode: true },
+      { name: 'scope.id', in: 'path', schema: stringSchema(), style: 'label' },
+      { name: 'petId', in: 'path', schema: stringSchema(), style: 'simple', explode: false },
+    ])
+    expect(buildStyles({ node })).toBe(
+      "{ path: { pet_id: { style: 'matrix', explode: true }, \"scope.id\": { style: 'label' }, petId: { style: 'simple', explode: false } } }",
+    )
+  })
+
   test('quotes a query key that is not a bare identifier', () => {
     const node = createOperation([{ name: '2fa', in: 'query', schema: stringSchema(), explode: true }])
     expect(buildStyles({ node })).toBe('{ query: { "2fa": { explode: true } } }')

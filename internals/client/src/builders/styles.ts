@@ -1,16 +1,15 @@
-import { camelCase, isValidVarName } from '@internals/utils'
+import { isValidVarName } from '@internals/utils'
 import { ast } from 'kubb/kit'
 
 type StyledLocation = 'path' | 'query' | 'header' | 'cookie'
 
 /**
- * Renders a parameter name as an object-literal key, quoted when it is not a bare identifier.
- * Path keys are camelCased to match the URL template placeholders. Query, header, and cookie keys
- * keep the spec name, matching the remapped keys the runtime serializes.
+ * Renders a parameter name as an object-literal key, quoted when it is not a bare identifier. Every
+ * location keeps the spec name: the runtime looks path styles up by the `{name}` placeholder in the
+ * URL, and the other locations by the key it serializes.
  */
-function toKey(name: string, location: StyledLocation): string {
-  const key = location === 'path' ? camelCase(name) : name
-  return isValidVarName(key) ? key : JSON.stringify(key)
+function toKey(name: string): string {
+  return isValidVarName(name) ? name : JSON.stringify(name)
 }
 
 /**
@@ -53,8 +52,7 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): string | null {
 
 /**
  * Builds the per-operation `styles` literal from the operation's parameters, grouped by location.
- * Path entries are keyed by the camelCased name to match the URL template placeholders; query,
- * header, and cookie entries keep the spec name to match the keys the runtime serializes.
+ * Entries are keyed by the spec name of the parameter.
  * Only parameters whose source defines `style`, `explode`, `allowReserved`, or `contentType` are
  * emitted, so calls without serialization metadata keep the runtime defaults and existing output
  * is unchanged. A form request body adds a `body` group keyed by property name from its `encoding`.
@@ -74,7 +72,7 @@ export function buildStyles({ node }: { node: ast.OperationNode }): string | nul
   for (const parameter of node.parameters) {
     const literal = serializeParameter(parameter)
     if (!literal) continue
-    groups[parameter.in].push(`${toKey(parameter.name, parameter.in)}: ${literal}`)
+    groups[parameter.in].push(`${toKey(parameter.name)}: ${literal}`)
   }
 
   const entries = [
