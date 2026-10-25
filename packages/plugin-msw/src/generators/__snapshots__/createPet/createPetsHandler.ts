@@ -17,10 +17,15 @@ export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
 
 export function createPetsHandler(
   data?:
-    string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, unknown extends CreatePetsBody ? DefaultBodyType : CreatePetsBody>,
+    | string
+    | number
+    | boolean
+    | null
+    | object
+    | HttpResponseResolver<Record<string, string>, CreatePetsBody extends DefaultBodyType ? CreatePetsBody : DefaultBodyType>,
   options?: { baseURL?: string },
 ) {
-  return http.post<Record<string, string>, unknown extends CreatePetsBody ? DefaultBodyType : CreatePetsBody>(
+  return http.post<Record<string, string>, CreatePetsBody extends DefaultBodyType ? CreatePetsBody : DefaultBodyType>(
     `${options?.baseURL ?? ''}/pets`,
     function handler(info) {
       if (typeof data === 'function') return data(info)

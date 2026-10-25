@@ -17,8 +17,8 @@ export function uploadFileHandlerResponse200(data: UploadFileResponse) {
   })
 }
 
-export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, unknown extends UploadFileBody ? DefaultBodyType : UploadFileBody>, options?: { baseURL?: string }) {
-  return http.post<Record<string, string>, unknown extends UploadFileBody ? DefaultBodyType : UploadFileBody>(`${options?.baseURL ?? ''}/pet/:petId/uploadImage`, function handler(info) {
+export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, UploadFileBody extends DefaultBodyType ? UploadFileBody : DefaultBodyType>, options?: { baseURL?: string }) {
+  return http.post<Record<string, string>, UploadFileBody extends DefaultBodyType ? UploadFileBody : DefaultBodyType>(`${options?.baseURL ?? ''}/pet/:petId/uploadImage`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return new HttpResponse(JSON.stringify(data), {
