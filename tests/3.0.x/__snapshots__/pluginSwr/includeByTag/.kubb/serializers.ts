@@ -196,7 +196,7 @@ export const defaultBodySerializer: BodySerializer = ({ body, contentType, encod
   }
   if (normalizedContentType?.includes('application/x-www-form-urlencoded')) {
     if (encoding) return serializeUrlencodedBody(body as Record<string, unknown>, encoding)
-    return new URLSearchParams(body as Record<string, string>)
+    return new URLSearchParams(serializeUrlencodedBody(body as Record<string, unknown>, {}))
   }
   return JSON.stringify(body, jsonReplacer)
 }
