@@ -5,8 +5,8 @@ import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyModifiers,
   buildEnum,
+  buildLiteral,
   buildObjectShape,
-  formatDefault,
   getMemberConstraint,
   integerFormatPattern,
   isClosedKeySchema,
@@ -350,7 +350,7 @@ const scalarNodes: PrinterZodNodes = {
 
     // asConst-style enum: use z.union([z.literal(…), …])
     if (node.namedEnumValues?.length) {
-      const literals = nonNullValues.map((v) => `z.literal(${formatDefault(v)})`)
+      const literals = nonNullValues.map((v) => buildLiteral(v))
 
       if (literals.length === 1) return literals[0]!
       return `z.union([${literals.join(', ')}])`

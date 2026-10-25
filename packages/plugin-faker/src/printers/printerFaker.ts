@@ -245,8 +245,13 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       enum(node) {
         const { typeName } = this.options
+        const values = ast.getSchemaLiteralValues(node)
 
-        return `faker.helpers.arrayElement${typeName ? `<${typeName}>` : ''}([${ast.getSchemaLiteralValues(node).map(parseEnumValue).join(', ')}])`
+        if (values.length === 1 && values[0] !== null && typeof values[0] === 'object') {
+          return JSON.stringify(values[0])
+        }
+
+        return `faker.helpers.arrayElement${typeName ? `<${typeName}>` : ''}([${values.map(parseEnumValue).join(', ')}])`
       },
       union(node): string {
         const { discriminatorPropertyName } = node

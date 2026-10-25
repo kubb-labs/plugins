@@ -209,6 +209,10 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       enum(node) {
         const values = ast.getSchemaLiteralValues(node)
 
+        if (values.some((value) => value !== null && typeof value === 'object')) {
+          return factory.createUnionDeclaration({ nodes: values.map((value) => factory.constToTypeNode(value)) })
+        }
+
         // A `const` (single-value enum) the adapter did not register as a named enum emits the bare
         // literal regardless of `enum.type`, matching how its references resolve.
         if (this.options.enum.type === 'inlineLiteral' || !node.name || isInlineConstEnum(node, this.options.enumSchemaNames)) {
