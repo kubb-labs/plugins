@@ -1,6 +1,5 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
-import type { AddPetRequest } from '../../../models/ts/AddPetRequest'
-import type { Pet } from '../../../models/ts/Pet'
+import type { AddPetOptions, AddPetResponses } from '../../../models/ts/pet/AddPet'
 import { client, withUnwrap } from '../../../.kubb/client'
 import { addPetResponseSchema, addPetErrorSchema } from '../../../zod/pet/addPetSchema'
 
@@ -10,35 +9,8 @@ import { addPetResponseSchema, addPetErrorSchema } from '../../../zod/pet/addPet
  * {@link /pet}
  */
 export function addPet<ThrowOnError extends boolean = true>(
-  options: Options<
-    {
-      body: AddPetRequest | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
-    ThrowOnError
-  >,
-): Unwrappable<
-  RequestResult<
-    {
-      '405': {
-        code?: number
-        message?: string
-      }
-      default:
-        | {
-            contentType: 'application/json'
-            data: Omit<NonNullable<Pet>, 'name'>
-          }
-        | {
-            contentType: 'application/xml'
-            data: Omit<NonNullable<Pet>, 'name'>
-          }
-    },
-    ThrowOnError
-  >
-> {
+  options: Options<AddPetOptions, ThrowOnError>,
+): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
   return withUnwrap(
@@ -49,25 +21,6 @@ export function addPet<ThrowOnError extends boolean = true>(
       validator: { response: addPetResponseSchema, error: addPetErrorSchema },
       ...config,
       throwOnError: config.throwOnError ?? true,
-    }) as Promise<
-      RequestResult<
-        {
-          '405': {
-            code?: number
-            message?: string
-          }
-          default:
-            | {
-                contentType: 'application/json'
-                data: Omit<NonNullable<Pet>, 'name'>
-              }
-            | {
-                contentType: 'application/xml'
-                data: Omit<NonNullable<Pet>, 'name'>
-              }
-        },
-        ThrowOnError
-      >
-    >,
+    }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>,
   )
 }

@@ -1,3 +1,4 @@
+import type { GetPetByIdOptions } from '../../models/ts/pet/GetPetById'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { getPetById } from '../../clients/axios/petService/getPetById'
 
@@ -6,19 +7,7 @@ import { getPetById } from '../../clients/axios/petService/getPetById'
  * @summary Find pet by ID
  * {@link /pet/:petId:search}
  */
-export async function getPetByIdHandler(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      petId: number
-    }
-    query?: never
-    headers?: never
-  },
-  ctx: ServerContext,
-): Promise<CallToolResult> {
+export async function getPetByIdHandler({ path }: GetPetByIdOptions, ctx: ServerContext): Promise<CallToolResult> {
   const res = await getPetById({ path, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

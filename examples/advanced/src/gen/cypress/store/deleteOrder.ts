@@ -1,18 +1,8 @@
-export function deleteOrder(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      orderId: number
-    }
-    query?: never
-    headers?: never
-  },
-  options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<unknown | unknown> {
+import type { DeleteOrderOptions, DeleteOrderResponse } from '../../models/ts/store/DeleteOrder'
+
+export function deleteOrder({ path }: DeleteOrderOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeleteOrderResponse> {
   return cy
-    .request<unknown | unknown>({
+    .request<DeleteOrderResponse>({
       method: 'DELETE',
       url: `/store/order/${path.orderId}`,
       ...options,

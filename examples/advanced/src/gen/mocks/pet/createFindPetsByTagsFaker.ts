@@ -1,16 +1,16 @@
-import type { FindPetsByTagsXEXAMPLEKey } from '../../models/ts/FindPetsByTagsXEXAMPLE'
-import type { Pet } from '../../models/ts/Pet'
+import type {
+  FindPetsByTagsHeaders,
+  FindPetsByTagsQuery,
+  FindPetsByTagsResponse,
+  FindPetsByTagsStatus200,
+  FindPetsByTagsStatus200Json,
+  FindPetsByTagsStatus200Xml,
+} from '../../models/ts/pet/FindPetsByTags'
 import { createFindPetsByTagsXEXAMPLEFaker } from '../createFindPetsByTagsXEXAMPLEFaker'
 import { createPetFaker } from '../createPetFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createFindPetsByTagsQueryFaker<
-  TData extends Partial<{
-    tags?: Array<string>
-    page?: string
-    pageSize?: number
-  }> = object,
->(data?: TData) {
+export function createFindPetsByTagsQueryFaker<TData extends Partial<FindPetsByTagsQuery> = object>(data?: TData) {
   const defaultFakeData = {
     tags: faker.helpers.multiple(() => faker.string.alpha()),
     page: faker.string.alpha(),
@@ -22,11 +22,7 @@ export function createFindPetsByTagsQueryFaker<
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createFindPetsByTagsHeadersFaker<
-  TData extends Partial<{
-    'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
-  }> = object,
->(data?: TData) {
+export function createFindPetsByTagsHeadersFaker<TData extends Partial<FindPetsByTagsHeaders> = object>(data?: TData) {
   const defaultFakeData = {
     'X-EXAMPLE': createFindPetsByTagsXEXAMPLEFaker(),
   }
@@ -39,22 +35,22 @@ export function createFindPetsByTagsHeadersFaker<
 /**
  * @description successful operation
  */
-export function createFindPetsByTagsStatus200FakerJson(data?: Partial<Array<Pet>>): Array<Pet> {
-  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || []).filter((item) => item !== undefined)] as Array<Pet>
+export function createFindPetsByTagsStatus200FakerJson(data?: Partial<FindPetsByTagsStatus200Json>): FindPetsByTagsStatus200Json {
+  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || []).filter((item) => item !== undefined)] as FindPetsByTagsStatus200Json
 }
 
 /**
  * @description successful operation
  */
-export function createFindPetsByTagsStatus200FakerXml(data?: Partial<Array<Pet>>): Array<Pet> {
-  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || []).filter((item) => item !== undefined)] as Array<Pet>
+export function createFindPetsByTagsStatus200FakerXml(data?: Partial<FindPetsByTagsStatus200Xml>): FindPetsByTagsStatus200Xml {
+  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || []).filter((item) => item !== undefined)] as FindPetsByTagsStatus200Xml
 }
 
 /**
  * @description successful operation
  */
-export function createFindPetsByTagsStatus200Faker(data?: Partial<Array<Pet>>): Array<Pet> {
-  return (data ?? faker.helpers.arrayElement([createFindPetsByTagsStatus200FakerJson(), createFindPetsByTagsStatus200FakerXml()])) as Array<Pet>
+export function createFindPetsByTagsStatus200Faker(data?: Partial<FindPetsByTagsStatus200>): FindPetsByTagsStatus200 {
+  return (data ?? faker.helpers.arrayElement([createFindPetsByTagsStatus200FakerJson(), createFindPetsByTagsStatus200FakerXml()])) as FindPetsByTagsStatus200
 }
 
 /**
@@ -64,6 +60,6 @@ export function createFindPetsByTagsStatus400Faker() {
   return undefined
 }
 
-export function createFindPetsByTagsResponseFaker(data?: Partial<Array<Pet>>): Array<Pet> {
-  return (data ?? faker.helpers.arrayElement([createFindPetsByTagsStatus200Faker(), createFindPetsByTagsStatus400Faker()])) as Array<Pet>
+export function createFindPetsByTagsResponseFaker(data?: Partial<FindPetsByTagsResponse>): FindPetsByTagsResponse {
+  return (data ?? faker.helpers.arrayElement([createFindPetsByTagsStatus200Faker(), createFindPetsByTagsStatus400Faker()])) as FindPetsByTagsResponse
 }

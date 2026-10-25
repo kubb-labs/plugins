@@ -1,20 +1,8 @@
-import type { PetEvent } from '../../models/ts/PetEvent'
+import type { StreamPetEventsOptions, StreamPetEventsResponse } from '../../models/ts/stream/StreamPetEvents'
 
-export function streamPetEvents(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      petId: number
-    }
-    query?: never
-    headers?: never
-  },
-  options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<PetEvent> {
+export function streamPetEvents({ path }: StreamPetEventsOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<StreamPetEventsResponse> {
   return cy
-    .request<PetEvent>({
+    .request<StreamPetEventsResponse>({
       method: 'GET',
       url: `/pet/${path.petId}/events`,
       ...options,

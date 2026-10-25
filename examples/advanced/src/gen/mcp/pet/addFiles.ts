@@ -1,4 +1,4 @@
-import type { Pet } from '../../models/ts/Pet'
+import type { AddFilesOptions } from '../../models/ts/pet/AddFiles'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { addFiles } from '../../clients/axios/petService/addFiles'
 
@@ -7,21 +7,7 @@ import { addFiles } from '../../clients/axios/petService/addFiles'
  * @summary Place an file for a pet
  * {@link /pet/files}
  */
-export async function addFilesHandler(
-  {
-    body,
-  }: {
-    body:
-      | {
-          url: string
-        }
-      | Omit<NonNullable<Pet>, 'id'>
-    path?: never
-    query?: never
-    headers?: never
-  },
-  ctx: ServerContext,
-): Promise<CallToolResult> {
+export async function addFilesHandler({ body }: AddFilesOptions, ctx: ServerContext): Promise<CallToolResult> {
   const res = await addFiles({ body, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

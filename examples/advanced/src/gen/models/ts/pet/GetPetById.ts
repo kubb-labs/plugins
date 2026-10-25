@@ -1,0 +1,47 @@
+import type { Pet } from '../Pet'
+
+export type GetPetByIdPath = {
+  /**
+   * @description ID of pet to return
+   *
+   * Format: `int64`
+   * @type integer
+   */
+  petId: number
+}
+
+export type GetPetByIdStatus200Json = Omit<NonNullable<Pet>, 'name'>
+
+export type GetPetByIdStatus200Xml = Omit<NonNullable<Pet>, 'name'>
+
+export type GetPetByIdStatus200 = GetPetByIdStatus200Json
+
+export type GetPetByIdStatus400 = unknown
+
+export type GetPetByIdStatus404 = unknown
+
+export type GetPetByIdOptions = {
+  body?: never
+  path: GetPetByIdPath
+  query?: never
+  headers?: never
+}
+
+export type GetPetByIdResponses = {
+  '200':
+    | {
+        contentType: 'application/json'
+        data: GetPetByIdStatus200Json
+      }
+    | {
+        contentType: 'application/xml'
+        data: GetPetByIdStatus200Xml
+      }
+  '400': GetPetByIdStatus400
+  '404': GetPetByIdStatus404
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetPetByIdResponse = GetPetByIdStatus200

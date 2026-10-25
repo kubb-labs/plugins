@@ -23,6 +23,155 @@ export type { PetEvent } from './models/ts/PetEvent'
 export type { PetEventTypeEnumKey } from './models/ts/PetEventTypeEnum'
 export type { PetNotFound } from './models/ts/PetNotFound'
 export type { PetStatusEnumKey } from './models/ts/PetStatusEnum'
+export type {
+  AddFilesBody,
+  AddFilesBodyFormData,
+  AddFilesBodyJson,
+  AddFilesOptions,
+  AddFilesResponse,
+  AddFilesResponses,
+  AddFilesStatus200,
+  AddFilesStatus405,
+} from './models/ts/pet/AddFiles'
+export type {
+  AddPetBody,
+  AddPetBodyFormUrlEncoded,
+  AddPetBodyJson,
+  AddPetBodyXml,
+  AddPetOptions,
+  AddPetResponse,
+  AddPetResponses,
+  AddPetStatus405,
+  AddPetStatusDefault,
+  AddPetStatusDefaultJson,
+  AddPetStatusDefaultXml,
+} from './models/ts/pet/AddPet'
+export type { DeletePetHeaders, DeletePetOptions, DeletePetPath, DeletePetResponse, DeletePetResponses, DeletePetStatus400 } from './models/ts/pet/DeletePet'
+export type {
+  FindPetsByStatusOptions,
+  FindPetsByStatusPath,
+  FindPetsByStatusResponse,
+  FindPetsByStatusResponses,
+  FindPetsByStatusStatus200,
+  FindPetsByStatusStatus200Json,
+  FindPetsByStatusStatus200Xml,
+  FindPetsByStatusStatus400,
+} from './models/ts/pet/FindPetsByStatus'
+export type {
+  FindPetsByTagsHeaders,
+  FindPetsByTagsOptions,
+  FindPetsByTagsQuery,
+  FindPetsByTagsResponse,
+  FindPetsByTagsResponses,
+  FindPetsByTagsStatus200,
+  FindPetsByTagsStatus200Json,
+  FindPetsByTagsStatus200Xml,
+  FindPetsByTagsStatus400,
+} from './models/ts/pet/FindPetsByTags'
+export type {
+  GetPetByIdOptions,
+  GetPetByIdPath,
+  GetPetByIdResponse,
+  GetPetByIdResponses,
+  GetPetByIdStatus200,
+  GetPetByIdStatus200Json,
+  GetPetByIdStatus200Xml,
+  GetPetByIdStatus400,
+  GetPetByIdStatus404,
+} from './models/ts/pet/GetPetById'
+export type {
+  UpdatePetBody,
+  UpdatePetBodyFormUrlEncoded,
+  UpdatePetBodyJson,
+  UpdatePetBodyXml,
+  UpdatePetOptions,
+  UpdatePetResponse,
+  UpdatePetResponses,
+  UpdatePetStatus200,
+  UpdatePetStatus200Json,
+  UpdatePetStatus200Xml,
+  UpdatePetStatus202,
+  UpdatePetStatus400,
+  UpdatePetStatus404,
+  UpdatePetStatus405,
+} from './models/ts/pet/UpdatePet'
+export type {
+  UpdatePetWithFormOptions,
+  UpdatePetWithFormPath,
+  UpdatePetWithFormQuery,
+  UpdatePetWithFormResponse,
+  UpdatePetWithFormResponses,
+  UpdatePetWithFormStatus405,
+} from './models/ts/pet/UpdatePetWithForm'
+export type {
+  UploadFileBody,
+  UploadFileOptions,
+  UploadFilePath,
+  UploadFileQuery,
+  UploadFileResponse,
+  UploadFileResponses,
+  UploadFileStatus200,
+} from './models/ts/pet/UploadFile'
+export type {
+  CreatePetsBody,
+  CreatePetsHeaders,
+  CreatePetsOptions,
+  CreatePetsPath,
+  CreatePetsQuery,
+  CreatePetsResponse,
+  CreatePetsResponses,
+  CreatePetsStatus201,
+  CreatePetsStatusDefault,
+} from './models/ts/pets/CreatePets'
+export type {
+  DeleteOrderOptions,
+  DeleteOrderPath,
+  DeleteOrderResponse,
+  DeleteOrderResponses,
+  DeleteOrderStatus400,
+  DeleteOrderStatus404,
+} from './models/ts/store/DeleteOrder'
+export type { GetInventoryOptions, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/ts/store/GetInventory'
+export type {
+  GetOrderByIdOptions,
+  GetOrderByIdPath,
+  GetOrderByIdResponse,
+  GetOrderByIdResponses,
+  GetOrderByIdStatus200,
+  GetOrderByIdStatus200Json,
+  GetOrderByIdStatus200Xml,
+  GetOrderByIdStatus400,
+  GetOrderByIdStatus404,
+} from './models/ts/store/GetOrderById'
+export type {
+  PlaceOrderBody,
+  PlaceOrderBodyFormUrlEncoded,
+  PlaceOrderBodyJson,
+  PlaceOrderBodyXml,
+  PlaceOrderOptions,
+  PlaceOrderResponse,
+  PlaceOrderResponses,
+  PlaceOrderStatus200,
+  PlaceOrderStatus405,
+} from './models/ts/store/PlaceOrder'
+export type {
+  PlaceOrderPatchBody,
+  PlaceOrderPatchBodyFormUrlEncoded,
+  PlaceOrderPatchBodyJson,
+  PlaceOrderPatchBodyXml,
+  PlaceOrderPatchOptions,
+  PlaceOrderPatchResponse,
+  PlaceOrderPatchResponses,
+  PlaceOrderPatchStatus200,
+  PlaceOrderPatchStatus405,
+} from './models/ts/store/PlaceOrderPatch'
+export type {
+  StreamPetEventsOptions,
+  StreamPetEventsPath,
+  StreamPetEventsResponse,
+  StreamPetEventsResponses,
+  StreamPetEventsStatus200,
+} from './models/ts/stream/StreamPetEvents'
 export type { TagTag } from './models/ts/tag/Tag'
 export type { AddPetRequestSchemaType } from './zod/addPetRequestSchema'
 export type { AddPetRequestStatusEnumSchemaType } from './zod/addPetRequestStatusEnumSchema'

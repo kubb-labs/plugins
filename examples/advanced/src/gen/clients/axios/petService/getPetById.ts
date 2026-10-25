@@ -1,5 +1,5 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
-import type { Pet } from '../../../models/ts/Pet'
+import type { GetPetByIdOptions, GetPetByIdResponses } from '../../../models/ts/pet/GetPetById'
 import { client, withUnwrap } from '../../../.kubb/client'
 import { getPetByIdResponseSchema, getPetByIdErrorSchema } from '../../../zod/pet/getPetByIdSchema'
 
@@ -9,35 +9,8 @@ import { getPetByIdResponseSchema, getPetByIdErrorSchema } from '../../../zod/pe
  * {@link /pet/:petId:search}
  */
 export function getPetById<ThrowOnError extends boolean = true>(
-  options: Options<
-    {
-      body?: never
-      path: {
-        petId: number
-      }
-      query?: never
-      headers?: never
-    },
-    ThrowOnError
-  >,
-): Unwrappable<
-  RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Omit<NonNullable<Pet>, 'name'>
-          }
-        | {
-            contentType: 'application/xml'
-            data: Omit<NonNullable<Pet>, 'name'>
-          }
-      '400': unknown
-      '404': unknown
-    },
-    ThrowOnError
-  >
-> {
+  options: Options<GetPetByIdOptions, ThrowOnError>,
+): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
   return withUnwrap(
@@ -51,23 +24,6 @@ export function getPetById<ThrowOnError extends boolean = true>(
       validator: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema },
       ...config,
       throwOnError: config.throwOnError ?? true,
-    }) as Promise<
-      RequestResult<
-        {
-          '200':
-            | {
-                contentType: 'application/json'
-                data: Omit<NonNullable<Pet>, 'name'>
-              }
-            | {
-                contentType: 'application/xml'
-                data: Omit<NonNullable<Pet>, 'name'>
-              }
-          '400': unknown
-          '404': unknown
-        },
-        ThrowOnError
-      >
-    >,
+    }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>,
   )
 }

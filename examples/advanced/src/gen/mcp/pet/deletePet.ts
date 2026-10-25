@@ -1,3 +1,4 @@
+import type { DeletePetOptions } from '../../models/ts/pet/DeletePet'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { deletePet } from '../../clients/axios/petService/deletePet'
 
@@ -6,22 +7,7 @@ import { deletePet } from '../../clients/axios/petService/deletePet'
  * @summary Deletes a pet
  * {@link /pet/:petId:search}
  */
-export async function deletePetHandler(
-  {
-    path,
-    headers,
-  }: {
-    body?: never
-    path: {
-      petId: number
-    }
-    query?: never
-    headers?: {
-      api_key?: string
-    }
-  },
-  ctx: ServerContext,
-): Promise<CallToolResult> {
+export async function deletePetHandler({ path, headers }: DeletePetOptions, ctx: ServerContext): Promise<CallToolResult> {
   const res = await deletePet({ path, headers, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

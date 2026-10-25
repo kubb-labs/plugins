@@ -1,20 +1,8 @@
-import type { Pet } from '../../models/ts/Pet'
+import type { GetPetByIdOptions, GetPetByIdResponse } from '../../models/ts/pet/GetPetById'
 
-export function getPetById(
-  {
-    path,
-  }: {
-    body?: never
-    path: {
-      petId: number
-    }
-    query?: never
-    headers?: never
-  },
-  options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<Omit<NonNullable<Pet>, 'name'>> {
+export function getPetById({ path }: GetPetByIdOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetByIdResponse> {
   return cy
-    .request<Omit<NonNullable<Pet>, 'name'>>({
+    .request<GetPetByIdResponse>({
       method: 'GET',
       url: `/pet/${path.petId}:search`,
       ...options,

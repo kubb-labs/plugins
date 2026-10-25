@@ -1,4 +1,5 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from '../../../models/ts/pet/UpdatePetWithForm'
 import { client, withUnwrap } from '../../../.kubb/client'
 import { updatePetWithFormResponseSchema, updatePetWithFormErrorSchema } from '../../../zod/pet/updatePetWithFormSchema'
 
@@ -7,28 +8,8 @@ import { updatePetWithFormResponseSchema, updatePetWithFormErrorSchema } from '.
  * {@link /pet/:petId:search}
  */
 export function updatePetWithForm<ThrowOnError extends boolean = true>(
-  options: Options<
-    {
-      body?: never
-      path: {
-        petId: number
-      }
-      query?: {
-        name?: string
-        status?: string
-      }
-      headers?: never
-    },
-    ThrowOnError
-  >,
-): Unwrappable<
-  RequestResult<
-    {
-      '405': unknown
-    },
-    ThrowOnError
-  >
-> {
+  options: Options<UpdatePetWithFormOptions, ThrowOnError>,
+): Unwrappable<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
   return withUnwrap(
@@ -39,13 +20,6 @@ export function updatePetWithForm<ThrowOnError extends boolean = true>(
       validator: { response: updatePetWithFormResponseSchema, error: updatePetWithFormErrorSchema },
       ...config,
       throwOnError: config.throwOnError ?? true,
-    }) as Promise<
-      RequestResult<
-        {
-          '405': unknown
-        },
-        ThrowOnError
-      >
-    >,
+    }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>,
   )
 }

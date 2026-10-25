@@ -1,0 +1,30 @@
+import type { Order } from '../Order'
+
+export type PlaceOrderPatchStatus200 = Order
+
+export type PlaceOrderPatchStatus405 = unknown
+
+export type PlaceOrderPatchBodyJson = Order | undefined
+
+export type PlaceOrderPatchBodyXml = Order | undefined
+
+export type PlaceOrderPatchBodyFormUrlEncoded = Order | undefined
+
+export type PlaceOrderPatchBody = PlaceOrderPatchBodyJson
+
+export type PlaceOrderPatchOptions = {
+  body: PlaceOrderPatchBody
+  path?: never
+  query?: never
+  headers?: never
+}
+
+export type PlaceOrderPatchResponses = {
+  '200': PlaceOrderPatchStatus200
+  '405': PlaceOrderPatchStatus405
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200

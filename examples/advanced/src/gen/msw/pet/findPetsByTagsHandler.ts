@@ -1,7 +1,7 @@
-import type { Pet } from '../../models/ts/Pet'
+import type { FindPetsByTagsResponse, FindPetsByTagsStatus400 } from '../../models/ts/pet/FindPetsByTags'
 import { http, HttpResponse } from 'msw/http'
 
-export function findPetsByTagsHandlerResponse200(data: Array<Pet>) {
+export function findPetsByTagsHandlerResponse200(data: FindPetsByTagsResponse) {
   return new HttpResponse(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -10,14 +10,14 @@ export function findPetsByTagsHandlerResponse200(data: Array<Pet>) {
   })
 }
 
-export function findPetsByTagsHandlerResponse400(data?: unknown) {
+export function findPetsByTagsHandlerResponse400(data?: FindPetsByTagsStatus400) {
   return new HttpResponse(JSON.stringify(data), {
     status: 400,
   })
 }
 
 export function findPetsByTagsHandler(
-  data?: Array<Pet> | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  data?: FindPetsByTagsResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
   return http.get(`${options?.baseURL ?? ''}/pet/findByTags`, function handler(info) {

@@ -1,3 +1,4 @@
+import type { UploadFileOptions } from '../../models/ts/pet/UploadFile'
 import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server'
 import { uploadFile } from '../../clients/axios/petService/uploadFile'
 
@@ -5,23 +6,7 @@ import { uploadFile } from '../../clients/axios/petService/uploadFile'
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFileHandler(
-  {
-    path,
-    query,
-    body,
-  }: {
-    body: Blob
-    path: {
-      petId: number
-    }
-    query?: {
-      additionalMetadata?: string
-    }
-    headers?: never
-  },
-  ctx: ServerContext,
-): Promise<CallToolResult> {
+export async function uploadFileHandler({ path, query, body }: UploadFileOptions, ctx: ServerContext): Promise<CallToolResult> {
   const res = await uploadFile({ path, query, body, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

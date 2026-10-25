@@ -1,5 +1,5 @@
 import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
-import type { Pet } from '../../../models/ts/Pet'
+import type { AddFilesOptions, AddFilesStatus200, AddFilesStatus405 } from '../../../models/ts/pet/AddFiles'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { addFiles } from '../../axios/petService/addFiles'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -12,21 +12,7 @@ export function addFilesMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = addFilesMutationKey()
-  return mutationOptions<
-    Omit<NonNullable<Pet>, 'name'>,
-    ResponseErrorConfig<unknown>,
-    {
-      body:
-        | {
-            url: string
-          }
-        | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >({
+  return mutationOptions<AddFilesStatus200, ResponseErrorConfig<AddFilesStatus405>, AddFilesOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       return addFiles({ ...config, body, throwOnError: true }).unwrap()
@@ -41,21 +27,7 @@ export function addFilesMutationOptions<TContext = unknown>(
  */
 export function useAddFiles<TContext>(
   options: {
-    mutation?: UseMutationOptions<
-      Omit<NonNullable<Pet>, 'name'>,
-      ResponseErrorConfig<unknown>,
-      {
-        body:
-          | {
-              url: string
-            }
-          | Omit<NonNullable<Pet>, 'id'>
-        path?: never
-        query?: never
-        headers?: never
-      },
-      TContext
-    > & { client?: QueryClient }
+    mutation?: UseMutationOptions<AddFilesStatus200, ResponseErrorConfig<AddFilesStatus405>, AddFilesOptions, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: { request?: 'application/json' | 'multipart/form-data' }
     }
@@ -66,55 +38,18 @@ export function useAddFiles<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? addFilesMutationKey()
 
   const baseOptions = addFilesMutationOptions(config) as UseMutationOptions<
-    Omit<NonNullable<Pet>, 'name'>,
-    ResponseErrorConfig<unknown>,
-    {
-      body:
-        | {
-            url: string
-          }
-        | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
+    AddFilesStatus200,
+    ResponseErrorConfig<AddFilesStatus405>,
+    AddFilesOptions,
     TContext
   >
 
-  return useMutation<
-    Omit<NonNullable<Pet>, 'name'>,
-    ResponseErrorConfig<unknown>,
-    {
-      body:
-        | {
-            url: string
-          }
-        | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >(
+  return useMutation<AddFilesStatus200, ResponseErrorConfig<AddFilesStatus405>, AddFilesOptions, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<
-    Omit<NonNullable<Pet>, 'name'>,
-    ResponseErrorConfig<unknown>,
-    {
-      body:
-        | {
-            url: string
-          }
-        | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >
+  ) as UseMutationResult<AddFilesStatus200, ResponseErrorConfig<AddFilesStatus405>, AddFilesOptions, TContext>
 }

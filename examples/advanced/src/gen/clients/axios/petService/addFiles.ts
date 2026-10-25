@@ -1,5 +1,5 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
-import type { Pet } from '../../../models/ts/Pet'
+import type { AddFilesOptions, AddFilesResponses } from '../../../models/ts/pet/AddFiles'
 import { client, withUnwrap } from '../../../.kubb/client'
 
 /**
@@ -8,39 +8,13 @@ import { client, withUnwrap } from '../../../.kubb/client'
  * {@link /pet/files}
  */
 export function addFiles<ThrowOnError extends boolean = true>(
-  options: Options<
-    {
-      body:
-        | {
-            url: string
-          }
-        | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
-    ThrowOnError
-  >,
-): Unwrappable<
-  RequestResult<
-    {
-      '200': Omit<NonNullable<Pet>, 'name'>
-      '405': unknown
-    },
-    ThrowOnError
-  >
-> {
+  options: Options<AddFilesOptions, ThrowOnError>,
+): Unwrappable<RequestResult<AddFilesResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
   return withUnwrap(
     request({ method: 'POST', url: '/pet/files', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-      RequestResult<
-        {
-          '200': Omit<NonNullable<Pet>, 'name'>
-          '405': unknown
-        },
-        ThrowOnError
-      >
+      RequestResult<AddFilesResponses, ThrowOnError>
     >,
   )
 }

@@ -1,16 +1,17 @@
-import type { CreatePetsBoolParamKey } from '../../models/ts/CreatePetsBoolParam'
-import type { CreatePetsXEXAMPLEKey } from '../../models/ts/CreatePetsXEXAMPLE'
-import type { PetNotFound } from '../../models/ts/PetNotFound'
+import type {
+  CreatePetsBody,
+  CreatePetsHeaders,
+  CreatePetsPath,
+  CreatePetsQuery,
+  CreatePetsResponse,
+  CreatePetsStatusDefault,
+} from '../../models/ts/pets/CreatePets'
 import { createCreatePetsBoolParamFaker } from '../createCreatePetsBoolParamFaker'
 import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLEFaker'
 import { createPetNotFoundFaker } from '../createPetNotFoundFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createCreatePetsPathFaker<
-  TData extends Partial<{
-    uuid: string
-  }> = object,
->(data?: TData) {
+export function createCreatePetsPathFaker<TData extends Partial<CreatePetsPath> = object>(data?: TData) {
   const defaultFakeData = {
     uuid: faker.string.alpha(),
   }
@@ -20,12 +21,7 @@ export function createCreatePetsPathFaker<
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createCreatePetsQueryFaker<
-  TData extends Partial<{
-    bool_param?: CreatePetsBoolParamKey
-    offset?: number
-  }> = object,
->(data?: TData) {
+export function createCreatePetsQueryFaker<TData extends Partial<CreatePetsQuery> = object>(data?: TData) {
   const defaultFakeData = {
     bool_param: createCreatePetsBoolParamFaker(),
     offset: faker.number.int(),
@@ -36,11 +32,7 @@ export function createCreatePetsQueryFaker<
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createCreatePetsHeadersFaker<
-  TData extends Partial<{
-    'X-EXAMPLE': CreatePetsXEXAMPLEKey
-  }> = object,
->(data?: TData) {
+export function createCreatePetsHeadersFaker<TData extends Partial<CreatePetsHeaders> = object>(data?: TData) {
   const defaultFakeData = {
     'X-EXAMPLE': createCreatePetsXEXAMPLEFaker(),
   }
@@ -60,16 +52,11 @@ export function createCreatePetsStatus201Faker() {
 /**
  * @description unexpected error
  */
-export function createCreatePetsStatusDefaultFaker(_data?: Partial<PetNotFound>): PetNotFound {
-  return createPetNotFoundFaker() as PetNotFound
+export function createCreatePetsStatusDefaultFaker(_data?: Partial<CreatePetsStatusDefault>): CreatePetsStatusDefault {
+  return createPetNotFoundFaker() as CreatePetsStatusDefault
 }
 
-export function createCreatePetsBodyFaker<
-  TData extends Partial<{
-    name: string
-    tag: string
-  }> = object,
->(data?: TData) {
+export function createCreatePetsBodyFaker<TData extends Partial<CreatePetsBody> = object>(data?: TData) {
   const defaultFakeData = {
     name: faker.string.alpha(),
     tag: faker.string.alpha(),
@@ -80,6 +67,6 @@ export function createCreatePetsBodyFaker<
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createCreatePetsResponseFaker(data?: Partial<unknown>): unknown {
-  return (data ?? faker.helpers.arrayElement([createCreatePetsStatus201Faker(), createCreatePetsStatusDefaultFaker()])) as unknown
+export function createCreatePetsResponseFaker(data?: Partial<CreatePetsResponse>): CreatePetsResponse {
+  return (data ?? faker.helpers.arrayElement([createCreatePetsStatus201Faker(), createCreatePetsStatusDefaultFaker()])) as CreatePetsResponse
 }

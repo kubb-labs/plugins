@@ -20,6 +20,155 @@ export type { PetEvent } from './PetEvent'
 export type { PetEventTypeEnumKey } from './PetEventTypeEnum'
 export type { PetNotFound } from './PetNotFound'
 export type { PetStatusEnumKey } from './PetStatusEnum'
+export type {
+  AddFilesBody,
+  AddFilesBodyFormData,
+  AddFilesBodyJson,
+  AddFilesOptions,
+  AddFilesResponse,
+  AddFilesResponses,
+  AddFilesStatus200,
+  AddFilesStatus405,
+} from './pet/AddFiles'
+export type {
+  AddPetBody,
+  AddPetBodyFormUrlEncoded,
+  AddPetBodyJson,
+  AddPetBodyXml,
+  AddPetOptions,
+  AddPetResponse,
+  AddPetResponses,
+  AddPetStatus405,
+  AddPetStatusDefault,
+  AddPetStatusDefaultJson,
+  AddPetStatusDefaultXml,
+} from './pet/AddPet'
+export type { DeletePetHeaders, DeletePetOptions, DeletePetPath, DeletePetResponse, DeletePetResponses, DeletePetStatus400 } from './pet/DeletePet'
+export type {
+  FindPetsByStatusOptions,
+  FindPetsByStatusPath,
+  FindPetsByStatusResponse,
+  FindPetsByStatusResponses,
+  FindPetsByStatusStatus200,
+  FindPetsByStatusStatus200Json,
+  FindPetsByStatusStatus200Xml,
+  FindPetsByStatusStatus400,
+} from './pet/FindPetsByStatus'
+export type {
+  FindPetsByTagsHeaders,
+  FindPetsByTagsOptions,
+  FindPetsByTagsQuery,
+  FindPetsByTagsResponse,
+  FindPetsByTagsResponses,
+  FindPetsByTagsStatus200,
+  FindPetsByTagsStatus200Json,
+  FindPetsByTagsStatus200Xml,
+  FindPetsByTagsStatus400,
+} from './pet/FindPetsByTags'
+export type {
+  GetPetByIdOptions,
+  GetPetByIdPath,
+  GetPetByIdResponse,
+  GetPetByIdResponses,
+  GetPetByIdStatus200,
+  GetPetByIdStatus200Json,
+  GetPetByIdStatus200Xml,
+  GetPetByIdStatus400,
+  GetPetByIdStatus404,
+} from './pet/GetPetById'
+export type {
+  UpdatePetBody,
+  UpdatePetBodyFormUrlEncoded,
+  UpdatePetBodyJson,
+  UpdatePetBodyXml,
+  UpdatePetOptions,
+  UpdatePetResponse,
+  UpdatePetResponses,
+  UpdatePetStatus200,
+  UpdatePetStatus200Json,
+  UpdatePetStatus200Xml,
+  UpdatePetStatus202,
+  UpdatePetStatus400,
+  UpdatePetStatus404,
+  UpdatePetStatus405,
+} from './pet/UpdatePet'
+export type {
+  UpdatePetWithFormOptions,
+  UpdatePetWithFormPath,
+  UpdatePetWithFormQuery,
+  UpdatePetWithFormResponse,
+  UpdatePetWithFormResponses,
+  UpdatePetWithFormStatus405,
+} from './pet/UpdatePetWithForm'
+export type {
+  UploadFileBody,
+  UploadFileOptions,
+  UploadFilePath,
+  UploadFileQuery,
+  UploadFileResponse,
+  UploadFileResponses,
+  UploadFileStatus200,
+} from './pet/UploadFile'
+export type {
+  CreatePetsBody,
+  CreatePetsHeaders,
+  CreatePetsOptions,
+  CreatePetsPath,
+  CreatePetsQuery,
+  CreatePetsResponse,
+  CreatePetsResponses,
+  CreatePetsStatus201,
+  CreatePetsStatusDefault,
+} from './pets/CreatePets'
+export type {
+  DeleteOrderOptions,
+  DeleteOrderPath,
+  DeleteOrderResponse,
+  DeleteOrderResponses,
+  DeleteOrderStatus400,
+  DeleteOrderStatus404,
+} from './store/DeleteOrder'
+export type { GetInventoryOptions, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './store/GetInventory'
+export type {
+  GetOrderByIdOptions,
+  GetOrderByIdPath,
+  GetOrderByIdResponse,
+  GetOrderByIdResponses,
+  GetOrderByIdStatus200,
+  GetOrderByIdStatus200Json,
+  GetOrderByIdStatus200Xml,
+  GetOrderByIdStatus400,
+  GetOrderByIdStatus404,
+} from './store/GetOrderById'
+export type {
+  PlaceOrderBody,
+  PlaceOrderBodyFormUrlEncoded,
+  PlaceOrderBodyJson,
+  PlaceOrderBodyXml,
+  PlaceOrderOptions,
+  PlaceOrderResponse,
+  PlaceOrderResponses,
+  PlaceOrderStatus200,
+  PlaceOrderStatus405,
+} from './store/PlaceOrder'
+export type {
+  PlaceOrderPatchBody,
+  PlaceOrderPatchBodyFormUrlEncoded,
+  PlaceOrderPatchBodyJson,
+  PlaceOrderPatchBodyXml,
+  PlaceOrderPatchOptions,
+  PlaceOrderPatchResponse,
+  PlaceOrderPatchResponses,
+  PlaceOrderPatchStatus200,
+  PlaceOrderPatchStatus405,
+} from './store/PlaceOrderPatch'
+export type {
+  StreamPetEventsOptions,
+  StreamPetEventsPath,
+  StreamPetEventsResponse,
+  StreamPetEventsResponses,
+  StreamPetEventsStatus200,
+} from './stream/StreamPetEvents'
 export type { TagTag } from './tag/Tag'
 export { addPetRequestStatusEnum } from './AddPetRequestStatusEnum'
 export { animalTypeEnum } from './AnimalTypeEnum'

@@ -1,5 +1,5 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
-import type { ApiResponse } from '../../../models/ts/ApiResponse'
+import type { UploadFileOptions, UploadFileResponses } from '../../../models/ts/pet/UploadFile'
 import { client, withUnwrap } from '../../../.kubb/client'
 
 /**
@@ -7,27 +7,8 @@ import { client, withUnwrap } from '../../../.kubb/client'
  * {@link /pet/:petId/uploadImage}
  */
 export function uploadFile<ThrowOnError extends boolean = true>(
-  options: Options<
-    {
-      body: Blob
-      path: {
-        petId: number
-      }
-      query?: {
-        additionalMetadata?: string
-      }
-      headers?: never
-    },
-    ThrowOnError
-  >,
-): Unwrappable<
-  RequestResult<
-    {
-      '200': ApiResponse
-    },
-    ThrowOnError
-  >
-> {
+  options: Options<UploadFileOptions, ThrowOnError>,
+): Unwrappable<RequestResult<UploadFileResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
   return withUnwrap(
@@ -38,13 +19,6 @@ export function uploadFile<ThrowOnError extends boolean = true>(
       contentType: { request: 'application/octet-stream' },
       ...config,
       throwOnError: config.throwOnError ?? true,
-    }) as Promise<
-      RequestResult<
-        {
-          '200': ApiResponse
-        },
-        ThrowOnError
-      >
-    >,
+    }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>,
   )
 }

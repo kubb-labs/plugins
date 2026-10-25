@@ -1,28 +1,8 @@
-import type { Pet } from '../../models/ts/Pet'
+import type { UpdatePetOptions, UpdatePetResponse } from '../../models/ts/pet/UpdatePet'
 
-export function updatePet(
-  {
-    body,
-  }: {
-    body: Omit<NonNullable<Pet>, 'id'>
-    path?: never
-    query?: never
-    headers?: never
-  },
-  options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<
-  | Omit<NonNullable<Pet>, 'name'>
-  | {
-      id?: number
-    }
-> {
+export function updatePet({ body }: UpdatePetOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<UpdatePetResponse> {
   return cy
-    .request<
-      | Omit<NonNullable<Pet>, 'name'>
-      | {
-          id?: number
-        }
-    >({
+    .request<UpdatePetResponse>({
       method: 'PUT',
       url: `/pet`,
       body,

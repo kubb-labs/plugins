@@ -1,6 +1,5 @@
 import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
-import type { AddPetRequest } from '../../../models/ts/AddPetRequest'
-import type { Pet } from '../../../models/ts/Pet'
+import type { AddPetOptions, AddPetResponse, AddPetStatus405 } from '../../../models/ts/pet/AddPet'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { addPet } from '../../axios/petService/addPet'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -13,24 +12,7 @@ export function addPetMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = addPetMutationKey()
-  return mutationOptions<
-    | {
-        code?: number
-        message?: string
-      }
-    | Omit<NonNullable<Pet>, 'name'>,
-    ResponseErrorConfig<{
-      code?: number
-      message?: string
-    }>,
-    {
-      body: AddPetRequest | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >({
+  return mutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       return addPet({ ...config, body, throwOnError: true }).unwrap()
@@ -45,24 +27,7 @@ export function addPetMutationOptions<TContext = unknown>(
  */
 export function useAddPet<TContext>(
   options: {
-    mutation?: UseMutationOptions<
-      | {
-          code?: number
-          message?: string
-        }
-      | Omit<NonNullable<Pet>, 'name'>,
-      ResponseErrorConfig<{
-        code?: number
-        message?: string
-      }>,
-      {
-        body: AddPetRequest | Omit<NonNullable<Pet>, 'id'>
-        path?: never
-        query?: never
-        headers?: never
-      },
-      TContext
-    > & { client?: QueryClient }
+    mutation?: UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
     }
@@ -72,65 +37,14 @@ export function useAddPet<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions.mutationKey ?? addPetMutationKey()
 
-  const baseOptions = addPetMutationOptions(config) as UseMutationOptions<
-    | {
-        code?: number
-        message?: string
-      }
-    | Omit<NonNullable<Pet>, 'name'>,
-    ResponseErrorConfig<{
-      code?: number
-      message?: string
-    }>,
-    {
-      body: AddPetRequest | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >
+  const baseOptions = addPetMutationOptions(config) as UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>
 
-  return useMutation<
-    | {
-        code?: number
-        message?: string
-      }
-    | Omit<NonNullable<Pet>, 'name'>,
-    ResponseErrorConfig<{
-      code?: number
-      message?: string
-    }>,
-    {
-      body: AddPetRequest | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >(
+  return useMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<
-    | {
-        code?: number
-        message?: string
-      }
-    | Omit<NonNullable<Pet>, 'name'>,
-    ResponseErrorConfig<{
-      code?: number
-      message?: string
-    }>,
-    {
-      body: AddPetRequest | Omit<NonNullable<Pet>, 'id'>
-      path?: never
-      query?: never
-      headers?: never
-    },
-    TContext
-  >
+  ) as UseMutationResult<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>
 }
