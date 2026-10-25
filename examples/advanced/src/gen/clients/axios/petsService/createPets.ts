@@ -1,7 +1,6 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { CreatePetsBoolParamKey } from '../../../models/ts/CreatePetsBoolParam'
 import type { CreatePetsXEXAMPLEKey } from '../../../models/ts/CreatePetsXEXAMPLE'
-import type { PetNotFound } from '../../../models/ts/PetNotFound'
 import { client, withUnwrap } from '../../../.kubb/client'
 import { createPetsResponseSchema, createPetsErrorSchema } from '../../../zod/pets/createPetsSchema'
 
@@ -33,7 +32,7 @@ export function createPets<ThrowOnError extends boolean = true>(
   RequestResult<
     {
       '201': unknown
-      default: PetNotFound
+      default: unknown
     },
     ThrowOnError
   >
@@ -51,7 +50,7 @@ export function createPets<ThrowOnError extends boolean = true>(
       RequestResult<
         {
           '201': unknown
-          default: PetNotFound
+          default: unknown
         },
         ThrowOnError
       >

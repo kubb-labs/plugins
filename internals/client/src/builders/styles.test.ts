@@ -53,4 +53,52 @@ describe('buildStyles', () => {
     const node = createOperation([{ name: '2fa', in: 'query', schema: stringSchema(), explode: true }])
     expect(buildStyles({ node })).toBe('{ query: { "2fa": { explode: true } } }')
   })
+
+  test('emits the encoding of a single request content type as a body group', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'search',
+      method: 'POST',
+      path: '/search',
+      tags: ['pet'],
+      parameters: [ast.factory.createParameter({ name: 'page', in: 'query', schema: stringSchema(), explode: false })],
+      requestBody: ast.factory.createRequestBody({
+        content: [
+          ast.factory.createContent({
+            contentType: 'application/x-www-form-urlencoded',
+            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+            encoding: {
+              filter: { style: 'deepObject', explode: true },
+              'x-meta': { contentType: 'application/json', allowReserved: true },
+              quoted: { contentType: "text/plain; name=O'Reilly" },
+            },
+          }),
+        ],
+      }),
+      responses: [ast.factory.createResponse({ statusCode: '200', schema: stringSchema(), description: 'ok' })],
+    })
+
+    expect(buildStyles({ node })).toBe(
+      '{ query: { page: { explode: false } }, body: { filter: { style: "deepObject", explode: true }, "x-meta": { allowReserved: true, contentType: "application/json" }, quoted: { contentType: "text/plain; name=O\'Reilly" } } }',
+    )
+  })
+
+  test('omits the body group when the request has several content types', () => {
+    const content = (contentType: string) =>
+      ast.factory.createContent({
+        contentType,
+        schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+        encoding: { filter: { explode: true } },
+      })
+    const node = ast.factory.createOperation({
+      operationId: 'search',
+      method: 'POST',
+      path: '/search',
+      tags: ['pet'],
+      parameters: [],
+      requestBody: ast.factory.createRequestBody({ content: [content('application/x-www-form-urlencoded'), content('multipart/form-data')] }),
+      responses: [ast.factory.createResponse({ statusCode: '200', schema: stringSchema(), description: 'ok' })],
+    })
+
+    expect(buildStyles({ node })).toBeNull()
+  })
 })
