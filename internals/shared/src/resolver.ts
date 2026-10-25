@@ -1,5 +1,9 @@
-import { toFilePath } from '@internals/utils'
+import { camelCase, ensureValidVarName, toFilePath } from '@internals/utils'
 import type { ast, Resolver, ResolverFile } from 'kubb/kit'
+
+export function resolveOperationName(name: string): string {
+  return ensureValidVarName(camelCase(name))
+}
 
 /**
  * The `param` namespace shared by the schema-producing plugins (ts, zod, faker):

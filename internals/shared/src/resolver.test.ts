@@ -2,7 +2,42 @@ import { pascalCase } from '@internals/utils'
 import type { Resolver } from 'kubb/kit'
 import { ast } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { createCasedFile, createOperationParamResolver, createOperationResponseResolver } from './resolver.ts'
+import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, resolveOperationName } from './resolver.ts'
+
+describe('resolveOperationName', () => {
+  test.each([
+    'export',
+    'import',
+    'delete',
+    'default',
+    'new',
+    'class',
+    'await',
+    'yield',
+    'enum',
+    'arguments',
+    'eval',
+    'implements',
+    'interface',
+    'let',
+    'package',
+    'private',
+    'protected',
+    'public',
+    'static',
+  ])('escapes %s', (name) => {
+    expect(resolveOperationName(name)).toBe(`_${name}`)
+  })
+
+  test.each([
+    ['Export', '_export'],
+    ['delete pet', 'deletePet'],
+    ['get-pet-by-id', 'getPetById'],
+    ['123pets', '_123Pets'],
+  ])('resolves %s as %s', (name, expected) => {
+    expect(resolveOperationName(name)).toBe(expected)
+  })
+})
 
 const resolver = { name: (name: string) => pascalCase(name) } as unknown as Resolver
 const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })

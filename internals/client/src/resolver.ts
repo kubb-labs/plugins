@@ -1,10 +1,11 @@
+import { resolveOperationName } from '@internals/shared'
 import { camelCase, ensureValidVarName, pascalCase } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
 import type { PluginContractClient } from './types.ts'
 
 /**
- * Default resolver shared by the client plugins. Functions and files inherit the built-in camelCase
- * `name` and `file`; classes and tag groups use PascalCase.
+ * Default resolver shared by the client plugins. Functions use safe camelCase identifiers and
+ * files inherit the built-in casing; classes and tag groups use PascalCase.
  *
  * @example
  * ```ts
@@ -14,6 +15,7 @@ import type { PluginContractClient } from './types.ts'
  */
 export const resolverClient = createResolver<PluginContractClient>({
   pluginName: 'plugin-contract-client',
+  name: resolveOperationName,
   className(name) {
     return ensureValidVarName(pascalCase(name))
   },

@@ -1,3 +1,4 @@
+import { resolveOperationName } from '@internals/shared'
 import { createMutationResolver, createQueryResolver } from '@internals/tanstack-query'
 import { capitalize } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
@@ -9,7 +10,7 @@ import type { PluginReactQuery } from '../types.ts'
  * `useFooSuspense`, `useFooInfinite`, ...) and its companion helpers
  * (`fooQueryKey`, `fooQueryOptions`).
  *
- * Functions and files use the built-in camelCase casing; hooks get the `use`
+ * Functions use safe camelCase identifiers; hooks get the `use`
  * prefix; suspense and infinite variants are suffixed with `Suspense`/`Infinite`.
  *
  * @example Resolve hook and helper names
@@ -24,6 +25,7 @@ import type { PluginReactQuery } from '../types.ts'
  */
 export const resolverReactQuery = createResolver<PluginReactQuery>({
   pluginName: 'plugin-react-query',
+  name: resolveOperationName,
   query: createQueryResolver(),
   suspenseQuery: createQueryResolver('Suspense'),
   infiniteQuery: createQueryResolver('Infinite'),

@@ -12,6 +12,7 @@ describe('isValidVarName', () => {
 
   test('reserved words return false', () => {
     expect(isValidVarName('class')).toBe(false)
+    expect(isValidVarName('await')).toBe(false)
     expect(isValidVarName('var')).toBe(false)
     expect(isValidVarName('return')).toBe(false)
     expect(isValidVarName('null')).toBe(false)

@@ -1,3 +1,4 @@
+import { resolveOperationName } from '@internals/shared'
 import { createMutationResolver, createQueryResolver } from '@internals/tanstack-query'
 import { capitalize } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
@@ -8,7 +9,7 @@ import type { PluginSwr } from '../types.ts'
  * SWR hook (`useFoo`, `useFooMutation`) and its companion helpers (`fooQueryKey`, `fooQueryOptions`,
  * `fooMutationKey`).
  *
- * Functions and files use the built-in camelCase casing; hooks get the `use` prefix.
+ * Functions use safe camelCase identifiers; hooks get the `use` prefix.
  *
  * @example Resolve hook and helper names
  * ```ts
@@ -21,6 +22,7 @@ import type { PluginSwr } from '../types.ts'
  */
 export const resolverSwr = createResolver<PluginSwr>({
   pluginName: 'plugin-swr',
+  name: resolveOperationName,
   query: createQueryResolver(),
   mutation: {
     ...createMutationResolver(),
