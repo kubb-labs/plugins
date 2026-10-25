@@ -256,10 +256,6 @@ Emits only the schema types. Clients, query hooks, MSW handlers, Faker mocks, Cy
 
 ::
 
-```ts [kubb.config.ts]
-pluginTs({ operations: 'inline' })
-```
-
 ### resolver
 
 Overrides generated file and symbol names. Omitted members keep `resolverTs`. The shared members (`name`, `file`, `imports`) and the `this` context are described under [`resolver`](https://kubb.dev/docs/5.x/reference/plugin-options#resolver).
