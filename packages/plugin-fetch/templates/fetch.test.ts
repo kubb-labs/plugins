@@ -1219,10 +1219,16 @@ describe('resolveAuth', () => {
     expect(headers.Authorization).toBe('Bearer token-123')
   })
 
-  test('base64-encodes a basic credential', async () => {
+  test.each([
+    ['user:pass', 'dXNlcjpwYXNz'],
+    ['user:pässwörd', 'dXNlcjpww6Rzc3fDtnJk'],
+    ['user:pässwörd€', 'dXNlcjpww6Rzc3fDtnJk4oKs'],
+    ['用户:密码', '55So5oi3OuWvhueggQ=='],
+    ['user:🔐', 'dXNlcjrwn5SQ'],
+  ])('base64-encodes basic credential %s as UTF-8', async (auth, encoded) => {
     const headers: Record<string, string> = {}
-    await resolveAuth({ security: [{ type: 'http', scheme: 'basic' }], auth: () => 'user:pass', headers, query: {} })
-    expect(headers.Authorization).toBe(`Basic ${btoa('user:pass')}`)
+    await resolveAuth({ security: [{ type: 'http', scheme: 'basic' }], auth, headers, query: {} })
+    expect(headers.Authorization).toBe(`Basic ${encoded}`)
   })
 
   test('resolves oauth2 as a bearer token', async () => {
