@@ -16,7 +16,6 @@ import {
   numberConstraints,
   patternKeySchema,
   printWithOmit,
-  propertyNamesOf,
   shouldCoerce,
   strictOneOfNode,
   STRING_FORMAT_CALLS,
@@ -235,7 +234,7 @@ export function containsDirectionalNode({
   if ('items' in node && node.items) children.push(...node.items)
   if ('members' in node && node.members) children.push(...node.members)
   if ('additionalProperties' in node && node.additionalProperties && node.additionalProperties !== true) children.push(node.additionalProperties)
-  const propertyNames = propertyNamesOf(node)
+  const propertyNames = node.type === 'object' ? node.propertyNames : undefined
   if (propertyNames) children.push(propertyNames)
 
   return children.some((child) => containsDirectionalNode({ node: child, printerOptions, seen }))
@@ -403,7 +402,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
     object(node) {
       const entries = node.properties ?? []
       const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
-      const propertyNamesNode = propertyNamesOf(node)
+      const propertyNamesNode = node.propertyNames
       const propertyNamesKeySchema = propertyNamesNode ? this.transform(propertyNamesNode) : null
 
       // `additionalProperties: false` still permits patternProperties keys, so only a pattern-free object is strict.
