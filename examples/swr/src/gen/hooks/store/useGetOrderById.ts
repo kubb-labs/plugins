@@ -7,7 +7,7 @@ import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { GetOrderByIdOptions, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById'
 import type { SWRConfiguration } from 'swr'
-import { getOrderById } from '../../clients/store/getOrderById'
+import { getOrderById as clientOperation } from '../../clients/store/getOrderById'
 
 export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdOptions, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
 
@@ -19,7 +19,7 @@ export function getOrderByIdQueryOptions(
 ) {
   return {
     fetcher: async () => {
-      return getOrderById({ ...config, path, throwOnError: true }).unwrap()
+      return clientOperation({ ...config, path, throwOnError: true }).unwrap()
     },
   }
 }

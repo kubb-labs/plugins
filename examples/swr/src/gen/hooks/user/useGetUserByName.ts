@@ -7,7 +7,7 @@ import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { GetUserByNameOptions, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName'
 import type { SWRConfiguration } from 'swr'
-import { getUserByName } from '../../clients/user/getUserByName'
+import { getUserByName as clientOperation } from '../../clients/user/getUserByName'
 
 export const getUserByNameQueryKey = ({ path }: Omit<GetUserByNameOptions, 'headers'>) => [{ url: '/user/:username', params: path }] as const
 
@@ -19,7 +19,7 @@ export function getUserByNameQueryOptions(
 ) {
   return {
     fetcher: async () => {
-      return getUserByName({ ...config, path, throwOnError: true }).unwrap()
+      return clientOperation({ ...config, path, throwOnError: true }).unwrap()
     },
   }
 }

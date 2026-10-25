@@ -7,7 +7,7 @@ import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { GetPetByIdOptions, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById'
 import type { SWRConfiguration } from 'swr'
-import { getPetById } from '../../clients/pet/getPetById'
+import { getPetById as clientOperation } from '../../clients/pet/getPetById'
 
 export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
@@ -16,7 +16,7 @@ type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return getPetById({ ...config, path, throwOnError: true }).unwrap()
+      return clientOperation({ ...config, path, throwOnError: true }).unwrap()
     },
   }
 }

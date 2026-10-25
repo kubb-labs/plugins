@@ -7,7 +7,7 @@ import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { LogoutUserResponse } from '../../models/user/LogoutUser'
 import type { SWRConfiguration } from 'swr'
-import { logoutUser } from '../../clients/user/logoutUser'
+import { logoutUser as clientOperation } from '../../clients/user/logoutUser'
 
 export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 
@@ -16,7 +16,7 @@ type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return logoutUser({ ...config, throwOnError: true }).unwrap()
+      return clientOperation({ ...config, throwOnError: true }).unwrap()
     },
   }
 }

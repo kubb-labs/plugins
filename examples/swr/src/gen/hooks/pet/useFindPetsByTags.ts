@@ -7,7 +7,7 @@ import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { FindPetsByTagsOptions, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../models/pet/FindPetsByTags'
 import type { SWRConfiguration } from 'swr'
-import { findPetsByTags } from '../../clients/pet/findPetsByTags'
+import { findPetsByTags as clientOperation } from '../../clients/pet/findPetsByTags'
 
 export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsOptions, 'headers'> = {}) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
@@ -20,7 +20,7 @@ export function findPetsByTagsQueryOptions(
 ) {
   return {
     fetcher: async () => {
-      return findPetsByTags({ ...config, query, throwOnError: true }).unwrap()
+      return clientOperation({ ...config, query, throwOnError: true }).unwrap()
     },
   }
 }

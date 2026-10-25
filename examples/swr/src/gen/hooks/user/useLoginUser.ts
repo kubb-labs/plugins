@@ -7,7 +7,7 @@ import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { LoginUserOptions, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser'
 import type { SWRConfiguration } from 'swr'
-import { loginUser } from '../../clients/user/loginUser'
+import { loginUser as clientOperation } from '../../clients/user/loginUser'
 
 export const loginUserQueryKey = ({ query }: Omit<LoginUserOptions, 'headers'> = {}) => [{ url: '/user/login' }, ...(query ? [query] : [])] as const
 
@@ -19,7 +19,7 @@ export function loginUserQueryOptions(
 ) {
   return {
     fetcher: async () => {
-      return loginUser({ ...config, query, throwOnError: true }).unwrap()
+      return clientOperation({ ...config, query, throwOnError: true }).unwrap()
     },
   }
 }

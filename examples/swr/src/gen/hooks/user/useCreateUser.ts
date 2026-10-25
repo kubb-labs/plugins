@@ -7,7 +7,7 @@ import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { CreateUserOptions, CreateUserResponse } from '../../models/user/CreateUser'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { createUser } from '../../clients/user/createUser'
+import { createUser as clientOperation } from '../../clients/user/createUser'
 
 export const createUserMutationKey = () => [{ url: '/user' }] as const
 
@@ -37,7 +37,7 @@ export function useCreateUser(
   return useSWRMutation<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return createUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof createUser<true>>[0]).unwrap()
+      return clientOperation({ ...config, ...variables, throwOnError: true } as Parameters<typeof clientOperation<true>>[0]).unwrap()
     },
     mutationOptions,
   )
