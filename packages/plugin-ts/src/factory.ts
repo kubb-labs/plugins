@@ -422,13 +422,20 @@ export function createUrlTemplateType(path: string): TsNode {
 // ─── Printer helpers ──────────────────────────────────────────────────────────
 
 /**
- * Converts a primitive const value to a TypeScript literal type.
+ * Converts a const value to a literal type, preserving nested arrays and objects.
  */
-export function constToTypeNode(value: string | number | boolean, format: 'string' | 'number' | 'boolean'): TsNode | undefined {
-  if (format === 'boolean') {
+export function constToTypeNode(value: unknown, format?: 'string' | 'number' | 'boolean'): TsNode {
+  if (value === null) return keywordTypeNodes.null
+  if (Array.isArray(value)) {
+    return { type: 'TSTupleType', elementTypes: value.map((item) => constToTypeNode(item)) }
+  }
+  if (typeof value === 'object') {
+    return createTypeLiteralNode(Object.entries(value).map(([name, item]) => createPropertySignature({ name, type: constToTypeNode(item) })))
+  }
+  if ((format ?? typeof value) === 'boolean') {
     return createLiteralType(value === true)
   }
-  return createLiteralType(format === 'number' && typeof value === 'number' ? value : String(value))
+  return createLiteralType((format ?? typeof value) === 'number' && typeof value === 'number' ? value : String(value))
 }
 
 /**

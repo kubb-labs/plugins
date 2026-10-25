@@ -150,14 +150,27 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
  * mixed set is emitted as a single `z.literal(…)` or a `z.union([z.literal(…), …])`.
  * An all-string set keeps the more compact `z.enum([…])`.
  */
-export function buildEnum(values: Array<string | number | boolean>): string {
+export function buildEnum(values: Array<unknown>): string {
   const allStrings = values.every((v) => typeof v === 'string')
   if (allStrings) return `z.enum([${values.map((v) => formatDefault(v)).join(', ')}])`
 
-  const literals = values.map((v) => `z.literal(${formatDefault(v)})`)
+  const literals = values.map((value) => buildLiteral(value))
   if (literals.length === 1) return literals[0]!
 
   return `z.union([${literals.join(', ')}])`
+}
+
+/**
+ * Preserves the structure of JSON const values in both Zod APIs.
+ */
+export function buildLiteral(value: unknown): string {
+  if (value === null) return 'z.null()'
+  if (Array.isArray(value)) return `z.tuple([${value.map((item) => buildLiteral(item)).join(', ')}])`
+  if (typeof value === 'object') {
+    const properties = Object.entries(value).map(([name, item]) => `${JSON.stringify(name)}: ${buildLiteral(item)}`)
+    return `z.strictObject({${properties.join(', ')}})`
+  }
+  return `z.literal(${formatDefault(value)})`
 }
 
 /**
