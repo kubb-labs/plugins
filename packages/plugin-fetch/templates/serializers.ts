@@ -181,7 +181,8 @@ export const defaultBodySerializer: BodySerializer = ({ body, contentType, encod
   if (body === undefined || body === null) return undefined
   if (typeof body === 'string' && isJsonMediaType(contentType)) return JSON.stringify(body)
   if (isFormBody(body)) return body as RequestBody
-  if (contentType?.includes('multipart/form-data')) {
+  const normalizedContentType = contentType?.toLowerCase()
+  if (normalizedContentType?.includes('multipart/form-data')) {
     const formData = new FormData()
     for (const [key, value] of Object.entries(body as Record<string, unknown>)) {
       const partContentType = encoding?.[key]?.contentType
@@ -193,7 +194,7 @@ export const defaultBodySerializer: BodySerializer = ({ body, contentType, encod
     }
     return formData
   }
-  if (contentType?.includes('application/x-www-form-urlencoded')) {
+  if (normalizedContentType?.includes('application/x-www-form-urlencoded')) {
     if (encoding) return serializeUrlencodedBody(body as Record<string, unknown>, encoding)
     return new URLSearchParams(body as Record<string, string>)
   }
