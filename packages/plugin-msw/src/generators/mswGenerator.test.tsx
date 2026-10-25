@@ -1,6 +1,9 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
+import { execFile } from 'node:child_process'
 import fs from 'node:fs/promises'
+import { createRequire } from 'node:module'
 import path from 'node:path'
+import { promisify } from 'node:util'
 import { ast } from 'kubb/kit'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from 'kubb/kit/testing'
 import type { PluginFaker } from '@kubb/plugin-faker'
@@ -232,6 +235,48 @@ async function importGenerated(source: string, stubs: Record<string, string> = {
 
   return import(path.join(dir, 'handler.ts'))
 }
+
+describe('mswGenerator request body types', () => {
+  test.each(['unknown', '{ name: string }'])('typechecks a handler when the request body is %s', async (bodyType) => {
+    const files = await renderOperation({ name: 'createPet', node: createPetsNode, options: {} })
+    const [source] = rawSources(files)
+    const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.msw-'))
+    onTestFinished(() => fs.rm(dir, { recursive: true, force: true }))
+    await fs.writeFile(path.join(dir, 'handler.ts'), source!)
+    await fs.writeFile(
+      path.join(dir, 'CreatePets.ts'),
+      `export type CreatePetsBody = ${bodyType}
+export type CreatePetsResponse = unknown`,
+    )
+    await fs.writeFile(
+      path.join(dir, 'check.ts'),
+      `import { createPetsHandler } from './handler'
+import { HttpResponse } from 'msw/http'
+createPetsHandler(async ({ request }) => {
+  const body: ${bodyType} = await request.json()
+  return new HttpResponse(JSON.stringify(body))
+})`,
+    )
+    const compiler = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
+
+    await expect(
+      promisify(execFile)(process.execPath, [
+        compiler,
+        '--ignoreConfig',
+        '--noEmit',
+        '--strict',
+        '--skipLibCheck',
+        '--module',
+        'preserve',
+        '--moduleResolution',
+        'bundler',
+        '--target',
+        'es2022',
+        path.join(dir, 'check.ts'),
+      ]),
+    ).resolves.toMatchObject({ stdout: '', stderr: '' })
+  })
+})
 
 describe('mswGenerator QUERY handler', () => {
   // MSW has no `http.query`, so the handler is registered with `http.all` and answers QUERY only.

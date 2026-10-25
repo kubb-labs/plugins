@@ -26,14 +26,15 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
   const responseHasSchema = hasResponseSchema(successResponse)
   const dataType = responseHasSchema ? typeName : 'string | number | boolean | null | object'
   const paramType = fakerName ? typeName : dataType
+  const requestBodyType = requestTypeName ? `unknown extends ${requestTypeName} ? DefaultBodyType : ${requestTypeName}` : null
 
-  const callbackType = requestTypeName
-    ? `HttpResponseResolver<Record<string, string>, ${requestTypeName}>`
+  const callbackType = requestBodyType
+    ? `HttpResponseResolver<Record<string, string>, ${requestBodyType}>`
     : `((info: Parameters<Parameters<typeof http.${method}>[1]>[0]) => Response | Promise<Response>)`
 
   const params = `data?: ${paramType} | ${callbackType}, options?: { baseURL?: string }`
 
-  const httpCall = requestTypeName ? `http.${method}<Record<string, string>, ${requestTypeName}>` : `http.${method}`
+  const httpCall = requestBodyType ? `http.${method}<Record<string, string>, ${requestBodyType}>` : `http.${method}`
 
   // Escape colons that do not start a param, such as the second one in `/pet/:petId:search`.
   const urlLiteral = `\`\${options?.baseURL ?? ${resolveDefaultBaseURL(baseURL)}}${url.replace(/([^/]):/g, '$1\\\\:')}\``
