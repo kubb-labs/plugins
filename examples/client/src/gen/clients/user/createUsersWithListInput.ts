@@ -15,9 +15,13 @@ import { client } from '../../../client'
 export function createUsersWithListInput<ThrowOnError extends boolean = true>(
   options: Options<CreateUsersWithListInputOptions, ThrowOnError>,
 ): Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: request = client, contentType, ...config } = options
 
-  return request({ method: 'POST', url: '/user/createWithList', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<CreateUsersWithListInputResponses, ThrowOnError>
-  >
+  return request({
+    method: 'POST',
+    url: '/user/createWithList',
+    contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
+    ...config,
+    throwOnError: config.throwOnError ?? true,
+  }) as Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>>
 }

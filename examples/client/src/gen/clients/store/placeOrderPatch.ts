@@ -17,7 +17,11 @@ export function placeOrderPatch<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'PATCH', url: '/store/order', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<PlaceOrderPatchResponses, ThrowOnError>
-  >
+  return request({
+    method: 'PATCH',
+    url: '/store/order',
+    contentType: { request: 'application/json' },
+    ...config,
+    throwOnError: config.throwOnError ?? true,
+  }) as Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>>
 }
