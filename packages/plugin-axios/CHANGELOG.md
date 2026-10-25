@@ -1,5 +1,16 @@
 # @kubb/plugin-axios
 
+## 5.9.2
+
+### Patch Changes
+
+- [#1218](https://github.com/kubb-labs/plugins/pull/1218) [`1c2c7d6`](https://github.com/kubb-labs/plugins/commit/1c2c7d619203426749fcb31e9b910063d02ea436) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb 5.13.1 or later.
+
+- [#1215](https://github.com/kubb-labs/plugins/pull/1215) [`2b9ded7`](https://github.com/kubb-labs/plugins/commit/2b9ded7fe0682763abe8d507a4366209effa5e01) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Generate smaller fetch and Axios clients by simplifying response handling and interceptor bookkeeping.
+- Updated dependencies [[`1c2c7d6`](https://github.com/kubb-labs/plugins/commit/1c2c7d619203426749fcb31e9b910063d02ea436), [`a117810`](https://github.com/kubb-labs/plugins/commit/a117810f9a7f5ec489bc842119f023e918565d83), [`16a4fb8`](https://github.com/kubb-labs/plugins/commit/16a4fb8712c41a5b86324509a3da81171876f43e)]:
+  - @kubb/plugin-ts@5.2.0
+  - @kubb/plugin-zod@5.7.2
+
 ## 5.9.1
 
 ### Patch Changes

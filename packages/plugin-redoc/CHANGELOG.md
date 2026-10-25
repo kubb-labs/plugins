@@ -1,5 +1,11 @@
 # @kubb/plugin-redoc
 
+## 5.1.1
+
+### Patch Changes
+
+- [#1218](https://github.com/kubb-labs/plugins/pull/1218) [`1c2c7d6`](https://github.com/kubb-labs/plugins/commit/1c2c7d619203426749fcb31e9b910063d02ea436) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb 5.13.1 or later.
+
 ## 5.1.0
 
 ### Minor Changes

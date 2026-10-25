@@ -1,5 +1,28 @@
 # @kubb/plugin-ts
 
+## 5.2.0
+
+### Minor Changes
+
+- [#1214](https://github.com/kubb-labs/plugins/pull/1214) [`a117810`](https://github.com/kubb-labs/plugins/commit/a117810f9a7f5ec489bc842119f023e918565d83) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add `operations` to `pluginTs`. Set it to `'inline'` to emit only the schema types: no per-operation file with `XxxOptions`, `XxxResponses`, or `XxxStatus200` aliases. Clients, query hooks, MSW handlers, Faker mocks, Cypress requests, and MCP handlers reference the schema types directly and print the rest inline. It needs the Kubb release with inline sources ([kubb-labs/kubb#4438](https://github.com/kubb-labs/kubb/pull/4438)).
+  
+  ```ts
+  pluginTs({ operations: 'inline' })
+  ```
+  
+  ```diff
+  -import type { PlaceOrderOptions, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../models/store/PlaceOrder'
+  +import type { Order } from '../../models/Order'
+  -mutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>
+  +mutationOptions<Order, ResponseErrorConfig<unknown>, { body: Order; path?: never; query?: never; headers?: never }, TContext>
+  ```
+  
+  The default, `'export'`, keeps the current output.
+
+### Patch Changes
+
+- [#1218](https://github.com/kubb-labs/plugins/pull/1218) [`1c2c7d6`](https://github.com/kubb-labs/plugins/commit/1c2c7d619203426749fcb31e9b910063d02ea436) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb 5.13.1 or later.
+
 ## 5.1.0
 
 ### Minor Changes
