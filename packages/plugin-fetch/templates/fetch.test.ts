@@ -211,16 +211,25 @@ describe('defaultBodySerializer', () => {
     expect(defaultBodySerializer({ body: formData })).toBe(formData)
   })
 
-  test('encodes form-urlencoded objects as URLSearchParams', () => {
-    const body = defaultBodySerializer({ body: { a: '1' }, contentType: 'application/x-www-form-urlencoded' })
+  test.each([
+    'application/x-www-form-urlencoded',
+    'Application/X-WWW-Form-Urlencoded',
+    'APPLICATION/X-WWW-FORM-URLENCODED',
+    'Application/X-WWW-Form-Urlencoded; charset=UTF-8',
+  ])('encodes objects as URLSearchParams for %s', (contentType) => {
+    const body = defaultBodySerializer({ body: { a: '1' }, contentType })
     expect(body).toBeInstanceOf(URLSearchParams)
+    expect(body?.toString()).toBe('a=1')
   })
 
-  test('builds FormData from a plain object for multipart/form-data', () => {
-    const body = defaultBodySerializer({ body: { field: 'x' }, contentType: 'multipart/form-data' })
-    expect(body).toBeInstanceOf(FormData)
-    expect((body as FormData).get('field')).toBe('x')
-  })
+  test.each(['multipart/form-data', 'Multipart/Form-Data', 'MULTIPART/FORM-DATA', 'Multipart/Form-Data; boundary=example'])(
+    'builds FormData from a plain object for %s',
+    (contentType) => {
+      const body = defaultBodySerializer({ body: { field: 'x' }, contentType })
+      expect(body).toBeInstanceOf(FormData)
+      expect((body as FormData).get('field')).toBe('x')
+    },
+  )
 
   test('passes Blob members through and serializes dates, objects, and arrays in multipart', () => {
     const file = new Blob(['hi'], { type: 'text/plain' })
