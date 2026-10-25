@@ -5,6 +5,7 @@
 
 import type { UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405, UpdatePetBody } from '../../../models/UpdatePet'
 import type { HttpResponseResolver } from 'msw/http'
+import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function updatePetHandlerResponse200(data: UpdatePetResponse) {
@@ -34,15 +35,21 @@ export function updatePetHandlerResponse405(data?: UpdatePetStatus405) {
   })
 }
 
-export function updatePetHandler(data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, UpdatePetBody>, options?: { baseURL?: string }) {
-  return http.put<Record<string, string>, UpdatePetBody>(`${options?.baseURL ?? 'http://localhost:3000'}/pet`, function handler(info) {
-    if (typeof data === 'function') return data(info)
+export function updatePetHandler(
+  data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, UpdatePetBody extends DefaultBodyType ? UpdatePetBody : DefaultBodyType>,
+  options?: { baseURL?: string },
+) {
+  return http.put<Record<string, string>, UpdatePetBody extends DefaultBodyType ? UpdatePetBody : DefaultBodyType>(
+    `${options?.baseURL ?? 'http://localhost:3000'}/pet`,
+    function handler(info) {
+      if (typeof data === 'function') return data(info)
 
-    return new HttpResponse(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-  })
+      return new HttpResponse(JSON.stringify(data), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    },
+  )
 }

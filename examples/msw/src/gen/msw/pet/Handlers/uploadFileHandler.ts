@@ -5,6 +5,7 @@
 
 import type { UploadFileResponse, UploadFileBody } from '../../../models/UploadFile'
 import type { HttpResponseResolver } from 'msw/http'
+import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function uploadFileHandlerResponse200(data: UploadFileResponse) {
@@ -16,15 +17,21 @@ export function uploadFileHandlerResponse200(data: UploadFileResponse) {
   })
 }
 
-export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, UploadFileBody>, options?: { baseURL?: string }) {
-  return http.post<Record<string, string>, UploadFileBody>(`${options?.baseURL ?? 'http://localhost:3000'}/pet/:petId/uploadImage`, function handler(info) {
-    if (typeof data === 'function') return data(info)
+export function uploadFileHandler(
+  data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, UploadFileBody extends DefaultBodyType ? UploadFileBody : DefaultBodyType>,
+  options?: { baseURL?: string },
+) {
+  return http.post<Record<string, string>, UploadFileBody extends DefaultBodyType ? UploadFileBody : DefaultBodyType>(
+    `${options?.baseURL ?? 'http://localhost:3000'}/pet/:petId/uploadImage`,
+    function handler(info) {
+      if (typeof data === 'function') return data(info)
 
-    return new HttpResponse(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-  })
+      return new HttpResponse(JSON.stringify(data), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    },
+  )
 }
