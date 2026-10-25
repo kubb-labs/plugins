@@ -5,6 +5,7 @@
 const reservedWords = new Set([
   'abstract',
   'arguments',
+  'await',
   'boolean',
   'break',
   'byte',

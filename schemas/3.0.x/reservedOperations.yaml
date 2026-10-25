@@ -1,0 +1,17 @@
+openapi: 3.1.0
+info: { title: Reserved operation names, version: '1' }
+paths:
+  /a:
+    get:
+      operationId: export
+      responses:
+        default: { description: OK }
+    post:
+      operationId: import
+      responses:
+        default: { description: OK }
+  /b:
+    get:
+      operationId: await
+      responses:
+        default: { description: OK }

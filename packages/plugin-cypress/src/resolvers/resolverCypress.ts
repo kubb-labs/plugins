@@ -1,3 +1,4 @@
+import { resolveOperationName } from '@internals/shared'
 import { createResolver } from 'kubb/kit'
 import type { PluginCypress } from '../types.ts'
 
@@ -15,4 +16,5 @@ import type { PluginCypress } from '../types.ts'
  */
 export const resolverCypress = createResolver<PluginCypress>({
   pluginName: 'plugin-cypress',
+  name: resolveOperationName,
 })
