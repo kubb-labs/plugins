@@ -1,5 +1,13 @@
 # @kubb/plugin-swr
 
+## 5.5.2
+
+### Patch Changes
+
+- [#1218](https://github.com/kubb-labs/plugins/pull/1218) [`1c2c7d6`](https://github.com/kubb-labs/plugins/commit/1c2c7d619203426749fcb31e9b910063d02ea436) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb 5.13.1 or later.
+- Updated dependencies [[`1c2c7d6`](https://github.com/kubb-labs/plugins/commit/1c2c7d619203426749fcb31e9b910063d02ea436), [`a117810`](https://github.com/kubb-labs/plugins/commit/a117810f9a7f5ec489bc842119f023e918565d83)]:
+  - @kubb/plugin-ts@5.2.0
+
 ## 5.5.1
 
 ### Patch Changes

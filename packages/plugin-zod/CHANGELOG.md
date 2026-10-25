@@ -1,5 +1,13 @@
 # @kubb/plugin-zod
 
+## 5.7.2
+
+### Patch Changes
+
+- [#1218](https://github.com/kubb-labs/plugins/pull/1218) [`1c2c7d6`](https://github.com/kubb-labs/plugins/commit/1c2c7d619203426749fcb31e9b910063d02ea436) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Require Kubb 5.13.1 or later.
+
+- [#1217](https://github.com/kubb-labs/plugins/pull/1217) [`16a4fb8`](https://github.com/kubb-labs/plugins/commit/16a4fb8712c41a5b86324509a3da81171876f43e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use shared AST helpers to follow schema refs and read property-name schemas.
+
 ## 5.7.1
 
 ### Patch Changes
