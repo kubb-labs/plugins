@@ -14,6 +14,7 @@ import {
   isObjectSchemaNode,
   lengthChecksMini,
   numberChecksMini,
+  objectConstraints,
   patternKeySchemaMini,
   printWithOmit,
   shouldCoerce,
@@ -240,36 +241,40 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         const shape = buildZodMiniObjectShape(this, node)
         const objectBase = `${ctor}(${shape})`
 
-        // Closed key schemas (enums, literals) use z.partialRecord() so missing keys do not fail exhaustiveness.
-        const recordFn = isClosedKeySchema(propertyNamesNode) ? 'z.partialRecord' : 'z.record'
+        const result = (() => {
+          // Closed key schemas (enums, literals) use z.partialRecord() so missing keys do not fail exhaustiveness.
+          const recordFn = isClosedKeySchema(propertyNamesNode) ? 'z.partialRecord' : 'z.record'
 
-        if (node.additionalProperties && node.additionalProperties !== true) {
-          const catchallType = this.transform(node.additionalProperties)
-          if (entries.length === 0) {
-            return catchallType ? `${recordFn}(${propertyNamesKeySchema || 'z.string()'}, ${catchallType})` : objectBase
+          if (node.additionalProperties && node.additionalProperties !== true) {
+            const catchallType = this.transform(node.additionalProperties)
+            if (entries.length === 0) {
+              return catchallType ? `${recordFn}(${propertyNamesKeySchema || 'z.string()'}, ${catchallType})` : objectBase
+            }
+            return catchallType ? `z.catchall(${objectBase}, ${catchallType})` : objectBase
           }
-          return catchallType ? `z.catchall(${objectBase}, ${catchallType})` : objectBase
-        }
-        if (entries.length === 0 && patterns.length === 0 && propertyNamesKeySchema && !isStrict) {
-          const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
-          return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
-        }
-        if (node.additionalProperties === true) return objectBase
-        if (isStrict) return objectBase
+          if (entries.length === 0 && patterns.length === 0 && propertyNamesKeySchema && !isStrict) {
+            const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+            return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
+          }
+          if (node.additionalProperties === true) return objectBase
+          if (isStrict) return objectBase
 
-        if (patterns.length > 0) {
-          const values = patterns.map(([, valueSchema]) => {
-            const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: 'unknown' }))!
-            return valueSchema.nullable ? `z.nullable(${valueType})` : valueType
-          })
-          const distinct = [...new Set(values)]
-          const value = distinct.length === 1 ? distinct[0]! : `z.union([${distinct.join(', ')}])`
+          if (patterns.length > 0) {
+            const values = patterns.map(([, valueSchema]) => {
+              const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+              return valueSchema.nullable ? `z.nullable(${valueType})` : valueType
+            })
+            const distinct = [...new Set(values)]
+            const value = distinct.length === 1 ? distinct[0]! : `z.union([${distinct.join(', ')}])`
 
-          if (entries.length > 0) return `z.catchall(${objectBase}, ${value})`
-          return `z.record(${patternKeySchemaMini({ patterns: patterns.map(([pattern]) => pattern), regexType: this.options.regexType })}, ${value})`
-        }
+            if (entries.length > 0) return `z.catchall(${objectBase}, ${value})`
+            return `z.record(${patternKeySchemaMini({ patterns: patterns.map(([pattern]) => pattern), regexType: this.options.regexType })}, ${value})`
+          }
 
-        return objectBase
+          return objectBase
+        })()
+
+        return objectConstraints({ value: result, node })
       },
       array(node) {
         const items = mapSchemaItems(node, (item) => this.transform(item))

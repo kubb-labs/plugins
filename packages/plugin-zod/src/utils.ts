@@ -34,11 +34,12 @@ export function isClosedKeySchema(node: ast.SchemaNode | undefined): boolean {
 
 /**
  * Whether the node is a plain inline object whose shape can be lifted into an `.extend({ … })`
- * argument. A catchall, `patternProperties`, or a nullable/optional wrapper cannot, so those stay
+ * argument. Property counts, a catchall, `patternProperties`, or a nullable/optional wrapper cannot, so those stay
  * on `.and(…)`.
  */
 export function isPlainInlineObject(node: ast.SchemaNode): boolean {
   if (node.type !== 'object') return false
+  if (node.minProperties !== undefined || node.maxProperties !== undefined) return false
   if (node.nullable || node.optional || node.nullish) return false
 
   const hasAdditionalProperties = node.additionalProperties !== undefined
@@ -52,11 +53,12 @@ export function isPlainInlineObject(node: ast.SchemaNode): boolean {
  * `z.discriminatedUnion` option. Covers object nodes, `$ref`s that resolve to (or are still
  * unresolved) objects, single-member unions of an object, and object-composable `allOf`.
  *
- * `cyclicSchemas` bounds the recursion: a ref into a cycle renders as `z.lazy(…)`, not an object.
+ * Property counts render as a pipe. A ref into `cyclicSchemas` renders as `z.lazy(…)`.
  */
 export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
   if (node.nullable || node.optional || node.nullish) return false
   if (node.type === 'object') {
+    if (node.minProperties !== undefined || node.maxProperties !== undefined) return false
     const hasProperties = Boolean(node.properties?.length)
     const hasTypedAdditionalProperties = Boolean(node.additionalProperties && node.additionalProperties !== true)
     const hasPatternProperties = Boolean(node.patternProperties)
@@ -293,6 +295,26 @@ export function lengthChecksMini({ min, max, pattern, regexType }: LengthConstra
 }
 
 /**
+ * Checks property counts before object parsing strips unknown keys or inserts defaults.
+ */
+export function objectConstraints({ value, node }: { value: string; node: ast.SchemaNode }): string {
+  if (node.type !== 'object') return value
+  const checks: Array<string> = []
+  const skip = 'typeof value !== "object" || value === null || Array.isArray(value)'
+  if (node.minProperties !== undefined) {
+    checks.push(
+      `z.refine(value => ${skip} || Object.keys(value).length >= ${node.minProperties}, { message: "Object must have at least ${node.minProperties} properties" })`,
+    )
+  }
+  if (node.maxProperties !== undefined) {
+    checks.push(
+      `z.refine(value => ${skip} || Object.keys(value).length <= ${node.maxProperties}, { message: "Object must have at most ${node.maxProperties} properties" })`,
+    )
+  }
+  return checks.length ? `z.pipe(z.unknown().check(${checks.join(', ')}), ${value})` : value
+}
+
+/**
  * Apply nullable / optional / nullish modifiers, an optional `.describe()` call, and an
  * optional `.meta({ examples })` call to a schema value string using the chainable Zod v4 API.
  */
@@ -449,7 +471,14 @@ export function printWithOmit(
     // Zod Mini schemas have no `.unwrap()` / `.omit()`, so walk `_zod.def.innerType` and call `z.omit()`.
     const unwrap = omitUnwrapChain(node, mini ? '._zod.def.innerType' : '.unwrap()')
     const mask = `{ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} }`
-    const omit = (target: string) => (mini ? `z.omit(${target}${unwrap}, ${mask})` : `${target}${unwrap}.omit(${mask})`)
+    const omit = (target: string) => {
+      const inner = `${target}${unwrap}`
+      const hasObjectConstraints = meta.type === 'object' && (meta.minProperties !== undefined || meta.maxProperties !== undefined)
+      const pipe = mini ? `${inner}._zod.def` : inner
+      const object = hasObjectConstraints ? `${pipe}.out` : inner
+      const omitted = mini ? `z.omit(${object}, ${mask})` : `${object}.omit(${mask})`
+      return hasObjectConstraints ? `z.pipe(${pipe}.in, ${omitted})` : omitted
+    }
 
     const lazyMatch = transformed.match(/^z\.lazy\(\(\)\s*=>\s*(.+)\)$/)
     if (lazyMatch) return `z.lazy(() => ${omit(lazyMatch[1]!)})`

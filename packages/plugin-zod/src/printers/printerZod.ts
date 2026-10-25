@@ -14,6 +14,7 @@ import {
   isObjectSchemaNode,
   lengthConstraints,
   numberConstraints,
+  objectConstraints,
   patternKeySchema,
   printWithOmit,
   shouldCoerce,
@@ -449,7 +450,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         return objectBase
       })()
 
-      return result
+      return objectConstraints({ value: result, node })
     },
     array(node) {
       const items = mapSchemaItems(node, (item) => this.transform(item))
