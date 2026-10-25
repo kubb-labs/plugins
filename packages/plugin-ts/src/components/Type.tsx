@@ -25,7 +25,7 @@ type Props = {
 export function Type({ name, node, printer, enum: enumOptions, resolver, inline }: Props): KubbReactNode {
   if (inline) {
     // An inline type has no file to declare its enums in, so they print as literal unions.
-    const withoutEnums = ast.transform(node, { schema: (n) => (n.type === 'enum' && n.name ? { ...n, name: undefined } : undefined) })
+    const withoutEnums = ast.transform(node, { schema: (n) => (n.type === ast.schemaTypes.enum && n.name ? { ...n, name: undefined } : undefined) })
     // Property JSDoc would repeat in every file that absorbs the type; the schema files keep theirs.
     const expression = printerTs({ ...printer.options, name: undefined })
       .print(withoutEnums)
