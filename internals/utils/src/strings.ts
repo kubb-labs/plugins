@@ -114,22 +114,26 @@ const KEPT_ESCAPE = /[A-Za-z0-9^$\\.*+?()[\]{}|/]/
 function dropIdentityEscapes(pattern: string): string {
   let result = ''
   let inClass = false
+  let escaped = false
 
-  for (let index = 0; index < pattern.length; index++) {
-    const char = pattern[index]!
+  for (const char of pattern) {
+    if (escaped) {
+      result += KEPT_ESCAPE.test(char) || (char === '-' && inClass) ? `\\${char}` : char
+      escaped = false
+      continue
+    }
 
-    if (char === '\\' && index + 1 < pattern.length) {
-      const next = pattern[++index]!
-      result += KEPT_ESCAPE.test(next) || (next === '-' && inClass) ? `\\${next}` : next
+    if (char === '\\') {
+      escaped = true
       continue
     }
 
     if (char === '[') inClass = true
-    else if (char === ']') inClass = false
+    if (char === ']') inClass = false
     result += char
   }
 
-  return result
+  return escaped ? `${result}\\` : result
 }
 
 /**
