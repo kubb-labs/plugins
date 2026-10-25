@@ -267,6 +267,21 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       object(node) {
         const { transform, options } = this
 
+        const keySchema = node.propertyNames && syncSchemaRef(node.propertyNames)
+        if (
+          !node.properties.length &&
+          !Object.keys(node.patternProperties ?? {}).length &&
+          node.propertyNames &&
+          keySchema?.type === 'enum' &&
+          node.additionalProperties !== false
+        ) {
+          const keyType = transform(node.propertyNames) ?? factory.keywordTypeNodes.string
+          const valueSchema = typeof node.additionalProperties === 'object' ? node.additionalProperties : ast.factory.createSchema({ type: 'unknown' })
+          const valueType = factory.buildPropertyType(valueSchema, transform(valueSchema) ?? factory.keywordTypeNodes.unknown, options.optionalType, false)
+
+          return factory.createTypeReferenceNode('Partial', [factory.createTypeReferenceNode('Record', [keyType, valueType])])
+        }
+
         const addsQuestionToken = options.optionalType === 'questionToken' || options.optionalType === 'questionTokenAndUndefined'
 
         const propertyNodes: Array<factory.TsNode> = mapSchemaProperties(node, (schema) => transform(schema)).map(({ name, property, output }) => {

@@ -1,6 +1,6 @@
 import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildObject, objectKey, stringify, toRegExpString } from '@internals/utils'
-import { ast, containsCircularRef, Diagnostics } from 'kubb/kit'
+import { ast, containsCircularRef, Diagnostics, syncSchemaRef } from 'kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 import { canOverrideSchema } from '../utils.ts'
 
@@ -327,7 +327,16 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       object(node): string {
         const cyclicSchemas = this.options.cyclicSchemas
-        const entries = (node.properties ?? []).map((property): string => {
+        const keySchema = node.propertyNames && syncSchemaRef(node.propertyNames)
+        const valueSchema = node.additionalProperties
+        const recordProperties =
+          keySchema?.type === 'enum' && typeof valueSchema === 'object'
+            ? ast
+                .getSchemaLiteralValues(keySchema)
+                .filter((key): key is string => typeof key === 'string' && !node.properties.some((property) => property.name === key))
+                .map((name) => ast.factory.createProperty({ name, schema: valueSchema }))
+            : []
+        const entries = [...node.properties, ...recordProperties].map((property): string => {
           const value: string =
             printNested(property.schema, {
               typeName: this.options.typeName ? indexedTypeName(this.options.typeName, property.name, this.options.nestedInUnion) : undefined,
