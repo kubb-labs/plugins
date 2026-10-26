@@ -5,6 +5,7 @@
 
 import type { AddPetResponse, AddPetStatus405, AddPetBody } from '../../../models/AddPet'
 import type { HttpResponseResolver } from 'msw/http'
+import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function addPetHandlerResponse200(data: AddPetResponse) {
@@ -25,15 +26,21 @@ export function addPetHandlerResponse405(data: AddPetStatus405) {
   })
 }
 
-export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Record<string, string>, AddPetBody>, options?: { baseURL?: string }) {
-  return http.post<Record<string, string>, AddPetBody>(`${options?.baseURL ?? 'http://localhost:3000'}/pet`, function handler(info) {
-    if (typeof data === 'function') return data(info)
+export function addPetHandler(
+  data?: AddPetResponse | HttpResponseResolver<Record<string, string>, AddPetBody extends DefaultBodyType ? AddPetBody : DefaultBodyType>,
+  options?: { baseURL?: string },
+) {
+  return http.post<Record<string, string>, AddPetBody extends DefaultBodyType ? AddPetBody : DefaultBodyType>(
+    `${options?.baseURL ?? 'http://localhost:3000'}/pet`,
+    function handler(info) {
+      if (typeof data === 'function') return data(info)
 
-    return new HttpResponse(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-  })
+      return new HttpResponse(JSON.stringify(data), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    },
+  )
 }

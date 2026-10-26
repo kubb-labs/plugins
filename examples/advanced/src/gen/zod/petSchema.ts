@@ -8,7 +8,7 @@ export const petSchema = z.object({
     .int()
     .optional()
     .meta({ examples: [10] }),
-  get parent() {
+  get parent(): z.ZodOptional<z.ZodArray<typeof petSchema>> {
     return z.array(petSchema).optional()
   },
   signature: z

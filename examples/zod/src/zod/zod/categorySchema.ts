@@ -14,7 +14,7 @@ export const categorySchema = z.object({
     .string()
     .optional()
     .meta({ examples: ['Dogs'] }),
-  get parent() {
+  get parent(): z.ZodOptional<typeof categorySchema> {
     return categorySchema.optional()
   },
 })
