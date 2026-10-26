@@ -7,7 +7,7 @@
 import type { TreeNode } from './types/TreeNode'
 import { faker } from '@faker-js/faker'
 
-export function createTreeNode<TData extends Partial<TreeNode> = object>(data?: TData) {
+export function createTreeNode<TData extends Partial<TreeNode> = object>(data?: TData): Omit<TreeNode, keyof NoInfer<TData>> & NoInfer<TData> {
   const defaultFakeData = {
     value: faker.string.alpha(),
     left: undefined as unknown as NonNullable<TreeNode>['left'],
@@ -16,5 +16,5 @@ export function createTreeNode<TData extends Partial<TreeNode> = object>(data?: 
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as Omit<TreeNode, keyof NoInfer<TData>> & NoInfer<TData>
 }
