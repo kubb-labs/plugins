@@ -1,5 +1,5 @@
 import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
-import { buildList, stringify } from '@internals/utils'
+import { buildList, lazyGetter, objectKey, stringify } from '@internals/utils'
 import { ast, extractRefName, syncSchemaRef } from 'kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
@@ -7,6 +7,7 @@ import {
   buildEnum,
   buildLiteral,
   buildObjectShape,
+  defaultLiteral,
   getMemberConstraint,
   integerFormatPattern,
   isClosedKeySchema,
@@ -156,8 +157,8 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
  * Builds the `{ key: value, … }` shape for an object node with the chainable modifiers.
  */
 function buildZodObjectShape(ctx: Parameters<typeof buildObjectShape>[0], node: ast.SchemaNode): string {
-  return buildObjectShape(ctx, node, ({ value, schema, required, meta }) =>
-    applyModifiers({
+  return buildObjectShape(ctx, node, ({ name, value, schema, required, meta, cyclic }) => {
+    const body = applyModifiers({
       value,
       schema,
       nullable: meta.nullable,
@@ -169,8 +170,52 @@ function buildZodObjectShape(ctx: Parameters<typeof buildObjectShape>[0], node: 
       // metadata from a replaced schema.
       description: schema.type !== 'ref' && meta.type === 'ref' ? undefined : meta.description,
       examples: meta.examples,
-    }),
-  )
+    })
+    if (!cyclic) return `${objectKey(name)}: ${body}`
+    const returnType = recursiveGetterType({ ctx, schema, required })
+    return returnType ? `get ${objectKey(name)}(): ${returnType} { return ${body} }` : lazyGetter({ name, body })
+  })
+}
+
+/**
+ * Breaks getter inference cycles without widening recursive refs and arrays to `z.ZodType`.
+ */
+function recursiveGetterType({
+  ctx,
+  schema,
+  required,
+}: {
+  ctx: Parameters<typeof buildObjectShape>[0]
+  schema: ast.SchemaNode
+  required?: boolean
+}): string | undefined {
+  function baseType(schema: ast.SchemaNode): string | undefined {
+    if (ctx.options.nodes?.[schema.type]) return undefined
+    if (schema.type === 'ref') {
+      const saved = ctx.options.cyclicSchemas
+      ctx.options.cyclicSchemas = undefined
+      const name = ctx.transform(schema)
+      ctx.options.cyclicSchemas = saved
+      return name ? `typeof ${name}` : undefined
+    }
+    if (schema.type === 'array' && schema.items?.length === 1) {
+      const item = baseType(schema.items[0]!)
+      return item ? `z.ZodArray<${item}>` : undefined
+    }
+    return undefined
+  }
+  const base = baseType(schema)
+  if (!base) return undefined
+
+  const meta = syncSchemaRef(schema)
+  const optional = schema.optional || required === false
+  const wrapped = (() => {
+    if (schema.nullish || (meta.nullable && optional)) return `z.ZodOptional<z.ZodNullable<${base}>>`
+    if (optional) return `z.ZodOptional<${base}>`
+    if (meta.nullable) return `z.ZodNullable<${base}>`
+    return base
+  })()
+  return meta.default !== undefined && defaultLiteral(schema, meta.default) !== null ? `z.ZodDefault<${wrapped}>` : wrapped
 }
 
 /**

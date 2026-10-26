@@ -1,5 +1,5 @@
 import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
-import { buildList, stringify } from '@internals/utils'
+import { buildList, lazyGetter, objectKey, stringify } from '@internals/utils'
 import { ast } from 'kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
@@ -98,16 +98,17 @@ export type PrinterZodMiniFactory = ast.PrinterFactoryOptions<'zod-mini', Printe
  * Builds the `{ key: value, … }` shape for an object node with the functional `zod/mini` modifiers.
  */
 function buildZodMiniObjectShape(ctx: Parameters<typeof buildObjectShape>[0], node: ast.SchemaNode): string {
-  return buildObjectShape(ctx, node, ({ value, schema, required, meta }) =>
-    applyMiniModifiers({
+  return buildObjectShape(ctx, node, ({ name, value, schema, required, meta, cyclic }) => {
+    const body = applyMiniModifiers({
       value,
       schema,
       nullable: meta.nullable,
       optional: schema.optional || required === false,
       nullish: schema.nullish,
       defaultValue: meta.default,
-    }),
-  )
+    })
+    return cyclic ? lazyGetter({ name, body }) : `${objectKey(name)}: ${body}`
+  })
 }
 
 /**

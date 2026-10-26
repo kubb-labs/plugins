@@ -12,7 +12,7 @@ export const petSchema = z.object({
     .bigint()
     .optional()
     .meta({ examples: [10] }),
-  get parent() {
+  get parent(): z.ZodOptional<z.ZodArray<typeof petSchema>> {
     return z.array(petSchema).optional()
   },
   internalId: z
@@ -21,7 +21,7 @@ export const petSchema = z.object({
     .optional()
     .meta({ examples: [10] }),
   name: z.string().meta({ examples: ['doggie'] }),
-  get category() {
+  get category(): z.ZodOptional<typeof categorySchema> {
     return categorySchema.optional()
   },
   photoUrls: z.array(z.string()),
