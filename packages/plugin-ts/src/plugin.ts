@@ -1,4 +1,4 @@
-import { createGroupConfig } from '@internals/shared'
+import { createCollisionResolver, createGroupConfig, reserveSchemaNames } from '@internals/shared'
 import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from 'kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
@@ -63,11 +63,11 @@ export const pluginTs = defineExtension<PluginTs>({
       keyCasing: enumOptions.keyCasing ?? 'none',
     }
 
-    setResolver(userResolver ? Resolver.merge(resolverTs, userResolver) : resolverTs)
+    setResolver(createCollisionResolver(userResolver ? Resolver.merge(resolverTs, userResolver) : resolverTs))
     if (userMacros?.length) {
       setMacros(userMacros)
     }
-    addGenerator(typeGenerator)
+    addGenerator(reserveSchemaNames, typeGenerator)
 
     return {
       output,

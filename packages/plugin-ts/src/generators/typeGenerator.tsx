@@ -1,4 +1,4 @@
-import { buildOptionsSchema, buildResponses, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
+import { buildOptionsSchema, buildResponses, getOperationParameters, resolveContentTypeVariants, resolveInlineEnumNames } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { File, jsxRenderer } from 'kubb/jsx'
 import { Type } from '../components/Type.tsx'
@@ -19,6 +19,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const { enum: enumOptions, syntaxType, optionalType, arrayType, output, group, printer } = ctx.options
     const { config, resolver, root } = ctx
 
+    node = resolveInlineEnumNames({ node, owner: node.name ?? '', resolver })
     if (!node.name) {
       return
     }
@@ -85,6 +86,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     function renderSchemaType({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
       if (!schema) return null
+      schema = resolveInlineEnumNames({ node: schema, owner: name, resolver })
 
       const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, name: importName })
 

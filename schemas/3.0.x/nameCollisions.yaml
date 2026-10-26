@@ -1,0 +1,45 @@
+openapi: 3.0.3
+info: { title: Name collisions, version: '1' }
+paths:
+  /containers:
+    post:
+      operationId: CreateContainer
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateContainerBody' }
+      responses:
+        '200': { description: OK }
+  /auth:
+    post:
+      operationId: provider.auth
+      responses:
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProviderAuthError' }
+components:
+  schemas:
+    CreateContainerBody:
+      type: object
+      properties:
+        name: { type: string }
+    CreateContainerBody2:
+      type: string
+    ProviderAuthError:
+      type: object
+      properties:
+        message: { type: string }
+    First:
+      type: object
+      additionalProperties:
+        type: object
+        properties:
+          mitigation_action: { type: string, enum: [block, allow] }
+    Second:
+      type: object
+      additionalProperties:
+        type: object
+        properties:
+          mitigation_action: { type: string, enum: [log, ignore] }
