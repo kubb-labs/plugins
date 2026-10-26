@@ -1,5 +1,6 @@
 import type { Pet } from '../../models/ts/Pet'
 import type { HttpResponseResolver } from 'msw/http'
+import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function addFilesHandlerResponse200(data: Omit<NonNullable<Pet>, 'name'>) {
@@ -22,19 +23,31 @@ export function addFilesHandler(
     | Omit<NonNullable<Pet>, 'name'>
     | HttpResponseResolver<
         Record<string, string>,
-        | {
-            url: string
-          }
-        | Omit<NonNullable<Pet>, 'id'>
+          | {
+              url: string
+            }
+          | Omit<NonNullable<Pet>, 'id'> extends DefaultBodyType
+          ?
+              | {
+                  url: string
+                }
+              | Omit<NonNullable<Pet>, 'id'>
+          : DefaultBodyType
       >,
   options?: { baseURL?: string },
 ) {
   return http.post<
     Record<string, string>,
-    | {
-        url: string
-      }
-    | Omit<NonNullable<Pet>, 'id'>
+      | {
+          url: string
+        }
+      | Omit<NonNullable<Pet>, 'id'> extends DefaultBodyType
+      ?
+          | {
+              url: string
+            }
+          | Omit<NonNullable<Pet>, 'id'>
+      : DefaultBodyType
   >(`${options?.baseURL ?? ''}/pet/files`, function handler(info) {
     if (typeof data === 'function') return data(info)
 

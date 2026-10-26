@@ -1,5 +1,6 @@
 import type { Pet } from '../../models/ts/Pet'
 import type { HttpResponseResolver } from 'msw/http'
+import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function updatePetHandlerResponse200(
@@ -58,17 +59,20 @@ export function updatePetHandler(
             id?: number
           }
       )
-    | HttpResponseResolver<Record<string, string>, Omit<NonNullable<Pet>, 'id'>>,
+    | HttpResponseResolver<Record<string, string>, Omit<NonNullable<Pet>, 'id'> extends DefaultBodyType ? Omit<NonNullable<Pet>, 'id'> : DefaultBodyType>,
   options?: { baseURL?: string },
 ) {
-  return http.put<Record<string, string>, Omit<NonNullable<Pet>, 'id'>>(`${options?.baseURL ?? ''}/pet`, function handler(info) {
-    if (typeof data === 'function') return data(info)
+  return http.put<Record<string, string>, Omit<NonNullable<Pet>, 'id'> extends DefaultBodyType ? Omit<NonNullable<Pet>, 'id'> : DefaultBodyType>(
+    `${options?.baseURL ?? ''}/pet`,
+    function handler(info) {
+      if (typeof data === 'function') return data(info)
 
-    return new HttpResponse(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-  })
+      return new HttpResponse(JSON.stringify(data), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    },
+  )
 }
