@@ -36,6 +36,8 @@ Controls the input and return types of object and intersection factories. Both m
 
 :::field{name="'inferred'"}
 Default value. Derives return types from generated values and supplied overrides. Optional and nullable fields retain their concrete value types, and overrides preserve literal types.
+
+Factories in a schema cycle use the declared model as their base return type to avoid circular TypeScript inference. Supplied overrides still preserve their types.
 :::
 
 :::field{name="'schema'"}
