@@ -251,13 +251,109 @@ const defaultOptions: PluginFaker['resolvedOptions'] = {
   printer: undefined,
 }
 
+const tsOptions: PluginTs['resolvedOptions'] = {
+  output: { path: 'types', mode: 'directory' },
+  enum: { type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' },
+  optionalType: 'questionToken',
+  arrayType: 'array',
+  syntaxType: 'type',
+  operations: 'export',
+  exclude: [],
+  include: undefined,
+  override: [],
+  group: null,
+  printer: undefined,
+}
+
 const defaultTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: 'types', mode: 'directory' }, group: null } as PluginTs['resolvedOptions'],
+  options: tsOptions,
   resolver: resolverTs,
 })
 
+async function typecheckFactories(driver: Pick<ReturnType<typeof createMockedPluginDriver>, 'fileManager'>, source: string): Promise<void> {
+  const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.faker-'))
+  onTestFinished(() => fs.rm(dir, { recursive: true, force: true }))
+  for (const file of driver.fileManager.files) {
+    const filePath = path.join(dir, path.relative(path.resolve(testConfig.output.path), file.path))
+    await fs.mkdir(path.dirname(filePath), { recursive: true })
+    await fs.writeFile(filePath, parserTs().parse(file))
+  }
+  const checkPath = path.join(dir, 'check.ts')
+  await fs.writeFile(checkPath, source)
+  const compiler = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
+  await expect(
+    promisify(execFile)(process.execPath, [
+      compiler,
+      '--ignoreConfig',
+      '--noEmit',
+      '--strict',
+      '--skipLibCheck',
+      '--module',
+      'preserve',
+      '--moduleResolution',
+      'bundler',
+      '--target',
+      'es2022',
+      checkPath,
+    ]),
+  ).resolves.toMatchObject({ stdout: '', stderr: '' })
+}
+
 describe('fakerGenerator — schema', () => {
+  test.each(['inferred', 'schema'] as const)('typechecks primitive allOf factories in %s mode', async (typeMode) => {
+    const id = ast.factory.createSchema({ type: 'string', name: 'Id' })
+    const code = ast.factory.createSchema({ type: 'string', name: 'Code', max: 8 })
+    const both = ast.factory.createSchema({
+      type: 'intersection',
+      name: 'Both',
+      members: [id, code].map((schema) => ast.factory.createSchema({ type: 'ref', name: schema.name, ref: `#/components/schemas/${schema.name}`, schema })),
+    })
+    const choice = ast.factory.createSchema({
+      type: 'intersection',
+      name: 'Choice',
+      members: [
+        ast.factory.createSchema({ type: 'string' }),
+        ast.factory.createSchema({
+          type: 'union',
+          members: ['a', 'b'].map((value) => ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: [value] })),
+        }),
+      ],
+    })
+    const options = { ...defaultOptions, typeMode }
+    const tsPlugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: tsOptions, resolver: resolverTs })
+    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options, resolver: resolverFaker })
+    const driver = createMockedPluginDriver({ name: 'primitiveAllOf', plugin: tsPlugin })
+    for (const node of [id, code, both, choice]) {
+      await renderGeneratorSchema(typeGenerator, node, {
+        config: testConfig,
+        adapter: createMockedAdapter(),
+        driver,
+        plugin: tsPlugin,
+        options: tsOptions,
+        resolver: resolverTs,
+        meta: { enumNames: [], circularNames: [] },
+      })
+      await renderGeneratorSchema(fakerGenerator, node, {
+        config: testConfig,
+        adapter: createMockedAdapter(),
+        driver,
+        plugin,
+        options,
+        resolver: resolverFaker,
+        meta: { enumNames: [], circularNames: [] },
+      })
+    }
+
+    await typecheckFactories(
+      driver,
+      `import { createBoth } from './createBoth'
+import { createChoice } from './createChoice'
+const both: string = createBoth('fixed')
+const choice: 'a' | 'b' = createChoice('a')`,
+    )
+  })
+
   test.each([2, 5])('typechecks factories in a %i-schema allOf cycle', async (size) => {
     const names = ['Base', 'Child', 'Branch', 'Leaf', 'Root'].slice(0, size)
     const schemas: Array<ast.SchemaNode> = names.map((name, index) =>
@@ -280,19 +376,6 @@ describe('fakerGenerator — schema', () => {
         ast.factory.createProperty({ name: 'parent', schema: ast.factory.createSchema({ type: 'ref', name: 'Child', ref: '#/components/schemas/Child' }) }),
       ],
     })
-    const tsOptions: PluginTs['resolvedOptions'] = {
-      output: { path: 'types', mode: 'directory' },
-      enum: { type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' },
-      optionalType: 'questionToken',
-      arrayType: 'array',
-      syntaxType: 'type',
-      operations: 'export',
-      exclude: [],
-      include: undefined,
-      override: [],
-      group: null,
-      printer: undefined,
-    }
     const tsPlugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: tsOptions, resolver: resolverTs })
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: defaultOptions, resolver: resolverFaker })
     const driver = createMockedPluginDriver({ name: 'allOfCycle', plugin: tsPlugin })
@@ -318,38 +401,13 @@ describe('fakerGenerator — schema', () => {
       })
     }
 
-    const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.faker-'))
-    onTestFinished(() => fs.rm(dir, { recursive: true, force: true }))
-    for (const file of driver.fileManager.files) {
-      const filePath = path.join(dir, path.relative(path.resolve(testConfig.output.path), file.path))
-      await fs.mkdir(path.dirname(filePath), { recursive: true })
-      await fs.writeFile(filePath, parserTs().parse(file))
-    }
-    const checkPath = path.join(dir, 'check.ts')
-    await fs.writeFile(
-      checkPath,
+    await typecheckFactories(
+      driver,
       `import { createChild } from './createChild'
 const child = createChild({ extra: 'fixed' as const, custom: true as const })
 const extra: 'fixed' = child.extra
 const custom: true = child.custom`,
     )
-    const compiler = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
-    await expect(
-      promisify(execFile)(process.execPath, [
-        compiler,
-        '--ignoreConfig',
-        '--noEmit',
-        '--strict',
-        '--skipLibCheck',
-        '--module',
-        'preserve',
-        '--moduleResolution',
-        'bundler',
-        '--target',
-        'es2022',
-        checkPath,
-      ]),
-    ).resolves.toMatchObject({ stdout: '', stderr: '' })
   })
 
   test.each([

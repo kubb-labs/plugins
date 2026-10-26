@@ -45,6 +45,22 @@ export function canOverrideSchema(node: ast.SchemaNode): boolean {
   return !NON_OVERRIDABLE_TYPES.has(node.type)
 }
 
+/**
+ * Whether a schema can supply object properties when merging faker values.
+ */
+export function isObjectSchema(node: ast.SchemaNode, seen = new Set<ast.SchemaNode>()): boolean {
+  const resolved = ast.resolveRef(node)
+  if (seen.has(resolved)) return false
+  seen.add(resolved)
+
+  if (resolved.type === 'object' || resolved.type === 'ref') return true
+  if (resolved.type === 'intersection' || resolved.type === 'union') {
+    return (resolved.type === 'intersection' && !resolved.members?.length) || (resolved.members ?? []).some((member) => isObjectSchema(member, seen))
+  }
+
+  return false
+}
+
 function shouldInlineSingleResponseSchema(schema: ast.SchemaNode): boolean {
   return !NON_INLINABLE_RESPONSE_TYPES.has(schema.type)
 }

@@ -299,6 +299,51 @@ describe('printerFaker', () => {
     )
   })
 
+  test.each([false, true])('uses the last primitive allOf member (referenced: %s)', (referenced) => {
+    const members = [ast.factory.createSchema({ type: 'string' }), ast.factory.createSchema({ type: 'string', max: 8 })]
+    const node = ast.factory.createSchema({
+      type: 'intersection',
+      members: referenced
+        ? members.map((schema, index) => ast.factory.createSchema({ type: 'ref', ref: `#/components/schemas/${index ? 'Code' : 'Id'}`, schema }))
+        : members,
+    })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe(referenced ? 'createCode()' : 'faker.string.alpha({ length: 8 })')
+  })
+
+  test('uses a primitive enum union without spreading it', () => {
+    const node = ast.factory.createSchema({
+      type: 'intersection',
+      members: [
+        ast.factory.createSchema({ type: 'string' }),
+        ast.factory.createSchema({
+          type: 'union',
+          members: [
+            ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['a'] }),
+            ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['b'] }),
+          ],
+        }),
+      ],
+    })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe(
+      "faker.helpers.arrayElement([faker.helpers.arrayElement(['a']), faker.helpers.arrayElement(['b'])])",
+    )
+  })
+
+  test('merges object allOf members without spreading primitive members', () => {
+    const node = ast.factory.createSchema({
+      type: 'intersection',
+      members: [
+        ast.factory.createSchema({ type: 'object' }),
+        ast.factory.createSchema({ type: 'string' }),
+        ast.factory.createSchema({ type: 'ref', ref: '#/components/schemas/Other', schema: ast.factory.createSchema({ type: 'object' }) }),
+      ],
+    })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('{...{}, ...createOther()}')
+  })
+
   test('drops shapeless allOf members instead of spreading undefined', () => {
     // `allOf: [{ $ref: EquipmentCategory }, { description }]` — the metadata-only member has no
     // shape and mocks to `undefined`. It must be dropped, not spread as `{...x, ...undefined}`.

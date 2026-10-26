@@ -4,7 +4,7 @@ import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
-import { resolveFakerTypeUsage, SCALAR_TYPES } from '../utils.ts'
+import { isObjectSchema, resolveFakerTypeUsage, SCALAR_TYPES } from '../utils.ts'
 
 type Props = {
   name: string
@@ -17,12 +17,12 @@ type Props = {
   keysToOmit?: Array<string> | null
 }
 
-const OBJECT_TYPES = new Set<ast.SchemaNode['type']>(['object', 'intersection'])
 export function Faker({ node, description, name, typeName, printer, canOverride, typeMode = 'inferred', keysToOmit }: Props): KubbReactNode {
   const fakerText = printer.print(node) ?? 'undefined'
 
   const isArray = node.type === 'array'
-  const isObject = OBJECT_TYPES.has(node.type)
+  const isObject = node.type === 'object' || (node.type === 'intersection' && isObjectSchema(node))
+  const isValueIntersection = node.type === 'intersection' && !isObject
   const isTuple = node.type === 'tuple'
   const isScalar = SCALAR_TYPES.has(node.type)
   const isUnion = node.type === 'union'
@@ -35,7 +35,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
     if (canOverride && isArray) return `[\n  ...${fakerText},\n  ...(data || []).filter((item) => item !== undefined),\n]`
     // `??` treats an explicit `null` as "not provided", so a nullable factory could never return
     // the `null` its own signature promises. Only `undefined` means "generate one".
-    if (canOverride && (isScalar || isUnion)) {
+    if (canOverride && (isScalar || isUnion || isValueIntersection)) {
       return node.nullable ? `data !== undefined ? data : ${fakerText}` : `data ?? ${fakerText}`
     }
     return fakerText
