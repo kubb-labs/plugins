@@ -1,5 +1,14 @@
 # @kubb/plugin-msw
 
+## 6.0.2
+
+### Patch Changes
+
+- [#1271](https://github.com/kubb-labs/plugins/pull/1271) [`fe8d315`](https://github.com/kubb-labs/plugins/commit/fe8d31561ab0c7100b818b6b6c1af071bebc8da5) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix MSW handlers failing to typecheck when a request body resolves to `unknown`.
+- Updated dependencies [[`379a99b`](https://github.com/kubb-labs/plugins/commit/379a99b7fe2c8ab37fe1a223649b540cbfafd336), [`cbcac52`](https://github.com/kubb-labs/plugins/commit/cbcac52e9e8f1b6fa65b871c68ea1d5a6b15f761), [`6c53ce3`](https://github.com/kubb-labs/plugins/commit/6c53ce350efbca1cfc0836a41e9d297b3f7ff1af), [`cc0a2af`](https://github.com/kubb-labs/plugins/commit/cc0a2af243030248e9735f180561b7bc0c60e6df), [`df86551`](https://github.com/kubb-labs/plugins/commit/df86551b33bac4aa83430cb4ff72c6f47bd090c2), [`d6e69b2`](https://github.com/kubb-labs/plugins/commit/d6e69b2f098351924f53e9ea3f6d7ac5e3cca4a9), [`44bee8e`](https://github.com/kubb-labs/plugins/commit/44bee8e50f4f46935957e9b53614a789e402c8d0)]:
+  - @kubb/plugin-faker@5.2.2
+  - @kubb/plugin-ts@5.3.0
+
 ## 6.0.1
 
 ### Patch Changes

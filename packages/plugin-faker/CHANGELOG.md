@@ -1,5 +1,19 @@
 # @kubb/plugin-faker
 
+## 5.2.2
+
+### Patch Changes
+
+- [#1280](https://github.com/kubb-labs/plugins/pull/1280) [`379a99b`](https://github.com/kubb-labs/plugins/commit/379a99b7fe2c8ab37fe1a223649b540cbfafd336) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix implicit any errors in generated factories for mutually recursive schemas, including cycles through allOf references.
+
+- [#1267](https://github.com/kubb-labs/plugins/pull/1267) [`cc0a2af`](https://github.com/kubb-labs/plugins/commit/cc0a2af243030248e9735f180561b7bc0c60e6df) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Honor `propertyNames` enums in record types and Faker mocks, including referenced key enums.
+
+- [#1254](https://github.com/kubb-labs/plugins/pull/1254) [`df86551`](https://github.com/kubb-labs/plugins/commit/df86551b33bac4aa83430cb4ff72c6f47bd090c2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - A `pattern` that uses `\p{...}`, `\P{...}` or `\u{...}`, or holds a character outside the BMP, is now emitted with the `u` flag.
+
+- [#1273](https://github.com/kubb-labs/plugins/pull/1273) [`44bee8e`](https://github.com/kubb-labs/plugins/commit/44bee8e50f4f46935957e9b53614a789e402c8d0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Preserve array and object `const` values as literal types, Zod schemas, and mock values, including nested arrays and objects.
+- Updated dependencies [[`cbcac52`](https://github.com/kubb-labs/plugins/commit/cbcac52e9e8f1b6fa65b871c68ea1d5a6b15f761), [`6c53ce3`](https://github.com/kubb-labs/plugins/commit/6c53ce350efbca1cfc0836a41e9d297b3f7ff1af), [`cc0a2af`](https://github.com/kubb-labs/plugins/commit/cc0a2af243030248e9735f180561b7bc0c60e6df), [`d6e69b2`](https://github.com/kubb-labs/plugins/commit/d6e69b2f098351924f53e9ea3f6d7ac5e3cca4a9), [`44bee8e`](https://github.com/kubb-labs/plugins/commit/44bee8e50f4f46935957e9b53614a789e402c8d0)]:
+  - @kubb/plugin-ts@5.3.0
+
 ## 5.2.1
 
 ### Patch Changes

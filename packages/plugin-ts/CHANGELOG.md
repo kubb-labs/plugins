@@ -1,5 +1,21 @@
 # @kubb/plugin-ts
 
+## 5.3.0
+
+### Minor Changes
+
+- [#1257](https://github.com/kubb-labs/plugins/pull/1257) [`d6e69b2`](https://github.com/kubb-labs/plugins/commit/d6e69b2f098351924f53e9ea3f6d7ac5e3cca4a9) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - A request body offered in several media types now pairs each body variant with its `contentType.request`. The first media type stays the default; any other variant must pass `contentType`, so sending the JSON body of a multipart-first operation as multipart is a type error.
+
+### Patch Changes
+
+- [#1263](https://github.com/kubb-labs/plugins/pull/1263) [`cbcac52`](https://github.com/kubb-labs/plugins/commit/cbcac52e9e8f1b6fa65b871c68ea1d5a6b15f761) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Generate valid runtime enum identifiers and barrel exports for schema names starting with a digit.
+
+- [#1264](https://github.com/kubb-labs/plugins/pull/1264) [`6c53ce3`](https://github.com/kubb-labs/plugins/commit/6c53ce350efbca1cfc0836a41e9d297b3f7ff1af) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Emit response types as `unknown` when response schemas are missing so generated clients and hooks can import them.
+
+- [#1267](https://github.com/kubb-labs/plugins/pull/1267) [`cc0a2af`](https://github.com/kubb-labs/plugins/commit/cc0a2af243030248e9735f180561b7bc0c60e6df) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Honor `propertyNames` enums in record types and Faker mocks, including referenced key enums.
+
+- [#1273](https://github.com/kubb-labs/plugins/pull/1273) [`44bee8e`](https://github.com/kubb-labs/plugins/commit/44bee8e50f4f46935957e9b53614a789e402c8d0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Preserve array and object `const` values as literal types, Zod schemas, and mock values, including nested arrays and objects.
+
 ## 5.2.0
 
 ### Minor Changes

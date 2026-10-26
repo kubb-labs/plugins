@@ -1,5 +1,30 @@
 # @kubb/plugin-axios
 
+## 5.10.0
+
+### Minor Changes
+
+- [#1257](https://github.com/kubb-labs/plugins/pull/1257) [`d6e69b2`](https://github.com/kubb-labs/plugins/commit/d6e69b2f098351924f53e9ea3f6d7ac5e3cca4a9) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - A request body offered in several media types now pairs each body variant with its `contentType.request`. The first media type stays the default; any other variant must pass `contentType`, so sending the JSON body of a multipart-first operation as multipart is a type error.
+
+### Patch Changes
+
+- [#1268](https://github.com/kubb-labs/plugins/pull/1268) [`3b37a18`](https://github.com/kubb-labs/plugins/commit/3b37a18ce0bbe81939188b70c9e5e70f5d0d006d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Encode HTTP Basic credentials as UTF-8 so non-ASCII usernames and passwords are sent correctly without throwing.
+
+- [#1251](https://github.com/kubb-labs/plugins/pull/1251) [`4c5d703`](https://github.com/kubb-labs/plugins/commit/4c5d70327c9517c39ae16851f973ccf508d7a09e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Generated clients now pass the `encoding` of a form or multipart request body as `styles.body`.
+
+- [#1261](https://github.com/kubb-labs/plugins/pull/1261) [`324bd89`](https://github.com/kubb-labs/plugins/commit/324bd890ef0884c48d1d3ad15a6f38695f5651f0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Serialize multipart and URL-encoded request bodies correctly when their media types use mixed case or uppercase.
+
+- [#1259](https://github.com/kubb-labs/plugins/pull/1259) [`73b2ee4`](https://github.com/kubb-labs/plugins/commit/73b2ee42f4b4c6e04331237f2e17d81c299aa2fd) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Emit the declared request media type for JSON bodies and JSON-encode string bodies in the Fetch and Axios clients.
+
+- [#1255](https://github.com/kubb-labs/plugins/pull/1255) [`970e6a1`](https://github.com/kubb-labs/plugins/commit/970e6a1d640f5c4e1872fe7fc8deb6434558756a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Path parameter styles are keyed by the spec name of the parameter, so `style` and `explode` now apply to path parameters that are not camelCase, such as `pet_id` and `scope.id`.
+
+- [#1258](https://github.com/kubb-labs/plugins/pull/1258) [`e6b99b9`](https://github.com/kubb-labs/plugins/commit/e6b99b9ac8a0b965a881194b2ecc37f5921cfc38) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Prefix reserved-word operation names with `_` so generated functions and their references compile.
+
+- [#1266](https://github.com/kubb-labs/plugins/pull/1266) [`f9fd2b1`](https://github.com/kubb-labs/plugins/commit/f9fd2b141a9679988f1678c9cf9576a888b47c3e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Serialize dates, nested objects, and arrays correctly in URL-encoded request bodies without encoding metadata, and omit null and undefined properties.
+- Updated dependencies [[`cbcac52`](https://github.com/kubb-labs/plugins/commit/cbcac52e9e8f1b6fa65b871c68ea1d5a6b15f761), [`6c53ce3`](https://github.com/kubb-labs/plugins/commit/6c53ce350efbca1cfc0836a41e9d297b3f7ff1af), [`cc0a2af`](https://github.com/kubb-labs/plugins/commit/cc0a2af243030248e9735f180561b7bc0c60e6df), [`df86551`](https://github.com/kubb-labs/plugins/commit/df86551b33bac4aa83430cb4ff72c6f47bd090c2), [`d6e69b2`](https://github.com/kubb-labs/plugins/commit/d6e69b2f098351924f53e9ea3f6d7ac5e3cca4a9), [`44bee8e`](https://github.com/kubb-labs/plugins/commit/44bee8e50f4f46935957e9b53614a789e402c8d0), [`aa8b947`](https://github.com/kubb-labs/plugins/commit/aa8b947f15c459ff4d3068c5853e999b05fda7c9), [`754fac6`](https://github.com/kubb-labs/plugins/commit/754fac619734a3edcaea3fbd7b7fd07c1b34243a)]:
+  - @kubb/plugin-ts@5.3.0
+  - @kubb/plugin-zod@5.7.3
+
 ## 5.9.2
 
 ### Patch Changes
