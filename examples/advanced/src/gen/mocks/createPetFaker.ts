@@ -3,7 +3,7 @@ import { createCategoryFaker } from './createCategoryFaker'
 import { createTagTagFaker } from './createTagTagFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
-export function createPetFaker<TData extends Partial<Pet> = object>(data?: TData) {
+export function createPetFaker<TData extends Partial<Pet> = object>(data?: TData): Omit<Pet, keyof NoInfer<TData>> & NoInfer<TData> {
   const defaultFakeData = {
     id: faker.number.int(),
     parent: faker.helpers.multiple(() => undefined as unknown as NonNullable<NonNullable<Pet>['parent']>[number]),
@@ -18,5 +18,5 @@ export function createPetFaker<TData extends Partial<Pet> = object>(data?: TData
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as Omit<Pet, keyof NoInfer<TData>> & NoInfer<TData>
 }

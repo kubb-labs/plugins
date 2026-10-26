@@ -8,7 +8,7 @@ import type { Pet } from './types/Pet'
 import { createCategory } from './createCategory'
 import { faker } from '@faker-js/faker'
 
-export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
+export function createPet<TData extends Partial<Pet> = object>(data?: TData): Omit<Pet, keyof NoInfer<TData>> & NoInfer<TData> {
   const defaultFakeData = {
     id: faker.number.int(),
     name: faker.string.alpha(),
@@ -20,5 +20,5 @@ export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  } as Omit<Pet, keyof NoInfer<TData>> & NoInfer<TData>
 }
