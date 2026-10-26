@@ -405,9 +405,19 @@ export function strictOneOfNode(node: ast.SchemaNode): ast.SchemaNode {
 }
 
 /**
- * Composes sibling properties into each oneOf variant before the printer makes its members strict.
+ * Keeps sibling validation outside a oneOf and disables implicit member strictness when sibling keys are present.
  */
-export function mergeOneOfSiblings({ node, document }: { node: ast.SchemaNode; document?: unknown }): ast.SchemaNode {
+export function prepareOneOfSiblings<TNode extends ast.SchemaNode>({
+  node,
+  document,
+  oneOfType,
+  cyclicSchemas,
+}: {
+  node: TNode
+  document?: unknown
+  oneOfType?: PluginZod['resolvedOptions']['oneOfType']
+  cyclicSchemas?: ReadonlySet<string>
+}): TNode {
   if (node.type !== 'intersection') return node
   const members = node.members ?? []
   const union = members.find((member) => member.type === 'union' && member.strategy === 'one')
@@ -423,29 +433,25 @@ export function mergeOneOfSiblings({ node, document }: { node: ast.SchemaNode; d
       return value && typeof value === 'object' ? Reflect.get(value, name) : undefined
     }, document)
   const required = source && typeof source === 'object' && 'required' in source && Array.isArray(source.required) ? source.required : []
+  const properties = required
+    .filter((name): name is string => typeof name === 'string')
+    .flatMap((name) => {
+      if (siblings.some((sibling) => sibling.properties.some((property) => property.name === name))) return []
+      const candidates = (union.members ?? []).flatMap((variant) => ast.resolveSchemaProperties({ node: variant, propertyName: name }))
+      const schemas = candidates.map((property) => ast.optionality(property.schema, true))
+      if (!schemas.length) return []
+      const schema = schemas.length === 1 ? schemas[0]! : ast.factory.createSchema({ type: 'union', members: schemas })
+      return [ast.factory.createProperty({ name, required: true, schema })]
+    })
+  const isDiscriminated = !!union.discriminatorPropertyName && (union.members ?? []).every((member) => isObjectSchemaNode(member, cyclicSchemas))
+  // Union printing uses strategy 'one' to add strictness; z.xor handles exclusivity itself.
+  const strategy: ast.UnionSchemaNode['strategy'] = oneOfType === 'xor' && !isDiscriminated ? 'one' : 'any'
   return {
     ...node,
-    ...union,
-    members: (union.members ?? []).map((member) => {
-      const properties = required
-        .filter((name): name is string => typeof name === 'string')
-        .flatMap((name) => {
-          if (siblings.some((sibling) => sibling.properties.some((property) => property.name === name))) return []
-          const own = ast.resolveSchemaProperties({ node: member, propertyName: name })
-          const candidates = own.length ? own : (union.members ?? []).flatMap((variant) => ast.resolveSchemaProperties({ node: variant, propertyName: name }))
-          const schemas = candidates.map((property) => ast.optionality(property.schema, true))
-          if (!schemas.length) return []
-          const schema = schemas.length === 1 ? schemas[0]! : ast.factory.createSchema({ type: 'union', members: schemas })
-          return [ast.factory.createProperty({ name, required: true, schema })]
-        })
-      const shared = properties.length ? [...siblings, ast.factory.createSchema({ type: 'object', properties })] : siblings
-      const overlaps = shared.some((sibling) =>
-        sibling.properties.some((property) => ast.resolveSchemaProperties({ node: member, propertyName: property.name }).length),
-      )
-      // Keep overlapping constraints in an intersection; .extend() would overwrite the member's discriminator or validation.
-      const rest = overlaps ? [ast.factory.createSchema({ type: 'intersection', members: shared })] : shared
-      return ast.factory.createSchema({ type: 'intersection', members: [member, ...rest] })
-    }),
+    members: [
+      ...members.map((member) => (member === union ? { ...union, strategy } : member)),
+      ...(properties.length ? [ast.factory.createSchema({ type: 'object', properties })] : []),
+    ],
   }
 }
 

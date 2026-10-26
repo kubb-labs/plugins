@@ -7,7 +7,7 @@ import * as z from 'zod/mini'
 import { sedanTypeEnumSchema } from './sedanTypeEnumSchema'
 import { vehicleSchema } from './vehicleSchema'
 
-export const sedanSchema = z.intersection(vehicleSchema, z.object({
+export const sedanSchema = z.extend(vehicleSchema, {
   type: z.optional(sedanTypeEnumSchema),
   seats: z.optional(z.int()),
-}))
+})

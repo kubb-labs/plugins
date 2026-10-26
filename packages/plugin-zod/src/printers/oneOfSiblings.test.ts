@@ -3,7 +3,7 @@ import { ast } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
 import * as z from 'zod'
 import * as mini from 'zod/mini'
-import { mergeOneOfSiblings } from '../utils.ts'
+import { prepareOneOfSiblings } from '../utils.ts'
 import { printerZod } from './printerZod.ts'
 import { printerZodMini } from './printerZodMini.ts'
 
@@ -11,6 +11,66 @@ describe.each([
   { name: 'Zod', createPrinter: printerZod, runtime: z },
   { name: 'Zod Mini', createPrinter: printerZodMini, runtime: mini },
 ])('$name oneOf with sibling properties', ({ createPrinter, runtime }) => {
+  test('keeps referenced single-member oneOf compositions usable as discriminator variants', () => {
+    const printer = createPrinter({})
+    const vehicle = ast.factory.createSchema({ type: 'object', properties: [] })
+    const variant = (name: string) =>
+      ast.factory.createSchema({
+        type: 'intersection',
+        members: [
+          ast.factory.createSchema({ type: 'union', strategy: 'one', members: [ast.factory.createSchema({ type: 'ref', name: 'vehicle', schema: vehicle })] }),
+          ast.factory.createSchema({
+            type: 'object',
+            properties: [
+              ast.factory.createProperty({
+                name: 'type',
+                required: true,
+                schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }),
+              }),
+            ],
+          }),
+        ],
+      })
+    const suv = variant('SUV')
+    const sedan = variant('Sedan')
+    const car = ast.factory.createSchema({
+      type: 'union',
+      strategy: 'one',
+      discriminatorPropertyName: 'type',
+      members: [
+        { name: 'SUV', schema: suv },
+        { name: 'Sedan', schema: sedan },
+      ].map(({ name, schema }) =>
+        ast.factory.createSchema({
+          type: 'intersection',
+          members: [
+            ast.factory.createSchema({ type: 'ref', name, schema }),
+            ast.factory.createSchema({
+              type: 'object',
+              properties: [
+                ast.factory.createProperty({
+                  name: 'type',
+                  required: true,
+                  schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }),
+                }),
+              ],
+            }),
+          ],
+        }),
+      ),
+    })
+    const source = printer.print(car)
+    expect(source).toContain("z.discriminatedUnion('type'")
+    const schema: z.ZodType = new Function(
+      'z',
+      `const vehicle = ${printer.print(vehicle)}; const SUV = ${printer.print(suv)}; const Sedan = ${printer.print(sedan)}; return ${source}`,
+    )(runtime)
+
+    expect(schema.safeParse({ type: 'SUV' }).success).toBe(true)
+    expect(schema.safeParse({ type: 'Sedan' }).success).toBe(true)
+    expect(schema.safeParse({ type: 'Other' }).success).toBe(false)
+  })
+
   test('preserves narrowed discriminators when sibling properties declare the same key', () => {
     const kind = (values: Array<string>) =>
       ast.factory.createProperty({ name: 'kind', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: values }) })
@@ -31,7 +91,9 @@ describe.each([
         ast.factory.createSchema({ type: 'object', properties: [kind(['a', 'b'])] }),
       ],
     })
-    const schema: z.ZodType = new Function('z', `return ${createPrinter({}).print(node)}`)(runtime)
+    const source = createPrinter({}).print(node)
+    expect(source).toContain("z.discriminatedUnion('kind'")
+    const schema: z.ZodType = new Function('z', `return ${source}`)(runtime)
 
     expect(schema.safeParse({ kind: 'a', a: 'x' }).success).toBe(true)
     expect(schema.safeParse({ kind: 'b', b: 'x' }).success).toBe(true)
@@ -104,7 +166,7 @@ describe.each([
     })
     const printer = createPrinter({})
     const pet = root.schemas.find((node) => node.name === 'Pet')!
-    const prepared = ast.applyMacros(pet, [{ name: 'oneOfSiblings', schema: (node) => mergeOneOfSiblings({ node, document: adapter.document }) }])
+    const prepared = ast.applyMacros(pet, [{ name: 'oneOfSiblings', schema: (node) => prepareOneOfSiblings({ node, document: adapter.document }) }])
     const source = root.schemas
       .filter((node) => node.name !== 'Pet')
       .map((node) => `const ${node.name} = ${printer.print(node)};`)

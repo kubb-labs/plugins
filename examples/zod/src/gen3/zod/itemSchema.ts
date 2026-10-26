@@ -7,29 +7,20 @@ import * as z from 'zod'
 import { itemTypeASchema } from './itemTypeASchema'
 import { itemTypeBSchema } from './itemTypeBSchema'
 
-export const itemSchema = z.union([
-  itemTypeASchema
-    .extend({
+export const itemSchema = z
+  .discriminatedUnion('type', [
+    itemTypeASchema.extend({
       type: z.enum(['typeA']),
-    })
-    .and(
-      z.object({
-        id: z.int().optional(),
-        type: z.enum(['typeA', 'typeB']),
-        name: z.string(),
-        createdAt: z.iso.datetime().optional(),
-      }),
-    ),
-  itemTypeBSchema
-    .extend({
+    }),
+    itemTypeBSchema.extend({
       type: z.enum(['typeB']),
-    })
-    .and(
-      z.object({
-        id: z.int().optional(),
-        type: z.enum(['typeA', 'typeB']),
-        name: z.string(),
-        createdAt: z.iso.datetime().optional(),
-      }),
-    ),
-])
+    }),
+  ])
+  .and(
+    z.object({
+      id: z.int().optional(),
+      type: z.enum(['typeA', 'typeB']),
+      name: z.string(),
+      createdAt: z.iso.datetime().optional(),
+    }),
+  )

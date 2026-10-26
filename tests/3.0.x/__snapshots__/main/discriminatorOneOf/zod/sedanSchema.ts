@@ -7,7 +7,7 @@ import * as z from 'zod'
 import { sedanTypeEnumSchema } from './sedanTypeEnumSchema'
 import { vehicleSchema } from './vehicleSchema'
 
-export const sedanSchema = vehicleSchema.and(z.object({
+export const sedanSchema = vehicleSchema.extend({
   type: sedanTypeEnumSchema.optional(),
   seats: z.int().optional().describe('Number of seats'),
-}))
+})

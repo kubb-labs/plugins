@@ -13,7 +13,7 @@ import {
   isObjectComposableIntersection,
   isObjectSchemaNode,
   lengthChecksMini,
-  mergeOneOfSiblings,
+  prepareOneOfSiblings,
   numberChecksMini,
   objectConstraints,
   patternKeySchemaMini,
@@ -315,9 +315,8 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         return `z.union(${buildList(members)})`
       },
       intersection(node) {
-        const composed = mergeOneOfSiblings({ node })
-        if (composed !== node) return this.transform(composed)
-        const members = node.members ?? []
+        const prepared = prepareOneOfSiblings({ node, oneOfType: this.options.oneOfType, cyclicSchemas: cyclicSchemaNames })
+        const members = prepared.members ?? []
         if (members.length === 0) return ''
 
         const [first, ...rest] = members
