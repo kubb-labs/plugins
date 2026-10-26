@@ -8,6 +8,6 @@ import { SUVTypeEnumSchema } from './SUVTypeEnumSchema'
 import { vehicleSchema } from './vehicleSchema'
 
 export const SUVSchema = vehicleSchema.extend({
-  type: SUVTypeEnumSchema.optional(),
+  type: SUVTypeEnumSchema,
   offroadCapability: z.boolean().optional().describe('Can handle offroad terrain'),
 })
