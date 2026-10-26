@@ -1,3 +1,4 @@
+import { adapterOas } from '@kubb/adapter-oas'
 import { ast } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
 import * as z from 'zod'
@@ -9,31 +10,41 @@ describe.each([
   { name: 'Zod', createPrinter: printerZod, runtime: z },
   { name: 'Zod Mini', createPrinter: printerZodMini, runtime: mini },
 ])('$name oneOf with sibling properties', ({ createPrinter, runtime }) => {
-  test('accepts required unknown keys from the adapter without narrowing other variants', () => {
-    const property = ({ name, required, type }: { name: string; required: boolean; type: typeof ast.schemaTypes.string | typeof ast.schemaTypes.unknown }) =>
-      ast.factory.createProperty({ name, required, schema: ast.factory.createSchema({ type }) })
-    const node = ast.factory.createSchema({
-      type: ast.schemaTypes.intersection,
-      members: [
-        ast.factory.createSchema({
-          type: ast.schemaTypes.union,
-          strategy: 'one',
-          members: [
-            ast.factory.createSchema({ type: ast.schemaTypes.object, properties: [property({ name: 'a', required: false, type: ast.schemaTypes.string })] }),
-            ast.factory.createSchema({ type: ast.schemaTypes.object, properties: [property({ name: 'b', required: false, type: ast.schemaTypes.string })] }),
-          ],
-        }),
-        ast.factory.createSchema({ type: ast.schemaTypes.object, properties: [property({ name: 'shared', required: true, type: ast.schemaTypes.string })] }),
-        ast.factory.createSchema({ type: ast.schemaTypes.object, properties: [property({ name: 'a', required: true, type: ast.schemaTypes.unknown })] }),
-      ],
+  test.each(['3.0.0', '3.1.0'])('validates the original OpenAPI %s fixture through the adapter', async (openapi) => {
+    const root = await adapterOas({ validate: false }).parse({
+      type: 'data',
+      data: {
+        openapi,
+        info: { title: 'oneOf siblings', version: '1' },
+        paths: {},
+        components: {
+          schemas: {
+            A: { type: 'object', properties: { a: { type: 'string' } } },
+            B: { type: 'object', properties: { b: { type: 'string' } } },
+            Pet: {
+              type: 'object',
+              required: ['a', 'shared'],
+              properties: { shared: { type: 'string' } },
+              oneOf: [{ $ref: '#/components/schemas/A' }, { $ref: '#/components/schemas/B' }],
+            },
+          },
+        },
+      },
     })
-    const schema: z.ZodType = new Function('z', `return ${createPrinter({}).print(node)}`)(runtime)
+    const printer = createPrinter({})
+    const pet = root.schemas.find((node) => node.name === 'Pet')!
+    const source = root.schemas
+      .filter((node) => node !== pet)
+      .map((node) => `const ${node.name} = ${printer.print(node)};`)
+      .join('\n')
+    const { schema, a }: { schema: z.ZodType; a: z.ZodType } = new Function('z', `${source}\nreturn { schema: ${printer.print(pet)}, a: A }`)(runtime)
 
     expect(schema.safeParse({ a: 'x', shared: 'y' }).success).toBe(true)
     expect(schema.safeParse({ a: 42, b: 'x', shared: 'y' }).success).toBe(true)
     expect(schema.safeParse({ b: 'x', shared: 'y' }).success).toBe(false)
     expect(schema.safeParse({ a: 42, b: 42, shared: 'y' }).success).toBe(false)
     expect(schema.safeParse({ a: 'x' }).success).toBe(false)
+    expect(a.safeParse({}).success).toBe(true)
   })
 
   test('keeps the same union strict when printed without sibling properties', () => {
