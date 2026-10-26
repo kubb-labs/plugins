@@ -1,5 +1,5 @@
 import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
-import { buildList, stringify } from '@internals/utils'
+import { buildList, lazyGetter, objectKey, stringify } from '@internals/utils'
 import { ast, extractRefName, syncSchemaRef } from 'kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
@@ -157,25 +157,24 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
  * Builds the `{ key: value, … }` shape for an object node with the chainable modifiers.
  */
 function buildZodObjectShape(ctx: Parameters<typeof buildObjectShape>[0], node: ast.SchemaNode): string {
-  return buildObjectShape(
-    ctx,
-    node,
-    ({ value, schema, required, meta }) =>
-      applyModifiers({
-        value,
-        schema,
-        nullable: meta.nullable,
-        optional: schema.optional || required === false,
-        nullish: schema.nullish,
-        defaultValue: meta.default,
-        // When a property schema is not a ref but the metadata is from a ref (e.g., discriminator
-        // property override), skip applying the description from the ref target to avoid applying
-        // metadata from a replaced schema.
-        description: schema.type !== 'ref' && meta.type === 'ref' ? undefined : meta.description,
-        examples: meta.examples,
-      }),
-    ({ schema, required }) => recursiveGetterType({ ctx, schema, required }),
-  )
+  return buildObjectShape(ctx, node, ({ name, value, schema, required, meta, cyclic }) => {
+    const body = applyModifiers({
+      value,
+      schema,
+      nullable: meta.nullable,
+      optional: schema.optional || required === false,
+      nullish: schema.nullish,
+      defaultValue: meta.default,
+      // When a property schema is not a ref but the metadata is from a ref (e.g., discriminator
+      // property override), skip applying the description from the ref target to avoid applying
+      // metadata from a replaced schema.
+      description: schema.type !== 'ref' && meta.type === 'ref' ? undefined : meta.description,
+      examples: meta.examples,
+    })
+    if (!cyclic) return `${objectKey(name)}: ${body}`
+    const returnType = recursiveGetterType({ ctx, schema, required })
+    return returnType ? `get ${objectKey(name)}(): ${returnType} { return ${body} }` : lazyGetter({ name, body })
+  })
 }
 
 /**
@@ -185,15 +184,13 @@ function recursiveGetterType({
   ctx,
   schema,
   required,
-  modifiers = true,
 }: {
   ctx: Parameters<typeof buildObjectShape>[0]
   schema: ast.SchemaNode
   required?: boolean
-  modifiers?: boolean
 }): string | undefined {
-  if (ctx.options.nodes?.[schema.type]) return undefined
-  const base = (() => {
+  function baseType(schema: ast.SchemaNode): string | undefined {
+    if (ctx.options.nodes?.[schema.type]) return undefined
     if (schema.type === 'ref') {
       const saved = ctx.options.cyclicSchemas
       ctx.options.cyclicSchemas = undefined
@@ -202,13 +199,13 @@ function recursiveGetterType({
       return name ? `typeof ${name}` : undefined
     }
     if (schema.type === 'array' && schema.items?.length === 1) {
-      const item = recursiveGetterType({ ctx, schema: schema.items[0]!, modifiers: false })
+      const item = baseType(schema.items[0]!)
       return item ? `z.ZodArray<${item}>` : undefined
     }
     return undefined
-  })()
+  }
+  const base = baseType(schema)
   if (!base) return undefined
-  if (!modifiers) return base
 
   const meta = syncSchemaRef(schema)
   const optional = schema.optional || required === false

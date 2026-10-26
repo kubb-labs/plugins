@@ -1,4 +1,4 @@
-import { buildObject, lazyGetter, objectKey, stringify, toRegExpString } from '@internals/utils'
+import { buildObject, stringify, toRegExpString } from '@internals/utils'
 import { mapSchemaProperties } from '@internals/shared'
 import { ast, containsCircularRef, syncSchemaRef } from 'kubb/kit'
 import type { PluginZod } from './types.ts'
@@ -435,8 +435,14 @@ type PrinterContext = {
 export function buildObjectShape(
   ctx: PrinterContext,
   node: ast.SchemaNode,
-  modify: (args: { value: string; schema: ast.SchemaNode; required?: boolean; meta: ReturnType<typeof syncSchemaRef> }) => string,
-  getterType?: (args: { schema: ast.SchemaNode; required?: boolean }) => string | undefined,
+  renderProperty: (args: {
+    name: string
+    value: string
+    schema: ast.SchemaNode
+    required?: boolean
+    meta: ReturnType<typeof syncSchemaRef>
+    cyclic: boolean
+  }) => string,
 ): string {
   const objectNode = ast.narrowSchema(node, 'object')
   if (!objectNode) return '{}'
@@ -452,13 +458,9 @@ export function buildObjectShape(
     const baseOutput = ctx.transform(schema) ?? ctx.transform(ast.factory.createSchema({ type: 'unknown' }))!
     if (hasSelfRef) ctx.options.cyclicSchemas = savedCyclicSchemas
     return baseOutput
-  }).map(({ name: propName, property, output: baseOutput }) => {
+  }).map(({ name, property, output: value }) => {
     const { schema } = property
-    const value = modify({ value: baseOutput, schema, required: property.required, meta: syncSchemaRef(schema) })
-
-    if (!isCyclic(schema)) return `${objectKey(propName)}: ${value}`
-    const returnType = getterType?.({ schema, required: property.required })
-    return returnType ? `get ${objectKey(propName)}(): ${returnType} { return ${value} }` : lazyGetter({ name: propName, body: value })
+    return renderProperty({ name, value, schema, required: property.required, meta: syncSchemaRef(schema), cyclic: isCyclic(schema) })
   })
 
   return buildObject(entries)
