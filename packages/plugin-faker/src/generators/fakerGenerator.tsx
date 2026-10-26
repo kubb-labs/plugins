@@ -216,7 +216,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         return null
       }
 
-      if (schema.type === 'object' && keysToOmit?.length) {
+      if (schema.type === ast.schemaTypes.object && keysToOmit?.length) {
         schema = { ...schema, properties: schema.properties.filter((property) => !keysToOmit?.includes(property.name)) }
         keysToOmit = undefined
       }
