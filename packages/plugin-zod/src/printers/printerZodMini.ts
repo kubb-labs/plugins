@@ -255,7 +255,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
             return catchallType ? `z.catchall(${objectBase}, ${catchallType})` : objectBase
           }
           if (entries.length === 0 && patterns.length === 0 && propertyNamesKeySchema && !isStrict) {
-            const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+            const unknownType = this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
             return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
           }
           if (node.additionalProperties === true) return objectBase
@@ -263,7 +263,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
 
           if (patterns.length > 0) {
             const values = patterns.map(([, valueSchema]) => {
-              const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+              const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
               return valueSchema.nullable ? `z.nullable(${valueType})` : valueType
             })
             const distinct = [...new Set(values)]
@@ -282,7 +282,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         const items = mapSchemaItems(node, (item) => this.transform(item))
           .map(({ output }) => output)
           .filter(Boolean)
-        const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+        const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
         const base = `z.array(${inner})${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
 
         return node.unique ? `${base}.check(z.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" }))` : base
