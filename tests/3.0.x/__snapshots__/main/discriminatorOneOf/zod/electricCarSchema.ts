@@ -8,6 +8,6 @@ import { electricCarTypeEnumSchema } from './electricCarTypeEnumSchema'
 import { vehicleSchema } from './vehicleSchema'
 
 export const electricCarSchema = vehicleSchema.extend({
-  type: electricCarTypeEnumSchema.optional(),
+  type: electricCarTypeEnumSchema,
   batteryCapacity: z.number().optional().describe('Battery capacity in kWh'),
 })

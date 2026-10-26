@@ -17,6 +17,7 @@ import {
   numberConstraints,
   objectConstraints,
   patternKeySchema,
+  preserveRequiredProperties,
   printWithOmit,
   shouldCoerce,
   strictOneOfNode,
@@ -566,7 +567,9 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       // An object `allOf` is a merge, not a runtime intersection: `.extend({ … })` keeps it a
       // ZodObject (usable in z.discriminatedUnion) instead of the non-discriminable `.and(…)`.
       if (rest.length > 0 && isObjectComposableIntersection(node, cyclicSchemaNames)) {
-        return rest.reduce((acc, member) => `${acc}.extend(${buildZodObjectShape(this, member)})`, firstBase)
+        return preserveRequiredProperties(members)
+          .slice(1)
+          .reduce((acc, member) => `${acc}.extend(${buildZodObjectShape(this, member)})`, firstBase)
       }
 
       return rest.reduce((acc, member) => {

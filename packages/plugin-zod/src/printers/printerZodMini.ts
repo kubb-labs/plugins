@@ -16,6 +16,7 @@ import {
   numberChecksMini,
   objectConstraints,
   patternKeySchemaMini,
+  preserveRequiredProperties,
   printWithOmit,
   shouldCoerce,
   strictOneOfNode,
@@ -338,7 +339,9 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         // An object `allOf` is a merge, not a runtime intersection: `z.extend(base, { … })` keeps it
         // a Zod object (usable in z.discriminatedUnion) instead of a non-discriminable `z.intersection`.
         if (rest.length > 0 && isObjectComposableIntersection(node, cyclicSchemaNames)) {
-          return rest.reduce((acc, member) => `z.extend(${acc}, ${buildZodMiniObjectShape(this, member)})`, firstBase)
+          return preserveRequiredProperties(members)
+            .slice(1)
+            .reduce((acc, member) => `z.extend(${acc}, ${buildZodMiniObjectShape(this, member)})`, firstBase)
         }
 
         return rest.reduce((acc, member) => {
