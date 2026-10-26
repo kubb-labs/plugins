@@ -317,7 +317,9 @@ describe('zodGenerator — Schema', () => {
     expect(source).toContain('export const errorDetailsSchema: z.ZodType')
   })
 
-  test.each([false, true])('nullable recursive object typechecks and validates with required=%s', async (required) => {
+  test.each(
+    [false, true].flatMap((required) => [{}, { nullable: true }, { optional: true }, { nullish: true }].map((itemModifiers) => ({ required, itemModifiers }))),
+  )('nullable recursive object typechecks and validates with required=$required and itemModifiers=$itemModifiers', async ({ required, itemModifiers }) => {
     const node = ast.factory.createSchema({
       type: 'object',
       name: 'Foo',
@@ -330,7 +332,7 @@ describe('zodGenerator — Schema', () => {
           schema: ast.factory.createSchema({
             type: 'array',
             description: 'This is baz property.',
-            items: [ast.factory.createSchema({ type: 'ref', name: 'Foo', ref: '#/components/schemas/Foo' })],
+            items: [ast.factory.createSchema({ type: 'ref', name: 'Foo', ref: '#/components/schemas/Foo', ...itemModifiers })],
           }),
         }),
       ],
@@ -349,6 +351,8 @@ describe('zodGenerator — Schema', () => {
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain(required ? 'get baz(): z.ZodArray<typeof fooSchema>' : 'get baz(): z.ZodOptional<z.ZodArray<typeof fooSchema>>')
+    expect(source).toContain('return z.array(fooSchema)')
     const directory = await fs.mkdtemp(path.join(path.dirname(fileURLToPath(import.meta.url)), '.nullable-recursive-'))
     try {
       const file = path.join(directory, 'schema.ts')
