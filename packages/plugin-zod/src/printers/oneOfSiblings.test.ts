@@ -9,6 +9,33 @@ describe.each([
   { name: 'Zod', createPrinter: printerZod, runtime: z },
   { name: 'Zod Mini', createPrinter: printerZodMini, runtime: mini },
 ])('$name oneOf with sibling properties', ({ createPrinter, runtime }) => {
+  test('accepts required unknown keys from the adapter without narrowing other variants', () => {
+    const property = ({ name, required, type }: { name: string; required: boolean; type: typeof ast.schemaTypes.string | typeof ast.schemaTypes.unknown }) =>
+      ast.factory.createProperty({ name, required, schema: ast.factory.createSchema({ type }) })
+    const node = ast.factory.createSchema({
+      type: ast.schemaTypes.intersection,
+      members: [
+        ast.factory.createSchema({
+          type: ast.schemaTypes.union,
+          strategy: 'one',
+          members: [
+            ast.factory.createSchema({ type: ast.schemaTypes.object, properties: [property({ name: 'a', required: false, type: ast.schemaTypes.string })] }),
+            ast.factory.createSchema({ type: ast.schemaTypes.object, properties: [property({ name: 'b', required: false, type: ast.schemaTypes.string })] }),
+          ],
+        }),
+        ast.factory.createSchema({ type: ast.schemaTypes.object, properties: [property({ name: 'shared', required: true, type: ast.schemaTypes.string })] }),
+        ast.factory.createSchema({ type: ast.schemaTypes.object, properties: [property({ name: 'a', required: true, type: ast.schemaTypes.unknown })] }),
+      ],
+    })
+    const schema: z.ZodType = new Function('z', `return ${createPrinter({}).print(node)}`)(runtime)
+
+    expect(schema.safeParse({ a: 'x', shared: 'y' }).success).toBe(true)
+    expect(schema.safeParse({ a: 42, b: 'x', shared: 'y' }).success).toBe(true)
+    expect(schema.safeParse({ b: 'x', shared: 'y' }).success).toBe(false)
+    expect(schema.safeParse({ a: 42, b: 42, shared: 'y' }).success).toBe(false)
+    expect(schema.safeParse({ a: 'x' }).success).toBe(false)
+  })
+
   test('keeps the same union strict when printed without sibling properties', () => {
     const printer = createPrinter({})
     const union = ast.factory.createSchema({
@@ -42,19 +69,23 @@ describe.each([
 
   test('keeps referenced single-member oneOf compositions usable as discriminator variants', () => {
     const printer = createPrinter({})
-    const vehicle = ast.factory.createSchema({ type: 'object', properties: [] })
+    const vehicle = ast.factory.createSchema({ type: ast.schemaTypes.object, properties: [] })
     const variant = (name: string) =>
       ast.factory.createSchema({
-        type: 'intersection',
+        type: ast.schemaTypes.intersection,
         members: [
-          ast.factory.createSchema({ type: 'union', strategy: 'one', members: [ast.factory.createSchema({ type: 'ref', name: 'vehicle', schema: vehicle })] }),
           ast.factory.createSchema({
-            type: 'object',
+            type: ast.schemaTypes.union,
+            strategy: 'one',
+            members: [ast.factory.createSchema({ type: ast.schemaTypes.ref, name: 'vehicle', schema: vehicle })],
+          }),
+          ast.factory.createSchema({
+            type: ast.schemaTypes.object,
             properties: [
               ast.factory.createProperty({
                 name: 'type',
                 required: true,
-                schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }),
+                schema: ast.factory.createSchema({ type: ast.schemaTypes.enum, enumValues: [name] }),
               }),
             ],
           }),
@@ -63,7 +94,7 @@ describe.each([
     const suv = variant('SUV')
     const sedan = variant('Sedan')
     const car = ast.factory.createSchema({
-      type: 'union',
+      type: ast.schemaTypes.union,
       strategy: 'one',
       discriminatorPropertyName: 'type',
       members: [
@@ -71,16 +102,16 @@ describe.each([
         { name: 'Sedan', schema: sedan },
       ].map(({ name, schema }) =>
         ast.factory.createSchema({
-          type: 'intersection',
+          type: ast.schemaTypes.intersection,
           members: [
-            ast.factory.createSchema({ type: 'ref', name, schema }),
+            ast.factory.createSchema({ type: ast.schemaTypes.ref, name, schema }),
             ast.factory.createSchema({
-              type: 'object',
+              type: ast.schemaTypes.object,
               properties: [
                 ast.factory.createProperty({
                   name: 'type',
                   required: true,
-                  schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }),
+                  schema: ast.factory.createSchema({ type: ast.schemaTypes.enum, enumValues: [name] }),
                 }),
               ],
             }),
@@ -102,22 +133,25 @@ describe.each([
 
   test('preserves narrowed discriminators when sibling properties declare the same key', () => {
     const kind = (values: Array<string>) =>
-      ast.factory.createProperty({ name: 'kind', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: values }) })
+      ast.factory.createProperty({ name: 'kind', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.enum, enumValues: values }) })
     const node = ast.factory.createSchema({
-      type: 'intersection',
+      type: ast.schemaTypes.intersection,
       members: [
         ast.factory.createSchema({
-          type: 'union',
+          type: ast.schemaTypes.union,
           strategy: 'one',
           discriminatorPropertyName: 'kind',
           members: ['a', 'b'].map((name) =>
             ast.factory.createSchema({
-              type: 'object',
-              properties: [kind([name]), ast.factory.createProperty({ name, required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+              type: ast.schemaTypes.object,
+              properties: [
+                kind([name]),
+                ast.factory.createProperty({ name, required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) }),
+              ],
             }),
           ),
         }),
-        ast.factory.createSchema({ type: 'object', properties: [kind(['a', 'b'])] }),
+        ast.factory.createSchema({ type: ast.schemaTypes.object, properties: [kind(['a', 'b'])] }),
       ],
     })
     const source = createPrinter({}).print(node)
@@ -139,21 +173,23 @@ describe.each([
     const printer = createPrinter({ oneOfType })
     const variants = ['a', 'b'].map((name) =>
       ast.factory.createSchema({
-        type: 'object',
-        properties: [ast.factory.createProperty({ name, required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+        type: ast.schemaTypes.object,
+        properties: [ast.factory.createProperty({ name, required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) })],
       }),
     )
     const node = ast.factory.createSchema({
-      type: 'intersection',
+      type: ast.schemaTypes.intersection,
       members: [
         ast.factory.createSchema({
-          type: 'union',
+          type: ast.schemaTypes.union,
           strategy: 'one',
-          members: variants.map((schema, index) => (references ? ast.factory.createSchema({ type: 'ref', name: `variant${index}`, schema }) : schema)),
+          members: variants.map((schema, index) =>
+            references ? ast.factory.createSchema({ type: ast.schemaTypes.ref, name: `variant${index}`, schema }) : schema,
+          ),
         }),
         ast.factory.createSchema({
-          type: 'object',
-          properties: [ast.factory.createProperty({ name: 'shared', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+          type: ast.schemaTypes.object,
+          properties: [ast.factory.createProperty({ name: 'shared', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) })],
         }),
       ],
     })
