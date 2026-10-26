@@ -61,7 +61,8 @@ export function buildResponseUnionSchema(node: ast.OperationNode, resolver: Reso
   }
 
   if (responses.length === 1) {
-    const schema = responses[0]!.content?.[0]?.schema
+    const schemas = responses[0]!.content?.flatMap((content) => (content.schema ? [content.schema] : [])) ?? []
+    const schema = schemas.length > 1 ? ast.factory.createSchema({ type: 'union', members: schemas }) : schemas[0]
     if (schema && shouldInlineSingleResponseSchema(schema)) {
       return schema
     }
