@@ -70,14 +70,16 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
   }
 
   // Generate function with defaultFakeData structure
-  const returnType = typeMode === 'schema' ? typeName : 'Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>'
+  const { cyclicSchemas, schemaName } = printer.options
+  const isCyclic = !!schemaName && !!cyclicSchemas?.has(schemaName)
+  const baseType = isCyclic ? typeName : 'typeof defaultFakeData'
+  const returnType = typeMode === 'schema' ? typeName : `Omit<${baseType}, keyof NoInfer<TData>> & NoInfer<TData>`
 
   // When the object node has properties that transitively reference a cyclic schema,
   // the printer emits memoizing getters for those properties. Spreading the object
   // literal would immediately invoke those getters, triggering recursive faker calls
   // and causing a stack overflow. Detect this upfront via ast helpers so we can
   // use Object.defineProperty-based merging instead of spread.
-  const { cyclicSchemas, schemaName } = printer.options
   const hasGetters =
     node.type === 'object' &&
     !!cyclicSchemas &&
@@ -105,7 +107,7 @@ return {
         JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
         generics={typeMode === 'schema' ? undefined : `TData extends Partial<${typeName}> = object`}
         params={typeMode === 'schema' ? `data?: Partial<${typeName}>` : 'data?: TData'}
-        returnType={typeMode === 'schema' ? typeName : undefined}
+        returnType={typeMode === 'schema' || isCyclic ? returnType : undefined}
       >
         {functionBody}
       </Function>

@@ -1,8 +1,13 @@
+import { execFile } from 'node:child_process'
+import fs from 'node:fs/promises'
+import { createRequire } from 'node:module'
+import path from 'node:path'
+import { promisify } from 'node:util'
 import { ast } from 'kubb/kit'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from 'kubb/kit/testing'
 import { parserTs } from '@kubb/parser-ts'
-import { type PluginTs, resolverTs } from '@kubb/plugin-ts'
-import { describe, expect, test } from 'vitest'
+import { type PluginTs, resolverTs, typeGenerator } from '@kubb/plugin-ts'
+import { describe, expect, onTestFinished, test } from 'vitest'
 import { format, matchFiles, testConfig } from '#mocks'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import type { PluginFaker } from '../types.ts'
@@ -253,6 +258,100 @@ const defaultTsPlugin = createMockedPlugin<PluginTs>({
 })
 
 describe('fakerGenerator — schema', () => {
+  test.each([2, 5])('typechecks factories in a %i-schema allOf cycle', async (size) => {
+    const names = ['Base', 'Child', 'Branch', 'Leaf', 'Root'].slice(0, size)
+    const schemas: Array<ast.SchemaNode> = names.map((name, index) =>
+      ast.factory.createSchema({
+        type: 'intersection',
+        name,
+        members: [
+          ast.factory.createSchema({ type: 'ref', name: names[(index + 1) % size]!, ref: `#/components/schemas/${names[(index + 1) % size]}` }),
+          ast.factory.createSchema({
+            type: 'object',
+            properties: [ast.factory.createProperty({ name: 'extra', schema: ast.factory.createSchema({ type: 'string' }) })],
+          }),
+        ],
+      }),
+    )
+    schemas[0] = ast.factory.createSchema({
+      type: 'object',
+      name: 'Base',
+      properties: [
+        ast.factory.createProperty({ name: 'parent', schema: ast.factory.createSchema({ type: 'ref', name: 'Child', ref: '#/components/schemas/Child' }) }),
+      ],
+    })
+    const tsOptions: PluginTs['resolvedOptions'] = {
+      output: { path: 'types', mode: 'directory' },
+      enum: { type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' },
+      optionalType: 'questionToken',
+      arrayType: 'array',
+      syntaxType: 'type',
+      operations: 'export',
+      exclude: [],
+      include: undefined,
+      override: [],
+      group: null,
+      printer: undefined,
+    }
+    const tsPlugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: tsOptions, resolver: resolverTs })
+    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: defaultOptions, resolver: resolverFaker })
+    const driver = createMockedPluginDriver({ name: 'allOfCycle', plugin: tsPlugin })
+    const meta = { circularNames: [...ast.findCircularSchemas(schemas)], enumNames: [] }
+    for (const node of schemas) {
+      await renderGeneratorSchema(typeGenerator, node, {
+        config: testConfig,
+        adapter: createMockedAdapter(),
+        driver,
+        plugin: tsPlugin,
+        options: tsOptions,
+        resolver: resolverTs,
+        meta,
+      })
+      await renderGeneratorSchema(fakerGenerator, node, {
+        config: testConfig,
+        adapter: createMockedAdapter(),
+        driver,
+        plugin,
+        options: defaultOptions,
+        resolver: resolverFaker,
+        meta,
+      })
+    }
+
+    const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.faker-'))
+    onTestFinished(() => fs.rm(dir, { recursive: true, force: true }))
+    for (const file of driver.fileManager.files) {
+      const filePath = path.join(dir, path.relative(path.resolve(testConfig.output.path), file.path))
+      await fs.mkdir(path.dirname(filePath), { recursive: true })
+      await fs.writeFile(filePath, parserTs().parse(file))
+    }
+    const checkPath = path.join(dir, 'check.ts')
+    await fs.writeFile(
+      checkPath,
+      `import { createChild } from './createChild'
+const child = createChild({ extra: 'fixed' as const, custom: true as const })
+const extra: 'fixed' = child.extra
+const custom: true = child.custom`,
+    )
+    const compiler = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
+    await expect(
+      promisify(execFile)(process.execPath, [
+        compiler,
+        '--ignoreConfig',
+        '--noEmit',
+        '--strict',
+        '--skipLibCheck',
+        '--module',
+        'preserve',
+        '--moduleResolution',
+        'bundler',
+        '--target',
+        'es2022',
+        checkPath,
+      ]),
+    ).resolves.toMatchObject({ stdout: '', stderr: '' })
+  })
+
   test.each([
     { name: 'pet', node: petSchema, options: {} },
     { name: 'treeNode', node: treeNodeSchema, options: {} },

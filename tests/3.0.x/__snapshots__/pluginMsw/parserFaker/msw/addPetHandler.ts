@@ -5,6 +5,7 @@
 
 import type { AddPetResponse, AddPetStatus405, AddPetBody } from '../types/AddPet'
 import type { HttpResponseResolver } from 'msw/http'
+import type { DefaultBodyType } from 'msw'
 import { createAddPetResponse } from '../faker/createAddPet'
 import { http, HttpResponse } from 'msw/http'
 
@@ -23,8 +24,8 @@ export function addPetHandlerResponse405(data?: AddPetStatus405) {
   })
 }
 
-export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Record<string, string>, AddPetBody>, options?: { baseURL?: string }) {
-  return http.post<Record<string, string>, AddPetBody>(`${options?.baseURL ?? ''}/pet`, function handler(info) {
+export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Record<string, string>, AddPetBody extends DefaultBodyType ? AddPetBody : DefaultBodyType>, options?: { baseURL?: string }) {
+  return http.post<Record<string, string>, AddPetBody extends DefaultBodyType ? AddPetBody : DefaultBodyType>(`${options?.baseURL ?? ''}/pet`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return new HttpResponse(JSON.stringify(data ?? createAddPetResponse(data)), {

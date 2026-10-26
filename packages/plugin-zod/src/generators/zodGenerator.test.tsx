@@ -1,5 +1,10 @@
+import { execFileSync } from 'node:child_process'
+import fs from 'node:fs/promises'
+import { createRequire } from 'node:module'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { adapterOas } from '@kubb/adapter-oas'
-import { ast } from 'kubb/kit'
+import { ast, Resolver } from 'kubb/kit'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from 'kubb/kit/testing'
 import { describe, expect, test } from 'vitest'
 import * as z from 'zod'
@@ -357,6 +362,65 @@ describe('zodGenerator — Schema', () => {
 
     const source = rawSources(driver.fileManager.files).join('\n')
     expect(source).toContain('export const errorDetailsSchema: z.ZodType')
+  })
+
+  test.each(
+    [false, true].flatMap((required) => [{}, { nullable: true }, { optional: true }, { nullish: true }].map((itemModifiers) => ({ required, itemModifiers }))),
+  )('nullable recursive object typechecks and validates with required=$required and itemModifiers=$itemModifiers', async ({ required, itemModifiers }) => {
+    const node = ast.factory.createSchema({
+      type: 'object',
+      name: 'Foo',
+      nullable: true,
+      description: 'This is Foo schema.',
+      properties: [
+        ast.factory.createProperty({
+          name: 'baz',
+          required,
+          schema: ast.factory.createSchema({
+            type: 'array',
+            description: 'This is baz property.',
+            items: [ast.factory.createSchema({ type: 'ref', name: 'Foo', ref: '#/components/schemas/Foo', ...itemModifiers })],
+          }),
+        }),
+      ],
+    })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver })
+    const driver = createMockedPluginDriver({ name: 'nullableRecursive' })
+    await renderGeneratorSchema(zodGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      meta: { circularNames: [...ast.findCircularSchemas([node])], enumNames: [] },
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver,
+    })
+
+    const source = rawSources(driver.fileManager.files).join('\n')
+    expect(source).toContain(required ? 'get baz(): z.ZodArray<typeof fooSchema>' : 'get baz(): z.ZodOptional<z.ZodArray<typeof fooSchema>>')
+    expect(source).toContain('return z.array(fooSchema)')
+    const directory = await fs.mkdtemp(path.join(path.dirname(fileURLToPath(import.meta.url)), '.nullable-recursive-'))
+    try {
+      const file = path.join(directory, 'schema.ts')
+      await fs.writeFile(
+        file,
+        `${source}
+const value: z.infer<typeof fooSchema> = { baz: [null, { baz: [] }] }
+// @ts-expect-error The schema retains its object type.
+const invalid: z.infer<typeof fooSchema> = 42
+if (!fooSchema.safeParse(null).success || !fooSchema.safeParse(value).success || fooSchema.safeParse({ baz: ['invalid'] }).success) throw new Error('Invalid recursive validation')
+if (fooSchema.safeParse({}).success !== ${!required}) throw new Error('Invalid required property')
+`,
+      )
+      const compiler = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
+      execFileSync(process.execPath, [compiler, '--ignoreConfig', '--strict', '--skipLibCheck', '--module', 'nodenext', '--target', 'es2022', file], {
+        stdio: 'inherit',
+      })
+      execFileSync(process.execPath, [path.join(directory, 'schema.js')], { stdio: 'pipe' })
+    } finally {
+      await fs.rm(directory, { recursive: true, force: true })
+    }
   })
 })
 
