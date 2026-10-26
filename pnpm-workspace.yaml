@@ -30,6 +30,14 @@ catalog:
   typescript: ^7.0.2
   vitest: ^5.0.5
 
+# Use the fixed canary until the next stable Kubb release.
+overrides:
+  '@kubb/adapter-oas': 0.0.0-canary-20261026131816
+  '@kubb/core': 0.0.0-canary-20261026131816
+  '@kubb/plugin-barrel': 0.0.0-canary-20261026131816
+  '@kubb/parser-ts': 0.0.0-canary-20261026131816
+  kubb: 0.0.0-canary-20261026131816
+
 #overrides: #  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
 
 #  '@kubb/ast': link:../kubb/packages/ast
