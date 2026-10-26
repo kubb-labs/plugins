@@ -2,7 +2,7 @@ import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildObject, objectKey, stringify, toRegExpString } from '@internals/utils'
 import { ast, containsCircularRef, Diagnostics, syncSchemaRef } from 'kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
-import { canOverrideSchema } from '../utils.ts'
+import { canOverrideSchema, isObjectSchema } from '../utils.ts'
 
 /**
  * Partial map of node-type overrides for the Faker printer. Each key is a
@@ -282,7 +282,9 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return `faker.helpers.arrayElement([${items.join(', ')}])`
       },
       intersection(node): string {
-        const items: Array<string> = mapSchemaMembers(node, (member) =>
+        const objectMembers = (node.members ?? []).filter((member) => isObjectSchema(member))
+        const members = objectMembers.length ? objectMembers : node.members
+        const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) =>
           printNested(member, {
             nestedInObject: true,
           }),
@@ -294,7 +296,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
         if (items.length === 0) return '{}'
 
-        return items.length === 1 ? items[0]! : `{...${items.join(', ...')}}`
+        return !objectMembers.length || items.length === 1 ? items.at(-1)! : `{...${items.join(', ...')}}`
       },
       array(node): string {
         const items: Array<string> = mapSchemaItems(node, (member) =>

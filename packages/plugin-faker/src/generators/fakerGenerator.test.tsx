@@ -40,6 +40,31 @@ const nullableNameSchema = ast.factory.createSchema({
   nullable: true,
 })
 
+const primitiveAllOfSchema = ast.factory.createSchema({
+  type: ast.schemaTypes.intersection,
+  name: 'Both',
+  members: [
+    ast.factory.createSchema({ type: ast.schemaTypes.ref, ref: '#/components/schemas/Id', schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) }),
+    ast.factory.createSchema({
+      type: ast.schemaTypes.ref,
+      ref: '#/components/schemas/Code',
+      schema: ast.factory.createSchema({ type: ast.schemaTypes.string, max: 8 }),
+    }),
+  ],
+})
+
+const primitiveEnumAllOfSchema = ast.factory.createSchema({
+  type: ast.schemaTypes.intersection,
+  name: 'Choice',
+  members: [
+    ast.factory.createSchema({ type: ast.schemaTypes.string }),
+    ast.factory.createSchema({
+      type: ast.schemaTypes.union,
+      members: ['a', 'b'].map((value) => ast.factory.createSchema({ type: ast.schemaTypes.enum, primitive: 'string', enumValues: [value] })),
+    }),
+  ],
+})
+
 const petSchema = ast.factory.createSchema({
   type: 'object',
   name: 'Pet',
@@ -362,6 +387,9 @@ const custom: true = child.custom`,
     { name: 'coordinate', node: coordinateSchema, options: {} },
     { name: 'catCycle', node: catSchema, options: {} },
     { name: 'nullableName', node: nullableNameSchema, options: {} },
+    { name: 'primitiveAllOf', node: primitiveAllOfSchema, options: {} },
+    { name: 'primitiveAllOfSchema', node: primitiveAllOfSchema, options: { typeMode: 'schema' } },
+    { name: 'primitiveEnumAllOf', node: primitiveEnumAllOfSchema, options: {} },
   ] as const)('$name', async ({ name, node, options }) => {
     const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
