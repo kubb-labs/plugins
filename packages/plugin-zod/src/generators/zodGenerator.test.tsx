@@ -117,7 +117,7 @@ const additionalPropertiesObjectSchema = ast.factory.createSchema({
 })
 
 describe('zodGenerator — Schema', () => {
-  test.each([false, true])('generates parent-required oneOf member fields with mini=%s', async (mini) => {
+  test.each([false, true])('generates sibling properties for oneOf with mini=%s', async (mini) => {
     const adapter = adapterOas({ validate: false })
     const root = await adapter.parse({
       type: 'data',
@@ -130,7 +130,7 @@ describe('zodGenerator — Schema', () => {
             Pet: {
               type: 'object',
               required: ['a', 'shared'],
-              properties: { shared: { type: 'string' } },
+              properties: { a: { type: 'string' }, shared: { type: 'string' } },
               oneOf: [
                 { type: 'object', properties: { a: { type: 'string' } } },
                 { type: 'object', properties: { b: { type: 'string' } } },

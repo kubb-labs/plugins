@@ -405,57 +405,6 @@ export function strictOneOfNode(node: ast.SchemaNode): ast.SchemaNode {
 }
 
 /**
- * Keeps sibling validation outside a oneOf and disables implicit member strictness when sibling keys are present.
- */
-export function prepareOneOfSiblings<TNode extends ast.SchemaNode>({
-  node,
-  document,
-  oneOfType,
-  cyclicSchemas,
-}: {
-  node: TNode
-  document?: unknown
-  oneOfType?: PluginZod['resolvedOptions']['oneOfType']
-  cyclicSchemas?: ReadonlySet<string>
-}): TNode {
-  if (node.type !== 'intersection') return node
-  const members = node.members ?? []
-  const union = members.find((member) => member.type === 'union' && member.strategy === 'one')
-  const siblings = members.filter((member) => member !== union)
-  if (!union || union.type !== 'union' || !siblings.length || !siblings.every((member) => member.type === 'object')) return node
-
-  // The adapter drops required names declared only in members, so recover them from the source.
-  const source = node.pointer
-    ?.replace(/^#\//, '')
-    .split('/')
-    .reduce<unknown>((value, key) => {
-      const name = key.replace(/~1/g, '/').replace(/~0/g, '~')
-      return value && typeof value === 'object' ? Reflect.get(value, name) : undefined
-    }, document)
-  const required = source && typeof source === 'object' && 'required' in source && Array.isArray(source.required) ? source.required : []
-  const properties = required
-    .filter((name): name is string => typeof name === 'string')
-    .flatMap((name) => {
-      if (siblings.some((sibling) => sibling.properties.some((property) => property.name === name))) return []
-      const candidates = (union.members ?? []).flatMap((variant) => ast.resolveSchemaProperties({ node: variant, propertyName: name }))
-      const schemas = candidates.map((property) => ast.optionality(property.schema, true))
-      if (!schemas.length) return []
-      const schema = schemas.length === 1 ? schemas[0]! : ast.factory.createSchema({ type: 'union', members: schemas })
-      return [ast.factory.createProperty({ name, required: true, schema })]
-    })
-  const isDiscriminated = !!union.discriminatorPropertyName && (union.members ?? []).every((member) => isObjectSchemaNode(member, cyclicSchemas))
-  // Union printing uses strategy 'one' to add strictness; z.xor handles exclusivity itself.
-  const strategy: ast.UnionSchemaNode['strategy'] = oneOfType === 'xor' && !isDiscriminated ? 'one' : 'any'
-  return {
-    ...node,
-    members: [
-      ...members.map((member) => (member === union ? { ...union, strategy } : member)),
-      ...(properties.length ? [ast.factory.createSchema({ type: 'object', properties })] : []),
-    ],
-  }
-}
-
-/**
  * The constraint chain an `allOf` member adds to a bare string, number or array; each printer passes its own renderers.
  */
 export function getMemberConstraint({

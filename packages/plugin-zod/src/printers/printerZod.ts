@@ -13,7 +13,6 @@ import {
   isObjectComposableIntersection,
   isObjectSchemaNode,
   lengthConstraints,
-  prepareOneOfSiblings,
   numberConstraints,
   objectConstraints,
   patternKeySchema,
@@ -379,6 +378,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
   // getter body (to suppress nested `z.lazy()`), so capture a stable reference for the `.strict()`
   // skip decision, which must still see cyclic members inside those getter bodies.
   const cyclicSchemaNames = options.cyclicSchemas
+  const unionsWithSiblings = new WeakSet<ast.SchemaNode>()
   const nodes: PrinterZodNodes = {
     ...scalarNodes,
     ref(node) {
@@ -477,7 +477,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       const isDiscriminated = !!node.discriminatorPropertyName && nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemaNames))
       const isXor = node.strategy === 'one' && !isDiscriminated && this.options.oneOfType === 'xor'
       // `z.xor` already rejects a value matching several members, so its members stay as declared.
-      const isStrict = node.strategy === 'one' && !isXor
+      const isStrict = node.strategy === 'one' && !isXor && !unionsWithSiblings.has(node)
       const members = mapSchemaMembers(node, (memberNode) => this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode))
         .map(({ schema, output }) => (output && isStrict ? strictOneOfMember(output, schema, cyclicSchemaNames) : output))
         .filter(Boolean)
@@ -491,14 +491,23 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       return `z.union(${buildList(members)})`
     },
     intersection(node) {
-      const prepared = prepareOneOfSiblings({ node, oneOfType: this.options.oneOfType, cyclicSchemas: cyclicSchemaNames })
-      const members = prepared.members ?? []
+      const members = node.members ?? []
       if (members.length === 0) return ''
+      const hasSiblingProperties = members.some((member) => member.type === ast.schemaTypes.object && member.properties.length > 0)
+      const transform = (member: ast.SchemaNode) => {
+        if (!hasSiblingProperties) return this.transform(member)
+        unionsWithSiblings.add(member)
+        try {
+          return this.transform(member)
+        } finally {
+          unionsWithSiblings.delete(member)
+        }
+      }
 
       const [first, ...rest] = members
       if (!first) return ''
 
-      const firstBase = this.transform(first)
+      const firstBase = transform(first)
       if (!firstBase) return ''
 
       // An object `allOf` is a merge, not a runtime intersection: `.extend({ … })` keeps it a
@@ -510,7 +519,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       return rest.reduce((acc, member) => {
         const constraint = getMemberConstraint({ member, regexType: this.options.regexType, lengths: lengthConstraints, numbers: numberConstraints })
         if (constraint) return acc + constraint
-        const transformed = this.transform(member)
+        const transformed = transform(member)
         return transformed ? `${acc}.and(${transformed})` : acc
       }, firstBase)
     },

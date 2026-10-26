@@ -13,7 +13,6 @@ import {
   isObjectComposableIntersection,
   isObjectSchemaNode,
   lengthChecksMini,
-  prepareOneOfSiblings,
   numberChecksMini,
   objectConstraints,
   patternKeySchemaMini,
@@ -127,6 +126,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
   // The object handler temporarily clears `options.cyclicSchemas` while rendering a getter body, so
   // capture a stable reference for the intersection/union discriminability decisions.
   const cyclicSchemaNames = options.cyclicSchemas
+  const unionsWithSiblings = new WeakSet<ast.SchemaNode>()
   return {
     name: 'zod-mini',
     options,
@@ -301,7 +301,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         const isDiscriminated = !!node.discriminatorPropertyName && nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemaNames))
         const isXor = node.strategy === 'one' && !isDiscriminated && this.options.oneOfType === 'xor'
         // `z.xor` already rejects a value matching several members, so its members stay as declared.
-        const isStrict = node.strategy === 'one' && !isXor
+        const isStrict = node.strategy === 'one' && !isXor && !unionsWithSiblings.has(node)
         const members = mapSchemaMembers(node, (memberNode) => this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode))
           .map(({ output }) => output)
           .filter(Boolean)
@@ -315,14 +315,23 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         return `z.union(${buildList(members)})`
       },
       intersection(node) {
-        const prepared = prepareOneOfSiblings({ node, oneOfType: this.options.oneOfType, cyclicSchemas: cyclicSchemaNames })
-        const members = prepared.members ?? []
+        const members = node.members ?? []
         if (members.length === 0) return ''
+        const hasSiblingProperties = members.some((member) => member.type === ast.schemaTypes.object && member.properties.length > 0)
+        const transform = (member: ast.SchemaNode) => {
+          if (!hasSiblingProperties) return this.transform(member)
+          unionsWithSiblings.add(member)
+          try {
+            return this.transform(member)
+          } finally {
+            unionsWithSiblings.delete(member)
+          }
+        }
 
         const [first, ...rest] = members
         if (!first) return ''
 
-        const firstBase = this.transform(first)
+        const firstBase = transform(first)
         if (!firstBase) return ''
 
         // An object `allOf` is a merge, not a runtime intersection: `z.extend(base, { … })` keeps it
@@ -334,7 +343,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         return rest.reduce((acc, member) => {
           const constraint = getMemberConstraint({ member, regexType: this.options.regexType, lengths: lengthChecksMini, numbers: numberChecksMini })
           if (constraint) return acc + constraint
-          const transformed = this.transform(member)
+          const transformed = transform(member)
           return transformed ? `z.intersection(${acc}, ${transformed})` : acc
         }, firstBase)
       },
