@@ -127,7 +127,7 @@ export type PrinterZodFactory = ast.PrinterFactoryOptions<'zod', PrinterZodOptio
 function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): string {
   // Inline objects are already strict through their node; only a ref needs the runtime call.
 
-  if (node.type === 'ref') {
+  if (node.type === ast.schemaTypes.ref) {
     if (member.startsWith('z.lazy(')) {
       return member
     }
@@ -145,7 +145,7 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
       return member
     }
 
-    if (schema.type === 'object' && (schema.additionalProperties === undefined || schema.additionalProperties === false)) {
+    if (schema.type === ast.schemaTypes.object && (schema.additionalProperties === undefined || schema.additionalProperties === false)) {
       return `${member}.strict()`
     }
   }
@@ -168,7 +168,7 @@ function buildZodObjectShape(ctx: Parameters<typeof buildObjectShape>[0], node: 
       // When a property schema is not a ref but the metadata is from a ref (e.g., discriminator
       // property override), skip applying the description from the ref target to avoid applying
       // metadata from a replaced schema.
-      description: schema.type !== 'ref' && meta.type === 'ref' ? undefined : meta.description,
+      description: schema.type !== ast.schemaTypes.ref && meta.type === ast.schemaTypes.ref ? undefined : meta.description,
       examples: meta.examples,
     })
     if (!cyclic) return `${objectKey(name)}: ${body}`
@@ -191,14 +191,14 @@ function recursiveGetterType({
 }): string | undefined {
   function baseType(schema: ast.SchemaNode): string | undefined {
     if (ctx.options.nodes?.[schema.type]) return undefined
-    if (schema.type === 'ref') {
+    if (schema.type === ast.schemaTypes.ref) {
       const saved = ctx.options.cyclicSchemas
       ctx.options.cyclicSchemas = undefined
       const name = ctx.transform(schema)
       ctx.options.cyclicSchemas = saved
       return name ? `typeof ${name}` : undefined
     }
-    if (schema.type === 'array' && schema.items?.length === 1) {
+    if (schema.type === ast.schemaTypes.array && schema.items?.length === 1) {
       const item = baseType(schema.items[0]!)
       return item ? `z.ZodArray<${item}>` : undefined
     }
@@ -222,7 +222,14 @@ function recursiveGetterType({
  * Types the direction probe skips. They delegate to their children rather than reading
  * `direction` themselves, so {@link containsDirectionalNode} walks into the children instead.
  */
-const CONTAINER_TYPES = new Set<ast.SchemaType>(['object', 'array', 'tuple', 'union', 'intersection', 'ref'])
+const CONTAINER_TYPES = new Set<ast.SchemaType>([
+  ast.schemaTypes.object,
+  ast.schemaTypes.array,
+  ast.schemaTypes.tuple,
+  ast.schemaTypes.union,
+  ast.schemaTypes.intersection,
+  ast.schemaTypes.ref,
+])
 
 type DirectionProbeContext = { options: PrinterZodOptions; transform: () => null; base: () => null; import: () => void }
 
@@ -261,7 +268,7 @@ export function containsDirectionalNode({
 }): boolean {
   if (!node) return false
 
-  if (node.type === 'ref') {
+  if (node.type === ast.schemaTypes.ref) {
     if (!node.ref) return false
     const refName = extractRefName(node.ref)
     if (refName) {
@@ -269,7 +276,7 @@ export function containsDirectionalNode({
       seen.add(refName)
     }
     const resolved = syncSchemaRef(node)
-    if (resolved.type === 'ref') return false
+    if (resolved.type === ast.schemaTypes.ref) return false
     return containsDirectionalNode({ node: resolved, printerOptions, seen })
   }
 
@@ -280,7 +287,7 @@ export function containsDirectionalNode({
   if ('items' in node && node.items) children.push(...node.items)
   if ('members' in node && node.members) children.push(...node.members)
   if ('additionalProperties' in node && node.additionalProperties && node.additionalProperties !== true) children.push(node.additionalProperties)
-  const propertyNames = node.type === 'object' ? node.propertyNames : undefined
+  const propertyNames = node.type === ast.schemaTypes.object ? node.propertyNames : undefined
   if (propertyNames) children.push(propertyNames)
 
   return children.some((child) => containsDirectionalNode({ node: child, printerOptions, seen }))
@@ -291,7 +298,8 @@ export function containsDirectionalNode({
  */
 export function collectDirectionalRefNames({ node, printerOptions }: { node: ast.SchemaNode; printerOptions: PrinterZodOptions }): Array<string> {
   return ast.collectSync<string>(node, {
-    schema: (n) => (n.type === 'ref' && n.ref && containsDirectionalNode({ node: n, printerOptions }) ? (ast.resolveRefName(n) ?? undefined) : undefined),
+    schema: (n) =>
+      n.type === ast.schemaTypes.ref && n.ref && containsDirectionalNode({ node: n, printerOptions }) ? (ast.resolveRefName(n) ?? undefined) : undefined,
   })
 }
 
@@ -423,6 +431,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
   // getter body (to suppress nested `z.lazy()`), so capture a stable reference for the `.strict()`
   // skip decision, which must still see cyclic members inside those getter bodies.
   const cyclicSchemaNames = options.cyclicSchemas
+  const unionsWithSiblings = new WeakSet<ast.SchemaNode>()
   const nodes: PrinterZodNodes = {
     ...scalarNodes,
     ref(node) {
@@ -472,7 +481,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           return catchallType ? `${objectBase}.catchall(${catchallType})` : objectBase
         }
         if (entries.length === 0 && patterns.length === 0 && propertyNamesKeySchema && !isStrict) {
-          const unknownType = this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+          const unknownType = this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
           return `${recordFn}(${propertyNamesKeySchema}, ${unknownType})`
         }
         if (node.additionalProperties === true) return objectBase
@@ -482,7 +491,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         // reject the declared keys, so fall back to .catchall (value validated, key pattern not).
         if (patterns.length > 0) {
           const values = patterns.map(([, valueSchema]) => {
-            const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+            const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
             return valueSchema.nullable ? `${valueType}.nullable()` : valueType
           })
           const distinct = [...new Set(values)]
@@ -501,7 +510,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       const items = mapSchemaItems(node, (item) => this.transform(item))
         .map(({ output }) => output)
         .filter(Boolean)
-      const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+      const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
       const base = `z.array(${inner})${lengthConstraints({ ...node, regexType: this.options.regexType })}`
 
       return node.unique ? `${base}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })` : base
@@ -521,7 +530,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       const isDiscriminated = !!node.discriminatorPropertyName && nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemaNames))
       const isXor = node.strategy === 'one' && !isDiscriminated && this.options.oneOfType === 'xor'
       // `z.xor` already rejects a value matching several members, so its members stay as declared.
-      const isStrict = node.strategy === 'one' && !isXor
+      const isStrict = node.strategy === 'one' && !isXor && !unionsWithSiblings.has(node)
       const members = mapSchemaMembers(node, (memberNode) => this.transform(isStrict ? strictOneOfNode(memberNode) : memberNode))
         .map(({ schema, output }) => (output && isStrict ? strictOneOfMember(output, schema, cyclicSchemaNames) : output))
         .filter(Boolean)
@@ -537,11 +546,21 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
     intersection(node) {
       const members = node.members ?? []
       if (members.length === 0) return ''
+      const hasSiblingProperties = members.some((member) => member.type === ast.schemaTypes.object && member.properties.length > 0)
+      const transform = (member: ast.SchemaNode) => {
+        if (!hasSiblingProperties) return this.transform(member)
+        unionsWithSiblings.add(member)
+        try {
+          return this.transform(member)
+        } finally {
+          unionsWithSiblings.delete(member)
+        }
+      }
 
       const [first, ...rest] = members
       if (!first) return ''
 
-      const firstBase = this.transform(first)
+      const firstBase = transform(first)
       if (!firstBase) return ''
 
       // An object `allOf` is a merge, not a runtime intersection: `.extend({ … })` keeps it a
@@ -553,7 +572,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       return rest.reduce((acc, member) => {
         const constraint = getMemberConstraint({ member, regexType: this.options.regexType, lengths: lengthConstraints, numbers: numberConstraints })
         if (constraint) return acc + constraint
-        const transformed = this.transform(member)
+        const transformed = transform(member)
         return transformed ? `${acc}.and(${transformed})` : acc
       }, firstBase)
     },

@@ -7,7 +7,7 @@ import * as z from 'zod'
 import { SUVTypeEnumSchema } from './SUVTypeEnumSchema'
 import { vehicleSchema } from './vehicleSchema'
 
-export const SUVSchema = vehicleSchema.strict().extend({
+export const SUVSchema = vehicleSchema.extend({
   type: SUVTypeEnumSchema.optional(),
   offroadCapability: z.boolean().optional().describe('Can handle offroad terrain'),
 })
