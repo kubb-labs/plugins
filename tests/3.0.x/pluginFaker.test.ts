@@ -395,6 +395,58 @@ const explicit: Category = createCategory<object>()
   expect(await typecheck(usagePath)).toStrictEqual([])
 })
 
+test.each(['inferred', 'schema'] as const)('accepts array and string response overrides across media types in %s mode', async (typeMode) => {
+  const root = await fs.mkdtemp(path.join(__dirname, '.faker-media-'))
+  onTestFinished(() => fs.rm(root, { recursive: true, force: true }))
+
+  const { diagnostics } = await createKubb({
+    root,
+    input: {
+      openapi: '3.0.0',
+      info: { title: 'Mixed response', version: '1' },
+      paths: {
+        '/notes': {
+          get: {
+            operationId: 'getNotes',
+            responses: {
+              '200': {
+                description: 'ok',
+                content: {
+                  'application/json': { schema: { type: 'array', items: { type: 'string' } } },
+                  'text/plain': { schema: { type: 'string' } },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    adapter: adapterOas(),
+    parsers: [parserTs()],
+    storage: fsStorage(),
+    output: { path: 'generated', clean: true, format: false, lint: false },
+    plugins: [pluginTs({ output: { path: 'types' } }), pluginFaker({ output: { path: 'mocks' }, typeMode })],
+  }).safeBuild()
+
+  expect(Diagnostics.hasError(diagnostics)).toBe(false)
+  const usagePath = path.join(root, 'usage.ts')
+  await fs.writeFile(
+    usagePath,
+    `import { createGetNotesResponse, createGetNotesStatus200 } from './generated/mocks/createGetNotes.ts'
+
+for (const create of [createGetNotesResponse, createGetNotesStatus200]) {
+  if (create('plain text') !== 'plain text') throw new Error('String override was not preserved')
+  if (JSON.stringify(create(['note'])) !== JSON.stringify(['note'])) throw new Error('Array override was not preserved')
+  const generated = create()
+  if (typeof generated !== 'string' && !Array.isArray(generated)) throw new Error('Unexpected response type')
+}
+`,
+  )
+
+  expect(await typecheck(usagePath)).toStrictEqual([])
+  await promisify(execFile)(process.execPath, ['--experimental-strip-types', usagePath])
+})
+
 test('creates mutable schema-typed fixtures and rejects unknown overrides', async () => {
   const root = await fs.mkdtemp(path.join(__dirname, '.faker-schema-'))
   onTestFinished(() => fs.rm(root, { recursive: true, force: true }))
