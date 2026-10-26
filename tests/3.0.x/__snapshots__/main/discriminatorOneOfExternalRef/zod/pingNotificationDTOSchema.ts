@@ -10,5 +10,5 @@ import { sendNotificationRequestSchema } from './sendNotificationRequestSchema'
 export const pingNotificationDTOSchema = z.object({
   notificationType: notificationTypeSchema.describe('Notification type: PING — test, ORDER_CREATED — new order, ORDER_CANCELLED — order cancelled'),
   message: z.string(),
-  get relatedNotification() { return sendNotificationRequestSchema.optional().describe('Notification payload.') },
+  get relatedNotification(): z.ZodOptional<typeof sendNotificationRequestSchema> { return sendNotificationRequestSchema.optional().describe('Notification payload.') },
 })

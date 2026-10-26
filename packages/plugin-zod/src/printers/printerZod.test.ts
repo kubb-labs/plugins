@@ -622,7 +622,7 @@ describe('printerZod', () => {
 
       expect(p.print(node)).toMatchInlineSnapshot(`
         "z.object({
-          get children() { return TreeNode.optional() },
+          get children(): z.ZodOptional<typeof TreeNode> { return TreeNode.optional() },
           name: z.string(),
         })"
       `)
@@ -649,7 +649,7 @@ describe('printerZod', () => {
 
       expect(p.print(node)).toMatchInlineSnapshot(`
         "z.strictObject({
-          get children() { return TreeNode.optional() },
+          get children(): z.ZodOptional<typeof TreeNode> { return TreeNode.optional() },
           name: z.string(),
         })"
       `)
@@ -674,7 +674,7 @@ describe('printerZod', () => {
       // z.lazy() should be stripped inside getter (getter already defers evaluation)
       expect(p.print(node)).toMatchInlineSnapshot(`
         "z.object({
-          get archEnemy() { return Pet.optional() },
+          get archEnemy(): z.ZodOptional<typeof Pet> { return Pet.optional() },
           name: z.string(),
         })"
       `)
@@ -875,7 +875,7 @@ describe('printerZod', () => {
       expect(p.print(node)).toMatchInlineSnapshot(`
         "z.union([
           z.strictObject({
-            get children() { return TreeNode.optional() },
+            get children(): z.ZodOptional<typeof TreeNode> { return TreeNode.optional() },
           }),
           z.strictObject({
             valueB: z.number(),

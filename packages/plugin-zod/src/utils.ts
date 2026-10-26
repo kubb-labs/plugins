@@ -426,7 +426,7 @@ export function getMemberConstraint({
 
 type PrinterContext = {
   transform: (node: ast.SchemaNode) => string | null
-  options: { cyclicSchemas?: ReadonlySet<string> }
+  options: { cyclicSchemas?: ReadonlySet<string>; nodes?: Partial<Record<ast.SchemaType, unknown>> }
 }
 
 /**
@@ -436,6 +436,7 @@ export function buildObjectShape(
   ctx: PrinterContext,
   node: ast.SchemaNode,
   modify: (args: { value: string; schema: ast.SchemaNode; required?: boolean; meta: ReturnType<typeof syncSchemaRef> }) => string,
+  getterType?: (args: { schema: ast.SchemaNode; required?: boolean }) => string | undefined,
 ): string {
   const objectNode = ast.narrowSchema(node, 'object')
   if (!objectNode) return '{}'
@@ -455,7 +456,9 @@ export function buildObjectShape(
     const { schema } = property
     const value = modify({ value: baseOutput, schema, required: property.required, meta: syncSchemaRef(schema) })
 
-    return isCyclic(schema) ? lazyGetter({ name: propName, body: value }) : `${objectKey(propName)}: ${value}`
+    if (!isCyclic(schema)) return `${objectKey(propName)}: ${value}`
+    const returnType = getterType?.({ schema, required: property.required })
+    return returnType ? `get ${objectKey(propName)}(): ${returnType} { return ${value} }` : lazyGetter({ name: propName, body: value })
   })
 
   return buildObject(entries)
