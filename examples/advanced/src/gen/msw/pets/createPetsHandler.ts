@@ -1,4 +1,5 @@
 import type { HttpResponseResolver } from 'msw/http'
+import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function createPetsHandlerResponse201(data?: unknown) {
@@ -19,7 +20,12 @@ export function createPetsHandler(
         {
           name: string
           tag: string
-        }
+        } extends DefaultBodyType
+          ? {
+              name: string
+              tag: string
+            }
+          : DefaultBodyType
       >,
   options?: { baseURL?: string },
 ) {
@@ -28,7 +34,12 @@ export function createPetsHandler(
     {
       name: string
       tag: string
-    }
+    } extends DefaultBodyType
+      ? {
+          name: string
+          tag: string
+        }
+      : DefaultBodyType
   >(`${options?.baseURL ?? ''}/pets/:uuid`, function handler(info) {
     if (typeof data === 'function') return data(info)
 

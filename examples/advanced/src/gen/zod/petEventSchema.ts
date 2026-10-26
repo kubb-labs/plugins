@@ -4,7 +4,7 @@ import { petSchema } from './petSchema'
 
 export const petEventSchema = z.object({
   type: petEventTypeEnumSchema.describe('The kind of change that occurred'),
-  get pet() {
+  get pet(): typeof petSchema {
     return petSchema
   },
   timestamp: z.iso.datetime().optional(),
