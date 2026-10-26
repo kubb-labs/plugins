@@ -461,6 +461,142 @@ const custom: true = child.custom`,
 })
 
 describe('fakerGenerator — operation', () => {
+  test.each(['inferred', 'schema'] as const)('typechecks binary refs and omitted properties in %s mode', async (typeMode) => {
+    const pdf = ast.factory.createSchema({ type: 'blob', name: 'Pdf' })
+    const payload = ast.factory.createSchema({
+      type: 'object',
+      name: 'Payload',
+      properties: [
+        ast.factory.createProperty({ name: 'id', schema: ast.factory.createSchema({ type: 'string', readOnly: true }) }),
+        ast.factory.createProperty({ name: 'secret', schema: ast.factory.createSchema({ type: 'string', writeOnly: true }) }),
+        ast.factory.createProperty({ name: 'name', schema: ast.factory.createSchema({ type: 'string' }) }),
+      ],
+    })
+    const operations = [
+      ...['*/*', 'application/octet-stream'].map((contentType, index) =>
+        ast.factory.createOperation({
+          operationId: `download${index}`,
+          method: 'GET',
+          path: `/download${index}`,
+          responses: [
+            ast.factory.createResponse({
+              statusCode: '200',
+              content: [
+                ast.factory.createContent({
+                  contentType,
+                  schema: ast.factory.createSchema({ type: 'ref', name: 'Pdf', ref: '#/components/schemas/Pdf', schema: pdf }),
+                }),
+              ],
+            }),
+          ],
+        }),
+      ),
+      ast.factory.createOperation({
+        operationId: 'updateA',
+        method: 'PUT',
+        path: '/a',
+        requestBody: {
+          content: ['application/json', 'application/xml'].map((contentType, index) =>
+            ast.factory.createContent({
+              contentType,
+              schema: index === 0 ? payload : ast.factory.createSchema({ type: 'ref', name: 'Payload', ref: '#/components/schemas/Payload', schema: payload }),
+              keysToOmit: ['id'],
+            }),
+          ),
+        },
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            content: [ast.factory.createContent({ contentType: 'application/json', schema: payload, keysToOmit: ['secret'] })],
+          }),
+        ],
+      }),
+    ]
+    const tsOptions = {
+      ...defaultTsPlugin.options,
+      enum: { type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' },
+      optionalType: 'questionToken',
+      arrayType: 'array',
+      syntaxType: 'type',
+      operations: 'export',
+    } as PluginTs['resolvedOptions']
+    const tsPlugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: tsOptions, resolver: resolverTs })
+    const options = { ...defaultOptions, typeMode }
+    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options, resolver: resolverFaker })
+    const driver = createMockedPluginDriver({ name: 'binaryReadonly', plugin: tsPlugin })
+    for (const node of [pdf, payload]) {
+      await renderGeneratorSchema(typeGenerator, node, {
+        config: testConfig,
+        adapter: createMockedAdapter(),
+        driver,
+        plugin: tsPlugin,
+        options: tsOptions,
+        resolver: resolverTs,
+      })
+      await renderGeneratorSchema(fakerGenerator, node, {
+        config: testConfig,
+        adapter: createMockedAdapter(),
+        driver,
+        plugin,
+        options,
+        resolver: resolverFaker,
+      })
+    }
+    for (const node of operations) {
+      await renderGeneratorOperation(typeGenerator, node, {
+        config: testConfig,
+        adapter: createMockedAdapter(),
+        driver,
+        plugin: tsPlugin,
+        options: tsOptions,
+        resolver: resolverTs,
+      })
+      await renderGeneratorOperation(fakerGenerator, node, {
+        config: testConfig,
+        adapter: createMockedAdapter(),
+        driver,
+        plugin,
+        options,
+        resolver: resolverFaker,
+      })
+    }
+    const dir = await fs.mkdtemp(path.join(import.meta.dirname, '.faker-'))
+    onTestFinished(() => fs.rm(dir, { recursive: true, force: true }))
+    const paths: Array<string> = []
+    for (const file of driver.fileManager.files) {
+      const filePath = path.join(dir, path.relative(path.resolve(testConfig.output.path), file.path))
+      await fs.mkdir(path.dirname(filePath), { recursive: true })
+      const output = parserTs().parse(file)
+      if (file.baseName === 'createUpdateA.ts') {
+        const body = output.slice(output.indexOf('export function createUpdateABody'))
+        expect(body).not.toMatch(/\bid:/)
+        const response = output.slice(0, output.indexOf('export function createUpdateABody'))
+        expect(response).not.toMatch(/\bsecret:/)
+        expect(body).toMatch(/\bname:/)
+        expect(response).toMatch(/\bid:/)
+      }
+      await fs.writeFile(filePath, output)
+      paths.push(filePath)
+    }
+    const compiler = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
+    await expect(
+      promisify(execFile)(process.execPath, [
+        compiler,
+        '--ignoreConfig',
+        '--noEmit',
+        '--strict',
+        '--skipLibCheck',
+        '--module',
+        'preserve',
+        '--moduleResolution',
+        'bundler',
+        '--target',
+        'es2022',
+        ...paths,
+      ]),
+    ).resolves.toMatchObject({ stdout: '', stderr: '' })
+  })
+
   test.each([
     {
       name: 'showPetById',

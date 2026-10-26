@@ -6,7 +6,7 @@ import { File, jsxRenderer } from 'kubb/jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
-import { buildResponseUnionSchema, canOverrideSchema, localeToFakerImport, resolveTypeReference } from '../utils.ts'
+import { buildResponseUnionSchema, canOverrideSchema, localeToFakerImport, omitSchemaProperties, resolveTypeReference } from '../utils.ts'
 
 /**
  * Built-in generator for `@kubb/plugin-faker`. Emits one `createX` factory
@@ -121,12 +121,16 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     // Expands a content array into render units: one faker per content type plus a union faker
     // (named `baseName`) when more than one content type carries a schema, else a single faker.
     function expandContentUnits(
-      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null }>,
+      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
       baseName: string,
       tsBaseName: string,
       description: string | undefined,
       decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
     ): Array<RenderUnit> {
+      entries = entries.map((entry) => ({
+        ...entry,
+        schema: entry.schema && entry.keysToOmit?.length ? omitSchemaProperties(entry.schema, entry.keysToOmit) : entry.schema,
+      }))
       const withSchema = entries.filter((entry) => entry.schema)
       if (withSchema.length <= 1) {
         const primary = withSchema[0] ?? entries[0]
