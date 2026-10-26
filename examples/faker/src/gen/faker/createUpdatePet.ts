@@ -61,22 +61,34 @@ export function createUpdatePetStatus405() {
 /**
  * @description Update an existent pet in the store
  */
-export function createUpdatePetBodyJson(data?: Partial<UpdatePetBodyJson>): UpdatePetBodyJson {
-  return createPet(data) as UpdatePetBodyJson
+export function createUpdatePetBodyJson<TData extends Partial<UpdatePetBodyJson> = object>(data?: TData) {
+  const { type: _omit0, ...defaultFakeData } = createPet()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
  * @description Update an existent pet in the store
  */
-export function createUpdatePetBodyXml(data?: Partial<UpdatePetBodyXml>): UpdatePetBodyXml {
-  return createPet(data) as UpdatePetBodyXml
+export function createUpdatePetBodyXml<TData extends Partial<UpdatePetBodyXml> = object>(data?: TData) {
+  const { type: _omit0, ...defaultFakeData } = createPet()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
  * @description Update an existent pet in the store
  */
-export function createUpdatePetBodyFormUrlEncoded(data?: Partial<UpdatePetBodyFormUrlEncoded>): UpdatePetBodyFormUrlEncoded {
-  return createPet(data) as UpdatePetBodyFormUrlEncoded
+export function createUpdatePetBodyFormUrlEncoded<TData extends Partial<UpdatePetBodyFormUrlEncoded> = object>(data?: TData) {
+  const { type: _omit0, ...defaultFakeData } = createPet()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**

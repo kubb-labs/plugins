@@ -8,6 +8,15 @@ import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
 import { buildResponseUnionSchema, canOverrideSchema, localeToFakerImport, resolveTypeReference } from '../utils.ts'
 
+type RenderUnit = {
+  schema: ast.SchemaNode | null
+  name: string
+  typeName: string
+  description?: string
+  keysToOmit?: Array<string> | null
+  skipImportNames?: Array<string>
+}
+
 /**
  * Built-in generator for `@kubb/plugin-faker`. Emits one `createX` factory
  * per schema in the spec plus per-operation request/response factories. Each
@@ -116,12 +125,10 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         name: group.name(node, group.params[0]!),
         typeName: group.typeName(node, group.params[0]!),
       }))
-    type RenderUnit = { schema: ast.SchemaNode | null; name: string; typeName: string; description?: string; skipImportNames: Array<string> }
-
     // Expands a content array into render units: one faker per content type plus a union faker
     // (named `baseName`) when more than one content type carries a schema, else a single faker.
     function expandContentUnits(
-      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null }>,
+      entries: Array<ast.ContentNode>,
       baseName: string,
       tsBaseName: string,
       description: string | undefined,
@@ -131,7 +138,15 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       if (withSchema.length <= 1) {
         const primary = withSchema[0] ?? entries[0]
         if (!primary?.schema) return []
-        return [{ schema: decorate ? decorate(primary.schema) : primary.schema, name: baseName, typeName: tsBaseName, description, skipImportNames: [] }]
+        return [
+          {
+            schema: decorate ? decorate(primary.schema) : primary.schema,
+            name: baseName,
+            typeName: tsBaseName,
+            description,
+            keysToOmit: primary.keysToOmit,
+          },
+        ]
       }
       const variants = resolveContentTypeVariants(entries, baseName)
       const unionSchema = ast.factory.createSchema({
@@ -144,7 +159,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
           name: variant.name,
           typeName: getPerContentTypeName(tsBaseName, variant.suffix),
           description,
-          skipImportNames: [],
+          keysToOmit: variant.keysToOmit,
         })),
         { schema: unionSchema, name: baseName, typeName: tsBaseName, description, skipImportNames: variants.map((variant) => variant.name) },
       ]
@@ -196,21 +211,14 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       return resolver.imports({ node: schema, root, output, group: group ?? undefined }).filter((entry) => entry.path !== meta.file.path)
     }
 
-    function renderEntry({
-      schema,
-      name,
-      typeName,
-      description,
-      skipImportNames = [],
-    }: {
-      schema: ast.SchemaNode | null
-      name: string
-      typeName: string
-      description?: string
-      skipImportNames?: Array<string>
-    }) {
+    function renderEntry({ schema, name, typeName, description, keysToOmit, skipImportNames = [] }: RenderUnit) {
       if (!schema) {
         return null
+      }
+
+      if (schema.type === ast.schemaTypes.object && keysToOmit?.length) {
+        schema = { ...schema, properties: schema.properties.filter((property) => !keysToOmit?.includes(property.name)) }
+        keysToOmit = undefined
       }
 
       const canOverride = canOverrideSchema(schema)
@@ -222,6 +230,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         regexGenerator,
         nodes: printer?.nodes,
         cyclicSchemas,
+        nestedInObject: !!keysToOmit?.length,
       })
       const fakerText = printerInstance.print(schema) ?? 'undefined'
       const usedImports = filterUsedImports(resolveMockImports(schema), fakerText, skipImportNames)
@@ -250,6 +259,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             printer={{ ...printerInstance, print: () => rewrittenFakerText }}
             canOverride={canOverride}
             typeMode={typeMode}
+            keysToOmit={keysToOmit}
           />
         </>
       )

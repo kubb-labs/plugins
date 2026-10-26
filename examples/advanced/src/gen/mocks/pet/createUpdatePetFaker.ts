@@ -5,15 +5,23 @@ import { fakerEN as faker } from '@faker-js/faker'
 /**
  * @description Successful operation
  */
-export function createUpdatePetStatus200FakerJson(data?: Partial<Omit<NonNullable<Pet>, 'name'>>): Omit<NonNullable<Pet>, 'name'> {
-  return createPetFaker(data) as Omit<NonNullable<Pet>, 'name'>
+export function createUpdatePetStatus200FakerJson<TData extends Partial<Omit<NonNullable<Pet>, 'name'>> = object>(data?: TData) {
+  const { name: _omit0, ...defaultFakeData } = createPetFaker()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
  * @description Successful operation
  */
-export function createUpdatePetStatus200FakerXml(data?: Partial<Omit<NonNullable<Pet>, 'name'>>): Omit<NonNullable<Pet>, 'name'> {
-  return createPetFaker(data) as Omit<NonNullable<Pet>, 'name'>
+export function createUpdatePetStatus200FakerXml<TData extends Partial<Omit<NonNullable<Pet>, 'name'>> = object>(data?: TData) {
+  const { name: _omit0, ...defaultFakeData } = createPetFaker()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -64,22 +72,34 @@ export function createUpdatePetStatus405Faker() {
 /**
  * @description Update an existent pet in the store
  */
-export function createUpdatePetBodyFakerJson(data?: Partial<Omit<NonNullable<Pet>, 'id'>>): Omit<NonNullable<Pet>, 'id'> {
-  return createPetFaker(data) as Omit<NonNullable<Pet>, 'id'>
+export function createUpdatePetBodyFakerJson<TData extends Partial<Omit<NonNullable<Pet>, 'id'>> = object>(data?: TData) {
+  const { id: _omit0, ...defaultFakeData } = createPetFaker()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
  * @description Update an existent pet in the store
  */
-export function createUpdatePetBodyFakerXml(data?: Partial<Omit<NonNullable<Pet>, 'id'>>): Omit<NonNullable<Pet>, 'id'> {
-  return createPetFaker(data) as Omit<NonNullable<Pet>, 'id'>
+export function createUpdatePetBodyFakerXml<TData extends Partial<Omit<NonNullable<Pet>, 'id'>> = object>(data?: TData) {
+  const { id: _omit0, ...defaultFakeData } = createPetFaker()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
  * @description Update an existent pet in the store
  */
-export function createUpdatePetBodyFakerFormUrlEncoded(data?: Partial<Omit<NonNullable<Pet>, 'id'>>): Omit<NonNullable<Pet>, 'id'> {
-  return createPetFaker(data) as Omit<NonNullable<Pet>, 'id'>
+export function createUpdatePetBodyFakerFormUrlEncoded<TData extends Partial<Omit<NonNullable<Pet>, 'id'>> = object>(data?: TData) {
+  const { id: _omit0, ...defaultFakeData } = createPetFaker()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**

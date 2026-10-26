@@ -19,15 +19,23 @@ export function createGetPetByIdPathFaker<
 /**
  * @description successful operation
  */
-export function createGetPetByIdStatus200FakerJson(data?: Partial<Omit<NonNullable<Pet>, 'name'>>): Omit<NonNullable<Pet>, 'name'> {
-  return createPetFaker(data) as Omit<NonNullable<Pet>, 'name'>
+export function createGetPetByIdStatus200FakerJson<TData extends Partial<Omit<NonNullable<Pet>, 'name'>> = object>(data?: TData) {
+  const { name: _omit0, ...defaultFakeData } = createPetFaker()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
  * @description successful operation
  */
-export function createGetPetByIdStatus200FakerXml(data?: Partial<Omit<NonNullable<Pet>, 'name'>>): Omit<NonNullable<Pet>, 'name'> {
-  return createPetFaker(data) as Omit<NonNullable<Pet>, 'name'>
+export function createGetPetByIdStatus200FakerXml<TData extends Partial<Omit<NonNullable<Pet>, 'name'>> = object>(data?: TData) {
+  const { name: _omit0, ...defaultFakeData } = createPetFaker()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**

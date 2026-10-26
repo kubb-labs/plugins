@@ -5,8 +5,12 @@ import { fakerEN as faker } from '@faker-js/faker'
 /**
  * @description successful operation
  */
-export function createAddFilesStatus200Faker(data?: Partial<Omit<NonNullable<Pet>, 'name'>>): Omit<NonNullable<Pet>, 'name'> {
-  return createPetFaker(data) as Omit<NonNullable<Pet>, 'name'>
+export function createAddFilesStatus200Faker<TData extends Partial<Omit<NonNullable<Pet>, 'name'>> = object>(data?: TData) {
+  const { name: _omit0, ...defaultFakeData } = createPetFaker()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -30,8 +34,12 @@ export function createAddFilesBodyFakerJson<
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createAddFilesBodyFakerFormData(data?: Partial<Omit<NonNullable<Pet>, 'id'>>): Omit<NonNullable<Pet>, 'id'> {
-  return createPetFaker(data) as Omit<NonNullable<Pet>, 'id'>
+export function createAddFilesBodyFakerFormData<TData extends Partial<Omit<NonNullable<Pet>, 'id'>> = object>(data?: TData) {
+  const { id: _omit0, ...defaultFakeData } = createPetFaker()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 export function createAddFilesBodyFaker(

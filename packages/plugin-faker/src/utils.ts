@@ -66,7 +66,11 @@ export function buildResponseUnionSchema(node: ast.OperationNode, resolver: Reso
       return schema
     }
 
-    return ast.factory.createSchema({ type: 'ref', name: resolver.response.status(node, responses[0]!.statusCode) })
+    return ast.factory.createSchema({
+      type: 'ref',
+      name: resolver.response.status(node, responses[0]!.statusCode),
+      schema: responses[0]!.content?.length === 1 ? schema : undefined,
+    })
   }
 
   return ast.factory.createSchema({
@@ -175,11 +179,12 @@ export function resolveFakerTypeUsage(
   usesTypeName: boolean
 } {
   // A nullable scalar inlines its primitive, so reapply the nullability the type plugin emitted.
-  const scalarType = SCALAR_TYPES.has(node.type) ? `${getScalarType(node, typeName)}${node.nullable ? ' | null' : ''}` : undefined
+  const resolvedNode = ast.resolveRef(node)
+  const scalarType = SCALAR_TYPES.has(resolvedNode.type)
+    ? `${getScalarType(resolvedNode, typeName)}${node.nullable || resolvedNode.nullable ? ' | null' : ''}`
+    : undefined
 
-  // Every overridable factory takes `Partial<T>`, so a `ref` wrapper can forward its own
-  // `Partial<T>` argument to whatever schema it points at. Scalars are the exception:
-  // `Partial<string>` is still `string`, so they name the primitive directly.
+  // Reference factories must accept the same overrides as the referenced factory.
   const dataType = scalarType ?? `Partial<${typeName}>`
   const returnType = scalarType ?? (canOverride ? typeName : null)
 
