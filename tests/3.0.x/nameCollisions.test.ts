@@ -1,8 +1,9 @@
-import { execFileSync } from 'node:child_process'
+import { execFile } from 'node:child_process'
 import fs from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { promisify } from 'node:util'
 import { adapterOas } from '@kubb/adapter-oas'
 import { Hookable, createKubb } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
@@ -44,24 +45,20 @@ test.each(['', 'Api'])('keeps component, operation, and inline enum exports dist
 
     const files = (await fs.readdir(output, { recursive: true })).filter((file) => file.endsWith('.ts')).map((file) => path.join(output, file))
     const compiler = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
-    execFileSync(
-      process.execPath,
-      [
-        compiler,
-        '--ignoreConfig',
-        '--noEmit',
-        '--skipLibCheck',
-        '--strict',
-        '--module',
-        'preserve',
-        '--moduleResolution',
-        'bundler',
-        '--target',
-        'es2022',
-        ...files,
-      ],
-      { stdio: 'inherit' },
-    )
+    await promisify(execFile)(process.execPath, [
+      compiler,
+      '--ignoreConfig',
+      '--noEmit',
+      '--skipLibCheck',
+      '--strict',
+      '--module',
+      'preserve',
+      '--moduleResolution',
+      'bundler',
+      '--target',
+      'es2022',
+      ...files,
+    ])
   } finally {
     await fs.rm(output, { recursive: true, force: true })
   }
