@@ -5,6 +5,7 @@
 
 import type { PlaceOrderPatchResponse, PlaceOrderPatchStatus405, PlaceOrderPatchBody } from '../../../models/PlaceOrderPatch'
 import type { HttpResponseResolver } from 'msw/http'
+import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function placeOrderPatchHandlerResponse200(data: PlaceOrderPatchResponse) {
@@ -23,17 +24,22 @@ export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatchStatus40
 }
 
 export function placeOrderPatchHandler(
-  data?: PlaceOrderPatchResponse | HttpResponseResolver<Record<string, string>, PlaceOrderPatchBody>,
+  data?:
+    | PlaceOrderPatchResponse
+    | HttpResponseResolver<Record<string, string>, PlaceOrderPatchBody extends DefaultBodyType ? PlaceOrderPatchBody : DefaultBodyType>,
   options?: { baseURL?: string },
 ) {
-  return http.patch<Record<string, string>, PlaceOrderPatchBody>(`${options?.baseURL ?? 'http://localhost:3000'}/store/order`, function handler(info) {
-    if (typeof data === 'function') return data(info)
+  return http.patch<Record<string, string>, PlaceOrderPatchBody extends DefaultBodyType ? PlaceOrderPatchBody : DefaultBodyType>(
+    `${options?.baseURL ?? 'http://localhost:3000'}/store/order`,
+    function handler(info) {
+      if (typeof data === 'function') return data(info)
 
-    return new HttpResponse(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-  })
+      return new HttpResponse(JSON.stringify(data), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    },
+  )
 }
