@@ -21,8 +21,8 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
   const fakerText = printer.print(node) ?? 'undefined'
 
   const isArray = node.type === 'array'
-  const isObject = node.type === 'object' || (node.type === 'intersection' && isObjectSchema(node))
-  const isValueIntersection = node.type === 'intersection' && !isObject
+  const isObject = !!ast.narrowSchema(node, ast.schemaTypes.object) || (node.type === ast.schemaTypes.intersection && isObjectSchema(node))
+  const isValueIntersection = node.type === ast.schemaTypes.intersection && !isObject
   const isTuple = node.type === 'tuple'
   const isScalar = SCALAR_TYPES.has(node.type)
   const isUnion = node.type === 'union'

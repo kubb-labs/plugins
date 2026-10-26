@@ -53,12 +53,14 @@ export function isObjectSchema(node: ast.SchemaNode, seen = new Set<ast.SchemaNo
   if (seen.has(resolved)) return false
   seen.add(resolved)
 
-  if (resolved.type === 'object' || resolved.type === 'ref') return true
-  if (resolved.type === 'intersection' || resolved.type === 'union') {
-    return (resolved.type === 'intersection' && !resolved.members?.length) || (resolved.members ?? []).some((member) => isObjectSchema(member, seen))
-  }
+  if (ast.narrowSchema(resolved, ast.schemaTypes.object) || ast.narrowSchema(resolved, ast.schemaTypes.ref)) return true
+  const composition = ast.narrowSchema(resolved, ast.schemaTypes.intersection) ?? ast.narrowSchema(resolved, ast.schemaTypes.union)
+  if (!composition) return false
 
-  return false
+  return (
+    (composition.type === ast.schemaTypes.intersection && !composition.members?.length) ||
+    (composition.members ?? []).some((member) => isObjectSchema(member, seen))
+  )
 }
 
 function shouldInlineSingleResponseSchema(schema: ast.SchemaNode): boolean {
