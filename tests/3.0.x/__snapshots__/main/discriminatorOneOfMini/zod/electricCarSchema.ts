@@ -7,7 +7,7 @@ import * as z from 'zod/mini'
 import { electricCarTypeEnumSchema } from './electricCarTypeEnumSchema'
 import { vehicleSchema } from './vehicleSchema'
 
-export const electricCarSchema = z.extend(vehicleSchema, {
+export const electricCarSchema = z.intersection(vehicleSchema, z.object({
   type: z.optional(electricCarTypeEnumSchema),
   batteryCapacity: z.optional(z.number()),
-})
+}))

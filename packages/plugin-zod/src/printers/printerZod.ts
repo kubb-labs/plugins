@@ -13,6 +13,7 @@ import {
   isObjectComposableIntersection,
   isObjectSchemaNode,
   lengthConstraints,
+  mergeOneOfSiblings,
   numberConstraints,
   objectConstraints,
   patternKeySchema,
@@ -490,6 +491,8 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       return `z.union(${buildList(members)})`
     },
     intersection(node) {
+      const composed = mergeOneOfSiblings({ node })
+      if (composed !== node) return this.transform(composed)
       const members = node.members ?? []
       if (members.length === 0) return ''
 

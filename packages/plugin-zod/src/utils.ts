@@ -405,6 +405,51 @@ export function strictOneOfNode(node: ast.SchemaNode): ast.SchemaNode {
 }
 
 /**
+ * Composes sibling properties into each oneOf variant before the printer makes its members strict.
+ */
+export function mergeOneOfSiblings({ node, document }: { node: ast.SchemaNode; document?: unknown }): ast.SchemaNode {
+  if (node.type !== 'intersection') return node
+  const members = node.members ?? []
+  const union = members.find((member) => member.type === 'union' && member.strategy === 'one')
+  const siblings = members.filter((member) => member !== union)
+  if (!union || union.type !== 'union' || !siblings.length || !siblings.every((member) => member.type === 'object')) return node
+
+  // The adapter drops required names declared only in members, so recover them from the source.
+  const source = node.pointer
+    ?.replace(/^#\//, '')
+    .split('/')
+    .reduce<unknown>((value, key) => {
+      const name = key.replace(/~1/g, '/').replace(/~0/g, '~')
+      return value && typeof value === 'object' ? Reflect.get(value, name) : undefined
+    }, document)
+  const required = source && typeof source === 'object' && 'required' in source && Array.isArray(source.required) ? source.required : []
+  return {
+    ...node,
+    ...union,
+    members: (union.members ?? []).map((member) => {
+      const properties = required
+        .filter((name): name is string => typeof name === 'string')
+        .flatMap((name) => {
+          if (siblings.some((sibling) => sibling.properties.some((property) => property.name === name))) return []
+          const own = ast.resolveSchemaProperties({ node: member, propertyName: name })
+          const candidates = own.length ? own : (union.members ?? []).flatMap((variant) => ast.resolveSchemaProperties({ node: variant, propertyName: name }))
+          const schemas = candidates.map((property) => ast.optionality(property.schema, true))
+          if (!schemas.length) return []
+          const schema = schemas.length === 1 ? schemas[0]! : ast.factory.createSchema({ type: 'union', members: schemas })
+          return [ast.factory.createProperty({ name, required: true, schema })]
+        })
+      const shared = properties.length ? [...siblings, ast.factory.createSchema({ type: 'object', properties })] : siblings
+      const overlaps = shared.some((sibling) =>
+        sibling.properties.some((property) => ast.resolveSchemaProperties({ node: member, propertyName: property.name }).length),
+      )
+      // Keep overlapping constraints in an intersection; .extend() would overwrite the member's discriminator or validation.
+      const rest = overlaps ? [ast.factory.createSchema({ type: 'intersection', members: shared })] : shared
+      return ast.factory.createSchema({ type: 'intersection', members: [member, ...rest] })
+    }),
+  }
+}
+
+/**
  * The constraint chain an `allOf` member adds to a bare string, number or array; each printer passes its own renderers.
  */
 export function getMemberConstraint({

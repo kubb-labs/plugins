@@ -14,6 +14,7 @@ import { collectDirectionalRefNames, containsDirectionalNode, printerZod } from 
 import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
+import { mergeOneOfSiblings } from '../utils.ts'
 
 /**
  * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
@@ -133,6 +134,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const { adapter, config, resolver, root } = ctx
     const { output, coercion, guidType, regexType, oneOfType, compile, mini, inferred, typeGuards, importPath, group, printer } = ctx.options
     const dateType = getOasAdapter(adapter).options.dateType
+    node = ast.applyMacros(node, [{ name: 'oneOfSiblings', schema: (schema) => mergeOneOfSiblings({ node: schema, document: adapter.document }) }])
 
     if (!node.name) {
       return
@@ -221,6 +223,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const { adapter, config, resolver, root } = ctx
     const { output, coercion, guidType, regexType, oneOfType, compile, mini, inferred, importPath, group, printer } = ctx.options
     const dateType = getOasAdapter(adapter).options.dateType
+    node = ast.applyMacros(node, [{ name: 'oneOfSiblings', schema: (schema) => mergeOneOfSiblings({ node: schema, document: adapter.document }) }])
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
 

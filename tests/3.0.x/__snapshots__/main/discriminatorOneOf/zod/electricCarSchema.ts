@@ -7,7 +7,7 @@ import * as z from 'zod'
 import { electricCarTypeEnumSchema } from './electricCarTypeEnumSchema'
 import { vehicleSchema } from './vehicleSchema'
 
-export const electricCarSchema = vehicleSchema.strict().extend({
+export const electricCarSchema = vehicleSchema.and(z.object({
   type: electricCarTypeEnumSchema.optional(),
   batteryCapacity: z.number().optional().describe('Battery capacity in kWh'),
-})
+}))

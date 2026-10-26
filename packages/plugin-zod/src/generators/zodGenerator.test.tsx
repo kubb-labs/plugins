@@ -1,6 +1,9 @@
+import { adapterOas } from '@kubb/adapter-oas'
 import { ast } from 'kubb/kit'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from 'kubb/kit/testing'
 import { describe, expect, test } from 'vitest'
+import * as z from 'zod'
+import * as zMini from 'zod/mini'
 import { matchFiles, rawSources, testConfig } from '#mocks'
 import type { PrinterZodNodes } from '../printers/printerZod.ts'
 import { resolverZod } from '../resolvers/resolverZod.ts'
@@ -114,6 +117,50 @@ const additionalPropertiesObjectSchema = ast.factory.createSchema({
 })
 
 describe('zodGenerator — Schema', () => {
+  test.each([false, true])('generates parent-required oneOf member fields with mini=%s', async (mini) => {
+    const adapter = adapterOas({ validate: false })
+    const root = await adapter.parse({
+      type: 'data',
+      data: {
+        openapi: '3.0.0',
+        info: { title: 'oneOf siblings', version: '1' },
+        paths: {},
+        components: {
+          schemas: {
+            Pet: {
+              type: 'object',
+              required: ['a', 'shared'],
+              properties: { shared: { type: 'string' } },
+              oneOf: [
+                { type: 'object', properties: { a: { type: 'string' } } },
+                { type: 'object', properties: { b: { type: 'string' } } },
+              ],
+            },
+          },
+        },
+      },
+    })
+    const options = { ...defaultOptions, mini, importPath: mini ? 'zod/mini' : 'zod' }
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'oneOfSiblings' })
+    await renderGeneratorSchema(zodGenerator, root.schemas[0]!, {
+      config: testConfig,
+      adapter,
+      driver,
+      plugin,
+      options,
+      resolver: resolverZod,
+    })
+    const source = rawSources(driver.fileManager.files)[0]!
+    const expression = source.slice(source.indexOf('export const petSchema =') + 'export const petSchema ='.length)
+    const schema: z.ZodType = new Function('z', `return ${expression}`)(mini ? zMini : z)
+
+    expect(schema.safeParse({ a: 'x', shared: 'y' }).success).toBe(true)
+    expect(schema.safeParse({ shared: 'y' }).success).toBe(false)
+    expect(schema.safeParse({ b: 'x', shared: 'y' }).success).toBe(false)
+    expect(schema.safeParse({ a: 1, shared: 'y' }).success).toBe(false)
+  })
+
   const schemas: Array<{ name: string; node: ast.SchemaNode; options?: Partial<PluginZod['resolvedOptions']> }> = [
     { name: 'string', node: stringSchema },
     { name: 'number', node: numberSchema },
