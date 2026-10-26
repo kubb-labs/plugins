@@ -98,17 +98,6 @@ export const SCALAR_TYPES = new Set<ast.SchemaNode['type']>([
   'enum',
 ])
 
-export function omitSchemaProperties(node: ast.SchemaNode, keys: Array<string>): ast.SchemaNode {
-  const resolved = ast.resolveRef(node)
-  if (resolved.type === 'object') {
-    return { ...resolved, properties: resolved.properties?.filter((property) => !keys.includes(property.name)) }
-  }
-  if (resolved.type === 'union' || resolved.type === 'intersection') {
-    return { ...resolved, members: resolved.members?.map((member) => omitSchemaProperties(member, keys)) }
-  }
-  return resolved
-}
-
 /**
  * Resolves a type reference, determining if it needs an import statement or inline type reference.
  * Takes into account whether the type can be overridden and the file paths.

@@ -1,6 +1,5 @@
-import { jsDocEscape } from '@internals/utils'
-import { containsCircularRef } from 'kubb/kit'
-import type { ast } from 'kubb/kit'
+import { jsDocEscape, objectKey } from '@internals/utils'
+import { ast, containsCircularRef } from 'kubb/kit'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
 import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
@@ -15,10 +14,11 @@ type Props = {
   description?: string
   canOverride: boolean
   typeMode?: PluginFaker['resolvedOptions']['typeMode']
+  keysToOmit?: Array<string> | null
 }
 
 const OBJECT_TYPES = new Set<ast.SchemaNode['type']>(['object', 'intersection'])
-export function Faker({ node, description, name, typeName, printer, canOverride, typeMode = 'inferred' }: Props): KubbReactNode {
+export function Faker({ node, description, name, typeName, printer, canOverride, typeMode = 'inferred', keysToOmit }: Props): KubbReactNode {
   const fakerText = printer.print(node) ?? 'undefined'
 
   const isArray = node.type === 'array'
@@ -27,7 +27,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
   const isScalar = SCALAR_TYPES.has(node.type)
   const isUnion = node.type === 'union'
 
-  const useObjectOverride = canOverride && isObject
+  const useObjectOverride = canOverride && (isObject || !!keysToOmit?.length)
   const fakerTextWithOverride = (() => {
     if (canOverride && node.type === 'tuple') {
       return `data && data.length === ${node.items?.length ?? 0} && !data.includes(undefined) ? data : ${fakerText}`
@@ -50,7 +50,7 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
     const returnType = resolvedReturnType
 
     // `as` binds tighter than `??`/`?:`, so tuple/union need parens or `data`'s own type leaks through.
-    const needsCast = canOverride && !!returnType && (node.type === 'ref' || isArray || isTuple || isUnion)
+    const needsCast = canOverride && !!returnType && ((node.type === 'ref' && !SCALAR_TYPES.has(ast.resolveRef(node).type)) || isArray || isTuple || isUnion)
     const needsParens = isTuple || isUnion
     const returnExpression = needsCast ? `${needsParens ? `(${fakerTextWithOverride})` : fakerTextWithOverride} as ${returnType}` : fakerTextWithOverride
 
@@ -85,15 +85,19 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
     !!cyclicSchemas &&
     (node.properties ?? []).some((p) => containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
 
+  const defaults = keysToOmit?.length
+    ? `{ ${keysToOmit.map((key, index) => `${objectKey(key)}: _omit${index}`).join(', ')}, ...defaultFakeData }`
+    : 'defaultFakeData'
+  const declaration = `const ${defaults} = ${fakerText}`
   const functionBody = hasGetters
-    ? `const defaultFakeData = ${fakerText}
+    ? `${declaration}
 if (data) {
   for (const [key, value] of Object.entries(data)) {
     Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
   }
 }
 return defaultFakeData as ${returnType}`
-    : `const defaultFakeData = ${fakerText}
+    : `${declaration}
 return {
   ...defaultFakeData,
   ...(data || {}),

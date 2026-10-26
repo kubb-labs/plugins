@@ -567,9 +567,14 @@ describe('fakerGenerator — operation', () => {
       const filePath = path.join(dir, path.relative(path.resolve(testConfig.output.path), file.path))
       await fs.mkdir(path.dirname(filePath), { recursive: true })
       const output = parserTs().parse(file)
+      if (file.baseName.startsWith('createDownload')) {
+        expect(output).not.toContain('Partial<')
+        expect(output).toContain('return createPdf(data)\n')
+      }
       if (file.baseName === 'createUpdateA.ts') {
         const body = output.slice(output.indexOf('export function createUpdateABody'))
-        expect(body).not.toMatch(/\bid:/)
+        expect(body).not.toMatch(/\bid: faker/)
+        expect(body).toContain('const { id: _omit0, ...defaultFakeData } = createPayload()')
         const response = output.slice(0, output.indexOf('export function createUpdateABody'))
         expect(response).not.toMatch(/\bsecret:/)
         expect(body).toMatch(/\bname:/)
@@ -578,6 +583,17 @@ describe('fakerGenerator — operation', () => {
       await fs.writeFile(filePath, output)
       paths.push(filePath)
     }
+    const checkPath = path.join(dir, 'check.ts')
+    await fs.writeFile(
+      checkPath,
+      `import { createUpdateABodyXml } from './createUpdateA'
+const body = createUpdateABodyXml({ name: 'fixed' as const })
+${typeMode === 'inferred' ? "const name: 'fixed' = body.name" : ''}
+// @ts-expect-error Read-only properties are absent from request bodies.
+body.id
+`,
+    )
+    paths.push(checkPath)
     const compiler = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
     await expect(
       promisify(execFile)(process.execPath, [

@@ -1,9 +1,7 @@
 import type { AddPetRequest } from '../../models/ts/AddPetRequest'
 import type { Pet } from '../../models/ts/Pet'
 import { createAddPetRequestFaker } from '../createAddPetRequestFaker'
-import { createCategoryFaker } from '../createCategoryFaker'
 import { createPetFaker } from '../createPetFaker'
-import { createTagTagFaker } from '../createTagTagFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**
@@ -29,52 +27,22 @@ export function createAddPetStatus405Faker<
  * @description Successful operation
  */
 export function createAddPetStatusDefaultFakerJson<TData extends Partial<Omit<NonNullable<Pet>, 'name'>> = object>(data?: TData) {
-  const defaultFakeData = {
-    id: faker.number.int(),
-    get parent() {
-      const _value = faker.helpers.multiple(() => createPetFaker())
-      Object.defineProperty(this, 'parent', { value: _value, configurable: true, writable: true, enumerable: true })
-      return _value
-    },
-    signature: faker.helpers.fromRegExp(/^data:image\/(png|jpeg|gif|webp);base64,([A-Za-z0-9+/]+={0,2})$/),
-    url: faker.internet.url(),
-    category: createCategoryFaker(),
-    photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
-    tags: faker.helpers.multiple(() => createTagTagFaker()),
-    status: faker.helpers.arrayElement<NonNullable<Omit<NonNullable<Pet>, 'name'>>['status']>(['available', 'pending', 'sold']),
-  }
-  if (data) {
-    for (const [key, value] of Object.entries(data)) {
-      Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
-    }
-  }
-  return defaultFakeData as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  const { name: _omit0, ...defaultFakeData } = createPetFaker()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
  * @description Successful operation
  */
 export function createAddPetStatusDefaultFakerXml<TData extends Partial<Omit<NonNullable<Pet>, 'name'>> = object>(data?: TData) {
-  const defaultFakeData = {
-    id: faker.number.int(),
-    get parent() {
-      const _value = faker.helpers.multiple(() => createPetFaker())
-      Object.defineProperty(this, 'parent', { value: _value, configurable: true, writable: true, enumerable: true })
-      return _value
-    },
-    signature: faker.helpers.fromRegExp(/^data:image\/(png|jpeg|gif|webp);base64,([A-Za-z0-9+/]+={0,2})$/),
-    url: faker.internet.url(),
-    category: createCategoryFaker(),
-    photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
-    tags: faker.helpers.multiple(() => createTagTagFaker()),
-    status: faker.helpers.arrayElement<NonNullable<Omit<NonNullable<Pet>, 'name'>>['status']>(['available', 'pending', 'sold']),
-  }
-  if (data) {
-    for (const [key, value] of Object.entries(data)) {
-      Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
-    }
-  }
-  return defaultFakeData as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  const { name: _omit0, ...defaultFakeData } = createPetFaker()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
@@ -95,52 +63,22 @@ export function createAddPetBodyFakerJson(data?: Partial<AddPetRequest>): AddPet
  * @description Create a new pet in the store
  */
 export function createAddPetBodyFakerXml<TData extends Partial<Omit<NonNullable<Pet>, 'id'>> = object>(data?: TData) {
-  const defaultFakeData = {
-    get parent() {
-      const _value = faker.helpers.multiple(() => createPetFaker())
-      Object.defineProperty(this, 'parent', { value: _value, configurable: true, writable: true, enumerable: true })
-      return _value
-    },
-    signature: faker.helpers.fromRegExp(/^data:image\/(png|jpeg|gif|webp);base64,([A-Za-z0-9+/]+={0,2})$/),
-    name: faker.string.alpha(),
-    url: faker.internet.url(),
-    category: createCategoryFaker(),
-    photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
-    tags: faker.helpers.multiple(() => createTagTagFaker()),
-    status: faker.helpers.arrayElement<NonNullable<Omit<NonNullable<Pet>, 'id'>>['status']>(['available', 'pending', 'sold']),
-  }
-  if (data) {
-    for (const [key, value] of Object.entries(data)) {
-      Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
-    }
-  }
-  return defaultFakeData as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  const { id: _omit0, ...defaultFakeData } = createPetFaker()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**
  * @description Create a new pet in the store
  */
 export function createAddPetBodyFakerFormUrlEncoded<TData extends Partial<Omit<NonNullable<Pet>, 'id'>> = object>(data?: TData) {
-  const defaultFakeData = {
-    get parent() {
-      const _value = faker.helpers.multiple(() => createPetFaker())
-      Object.defineProperty(this, 'parent', { value: _value, configurable: true, writable: true, enumerable: true })
-      return _value
-    },
-    signature: faker.helpers.fromRegExp(/^data:image\/(png|jpeg|gif|webp);base64,([A-Za-z0-9+/]+={0,2})$/),
-    name: faker.string.alpha(),
-    url: faker.internet.url(),
-    category: createCategoryFaker(),
-    photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
-    tags: faker.helpers.multiple(() => createTagTagFaker()),
-    status: faker.helpers.arrayElement<NonNullable<Omit<NonNullable<Pet>, 'id'>>['status']>(['available', 'pending', 'sold']),
-  }
-  if (data) {
-    for (const [key, value] of Object.entries(data)) {
-      Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
-    }
-  }
-  return defaultFakeData as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+  const { id: _omit0, ...defaultFakeData } = createPetFaker()
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
 /**

@@ -13,9 +13,7 @@ import type {
   UpdatePetStatus200Json,
   UpdatePetStatus200Xml,
 } from '../models/UpdatePet'
-import { createCategory } from './createCategory'
 import { createPet } from './createPet'
-import { createTag } from './createTag'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**
@@ -64,30 +62,7 @@ export function createUpdatePetStatus405() {
  * @description Update an existent pet in the store
  */
 export function createUpdatePetBodyJson<TData extends Partial<UpdatePetBodyJson> = object>(data?: TData) {
-  const defaultFakeData = {
-    ...faker.helpers.arrayElement([
-      {
-        ...{
-          bark: faker.string.alpha(),
-        },
-        ...{},
-      },
-      {
-        ...{
-          name: faker.string.alpha(),
-        },
-        ...{},
-      },
-    ]),
-    ...{
-      id: faker.number.bigInt(),
-      name: faker.string.alpha(),
-      category: createCategory(),
-      photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
-      tags: faker.helpers.multiple(() => createTag()),
-      status: faker.helpers.arrayElement<NonNullable<UpdatePetBodyJson>['status']>(['available', 'pending', 'sold']),
-    },
-  }
+  const { type: _omit0, ...defaultFakeData } = createPet()
   return {
     ...defaultFakeData,
     ...(data || {}),
@@ -98,30 +73,7 @@ export function createUpdatePetBodyJson<TData extends Partial<UpdatePetBodyJson>
  * @description Update an existent pet in the store
  */
 export function createUpdatePetBodyXml<TData extends Partial<UpdatePetBodyXml> = object>(data?: TData) {
-  const defaultFakeData = {
-    ...faker.helpers.arrayElement([
-      {
-        ...{
-          bark: faker.string.alpha(),
-        },
-        ...{},
-      },
-      {
-        ...{
-          name: faker.string.alpha(),
-        },
-        ...{},
-      },
-    ]),
-    ...{
-      id: faker.number.bigInt(),
-      name: faker.string.alpha(),
-      category: createCategory(),
-      photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
-      tags: faker.helpers.multiple(() => createTag()),
-      status: faker.helpers.arrayElement<NonNullable<UpdatePetBodyXml>['status']>(['available', 'pending', 'sold']),
-    },
-  }
+  const { type: _omit0, ...defaultFakeData } = createPet()
   return {
     ...defaultFakeData,
     ...(data || {}),
@@ -132,30 +84,7 @@ export function createUpdatePetBodyXml<TData extends Partial<UpdatePetBodyXml> =
  * @description Update an existent pet in the store
  */
 export function createUpdatePetBodyFormUrlEncoded<TData extends Partial<UpdatePetBodyFormUrlEncoded> = object>(data?: TData) {
-  const defaultFakeData = {
-    ...faker.helpers.arrayElement([
-      {
-        ...{
-          bark: faker.string.alpha(),
-        },
-        ...{},
-      },
-      {
-        ...{
-          name: faker.string.alpha(),
-        },
-        ...{},
-      },
-    ]),
-    ...{
-      id: faker.number.bigInt(),
-      name: faker.string.alpha(),
-      category: createCategory(),
-      photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
-      tags: faker.helpers.multiple(() => createTag()),
-      status: faker.helpers.arrayElement<NonNullable<UpdatePetBodyFormUrlEncoded>['status']>(['available', 'pending', 'sold']),
-    },
-  }
+  const { type: _omit0, ...defaultFakeData } = createPet()
   return {
     ...defaultFakeData,
     ...(data || {}),
