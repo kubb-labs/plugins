@@ -72,6 +72,9 @@ describe('casing', () => {
   test('screamingSnakeCase', () => {
     expect(screamingSnakeCase('petPet')).toBe('PET_PET')
     expect(screamingSnakeCase('sensor2Reading')).toBe('SENSOR2_READING')
+    expect(screamingSnakeCase('COOL_2D_DRAWING')).toBe('COOL_2D_DRAWING')
+    expect(screamingSnakeCase('NICE_3D_MODEL')).toBe('NICE_3D_MODEL')
+    expect(screamingSnakeCase('RANKED_3RD_PLACE')).toBe('RANKED_3RD_PLACE')
     expect(screamingSnakeCase('tag', { prefix: 'create' })).toBe('CREATE_TAG')
     expect(screamingSnakeCase('tag', { suffix: 'schema' })).toBe('TAG_SCHEMA')
   })

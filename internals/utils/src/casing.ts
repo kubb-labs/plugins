@@ -97,8 +97,10 @@ export function capitalize(text: string): string {
  */
 export function snakeCase(text: string, { prefix = '', suffix = '' }: Options = {}): string {
   const processed = `${prefix} ${text} ${suffix}`.trim()
+  // After a digit, only `2Reading` starts a new word, so `2D` and `3RD` stay together
   return processed
-    .replace(/([a-z\d])([A-Z])/g, '$1_$2')
+    .replace(/([a-z])([A-Z])/g, '$1_$2')
+    .replace(/(\d)([A-Z][a-z])/g, '$1_$2')
     .replace(/[\s\-.]+/g, '_')
     .replace(/[^a-zA-Z0-9_]/g, '')
     .toLowerCase()
