@@ -3,6 +3,8 @@
 
 # Collapse in GitHub diffs and skip in language stats
 pnpm-lock.yaml linguist-generated
+**/__snapshots__/** linguist-generated
+CHANGELOG.md linguist-generated
 examples/*/src/gen*/** linguist-generated
 examples/zod/src/zod/** linguist-generated
 examples/zod/src/mini/** linguist-generated
@@ -14,4 +16,3 @@ examples/zod/src/mini/** linguist-generated
 *.gif binary
 *.webp binary
 *.ico binary
-*.svg -diff linguist-generated
