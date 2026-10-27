@@ -24,17 +24,20 @@ export function resolveInlineEnumNames({
       const key = ['enum', owner, child.pointer ?? child.name]
       const names = (name: string) => getEnumNames({ node: { ...child, name }, enum: enumOptions, resolver })
       let candidate = child.name
-      // The enum's value and type alias must both be free for the same raw name.
-      while (true) {
-        const name = resolver.resolveName({ key: [...key, 'type', candidate], name: candidate, normalize: (value) => names(value).typeName })
+      // The enum's value and type alias must both be free for the same raw name. Keying each round
+      // by its index keeps the allocation stable when the same enum is resolved again.
+      // shortcut: keeps the last candidate after 10 rounds, raise it if a spec ever chains more
+      for (let round = 0; round < 10; round++) {
+        const name = resolver.resolveName({ key: [...key, 'type', String(round)], name: candidate, normalize: (value) => names(value).typeName })
         const { enumName, typeName } = names(name)
         const valueName =
           enumOptions.type === 'literal' || enumName === typeName
             ? name
-            : resolver.resolveName({ key: [...key, 'value', name], name, normalize: (value) => names(value).enumName })
+            : resolver.resolveName({ key: [...key, 'value', String(round)], name, normalize: (value) => names(value).enumName })
         if (valueName === name) return name === child.name ? undefined : { ...child, name }
         candidate = valueName
       }
+      return candidate === child.name ? undefined : { ...child, name: candidate }
     },
   })
 }

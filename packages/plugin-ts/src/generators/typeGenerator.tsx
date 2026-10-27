@@ -86,7 +86,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     function renderSchemaType({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
       if (!schema) return null
-      if (!inline && enumOptions.type !== 'inlineLiteral') schema = resolveInlineEnumNames({ node: schema, owner: name, resolver, enumOptions })
+      if (!inline && enumOptions.type !== 'inlineLiteral') schema = resolveInlineEnumNames({ node: schema, owner: node.operationId, resolver, enumOptions })
 
       const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, name: importName })
 
