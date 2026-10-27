@@ -21,6 +21,8 @@ paths:
               schema: { $ref: '#/components/schemas/ProviderAuthError' }
 components:
   schemas:
+    MitigationActionEnumKey:
+      type: string
     CreateContainerBody:
       type: object
       properties:

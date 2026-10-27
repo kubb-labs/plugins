@@ -1,21 +1,40 @@
 import { isSuccessStatusCode } from '@internals/shared'
 import { jsDocEscape, stringify } from '@internals/utils'
 import { ast, syncSchemaRef } from 'kubb/kit'
-import type { ResolverTs } from './types.ts'
+import { getEnumNames } from './components/Enum.tsx'
+import type { PluginTs, ResolverTs } from './types.ts'
 
 /**
  * Renames inline enum declarations and their uses together.
  */
-export function resolveInlineEnumNames({ node, owner, resolver }: { node: ast.SchemaNode; owner: string; resolver: ResolverTs }): ast.SchemaNode {
+export function resolveInlineEnumNames({
+  node,
+  owner,
+  resolver,
+  enumOptions,
+}: {
+  node: ast.SchemaNode
+  owner: string
+  resolver: ResolverTs
+  enumOptions: PluginTs['resolvedOptions']['enum']
+}): ast.SchemaNode {
   return ast.transform(node, {
     schema(child) {
       if (child === node || child.type !== 'enum' || !child.name) return
-      const name = resolver.resolveName({
-        key: ['enum', owner, child.pointer ?? child.name],
-        name: child.name,
-        normalize: (name) => resolver.name(name),
-      })
-      return name === child.name ? undefined : { ...child, name }
+      const key = ['enum', owner, child.pointer ?? child.name]
+      const names = (name: string) => getEnumNames({ node: { ...child, name }, enum: enumOptions, resolver })
+      let candidate = child.name
+      // The enum's value and type alias must both be free for the same raw name.
+      while (true) {
+        const name = resolver.resolveName({ key: [...key, 'type', candidate], name: candidate, normalize: (value) => names(value).typeName })
+        const { enumName, typeName } = names(name)
+        const valueName =
+          enumOptions.type === 'literal' || enumName === typeName
+            ? name
+            : resolver.resolveName({ key: [...key, 'value', name], name, normalize: (value) => names(value).enumName })
+        if (valueName === name) return name === child.name ? undefined : { ...child, name }
+        candidate = valueName
+      }
     },
   })
 }

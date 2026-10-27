@@ -19,7 +19,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const { enum: enumOptions, syntaxType, optionalType, arrayType, output, group, printer } = ctx.options
     const { config, resolver, root } = ctx
 
-    if (enumOptions.type !== 'inlineLiteral') node = resolveInlineEnumNames({ node, owner: node.name ?? '', resolver })
+    if (enumOptions.type !== 'inlineLiteral') node = resolveInlineEnumNames({ node, owner: node.name ?? '', resolver, enumOptions })
     if (!node.name) {
       return
     }
@@ -86,7 +86,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     function renderSchemaType({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
       if (!schema) return null
-      if (!inline && enumOptions.type !== 'inlineLiteral') schema = resolveInlineEnumNames({ node: schema, owner: name, resolver })
+      if (!inline && enumOptions.type !== 'inlineLiteral') schema = resolveInlineEnumNames({ node: schema, owner: name, resolver, enumOptions })
 
       const imports = resolver.imports({ node: schema, root, output, group: group ?? undefined, name: importName })
 

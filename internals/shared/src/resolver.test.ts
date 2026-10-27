@@ -59,6 +59,21 @@ describe('createOperationParamResolver', () => {
 describe('createOperationResponseResolver', () => {
   const response = createOperationResponseResolver()
 
+  test('keeps declaration keys distinct when custom naming collapses their names', () => {
+    const resolver = new Resolver({ pluginName: 'test', name: () => 'Same' })
+    const param = createOperationParamResolver()
+    expect(response.body.call(resolver, node)).toBe('Same')
+    expect(response.status.call(resolver, node, '200')).toBe('Same2')
+    expect(response.status.call(resolver, node, '400')).toBe('Same3')
+    expect(response.responses.call(resolver, node)).toBe('Same4')
+    expect(response.response.call(resolver, node)).toBe('Same5')
+    expect(param.path.call(resolver, node)).toBe('Same6')
+    expect(param.query.call(resolver, node)).toBe('Same7')
+    expect(param.headers.call(resolver, node)).toBe('Same8')
+    expect(response.body.call(resolver, node)).toBe('Same')
+    expect(response.status.call(resolver, node, '200')).toBe('Same2')
+  })
+
   test('status/body/responses/response use the grouped templates', () => {
     expect(response.status.call(resolver, node, '200')).toBe('ListPetsStatus200')
     expect(response.body.call(resolver, node)).toBe('ListPetsBody')
