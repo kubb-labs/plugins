@@ -98,7 +98,7 @@
   },
   "peerDependencies": {
     "axios": "^1.20.0",
-    "kubb": "^5.15.0"
+    "kubb": "^5.14.4"
   },
   "peerDependenciesMeta": {
     "axios": {

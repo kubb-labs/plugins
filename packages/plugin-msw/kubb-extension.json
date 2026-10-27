@@ -20,7 +20,7 @@
   "dependencies": ["plugin-ts"],
   "optionalDependencies": ["plugin-faker"],
   "compatibility": {
-    "kubb": ">=5.15.0",
+    "kubb": ">=5.14.4",
     "node": ">=22.22"
   },
   "options": [
