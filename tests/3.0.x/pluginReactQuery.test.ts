@@ -309,11 +309,10 @@ describe(`plugin-react-query options ${version}`, () => {
       },
     ).safeBuild()
 
-    expect(files.length).toBeGreaterThan(0)
     expect(Diagnostics.hasError(diagnostics)).toBe(false)
 
     // Snapshot only this plugin's output. The plugins it builds on have their own suites.
-    const ownFiles = files.filter((file) => /^\.\/(hooks)\//.test(getRelativePath(output, file.path)))
+    const ownFiles = files.filter((file) => /^\.\/hooks\//.test(getRelativePath(output, file.path)))
     expect(ownFiles.length).toBeGreaterThan(0)
 
     for (const file of ownFiles) {

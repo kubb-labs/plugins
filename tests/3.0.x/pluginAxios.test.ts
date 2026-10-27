@@ -152,7 +152,6 @@ describe(`plugin-axios options ${version}`, () => {
       },
     ).safeBuild()
 
-    expect(files.length).toBeGreaterThan(0)
     expect(Diagnostics.hasError(diagnostics)).toBe(false)
 
     // Snapshot only this plugin's output. The plugins it builds on have their own suites.
