@@ -30,18 +30,6 @@ export type OperationResponseResolver = {
 }
 
 /**
- * Resolves a single operation parameter name with the
- * `<operationId> <in> <name>` template.
- *
- * @example
- * `operationParamName.call(resolver, node, param) // → 'DeletePetPathPetId'`
- */
-function operationParamName(this: Resolver, node: ast.OperationNode, param: ast.ParameterNode): string {
-  const name = this.name(`${node.operationId} ${param.in} ${param.name}`)
-  return this.resolveName({ key: ['operation', node.method, node.path, name], name })
-}
-
-/**
  * Builds the shared `param` namespace. Spread the result into `createResolver`
  * and override individual methods next to it when a plugin deviates.
  *
@@ -52,7 +40,10 @@ function operationParamName(this: Resolver, node: ast.OperationNode, param: ast.
  */
 export function createOperationParamResolver(): OperationParamResolver {
   return {
-    name: operationParamName,
+    name(node, param) {
+      const name = this.name(`${node.operationId} ${param.in} ${param.name}`)
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
+    },
     path(node) {
       const name = this.name(`${node.operationId} Path`)
       return this.resolveName({ key: ['operation', node.method, node.path, name], name })
