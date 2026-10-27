@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { isEventStream, operationFileEntry, resolveDependencyOperationFile } from '@internals/shared'
+import { isEventStream, operationFileEntry, operationKey, resolveDependencyOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import type { Generator } from 'kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -41,9 +41,10 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
 
       const validatorHooks = buildValidatorHooks({ node, validator, zodResolver })
       const importedZodNames = validatorHooks.importedZodNames
+      const operationName = resolver.name(node.operationId)
 
       const meta = {
-        name: resolver.name(node.operationId),
+        name: resolver.resolveName({ key: operationKey(node), name: operationName }),
         file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
         fileTypes: resolveDependencyOperationFile({
           cache: ctx.cache,

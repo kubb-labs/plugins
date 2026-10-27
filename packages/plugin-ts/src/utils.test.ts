@@ -1,10 +1,48 @@
 import { buildResponses } from '@internals/shared'
-import { ast } from 'kubb/kit'
+import { ast, Resolver } from 'kubb/kit'
 import { describe, expect, it } from 'vitest'
 import { print } from './factory.ts'
 import { printerTs } from './printers/printerTs.ts'
 import { resolverTs } from './resolvers/resolverTs.ts'
-import { buildParams, buildPropertyJSDocComments, buildResponseUnion } from './utils.ts'
+import { buildParams, buildPropertyJSDocComments, buildResponseUnion, resolveInlineEnumNames } from './utils.ts'
+
+describe('resolveInlineEnumNames', () => {
+  it.each(['Key', 'Value'])('checks the emitted enum alias with suffix %s', (typeSuffix) => {
+    const resolver = Resolver.merge(resolverTs)
+    resolver.reserveNames([`StatusEnum${typeSuffix}`, `StatusEnum2${typeSuffix}`])
+    const node = ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({ name: 'status', schema: ast.factory.createSchema({ type: 'enum', name: 'StatusEnum', enumValues: ['on', 'off'] }) }),
+      ],
+    })
+    const options = { node, owner: 'First', resolver, enumOptions: { type: 'asConst', typeSuffix, constCasing: 'camelCase', keyCasing: 'none' } } as const
+    const resolved = resolveInlineEnumNames(options)
+    expect(resolved).toMatchObject({ properties: [{ schema: { name: 'StatusEnum3' } }] })
+    expect(resolveInlineEnumNames(options)).toEqual(resolved)
+    expect(resolveInlineEnumNames({ ...options, owner: 'Second' })).toMatchObject({ properties: [{ schema: { name: 'StatusEnum4' } }] })
+    expect(resolver.resolveName({ key: 'later', name: 'statusEnum3' })).toBe('statusEnum32')
+  })
+
+  it('skips names taken by either the enum value or its type alias', () => {
+    const resolver = Resolver.merge(resolverTs)
+    resolver.reserveNames(['statusEnum', 'StatusEnum2Key'])
+    const node = ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({ name: 'status', schema: ast.factory.createSchema({ type: 'enum', name: 'StatusEnum', enumValues: ['on', 'off'] }) }),
+      ],
+    })
+    const resolved = resolveInlineEnumNames({
+      node,
+      owner: 'First',
+      resolver,
+      enumOptions: { type: 'asConst', typeSuffix: 'Key', constCasing: 'camelCase', keyCasing: 'none' },
+    })
+    // `StatusEnum` is taken as a value and `StatusEnum2` as a type alias.
+    expect(resolved).toMatchObject({ properties: [{ schema: { name: 'StatusEnum3' } }] })
+  })
+})
 
 const printer = printerTs({
   resolver: resolverTs,

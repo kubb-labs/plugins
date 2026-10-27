@@ -9,6 +9,10 @@ import { petSchema } from './petSchema'
 
 export const catSchema = z.object({
   id: z.int(),
-  archEnemy: z.union([z.null(), petSchema]).optional(),
-  friends: z.array(petSchema).optional(),
+  get archEnemy() {
+    return z.union([z.null(), petSchema]).optional()
+  },
+  get friends(): z.ZodOptional<z.ZodArray<typeof petSchema>> {
+    return z.array(petSchema).optional()
+  },
 })

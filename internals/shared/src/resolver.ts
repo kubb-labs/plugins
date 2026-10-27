@@ -6,6 +6,20 @@ export function resolveOperationName(name: string): string {
 }
 
 /**
+ * Builds the allocation key for a declaration an operation owns. `scope` names which declaration
+ * it is, so two of them never share an allocation even when a custom resolver gives both the same
+ * name. Leave `scope` empty for the operation's own declaration.
+ *
+ * @example
+ * ```ts
+ * resolver.resolveName({ key: operationKey(node, 'response', 'status', 404), name })
+ * ```
+ */
+export function operationKey(node: ast.OperationNode, ...scope: Array<string | number>): Array<string | undefined> {
+  return ['operation', node.method, node.path, ...scope.map(String)]
+}
+
+/**
  * The `param` namespace shared by the schema-producing plugins (ts, zod, faker):
  * per-parameter names plus the grouped `Path`/`Query`/`Headers` names, all routed
  * through the plugin's top-level `name` casing.
@@ -30,17 +44,6 @@ export type OperationResponseResolver = {
 }
 
 /**
- * Resolves a single operation parameter name with the
- * `<operationId> <in> <name>` template.
- *
- * @example
- * `operationParamName.call(resolver, node, param) // → 'DeletePetPathPetId'`
- */
-function operationParamName(this: Resolver, node: ast.OperationNode, param: ast.ParameterNode): string {
-  return this.name(`${node.operationId} ${param.in} ${param.name}`)
-}
-
-/**
  * Builds the shared `param` namespace. Spread the result into `createResolver`
  * and override individual methods next to it when a plugin deviates.
  *
@@ -51,15 +54,21 @@ function operationParamName(this: Resolver, node: ast.OperationNode, param: ast.
  */
 export function createOperationParamResolver(): OperationParamResolver {
   return {
-    name: operationParamName,
+    name(node, param) {
+      const name = this.name(`${node.operationId} ${param.in} ${param.name}`)
+      return this.resolveName({ key: operationKey(node, 'param', 'name', param.in, param.name), name })
+    },
     path(node) {
-      return this.name(`${node.operationId} Path`)
+      const name = this.name(`${node.operationId} Path`)
+      return this.resolveName({ key: operationKey(node, 'param', 'path'), name })
     },
     query(node) {
-      return this.name(`${node.operationId} Query`)
+      const name = this.name(`${node.operationId} Query`)
+      return this.resolveName({ key: operationKey(node, 'param', 'query'), name })
     },
     headers(node) {
-      return this.name(`${node.operationId} Headers`)
+      const name = this.name(`${node.operationId} Headers`)
+      return this.resolveName({ key: operationKey(node, 'param', 'headers'), name })
     },
   }
 }
@@ -77,16 +86,20 @@ export function createOperationParamResolver(): OperationParamResolver {
 export function createOperationResponseResolver(): OperationResponseResolver {
   return {
     status(node, statusCode) {
-      return this.name(`${node.operationId} Status ${statusCode}`)
+      const name = this.name(`${node.operationId} Status ${statusCode}`)
+      return this.resolveName({ key: operationKey(node, 'response', 'status', statusCode), name })
     },
     body(node) {
-      return this.name(`${node.operationId} Body`)
+      const name = this.name(`${node.operationId} Body`)
+      return this.resolveName({ key: operationKey(node, 'response', 'body'), name })
     },
     responses(node) {
-      return this.name(`${node.operationId} Responses`)
+      const name = this.name(`${node.operationId} Responses`)
+      return this.resolveName({ key: operationKey(node, 'response', 'responses'), name })
     },
     response(node) {
-      return this.name(`${node.operationId} Response`)
+      const name = this.name(`${node.operationId} Response`)
+      return this.resolveName({ key: operationKey(node, 'response', 'response'), name })
     },
   }
 }

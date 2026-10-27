@@ -206,11 +206,12 @@ describe("typeGenerator — operations: 'inline'", () => {
   })
 
   test('marks every operation source inline, printed without enum declarations or property JSDoc', async () => {
+    const resolver = Resolver.merge(apiResolver)
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions, operations: 'inline' }
-    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: apiResolver })
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver })
     const driver = createMockedPluginDriver({ name: 'operations inline' })
 
-    await renderGeneratorOperation(typeGenerator, node, { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: apiResolver })
+    await renderGeneratorOperation(typeGenerator, node, { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver })
 
     const [file] = driver.fileManager.files
     expect(ast.isVirtualFile(file!)).toBe(true)

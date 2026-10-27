@@ -149,7 +149,8 @@ describe('zodGenerator — Schema', () => {
       },
     })
     const options = { ...defaultOptions, mini, importPath: mini ? 'zod/mini' : 'zod' }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'oneOfSiblings' })
     await renderGeneratorSchema(zodGenerator, root.schemas[0]!, {
       config: testConfig,
@@ -157,7 +158,7 @@ describe('zodGenerator — Schema', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
     const source = rawSources(driver.fileManager.files)[0]!
     const expression = source.slice(source.indexOf('export const petSchema =') + 'export const petSchema ='.length)
@@ -306,7 +307,8 @@ describe('zodGenerator — Schema', () => {
 
   test.each(schemas)('$name', async (props) => {
     const options: PluginZod['resolvedOptions'] = { ...defaultOptions, ...props.options }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: props.name })
 
     await renderGeneratorSchema(zodGenerator, props.node, {
@@ -315,14 +317,15 @@ describe('zodGenerator — Schema', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
 
     await matchFiles(driver.fileManager.files, props.name)
   })
 
   test('catCycle — indirect circular ref uses getter syntax (issue #3172)', async () => {
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver })
     const driver = createMockedPluginDriver({ name: 'catCycle' })
 
     await renderGeneratorSchema(zodGenerator, catCycleSchema, {
@@ -337,7 +340,7 @@ describe('zodGenerator — Schema', () => {
       driver,
       plugin,
       options: defaultOptions,
-      resolver: resolverZod,
+      resolver,
     })
 
     await matchFiles(driver.fileManager.files, 'catCycle')
@@ -356,7 +359,8 @@ describe('zodGenerator — Schema', () => {
   })
 
   test('selfRefCycle — directly self-referential schema is annotated z.ZodType', async () => {
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver })
     const driver = createMockedPluginDriver({ name: 'selfRefCycle' })
 
     await renderGeneratorSchema(zodGenerator, errorDetailsSchema, {
@@ -369,7 +373,7 @@ describe('zodGenerator — Schema', () => {
       driver,
       plugin,
       options: defaultOptions,
-      resolver: resolverZod,
+      resolver,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -759,7 +763,8 @@ describe('zodGenerator — Operation', () => {
 
   test.each(operations)('$name', async (props) => {
     const options: PluginZod['resolvedOptions'] = { ...defaultOptions, ...props.options }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: props.name })
 
     await renderGeneratorOperation(zodGenerator, props.node, {
@@ -768,7 +773,7 @@ describe('zodGenerator — Operation', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
 
     await matchFiles(driver.fileManager.files, props.name)
@@ -786,7 +791,8 @@ describe('zodGenerator — transformers', () => {
         return node
       },
     }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod, macros: [removeOptionalProperties] })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver, macros: [removeOptionalProperties] })
     const driver = createMockedPluginDriver({ name: 'transformers removeOptionalProperties' })
 
     await renderGeneratorSchema(zodGenerator, objectSchema, {
@@ -795,7 +801,7 @@ describe('zodGenerator — transformers', () => {
       driver,
       plugin,
       options: defaultOptions,
-      resolver: resolverZod,
+      resolver,
     })
 
     await matchFiles(driver.fileManager.files, 'transformers removeOptionalProperties')
@@ -809,7 +815,8 @@ describe('zodGenerator — transformers', () => {
         return node
       },
     }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod, macros: [integerToString] })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver, macros: [integerToString] })
     const driver = createMockedPluginDriver({ name: 'transformers integerToString' })
 
     const schemaWithInteger = ast.factory.createSchema({
@@ -829,7 +836,7 @@ describe('zodGenerator — transformers', () => {
       driver,
       plugin,
       options: defaultOptions,
-      resolver: resolverZod,
+      resolver,
     })
 
     await matchFiles(driver.fileManager.files, 'transformers integerToString')
@@ -865,7 +872,8 @@ describe('zodGenerator — inferred aliases', () => {
   }
 
   async function renderSchema(node: ast.SchemaNode, options: PluginZod['resolvedOptions']) {
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: `alias-${node.name}` })
     await renderGeneratorSchema(zodGenerator, node, {
       config: testConfig,
@@ -873,13 +881,14 @@ describe('zodGenerator — inferred aliases', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
     return rawSources(driver.fileManager.files)[0]
   }
 
   async function renderOperation(node: ast.OperationNode, options: PluginZod['resolvedOptions']) {
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: `alias-${node.operationId}` })
     await renderGeneratorOperation(zodGenerator, node, {
       config: testConfig,
@@ -887,7 +896,7 @@ describe('zodGenerator — inferred aliases', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
     return rawSources(driver.fileManager.files)[0]
   }
@@ -983,7 +992,8 @@ describe('zodGenerator — Type Guards', () => {
 
   test('typeGuards: true generates both is* and assert*', async () => {
     const options: PluginZod['resolvedOptions'] = { ...defaultOptions, typeGuards: true }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'typeguards-true' })
 
     await renderGeneratorSchema(zodGenerator, testSchema, {
@@ -992,7 +1002,7 @@ describe('zodGenerator — Type Guards', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
 
     const source = rawSources(driver.fileManager.files)[0]
@@ -1005,7 +1015,8 @@ describe('zodGenerator — Type Guards', () => {
 
   test('typeGuards: { is: true, assert: false } generates only is*', async () => {
     const options: PluginZod['resolvedOptions'] = { ...defaultOptions, typeGuards: { is: true, assert: false } }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'typeguards-is-only' })
 
     await renderGeneratorSchema(zodGenerator, testSchema, {
@@ -1014,7 +1025,7 @@ describe('zodGenerator — Type Guards', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
 
     const source = rawSources(driver.fileManager.files)[0]
@@ -1025,7 +1036,8 @@ describe('zodGenerator — Type Guards', () => {
 
   test('typeGuards: { is: false, assert: true } generates only assert*', async () => {
     const options: PluginZod['resolvedOptions'] = { ...defaultOptions, typeGuards: { is: false, assert: true } }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'typeguards-assert-only' })
 
     await renderGeneratorSchema(zodGenerator, testSchema, {
@@ -1034,7 +1046,7 @@ describe('zodGenerator — Type Guards', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
 
     const source = rawSources(driver.fileManager.files)[0]
@@ -1045,7 +1057,8 @@ describe('zodGenerator — Type Guards', () => {
 
   test('typeGuards with inferred: true narrows to inferred type alias', async () => {
     const options: PluginZod['resolvedOptions'] = { ...defaultOptions, typeGuards: true, inferred: true }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'typeguards-inferred' })
 
     await renderGeneratorSchema(zodGenerator, testSchema, {
@@ -1054,7 +1067,7 @@ describe('zodGenerator — Type Guards', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
 
     const source = rawSources(driver.fileManager.files)[0]
@@ -1066,7 +1079,8 @@ describe('zodGenerator — Type Guards', () => {
 
   test('typeGuards with mini: true uses z.validate and z.parse', async () => {
     const options: PluginZod['resolvedOptions'] = { ...defaultOptions, typeGuards: true, mini: true, importPath: 'zod/mini' }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'typeguards-mini' })
 
     await renderGeneratorSchema(zodGenerator, testSchema, {
@@ -1075,7 +1089,7 @@ describe('zodGenerator — Type Guards', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
 
     const source = rawSources(driver.fileManager.files)[0]
@@ -1090,7 +1104,8 @@ describe('zodGenerator — Type Guards', () => {
 describe('zodGenerator — Compile Option', () => {
   test('compile option wraps schema in z.compile', async () => {
     const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: true }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'compileSchema' })
 
     await renderGeneratorSchema(zodGenerator, objectSchema, {
@@ -1099,7 +1114,7 @@ describe('zodGenerator — Compile Option', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -1108,7 +1123,8 @@ describe('zodGenerator — Compile Option', () => {
 
   test('compile option in mini mode wraps schema in z.compile', async () => {
     const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: true, mini: true, importPath: 'zod/mini' }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'compileMiniSchema' })
 
     await renderGeneratorSchema(zodGenerator, objectSchema, {
@@ -1117,7 +1133,7 @@ describe('zodGenerator — Compile Option', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -1155,7 +1171,8 @@ describe('zodGenerator — Compile Option', () => {
     })
 
     const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: true }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'compileOperation' })
 
     await renderGeneratorOperation(zodGenerator, operationWithRefAndInline, {
@@ -1164,7 +1181,7 @@ describe('zodGenerator — Compile Option', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -1182,7 +1199,8 @@ describe('zodGenerator — Compile Option', () => {
 
   test('compile with { strict: true } wraps schema with { strict: true } option', async () => {
     const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: { strict: true } }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'compileStrictSchema' })
 
     await renderGeneratorSchema(zodGenerator, objectSchema, {
@@ -1191,7 +1209,7 @@ describe('zodGenerator — Compile Option', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
@@ -1217,7 +1235,8 @@ describe('zodGenerator — Compile Option', () => {
     })
 
     const options: PluginZod['resolvedOptions'] = { ...defaultOptions, compile: { strict: true } }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'compileStrictCyclic' })
 
     await renderGeneratorSchema(zodGenerator, cyclicNodeSchema, {
@@ -1226,7 +1245,7 @@ describe('zodGenerator — Compile Option', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
       meta: {
         circularNames: ['TreeNode'],
         enumNames: [],
@@ -1246,7 +1265,8 @@ describe('custom imports', () => {
 
   async function render(schema: ast.SchemaNode, options: Partial<PluginZod['resolvedOptions']>) {
     const resolved: PluginZod['resolvedOptions'] = { ...defaultOptions, ...options }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: resolved, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: resolved, resolver })
     const driver = createMockedPluginDriver({ name: 'customImports' })
 
     await renderGeneratorSchema(zodGenerator, schema, {
@@ -1255,7 +1275,7 @@ describe('custom imports', () => {
       driver,
       plugin,
       options: resolved,
-      resolver: resolverZod,
+      resolver,
     })
 
     return driver.fileManager.files

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "Operation name collisions": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "tsx",
+        "./operationsWithFetch/mcp/start.ts"
+      ]
+    }
+  }
+}

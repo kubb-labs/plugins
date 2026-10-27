@@ -1,7 +1,39 @@
 import { isSuccessStatusCode } from '@internals/shared'
 import { jsDocEscape, stringify } from '@internals/utils'
 import { ast, syncSchemaRef } from 'kubb/kit'
-import type { ResolverTs } from './types.ts'
+import { getEnumNames } from './components/Enum.tsx'
+import type { PluginTs, ResolverTs } from './types.ts'
+
+/**
+ * Renames inline enum declarations and their uses together.
+ */
+export function resolveInlineEnumNames({
+  node,
+  owner,
+  resolver,
+  enumOptions,
+}: {
+  node: ast.SchemaNode
+  owner: string
+  resolver: ResolverTs
+  enumOptions: PluginTs['resolvedOptions']['enum']
+}): ast.SchemaNode {
+  return ast.transform(node, {
+    schema(child) {
+      if (child === node || child.type !== 'enum' || !child.name) return
+      const name = resolver.resolveName({
+        key: ['enum', owner, child.pointer ?? child.name],
+        name: child.name,
+        normalize: (value) => {
+          // An `asConst` enum emits a value and a type alias, and the name has to be free as both.
+          const { enumName, typeName } = getEnumNames({ node: { ...child, name: value }, enum: enumOptions, resolver })
+          return enumOptions.type === 'literal' ? [typeName] : [enumName, typeName]
+        },
+      })
+      return name === child.name ? undefined : { ...child, name }
+    },
+  })
+}
 
 /**
  * Resolves the type name an enum schema is referenced by. An enum emitted as a `const` object
