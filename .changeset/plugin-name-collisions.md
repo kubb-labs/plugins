@@ -13,4 +13,4 @@
 '@kubb/plugin-mcp': patch
 ---
 
-Avoid duplicate exports when operations, components, or inline TypeScript enums produce the same name. Requires Kubb 5.14.4.
+Avoid duplicate exports when operations, components, or inline TypeScript enums produce the same name. Requires Kubb 5.14.5.

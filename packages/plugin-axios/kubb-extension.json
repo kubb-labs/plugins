@@ -20,7 +20,7 @@
   "dependencies": ["plugin-ts"],
   "optionalDependencies": ["plugin-zod"],
   "compatibility": {
-    "kubb": ">=5.14.4",
+    "kubb": ">=5.14.5",
     "node": ">=22.22"
   },
   "role": "client",
