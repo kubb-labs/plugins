@@ -1,9 +1,7 @@
-import { execFile } from 'node:child_process'
 import fs from 'node:fs/promises'
-import { createRequire } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { promisify } from 'node:util'
+import ts from '@typescript/typescript6'
 import { adapterOas } from '@kubb/adapter-oas'
 import { Hookable, createKubb } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
@@ -52,21 +50,15 @@ test.each(['', 'Api'])('keeps component, operation, and inline enum exports dist
     expect(factory).toContain('export function createCreateContainerBody3')
 
     const files = (await fs.readdir(output, { recursive: true })).filter((file) => file.endsWith('.ts')).map((file) => path.join(output, file))
-    const compiler = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')
-    await promisify(execFile)(process.execPath, [
-      compiler,
-      '--ignoreConfig',
-      '--noEmit',
-      '--skipLibCheck',
-      '--strict',
-      '--module',
-      'preserve',
-      '--moduleResolution',
-      'bundler',
-      '--target',
-      'es2022',
-      ...files,
-    ])
+    const program = ts.createProgram(files, {
+      noEmit: true,
+      skipLibCheck: true,
+      strict: true,
+      module: ts.ModuleKind.Preserve,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
+      target: ts.ScriptTarget.ES2022,
+    })
+    expect(ts.getPreEmitDiagnostics(program).map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'))).toEqual([])
   } finally {
     await fs.rm(output, { recursive: true, force: true })
   }
