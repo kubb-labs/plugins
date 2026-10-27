@@ -30,7 +30,8 @@ export const resolverVueQuery = createResolver<PluginVueQuery>({
   mutation: {
     ...createMutationResolver(),
     typeName(node) {
-      return capitalize(this.name(node.operationId))
+      const name = capitalize(this.name(node.operationId))
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
   },
 })

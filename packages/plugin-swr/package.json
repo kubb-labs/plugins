@@ -96,7 +96,7 @@
     "swr": "^2.5.1"
   },
   "peerDependencies": {
-    "kubb": "catalog:",
+    "kubb": "^5.15.0",
     "swr": "^2.2.0"
   },
   "peerDependenciesMeta": {

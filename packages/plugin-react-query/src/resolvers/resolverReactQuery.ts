@@ -33,18 +33,20 @@ export const resolverReactQuery = createResolver<PluginReactQuery>({
   mutation: {
     ...createMutationResolver(),
     optionsName(node) {
-      return `${this.name(node.operationId)}MutationOptions`
+      const name = `${this.name(node.operationId)}MutationOptions`
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
     typeName(node) {
-      return capitalize(this.name(node.operationId))
+      const name = capitalize(this.name(node.operationId))
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
   },
   hook: {
     optionsName() {
-      return 'HookOptions'
+      return this.resolveName({ key: ['hook', 'options'], name: 'HookOptions' })
     },
     customOptionsName() {
-      return 'getCustomHookOptions'
+      return this.resolveName({ key: ['hook', 'custom-options'], name: 'getCustomHookOptions' })
     },
   },
 })

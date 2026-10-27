@@ -21,7 +21,8 @@ export const resolverMcp = createResolver<PluginMcp>({
   },
   handler: {
     name(node) {
-      return this.name(node.operationId)
+      const name = this.name(node.operationId)
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
   },
 })

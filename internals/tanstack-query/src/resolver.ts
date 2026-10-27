@@ -45,19 +45,24 @@ export type MutationResolver = {
 export function createQueryResolver(variant: QueryVariant = ''): QueryResolver {
   return {
     name(node) {
-      return `use${capitalize(this.name(node.operationId))}${variant}`
+      const name = `use${capitalize(this.name(node.operationId))}${variant}`
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
     optionsName(node) {
-      return `${this.name(node.operationId)}${variant}QueryOptions`
+      const name = `${this.name(node.operationId)}${variant}QueryOptions`
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
     keyName(node) {
-      return `${this.name(node.operationId)}${variant}QueryKey`
+      const name = `${this.name(node.operationId)}${variant}QueryKey`
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
     keyTypeName(node) {
-      return `${capitalize(this.name(node.operationId))}${variant}QueryKey`
+      const name = `${capitalize(this.name(node.operationId))}${variant}QueryKey`
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
     clientName(node) {
-      return `${this.name(node.operationId)}${variant}`
+      const name = `${this.name(node.operationId)}${variant}`
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
   }
 }
@@ -75,10 +80,12 @@ export function createQueryResolver(variant: QueryVariant = ''): QueryResolver {
 export function createMutationResolver(): MutationResolver {
   return {
     name(node) {
-      return `use${capitalize(this.name(node.operationId))}`
+      const name = `use${capitalize(this.name(node.operationId))}`
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
     keyName(node) {
-      return `${this.name(node.operationId)}MutationKey`
+      const name = `${this.name(node.operationId)}MutationKey`
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
   }
 }

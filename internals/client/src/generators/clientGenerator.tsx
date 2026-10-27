@@ -41,9 +41,10 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
 
       const validatorHooks = buildValidatorHooks({ node, validator, zodResolver })
       const importedZodNames = validatorHooks.importedZodNames
+      const operationName = resolver.name(node.operationId)
 
       const meta = {
-        name: resolver.name(node.operationId),
+        name: resolver.resolveName({ key: ['operation', node.method, node.path, operationName], name: operationName }),
         file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
         fileTypes: resolveDependencyOperationFile({
           cache: ctx.cache,

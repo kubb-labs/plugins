@@ -5,9 +5,8 @@ import type { PluginTs } from '../types.ts'
 
 /**
  * Default resolver used by `@kubb/plugin-ts`. Decides the names and file paths
- * for every generated TypeScript type. Import this in other plugins that need
- * to reference the exact names `plugin-ts` produces without duplicating the
- * casing/file-layout rules.
+ * for generated TypeScript types. Other plugins should read the build's resolver
+ * through `driver.getResolver(pluginTsName)` to share its name allocations.
  *
  * The `default` helpers are supplied by `createResolver`. This plugin overrides the top-level `name`
  * to use PascalCase for value and type names and `file` to write PascalCase file paths (dotted names

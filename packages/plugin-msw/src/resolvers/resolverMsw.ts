@@ -24,10 +24,11 @@ export const resolverMsw = createResolver<PluginMsw>({
   },
   handler: {
     name(node) {
-      return this.name(node.operationId)
+      const name = this.name(node.operationId)
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
     listName() {
-      return 'handlers'
+      return this.resolveName({ key: ['handlers', 'list'], name: 'handlers' })
     },
   },
 })

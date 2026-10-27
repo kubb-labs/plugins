@@ -1,0 +1,45 @@
+openapi: 3.0.3
+info: { title: Operation name collisions, version: '1' }
+paths:
+  /pets/first:
+    get:
+      operationId: pet.list
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Pet' }
+  /pets/second:
+    get:
+      operationId: pet-list
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Pet' }
+  /pets/create-first:
+    post:
+      operationId: pet.create
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Pet' }
+  /pets/create-second:
+    post:
+      operationId: pet-create
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Pet' }
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        id: { type: integer }

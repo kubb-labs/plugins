@@ -24,13 +24,8 @@ function createTestCache(): NodeCache {
 }
 
 function createDriver() {
-  const getResolver = vi.fn(
-    () =>
-      ({
-        file: () => ast.factory.createFile({ path: '/root/getPetById.ts', baseName: 'getPetById.ts' as const }),
-        name: (name: string) => name,
-      }) as unknown as Resolver,
-  )
+  const resolver = createResolver({ pluginName: 'plugin-fetch', name: (name: string) => name, file: { path: () => '/root/getPetById.ts' } })
+  const getResolver = vi.fn(() => resolver)
   const getPlugin = vi.fn(() => ({ options: {} }))
   return { getPlugin, getResolver }
 }
