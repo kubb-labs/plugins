@@ -9,17 +9,12 @@ type Options = {
   suffix?: string
 }
 
-const separators = new Set(['-', '_', '.', '/', '\\', ':'])
-
 // shortcut: ASCII letters and digits only, as before; widen when non-ASCII names need casing
 const isUpper = (char = '') => char >= 'A' && char <= 'Z'
 const isLower = (char = '') => char >= 'a' && char <= 'z'
 const isDigit = (char = '') => char >= '0' && char <= '9'
 const isAlphanumeric = (char = '') => isUpper(char) || isLower(char) || isDigit(char)
-
-function isSeparator(char: string): boolean {
-  return separators.has(char) || char.trim() === ''
-}
+const isSeparator = (char: string) => '-_./\\:'.includes(char) || char.trim() === ''
 
 /**
  * Whether a new word starts at `index`: `petType`, `sensor2Reading`, `v2beta`, and `HTTPResponse` split,
@@ -28,15 +23,15 @@ function isSeparator(char: string): boolean {
 function isWordStart(text: string, index: number): boolean {
   const prev = text[index - 1]
   const char = text[index]
-  if (isDigit(prev) && isLower(char)) return true
-  if (!isUpper(char)) return false
-  if (isLower(prev) || isDigit(prev)) return true
-  return isUpper(prev) && isUpper(text[index - 2]) && isLower(text[index + 1]) && isLower(text[index + 2])
+  if (isUpper(char)) {
+    return isLower(prev) || isDigit(prev) || (isUpper(prev) && isUpper(text[index - 2]) && isLower(text[index + 1]) && isLower(text[index + 2]))
+  }
+  return isDigit(prev) && isLower(char)
 }
 
 function splitSegment(segment: string): Array<string> {
   // A segment without lowercase letters, such as `COOL` or `2D`, is already one word
-  if (![...segment].some((char) => isLower(char))) return [segment]
+  if (![...segment].some(isLower)) return [segment]
 
   const parts: Array<string> = []
   let start = 0
@@ -55,21 +50,16 @@ function splitSegment(segment: string): Array<string> {
  * changes nothing.
  */
 function words(text: string): Array<string> {
-  const result: Array<string> = []
-  let segment = ''
-  for (const char of `${text} `) {
-    if (!isSeparator(char)) {
-      segment += char
-      continue
-    }
-    if (segment) result.push(...splitSegment(segment))
-    segment = ''
-  }
-  return result
+  return [...text]
+    .map((char) => (isSeparator(char) ? ' ' : char))
+    .join('')
+    .split(' ')
+    .filter(Boolean)
+    .flatMap(splitSegment)
 }
 
 function stripNonAlphanumeric(text: string): string {
-  return [...text].filter((char) => isAlphanumeric(char)).join('')
+  return [...text].filter(isAlphanumeric).join('')
 }
 
 /**
