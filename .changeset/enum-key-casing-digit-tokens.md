@@ -2,4 +2,13 @@
 '@kubb/plugin-ts': patch
 ---
 
-Keep digit-letter tokens such as `2D` and `3RD` together when `enum.keyCasing` is `snakeCase` or `screamingSnakeCase`. `COOL_2D_DRAWING` now stays `COOL_2D_DRAWING` instead of becoming `COOL_2_D_DRAWING`, and `sensor2Reading` still becomes `SENSOR2_READING`.
+`enum.keyCasing: 'snakeCase'` and `'screamingSnakeCase'` now split enum keys into words the same way `camelCase` and `pascalCase` do. Keys that are already in the target casing stay unchanged.
+
+| Key                | Before              | After              |
+| ------------------ | ------------------- | ------------------ |
+| `COOL_2D_DRAWING`  | `COOL_2_D_DRAWING`  | `COOL_2D_DRAWING`  |
+| `RANKED_3RD_PLACE` | `RANKED_3_RD_PLACE` | `RANKED_3RD_PLACE` |
+| `HTTPResponse`     | `HTTPRESPONSE`      | `HTTP_RESPONSE`    |
+| `pets/{id}:list`   | `PETSIDLIST`        | `PETS_ID_LIST`     |
+
+The enum values stay the same.

@@ -9,28 +9,85 @@ type Options = {
   suffix?: string
 }
 
+const separators = new Set(['-', '_', '.', '/', '\\', ':'])
+
+// shortcut: ASCII letters and digits only, as before; widen when non-ASCII names need casing
+const isUpper = (char = '') => char >= 'A' && char <= 'Z'
+const isLower = (char = '') => char >= 'a' && char <= 'z'
+const isDigit = (char = '') => char >= '0' && char <= '9'
+const isAlphanumeric = (char = '') => isUpper(char) || isLower(char) || isDigit(char)
+
+function isSeparator(char: string): boolean {
+  return separators.has(char) || char.trim() === ''
+}
+
+/**
+ * Whether a new word starts at `index`: `petType`, `sensor2Reading`, `v2beta`, and `HTTPResponse` split,
+ * while `IDs` and `OAuth` stay whole.
+ */
+function isWordStart(text: string, index: number): boolean {
+  const prev = text[index - 1]
+  const char = text[index]
+  if (isDigit(prev) && isLower(char)) return true
+  if (!isUpper(char)) return false
+  if (isLower(prev) || isDigit(prev)) return true
+  return isUpper(prev) && isUpper(text[index - 2]) && isLower(text[index + 1]) && isLower(text[index + 2])
+}
+
+function splitSegment(segment: string): Array<string> {
+  // A segment without lowercase letters, such as `COOL` or `2D`, is already one word
+  if (![...segment].some((char) => isLower(char))) return [segment]
+
+  const parts: Array<string> = []
+  let start = 0
+  for (let index = 1; index < segment.length; index++) {
+    if (!isWordStart(segment, index)) continue
+    parts.push(segment.slice(start, index))
+    start = index
+  }
+  parts.push(segment.slice(start))
+  return parts
+}
+
+/**
+ * Splits `text` into words on separators (whitespace, hyphens, underscores, dots, slashes, colons)
+ * and on case boundaries. Every casing shares it, so converting to the casing a name is already in
+ * changes nothing.
+ */
+function words(text: string): Array<string> {
+  const result: Array<string> = []
+  let segment = ''
+  for (const char of `${text} `) {
+    if (!isSeparator(char)) {
+      segment += char
+      continue
+    }
+    if (segment) result.push(...splitSegment(segment))
+    segment = ''
+  }
+  return result
+}
+
+function stripNonAlphanumeric(text: string): string {
+  return [...text].filter((char) => isAlphanumeric(char)).join('')
+}
+
 /**
  * Shared implementation for camelCase and PascalCase conversion.
- * Splits on common word boundaries (spaces, hyphens, underscores, dots, slashes, colons)
- * and capitalizes each word according to `pascal`.
+ * Capitalizes each word from {@link words} according to `pascal`.
  *
  * When `pascal` is `true` the first word is also capitalized (PascalCase), otherwise only subsequent words are.
  */
 function convert(text: string, pascal: boolean): string {
-  return text
-    .trim()
-    .replace(/([a-z\d])([A-Z])/g, '$1 $2')
-    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
-    .replace(/(\d)([a-z])/g, '$1 $2')
-    .split(/[\s\-_./\\:]+/)
-    .filter(Boolean)
-    .map((word, i) => {
-      if (word.length > 1 && word === word.toUpperCase()) return word
-      const head = i === 0 && !pascal ? word.charAt(0).toLowerCase() : word.charAt(0).toUpperCase()
-      return head + word.slice(1)
-    })
-    .join('')
-    .replace(/[^a-zA-Z0-9]/g, '')
+  return stripNonAlphanumeric(
+    words(text)
+      .map((word, i) => {
+        if (word.length > 1 && word === word.toUpperCase()) return word
+        const head = i === 0 && !pascal ? word.charAt(0).toLowerCase() : word.charAt(0).toUpperCase()
+        return head + word.slice(1)
+      })
+      .join(''),
+  )
 }
 
 // Plugins resolve the same names over and over (about 47,000 calls for a 1,000 schema spec), so
@@ -96,15 +153,8 @@ export function capitalize(text: string): string {
  * `snakeCase('Hello-World') // 'hello_world'`
  */
 export function snakeCase(text: string, { prefix = '', suffix = '' }: Options = {}): string {
-  const processed = `${prefix} ${text} ${suffix}`.trim()
-  // After a digit, only `2Reading` starts a new word, so `2D` and `3RD` stay together
-  return processed
-    .replace(/([a-z])([A-Z])/g, '$1_$2')
-    .replace(/(\d)([A-Z][a-z])/g, '$1_$2')
-    .replace(/[\s\-.]+/g, '_')
-    .replace(/[^a-zA-Z0-9_]/g, '')
-    .toLowerCase()
-    .split('_')
+  return words(`${prefix} ${text} ${suffix}`)
+    .map((word) => stripNonAlphanumeric(word).toLowerCase())
     .filter(Boolean)
     .join('_')
 }
