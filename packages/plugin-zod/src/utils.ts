@@ -96,6 +96,50 @@ export function isObjectComposableIntersection(node: ast.SchemaNode, cyclicSchem
   return !!first && isObjectSchemaNode(first, cyclicSchemas) && rest.every(isPlainInlineObject)
 }
 
+export function preserveRequiredProperties(members: Array<ast.SchemaNode>): Array<ast.SchemaNode> {
+  const hasRequiredProperty = ({
+    node,
+    propertyName,
+    seen = new Set<ast.SchemaNode>(),
+  }: {
+    node: ast.SchemaNode
+    propertyName: string
+    seen?: Set<ast.SchemaNode>
+  }): boolean => {
+    if (seen.has(node)) return false
+    seen.add(node)
+    const resolved = syncSchemaRef(node)
+    const composition = ast.narrowSchema(resolved, ast.schemaTypes.intersection) ?? ast.narrowSchema(resolved, ast.schemaTypes.union)
+    // Property lookup skips unions, but a single-member union prints as its member.
+    if (composition) {
+      if (composition.type === ast.schemaTypes.union && composition.members?.length !== 1) return false
+      return composition.members?.some((child) => hasRequiredProperty({ node: child, propertyName, seen })) ?? false
+    }
+    return ast
+      .resolveSchemaProperties({ node: resolved, propertyName })
+      .some((property) => property.required !== false && !property.schema.optional && !property.schema.nullish)
+  }
+
+  return members.map((member, index) => {
+    const object = ast.narrowSchema(member, ast.schemaTypes.object)
+    if (!object || index === 0) return member
+
+    return {
+      ...object,
+      properties: object.properties.map((property) => {
+        const required = members.slice(0, index).some((base) => hasRequiredProperty({ node: base, propertyName: property.name }))
+        if (!required) return property
+
+        return {
+          ...property,
+          required: true,
+          schema: { ...property.schema, optional: false, nullish: false, nullable: property.schema.nullable || property.schema.nullish },
+        }
+      }),
+    }
+  })
+}
+
 /**
  * Format a default value as a code-level literal.
  * Arrays and objects keep their contents as a JSON literal, primitives become their string
