@@ -98,7 +98,7 @@ export function capitalize(text: string): string {
 export function snakeCase(text: string, { prefix = '', suffix = '' }: Options = {}): string {
   const processed = `${prefix} ${text} ${suffix}`.trim()
   return processed
-    .replace(/([a-z])([A-Z])/g, '$1_$2')
+    .replace(/([a-z\d])([A-Z])/g, '$1_$2')
     .replace(/[\s\-.]+/g, '_')
     .replace(/[^a-zA-Z0-9_]/g, '')
     .toLowerCase()
