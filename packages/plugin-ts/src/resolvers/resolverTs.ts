@@ -32,7 +32,7 @@ export const resolverTs = createResolver<PluginTs>({
     ...createOperationResponseResolver(),
     options(node) {
       const name = this.name(`${node.operationId} Options`)
-      return this.resolveName({ key: ['operation', node.method, node.path, 'response', 'options', name], name })
+      return this.resolveName({ node, scope: ['response', 'options'], name })
     },
   },
   enum: {

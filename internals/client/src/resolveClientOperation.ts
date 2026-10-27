@@ -91,7 +91,7 @@ export function resolveClientOperation(options: {
     const name = resolver.name(node.operationId)
 
     return {
-      name: resolver.resolveName({ key: ['operation', node.method, node.path, name], name }),
+      name: resolver.resolveName({ node, name }),
       path: file.path,
       clientPath: importPath === undefined ? path.resolve(root, '.kubb/client.ts') : resolveImportPath({ importPath, operationFile: file.path }),
       clientPathIsFile: importPath === undefined || isRelativeImport(importPath),

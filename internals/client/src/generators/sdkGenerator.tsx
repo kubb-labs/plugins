@@ -74,7 +74,7 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
     const validatorHooks = zodResolver ? buildValidatorHooks({ node, validator, zodResolver }) : null
 
     const name = resolver.name(node.operationId)
-    return { node, name: resolver.resolveName({ key: ['operation', node.method, node.path, name], name }), types, typeFile, zodFile, validatorHooks, security }
+    return { node, name: resolver.resolveName({ node, name }), types, typeFile, zodFile, validatorHooks, security }
   }
 
   return nodes.reduce((acc, operationNode) => {

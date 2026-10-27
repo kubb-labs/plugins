@@ -42,19 +42,19 @@ export function createOperationParamResolver(): OperationParamResolver {
   return {
     name(node, param) {
       const name = this.name(`${node.operationId} ${param.in} ${param.name}`)
-      return this.resolveName({ key: ['operation', node.method, node.path, 'param', 'name', param.in, param.name, name], name })
+      return this.resolveName({ node, scope: ['param', 'name', param.in, param.name], name })
     },
     path(node) {
       const name = this.name(`${node.operationId} Path`)
-      return this.resolveName({ key: ['operation', node.method, node.path, 'param', 'path', name], name })
+      return this.resolveName({ node, scope: ['param', 'path'], name })
     },
     query(node) {
       const name = this.name(`${node.operationId} Query`)
-      return this.resolveName({ key: ['operation', node.method, node.path, 'param', 'query', name], name })
+      return this.resolveName({ node, scope: ['param', 'query'], name })
     },
     headers(node) {
       const name = this.name(`${node.operationId} Headers`)
-      return this.resolveName({ key: ['operation', node.method, node.path, 'param', 'headers', name], name })
+      return this.resolveName({ node, scope: ['param', 'headers'], name })
     },
   }
 }
@@ -73,19 +73,19 @@ export function createOperationResponseResolver(): OperationResponseResolver {
   return {
     status(node, statusCode) {
       const name = this.name(`${node.operationId} Status ${statusCode}`)
-      return this.resolveName({ key: ['operation', node.method, node.path, 'response', 'status', String(statusCode), name], name })
+      return this.resolveName({ node, scope: ['response', 'status', statusCode], name })
     },
     body(node) {
       const name = this.name(`${node.operationId} Body`)
-      return this.resolveName({ key: ['operation', node.method, node.path, 'response', 'body', name], name })
+      return this.resolveName({ node, scope: ['response', 'body'], name })
     },
     responses(node) {
       const name = this.name(`${node.operationId} Responses`)
-      return this.resolveName({ key: ['operation', node.method, node.path, 'response', 'responses', name], name })
+      return this.resolveName({ node, scope: ['response', 'responses'], name })
     },
     response(node) {
       const name = this.name(`${node.operationId} Response`)
-      return this.resolveName({ key: ['operation', node.method, node.path, 'response', 'response', name], name })
+      return this.resolveName({ node, scope: ['response', 'response'], name })
     },
   }
 }

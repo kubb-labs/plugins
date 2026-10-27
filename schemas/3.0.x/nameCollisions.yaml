@@ -10,6 +10,12 @@ paths:
             schema: { $ref: '#/components/schemas/CreateContainerBody' }
       responses:
         '200': { description: OK }
+  /pets:
+    post:
+      operationId: createPet
+      requestBody: { $ref: '#/components/requestBodies/CreatePetBody' }
+      responses:
+        '200': { description: OK }
   /auth:
     post:
       operationId: provider.auth
@@ -20,6 +26,14 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ProviderAuthError' }
 components:
+  requestBodies:
+    CreatePetBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name: { type: string }
   schemas:
     MitigationActionEnumKey:
       type: string

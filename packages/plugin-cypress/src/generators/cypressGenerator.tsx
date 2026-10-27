@@ -26,7 +26,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     const name = resolver.name(node.operationId)
 
     const meta = {
-      name: resolver.resolveName({ key: ['operation', node.method, node.path, name], name }),
+      name: resolver.resolveName({ node, name }),
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
       fileTs: resolveDependencyOperationFile({
         cache: ctx.cache,

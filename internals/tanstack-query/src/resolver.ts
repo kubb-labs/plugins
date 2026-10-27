@@ -46,23 +46,23 @@ export function createQueryResolver(variant: QueryVariant = ''): QueryResolver {
   return {
     name(node) {
       const name = `use${capitalize(this.name(node.operationId))}${variant}`
-      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
+      return this.resolveName({ node, name })
     },
     optionsName(node) {
       const name = `${this.name(node.operationId)}${variant}QueryOptions`
-      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
+      return this.resolveName({ node, name })
     },
     keyName(node) {
       const name = `${this.name(node.operationId)}${variant}QueryKey`
-      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
+      return this.resolveName({ node, name })
     },
     keyTypeName(node) {
       const name = `${capitalize(this.name(node.operationId))}${variant}QueryKey`
-      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
+      return this.resolveName({ node, name })
     },
     clientName(node) {
       const name = `${this.name(node.operationId)}${variant}`
-      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
+      return this.resolveName({ node, name })
     },
   }
 }
@@ -81,11 +81,11 @@ export function createMutationResolver(): MutationResolver {
   return {
     name(node) {
       const name = `use${capitalize(this.name(node.operationId))}`
-      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
+      return this.resolveName({ node, name })
     },
     keyName(node) {
       const name = `${this.name(node.operationId)}MutationKey`
-      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
+      return this.resolveName({ node, name })
     },
   }
 }

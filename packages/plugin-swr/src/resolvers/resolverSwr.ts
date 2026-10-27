@@ -28,11 +28,11 @@ export const resolverSwr = createResolver<PluginSwr>({
     ...createMutationResolver(),
     keyTypeName(node) {
       const name = `${capitalize(this.name(node.operationId))}MutationKey`
-      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
+      return this.resolveName({ node, name })
     },
     argTypeName(node) {
       const name = `${capitalize(this.name(node.operationId))}MutationArg`
-      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
+      return this.resolveName({ node, name })
     },
   },
 })
