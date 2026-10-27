@@ -24,7 +24,7 @@ describe('resolveInlineEnumNames', () => {
     expect(resolver.resolveName({ key: 'later', name: 'statusEnum3' })).toBe('statusEnum32')
   })
 
-  it('rechecks the alias after a runtime name collision', () => {
+  it('skips names taken by either the enum value or its type alias', () => {
     const resolver = Resolver.merge(resolverTs)
     resolver.reserveNames(['statusEnum', 'StatusEnum2Key'])
     const node = ast.factory.createSchema({
@@ -39,7 +39,8 @@ describe('resolveInlineEnumNames', () => {
       resolver,
       enumOptions: { type: 'asConst', typeSuffix: 'Key', constCasing: 'camelCase', keyCasing: 'none' },
     })
-    expect(resolved).toMatchObject({ properties: [{ schema: { name: 'StatusEnum22' } }] })
+    // `StatusEnum` is taken as a value and `StatusEnum2` as a type alias.
+    expect(resolved).toMatchObject({ properties: [{ schema: { name: 'StatusEnum3' } }] })
   })
 })
 
