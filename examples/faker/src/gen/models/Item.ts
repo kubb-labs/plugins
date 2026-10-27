@@ -11,7 +11,7 @@ export type Item = {
    */
   name: string
   /**
-   * @minLength 5
+   * @minimum 5
    * @type number
    */
   price: number
