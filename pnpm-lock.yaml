@@ -1186,9 +1186,6 @@ importers:
       '@faker-js/faker':
         specifier: ^10.6.0
         version: 10.6.0
-      '@typescript/typescript6':
-        specifier: ^6.0.2
-        version: 6.0.2
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
