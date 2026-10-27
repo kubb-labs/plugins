@@ -64,12 +64,14 @@ describe('casing', () => {
     expect(snakeCase('is HTML test')).toBe('is_html_test')
     expect(snakeCase('description')).toBe('description')
     expect(snakeCase('PetType')).toBe('pet_type')
+    expect(snakeCase('sensor2Reading')).toBe('sensor2_reading')
     expect(snakeCase('tag', { prefix: 'create' })).toBe('create_tag')
     expect(snakeCase('tag', { suffix: 'schema' })).toBe('tag_schema')
   })
 
   test('screamingSnakeCase', () => {
     expect(screamingSnakeCase('petPet')).toBe('PET_PET')
+    expect(screamingSnakeCase('sensor2Reading')).toBe('SENSOR2_READING')
     expect(screamingSnakeCase('tag', { prefix: 'create' })).toBe('CREATE_TAG')
     expect(screamingSnakeCase('tag', { suffix: 'schema' })).toBe('TAG_SCHEMA')
   })
