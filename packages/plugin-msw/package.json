@@ -101,7 +101,7 @@
     "msw": "^3.0.3"
   },
   "peerDependencies": {
-    "kubb": "^5.14.5",
+    "kubb": "^5.14.6",
     "msw": "^3.0.0"
   },
   "peerDependenciesMeta": {
