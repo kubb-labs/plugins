@@ -1,5 +1,23 @@
 # @kubb/plugin-zod
 
+## 5.7.3
+
+### Patch Changes
+
+- [#1288](https://github.com/kubb-labs/plugins/pull/1288) [`9d2d786`](https://github.com/kubb-labs/plugins/commit/9d2d786c59208fd9c80dbf303be70ff45649503d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Avoid duplicate exports when operations, components, or inline TypeScript enums produce the same name. Requires Kubb 5.14.6.
+
+- [#1287](https://github.com/kubb-labs/plugins/pull/1287) [`758aec3`](https://github.com/kubb-labs/plugins/commit/758aec3d5b4044de9e1d2981c3c02ea1955cd143) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Preserve required properties when later `allOf` members narrow them without repeating `required`, in both Zod and Zod Mini schemas.
+
+- [#1276](https://github.com/kubb-labs/plugins/pull/1276) [`11389cd`](https://github.com/kubb-labs/plugins/commit/11389cd80f2dae489ba7dfc6df2b4843f6e6ee69) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Accept sibling properties in `oneOf` objects and preserve parent `required` keys with Kubb 5.14.3, including with Zod Mini.
+
+- [#1254](https://github.com/kubb-labs/plugins/pull/1254) [`df86551`](https://github.com/kubb-labs/plugins/commit/df86551b33bac4aa83430cb4ff72c6f47bd090c2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - A `pattern` that uses `\p{...}`, `\P{...}` or `\u{...}`, or holds a character outside the BMP, is now emitted with the `u` flag.
+
+- [#1273](https://github.com/kubb-labs/plugins/pull/1273) [`44bee8e`](https://github.com/kubb-labs/plugins/commit/44bee8e50f4f46935957e9b53614a789e402c8d0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Preserve array and object `const` values as literal types, Zod schemas, and mock values, including nested arrays and objects.
+
+- [#1278](https://github.com/kubb-labs/plugins/pull/1278) [`aa8b947`](https://github.com/kubb-labs/plugins/commit/aa8b947f15c459ff4d3068c5853e999b05fda7c9) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix strict TypeScript errors in nullable recursive object schemas by annotating recursive reference and array getters.
+
+- [#1270](https://github.com/kubb-labs/plugins/pull/1270) [`754fac6`](https://github.com/kubb-labs/plugins/commit/754fac619734a3edcaea3fbd7b7fd07c1b34243a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Enforce `minProperties` and `maxProperties` on input objects in Zod and Zod Mini schemas.
+
 ## 5.7.2
 
 ### Patch Changes

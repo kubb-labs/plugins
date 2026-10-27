@@ -1,5 +1,16 @@
 # @kubb/plugin-msw
 
+## 6.0.2
+
+### Patch Changes
+
+- [#1271](https://github.com/kubb-labs/plugins/pull/1271) [`fe8d315`](https://github.com/kubb-labs/plugins/commit/fe8d31561ab0c7100b818b6b6c1af071bebc8da5) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix MSW handlers failing to typecheck when a request body resolves to `unknown`.
+
+- [#1288](https://github.com/kubb-labs/plugins/pull/1288) [`9d2d786`](https://github.com/kubb-labs/plugins/commit/9d2d786c59208fd9c80dbf303be70ff45649503d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Avoid duplicate exports when operations, components, or inline TypeScript enums produce the same name. Requires Kubb 5.14.6.
+- Updated dependencies [[`5f6fd2e`](https://github.com/kubb-labs/plugins/commit/5f6fd2eb125d5976a369403934c46c0ef192983e), [`11c257f`](https://github.com/kubb-labs/plugins/commit/11c257f6b44e31432ff43338e4f5692482b6611d), [`379a99b`](https://github.com/kubb-labs/plugins/commit/379a99b7fe2c8ab37fe1a223649b540cbfafd336), [`7d06de7`](https://github.com/kubb-labs/plugins/commit/7d06de754aa08fd2a767fd14463d26131ff3a93f), [`9d2d786`](https://github.com/kubb-labs/plugins/commit/9d2d786c59208fd9c80dbf303be70ff45649503d), [`cbcac52`](https://github.com/kubb-labs/plugins/commit/cbcac52e9e8f1b6fa65b871c68ea1d5a6b15f761), [`fa27169`](https://github.com/kubb-labs/plugins/commit/fa27169ee15653a3cfd58f89ec30028bb96eb54c), [`6c53ce3`](https://github.com/kubb-labs/plugins/commit/6c53ce350efbca1cfc0836a41e9d297b3f7ff1af), [`cc0a2af`](https://github.com/kubb-labs/plugins/commit/cc0a2af243030248e9735f180561b7bc0c60e6df), [`df86551`](https://github.com/kubb-labs/plugins/commit/df86551b33bac4aa83430cb4ff72c6f47bd090c2), [`d6e69b2`](https://github.com/kubb-labs/plugins/commit/d6e69b2f098351924f53e9ea3f6d7ac5e3cca4a9), [`44bee8e`](https://github.com/kubb-labs/plugins/commit/44bee8e50f4f46935957e9b53614a789e402c8d0)]:
+  - @kubb/plugin-faker@5.2.2
+  - @kubb/plugin-ts@5.3.0
+
 ## 6.0.1
 
 ### Patch Changes
