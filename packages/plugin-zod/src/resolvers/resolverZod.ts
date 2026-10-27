@@ -49,11 +49,11 @@ export const resolverZod = createResolver<PluginZod>({
     ...createOperationResponseResolver(),
     error(node) {
       const name = this.name(`${node.operationId} Error`)
-      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
     options(node) {
       const name = this.schema.type(this.name(`${node.operationId} Options`))
-      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
   },
 })

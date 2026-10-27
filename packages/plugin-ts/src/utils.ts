@@ -11,7 +11,7 @@ export function resolveInlineEnumNames({ node, owner, resolver }: { node: ast.Sc
     schema(child) {
       if (child === node || child.type !== 'enum' || !child.name) return
       const name = resolver.resolveName({
-        key: JSON.stringify(['enum', owner, child.pointer ?? child.name]),
+        key: ['enum', owner, child.pointer ?? child.name],
         name: child.name,
         normalize: (name) => resolver.name(name),
       })

@@ -38,7 +38,7 @@ export type OperationResponseResolver = {
  */
 function operationParamName(this: Resolver, node: ast.OperationNode, param: ast.ParameterNode): string {
   const name = this.name(`${node.operationId} ${param.in} ${param.name}`)
-  return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
+  return this.resolveName({ key: ['operation', node.method, node.path, name], name })
 }
 
 /**
@@ -55,15 +55,15 @@ export function createOperationParamResolver(): OperationParamResolver {
     name: operationParamName,
     path(node) {
       const name = this.name(`${node.operationId} Path`)
-      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
     query(node) {
       const name = this.name(`${node.operationId} Query`)
-      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
     headers(node) {
       const name = this.name(`${node.operationId} Headers`)
-      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
   }
 }
@@ -82,19 +82,19 @@ export function createOperationResponseResolver(): OperationResponseResolver {
   return {
     status(node, statusCode) {
       const name = this.name(`${node.operationId} Status ${statusCode}`)
-      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
     body(node) {
       const name = this.name(`${node.operationId} Body`)
-      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
     responses(node) {
       const name = this.name(`${node.operationId} Responses`)
-      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
     response(node) {
       const name = this.name(`${node.operationId} Response`)
-      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
+      return this.resolveName({ key: ['operation', node.method, node.path, name], name })
     },
   }
 }
