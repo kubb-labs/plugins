@@ -1,5 +1,15 @@
 # @kubb/plugin-cypress
 
+## 5.1.2
+
+### Patch Changes
+
+- [#1288](https://github.com/kubb-labs/plugins/pull/1288) [`9d2d786`](https://github.com/kubb-labs/plugins/commit/9d2d786c59208fd9c80dbf303be70ff45649503d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Avoid duplicate exports when operations, components, or inline TypeScript enums produce the same name. Requires Kubb 5.14.6.
+
+- [#1258](https://github.com/kubb-labs/plugins/pull/1258) [`e6b99b9`](https://github.com/kubb-labs/plugins/commit/e6b99b9ac8a0b965a881194b2ecc37f5921cfc38) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Prefix reserved-word operation names with `_` so generated functions and their references compile.
+- Updated dependencies [[`9d2d786`](https://github.com/kubb-labs/plugins/commit/9d2d786c59208fd9c80dbf303be70ff45649503d), [`cbcac52`](https://github.com/kubb-labs/plugins/commit/cbcac52e9e8f1b6fa65b871c68ea1d5a6b15f761), [`fa27169`](https://github.com/kubb-labs/plugins/commit/fa27169ee15653a3cfd58f89ec30028bb96eb54c), [`6c53ce3`](https://github.com/kubb-labs/plugins/commit/6c53ce350efbca1cfc0836a41e9d297b3f7ff1af), [`cc0a2af`](https://github.com/kubb-labs/plugins/commit/cc0a2af243030248e9735f180561b7bc0c60e6df), [`d6e69b2`](https://github.com/kubb-labs/plugins/commit/d6e69b2f098351924f53e9ea3f6d7ac5e3cca4a9), [`44bee8e`](https://github.com/kubb-labs/plugins/commit/44bee8e50f4f46935957e9b53614a789e402c8d0)]:
+  - @kubb/plugin-ts@5.3.0
+
 ## 5.1.1
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @kubb/plugin-mcp
 
+## 5.3.3
+
+### Patch Changes
+
+- [#1288](https://github.com/kubb-labs/plugins/pull/1288) [`9d2d786`](https://github.com/kubb-labs/plugins/commit/9d2d786c59208fd9c80dbf303be70ff45649503d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Avoid duplicate exports when operations, components, or inline TypeScript enums produce the same name. Requires Kubb 5.14.6.
+
+- [#1257](https://github.com/kubb-labs/plugins/pull/1257) [`d6e69b2`](https://github.com/kubb-labs/plugins/commit/d6e69b2f098351924f53e9ea3f6d7ac5e3cca4a9) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - A request body offered in several media types now pairs each body variant with its `contentType.request`. The first media type stays the default; any other variant must pass `contentType`, so sending the JSON body of a multipart-first operation as multipart is a type error.
+- Updated dependencies [[`9d2d786`](https://github.com/kubb-labs/plugins/commit/9d2d786c59208fd9c80dbf303be70ff45649503d), [`cbcac52`](https://github.com/kubb-labs/plugins/commit/cbcac52e9e8f1b6fa65b871c68ea1d5a6b15f761), [`fa27169`](https://github.com/kubb-labs/plugins/commit/fa27169ee15653a3cfd58f89ec30028bb96eb54c), [`6c53ce3`](https://github.com/kubb-labs/plugins/commit/6c53ce350efbca1cfc0836a41e9d297b3f7ff1af), [`758aec3`](https://github.com/kubb-labs/plugins/commit/758aec3d5b4044de9e1d2981c3c02ea1955cd143), [`11389cd`](https://github.com/kubb-labs/plugins/commit/11389cd80f2dae489ba7dfc6df2b4843f6e6ee69), [`cc0a2af`](https://github.com/kubb-labs/plugins/commit/cc0a2af243030248e9735f180561b7bc0c60e6df), [`df86551`](https://github.com/kubb-labs/plugins/commit/df86551b33bac4aa83430cb4ff72c6f47bd090c2), [`d6e69b2`](https://github.com/kubb-labs/plugins/commit/d6e69b2f098351924f53e9ea3f6d7ac5e3cca4a9), [`44bee8e`](https://github.com/kubb-labs/plugins/commit/44bee8e50f4f46935957e9b53614a789e402c8d0), [`aa8b947`](https://github.com/kubb-labs/plugins/commit/aa8b947f15c459ff4d3068c5853e999b05fda7c9), [`754fac6`](https://github.com/kubb-labs/plugins/commit/754fac619734a3edcaea3fbd7b7fd07c1b34243a)]:
+  - @kubb/plugin-ts@5.3.0
+  - @kubb/plugin-zod@5.7.3
+
 ## 5.3.2
 
 ### Patch Changes
