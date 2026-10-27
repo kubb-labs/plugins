@@ -2,7 +2,7 @@
 '@kubb/plugin-ts': patch
 ---
 
-`enum.keyCasing: 'snakeCase'` and `'screamingSnakeCase'` now split enum keys into words the same way `camelCase` and `pascalCase` do. Keys that are already in the target casing stay unchanged.
+With `enum.keyCasing: 'snakeCase'` or `'screamingSnakeCase'`, an enum key that is already in that casing now stays unchanged, and acronyms, slashes, and colons now split words.
 
 | Key                | Before              | After              |
 | ------------------ | ------------------- | ------------------ |
