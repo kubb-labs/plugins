@@ -309,16 +309,15 @@ describe(`plugin-react-query options ${version}`, () => {
       },
     ).safeBuild()
 
-    expect(files.length).toBeGreaterThan(0)
     expect(Diagnostics.hasError(diagnostics)).toBe(false)
 
-    for (const file of files) {
-      try {
-        const fileContent = await fs.readFile(file.path, 'utf-8')
-        await expect(fileContent).toMatchFileSnapshot(path.join(__dirname, '__snapshots__', 'pluginReactQuery', name, getRelativePath(output, file.path)))
-      } catch (e) {
-        if ((e as NodeJS.ErrnoException).code !== 'ENOENT') throw e
-      }
+    // Snapshot only this plugin's output. The plugins it builds on have their own suites.
+    const ownFiles = files.filter((file) => /^\.\/hooks\//.test(getRelativePath(output, file.path)))
+    expect(ownFiles.length).toBeGreaterThan(0)
+
+    for (const file of ownFiles) {
+      const fileContent = await fs.readFile(file.path, 'utf-8')
+      await expect(fileContent).toMatchFileSnapshot(path.join(__dirname, '__snapshots__', 'pluginReactQuery', name, getRelativePath(output, file.path)))
     }
 
     await fs.rm(tmpDir, { recursive: true, force: true })
