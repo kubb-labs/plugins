@@ -1,5 +1,20 @@
 # @kubb/plugin-ts
 
+## 5.3.2
+
+### Patch Changes
+
+- [#1296](https://github.com/kubb-labs/plugins/pull/1296) [`d2a971e`](https://github.com/kubb-labs/plugins/commit/d2a971e1a9312a028cfb0af4fd02c7e707580250) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - With `enum.keyCasing: 'snakeCase'` or `'screamingSnakeCase'`, an enum key that is already in that casing now stays unchanged, and acronyms, slashes, and colons now split words.
+  
+  | Key                | Before              | After              |
+  | ------------------ | ------------------- | ------------------ |
+  | `COOL_2D_DRAWING`  | `COOL_2_D_DRAWING`  | `COOL_2D_DRAWING`  |
+  | `RANKED_3RD_PLACE` | `RANKED_3_RD_PLACE` | `RANKED_3RD_PLACE` |
+  | `HTTPResponse`     | `HTTPRESPONSE`      | `HTTP_RESPONSE`    |
+  | `pets/{id}:list`   | `PETSIDLIST`        | `PETS_ID_LIST`     |
+  
+  The enum values stay the same.
+
 ## 5.3.1
 
 ### Patch Changes
