@@ -8,6 +8,6 @@ import { sedanTypeEnumSchema } from './sedanTypeEnumSchema'
 import { vehicleSchema } from './vehicleSchema'
 
 export const sedanSchema = vehicleSchema.extend({
-  type: sedanTypeEnumSchema.optional(),
+  type: sedanTypeEnumSchema,
   seats: z.int().optional().describe('Number of seats'),
 })

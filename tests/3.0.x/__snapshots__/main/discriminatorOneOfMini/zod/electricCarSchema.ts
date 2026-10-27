@@ -8,6 +8,6 @@ import { electricCarTypeEnumSchema } from './electricCarTypeEnumSchema'
 import { vehicleSchema } from './vehicleSchema'
 
 export const electricCarSchema = z.extend(vehicleSchema, {
-  type: z.optional(electricCarTypeEnumSchema),
+  type: electricCarTypeEnumSchema,
   batteryCapacity: z.optional(z.number()),
 })

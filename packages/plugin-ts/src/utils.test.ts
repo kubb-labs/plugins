@@ -124,12 +124,29 @@ describe('buildPropertyJSDocComments', () => {
     expect(buildPropertyJSDocComments(ast.factory.createSchema({ type: 'object', default: { note: '*/' } }))).toContain('@default {"note":"*\\/"}')
   })
 
-  it('does not emit @minLength/@maxLength for array schemas', () => {
+  it.each(['number', 'integer', 'bigint'] as const)('emits numeric bounds for %s schemas', (type) => {
+    const schema = ast.factory.createSchema({ type, min: 0, max: 30 })
+
+    expect(buildPropertyJSDocComments(schema)).toStrictEqual(['@minimum 0', '@maximum 30', `@type ${type}`])
+  })
+
+  it('emits length bounds for string schemas', () => {
+    const schema = ast.factory.createSchema({ type: 'string', min: 0, max: 30 })
+
+    expect(buildPropertyJSDocComments(schema)).toStrictEqual(['@minLength 0', '@maxLength 30', '@type string'])
+  })
+
+  it('does not emit bounds for unconstrained numeric schemas', () => {
+    const schema = ast.factory.createSchema({ type: 'integer' })
+
+    expect(buildPropertyJSDocComments(schema)).toStrictEqual([])
+  })
+
+  it('does not emit bounds for array schemas', () => {
     const schema = ast.factory.createSchema({ type: 'array', primitive: 'array', min: 1, max: 10 })
     const comments = buildPropertyJSDocComments(schema)
 
-    expect(comments).not.toContain('@minLength 1')
-    expect(comments).not.toContain('@maxLength 10')
+    expect(comments).toStrictEqual([])
   })
 
   it('emits format on a separate line when both description and format exist', () => {
