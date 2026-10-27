@@ -81,7 +81,7 @@
     "zod": "^4.6.7"
   },
   "peerDependencies": {
-    "kubb": "catalog:",
+    "kubb": "^5.15.0",
     "zod": "^4.0.0"
   },
   "peerDependenciesMeta": {

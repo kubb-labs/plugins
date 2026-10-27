@@ -8,9 +8,10 @@ import { adapterOas } from '@kubb/adapter-oas'
 import { Hookable, createKubb } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginFetch } from '@kubb/plugin-fetch'
+import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginTs, resolverTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
-import { type Config, Diagnostics, fsStorage, type KubbHooks } from 'kubb/kit'
+import { type Config, fsStorage, type KubbHooks } from 'kubb/kit'
 import { expect, test } from 'vitest'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -27,11 +28,16 @@ test.each(['', 'Api'])('keeps component, operation, and inline enum exports dist
         parsers: [parserTs()],
         reporters: [],
         storage: fsStorage(),
-        plugins: [pluginTs({ resolver: { name: (name) => `${prefix}${resolverTs.name(name)}` } }), pluginZod(), pluginFetch({ validator: 'zod' })],
+        plugins: [
+          pluginTs({ resolver: { name: (name) => `${prefix}${resolverTs.name(name)}` } }),
+          pluginZod(),
+          pluginFetch({ validator: 'zod' }),
+          pluginFaker(),
+        ],
       } as Config,
       { hooks: new Hookable<KubbHooks>() },
     ).safeBuild()
-    expect(diagnostics.filter(Diagnostics.isError)).toEqual([])
+    expect(diagnostics.filter((diagnostic) => diagnostic.severity === 'error')).toEqual([])
 
     const operation = await fs.readFile(path.join(output, 'types/CreateContainer.ts'), 'utf8')
     expect(operation).toContain(`export type ${prefix}CreateContainerBody3 = ${prefix}CreateContainerBody`)
@@ -42,6 +48,8 @@ test.each(['', 'Api'])('keeps component, operation, and inline enum exports dist
     expect(second).toContain('export const mitigationActionEnum2 =')
     const auth = await fs.readFile(path.join(output, 'zod/provider/authSchema.ts'), 'utf8')
     expect(auth).toContain('export const providerAuthErrorSchema2 =')
+    const factory = await fs.readFile(path.join(output, 'mocks/createCreateContainer.ts'), 'utf8')
+    expect(factory).toContain('export function createCreateContainerBody3')
 
     const files = (await fs.readdir(output, { recursive: true })).filter((file) => file.endsWith('.ts')).map((file) => path.join(output, file))
     const compiler = path.join(path.dirname(createRequire(import.meta.url).resolve('typescript/package.json')), 'bin/tsc')

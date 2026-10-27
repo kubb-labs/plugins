@@ -5,6 +5,10 @@ export function resolveOperationName(name: string): string {
   return ensureValidVarName(camelCase(name))
 }
 
+export function resolveOperationSchemaName({ node, name, resolver }: { node: ast.OperationNode; name: string; resolver: Resolver }): string {
+  return resolver.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
+}
+
 /**
  * The `param` namespace shared by the schema-producing plugins (ts, zod, faker):
  * per-parameter names plus the grouped `Path`/`Query`/`Headers` names, all routed
@@ -37,7 +41,7 @@ export type OperationResponseResolver = {
  * `operationParamName.call(resolver, node, param) // → 'DeletePetPathPetId'`
  */
 function operationParamName(this: Resolver, node: ast.OperationNode, param: ast.ParameterNode): string {
-  return this.name(`${node.operationId} ${param.in} ${param.name}`)
+  return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} ${param.in} ${param.name}`) })
 }
 
 /**
@@ -53,13 +57,13 @@ export function createOperationParamResolver(): OperationParamResolver {
   return {
     name: operationParamName,
     path(node) {
-      return this.name(`${node.operationId} Path`)
+      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Path`) })
     },
     query(node) {
-      return this.name(`${node.operationId} Query`)
+      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Query`) })
     },
     headers(node) {
-      return this.name(`${node.operationId} Headers`)
+      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Headers`) })
     },
   }
 }
@@ -77,16 +81,16 @@ export function createOperationParamResolver(): OperationParamResolver {
 export function createOperationResponseResolver(): OperationResponseResolver {
   return {
     status(node, statusCode) {
-      return this.name(`${node.operationId} Status ${statusCode}`)
+      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Status ${statusCode}`) })
     },
     body(node) {
-      return this.name(`${node.operationId} Body`)
+      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Body`) })
     },
     responses(node) {
-      return this.name(`${node.operationId} Responses`)
+      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Responses`) })
     },
     response(node) {
-      return this.name(`${node.operationId} Response`)
+      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Response`) })
     },
   }
 }

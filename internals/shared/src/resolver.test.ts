@@ -1,6 +1,5 @@
 import { pascalCase } from '@internals/utils'
-import type { Resolver } from 'kubb/kit'
-import { ast } from 'kubb/kit'
+import { ast, Resolver } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
 import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, resolveOperationName } from './resolver.ts'
 
@@ -39,7 +38,7 @@ describe('resolveOperationName', () => {
   })
 })
 
-const resolver = { name: (name: string) => pascalCase(name) } as unknown as Resolver
+const resolver = new Resolver({ pluginName: 'test', name: pascalCase })
 const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
 describe('createOperationParamResolver', () => {

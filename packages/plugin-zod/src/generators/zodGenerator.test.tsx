@@ -879,7 +879,8 @@ describe('zodGenerator — inferred aliases', () => {
   }
 
   async function renderOperation(node: ast.OperationNode, options: PluginZod['resolvedOptions']) {
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
+    const resolver = Resolver.merge(resolverZod)
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: `alias-${node.operationId}` })
     await renderGeneratorOperation(zodGenerator, node, {
       config: testConfig,
@@ -887,7 +888,7 @@ describe('zodGenerator — inferred aliases', () => {
       driver,
       plugin,
       options,
-      resolver: resolverZod,
+      resolver,
     })
     return rawSources(driver.fileManager.files)[0]
   }

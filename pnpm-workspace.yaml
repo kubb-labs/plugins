@@ -30,7 +30,7 @@ catalog:
   typescript: ^7.0.2
   vitest: ^5.0.5
 
-# Use the fixed canary until the next stable Kubb release.
+# Replace this development canary with Kubb 5.15 after kubb-labs/kubb#4474 is released.
 overrides:
   '@kubb/adapter-oas': 0.0.0-canary-20261026131816
   '@kubb/core': 0.0.0-canary-20261026131816

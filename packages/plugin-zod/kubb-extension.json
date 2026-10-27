@@ -18,7 +18,7 @@
     }
   ],
   "compatibility": {
-    "kubb": ">=5.8.3",
+    "kubb": ">=5.15.0",
     "node": ">=22.22"
   },
   "options": [

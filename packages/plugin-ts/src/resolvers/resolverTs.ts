@@ -1,4 +1,4 @@
-import { createCasedFile, createOperationParamResolver, createOperationResponseResolver } from '@internals/shared'
+import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, resolveOperationSchemaName } from '@internals/shared'
 import { ensureValidVarName, pascalCase } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
 import type { PluginTs } from '../types.ts'
@@ -32,7 +32,7 @@ export const resolverTs = createResolver<PluginTs>({
   response: {
     ...createOperationResponseResolver(),
     options(node) {
-      return this.name(`${node.operationId} Options`)
+      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Options`) })
     },
   },
   enum: {

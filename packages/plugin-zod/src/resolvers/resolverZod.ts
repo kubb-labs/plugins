@@ -1,4 +1,4 @@
-import { createCasedFile, createOperationParamResolver, createOperationResponseResolver } from '@internals/shared'
+import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, resolveOperationSchemaName } from '@internals/shared'
 import { camelCase, ensureValidVarName, pascalCase } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
 import type { PluginZod } from '../types.ts'
@@ -48,10 +48,10 @@ export const resolverZod = createResolver<PluginZod>({
   response: {
     ...createOperationResponseResolver(),
     error(node) {
-      return this.name(`${node.operationId} Error`)
+      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Error`) })
     },
     options(node) {
-      return this.schema.type(this.name(`${node.operationId} Options`))
+      return resolveOperationSchemaName({ node, resolver: this, name: this.schema.type(this.name(`${node.operationId} Options`)) })
     },
   },
 })

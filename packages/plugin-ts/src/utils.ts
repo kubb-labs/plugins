@@ -4,6 +4,23 @@ import { ast, syncSchemaRef } from 'kubb/kit'
 import type { ResolverTs } from './types.ts'
 
 /**
+ * Renames inline enum declarations and their uses together.
+ */
+export function resolveInlineEnumNames({ node, owner, resolver }: { node: ast.SchemaNode; owner: string; resolver: ResolverTs }): ast.SchemaNode {
+  return ast.transform(node, {
+    schema(child) {
+      if (child === node || child.type !== 'enum' || !child.name) return
+      const name = resolver.resolveName({
+        key: JSON.stringify(['enum', owner, child.pointer ?? child.name]),
+        name: child.name,
+        normalize: (name) => resolver.name(name),
+      })
+      return name === child.name ? undefined : { ...child, name }
+    },
+  })
+}
+
+/**
  * Resolves the type name an enum schema is referenced by. An enum emitted as a `const` object
  * with a `typeSuffix` uses its suffixed key alias (e.g. `StatusKey`); every other schema uses its
  * plain resolved name.
