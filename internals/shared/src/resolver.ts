@@ -5,10 +5,6 @@ export function resolveOperationName(name: string): string {
   return ensureValidVarName(camelCase(name))
 }
 
-export function resolveOperationSchemaName({ node, name, resolver }: { node: ast.OperationNode; name: string; resolver: Resolver }): string {
-  return resolver.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
-}
-
 /**
  * The `param` namespace shared by the schema-producing plugins (ts, zod, faker):
  * per-parameter names plus the grouped `Path`/`Query`/`Headers` names, all routed
@@ -41,7 +37,8 @@ export type OperationResponseResolver = {
  * `operationParamName.call(resolver, node, param) // → 'DeletePetPathPetId'`
  */
 function operationParamName(this: Resolver, node: ast.OperationNode, param: ast.ParameterNode): string {
-  return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} ${param.in} ${param.name}`) })
+  const name = this.name(`${node.operationId} ${param.in} ${param.name}`)
+  return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
 }
 
 /**
@@ -57,13 +54,16 @@ export function createOperationParamResolver(): OperationParamResolver {
   return {
     name: operationParamName,
     path(node) {
-      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Path`) })
+      const name = this.name(`${node.operationId} Path`)
+      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
     },
     query(node) {
-      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Query`) })
+      const name = this.name(`${node.operationId} Query`)
+      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
     },
     headers(node) {
-      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Headers`) })
+      const name = this.name(`${node.operationId} Headers`)
+      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
     },
   }
 }
@@ -81,16 +81,20 @@ export function createOperationParamResolver(): OperationParamResolver {
 export function createOperationResponseResolver(): OperationResponseResolver {
   return {
     status(node, statusCode) {
-      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Status ${statusCode}`) })
+      const name = this.name(`${node.operationId} Status ${statusCode}`)
+      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
     },
     body(node) {
-      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Body`) })
+      const name = this.name(`${node.operationId} Body`)
+      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
     },
     responses(node) {
-      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Responses`) })
+      const name = this.name(`${node.operationId} Responses`)
+      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
     },
     response(node) {
-      return resolveOperationSchemaName({ node, resolver: this, name: this.name(`${node.operationId} Response`) })
+      const name = this.name(`${node.operationId} Response`)
+      return this.resolveName({ key: JSON.stringify(['operation', node.method, node.path, name]), name })
     },
   }
 }
