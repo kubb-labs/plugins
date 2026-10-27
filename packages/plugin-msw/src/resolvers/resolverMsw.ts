@@ -1,3 +1,4 @@
+import { operationKey } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
 import type { PluginMsw } from '../types.ts'
@@ -25,7 +26,7 @@ export const resolverMsw = createResolver<PluginMsw>({
   handler: {
     name(node) {
       const name = this.name(node.operationId)
-      return this.resolveName({ node, name })
+      return this.resolveName({ key: operationKey(node, 'handler', 'name'), name })
     },
     listName() {
       return this.resolveName({ key: ['handlers', 'list'], name: 'handlers' })

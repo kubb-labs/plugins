@@ -1,3 +1,4 @@
+import { operationKey } from '@internals/shared'
 import { capitalize } from '@internals/utils'
 import type { ast, Resolver } from 'kubb/kit'
 
@@ -46,23 +47,23 @@ export function createQueryResolver(variant: QueryVariant = ''): QueryResolver {
   return {
     name(node) {
       const name = `use${capitalize(this.name(node.operationId))}${variant}`
-      return this.resolveName({ node, name })
+      return this.resolveName({ key: operationKey(node, 'query', variant, 'name'), name })
     },
     optionsName(node) {
       const name = `${this.name(node.operationId)}${variant}QueryOptions`
-      return this.resolveName({ node, name })
+      return this.resolveName({ key: operationKey(node, 'query', variant, 'optionsName'), name })
     },
     keyName(node) {
       const name = `${this.name(node.operationId)}${variant}QueryKey`
-      return this.resolveName({ node, name })
+      return this.resolveName({ key: operationKey(node, 'query', variant, 'keyName'), name })
     },
     keyTypeName(node) {
       const name = `${capitalize(this.name(node.operationId))}${variant}QueryKey`
-      return this.resolveName({ node, name })
+      return this.resolveName({ key: operationKey(node, 'query', variant, 'keyTypeName'), name })
     },
     clientName(node) {
       const name = `${this.name(node.operationId)}${variant}`
-      return this.resolveName({ node, name })
+      return this.resolveName({ key: operationKey(node, 'query', variant, 'clientName'), name })
     },
   }
 }
@@ -81,11 +82,11 @@ export function createMutationResolver(): MutationResolver {
   return {
     name(node) {
       const name = `use${capitalize(this.name(node.operationId))}`
-      return this.resolveName({ node, name })
+      return this.resolveName({ key: operationKey(node, 'mutation', 'name'), name })
     },
     keyName(node) {
       const name = `${this.name(node.operationId)}MutationKey`
-      return this.resolveName({ node, name })
+      return this.resolveName({ key: operationKey(node, 'mutation', 'keyName'), name })
     },
   }
 }

@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { operationFileEntry } from '@internals/shared'
+import { operationFileEntry, operationKey } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import { ast, defineGenerator, Diagnostics } from 'kubb/kit'
 import type { Generator } from 'kubb/kit'
@@ -74,7 +74,7 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
     const validatorHooks = zodResolver ? buildValidatorHooks({ node, validator, zodResolver }) : null
 
     const name = resolver.name(node.operationId)
-    return { node, name: resolver.resolveName({ node, name }), types, typeFile, zodFile, validatorHooks, security }
+    return { node, name: resolver.resolveName({ key: operationKey(node), name }), types, typeFile, zodFile, validatorHooks, security }
   }
 
   return nodes.reduce((acc, operationNode) => {

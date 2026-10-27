@@ -1,4 +1,4 @@
-import { resolveOperationName } from '@internals/shared'
+import { operationKey, resolveOperationName } from '@internals/shared'
 import { createMutationResolver, createQueryResolver } from '@internals/tanstack-query'
 import { capitalize } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
@@ -28,11 +28,11 @@ export const resolverSwr = createResolver<PluginSwr>({
     ...createMutationResolver(),
     keyTypeName(node) {
       const name = `${capitalize(this.name(node.operationId))}MutationKey`
-      return this.resolveName({ node, name })
+      return this.resolveName({ key: operationKey(node, 'mutation', 'keyTypeName'), name })
     },
     argTypeName(node) {
       const name = `${capitalize(this.name(node.operationId))}MutationArg`
-      return this.resolveName({ node, name })
+      return this.resolveName({ key: operationKey(node, 'mutation', 'argTypeName'), name })
     },
   },
 })

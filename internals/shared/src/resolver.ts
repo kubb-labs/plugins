@@ -6,6 +6,20 @@ export function resolveOperationName(name: string): string {
 }
 
 /**
+ * Builds the allocation key for a declaration an operation owns. `scope` names which declaration
+ * it is, so two of them never share an allocation even when a custom resolver gives both the same
+ * name. Leave `scope` empty for the operation's own declaration.
+ *
+ * @example
+ * ```ts
+ * resolver.resolveName({ key: operationKey(node, 'response', 'status', 404), name })
+ * ```
+ */
+export function operationKey(node: ast.OperationNode, ...scope: Array<string | number>): Array<string | undefined> {
+  return ['operation', node.method, node.path, ...scope.map(String)]
+}
+
+/**
  * The `param` namespace shared by the schema-producing plugins (ts, zod, faker):
  * per-parameter names plus the grouped `Path`/`Query`/`Headers` names, all routed
  * through the plugin's top-level `name` casing.
@@ -42,19 +56,19 @@ export function createOperationParamResolver(): OperationParamResolver {
   return {
     name(node, param) {
       const name = this.name(`${node.operationId} ${param.in} ${param.name}`)
-      return this.resolveName({ node, scope: ['param', 'name', param.in, param.name], name })
+      return this.resolveName({ key: operationKey(node, 'param', 'name', param.in, param.name), name })
     },
     path(node) {
       const name = this.name(`${node.operationId} Path`)
-      return this.resolveName({ node, scope: ['param', 'path'], name })
+      return this.resolveName({ key: operationKey(node, 'param', 'path'), name })
     },
     query(node) {
       const name = this.name(`${node.operationId} Query`)
-      return this.resolveName({ node, scope: ['param', 'query'], name })
+      return this.resolveName({ key: operationKey(node, 'param', 'query'), name })
     },
     headers(node) {
       const name = this.name(`${node.operationId} Headers`)
-      return this.resolveName({ node, scope: ['param', 'headers'], name })
+      return this.resolveName({ key: operationKey(node, 'param', 'headers'), name })
     },
   }
 }
@@ -73,19 +87,19 @@ export function createOperationResponseResolver(): OperationResponseResolver {
   return {
     status(node, statusCode) {
       const name = this.name(`${node.operationId} Status ${statusCode}`)
-      return this.resolveName({ node, scope: ['response', 'status', statusCode], name })
+      return this.resolveName({ key: operationKey(node, 'response', 'status', statusCode), name })
     },
     body(node) {
       const name = this.name(`${node.operationId} Body`)
-      return this.resolveName({ node, scope: ['response', 'body'], name })
+      return this.resolveName({ key: operationKey(node, 'response', 'body'), name })
     },
     responses(node) {
       const name = this.name(`${node.operationId} Responses`)
-      return this.resolveName({ node, scope: ['response', 'responses'], name })
+      return this.resolveName({ key: operationKey(node, 'response', 'responses'), name })
     },
     response(node) {
       const name = this.name(`${node.operationId} Response`)
-      return this.resolveName({ node, scope: ['response', 'response'], name })
+      return this.resolveName({ key: operationKey(node, 'response', 'response'), name })
     },
   }
 }

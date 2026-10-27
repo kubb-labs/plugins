@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { operationFileEntry } from '@internals/shared'
+import { operationFileEntry, operationKey } from '@internals/shared'
 import type { ast, Exclude, Group, Include, NodeCache, Output, Override, Resolver } from 'kubb/kit'
 import type { ReturnTypeOption } from './types.ts'
 
@@ -91,7 +91,7 @@ export function resolveClientOperation(options: {
     const name = resolver.name(node.operationId)
 
     return {
-      name: resolver.resolveName({ node, name }),
+      name: resolver.resolveName({ key: operationKey(node), name }),
       path: file.path,
       clientPath: importPath === undefined ? path.resolve(root, '.kubb/client.ts') : resolveImportPath({ importPath, operationFile: file.path }),
       clientPathIsFile: importPath === undefined || isRelativeImport(importPath),

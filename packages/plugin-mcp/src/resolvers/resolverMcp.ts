@@ -1,3 +1,4 @@
+import { operationKey } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
 import type { PluginMcp } from '../types.ts'
@@ -22,7 +23,7 @@ export const resolverMcp = createResolver<PluginMcp>({
   handler: {
     name(node) {
       const name = this.name(node.operationId)
-      return this.resolveName({ node, name })
+      return this.resolveName({ key: operationKey(node, 'handler', 'name'), name })
     },
   },
 })
