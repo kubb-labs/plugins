@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { operationFileEntry, operationKey } from '@internals/shared'
-import { ast, camelCase, defineGenerator, Diagnostics } from 'kubb/kit'
+import { ast, defineGenerator, Diagnostics } from 'kubb/kit'
 import type { Generator } from 'kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from 'kubb/jsx'
@@ -79,7 +79,7 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
   return nodes.reduce((acc, operationNode) => {
     if (!ast.isHttpOperationNode(operationNode)) return acc
     const tag = operationNode.tags[0]
-    const name = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.groupName(tag)) : resolver.className('ApiClient')
+    const name = tag ? (group?.name?.({ group: resolver.camelCase(tag) }) ?? resolver.groupName(tag)) : resolver.className('ApiClient')
     const file = resolver.file({ name, extname: '.ts', tag, root, output, group: group ?? undefined })
     const operationData = buildOperationData(operationNode)
     const previous = acc.find((item) => item.file.path === file.path)

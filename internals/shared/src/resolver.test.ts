@@ -83,7 +83,7 @@ describe('createOperationResponseResolver', () => {
 
 describe('createCasedFile', () => {
   test('baseName cases the final segment and appends the extension', () => {
-    const file = createCasedFile(pascalCase)
-    expect(file.baseName?.({ name: 'pet.petId', extname: '.ts' })).toBe('pet/PetId.ts')
+    const file = createCasedFile((part, { pascalCase }) => pascalCase(part))
+    expect(file.baseName?.call(resolver, { name: 'pet.petId', extname: '.ts' })).toBe('pet/PetId.ts')
   })
 })

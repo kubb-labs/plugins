@@ -1,4 +1,4 @@
-import { ast, camelCase, defineGenerator } from 'kubb/kit'
+import { ast, defineGenerator } from 'kubb/kit'
 import type { PluginMsw } from '../types'
 
 /**
@@ -14,7 +14,7 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
     const { output, group } = ctx.options
 
     const handlersName = resolver.handler.listName()
-    const createHandlersName = resolver.resolveName({ key: ['handlers', 'create'], name: camelCase(handlersName, { prefix: 'create' }) })
+    const createHandlersName = resolver.resolveName({ key: ['handlers', 'create'], name: resolver.camelCase(handlersName, { prefix: 'create' }) })
     const file = resolver.file({ name: handlersName, extname: '.ts', root, output, group: group ?? undefined })
 
     const handlerNames = nodes.map((node) => resolver.handler.name(node))

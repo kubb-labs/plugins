@@ -1,6 +1,6 @@
 import { resolveOperationName } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
-import { camelCase, createResolver, pascalCase } from 'kubb/kit'
+import { createResolver } from 'kubb/kit'
 import type { PluginContractClient } from './types.ts'
 
 /**
@@ -17,12 +17,12 @@ export const resolverClient = createResolver<PluginContractClient>({
   pluginName: 'plugin-contract-client',
   name: resolveOperationName,
   className(name) {
-    return ensureValidVarName(pascalCase(name))
+    return ensureValidVarName(this.pascalCase(name))
   },
   groupName(name) {
-    return ensureValidVarName(pascalCase(`${name} Client`))
+    return ensureValidVarName(this.pascalCase(`${name} Client`))
   },
   propertyName(name) {
-    return ensureValidVarName(camelCase(name))
+    return ensureValidVarName(this.camelCase(name))
   },
 })

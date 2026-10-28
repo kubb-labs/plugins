@@ -2,8 +2,12 @@ import { ensureValidVarName, toFilePath } from '@internals/utils'
 import { camelCase } from 'kubb/kit'
 import type { ast, Resolver, ResolverFile } from 'kubb/kit'
 
-export function resolveOperationName(name: string): string {
-  return ensureValidVarName(camelCase(name))
+/**
+ * The shared top-level `name` of the operation plugins. Bound to a resolver it uses the build's
+ * memoized `camelCase`; called plain it falls back to the kit helper.
+ */
+export function resolveOperationName(this: Resolver | void, name: string): string {
+  return ensureValidVarName((this ? this.camelCase : camelCase)(name))
 }
 
 /**
@@ -107,17 +111,18 @@ export function createOperationResponseResolver(): OperationResponseResolver {
 
 /**
  * Builds a resolver `file` override whose base name runs every path segment
- * through `toFilePath`, casing the final segment with `caseLast`.
+ * through `toFilePath`, casing the final segment with `caseLast`. The resolver is passed
+ * along so `caseLast` can use its memoized `camelCase` and `pascalCase`.
  *
  * @example
  * ```ts
- * createResolver<PluginTs>({ file: createCasedFile(pascalCase), ... })
+ * createResolver<PluginTs>({ file: createCasedFile((part, resolver) => resolver.pascalCase(part)), ... })
  * ```
  */
-export function createCasedFile(caseLast: (part: string) => string): ResolverFile {
+export function createCasedFile(caseLast: (part: string, resolver: Resolver) => string): ResolverFile {
   return {
     baseName({ name, extname }) {
-      return `${toFilePath(name, caseLast)}${extname}`
+      return `${toFilePath(name, (part) => caseLast(part, this), this.camelCase)}${extname}`
     },
   }
 }

@@ -13,4 +13,4 @@
 '@kubb/plugin-zod': patch
 ---
 
-Import `camelCase` and `pascalCase` from `kubb/kit` instead of a copy bundled into each plugin, so every plugin shares one casing memo with Kubb core. Needs kubb 5.15 or later.
+Case names through the resolver's `this.camelCase` and `this.pascalCase` instead of a copy bundled into each plugin, so every plugin of a build shares one casing memo with Kubb core. Needs kubb 5.15 or later.
