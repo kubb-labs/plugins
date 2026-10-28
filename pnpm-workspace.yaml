@@ -31,28 +31,19 @@ catalog:
   typescript: ^7.0.2
   vitest: ^5.0.5
 
-#overrides: #  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
-
-#  '@kubb/ast': link:../kubb/packages/ast
-#  '@kubb/cli': link:../kubb/packages/cli
-#  '@kubb/core': link:../kubb/packages/core
-#  '@kubb/kit': link:../kubb/packages/kit
-#  '@kubb/mcp': link:../kubb/packages/mcp
-#  '@kubb/plugin-barrel': link:../kubb/packages/plugin-barrel
-#  '@kubb/parser-md': link:../kubb/packages/parser-md
-#  '@kubb/parser-ts': link:../kubb/packages/parser-ts
-#  '@kubb/renderer-jsx': link:../kubb/packages/renderer-jsx
-#  '@kubb/studio': link:../kubb/packages/studio
-#  '@kubb/tui': link:../kubb/packages/tui
-#  kubb: link:../kubb/packages/kubb
-#  unplugin-kubb: link:../kubb/packages/unplugin-kubb
-
-minimumReleaseAge: 2880 # 48 hours, matches CI's SAFE_CHAIN_MINIMUM_PACKAGE_AGE_HOURS
-minimumReleaseAgeExclude:
-  - '@kubb/*'
-  - 'kubb'
-  - 'unplugin-kubb'
-  - '@types/*'
-  - '@clack/core'
-pmOnFail: warn
-resolutionMode: highest
+# Link the sibling kubb checkout until kubb 5.15 ships the `camelCase` and `pascalCase` exports from `kubb/kit`.
+# Drop this block and bump the catalog to ^5.15.0 at that release.
+overrides:
+  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
+  '@kubb/ast': link:../kubb/packages/ast
+  '@kubb/cli': link:../kubb/packages/cli
+  '@kubb/core': link:../kubb/packages/core
+  '@kubb/kit': link:../kubb/packages/kit
+  '@kubb/mcp': link:../kubb/packages/mcp
+  '@kubb/plugin-barrel': link:../kubb/packages/plugin-barrel
+  '@kubb/parser-md': link:../kubb/packages/parser-md
+  '@kubb/parser-ts': link:../kubb/packages/parser-ts
+  '@kubb/renderer-jsx': link:../kubb/packages/renderer-jsx
+  '@kubb/studio': link:../kubb/packages/studio
+  'kubb': link:../kubb/packages/kubb
+  'unplugin-kubb': link:../kubb/packages/unplugin-kubb
