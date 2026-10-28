@@ -84,7 +84,7 @@
   },
   "peerDependencies": {
     "cypress": "^15.0.0 || ^16.0.0",
-    "kubb": "^5.14.6"
+    "kubb": "^5.15.0"
   },
   "peerDependenciesMeta": {
     "cypress": {

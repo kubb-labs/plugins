@@ -14,15 +14,15 @@ allowBuilds:
 catalog:
   # Ranges, not pins: these end up in the published dependencies and peerDependencies of every
   # plugin, and a pin there conflicts with any newer Kubb release the user installs.
-  '@kubb/adapter-oas': ^5.14.6
-  '@kubb/core': ^5.14.6
-  '@kubb/plugin-barrel': ^5.14.6
-  '@kubb/parser-ts': ^5.14.6
+  '@kubb/adapter-oas': ^5.15.0
+  '@kubb/core': ^5.15.0
+  '@kubb/plugin-barrel': ^5.15.0
+  '@kubb/parser-ts': ^5.15.0
   '@types/node': 22.20.2
   '@types/react': ^19.3.0
   '@vitest/coverage-v8': ^5.0.5
   '@vitest/ui': ^5.0.5
-  kubb: ^5.14.6
+  kubb: ^5.15.0
   oxfmt: ^0.74.0
   oxlint: ^1.89.0
   prettier: ^3.9.10
@@ -31,22 +31,21 @@ catalog:
   typescript: ^7.0.2
   vitest: ^5.0.5
 
-# Link the sibling kubb checkout until kubb 5.15 ships the `camelCase` and `pascalCase` exports from `kubb/kit`.
-# Drop this block and bump the catalog to ^5.15.0 at that release.
-overrides:
-  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
-  '@kubb/ast': link:../kubb/packages/ast
-  '@kubb/cli': link:../kubb/packages/cli
-  '@kubb/core': link:../kubb/packages/core
-  '@kubb/kit': link:../kubb/packages/kit
-  '@kubb/mcp': link:../kubb/packages/mcp
-  '@kubb/plugin-barrel': link:../kubb/packages/plugin-barrel
-  '@kubb/parser-md': link:../kubb/packages/parser-md
-  '@kubb/parser-ts': link:../kubb/packages/parser-ts
-  '@kubb/renderer-jsx': link:../kubb/packages/renderer-jsx
-  '@kubb/studio': link:../kubb/packages/studio
-  'kubb': link:../kubb/packages/kubb
-  'unplugin-kubb': link:../kubb/packages/unplugin-kubb
+#overrides: #  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
+
+#  '@kubb/ast': link:../kubb/packages/ast
+#  '@kubb/cli': link:../kubb/packages/cli
+#  '@kubb/core': link:../kubb/packages/core
+#  '@kubb/kit': link:../kubb/packages/kit
+#  '@kubb/mcp': link:../kubb/packages/mcp
+#  '@kubb/plugin-barrel': link:../kubb/packages/plugin-barrel
+#  '@kubb/parser-md': link:../kubb/packages/parser-md
+#  '@kubb/parser-ts': link:../kubb/packages/parser-ts
+#  '@kubb/renderer-jsx': link:../kubb/packages/renderer-jsx
+#  '@kubb/studio': link:../kubb/packages/studio
+#  '@kubb/tui': link:../kubb/packages/tui
+#  kubb: link:../kubb/packages/kubb
+#  unplugin-kubb: link:../kubb/packages/unplugin-kubb
 
 minimumReleaseAge: 2880 # 48 hours, matches CI's SAFE_CHAIN_MINIMUM_PACKAGE_AGE_HOURS
 minimumReleaseAgeExclude:
