@@ -1,8 +1,6 @@
 import path from 'node:path'
-import { camelCase } from '@internals/utils'
-
 import type { Group } from 'kubb/kit'
-import { ast, Resolver } from 'kubb/kit'
+import { ast, camelCase, Resolver } from 'kubb/kit'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from 'kubb/kit/testing'
 import { describe, expect, test } from 'vitest'
 import { matchFiles, rawSources, testConfig } from '#mocks'

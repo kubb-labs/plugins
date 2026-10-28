@@ -1,8 +1,12 @@
-import { camelCase, ensureValidVarName, toFilePath } from '@internals/utils'
+import { ensureValidVarName, toFilePath } from '@internals/utils'
+import { camelCase } from 'kubb/kit'
 import type { ast, Resolver, ResolverFile } from 'kubb/kit'
 
-export function resolveOperationName(name: string): string {
-  return ensureValidVarName(camelCase(name))
+/**
+ * The shared top-level `name` of the operation plugins, computed once per operation name and build.
+ */
+export function resolveOperationName(this: Resolver, name: string): string {
+  return this.memo(`operation:${name}`, () => ensureValidVarName(camelCase(name)))
 }
 
 /**
@@ -116,7 +120,17 @@ export function createOperationResponseResolver(): OperationResponseResolver {
 export function createCasedFile(caseLast: (part: string) => string): ResolverFile {
   return {
     baseName({ name, extname }) {
-      return `${toFilePath(name, caseLast)}${extname}`
+      return this.memo(`file:${name}\0${extname}`, (): ast.FileNode['baseName'] => `${toFilePath(name, caseLast)}${extname}`)
     },
+  }
+}
+
+declare global {
+  namespace Kubb {
+    interface MemoRegistry {
+      operation: string
+      file: ast.FileNode['baseName']
+      operationTypeNames: Array<string>
+    }
   }
 }

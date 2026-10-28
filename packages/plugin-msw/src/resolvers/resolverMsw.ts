@@ -1,6 +1,5 @@
 import { operationKey } from '@internals/shared'
-import { camelCase } from '@internals/utils'
-import { createResolver } from 'kubb/kit'
+import { camelCase, createResolver } from 'kubb/kit'
 import type { PluginMsw } from '../types.ts'
 
 /**
@@ -21,7 +20,7 @@ import type { PluginMsw } from '../types.ts'
 export const resolverMsw = createResolver<PluginMsw>({
   pluginName: 'plugin-msw',
   name(name) {
-    return camelCase(name, { suffix: 'handler' })
+    return this.memo(`name:${name}`, () => camelCase(name, { suffix: 'handler' }))
   },
   handler: {
     name(node) {

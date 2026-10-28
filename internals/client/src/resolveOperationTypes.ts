@@ -50,8 +50,10 @@ function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
 
   return {
     ...resolver,
-    // A class method, so a spread drops it, and it reads private fields, so it must run on `resolver`.
+    // Class methods, so a spread drops them. `file` reads private fields, and `memo` gets its own key
+    // space so these type names never share an entry with the zod names.
     file: resolver.file.bind(resolver),
+    memo: (key: string, compute: () => unknown) => resolver.memo(`zodTypes:${key}`, compute),
     param: {
       name: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.name(node, p)),
       path: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.path(node, p)),

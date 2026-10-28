@@ -590,48 +590,41 @@ export function resolveStatusCodeNames(node: ast.OperationNode, resolver: Respon
   return node.responses.map((response) => resolver.response.status(node, response.statusCode))
 }
 
-const typeNamesByResolver = new WeakMap<OperationTypeNameResolver, Map<string, string[]>>()
-
+/**
+ * Lists the type names an operation's types file declares, computed once per resolver and `options` so every
+ * dependent reads the same list.
+ */
 export function resolveOperationTypeNames(
   node: ast.OperationNode,
-  resolver: OperationTypeNameResolver,
+  resolver: OperationTypeNameResolver & Pick<Resolver, 'memo'>,
   options: ResolveOperationTypeNameOptions = {},
 ): string[] {
-  const cacheKey = `${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
-  let byResolver = typeNamesByResolver.get(resolver)
-  if (byResolver) {
-    const cached = byResolver.get(cacheKey)
-    if (cached) return cached
-  } else {
-    byResolver = new Map()
-    typeNamesByResolver.set(resolver, byResolver)
-  }
-
-  const { path, query, header } = getOperationParameters(node)
-  const responseStatusNames =
-    options.responseStatusNames === 'error'
-      ? resolveErrorNames(node, resolver)
-      : options.responseStatusNames === false
+  const key = `${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
+  return resolver.memo(`operationTypeNames:${key}`, () => {
+    const { path, query, header } = getOperationParameters(node)
+    const responseStatusNames =
+      options.responseStatusNames === 'error'
+        ? resolveErrorNames(node, resolver)
+        : options.responseStatusNames === false
+          ? []
+          : resolveStatusCodeNames(node, resolver)
+    const exclude = new Set(options.exclude ?? [])
+    const paramNames =
+      options.includeParams === false
         ? []
-        : resolveStatusCodeNames(node, resolver)
-  const exclude = new Set(options.exclude ?? [])
-  const paramNames =
-    options.includeParams === false
-      ? []
-      : [
-          ...path.map((param) => resolver.param.path(node, param)),
-          ...query.map((param) => resolver.param.query(node, param)),
-          ...header.map((param) => resolver.param.headers(node, param)),
-        ]
-  const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.response.body(node) : null, resolver.response.response(node)]
-  const names =
-    options.order === 'body-response-first'
-      ? [...bodyAndResponseNames, ...paramNames, ...responseStatusNames]
-      : [...paramNames, ...bodyAndResponseNames, ...responseStatusNames]
+        : [
+            ...path.map((param) => resolver.param.path(node, param)),
+            ...query.map((param) => resolver.param.query(node, param)),
+            ...header.map((param) => resolver.param.headers(node, param)),
+          ]
+    const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.response.body(node) : null, resolver.response.response(node)]
+    const names =
+      options.order === 'body-response-first'
+        ? [...bodyAndResponseNames, ...paramNames, ...responseStatusNames]
+        : [...paramNames, ...bodyAndResponseNames, ...responseStatusNames]
 
-  const result = names.filter((name): name is string => Boolean(name) && !exclude.has(name as string))
-  byResolver.set(cacheKey, result)
-  return result
+    return names.filter((name): name is string => Boolean(name) && !exclude.has(name as string))
+  })
 }
 
 export function resolveResponseTypes(node: ast.OperationNode, resolver: ResponseNameResolver): Array<[statusCode: number | 'default', typeName: string]> {

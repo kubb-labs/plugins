@@ -46,6 +46,9 @@
     "start": "tsdown --watch",
     "typecheck": "tsc"
   },
+  "dependencies": {
+    "kubb": "catalog:"
+  },
   "devDependencies": {
     "@types/node": "catalog:"
   },

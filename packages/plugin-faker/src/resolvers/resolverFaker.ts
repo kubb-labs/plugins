@@ -1,6 +1,6 @@
 import { createCasedFile, createOperationParamResolver, createOperationResponseResolver } from '@internals/shared'
-import { camelCase, ensureValidVarName } from '@internals/utils'
-import { createResolver } from 'kubb/kit'
+import { ensureValidVarName } from '@internals/utils'
+import { camelCase, createResolver } from 'kubb/kit'
 import type { PluginFaker } from '../types.ts'
 
 /**
@@ -18,7 +18,7 @@ import type { PluginFaker } from '../types.ts'
 export const resolverFaker = createResolver<PluginFaker>({
   pluginName: 'plugin-faker',
   name(name) {
-    return ensureValidVarName(camelCase(name, { prefix: 'create' }))
+    return this.memo(`name:${name}`, () => ensureValidVarName(camelCase(name, { prefix: 'create' })))
   },
   file: createCasedFile((part) => camelCase(part, { prefix: 'create' })),
   param: createOperationParamResolver(),

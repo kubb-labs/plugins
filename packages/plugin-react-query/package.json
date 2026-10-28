@@ -99,7 +99,7 @@
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.82.0",
-    "kubb": "^5.14.6"
+    "kubb": "^5.15.0"
   },
   "peerDependenciesMeta": {
     "@tanstack/react-query": {

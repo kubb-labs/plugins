@@ -1,4 +1,5 @@
-import { camelCase, ensureValidVarName, trimQuotes } from '@internals/utils'
+import { ensureValidVarName, trimQuotes } from '@internals/utils'
+import { camelCase } from 'kubb/kit'
 import type { ast } from 'kubb/kit'
 import { File } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'

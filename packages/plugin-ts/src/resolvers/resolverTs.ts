@@ -1,6 +1,6 @@
 import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, operationKey } from '@internals/shared'
-import { ensureValidVarName, pascalCase } from '@internals/utils'
-import { createResolver } from 'kubb/kit'
+import { ensureValidVarName } from '@internals/utils'
+import { createResolver, pascalCase } from 'kubb/kit'
 import type { PluginTs } from '../types.ts'
 
 /**
@@ -24,7 +24,7 @@ import type { PluginTs } from '../types.ts'
 export const resolverTs = createResolver<PluginTs>({
   pluginName: 'plugin-ts',
   name(name) {
-    return ensureValidVarName(pascalCase(name))
+    return this.memo(`name:${name}`, () => ensureValidVarName(pascalCase(name)))
   },
   file: createCasedFile(pascalCase),
   param: createOperationParamResolver(),

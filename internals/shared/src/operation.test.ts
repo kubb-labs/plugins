@@ -1,5 +1,5 @@
-import { ast } from 'kubb/kit'
-import type { NodeCache } from 'kubb/kit'
+import { ast, createResolver } from 'kubb/kit'
+import type { NodeCache, PluginType, Resolver } from 'kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
 import {
   buildOperationComments,
@@ -27,7 +27,15 @@ import {
   type ResponseStatusNameResolver,
 } from './operation.ts'
 
-const resolver: RequestConfigResolver & ResponseNameResolver & ResponseStatusNameResolver & OperationTypeNameResolver = {
+type TestPlugin = PluginType<
+  'test',
+  object,
+  object,
+  Resolver & RequestConfigResolver & ResponseNameResolver & ResponseStatusNameResolver & OperationTypeNameResolver
+>
+
+const resolver = createResolver<TestPlugin>({
+  pluginName: 'test',
   param: {
     path(_node, param) {
       return `${param.name}PathParams`
@@ -50,7 +58,7 @@ const resolver: RequestConfigResolver & ResponseNameResolver & ResponseStatusNam
       return `Status${statusCode}`
     },
   },
-}
+})
 
 describe('getContentTypeInfo', () => {
   test('returns defaults for operations without a request body', () => {

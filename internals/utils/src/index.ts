@@ -1,4 +1,4 @@
-export { camelCase, capitalize, pascalCase, screamingSnakeCase, snakeCase } from './casing.ts'
+export { capitalize, screamingSnakeCase, snakeCase } from './casing.ts'
 export { buildJSDoc, buildList, buildObject, lazyGetter, objectKey } from './codegen.ts'
 export { getRelativePath, toFilePath } from './fs.ts'
 export { ensureValidVarName, isValidVarName } from './reserved.ts'
