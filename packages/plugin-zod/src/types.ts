@@ -314,5 +314,9 @@ declare global {
     interface PluginRegistry {
       'plugin-zod': PluginZod
     }
+    interface MemoRegistry {
+      typeName: string
+      type: string
+    }
   }
 }

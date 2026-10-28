@@ -595,8 +595,8 @@ export function resolveOperationTypeNames(
   resolver: OperationTypeNameResolver & Pick<Resolver, 'memo'>,
   options: ResolveOperationTypeNameOptions = {},
 ): string[] {
-  const key = `operationTypeNames:${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
-  return resolver.memo(key, () => {
+  const key = `${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
+  return resolver.memo(`operationTypeNames:${key}`, () => {
     const { path, query, header } = getOperationParameters(node)
     const responseStatusNames =
       options.responseStatusNames === 'error'

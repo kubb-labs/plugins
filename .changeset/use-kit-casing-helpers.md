@@ -13,4 +13,4 @@
 '@kubb/plugin-zod': patch
 ---
 
-Import `camelCase` and `pascalCase` from `kubb/kit` instead of a copy bundled into each plugin, and compute each resolved name once per build through `this.memo`. Needs kubb 5.15 or later.
+Import `camelCase` and `pascalCase` from `kubb/kit` instead of a copy bundled into each plugin, and compute each resolved name once per build through `this.memo`, with the key prefixes registered in `Kubb.MemoRegistry`. Needs kubb 5.15 or later.

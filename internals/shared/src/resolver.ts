@@ -120,7 +120,17 @@ export function createOperationResponseResolver(): OperationResponseResolver {
 export function createCasedFile(caseLast: (part: string) => string): ResolverFile {
   return {
     baseName({ name, extname }) {
-      return this.memo<ast.FileNode['baseName']>(`file:${name}${extname}`, () => `${toFilePath(name, caseLast)}${extname}`)
+      return this.memo(`file:${name}${extname}`, (): ast.FileNode['baseName'] => `${toFilePath(name, caseLast)}${extname}`)
     },
+  }
+}
+
+declare global {
+  namespace Kubb {
+    interface MemoRegistry {
+      operation: string
+      file: ast.FileNode['baseName']
+      operationTypeNames: Array<string>
+    }
   }
 }
