@@ -1,6 +1,6 @@
 import path from 'node:path'
 import type { Group } from 'kubb/kit'
-import { ast, Resolver } from 'kubb/kit'
+import { ast, camelCase, Resolver } from 'kubb/kit'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from 'kubb/kit/testing'
 import { describe, expect, test } from 'vitest'
 import { matchFiles, rawSources, testConfig } from '#mocks'
@@ -656,7 +656,7 @@ describe('typeGenerator — Operation — group', () => {
     {
       group: {
         type: 'tag',
-        name: (ctx: { group: string }) => `${apiResolver.camelCase(ctx.group)}Controller`,
+        name: (ctx: { group: string }) => `${camelCase(ctx.group)}Controller`,
       } satisfies Group,
       expectedBaseName: 'ListPets.ts',
       expectedDir: 'petsController',
@@ -701,7 +701,7 @@ describe('typeGenerator — Operation — group', () => {
       ...defaultOptions,
       group: {
         type: 'tag',
-        name: (ctx: { group: string }) => `${apiResolver.camelCase(ctx.group)}Controller`,
+        name: (ctx: { group: string }) => `${camelCase(ctx.group)}Controller`,
       },
     }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })

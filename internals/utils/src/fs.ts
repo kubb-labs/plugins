@@ -1,4 +1,5 @@
 import { posix } from 'node:path'
+import { camelCase } from 'kubb/kit'
 
 function toSlash(p: string): string {
   if (p.startsWith('\\\\?\\')) return p
@@ -24,7 +25,7 @@ export function getRelativePath(rootDir: string, filePath: string): string {
 /**
  * Builds a nested file path from a dotted name. Splits on dots that precede a letter
  * (so version numbers embedded in operationIds like `v2025.0` stay intact), camelCases
- * every earlier segment with `caseRest`, applies `caseLast` to the final segment, and joins with `/`.
+ * every earlier segment, applies `caseLast` to the final segment, and joins with `/`.
  *
  * Empty segments are dropped before joining. They arise when the name starts with a dot
  * followed by a letter (e.g. `..Schema` splits into `['..', 'Schema']` and `'..'` cases to
@@ -32,18 +33,18 @@ export function getRelativePath(rootDir: string, filePath: string): string {
  * absolute path, letting generated files escape the configured output directory.
  *
  * @example Nested path from a dotted name
- * `toFilePath('pet.petId', resolver.camelCase, resolver.camelCase) // 'pet/petId'`
+ * `toFilePath('pet.petId') // 'pet/petId'`
  *
  * @example PascalCase the final segment
- * `toFilePath('pet.Pet', resolver.pascalCase, resolver.camelCase) // 'pet/Pet'`
+ * `toFilePath('pet.Pet', pascalCase) // 'pet/Pet'`
  *
  * @example Suffix applied to the final segment only
- * `toFilePath('tag.tag', (part) => resolver.camelCase(part, { suffix: 'schema' }), resolver.camelCase) // 'tag/tagSchema'`
+ * `toFilePath('tag.tag', (part) => camelCase(part, { suffix: 'schema' })) // 'tag/tagSchema'`
  */
-export function toFilePath(name: string, caseLast: (part: string) => string, caseRest: (part: string) => string): string {
+export function toFilePath(name: string, caseLast: (part: string) => string = camelCase): string {
   const parts = name.split(/\.(?=[a-zA-Z])/)
   return parts
-    .map((part, i) => (i === parts.length - 1 ? caseLast(part) : caseRest(part)))
+    .map((part, i) => (i === parts.length - 1 ? caseLast(part) : camelCase(part)))
     .filter(Boolean)
     .join('/')
 }

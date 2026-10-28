@@ -1,4 +1,5 @@
 import { ensureValidVarName, trimQuotes } from '@internals/utils'
+import { camelCase } from 'kubb/kit'
 import type { ast } from 'kubb/kit'
 import { File } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
@@ -29,7 +30,7 @@ export function getEnumNames({ node, enum: enumOptions, resolver }: { node: ast.
   typeName: string
 } {
   const resolved = resolver.name(node.name!)
-  const enumName = enumOptions.constCasing === 'pascalCase' ? resolved : ensureValidVarName(resolver.camelCase(node.name!))
+  const enumName = enumOptions.constCasing === 'pascalCase' ? resolved : ensureValidVarName(camelCase(node.name!))
   const typeName = enumOptions.type === 'asConst' ? resolver.enum.keyName(node, enumOptions.typeSuffix) : resolved
 
   return { enumName, typeName }
@@ -57,7 +58,6 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
       []) as Array<[string | number, string | number | boolean, string?]>,
     type: enumOptions.type,
     enumKeyCasing: enumOptions.keyCasing,
-    resolver,
   })
 
   // When the const and the type share a name (pascalCase const + empty typeSuffix) they merge into

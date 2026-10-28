@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { ensureValidVarName, getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
 import { Hookable, createKubb } from '@kubb/core'
-import { type Config, Diagnostics, type KubbHooks } from 'kubb/kit'
+import { type Config, Diagnostics, type KubbHooks, pascalCase } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
@@ -398,7 +398,7 @@ const configs = [
           output: { path: './types', barrel: false, banner: '// Custom banner', mode: 'directory' },
           resolver: {
             name(name: string) {
-              return `Custom${ensureValidVarName(this.pascalCase(name))}`
+              return `Custom${ensureValidVarName(pascalCase(name))}`
             },
           },
         }),

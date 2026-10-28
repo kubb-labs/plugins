@@ -1,13 +1,8 @@
-import { ast, Resolver } from 'kubb/kit'
+import { ast, pascalCase, Resolver } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
 import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, resolveOperationName } from './resolver.ts'
 
-const resolver = new Resolver({
-  pluginName: 'test',
-  name(name) {
-    return this.pascalCase(name)
-  },
-})
+const resolver = new Resolver({ pluginName: 'test', name: pascalCase })
 
 describe('resolveOperationName', () => {
   test.each([
@@ -89,7 +84,7 @@ describe('createOperationResponseResolver', () => {
 
 describe('createCasedFile', () => {
   test('baseName cases the final segment and appends the extension', () => {
-    const file = createCasedFile((part, { pascalCase }) => pascalCase(part))
+    const file = createCasedFile(pascalCase)
     expect(file.baseName?.call(resolver, { name: 'pet.petId', extname: '.ts' })).toBe('pet/PetId.ts')
   })
 })

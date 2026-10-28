@@ -1,6 +1,5 @@
 import { screamingSnakeCase, snakeCase } from '@internals/utils'
-import { syncSchemaRef } from 'kubb/kit'
-import type { Resolver } from 'kubb/kit'
+import { camelCase, pascalCase, syncSchemaRef } from 'kubb/kit'
 import type { ast } from 'kubb/kit'
 import { generate } from 'yuku-codegen'
 
@@ -230,12 +229,10 @@ function valueToExpression(value: string | number | boolean, asNumber = isNumber
   return literal(typeof value === 'boolean' || (asNumber && isNumber(value)) ? value : value.toString())
 }
 
-type EnumCasing = Pick<Resolver, 'camelCase' | 'pascalCase'>
-
 /**
  * Apply casing transformation to enum keys
  */
-function applyEnumKeyCasing(key: string, casing: 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none', resolver: EnumCasing): string {
+function applyEnumKeyCasing(key: string, casing: 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none' = 'none'): string {
   if (casing === 'none') {
     return key
   }
@@ -246,10 +243,10 @@ function applyEnumKeyCasing(key: string, casing: 'screamingSnakeCase' | 'snakeCa
     return snakeCase(key)
   }
   if (casing === 'pascalCase') {
-    return resolver.pascalCase(key)
+    return pascalCase(key)
   }
   if (casing === 'camelCase') {
-    return resolver.camelCase(key)
+    return camelCase(key)
   }
   return key
 }
@@ -274,7 +271,6 @@ export function createEnumDeclaration({
   typeName,
   enums,
   enumKeyCasing = 'none',
-  resolver,
 }: {
   /**
    * Choose to use `enum`, `asConst`, `constEnum`, or `literal` for enums.
@@ -299,10 +295,6 @@ export function createEnumDeclaration({
    * @default 'none'
    */
   enumKeyCasing?: 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'
-  /**
-   * Source of the build's `camelCase` and `pascalCase` for `enumKeyCasing`.
-   */
-  resolver: EnumCasing
 }): [name: string | undefined, type: string] {
   const typeAlias = (annotation: TsNode) => createTypeDeclaration({ syntax: 'type', isExportable: true, name: typeName, comments: [], type: annotation })
 
@@ -321,7 +313,7 @@ export function createEnumDeclaration({
         const memberName = isNumber(Number.parseInt(key.toString(), 10)) ? `${typeName}_${key}` : key?.toString()
         if (memberName === undefined) return undefined
 
-        const id = propertyName(applyEnumKeyCasing(memberName, enumKeyCasing, resolver))
+        const id = propertyName(applyEnumKeyCasing(memberName, enumKeyCasing))
         return appendJSDocToNode({ node: { type: 'TSEnumMember', id, initializer }, comments: [description] })
       })
       .filter(isNonNullable)
@@ -357,7 +349,7 @@ export function createEnumDeclaration({
       const property = {
         type: 'Property',
         kind: 'init',
-        key: propertyName(applyEnumKeyCasing(key.toString(), enumKeyCasing, resolver)),
+        key: propertyName(applyEnumKeyCasing(key.toString(), enumKeyCasing)),
         value: valueToExpression(value),
         computed: false,
         method: false,

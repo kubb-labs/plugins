@@ -2,7 +2,6 @@
 
 import { describe, expect, it } from 'vitest'
 import { format } from '#mocks'
-import { Resolver } from 'kubb/kit'
 import {
   appendJSDocToNode,
   constToTypeNode,
@@ -21,8 +20,6 @@ import {
 } from './factory.ts'
 
 const { string, number } = keywordTypeNodes
-
-const resolver = new Resolver({ pluginName: 'plugin-ts' })
 
 describe('Code Generation', () => {
   it.each([
@@ -61,7 +58,6 @@ describe('Code Generation', () => {
     // quoted string keys, otherwise they parse as illegal private identifiers.
     const output = await format(
       createEnumDeclaration({
-        resolver,
         type: 'asConst',
         name: 'hello',
         typeName: 'Hello',
@@ -82,7 +78,6 @@ describe('Code Generation', () => {
   it('quotes #-prefixed hex color enum keys (regression for kubb-labs/kubb#3476)', async () => {
     const output = await format(
       createEnumDeclaration({
-        resolver,
         type: 'asConst',
         name: 'labelsColor',
         typeName: 'LabelsColor',
@@ -101,7 +96,6 @@ describe('Code Generation', () => {
 
   it('renders per-member descriptions as JSDoc on enum members', () => {
     const [, output] = createEnumDeclaration({
-      resolver,
       type: 'enum',
       name: 'status',
       typeName: 'Status',
@@ -117,7 +111,6 @@ describe('Code Generation', () => {
 
   it('renders per-member descriptions as JSDoc on asConst members', () => {
     const [output] = createEnumDeclaration({
-      resolver,
       type: 'asConst',
       name: 'status',
       typeName: 'StatusKey',
@@ -133,7 +126,7 @@ describe('Code Generation', () => {
   })
 
   it('prints an asConst enum with one member per line and its key type', () => {
-    expect(createEnumDeclaration({ resolver, type: 'asConst', name: 'petStatus', typeName: 'PetStatusKey', enums: [['available', 'available']] })).toEqual([
+    expect(createEnumDeclaration({ type: 'asConst', name: 'petStatus', typeName: 'PetStatusKey', enums: [['available', 'available']] })).toEqual([
       "export const petStatus = {\n  available: 'available',\n} as const;",
       'export type PetStatusKey = (typeof petStatus)[keyof typeof petStatus];',
     ])

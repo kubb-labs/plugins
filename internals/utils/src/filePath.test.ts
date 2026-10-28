@@ -1,8 +1,6 @@
 import { describe, expect, test } from 'vitest'
-import { Resolver } from 'kubb/kit'
+import { camelCase, pascalCase } from 'kubb/kit'
 import { toFilePath } from './fs.ts'
-
-const { camelCase, pascalCase } = new Resolver({ pluginName: 'test' })
 
 describe('toFilePath', () => {
   test.each([
@@ -19,16 +17,16 @@ describe('toFilePath', () => {
     ['...Schema', 'schema'],
     ['.Internal', 'internal'],
   ])('toFilePath(%s) -> %s (camelCase segments)', (input, expected) => {
-    expect(toFilePath(input, camelCase, camelCase)).toBe(expected)
+    expect(toFilePath(input)).toBe(expected)
   })
 
   test('cases the last segment with the provided caser', () => {
-    expect(toFilePath('pet.petId', pascalCase, camelCase)).toBe('pet/PetId')
-    expect(toFilePath('pet.Pet', pascalCase, camelCase)).toBe('pet/Pet')
+    expect(toFilePath('pet.petId', pascalCase)).toBe('pet/PetId')
+    expect(toFilePath('pet.Pet', pascalCase)).toBe('pet/Pet')
   })
 
   test('applies prefix and suffix to the last segment only', () => {
-    expect(toFilePath('create tag.tag', (part) => camelCase(part, { prefix: 'create' }), camelCase)).toBe('createTag/createTag')
-    expect(toFilePath('tag.tag', (part) => camelCase(part, { suffix: 'schema' }), camelCase)).toBe('tag/tagSchema')
+    expect(toFilePath('create tag.tag', (part) => camelCase(part, { prefix: 'create' }))).toBe('createTag/createTag')
+    expect(toFilePath('tag.tag', (part) => camelCase(part, { suffix: 'schema' }))).toBe('tag/tagSchema')
   })
 })
