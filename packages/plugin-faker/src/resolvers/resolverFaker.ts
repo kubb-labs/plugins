@@ -1,5 +1,6 @@
 import { createCasedFile, createOperationParamResolver, createOperationResponseResolver } from '@internals/shared'
-import { camelCase, ensureValidVarName } from '@internals/utils'
+import { ensureValidVarName } from '@internals/utils'
+import { camelCase } from 'kubb/kit'
 import { createResolver } from 'kubb/kit'
 import type { PluginFaker } from '../types.ts'
 

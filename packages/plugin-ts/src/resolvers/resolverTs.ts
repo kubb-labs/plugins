@@ -1,5 +1,6 @@
 import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, operationKey } from '@internals/shared'
-import { ensureValidVarName, pascalCase } from '@internals/utils'
+import { ensureValidVarName } from '@internals/utils'
+import { pascalCase } from 'kubb/kit'
 import { createResolver } from 'kubb/kit'
 import type { PluginTs } from '../types.ts'
 

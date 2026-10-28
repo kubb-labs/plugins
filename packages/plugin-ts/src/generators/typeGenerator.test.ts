@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { camelCase } from '@internals/utils'
+import { camelCase } from 'kubb/kit'
 
 import type { Group } from 'kubb/kit'
 import { ast, Resolver } from 'kubb/kit'

@@ -25,70 +25,8 @@ function words(text: string): Array<string> {
 }
 
 /**
- * Shared implementation for camelCase and PascalCase conversion.
- * Capitalizes each word from {@link words} according to `pascal`.
- *
- * When `pascal` is `true` the first word is also capitalized (PascalCase), otherwise only subsequent words are.
- */
-function convert(text: string, pascal: boolean): string {
-  // Also split after a digit (`v1alpha1` → `v1Alpha1`) and inside `URLs`, as camelCase always has. Snake
-  // case keeps both whole, so `cool_2d_drawing` and `urls` stay unchanged
-  return words(text)
-    .flatMap((word) => word.split(/(?<=\d)(?=[a-z])|(?<=[A-Z])(?=[A-Z][a-z])/))
-    .map((word, i) => {
-      if (word.length > 1 && word === word.toUpperCase()) return word
-      const head = i === 0 && !pascal ? word.charAt(0).toLowerCase() : word.charAt(0).toUpperCase()
-      return head + word.slice(1)
-    })
-    .join('')
-    .replace(/[^a-zA-Z0-9]/g, '')
-}
-
-// Plugins resolve the same names over and over (about 47,000 calls for a 1,000 schema spec), so
-// results are kept. Clearing at the limit bounds the memory a long-running process spends on it.
-const cache = new Map<string, string>()
-const cacheLimit = 10_000
-
-function toCamelOrPascal(text: string, pascal: boolean): string {
-  const key = `${pascal ? 'P' : 'c'}${text}`
-  const cached = cache.get(key)
-  if (cached !== undefined) return cached
-
-  const result = convert(text, pascal)
-  if (cache.size >= cacheLimit) cache.clear()
-  cache.set(key, result)
-  return result
-}
-
-/**
- * Converts `text` to camelCase.
- *
- * @example Word boundaries
- * `camelCase('hello-world') // 'helloWorld'`
- *
- * @example With a prefix
- * `camelCase('tag', { prefix: 'create' }) // 'createTag'`
- */
-export function camelCase(text: string, { prefix = '', suffix = '' }: Options = {}): string {
-  return toCamelOrPascal(`${prefix} ${text} ${suffix}`, false)
-}
-
-/**
- * Converts `text` to PascalCase.
- *
- * @example Word boundaries
- * `pascalCase('hello-world') // 'HelloWorld'`
- *
- * @example With a suffix
- * `pascalCase('tag', { suffix: 'schema' }) // 'TagSchema'`
- */
-export function pascalCase(text: string, { prefix = '', suffix = '' }: Options = {}): string {
-  return toCamelOrPascal(`${prefix} ${text} ${suffix}`, true)
-}
-
-/**
  * Uppercases only the first character of `text`, leaving the rest untouched.
- * Unlike {@link pascalCase} it never re-splits word boundaries or strips characters.
+ * Unlike `pascalCase` it never re-splits word boundaries or strips characters.
  *
  * @example
  * `capitalize('getPetById') // 'GetPetById'`

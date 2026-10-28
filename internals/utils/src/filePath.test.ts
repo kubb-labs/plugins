@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { camelCase, pascalCase } from './casing.ts'
+import { camelCase, pascalCase } from 'kubb/kit'
 import { toFilePath } from './fs.ts'
 
 describe('toFilePath', () => {

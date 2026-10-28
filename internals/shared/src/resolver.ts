@@ -1,4 +1,5 @@
-import { camelCase, ensureValidVarName, toFilePath } from '@internals/utils'
+import { ensureValidVarName, toFilePath } from '@internals/utils'
+import { camelCase } from 'kubb/kit'
 import type { ast, Resolver, ResolverFile } from 'kubb/kit'
 
 export function resolveOperationName(name: string): string {

@@ -1,5 +1,5 @@
 import { posix } from 'node:path'
-import { camelCase } from './casing.ts'
+import { camelCase } from 'kubb/kit'
 
 function toSlash(p: string): string {
   if (p.startsWith('\\\\?\\')) return p

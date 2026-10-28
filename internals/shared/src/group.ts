@@ -1,4 +1,4 @@
-import { camelCase } from '@internals/utils'
+import { camelCase } from 'kubb/kit'
 import type { Group } from 'kubb/kit'
 
 /**

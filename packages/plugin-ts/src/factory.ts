@@ -1,4 +1,5 @@
-import { camelCase, pascalCase, screamingSnakeCase, snakeCase } from '@internals/utils'
+import { screamingSnakeCase, snakeCase } from '@internals/utils'
+import { camelCase, pascalCase } from 'kubb/kit'
 import { syncSchemaRef } from 'kubb/kit'
 import type { ast } from 'kubb/kit'
 import { generate } from 'yuku-codegen'
