@@ -1,7 +1,6 @@
 import path from 'node:path'
 import { operationFileEntry, operationKey } from '@internals/shared'
-import { camelCase } from 'kubb/kit'
-import { ast, defineGenerator, Diagnostics } from 'kubb/kit'
+import { ast, camelCase, defineGenerator, Diagnostics } from 'kubb/kit'
 import type { Generator } from 'kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from 'kubb/jsx'

@@ -1,5 +1,4 @@
-import { pascalCase } from 'kubb/kit'
-import { ast, Resolver } from 'kubb/kit'
+import { ast, pascalCase, Resolver } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
 import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, resolveOperationName } from './resolver.ts'
 

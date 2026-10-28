@@ -1,5 +1,4 @@
-import { camelCase } from 'kubb/kit'
-import { ast, defineGenerator } from 'kubb/kit'
+import { ast, camelCase, defineGenerator } from 'kubb/kit'
 import type { PluginMsw } from '../types'
 
 /**
