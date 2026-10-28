@@ -1,3 +1,4 @@
+import { createGroupConfig } from '@internals/shared'
 import { addGenerator, defineExtension, Resolver, setMacros, setResolver, useConfig } from 'kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
@@ -71,7 +72,7 @@ export const pluginSwr = defineExtension<PluginSwr>({
       query: resolveQueryConfig(query, { importPath: 'swr' }),
       mutationKey,
       mutation: resolveMutationConfig(mutation, { importPath: 'swr/mutation' }),
-      group,
+      group: createGroupConfig(group) ?? undefined,
       exclude,
       include,
       override,

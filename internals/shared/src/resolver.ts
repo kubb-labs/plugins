@@ -120,7 +120,7 @@ export function createOperationResponseResolver(): OperationResponseResolver {
 export function createCasedFile(caseLast: (part: string) => string): ResolverFile {
   return {
     baseName({ name, extname }) {
-      return this.memo(`file:${name}${extname}`, (): ast.FileNode['baseName'] => `${toFilePath(name, caseLast)}${extname}`)
+      return this.memo(`file:${name}\0${extname}`, (): ast.FileNode['baseName'] => `${toFilePath(name, caseLast)}${extname}`)
     },
   }
 }

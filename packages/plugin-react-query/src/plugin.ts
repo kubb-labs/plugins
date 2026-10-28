@@ -1,3 +1,4 @@
+import { createGroupConfig } from '@internals/shared'
 import { addGenerator, defineExtension, Resolver, setMacros, setResolver, useConfig } from 'kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
@@ -99,7 +100,7 @@ export const pluginReactQuery = defineExtension<PluginReactQuery>({
       suspense,
       customOptions: customOptions ? { name: 'useCustomHookOptions', ...customOptions } : null,
       hooks,
-      group: group ?? null,
+      group: createGroupConfig(group),
       exclude,
       include,
       override,

@@ -1,3 +1,4 @@
+import { createGroupConfig } from '@internals/shared'
 import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from 'kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
@@ -72,7 +73,7 @@ export const pluginZod = defineExtension<PluginZod>({
       exclude,
       include,
       override,
-      group: group ?? null,
+      group: createGroupConfig(group),
       importPath,
       coercion,
       // `'direction'` is the deprecated name of `'codec'`.
