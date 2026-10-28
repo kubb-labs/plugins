@@ -1,5 +1,4 @@
 import { posix } from 'node:path'
-import { camelCase } from 'kubb/kit'
 
 function toSlash(p: string): string {
   if (p.startsWith('\\\\?\\')) return p
@@ -33,15 +32,15 @@ export function getRelativePath(rootDir: string, filePath: string): string {
  * absolute path, letting generated files escape the configured output directory.
  *
  * @example Nested path from a dotted name
- * `toFilePath('pet.petId') // 'pet/petId'`
+ * `toFilePath('pet.petId', resolver.camelCase, resolver.camelCase) // 'pet/petId'`
  *
  * @example PascalCase the final segment
- * `toFilePath('pet.Pet', pascalCase) // 'pet/Pet'`
+ * `toFilePath('pet.Pet', resolver.pascalCase, resolver.camelCase) // 'pet/Pet'`
  *
  * @example Suffix applied to the final segment only
- * `toFilePath('tag.tag', (part) => camelCase(part, { suffix: 'schema' })) // 'tag/tagSchema'`
+ * `toFilePath('tag.tag', (part) => resolver.camelCase(part, { suffix: 'schema' }), resolver.camelCase) // 'tag/tagSchema'`
  */
-export function toFilePath(name: string, caseLast: (part: string) => string = camelCase, caseRest: (part: string) => string = camelCase): string {
+export function toFilePath(name: string, caseLast: (part: string) => string, caseRest: (part: string) => string): string {
   const parts = name.split(/\.(?=[a-zA-Z])/)
   return parts
     .map((part, i) => (i === parts.length - 1 ? caseLast(part) : caseRest(part)))

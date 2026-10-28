@@ -1,13 +1,12 @@
 import { ensureValidVarName, toFilePath } from '@internals/utils'
-import { camelCase } from 'kubb/kit'
 import type { ast, Resolver, ResolverFile } from 'kubb/kit'
 
 /**
- * The shared top-level `name` of the operation plugins. Bound to a resolver it uses the build's
- * memoized `camelCase`; called plain it falls back to the kit helper.
+ * The shared top-level `name` of the operation plugins. Runs bound to the resolver, so it cases
+ * through the build's `camelCase`.
  */
-export function resolveOperationName(this: Resolver | void, name: string): string {
-  return ensureValidVarName((this ? this.camelCase : camelCase)(name))
+export function resolveOperationName(this: Resolver, name: string): string {
+  return ensureValidVarName(this.camelCase(name))
 }
 
 /**

@@ -1,6 +1,5 @@
 import path from 'node:path'
 import { createSdkGenerator, defaultMacros, isValidatorEnabled, resolverClient } from '@internals/client'
-import { createGroupConfig } from '@internals/shared'
 import { addGenerator, defineExtension, injectFile, Resolver, setMacros, setResolver, useConfig } from 'kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
@@ -65,7 +64,7 @@ export const pluginFetch = defineExtension<PluginFetch>({
       exclude,
       include,
       override,
-      group: createGroupConfig(group),
+      group: group ?? null,
       baseURL,
       throwOnErrorDefault,
       validator,

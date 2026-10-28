@@ -79,7 +79,11 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
   return nodes.reduce((acc, operationNode) => {
     if (!ast.isHttpOperationNode(operationNode)) return acc
     const tag = operationNode.tags[0]
-    const name = tag ? (group?.name?.({ group: resolver.camelCase(tag) }) ?? resolver.groupName(tag)) : resolver.className('ApiClient')
+    const name = tag
+      ? group
+        ? (group.name?.({ group: resolver.camelCase(tag) }) ?? resolver.camelCase(tag))
+        : resolver.groupName(tag)
+      : resolver.className('ApiClient')
     const file = resolver.file({ name, extname: '.ts', tag, root, output, group: group ?? undefined })
     const operationData = buildOperationData(operationNode)
     const previous = acc.find((item) => item.file.path === file.path)

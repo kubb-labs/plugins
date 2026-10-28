@@ -1,6 +1,13 @@
-import { ast, pascalCase, Resolver } from 'kubb/kit'
+import { ast, Resolver } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
 import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, resolveOperationName } from './resolver.ts'
+
+const resolver = new Resolver({
+  pluginName: 'test',
+  name(name) {
+    return this.pascalCase(name)
+  },
+})
 
 describe('resolveOperationName', () => {
   test.each([
@@ -24,7 +31,7 @@ describe('resolveOperationName', () => {
     'public',
     'static',
   ])('escapes %s', (name) => {
-    expect(resolveOperationName(name)).toBe(`_${name}`)
+    expect(resolveOperationName.call(resolver, name)).toBe(`_${name}`)
   })
 
   test.each([
@@ -33,11 +40,10 @@ describe('resolveOperationName', () => {
     ['get-pet-by-id', 'getPetById'],
     ['123pets', '_123Pets'],
   ])('resolves %s as %s', (name, expected) => {
-    expect(resolveOperationName(name)).toBe(expected)
+    expect(resolveOperationName.call(resolver, name)).toBe(expected)
   })
 })
 
-const resolver = new Resolver({ pluginName: 'test', name: pascalCase })
 const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
 describe('createOperationParamResolver', () => {

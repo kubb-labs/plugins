@@ -1,5 +1,3 @@
-import { createGroupConfig } from '@internals/shared'
-
 import { resolveContractClient } from '@internals/client'
 import { addGenerator, defineExtension, Resolver, setMacros, setResolver, useConfig } from 'kubb/kit'
 import { compatibility } from '../kubb-extension.json'
@@ -74,7 +72,7 @@ export const pluginMcp = defineExtension<PluginMcp>({
       exclude,
       include,
       override,
-      group: createGroupConfig(group),
+      group: group ?? null,
       client: resolveContractClient({ plugin: pluginMcpName, client, plugins: useConfig().plugins }),
       resolver,
     }

@@ -1,4 +1,3 @@
-import { createGroupConfig } from '@internals/shared'
 import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from 'kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
@@ -51,7 +50,7 @@ export const pluginClient = defineExtension<PluginClient>({
       exclude,
       include,
       override,
-      group: createGroupConfig(group),
+      group: group ?? null,
       importPath,
       baseURL: undefined,
       throwOnErrorDefault,

@@ -57,6 +57,7 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
       []) as Array<[string | number, string | number | boolean, string?]>,
     type: enumOptions.type,
     enumKeyCasing: enumOptions.keyCasing,
+    resolver,
   })
 
   // When the const and the type share a name (pascalCase const + empty typeSuffix) they merge into
