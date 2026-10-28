@@ -25,113 +25,122 @@ describe('Plugin Generation Performance', () => {
   const petStorePath = path.resolve(__dirname, '../../schemas/3.0.x/petStore.yaml')
 
   test('single plugin generation (plugin-ts)', async ({ bench }) => {
-    await bench('single plugin generation (plugin-ts)', async () => {
-      const config = defineConfig({
-        root: '.',
-        storage: memoryStorage(),
-        input: petStorePath,
-        adapter: adapterOas({ validate: false }),
-        output: {
-          path: './src/gen',
-          clean: false,
-        },
-        plugins: [
-          pluginTs({
-            output: {
-              path: 'types',
-              mode: 'directory',
-              barrel: false,
-            },
-            enum: { type: 'asConst' },
-          }),
-        ] as Plugin[],
-      })
+    await bench(
+      'single plugin generation (plugin-ts)',
+      async () => {
+        const config = defineConfig({
+          root: '.',
+          storage: memoryStorage(),
+          input: petStorePath,
+          adapter: adapterOas({ validate: false }),
+          output: {
+            path: './src/gen',
+            clean: false,
+          },
+          plugins: [
+            pluginTs({
+              output: {
+                path: 'types',
+                mode: 'directory',
+                barrel: false,
+              },
+              enum: { type: 'asConst' },
+            }),
+          ] as Plugin[],
+        })
 
-      const hooks = new Hookable()
-      await createKubb(config, { hooks }).build()
-    }).run({ time: 10000 })
+        const hooks = new Hookable()
+        await createKubb(config, { hooks }).build()
+      },
+    ).run({ time: 10000 })
   })
 
   test('multiple plugins generation (plugin-ts + plugin-axios)', async ({ bench }) => {
-    await bench('multiple plugins generation (plugin-ts + plugin-axios)', async () => {
-      const config = defineConfig({
-        root: '.',
-        storage: memoryStorage(),
-        input: petStorePath,
-        adapter: adapterOas({ validate: false }),
-        output: {
-          path: './src/gen',
-          clean: false,
-        },
-        plugins: [
-          pluginTs({
-            output: {
-              path: 'types',
-              mode: 'directory',
-              barrel: false,
-            },
-            enum: { type: 'asConst' },
-          }),
-          pluginAxios({
-            output: {
-              path: 'clients',
-              mode: 'directory',
-            },
-          }),
-        ] as Plugin[],
-      })
+    await bench(
+      'multiple plugins generation (plugin-ts + plugin-axios)',
+      async () => {
+        const config = defineConfig({
+          root: '.',
+          storage: memoryStorage(),
+          input: petStorePath,
+          adapter: adapterOas({ validate: false }),
+          output: {
+            path: './src/gen',
+            clean: false,
+          },
+          plugins: [
+            pluginTs({
+              output: {
+                path: 'types',
+                mode: 'directory',
+                barrel: false,
+              },
+              enum: { type: 'asConst' },
+            }),
+            pluginAxios({
+              output: {
+                path: 'clients',
+                mode: 'directory',
+              },
+            }),
+          ] as Plugin[],
+        })
 
-      const hooks = new Hookable()
-      await createKubb(config, { hooks }).build()
-    }).run({ time: 10000 })
+        const hooks = new Hookable()
+        await createKubb(config, { hooks }).build()
+      },
+    ).run({ time: 10000 })
   })
 
   test('comprehensive plugin suite generation', async ({ bench }) => {
-    await bench('comprehensive plugin suite generation', async () => {
-      const config = defineConfig({
-        root: '.',
-        storage: memoryStorage(),
-        input: petStorePath,
-        adapter: adapterOas({ validate: false }),
-        output: {
-          path: './src/gen',
-          clean: false,
-        },
-        plugins: [
-          pluginTs({
-            output: {
-              path: 'types',
-              mode: 'directory',
-              barrel: false,
-            },
-            enum: { type: 'asConst' },
-          }),
-          pluginAxios({
-            output: {
-              path: 'clients',
-              mode: 'directory',
-            },
-          }),
-          pluginZod({
-            output: {
-              path: 'zod',
-              mode: 'directory',
-              barrel: false,
-            },
-            inferred: true,
-          }),
-          pluginFaker({
-            output: {
-              path: 'mocks',
-              mode: 'directory',
-              barrel: false,
-            },
-          }),
-        ] as Plugin[],
-      })
+    await bench(
+      'comprehensive plugin suite generation',
+      async () => {
+        const config = defineConfig({
+          root: '.',
+          storage: memoryStorage(),
+          input: petStorePath,
+          adapter: adapterOas({ validate: false }),
+          output: {
+            path: './src/gen',
+            clean: false,
+          },
+          plugins: [
+            pluginTs({
+              output: {
+                path: 'types',
+                mode: 'directory',
+                barrel: false,
+              },
+              enum: { type: 'asConst' },
+            }),
+            pluginAxios({
+              output: {
+                path: 'clients',
+                mode: 'directory',
+              },
+            }),
+            pluginZod({
+              output: {
+                path: 'zod',
+                mode: 'directory',
+                barrel: false,
+              },
+              inferred: true,
+            }),
+            pluginFaker({
+              output: {
+                path: 'mocks',
+                mode: 'directory',
+                barrel: false,
+              },
+            }),
+          ] as Plugin[],
+        })
 
-      const hooks = new Hookable()
-      await createKubb(config, { hooks }).build()
-    }).run({ time: 10000 })
+        const hooks = new Hookable()
+        await createKubb(config, { hooks }).build()
+      },
+    ).run({ time: 10000 })
   })
 })
