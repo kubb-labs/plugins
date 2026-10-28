@@ -192,9 +192,12 @@ export default defineConfig(() => {
         ...baseConfig.output,
         path: `./gen/${name}`,
         // Strict-typecheck the generated models + zod so output that does not compile fails the
-        // run. Kubb runs these commands without a shell (no globbing), so copy the shared strict
-        // config into the spec's output and point `tsc -p` at it — `include` globs resolve from there.
-        postGenerate: skipTypecheck.has(name) ? undefined : [`cp ./tsconfig.gen.json ./gen/${name}/tsconfig.json`, `tsc -p ./gen/${name}/tsconfig.json`],
+        // run. Kubb runs these commands without a shell (no globbing, no `cp` on Windows), so copy the
+        // shared strict config into the spec's output with Node and point `tsc -p` at it — `include`
+        // globs resolve from there.
+        postGenerate: skipTypecheck.has(name)
+          ? undefined
+          : [`node -e "require('node:fs').copyFileSync('./tsconfig.gen.json', './gen/${name}/tsconfig.json')"`, `tsc -p ./gen/${name}/tsconfig.json`],
       },
       input: path,
     }
