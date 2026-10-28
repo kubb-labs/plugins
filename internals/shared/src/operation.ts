@@ -590,7 +590,10 @@ export function resolveStatusCodeNames(node: ast.OperationNode, resolver: Respon
   return node.responses.map((response) => resolver.response.status(node, response.statusCode))
 }
 
-/** Lists the type names an operation's types file declares, computed once per resolver and `options` so every dependent reads the same list. */
+/**
+ * Lists the type names an operation's types file declares, computed once per resolver and `options` so every
+ * dependent reads the same list.
+ */
 export function resolveOperationTypeNames(
   node: ast.OperationNode,
   resolver: OperationTypeNameResolver & Pick<Resolver, 'memo'>,
