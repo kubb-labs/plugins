@@ -1,5 +1,13 @@
 # @kubb/plugin-cypress
 
+## 5.1.3
+
+### Patch Changes
+
+- [#1299](https://github.com/kubb-labs/plugins/pull/1299) [`d3a8c5d`](https://github.com/kubb-labs/plugins/commit/d3a8c5dec2eab6e920b7dd9ff7e8637f7addd85f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Import `camelCase` and `pascalCase` from `kubb/kit` instead of a copy bundled into each plugin, and compute each resolved name once per build through `this.memo`, with the key prefixes registered in `Kubb.MemoRegistry`. A grouped SDK class whose tag starts with a digit now gets a valid class name. Needs kubb 5.15 or later.
+- Updated dependencies [[`d3a8c5d`](https://github.com/kubb-labs/plugins/commit/d3a8c5dec2eab6e920b7dd9ff7e8637f7addd85f)]:
+  - @kubb/plugin-ts@5.3.3
+
 ## 5.1.2
 
 ### Patch Changes
