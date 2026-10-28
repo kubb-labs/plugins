@@ -223,6 +223,9 @@ importers:
       '@kubb/adapter-oas':
         specifier: link:../kubb/packages/adapter-oas
         version: link:../kubb/packages/adapter-oas
+      '@kubb/core':
+        specifier: link:../kubb/packages/core
+        version: link:../kubb/packages/core
       '@kubb/parser-ts':
         specifier: link:../kubb/packages/parser-ts
         version: link:../kubb/packages/parser-ts
