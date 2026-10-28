@@ -18,6 +18,7 @@ export default defineConfig(() => {
       path: './src/gen',
       clean: true,
       format: 'oxfmt',
+      postGenerate: ['npm run typecheck'],
     },
     // TODO: drop once @kubb/parser-ts releases the beta.92 default (no extension on relative
     // imports) and the catalog is bumped to it.
@@ -97,8 +98,5 @@ export default defineConfig(() => {
         group: { type: 'tag' },
       }),
     ],
-    hooks: {
-      done: ['npm run typecheck'],
-    },
   }
 })
