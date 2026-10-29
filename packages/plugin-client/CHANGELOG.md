@@ -1,5 +1,28 @@
 # @kubb/plugin-client
 
+## 5.9.0
+
+### Minor Changes
+
+- [#1314](https://github.com/kubb-labs/plugins/pull/1314) [`c40a8a0`](https://github.com/kubb-labs/plugins/commit/c40a8a0b77ede6b436a905ec4b1e35aabbe69b77) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Plugins no longer need the `kubb` package. They import `@kubb/kit` and `@kubb/renderer-jsx` directly and list them as dependencies instead of a peer on `kubb`. A project that runs Kubb from code with `createKubb` from `@kubb/core` no longer installs the CLI, MCP server, Studio, and bundler integrations that `kubb` brings. This works with npm, pnpm, Yarn (including Plug'n'Play), and Bun without extra installs. If you use the `kubb` CLI, nothing changes.
+  
+  `@kubb/plugin-ts` no longer installs `@kubb/parser-ts`. It is now an optional peer dependency, needed only when a `printer.nodes` handler returns a TypeScript compiler node, which is deprecated. If that happens and `@kubb/parser-ts` is missing, the build fails with `KUBB_MISSING_DEPENDENCY` and tells you to run `npm i -D @kubb/parser-ts`. Return a string from the handler instead to avoid the dependency.
+  
+  `@kubb/plugin-redoc` lists `@kubb/adapter-oas` as a peer dependency instead of a dependency, so it uses your project's copy.
+  
+  A project that pins an older Kubb version keeps one `@kubb/core` with npm and Bun. With pnpm or Yarn, pin `@kubb/kit` and `@kubb/renderer-jsx` to your Kubb version in `overrides` or `resolutions` to get the same.
+
+### Patch Changes
+
+- [#1313](https://github.com/kubb-labs/plugins/pull/1313) [`25cb730`](https://github.com/kubb-labs/plugins/commit/25cb730ce55b6f4c97c087d0eabc6b5281f75612) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Depend on Kubb `^5.15.2`: `@kubb/kit` and `@kubb/renderer-jsx` for every plugin, `@kubb/parser-ts` as the optional peer of `@kubb/plugin-ts`, and `@kubb/adapter-oas` as the peer of `@kubb/plugin-redoc`.
+
+- [#1313](https://github.com/kubb-labs/plugins/pull/1313) [`25cb730`](https://github.com/kubb-labs/plugins/commit/25cb730ce55b6f4c97c087d0eabc6b5281f75612) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Cache each operation's client and dependency file with `ctx.memo` instead of `ctx.cache`. This keeps the plugins working once `@kubb/core` drops `ctx.cache`. Generated output does not change.
+
+- [#1304](https://github.com/kubb-labs/plugins/pull/1304) [`4bed009`](https://github.com/kubb-labs/plugins/commit/4bed00935f652cc50358d1058a42d28adf1b3af8) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Compute build-constant work once per build through `memo` instead of once per schema or operation node: the Zod printers, the operation type source a client or hook takes its types from, the `TData` and `TError` expressions of each hook, and the circular and enum name sets. Each key prefix is registered in `Kubb.MemoRegistry`.
+- Updated dependencies [[`1fd420e`](https://github.com/kubb-labs/plugins/commit/1fd420edfc2d479808b8af6d48526ea923aa6a41), [`25cb730`](https://github.com/kubb-labs/plugins/commit/25cb730ce55b6f4c97c087d0eabc6b5281f75612), [`4bed009`](https://github.com/kubb-labs/plugins/commit/4bed00935f652cc50358d1058a42d28adf1b3af8), [`c40a8a0`](https://github.com/kubb-labs/plugins/commit/c40a8a0b77ede6b436a905ec4b1e35aabbe69b77), [`b4c30d3`](https://github.com/kubb-labs/plugins/commit/b4c30d3ae240548e0d5ab69f5f3a06fba8ebf49d), [`5d013e3`](https://github.com/kubb-labs/plugins/commit/5d013e3d8a747780f81b7eb67be603695ac9c0bb)]:
+  - @kubb/plugin-ts@5.4.0
+  - @kubb/plugin-zod@5.8.0
+
 ## 5.8.1
 
 ### Patch Changes
