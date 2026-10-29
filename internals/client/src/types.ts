@@ -171,6 +171,10 @@ export type ResolvedOptions = {
   override: Array<Override<Omit<ResolvedOptions, 'throwOnErrorDefault'>>>
   group: Group | null
   baseURL: Options['baseURL']
+  /**
+   * Module the generated operations import the client runtime from, used verbatim. Unset, they import the bundled `.kubb/client.ts`.
+   */
+  importPath?: string
   throwOnErrorDefault: boolean
   validator: NonNullable<Options['validator']>
   returnType: ReturnTypeOption

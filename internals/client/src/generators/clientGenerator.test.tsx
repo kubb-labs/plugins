@@ -17,7 +17,7 @@ const clientGenerator = createClientGenerator<PluginFetch>('fetch')
 type PluginClient = PluginType<'plugin-client', Options, ResolvedOptions & { importPath: string }, ResolverClient>
 
 // What `@kubb/plugin-client` registers: a user-owned client module, imported exactly as configured.
-const customClientGenerator = createClientGenerator<PluginClient>('client', (options) => options.importPath)
+const customClientGenerator = createClientGenerator<PluginClient>('client')
 
 const testConfig: Config = {
   root: '.',

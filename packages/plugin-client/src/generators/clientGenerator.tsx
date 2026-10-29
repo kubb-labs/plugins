@@ -6,4 +6,4 @@ import type { PluginClient } from '../types.ts'
  * operation using the shared `Operation` component: a grouped `<Name>Request` type and a function
  * that forwards a single `options` object to the user-provided client module and returns the `RequestResult`.
  */
-export const clientGenerator = createClientGenerator<PluginClient>('client', (options) => options.importPath)
+export const clientGenerator = createClientGenerator<PluginClient>('client')
