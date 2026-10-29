@@ -70,7 +70,7 @@ export function resolveClientOperation(options: {
   const { clientPlugin, driver, node, root, output, memo } = options
   if (!clientPlugin) return null
 
-  return memo(`${clientPlugin.pluginName}:clientOperation:${node.method} ${node.path}`, () => {
+  return memo(`${clientPlugin.pluginName}:clientOperation:${node.operationId}`, () => {
     const resolver = driver.getResolver(clientPlugin.pluginName)
     const pluginOptions = driver.getPlugin(clientPlugin.pluginName)?.options ?? {}
     const { exclude, include, override } = pluginOptions

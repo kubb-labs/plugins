@@ -452,4 +452,26 @@ describe('resolveDependencyOperationFile', () => {
     expect(tsResolver.file).toHaveBeenCalledOnce()
     expect(zodResolver.file).toHaveBeenCalledOnce()
   })
+
+  test('resolves each operation on its own when they have no method or path', () => {
+    const tsResolver = createFileResolver('plugin-ts')
+    const memo = createTestMemo()
+
+    resolveDependencyOperationFile({
+      memo,
+      node: ast.factory.createOperation({ operationId: 'publishPet' }),
+      resolver: tsResolver,
+      root: '/root',
+      output: { path: '.' },
+    })
+    resolveDependencyOperationFile({
+      memo,
+      node: ast.factory.createOperation({ operationId: 'publishOrder' }),
+      resolver: tsResolver,
+      root: '/root',
+      output: { path: '.' },
+    })
+
+    expect(tsResolver.file).toHaveBeenCalledTimes(2)
+  })
 })

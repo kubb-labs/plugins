@@ -41,7 +41,7 @@ export function resolveDependencyOperationFile(options: {
 }): ast.FileNode {
   const { memo, node, resolver, root, output, group } = options
 
-  return memo(`${resolver.pluginName}:operationFile:${node.method} ${node.path}`, () =>
+  return memo(`${resolver.pluginName}:operationFile:${node.operationId}`, () =>
     resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
   )
 }
