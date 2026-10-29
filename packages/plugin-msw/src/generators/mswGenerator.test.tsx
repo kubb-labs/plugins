@@ -187,7 +187,7 @@ async function renderOperation(props: RenderProps) {
     plugin,
     options,
     resolver: resolverMsw,
-    meta: { enumNames: props.enumNames ?? [], circularNames: [] },
+    meta: { enumNames: new Set(props.enumNames), circularNames: new Set() },
   })
 
   return driver.fileManager.files

@@ -63,7 +63,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     }
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
-    const cyclicSchemas = ctx.memo('circularNames:set', () => new Set(ctx.meta.circularNames))
+    const cyclicSchemas = ctx.meta.circularNames
     const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
 
     // Rendered twice: the canonical schema decodes, the `${name}InputSchema` variant encodes.
@@ -149,7 +149,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
     } as const
 
-    const cyclicSchemas = ctx.memo('circularNames:set', () => new Set(ctx.meta.circularNames))
+    const cyclicSchemas = ctx.meta.circularNames
     const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
 
     function renderSchemaEntry({

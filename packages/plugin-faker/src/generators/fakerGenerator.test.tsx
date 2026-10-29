@@ -321,7 +321,7 @@ describe('fakerGenerator — schema', () => {
     const tsPlugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: tsOptions, resolver: resolverTs })
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: defaultOptions, resolver: resolverFaker })
     const driver = createMockedPluginDriver({ name: 'allOfCycle', plugin: tsPlugin })
-    const meta = { circularNames: [...ast.findCircularSchemas(schemas)], enumNames: [] }
+    const meta = { circularNames: ast.findCircularSchemas(schemas), enumNames: new Set<string>() }
     for (const node of schemas) {
       await renderGeneratorSchema(typeGenerator, node, {
         config: testConfig,
@@ -402,24 +402,22 @@ const custom: true = child.custom`,
       config: testConfig,
       adapter: createMockedAdapter(),
       meta: {
-        circularNames: [
-          ...ast.findCircularSchemas([
-            categorySchema,
-            apiErrorSchema,
-            apiErrorDetailedSchema,
-            petListSchema,
-            petOrPetListSchema,
-            coordinateSchema,
-            emojiSchema,
-            errorSchema,
-            petSchema,
-            treeNodeSchema,
-            petPolySchema,
-            catSchema,
-            dogSchema,
-          ]),
-        ],
-        enumNames: [],
+        circularNames: ast.findCircularSchemas([
+          categorySchema,
+          apiErrorSchema,
+          apiErrorDetailedSchema,
+          petListSchema,
+          petOrPetListSchema,
+          coordinateSchema,
+          emojiSchema,
+          errorSchema,
+          petSchema,
+          treeNodeSchema,
+          petPolySchema,
+          catSchema,
+          dogSchema,
+        ]),
+        enumNames: new Set(),
       },
       driver,
       plugin,
@@ -835,8 +833,8 @@ body.id
       config: testConfig,
       adapter: createMockedAdapter(),
       meta: {
-        circularNames: [...ast.findCircularSchemas([apiErrorSchema, petListSchema, categorySchema, errorSchema, petSchema, treeNodeSchema])],
-        enumNames: [],
+        circularNames: ast.findCircularSchemas([apiErrorSchema, petListSchema, categorySchema, errorSchema, petSchema, treeNodeSchema]),
+        enumNames: new Set(),
       },
       driver,
       plugin,
@@ -872,7 +870,7 @@ body.id
     await renderGeneratorOperation(fakerGenerator, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
-      meta: { circularNames: [], enumNames: [] },
+      meta: { circularNames: new Set(), enumNames: new Set() },
       driver,
       plugin,
       options: resolvedOptions,
