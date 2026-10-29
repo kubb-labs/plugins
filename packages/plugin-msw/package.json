@@ -99,7 +99,6 @@
     "@internals/utils": "workspace:*",
     "@kubb/kit": "catalog:",
     "@kubb/renderer-jsx": "catalog:",
-    "kubb": "catalog:",
     "msw": "^3.0.3"
   },
   "peerDependencies": {

@@ -77,8 +77,7 @@
   },
   "devDependencies": {
     "@kubb/adapter-oas": "catalog:",
-    "@kubb/kit": "catalog:",
-    "kubb": "catalog:"
+    "@kubb/kit": "catalog:"
   },
   "peerDependencies": {
     "@kubb/adapter-oas": "catalog:",

@@ -81,8 +81,7 @@
     "@internals/utils": "workspace:*",
     "@kubb/kit": "catalog:",
     "@kubb/renderer-jsx": "catalog:",
-    "cypress": "^16.2.0",
-    "kubb": "catalog:"
+    "cypress": "^16.2.0"
   },
   "peerDependencies": {
     "@kubb/kit": "^5.15.0",

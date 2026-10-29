@@ -96,8 +96,7 @@
     "@internals/utils": "workspace:*",
     "@kubb/kit": "catalog:",
     "@kubb/renderer-jsx": "catalog:",
-    "@tanstack/react-query": "^5.104.5",
-    "kubb": "catalog:"
+    "@tanstack/react-query": "^5.104.5"
   },
   "peerDependencies": {
     "@kubb/kit": "^5.15.0",

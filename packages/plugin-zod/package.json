@@ -79,7 +79,6 @@
     "@internals/utils": "workspace:*",
     "@kubb/kit": "catalog:",
     "@kubb/renderer-jsx": "catalog:",
-    "kubb": "catalog:",
     "zod": "^4.6.7"
   },
   "peerDependencies": {

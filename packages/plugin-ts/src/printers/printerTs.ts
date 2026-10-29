@@ -7,13 +7,13 @@ import { buildPropertyJSDocComments, enumTypeName, isInlineConstEnum } from '../
 
 const { isNonNullable } = factory
 
-const require = createRequire(import.meta.url)
+const requireModule = createRequire(import.meta.url)
 
 /**
  * Loads `@kubb/parser-ts` on first use. It is an optional peer dependency: only a deprecated `printer.nodes`
  * handler that returns a TypeScript compiler node needs it. Loads synchronously because node handlers are synchronous.
  */
-export function loadParserTs(load = () => require('@kubb/parser-ts') as typeof import('@kubb/parser-ts')): typeof import('@kubb/parser-ts') {
+export function loadParserTs(load = () => requireModule('@kubb/parser-ts') as typeof import('@kubb/parser-ts')): typeof import('@kubb/parser-ts') {
   try {
     return load()
   } catch (error) {

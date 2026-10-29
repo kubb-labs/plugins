@@ -250,9 +250,6 @@ importers:
       '@kubb/plugin-zod':
         specifier: workspace:*
         version: link:packages/plugin-zod
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.15.1
       '@types/node':
         specifier: 'catalog:'
         version: 22.20.2
@@ -887,9 +884,6 @@ importers:
       axios:
         specifier: ^1.20.0
         version: 1.20.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
-      kubb:
-        specifier: 'catalog:'
-        version: 5.15.1(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.5)
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -915,9 +909,6 @@ importers:
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.15.1
-      kubb:
-        specifier: 'catalog:'
-        version: 5.15.1(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.5)
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -943,9 +934,6 @@ importers:
       cypress:
         specifier: ^16.2.0
         version: 16.2.0
-      kubb:
-        specifier: 'catalog:'
-        version: 5.15.1(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.5)
 
   packages/plugin-faker:
     dependencies:
@@ -968,9 +956,6 @@ importers:
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.15.1
-      kubb:
-        specifier: 'catalog:'
-        version: 5.15.1(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.5)
 
   packages/plugin-fetch:
     dependencies:
@@ -993,9 +978,6 @@ importers:
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.15.1
-      kubb:
-        specifier: 'catalog:'
-        version: 5.15.1(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.5)
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -1027,9 +1009,6 @@ importers:
       '@modelcontextprotocol/server':
         specifier: ^2.4.0
         version: 2.4.0
-      kubb:
-        specifier: 'catalog:'
-        version: 5.15.1(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.5)
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -1055,9 +1034,6 @@ importers:
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.15.1
-      kubb:
-        specifier: 'catalog:'
-        version: 5.15.1(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.5)
       msw:
         specifier: ^3.0.3
         version: 3.0.3(@types/node@22.20.2)(graphql@16.14.2)(supports-color@8.1.1)(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
@@ -1089,9 +1065,6 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.104.5
         version: 5.104.5(@types/react@19.3.0)(react@19.3.1)
-      kubb:
-        specifier: 'catalog:'
-        version: 5.15.1(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.5)
 
   packages/plugin-redoc:
     devDependencies:
@@ -1101,9 +1074,6 @@ importers:
       '@kubb/kit':
         specifier: 'catalog:'
         version: 5.15.1(vitest@5.0.5)
-      kubb:
-        specifier: 'catalog:'
-        version: 5.15.1(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.5)
 
   packages/plugin-swr:
     dependencies:
@@ -1129,9 +1099,6 @@ importers:
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.15.1
-      kubb:
-        specifier: 'catalog:'
-        version: 5.15.1(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.5)
       swr:
         specifier: ^2.5.1
         version: 2.5.1(react@19.3.1)
@@ -1160,9 +1127,6 @@ importers:
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.15.1
-      kubb:
-        specifier: 'catalog:'
-        version: 5.15.1(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.5)
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -1194,9 +1158,6 @@ importers:
       '@tanstack/vue-query':
         specifier: ^5.104.5
         version: 5.104.5(vue@3.5.44(typescript@7.0.2))
-      kubb:
-        specifier: 'catalog:'
-        version: 5.15.1(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.5)
       vue:
         specifier: ^3.5.44
         version: 3.5.44(typescript@7.0.2)
@@ -1215,9 +1176,6 @@ importers:
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.15.1
-      kubb:
-        specifier: 'catalog:'
-        version: 5.15.1(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.0.5)
       zod:
         specifier: ^4.6.7
         version: 4.6.7

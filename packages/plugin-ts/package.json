@@ -81,7 +81,6 @@
     "@kubb/kit": "catalog:",
     "@kubb/parser-ts": "catalog:",
     "@kubb/renderer-jsx": "catalog:",
-    "kubb": "catalog:",
     "typescript": "catalog:"
   },
   "peerDependencies": {

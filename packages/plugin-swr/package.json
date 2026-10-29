@@ -94,7 +94,6 @@
     "@internals/utils": "workspace:*",
     "@kubb/kit": "catalog:",
     "@kubb/renderer-jsx": "catalog:",
-    "kubb": "catalog:",
     "swr": "^2.5.1"
   },
   "peerDependencies": {

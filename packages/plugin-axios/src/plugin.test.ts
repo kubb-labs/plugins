@@ -1,4 +1,4 @@
-import { createKubb } from 'kubb'
+import { createKubb } from '@kubb/core'
 import { defineExtension } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
 import { pluginAxios } from './plugin.ts'

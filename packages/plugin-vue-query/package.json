@@ -99,7 +99,6 @@
     "@kubb/kit": "catalog:",
     "@kubb/renderer-jsx": "catalog:",
     "@tanstack/vue-query": "^5.104.5",
-    "kubb": "catalog:",
     "vue": "^3.5.44"
   },
   "peerDependencies": {

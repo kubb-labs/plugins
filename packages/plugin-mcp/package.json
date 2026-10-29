@@ -84,7 +84,6 @@
     "@kubb/kit": "catalog:",
     "@kubb/renderer-jsx": "catalog:",
     "@modelcontextprotocol/server": "^2.4.0",
-    "kubb": "catalog:",
     "zod": "^4.6.7"
   },
   "peerDependencies": {
