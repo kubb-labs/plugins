@@ -75,13 +75,12 @@
     "start": "tsdown --watch",
     "typecheck": "tsc"
   },
-  "dependencies": {
-    "@kubb/adapter-oas": "catalog:"
-  },
   "devDependencies": {
+    "@kubb/adapter-oas": "catalog:",
     "kubb": "catalog:"
   },
   "peerDependencies": {
+    "@kubb/adapter-oas": "catalog:",
     "kubb": "catalog:"
   },
   "engines": {
