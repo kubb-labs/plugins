@@ -85,9 +85,9 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "^5.15.1",
+    "@kubb/kit": "^5.15.2",
     "@kubb/plugin-ts": "workspace:^",
-    "@kubb/renderer-jsx": "^5.15.1"
+    "@kubb/renderer-jsx": "^5.15.2"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.6.0",
