@@ -327,16 +327,13 @@ describe('zodGenerator — Schema', () => {
     const resolver = Resolver.merge(resolverZod)
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver })
     const driver = createMockedPluginDriver({ name: 'catCycle' })
+    driver.inputNode = ast.factory.createInput({ schemas: [petPolySchema, catCycleSchema] })
 
     await renderGeneratorSchema(zodGenerator, catCycleSchema, {
       config: testConfig,
       adapter: createMockedAdapter({
         resolvedOptions: { dateType: 'string' },
       }),
-      meta: {
-        circularNames: ast.findCircularSchemas([petPolySchema, catCycleSchema]),
-        enumNames: new Set(),
-      },
       driver,
       plugin,
       options: defaultOptions,
@@ -362,14 +359,11 @@ describe('zodGenerator — Schema', () => {
     const resolver = Resolver.merge(resolverZod)
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver })
     const driver = createMockedPluginDriver({ name: 'selfRefCycle' })
+    driver.inputNode = ast.factory.createInput({ schemas: [errorDetailsSchema] })
 
     await renderGeneratorSchema(zodGenerator, errorDetailsSchema, {
       config: testConfig,
       adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
-      meta: {
-        circularNames: ast.findCircularSchemas([errorDetailsSchema]),
-        enumNames: new Set(),
-      },
       driver,
       plugin,
       options: defaultOptions,
@@ -403,10 +397,10 @@ describe('zodGenerator — Schema', () => {
     const resolver = Resolver.merge(resolverZod)
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver })
     const driver = createMockedPluginDriver({ name: 'nullableRecursive' })
+    driver.inputNode = ast.factory.createInput({ schemas: [node] })
     await renderGeneratorSchema(zodGenerator, node, {
       config: testConfig,
       adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
-      meta: { circularNames: ast.findCircularSchemas([node]), enumNames: new Set() },
       driver,
       plugin,
       options: defaultOptions,
@@ -1238,6 +1232,7 @@ describe('zodGenerator — Compile Option', () => {
     const resolver = Resolver.merge(resolverZod)
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'compileStrictCyclic' })
+    driver.inputNode = ast.factory.createInput({ schemas: [cyclicNodeSchema] })
 
     await renderGeneratorSchema(zodGenerator, cyclicNodeSchema, {
       config: testConfig,
@@ -1246,10 +1241,6 @@ describe('zodGenerator — Compile Option', () => {
       plugin,
       options,
       resolver,
-      meta: {
-        circularNames: new Set(['TreeNode']),
-        enumNames: new Set(),
-      },
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')

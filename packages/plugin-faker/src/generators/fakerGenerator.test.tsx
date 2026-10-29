@@ -321,7 +321,7 @@ describe('fakerGenerator — schema', () => {
     const tsPlugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: tsOptions, resolver: resolverTs })
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: defaultOptions, resolver: resolverFaker })
     const driver = createMockedPluginDriver({ name: 'allOfCycle', plugin: tsPlugin })
-    const meta = { circularNames: ast.findCircularSchemas(schemas), enumNames: new Set<string>() }
+    driver.inputNode = ast.factory.createInput({ schemas })
     for (const node of schemas) {
       await renderGeneratorSchema(typeGenerator, node, {
         config: testConfig,
@@ -330,7 +330,6 @@ describe('fakerGenerator — schema', () => {
         plugin: tsPlugin,
         options: tsOptions,
         resolver: resolverTs,
-        meta,
       })
       await renderGeneratorSchema(fakerGenerator, node, {
         config: testConfig,
@@ -339,7 +338,6 @@ describe('fakerGenerator — schema', () => {
         plugin,
         options: defaultOptions,
         resolver: resolverFaker,
-        meta,
       })
     }
 
@@ -398,27 +396,27 @@ const custom: true = child.custom`,
       plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
+    driver.inputNode = ast.factory.createInput({
+      schemas: [
+        categorySchema,
+        apiErrorSchema,
+        apiErrorDetailedSchema,
+        petListSchema,
+        petOrPetListSchema,
+        coordinateSchema,
+        emojiSchema,
+        errorSchema,
+        petSchema,
+        treeNodeSchema,
+        petPolySchema,
+        catSchema,
+        dogSchema,
+      ],
+    })
+
     await renderGeneratorSchema(fakerGenerator, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
-      meta: {
-        circularNames: ast.findCircularSchemas([
-          categorySchema,
-          apiErrorSchema,
-          apiErrorDetailedSchema,
-          petListSchema,
-          petOrPetListSchema,
-          coordinateSchema,
-          emojiSchema,
-          errorSchema,
-          petSchema,
-          treeNodeSchema,
-          petPolySchema,
-          catSchema,
-          dogSchema,
-        ]),
-        enumNames: new Set(),
-      },
       driver,
       plugin,
       options: resolvedOptions,
@@ -829,13 +827,11 @@ body.id
       plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
+    driver.inputNode = ast.factory.createInput({ schemas: [apiErrorSchema, petListSchema, categorySchema, errorSchema, petSchema, treeNodeSchema] })
+
     await renderGeneratorOperation(fakerGenerator, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
-      meta: {
-        circularNames: ast.findCircularSchemas([apiErrorSchema, petListSchema, categorySchema, errorSchema, petSchema, treeNodeSchema]),
-        enumNames: new Set(),
-      },
       driver,
       plugin,
       options: resolvedOptions,
@@ -870,7 +866,6 @@ body.id
     await renderGeneratorOperation(fakerGenerator, node, {
       config: testConfig,
       adapter: createMockedAdapter(),
-      meta: { circularNames: new Set(), enumNames: new Set() },
       driver,
       plugin,
       options: resolvedOptions,

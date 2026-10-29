@@ -160,6 +160,9 @@ async function renderOperation(props: RenderProps) {
   }
   const plugin = createMockedPlugin<PluginMsw>({ name: 'plugin-msw', options, resolver: resolverMsw })
   const driver = createMockedPluginDriver({ name: props.name })
+  driver.inputNode = ast.factory.createInput({
+    schemas: (props.enumNames ?? []).map((name) => ast.factory.createSchema({ type: 'enum', name, enumValues: [] })),
+  })
   const tsPlugin = props.tsEnum
     ? createMockedPlugin<PluginTs>({
         name: 'plugin-ts',
@@ -187,7 +190,6 @@ async function renderOperation(props: RenderProps) {
     plugin,
     options,
     resolver: resolverMsw,
-    meta: { enumNames: new Set(props.enumNames), circularNames: new Set() },
   })
 
   return driver.fileManager.files
