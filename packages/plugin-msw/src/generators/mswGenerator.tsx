@@ -1,4 +1,4 @@
-import { getOperationSuccessResponses, resolveDependencyOperationFile, resolveResponseTypes } from '@internals/shared'
+import { getEnumNames, getOperationSuccessResponses, resolveDependencyOperationFile, resolveResponseTypes } from '@internals/shared'
 import { ast, defineGenerator } from 'kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -66,7 +66,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       (response.content ?? []).flatMap((entry) => (entry.schema ? ast.collectImportedRefNames(entry.schema) : [])),
     )
     const enumOptions = pluginTs.options?.enum
-    const enumNames = new Set(ctx.meta.enumNames)
+    const enumNames = getEnumNames(ctx)
     const hasResponseNameCollision = referencedNames.some((name) => {
       return enumTypeName({ resolver: tsResolver, name, enumOptions, isEnum: enumNames.has(name) }) === type.responseName
     })

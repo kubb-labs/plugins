@@ -85,7 +85,7 @@ export type PrinterTsOptions = {
   /**
    * Schema names that represent enums for suffixed key references.
    */
-  enumSchemaNames?: Set<string>
+  enumSchemaNames?: ReadonlySet<string>
   /**
    * Custom handler map for node type overrides.
    */

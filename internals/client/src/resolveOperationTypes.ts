@@ -84,6 +84,10 @@ function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
  * ```
  */
 export function resolveOperationTypes(driver: GeneratorDriver, pluginName: string): OperationTypeSource {
+  return driver.memo(`operationTypes:${pluginName}`, () => resolve(driver, pluginName))
+}
+
+function resolve(driver: GeneratorDriver, pluginName: string): OperationTypeSource {
   const pluginTs = driver.getPlugin(pluginTsName)
   const pluginZod = driver.getPlugin(pluginZodName)
 
@@ -105,4 +109,16 @@ export function resolveOperationTypes(driver: GeneratorDriver, pluginName: strin
 
   const resolver = toZodTypeResolver(driver.getResolver(pluginZodName))
   return { response: resolver.response, resolver, output: pluginZod.options.output, group: pluginZod.options.group ?? undefined }
+}
+
+declare global {
+  namespace Kubb {
+    interface MemoRegistry {
+      operationTypes: OperationTypeSource
+      /**
+       * Nests every key the zod-backed `ResolverTs` memoizes, so it holds each of their value types.
+       */
+      zodTypes: unknown
+    }
+  }
 }
