@@ -3,11 +3,18 @@
 import type { Config } from 'kubb/kit'
 import { ast } from 'kubb/kit'
 import { resolverClient } from '@internals/client'
-import { createMockedAdapter, createMockedPlugin, renderGeneratorOperation } from 'kubb/kit/testing'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import { createMultiPluginDriver, matchFiles, rawSources, testConfig as baseConfig } from '#mocks'
+import {
+  createMockedAdapter,
+  createMockedPlugin,
+  createMultiPluginDriver,
+  matchFiles,
+  rawSources,
+  renderGeneratorOperation,
+  testConfig as baseConfig,
+} from '#mocks'
 import { resolverMcp } from '../resolvers/resolverMcp.ts'
 import type { PluginMcp } from '../types.ts'
 import { mcpGenerator } from './mcpGenerator.tsx'

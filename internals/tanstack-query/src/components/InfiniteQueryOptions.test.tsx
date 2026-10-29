@@ -1,10 +1,9 @@
 import { File, jsxRenderer } from 'kubb/jsx'
 import { ast, defineGenerator } from 'kubb/kit'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from 'kubb/kit/testing'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import { rawSources, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, rawSources, renderGeneratorOperation, testConfig } from '#mocks'
 import { definePageParam } from '../utils.ts'
 import { InfiniteQueryOptions } from './InfiniteQueryOptions.tsx'
 

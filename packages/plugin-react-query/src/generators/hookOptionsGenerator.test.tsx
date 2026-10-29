@@ -1,11 +1,10 @@
 import { ast } from 'kubb/kit'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperations } from 'kubb/kit/testing'
 import { describe, expect, test } from 'vitest'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
 import { hookOptionsGenerator } from './hookOptionsGenerator.tsx'
-import { testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperations, testConfig } from '#mocks'
 
 function createOptions(overrides: Partial<PluginReactQuery['resolvedOptions']> = {}): PluginReactQuery['resolvedOptions'] {
   return {

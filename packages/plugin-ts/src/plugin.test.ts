@@ -1,5 +1,5 @@
 import { kubbContext } from 'kubb/kit'
-import { createMockedSetupContext } from 'kubb/kit/testing'
+import { createMockedSetupContext } from '#mocks'
 import { describe, expect, test } from 'vitest'
 import { pluginTs } from './plugin.ts'
 import type { Options, PluginTs } from './types.ts'

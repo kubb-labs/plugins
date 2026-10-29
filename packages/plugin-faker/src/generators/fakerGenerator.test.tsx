@@ -4,11 +4,19 @@ import { createRequire } from 'node:module'
 import path from 'node:path'
 import { promisify } from 'node:util'
 import { ast } from 'kubb/kit'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from 'kubb/kit/testing'
 import { parserTs } from '@kubb/parser-ts'
 import { type PluginTs, resolverTs, typeGenerator } from '@kubb/plugin-ts'
 import { describe, expect, onTestFinished, test } from 'vitest'
-import { format, matchFiles, testConfig } from '#mocks'
+import {
+  createMockedAdapter,
+  createMockedPlugin,
+  createMockedPluginDriver,
+  format,
+  matchFiles,
+  renderGeneratorOperation,
+  renderGeneratorSchema,
+  testConfig,
+} from '#mocks'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import type { PluginFaker } from '../types.ts'
 import { fakerGenerator } from './fakerGenerator.tsx'

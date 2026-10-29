@@ -1,11 +1,10 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
 
 import { ast } from 'kubb/kit'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from 'kubb/kit/testing'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
-import { matchFiles, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
 import { resolverCypress } from '../resolvers/resolverCypress.ts'
 import type { PluginCypress } from '../types.ts'
 import { cypressGenerator } from './cypressGenerator.tsx'

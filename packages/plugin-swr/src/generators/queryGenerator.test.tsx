@@ -1,12 +1,11 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
 
 import { ast } from 'kubb/kit'
-import { createMockedAdapter, createMockedPlugin, renderGeneratorOperation } from 'kubb/kit/testing'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
 import { describe, expect, test, vi } from 'vitest'
-import { createMultiPluginDriver, matchFiles, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import type { Transformer } from '@internals/tanstack-query'
 import { resolverSwr } from '../resolvers/resolverSwr.ts'

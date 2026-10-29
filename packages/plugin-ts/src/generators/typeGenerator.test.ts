@@ -1,9 +1,17 @@
 import path from 'node:path'
 import type { Group } from 'kubb/kit'
 import { ast, camelCase, Resolver } from 'kubb/kit'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from 'kubb/kit/testing'
 import { describe, expect, test } from 'vitest'
-import { matchFiles, rawSources, testConfig } from '#mocks'
+import {
+  createMockedAdapter,
+  createMockedPlugin,
+  createMockedPluginDriver,
+  matchFiles,
+  rawSources,
+  renderGeneratorOperation,
+  renderGeneratorSchema,
+  testConfig,
+} from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'
 import type { PluginTs } from '../types.ts'
 import { typeGenerator } from './typeGenerator.tsx'
