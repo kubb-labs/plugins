@@ -217,7 +217,7 @@ type ResolvePageParamTypeParams = {
  * success responses into `TData` and wrapping the error responses in `ResponseErrorConfig<...>`.
  */
 export function buildResponseTypes(node: ast.OperationNode, resolver: ResolverTs): ResponseTypes {
-  return resolver.memo(`responseTypes:${node.operationId}`, () => {
+  return resolver.memo(`responseTypes:${node.method}\0${node.path}`, () => {
     const successNames = resolveSuccessNames(node, resolver)
     const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
     const errorNames = resolveErrorNames(node, resolver)
