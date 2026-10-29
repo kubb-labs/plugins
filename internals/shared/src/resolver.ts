@@ -1,6 +1,7 @@
 import { ensureValidVarName, toFilePath } from '@internals/utils'
 import { camelCase } from 'kubb/kit'
-import type { ast, Resolver, ResolverFile } from 'kubb/kit'
+import { ast } from 'kubb/kit'
+import type { GeneratorContext, Resolver, ResolverFile } from 'kubb/kit'
 
 /**
  * The shared top-level `name` of the operation plugins, computed once per operation name and build.
@@ -123,6 +124,25 @@ export function createCasedFile(caseLast: (part: string) => string): ResolverFil
       return this.memo(`file:${name}\0${extname}`, (): ast.FileNode['baseName'] => `${toFilePath(name, caseLast)}${extname}`)
     },
   }
+}
+
+type SchemaIndexContext = Pick<GeneratorContext, 'memo' | 'driver'>
+
+/**
+ * Names of the schemas in a circular reference chain, computed once per build.
+ */
+export function getCircularNames(ctx: SchemaIndexContext): ReadonlySet<string> {
+  return ctx.memo('circularNames:set', () => ast.findCircularSchemas(ctx.driver.inputNode?.schemas ?? []))
+}
+
+/**
+ * Names of the schemas whose type is `enum`, computed once per build.
+ */
+export function getEnumNames(ctx: SchemaIndexContext): ReadonlySet<string> {
+  return ctx.memo(
+    'enumNames:set',
+    () => new Set((ctx.driver.inputNode?.schemas ?? []).flatMap((schema) => (schema.type === 'enum' && schema.name ? [schema.name] : []))),
+  )
 }
 
 declare global {
