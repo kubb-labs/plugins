@@ -212,7 +212,7 @@ describe("typeGenerator — operations: 'inline'", () => {
     await renderGeneratorOperation(typeGenerator, node, { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver })
 
     const [file] = driver.fileManager.files
-    expect(ast.isVirtualFile(file!)).toBe(true)
+    expect(file!.sources.length > 0 && file!.sources.every((source) => source.inline)).toBe(true)
     expect(Object.fromEntries(file!.sources.map((source) => [source.name, source.inline?.expression]))).toMatchInlineSnapshot(`
       {
         "ApiCreatePetBody": "ApiCreatePetBodyJson",
