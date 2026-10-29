@@ -1,4 +1,4 @@
-import { getCircularNames, getOperationParameters, getPerContentTypeName, resolveContentTypeVariants, resolveDependencyOperationFile } from '@internals/shared'
+import { getOperationParameters, getPerContentTypeName, resolveContentTypeVariants, resolveDependencyOperationFile } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
 import { ast, defineGenerator } from 'kubb/kit'
 import { buildParams, enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -53,7 +53,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       }),
     } as const
     const canOverride = canOverrideSchema(node)
-    const cyclicSchemas = getCircularNames(ctx)
+    const cyclicSchemas = ctx.memo('circularNames:set', () => new Set(ctx.meta.circularNames))
     const printerInstance = printerFaker({
       resolver,
       schemaName,
@@ -193,7 +193,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ...dataUnits.map((unit) => unit.name),
       ...(hasResponseNameCollision ? [] : [responseName]),
     ])
-    const cyclicSchemas = getCircularNames(ctx)
+    const cyclicSchemas = ctx.memo('circularNames:set', () => new Set(ctx.meta.circularNames))
 
     const meta = {
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
