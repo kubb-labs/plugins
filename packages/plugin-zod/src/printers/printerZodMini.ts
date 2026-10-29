@@ -96,6 +96,13 @@ export type PrinterZodMiniOptions = {
 export type PrinterZodMiniFactory = ast.PrinterFactoryOptions<'zod-mini', PrinterZodMiniOptions, string, string>
 
 /**
+ * Rejects every value the `excluded` schema accepts, for `not`.
+ */
+function notCheckMini(excluded: string): string {
+  return `.check(z.refine((value) => !${excluded}.safeParse(value).success))`
+}
+
+/**
  * Builds the `{ key: value, … }` shape for an object node with the functional `zod/mini` modifiers.
  */
 function buildZodMiniObjectShape(ctx: Parameters<typeof buildObjectShape>[0], node: ast.SchemaNode): string {
@@ -295,6 +302,11 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
 
         return `z.tuple(${buildList(items)})`
       },
+      not(node) {
+        const [member] = node.members ?? []
+        const excluded = member ? this.transform(member) : null
+        return excluded ? `z.any()${notCheckMini(excluded)}` : null
+      },
       union(node) {
         const nodeMembers = node.members ?? []
         // z.discriminatedUnion needs every option to be a Zod object. Object variants (refs or
@@ -345,6 +357,12 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         }
 
         return rest.reduce((acc, member) => {
+          // `not` excludes values from what the other members accept, so it checks them instead of joining with `z.intersection(…)`.
+          if (member.type === ast.schemaTypes.not) {
+            const [excluded] = member.members ?? []
+            const transformed = excluded ? transform(excluded) : null
+            return transformed ? `${acc}${notCheckMini(transformed)}` : acc
+          }
           const constraint = getMemberConstraint({ member, regexType: this.options.regexType, lengths: lengthChecksMini, numbers: numberChecksMini })
           if (constraint) return acc + constraint
           const transformed = transform(member)

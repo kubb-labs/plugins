@@ -179,6 +179,13 @@ function buildZodObjectShape(ctx: Parameters<typeof buildObjectShape>[0], node: 
 }
 
 /**
+ * Rejects every value the `excluded` schema accepts, for `not`.
+ */
+function notRefine(excluded: string): string {
+  return `.refine((value) => !${excluded}.safeParse(value).success)`
+}
+
+/**
  * Breaks getter inference cycles without widening recursive refs and arrays to `z.ZodType`.
  */
 function recursiveGetterType({
@@ -523,6 +530,11 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
 
       return `z.tuple(${buildList(items)})`
     },
+    not(node) {
+      const [member] = node.members ?? []
+      const excluded = member ? this.transform(member) : null
+      return excluded ? `z.any()${notRefine(excluded)}` : null
+    },
     union(node) {
       const nodeMembers = node.members ?? []
       // z.discriminatedUnion needs every option to be a ZodObject. Object variants (refs or
@@ -573,6 +585,12 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       }
 
       return rest.reduce((acc, member) => {
+        // `not` excludes values from what the other members accept, so it refines them instead of joining with `.and(…)`.
+        if (member.type === ast.schemaTypes.not) {
+          const [excluded] = member.members ?? []
+          const transformed = excluded ? transform(excluded) : null
+          return transformed ? `${acc}${notRefine(transformed)}` : acc
+        }
         const constraint = getMemberConstraint({ member, regexType: this.options.regexType, lengths: lengthConstraints, numbers: numberConstraints })
         if (constraint) return acc + constraint
         const transformed = transform(member)
