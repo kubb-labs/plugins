@@ -1,6 +1,6 @@
 import { posix } from 'node:path'
 import { getRelativePath } from '@internals/utils'
-import { ast } from 'kubb/kit'
+import { ast } from '@kubb/kit'
 import type { ResolverFaker } from './types.ts'
 
 /**

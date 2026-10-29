@@ -1,4 +1,4 @@
-import type { Output, PluginType } from 'kubb/kit'
+import type { Output, PluginType } from '@kubb/kit'
 
 export type Options = {
   /**

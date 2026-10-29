@@ -1,8 +1,8 @@
 import { ensureValidVarName, trimQuotes } from '@internals/utils'
-import { camelCase } from 'kubb/kit'
-import type { ast } from 'kubb/kit'
-import { File } from 'kubb/jsx'
-import type { KubbReactNode } from 'kubb/jsx'
+import { camelCase } from '@kubb/kit'
+import type { ast } from '@kubb/kit'
+import { File } from '@kubb/renderer-jsx'
+import type { KubbReactNode } from '@kubb/renderer-jsx'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 

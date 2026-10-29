@@ -1,4 +1,4 @@
-import type { ast } from 'kubb/kit'
+import type { ast } from '@kubb/kit'
 import { getRequestGroupOptionality } from '@internals/shared'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'

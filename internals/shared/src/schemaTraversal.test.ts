@@ -1,4 +1,4 @@
-import { ast } from 'kubb/kit'
+import { ast } from '@kubb/kit'
 import { describe, expect, it } from 'vitest'
 import { mapSchemaItems, mapSchemaMembers, mapSchemaProperties } from './schemaTraversal.ts'
 

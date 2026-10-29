@@ -1,9 +1,9 @@
 import { resolveOperationTypes } from '@internals/client'
 import { operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
-import type { ast, GeneratorContext, Group, Output } from 'kubb/kit'
+import type { ast, GeneratorContext, Group, Output } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { File } from 'kubb/jsx'
-import type { KubbReactNode } from 'kubb/jsx'
+import { File } from '@kubb/renderer-jsx'
+import type { KubbReactNode } from '@kubb/renderer-jsx'
 
 type ContractOperation = { name: string; path: string; clientPath: string; clientPathIsFile: boolean }
 

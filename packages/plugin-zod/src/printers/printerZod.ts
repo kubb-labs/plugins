@@ -1,5 +1,5 @@
 import { lazyGetter, objectKey } from '@internals/utils'
-import { ast, syncSchemaRef } from 'kubb/kit'
+import { ast, syncSchemaRef } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   applyModifiers,

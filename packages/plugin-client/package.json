@@ -58,18 +58,17 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@kubb/kit": "^5.15.0",
     "@kubb/plugin-ts": "workspace:^",
-    "@kubb/plugin-zod": "workspace:^"
+    "@kubb/plugin-zod": "workspace:^",
+    "@kubb/renderer-jsx": "^5.15.0"
   },
   "devDependencies": {
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
-    "kubb": "catalog:",
     "typescript": "catalog:"
   },
-  "peerDependencies": {
-    "kubb": "^5.15.0"
-  },
+  "peerDependencies": {},
   "engines": {
     "node": ">=22.22"
   }

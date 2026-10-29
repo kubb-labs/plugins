@@ -1,4 +1,4 @@
-import type { ast } from 'kubb/kit'
+import type { ast } from '@kubb/kit'
 
 /**
  * Converts a child schema to printer output. Plugins instantiate it with their own output type:

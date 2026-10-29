@@ -16,7 +16,9 @@ catalog:
   # plugin, and a pin there conflicts with any newer Kubb release the user installs.
   '@kubb/adapter-oas': ^5.15.1
   '@kubb/core': ^5.15.1
+  '@kubb/kit': ^5.15.1
   '@kubb/plugin-barrel': ^5.15.1
+  '@kubb/renderer-jsx': ^5.15.1
   '@kubb/parser-ts': ^5.15.1
   '@types/node': 22.20.2
   '@types/react': ^19.3.0

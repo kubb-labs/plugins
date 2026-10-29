@@ -9,8 +9,8 @@ import {
   resolveHookFile,
   resolvePageParamType,
 } from '@internals/tanstack-query'
-import { ast, defineGenerator } from 'kubb/kit'
-import { File, jsxRenderer } from 'kubb/jsx'
+import { ast, defineGenerator } from '@kubb/kit'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Query } from '../components/Query.tsx'
 import { QueryOptions } from '../components/QueryOptions.tsx'
 import type { PluginReactQuery } from '../types'

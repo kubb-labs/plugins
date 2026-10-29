@@ -85,18 +85,18 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/plugin-ts": "workspace:^"
+    "@kubb/kit": "^5.15.0",
+    "@kubb/plugin-ts": "workspace:^",
+    "@kubb/renderer-jsx": "^5.15.0"
   },
   "devDependencies": {
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*",
-    "kubb": "catalog:",
     "swr": "^2.5.1"
   },
   "peerDependencies": {
-    "kubb": "^5.15.0",
     "swr": "^2.2.0"
   },
   "peerDependenciesMeta": {

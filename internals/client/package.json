@@ -53,15 +53,17 @@
   "dependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
+    "@kubb/kit": "catalog:",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
-    "kubb": "catalog:"
+    "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:"
   },
   "peerDependencies": {
-    "kubb": "catalog:"
+    "@kubb/kit": "catalog:",
+    "@kubb/renderer-jsx": "catalog:"
   },
   "engines": {
     "node": ">=22.22"

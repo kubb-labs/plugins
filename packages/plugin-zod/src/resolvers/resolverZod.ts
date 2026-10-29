@@ -1,6 +1,6 @@
 import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, operationKey } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
-import { camelCase, createResolver, pascalCase } from 'kubb/kit'
+import { camelCase, createResolver, pascalCase } from '@kubb/kit'
 import type { PluginZod } from '../types.ts'
 
 /**

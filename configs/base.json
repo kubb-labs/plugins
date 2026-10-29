@@ -21,7 +21,7 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "kubb/jsx",
+    "jsxImportSource": "@kubb/renderer-jsx",
     "declaration": true,
     "declarationMap": true,
     "noEmit": true,

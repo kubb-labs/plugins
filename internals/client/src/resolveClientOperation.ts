@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { operationFileEntry, operationKey } from '@internals/shared'
-import type { ast, Exclude, Group, Include, NodeCache, Output, Override, Resolver } from 'kubb/kit'
+import type { ast, Exclude, Group, Include, NodeCache, Output, Override, Resolver } from '@kubb/kit'
 import type { ReturnTypeOption } from './types.ts'
 
 /**

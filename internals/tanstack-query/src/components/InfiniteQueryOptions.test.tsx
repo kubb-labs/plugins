@@ -1,5 +1,5 @@
-import { File, jsxRenderer } from 'kubb/jsx'
-import { ast, defineGenerator } from 'kubb/kit'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { ast, defineGenerator } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'

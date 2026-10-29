@@ -1,6 +1,6 @@
 import { isSuccessStatusCode } from '@internals/shared'
 import { jsDocEscape, stringify } from '@internals/utils'
-import { ast, syncSchemaRef } from 'kubb/kit'
+import { ast, syncSchemaRef } from '@kubb/kit'
 import { getEnumNames } from './components/Enum.tsx'
 import type { PluginTs, ResolverTs } from './types.ts'
 

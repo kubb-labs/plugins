@@ -1,9 +1,9 @@
-import { ast } from 'kubb/kit'
+import { ast, Diagnostics } from '@kubb/kit'
 import { describe, expect, it } from 'vitest'
 import { format } from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'
 import { print, type TsNode } from '../factory.ts'
-import { printerTs } from './printerTs.ts'
+import { loadParserTs, printerTs } from './printerTs.ts'
 
 const inlineLiteralEnum = { type: 'inlineLiteral', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
 const enumEnum = { type: 'enum', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
@@ -966,5 +966,58 @@ describe('printerTs', () => {
       })
       expect(await formatTS(p.transform(ast.factory.createSchema({ type: 'string' })))).toBe('string')
     })
+  })
+})
+
+describe('loadParserTs', () => {
+  it('loads @kubb/parser-ts when it is installed', () => {
+    expect(typeof loadParserTs().parserTs).toBe('function')
+  })
+
+  it('throws a missing-dependency diagnostic with install help when @kubb/parser-ts is not installed', () => {
+    const notFound = Object.assign(new Error("Cannot find module '@kubb/parser-ts'"), { code: 'MODULE_NOT_FOUND' })
+    const load = () => {
+      throw notFound
+    }
+
+    expect(() => loadParserTs(load)).toThrow(Diagnostics.Error)
+    expect(() => loadParserTs(load)).toThrow(
+      expect.objectContaining({
+        diagnostic: expect.objectContaining({ code: Diagnostics.code.missingDependency, help: expect.stringContaining('npm i -D @kubb/parser-ts') }),
+      }),
+    )
+  })
+
+  it('throws the missing-dependency diagnostic for the Yarn PnP missing-peer error', () => {
+    const missingPeer = Object.assign(new Error("@kubb/plugin-ts tried to access @kubb/parser-ts (a peer dependency) but it isn't provided by its ancestors"), {
+      code: 'MODULE_NOT_FOUND',
+    })
+
+    expect(() =>
+      loadParserTs(() => {
+        throw missingPeer
+      }),
+    ).toThrow(expect.objectContaining({ diagnostic: expect.objectContaining({ code: Diagnostics.code.missingDependency }) }))
+  })
+
+  it('rethrows a missing module inside @kubb/parser-ts', () => {
+    const nested = Object.assign(new Error("Cannot find module 'typescript'\nRequire stack:\n- /node_modules/@kubb/parser-ts/dist/index.cjs"), {
+      code: 'MODULE_NOT_FOUND',
+    })
+
+    expect(() =>
+      loadParserTs(() => {
+        throw nested
+      }),
+    ).toThrow(nested)
+  })
+
+  it('rethrows other load errors', () => {
+    const broken = new Error('boom')
+    expect(() =>
+      loadParserTs(() => {
+        throw broken
+      }),
+    ).toThrow(broken)
   })
 })

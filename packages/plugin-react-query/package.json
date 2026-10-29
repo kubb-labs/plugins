@@ -87,19 +87,19 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/plugin-ts": "workspace:^"
+    "@kubb/kit": "^5.15.0",
+    "@kubb/plugin-ts": "workspace:^",
+    "@kubb/renderer-jsx": "^5.15.0"
   },
   "devDependencies": {
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*",
-    "@tanstack/react-query": "^5.104.5",
-    "kubb": "catalog:"
+    "@tanstack/react-query": "^5.104.5"
   },
   "peerDependencies": {
-    "@tanstack/react-query": "^5.82.0",
-    "kubb": "^5.15.0"
+    "@tanstack/react-query": "^5.82.0"
   },
   "peerDependenciesMeta": {
     "@tanstack/react-query": {

@@ -1,8 +1,8 @@
 import { getRequestGroups } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { classifyOperation, HookFile, MutationKey, resolveHookFile } from '@internals/tanstack-query'
-import { ast, defineGenerator } from 'kubb/kit'
-import { File, jsxRenderer } from 'kubb/jsx'
+import { ast, defineGenerator } from '@kubb/kit'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Mutation } from '../components/Mutation.tsx'
 import type { PluginVueQuery } from '../types'
 

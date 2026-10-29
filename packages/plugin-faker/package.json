@@ -85,17 +85,17 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/plugin-ts": "workspace:^"
+    "@kubb/kit": "^5.15.1",
+    "@kubb/plugin-ts": "workspace:^",
+    "@kubb/renderer-jsx": "^5.15.1"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.6.0",
     "@internals/shared": "workspace:*",
-    "@internals/utils": "workspace:*",
-    "kubb": "catalog:"
+    "@internals/utils": "workspace:*"
   },
   "peerDependencies": {
-    "@faker-js/faker": "^10.0.0",
-    "kubb": "^5.15.1"
+    "@faker-js/faker": "^10.0.0"
   },
   "peerDependenciesMeta": {
     "@faker-js/faker": {

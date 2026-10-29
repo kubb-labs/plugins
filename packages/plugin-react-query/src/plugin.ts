@@ -1,5 +1,5 @@
 import { createGroupConfig } from '@internals/shared'
-import { addGenerator, defineExtension, Resolver, setMacros, setResolver, useConfig } from 'kubb/kit'
+import { addGenerator, defineExtension, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { resolveContractClient } from '@internals/client'

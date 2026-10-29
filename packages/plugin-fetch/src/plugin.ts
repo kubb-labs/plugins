@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { createSdkGenerator, defaultMacros, isValidatorEnabled, resolverClient } from '@internals/client'
 import { createGroupConfig } from '@internals/shared'
-import { addGenerator, defineExtension, injectFile, Resolver, setMacros, setResolver, useConfig } from 'kubb/kit'
+import { addGenerator, defineExtension, injectFile, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'

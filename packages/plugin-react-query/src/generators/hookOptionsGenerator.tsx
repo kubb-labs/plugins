@@ -1,8 +1,8 @@
 import { operationFileEntry } from '@internals/shared'
 import { matchesInfinite } from '@internals/tanstack-query'
-import { ast, defineGenerator } from 'kubb/kit'
-import { File, jsxRenderer, Type } from 'kubb/jsx'
-import type { KubbReactNode } from 'kubb/jsx'
+import { ast, defineGenerator } from '@kubb/kit'
+import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
+import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { PluginReactQuery } from '../types'
 import { classifyOperation, resolveOperationOverrides } from '@internals/tanstack-query'
 

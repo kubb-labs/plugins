@@ -8,8 +8,8 @@ import {
   isSuccessStatusCode,
   resolveContentTypeVariants,
 } from '@internals/shared'
-import { ast, defineGenerator } from 'kubb/kit'
-import { File, jsxRenderer } from 'kubb/jsx'
+import { ast, defineGenerator } from '@kubb/kit'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Zod } from '../components/Zod.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerZod } from '../printers/printerZod.ts'
 import type { PrinterZodOptions } from '../printers/printerZod.ts'
