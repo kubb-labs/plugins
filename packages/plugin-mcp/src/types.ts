@@ -1,5 +1,5 @@
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
-import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from 'kubb/kit'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
 
 /**
  * Resolver for MCP that provides naming methods for handler functions.

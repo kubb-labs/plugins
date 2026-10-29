@@ -1,6 +1,6 @@
 import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildObject, objectKey, stringify, toRegExpString } from '@internals/utils'
-import { ast, containsCircularRef, Diagnostics, syncSchemaRef } from 'kubb/kit'
+import { ast, containsCircularRef, Diagnostics, syncSchemaRef } from '@kubb/kit'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 import { canOverrideSchema, isObjectSchema } from '../utils.ts'
 

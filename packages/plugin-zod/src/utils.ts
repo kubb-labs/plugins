@@ -1,6 +1,6 @@
 import { buildObject, stringify, toRegExpString } from '@internals/utils'
 import { mapSchemaProperties } from '@internals/shared'
-import { ast, containsCircularRef, syncSchemaRef } from 'kubb/kit'
+import { ast, containsCircularRef, syncSchemaRef } from '@kubb/kit'
 import type { PluginZod } from './types.ts'
 
 /**

@@ -1,7 +1,7 @@
 import { operationKey, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
-import { ast, defineGenerator } from 'kubb/kit'
+import { ast, defineGenerator } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { File, jsxRenderer } from 'kubb/jsx'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'
 import type { PluginCypress } from '../types.ts'
 

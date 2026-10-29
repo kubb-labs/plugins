@@ -9,7 +9,7 @@ import {
   resolveErrorNames,
   resolveSuccessNames,
 } from '@internals/shared'
-import type { ast } from 'kubb/kit'
+import type { ast } from '@kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
 import type { Infinite, Mutation, PageParamFn, Query } from './types.ts'

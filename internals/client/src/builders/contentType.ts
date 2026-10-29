@@ -1,5 +1,5 @@
 import { getContentTypeInfo, getResponseContentTypeInfo } from '@internals/shared'
-import { ast } from 'kubb/kit'
+import { ast } from '@kubb/kit'
 
 /**
  * Builds the `contentType` entry baked into the call config, or `null` without a request body.

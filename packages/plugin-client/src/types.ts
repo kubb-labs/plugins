@@ -1,4 +1,4 @@
-import type { Override, PluginType } from 'kubb/kit'
+import type { Override, PluginType } from '@kubb/kit'
 import type { Options as ClientOptions, ResolvedOptions as ClientResolvedOptions, ResolverClient } from '@internals/client'
 
 export type { ResolverClient } from '@internals/client'

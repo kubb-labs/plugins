@@ -1,4 +1,4 @@
-import type { ast } from 'kubb/kit'
+import type { ast } from '@kubb/kit'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption } from '../types.ts'
 

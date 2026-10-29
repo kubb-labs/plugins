@@ -1,8 +1,8 @@
-import type { ast } from 'kubb/kit'
+import type { ast } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
-import { File, Function } from 'kubb/jsx'
-import type { KubbReactNode } from 'kubb/jsx'
+import { File, Function } from '@kubb/renderer-jsx'
+import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildQueryKeyParams, buildQueryOptionsParams, buildResponseTypes } from '@internals/tanstack-query'
 import { buildClientOptionType, buildOperationComments as getComments } from '@internals/shared'
 

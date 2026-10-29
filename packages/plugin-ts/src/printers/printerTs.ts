@@ -1,5 +1,5 @@
 import { mapSchemaItems, mapSchemaProperties } from '@internals/shared'
-import { ast, isStringType, syncSchemaRef } from 'kubb/kit'
+import { ast, isStringType, syncSchemaRef } from '@kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'

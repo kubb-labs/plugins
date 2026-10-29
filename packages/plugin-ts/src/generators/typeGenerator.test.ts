@@ -1,6 +1,6 @@
 import path from 'node:path'
-import type { Group } from 'kubb/kit'
-import { ast, camelCase, Resolver } from 'kubb/kit'
+import type { Group } from '@kubb/kit'
+import { ast, camelCase, Resolver } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
 import {
   createMockedAdapter,

@@ -1,5 +1,5 @@
 import { createKubb } from 'kubb'
-import { defineExtension } from 'kubb/kit'
+import { defineExtension } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
 import { pluginMcp } from './plugin.ts'
 

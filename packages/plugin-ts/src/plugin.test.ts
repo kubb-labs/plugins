@@ -1,4 +1,4 @@
-import { kubbContext } from 'kubb/kit'
+import { kubbContext } from '@kubb/kit'
 import { createMockedSetupContext } from '#mocks'
 import { describe, expect, test } from 'vitest'
 import { pluginTs } from './plugin.ts'

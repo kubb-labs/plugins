@@ -1,6 +1,6 @@
 import { operationKey } from '@internals/shared'
 import { capitalize } from '@internals/utils'
-import type { ast, Resolver } from 'kubb/kit'
+import type { ast, Resolver } from '@kubb/kit'
 
 /**
  * The naming variant of a query namespace: the plain query, or the

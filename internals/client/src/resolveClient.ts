@@ -15,7 +15,7 @@
  * lone registered contract client plugin is picked up automatically.
  */
 
-import { Diagnostics } from 'kubb/kit'
+import { Diagnostics } from '@kubb/kit'
 
 // Canonical plugin names. They mirror the `pluginFetchName` / `pluginAxiosName` / `pluginClientName`
 // consts the plugins export, kept as literals so this internal needs no plugin install deps.

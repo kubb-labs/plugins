@@ -92,11 +92,14 @@
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*",
+    "@kubb/kit": "catalog:",
+    "@kubb/renderer-jsx": "catalog:",
     "kubb": "catalog:",
     "swr": "^2.5.1"
   },
   "peerDependencies": {
-    "kubb": "^5.15.0",
+    "@kubb/kit": "^5.15.0",
+    "@kubb/renderer-jsx": "^5.15.0",
     "swr": "^2.2.0"
   },
   "peerDependenciesMeta": {

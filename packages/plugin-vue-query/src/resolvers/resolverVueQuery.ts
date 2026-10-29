@@ -1,6 +1,6 @@
 import { resolveOperationName } from '@internals/shared'
 import { createMutationResolver, createQueryResolver } from '@internals/tanstack-query'
-import { createResolver } from 'kubb/kit'
+import { createResolver } from '@kubb/kit'
 import type { PluginVueQuery } from '../types.ts'
 
 /**

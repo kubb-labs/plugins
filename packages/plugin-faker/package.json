@@ -91,11 +91,14 @@
     "@faker-js/faker": "^10.6.0",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
+    "@kubb/kit": "catalog:",
+    "@kubb/renderer-jsx": "catalog:",
     "kubb": "catalog:"
   },
   "peerDependencies": {
     "@faker-js/faker": "^10.0.0",
-    "kubb": "^5.15.1"
+    "@kubb/kit": "^5.15.1",
+    "@kubb/renderer-jsx": "^5.15.1"
   },
   "peerDependenciesMeta": {
     "@faker-js/faker": {

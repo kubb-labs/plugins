@@ -1,5 +1,5 @@
-import type { Adapter, Config, PluginType } from 'kubb/kit'
-import { ast, Diagnostics, memoryStorage } from 'kubb/kit'
+import type { Adapter, Config, PluginType } from '@kubb/kit'
+import { ast, Diagnostics, memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'

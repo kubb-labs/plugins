@@ -1,4 +1,4 @@
-import { camelCase, type Group } from 'kubb/kit'
+import { camelCase, type Group } from '@kubb/kit'
 
 /**
  * Builds the `group` config a Kubb plugin passes to `ctx.setOptions`, applying the

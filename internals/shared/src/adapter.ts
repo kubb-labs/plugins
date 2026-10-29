@@ -1,4 +1,4 @@
-import { type Adapter, Diagnostics } from 'kubb/kit'
+import { type Adapter, Diagnostics } from '@kubb/kit'
 import type { AdapterOas } from '@kubb/adapter-oas'
 
 /**

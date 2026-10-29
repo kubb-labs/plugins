@@ -1,5 +1,5 @@
 import { getOperationParameters } from '@internals/shared'
-import type { ast } from 'kubb/kit'
+import type { ast } from '@kubb/kit'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import type { ValidatorOptions } from '../types.ts'
 import { buildZodErrorParse, resolveParamsValidator, resolveRequestValidator, resolveResponseValidator } from './validatorOptions.ts'

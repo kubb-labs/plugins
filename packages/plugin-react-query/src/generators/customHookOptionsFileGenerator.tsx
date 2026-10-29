@@ -1,8 +1,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { defineGenerator } from 'kubb/kit'
-import { File, Function, jsxRenderer } from 'kubb/jsx'
+import { defineGenerator } from '@kubb/kit'
+import { File, Function, jsxRenderer } from '@kubb/renderer-jsx'
 import type { PluginReactQuery } from '../types'
 
 /**

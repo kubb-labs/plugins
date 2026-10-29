@@ -1,7 +1,7 @@
 import { operationKey, resolveOperationName } from '@internals/shared'
 import { createMutationResolver, createQueryResolver } from '@internals/tanstack-query'
 import { capitalize } from '@internals/utils'
-import { createResolver } from 'kubb/kit'
+import { createResolver } from '@kubb/kit'
 import type { PluginSwr } from '../types.ts'
 
 /**

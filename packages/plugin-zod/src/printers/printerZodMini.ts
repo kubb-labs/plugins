@@ -1,5 +1,5 @@
 import { lazyGetter, objectKey } from '@internals/utils'
-import { ast } from 'kubb/kit'
+import { ast } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import { applyMiniModifiers, buildObjectShape, lengthChecksMini, numberChecksMini, patternKeySchemaMini, printWithOmit, shouldCoerce } from '../utils.ts'
 import { buildZodNodes, type ZodDialect } from './zodNodes.ts'

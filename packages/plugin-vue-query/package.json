@@ -96,13 +96,16 @@
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*",
+    "@kubb/kit": "catalog:",
+    "@kubb/renderer-jsx": "catalog:",
     "@tanstack/vue-query": "^5.104.5",
     "kubb": "catalog:",
     "vue": "^3.5.44"
   },
   "peerDependencies": {
+    "@kubb/kit": "^5.15.0",
+    "@kubb/renderer-jsx": "^5.15.0",
     "@tanstack/vue-query": "^5.41.0",
-    "kubb": "^5.15.0",
     "vue": ">=3.3.0"
   },
   "peerDependenciesMeta": {

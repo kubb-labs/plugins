@@ -2,7 +2,7 @@ import path from 'node:path'
 import type { AdapterOas } from '@kubb/adapter-oas'
 import { adapterOasName } from '@kubb/adapter-oas'
 
-import { type Adapter, ast, defineExtension, Diagnostics, injectFile, useConfig } from 'kubb/kit'
+import { type Adapter, ast, defineExtension, Diagnostics, injectFile, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
 import { getPageHTML } from './redoc.ts'

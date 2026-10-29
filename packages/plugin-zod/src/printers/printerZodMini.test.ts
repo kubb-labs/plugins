@@ -1,4 +1,4 @@
-import { ast } from 'kubb/kit'
+import { ast } from '@kubb/kit'
 import * as z from 'zod/mini'
 import { describe, expect, test } from 'vitest'
 import type { ResolverZod } from '../types.ts'

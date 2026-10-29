@@ -1,6 +1,6 @@
 import { resolveOperationName } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
-import { camelCase, createResolver, pascalCase } from 'kubb/kit'
+import { camelCase, createResolver, pascalCase } from '@kubb/kit'
 import type { PluginContractClient } from './types.ts'
 
 /**

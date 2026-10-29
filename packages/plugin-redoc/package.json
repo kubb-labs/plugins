@@ -77,11 +77,12 @@
   },
   "devDependencies": {
     "@kubb/adapter-oas": "catalog:",
+    "@kubb/kit": "catalog:",
     "kubb": "catalog:"
   },
   "peerDependencies": {
     "@kubb/adapter-oas": "catalog:",
-    "kubb": "catalog:"
+    "@kubb/kit": "catalog:"
   },
   "engines": {
     "node": ">=22.22"

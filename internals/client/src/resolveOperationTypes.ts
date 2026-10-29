@@ -1,4 +1,4 @@
-import { type ast, Diagnostics, type Generator, type Group, type Output } from 'kubb/kit'
+import { type ast, Diagnostics, type Generator, type Group, type Output } from '@kubb/kit'
 import { pluginTsName, type ResolverTs } from '@kubb/plugin-ts'
 import { pluginZodName, type ResolverZod } from '@kubb/plugin-zod'
 import type { ContractClientFactory } from './types.ts'

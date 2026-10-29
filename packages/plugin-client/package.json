@@ -64,11 +64,14 @@
   "devDependencies": {
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
+    "@kubb/kit": "catalog:",
+    "@kubb/renderer-jsx": "catalog:",
     "kubb": "catalog:",
     "typescript": "catalog:"
   },
   "peerDependencies": {
-    "kubb": "^5.15.0"
+    "@kubb/kit": "^5.15.0",
+    "@kubb/renderer-jsx": "^5.15.0"
   },
   "engines": {
     "node": ">=22.22"

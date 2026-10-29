@@ -1,6 +1,6 @@
 import { buildOptionsSchema, buildResponses, getEnumNames, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
-import { ast, defineGenerator } from 'kubb/kit'
-import { File, jsxRenderer } from 'kubb/jsx'
+import { ast, defineGenerator } from '@kubb/kit'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import { printerTs } from '../printers/printerTs.ts'
 import type { PluginTs } from '../types'

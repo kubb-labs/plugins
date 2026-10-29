@@ -1,6 +1,6 @@
 import { operationKey, resolveOperationName } from '@internals/shared'
 import { createMutationResolver, createQueryResolver } from '@internals/tanstack-query'
-import { createResolver } from 'kubb/kit'
+import { createResolver } from '@kubb/kit'
 import type { PluginReactQuery } from '../types.ts'
 
 /**
