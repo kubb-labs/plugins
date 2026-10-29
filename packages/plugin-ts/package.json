@@ -92,6 +92,9 @@
     "typescript": ">=5.0.0"
   },
   "peerDependenciesMeta": {
+    "@kubb/parser-ts": {
+      "optional": true
+    },
     "@typescript/typescript6": {
       "optional": true
     },
