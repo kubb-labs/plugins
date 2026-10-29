@@ -74,18 +74,16 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/plugin-ts": "workspace:^"
+    "@kubb/kit": "^5.15.0",
+    "@kubb/plugin-ts": "workspace:^",
+    "@kubb/renderer-jsx": "^5.15.0"
   },
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "@kubb/kit": "catalog:",
-    "@kubb/renderer-jsx": "catalog:",
     "cypress": "^16.2.0"
   },
   "peerDependencies": {
-    "@kubb/kit": "^5.15.0",
-    "@kubb/renderer-jsx": "^5.15.0",
     "cypress": "^15.0.0 || ^16.0.0"
   },
   "peerDependenciesMeta": {

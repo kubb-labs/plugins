@@ -988,6 +988,30 @@ describe('loadParserTs', () => {
     )
   })
 
+  it('throws the missing-dependency diagnostic for the Yarn PnP missing-peer error', () => {
+    const missingPeer = Object.assign(new Error("@kubb/plugin-ts tried to access @kubb/parser-ts (a peer dependency) but it isn't provided by its ancestors"), {
+      code: 'MODULE_NOT_FOUND',
+    })
+
+    expect(() =>
+      loadParserTs(() => {
+        throw missingPeer
+      }),
+    ).toThrow(expect.objectContaining({ diagnostic: expect.objectContaining({ code: Diagnostics.code.missingDependency }) }))
+  })
+
+  it('rethrows a missing module inside @kubb/parser-ts', () => {
+    const nested = Object.assign(new Error("Cannot find module 'typescript'\nRequire stack:\n- /node_modules/@kubb/parser-ts/dist/index.cjs"), {
+      code: 'MODULE_NOT_FOUND',
+    })
+
+    expect(() =>
+      loadParserTs(() => {
+        throw nested
+      }),
+    ).toThrow(nested)
+  })
+
   it('rethrows other load errors', () => {
     const broken = new Error('boom')
     expect(() =>

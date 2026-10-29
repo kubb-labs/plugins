@@ -17,7 +17,8 @@ export function loadParserTs(load = () => requireModule('@kubb/parser-ts') as ty
   try {
     return load()
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== 'MODULE_NOT_FOUND' || !(error as Error).message.includes("'@kubb/parser-ts'")) throw error
+    // Node says "Cannot find module '@kubb/parser-ts'" and Yarn PnP "... tried to access @kubb/parser-ts ..."; later lines hold the require stack
+    if ((error as NodeJS.ErrnoException).code !== 'MODULE_NOT_FOUND' || !(error as Error).message.split('\n')[0]!.includes('@kubb/parser-ts')) throw error
     throw new Diagnostics.Error({
       code: Diagnostics.code.missingDependency,
       severity: 'error',

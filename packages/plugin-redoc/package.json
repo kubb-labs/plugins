@@ -75,13 +75,14 @@
     "start": "tsdown --watch",
     "typecheck": "tsc"
   },
-  "devDependencies": {
-    "@kubb/adapter-oas": "catalog:",
+  "dependencies": {
     "@kubb/kit": "catalog:"
   },
+  "devDependencies": {
+    "@kubb/adapter-oas": "catalog:"
+  },
   "peerDependencies": {
-    "@kubb/adapter-oas": "catalog:",
-    "@kubb/kit": "catalog:"
+    "@kubb/adapter-oas": "catalog:"
   },
   "engines": {
     "node": ">=22.22"

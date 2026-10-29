@@ -74,21 +74,19 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@kubb/kit": "^5.15.0",
     "@kubb/plugin-ts": "workspace:^",
-    "@kubb/plugin-zod": "workspace:^"
+    "@kubb/plugin-zod": "workspace:^",
+    "@kubb/renderer-jsx": "^5.15.0"
   },
   "devDependencies": {
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "@kubb/kit": "catalog:",
-    "@kubb/renderer-jsx": "catalog:",
     "@modelcontextprotocol/server": "^2.4.0",
     "zod": "^4.6.7"
   },
   "peerDependencies": {
-    "@kubb/kit": "^5.15.0",
-    "@kubb/renderer-jsx": "^5.15.0",
     "@modelcontextprotocol/server": "^2.0.0",
     "zod": "^4.2.0"
   },

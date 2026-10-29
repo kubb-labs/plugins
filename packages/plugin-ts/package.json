@@ -73,20 +73,18 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@kubb/kit": "^5.15.1",
+    "@kubb/renderer-jsx": "^5.15.1",
     "yuku-codegen": "^0.19.0"
   },
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "@kubb/kit": "catalog:",
     "@kubb/parser-ts": "catalog:",
-    "@kubb/renderer-jsx": "catalog:",
     "typescript": "catalog:"
   },
   "peerDependencies": {
-    "@kubb/kit": "^5.15.1",
     "@kubb/parser-ts": "catalog:",
-    "@kubb/renderer-jsx": "^5.15.1",
     "@typescript/typescript6": "^6.0.2",
     "typescript": ">=5.0.0"
   },

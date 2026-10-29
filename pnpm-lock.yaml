@@ -862,12 +862,18 @@ importers:
 
   packages/plugin-axios:
     dependencies:
+      '@kubb/kit':
+        specifier: ^5.15.0
+        version: 5.15.1(vitest@5.0.5)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/plugin-zod':
         specifier: workspace:^
         version: link:../plugin-zod
+      '@kubb/renderer-jsx':
+        specifier: ^5.15.0
+        version: 5.15.1
     devDependencies:
       '@internals/client':
         specifier: workspace:*
@@ -875,12 +881,6 @@ importers:
       '@internals/shared':
         specifier: workspace:*
         version: link:../../internals/shared
-      '@kubb/kit':
-        specifier: 'catalog:'
-        version: 5.15.1(vitest@5.0.5)
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.15.1
       axios:
         specifier: ^1.20.0
         version: 1.20.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
@@ -890,12 +890,18 @@ importers:
 
   packages/plugin-client:
     dependencies:
+      '@kubb/kit':
+        specifier: ^5.15.0
+        version: 5.15.1(vitest@5.0.5)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/plugin-zod':
         specifier: workspace:^
         version: link:../plugin-zod
+      '@kubb/renderer-jsx':
+        specifier: ^5.15.0
+        version: 5.15.1
     devDependencies:
       '@internals/client':
         specifier: workspace:*
@@ -903,21 +909,21 @@ importers:
       '@internals/shared':
         specifier: workspace:*
         version: link:../../internals/shared
-      '@kubb/kit':
-        specifier: 'catalog:'
-        version: 5.15.1(vitest@5.0.5)
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.15.1
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
 
   packages/plugin-cypress:
     dependencies:
+      '@kubb/kit':
+        specifier: ^5.15.0
+        version: 5.15.1(vitest@5.0.5)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
+      '@kubb/renderer-jsx':
+        specifier: ^5.15.0
+        version: 5.15.1
     devDependencies:
       '@internals/shared':
         specifier: workspace:*
@@ -925,21 +931,21 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
-      '@kubb/kit':
-        specifier: 'catalog:'
-        version: 5.15.1(vitest@5.0.5)
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.15.1
       cypress:
         specifier: ^16.2.0
         version: 16.2.0
 
   packages/plugin-faker:
     dependencies:
+      '@kubb/kit':
+        specifier: ^5.15.1
+        version: 5.15.1(vitest@5.0.5)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
+      '@kubb/renderer-jsx':
+        specifier: ^5.15.1
+        version: 5.15.1
     devDependencies:
       '@faker-js/faker':
         specifier: ^10.6.0
@@ -950,21 +956,21 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
-      '@kubb/kit':
-        specifier: 'catalog:'
-        version: 5.15.1(vitest@5.0.5)
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.15.1
 
   packages/plugin-fetch:
     dependencies:
+      '@kubb/kit':
+        specifier: ^5.15.0
+        version: 5.15.1(vitest@5.0.5)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/plugin-zod':
         specifier: workspace:^
         version: link:../plugin-zod
+      '@kubb/renderer-jsx':
+        specifier: ^5.15.0
+        version: 5.15.1
     devDependencies:
       '@internals/client':
         specifier: workspace:*
@@ -972,24 +978,24 @@ importers:
       '@internals/shared':
         specifier: workspace:*
         version: link:../../internals/shared
-      '@kubb/kit':
-        specifier: 'catalog:'
-        version: 5.15.1(vitest@5.0.5)
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.15.1
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
 
   packages/plugin-mcp:
     dependencies:
+      '@kubb/kit':
+        specifier: ^5.15.0
+        version: 5.15.1(vitest@5.0.5)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/plugin-zod':
         specifier: workspace:^
         version: link:../plugin-zod
+      '@kubb/renderer-jsx':
+        specifier: ^5.15.0
+        version: 5.15.1
     devDependencies:
       '@internals/client':
         specifier: workspace:*
@@ -1000,12 +1006,6 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
-      '@kubb/kit':
-        specifier: 'catalog:'
-        version: 5.15.1(vitest@5.0.5)
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.15.1
       '@modelcontextprotocol/server':
         specifier: ^2.4.0
         version: 2.4.0
@@ -1015,12 +1015,18 @@ importers:
 
   packages/plugin-msw:
     dependencies:
+      '@kubb/kit':
+        specifier: ^5.15.1
+        version: 5.15.1(vitest@5.0.5)
       '@kubb/plugin-faker':
         specifier: workspace:^
         version: link:../plugin-faker
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
+      '@kubb/renderer-jsx':
+        specifier: ^5.15.1
+        version: 5.15.1
     devDependencies:
       '@internals/shared':
         specifier: workspace:*
@@ -1028,21 +1034,21 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
-      '@kubb/kit':
-        specifier: 'catalog:'
-        version: 5.15.1(vitest@5.0.5)
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.15.1
       msw:
         specifier: ^3.0.3
         version: 3.0.3(@types/node@22.20.2)(graphql@16.14.2)(supports-color@8.1.1)(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
 
   packages/plugin-react-query:
     dependencies:
+      '@kubb/kit':
+        specifier: ^5.15.0
+        version: 5.15.1(vitest@5.0.5)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
+      '@kubb/renderer-jsx':
+        specifier: ^5.15.0
+        version: 5.15.1
     devDependencies:
       '@internals/client':
         specifier: workspace:*
@@ -1056,30 +1062,31 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
-      '@kubb/kit':
-        specifier: 'catalog:'
-        version: 5.15.1(vitest@5.0.5)
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.15.1
       '@tanstack/react-query':
         specifier: ^5.104.5
         version: 5.104.5(@types/react@19.3.0)(react@19.3.1)
 
   packages/plugin-redoc:
+    dependencies:
+      '@kubb/kit':
+        specifier: 'catalog:'
+        version: 5.15.1(vitest@5.0.5)
     devDependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 5.15.1(openapi-types@12.1.3)(vitest@5.0.5)
-      '@kubb/kit':
-        specifier: 'catalog:'
-        version: 5.15.1(vitest@5.0.5)
 
   packages/plugin-swr:
     dependencies:
+      '@kubb/kit':
+        specifier: ^5.15.0
+        version: 5.15.1(vitest@5.0.5)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
+      '@kubb/renderer-jsx':
+        specifier: ^5.15.0
+        version: 5.15.1
     devDependencies:
       '@internals/client':
         specifier: workspace:*
@@ -1093,18 +1100,18 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
-      '@kubb/kit':
-        specifier: 'catalog:'
-        version: 5.15.1(vitest@5.0.5)
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.15.1
       swr:
         specifier: ^2.5.1
         version: 2.5.1(react@19.3.1)
 
   packages/plugin-ts:
     dependencies:
+      '@kubb/kit':
+        specifier: ^5.15.1
+        version: 5.15.1(vitest@5.0.5)
+      '@kubb/renderer-jsx':
+        specifier: ^5.15.1
+        version: 5.15.1
       '@typescript/typescript6':
         specifier: ^6.0.2
         version: 6.0.2
@@ -1118,24 +1125,24 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
-      '@kubb/kit':
-        specifier: 'catalog:'
-        version: 5.15.1(vitest@5.0.5)
       '@kubb/parser-ts':
         specifier: 'catalog:'
         version: 5.15.1(vitest@5.0.5)
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.15.1
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
 
   packages/plugin-vue-query:
     dependencies:
+      '@kubb/kit':
+        specifier: ^5.15.0
+        version: 5.15.1(vitest@5.0.5)
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
+      '@kubb/renderer-jsx':
+        specifier: ^5.15.0
+        version: 5.15.1
     devDependencies:
       '@internals/client':
         specifier: workspace:*
@@ -1149,12 +1156,6 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
-      '@kubb/kit':
-        specifier: 'catalog:'
-        version: 5.15.1(vitest@5.0.5)
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.15.1
       '@tanstack/vue-query':
         specifier: ^5.104.5
         version: 5.104.5(vue@3.5.44(typescript@7.0.2))
@@ -1163,6 +1164,13 @@ importers:
         version: 3.5.44(typescript@7.0.2)
 
   packages/plugin-zod:
+    dependencies:
+      '@kubb/kit':
+        specifier: ^5.15.1
+        version: 5.15.1(vitest@5.0.5)
+      '@kubb/renderer-jsx':
+        specifier: ^5.15.1
+        version: 5.15.1
     devDependencies:
       '@internals/shared':
         specifier: workspace:*
@@ -1170,12 +1178,6 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
-      '@kubb/kit':
-        specifier: 'catalog:'
-        version: 5.15.1(vitest@5.0.5)
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.15.1
       zod:
         specifier: ^4.6.7
         version: 4.6.7
