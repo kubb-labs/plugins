@@ -1,6 +1,6 @@
 import { ensureValidVarName, toFilePath } from '@internals/utils'
-import { ast, camelCase } from 'kubb/kit'
-import type { GeneratorContext, Resolver, ResolverFile } from 'kubb/kit'
+import { ast, camelCase } from '@kubb/kit'
+import type { GeneratorContext, Resolver, ResolverFile } from '@kubb/kit'
 
 /**
  * The shared top-level `name` of the operation plugins, computed once per operation name and build.

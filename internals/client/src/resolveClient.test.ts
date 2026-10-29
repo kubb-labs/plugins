@@ -1,4 +1,4 @@
-import { Diagnostics } from 'kubb/kit'
+import { Diagnostics } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
 import { resolveClient, resolveContractClient } from './resolveClient.ts'
 

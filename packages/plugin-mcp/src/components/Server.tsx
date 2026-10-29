@@ -1,6 +1,6 @@
-import type { ast } from 'kubb/kit'
-import { Const, File, Function } from 'kubb/jsx'
-import type { KubbReactNode } from 'kubb/jsx'
+import type { ast } from '@kubb/kit'
+import { Const, File, Function } from '@kubb/renderer-jsx'
+import type { KubbReactNode } from '@kubb/renderer-jsx'
 
 type ZodParam = {
   name: string

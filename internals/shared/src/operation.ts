@@ -1,4 +1,4 @@
-import { ast, type Group, type Memo, type Output, type Resolver, type ResolverFileParams, Url } from 'kubb/kit'
+import { ast, type Group, type Memo, type Output, type Resolver, type ResolverFileParams, Url } from '@kubb/kit'
 
 /**
  * Builds the `ResolverFileParams` every operation generator passes to

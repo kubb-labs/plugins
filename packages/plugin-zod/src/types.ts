@@ -1,4 +1,4 @@
-import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from 'kubb/kit'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
 import type { PrinterZodNodes, printerZod } from './printers/printerZod.ts'
 import type { PrinterZodMiniNodes, printerZodMini } from './printers/printerZodMini.ts'
 

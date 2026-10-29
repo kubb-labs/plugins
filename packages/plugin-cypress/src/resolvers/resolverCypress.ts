@@ -1,5 +1,5 @@
 import { resolveOperationName } from '@internals/shared'
-import { createResolver } from 'kubb/kit'
+import { createResolver } from '@kubb/kit'
 import type { PluginCypress } from '../types.ts'
 
 /**

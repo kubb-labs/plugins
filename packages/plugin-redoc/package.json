@@ -76,13 +76,13 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/adapter-oas": "catalog:"
+    "@kubb/kit": "catalog:"
   },
   "devDependencies": {
-    "kubb": "catalog:"
+    "@kubb/adapter-oas": "catalog:"
   },
   "peerDependencies": {
-    "kubb": "catalog:"
+    "@kubb/adapter-oas": "catalog:"
   },
   "engines": {
     "node": ">=22.22"

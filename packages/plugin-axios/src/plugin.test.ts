@@ -1,5 +1,5 @@
-import { createKubb } from 'kubb'
-import { defineExtension } from 'kubb/kit'
+import { createKubb } from '@kubb/core'
+import { defineExtension } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
 import { pluginAxios } from './plugin.ts'
 import type { Options } from './types.ts'

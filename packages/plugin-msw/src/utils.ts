@@ -1,4 +1,4 @@
-import type { ast } from 'kubb/kit'
+import type { ast } from '@kubb/kit'
 
 /**
  * Returns the base URL as source code. A `${...}` value stays a template literal.

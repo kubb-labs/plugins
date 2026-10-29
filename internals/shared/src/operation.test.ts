@@ -1,5 +1,5 @@
-import { ast, createResolver } from 'kubb/kit'
-import type { Memo, PluginType, Resolver } from 'kubb/kit'
+import { ast, createResolver } from '@kubb/kit'
+import type { Memo, PluginType, Resolver } from '@kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
 import {
   buildOperationComments,

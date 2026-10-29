@@ -1,9 +1,9 @@
 import path from 'node:path'
 import { getOperationParameters, getPrimarySuccessResponse, operationFileEntry } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
-import { ast, defineGenerator } from 'kubb/kit'
+import { ast, defineGenerator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { File, jsxRenderer } from 'kubb/jsx'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
 import type { PluginMcp } from '../types.ts'
 

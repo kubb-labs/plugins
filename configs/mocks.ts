@@ -14,8 +14,8 @@ import type {
   Parser,
   Plugin,
   PluginType,
-} from 'kubb/kit'
-import { ast, camelCase, Diagnostics, Hookable, memoryStorage } from 'kubb/kit'
+} from '@kubb/kit'
+import { ast, camelCase, Diagnostics, Hookable, memoryStorage } from '@kubb/kit'
 import type { Options } from 'prettier'
 import { format as prettierFormat } from 'prettier'
 import pluginTypescript from 'prettier/plugins/typescript'

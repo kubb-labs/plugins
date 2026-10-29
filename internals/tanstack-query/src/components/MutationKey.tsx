@@ -1,7 +1,7 @@
-import { type ast, Url } from 'kubb/kit'
+import { type ast, Url } from '@kubb/kit'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
-import { File, Function, Type } from 'kubb/jsx'
-import type { KubbReactNode } from 'kubb/jsx'
+import { File, Function, Type } from '@kubb/renderer-jsx'
+import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { Transformer } from '../types.ts'
 
 type Props = {

@@ -1,9 +1,9 @@
 import { getOperationParameters } from '@internals/shared'
-import { type ast, Url } from 'kubb/kit'
+import { type ast, Url } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
-import { File, Function, Type } from 'kubb/jsx'
-import type { KubbReactNode } from 'kubb/jsx'
+import { File, Function, Type } from '@kubb/renderer-jsx'
+import type { KubbReactNode } from '@kubb/renderer-jsx'
 import type { KeyVariant, Transformer } from '../types.ts'
 import { buildQueryKeyParams } from '../utils.ts'
 

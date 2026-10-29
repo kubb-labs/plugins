@@ -1,5 +1,5 @@
 import { getResponseType, isEventStream } from '@internals/shared'
-import type { ast } from 'kubb/kit'
+import type { ast } from '@kubb/kit'
 import { buildContentType } from './contentType.ts'
 import { type Auth, buildSecurityMetadata } from './security.ts'
 import { buildStyles } from './styles.ts'

@@ -1,11 +1,33 @@
+import { createRequire } from 'node:module'
 import { mapSchemaItems, mapSchemaProperties } from '@internals/shared'
-import { ast, isStringType, syncSchemaRef } from 'kubb/kit'
-import { parserTs } from '@kubb/parser-ts'
+import { ast, Diagnostics, isStringType, syncSchemaRef } from '@kubb/kit'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { buildPropertyJSDocComments, enumTypeName, isInlineConstEnum } from '../utils.ts'
 
 const { isNonNullable } = factory
+
+const requireModule = createRequire(import.meta.url)
+
+/**
+ * Loads `@kubb/parser-ts` on first use. It is an optional peer dependency: only a deprecated `printer.nodes`
+ * handler that returns a TypeScript compiler node needs it. Loads synchronously because node handlers are synchronous.
+ */
+export function loadParserTs(load = () => requireModule('@kubb/parser-ts') as typeof import('@kubb/parser-ts')): typeof import('@kubb/parser-ts') {
+  try {
+    return load()
+  } catch (error) {
+    // Node says "Cannot find module '@kubb/parser-ts'" and Yarn PnP "... tried to access @kubb/parser-ts ..."; later lines hold the require stack
+    if ((error as NodeJS.ErrnoException).code !== 'MODULE_NOT_FOUND' || !(error as Error).message.split('\n')[0]!.includes('@kubb/parser-ts')) throw error
+    throw new Diagnostics.Error({
+      code: Diagnostics.code.missingDependency,
+      severity: 'error',
+      message: 'Missing dependency: @kubb/parser-ts. A `printer.nodes` handler returned a TypeScript compiler node, and printing it needs @kubb/parser-ts.',
+      help: 'Run `npm i -D @kubb/parser-ts` in the project, or return a string from the handler.',
+      plugin: 'plugin-ts',
+    })
+  }
+}
 
 /**
  * Partial map of node-type overrides for the TypeScript printer.
@@ -119,7 +141,8 @@ function toNodeHandlers(nodes: PrinterTsNodes | undefined): ast.PrinterPartial<f
         return factory.createRaw(
           typeof result === 'string'
             ? result
-            : parserTs()
+            : loadParserTs()
+                .parserTs()
                 .print(result as never)
                 .trimEnd(),
         )

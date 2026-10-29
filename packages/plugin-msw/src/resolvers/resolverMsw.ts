@@ -1,5 +1,5 @@
 import { operationKey } from '@internals/shared'
-import { camelCase, createResolver } from 'kubb/kit'
+import { camelCase, createResolver } from '@kubb/kit'
 import type { PluginMsw } from '../types.ts'
 
 /**

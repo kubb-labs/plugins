@@ -1,6 +1,6 @@
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
 import type { Transformer } from '@internals/tanstack-query'
-import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from 'kubb/kit'
+import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
 
 export type { Transformer } from '@internals/tanstack-query'
 
