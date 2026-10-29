@@ -50,6 +50,7 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
   })
 
   const output = printer.print(node)
+  const printerImports = printer.drainImports()
 
   if (!output) {
     return
@@ -70,9 +71,14 @@ export function Type({ name, node, printer, enum: enumOptions, resolver, inline 
     <>
       {shouldExportEnums && enums.map(({ node }) => <Enum key={node.name} node={node} enum={enumOptions} resolver={resolver} />)}
       {shouldExportType && (
-        <File.Source name={name} pointer={node.pointer} isTypeOnly isExportable isIndexable>
-          {output}
-        </File.Source>
+        <>
+          {printerImports.map((imp) => (
+            <File.Import key={[name, imp.path, imp.name].join('-')} {...imp} />
+          ))}
+          <File.Source name={name} pointer={node.pointer} isTypeOnly isExportable isIndexable>
+            {output}
+          </File.Source>
+        </>
       )}
     </>
   )

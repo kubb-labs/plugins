@@ -890,3 +890,35 @@ body.id
     expect(typeImport).not.toMatch(/\bArchiveBookStatus204\b/)
   })
 })
+
+describe('fakerGenerator — custom imports', () => {
+  test('`this.import` in a printer.nodes handler adds the import to the file', async () => {
+    const options: PluginFaker['resolvedOptions'] = {
+      ...defaultOptions,
+      printer: {
+        nodes: {
+          bigint() {
+            this.import(ast.factory.createImport({ name: ['fakeInt64'], path: 'my-int64/faker' }))
+            return 'fakeInt64()'
+          },
+        },
+      },
+    }
+    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options, resolver: resolverFaker })
+    const driver = createMockedPluginDriver({
+      name: 'customImports',
+      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorSchema(fakerGenerator, ast.factory.createSchema({ type: ast.schemaTypes.bigint, name: 'Counter' }), {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverFaker,
+    })
+
+    expect(driver.fileManager.files.flatMap((file) => file.imports.map((imp) => imp.path))).toContain('my-int64/faker')
+  })
+})
