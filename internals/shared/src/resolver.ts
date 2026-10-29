@@ -131,6 +131,8 @@ declare global {
       operation: string
       file: ast.FileNode['baseName']
       operationTypeNames: Array<string>
+      circularNames: ReadonlySet<string>
+      enumNames: ReadonlySet<string>
     }
   }
 }

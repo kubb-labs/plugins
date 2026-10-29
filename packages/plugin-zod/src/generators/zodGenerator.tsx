@@ -13,7 +13,9 @@ import { Zod } from '../components/Zod.tsx'
 import { collectDirectionalRefNames, containsDirectionalNode, printerZod } from '../printers/printerZod.ts'
 import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
+import type { PrinterZodMiniOptions } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
+import { shouldCoerce } from '../utils.ts'
 
 /**
  * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
@@ -24,31 +26,6 @@ function aliasKind(inferred: PluginZod['resolvedOptions']['inferred'], direction
   return direction === 'encode' ? 'input' : 'output'
 }
 
-type StdPrinters = { decode: ReturnType<typeof printerZod>; encode: ReturnType<typeof printerZod> }
-type ZodPrinterEntry = StdPrinters & { coercion: unknown; guidType: unknown; regexType: unknown; oneOfType: unknown; dateType: unknown; nodes: unknown }
-type ZodMiniPrinterEntry = {
-  printer: ReturnType<typeof printerZodMini>
-  coercion: unknown
-  guidType: unknown
-  regexType: unknown
-  oneOfType: unknown
-  nodes: unknown
-}
-
-// Per-build caches: keyed on resolver (unique per plugin instance per build, GC'd when released)
-const zodPrinterCache = new WeakMap<ResolverZod, ZodPrinterEntry>()
-const zodMiniPrinterCache = new WeakMap<ResolverZod, ZodMiniPrinterEntry>()
-
-type StdPrinterParams = {
-  coercion: unknown
-  guidType: unknown
-  regexType: unknown
-  oneOfType: unknown
-  dateType: unknown
-  cyclicSchemas: ReadonlySet<string>
-  nodes: unknown
-}
-
 type BuildResponseUnionParams = {
   responses: Array<ast.ResponseNode>
   name: string
@@ -56,68 +33,15 @@ type BuildResponseUnionParams = {
 }
 
 /**
- * Cached printer per direction for a resolver, built on first use. Schemas holding nothing that
- * converts print the same either way.
+ * The printer for one direction, built once per plugin per build. A `keysToOmit` list and a
+ * `printer.nodes` override differ per node and have no string key, so they get a fresh printer.
  */
-function getStdPrinters(resolver: ResolverZod, params: StdPrinterParams): StdPrinters {
-  const cached = zodPrinterCache.get(resolver)
-  if (
-    cached &&
-    cached.coercion === params.coercion &&
-    cached.guidType === params.guidType &&
-    cached.regexType === params.regexType &&
-    cached.oneOfType === params.oneOfType &&
-    cached.dateType === params.dateType &&
-    cached.nodes === params.nodes
-  ) {
-    return { decode: cached.decode, encode: cached.encode }
-  }
-  const decode = printerZod({ ...params, resolver, direction: 'decode' } as Parameters<typeof printerZod>[0])
-  const encode = printerZod({ ...params, resolver, direction: 'encode' } as Parameters<typeof printerZod>[0])
-  zodPrinterCache.set(resolver, {
-    decode,
-    encode,
-    coercion: params.coercion,
-    guidType: params.guidType,
-    regexType: params.regexType,
-    oneOfType: params.oneOfType,
-    dateType: params.dateType,
-    nodes: params.nodes,
-  })
-  return { decode, encode }
-}
-
-function getMiniPrinter(
-  resolver: ResolverZod,
-  params: {
-    coercion: unknown
-    guidType: unknown
-    regexType: unknown
-    oneOfType: unknown
-    cyclicSchemas: ReadonlySet<string>
-    nodes: unknown
-  },
-) {
-  const cached = zodMiniPrinterCache.get(resolver)
-  if (
-    cached &&
-    cached.coercion === params.coercion &&
-    cached.guidType === params.guidType &&
-    cached.regexType === params.regexType &&
-    cached.oneOfType === params.oneOfType &&
-    cached.nodes === params.nodes
-  )
-    return cached.printer
-  const p = printerZodMini({ ...params, resolver } as Parameters<typeof printerZodMini>[0])
-  zodMiniPrinterCache.set(resolver, {
-    printer: p,
-    coercion: params.coercion,
-    guidType: params.guidType,
-    regexType: params.regexType,
-    oneOfType: params.oneOfType,
-    nodes: params.nodes,
-  })
-  return p
+function getPrinter(resolver: ResolverZod, options: PrinterZodOptions, mini: boolean, direction: 'encode' | 'decode') {
+  const build = () => (mini ? printerZodMini(options as PrinterZodMiniOptions) : printerZod({ ...options, direction }))
+  if (options.nodes || options.keysToOmit?.length) return build()
+  const { coercion, guidType, regexType, oneOfType, dateType } = options
+  const coerce = (['dates', 'strings', 'numbers'] as const).map((type) => shouldCoerce(coercion, type))
+  return resolver.memo(`zodPrinter:${[mini, direction, ...coerce, guidType, regexType, oneOfType, dateType].join(':')}`, build)
 }
 
 /**
@@ -139,7 +63,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     }
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
-    const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
+    const cyclicSchemas = ctx.memo('circularNames:set', () => new Set(ctx.meta.circularNames))
     const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
 
     // Rendered twice: the canonical schema decodes, the `${name}InputSchema` variant encodes.
@@ -167,10 +91,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const isName = typeGuards ? resolver.schema.isName(node.name) : null
     const assertName = typeGuards ? resolver.schema.assertName(node.name) : null
 
-    const stdPrinters = mini ? null : getStdPrinters(resolver, { coercion, guidType, regexType, oneOfType, dateType, cyclicSchemas, nodes: printer?.nodes })
-    const schemaPrinter = mini
-      ? getMiniPrinter(resolver, { coercion, guidType, regexType, oneOfType, cyclicSchemas, nodes: printer?.nodes })
-      : stdPrinters!.decode
+    const schemaPrinter = getPrinter(resolver, printerOptions, mini, 'decode')
 
     return (
       <File
@@ -198,11 +119,11 @@ export const zodGenerator = defineGenerator<PluginZod>({
           cyclic={cyclicSchemas.has(node.name)}
           compile={compile}
         />
-        {hasDirectionalNode && stdPrinters && (
+        {hasDirectionalNode && (
           <Zod
             name={resolver.schema.inputName(node.name)}
             node={node}
-            printer={stdPrinters.encode}
+            printer={getPrinter(resolver, printerOptions, mini, 'encode')}
             inferTypeName={inferred ? resolver.schema.inputTypeName(node.name) : null}
             inferKind={aliasKind(inferred, 'encode')}
             typeGuards={typeGuards}
@@ -228,7 +149,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
     } as const
 
-    const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
+    const cyclicSchemas = ctx.memo('circularNames:set', () => new Set(ctx.meta.circularNames))
     const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
 
     function renderSchemaEntry({
@@ -253,24 +174,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
         name: (schemaName) => (directionalRefNames?.has(schemaName) ? resolver.schema.inputName(schemaName) : resolver.name(schemaName)),
       })
 
-      const schemaPrinter = mini
-        ? keysToOmit?.length
-          ? printerZodMini({ coercion, guidType, regexType, oneOfType, resolver, keysToOmit, cyclicSchemas, nodes: printer?.nodes })
-          : getMiniPrinter(resolver, { coercion, guidType, regexType, oneOfType, cyclicSchemas, nodes: printer?.nodes })
-        : keysToOmit?.length
-          ? printerZod({
-              coercion,
-              guidType,
-              regexType,
-              oneOfType,
-              dateType,
-              resolver,
-              keysToOmit,
-              cyclicSchemas,
-              nodes: printer?.nodes,
-              direction,
-            })
-          : getStdPrinters(resolver, { coercion, guidType, regexType, oneOfType, dateType, cyclicSchemas, nodes: printer?.nodes })[direction]
+      const schemaPrinter = getPrinter(resolver, { ...printerOptions, keysToOmit }, mini, direction)
 
       return (
         <>

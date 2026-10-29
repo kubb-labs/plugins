@@ -1,6 +1,6 @@
 import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from 'kubb/kit'
-import type { PrinterZodNodes } from './printers/printerZod.ts'
-import type { PrinterZodMiniNodes } from './printers/printerZodMini.ts'
+import type { PrinterZodNodes, printerZod } from './printers/printerZod.ts'
+import type { PrinterZodMiniNodes, printerZodMini } from './printers/printerZodMini.ts'
 
 /**
  * Resolver for Zod that provides naming methods for schema types.
@@ -317,6 +317,7 @@ declare global {
     interface MemoRegistry {
       typeName: string
       type: string
+      zodPrinter: ReturnType<typeof printerZod> | ReturnType<typeof printerZodMini>
     }
   }
 }

@@ -25,7 +25,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     }
     // Build a set of schema names that are enums so the ref handler and the imports
     // name callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
-    const enumSchemaNames = new Set<string>(ctx.meta.enumNames)
+    const enumSchemaNames = ctx.memo('enumNames:set', () => new Set(ctx.meta.enumNames))
     const importName = (schemaName: string) => enumTypeName({ resolver, name: schemaName, enumOptions, isEnum: enumSchemaNames.has(schemaName) })
 
     const imports = resolver.imports({ node, root, output, group: group ?? undefined, name: importName })
@@ -78,7 +78,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     // Build a set of schema names that are enums so the ref handler and the imports
     // name callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
-    const enumSchemaNames = new Set<string>(ctx.meta.enumNames)
+    const enumSchemaNames = ctx.memo('enumNames:set', () => new Set(ctx.meta.enumNames))
     const importName = (schemaName: string) => enumTypeName({ resolver, name: schemaName, enumOptions, isEnum: enumSchemaNames.has(schemaName) })
     const inlinePrinter = inline
       ? printerTs({ optionalType, arrayType, enum: enumOptions, syntaxType, resolver, enumSchemaNames, nodes: printer?.nodes })

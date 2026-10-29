@@ -84,25 +84,39 @@ function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
  * ```
  */
 export function resolveOperationTypes(driver: GeneratorDriver, pluginName: string): OperationTypeSource {
-  const pluginTs = driver.getPlugin(pluginTsName)
-  const pluginZod = driver.getPlugin(pluginZodName)
+  return driver.memo(`operationTypes:${pluginName}`, () => {
+    const pluginTs = driver.getPlugin(pluginTsName)
+    const pluginZod = driver.getPlugin(pluginZodName)
 
-  if (pluginTs && pluginZod?.options?.inferred !== 'codec') {
-    const resolver = driver.getResolver(pluginTsName)
-    return { response: resolver.response, resolver, output: pluginTs.options?.output, group: pluginTs.options?.group ?? undefined }
+    if (pluginTs && pluginZod?.options?.inferred !== 'codec') {
+      const resolver = driver.getResolver(pluginTsName)
+      return { response: resolver.response, resolver, output: pluginTs.options?.output, group: pluginTs.options?.group ?? undefined }
+    }
+
+    if (!pluginZod?.options?.inferred) {
+      throw new Diagnostics.Error({
+        code: Diagnostics.code.missingDependency,
+        severity: 'error',
+        message: `Plugin "${pluginName}" has no source for operation types.`,
+        help: `Add \`pluginTs()\` before "${pluginName}", or add \`pluginZod({ inferred: true })\`.`,
+        location: { kind: 'config' },
+        plugin: pluginName,
+      })
+    }
+
+    const resolver = toZodTypeResolver(driver.getResolver(pluginZodName))
+    return { response: resolver.response, resolver, output: pluginZod.options.output, group: pluginZod.options.group ?? undefined }
+  })
+}
+
+declare global {
+  namespace Kubb {
+    interface MemoRegistry {
+      operationTypes: OperationTypeSource
+      /**
+       * Nests every key the zod-backed `ResolverTs` memoizes, so it holds each of their value types.
+       */
+      zodTypes: unknown
+    }
   }
-
-  if (!pluginZod?.options?.inferred) {
-    throw new Diagnostics.Error({
-      code: Diagnostics.code.missingDependency,
-      severity: 'error',
-      message: `Plugin "${pluginName}" has no source for operation types.`,
-      help: `Add \`pluginTs()\` before "${pluginName}", or add \`pluginZod({ inferred: true })\`.`,
-      location: { kind: 'config' },
-      plugin: pluginName,
-    })
-  }
-
-  const resolver = toZodTypeResolver(driver.getResolver(pluginZodName))
-  return { response: resolver.response, resolver, output: pluginZod.options.output, group: pluginZod.options.group ?? undefined }
 }

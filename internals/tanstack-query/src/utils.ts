@@ -217,14 +217,16 @@ type ResolvePageParamTypeParams = {
  * success responses into `TData` and wrapping the error responses in `ResponseErrorConfig<...>`.
  */
 export function buildResponseTypes(node: ast.OperationNode, resolver: ResolverTs): ResponseTypes {
-  const successNames = resolveSuccessNames(node, resolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
-  const errorNames = resolveErrorNames(node, resolver)
+  return resolver.memo(`responseTypes:${node.method}\0${node.path}`, () => {
+    const successNames = resolveSuccessNames(node, resolver)
+    const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
+    const errorNames = resolveErrorNames(node, resolver)
 
-  return {
-    TData: responseName,
-    TError: `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`,
-  }
+    return {
+      TData: responseName,
+      TError: `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`,
+    }
+  })
 }
 
 function resolveFallbackPageParamType(initialPageParam: Infinite['initialPageParam']): string {
@@ -486,4 +488,12 @@ export function buildResolvedRequestParams(node: ast.OperationNode): string | nu
   const names = requestGroupOrder.filter((key) => groups[key])
   if (names.length === 0) return null
   return `{ ${names.map((name) => `${name}: typeof ${name} === 'function' ? ${name}() : ${name}`).join(', ')} }`
+}
+
+declare global {
+  namespace Kubb {
+    interface MemoRegistry {
+      responseTypes: ResponseTypes
+    }
+  }
 }
