@@ -1,5 +1,21 @@
 # @kubb/plugin-redoc
 
+## 5.2.0
+
+### Minor Changes
+
+- [#1314](https://github.com/kubb-labs/plugins/pull/1314) [`c40a8a0`](https://github.com/kubb-labs/plugins/commit/c40a8a0b77ede6b436a905ec4b1e35aabbe69b77) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Plugins no longer need the `kubb` package. They import `@kubb/kit` and `@kubb/renderer-jsx` directly and list them as dependencies instead of a peer on `kubb`. A project that runs Kubb from code with `createKubb` from `@kubb/core` no longer installs the CLI, MCP server, Studio, and bundler integrations that `kubb` brings. This works with npm, pnpm, Yarn (including Plug'n'Play), and Bun without extra installs. If you use the `kubb` CLI, nothing changes.
+  
+  `@kubb/plugin-ts` no longer installs `@kubb/parser-ts`. It is now an optional peer dependency, needed only when a `printer.nodes` handler returns a TypeScript compiler node, which is deprecated. If that happens and `@kubb/parser-ts` is missing, the build fails with `KUBB_MISSING_DEPENDENCY` and tells you to run `npm i -D @kubb/parser-ts`. Return a string from the handler instead to avoid the dependency.
+  
+  `@kubb/plugin-redoc` lists `@kubb/adapter-oas` as a peer dependency instead of a dependency, so it uses your project's copy.
+  
+  A project that pins an older Kubb version keeps one `@kubb/core` with npm and Bun. With pnpm or Yarn, pin `@kubb/kit` and `@kubb/renderer-jsx` to your Kubb version in `overrides` or `resolutions` to get the same.
+
+### Patch Changes
+
+- [#1313](https://github.com/kubb-labs/plugins/pull/1313) [`25cb730`](https://github.com/kubb-labs/plugins/commit/25cb730ce55b6f4c97c087d0eabc6b5281f75612) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Depend on Kubb `^5.15.2`: `@kubb/kit` and `@kubb/renderer-jsx` for every plugin, `@kubb/parser-ts` as the optional peer of `@kubb/plugin-ts`, and `@kubb/adapter-oas` as the peer of `@kubb/plugin-redoc`.
+
 ## 5.1.1
 
 ### Patch Changes
