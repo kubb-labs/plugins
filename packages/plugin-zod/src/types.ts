@@ -309,9 +309,6 @@ export type ResolvedOptions = {
 
 export type PluginZod = PluginType<'plugin-zod', Options, ResolvedOptions, ResolverZod>
 
-/**
- * A configured Zod or Zod Mini printer, as the generator memoizes it per plugin per build.
- */
 export type ZodPrinter = ReturnType<typeof printerZod> | ReturnType<typeof printerZodMini>
 
 declare global {
