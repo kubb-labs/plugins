@@ -311,14 +311,12 @@ type ResolverReactQueryPatch = {
     optionsName?(node: OperationNode): string  // → 'getPetByIdQueryOptions'
     keyName?(node: OperationNode): string       // → 'getPetByIdQueryKey'
     keyTypeName?(node: OperationNode): string   // → 'GetPetByIdQueryKey'
-    clientName?(node: OperationNode): string    // → 'getPetById'
   }
   // suspenseQuery, infiniteQuery, suspenseInfiniteQuery: same members as query
   mutation?: {
     name?(node: OperationNode): string          // → 'useUpdatePet'
     optionsName?(node: OperationNode): string
     keyName?(node: OperationNode): string
-    typeName?(node: OperationNode): string      // → 'UpdatePet'
   }
   hook?: {
     optionsName?(): string

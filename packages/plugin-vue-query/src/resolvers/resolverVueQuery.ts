@@ -1,6 +1,5 @@
-import { operationKey, resolveOperationName } from '@internals/shared'
+import { resolveOperationName } from '@internals/shared'
 import { createMutationResolver, createQueryResolver } from '@internals/tanstack-query'
-import { capitalize } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
 import type { PluginVueQuery } from '../types.ts'
 
@@ -27,11 +26,5 @@ export const resolverVueQuery = createResolver<PluginVueQuery>({
   name: resolveOperationName,
   query: createQueryResolver(),
   infiniteQuery: createQueryResolver('Infinite'),
-  mutation: {
-    ...createMutationResolver(),
-    typeName(node) {
-      const name = capitalize(this.name(node.operationId))
-      return this.resolveName({ key: operationKey(node, 'mutation', 'typeName'), name })
-    },
-  },
+  mutation: createMutationResolver(),
 })

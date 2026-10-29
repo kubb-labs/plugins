@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { operationFileEntry, operationKey } from '@internals/shared'
+import { isEventStream, operationFileEntry, operationKey } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
 import { ast, camelCase, defineGenerator, Diagnostics } from 'kubb/kit'
 import type { Generator } from 'kubb/kit'
@@ -44,11 +44,16 @@ function resolveTypeImportNames(node: ast.OperationNode, types: OperationTypeNam
  * Groups operations into one controller per tag. Operations without a tag fall back to a single
  * `Client`/`ApiClient` controller, matching the resolver's default naming.
  */
-function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: GeneratorContext, types: OperationTypeSource): Array<Controller> {
+function buildControllers(
+  nodes: ReadonlyArray<ast.OperationNode>,
+  ctx: GeneratorContext,
+  types: OperationTypeSource,
+  validatorEnabled: boolean,
+): Array<Controller> {
   const { driver, resolver, root } = ctx
   const { output, group, validator } = ctx.options
 
-  const pluginZod = isValidatorEnabled(validator) ? driver.getPlugin(pluginZodName) : null
+  const pluginZod = validatorEnabled ? driver.getPlugin(pluginZodName) : null
   const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
   const document = ctx.adapter.document as SecurityDocument | null | undefined
 
@@ -148,7 +153,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
 
       const types = resolveOperationTypes(ctx.driver, ctx.plugin.name)
 
-      const controllers = buildControllers(nodes, ctx, types)
+      const validatorEnabled = isValidatorEnabled(validator)
+      const controllers = buildControllers(nodes, ctx, types, validatorEnabled)
       const clientPath = path.resolve(root, '.kubb/client.ts')
       const standardSchemaPath = path.resolve(root, '.kubb/standardSchema.ts')
 
@@ -160,23 +166,31 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
           file: op.typeFile,
           names: resolveTypeImportNames(op.node, op.types),
         }))
-        const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = isValidatorEnabled(validator)
-          ? collectImportsByFile(ops, (op) => ({
-              file: op.zodFile,
-              // SDK methods wire no `validator.error`, so the error schema is not imported.
-              names: op.validatorHooks?.importedZodNames.filter((name) => name !== op.validatorHooks?.error) ?? [],
-            }))
+        const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = validatorEnabled
+          ? collectImportsByFile(ops, (op) => ({ file: op.zodFile, names: op.validatorHooks?.importedZodNames ?? [] }))
           : { namesByPath: new Map<string, Set<string>>(), filesByPath: new Map<string, ast.FileNode>() }
+        const hasEventStream = ops.some((op) => isEventStream(op.node))
+        const hasResult = ops.some((op) => !isEventStream(op.node))
 
         return (
           <File key={file.path} baseName={file.baseName} path={file.path} meta={file.meta} banner={banner(file)} footer={footer(file)}>
-            <File.Import name={['createClient', returnType === 'data' ? 'unwrapResult' : 'withUnwrap']} root={file.path} path={clientPath} />
             <File.Import
-              name={
-                returnType === 'data'
-                  ? ['ClientConfig', 'ClientInstance', 'Options', 'UnwrappedResult']
-                  : ['ClientConfig', 'ClientInstance', 'Options', 'Unwrappable', 'RequestResult']
-              }
+              name={[
+                'createClient',
+                ...(hasResult ? [returnType === 'data' ? 'unwrapResult' : 'withUnwrap'] : []),
+                ...(hasEventStream ? ['toEventStream'] : []),
+              ]}
+              root={file.path}
+              path={clientPath}
+            />
+            <File.Import
+              name={[
+                'ClientConfig',
+                'ClientInstance',
+                'Options',
+                ...(hasResult ? (returnType === 'data' ? ['UnwrappedResult'] : ['Unwrappable', 'RequestResult']) : []),
+                ...(hasEventStream ? ['EventStreamResult', 'SuccessOf'] : []),
+              ]}
               root={file.path}
               path={clientPath}
               isTypeOnly
@@ -188,7 +202,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
               <File.Import key={filePath} name={Array.from(set)} root={file.path} path={typeFilesByPath.get(filePath)!.path} isTypeOnly />
             ))}
 
-            {isValidatorEnabled(validator) &&
+            {validatorEnabled &&
               Array.from(zodNamesByPath.entries()).map(([filePath, set]) => (
                 <File.Import key={filePath} name={Array.from(set)} root={file.path} path={zodFilesByPath.get(filePath)!.path} />
               ))}

@@ -19,10 +19,7 @@ import type { ContractClientFactory } from '../types.ts'
  * generator `name` differs between plugins. Every other resolution, import, and rendering step is
  * identical.
  */
-export function createClientGenerator<TFactory extends ContractClientFactory>(
-  name: string,
-  resolveClientPath?: (options: TFactory['resolvedOptions'], root: string) => string,
-): Generator<TFactory> {
+export function createClientGenerator<TFactory extends ContractClientFactory>(name: string): Generator<TFactory> {
   return defineGenerator<TFactory>({
     name,
     renderer: jsxRenderer,
@@ -30,7 +27,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
       if (!ast.isHttpOperationNode(node)) return null
 
       const { config, driver, resolver, root } = ctx
-      const { output, validator, returnType, throwOnErrorDefault, group } = ctx.options
+      const { output, validator, returnType, throwOnErrorDefault, group, importPath } = ctx.options
 
       const types = resolveOperationTypes(driver, ctx.plugin.name)
 
@@ -73,12 +70,11 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
 
       // A custom client module is emitted verbatim, so `importPath` is used exactly as configured.
       // The default `.kubb/client.ts` is a file path and is made relative to the operation file.
-      const customClientPath = resolveClientPath?.(ctx.options, root)
-      const clientPath = customClientPath ?? path.resolve(root, '.kubb/client.ts')
-      const clientRoot = customClientPath === undefined ? meta.file.path : undefined
+      const clientPath = importPath ?? path.resolve(root, '.kubb/client.ts')
+      const clientRoot = importPath === undefined ? meta.file.path : undefined
       // The headers validator helper ships in `.kubb/standardSchema.ts`; a custom client module exports it
       // alongside its other runtime helpers.
-      const standardSchemaPath = customClientPath ?? path.resolve(root, '.kubb/standardSchema.ts')
+      const standardSchemaPath = importPath ?? path.resolve(root, '.kubb/standardSchema.ts')
       const eventStream = isEventStream(node)
 
       const clientValueImports = (() => {
@@ -117,8 +113,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(
             name={meta.name}
             node={node}
             types={types}
-            zodResolver={zodResolver}
-            validator={validator}
+            validatorHooks={validatorHooks}
             returnType={returnType}
             throwOnErrorDefault={throwOnErrorDefault}
             security={security}

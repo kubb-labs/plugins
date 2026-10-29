@@ -44,13 +44,6 @@ export type ResolverReactQuery = Resolver & {
      * `resolver.query.keyTypeName(node) // → 'GetPetByIdQueryKey'`
      */
     keyTypeName(node: ast.OperationNode): string
-    /**
-     * Resolves the client function name generated inline by query hooks.
-     *
-     * @example Client function names
-     * `resolver.query.clientName(node) // → 'getPetById'`
-     */
-    clientName(node: ast.OperationNode): string
   }
   /**
    * Naming for the generated `useSuspenseQuery` hook and its companion helpers.
@@ -75,10 +68,6 @@ export type ResolverReactQuery = Resolver & {
      * Resolves the suspense query key type name.
      */
     keyTypeName(node: ast.OperationNode): string
-    /**
-     * Resolves the client function name generated inline by suspense query hooks.
-     */
-    clientName(node: ast.OperationNode): string
   }
   /**
    * Naming for the generated `useInfiniteQuery` hook and its companion helpers.
@@ -103,10 +92,6 @@ export type ResolverReactQuery = Resolver & {
      * Resolves the infinite query key type name.
      */
     keyTypeName(node: ast.OperationNode): string
-    /**
-     * Resolves the client function name generated inline by infinite query hooks.
-     */
-    clientName(node: ast.OperationNode): string
   }
   /**
    * Naming for the generated `useSuspenseInfiniteQuery` hook and its companion helpers.
@@ -131,10 +116,6 @@ export type ResolverReactQuery = Resolver & {
      * Resolves the suspense infinite query key type name.
      */
     keyTypeName(node: ast.OperationNode): string
-    /**
-     * Resolves the client function name generated inline by suspense infinite query hooks.
-     */
-    clientName(node: ast.OperationNode): string
   }
   /**
    * Naming for the generated `useMutation` hook and its companion helpers.
@@ -155,13 +136,6 @@ export type ResolverReactQuery = Resolver & {
      * Resolves the mutation key helper name.
      */
     keyName(node: ast.OperationNode): string
-    /**
-     * Resolves the mutation type name.
-     *
-     * @example Mutation type names
-     * `resolver.mutation.typeName(node) // → 'UpdatePet'`
-     */
-    typeName(node: ast.OperationNode): string
   }
   /**
    * Naming for the generated custom hook options file.

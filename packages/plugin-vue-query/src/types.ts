@@ -9,8 +9,7 @@ export type { Infinite, Transformer } from '@internals/tanstack-query'
  */
 export type ResolverVueQuery = Resolver & {
   /**
-   * Names for a query operation: its `useQuery` composable, key helpers, options helper, and the
-   * inline client function it calls.
+   * Names for a query operation: its `useQuery` composable, key helpers, and options helper.
    */
   query: {
     /**
@@ -29,14 +28,10 @@ export type ResolverVueQuery = Resolver & {
      * Resolves the query options helper name.
      */
     optionsName(node: ast.OperationNode): string
-    /**
-     * Resolves the client function name generated inline by query hooks.
-     */
-    clientName(node: ast.OperationNode): string
   }
   /**
-   * Names for an infinite query operation: its `useInfiniteQuery` composable, key helpers, options
-   * helper, and the inline client function it calls.
+   * Names for an infinite query operation: its `useInfiniteQuery` composable, key helpers, and
+   * options helper.
    */
   infiniteQuery: {
     /**
@@ -55,13 +50,9 @@ export type ResolverVueQuery = Resolver & {
      * Resolves the infinite query options helper name.
      */
     optionsName(node: ast.OperationNode): string
-    /**
-     * Resolves the client function name generated inline by infinite query hooks.
-     */
-    clientName(node: ast.OperationNode): string
   }
   /**
-   * Names for a mutation operation: its `useMutation` composable, key helper, and type name.
+   * Names for a mutation operation: its `useMutation` composable and key helper.
    */
   mutation: {
     /**
@@ -72,10 +63,6 @@ export type ResolverVueQuery = Resolver & {
      * Resolves the mutation key helper name.
      */
     keyName(node: ast.OperationNode): string
-    /**
-     * Resolves the mutation type name.
-     */
-    typeName(node: ast.OperationNode): string
   }
 }
 

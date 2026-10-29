@@ -279,13 +279,11 @@ type ResolverVueQueryPatch = {
     optionsName?(node: OperationNode): string
     keyName?(node: OperationNode): string
     keyTypeName?(node: OperationNode): string
-    clientName?(node: OperationNode): string
   }
   infiniteQuery?: { /* same members as query */ }
   mutation?: {
     name?(node: OperationNode): string
     keyName?(node: OperationNode): string
-    typeName?(node: OperationNode): string
   }
 }
 ```

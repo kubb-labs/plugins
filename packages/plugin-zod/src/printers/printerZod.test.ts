@@ -2,7 +2,7 @@ import { ast } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
 import z from 'zod'
 import type { ResolverZod } from '../types.ts'
-import { printerZod } from './printerZod.ts'
+import { containsDirectionalNode, printerZod } from './printerZod.ts'
 
 describe('printerZod', () => {
   const printer = printerZod({})
@@ -1274,5 +1274,27 @@ describe('printerZod', () => {
       })
       expect(p.print(ast.factory.createSchema({ type: 'string' }))).toBe('z.coerce.string().custom()')
     })
+  })
+})
+
+describe('containsDirectionalNode', () => {
+  const dateNode = ast.factory.createSchema({ type: 'date', representation: 'date', format: 'date-time' })
+
+  test('finds a directional node in a tuple rest item', () => {
+    const node = ast.factory.createSchema({ type: 'tuple', items: [ast.factory.createSchema({ type: 'string' })], rest: dateNode })
+
+    expect(containsDirectionalNode({ node, printerOptions: {} })).toBe(true)
+  })
+
+  test('follows a ref to its resolved schema', () => {
+    const node = ast.factory.createSchema({ type: 'ref', name: 'Event', ref: '#/components/schemas/Event', schema: dateNode })
+
+    expect(containsDirectionalNode({ node, printerOptions: {} })).toBe(true)
+  })
+
+  test('ignores a string date', () => {
+    const node = ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'date', representation: 'string' })] })
+
+    expect(containsDirectionalNode({ node, printerOptions: {} })).toBe(false)
   })
 })

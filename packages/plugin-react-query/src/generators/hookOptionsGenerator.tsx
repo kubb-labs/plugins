@@ -43,57 +43,26 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       const nodeInfinite = 'infinite' in opOverrides ? opOverrides.infinite : infinite
       const nodeInfiniteOptions = nodeInfinite && typeof nodeInfinite === 'object' ? nodeInfinite : null
 
-      // query: false means "still a query but skip the useQuery hook"
-      const { isQuery: isQueryOp, isMutation: isMutationOp } = classifyOperation(node, {
-        query: nodeQuery === false ? query : nodeQuery,
-        mutation: nodeMutation,
-      })
-      const isSuspenseOp = !!suspense
-      const isInfiniteOp = !!nodeInfiniteOptions
+      // A per-operation `query: false` skips the query hooks, matching the generators that emit them.
+      const { isQuery, isMutation } = classifyOperation(node, { query: nodeQuery, mutation: nodeMutation })
+      const isSuspense = !!suspense
+      const isInfinite = isQuery && !!nodeInfiniteOptions && matchesInfinite(node, nodeInfiniteOptions)
 
-      if (isQueryOp) {
-        const queryOptionsName = resolver.query.optionsName(node)
-        const queryHookName = resolver.query.name(node)
-        const queryHookFile = resolver.file({ ...operationFileEntry(node, queryHookName), root, output, group: group ?? undefined })
-        imports.push(<File.Import name={[queryOptionsName]} root={hookOptionsFile.path} path={queryHookFile.path} />)
-        hookOptions[queryHookName] = `Partial<ReturnType<typeof ${queryOptionsName}>>`
+      const namespaces: Array<[{ name(node: ast.OperationNode): string; optionsName(node: ast.OperationNode): string }, boolean]> = [
+        [resolver.query, isQuery],
+        [resolver.suspenseQuery, isQuery && isSuspense],
+        [resolver.infiniteQuery, isInfinite],
+        [resolver.suspenseInfiniteQuery, isInfinite && isSuspense],
+        [resolver.mutation, isMutation],
+      ]
 
-        if (isSuspenseOp) {
-          const suspenseOptionsName = resolver.suspenseQuery.optionsName(node)
-          const suspenseHookName = resolver.suspenseQuery.name(node)
-          const suspenseHookFile = resolver.file({ ...operationFileEntry(node, suspenseHookName), root, output, group: group ?? undefined })
-          imports.push(<File.Import name={[suspenseOptionsName]} root={hookOptionsFile.path} path={suspenseHookFile.path} />)
-          hookOptions[suspenseHookName] = `Partial<ReturnType<typeof ${suspenseOptionsName}>>`
-        }
-
-        if (isInfiniteOp) {
-          // Validate queryParam
-          const hasQueryParam = matchesInfinite(node, nodeInfiniteOptions!)
-
-          if (hasQueryParam) {
-            const infiniteOptionsName = resolver.infiniteQuery.optionsName(node)
-            const infiniteHookName = resolver.infiniteQuery.name(node)
-            const infiniteHookFile = resolver.file({ ...operationFileEntry(node, infiniteHookName), root, output, group: group ?? undefined })
-            imports.push(<File.Import name={[infiniteOptionsName]} root={hookOptionsFile.path} path={infiniteHookFile.path} />)
-            hookOptions[infiniteHookName] = `Partial<ReturnType<typeof ${infiniteOptionsName}>>`
-
-            if (isSuspenseOp) {
-              const suspenseInfiniteOptionsName = resolver.suspenseInfiniteQuery.optionsName(node)
-              const suspenseInfiniteHookName = resolver.suspenseInfiniteQuery.name(node)
-              const suspenseInfiniteHookFile = resolver.file({ ...operationFileEntry(node, suspenseInfiniteHookName), root, output, group: group ?? undefined })
-              imports.push(<File.Import name={[suspenseInfiniteOptionsName]} root={hookOptionsFile.path} path={suspenseInfiniteHookFile.path} />)
-              hookOptions[suspenseInfiniteHookName] = `Partial<ReturnType<typeof ${suspenseInfiniteOptionsName}>>`
-            }
-          }
-        }
-      }
-
-      if (isMutationOp) {
-        const mutationOptionsName = resolver.mutation.optionsName(node)
-        const mutationHookName = resolver.mutation.name(node)
-        const mutationHookFile = resolver.file({ ...operationFileEntry(node, mutationHookName), root, output, group: group ?? undefined })
-        imports.push(<File.Import name={[mutationOptionsName]} root={hookOptionsFile.path} path={mutationHookFile.path} />)
-        hookOptions[mutationHookName] = `Partial<ReturnType<typeof ${mutationOptionsName}>>`
+      for (const [ns, enabled] of namespaces) {
+        if (!enabled) continue
+        const optionsName = ns.optionsName(node)
+        const hookName = ns.name(node)
+        const hookFile = resolver.file({ ...operationFileEntry(node, hookName), root, output, group: group ?? undefined })
+        imports.push(<File.Import name={[optionsName]} root={hookOptionsFile.path} path={hookFile.path} />)
+        hookOptions[hookName] = `Partial<ReturnType<typeof ${optionsName}>>`
       }
     }
 

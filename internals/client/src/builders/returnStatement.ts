@@ -51,3 +51,15 @@ export function buildReturnStatement({
   }
   return `return withUnwrap(${request}(${callConfig}) as Promise<RequestResult<${buildRequestResultGenerics({ node, types })}>>)`
 }
+
+/**
+ * Builds the return type and statement of an operation that returns `text/event-stream`: the call
+ * is wrapped in `toEventStream`, so the caller iterates the typed success events.
+ */
+export function buildEventStreamReturn({ node, types, callConfig }: { node: ast.OperationNode; types: OperationTypeNames; callConfig: string }): {
+  returnType: string
+  statement: string
+} {
+  const eventType = `SuccessOf<${types.response.responses(node)}>`
+  return { returnType: `Promise<EventStreamResult<${eventType}>>`, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
+}

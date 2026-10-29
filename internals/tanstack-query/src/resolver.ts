@@ -11,15 +11,13 @@ export type QueryVariant = '' | 'Suspense' | 'Infinite' | 'SuspenseInfinite'
 
 /**
  * The query namespace shared by the TanStack Query flavored plugins
- * (react-query, vue-query, swr): hook, options, key, key type, and inline
- * client names.
+ * (react-query, vue-query, swr): hook, options, key, and key type names.
  */
 export type QueryResolver = {
   name(this: Resolver, node: ast.OperationNode): string
   optionsName(this: Resolver, node: ast.OperationNode): string
   keyName(this: Resolver, node: ast.OperationNode): string
   keyTypeName(this: Resolver, node: ast.OperationNode): string
-  clientName(this: Resolver, node: ast.OperationNode): string
 }
 
 /**
@@ -61,17 +59,13 @@ export function createQueryResolver(variant: QueryVariant = ''): QueryResolver {
       const name = `${capitalize(this.name(node.operationId))}${variant}QueryKey`
       return this.resolveName({ key: operationKey(node, 'query', variant, 'keyTypeName'), name })
     },
-    clientName(node) {
-      const name = `${this.name(node.operationId)}${variant}`
-      return this.resolveName({ key: operationKey(node, 'query', variant, 'clientName'), name })
-    },
   }
 }
 
 /**
  * Builds the shared mutation namespace. Spread the result into
  * `createResolver` and add plugin-specific methods (`optionsName`,
- * `typeName`, `argTypeName`) next to it.
+ * `argTypeName`) next to it.
  *
  * @example
  * ```ts
