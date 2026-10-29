@@ -1297,3 +1297,32 @@ describe('typeGenerator — transformers', () => {
     await matchFiles(driver.fileManager.files, 'transformers integerToString')
   })
 })
+
+describe('typeGenerator — custom imports', () => {
+  test('`this.import` in a printer.nodes handler adds the import to the file', async () => {
+    const options: PluginTs['resolvedOptions'] = {
+      ...defaultOptions,
+      printer: {
+        nodes: {
+          bigint() {
+            this.import(ast.factory.createImport({ name: ['Int64'], path: 'my-int64', isTypeOnly: true }))
+            return 'Int64'
+          },
+        },
+      },
+    }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'customImports' })
+
+    await renderGeneratorSchema(typeGenerator, ast.factory.createSchema({ type: ast.schemaTypes.bigint, name: 'Counter' }), {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    expect(driver.fileManager.files[0]?.imports.map((imp) => imp.path)).toContain('my-int64')
+  })
+})

@@ -19,6 +19,7 @@ type Props = {
 
 export function Faker({ node, description, name, typeName, printer, canOverride, typeMode = 'inferred', keysToOmit }: Props): KubbReactNode {
   const fakerText = printer.print(node) ?? 'undefined'
+  const imports = printer.drainImports().map((imp) => <File.Import key={[name, imp.path, imp.name].join('-')} {...imp} />)
 
   const isArray = node.type === 'array'
   const isObject = !!ast.narrowSchema(node, ast.schemaTypes.object) || (node.type === ast.schemaTypes.intersection && isObjectSchema(node))
@@ -55,17 +56,20 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
     const returnExpression = needsCast ? `${needsParens ? `(${fakerTextWithOverride})` : fakerTextWithOverride} as ${returnType}` : fakerTextWithOverride
 
     return (
-      <File.Source name={name} isExportable isIndexable>
-        <Function
-          export
-          name={name}
-          JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
-          params={canOverride ? paramsSignature : undefined}
-          returnType={returnType ?? undefined}
-        >
-          {`return ${returnExpression}`}
-        </Function>
-      </File.Source>
+      <>
+        {imports}
+        <File.Source name={name} isExportable isIndexable>
+          <Function
+            export
+            name={name}
+            JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
+            params={canOverride ? paramsSignature : undefined}
+            returnType={returnType ?? undefined}
+          >
+            {`return ${returnExpression}`}
+          </Function>
+        </File.Source>
+      </>
     )
   }
 
@@ -104,17 +108,20 @@ return {
 } as ${returnType}`
 
   return (
-    <File.Source name={name} isExportable isIndexable>
-      <Function
-        export
-        name={name}
-        JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
-        generics={typeMode === 'schema' ? undefined : `TData extends Partial<${typeName}> = object`}
-        params={typeMode === 'schema' ? `data?: Partial<${typeName}>` : 'data?: TData'}
-        returnType={typeMode === 'schema' || isCyclic ? returnType : undefined}
-      >
-        {functionBody}
-      </Function>
-    </File.Source>
+    <>
+      {imports}
+      <File.Source name={name} isExportable isIndexable>
+        <Function
+          export
+          name={name}
+          JSDoc={{ comments: description ? [`@description ${jsDocEscape(description)}`] : [] }}
+          generics={typeMode === 'schema' ? undefined : `TData extends Partial<${typeName}> = object`}
+          params={typeMode === 'schema' ? `data?: Partial<${typeName}>` : 'data?: TData'}
+          returnType={typeMode === 'schema' || isCyclic ? returnType : undefined}
+        >
+          {functionBody}
+        </Function>
+      </File.Source>
+    </>
   )
 }
