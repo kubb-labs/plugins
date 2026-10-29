@@ -1,6 +1,5 @@
 import { ensureValidVarName, toFilePath } from '@internals/utils'
-import { camelCase } from 'kubb/kit'
-import { ast } from 'kubb/kit'
+import { ast, camelCase } from 'kubb/kit'
 import type { GeneratorContext, Resolver, ResolverFile } from 'kubb/kit'
 
 /**
