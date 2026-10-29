@@ -1,6 +1,6 @@
 import { createKubb } from 'kubb'
 import { defineExtension, kubbContext } from 'kubb/kit'
-import { createMockedSetupContext } from 'kubb/kit/testing'
+import { createMockedSetupContext } from '#mocks'
 import { describe, expect, test } from 'vitest'
 import { pluginMsw } from './plugin.ts'
 import type { Options, PluginMsw } from './types.ts'

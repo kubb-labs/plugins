@@ -1,9 +1,17 @@
 import path from 'node:path'
 import type { Group } from 'kubb/kit'
 import { ast, camelCase, Resolver } from 'kubb/kit'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from 'kubb/kit/testing'
 import { describe, expect, test } from 'vitest'
-import { matchFiles, rawSources, testConfig } from '#mocks'
+import {
+  createMockedAdapter,
+  createMockedPlugin,
+  createMockedPluginDriver,
+  matchFiles,
+  rawSources,
+  renderGeneratorOperation,
+  renderGeneratorSchema,
+  testConfig,
+} from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'
 import type { PluginTs } from '../types.ts'
 import { typeGenerator } from './typeGenerator.tsx'
@@ -212,7 +220,7 @@ describe("typeGenerator — operations: 'inline'", () => {
     await renderGeneratorOperation(typeGenerator, node, { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver })
 
     const [file] = driver.fileManager.files
-    expect(ast.isVirtualFile(file!)).toBe(true)
+    expect(file!.sources.length > 0 && file!.sources.every((source) => source.inline)).toBe(true)
     expect(Object.fromEntries(file!.sources.map((source) => [source.name, source.inline?.expression]))).toMatchInlineSnapshot(`
       {
         "ApiCreatePetBody": "ApiCreatePetBodyJson",
