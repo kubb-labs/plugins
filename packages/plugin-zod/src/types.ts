@@ -309,8 +309,6 @@ export type ResolvedOptions = {
 
 export type PluginZod = PluginType<'plugin-zod', Options, ResolvedOptions, ResolverZod>
 
-export type ZodPrinter = ReturnType<typeof printerZod> | ReturnType<typeof printerZodMini>
-
 declare global {
   namespace Kubb {
     interface PluginRegistry {
@@ -319,7 +317,7 @@ declare global {
     interface MemoRegistry {
       typeName: string
       type: string
-      zodPrinter: ZodPrinter
+      zodPrinter: ReturnType<typeof printerZod> | ReturnType<typeof printerZodMini>
     }
   }
 }

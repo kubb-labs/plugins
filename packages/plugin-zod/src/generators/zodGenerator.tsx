@@ -15,7 +15,7 @@ import { collectDirectionalRefNames, containsDirectionalNode, printerZod } from 
 import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PrinterZodMiniOptions } from '../printers/printerZodMini.ts'
-import type { PluginZod, ResolverZod, ZodPrinter } from '../types'
+import type { PluginZod, ResolverZod } from '../types'
 
 /**
  * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
@@ -36,7 +36,7 @@ type BuildResponseUnionParams = {
  * The printer for one direction, built once per plugin per build. A `keysToOmit` list and a
  * `printer.nodes` override differ per node and have no string key, so they get a fresh printer.
  */
-function getPrinter(resolver: ResolverZod, options: PrinterZodOptions, mini: boolean, direction: 'encode' | 'decode'): ZodPrinter {
+function getPrinter(resolver: ResolverZod, options: PrinterZodOptions, mini: boolean, direction: 'encode' | 'decode') {
   const build = () => (mini ? printerZodMini(options as PrinterZodMiniOptions) : printerZod({ ...options, direction }))
   if (options.nodes || options.keysToOmit?.length) return build()
   const { coercion, guidType, regexType, oneOfType, dateType } = options
