@@ -5,4 +5,4 @@
 '@kubb/plugin-zod': patch
 ---
 
-Read `ctx.meta.circularNames` and `ctx.meta.enumNames` as the sets kubb now provides, instead of building a set per build through `ctx.memo`. Needs the kubb release that makes these fields `ReadonlySet<string>`.
+Read `ctx.meta.circularNames` and `ctx.meta.enumNames` as the sets kubb now provides, instead of building a set per build through `ctx.memo`. The `kubb` peer range is now `^5.16.0`, the first release where these fields are `ReadonlySet<string>`.
