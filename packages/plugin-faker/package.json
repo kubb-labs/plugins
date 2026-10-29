@@ -95,7 +95,7 @@
   },
   "peerDependencies": {
     "@faker-js/faker": "^10.0.0",
-    "kubb": "^5.16.0"
+    "kubb": "^5.15.1"
   },
   "peerDependenciesMeta": {
     "@faker-js/faker": {
