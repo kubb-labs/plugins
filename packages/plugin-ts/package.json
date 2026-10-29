@@ -84,7 +84,7 @@
   },
   "peerDependencies": {
     "@typescript/typescript6": "^6.0.2",
-    "kubb": "^5.15.0",
+    "kubb": "^5.15.1",
     "typescript": ">=5.0.0"
   },
   "peerDependenciesMeta": {

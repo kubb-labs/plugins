@@ -334,8 +334,8 @@ describe('zodGenerator — Schema', () => {
         resolvedOptions: { dateType: 'string' },
       }),
       meta: {
-        circularNames: [...ast.findCircularSchemas([petPolySchema, catCycleSchema])],
-        enumNames: [],
+        circularNames: ast.findCircularSchemas([petPolySchema, catCycleSchema]),
+        enumNames: new Set(),
       },
       driver,
       plugin,
@@ -367,8 +367,8 @@ describe('zodGenerator — Schema', () => {
       config: testConfig,
       adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
       meta: {
-        circularNames: [...ast.findCircularSchemas([errorDetailsSchema])],
-        enumNames: [],
+        circularNames: ast.findCircularSchemas([errorDetailsSchema]),
+        enumNames: new Set(),
       },
       driver,
       plugin,
@@ -406,7 +406,7 @@ describe('zodGenerator — Schema', () => {
     await renderGeneratorSchema(zodGenerator, node, {
       config: testConfig,
       adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
-      meta: { circularNames: [...ast.findCircularSchemas([node])], enumNames: [] },
+      meta: { circularNames: ast.findCircularSchemas([node]), enumNames: new Set() },
       driver,
       plugin,
       options: defaultOptions,
@@ -1247,8 +1247,8 @@ describe('zodGenerator — Compile Option', () => {
       options,
       resolver,
       meta: {
-        circularNames: ['TreeNode'],
-        enumNames: [],
+        circularNames: new Set(['TreeNode']),
+        enumNames: new Set(),
       },
     })
 
