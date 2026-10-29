@@ -15,6 +15,7 @@ import type { PrinterZodOptions } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PrinterZodMiniOptions } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
+import { shouldCoerce } from '../utils.ts'
 
 /**
  * The helper an inferred alias is printed with. `'codec'` reads a request (encode) schema from its
@@ -39,7 +40,8 @@ function getPrinter(resolver: ResolverZod, options: PrinterZodOptions, mini: boo
   const build = () => (mini ? printerZodMini(options as PrinterZodMiniOptions) : printerZod({ ...options, direction }))
   if (options.nodes || options.keysToOmit?.length) return build()
   const { coercion, guidType, regexType, oneOfType, dateType } = options
-  return resolver.memo(`zodPrinter:${JSON.stringify([mini, direction, coercion, guidType, regexType, oneOfType, dateType])}`, build)
+  const coerce = (['dates', 'strings', 'numbers'] as const).map((type) => shouldCoerce(coercion, type))
+  return resolver.memo(`zodPrinter:${[mini, direction, ...coerce, guidType, regexType, oneOfType, dateType].join(':')}`, build)
 }
 
 /**
