@@ -1,6 +1,5 @@
 import { operationKey, resolveOperationName } from '@internals/shared'
 import { createMutationResolver, createQueryResolver } from '@internals/tanstack-query'
-import { capitalize } from '@internals/utils'
 import { createResolver } from 'kubb/kit'
 import type { PluginReactQuery } from '../types.ts'
 
@@ -35,10 +34,6 @@ export const resolverReactQuery = createResolver<PluginReactQuery>({
     optionsName(node) {
       const name = `${this.name(node.operationId)}MutationOptions`
       return this.resolveName({ key: operationKey(node, 'mutation', 'optionsName'), name })
-    },
-    typeName(node) {
-      const name = capitalize(this.name(node.operationId))
-      return this.resolveName({ key: operationKey(node, 'mutation', 'typeName'), name })
     },
   },
   hook: {

@@ -43,13 +43,6 @@ export type ResolverSwr = Resolver & {
      * `resolver.query.keyTypeName(node) // → 'GetPetByIdQueryKey'`
      */
     keyTypeName(node: ast.OperationNode): string
-    /**
-     * Resolves the client function name generated inline by query hooks.
-     *
-     * @example Client function names
-     * `resolver.query.clientName(node) // → 'getPetById'`
-     */
-    clientName(node: ast.OperationNode): string
   }
   /**
    * Naming for the generated `useSWRMutation` hook and its companion helpers.

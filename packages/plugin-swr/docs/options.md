@@ -172,7 +172,6 @@ type ResolverSwrPatch = {
     optionsName?(node: OperationNode): string  // → 'getPetByIdQueryOptions'
     keyName?(node: OperationNode): string       // → 'getPetByIdQueryKey'
     keyTypeName?(node: OperationNode): string   // → 'GetPetByIdQueryKey'
-    clientName?(node: OperationNode): string    // → 'getPetById'
   }
   mutation?: {
     name?(node: OperationNode): string          // → 'useUpdatePet'
