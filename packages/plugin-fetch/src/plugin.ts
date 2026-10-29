@@ -1,14 +1,9 @@
-import path from 'node:path'
-import { createSdkGenerator, defaultMacros, isValidatorEnabled, resolverClient } from '@internals/client'
-import { createGroupConfig } from '@internals/shared'
-import { addGenerator, defineExtension, injectFile, Resolver, setMacros, setResolver, useConfig } from 'kubb/kit'
+import { createContractClientPlugin } from '@internals/client'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
-import { pluginTsName } from '@kubb/plugin-ts'
-import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
 import { fetchClientTemplatePath, fetchSerializersTemplatePath, standardSchemaTemplatePath } from './templates.ts'
-import type { PluginFetch, ResolvedOptions, ResolverClient } from './types.ts'
+import type { PluginFetch } from './types.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-fetch`. Used for driver lookups and cross-plugin
@@ -38,73 +33,10 @@ export const pluginFetchName = 'plugin-fetch' satisfies PluginFetch['name']
  * })
  * ```
  */
-export const pluginFetch = defineExtension<PluginFetch>({
-  kind: 'plugin',
+export const pluginFetch = createContractClientPlugin<PluginFetch>({
   meta: { name: pluginFetchName, version, compatibility },
-  // `plugin-ts` supplies the operation types unless it is absent, in which case `pluginZod({ inferred: true })`
-  // does. `plugin-zod` is required once `validator` enables a direction, so a missing one fails setup instead of codegen.
-  dependencies: (options) => ({ [pluginTsName]: { optional: true }, [pluginZodName]: { optional: !isValidatorEnabled(options.validator) } }),
-  setup(options) {
-    const config = useConfig()
-    const {
-      output = { path: 'clients', barrel: { type: 'named' } },
-      exclude = [],
-      include,
-      override = [],
-      baseURL,
-      throwOnErrorDefault = true,
-      validator = false,
-      returnType = 'full',
-      group,
-      sdk,
-      resolver: userResolver,
-    } = options
-
-    const resolved: ResolvedOptions = {
-      output,
-      exclude,
-      include,
-      override,
-      group: createGroupConfig(group),
-      baseURL,
-      throwOnErrorDefault,
-      validator,
-      returnType,
-      sdk: sdk ? { mode: sdk.mode ?? 'tag', name: sdk.name } : undefined,
-      resolver: userResolver ? Resolver.merge<ResolverClient>(resolverClient, userResolver) : resolverClient,
-    }
-
-    setResolver(resolved.resolver)
-    setMacros([...defaultMacros, ...(options.macros ?? [])])
-
-    // `sdk` swaps the per-operation functions for the class-based SDK; left unset, the standalone
-    // functions (which query plugins consume) stay.
-    addGenerator(resolved.sdk ? createSdkGenerator<PluginFetch>() : clientGenerator)
-
-    const root = path.resolve(config.root, config.output.path)
-    const baseURLExpression = baseURL ? (baseURL.includes('${') ? `\`${baseURL.replaceAll('`', '\\`')}\`` : JSON.stringify(baseURL)) : undefined
-
-    injectFile({
-      baseName: 'serializers.ts',
-      path: path.resolve(root, '.kubb/serializers.ts'),
-      copy: fetchSerializersTemplatePath,
-    })
-
-    injectFile({
-      baseName: 'client.ts',
-      path: path.resolve(root, '.kubb/client.ts'),
-      copy: fetchClientTemplatePath,
-      footer: baseURLExpression ? `client.setConfig({ baseURL: ${baseURLExpression} })` : undefined,
-    })
-
-    injectFile({
-      baseName: 'standardSchema.ts',
-      path: path.resolve(root, '.kubb/standardSchema.ts'),
-      copy: standardSchemaTemplatePath,
-    })
-
-    return resolved
-  },
+  clientGenerator,
+  templates: { client: fetchClientTemplatePath, serializers: fetchSerializersTemplatePath, standardSchema: standardSchemaTemplatePath },
 })
 
 export default pluginFetch
