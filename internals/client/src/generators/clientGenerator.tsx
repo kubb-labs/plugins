@@ -44,7 +44,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
         name: resolver.resolveName({ key: operationKey(node), name: operationName }),
         file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
         fileTypes: resolveDependencyOperationFile({
-          cache: ctx.cache,
+          memo: ctx.memo,
           node,
           resolver: types.resolver,
           root,

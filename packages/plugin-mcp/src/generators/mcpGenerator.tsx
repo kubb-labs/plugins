@@ -23,7 +23,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     const tsResolver = types.resolver
 
     // The registered contract client plugin owns the `<op>` the handler imports and calls.
-    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, cache: ctx.cache })
+    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
     if (!contractOp) {
       return null
     }
@@ -35,7 +35,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
       name: resolver.handler.name(node),
       file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
       fileTs: resolveDependencyOperationFile({
-        cache: ctx.cache,
+        memo: ctx.memo,
         node,
         resolver: tsResolver,
         root,

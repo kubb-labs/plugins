@@ -10,7 +10,6 @@ import type {
   KubbHooks,
   KubbPluginSetupContext,
   Memo,
-  NodeCache,
   NormalizedPlugin,
   Parser,
   Plugin,
@@ -31,18 +30,6 @@ function memoOn(store: Map<string, unknown>): Memo {
     store.set(key, value)
     return value
   }) as Memo
-}
-
-function createNodeCache(): NodeCache {
-  const store = new Map<string, unknown>()
-  return {
-    readItem: <TValue>(key: string) => store.get(key) as TValue | undefined,
-    writeItem: <TValue>(key: string, value: TValue) => {
-      store.set(key, value)
-      return value
-    },
-    ensureItem: <TValue>(key: string, factory: () => TValue) => memoOn(store)(key, factory) as TValue,
-  } as NodeCache
 }
 
 function pluginNotFoundError({ pluginName, requiredBy }: { pluginName: string; requiredBy?: string }) {
@@ -163,7 +150,6 @@ function createMockedPluginContext<TOptions extends PluginType>(opts: RenderGene
       return plugin
     },
     meta: opts.meta ?? {},
-    cache: createNodeCache(),
     memo: opts.driver.memo.bind(opts.driver),
     addFile: async (...files: Array<ast.FileNode>) => opts.driver.fileManager.add(...files),
     upsertFile: async (...files: Array<ast.FileNode>) => opts.driver.fileManager.upsert(...files),

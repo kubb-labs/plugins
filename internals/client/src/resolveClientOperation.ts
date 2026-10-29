@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { operationFileEntry, operationKey } from '@internals/shared'
-import type { ast, Exclude, Group, Include, NodeCache, Output, Override, Resolver } from '@kubb/kit'
+import type { ast, Exclude, Group, Include, Memo, Output, Override, Resolver } from '@kubb/kit'
 import type { ReturnTypeOption } from './types.ts'
 
 /**
@@ -47,7 +47,7 @@ function resolveImportPath(options: { importPath: string; operationFile: string 
  * output root, the same path consumers read `RequestConfig` / `ResponseErrorConfig` from.
  * With plugin-client they come from the user's `importPath` module instead.
  *
- * The result is cached in the current node's `cache` (`ctx.cache`) under the client plugin's name,
+ * The result is cached in `memo` (the build's `ctx.memo`) under the client plugin's name and the operation,
  * so several dependents reading the same client plugin for one operation in a single pass
  * (react-query's query/mutation/infinite generators, vue-query, swr, the MCP handler, ...) share
  * one computed result instead of each re-deriving the name and path.
@@ -65,12 +65,12 @@ export function resolveClientOperation(options: {
   node: ast.OperationNode
   root: string
   output: Output
-  cache: NodeCache
+  memo: Memo
 }): ClientOperation | null {
-  const { clientPlugin, driver, node, root, output, cache } = options
+  const { clientPlugin, driver, node, root, output, memo } = options
   if (!clientPlugin) return null
 
-  return cache.ensureItem(`${clientPlugin.pluginName}:clientOperation`, () => {
+  return memo(`${clientPlugin.pluginName}:clientOperation:${node.operationId}`, () => {
     const resolver = driver.getResolver(clientPlugin.pluginName)
     const pluginOptions = driver.getPlugin(clientPlugin.pluginName)?.options ?? {}
     const { exclude, include, override } = pluginOptions

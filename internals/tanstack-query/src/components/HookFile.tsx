@@ -7,7 +7,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 
 type ContractOperation = { name: string; path: string; clientPath: string; clientPathIsFile: boolean }
 
-type HookFileContext = Pick<GeneratorContext, 'config' | 'root' | 'cache' | 'meta' | 'driver' | 'requirePlugin' | 'resolver'>
+type HookFileContext = Pick<GeneratorContext, 'config' | 'root' | 'memo' | 'meta' | 'driver' | 'requirePlugin' | 'resolver'>
 
 type ResolveHookFileOptions = {
   name: string
@@ -46,7 +46,7 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
 
   const file = resolver.file({ ...operationFileEntry(node, name), root, output, group: group ?? undefined })
   const fileTs = resolveDependencyOperationFile({
-    cache: ctx.cache,
+    memo: ctx.memo,
     node,
     resolver: tsResolver,
     root,

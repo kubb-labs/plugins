@@ -65,7 +65,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
         if (pageParamsWarning) ctx.warn(pageParamsWarning)
       }
 
-      const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, cache: ctx.cache })
+      const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
       if (!contractOp) return null
 
       const importPath = query ? query.importPath : '@tanstack/react-query'

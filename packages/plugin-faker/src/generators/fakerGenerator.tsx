@@ -198,7 +198,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const meta = {
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
       typeFile: resolveDependencyOperationFile({
-        cache: ctx.cache,
+        memo: ctx.memo,
         node,
         resolver: tsResolver,
         root,
