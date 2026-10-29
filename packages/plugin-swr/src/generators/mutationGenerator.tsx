@@ -25,7 +25,7 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
     const importPath = mutation ? mutation.importPath : 'swr/mutation'
 
     // The registered contract client plugin owns the `<op>` the hook imports and calls.
-    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, cache: ctx.cache })
+    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
     if (!contractOp) return null
 
     const mutationHookName = resolver.mutation.name(node)

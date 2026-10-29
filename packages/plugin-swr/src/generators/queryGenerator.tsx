@@ -25,7 +25,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
     const importPath = query ? query.importPath : 'swr'
 
     // The registered contract client plugin owns the `<op>` the hook imports and calls.
-    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, cache: ctx.cache })
+    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
     if (!contractOp) return null
 
     const queryName = resolver.query.name(node)

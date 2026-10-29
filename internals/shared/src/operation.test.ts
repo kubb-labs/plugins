@@ -1,5 +1,5 @@
 import { ast, createResolver } from 'kubb/kit'
-import type { NodeCache, PluginType, Resolver } from 'kubb/kit'
+import type { Memo, PluginType, Resolver } from 'kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
 import {
   buildOperationComments,
@@ -416,23 +416,12 @@ describe('getResponseType / isEventStream', () => {
 })
 
 describe('resolveDependencyOperationFile', () => {
-  function createTestCache(): NodeCache {
+  function createTestMemo(): Memo {
     const store = new Map<string, unknown>()
-    return {
-      readItem<TValue>(key: string) {
-        return store.get(key) as TValue | undefined
-      },
-      writeItem<TValue>(key: string, value: TValue) {
-        store.set(key, value)
-        return value
-      },
-      ensureItem<TValue>(key: string, factory: () => TValue) {
-        if (store.has(key)) return store.get(key) as TValue
-        const value = factory()
-        store.set(key, value)
-        return value
-      },
-    }
+    return ((key: string, compute: () => unknown) => {
+      if (!store.has(key)) store.set(key, compute())
+      return store.get(key)
+    }) as Memo
   }
 
   function createFileResolver(pluginName: string) {
@@ -443,22 +432,22 @@ describe('resolveDependencyOperationFile', () => {
 
   test('reuses the cached file for the same dependency plugin and node instead of resolving again', () => {
     const dependencyResolver = createFileResolver('plugin-ts')
-    const cache = createTestCache()
+    const memo = createTestMemo()
 
-    const first = resolveDependencyOperationFile({ cache, node, resolver: dependencyResolver, root: '/root', output: { path: '.' } })
-    const second = resolveDependencyOperationFile({ cache, node, resolver: dependencyResolver, root: '/root', output: { path: '.' } })
+    const first = resolveDependencyOperationFile({ memo, node, resolver: dependencyResolver, root: '/root', output: { path: '.' } })
+    const second = resolveDependencyOperationFile({ memo, node, resolver: dependencyResolver, root: '/root', output: { path: '.' } })
 
     expect(second).toBe(first)
     expect(dependencyResolver.file).toHaveBeenCalledOnce()
   })
 
-  test('resolves independently per dependency plugin name, even sharing the same cache', () => {
+  test('resolves independently per dependency plugin name, even sharing the same memo', () => {
     const tsResolver = createFileResolver('plugin-ts')
     const zodResolver = createFileResolver('plugin-zod')
-    const cache = createTestCache()
+    const memo = createTestMemo()
 
-    resolveDependencyOperationFile({ cache, node, resolver: tsResolver, root: '/root', output: { path: '.' } })
-    resolveDependencyOperationFile({ cache, node, resolver: zodResolver, root: '/root', output: { path: '.' } })
+    resolveDependencyOperationFile({ memo, node, resolver: tsResolver, root: '/root', output: { path: '.' } })
+    resolveDependencyOperationFile({ memo, node, resolver: zodResolver, root: '/root', output: { path: '.' } })
 
     expect(tsResolver.file).toHaveBeenCalledOnce()
     expect(zodResolver.file).toHaveBeenCalledOnce()

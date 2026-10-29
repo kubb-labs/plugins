@@ -51,7 +51,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     const type = {
       file: resolveDependencyOperationFile({
-        cache: ctx.cache,
+        memo: ctx.memo,
         node,
         resolver: tsResolver,
         root,

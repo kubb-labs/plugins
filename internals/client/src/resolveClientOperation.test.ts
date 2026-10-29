@@ -1,26 +1,15 @@
 import path from 'node:path'
 import { ast, createResolver } from 'kubb/kit'
-import type { NodeCache, Resolver } from 'kubb/kit'
+import type { Memo, Resolver } from 'kubb/kit'
 import { describe, expect, test, vi } from 'vitest'
 import { resolveClientOperation } from './resolveClientOperation.ts'
 
-function createTestCache(): NodeCache {
+function createTestMemo(): Memo {
   const store = new Map<string, unknown>()
-  return {
-    readItem<TValue>(key: string) {
-      return store.get(key) as TValue | undefined
-    },
-    writeItem<TValue>(key: string, value: TValue) {
-      store.set(key, value)
-      return value
-    },
-    ensureItem<TValue>(key: string, factory: () => TValue) {
-      if (store.has(key)) return store.get(key) as TValue
-      const value = factory()
-      store.set(key, value)
-      return value
-    },
-  }
+  return ((key: string, compute: () => unknown) => {
+    if (!store.has(key)) store.set(key, compute())
+    return store.get(key)
+  }) as Memo
 }
 
 function createDriver() {
@@ -35,7 +24,7 @@ describe('resolveClientOperation', () => {
     const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
     const driver = createDriver()
 
-    const result = resolveClientOperation({ clientPlugin: null, driver, node, root: '/root', output: { path: '.' }, cache: createTestCache() })
+    const result = resolveClientOperation({ clientPlugin: null, driver, node, root: '/root', output: { path: '.' }, memo: createTestMemo() })
 
     expect(result).toBeNull()
     expect(driver.getResolver).not.toHaveBeenCalled()
@@ -51,7 +40,7 @@ describe('resolveClientOperation', () => {
       node,
       root: '/root',
       output: { path: '.' },
-      cache: createTestCache(),
+      memo: createTestMemo(),
     })
 
     expect(result).toStrictEqual({
@@ -74,7 +63,7 @@ describe('resolveClientOperation', () => {
       node,
       root: '/root',
       output: { path: '.' },
-      cache: createTestCache(),
+      memo: createTestMemo(),
     })
 
     expect(result).toStrictEqual({ name: 'getPetById', path: '/root/getPetById.ts', clientPath: '/client', clientPathIsFile: true, returnType: 'plain' })
@@ -91,7 +80,7 @@ describe('resolveClientOperation', () => {
       node,
       root: '/root',
       output: { path: '.' },
-      cache: createTestCache(),
+      memo: createTestMemo(),
     })
 
     expect(result).toMatchObject({ clientPath: '@my-org/api-client', clientPathIsFile: false })
@@ -100,22 +89,22 @@ describe('resolveClientOperation', () => {
   test('reuses the cached result for the same client plugin and node instead of resolving again', () => {
     const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
     const driver = createDriver()
-    const cache = createTestCache()
+    const memo = createTestMemo()
 
-    const first = resolveClientOperation({ clientPlugin: { pluginName: 'plugin-fetch' }, driver, node, root: '/root', output: { path: '.' }, cache })
-    const second = resolveClientOperation({ clientPlugin: { pluginName: 'plugin-fetch' }, driver, node, root: '/root', output: { path: '.' }, cache })
+    const first = resolveClientOperation({ clientPlugin: { pluginName: 'plugin-fetch' }, driver, node, root: '/root', output: { path: '.' }, memo })
+    const second = resolveClientOperation({ clientPlugin: { pluginName: 'plugin-fetch' }, driver, node, root: '/root', output: { path: '.' }, memo })
 
     expect(second).toStrictEqual(first)
     expect(driver.getResolver).toHaveBeenCalledOnce()
   })
 
-  test('resolves independently per client plugin name, even sharing the same cache', () => {
+  test('resolves independently per client plugin name, even sharing the same memo', () => {
     const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
     const driver = createDriver()
-    const cache = createTestCache()
+    const memo = createTestMemo()
 
-    resolveClientOperation({ clientPlugin: { pluginName: 'plugin-fetch' }, driver, node, root: '/root', output: { path: '.' }, cache })
-    resolveClientOperation({ clientPlugin: { pluginName: 'plugin-axios' }, driver, node, root: '/root', output: { path: '.' }, cache })
+    resolveClientOperation({ clientPlugin: { pluginName: 'plugin-fetch' }, driver, node, root: '/root', output: { path: '.' }, memo })
+    resolveClientOperation({ clientPlugin: { pluginName: 'plugin-axios' }, driver, node, root: '/root', output: { path: '.' }, memo })
 
     expect(driver.getResolver).toHaveBeenCalledTimes(2)
     expect(driver.getResolver).toHaveBeenNthCalledWith(1, 'plugin-fetch')
@@ -137,7 +126,7 @@ describe('resolveClientOperation', () => {
         node,
         root: '/root',
         output: { path: '.', mode: 'directory' },
-        cache: createTestCache(),
+        memo: createTestMemo(),
       })
     }
 
@@ -202,7 +191,7 @@ describe('resolveClientOperation', () => {
         node: getPetById,
         root: '/root',
         output: { path: '.', mode: 'directory' },
-        cache: createTestCache(),
+        memo: createTestMemo(),
       })
 
       expect(res?.returnType).toBe('full')
