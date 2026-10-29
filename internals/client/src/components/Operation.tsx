@@ -1,16 +1,14 @@
-import { buildOperationComments, getResponseType, isEventStream } from '@internals/shared'
+import { buildOperationComments } from '@internals/shared'
 import { ast } from 'kubb/kit'
-import type { ResolverZod } from '@kubb/plugin-zod'
 import { File, Function } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import { buildContentType } from '../builders/contentType.ts'
-import { buildReturnStatement } from '../builders/returnStatement.ts'
-import { type Auth, buildSecurityMetadata } from '../builders/security.ts'
+import { buildCallConfig } from '../builders/callConfig.ts'
+import { buildEventStreamReturn, buildReturnStatement } from '../builders/returnStatement.ts'
+import type { Auth } from '../builders/security.ts'
 import { buildGroupedOptionsSignature } from '../builders/signature.ts'
-import { buildStyles } from '../builders/styles.ts'
-import { buildValidatorHooks, buildValidatorLiteral } from '../builders/validator.ts'
+import type { ValidatorHooks } from '../builders/validator.ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
-import type { ReturnTypeOption, ValidatorOptions } from '../types.ts'
+import type { ReturnTypeOption } from '../types.ts'
 
 type Props = {
   /**
@@ -27,13 +25,9 @@ type Props = {
    */
   types: OperationTypeNames
   /**
-   * Resolver for the zod schema names the validators reference, when `validator` is on.
+   * The operation's validator hooks, built once by the generator and shared with its zod imports.
    */
-  zodResolver?: ResolverZod | null
-  /**
-   * The active validator option, driving the validator-hook wiring.
-   */
-  validator?: ValidatorOptions
+  validatorHooks: ValidatorHooks | null
   /**
    * Shape of the value the generated function resolves to.
    */
@@ -52,41 +46,14 @@ type Props = {
  * type, signature, and call config are built with the AST factory, and only the jsx-renderer emits
  * the source.
  */
-export function Operation({ name, node, types, zodResolver, validator, returnType, throwOnErrorDefault, security }: Props): KubbReactNode {
+export function Operation({ name, node, types, validatorHooks, returnType, throwOnErrorDefault, security }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
 
   const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault })
-  const validators = buildValidatorHooks({ node, validator, zodResolver })
-  const securityLiteral = buildSecurityMetadata({ security })
-  const stylesLiteral = buildStyles({ node })
-
-  const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node })
-
-  const eventStream = isEventStream(node)
-  const responseType = getResponseType(node)
-  const responseTypeLiteral = responseType ? `responseType: '${responseType}'` : null
-
-  const validatorLiteral = buildValidatorLiteral(validators, ['request', 'path', 'query', 'headers', 'response', 'error'])
-
-  const callConfig = `{ ${[
-    `method: '${node.method.toUpperCase()}'`,
-    `url: '${node.path}'`,
-    securityLiteral ? `security: ${securityLiteral}` : null,
-    stylesLiteral ? `styles: ${stylesLiteral}` : null,
-    validatorLiteral,
-    contentTypeLiteral,
-    responseTypeLiteral,
-    '...config',
-    `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`,
-  ]
-    .filter(Boolean)
-    .join(', ')} }`
-
-  const eventType = `SuccessOf<${types.response.responses(node)}>`
-  const functionReturnType = eventStream ? `Promise<EventStreamResult<${eventType}>>` : signature.returnType
-  const returnStatement = eventStream
-    ? `return toEventStream<${eventType}>(request(${callConfig}))`
-    : buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault })
+  const { callConfig, mergeContentType, eventStream } = buildCallConfig({ node, validatorHooks, security, throwOnErrorDefault })
+  const eventStreamReturn = eventStream ? buildEventStreamReturn({ node, types, callConfig }) : null
+  const functionReturnType = eventStreamReturn?.returnType ?? signature.returnType
+  const returnStatement = eventStreamReturn?.statement ?? buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault })
 
   return (
     <File.Source name={name} isExportable isIndexable>

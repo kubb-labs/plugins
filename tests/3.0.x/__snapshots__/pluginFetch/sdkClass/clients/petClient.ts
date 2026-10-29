@@ -37,7 +37,7 @@ export class PetClient {
     public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptions, ThrowOnError> = {}): Unwrappable<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>)
+    return withUnwrap(request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], styles: { query: { status: { explode: true } } }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>)
   }
 
 /**

@@ -113,8 +113,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
             name={meta.name}
             node={node}
             types={types}
-            zodResolver={zodResolver}
-            validator={validator}
+            validatorHooks={validatorHooks}
             returnType={returnType}
             throwOnErrorDefault={throwOnErrorDefault}
             security={security}

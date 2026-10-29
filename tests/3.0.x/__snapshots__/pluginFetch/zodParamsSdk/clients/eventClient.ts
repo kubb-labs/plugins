@@ -11,7 +11,7 @@ import { createClient, withUnwrap } from '../.kubb/client'
 import { toHeadersStandardSchema } from '../.kubb/standardSchema'
 import { getResourceResponseSchema, getResourcePathSchema, getResourceQuerySchema, getResourceHeadersSchema } from '../zod/getResourceSchema'
 import { listEventsResponseSchema, listEventsQuerySchema } from '../zod/listEventsSchema'
-import { putEventResponseSchema, putEventBodySchema, putEventPathSchema, putEventQuerySchema, putEventHeadersSchema } from '../zod/putEventSchema'
+import { putEventResponseSchema, putEventErrorSchema, putEventBodySchema, putEventPathSchema, putEventQuerySchema, putEventHeadersSchema } from '../zod/putEventSchema'
 
 export class EventClient {
   private readonly client: ClientInstance
@@ -26,7 +26,7 @@ export class EventClient {
     public putEvent<ThrowOnError extends boolean = true>(options: Options<PutEventOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<PutEventResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'PUT', url: '/events/{day}', validator: { request: putEventBodySchema, path: putEventPathSchema, query: putEventQuerySchema, headers: toHeadersStandardSchema(putEventHeadersSchema, putEventHeadersSchema.shape), response: putEventResponseSchema }, contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<PutEventResponsesSchemaType, ThrowOnError>>)
+    return withUnwrap(request({ method: 'PUT', url: '/events/{day}', validator: { request: putEventBodySchema, path: putEventPathSchema, query: putEventQuerySchema, headers: toHeadersStandardSchema(putEventHeadersSchema, putEventHeadersSchema.shape), response: putEventResponseSchema, error: putEventErrorSchema }, contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<PutEventResponsesSchemaType, ThrowOnError>>)
   }
 
 /**

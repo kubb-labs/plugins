@@ -3,44 +3,13 @@ import { buildJSDoc } from '@internals/utils'
 import { ast } from 'kubb/kit'
 import { File } from 'kubb/jsx'
 import type { KubbReactNode } from 'kubb/jsx'
-import { buildContentType } from '../builders/contentType.ts'
-import { buildReturnStatement } from '../builders/returnStatement.ts'
-import { type Auth, buildSecurityMetadata } from '../builders/security.ts'
+import { buildCallConfig } from '../builders/callConfig.ts'
+import { buildEventStreamReturn, buildReturnStatement } from '../builders/returnStatement.ts'
+import type { Auth } from '../builders/security.ts'
 import { buildGroupedOptionsSignature } from '../builders/signature.ts'
-import { buildValidatorLiteral, type ValidatorHooks } from '../builders/validator.ts'
+import type { ValidatorHooks } from '../builders/validator.ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption } from '../types.ts'
-
-/**
- * Builds the call config literal forwarded to the contract client; the `throwOnError` fallback is applied after the `...config` spread.
- */
-function buildCallConfig({
-  node,
-  validatorHooks,
-  security,
-  throwOnErrorDefault,
-}: {
-  node: ast.HttpOperationNode
-  validatorHooks: ValidatorHooks | null
-  security?: Array<Auth>
-  throwOnErrorDefault: boolean
-}): string {
-  const validatorLiteral = buildValidatorLiteral(validatorHooks, ['request', 'path', 'query', 'headers', 'response'])
-  const securityLiteral = buildSecurityMetadata({ security })
-  const { literal: contentTypeLiteral } = buildContentType({ node })
-
-  return `{ ${[
-    `method: '${node.method.toUpperCase()}'`,
-    `url: '${node.path}'`,
-    securityLiteral ? `security: ${securityLiteral}` : null,
-    validatorLiteral,
-    contentTypeLiteral,
-    '...config',
-    `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`,
-  ]
-    .filter(Boolean)
-    .join(', ')} }`
-}
 
 /**
  * Builds one instance method of a generated SDK class; a per-call `options.client` overrides `this.client`.
@@ -65,17 +34,19 @@ export function buildSdkMethod({
   if (!ast.isHttpOperationNode(node)) return ''
 
   const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault })
-  const callConfig = buildCallConfig({ node, validatorHooks, security, throwOnErrorDefault })
-  const returnStatement = buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault })
+  const { callConfig, mergeContentType, eventStream } = buildCallConfig({ node, validatorHooks, security, throwOnErrorDefault })
+  const eventStreamReturn = eventStream ? buildEventStreamReturn({ node, types, callConfig }) : null
+  const methodReturnType = eventStreamReturn?.returnType ?? signature.returnType
+  const returnStatement = eventStreamReturn?.statement ?? buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault })
   const generics = signature.generics.length ? `<${signature.generics.join(', ')}>` : ''
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
-  const destructure = buildContentType({ node }).merge
+  const destructure = mergeContentType
     ? 'const { client: request = this.client, contentType, ...config } = options'
     : 'const { client: request = this.client, ...config } = options'
   const methodBody = [destructure, '', returnStatement].map((line) => (line ? `    ${line}` : '')).join('\n')
 
-  return `${jsdoc}  public ${name}${generics}(${signature.paramsSignature}): ${signature.returnType} {\n${methodBody}\n  }`
+  return `${jsdoc}  public ${name}${generics}(${signature.paramsSignature}): ${methodReturnType} {\n${methodBody}\n  }`
 }
 
 type OperationData = {
