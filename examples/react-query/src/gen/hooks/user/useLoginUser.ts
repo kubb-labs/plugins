@@ -25,7 +25,7 @@ export function loginUserQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await loginUser({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
+      return loginUser({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }

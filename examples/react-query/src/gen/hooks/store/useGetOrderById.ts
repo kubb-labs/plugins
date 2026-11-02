@@ -25,7 +25,7 @@ export function getOrderByIdQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await getOrderById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
+      return getOrderById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }

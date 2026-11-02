@@ -16,7 +16,7 @@ type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return await logoutUser({ ...config, throwOnError: true })
+      return logoutUser({ ...config, throwOnError: true })
     },
   }
 }

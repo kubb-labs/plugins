@@ -19,7 +19,7 @@ export function getOrderByIdQueryOptions(
 ) {
   return {
     fetcher: async () => {
-      return await getOrderById({ ...config, path, throwOnError: true })
+      return getOrderById({ ...config, path, throwOnError: true })
     },
   }
 }

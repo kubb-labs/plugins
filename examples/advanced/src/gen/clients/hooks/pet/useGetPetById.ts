@@ -72,7 +72,7 @@ export function getPetByIdQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
+      return getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }

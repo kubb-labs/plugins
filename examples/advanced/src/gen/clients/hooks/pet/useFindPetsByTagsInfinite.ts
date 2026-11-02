@@ -101,7 +101,7 @@ export function findPetsByTagsInfiniteQueryOptions(
         page?: string
         pageSize?: number
       }
-      return await findPetsByTags({ ...config, query, headers, signal: config.signal ?? signal, throwOnError: true })
+      return findPetsByTags({ ...config, query, headers, signal: config.signal ?? signal, throwOnError: true })
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => (Array.isArray(lastPage.data) && lastPage.data.length === 0 ? undefined : lastPageParam + 1),

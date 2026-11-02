@@ -40,7 +40,7 @@ export function useCreateUser(
   return useSWRMutation<RequestResult<CreateUserResponses, true>, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return await createUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof createUser<true>>[0])
+      return createUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof createUser<true>>[0])
     },
     mutationOptions,
   )

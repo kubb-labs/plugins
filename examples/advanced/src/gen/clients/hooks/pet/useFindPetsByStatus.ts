@@ -70,7 +70,7 @@ export function findPetsByStatusQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await findPetsByStatus({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
+      return findPetsByStatus({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }

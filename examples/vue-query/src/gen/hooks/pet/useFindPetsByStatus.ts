@@ -27,7 +27,7 @@ export function findPetsByStatusQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await findPetsByStatus({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true })
+      return findPetsByStatus({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }

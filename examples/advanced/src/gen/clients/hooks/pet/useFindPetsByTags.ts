@@ -80,7 +80,7 @@ export function findPetsByTagsQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await findPetsByTags({ ...config, query, headers, signal: config.signal ?? signal, throwOnError: true })
+      return findPetsByTags({ ...config, query, headers, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }

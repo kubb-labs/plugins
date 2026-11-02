@@ -19,7 +19,7 @@ export function loginUserQueryOptions(
 ) {
   return {
     fetcher: async () => {
-      return await loginUser({ ...config, query, throwOnError: true })
+      return loginUser({ ...config, query, throwOnError: true })
     },
   }
 }
