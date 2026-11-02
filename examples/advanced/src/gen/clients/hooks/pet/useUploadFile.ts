@@ -1,4 +1,4 @@
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../../.kubb/client'
 import type { ApiResponse } from '../../../models/ts/ApiResponse'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { uploadFile } from '../../axios/petService/uploadFile'
@@ -9,7 +9,12 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
 export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = uploadFileMutationKey()
   return mutationOptions<
-    ApiResponse,
+    RequestResult<
+      {
+        '200': ApiResponse
+      },
+      true
+    >,
     ResponseErrorConfig<Error>,
     {
       body: Blob
@@ -25,7 +30,7 @@ export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Om
   >({
     mutationKey,
     mutationFn: async ({ path, query, body }) => {
-      return uploadFile({ ...config, path, query, body, throwOnError: true }).unwrap()
+      return await uploadFile({ ...config, path, query, body, throwOnError: true })
     },
   })
 }
@@ -37,7 +42,12 @@ export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Om
 export function useUploadFile<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      ApiResponse,
+      RequestResult<
+        {
+          '200': ApiResponse
+        },
+        true
+      >,
       ResponseErrorConfig<Error>,
       {
         body: Blob
@@ -59,7 +69,12 @@ export function useUploadFile<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? uploadFileMutationKey()
 
   const baseOptions = uploadFileMutationOptions(config) as UseMutationOptions<
-    ApiResponse,
+    RequestResult<
+      {
+        '200': ApiResponse
+      },
+      true
+    >,
     ResponseErrorConfig<Error>,
     {
       body: Blob
@@ -75,7 +90,12 @@ export function useUploadFile<TContext>(
   >
 
   return useMutation<
-    ApiResponse,
+    RequestResult<
+      {
+        '200': ApiResponse
+      },
+      true
+    >,
     ResponseErrorConfig<Error>,
     {
       body: Blob
@@ -96,7 +116,12 @@ export function useUploadFile<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    ApiResponse,
+    RequestResult<
+      {
+        '200': ApiResponse
+      },
+      true
+    >,
     ResponseErrorConfig<Error>,
     {
       body: Blob

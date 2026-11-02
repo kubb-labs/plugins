@@ -4,8 +4,8 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { CreateUsersWithListInputOptions, CreateUsersWithListInputStatus200 } from '../../models/user/CreateUsersWithListInput'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponses } from '../../models/user/CreateUsersWithListInput'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { createUsersWithListInput } from '../../clients/user/createUsersWithListInput'
 
@@ -23,7 +23,7 @@ export type CreateUsersWithListInputMutationArg = CreateUsersWithListInputOption
 export function useCreateUsersWithListInput(
   options: {
     mutation?: SWRMutationConfiguration<
-      CreateUsersWithListInputStatus200,
+      RequestResult<CreateUsersWithListInputResponses, true>,
       ResponseErrorConfig<Error>,
       CreateUsersWithListInputMutationKey | null,
       CreateUsersWithListInputMutationArg
@@ -38,14 +38,14 @@ export function useCreateUsersWithListInput(
   const mutationKey = createUsersWithListInputMutationKey()
 
   return useSWRMutation<
-    CreateUsersWithListInputStatus200,
+    RequestResult<CreateUsersWithListInputResponses, true>,
     ResponseErrorConfig<Error>,
     CreateUsersWithListInputMutationKey | null,
     CreateUsersWithListInputMutationArg
   >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { body } }) => {
-      return createUsersWithListInput({ ...config, body, throwOnError: true }).unwrap()
+      return await createUsersWithListInput({ ...config, body, throwOnError: true })
     },
     mutationOptions,
   )

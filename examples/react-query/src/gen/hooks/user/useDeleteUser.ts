@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { DeleteUserOptions, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/user/DeleteUser'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { DeleteUserOptions, DeleteUserResponses, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/user/DeleteUser'
 import { deleteUser } from '../../clients/user/deleteUser'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -12,10 +12,12 @@ export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 
 export function deleteUserMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = deleteUserMutationKey()
-  return mutationOptions<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, DeleteUserOptions, TContext>({
-    mutationKey,
-    mutationFn: async ({ path }) => {
-      return deleteUser({ ...config, path, throwOnError: true }).unwrap()
+  return mutationOptions<RequestResult<DeleteUserResponses, true>, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, DeleteUserOptions, TContext>(
+    {
+      mutationKey,
+      mutationFn: async ({ path }) => {
+        return await deleteUser({ ...config, path, throwOnError: true })
+      },
     },
-  })
+  )
 }

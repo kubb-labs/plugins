@@ -1,5 +1,5 @@
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { findPetsByStatus } from '../../axios/petService/findPetsByStatus'
@@ -34,10 +34,43 @@ export function findPetsByStatusQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByStatusQueryKey({ path })
-  return queryOptions<Array<Pet>, ResponseErrorConfig<unknown>, Array<Pet>, typeof queryKey>({
+  return queryOptions<
+    RequestResult<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Array<Pet>
+            }
+          | {
+              contentType: 'application/xml'
+              data: Array<Pet>
+            }
+        '400': unknown
+      },
+      true
+    >,
+    ResponseErrorConfig<unknown>,
+    RequestResult<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Array<Pet>
+            }
+          | {
+              contentType: 'application/xml'
+              data: Array<Pet>
+            }
+        '400': unknown
+      },
+      true
+    >,
+    typeof queryKey
+  >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByStatus({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()
+      return await findPetsByStatus({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }
@@ -47,7 +80,39 @@ export function findPetsByStatusQueryOptions(
  * @summary Finds Pets by status
  * {@link /pet/findByStatus/:step_id}
  */
-export function useFindPetsByStatus<TData = Array<Pet>, TQueryData = Array<Pet>, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>(
+export function useFindPetsByStatus<
+  TData = RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Array<Pet>
+          }
+        | {
+            contentType: 'application/xml'
+            data: Array<Pet>
+          }
+      '400': unknown
+    },
+    true
+  >,
+  TQueryData = RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Array<Pet>
+          }
+        | {
+            contentType: 'application/xml'
+            data: Array<Pet>
+          }
+      '400': unknown
+    },
+    true
+  >,
+  TQueryKey extends QueryKey = FindPetsByStatusQueryKey,
+>(
   {
     path,
   }: {
@@ -70,7 +135,29 @@ export function useFindPetsByStatus<TData = Array<Pet>, TQueryData = Array<Pet>,
         }['path'])
   },
   options: {
-    query?: Partial<QueryObserverOptions<Array<Pet>, ResponseErrorConfig<unknown>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<
+      QueryObserverOptions<
+        RequestResult<
+          {
+            '200':
+              | {
+                  contentType: 'application/json'
+                  data: Array<Pet>
+                }
+              | {
+                  contentType: 'application/xml'
+                  data: Array<Pet>
+                }
+            '400': unknown
+          },
+          true
+        >,
+        ResponseErrorConfig<unknown>,
+        TData,
+        TQueryData,
+        TQueryKey
+      >
+    > & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {

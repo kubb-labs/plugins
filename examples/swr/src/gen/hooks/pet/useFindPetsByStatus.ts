@@ -4,8 +4,8 @@
  */
 
 import useSWR from 'swr'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { FindPetsByStatusOptions, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../models/pet/FindPetsByStatus'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponses, FindPetsByStatusStatus400 } from '../../models/pet/FindPetsByStatus'
 import type { SWRConfiguration } from 'swr'
 import { findPetsByStatus } from '../../clients/pet/findPetsByStatus'
 
@@ -20,7 +20,7 @@ export function findPetsByStatusQueryOptions(
 ) {
   return {
     fetcher: async () => {
-      return findPetsByStatus({ ...config, query, throwOnError: true }).unwrap()
+      return await findPetsByStatus({ ...config, query, throwOnError: true })
     },
   }
 }
@@ -33,7 +33,7 @@ export function findPetsByStatusQueryOptions(
 export function useFindPetsByStatus(
   { query }: FindPetsByStatusOptions = {},
   options: {
-    query?: SWRConfiguration<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>>
+    query?: SWRConfiguration<RequestResult<FindPetsByStatusResponses, true>, ResponseErrorConfig<FindPetsByStatusStatus400>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -43,15 +43,18 @@ export function useFindPetsByStatus(
 
   const queryKey = findPetsByStatusQueryKey({ query })
 
-  return useSWR<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusQueryKey | null>(shouldFetch ? queryKey : null, {
-    ...findPetsByStatusQueryOptions({ query }, config),
-    ...(immutable
-      ? {
-          revalidateIfStale: false,
-          revalidateOnFocus: false,
-          revalidateOnReconnect: false,
-        }
-      : {}),
-    ...queryOptions,
-  })
+  return useSWR<RequestResult<FindPetsByStatusResponses, true>, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusQueryKey | null>(
+    shouldFetch ? queryKey : null,
+    {
+      ...findPetsByStatusQueryOptions({ query }, config),
+      ...(immutable
+        ? {
+            revalidateIfStale: false,
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+          }
+        : {}),
+      ...queryOptions,
+    },
+  )
 }

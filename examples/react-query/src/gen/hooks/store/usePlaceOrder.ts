@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { PlaceOrderOptions, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../models/store/PlaceOrder'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { PlaceOrderOptions, PlaceOrderResponses, PlaceOrderStatus405 } from '../../models/store/PlaceOrder'
 import { placeOrder } from '../../clients/store/placeOrder'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -16,10 +16,10 @@ export function placeOrderMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = placeOrderMutationKey()
-  return mutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>({
+  return mutationOptions<RequestResult<PlaceOrderResponses, true>, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0]).unwrap()
+      return await placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0])
     },
   })
 }

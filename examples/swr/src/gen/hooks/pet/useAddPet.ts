@@ -4,8 +4,8 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { AddPetOptions, AddPetStatus200, AddPetStatus405 } from '../../models/pet/AddPet'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { AddPetOptions, AddPetResponses, AddPetStatus405 } from '../../models/pet/AddPet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { addPet } from '../../clients/pet/addPet'
 
@@ -22,9 +22,12 @@ export type AddPetMutationArg = AddPetOptions
  */
 export function useAddPet(
   options: {
-    mutation?: SWRMutationConfiguration<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg> & {
-      throwOnError?: boolean
-    }
+    mutation?: SWRMutationConfiguration<
+      RequestResult<AddPetResponses, true>,
+      ResponseErrorConfig<AddPetStatus405>,
+      AddPetMutationKey | null,
+      AddPetMutationArg
+    > & { throwOnError?: boolean }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: {
         request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -37,10 +40,10 @@ export function useAddPet(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = addPetMutationKey()
 
-  return useSWRMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg>(
+  return useSWRMutation<RequestResult<AddPetResponses, true>, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0]).unwrap()
+      return await addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0])
     },
     mutationOptions,
   )

@@ -4,8 +4,8 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { PlaceOrderOptions, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../models/store/PlaceOrder'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { PlaceOrderOptions, PlaceOrderResponses, PlaceOrderStatus405 } from '../../models/store/PlaceOrder'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { placeOrder } from '../../clients/store/placeOrder'
 
@@ -22,9 +22,12 @@ export type PlaceOrderMutationArg = PlaceOrderOptions
  */
 export function usePlaceOrder(
   options: {
-    mutation?: SWRMutationConfiguration<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg> & {
-      throwOnError?: boolean
-    }
+    mutation?: SWRMutationConfiguration<
+      RequestResult<PlaceOrderResponses, true>,
+      ResponseErrorConfig<PlaceOrderStatus405>,
+      PlaceOrderMutationKey | null,
+      PlaceOrderMutationArg
+    > & { throwOnError?: boolean }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
     }
@@ -34,10 +37,15 @@ export function usePlaceOrder(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = placeOrderMutationKey()
 
-  return useSWRMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg>(
+  return useSWRMutation<
+    RequestResult<PlaceOrderResponses, true>,
+    ResponseErrorConfig<PlaceOrderStatus405>,
+    PlaceOrderMutationKey | null,
+    PlaceOrderMutationArg
+  >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0]).unwrap()
+      return await placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0])
     },
     mutationOptions,
   )

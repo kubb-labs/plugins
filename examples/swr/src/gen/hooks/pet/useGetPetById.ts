@@ -4,8 +4,8 @@
  */
 
 import useSWR from 'swr'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { GetPetByIdOptions, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { GetPetByIdOptions, GetPetByIdResponses, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById'
 import type { SWRConfiguration } from 'swr'
 import { getPetById } from '../../clients/pet/getPetById'
 
@@ -16,7 +16,7 @@ type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return getPetById({ ...config, path, throwOnError: true }).unwrap()
+      return await getPetById({ ...config, path, throwOnError: true })
     },
   }
 }
@@ -29,7 +29,7 @@ export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Part
 export function useGetPetById(
   { path }: GetPetByIdOptions,
   options: {
-    query?: SWRConfiguration<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>>
+    query?: SWRConfiguration<RequestResult<GetPetByIdResponses, true>, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -39,15 +39,18 @@ export function useGetPetById(
 
   const queryKey = getPetByIdQueryKey({ path })
 
-  return useSWR<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdQueryKey | null>(shouldFetch ? queryKey : null, {
-    ...getPetByIdQueryOptions({ path }, config),
-    ...(immutable
-      ? {
-          revalidateIfStale: false,
-          revalidateOnFocus: false,
-          revalidateOnReconnect: false,
-        }
-      : {}),
-    ...queryOptions,
-  })
+  return useSWR<RequestResult<GetPetByIdResponses, true>, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdQueryKey | null>(
+    shouldFetch ? queryKey : null,
+    {
+      ...getPetByIdQueryOptions({ path }, config),
+      ...(immutable
+        ? {
+            revalidateIfStale: false,
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+          }
+        : {}),
+      ...queryOptions,
+    },
+  )
 }
