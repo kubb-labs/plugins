@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { FindPetsByStatusOptions, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../models/pet/FindPetsByStatus'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponses, FindPetsByStatusStatus400 } from '../../models/pet/FindPetsByStatus'
 import { findPetsByStatus } from '../../clients/pet/findPetsByStatus'
 import { queryOptions } from '@tanstack/react-query'
 
@@ -18,10 +18,15 @@ export function findPetsByStatusQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByStatusQueryKey({ query })
-  return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, typeof queryKey>({
+  return queryOptions<
+    RequestResult<FindPetsByStatusResponses, true>,
+    ResponseErrorConfig<FindPetsByStatusStatus400>,
+    RequestResult<FindPetsByStatusResponses, true>,
+    typeof queryKey
+  >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByStatus({ ...config, query, signal: config.signal ?? signal, throwOnError: true }).unwrap()
+      return await findPetsByStatus({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }

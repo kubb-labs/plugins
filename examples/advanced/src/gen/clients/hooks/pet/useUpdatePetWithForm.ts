@@ -1,4 +1,4 @@
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../../.kubb/client'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { updatePetWithForm } from '../../axios/petService/updatePetWithForm'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -8,7 +8,12 @@ export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId:search' }
 export function updatePetWithFormMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = updatePetWithFormMutationKey()
   return mutationOptions<
-    unknown,
+    RequestResult<
+      {
+        '405': unknown
+      },
+      true
+    >,
     ResponseErrorConfig<unknown>,
     {
       body?: never
@@ -25,7 +30,7 @@ export function updatePetWithFormMutationOptions<TContext = unknown>(config: Par
   >({
     mutationKey,
     mutationFn: async ({ path, query }) => {
-      return updatePetWithForm({ ...config, path, query, throwOnError: true }).unwrap()
+      return await updatePetWithForm({ ...config, path, query, throwOnError: true })
     },
   })
 }
@@ -37,7 +42,12 @@ export function updatePetWithFormMutationOptions<TContext = unknown>(config: Par
 export function useUpdatePetWithForm<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      unknown,
+      RequestResult<
+        {
+          '405': unknown
+        },
+        true
+      >,
       ResponseErrorConfig<unknown>,
       {
         body?: never
@@ -60,7 +70,12 @@ export function useUpdatePetWithForm<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? updatePetWithFormMutationKey()
 
   const baseOptions = updatePetWithFormMutationOptions(config) as UseMutationOptions<
-    unknown,
+    RequestResult<
+      {
+        '405': unknown
+      },
+      true
+    >,
     ResponseErrorConfig<unknown>,
     {
       body?: never
@@ -77,7 +92,12 @@ export function useUpdatePetWithForm<TContext>(
   >
 
   return useMutation<
-    unknown,
+    RequestResult<
+      {
+        '405': unknown
+      },
+      true
+    >,
     ResponseErrorConfig<unknown>,
     {
       body?: never
@@ -99,7 +119,12 @@ export function useUpdatePetWithForm<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    unknown,
+    RequestResult<
+      {
+        '405': unknown
+      },
+      true
+    >,
     ResponseErrorConfig<unknown>,
     {
       body?: never

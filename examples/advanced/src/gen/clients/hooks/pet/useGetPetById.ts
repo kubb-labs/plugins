@@ -1,5 +1,5 @@
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { getPetById } from '../../axios/petService/getPetById'
@@ -34,10 +34,45 @@ export function getPetByIdQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = getPetByIdQueryKey({ path })
-  return queryOptions<Omit<NonNullable<Pet>, 'name'>, ResponseErrorConfig<unknown | unknown>, Omit<NonNullable<Pet>, 'name'>, typeof queryKey>({
+  return queryOptions<
+    RequestResult<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+          | {
+              contentType: 'application/xml'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+        '400': unknown
+        '404': unknown
+      },
+      true
+    >,
+    ResponseErrorConfig<unknown | unknown>,
+    RequestResult<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+          | {
+              contentType: 'application/xml'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+        '400': unknown
+        '404': unknown
+      },
+      true
+    >,
+    typeof queryKey
+  >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()
+      return await getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }
@@ -48,8 +83,38 @@ export function getPetByIdQueryOptions(
  * {@link /pet/:petId:search}
  */
 export function useGetPetById<
-  TData = Omit<NonNullable<Pet>, 'name'>,
-  TQueryData = Omit<NonNullable<Pet>, 'name'>,
+  TData = RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Omit<NonNullable<Pet>, 'name'>
+          }
+        | {
+            contentType: 'application/xml'
+            data: Omit<NonNullable<Pet>, 'name'>
+          }
+      '400': unknown
+      '404': unknown
+    },
+    true
+  >,
+  TQueryData = RequestResult<
+    {
+      '200':
+        | {
+            contentType: 'application/json'
+            data: Omit<NonNullable<Pet>, 'name'>
+          }
+        | {
+            contentType: 'application/xml'
+            data: Omit<NonNullable<Pet>, 'name'>
+          }
+      '400': unknown
+      '404': unknown
+    },
+    true
+  >,
   TQueryKey extends QueryKey = GetPetByIdQueryKey,
 >(
   {
@@ -74,9 +139,30 @@ export function useGetPetById<
         }['path'])
   },
   options: {
-    query?: Partial<QueryObserverOptions<Omit<NonNullable<Pet>, 'name'>, ResponseErrorConfig<unknown | unknown>, TData, TQueryData, TQueryKey>> & {
-      client?: QueryClient
-    }
+    query?: Partial<
+      QueryObserverOptions<
+        RequestResult<
+          {
+            '200':
+              | {
+                  contentType: 'application/json'
+                  data: Omit<NonNullable<Pet>, 'name'>
+                }
+              | {
+                  contentType: 'application/xml'
+                  data: Omit<NonNullable<Pet>, 'name'>
+                }
+            '400': unknown
+            '404': unknown
+          },
+          true
+        >,
+        ResponseErrorConfig<unknown | unknown>,
+        TData,
+        TQueryData,
+        TQueryKey
+      >
+    > & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {

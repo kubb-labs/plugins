@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { GetOrderByIdOptions, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { GetOrderByIdOptions, GetOrderByIdResponses, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById'
 import { getOrderById } from '../../clients/store/getOrderById'
 import { queryOptions } from '@tanstack/react-query'
 
@@ -17,10 +17,15 @@ export function getOrderByIdQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = getOrderByIdQueryKey({ path })
-  return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
+  return queryOptions<
+    RequestResult<GetOrderByIdResponses, true>,
+    ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>,
+    RequestResult<GetOrderByIdResponses, true>,
+    typeof queryKey
+  >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getOrderById({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()
+      return await getOrderById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }

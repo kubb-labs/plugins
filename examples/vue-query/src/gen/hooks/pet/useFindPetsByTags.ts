@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { FindPetsByTagsOptions, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../models/pet/FindPetsByTags'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { FindPetsByTagsOptions, FindPetsByTagsResponses, FindPetsByTagsStatus400 } from '../../models/pet/FindPetsByTags'
 import type { MaybeRefOrGetter } from 'vue'
 import { findPetsByTags } from '../../clients/pet/findPetsByTags'
 import { queryOptions } from '@tanstack/vue-query'
@@ -20,10 +20,12 @@ export function findPetsByTagsQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsQueryKey({ query })
-  return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsStatus200>({
-    queryKey,
-    queryFn: async ({ signal }) => {
-      return findPetsByTags({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true }).unwrap()
+  return queryOptions<RequestResult<FindPetsByTagsResponses, true>, ResponseErrorConfig<FindPetsByTagsStatus400>, RequestResult<FindPetsByTagsResponses, true>>(
+    {
+      queryKey,
+      queryFn: async ({ signal }) => {
+        return await findPetsByTags({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true })
+      },
     },
-  })
+  )
 }

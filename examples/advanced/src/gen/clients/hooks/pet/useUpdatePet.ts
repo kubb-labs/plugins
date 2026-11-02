@@ -1,4 +1,4 @@
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { updatePet } from '../../axios/petService/updatePet'
@@ -13,10 +13,26 @@ export function updatePetMutationOptions<TContext = unknown>(
 ) {
   const mutationKey = updatePetMutationKey()
   return mutationOptions<
-    | Omit<NonNullable<Pet>, 'name'>
-    | {
-        id?: number
+    RequestResult<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+          | {
+              contentType: 'application/xml'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+        '202': {
+          id?: number
+        }
+        '400': unknown
+        '404': unknown
+        '405': unknown
       },
+      true
+    >,
     ResponseErrorConfig<unknown | unknown | unknown>,
     | {
         body: Omit<NonNullable<Pet>, 'id'>
@@ -49,7 +65,7 @@ export function updatePetMutationOptions<TContext = unknown>(
   >({
     mutationKey,
     mutationFn: async (variables) => {
-      return updatePet({ ...config, ...variables, throwOnError: true } as Parameters<typeof updatePet<true>>[0]).unwrap()
+      return await updatePet({ ...config, ...variables, throwOnError: true } as Parameters<typeof updatePet<true>>[0])
     },
   })
 }
@@ -62,10 +78,26 @@ export function updatePetMutationOptions<TContext = unknown>(
 export function useUpdatePet<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      | Omit<NonNullable<Pet>, 'name'>
-      | {
-          id?: number
+      RequestResult<
+        {
+          '200':
+            | {
+                contentType: 'application/json'
+                data: Omit<NonNullable<Pet>, 'name'>
+              }
+            | {
+                contentType: 'application/xml'
+                data: Omit<NonNullable<Pet>, 'name'>
+              }
+          '202': {
+            id?: number
+          }
+          '400': unknown
+          '404': unknown
+          '405': unknown
         },
+        true
+      >,
       ResponseErrorConfig<unknown | unknown | unknown>,
       | {
           body: Omit<NonNullable<Pet>, 'id'>
@@ -109,10 +141,26 @@ export function useUpdatePet<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? updatePetMutationKey()
 
   const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<
-    | Omit<NonNullable<Pet>, 'name'>
-    | {
-        id?: number
+    RequestResult<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+          | {
+              contentType: 'application/xml'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+        '202': {
+          id?: number
+        }
+        '400': unknown
+        '404': unknown
+        '405': unknown
       },
+      true
+    >,
     ResponseErrorConfig<unknown | unknown | unknown>,
     | {
         body: Omit<NonNullable<Pet>, 'id'>
@@ -145,10 +193,26 @@ export function useUpdatePet<TContext>(
   >
 
   return useMutation<
-    | Omit<NonNullable<Pet>, 'name'>
-    | {
-        id?: number
+    RequestResult<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+          | {
+              contentType: 'application/xml'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+        '202': {
+          id?: number
+        }
+        '400': unknown
+        '404': unknown
+        '405': unknown
       },
+      true
+    >,
     ResponseErrorConfig<unknown | unknown | unknown>,
     | {
         body: Omit<NonNullable<Pet>, 'id'>
@@ -186,10 +250,26 @@ export function useUpdatePet<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    | Omit<NonNullable<Pet>, 'name'>
-    | {
-        id?: number
+    RequestResult<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+          | {
+              contentType: 'application/xml'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+        '202': {
+          id?: number
+        }
+        '400': unknown
+        '404': unknown
+        '405': unknown
       },
+      true
+    >,
     ResponseErrorConfig<unknown | unknown | unknown>,
     | {
         body: Omit<NonNullable<Pet>, 'id'>

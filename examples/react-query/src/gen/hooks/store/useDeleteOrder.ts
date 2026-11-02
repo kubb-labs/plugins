@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { DeleteOrderOptions, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/store/DeleteOrder'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { DeleteOrderOptions, DeleteOrderResponses, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/store/DeleteOrder'
 import { deleteOrder } from '../../clients/store/deleteOrder'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -12,10 +12,15 @@ export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] a
 
 export function deleteOrderMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = deleteOrderMutationKey()
-  return mutationOptions<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderOptions, TContext>({
+  return mutationOptions<
+    RequestResult<DeleteOrderResponses, true>,
+    ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>,
+    DeleteOrderOptions,
+    TContext
+  >({
     mutationKey,
     mutationFn: async ({ path }) => {
-      return deleteOrder({ ...config, path, throwOnError: true }).unwrap()
+      return await deleteOrder({ ...config, path, throwOnError: true })
     },
   })
 }

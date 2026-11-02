@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { CreateUserOptions, CreateUserResponse } from '../../models/user/CreateUser'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { CreateUserOptions, CreateUserResponses } from '../../models/user/CreateUser'
 import { createUser } from '../../clients/user/createUser'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -16,10 +16,10 @@ export function createUserMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = createUserMutationKey()
-  return mutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserOptions, TContext>({
+  return mutationOptions<RequestResult<CreateUserResponses, true>, ResponseErrorConfig<Error>, CreateUserOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return createUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof createUser<true>>[0]).unwrap()
+      return await createUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof createUser<true>>[0])
     },
   })
 }

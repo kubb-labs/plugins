@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { AddPetOptions, AddPetStatus200, AddPetStatus405 } from '../../models/pet/AddPet'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { AddPetOptions, AddPetResponses, AddPetStatus405 } from '../../models/pet/AddPet'
 import { addPet } from '../../clients/pet/addPet'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -16,10 +16,10 @@ export function addPetMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = addPetMutationKey()
-  return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
+  return mutationOptions<RequestResult<AddPetResponses, true>, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0]).unwrap()
+      return await addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0])
     },
   })
 }
