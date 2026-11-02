@@ -28,12 +28,11 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
     // The registered contract client plugin owns the `<op>` the composable imports and calls.
     const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
     if (!contractOp) return null
-    const returnType = ctx.options.returnType ?? contractOp.returnType
 
     const mutationHookName = resolver.mutation.name(node)
     const mutationKeyName = resolver.mutation.keyName(node)
 
-    const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp, returnType })
+    const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp, returnType: ctx.options.returnType })
 
     // The contract body unwraps each request group with `toValue()`, so it needs the runtime import.
     const groups = getRequestGroups(node)
@@ -62,7 +61,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
               tsResolver={hook.tsResolver}
               mutationKeyName={mutationKeyName}
               clientReturnType={contractOp.returnType}
-              returnType={returnType}
+              returnType={hook.returnType}
             />
           </>
         )}

@@ -27,14 +27,13 @@ export const queryGenerator = defineGenerator<PluginSwr>({
     // The registered contract client plugin owns the `<op>` the hook imports and calls.
     const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
     if (!contractOp) return null
-    const returnType = ctx.options.returnType ?? contractOp.returnType
 
     const queryName = resolver.query.name(node)
     const queryOptionsName = resolver.query.optionsName(node)
     const queryKeyName = resolver.query.keyName(node)
     const queryKeyTypeName = resolver.query.keyTypeName(node)
 
-    const hook = resolveHookFile(node, ctx, { name: queryName, output, group, contractOp, keyTypeName: queryKeyTypeName, returnType })
+    const hook = resolveHookFile(node, ctx, { name: queryName, output, group, contractOp, keyTypeName: queryKeyTypeName, returnType: ctx.options.returnType })
     const { tsResolver } = hook
 
     return (
@@ -47,7 +46,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
           node={node}
           tsResolver={tsResolver}
           clientReturnType={contractOp.returnType}
-          returnType={returnType}
+          returnType={hook.returnType}
         />
 
         {query && (
@@ -61,7 +60,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
               queryKeyTypeName={queryKeyTypeName}
               node={node}
               tsResolver={tsResolver}
-              returnType={returnType}
+              returnType={hook.returnType}
             />
           </>
         )}

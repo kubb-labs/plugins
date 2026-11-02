@@ -51,7 +51,6 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
     // The registered contract client plugin owns the `<op>` the composable imports and calls.
     const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
     if (!contractOp) return null
-    const returnType = ctx.options.returnType ?? contractOp.returnType
 
     const queryName = resolver.infiniteQuery.name(node)
     const queryOptionsName = resolver.infiniteQuery.optionsName(node)
@@ -63,7 +62,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
       output,
       group,
       contractOp,
-      returnType,
+      returnType: ctx.options.returnType,
       keyTypeName: queryKeyTypeName,
       extraTypeNames: [
         resolvePageParamType(node, {
@@ -114,7 +113,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           hasExplicitInitialPageParam={infiniteOptions.hasExplicitInitialPageParam}
           queryParam={infiniteOptions.queryParam}
           clientReturnType={contractOp.returnType}
-          returnType={returnType}
+          returnType={hook.returnType}
           queryKeyType="QueryKey"
           memberTypeWrapper={maybeRefOrGetter}
           unwrapName={(name) => `toValue(${name})`}
@@ -131,7 +130,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           node={node}
           tsResolver={tsResolver}
           infinite
-          returnType={returnType}
+          returnType={hook.returnType}
         />
       </HookFile>
     )

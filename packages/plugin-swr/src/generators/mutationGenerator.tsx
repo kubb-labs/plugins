@@ -27,14 +27,13 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
     // The registered contract client plugin owns the `<op>` the hook imports and calls.
     const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
     if (!contractOp) return null
-    const returnType = ctx.options.returnType ?? contractOp.returnType
 
     const mutationHookName = resolver.mutation.name(node)
     const mutationKeyName = resolver.mutation.keyName(node)
     const mutationKeyTypeName = resolver.mutation.keyTypeName(node)
     const mutationArgTypeName = resolver.mutation.argTypeName(node)
 
-    const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp, returnType })
+    const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp, returnType: ctx.options.returnType })
 
     return (
       <HookFile hook={hook}>
@@ -53,7 +52,7 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
               node={node}
               tsResolver={hook.tsResolver}
               clientReturnType={contractOp.returnType}
-              returnType={returnType}
+              returnType={hook.returnType}
             />
           </>
         )}

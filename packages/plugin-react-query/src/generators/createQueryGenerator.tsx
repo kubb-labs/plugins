@@ -67,7 +67,6 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
 
       const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
       if (!contractOp) return null
-      const returnType = ctx.options.returnType ?? contractOp.returnType
 
       const importPath = query ? query.importPath : '@tanstack/react-query'
       const variantResolver = resolver[variant]
@@ -82,7 +81,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
         output,
         group,
         contractOp,
-        returnType,
+        returnType: ctx.options.returnType,
         keyTypeName: queryKeyTypeName,
         extraTypeNames: infiniteOptions
           ? [
@@ -122,7 +121,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
                 hasExplicitInitialPageParam={infiniteOptions.hasExplicitInitialPageParam}
                 queryParam={infiniteOptions.queryParam}
                 clientReturnType={contractOp.returnType}
-                returnType={returnType}
+                returnType={hook.returnType}
               />
             </>
           ) : (
@@ -135,7 +134,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
                 node={node}
                 tsResolver={hook.tsResolver}
                 clientReturnType={contractOp.returnType}
-                returnType={returnType}
+                returnType={hook.returnType}
               />
             </>
           )}
@@ -152,7 +151,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
                 node={node}
                 tsResolver={hook.tsResolver}
                 customOptions={customOptions}
-                returnType={returnType}
+                returnType={hook.returnType}
                 suspense={suspense}
                 infinite={infiniteOptions ? { initialPageParam: infiniteOptions.initialPageParam, queryParam: infiniteOptions.queryParam } : undefined}
               />

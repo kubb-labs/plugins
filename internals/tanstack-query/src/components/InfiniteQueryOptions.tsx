@@ -78,8 +78,7 @@ export function InfiniteQueryOptions({
   returnType = 'data',
 }: Props): KubbReactNode {
   const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver, { returnType })
-  const lastPage = returnType !== 'data' ? 'lastPage.data' : 'lastPage'
-  const firstPage = returnType !== 'data' ? 'firstPage.data' : 'firstPage'
+  const body = returnType === 'data' ? '' : '.data'
 
   const { queryParamsTypeName, pageParamType } = resolvePageParamType(node, { resolver: tsResolver, initialPageParam, queryParam })
 
@@ -101,9 +100,9 @@ export function InfiniteQueryOptions({
   const serializedGetNextPageParam = typeof getNextPageParam === 'function' ? getNextPageParam.toString() : getNextPageParam
   const getNextPageParamExpr = (() => {
     if (serializedGetNextPageParam) return `getNextPageParam: ${serializedGetNextPageParam}`
-    if (nextParam) return `getNextPageParam: (lastPage) => ${getNestedAccessor(nextParam, lastPage)}`
-    if (cursorParam) return `getNextPageParam: (lastPage) => ${lastPage}['${cursorParam}']`
-    return `getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(${lastPage}) && ${lastPage}.length === 0 ? undefined : lastPageParam + 1`
+    if (nextParam) return `getNextPageParam: (lastPage) => ${getNestedAccessor(nextParam, `lastPage${body}`)}`
+    if (cursorParam) return `getNextPageParam: (lastPage) => lastPage${body}['${cursorParam}']`
+    return `getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage${body}) && lastPage${body}.length === 0 ? undefined : lastPageParam + 1`
   })()
 
   // Resolve getPreviousPageParam: custom source > previousParam > cursorParam > default numeric fallback.
@@ -115,8 +114,8 @@ export function InfiniteQueryOptions({
 
   const getPreviousPageParamExpr = (() => {
     if (serializedGetPreviousPageParam) return `getPreviousPageParam: ${serializedGetPreviousPageParam}`
-    if (previousParam) return `getPreviousPageParam: (firstPage) => ${getNestedAccessor(previousParam, firstPage)}`
-    if (cursorParam) return `getPreviousPageParam: (firstPage) => ${firstPage}['${cursorParam}']`
+    if (previousParam) return `getPreviousPageParam: (firstPage) => ${getNestedAccessor(previousParam, `firstPage${body}`)}`
+    if (cursorParam) return `getPreviousPageParam: (firstPage) => firstPage${body}['${cursorParam}']`
     if (serializedGetNextPageParam || nextParam) return null
     return `getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= ${defaultPreviousThreshold} ? undefined : firstPageParam - 1`
   })()
