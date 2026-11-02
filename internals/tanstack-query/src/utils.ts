@@ -155,7 +155,7 @@ export function buildQueryOptionsParams(
  */
 export function buildClientCall(
   node: ast.OperationNode,
-  options: { clientName: string; signal?: boolean; unwrapName?: (name: string) => string; withContentType?: boolean; returnType?: 'full' | 'data' | 'plain' },
+  options: { clientName: string; signal?: boolean; unwrapName?: (name: string) => string; withContentType?: boolean; returnType?: ReturnTypeOption },
 ): string {
   const { clientName, signal = false, unwrapName, withContentType = false, returnType = 'full' } = options
   const { groups } = getRequestGroupOptionality(node)
@@ -189,7 +189,7 @@ export function buildClientCall(
  * // return getPetById({ ...config, throwOnError: true }).unwrap()
  * ```
  */
-export function buildCallResultBody(call: string, options: { clientReturnType?: 'full' | 'data' | 'plain'; returnType?: ReturnTypeOption } = {}): string {
+export function buildCallResultBody(call: string, options: { clientReturnType?: ReturnTypeOption; returnType?: ReturnTypeOption } = {}): string {
   const { clientReturnType = 'full', returnType = 'data' } = options
   if (returnType !== 'data' && clientReturnType === 'data') {
     throw new Diagnostics.Error({

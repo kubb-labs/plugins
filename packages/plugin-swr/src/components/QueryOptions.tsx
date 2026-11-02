@@ -16,7 +16,7 @@ type Props = {
    *
    * @default 'full'
    */
-  clientReturnType?: 'full' | 'data' | 'plain'
+  clientReturnType?: ReturnTypeOption
   returnType?: ReturnTypeOption
 }
 
