@@ -1,8 +1,8 @@
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
-import type { Infinite, Mutation, Query, Transformer } from '@internals/tanstack-query'
+import type { DataReturn, Infinite, Mutation, Query, Transformer } from '@internals/tanstack-query'
 import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
 
-export type { Infinite, Transformer } from '@internals/tanstack-query'
+export type { DataReturn, Infinite, Transformer } from '@internals/tanstack-query'
 
 /**
  * The concrete resolver type for `@kubb/plugin-react-query`.
@@ -204,6 +204,14 @@ export type Options = OutputOptions & {
    */
   client?: ClientSelector
   /**
+   * What the generated hooks resolve to. `'body'` returns the success body. `'full'` returns the
+   * client's whole `RequestResult` (`data`, `status`, `response`), so a hook can read
+   * response headers. Needs a client plugin whose `returnType` is `'full'` or `'plain'`.
+   *
+   * @default 'body'
+   */
+  data?: DataReturn
+  /**
    * Skip operations matching at least one entry in the list.
    */
   exclude?: Array<Exclude>
@@ -292,6 +300,7 @@ export type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedClient
+  data: DataReturn
   /**
    * Resolved infinite query configuration, or `false` when infinite queries are disabled.
    */

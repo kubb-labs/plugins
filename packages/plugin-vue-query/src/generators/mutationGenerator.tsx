@@ -17,7 +17,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { driver, resolver, root } = ctx
-    const { output, query, mutation, client, group, hooks } = ctx.options
+    const { output, query, mutation, client, group, hooks, data } = ctx.options
 
     const { isMutation } = classifyOperation(node, { query, mutation })
 
@@ -32,7 +32,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
     const mutationHookName = resolver.mutation.name(node)
     const mutationKeyName = resolver.mutation.keyName(node)
 
-    const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp })
+    const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp, data })
 
     // The contract body unwraps each request group with `toValue()`, so it needs the runtime import.
     const groups = getRequestGroups(node)
@@ -61,6 +61,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
               tsResolver={hook.tsResolver}
               mutationKeyName={mutationKeyName}
               returnType={contractOp.returnType}
+              data={data}
             />
           </>
         )}

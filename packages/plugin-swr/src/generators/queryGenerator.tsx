@@ -16,7 +16,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { driver, resolver, root } = ctx
-    const { output, query, mutation, client, group } = ctx.options
+    const { output, query, mutation, client, group, data } = ctx.options
 
     const { isQuery } = classifyOperation(node, { query, mutation })
 
@@ -33,14 +33,14 @@ export const queryGenerator = defineGenerator<PluginSwr>({
     const queryKeyName = resolver.query.keyName(node)
     const queryKeyTypeName = resolver.query.keyTypeName(node)
 
-    const hook = resolveHookFile(node, ctx, { name: queryName, output, group, contractOp, keyTypeName: queryKeyTypeName })
+    const hook = resolveHookFile(node, ctx, { name: queryName, output, group, contractOp, keyTypeName: queryKeyTypeName, data })
     const { tsResolver } = hook
 
     return (
       <HookFile hook={hook}>
         <QueryKey name={queryKeyName} typeName={queryKeyTypeName} node={node} tsResolver={tsResolver} transformer={ctx.options.queryKey} variant="query" />
 
-        <QueryOptions name={queryOptionsName} clientName={contractOp.name} node={node} tsResolver={tsResolver} returnType={contractOp.returnType} />
+        <QueryOptions name={queryOptionsName} clientName={contractOp.name} node={node} tsResolver={tsResolver} returnType={contractOp.returnType} data={data} />
 
         {query && (
           <>
@@ -53,6 +53,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
               queryKeyTypeName={queryKeyTypeName}
               node={node}
               tsResolver={tsResolver}
+              data={data}
             />
           </>
         )}

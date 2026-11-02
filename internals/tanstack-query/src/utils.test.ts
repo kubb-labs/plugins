@@ -135,6 +135,17 @@ describe('buildCallResultBody', () => {
   test('reads data off the plain result of a plugin-client operation', () => {
     expect(buildCallResultBody('getPetById({ throwOnError: true })', { returnType: 'plain' })).toBe('return (await getPetById({ throwOnError: true })).data')
   })
+
+  test("returns the whole result with data 'full'", () => {
+    expect(buildCallResultBody('getPetById({ throwOnError: true })', { data: 'full' })).toBe('return await getPetById({ throwOnError: true })')
+    expect(buildCallResultBody('getPetById({ throwOnError: true })', { returnType: 'plain', data: 'full' })).toBe(
+      'return await getPetById({ throwOnError: true })',
+    )
+  })
+
+  test("throws with data 'full' when the client only returns the body", () => {
+    expect(() => buildCallResultBody('getPetById({ throwOnError: true })', { returnType: 'data', data: 'full' })).toThrow(/returnType: 'data'/)
+  })
 })
 
 const listPetsNode = (schema: ast.SchemaNode, paramName = 'page') =>

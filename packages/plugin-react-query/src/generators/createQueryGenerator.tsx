@@ -54,7 +54,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
     operation(node, ctx) {
       if (!ast.isHttpOperationNode(node)) return null
       const { driver, resolver, root } = ctx
-      const { output, query, infinite: infiniteConfig, client, group, customOptions, hooks } = ctx.options
+      const { output, query, infinite: infiniteConfig, client, group, customOptions, hooks, data } = ctx.options
 
       const infiniteOptions = infinite && infiniteConfig && typeof infiniteConfig === 'object' ? infiniteConfig : null
       if (infinite && !infiniteOptions) return null
@@ -81,6 +81,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
         output,
         group,
         contractOp,
+        data,
         keyTypeName: queryKeyTypeName,
         extraTypeNames: infiniteOptions
           ? [
@@ -120,6 +121,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
                 hasExplicitInitialPageParam={infiniteOptions.hasExplicitInitialPageParam}
                 queryParam={infiniteOptions.queryParam}
                 returnType={contractOp.returnType}
+                data={data}
               />
             </>
           ) : (
@@ -132,6 +134,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
                 node={node}
                 tsResolver={hook.tsResolver}
                 returnType={contractOp.returnType}
+                data={data}
               />
             </>
           )}
@@ -148,6 +151,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
                 node={node}
                 tsResolver={hook.tsResolver}
                 customOptions={customOptions}
+                data={data}
                 suspense={suspense}
                 infinite={infiniteOptions ? { initialPageParam: infiniteOptions.initialPageParam, queryParam: infiniteOptions.queryParam } : undefined}
               />

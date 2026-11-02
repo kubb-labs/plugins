@@ -9,6 +9,7 @@ import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, rend
 function createOptions(overrides: Partial<PluginReactQuery['resolvedOptions']> = {}): PluginReactQuery['resolvedOptions'] {
   return {
     client: { kind: 'contract', pluginName: 'plugin-axios' },
+    data: 'body',
     queryKey: queryKeyTransformer,
     mutationKey: mutationKeyTransformer,
     query: {

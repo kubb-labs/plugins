@@ -16,7 +16,7 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { driver, resolver, root } = ctx
-    const { output, query, mutation, client, group } = ctx.options
+    const { output, query, mutation, client, group, data } = ctx.options
 
     const { isMutation } = classifyOperation(node, { query, mutation })
 
@@ -33,7 +33,7 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
     const mutationKeyTypeName = resolver.mutation.keyTypeName(node)
     const mutationArgTypeName = resolver.mutation.argTypeName(node)
 
-    const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp })
+    const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp, data })
 
     return (
       <HookFile hook={hook}>
@@ -52,6 +52,7 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
               node={node}
               tsResolver={hook.tsResolver}
               returnType={contractOp.returnType}
+              data={data}
             />
           </>
         )}

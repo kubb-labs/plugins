@@ -6,6 +6,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildGroupedRequestParam, buildClientCall } from '@internals/tanstack-query'
 import { buildRequestConfigType } from '@internals/shared'
 import { buildResponseTypes } from '@internals/tanstack-query'
+import type { DataReturn } from '@internals/tanstack-query'
 
 type Props = {
   name: string
@@ -19,6 +20,12 @@ type Props = {
    * @default 'full'
    */
   returnType?: 'full' | 'data' | 'plain'
+  /**
+   * With `'full'`, the hook resolves to the whole `RequestResult` instead of the success body.
+   *
+   * @default 'body'
+   */
+  data?: DataReturn
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -36,8 +43,8 @@ export function buildMutationConfigParamsNode(node: ast.OperationNode): Function
   })
 }
 
-export function MutationOptions({ name, clientName, node, tsResolver, mutationKeyName, returnType = 'full' }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver)
+export function MutationOptions({ name, clientName, node, tsResolver, mutationKeyName, returnType = 'full', data = 'body' }: Props): KubbReactNode {
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { data })
 
   const configParamsNode = buildMutationConfigParamsNode(node)
   const paramsSignature = declarationPrinter.print(configParamsNode) ?? ''
@@ -48,7 +55,7 @@ export function MutationOptions({ name, clientName, node, tsResolver, mutationKe
   const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const TRequest = hasMutationParams ? tsResolver.response.options(node) : 'undefined'
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : '_'
-  const mutationFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false, withContentType: true, returnType }), { returnType })
+  const mutationFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false, withContentType: true, returnType }), { returnType, data })
 
   return (
     <File.Source name={name} isExportable isIndexable>

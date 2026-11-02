@@ -4,7 +4,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import type { Infinite } from '../types.ts'
+import type { DataReturn, Infinite } from '../types.ts'
 import {
   buildCallResultBody,
   buildClientCall,
@@ -50,6 +50,12 @@ type Props = {
    * @default 'full'
    */
   returnType?: 'full' | 'data' | 'plain'
+  /**
+   * With `'full'`, the query resolves to the whole `RequestResult` and the page params read the cursor off `page.data`.
+   *
+   * @default 'body'
+   */
+  data?: DataReturn
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -73,8 +79,12 @@ export function InfiniteQueryOptions({
   memberTypeWrapper,
   unwrapName,
   returnType = 'full',
+  data = 'body',
 }: Props): KubbReactNode {
-  const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver)
+  const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver, { data })
+  // With the full result, the page body lives under `.data`.
+  const lastPage = data === 'full' ? 'lastPage.data' : 'lastPage'
+  const firstPage = data === 'full' ? 'firstPage.data' : 'firstPage'
 
   const { queryParamsTypeName, pageParamType } = resolvePageParamType(node, { resolver: tsResolver, initialPageParam, queryParam })
 
@@ -84,7 +94,7 @@ export function InfiniteQueryOptions({
 
   const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver, memberTypeWrapper })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName }), { returnType })
+  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName }), { returnType, data })
 
   const initialPageParamLiteral =
     typeof initialPageParam === 'string' || (typeof initialPageParam === 'object' && initialPageParam !== null)
@@ -96,9 +106,9 @@ export function InfiniteQueryOptions({
   const serializedGetNextPageParam = typeof getNextPageParam === 'function' ? getNextPageParam.toString() : getNextPageParam
   const getNextPageParamExpr = (() => {
     if (serializedGetNextPageParam) return `getNextPageParam: ${serializedGetNextPageParam}`
-    if (nextParam) return `getNextPageParam: (lastPage) => ${getNestedAccessor(nextParam, 'lastPage')}`
-    if (cursorParam) return `getNextPageParam: (lastPage) => lastPage['${cursorParam}']`
-    return 'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1'
+    if (nextParam) return `getNextPageParam: (lastPage) => ${getNestedAccessor(nextParam, lastPage)}`
+    if (cursorParam) return `getNextPageParam: (lastPage) => ${lastPage}['${cursorParam}']`
+    return `getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(${lastPage}) && ${lastPage}.length === 0 ? undefined : lastPageParam + 1`
   })()
 
   // Resolve getPreviousPageParam: custom source > previousParam > cursorParam > default numeric fallback.
@@ -110,8 +120,8 @@ export function InfiniteQueryOptions({
 
   const getPreviousPageParamExpr = (() => {
     if (serializedGetPreviousPageParam) return `getPreviousPageParam: ${serializedGetPreviousPageParam}`
-    if (previousParam) return `getPreviousPageParam: (firstPage) => ${getNestedAccessor(previousParam, 'firstPage')}`
-    if (cursorParam) return `getPreviousPageParam: (firstPage) => firstPage['${cursorParam}']`
+    if (previousParam) return `getPreviousPageParam: (firstPage) => ${getNestedAccessor(previousParam, firstPage)}`
+    if (cursorParam) return `getPreviousPageParam: (firstPage) => ${firstPage}['${cursorParam}']`
     if (serializedGetNextPageParam || nextParam) return null
     return `getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= ${defaultPreviousThreshold} ? undefined : firstPageParam - 1`
   })()

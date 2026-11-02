@@ -3,6 +3,12 @@ import type { ast } from '@kubb/kit'
 export type ParamsCasing = 'camelcase' | undefined
 
 /**
+ * What a generated hook resolves to: `'body'` is the success body, `'full'` is the client's whole
+ * `RequestResult` (`data`, `status`, `response`), so a hook can read response headers.
+ */
+export type DataReturn = 'body' | 'full'
+
+/**
  * The hook a key is built for. Plain and suspense queries can share a key, but an infinite query
  * caches `InfiniteData` and must never share one with a plain query.
  */

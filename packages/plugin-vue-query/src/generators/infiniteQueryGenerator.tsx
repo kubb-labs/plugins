@@ -38,7 +38,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { driver, resolver, root } = ctx
-    const { output, query, infinite, client, group } = ctx.options
+    const { output, query, infinite, client, group, data } = ctx.options
 
     const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
     if (!infiniteOptions) return null
@@ -62,6 +62,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
       output,
       group,
       contractOp,
+      data,
       keyTypeName: queryKeyTypeName,
       extraTypeNames: [
         resolvePageParamType(node, {
@@ -112,6 +113,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           hasExplicitInitialPageParam={infiniteOptions.hasExplicitInitialPageParam}
           queryParam={infiniteOptions.queryParam}
           returnType={contractOp.returnType}
+          data={data}
           queryKeyType="QueryKey"
           memberTypeWrapper={maybeRefOrGetter}
           unwrapName={(name) => `toValue(${name})`}
@@ -128,6 +130,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           node={node}
           tsResolver={tsResolver}
           infinite
+          data={data}
         />
       </HookFile>
     )

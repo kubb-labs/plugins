@@ -12,7 +12,7 @@ import {
   maybeValueOrGetter,
   resolvePageParamType,
 } from '@internals/tanstack-query'
-import type { Infinite } from '@internals/tanstack-query'
+import type { DataReturn, Infinite } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
 
 type Props = {
@@ -35,6 +35,12 @@ type Props = {
     initialPageParam: Infinite['initialPageParam']
     queryParam?: Infinite['queryParam']
   }
+  /**
+   * With `'full'`, the hook resolves to the whole `RequestResult` instead of the success body.
+   *
+   * @default 'body'
+   */
+  data?: DataReturn
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -77,8 +83,19 @@ function buildHookTypes({ node, tsResolver, infinite, suspense, TData, TError, q
   }
 }
 
-export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver, customOptions, suspense, infinite }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver)
+export function Query({
+  name,
+  queryKeyTypeName,
+  queryOptionsName,
+  queryKeyName,
+  node,
+  tsResolver,
+  customOptions,
+  suspense,
+  infinite,
+  data = 'body',
+}: Props): KubbReactNode {
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { data })
 
   const prefix = suspense ? 'UseSuspense' : 'Use'
   const hookName = `${suspense ? 'useSuspense' : 'use'}${infinite ? 'InfiniteQuery' : 'Query'}`

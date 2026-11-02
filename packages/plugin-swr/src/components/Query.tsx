@@ -4,6 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildQueryKeyParams, buildQueryOptionsParams, buildResponseTypes } from '@internals/tanstack-query'
+import type { DataReturn } from '@internals/tanstack-query'
 import { buildClientOptionType, buildOperationComments as getComments } from '@internals/shared'
 
 type Props = {
@@ -13,13 +14,19 @@ type Props = {
   queryKeyTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
+  /**
+   * With `'full'`, the hook resolves to the whole `RequestResult` instead of the success body.
+   *
+   * @default 'body'
+   */
+  data?: DataReturn
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver)
+export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver, data = 'body' }: Props): KubbReactNode {
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { data })
   const generics = [TData, TError, `${queryKeyTypeName} | null`]
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })

@@ -11,6 +11,7 @@ import {
   buildResponseTypes,
   resolveMutationRequestType,
 } from '@internals/tanstack-query'
+import type { DataReturn } from '@internals/tanstack-query'
 import { buildRequestConfigType, getComments } from '../utils.ts'
 
 type Props = {
@@ -25,14 +26,20 @@ type Props = {
    * @default 'full'
    */
   returnType?: 'full' | 'data' | 'plain'
+  /**
+   * With `'full'`, the hook resolves to the whole `RequestResult` instead of the success body.
+   *
+   * @default 'body'
+   */
+  data?: DataReturn
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: ResolverTs }): FunctionParametersNode {
-  const { resolver } = options
-  const { TData, TError } = buildResponseTypes(node, resolver)
+function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: ResolverTs; data: DataReturn }): FunctionParametersNode {
+  const { resolver, data } = options
+  const { TData, TError } = buildResponseTypes(node, resolver, { data })
 
   return buildHookParams(node, {
     resolver,
@@ -44,8 +51,8 @@ function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: R
   })
 }
 
-export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, returnType = 'full' }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver)
+export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, returnType = 'full', data = 'body' }: Props): KubbReactNode {
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { data })
 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver, withContentType: true })
   const hasMutationParams = groupedParam !== null
@@ -61,11 +68,11 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, 
       // Pin the payload type: an optional `value` property can otherwise drive Vue's ref inference.
       unwrapName: (name) => `toValue<${TRequest}['${name}']>(${name})`,
     }),
-    { returnType },
+    { returnType, data },
   )
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')
 
-  const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver })
+  const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver, data })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

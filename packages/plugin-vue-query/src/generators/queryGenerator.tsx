@@ -18,7 +18,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { driver, resolver, root } = ctx
-    const { output, query, mutation, client, group, hooks } = ctx.options
+    const { output, query, mutation, client, group, hooks, data } = ctx.options
 
     const { isQuery, isMutation } = classifyOperation(node, { query, mutation })
 
@@ -35,7 +35,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
     const queryKeyName = resolver.query.keyName(node)
     const queryKeyTypeName = resolver.query.keyTypeName(node)
 
-    const hook = resolveHookFile(node, ctx, { name: queryName, output, group, contractOp, keyTypeName: queryKeyTypeName })
+    const hook = resolveHookFile(node, ctx, { name: queryName, output, group, contractOp, keyTypeName: queryKeyTypeName, data })
     const { tsResolver } = hook
 
     return (
@@ -68,6 +68,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
           node={node}
           tsResolver={tsResolver}
           returnType={contractOp.returnType}
+          data={data}
         />
 
         {query && hooks && (
@@ -81,6 +82,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
               queryKeyTypeName={queryKeyTypeName}
               node={node}
               tsResolver={tsResolver}
+              data={data}
             />
           </>
         )}

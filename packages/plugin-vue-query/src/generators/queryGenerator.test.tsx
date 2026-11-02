@@ -15,6 +15,7 @@ import { queryGenerator } from './queryGenerator.tsx'
 
 const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
+  data: 'body',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -96,6 +97,7 @@ const updatePetWithFormNode = ast.factory.createOperation({
 describe('queryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
+    { name: 'findByTagsFullData', node: findByTagsNode, options: { data: 'full' } },
     {
       name: 'findByTagsWithCustomQueryKey',
       node: findByTagsNode,

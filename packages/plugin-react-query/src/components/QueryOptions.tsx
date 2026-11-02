@@ -4,6 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildQueryOptionsParams, buildClientCall } from '@internals/tanstack-query'
+import type { DataReturn } from '@internals/tanstack-query'
 import { buildQueryKeyParams, buildResponseTypes } from '@internals/tanstack-query'
 
 type Props = {
@@ -18,20 +19,26 @@ type Props = {
    * @default 'full'
    */
   returnType?: 'full' | 'data' | 'plain'
+  /**
+   * With `'full'`, the hook resolves to the whole `RequestResult` instead of the success body.
+   *
+   * @default 'body'
+   */
+  data?: DataReturn
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function QueryOptions({ name, clientName, node, tsResolver, queryKeyName, returnType = 'full' }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver)
+export function QueryOptions({ name, clientName, node, tsResolver, queryKeyName, returnType = 'full', data = 'body' }: Props): KubbReactNode {
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { data })
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true }), { returnType })
+  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true }), { returnType, data })
 
   return (
     <File.Source name={name} isExportable isIndexable>
