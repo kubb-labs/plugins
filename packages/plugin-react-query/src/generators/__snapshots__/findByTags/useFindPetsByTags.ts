@@ -4,8 +4,8 @@
  * Source: text content
  */
 
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsOptions, FindPetsByTagsStatus200 } from './FindPetsByTags'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from './.kubb/client'
+import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from './FindPetsByTags'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { findPetsByTags } from './clients/findPetsByTags'
 import { queryOptions, useQuery } from '@tanstack/react-query'
@@ -19,10 +19,10 @@ export function findPetsByTagsQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsQueryKey({ query })
-  return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, FindPetsByTagsStatus200, typeof queryKey>({
+  return queryOptions<RequestResult<FindPetsByTagsResponses, true>, ResponseErrorConfig<Error>, RequestResult<FindPetsByTagsResponses, true>, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true }).unwrap()
+      return await findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }
@@ -30,10 +30,16 @@ export function findPetsByTagsQueryOptions(
 /**
  * {@link /pet/findByTags}
  */
-export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
+export function useFindPetsByTags<
+  TData = RequestResult<FindPetsByTagsResponses, true>,
+  TQueryData = RequestResult<FindPetsByTagsResponses, true>,
+  TQueryKey extends QueryKey = FindPetsByTagsQueryKey,
+>(
   { query }: { query: FindPetsByTagsOptions['query'] | (() => FindPetsByTagsOptions['query']) },
   options: {
-    query?: Partial<QueryObserverOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<QueryObserverOptions<RequestResult<FindPetsByTagsResponses, true>, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
+      client?: QueryClient
+    }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {

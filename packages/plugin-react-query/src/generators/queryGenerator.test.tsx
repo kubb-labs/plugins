@@ -15,7 +15,7 @@ import { queryGenerator } from './queryGenerator.tsx'
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  returnType: 'data',
+  returnType: undefined,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -158,8 +158,8 @@ describe('queryGenerator operation', () => {
     { name: 'findByTags', node: findByTagsNode, options: {} },
     { name: 'getPetById', node: getPetByIdNode, options: {} },
     { name: 'pluginClient', node: getPetByIdNode, options: { client: { kind: 'contract', pluginName: 'plugin-client' } } },
-    { name: 'getPetByIdReturnTypeFull', node: getPetByIdNode, options: { returnType: 'full' } },
-    { name: 'pluginClientReturnTypeFull', node: getPetByIdNode, options: { client: { kind: 'contract', pluginName: 'plugin-client' }, returnType: 'full' } },
+    { name: 'getPetByIdReturnTypeData', node: getPetByIdNode, options: { returnType: 'data' } },
+    { name: 'pluginClientReturnTypeData', node: getPetByIdNode, options: { client: { kind: 'contract', pluginName: 'plugin-client' }, returnType: 'data' } },
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
     {
       name: 'createUsersWithListInputAsQuery',

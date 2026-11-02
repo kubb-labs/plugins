@@ -57,7 +57,7 @@ export const pluginVueQuery = defineExtension<PluginVueQuery>({
       queryKey = queryKeyTransformer,
       hooks = false,
       client,
-      returnType = 'data',
+      returnType,
       resolver: userResolver,
       macros: userMacros,
     } = options

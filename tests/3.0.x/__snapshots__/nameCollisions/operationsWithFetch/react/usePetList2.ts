@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { PetListStatus2002 } from '../types/PetList'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../.kubb/client'
+import type { PetListResponses2 } from '../types/PetList'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { petList2 } from '../clients/petList'
 import { queryOptions, useQuery } from '@tanstack/react-query'
@@ -15,10 +15,10 @@ type PetListQueryKey2 = ReturnType<typeof petListQueryKey2>
 
 export function petListQueryOptions2(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = petListQueryKey2()
-  return queryOptions<PetListStatus2002, ResponseErrorConfig<Error>, PetListStatus2002, typeof queryKey>({
+  return queryOptions<RequestResult<PetListResponses2, true>, ResponseErrorConfig<Error>, RequestResult<PetListResponses2, true>, typeof queryKey>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return petList2({ ...config, signal: config.signal ?? signal, throwOnError: true }).unwrap()
+      return await petList2({ ...config, signal: config.signal ?? signal, throwOnError: true })
    },
   })
 }
@@ -26,8 +26,8 @@ export function petListQueryOptions2(config: Partial<Omit<RequestConfig, 'path' 
 /**
  * {@link /pets/second}
  */
-export function usePetList2<TData = PetListStatus2002, TQueryData = PetListStatus2002, TQueryKey extends QueryKey = PetListQueryKey2>(options: {
-  query?: Partial<QueryObserverOptions<PetListStatus2002, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function usePetList2<TData = RequestResult<PetListResponses2, true>, TQueryData = RequestResult<PetListResponses2, true>, TQueryKey extends QueryKey = PetListQueryKey2>(options: {
+  query?: Partial<QueryObserverOptions<RequestResult<PetListResponses2, true>, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

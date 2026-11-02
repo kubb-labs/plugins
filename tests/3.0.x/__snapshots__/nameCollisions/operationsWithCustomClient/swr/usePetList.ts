@@ -4,8 +4,8 @@
 */
 
 import useSWR from 'swr'
-import type { PetListStatus200 } from '../types/pet/List'
-import type { RequestConfig, ResponseErrorConfig } from '@example/client'
+import type { PetListResponses } from '../types/pet/List'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '@example/client'
 import type { SWRConfiguration } from 'swr'
 import { petList } from '../clients/pet/list'
 
@@ -16,7 +16,7 @@ type PetListQueryKey = ReturnType<typeof petListQueryKey>
 export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return (await petList({ ...config, throwOnError: true })).data
+      return await petList({ ...config, throwOnError: true })
     },
   }
 }
@@ -25,7 +25,7 @@ export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' |
  * {@link /pets/first}
  */
 export function usePetList(options: {
-  query?: SWRConfiguration<PetListStatus200, ResponseErrorConfig<Error>>,
+  query?: SWRConfiguration<RequestResult<PetListResponses, true>, ResponseErrorConfig<Error>>,
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
   shouldFetch?: boolean,
   immutable?: boolean
@@ -34,7 +34,7 @@ export function usePetList(options: {
 
   const queryKey = petListQueryKey()
 
-  return useSWR<PetListStatus200, ResponseErrorConfig<Error>, PetListQueryKey | null>(
+  return useSWR<RequestResult<PetListResponses, true>, ResponseErrorConfig<Error>, PetListQueryKey | null>(
    shouldFetch ? queryKey : null,
    {
      ...petListQueryOptions(config),

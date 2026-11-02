@@ -9,7 +9,7 @@ import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, rend
 function createOptions(overrides: Partial<PluginReactQuery['resolvedOptions']> = {}): PluginReactQuery['resolvedOptions'] {
   return {
     client: { kind: 'contract', pluginName: 'plugin-axios' },
-    returnType: 'data',
+    returnType: undefined,
     queryKey: queryKeyTransformer,
     mutationKey: mutationKeyTransformer,
     query: { importPath: '@tanstack/react-query', methods: ['GET'] },

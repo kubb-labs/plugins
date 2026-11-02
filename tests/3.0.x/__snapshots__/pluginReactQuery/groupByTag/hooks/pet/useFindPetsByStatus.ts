@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { FindPetsByStatusOptions, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../types/FindPetsByStatus'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { FindPetsByStatusOptions, FindPetsByStatusResponses, FindPetsByStatusStatus400 } from '../../types/FindPetsByStatus'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { findPetsByStatus } from '../../clients/findPetsByStatus'
 import { queryOptions, useQuery } from '@tanstack/react-query'
@@ -15,10 +15,10 @@ type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
 export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusOptions = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = findPetsByStatusQueryKey({ query })
-  return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, typeof queryKey>({
+  return queryOptions<RequestResult<FindPetsByStatusResponses, true>, ResponseErrorConfig<FindPetsByStatusStatus400>, RequestResult<FindPetsByStatusResponses, true>, typeof queryKey>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return findPetsByStatus({ ...config, query, signal: config.signal ?? signal, throwOnError: true }).unwrap()
+      return await findPetsByStatus({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
    },
   })
 }
@@ -28,8 +28,8 @@ export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusOptions 
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export function useFindPetsByStatus<TData = FindPetsByStatusStatus200, TQueryData = FindPetsByStatusStatus200, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>({ query }: { query?: FindPetsByStatusOptions['query'] | (() => FindPetsByStatusOptions['query']) } = {}, options: {
-  query?: Partial<QueryObserverOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function useFindPetsByStatus<TData = RequestResult<FindPetsByStatusResponses, true>, TQueryData = RequestResult<FindPetsByStatusResponses, true>, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>({ query }: { query?: FindPetsByStatusOptions['query'] | (() => FindPetsByStatusOptions['query']) } = {}, options: {
+  query?: Partial<QueryObserverOptions<RequestResult<FindPetsByStatusResponses, true>, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

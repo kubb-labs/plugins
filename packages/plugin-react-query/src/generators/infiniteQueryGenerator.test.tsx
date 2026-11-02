@@ -12,7 +12,7 @@ import { infiniteQueryGenerator } from './infiniteQueryGenerator.tsx'
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  returnType: 'data',
+  returnType: undefined,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -114,7 +114,7 @@ describe('infiniteQueryGenerator operation', () => {
       },
     },
     { name: 'findByTagsInitialPageParam', node: findByTagsNode, options: { infinite: { ...infiniteConfig, initialPageParam: 1 } } },
-    { name: 'findByTagsReturnTypeFull', node: findByTagsNode, options: { infinite: { ...infiniteConfig, nextParam: 'next' }, returnType: 'full' } },
+    { name: 'findByTagsReturnTypeData', node: findByTagsNode, options: { infinite: { ...infiniteConfig, nextParam: 'next' }, returnType: 'data' } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {

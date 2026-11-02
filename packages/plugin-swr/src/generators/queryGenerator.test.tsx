@@ -14,7 +14,7 @@ import { queryGenerator } from './queryGenerator.tsx'
 
 const defaultOptions: PluginSwr['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  returnType: 'data',
+  returnType: undefined,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -105,7 +105,7 @@ describe('queryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
     { name: 'getPetById', node: getPetByIdNode, options: {} },
-    { name: 'getPetByIdReturnTypeFull', node: getPetByIdNode, options: { returnType: 'full' } },
+    { name: 'getPetByIdReturnTypeData', node: getPetByIdNode, options: { returnType: 'data' } },
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginSwr['resolvedOptions']> }>
 

@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { PetCreateStatus200 } from '../types/pet/Create'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../.kubb/client'
+import type { PetCreateResponses } from '../types/pet/Create'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { petCreate } from '../clients/pet/create'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -13,10 +13,10 @@ export const petCreateMutationKey = () => [{ url: '/pets/create-first' }] as con
 
 export function petCreateMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = petCreateMutationKey()
-  return mutationOptions<PetCreateStatus200, ResponseErrorConfig<Error>, undefined, TContext>({
+  return mutationOptions<RequestResult<PetCreateResponses, true>, ResponseErrorConfig<Error>, undefined, TContext>({
     mutationKey,
     mutationFn: async(_) => {
-      return petCreate({ ...config, throwOnError: true }).unwrap()
+      return await petCreate({ ...config, throwOnError: true })
     },
   })
 }
@@ -25,18 +25,18 @@ export function petCreateMutationOptions<TContext = unknown>(config: Partial<Omi
  * {@link /pets/create-first}
  */
 export function usePetCreate<TContext>(options: {
-  mutation?: UseMutationOptions<PetCreateStatus200, ResponseErrorConfig<Error>, undefined, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<RequestResult<PetCreateResponses, true>, ResponseErrorConfig<Error>, undefined, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions.mutationKey ?? petCreateMutationKey()
 
-  const baseOptions = petCreateMutationOptions(config) as UseMutationOptions<PetCreateStatus200, ResponseErrorConfig<Error>, undefined, TContext>
+  const baseOptions = petCreateMutationOptions(config) as UseMutationOptions<RequestResult<PetCreateResponses, true>, ResponseErrorConfig<Error>, undefined, TContext>
 
-  return useMutation<PetCreateStatus200, ResponseErrorConfig<Error>, undefined, TContext>({
+  return useMutation<RequestResult<PetCreateResponses, true>, ResponseErrorConfig<Error>, undefined, TContext>({
     ...baseOptions,
     mutationKey,
     ...mutationOptions,
-  }, queryClient) as UseMutationResult<PetCreateStatus200, ResponseErrorConfig<Error>, undefined, TContext>
+  }, queryClient) as UseMutationResult<RequestResult<PetCreateResponses, true>, ResponseErrorConfig<Error>, undefined, TContext>
 }

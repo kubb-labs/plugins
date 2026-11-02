@@ -26,5 +26,6 @@ export {
   resolveMutationConfig,
   resolveOperationOverrides,
   resolvePageParamType,
+  resolveHookReturnType,
   resolveQueryConfig,
 } from './utils.ts'

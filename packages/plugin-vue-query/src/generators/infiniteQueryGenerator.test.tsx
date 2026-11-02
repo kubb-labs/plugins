@@ -12,7 +12,7 @@ import { infiniteQueryGenerator } from './infiniteQueryGenerator.tsx'
 
 const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  returnType: 'data',
+  returnType: undefined,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {

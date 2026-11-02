@@ -208,6 +208,11 @@ export function buildCallResultBody(call: string, options: { clientReturnType?: 
   return `return ${call}.unwrap()`
 }
 
+/** The plugin's own `returnType` when set, else the client plugin's, where `'plain'` already returns the whole `RequestResult`. */
+export function resolveHookReturnType(returnType: HookReturnType | undefined, clientReturnType: 'full' | 'data' | 'plain'): HookReturnType {
+  return returnType ?? (clientReturnType === 'data' ? 'data' : 'full')
+}
+
 type ResponseTypes = {
   TData: string
   TError: string

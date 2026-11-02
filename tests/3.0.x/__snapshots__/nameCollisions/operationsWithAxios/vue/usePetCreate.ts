@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { PetCreateStatus200 } from '../types/pet/Create'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../.kubb/client'
+import type { PetCreateResponses } from '../types/pet/Create'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { petCreate } from '../clients/pet/create'
 import { useMutation } from '@tanstack/vue-query'
@@ -15,16 +15,16 @@ export const petCreateMutationKey = () => [{ url: '/pets/create-first' }] as con
  * {@link /pets/create-first}
  */
 export function usePetCreate<TContext>(options: {
-  mutation?: MutationObserverOptions<PetCreateStatus200, ResponseErrorConfig<Error>, undefined, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<RequestResult<PetCreateResponses, true>, ResponseErrorConfig<Error>, undefined, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions?.mutationKey ?? petCreateMutationKey()
 
-  return useMutation<PetCreateStatus200, ResponseErrorConfig<Error>, undefined, TContext>({
+  return useMutation<RequestResult<PetCreateResponses, true>, ResponseErrorConfig<Error>, undefined, TContext>({
     mutationFn: async() => {
-      return petCreate({ ...config, throwOnError: true }).unwrap()
+      return await petCreate({ ...config, throwOnError: true })
     },
     mutationKey,
     ...mutationOptions

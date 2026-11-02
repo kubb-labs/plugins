@@ -52,7 +52,7 @@ export const pluginSwr = defineExtension<PluginSwr>({
       mutationKey = mutationKeyTransformer,
       queryKey = queryKeyTransformer,
       client,
-      returnType = 'data',
+      returnType,
       resolver: userResolver,
       macros: userMacros,
     } = options

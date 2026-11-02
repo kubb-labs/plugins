@@ -4,8 +4,8 @@
  * Source: text content
  */
 
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { RetrieveMyProfileOptions, RetrieveMyProfileStatus200 } from './RetrieveMyProfile'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from './.kubb/client'
+import type { RetrieveMyProfileOptions, RetrieveMyProfileResponses } from './RetrieveMyProfile'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { retrieveMyProfile } from './clients/retrieveMyProfile'
 import { queryOptions, useQuery } from '@tanstack/react-query'
@@ -19,10 +19,15 @@ export function retrieveMyProfileQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = retrieveMyProfileQueryKey()
-  return queryOptions<RetrieveMyProfileStatus200, ResponseErrorConfig<Error>, RetrieveMyProfileStatus200, typeof queryKey>({
+  return queryOptions<
+    RequestResult<RetrieveMyProfileResponses, true>,
+    ResponseErrorConfig<Error>,
+    RequestResult<RetrieveMyProfileResponses, true>,
+    typeof queryKey
+  >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return retrieveMyProfile({ ...config, headers, signal: config.signal ?? signal, throwOnError: true }).unwrap()
+      return await retrieveMyProfile({ ...config, headers, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }
@@ -31,13 +36,15 @@ export function retrieveMyProfileQueryOptions(
  * {@link /user/me}
  */
 export function useRetrieveMyProfile<
-  TData = RetrieveMyProfileStatus200,
-  TQueryData = RetrieveMyProfileStatus200,
+  TData = RequestResult<RetrieveMyProfileResponses, true>,
+  TQueryData = RequestResult<RetrieveMyProfileResponses, true>,
   TQueryKey extends QueryKey = RetrieveMyProfileQueryKey,
 >(
   { headers }: { headers: RetrieveMyProfileOptions['headers'] | (() => RetrieveMyProfileOptions['headers']) },
   options: {
-    query?: Partial<QueryObserverOptions<RetrieveMyProfileStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<QueryObserverOptions<RequestResult<RetrieveMyProfileResponses, true>, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
+      client?: QueryClient
+    }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {

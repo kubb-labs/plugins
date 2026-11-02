@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { DeletePetOptions, DeletePetResponse, DeletePetStatus400 } from '../types/DeletePet'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../.kubb/client'
+import type { DeletePetOptions, DeletePetResponses, DeletePetStatus400 } from '../types/DeletePet'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { deletePet } from '../clients/deletePet'
 import { useMutation } from '@tanstack/vue-query'
@@ -18,16 +18,16 @@ export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
  * {@link /pet/:petId}
  */
 export function useDeletePet<TContext>(options: {
-  mutation?: MutationObserverOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<RequestResult<DeletePetResponses, true>, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions?.mutationKey ?? deletePetMutationKey()
 
-  return useMutation<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext>({
+  return useMutation<RequestResult<DeletePetResponses, true>, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext>({
     mutationFn: async({ path, headers }) => {
-      return deletePet({ ...config, path: toValue<DeletePetOptions['path']>(path), headers: toValue<DeletePetOptions['headers']>(headers), throwOnError: true }).unwrap()
+      return await deletePet({ ...config, path: toValue<DeletePetOptions['path']>(path), headers: toValue<DeletePetOptions['headers']>(headers), throwOnError: true })
     },
     mutationKey,
     ...mutationOptions

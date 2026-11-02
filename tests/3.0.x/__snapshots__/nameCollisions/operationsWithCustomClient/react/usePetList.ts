@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { PetListStatus200 } from '../types/pet/List'
-import type { RequestConfig, ResponseErrorConfig } from '@example/client'
+import type { PetListResponses } from '../types/pet/List'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '@example/client'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { petList } from '../clients/pet/list'
 import { queryOptions, useQuery } from '@tanstack/react-query'
@@ -15,10 +15,10 @@ type PetListQueryKey = ReturnType<typeof petListQueryKey>
 
 export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = petListQueryKey()
-  return queryOptions<PetListStatus200, ResponseErrorConfig<Error>, PetListStatus200, typeof queryKey>({
+  return queryOptions<RequestResult<PetListResponses, true>, ResponseErrorConfig<Error>, RequestResult<PetListResponses, true>, typeof queryKey>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return (await petList({ ...config, signal: config.signal ?? signal, throwOnError: true })).data
+      return await petList({ ...config, signal: config.signal ?? signal, throwOnError: true })
    },
   })
 }
@@ -26,8 +26,8 @@ export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' |
 /**
  * {@link /pets/first}
  */
-export function usePetList<TData = PetListStatus200, TQueryData = PetListStatus200, TQueryKey extends QueryKey = PetListQueryKey>(options: {
-  query?: Partial<QueryObserverOptions<PetListStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function usePetList<TData = RequestResult<PetListResponses, true>, TQueryData = RequestResult<PetListResponses, true>, TQueryKey extends QueryKey = PetListQueryKey>(options: {
+  query?: Partial<QueryObserverOptions<RequestResult<PetListResponses, true>, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

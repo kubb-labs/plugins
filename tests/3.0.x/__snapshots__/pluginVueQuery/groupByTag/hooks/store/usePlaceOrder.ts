@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { PlaceOrderOptions, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../types/PlaceOrder'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
+import type { PlaceOrderOptions, PlaceOrderResponses, PlaceOrderStatus405 } from '../../types/PlaceOrder'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { placeOrder } from '../../clients/placeOrder'
 import { useMutation } from '@tanstack/vue-query'
@@ -17,16 +17,16 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  * {@link /store/order}
  */
 export function usePlaceOrder<TContext>(options: {
-  mutation?: MutationObserverOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<RequestResult<PlaceOrderResponses, true>, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: { request?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } },
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions?.mutationKey ?? placeOrderMutationKey()
 
-  return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>({
+  return useMutation<RequestResult<PlaceOrderResponses, true>, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>({
     mutationFn: async(variables) => {
-      return placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0]).unwrap()
+      return await placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0])
     },
     mutationKey,
     ...mutationOptions

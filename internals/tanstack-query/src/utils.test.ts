@@ -2,6 +2,7 @@ import { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
 import {
   buildCallResultBody,
+  resolveHookReturnType,
   classifyOperation,
   getDefaultPageParamsWarning,
   hasQueryKeyParams,
@@ -147,6 +148,15 @@ describe('buildCallResultBody', () => {
 
   test("throws with returnType 'full' when the client only returns the body", () => {
     expect(() => buildCallResultBody('getPetById({ throwOnError: true })', { clientReturnType: 'data', returnType: 'full' })).toThrow(/returnType: 'data'/)
+  })
+})
+
+describe('resolveHookReturnType', () => {
+  test('prefers the hook option, then follows the client', () => {
+    expect(resolveHookReturnType('data', 'full')).toBe('data')
+    expect(resolveHookReturnType(undefined, 'full')).toBe('full')
+    expect(resolveHookReturnType(undefined, 'data')).toBe('data')
+    expect(resolveHookReturnType(undefined, 'plain')).toBe('full')
   })
 })
 

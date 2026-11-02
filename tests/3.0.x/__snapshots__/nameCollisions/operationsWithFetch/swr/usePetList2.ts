@@ -4,8 +4,8 @@
 */
 
 import useSWR from 'swr'
-import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { PetListStatus2002 } from '../types/PetList'
+import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../.kubb/client'
+import type { PetListResponses2 } from '../types/PetList'
 import type { SWRConfiguration } from 'swr'
 import { petList2 } from '../clients/petList'
 
@@ -16,7 +16,7 @@ type PetListQueryKey2 = ReturnType<typeof petListQueryKey2>
 export function petListQueryOptions2(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return petList2({ ...config, throwOnError: true }).unwrap()
+      return await petList2({ ...config, throwOnError: true })
     },
   }
 }
@@ -25,7 +25,7 @@ export function petListQueryOptions2(config: Partial<Omit<RequestConfig, 'path' 
  * {@link /pets/second}
  */
 export function usePetList2(options: {
-  query?: SWRConfiguration<PetListStatus2002, ResponseErrorConfig<Error>>,
+  query?: SWRConfiguration<RequestResult<PetListResponses2, true>, ResponseErrorConfig<Error>>,
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
   shouldFetch?: boolean,
   immutable?: boolean
@@ -34,7 +34,7 @@ export function usePetList2(options: {
 
   const queryKey = petListQueryKey2()
 
-  return useSWR<PetListStatus2002, ResponseErrorConfig<Error>, PetListQueryKey2 | null>(
+  return useSWR<RequestResult<PetListResponses2, true>, ResponseErrorConfig<Error>, PetListQueryKey2 | null>(
    shouldFetch ? queryKey : null,
    {
      ...petListQueryOptions2(config),

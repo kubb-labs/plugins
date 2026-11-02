@@ -1,6 +1,6 @@
 import { getRequestGroups } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
-import { classifyOperation, HookFile, MutationKey, resolveHookFile } from '@internals/tanstack-query'
+import { classifyOperation, HookFile, MutationKey, resolveHookFile, resolveHookReturnType } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Mutation } from '../components/Mutation.tsx'
@@ -17,7 +17,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { driver, resolver, root } = ctx
-    const { output, query, mutation, client, group, hooks, returnType } = ctx.options
+    const { output, query, mutation, client, group, hooks } = ctx.options
 
     const { isMutation } = classifyOperation(node, { query, mutation })
 
@@ -28,6 +28,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
     // The registered contract client plugin owns the `<op>` the composable imports and calls.
     const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
     if (!contractOp) return null
+    const returnType = resolveHookReturnType(ctx.options.returnType, contractOp.returnType)
 
     const mutationHookName = resolver.mutation.name(node)
     const mutationKeyName = resolver.mutation.keyName(node)

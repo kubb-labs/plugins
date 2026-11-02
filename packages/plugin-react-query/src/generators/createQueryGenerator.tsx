@@ -7,6 +7,7 @@ import {
   matchesInfinite,
   QueryKey,
   resolveHookFile,
+  resolveHookReturnType,
   resolvePageParamType,
 } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/kit'
@@ -54,7 +55,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
     operation(node, ctx) {
       if (!ast.isHttpOperationNode(node)) return null
       const { driver, resolver, root } = ctx
-      const { output, query, infinite: infiniteConfig, client, group, customOptions, hooks, returnType } = ctx.options
+      const { output, query, infinite: infiniteConfig, client, group, customOptions, hooks } = ctx.options
 
       const infiniteOptions = infinite && infiniteConfig && typeof infiniteConfig === 'object' ? infiniteConfig : null
       if (infinite && !infiniteOptions) return null
@@ -67,6 +68,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
 
       const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
       if (!contractOp) return null
+      const returnType = resolveHookReturnType(ctx.options.returnType, contractOp.returnType)
 
       const importPath = query ? query.importPath : '@tanstack/react-query'
       const variantResolver = resolver[variant]
