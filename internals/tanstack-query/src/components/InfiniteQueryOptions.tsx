@@ -4,7 +4,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import type { DataReturn, Infinite } from '../types.ts'
+import type { HookReturnType, Infinite } from '../types.ts'
 import {
   buildCallResultBody,
   buildClientCall,
@@ -49,8 +49,8 @@ type Props = {
    *
    * @default 'full'
    */
-  returnType?: 'full' | 'data' | 'plain'
-  data?: DataReturn
+  clientReturnType?: 'full' | 'data' | 'plain'
+  returnType?: HookReturnType
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -73,12 +73,12 @@ export function InfiniteQueryOptions({
   queryKeyType = 'typeof queryKey',
   memberTypeWrapper,
   unwrapName,
-  returnType = 'full',
-  data = 'body',
+  clientReturnType = 'full',
+  returnType = 'data',
 }: Props): KubbReactNode {
-  const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver, { data })
-  const lastPage = data === 'full' ? 'lastPage.data' : 'lastPage'
-  const firstPage = data === 'full' ? 'firstPage.data' : 'firstPage'
+  const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver, { returnType })
+  const lastPage = returnType === 'full' ? 'lastPage.data' : 'lastPage'
+  const firstPage = returnType === 'full' ? 'firstPage.data' : 'firstPage'
 
   const { queryParamsTypeName, pageParamType } = resolvePageParamType(node, { resolver: tsResolver, initialPageParam, queryParam })
 
@@ -88,7 +88,7 @@ export function InfiniteQueryOptions({
 
   const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver, memberTypeWrapper })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName }), { returnType, data })
+  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName }), { clientReturnType, returnType })
 
   const initialPageParamLiteral =
     typeof initialPageParam === 'string' || (typeof initialPageParam === 'object' && initialPageParam !== null)

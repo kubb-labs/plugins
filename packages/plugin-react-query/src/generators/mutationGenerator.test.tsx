@@ -12,7 +12,7 @@ import { mutationGenerator } from './mutationGenerator.tsx'
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  data: 'body',
+  returnType: 'data',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -141,7 +141,7 @@ describe('mutationGenerator operation', () => {
   const testData = [
     { name: 'getAsMutation', node: findByTagsNode, options: { mutation: { importPath: 'custom-swr/mutation', methods: ['get'] } } },
     { name: 'updatePetById', node: updatePetByIdNode, options: {} },
-    { name: 'updatePetByIdFullData', node: updatePetByIdNode, options: { data: 'full' } },
+    { name: 'updatePetByIdReturnTypeFull', node: updatePetByIdNode, options: { returnType: 'full' } },
     { name: 'deletePet', node: deletePetNode, options: {} },
     { name: 'multiContentType', node: multiContentTypeNode, options: {} },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']> }>

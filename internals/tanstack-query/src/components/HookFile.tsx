@@ -4,7 +4,7 @@ import type { ast, GeneratorContext, Group, Output } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import type { DataReturn } from '../types.ts'
+import type { HookReturnType } from '../types.ts'
 
 type ContractOperation = { name: string; path: string; clientPath: string; clientPathIsFile: boolean }
 
@@ -23,7 +23,7 @@ type ResolveHookFileOptions = {
    * Type names imported right after the response options type.
    */
   extraTypeNames?: Array<string | null | undefined>
-  data?: DataReturn
+  returnType?: HookReturnType
 }
 
 type ResolvedHookFile = {
@@ -32,7 +32,7 @@ type ResolvedHookFile = {
   tsResolver: ResolverTs
   contractOp: ContractOperation
   importedTypeNames: Array<string>
-  data: DataReturn
+  returnType: HookReturnType
   banner: string | null
   footer: string | null
 }
@@ -42,7 +42,7 @@ type ResolvedHookFile = {
  * `pluginZod({ inferred: 'codec' })`), banner and footer.
  */
 export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, options: ResolveHookFileOptions): ResolvedHookFile {
-  const { name, output, group, contractOp, keyTypeName, extraTypeNames = [], data = 'body' } = options
+  const { name, output, group, contractOp, keyTypeName, extraTypeNames = [], returnType = 'data' } = options
   const { config, root, resolver } = ctx
   const types = resolveOperationTypes(ctx.driver, resolver.pluginName)
   const tsResolver = types.resolver
@@ -58,11 +58,11 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
   })
   const importedTypeNames = [
     tsResolver.response.options(node),
-    data === 'full' ? tsResolver.response.responses(node) : null,
+    returnType === 'full' ? tsResolver.response.responses(node) : null,
     ...extraTypeNames,
     ...resolveOperationTypeNames(node, tsResolver, {
       // The joined response alias is unused with the full result, and the printer keeps it as a substring of the responses record name.
-      exclude: [keyTypeName, data === 'full' ? tsResolver.response.response(node) : null].filter((name): name is string => Boolean(name)),
+      exclude: [keyTypeName, returnType === 'full' ? tsResolver.response.response(node) : null].filter((name): name is string => Boolean(name)),
       order: 'body-response-first',
       includeParams: false,
     }),
@@ -75,7 +75,7 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
     tsResolver,
     contractOp,
     importedTypeNames,
-    data,
+    returnType,
     banner: resolver.default.banner(ctx.meta, { output, config, file: fileMeta }),
     footer: resolver.default.footer(ctx.meta, { output, config, file: fileMeta }),
   }
@@ -94,13 +94,13 @@ type HookFileProps = {
  * The `<File>` shell shared by the TanStack hook generators; renders `children` after the imports.
  */
 export function HookFile({ hook, imports, children }: HookFileProps): KubbReactNode {
-  const { file, fileTs, contractOp, importedTypeNames, data, banner, footer } = hook
+  const { file, fileTs, contractOp, importedTypeNames, returnType, banner, footer } = hook
 
   return (
     <File baseName={file.baseName} path={file.path} meta={file.meta} banner={banner} footer={footer}>
       <File.Import name={[contractOp.name]} root={file.path} path={contractOp.path} />
       <File.Import
-        name={data === 'full' ? ['RequestConfig', 'ResponseErrorConfig', 'RequestResult'] : ['RequestConfig', 'ResponseErrorConfig']}
+        name={returnType === 'full' ? ['RequestConfig', 'ResponseErrorConfig', 'RequestResult'] : ['RequestConfig', 'ResponseErrorConfig']}
         root={contractOp.clientPathIsFile ? file.path : undefined}
         path={contractOp.clientPath}
         isTypeOnly

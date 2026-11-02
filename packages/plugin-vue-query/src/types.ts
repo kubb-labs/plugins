@@ -1,8 +1,8 @@
 import type { ClientSelector, ResolvedContractClient } from '@internals/client'
-import type { DataReturn, Infinite, Mutation, Query, Transformer } from '@internals/tanstack-query'
+import type { HookReturnType, Infinite, Mutation, Query, Transformer } from '@internals/tanstack-query'
 import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
 
-export type { DataReturn, Infinite, Transformer } from '@internals/tanstack-query'
+export type { HookReturnType, Infinite, Transformer } from '@internals/tanstack-query'
 
 /**
  * Resolver for Vue Query that provides naming methods for hook functions.
@@ -102,10 +102,10 @@ export type Options = OutputOptions & {
    */
   client?: ClientSelector
   /**
-   * What the hooks resolve to: the success body, or with `'full'` the client's whole `RequestResult` so a hook can read response headers. Needs a client plugin whose `returnType` is `'full'` or `'plain'`.
-   * @default 'body'
+   * Shape of the value the hooks resolve to, named after the client plugins' option: `'data'` is the success body, `'full'` the client's whole `RequestResult` so a hook can read response headers. Needs a client plugin whose own `returnType` is `'full'` or `'plain'`.
+   * @default 'data'
    */
-  data?: DataReturn
+  returnType?: HookReturnType
   /**
    * Skip operations matching at least one entry in the list.
    */
@@ -175,7 +175,7 @@ export type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedClient
-  data: DataReturn
+  returnType: HookReturnType
   /**
    * Resolved infinite query configuration, or `false` when infinite queries are disabled.
    */

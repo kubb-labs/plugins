@@ -54,7 +54,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
     operation(node, ctx) {
       if (!ast.isHttpOperationNode(node)) return null
       const { driver, resolver, root } = ctx
-      const { output, query, infinite: infiniteConfig, client, group, customOptions, hooks, data } = ctx.options
+      const { output, query, infinite: infiniteConfig, client, group, customOptions, hooks, returnType } = ctx.options
 
       const infiniteOptions = infinite && infiniteConfig && typeof infiniteConfig === 'object' ? infiniteConfig : null
       if (infinite && !infiniteOptions) return null
@@ -81,7 +81,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
         output,
         group,
         contractOp,
-        data,
+        returnType,
         keyTypeName: queryKeyTypeName,
         extraTypeNames: infiniteOptions
           ? [
@@ -120,8 +120,8 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
                 initialPageParam={infiniteOptions.initialPageParam}
                 hasExplicitInitialPageParam={infiniteOptions.hasExplicitInitialPageParam}
                 queryParam={infiniteOptions.queryParam}
-                returnType={contractOp.returnType}
-                data={data}
+                clientReturnType={contractOp.returnType}
+                returnType={returnType}
               />
             </>
           ) : (
@@ -133,8 +133,8 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
                 queryKeyName={queryKeyName}
                 node={node}
                 tsResolver={hook.tsResolver}
-                returnType={contractOp.returnType}
-                data={data}
+                clientReturnType={contractOp.returnType}
+                returnType={returnType}
               />
             </>
           )}
@@ -151,7 +151,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
                 node={node}
                 tsResolver={hook.tsResolver}
                 customOptions={customOptions}
-                data={data}
+                returnType={returnType}
                 suspense={suspense}
                 infinite={infiniteOptions ? { initialPageParam: infiniteOptions.initialPageParam, queryParam: infiniteOptions.queryParam } : undefined}
               />

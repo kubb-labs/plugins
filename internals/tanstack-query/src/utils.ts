@@ -13,7 +13,7 @@ import type { ast } from '@kubb/kit'
 import { Diagnostics } from '@kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
-import type { DataReturn, Infinite, Mutation, PageParamFn, Query } from './types.ts'
+import type { HookReturnType, Infinite, Mutation, PageParamFn, Query } from './types.ts'
 
 /**
  * The grouped request options, ordered for both the destructured signature and the
@@ -174,13 +174,13 @@ export function buildClientCall(
 
 /**
  * Builds the query/mutation body that resolves a `buildClientCall` expression down to the bare
- * success body. `returnType` mirrors the registered client plugin's own `returnType` option: with
+ * success body. `clientReturnType` mirrors the registered client plugin's own `returnType` option: with
  * `'data'` the call already resolves to the bare body, so it is returned directly; with `'full'`
  * (the default) the call carries `unwrap()`, so the body calls it instead of destructuring `data`
  * off the full result by hand. With `'plain'` (plugin-client) the call resolves to the user's
  * `RequestResult`, so the body awaits it and reads `data`.
  *
- * With `data: 'full'` the body resolves to the whole `RequestResult`, which needs a client that still returns one.
+ * With `returnType: 'full'` the body resolves to the whole `RequestResult`, which needs a client that still returns one.
  *
  * @example
  * ```ts
@@ -188,21 +188,21 @@ export function buildClientCall(
  * // return getPetById({ ...config, throwOnError: true }).unwrap()
  * ```
  */
-export function buildCallResultBody(call: string, options: { returnType?: 'full' | 'data' | 'plain'; data?: DataReturn } = {}): string {
-  const { returnType = 'full', data = 'body' } = options
-  if (data === 'full' && returnType === 'data') {
+export function buildCallResultBody(call: string, options: { clientReturnType?: 'full' | 'data' | 'plain'; returnType?: HookReturnType } = {}): string {
+  const { clientReturnType = 'full', returnType = 'data' } = options
+  if (returnType === 'full' && clientReturnType === 'data') {
     throw new Diagnostics.Error({
       code: Diagnostics.code.invalidPluginOptions,
       severity: 'error',
-      message: "Option `data` is 'full', but the client plugin has `returnType: 'data'` and only returns the response body.",
-      help: "Set the client plugin's `returnType` to 'full', or drop `data: 'full'`.",
+      message: "Option `returnType` is 'full', but the client plugin has `returnType: 'data'` and only returns the response body.",
+      help: "Set the client plugin's `returnType` to 'full', or drop `returnType: 'full'`.",
       location: { kind: 'config' },
     })
   }
-  if (data === 'full' || returnType === 'data') {
+  if (returnType === 'full' || clientReturnType === 'data') {
     return `return await ${call}`
   }
-  if (returnType === 'plain') {
+  if (clientReturnType === 'plain') {
     return `return (await ${call}).data`
   }
   return `return ${call}.unwrap()`
@@ -227,17 +227,17 @@ type ResolvePageParamTypeParams = {
 /**
  * Builds the `TData` / `TError` type expressions shared by every generated hook, joining the resolved
  * success responses into `TData` and wrapping the error responses in `ResponseErrorConfig<...>`.
- * With `data: 'full'`, `TData` is the client's `RequestResult` over the operation's responses record.
+ * With `returnType: 'full'`, `TData` is the client's `RequestResult` over the operation's responses record.
  */
-export function buildResponseTypes(node: ast.OperationNode, resolver: ResolverTs, options: { data?: DataReturn } = {}): ResponseTypes {
-  const { data = 'body' } = options
-  return resolver.memo(`responseTypes:${data}:${node.method}\0${node.path}`, () => {
+export function buildResponseTypes(node: ast.OperationNode, resolver: ResolverTs, options: { returnType?: HookReturnType } = {}): ResponseTypes {
+  const { returnType = 'data' } = options
+  return resolver.memo(`responseTypes:${returnType}:${node.method}\0${node.path}`, () => {
     const successNames = resolveSuccessNames(node, resolver)
     const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
     const errorNames = resolveErrorNames(node, resolver)
 
     return {
-      TData: data === 'full' ? `RequestResult<${resolver.response.responses(node)}, true>` : responseName,
+      TData: returnType === 'full' ? `RequestResult<${resolver.response.responses(node)}, true>` : responseName,
       TError: `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`,
     }
   })

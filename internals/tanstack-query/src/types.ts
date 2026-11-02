@@ -2,8 +2,8 @@ import type { ast } from '@kubb/kit'
 
 export type ParamsCasing = 'camelcase' | undefined
 
-/** What a generated hook resolves to: `'body'` is the success body, `'full'` is the client's whole `RequestResult`. */
-export type DataReturn = 'body' | 'full'
+/** Shape of the value a generated hook resolves to: `'data'` is the success body, `'full'` the client's whole `RequestResult`. */
+export type HookReturnType = 'data' | 'full'
 
 /**
  * The hook a key is built for. Plain and suspense queries can share a key, but an infinite query

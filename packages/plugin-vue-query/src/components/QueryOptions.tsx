@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildClientCall, buildQueryKeyParams, buildQueryOptionsParams, buildResponseTypes } from '@internals/tanstack-query'
-import type { DataReturn } from '@internals/tanstack-query'
+import type { HookReturnType } from '@internals/tanstack-query'
 import { maybeRefOrGetter } from '../utils.ts'
 
 type Props = {
@@ -18,8 +18,8 @@ type Props = {
    *
    * @default 'full'
    */
-  returnType?: 'full' | 'data' | 'plain'
-  data?: DataReturn
+  clientReturnType?: 'full' | 'data' | 'plain'
+  returnType?: HookReturnType
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -29,15 +29,18 @@ export function getQueryOptionsParams(node: ast.OperationNode, options: { resolv
   return buildQueryOptionsParams(node, { resolver: options.resolver, memberTypeWrapper: maybeRefOrGetter })
 }
 
-export function QueryOptions({ name, clientName, node, tsResolver, queryKeyName, returnType = 'full', data = 'body' }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver, { data })
+export function QueryOptions({ name, clientName, node, tsResolver, queryKeyName, clientReturnType = 'full', returnType = 'data' }: Props): KubbReactNode {
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver, memberTypeWrapper: maybeRefOrGetter })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName: (name) => `toValue(${name})` }), { returnType, data })
+  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName: (name) => `toValue(${name})` }), {
+    clientReturnType,
+    returnType,
+  })
 
   return (
     <File.Source name={name} isExportable isIndexable>

@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildQueryOptionsParams, buildClientCall } from '@internals/tanstack-query'
-import type { DataReturn } from '@internals/tanstack-query'
+import type { HookReturnType } from '@internals/tanstack-query'
 
 type Props = {
   name: string
@@ -16,16 +16,16 @@ type Props = {
    *
    * @default 'full'
    */
-  returnType?: 'full' | 'data' | 'plain'
-  data?: DataReturn
+  clientReturnType?: 'full' | 'data' | 'plain'
+  returnType?: HookReturnType
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export function QueryOptions({ name, clientName, node, tsResolver, returnType = 'full', data = 'body' }: Props): KubbReactNode {
+export function QueryOptions({ name, clientName, node, tsResolver, clientReturnType = 'full', returnType = 'data' }: Props): KubbReactNode {
   const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const fetcherBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false }), { returnType, data })
+  const fetcherBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false }), { clientReturnType, returnType })
 
   return (
     <File.Source name={name} isExportable isIndexable>

@@ -11,7 +11,7 @@ import {
   buildResponseTypes,
   resolveMutationRequestType,
 } from '@internals/tanstack-query'
-import type { DataReturn } from '@internals/tanstack-query'
+import type { HookReturnType } from '@internals/tanstack-query'
 import { buildRequestConfigType, getComments } from '../utils.ts'
 
 type Props = {
@@ -25,16 +25,16 @@ type Props = {
    *
    * @default 'full'
    */
-  returnType?: 'full' | 'data' | 'plain'
-  data?: DataReturn
+  clientReturnType?: 'full' | 'data' | 'plain'
+  returnType?: HookReturnType
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: ResolverTs; data: DataReturn }): FunctionParametersNode {
-  const { resolver, data } = options
-  const { TData, TError } = buildResponseTypes(node, resolver, { data })
+function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: ResolverTs; returnType: HookReturnType }): FunctionParametersNode {
+  const { resolver, returnType } = options
+  const { TData, TError } = buildResponseTypes(node, resolver, { returnType })
 
   return buildHookParams(node, {
     resolver,
@@ -46,8 +46,8 @@ function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: R
   })
 }
 
-export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, returnType = 'full', data = 'body' }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver, { data })
+export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, clientReturnType = 'full', returnType = 'data' }: Props): KubbReactNode {
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver, withContentType: true })
   const hasMutationParams = groupedParam !== null
@@ -59,15 +59,15 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, 
       clientName,
       signal: false,
       withContentType: true,
-      returnType,
+      returnType: clientReturnType,
       // Pin the payload type: an optional `value` property can otherwise drive Vue's ref inference.
       unwrapName: (name) => `toValue<${TRequest}['${name}']>(${name})`,
     }),
-    { returnType, data },
+    { clientReturnType, returnType },
   )
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')
 
-  const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver, data })
+  const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver, returnType })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

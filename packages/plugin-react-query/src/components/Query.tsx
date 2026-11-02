@@ -12,7 +12,7 @@ import {
   maybeValueOrGetter,
   resolvePageParamType,
 } from '@internals/tanstack-query'
-import type { DataReturn, Infinite } from '@internals/tanstack-query'
+import type { HookReturnType, Infinite } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
 
 type Props = {
@@ -35,7 +35,7 @@ type Props = {
     initialPageParam: Infinite['initialPageParam']
     queryParam?: Infinite['queryParam']
   }
-  data?: DataReturn
+  returnType?: HookReturnType
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -65,7 +65,7 @@ function buildHookTypes({ node, tsResolver, infinite, suspense, TData, TError, q
         `TPageParam = ${pageParamType}`,
       ],
       observerOptionsType: `${observerOptionsName}<TQueryFnData, TError, TData, TQueryKey, TPageParam>`,
-      returnType: `${resultTypeName}<TData, TError> & { queryKey: TQueryKey }`,
+      resultType: `${resultTypeName}<TData, TError> & { queryKey: TQueryKey }`,
     }
   }
 
@@ -74,7 +74,7 @@ function buildHookTypes({ node, tsResolver, infinite, suspense, TData, TError, q
       ? [`TData = ${TData}`, `TQueryKey extends QueryKey = ${queryKeyTypeName}`]
       : [`TData = ${TData}`, `TQueryData = ${TData}`, `TQueryKey extends QueryKey = ${queryKeyTypeName}`],
     observerOptionsType: `${observerOptionsName}<${(suspense ? [TData, TError, 'TData', 'TQueryKey'] : [TData, TError, 'TData', 'TQueryData', 'TQueryKey']).join(', ')}>`,
-    returnType: `${resultTypeName}<TData, ${TError}> & { queryKey: TQueryKey }`,
+    resultType: `${resultTypeName}<TData, ${TError}> & { queryKey: TQueryKey }`,
   }
 }
 
@@ -88,16 +88,16 @@ export function Query({
   customOptions,
   suspense,
   infinite,
-  data = 'body',
+  returnType = 'data',
 }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver, { data })
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
 
   const prefix = suspense ? 'UseSuspense' : 'Use'
   const hookName = `${suspense ? 'useSuspense' : 'use'}${infinite ? 'InfiniteQuery' : 'Query'}`
   const observerOptionsName = OBSERVER_OPTIONS_NAMES[infinite ? 'infinite' : 'plain'][suspense ? 'suspense' : 'standard']
   const resultTypeName = `${prefix}${infinite ? 'Infinite' : ''}QueryResult`
 
-  const { generics, observerOptionsType, returnType } = buildHookTypes({
+  const { generics, observerOptionsType, resultType } = buildHookTypes({
     node,
     tsResolver,
     infinite,
@@ -144,7 +144,7 @@ export function Query({
         ...${queryOptionsName}(${queryOptionsArgs}),${customOptions ? '\n        ...customOptions,' : ''}
         ...resolvedOptions,
         queryKey,
-       } as unknown as ${castType}, queryClient) as ${returnType}
+       } as unknown as ${castType}, queryClient) as ${resultType}
 
        queryResult.queryKey = queryKey as TQueryKey
 
