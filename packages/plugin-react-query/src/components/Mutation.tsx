@@ -16,11 +16,6 @@ type Props = {
   node: ast.OperationNode
   tsResolver: ResolverTs
   customOptions: PluginReactQuery['resolvedOptions']['customOptions']
-  /**
-   * With `'full'`, the hook resolves to the whole `RequestResult` instead of the success body.
-   *
-   * @default 'body'
-   */
   data?: DataReturn
 }
 

@@ -14,11 +14,6 @@ type Props = {
   queryKeyTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  /**
-   * With `'full'`, the hook resolves to the whole `RequestResult` instead of the success body.
-   *
-   * @default 'body'
-   */
   data?: DataReturn
 }
 

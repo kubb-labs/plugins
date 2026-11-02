@@ -180,9 +180,7 @@ export function buildClientCall(
  * off the full result by hand. With `'plain'` (plugin-client) the call resolves to the user's
  * `RequestResult`, so the body awaits it and reads `data`.
  *
- * With `data: 'full'` the body resolves to the whole `RequestResult` instead, which needs a client
- * that still returns one (`returnType` `'full'` or `'plain'`).
- *
+ * With `data: 'full'` the body resolves to the whole `RequestResult`, which needs a client that still returns one.
  * @example
  * ```ts
  * buildCallResultBody(buildClientCall(node, { clientName: 'getPetById' }))

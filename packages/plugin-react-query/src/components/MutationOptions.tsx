@@ -20,11 +20,6 @@ type Props = {
    * @default 'full'
    */
   returnType?: 'full' | 'data' | 'plain'
-  /**
-   * With `'full'`, the hook resolves to the whole `RequestResult` instead of the success body.
-   *
-   * @default 'body'
-   */
   data?: DataReturn
 }
 

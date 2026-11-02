@@ -2,10 +2,7 @@ import type { ast } from '@kubb/kit'
 
 export type ParamsCasing = 'camelcase' | undefined
 
-/**
- * What a generated hook resolves to: `'body'` is the success body, `'full'` is the client's whole
- * `RequestResult` (`data`, `status`, `response`), so a hook can read response headers.
- */
+/** What a generated hook resolves to: `'body'` is the success body, `'full'` is the client's whole `RequestResult`. */
 export type DataReturn = 'body' | 'full'
 
 /**

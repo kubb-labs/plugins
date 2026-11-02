@@ -102,10 +102,7 @@ export type Options = OutputOptions & {
    */
   client?: ClientSelector
   /**
-   * What the generated hooks resolve to. `'body'` returns the success body. `'full'` returns the
-   * client's whole `RequestResult` (`data`, `status`, `response`), so a hook can read
-   * response headers. Needs a client plugin whose `returnType` is `'full'` or `'plain'`.
-   *
+   * What the hooks resolve to: the success body, or with `'full'` the client's whole `RequestResult` so a hook can read response headers. Needs a client plugin whose `returnType` is `'full'` or `'plain'`.
    * @default 'body'
    */
   data?: DataReturn

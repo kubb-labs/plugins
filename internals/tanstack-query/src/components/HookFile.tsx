@@ -23,11 +23,6 @@ type ResolveHookFileOptions = {
    * Type names imported right after the response options type.
    */
   extraTypeNames?: Array<string | null | undefined>
-  /**
-   * With `'full'`, the file also imports the client's `RequestResult` and the operation's responses record.
-   *
-   * @default 'body'
-   */
   data?: DataReturn
 }
 

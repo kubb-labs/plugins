@@ -19,11 +19,6 @@ type Props = {
    * Emits the `useInfiniteQuery` variant of the hook instead of `useQuery`.
    */
   infinite?: boolean
-  /**
-   * With `'full'`, the hook resolves to the whole `RequestResult` instead of the success body.
-   *
-   * @default 'body'
-   */
   data?: DataReturn
 }
 

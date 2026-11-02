@@ -50,11 +50,6 @@ type Props = {
    * @default 'full'
    */
   returnType?: 'full' | 'data' | 'plain'
-  /**
-   * With `'full'`, the query resolves to the whole `RequestResult` and the page params read the cursor off `page.data`.
-   *
-   * @default 'body'
-   */
   data?: DataReturn
 }
 
@@ -82,7 +77,6 @@ export function InfiniteQueryOptions({
   data = 'body',
 }: Props): KubbReactNode {
   const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver, { data })
-  // With the full result, the page body lives under `.data`.
   const lastPage = data === 'full' ? 'lastPage.data' : 'lastPage'
   const firstPage = data === 'full' ? 'firstPage.data' : 'firstPage'
 
