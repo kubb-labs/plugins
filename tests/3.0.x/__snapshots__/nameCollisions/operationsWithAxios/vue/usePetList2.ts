@@ -19,7 +19,7 @@ export function petListQueryOptions2(config: Partial<Omit<RequestConfig, 'path' 
   return queryOptions<RequestResult<PetListResponses2, true>, ResponseErrorConfig<Error>, RequestResult<PetListResponses2, true>>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return await petList2({ ...config, signal: config.signal ?? signal, throwOnError: true })
+      return petList2({ ...config, signal: config.signal ?? signal, throwOnError: true })
    },
   })
 }

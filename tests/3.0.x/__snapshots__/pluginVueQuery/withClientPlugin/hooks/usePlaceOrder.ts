@@ -26,7 +26,7 @@ export function usePlaceOrder<TContext>(options: {
 
   return useMutation<RequestResult<PlaceOrderResponses, true>, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>({
     mutationFn: async(variables) => {
-      return await placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0])
+      return placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0])
     },
     mutationKey,
     ...mutationOptions

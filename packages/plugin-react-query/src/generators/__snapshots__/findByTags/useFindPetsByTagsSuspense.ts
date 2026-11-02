@@ -23,7 +23,7 @@ export function findPetsByTagsSuspenseQueryOptions(
   return queryOptions<RequestResult<FindPetsByTagsResponses, true>, ResponseErrorConfig<Error>, RequestResult<FindPetsByTagsResponses, true>, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
+      return findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }

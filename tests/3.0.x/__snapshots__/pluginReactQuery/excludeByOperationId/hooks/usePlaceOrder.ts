@@ -16,7 +16,7 @@ export function placeOrderMutationOptions<TContext = unknown>(config: Partial<Om
   return mutationOptions<RequestResult<PlaceOrderResponses, true>, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>({
     mutationKey,
     mutationFn: async(variables) => {
-      return await placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0])
+      return placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0])
     },
   })
 }

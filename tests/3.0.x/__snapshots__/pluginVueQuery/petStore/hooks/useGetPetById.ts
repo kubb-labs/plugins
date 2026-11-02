@@ -20,7 +20,7 @@ export function getPetByIdQueryOptions({ path }: { path: MaybeRefOrGetter<GetPet
   return queryOptions<RequestResult<GetPetByIdResponses, true>, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, RequestResult<GetPetByIdResponses, true>>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return await getPetById({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true })
+      return getPetById({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true })
    },
   })
 }

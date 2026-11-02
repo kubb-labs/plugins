@@ -17,7 +17,7 @@ export function updatePetWithFormMutationOptions<TContext = unknown>(config: Par
   return mutationOptions<RequestResult<UpdatePetWithFormResponses, true>, ResponseErrorConfig<Error>, UpdatePetWithFormOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, body }) => {
-      return await updatePetWithForm({ ...config, path, body, throwOnError: true })
+      return updatePetWithForm({ ...config, path, body, throwOnError: true })
     },
   })
 }

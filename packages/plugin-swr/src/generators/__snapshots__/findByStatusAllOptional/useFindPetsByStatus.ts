@@ -21,7 +21,7 @@ export function findPetsByStatusQueryOptions(
 ) {
   return {
     fetcher: async () => {
-      return await findPetsByStatus({ ...config, query, throwOnError: true })
+      return findPetsByStatus({ ...config, query, throwOnError: true })
     },
   }
 }

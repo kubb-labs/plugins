@@ -16,7 +16,7 @@ type PetListQueryKey2 = ReturnType<typeof petListQueryKey2>
 export function petListQueryOptions2(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return await petList2({ ...config, throwOnError: true })
+      return petList2({ ...config, throwOnError: true })
     },
   }
 }

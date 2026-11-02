@@ -27,7 +27,7 @@ export function retrieveMyProfileQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await retrieveMyProfile({ ...config, headers, signal: config.signal ?? signal, throwOnError: true })
+      return retrieveMyProfile({ ...config, headers, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }

@@ -21,7 +21,7 @@ export function uploadFileMutationOptions<TContext = unknown>(
   return mutationOptions<RequestResult<UploadFileResponses, true>, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return await uploadFile({ ...config, ...variables, throwOnError: true } as Parameters<typeof uploadFile<true>>[0])
+      return uploadFile({ ...config, ...variables, throwOnError: true } as Parameters<typeof uploadFile<true>>[0])
     },
   })
 }

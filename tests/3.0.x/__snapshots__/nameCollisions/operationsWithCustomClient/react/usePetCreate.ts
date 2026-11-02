@@ -16,7 +16,7 @@ export function petCreateMutationOptions<TContext = unknown>(config: Partial<Omi
   return mutationOptions<RequestResult<PetCreateResponses, true>, ResponseErrorConfig<Error>, undefined, TContext>({
     mutationKey,
     mutationFn: async(_) => {
-      return await petCreate({ ...config, throwOnError: true })
+      return petCreate({ ...config, throwOnError: true })
     },
   })
 }

@@ -37,7 +37,7 @@ export function useFindPetsByTags(
   return useSWRMutation<RequestResult<FindPetsByTagsResponses, true>, ResponseErrorConfig<Error>, FindPetsByTagsMutationKey | null, FindPetsByTagsMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { query } }) => {
-      return await findPetsByTags({ ...config, query, throwOnError: true })
+      return findPetsByTags({ ...config, query, throwOnError: true })
     },
     mutationOptions,
   )

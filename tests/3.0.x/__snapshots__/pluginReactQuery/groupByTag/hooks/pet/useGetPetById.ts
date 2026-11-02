@@ -18,7 +18,7 @@ export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Part
   return queryOptions<RequestResult<GetPetByIdResponses, true>, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, RequestResult<GetPetByIdResponses, true>, typeof queryKey>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return await getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
+      return getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
    },
   })
 }

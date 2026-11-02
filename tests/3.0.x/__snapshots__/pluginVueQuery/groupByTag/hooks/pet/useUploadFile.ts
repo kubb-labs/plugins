@@ -26,7 +26,7 @@ export function useUploadFile<TContext>(options: {
 
   return useMutation<RequestResult<UploadFileResponses, true>, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
     mutationFn: async({ path, query, body }) => {
-      return await uploadFile({ ...config, path: toValue<UploadFileOptions['path']>(path), query: toValue<UploadFileOptions['query']>(query), body: toValue<UploadFileOptions['body']>(body), throwOnError: true })
+      return uploadFile({ ...config, path: toValue<UploadFileOptions['path']>(path), query: toValue<UploadFileOptions['query']>(query), body: toValue<UploadFileOptions['body']>(body), throwOnError: true })
     },
     mutationKey,
     ...mutationOptions

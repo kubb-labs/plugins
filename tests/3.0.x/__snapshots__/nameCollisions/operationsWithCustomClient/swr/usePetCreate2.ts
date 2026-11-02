@@ -29,7 +29,7 @@ export function usePetCreate2(options: {
   return useSWRMutation<RequestResult<PetCreateResponses2, true>, ResponseErrorConfig<Error>, PetCreateMutationKey2 | null, PetCreateMutationArg2>(
     shouldFetch ? mutationKey : null,
     async (_url) => {
-      return await petCreate2({ ...config, throwOnError: true })
+      return petCreate2({ ...config, throwOnError: true })
     },
     mutationOptions
   )

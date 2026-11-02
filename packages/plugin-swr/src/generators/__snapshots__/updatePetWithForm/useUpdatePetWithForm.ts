@@ -42,7 +42,7 @@ export function useUpdatePetWithForm(
   >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, body } }) => {
-      return await updatePetWithForm({ ...config, path, body, throwOnError: true })
+      return updatePetWithForm({ ...config, path, body, throwOnError: true })
     },
     mutationOptions,
   )

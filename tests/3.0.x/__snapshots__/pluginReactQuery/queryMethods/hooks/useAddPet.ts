@@ -16,7 +16,7 @@ export function addPetMutationOptions<TContext = unknown>(config: Partial<Omit<R
   return mutationOptions<RequestResult<AddPetResponses, true>, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
     mutationKey,
     mutationFn: async(variables) => {
-      return await addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0])
+      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0])
     },
   })
 }

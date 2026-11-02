@@ -31,7 +31,7 @@ export function useSetProperty<TContext>(
   return useMutation<RequestResult<SetPropertyResponses, true>, ResponseErrorConfig<Error>, SetPropertyOptions, TContext>(
     {
       mutationFn: async ({ body }) => {
-        return await setProperty({ ...config, body: toValue<SetPropertyOptions['body']>(body), throwOnError: true })
+        return setProperty({ ...config, body: toValue<SetPropertyOptions['body']>(body), throwOnError: true })
       },
       mutationKey,
       ...mutationOptions,

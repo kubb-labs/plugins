@@ -20,7 +20,7 @@ export function findPetsByStatusQueryOptions({ query }: { query?: MaybeRefOrGett
   return queryOptions<RequestResult<FindPetsByStatusResponses, true>, ResponseErrorConfig<FindPetsByStatusStatus400>, RequestResult<FindPetsByStatusResponses, true>>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return await findPetsByStatus({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true })
+      return findPetsByStatus({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true })
    },
   })
 }

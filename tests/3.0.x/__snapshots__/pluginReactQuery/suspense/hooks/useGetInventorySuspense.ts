@@ -18,7 +18,7 @@ export function getInventorySuspenseQueryOptions(config: Partial<Omit<RequestCon
   return queryOptions<RequestResult<GetInventoryResponses, true>, ResponseErrorConfig<Error>, RequestResult<GetInventoryResponses, true>, typeof queryKey>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return await getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
+      return getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
    },
   })
 }

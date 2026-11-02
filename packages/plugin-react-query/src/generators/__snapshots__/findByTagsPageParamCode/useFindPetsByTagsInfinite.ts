@@ -33,7 +33,7 @@ export function findPetsByTagsInfiniteQueryOptions(
         ...(query ?? {}),
         ['pageSize']: pageParam as unknown as FindPetsByTagsQuery['pageSize'],
       } as FindPetsByTagsQuery
-      return await findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
+      return findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined),

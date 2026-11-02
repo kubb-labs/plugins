@@ -24,7 +24,7 @@ export function usePetCreate2<TContext>(options: {
 
   return useMutation<RequestResult<PetCreateResponses2, true>, ResponseErrorConfig<Error>, undefined, TContext>({
     mutationFn: async() => {
-      return await petCreate2({ ...config, throwOnError: true })
+      return petCreate2({ ...config, throwOnError: true })
     },
     mutationKey,
     ...mutationOptions

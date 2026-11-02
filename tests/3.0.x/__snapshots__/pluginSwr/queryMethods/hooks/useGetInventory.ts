@@ -16,7 +16,7 @@ type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return await getInventory({ ...config, throwOnError: true })
+      return getInventory({ ...config, throwOnError: true })
     },
   }
 }

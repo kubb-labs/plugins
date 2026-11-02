@@ -201,7 +201,7 @@ export function buildCallResultBody(call: string, options: { clientReturnType?: 
     })
   }
   if (returnType !== 'data' || clientReturnType === 'data') {
-    return `return await ${call}`
+    return `return ${call}`
   }
   if (clientReturnType === 'plain') {
     return `return (await ${call}).data`

@@ -30,7 +30,7 @@ export function useUploadFile(options: {
   return useSWRMutation<RequestResult<UploadFileResponses, true>, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, query, body } }) => {
-      return await uploadFile({ ...config, path, query, body, throwOnError: true })
+      return uploadFile({ ...config, path, query, body, throwOnError: true })
     },
     mutationOptions
   )

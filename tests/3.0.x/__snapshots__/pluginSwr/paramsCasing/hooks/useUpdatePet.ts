@@ -29,7 +29,7 @@ export function useUpdatePet(options: {
   return useSWRMutation<RequestResult<UpdatePetResponses, true>, ResponseErrorConfig<Error>, UpdatePetMutationKey | null, UpdatePetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, query, body, headers } }) => {
-      return await updatePet({ ...config, path, query, body, headers, throwOnError: true })
+      return updatePet({ ...config, path, query, body, headers, throwOnError: true })
     },
     mutationOptions
   )
