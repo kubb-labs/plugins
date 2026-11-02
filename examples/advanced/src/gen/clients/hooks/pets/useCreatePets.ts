@@ -1,4 +1,4 @@
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type { CreatePetsBoolParamKey } from '../../../models/ts/CreatePetsBoolParam'
 import type { CreatePetsXEXAMPLEKey } from '../../../models/ts/CreatePetsXEXAMPLE'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
@@ -10,13 +10,7 @@ export const createPetsMutationKey = () => [{ url: '/pets/:uuid' }] as const
 export function createPetsMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = createPetsMutationKey()
   return mutationOptions<
-    RequestResult<
-      {
-        '201': unknown
-        default: unknown
-      },
-      true
-    >,
+    unknown,
     ResponseErrorConfig<Error>,
     {
       body: {
@@ -38,7 +32,7 @@ export function createPetsMutationOptions<TContext = unknown>(config: Partial<Om
   >({
     mutationKey,
     mutationFn: async ({ path, query, body, headers }) => {
-      return createPets({ ...config, path, query, body, headers, throwOnError: true })
+      return createPets({ ...config, path, query, body, headers, throwOnError: true }).unwrap()
     },
   })
 }
@@ -50,13 +44,7 @@ export function createPetsMutationOptions<TContext = unknown>(config: Partial<Om
 export function useCreatePets<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      RequestResult<
-        {
-          '201': unknown
-          default: unknown
-        },
-        true
-      >,
+      unknown,
       ResponseErrorConfig<Error>,
       {
         body: {
@@ -84,13 +72,7 @@ export function useCreatePets<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? createPetsMutationKey()
 
   const baseOptions = createPetsMutationOptions(config) as UseMutationOptions<
-    RequestResult<
-      {
-        '201': unknown
-        default: unknown
-      },
-      true
-    >,
+    unknown,
     ResponseErrorConfig<Error>,
     {
       body: {
@@ -112,13 +94,7 @@ export function useCreatePets<TContext>(
   >
 
   return useMutation<
-    RequestResult<
-      {
-        '201': unknown
-        default: unknown
-      },
-      true
-    >,
+    unknown,
     ResponseErrorConfig<Error>,
     {
       body: {
@@ -145,13 +121,7 @@ export function useCreatePets<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    RequestResult<
-      {
-        '201': unknown
-        default: unknown
-      },
-      true
-    >,
+    unknown,
     ResponseErrorConfig<Error>,
     {
       body: {

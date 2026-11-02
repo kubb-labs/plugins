@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
-import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponses } from '../../models/user/CreateUsersWithListInput'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { CreateUsersWithListInputOptions, CreateUsersWithListInputStatus200 } from '../../models/user/CreateUsersWithListInput'
 import { createUsersWithListInput } from '../../clients/user/createUsersWithListInput'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -16,10 +16,10 @@ export function createUsersWithListInputMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = createUsersWithListInputMutationKey()
-  return mutationOptions<RequestResult<CreateUsersWithListInputResponses, true>, ResponseErrorConfig<Error>, CreateUsersWithListInputOptions, TContext>({
+  return mutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputOptions, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
-      return createUsersWithListInput({ ...config, body, throwOnError: true })
+      return createUsersWithListInput({ ...config, body, throwOnError: true }).unwrap()
     },
   })
 }

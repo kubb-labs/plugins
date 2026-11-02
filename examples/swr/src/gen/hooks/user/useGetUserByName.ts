@@ -4,8 +4,8 @@
  */
 
 import useSWR from 'swr'
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
-import type { GetUserByNameOptions, GetUserByNameResponses, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { GetUserByNameOptions, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName'
 import type { SWRConfiguration } from 'swr'
 import { getUserByName } from '../../clients/user/getUserByName'
 
@@ -19,7 +19,7 @@ export function getUserByNameQueryOptions(
 ) {
   return {
     fetcher: async () => {
-      return getUserByName({ ...config, path, throwOnError: true })
+      return getUserByName({ ...config, path, throwOnError: true }).unwrap()
     },
   }
 }
@@ -31,7 +31,7 @@ export function getUserByNameQueryOptions(
 export function useGetUserByName(
   { path }: GetUserByNameOptions,
   options: {
-    query?: SWRConfiguration<RequestResult<GetUserByNameResponses, true>, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>>
+    query?: SWRConfiguration<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>>
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
     immutable?: boolean
@@ -41,19 +41,18 @@ export function useGetUserByName(
 
   const queryKey = getUserByNameQueryKey({ path })
 
-  return useSWR<
-    RequestResult<GetUserByNameResponses, true>,
-    ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>,
-    GetUserByNameQueryKey | null
-  >(shouldFetch ? queryKey : null, {
-    ...getUserByNameQueryOptions({ path }, config),
-    ...(immutable
-      ? {
-          revalidateIfStale: false,
-          revalidateOnFocus: false,
-          revalidateOnReconnect: false,
-        }
-      : {}),
-    ...queryOptions,
-  })
+  return useSWR<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameQueryKey | null>(
+    shouldFetch ? queryKey : null,
+    {
+      ...getUserByNameQueryOptions({ path }, config),
+      ...(immutable
+        ? {
+            revalidateIfStale: false,
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+          }
+        : {}),
+      ...queryOptions,
+    },
+  )
 }

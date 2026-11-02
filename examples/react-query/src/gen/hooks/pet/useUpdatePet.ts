@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
-import type { UpdatePetOptions, UpdatePetResponses, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/pet/UpdatePet'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { UpdatePetOptions, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/pet/UpdatePet'
 import { updatePet } from '../../clients/pet/updatePet'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -16,15 +16,10 @@ export function updatePetMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = updatePetMutationKey()
-  return mutationOptions<
-    RequestResult<UpdatePetResponses, true>,
-    ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    UpdatePetOptions,
-    TContext
-  >({
+  return mutationOptions<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return updatePet({ ...config, ...variables, throwOnError: true } as Parameters<typeof updatePet<true>>[0])
+      return updatePet({ ...config, ...variables, throwOnError: true } as Parameters<typeof updatePet<true>>[0]).unwrap()
     },
   })
 }

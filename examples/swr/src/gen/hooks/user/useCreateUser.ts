@@ -4,8 +4,8 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
-import type { CreateUserOptions, CreateUserResponses } from '../../models/user/CreateUser'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { CreateUserOptions, CreateUserResponse } from '../../models/user/CreateUser'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { createUser } from '../../clients/user/createUser'
 
@@ -22,12 +22,9 @@ export type CreateUserMutationArg = CreateUserOptions
  */
 export function useCreateUser(
   options: {
-    mutation?: SWRMutationConfiguration<
-      RequestResult<CreateUserResponses, true>,
-      ResponseErrorConfig<Error>,
-      CreateUserMutationKey | null,
-      CreateUserMutationArg
-    > & { throwOnError?: boolean }
+    mutation?: SWRMutationConfiguration<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg> & {
+      throwOnError?: boolean
+    }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
     }
@@ -37,10 +34,10 @@ export function useCreateUser(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = createUserMutationKey()
 
-  return useSWRMutation<RequestResult<CreateUserResponses, true>, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg>(
+  return useSWRMutation<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return createUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof createUser<true>>[0])
+      return createUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof createUser<true>>[0]).unwrap()
     },
     mutationOptions,
   )

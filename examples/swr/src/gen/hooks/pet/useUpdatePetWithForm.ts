@@ -4,8 +4,8 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
-import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses, UpdatePetWithFormStatus405 } from '../../models/pet/UpdatePetWithForm'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../../models/pet/UpdatePetWithForm'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { updatePetWithForm } from '../../clients/pet/updatePetWithForm'
 
@@ -22,7 +22,7 @@ export type UpdatePetWithFormMutationArg = UpdatePetWithFormOptions
 export function useUpdatePetWithForm(
   options: {
     mutation?: SWRMutationConfiguration<
-      RequestResult<UpdatePetWithFormResponses, true>,
+      UpdatePetWithFormResponse,
       ResponseErrorConfig<UpdatePetWithFormStatus405>,
       UpdatePetWithFormMutationKey | null,
       UpdatePetWithFormMutationArg
@@ -35,14 +35,14 @@ export function useUpdatePetWithForm(
   const mutationKey = updatePetWithFormMutationKey()
 
   return useSWRMutation<
-    RequestResult<UpdatePetWithFormResponses, true>,
+    UpdatePetWithFormResponse,
     ResponseErrorConfig<UpdatePetWithFormStatus405>,
     UpdatePetWithFormMutationKey | null,
     UpdatePetWithFormMutationArg
   >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, query } }) => {
-      return updatePetWithForm({ ...config, path, query, throwOnError: true })
+      return updatePetWithForm({ ...config, path, query, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
-import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses, PlaceOrderPatchStatus405 } from '../../models/store/PlaceOrderPatch'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { PlaceOrderPatchOptions, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/store/PlaceOrderPatch'
 import { placeOrderPatch } from '../../clients/store/placeOrderPatch'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -16,10 +16,10 @@ export function placeOrderPatchMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = placeOrderPatchMutationKey()
-  return mutationOptions<RequestResult<PlaceOrderPatchResponses, true>, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchOptions, TContext>({
+  return mutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return placeOrderPatch({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrderPatch<true>>[0])
+      return placeOrderPatch({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrderPatch<true>>[0]).unwrap()
     },
   })
 }
