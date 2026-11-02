@@ -181,6 +181,7 @@ export function buildClientCall(
  * `RequestResult`, so the body awaits it and reads `data`.
  *
  * With `data: 'full'` the body resolves to the whole `RequestResult`, which needs a client that still returns one.
+ *
  * @example
  * ```ts
  * buildCallResultBody(buildClientCall(node, { clientName: 'getPetById' }))
@@ -189,19 +190,16 @@ export function buildClientCall(
  */
 export function buildCallResultBody(call: string, options: { returnType?: 'full' | 'data' | 'plain'; data?: DataReturn } = {}): string {
   const { returnType = 'full', data = 'body' } = options
-  if (data === 'full') {
-    if (returnType === 'data') {
-      throw new Diagnostics.Error({
-        code: Diagnostics.code.invalidPluginOptions,
-        severity: 'error',
-        message: "Option `data` is 'full', but the client plugin has `returnType: 'data'` and only returns the response body.",
-        help: "Set the client plugin's `returnType` to 'full', or drop `data: 'full'`.",
-        location: { kind: 'config' },
-      })
-    }
-    return `return await ${call}`
+  if (data === 'full' && returnType === 'data') {
+    throw new Diagnostics.Error({
+      code: Diagnostics.code.invalidPluginOptions,
+      severity: 'error',
+      message: "Option `data` is 'full', but the client plugin has `returnType: 'data'` and only returns the response body.",
+      help: "Set the client plugin's `returnType` to 'full', or drop `data: 'full'`.",
+      location: { kind: 'config' },
+    })
   }
-  if (returnType === 'data') {
+  if (data === 'full' || returnType === 'data') {
     return `return await ${call}`
   }
   if (returnType === 'plain') {
