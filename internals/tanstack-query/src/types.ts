@@ -3,7 +3,7 @@ import type { ast } from '@kubb/kit'
 
 export type ParamsCasing = 'camelcase' | undefined
 
-/** The `returnType` a hook file resolved for its operation: the plugin's option, else the client plugin's. */
+/** The hook plugin's `returnType`, `'data'` when unset. */
 export type HookReturnTypeProps = { returnType: ReturnTypeOption }
 
 /** Adds the client plugin's own `returnType`, which decides how the client call is unwrapped. */
@@ -106,9 +106,9 @@ export type Infinite = {
    * reference local closures or external variables from the config file.
    *
    * @example
-   * `'(lastPage) => (lastPage.data.hasNext ? lastPage.data.number + 1 : undefined)'`
+   * `'(lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined)'`
    * // or with definePageParam:
-   * `definePageParam<MyResult, number>((lastPage) => (lastPage.data.hasNext ? lastPage.data.number + 1 : undefined))`
+   * `definePageParam<MyResponse, number>((lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined))`
    */
   getNextPageParam?: string | PageParamFn | null
   /**
@@ -119,9 +119,9 @@ export type Infinite = {
    * reference local closures or external variables from the config file.
    *
    * @example
-   * `'(firstPage) => (firstPage.data.number > 0 ? firstPage.data.number - 1 : undefined)'`
+   * `'(firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined)'`
    * // or with definePageParam:
-   * `definePageParam<MyResult, number>((firstPage) => (firstPage.data.number > 0 ? firstPage.data.number - 1 : undefined))`
+   * `definePageParam<MyResponse, number>((firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined))`
    */
   getPreviousPageParam?: string | PageParamFn | null
 }

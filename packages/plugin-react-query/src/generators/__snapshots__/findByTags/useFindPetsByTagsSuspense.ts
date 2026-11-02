@@ -4,8 +4,8 @@
  * Source: text content
  */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from './.kubb/client'
-import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from './FindPetsByTags'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByTagsOptions, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { findPetsByTags } from './clients/findPetsByTags'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
@@ -20,10 +20,10 @@ export function findPetsByTagsSuspenseQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsSuspenseQueryKey({ query })
-  return queryOptions<RequestResult<FindPetsByTagsResponses, true>, ResponseErrorConfig<Error>, RequestResult<FindPetsByTagsResponses, true>, typeof queryKey>({
+  return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, FindPetsByTagsStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
+      return findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }
@@ -31,12 +31,10 @@ export function findPetsByTagsSuspenseQueryOptions(
 /**
  * {@link /pet/findByTags}
  */
-export function useFindPetsByTagsSuspense<TData = RequestResult<FindPetsByTagsResponses, true>, TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey>(
+export function useFindPetsByTagsSuspense<TData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey>(
   { query }: { query: FindPetsByTagsOptions['query'] | (() => FindPetsByTagsOptions['query']) },
   options: {
-    query?: Partial<UseSuspenseQueryOptions<RequestResult<FindPetsByTagsResponses, true>, ResponseErrorConfig<Error>, TData, TQueryKey>> & {
-      client?: QueryClient
-    }
+    query?: Partial<UseSuspenseQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {

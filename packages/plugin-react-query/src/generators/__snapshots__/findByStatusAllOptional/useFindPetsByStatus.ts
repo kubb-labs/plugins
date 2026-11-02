@@ -4,8 +4,8 @@
  * Source: text content
  */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from './.kubb/client'
-import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from './FindPetsByStatus'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByStatusOptions, FindPetsByStatusStatus200 } from './FindPetsByStatus'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { findPetsByStatus } from './clients/findPetsByStatus'
 import { queryOptions, useQuery } from '@tanstack/react-query'
@@ -20,15 +20,10 @@ export function findPetsByStatusQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByStatusQueryKey({ query })
-  return queryOptions<
-    RequestResult<FindPetsByStatusResponses, true>,
-    ResponseErrorConfig<Error>,
-    RequestResult<FindPetsByStatusResponses, true>,
-    typeof queryKey
-  >({
+  return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<Error>, FindPetsByStatusStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByStatus({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
+      return findPetsByStatus({ ...config, query, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }
@@ -37,15 +32,13 @@ export function findPetsByStatusQueryOptions(
  * {@link /pet/findByStatus}
  */
 export function useFindPetsByStatus<
-  TData = RequestResult<FindPetsByStatusResponses, true>,
-  TQueryData = RequestResult<FindPetsByStatusResponses, true>,
+  TData = FindPetsByStatusStatus200,
+  TQueryData = FindPetsByStatusStatus200,
   TQueryKey extends QueryKey = FindPetsByStatusQueryKey,
 >(
   { query }: { query?: FindPetsByStatusOptions['query'] | (() => FindPetsByStatusOptions['query']) } = {},
   options: {
-    query?: Partial<QueryObserverOptions<RequestResult<FindPetsByStatusResponses, true>, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
-      client?: QueryClient
-    }
+    query?: Partial<QueryObserverOptions<FindPetsByStatusStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {

@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../.kubb/client'
-import type { GetInventoryResponses } from '../types/GetInventory'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { GetInventoryStatus200 } from '../types/GetInventory'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import { getInventory } from '../clients/getInventory'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
@@ -16,10 +16,10 @@ export type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
 export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = getInventoryQueryKey()
-  return queryOptions<RequestResult<GetInventoryResponses, true>, ResponseErrorConfig<Error>, RequestResult<GetInventoryResponses, true>>({
+  return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
+      return getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true }).unwrap()
    },
   })
 }
@@ -29,8 +29,8 @@ export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'pa
  * @summary Returns pet inventories by status
  * {@link /store/inventory}
  */
-export function useGetInventory<TData = RequestResult<GetInventoryResponses, true>, TQueryData = RequestResult<GetInventoryResponses, true>, TQueryKey extends QueryKey = GetInventoryQueryKey>(options: {
-  query?: Partial<UseQueryOptions<RequestResult<GetInventoryResponses, true>, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function useGetInventory<TData = GetInventoryStatus200, TQueryData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventoryQueryKey>(options: {
+  query?: Partial<UseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
@@ -41,7 +41,7 @@ export function useGetInventory<TData = RequestResult<GetInventoryResponses, tru
    ...getInventoryQueryOptions(config),
    ...resolvedOptions,
    queryKey
-  } as unknown as UseQueryOptions<RequestResult<GetInventoryResponses, true>, ResponseErrorConfig<Error>, TData, RequestResult<GetInventoryResponses, true>, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
+  } as unknown as UseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, GetInventoryStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
   queryResult.queryKey = queryKey as TQueryKey
 

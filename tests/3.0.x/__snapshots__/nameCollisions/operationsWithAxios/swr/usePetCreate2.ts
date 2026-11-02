@@ -4,8 +4,8 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../.kubb/client'
-import type { PetCreateResponses2 } from '../types/PetCreate'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { PetCreateStatus2002 } from '../types/PetCreate'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { petCreate2 } from '../clients/petCreate'
 
@@ -19,17 +19,17 @@ export type PetCreateMutationArg2 = never
  * {@link /pets/create-second}
  */
 export function usePetCreate2(options: {
-  mutation?: SWRMutationConfiguration<RequestResult<PetCreateResponses2, true>, ResponseErrorConfig<Error>, PetCreateMutationKey2 | null, PetCreateMutationArg2> & { throwOnError?: boolean },
+  mutation?: SWRMutationConfiguration<PetCreateStatus2002, ResponseErrorConfig<Error>, PetCreateMutationKey2 | null, PetCreateMutationArg2> & { throwOnError?: boolean },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = petCreateMutationKey2()
 
-  return useSWRMutation<RequestResult<PetCreateResponses2, true>, ResponseErrorConfig<Error>, PetCreateMutationKey2 | null, PetCreateMutationArg2>(
+  return useSWRMutation<PetCreateStatus2002, ResponseErrorConfig<Error>, PetCreateMutationKey2 | null, PetCreateMutationArg2>(
     shouldFetch ? mutationKey : null,
     async (_url) => {
-      return petCreate2({ ...config, throwOnError: true })
+      return petCreate2({ ...config, throwOnError: true }).unwrap()
     },
     mutationOptions
   )

@@ -4,8 +4,8 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../.kubb/client'
-import type { UpdatePetOptions, UpdatePetResponses } from '../types/UpdatePet'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { UpdatePetOptions, UpdatePetStatus200 } from '../types/UpdatePet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { updatePet } from '../clients/updatePet'
 
@@ -19,17 +19,17 @@ export type UpdatePetMutationArg = UpdatePetOptions
  * {@link /pets/:pet_id}
  */
 export function useUpdatePet(options: {
-  mutation?: SWRMutationConfiguration<RequestResult<UpdatePetResponses, true>, ResponseErrorConfig<Error>, UpdatePetMutationKey | null, UpdatePetMutationArg> & { throwOnError?: boolean },
+  mutation?: SWRMutationConfiguration<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetMutationKey | null, UpdatePetMutationArg> & { throwOnError?: boolean },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = updatePetMutationKey()
 
-  return useSWRMutation<RequestResult<UpdatePetResponses, true>, ResponseErrorConfig<Error>, UpdatePetMutationKey | null, UpdatePetMutationArg>(
+  return useSWRMutation<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetMutationKey | null, UpdatePetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, query, body, headers } }) => {
-      return updatePet({ ...config, path, query, body, headers, throwOnError: true })
+      return updatePet({ ...config, path, query, body, headers, throwOnError: true }).unwrap()
     },
     mutationOptions
   )

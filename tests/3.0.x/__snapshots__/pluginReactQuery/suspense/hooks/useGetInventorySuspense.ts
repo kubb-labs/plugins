@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../.kubb/client'
-import type { GetInventoryResponses } from '../types/GetInventory'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { GetInventoryStatus200 } from '../types/GetInventory'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { getInventory } from '../clients/getInventory'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
@@ -15,10 +15,10 @@ type GetInventorySuspenseQueryKey = ReturnType<typeof getInventorySuspenseQueryK
 
 export function getInventorySuspenseQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = getInventorySuspenseQueryKey()
-  return queryOptions<RequestResult<GetInventoryResponses, true>, ResponseErrorConfig<Error>, RequestResult<GetInventoryResponses, true>, typeof queryKey>({
+  return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
+      return getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true }).unwrap()
    },
   })
 }
@@ -28,8 +28,8 @@ export function getInventorySuspenseQueryOptions(config: Partial<Omit<RequestCon
  * @summary Returns pet inventories by status
  * {@link /store/inventory}
  */
-export function useGetInventorySuspense<TData = RequestResult<GetInventoryResponses, true>, TQueryKey extends QueryKey = GetInventorySuspenseQueryKey>(options: {
-  query?: Partial<UseSuspenseQueryOptions<RequestResult<GetInventoryResponses, true>, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient },
+export function useGetInventorySuspense<TData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventorySuspenseQueryKey>(options: {
+  query?: Partial<UseSuspenseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

@@ -205,7 +205,7 @@ export type Options = OutputOptions & {
   client?: ClientSelector
   /**
    * Shape of the value the hooks resolve to: `'data'` is the success body, `'full'` or `'plain'` the client's whole `RequestResult` so a hook can read response headers. Both need a client plugin whose own `returnType` is `'full'` or `'plain'`.
-   * @default the client plugin's `returnType`
+   * @default 'data'
    */
   returnType?: ReturnTypeOption
   /**

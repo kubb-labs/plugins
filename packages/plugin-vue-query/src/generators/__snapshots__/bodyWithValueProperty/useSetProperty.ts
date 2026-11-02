@@ -4,8 +4,8 @@
  * Source: text content
  */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from './.kubb/client'
-import type { SetPropertyOptions, SetPropertyResponses } from './SetProperty'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { SetPropertyOptions, SetPropertyStatus200 } from './SetProperty'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { setProperty } from './clients/setProperty'
 import { useMutation } from '@tanstack/vue-query'
@@ -18,9 +18,7 @@ export const setPropertyMutationKey = () => [{ url: '/properties' }] as const
  */
 export function useSetProperty<TContext>(
   options: {
-    mutation?: MutationObserverOptions<RequestResult<SetPropertyResponses, true>, ResponseErrorConfig<Error>, SetPropertyOptions, TContext> & {
-      client?: QueryClient
-    }
+    mutation?: MutationObserverOptions<SetPropertyStatus200, ResponseErrorConfig<Error>, SetPropertyOptions, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
@@ -28,10 +26,10 @@ export function useSetProperty<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? setPropertyMutationKey()
 
-  return useMutation<RequestResult<SetPropertyResponses, true>, ResponseErrorConfig<Error>, SetPropertyOptions, TContext>(
+  return useMutation<SetPropertyStatus200, ResponseErrorConfig<Error>, SetPropertyOptions, TContext>(
     {
       mutationFn: async ({ body }) => {
-        return setProperty({ ...config, body: toValue<SetPropertyOptions['body']>(body), throwOnError: true })
+        return setProperty({ ...config, body: toValue<SetPropertyOptions['body']>(body), throwOnError: true }).unwrap()
       },
       mutationKey,
       ...mutationOptions,

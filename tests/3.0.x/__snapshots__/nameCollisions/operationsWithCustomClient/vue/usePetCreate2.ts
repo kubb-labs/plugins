@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { PetCreateResponses2 } from '../types/PetCreate'
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '@example/client'
+import type { PetCreateStatus2002 } from '../types/PetCreate'
+import type { RequestConfig, ResponseErrorConfig } from '@example/client'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { petCreate2 } from '../clients/petCreate'
 import { useMutation } from '@tanstack/vue-query'
@@ -15,16 +15,16 @@ export const petCreateMutationKey2 = () => [{ url: '/pets/create-second' }] as c
  * {@link /pets/create-second}
  */
 export function usePetCreate2<TContext>(options: {
-  mutation?: MutationObserverOptions<RequestResult<PetCreateResponses2, true>, ResponseErrorConfig<Error>, undefined, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<PetCreateStatus2002, ResponseErrorConfig<Error>, undefined, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions?.mutationKey ?? petCreateMutationKey2()
 
-  return useMutation<RequestResult<PetCreateResponses2, true>, ResponseErrorConfig<Error>, undefined, TContext>({
+  return useMutation<PetCreateStatus2002, ResponseErrorConfig<Error>, undefined, TContext>({
     mutationFn: async() => {
-      return petCreate2({ ...config, throwOnError: true })
+      return (await petCreate2({ ...config, throwOnError: true })).data
     },
     mutationKey,
     ...mutationOptions

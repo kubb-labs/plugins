@@ -40,7 +40,7 @@ type ResolvedHookFile = {
  * `pluginZod({ inferred: 'codec' })`), banner and footer.
  */
 export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, options: ResolveHookFileOptions): ResolvedHookFile {
-  const { name, output, group, contractOp, keyTypeName, extraTypeNames = [], returnType = contractOp.returnType } = options
+  const { name, output, group, contractOp, keyTypeName, extraTypeNames = [], returnType = 'data' } = options
   const { config, root, resolver } = ctx
   if (returnType !== 'data' && contractOp.returnType === 'data') {
     throw new Diagnostics.Error({

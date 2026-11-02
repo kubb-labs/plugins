@@ -50,9 +50,7 @@ describe("pluginTs({ operations: 'inline' }) with its consumers", () => {
     const hook = await fs.readFile(path.join(output, 'hooks/usePlaceOrder.ts'), 'utf-8')
     expect(hook).toContain("import type { Order } from '../types/Order'")
     // `placeOrder` takes three content types with one schema, so its body collapses to `Order`.
-    expect(hook).toMatch(
-      /mutationOptions<RequestResult<\(\{\s*'200': Order;\s*'405': unknown;\s*\}\), true>, ResponseErrorConfig<unknown>, \(\{\s*body: Order;/,
-    )
+    expect(hook).toMatch(/mutationOptions<Order, ResponseErrorConfig<unknown>, \(\{\s*body: Order;/)
     // The infinite query indexes the printed query type for its page param.
     expect(await fs.readFile(path.join(output, 'hooks/useFindPetsByStatusInfinite.ts'), 'utf-8')).toMatch(/\}\)\['status'\]/)
   })

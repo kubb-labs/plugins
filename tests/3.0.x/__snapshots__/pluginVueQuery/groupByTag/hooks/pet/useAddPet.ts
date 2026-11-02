@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
-import type { AddPetOptions, AddPetResponses, AddPetStatus405 } from '../../types/AddPet'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { AddPetOptions, AddPetStatus200, AddPetStatus405 } from '../../types/AddPet'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { addPet } from '../../clients/addPet'
 import { useMutation } from '@tanstack/vue-query'
@@ -17,16 +17,16 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  * {@link /pet}
  */
 export function useAddPet<TContext>(options: {
-  mutation?: MutationObserverOptions<RequestResult<AddPetResponses, true>, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: { request?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"; response?: "application/json" | "application/xml" } },
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions?.mutationKey ?? addPetMutationKey()
 
-  return useMutation<RequestResult<AddPetResponses, true>, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
+  return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
     mutationFn: async(variables) => {
-      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0])
+      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0]).unwrap()
     },
     mutationKey,
     ...mutationOptions

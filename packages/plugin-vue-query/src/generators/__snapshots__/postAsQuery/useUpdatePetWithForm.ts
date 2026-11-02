@@ -4,8 +4,8 @@
  * Source: text content
  */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from './.kubb/client'
-import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from './UpdatePetWithForm'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from 'custom-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { updatePetWithForm } from './clients/updatePetWithForm'
@@ -37,7 +37,7 @@ export function updatePetWithFormQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = updatePetWithFormQueryKey({ path, body, query })
-  return queryOptions<RequestResult<UpdatePetWithFormResponses, true>, ResponseErrorConfig<Error>, RequestResult<UpdatePetWithFormResponses, true>>({
+  return queryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormStatus200>({
     queryKey,
     queryFn: async ({ signal }) => {
       return updatePetWithForm({
@@ -47,7 +47,7 @@ export function updatePetWithFormQueryOptions(
         body: toValue(body),
         signal: config.signal ?? signal,
         throwOnError: true,
-      })
+      }).unwrap()
     },
   })
 }
@@ -56,8 +56,8 @@ export function updatePetWithFormQueryOptions(
  * {@link /pet/:petId}
  */
 export function useUpdatePetWithForm<
-  TData = RequestResult<UpdatePetWithFormResponses, true>,
-  TQueryData = RequestResult<UpdatePetWithFormResponses, true>,
+  TData = UpdatePetWithFormStatus200,
+  TQueryData = UpdatePetWithFormStatus200,
   TQueryKey extends QueryKey = UpdatePetWithFormQueryKey,
 >(
   {
@@ -70,9 +70,7 @@ export function useUpdatePetWithForm<
     query?: MaybeRefOrGetter<UpdatePetWithFormOptions['query']>
   },
   options: {
-    query?: Partial<UseQueryOptions<RequestResult<UpdatePetWithFormResponses, true>, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
-      client?: QueryClient
-    }
+    query?: Partial<UseQueryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
@@ -86,13 +84,7 @@ export function useUpdatePetWithForm<
       ...updatePetWithFormQueryOptions({ path, body, query }, config),
       ...resolvedOptions,
       queryKey,
-    } as unknown as UseQueryOptions<
-      RequestResult<UpdatePetWithFormResponses, true>,
-      ResponseErrorConfig<Error>,
-      TData,
-      RequestResult<UpdatePetWithFormResponses, true>,
-      TQueryKey
-    >,
+    } as unknown as UseQueryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, TData, UpdatePetWithFormStatus200, TQueryKey>,
     toValue(queryClient),
   ) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 

@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { PetListResponses } from '../types/pet/List'
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '@example/client'
+import type { PetListStatus200 } from '../types/pet/List'
+import type { RequestConfig, ResponseErrorConfig } from '@example/client'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import { petList } from '../clients/pet/list'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
@@ -16,10 +16,10 @@ export type PetListQueryKey = ReturnType<typeof petListQueryKey>
 
 export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = petListQueryKey()
-  return queryOptions<RequestResult<PetListResponses, true>, ResponseErrorConfig<Error>, RequestResult<PetListResponses, true>>({
+  return queryOptions<PetListStatus200, ResponseErrorConfig<Error>, PetListStatus200>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return petList({ ...config, signal: config.signal ?? signal, throwOnError: true })
+      return (await petList({ ...config, signal: config.signal ?? signal, throwOnError: true })).data
    },
   })
 }
@@ -27,8 +27,8 @@ export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' |
 /**
  * {@link /pets/first}
  */
-export function usePetList<TData = RequestResult<PetListResponses, true>, TQueryData = RequestResult<PetListResponses, true>, TQueryKey extends QueryKey = PetListQueryKey>(options: {
-  query?: Partial<UseQueryOptions<RequestResult<PetListResponses, true>, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function usePetList<TData = PetListStatus200, TQueryData = PetListStatus200, TQueryKey extends QueryKey = PetListQueryKey>(options: {
+  query?: Partial<UseQueryOptions<PetListStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
@@ -39,7 +39,7 @@ export function usePetList<TData = RequestResult<PetListResponses, true>, TQuery
    ...petListQueryOptions(config),
    ...resolvedOptions,
    queryKey
-  } as unknown as UseQueryOptions<RequestResult<PetListResponses, true>, ResponseErrorConfig<Error>, TData, RequestResult<PetListResponses, true>, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
+  } as unknown as UseQueryOptions<PetListStatus200, ResponseErrorConfig<Error>, TData, PetListStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
   queryResult.queryKey = queryKey as TQueryKey
 

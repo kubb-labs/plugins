@@ -153,7 +153,7 @@ pluginFetch({ returnType: 'data' })
 const pet = await getPetById({ path: { petId: 1 } }) // Pet, not { status, data, ... }
 ```
 
-It applies to the functions and the SDK. The query plugins follow it unless they set their own `returnType`, and `@kubb/plugin-mcp` reads it too, including a per-operation value set through [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override). To read headers such as `ETag` under `'data'`, pass `throwOnError: false` and call `result.response.headers.get('etag')`.
+It applies to the functions and the SDK. The query plugins and `@kubb/plugin-mcp` read it too, including a per-operation value set through [`override`](https://kubb.dev/docs/5.x/reference/plugin-options#override). To read headers such as `ETag` under `'data'`, pass `throwOnError: false` and call `result.response.headers.get('etag')`.
 
 ### resolver
 

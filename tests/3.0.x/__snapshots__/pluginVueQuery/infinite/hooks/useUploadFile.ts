@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../.kubb/client'
-import type { UploadFileOptions, UploadFileResponses } from '../types/UploadFile'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { UploadFileOptions, UploadFileStatus200 } from '../types/UploadFile'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { uploadFile } from '../clients/uploadFile'
 import { useMutation } from '@tanstack/vue-query'
@@ -17,16 +17,16 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
  * {@link /pet/:petId/uploadImage}
  */
 export function useUploadFile<TContext>(options: {
-  mutation?: MutationObserverOptions<RequestResult<UploadFileResponses, true>, ResponseErrorConfig<Error>, UploadFileOptions, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileOptions, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions?.mutationKey ?? uploadFileMutationKey()
 
-  return useMutation<RequestResult<UploadFileResponses, true>, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
+  return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
     mutationFn: async({ path, query, body }) => {
-      return uploadFile({ ...config, path: toValue<UploadFileOptions['path']>(path), query: toValue<UploadFileOptions['query']>(query), body: toValue<UploadFileOptions['body']>(body), throwOnError: true })
+      return uploadFile({ ...config, path: toValue<UploadFileOptions['path']>(path), query: toValue<UploadFileOptions['query']>(query), body: toValue<UploadFileOptions['body']>(body), throwOnError: true }).unwrap()
     },
     mutationKey,
     ...mutationOptions

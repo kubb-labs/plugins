@@ -4,8 +4,8 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
-import type { AddPetOptions, AddPetResponses, AddPetStatus405 } from '../../types/AddPet'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { AddPetOptions, AddPetStatus200, AddPetStatus405 } from '../../types/AddPet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { addPet } from '../../clients/addPet'
 
@@ -21,17 +21,17 @@ export type AddPetMutationArg = AddPetOptions
  * {@link /pet}
  */
 export function useAddPet(options: {
-  mutation?: SWRMutationConfiguration<RequestResult<AddPetResponses, true>, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg> & { throwOnError?: boolean },
+  mutation?: SWRMutationConfiguration<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg> & { throwOnError?: boolean },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: { request?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"; response?: "application/json" | "application/xml" } },
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = addPetMutationKey()
 
-  return useSWRMutation<RequestResult<AddPetResponses, true>, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg>(
+  return useSWRMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0])
+      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0]).unwrap()
     },
     mutationOptions
   )

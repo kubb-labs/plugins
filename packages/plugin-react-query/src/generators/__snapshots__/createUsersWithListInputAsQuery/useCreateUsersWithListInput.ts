@@ -4,8 +4,8 @@
  * Source: text content
  */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from './.kubb/client'
-import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponses } from './CreateUsersWithListInput'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { CreateUsersWithListInputOptions, CreateUsersWithListInputStatus200 } from './CreateUsersWithListInput'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { createUsersWithListInput } from './clients/createUsersWithListInput'
 import { queryOptions, useQuery } from '@tanstack/react-query'
@@ -20,15 +20,10 @@ export function createUsersWithListInputQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = createUsersWithListInputQueryKey({ body })
-  return queryOptions<
-    RequestResult<CreateUsersWithListInputResponses, true>,
-    ResponseErrorConfig<Error>,
-    RequestResult<CreateUsersWithListInputResponses, true>,
-    typeof queryKey
-  >({
+  return queryOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return createUsersWithListInput({ ...config, body, signal: config.signal ?? signal, throwOnError: true })
+      return createUsersWithListInput({ ...config, body, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }
@@ -37,13 +32,13 @@ export function createUsersWithListInputQueryOptions(
  * {@link /user/createWithList}
  */
 export function useCreateUsersWithListInput<
-  TData = RequestResult<CreateUsersWithListInputResponses, true>,
-  TQueryData = RequestResult<CreateUsersWithListInputResponses, true>,
+  TData = CreateUsersWithListInputStatus200,
+  TQueryData = CreateUsersWithListInputStatus200,
   TQueryKey extends QueryKey = CreateUsersWithListInputQueryKey,
 >(
   { body }: { body: CreateUsersWithListInputOptions['body'] | (() => CreateUsersWithListInputOptions['body']) },
   options: {
-    query?: Partial<QueryObserverOptions<RequestResult<CreateUsersWithListInputResponses, true>, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
+    query?: Partial<QueryObserverOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
     }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>

@@ -104,7 +104,7 @@ describe('queryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
     { name: 'getPetById', node: getPetByIdNode, options: {} },
-    { name: 'getPetByIdReturnTypeData', node: getPetByIdNode, options: { returnType: 'data' } },
+    { name: 'getPetByIdReturnTypeFull', node: getPetByIdNode, options: { returnType: 'full' } },
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginSwr['resolvedOptions']> }>
 

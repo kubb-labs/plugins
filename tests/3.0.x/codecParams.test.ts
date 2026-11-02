@@ -285,7 +285,7 @@ describe("zod types without plugin-ts: pluginZod({ inferred: 'codec' }) + React 
 
   test.each(['react-query', 'swr', 'vue-query'])('generates %s hooks typed by the zod operation types', async (dir) => {
     const hookFile = await fs.readFile(path.join(client.output, dir, 'useGetResource.ts'), 'utf-8')
-    expect(hookFile).toContain("import type { GetResourceOptionsSchemaType, GetResourceResponsesSchemaType } from '../zod/getResourceSchema'")
+    expect(hookFile).toContain("import type { GetResourceOptionsSchemaType, GetResourceStatus200SchemaType } from '../zod/getResourceSchema'")
   })
 })
 

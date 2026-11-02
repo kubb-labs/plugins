@@ -4,8 +4,8 @@
  * Source: text content
  */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from './.kubb/client'
-import type { FindPetsByTagsOptions, FindPetsByTagsResponses, FindPetsByTagsQuery } from './FindPetsByTags'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByTagsOptions, FindPetsByTagsQuery, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { findPetsByTags } from './clients/findPetsByTags'
 import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
@@ -21,9 +21,9 @@ export function findPetsByTagsInfiniteQueryOptions(
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey({ query })
   return infiniteQueryOptions<
-    RequestResult<FindPetsByTagsResponses, true>,
+    FindPetsByTagsStatus200,
     ResponseErrorConfig<Error>,
-    InfiniteData<RequestResult<FindPetsByTagsResponses, true>>,
+    InfiniteData<FindPetsByTagsStatus200>,
     typeof queryKey,
     NonNullable<FindPetsByTagsQuery['pageSize']>
   >({
@@ -33,10 +33,10 @@ export function findPetsByTagsInfiniteQueryOptions(
         ...(query ?? {}),
         ['pageSize']: pageParam as unknown as FindPetsByTagsQuery['pageSize'],
       } as FindPetsByTagsQuery
-      return findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
+      return findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => lastPage.data?.['next'],
+    getNextPageParam: (lastPage) => lastPage?.['next'],
   })
 }
 
@@ -44,7 +44,7 @@ export function findPetsByTagsInfiniteQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsInfinite<
-  TQueryFnData = RequestResult<FindPetsByTagsResponses, true>,
+  TQueryFnData = FindPetsByTagsStatus200,
   TError = ResponseErrorConfig<Error>,
   TData = InfiniteData<TQueryFnData>,
   TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,

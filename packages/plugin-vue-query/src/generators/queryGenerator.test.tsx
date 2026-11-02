@@ -96,7 +96,7 @@ const updatePetWithFormNode = ast.factory.createOperation({
 describe('queryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
-    { name: 'findByTagsReturnTypeData', node: findByTagsNode, options: { returnType: 'data' } },
+    { name: 'findByTagsReturnTypeFull', node: findByTagsNode, options: { returnType: 'full' } },
     {
       name: 'findByTagsWithCustomQueryKey',
       node: findByTagsNode,

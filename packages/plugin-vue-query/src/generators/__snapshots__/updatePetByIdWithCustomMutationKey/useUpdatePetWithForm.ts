@@ -4,8 +4,8 @@
  * Source: text content
  */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from './.kubb/client'
-import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from './UpdatePetWithForm'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { UpdatePetWithFormOptions, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { updatePetWithForm } from './clients/updatePetWithForm'
 import { useMutation } from '@tanstack/vue-query'
@@ -18,9 +18,7 @@ export const updatePetWithFormMutationKey = () => ['updatePetWithForm', { url: '
  */
 export function useUpdatePetWithForm<TContext>(
   options: {
-    mutation?: MutationObserverOptions<RequestResult<UpdatePetWithFormResponses, true>, ResponseErrorConfig<Error>, UpdatePetWithFormOptions, TContext> & {
-      client?: QueryClient
-    }
+    mutation?: MutationObserverOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormOptions, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
@@ -28,7 +26,7 @@ export function useUpdatePetWithForm<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? updatePetWithFormMutationKey()
 
-  return useMutation<RequestResult<UpdatePetWithFormResponses, true>, ResponseErrorConfig<Error>, UpdatePetWithFormOptions, TContext>(
+  return useMutation<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormOptions, TContext>(
     {
       mutationFn: async ({ path, body }) => {
         return updatePetWithForm({
@@ -36,7 +34,7 @@ export function useUpdatePetWithForm<TContext>(
           path: toValue<UpdatePetWithFormOptions['path']>(path),
           body: toValue<UpdatePetWithFormOptions['body']>(body),
           throwOnError: true,
-        })
+        }).unwrap()
       },
       mutationKey,
       ...mutationOptions,
