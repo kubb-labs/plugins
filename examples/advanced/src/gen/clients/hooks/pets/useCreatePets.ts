@@ -38,7 +38,7 @@ export function createPetsMutationOptions<TContext = unknown>(config: Partial<Om
   >({
     mutationKey,
     mutationFn: async ({ path, query, body, headers }) => {
-      return await createPets({ ...config, path, query, body, headers, throwOnError: true })
+      return createPets({ ...config, path, query, body, headers, throwOnError: true })
     },
   })
 }

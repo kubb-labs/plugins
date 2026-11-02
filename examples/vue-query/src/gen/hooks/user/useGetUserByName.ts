@@ -27,7 +27,7 @@ export function getUserByNameQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await getUserByName({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true })
+      return getUserByName({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }

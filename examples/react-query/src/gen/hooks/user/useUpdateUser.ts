@@ -19,7 +19,7 @@ export function updateUserMutationOptions<TContext = unknown>(
   return mutationOptions<RequestResult<UpdateUserResponses, true>, ResponseErrorConfig<Error>, UpdateUserOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return await updateUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof updateUser<true>>[0])
+      return updateUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof updateUser<true>>[0])
     },
   })
 }

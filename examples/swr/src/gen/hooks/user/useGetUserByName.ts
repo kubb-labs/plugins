@@ -19,7 +19,7 @@ export function getUserByNameQueryOptions(
 ) {
   return {
     fetcher: async () => {
-      return await getUserByName({ ...config, path, throwOnError: true })
+      return getUserByName({ ...config, path, throwOnError: true })
     },
   }
 }

@@ -45,7 +45,7 @@ export function addFilesMutationOptions<TContext = unknown>(
   >({
     mutationKey,
     mutationFn: async (variables) => {
-      return await addFiles({ ...config, ...variables, throwOnError: true } as Parameters<typeof addFiles<true>>[0])
+      return addFiles({ ...config, ...variables, throwOnError: true } as Parameters<typeof addFiles<true>>[0])
     },
   })
 }

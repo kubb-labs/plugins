@@ -30,7 +30,7 @@ export function updatePetWithFormMutationOptions<TContext = unknown>(config: Par
   >({
     mutationKey,
     mutationFn: async ({ path, query }) => {
-      return await updatePetWithForm({ ...config, path, query, throwOnError: true })
+      return updatePetWithForm({ ...config, path, query, throwOnError: true })
     },
   })
 }

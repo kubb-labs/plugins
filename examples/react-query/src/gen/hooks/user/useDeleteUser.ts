@@ -16,7 +16,7 @@ export function deleteUserMutationOptions<TContext = unknown>(config: Partial<Om
     {
       mutationKey,
       mutationFn: async ({ path }) => {
-        return await deleteUser({ ...config, path, throwOnError: true })
+        return deleteUser({ ...config, path, throwOnError: true })
       },
     },
   )

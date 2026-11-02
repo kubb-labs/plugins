@@ -20,7 +20,7 @@ export function deleteOrderMutationOptions<TContext = unknown>(config: Partial<O
   >({
     mutationKey,
     mutationFn: async ({ path }) => {
-      return await deleteOrder({ ...config, path, throwOnError: true })
+      return deleteOrder({ ...config, path, throwOnError: true })
     },
   })
 }

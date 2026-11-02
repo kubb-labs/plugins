@@ -30,7 +30,7 @@ export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Om
   >({
     mutationKey,
     mutationFn: async ({ path, query, body }) => {
-      return await uploadFile({ ...config, path, query, body, throwOnError: true })
+      return uploadFile({ ...config, path, query, body, throwOnError: true })
     },
   })
 }

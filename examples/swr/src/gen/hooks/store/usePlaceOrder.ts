@@ -45,7 +45,7 @@ export function usePlaceOrder(
   >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return await placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0])
+      return placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0])
     },
     mutationOptions,
   )

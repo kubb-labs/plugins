@@ -40,7 +40,7 @@ export function useUpdateUser(
   return useSWRMutation<RequestResult<UpdateUserResponses, true>, ResponseErrorConfig<Error>, UpdateUserMutationKey | null, UpdateUserMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return await updateUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof updateUser<true>>[0])
+      return updateUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof updateUser<true>>[0])
     },
     mutationOptions,
   )

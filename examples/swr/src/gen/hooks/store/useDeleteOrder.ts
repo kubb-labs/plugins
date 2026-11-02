@@ -43,7 +43,7 @@ export function useDeleteOrder(
   >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path } }) => {
-      return await deleteOrder({ ...config, path, throwOnError: true })
+      return deleteOrder({ ...config, path, throwOnError: true })
     },
     mutationOptions,
   )

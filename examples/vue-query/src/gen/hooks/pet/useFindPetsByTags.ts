@@ -24,7 +24,7 @@ export function findPetsByTagsQueryOptions(
     {
       queryKey,
       queryFn: async ({ signal }) => {
-        return await findPetsByTags({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true })
+        return findPetsByTags({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true })
       },
     },
   )

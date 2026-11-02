@@ -65,7 +65,7 @@ export function updatePetMutationOptions<TContext = unknown>(
   >({
     mutationKey,
     mutationFn: async (variables) => {
-      return await updatePet({ ...config, ...variables, throwOnError: true } as Parameters<typeof updatePet<true>>[0])
+      return updatePet({ ...config, ...variables, throwOnError: true } as Parameters<typeof updatePet<true>>[0])
     },
   })
 }

@@ -17,7 +17,7 @@ export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path
   return queryOptions<RequestResult<LogoutUserResponses, true>, ResponseErrorConfig<Error>, RequestResult<LogoutUserResponses, true>>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await logoutUser({ ...config, signal: config.signal ?? signal, throwOnError: true })
+      return logoutUser({ ...config, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }

@@ -78,7 +78,7 @@ export function updatePetMutationOptions<TContext = unknown>(
   >({
     mutationKey,
     mutationFn: async (variables) => {
-      return await updatePet({ ...config, ...variables, throwOnError: true } as Parameters<typeof updatePet<true>>[0])
+      return updatePet({ ...config, ...variables, throwOnError: true } as Parameters<typeof updatePet<true>>[0])
     },
   })
 }
@@ -94,7 +94,7 @@ export function addPetMutationOptions<TContext = unknown>(
   return mutationOptions<RequestResult<AddPetResponses, true>, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return await addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0])
+      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0])
     },
   })
 }
@@ -117,7 +117,7 @@ export function findPetsByStatusQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await findPetsByStatus({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
+      return findPetsByStatus({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }
@@ -140,7 +140,7 @@ export function findPetsByTagsQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
+      return findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }
@@ -159,7 +159,7 @@ export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Part
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
+      return getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }
@@ -171,7 +171,7 @@ export function updatePetWithFormMutationOptions<TContext = unknown>(config: Par
   return mutationOptions<RequestResult<UpdatePetWithFormResponses, true>, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, query }) => {
-      return await updatePetWithForm({ ...config, path, query, throwOnError: true })
+      return updatePetWithForm({ ...config, path, query, throwOnError: true })
     },
   })
 }
@@ -183,7 +183,7 @@ export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omi
   return mutationOptions<RequestResult<DeletePetResponses, true>, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, headers }) => {
-      return await deletePet({ ...config, path, headers, throwOnError: true })
+      return deletePet({ ...config, path, headers, throwOnError: true })
     },
   })
 }
@@ -195,7 +195,7 @@ export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Om
   return mutationOptions<RequestResult<UploadFileResponses, true>, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
     mutationKey,
     mutationFn: async ({ path, query, body }) => {
-      return await uploadFile({ ...config, path, query, body, throwOnError: true })
+      return uploadFile({ ...config, path, query, body, throwOnError: true })
     },
   })
 }
@@ -209,7 +209,7 @@ export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'pa
   return queryOptions<RequestResult<GetInventoryResponses, true>, ResponseErrorConfig<Error>, RequestResult<GetInventoryResponses, true>, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
+      return getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }
@@ -225,7 +225,7 @@ export function placeOrderMutationOptions<TContext = unknown>(
   return mutationOptions<RequestResult<PlaceOrderResponses, true>, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return await placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0])
+      return placeOrder({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrder<true>>[0])
     },
   })
 }
@@ -241,7 +241,7 @@ export function placeOrderPatchMutationOptions<TContext = unknown>(
   return mutationOptions<RequestResult<PlaceOrderPatchResponses, true>, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return await placeOrderPatch({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrderPatch<true>>[0])
+      return placeOrderPatch({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrderPatch<true>>[0])
     },
   })
 }
@@ -263,7 +263,7 @@ export function getOrderByIdQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return await getOrderById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
+      return getOrderById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
     },
   })
 }
@@ -280,7 +280,7 @@ export function deleteOrderMutationOptions<TContext = unknown>(config: Partial<O
   >({
     mutationKey,
     mutationFn: async ({ path }) => {
-      return await deleteOrder({ ...config, path, throwOnError: true })
+      return deleteOrder({ ...config, path, throwOnError: true })
     },
   })
 }
