@@ -1,5 +1,5 @@
 import { resolveClientOperation } from '@internals/client'
-import { classifyOperation, HookFile, MutationKey, resolveHookFile, resolveHookReturnType } from '@internals/tanstack-query'
+import { classifyOperation, HookFile, MutationKey, resolveHookFile } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Mutation } from '../components/Mutation.tsx'
@@ -30,7 +30,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
     // The registered contract client plugin owns the `<op>` the hook imports and calls.
     const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
     if (!contractOp) return null
-    const returnType = resolveHookReturnType(ctx.options.returnType, contractOp.returnType)
+    const returnType = ctx.options.returnType ?? contractOp.returnType
 
     const mutationHookName = resolver.mutation.name(node)
     const mutationOptionsName = resolver.mutation.optionsName(node)

@@ -6,7 +6,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildGroupedRequestParam, buildClientCall } from '@internals/tanstack-query'
 import { buildRequestConfigType } from '@internals/shared'
 import { buildResponseTypes } from '@internals/tanstack-query'
-import type { HookReturnType } from '@internals/tanstack-query'
+import type { ReturnTypeOption } from '@internals/client'
 
 type Props = {
   name: string
@@ -20,7 +20,7 @@ type Props = {
    * @default 'full'
    */
   clientReturnType?: 'full' | 'data' | 'plain'
-  returnType?: HookReturnType
+  returnType?: ReturnTypeOption
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })

@@ -4,7 +4,7 @@ import type { ast, GeneratorContext, Group, Output } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import type { HookReturnType } from '../types.ts'
+import type { ReturnTypeOption } from '@internals/client'
 
 type ContractOperation = { name: string; path: string; clientPath: string; clientPathIsFile: boolean }
 
@@ -23,7 +23,7 @@ type ResolveHookFileOptions = {
    * Type names imported right after the response options type.
    */
   extraTypeNames?: Array<string | null | undefined>
-  returnType?: HookReturnType
+  returnType?: ReturnTypeOption
 }
 
 type ResolvedHookFile = {
@@ -32,7 +32,7 @@ type ResolvedHookFile = {
   tsResolver: ResolverTs
   contractOp: ContractOperation
   importedTypeNames: Array<string>
-  returnType: HookReturnType
+  returnType: ReturnTypeOption
   banner: string | null
   footer: string | null
 }
@@ -58,11 +58,11 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
   })
   const importedTypeNames = [
     tsResolver.response.options(node),
-    returnType === 'full' ? tsResolver.response.responses(node) : null,
+    returnType !== 'data' ? tsResolver.response.responses(node) : null,
     ...extraTypeNames,
     ...resolveOperationTypeNames(node, tsResolver, {
       // The joined response alias is unused with the full result, and the printer keeps it as a substring of the responses record name.
-      exclude: [keyTypeName, returnType === 'full' ? tsResolver.response.response(node) : null].filter((name): name is string => Boolean(name)),
+      exclude: [keyTypeName, returnType !== 'data' ? tsResolver.response.response(node) : null].filter((name): name is string => Boolean(name)),
       order: 'body-response-first',
       includeParams: false,
     }),
@@ -100,7 +100,7 @@ export function HookFile({ hook, imports, children }: HookFileProps): KubbReactN
     <File baseName={file.baseName} path={file.path} meta={file.meta} banner={banner} footer={footer}>
       <File.Import name={[contractOp.name]} root={file.path} path={contractOp.path} />
       <File.Import
-        name={returnType === 'full' ? ['RequestConfig', 'ResponseErrorConfig', 'RequestResult'] : ['RequestConfig', 'ResponseErrorConfig']}
+        name={returnType !== 'data' ? ['RequestConfig', 'ResponseErrorConfig', 'RequestResult'] : ['RequestConfig', 'ResponseErrorConfig']}
         root={contractOp.clientPathIsFile ? file.path : undefined}
         path={contractOp.clientPath}
         isTypeOnly

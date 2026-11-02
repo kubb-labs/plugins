@@ -3,7 +3,7 @@ export { InfiniteQueryOptions } from './components/InfiniteQueryOptions.tsx'
 export { MutationKey, mutationKeyTransformer } from './components/MutationKey.tsx'
 export { createMutationResolver, createQueryResolver, type MutationResolver, type QueryResolver, type QueryVariant } from './resolver.ts'
 export { QueryKey, queryKeyTransformer } from './components/QueryKey.tsx'
-export type { HookReturnType, Infinite, KeyVariant, Mutation, PageParamFn, ParamsCasing, Query, Transformer } from './types.ts'
+export type { Infinite, KeyVariant, Mutation, PageParamFn, ParamsCasing, Query, Transformer } from './types.ts'
 export {
   buildGroupedRequestParam,
   buildHookParams,
@@ -26,6 +26,5 @@ export {
   resolveMutationConfig,
   resolveOperationOverrides,
   resolvePageParamType,
-  resolveHookReturnType,
   resolveQueryConfig,
 } from './utils.ts'

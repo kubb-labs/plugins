@@ -4,7 +4,7 @@ import { createFunctionParameter, createFunctionParameters, functionPrinter } fr
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildGroupedRequestParam, buildClientCall, buildResponseTypes } from '@internals/tanstack-query'
-import type { HookReturnType } from '@internals/tanstack-query'
+import type { ReturnTypeOption } from '@internals/client'
 import { buildOperationComments as getComments, buildRequestConfigType } from '@internals/shared'
 
 type Props = {
@@ -21,7 +21,7 @@ type Props = {
    * @default 'full'
    */
   clientReturnType?: 'full' | 'data' | 'plain'
-  returnType?: HookReturnType
+  returnType?: ReturnTypeOption
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -33,7 +33,7 @@ function buildMutationParamsNode(
     mutationKeyTypeName: string
     mutationArgTypeName: string
     resolver: ResolverTs
-    returnType: HookReturnType
+    returnType: ReturnTypeOption
   },
 ): FunctionParametersNode {
   const { mutationKeyTypeName, mutationArgTypeName, resolver, returnType } = options

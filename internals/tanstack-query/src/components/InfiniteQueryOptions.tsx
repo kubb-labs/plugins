@@ -4,7 +4,8 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import type { HookReturnType, Infinite } from '../types.ts'
+import type { ReturnTypeOption } from '@internals/client'
+import type { Infinite } from '../types.ts'
 import {
   buildCallResultBody,
   buildClientCall,
@@ -50,7 +51,7 @@ type Props = {
    * @default 'full'
    */
   clientReturnType?: 'full' | 'data' | 'plain'
-  returnType?: HookReturnType
+  returnType?: ReturnTypeOption
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -77,8 +78,8 @@ export function InfiniteQueryOptions({
   returnType = 'data',
 }: Props): KubbReactNode {
   const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver, { returnType })
-  const lastPage = returnType === 'full' ? 'lastPage.data' : 'lastPage'
-  const firstPage = returnType === 'full' ? 'firstPage.data' : 'firstPage'
+  const lastPage = returnType !== 'data' ? 'lastPage.data' : 'lastPage'
+  const firstPage = returnType !== 'data' ? 'firstPage.data' : 'firstPage'
 
   const { queryParamsTypeName, pageParamType } = resolvePageParamType(node, { resolver: tsResolver, initialPageParam, queryParam })
 

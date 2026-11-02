@@ -7,7 +7,6 @@ import {
   matchesInfinite,
   QueryKey,
   resolveHookFile,
-  resolveHookReturnType,
   resolvePageParamType,
 } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/kit'
@@ -52,7 +51,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
     // The registered contract client plugin owns the `<op>` the composable imports and calls.
     const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
     if (!contractOp) return null
-    const returnType = resolveHookReturnType(ctx.options.returnType, contractOp.returnType)
+    const returnType = ctx.options.returnType ?? contractOp.returnType
 
     const queryName = resolver.infiniteQuery.name(node)
     const queryOptionsName = resolver.infiniteQuery.optionsName(node)

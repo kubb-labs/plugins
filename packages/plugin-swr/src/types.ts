@@ -1,8 +1,8 @@
-import type { ClientSelector, ResolvedContractClient } from '@internals/client'
-import type { HookReturnType, Transformer } from '@internals/tanstack-query'
+import type { ClientSelector, ResolvedContractClient, ReturnTypeOption } from '@internals/client'
+import type { Transformer } from '@internals/tanstack-query'
 import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
 
-export type { HookReturnType, Transformer } from '@internals/tanstack-query'
+export type { Transformer } from '@internals/tanstack-query'
 
 /**
  * The concrete resolver type for `@kubb/plugin-swr`.
@@ -142,10 +142,10 @@ export type Options = OutputOptions & {
    */
   client?: ClientSelector
   /**
-   * Shape of the value the hooks resolve to: `'data'` is the success body, `'full'` the client's whole `RequestResult` so a hook can read response headers. `'full'` needs a client plugin whose own `returnType` is `'full'` or `'plain'`.
-   * @default the client plugin's `returnType`, where `'plain'` counts as `'full'`
+   * Shape of the value the hooks resolve to: `'data'` is the success body, `'full'` or `'plain'` the client's whole `RequestResult` so a hook can read response headers. Both need a client plugin whose own `returnType` is `'full'` or `'plain'`.
+   * @default the client plugin's `returnType`
    */
-  returnType?: HookReturnType
+  returnType?: ReturnTypeOption
   /**
    * Tags, operations, or paths to exclude from generation.
    */
@@ -196,7 +196,7 @@ export type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedContractClient
-  returnType: HookReturnType | undefined
+  returnType: ReturnTypeOption | undefined
   queryKey: QueryKey | undefined
   query: NonNullable<Required<Query>> | false
   mutationKey: MutationKey | undefined

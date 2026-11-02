@@ -1,5 +1,5 @@
 import { resolveClientOperation } from '@internals/client'
-import { classifyOperation, HookFile, QueryKey, resolveHookFile, resolveHookReturnType } from '@internals/tanstack-query'
+import { classifyOperation, HookFile, QueryKey, resolveHookFile } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Query } from '../components/Query.tsx'
@@ -27,7 +27,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
     // The registered contract client plugin owns the `<op>` the hook imports and calls.
     const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output, memo: ctx.memo })
     if (!contractOp) return null
-    const returnType = resolveHookReturnType(ctx.options.returnType, contractOp.returnType)
+    const returnType = ctx.options.returnType ?? contractOp.returnType
 
     const queryName = resolver.query.name(node)
     const queryOptionsName = resolver.query.optionsName(node)

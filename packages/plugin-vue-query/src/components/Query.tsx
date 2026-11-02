@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildQueryKeyParams, buildResponseTypes, maybeRefOrGetter } from '@internals/tanstack-query'
-import type { HookReturnType } from '@internals/tanstack-query'
+import type { ReturnTypeOption } from '@internals/client'
 import { buildClientOptionType, getComments } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -19,7 +19,7 @@ type Props = {
    * Emits the `useInfiniteQuery` variant of the hook instead of `useQuery`.
    */
   infinite?: boolean
-  returnType?: HookReturnType
+  returnType?: ReturnTypeOption
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
