@@ -62,8 +62,8 @@ What the generated composables resolve to. `'body'` returns the success body. `'
 ```ts
 const { data: result } = useGetPetById({ path: { petId: 1 } })
 
-const etag = result?.response.headers.get('ETag')
-const pet = result?.data
+const etag = result.value?.response.headers.get('ETag')
+const pet = result.value?.data
 ```
 
 ### infinite
