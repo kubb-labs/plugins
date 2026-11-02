@@ -10,7 +10,6 @@ import {
   resolveSuccessNames,
 } from '@internals/shared'
 import type { ast } from '@kubb/kit'
-import { Diagnostics } from '@kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
 import type { ReturnTypeOption } from '@internals/client'
@@ -179,9 +178,8 @@ export function buildClientCall(
  * `'data'` the call already resolves to the bare body, so it is returned directly; with `'full'`
  * (the default) the call carries `unwrap()`, so the body calls it instead of destructuring `data`
  * off the full result by hand. With `'plain'` (plugin-client) the call resolves to the user's
- * `RequestResult`, so the body awaits it and reads `data`.
- *
- * With `returnType` `'full'` or `'plain'` the body resolves to the whole `RequestResult`, which needs a client that still returns one.
+ * `RequestResult`, so the body awaits it and reads `data`. With `returnType` `'full'` or `'plain'` the body
+ * resolves to the whole `RequestResult`; `resolveHookFile` rejects that for a client that already stripped it.
  *
  * @example
  * ```ts
@@ -191,15 +189,6 @@ export function buildClientCall(
  */
 export function buildCallResultBody(call: string, options: { clientReturnType?: ReturnTypeOption; returnType?: ReturnTypeOption } = {}): string {
   const { clientReturnType = 'full', returnType = 'data' } = options
-  if (returnType !== 'data' && clientReturnType === 'data') {
-    throw new Diagnostics.Error({
-      code: Diagnostics.code.invalidPluginOptions,
-      severity: 'error',
-      message: `Option \`returnType\` is '${returnType}', but the client plugin has \`returnType: 'data'\` and only returns the response body.`,
-      help: "Set the client plugin's `returnType` to 'full', or set the hook plugin's `returnType` to 'data'.",
-      location: { kind: 'config' },
-    })
-  }
   if (returnType !== 'data' || clientReturnType === 'data') {
     return `return ${call}`
   }

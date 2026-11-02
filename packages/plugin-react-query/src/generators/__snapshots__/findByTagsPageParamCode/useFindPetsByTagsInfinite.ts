@@ -36,8 +36,8 @@ export function findPetsByTagsInfiniteQueryOptions(
       return findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
     },
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined),
-    getPreviousPageParam: (firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined),
+    getNextPageParam: (lastPage) => (lastPage.data.hasNext ? lastPage.data.number + 1 : undefined),
+    getPreviousPageParam: (firstPage) => (firstPage.data.number > 0 ? firstPage.data.number - 1 : undefined),
   })
 }
 

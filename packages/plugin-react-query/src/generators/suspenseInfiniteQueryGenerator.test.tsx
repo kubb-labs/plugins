@@ -12,7 +12,6 @@ import { suspenseInfiniteQueryGenerator } from './suspenseInfiniteQueryGenerator
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  returnType: undefined,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {

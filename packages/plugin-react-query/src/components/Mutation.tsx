@@ -4,6 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildResponseTypes, resolveMutationRequestType } from '@internals/tanstack-query'
+import type { HookReturnTypeProps } from '@internals/tanstack-query'
 import type { ReturnTypeOption } from '@internals/client'
 import type { PluginReactQuery } from '../types.ts'
 import { buildOperationComments as getComments, buildRequestConfigType } from '@internals/shared'
@@ -16,8 +17,7 @@ type Props = {
   node: ast.OperationNode
   tsResolver: ResolverTs
   customOptions: PluginReactQuery['resolvedOptions']['customOptions']
-  returnType?: ReturnTypeOption
-}
+} & HookReturnTypeProps
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
@@ -37,7 +37,7 @@ function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: R
   })
 }
 
-export function Mutation({ name, mutationOptionsName, node, tsResolver, mutationKeyName, customOptions, returnType = 'data' }: Props): KubbReactNode {
+export function Mutation({ name, mutationOptionsName, node, tsResolver, mutationKeyName, customOptions, returnType }: Props): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
 
   const TRequest = resolveMutationRequestType(node, tsResolver)

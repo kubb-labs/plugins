@@ -159,7 +159,7 @@ Deprecated path to the cursor field, read for both `getNextPageParam` and `getPr
 
 #### infinite.getNextPageParam
 
-Source code for TanStack Query's `getNextPageParam`, copied into the generated code as written, such as `'(lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined)'`. Use it when the next page must be computed instead of read from a field. Takes precedence over `nextParam` and `cursorParam`.
+Source code for TanStack Query's `getNextPageParam`, copied into the generated code as written, such as `'(lastPage) => (lastPage.data.hasNext ? lastPage.data.number + 1 : undefined)'`. Use it when the next page must be computed instead of read from a field. Takes precedence over `nextParam` and `cursorParam`.
 
 |          |                  |
 | -------- | ---------------- |

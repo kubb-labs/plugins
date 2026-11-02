@@ -15,7 +15,6 @@ import { queryGenerator } from './queryGenerator.tsx'
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  returnType: undefined,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -160,6 +159,7 @@ describe('queryGenerator operation', () => {
     { name: 'pluginClient', node: getPetByIdNode, options: { client: { kind: 'contract', pluginName: 'plugin-client' } } },
     { name: 'getPetByIdReturnTypeData', node: getPetByIdNode, options: { returnType: 'data' } },
     { name: 'pluginClientReturnTypeData', node: getPetByIdNode, options: { client: { kind: 'contract', pluginName: 'plugin-client' }, returnType: 'data' } },
+    { name: 'pluginClientReturnTypeFull', node: getPetByIdNode, options: { client: { kind: 'contract', pluginName: 'plugin-client' }, returnType: 'full' } },
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
     {
       name: 'createUsersWithListInputAsQuery',
@@ -187,6 +187,30 @@ describe('queryGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('queryGenerator returnType', () => {
+  test("rejects returnType 'full' when the client plugin only returns the body", async () => {
+    const mockedDataAxiosPlugin = createMockedPlugin({
+      name: 'plugin-axios',
+      options: { output: { path: './clients', mode: 'directory' }, group: null, returnType: 'data' } as ClientResolvedOptions,
+      resolver: resolverClient,
+    })
+    const options: PluginReactQuery['resolvedOptions'] = { ...defaultOptions, returnType: 'full' }
+    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
+    const driver = createMultiPluginDriver('returnTypeConflict', { 'plugin-ts': mockedTsPlugin, 'plugin-axios': mockedDataAxiosPlugin })
+
+    await expect(
+      renderGeneratorOperation(queryGenerator, getPetByIdNode, {
+        config: testConfig,
+        adapter: createMockedAdapter(),
+        driver,
+        plugin,
+        options,
+        resolver: resolverReactQuery,
+      }),
+    ).rejects.toThrow(/returnType: 'data'/)
   })
 })
 

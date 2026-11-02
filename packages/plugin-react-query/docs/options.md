@@ -162,8 +162,8 @@ Source code for TanStack Query's `getNextPageParam`, copied into the generated c
 ```typescript
 infinite: {
   queryParam: 'page',
-  getNextPageParam: '(lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined)',
-  getPreviousPageParam: '(firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined)',
+  getNextPageParam: '(lastPage) => (lastPage.data.hasNext ? lastPage.data.number + 1 : undefined)',
+  getPreviousPageParam: '(firstPage) => (firstPage.data.number > 0 ? firstPage.data.number - 1 : undefined)',
 }
 ```
 

@@ -196,7 +196,7 @@ export type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedContractClient
-  returnType: ReturnTypeOption | undefined
+  returnType?: ReturnTypeOption
   queryKey: QueryKey | undefined
   query: NonNullable<Required<Query>> | false
   mutationKey: MutationKey | undefined

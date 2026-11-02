@@ -1,6 +1,13 @@
+import type { ReturnTypeOption } from '@internals/client'
 import type { ast } from '@kubb/kit'
 
 export type ParamsCasing = 'camelcase' | undefined
+
+/** The `returnType` a hook file resolved for its operation: the plugin's option, else the client plugin's. */
+export type HookReturnTypeProps = { returnType: ReturnTypeOption }
+
+/** Adds the client plugin's own `returnType`, which decides how the client call is unwrapped. */
+export type CallReturnTypeProps = HookReturnTypeProps & { clientReturnType: ReturnTypeOption }
 
 /**
  * The hook a key is built for. Plain and suspense queries can share a key, but an infinite query
@@ -99,9 +106,9 @@ export type Infinite = {
    * reference local closures or external variables from the config file.
    *
    * @example
-   * `'(lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined)'`
+   * `'(lastPage) => (lastPage.data.hasNext ? lastPage.data.number + 1 : undefined)'`
    * // or with definePageParam:
-   * `definePageParam<MyResponse, number>((lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined))`
+   * `definePageParam<MyResult, number>((lastPage) => (lastPage.data.hasNext ? lastPage.data.number + 1 : undefined))`
    */
   getNextPageParam?: string | PageParamFn | null
   /**
@@ -112,9 +119,9 @@ export type Infinite = {
    * reference local closures or external variables from the config file.
    *
    * @example
-   * `'(firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined)'`
+   * `'(firstPage) => (firstPage.data.number > 0 ? firstPage.data.number - 1 : undefined)'`
    * // or with definePageParam:
-   * `definePageParam<MyResponse, number>((firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined))`
+   * `definePageParam<MyResult, number>((firstPage) => (firstPage.data.number > 0 ? firstPage.data.number - 1 : undefined))`
    */
   getPreviousPageParam?: string | PageParamFn | null
 }

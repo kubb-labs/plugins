@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildQueryKeyParams, buildQueryOptionsParams, buildResponseTypes } from '@internals/tanstack-query'
-import type { ReturnTypeOption } from '@internals/client'
+import type { HookReturnTypeProps } from '@internals/tanstack-query'
 import { buildClientOptionType, buildOperationComments as getComments } from '@internals/shared'
 
 type Props = {
@@ -14,13 +14,12 @@ type Props = {
   queryKeyTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  returnType?: ReturnTypeOption
-}
+} & HookReturnTypeProps
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver, returnType = 'data' }: Props): KubbReactNode {
+export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver, returnType }: Props): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
   const generics = [TData, TError, `${queryKeyTypeName} | null`]
 

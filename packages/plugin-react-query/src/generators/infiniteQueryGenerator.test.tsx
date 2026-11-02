@@ -12,7 +12,6 @@ import { infiniteQueryGenerator } from './infiniteQueryGenerator.tsx'
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  returnType: undefined,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -108,13 +107,14 @@ describe('infiniteQueryGenerator operation', () => {
       options: {
         infinite: {
           ...infiniteConfig,
-          getNextPageParam: '(lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined)',
-          getPreviousPageParam: '(firstPage) => (firstPage.number > 0 ? firstPage.number - 1 : undefined)',
+          getNextPageParam: '(lastPage) => (lastPage.data.hasNext ? lastPage.data.number + 1 : undefined)',
+          getPreviousPageParam: '(firstPage) => (firstPage.data.number > 0 ? firstPage.data.number - 1 : undefined)',
         },
       },
     },
     { name: 'findByTagsInitialPageParam', node: findByTagsNode, options: { infinite: { ...infiniteConfig, initialPageParam: 1 } } },
     { name: 'findByTagsReturnTypeData', node: findByTagsNode, options: { infinite: { ...infiniteConfig, nextParam: 'next' }, returnType: 'data' } },
+    { name: 'findByTagsNextParam', node: findByTagsNode, options: { infinite: { ...infiniteConfig, nextParam: 'next' } } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {

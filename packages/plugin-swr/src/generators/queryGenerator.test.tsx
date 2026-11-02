@@ -14,7 +14,6 @@ import { queryGenerator } from './queryGenerator.tsx'
 
 const defaultOptions: PluginSwr['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  returnType: undefined,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {

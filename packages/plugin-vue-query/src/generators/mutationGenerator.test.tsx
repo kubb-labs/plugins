@@ -13,7 +13,6 @@ import { mutationGenerator } from './mutationGenerator.tsx'
 
 const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   client: { kind: 'contract', pluginName: 'plugin-axios' },
-  returnType: undefined,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {

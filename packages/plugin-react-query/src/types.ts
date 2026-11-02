@@ -297,7 +297,7 @@ export type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedClient
-  returnType: ReturnTypeOption | undefined
+  returnType?: ReturnTypeOption
   /**
    * Resolved infinite query configuration, or `false` when infinite queries are disabled.
    */

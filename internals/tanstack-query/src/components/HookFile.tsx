@@ -1,6 +1,6 @@
 import { resolveOperationTypes } from '@internals/client'
 import { operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
-import type { ast, GeneratorContext, Group, Output } from '@kubb/kit'
+import { type ast, Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -40,9 +40,18 @@ type ResolvedHookFile = {
  * `pluginZod({ inferred: 'codec' })`), banner and footer.
  */
 export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, options: ResolveHookFileOptions): ResolvedHookFile {
-  const { name, output, group, contractOp, keyTypeName, extraTypeNames = [] } = options
-  const returnType = options.returnType ?? contractOp.returnType
+  const { name, output, group, contractOp, keyTypeName, extraTypeNames = [], returnType = contractOp.returnType } = options
   const { config, root, resolver } = ctx
+  if (returnType !== 'data' && contractOp.returnType === 'data') {
+    throw new Diagnostics.Error({
+      code: Diagnostics.code.invalidPluginOptions,
+      severity: 'error',
+      message: `Option \`returnType\` is '${returnType}' for ${node.operationId}, but the client plugin has \`returnType: 'data'\` and only returns the response body.`,
+      help: "Set the client plugin's `returnType` to 'full', or set the hook plugin's `returnType` to 'data'.",
+      location: { kind: 'config' },
+      plugin: resolver.pluginName,
+    })
+  }
   const types = resolveOperationTypes(ctx.driver, resolver.pluginName)
   const tsResolver = types.resolver
 

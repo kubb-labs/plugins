@@ -60,6 +60,8 @@ const generator = (params: PageParams) =>
             queryKeyName="findPetsByTagsInfiniteQueryKey"
             node={node}
             tsResolver={resolverTs}
+            clientReturnType="full"
+            returnType="data"
             {...infiniteConfig}
             {...params}
           />

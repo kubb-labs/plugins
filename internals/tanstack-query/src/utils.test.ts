@@ -147,10 +147,6 @@ describe('buildCallResultBody', () => {
       'return getPetById({ throwOnError: true })',
     )
   })
-
-  test("throws with returnType 'full' when the client only returns the body", () => {
-    expect(() => buildCallResultBody('getPetById({ throwOnError: true })', { clientReturnType: 'data', returnType: 'full' })).toThrow(/returnType: 'data'/)
-  })
 })
 
 const listPetsNode = (schema: ast.SchemaNode, paramName = 'page') =>

@@ -11,6 +11,7 @@ import {
   buildResponseTypes,
   resolveMutationRequestType,
 } from '@internals/tanstack-query'
+import type { CallReturnTypeProps } from '@internals/tanstack-query'
 import type { ReturnTypeOption } from '@internals/client'
 import { buildRequestConfigType, getComments } from '../utils.ts'
 
@@ -20,14 +21,7 @@ type Props = {
   mutationKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  /**
-   * The registered client plugin's `returnType`, read by the caller off `resolveClientOperation`.
-   *
-   * @default 'full'
-   */
-  clientReturnType?: ReturnTypeOption
-  returnType?: ReturnTypeOption
-}
+} & CallReturnTypeProps
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
@@ -46,7 +40,7 @@ function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: R
   })
 }
 
-export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, clientReturnType = 'full', returnType = 'data' }: Props): KubbReactNode {
+export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, clientReturnType, returnType }: Props): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver, withContentType: true })
