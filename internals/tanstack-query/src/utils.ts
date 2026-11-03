@@ -178,7 +178,7 @@ export function buildClientCall(
  * `'data'` the call already resolves to the bare body, so it is returned directly; with `'full'`
  * (the default) the call carries `unwrap()`, so the body calls it instead of destructuring `data`
  * off the full result by hand. With `'plain'` (plugin-client) the call resolves to the user's
- * `RequestResult`, so the body awaits it and reads `data`. With `returnType` `'full'` or `'plain'` the body
+ * `RequestResult`, so the body awaits it and reads `data`. With `returnType` `'full'` the body
  * resolves to the whole `RequestResult`; `resolveHookFile` rejects that for a client that already stripped it.
  *
  * @example
@@ -217,7 +217,7 @@ type ResolvePageParamTypeParams = {
 /**
  * Builds the `TData` / `TError` type expressions shared by every generated hook, joining the resolved
  * success responses into `TData` and wrapping the error responses in `ResponseErrorConfig<...>`.
- * With `returnType` `'full'` or `'plain'`, `TData` is the client's `RequestResult` over the operation's responses record.
+ * With `returnType` `'full'`, `TData` is the client's `RequestResult` over the operation's responses record.
  */
 export function buildResponseTypes(node: ast.OperationNode, resolver: ResolverTs, options: { returnType?: ReturnTypeOption } = {}): ResponseTypes {
   const { returnType = 'data' } = options

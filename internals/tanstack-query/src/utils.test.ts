@@ -143,9 +143,6 @@ describe('buildCallResultBody', () => {
     expect(buildCallResultBody('getPetById({ throwOnError: true })', { clientReturnType: 'plain', returnType: 'full' })).toBe(
       'return getPetById({ throwOnError: true })',
     )
-    expect(buildCallResultBody('getPetById({ throwOnError: true })', { clientReturnType: 'plain', returnType: 'plain' })).toBe(
-      'return getPetById({ throwOnError: true })',
-    )
   })
 })
 
