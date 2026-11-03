@@ -4,8 +4,8 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
-import type { UploadFileOptions, UploadFileResponses } from '../../models/pet/UploadFile'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { UploadFileOptions, UploadFileStatus200 } from '../../models/pet/UploadFile'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { uploadFile } from '../../clients/pet/uploadFile'
 
@@ -21,12 +21,9 @@ export type UploadFileMutationArg = UploadFileOptions
  */
 export function useUploadFile(
   options: {
-    mutation?: SWRMutationConfiguration<
-      RequestResult<UploadFileResponses, true>,
-      ResponseErrorConfig<Error>,
-      UploadFileMutationKey | null,
-      UploadFileMutationArg
-    > & { throwOnError?: boolean }
+    mutation?: SWRMutationConfiguration<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg> & {
+      throwOnError?: boolean
+    }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: { request?: 'application/json' | 'multipart/form-data' }
     }
@@ -36,10 +33,10 @@ export function useUploadFile(
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = uploadFileMutationKey()
 
-  return useSWRMutation<RequestResult<UploadFileResponses, true>, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
+  return useSWRMutation<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return uploadFile({ ...config, ...variables, throwOnError: true } as Parameters<typeof uploadFile<true>>[0])
+      return uploadFile({ ...config, ...variables, throwOnError: true } as Parameters<typeof uploadFile<true>>[0]).unwrap()
     },
     mutationOptions,
   )

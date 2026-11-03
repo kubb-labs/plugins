@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
-import type { GetPetByIdOptions, GetPetByIdResponses, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { GetPetByIdOptions, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/pet/GetPetById'
 import type { MaybeRefOrGetter } from 'vue'
 import { getPetById } from '../../clients/pet/getPetById'
 import { queryOptions } from '@tanstack/vue-query'
@@ -20,14 +20,10 @@ export function getPetByIdQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = getPetByIdQueryKey({ path })
-  return queryOptions<
-    RequestResult<GetPetByIdResponses, true>,
-    ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>,
-    RequestResult<GetPetByIdResponses, true>
-  >({
+  return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getPetById({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true })
+      return getPetById({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }

@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
-import type { LoginUserOptions, LoginUserResponses, LoginUserStatus400 } from '../../models/user/LoginUser'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { LoginUserOptions, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser'
 import { loginUser } from '../../clients/user/loginUser'
 import { queryOptions } from '@tanstack/react-query'
 
@@ -17,15 +17,10 @@ export function loginUserQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = loginUserQueryKey({ query })
-  return queryOptions<
-    RequestResult<LoginUserResponses, true>,
-    ResponseErrorConfig<LoginUserStatus400>,
-    RequestResult<LoginUserResponses, true>,
-    typeof queryKey
-  >({
+  return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return loginUser({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
+      return loginUser({ ...config, query, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
   })
 }

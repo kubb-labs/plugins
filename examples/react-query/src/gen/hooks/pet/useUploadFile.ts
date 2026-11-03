@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
-import type { UploadFileOptions, UploadFileResponses } from '../../models/pet/UploadFile'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { UploadFileOptions, UploadFileStatus200 } from '../../models/pet/UploadFile'
 import { uploadFile } from '../../clients/pet/uploadFile'
 import { mutationOptions } from '@tanstack/react-query'
 
@@ -16,10 +16,10 @@ export function uploadFileMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = uploadFileMutationKey()
-  return mutationOptions<RequestResult<UploadFileResponses, true>, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
+  return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return uploadFile({ ...config, ...variables, throwOnError: true } as Parameters<typeof uploadFile<true>>[0])
+      return uploadFile({ ...config, ...variables, throwOnError: true } as Parameters<typeof uploadFile<true>>[0]).unwrap()
     },
   })
 }

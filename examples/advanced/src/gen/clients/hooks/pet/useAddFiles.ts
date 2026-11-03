@@ -1,4 +1,4 @@
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { addFiles } from '../../axios/petService/addFiles'
@@ -13,13 +13,7 @@ export function addFilesMutationOptions<TContext = unknown>(
 ) {
   const mutationKey = addFilesMutationKey()
   return mutationOptions<
-    RequestResult<
-      {
-        '200': Omit<NonNullable<Pet>, 'name'>
-        '405': unknown
-      },
-      true
-    >,
+    Omit<NonNullable<Pet>, 'name'>,
     ResponseErrorConfig<unknown>,
     | {
         body: {
@@ -45,7 +39,7 @@ export function addFilesMutationOptions<TContext = unknown>(
   >({
     mutationKey,
     mutationFn: async (variables) => {
-      return addFiles({ ...config, ...variables, throwOnError: true } as Parameters<typeof addFiles<true>>[0])
+      return addFiles({ ...config, ...variables, throwOnError: true } as Parameters<typeof addFiles<true>>[0]).unwrap()
     },
   })
 }
@@ -58,13 +52,7 @@ export function addFilesMutationOptions<TContext = unknown>(
 export function useAddFiles<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      RequestResult<
-        {
-          '200': Omit<NonNullable<Pet>, 'name'>
-          '405': unknown
-        },
-        true
-      >,
+      Omit<NonNullable<Pet>, 'name'>,
       ResponseErrorConfig<unknown>,
       | {
           body: {
@@ -98,13 +86,7 @@ export function useAddFiles<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? addFilesMutationKey()
 
   const baseOptions = addFilesMutationOptions(config) as UseMutationOptions<
-    RequestResult<
-      {
-        '200': Omit<NonNullable<Pet>, 'name'>
-        '405': unknown
-      },
-      true
-    >,
+    Omit<NonNullable<Pet>, 'name'>,
     ResponseErrorConfig<unknown>,
     | {
         body: {
@@ -130,13 +112,7 @@ export function useAddFiles<TContext>(
   >
 
   return useMutation<
-    RequestResult<
-      {
-        '200': Omit<NonNullable<Pet>, 'name'>
-        '405': unknown
-      },
-      true
-    >,
+    Omit<NonNullable<Pet>, 'name'>,
     ResponseErrorConfig<unknown>,
     | {
         body: {
@@ -167,13 +143,7 @@ export function useAddFiles<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    RequestResult<
-      {
-        '200': Omit<NonNullable<Pet>, 'name'>
-        '405': unknown
-      },
-      true
-    >,
+    Omit<NonNullable<Pet>, 'name'>,
     ResponseErrorConfig<unknown>,
     | {
         body: {

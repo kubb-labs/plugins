@@ -1,4 +1,4 @@
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { deletePet } from '../../axios/petService/deletePet'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -8,12 +8,7 @@ export const deletePetMutationKey = () => [{ url: '/pet/:petId:search' }] as con
 export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = deletePetMutationKey()
   return mutationOptions<
-    RequestResult<
-      {
-        '400': unknown
-      },
-      true
-    >,
+    unknown,
     ResponseErrorConfig<unknown>,
     {
       body?: never
@@ -29,7 +24,7 @@ export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omi
   >({
     mutationKey,
     mutationFn: async ({ path, headers }) => {
-      return deletePet({ ...config, path, headers, throwOnError: true })
+      return deletePet({ ...config, path, headers, throwOnError: true }).unwrap()
     },
   })
 }
@@ -42,12 +37,7 @@ export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omi
 export function useDeletePet<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      RequestResult<
-        {
-          '400': unknown
-        },
-        true
-      >,
+      unknown,
       ResponseErrorConfig<unknown>,
       {
         body?: never
@@ -69,12 +59,7 @@ export function useDeletePet<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? deletePetMutationKey()
 
   const baseOptions = deletePetMutationOptions(config) as UseMutationOptions<
-    RequestResult<
-      {
-        '400': unknown
-      },
-      true
-    >,
+    unknown,
     ResponseErrorConfig<unknown>,
     {
       body?: never
@@ -90,12 +75,7 @@ export function useDeletePet<TContext>(
   >
 
   return useMutation<
-    RequestResult<
-      {
-        '400': unknown
-      },
-      true
-    >,
+    unknown,
     ResponseErrorConfig<unknown>,
     {
       body?: never
@@ -116,12 +96,7 @@ export function useDeletePet<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    RequestResult<
-      {
-        '400': unknown
-      },
-      true
-    >,
+    unknown,
     ResponseErrorConfig<unknown>,
     {
       body?: never

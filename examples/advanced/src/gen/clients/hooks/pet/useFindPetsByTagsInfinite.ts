@@ -1,5 +1,5 @@
 import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '../../../../tanstack-query-hook'
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type { FindPetsByTagsXEXAMPLEKey } from '../../../models/ts/FindPetsByTagsXEXAMPLE'
 import type { Pet } from '../../../models/ts/Pet'
 import { infiniteQueryOptions, useInfiniteQuery } from '../../../../tanstack-query-hook'
@@ -45,39 +45,9 @@ export function findPetsByTagsInfiniteQueryOptions(
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey({ query })
   return infiniteQueryOptions<
-    RequestResult<
-      {
-        '200':
-          | {
-              contentType: 'application/json'
-              data: Array<Pet>
-            }
-          | {
-              contentType: 'application/xml'
-              data: Array<Pet>
-            }
-        '400': unknown
-      },
-      true
-    >,
+    Array<Pet>,
     ResponseErrorConfig<unknown>,
-    InfiniteData<
-      RequestResult<
-        {
-          '200':
-            | {
-                contentType: 'application/json'
-                data: Array<Pet>
-              }
-            | {
-                contentType: 'application/xml'
-                data: Array<Pet>
-              }
-          '400': unknown
-        },
-        true
-      >
-    >,
+    InfiniteData<Array<Pet>>,
     typeof queryKey,
     NonNullable<
       {
@@ -101,10 +71,10 @@ export function findPetsByTagsInfiniteQueryOptions(
         page?: string
         pageSize?: number
       }
-      return findPetsByTags({ ...config, query, headers, signal: config.signal ?? signal, throwOnError: true })
+      return findPetsByTags({ ...config, query, headers, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
     initialPageParam: 0,
-    getNextPageParam: (lastPage, _allPages, lastPageParam) => (Array.isArray(lastPage.data) && lastPage.data.length === 0 ? undefined : lastPageParam + 1),
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => (Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1),
     getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => (firstPageParam <= 1 ? undefined : firstPageParam - 1),
   })
 }
@@ -115,21 +85,7 @@ export function findPetsByTagsInfiniteQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsInfinite<
-  TQueryFnData = RequestResult<
-    {
-      '200':
-        | {
-            contentType: 'application/json'
-            data: Array<Pet>
-          }
-        | {
-            contentType: 'application/xml'
-            data: Array<Pet>
-          }
-      '400': unknown
-    },
-    true
-  >,
+  TQueryFnData = Array<Pet>,
   TError = ResponseErrorConfig<unknown>,
   TData = InfiniteData<TQueryFnData>,
   TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,

@@ -1,4 +1,4 @@
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type { AddPetRequest } from '../../../models/ts/AddPetRequest'
 import type { Pet } from '../../../models/ts/Pet'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
@@ -14,24 +14,11 @@ export function addPetMutationOptions<TContext = unknown>(
 ) {
   const mutationKey = addPetMutationKey()
   return mutationOptions<
-    RequestResult<
-      {
-        '405': {
-          code?: number
-          message?: string
-        }
-        default:
-          | {
-              contentType: 'application/json'
-              data: Omit<NonNullable<Pet>, 'name'>
-            }
-          | {
-              contentType: 'application/xml'
-              data: Omit<NonNullable<Pet>, 'name'>
-            }
-      },
-      true
-    >,
+    | {
+        code?: number
+        message?: string
+      }
+    | Omit<NonNullable<Pet>, 'name'>,
     ResponseErrorConfig<{
       code?: number
       message?: string
@@ -67,7 +54,7 @@ export function addPetMutationOptions<TContext = unknown>(
   >({
     mutationKey,
     mutationFn: async (variables) => {
-      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0])
+      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0]).unwrap()
     },
   })
 }
@@ -80,24 +67,11 @@ export function addPetMutationOptions<TContext = unknown>(
 export function useAddPet<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      RequestResult<
-        {
-          '405': {
-            code?: number
-            message?: string
-          }
-          default:
-            | {
-                contentType: 'application/json'
-                data: Omit<NonNullable<Pet>, 'name'>
-              }
-            | {
-                contentType: 'application/xml'
-                data: Omit<NonNullable<Pet>, 'name'>
-              }
-        },
-        true
-      >,
+      | {
+          code?: number
+          message?: string
+        }
+      | Omit<NonNullable<Pet>, 'name'>,
       ResponseErrorConfig<{
         code?: number
         message?: string
@@ -141,24 +115,11 @@ export function useAddPet<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? addPetMutationKey()
 
   const baseOptions = addPetMutationOptions(config) as UseMutationOptions<
-    RequestResult<
-      {
-        '405': {
-          code?: number
-          message?: string
-        }
-        default:
-          | {
-              contentType: 'application/json'
-              data: Omit<NonNullable<Pet>, 'name'>
-            }
-          | {
-              contentType: 'application/xml'
-              data: Omit<NonNullable<Pet>, 'name'>
-            }
-      },
-      true
-    >,
+    | {
+        code?: number
+        message?: string
+      }
+    | Omit<NonNullable<Pet>, 'name'>,
     ResponseErrorConfig<{
       code?: number
       message?: string
@@ -194,24 +155,11 @@ export function useAddPet<TContext>(
   >
 
   return useMutation<
-    RequestResult<
-      {
-        '405': {
-          code?: number
-          message?: string
-        }
-        default:
-          | {
-              contentType: 'application/json'
-              data: Omit<NonNullable<Pet>, 'name'>
-            }
-          | {
-              contentType: 'application/xml'
-              data: Omit<NonNullable<Pet>, 'name'>
-            }
-      },
-      true
-    >,
+    | {
+        code?: number
+        message?: string
+      }
+    | Omit<NonNullable<Pet>, 'name'>,
     ResponseErrorConfig<{
       code?: number
       message?: string
@@ -252,24 +200,11 @@ export function useAddPet<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    RequestResult<
-      {
-        '405': {
-          code?: number
-          message?: string
-        }
-        default:
-          | {
-              contentType: 'application/json'
-              data: Omit<NonNullable<Pet>, 'name'>
-            }
-          | {
-              contentType: 'application/xml'
-              data: Omit<NonNullable<Pet>, 'name'>
-            }
-      },
-      true
-    >,
+    | {
+        code?: number
+        message?: string
+      }
+    | Omit<NonNullable<Pet>, 'name'>,
     ResponseErrorConfig<{
       code?: number
       message?: string

@@ -4,8 +4,8 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig, RequestResult } from '../../.kubb/client'
-import type { DeleteOrderOptions, DeleteOrderResponses, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/store/DeleteOrder'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { DeleteOrderOptions, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/store/DeleteOrder'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { deleteOrder } from '../../clients/store/deleteOrder'
 
@@ -23,7 +23,7 @@ export type DeleteOrderMutationArg = DeleteOrderOptions
 export function useDeleteOrder(
   options: {
     mutation?: SWRMutationConfiguration<
-      RequestResult<DeleteOrderResponses, true>,
+      DeleteOrderResponse,
       ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>,
       DeleteOrderMutationKey | null,
       DeleteOrderMutationArg
@@ -36,14 +36,14 @@ export function useDeleteOrder(
   const mutationKey = deleteOrderMutationKey()
 
   return useSWRMutation<
-    RequestResult<DeleteOrderResponses, true>,
+    DeleteOrderResponse,
     ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>,
     DeleteOrderMutationKey | null,
     DeleteOrderMutationArg
   >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path } }) => {
-      return deleteOrder({ ...config, path, throwOnError: true })
+      return deleteOrder({ ...config, path, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )
