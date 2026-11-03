@@ -1,6 +1,13 @@
+import type { ReturnTypeOption } from '@internals/client'
 import type { ast } from '@kubb/kit'
 
 export type ParamsCasing = 'camelcase' | undefined
+
+/** The hook plugin's `returnType`, `'data'` when unset. */
+export type HookReturnTypeProps = { returnType: ReturnTypeOption }
+
+/** Adds the client plugin's own `returnType`, which decides how the client call is unwrapped. */
+export type CallReturnTypeProps = HookReturnTypeProps & { clientReturnType: ReturnTypeOption }
 
 /**
  * The hook a key is built for. Plain and suspense queries can share a key, but an infinite query

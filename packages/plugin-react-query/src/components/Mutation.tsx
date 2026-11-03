@@ -4,6 +4,8 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildHookParams, buildResponseTypes, resolveMutationRequestType } from '@internals/tanstack-query'
+import type { HookReturnTypeProps } from '@internals/tanstack-query'
+import type { ReturnTypeOption } from '@internals/client'
 import type { PluginReactQuery } from '../types.ts'
 import { buildOperationComments as getComments, buildRequestConfigType } from '@internals/shared'
 import { buildMutationConfigParamsNode } from './MutationOptions.tsx'
@@ -15,14 +17,14 @@ type Props = {
   node: ast.OperationNode
   tsResolver: ResolverTs
   customOptions: PluginReactQuery['resolvedOptions']['customOptions']
-}
+} & HookReturnTypeProps
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: ResolverTs }): FunctionParametersNode {
-  const { resolver } = options
-  const { TData, TError } = buildResponseTypes(node, resolver)
+function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: ResolverTs; returnType: ReturnTypeOption }): FunctionParametersNode {
+  const { resolver, returnType } = options
+  const { TData, TError } = buildResponseTypes(node, resolver, { returnType })
   const generics = [TData, TError, resolveMutationRequestType(node, resolver), 'TContext'].join(', ')
 
   return buildHookParams(node, {
@@ -35,17 +37,17 @@ function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: R
   })
 }
 
-export function Mutation({ name, mutationOptionsName, node, tsResolver, mutationKeyName, customOptions }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver)
+export function Mutation({ name, mutationOptionsName, node, tsResolver, mutationKeyName, customOptions, returnType }: Props): KubbReactNode {
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
 
   const TRequest = resolveMutationRequestType(node, tsResolver)
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')
-  const returnType = `UseMutationResult<${generics}>`
+  const resultType = `UseMutationResult<${generics}>`
 
   const mutationOptionsConfigNode = buildMutationConfigParamsNode(node)
   const mutationOptionsParamsCall = callPrinter.print(mutationOptionsConfigNode) ?? ''
 
-  const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver })
+  const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver, returnType })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
@@ -62,7 +64,7 @@ export function Mutation({ name, mutationOptionsName, node, tsResolver, mutation
           ...baseOptions,${customOptions ? '\n          ...customOptions,' : ''}
           mutationKey,
           ...mutationOptions,
-        }, queryClient) as ${returnType}
+        }, queryClient) as ${resultType}
     `}
       </Function>
     </File.Source>

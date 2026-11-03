@@ -140,6 +140,7 @@ describe('mutationGenerator operation', () => {
   const testData = [
     { name: 'getAsMutation', node: findByTagsNode, options: { mutation: { importPath: 'custom-swr/mutation', methods: ['get'] } } },
     { name: 'updatePetById', node: updatePetByIdNode, options: {} },
+    { name: 'updatePetByIdReturnTypeFull', node: updatePetByIdNode, options: { returnType: 'full' } },
     { name: 'deletePet', node: deletePetNode, options: {} },
     { name: 'multiContentType', node: multiContentTypeNode, options: {} },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']> }>

@@ -4,7 +4,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import type { Infinite } from '../types.ts'
+import type { CallReturnTypeProps, Infinite } from '../types.ts'
 import {
   buildCallResultBody,
   buildClientCall,
@@ -44,13 +44,7 @@ type Props = {
    * Unwraps a request group inside the client call, used by vue-query to emit `toValue(...)`.
    */
   unwrapName?: (name: string) => string
-  /**
-   * The registered client plugin's `returnType`, read by the caller off `resolveClientOperation`.
-   *
-   * @default 'full'
-   */
-  returnType?: 'full' | 'data' | 'plain'
-}
+} & CallReturnTypeProps
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
@@ -72,9 +66,11 @@ export function InfiniteQueryOptions({
   queryKeyType = 'typeof queryKey',
   memberTypeWrapper,
   unwrapName,
-  returnType = 'full',
+  clientReturnType,
+  returnType,
 }: Props): KubbReactNode {
-  const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver)
+  const { TData: queryFnDataType, TError: errorType } = buildResponseTypes(node, tsResolver, { returnType })
+  const dataSuffix = returnType === 'data' ? '' : '.data'
 
   const { queryParamsTypeName, pageParamType } = resolvePageParamType(node, { resolver: tsResolver, initialPageParam, queryParam })
 
@@ -84,7 +80,7 @@ export function InfiniteQueryOptions({
 
   const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver, memberTypeWrapper })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName }), { returnType })
+  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName }), { clientReturnType, returnType })
 
   const initialPageParamLiteral =
     typeof initialPageParam === 'string' || (typeof initialPageParam === 'object' && initialPageParam !== null)
@@ -96,9 +92,9 @@ export function InfiniteQueryOptions({
   const serializedGetNextPageParam = typeof getNextPageParam === 'function' ? getNextPageParam.toString() : getNextPageParam
   const getNextPageParamExpr = (() => {
     if (serializedGetNextPageParam) return `getNextPageParam: ${serializedGetNextPageParam}`
-    if (nextParam) return `getNextPageParam: (lastPage) => ${getNestedAccessor(nextParam, 'lastPage')}`
-    if (cursorParam) return `getNextPageParam: (lastPage) => lastPage['${cursorParam}']`
-    return 'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1'
+    if (nextParam) return `getNextPageParam: (lastPage) => ${getNestedAccessor(nextParam, `lastPage${dataSuffix}`)}`
+    if (cursorParam) return `getNextPageParam: (lastPage) => lastPage${dataSuffix}['${cursorParam}']`
+    return `getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage${dataSuffix}) && lastPage${dataSuffix}.length === 0 ? undefined : lastPageParam + 1`
   })()
 
   // Resolve getPreviousPageParam: custom source > previousParam > cursorParam > default numeric fallback.
@@ -110,8 +106,8 @@ export function InfiniteQueryOptions({
 
   const getPreviousPageParamExpr = (() => {
     if (serializedGetPreviousPageParam) return `getPreviousPageParam: ${serializedGetPreviousPageParam}`
-    if (previousParam) return `getPreviousPageParam: (firstPage) => ${getNestedAccessor(previousParam, 'firstPage')}`
-    if (cursorParam) return `getPreviousPageParam: (firstPage) => firstPage['${cursorParam}']`
+    if (previousParam) return `getPreviousPageParam: (firstPage) => ${getNestedAccessor(previousParam, `firstPage${dataSuffix}`)}`
+    if (cursorParam) return `getPreviousPageParam: (firstPage) => firstPage${dataSuffix}['${cursorParam}']`
     if (serializedGetNextPageParam || nextParam) return null
     return `getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= ${defaultPreviousThreshold} ? undefined : firstPageParam - 1`
   })()

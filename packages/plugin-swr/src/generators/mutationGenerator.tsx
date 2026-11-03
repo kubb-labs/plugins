@@ -33,7 +33,7 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
     const mutationKeyTypeName = resolver.mutation.keyTypeName(node)
     const mutationArgTypeName = resolver.mutation.argTypeName(node)
 
-    const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp })
+    const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp, returnType: ctx.options.returnType })
 
     return (
       <HookFile hook={hook}>
@@ -51,7 +51,8 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
               mutationArgTypeName={mutationArgTypeName}
               node={node}
               tsResolver={hook.tsResolver}
-              returnType={contractOp.returnType}
+              clientReturnType={contractOp.returnType}
+              returnType={hook.returnType}
             />
           </>
         )}

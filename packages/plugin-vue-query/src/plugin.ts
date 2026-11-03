@@ -57,6 +57,7 @@ export const pluginVueQuery = defineExtension<PluginVueQuery>({
       queryKey = queryKeyTransformer,
       hooks = false,
       client,
+      returnType = 'data',
       resolver: userResolver,
       macros: userMacros,
     } = options
@@ -73,6 +74,7 @@ export const pluginVueQuery = defineExtension<PluginVueQuery>({
     return {
       output,
       client: resolveContractClient({ plugin: pluginVueQueryName, client, plugins: useConfig().plugins }),
+      returnType,
       queryKey,
       query: resolveQueryConfig(query, { importPath: '@tanstack/vue-query' }),
       mutationKey,

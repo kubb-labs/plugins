@@ -4,6 +4,7 @@ import { createFunctionParameter, createFunctionParameters, functionPrinter } fr
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildCallResultBody, buildGroupedRequestParam, buildClientCall } from '@internals/tanstack-query'
+import type { CallReturnTypeProps } from '@internals/tanstack-query'
 import { buildRequestConfigType } from '@internals/shared'
 import { buildResponseTypes } from '@internals/tanstack-query'
 
@@ -13,13 +14,7 @@ type Props = {
   mutationKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  /**
-   * The registered client plugin's `returnType`, read by the caller off `resolveClientOperation`.
-   *
-   * @default 'full'
-   */
-  returnType?: 'full' | 'data' | 'plain'
-}
+} & CallReturnTypeProps
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
@@ -36,8 +31,8 @@ export function buildMutationConfigParamsNode(node: ast.OperationNode): Function
   })
 }
 
-export function MutationOptions({ name, clientName, node, tsResolver, mutationKeyName, returnType = 'full' }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver)
+export function MutationOptions({ name, clientName, node, tsResolver, mutationKeyName, clientReturnType, returnType }: Props): KubbReactNode {
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
 
   const configParamsNode = buildMutationConfigParamsNode(node)
   const paramsSignature = declarationPrinter.print(configParamsNode) ?? ''
@@ -48,7 +43,10 @@ export function MutationOptions({ name, clientName, node, tsResolver, mutationKe
   const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const TRequest = hasMutationParams ? tsResolver.response.options(node) : 'undefined'
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : '_'
-  const mutationFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false, withContentType: true, returnType }), { returnType })
+  const mutationFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: false, withContentType: true, returnType: clientReturnType }), {
+    clientReturnType,
+    returnType,
+  })
 
   return (
     <File.Source name={name} isExportable isIndexable>

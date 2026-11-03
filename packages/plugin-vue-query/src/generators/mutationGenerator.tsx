@@ -32,7 +32,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
     const mutationHookName = resolver.mutation.name(node)
     const mutationKeyName = resolver.mutation.keyName(node)
 
-    const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp })
+    const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp, returnType: ctx.options.returnType })
 
     // The contract body unwraps each request group with `toValue()`, so it needs the runtime import.
     const groups = getRequestGroups(node)
@@ -60,7 +60,8 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
               node={node}
               tsResolver={hook.tsResolver}
               mutationKeyName={mutationKeyName}
-              returnType={contractOp.returnType}
+              clientReturnType={contractOp.returnType}
+              returnType={hook.returnType}
             />
           </>
         )}

@@ -113,6 +113,8 @@ describe('infiniteQueryGenerator operation', () => {
       },
     },
     { name: 'findByTagsInitialPageParam', node: findByTagsNode, options: { infinite: { ...infiniteConfig, initialPageParam: 1 } } },
+    { name: 'findByTagsReturnTypeFull', node: findByTagsNode, options: { infinite: { ...infiniteConfig, nextParam: 'next' }, returnType: 'full' } },
+    { name: 'findByTagsNextParam', node: findByTagsNode, options: { infinite: { ...infiniteConfig, nextParam: 'next' } } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {

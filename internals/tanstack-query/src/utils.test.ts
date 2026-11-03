@@ -129,11 +129,20 @@ describe('buildCallResultBody', () => {
   })
 
   test('returns the call directly when the client already resolves to bare data', () => {
-    expect(buildCallResultBody('getPetById({ throwOnError: true })', { returnType: 'data' })).toBe('return await getPetById({ throwOnError: true })')
+    expect(buildCallResultBody('getPetById({ throwOnError: true })', { clientReturnType: 'data' })).toBe('return getPetById({ throwOnError: true })')
   })
 
   test('reads data off the plain result of a plugin-client operation', () => {
-    expect(buildCallResultBody('getPetById({ throwOnError: true })', { returnType: 'plain' })).toBe('return (await getPetById({ throwOnError: true })).data')
+    expect(buildCallResultBody('getPetById({ throwOnError: true })', { clientReturnType: 'plain' })).toBe(
+      'return (await getPetById({ throwOnError: true })).data',
+    )
+  })
+
+  test("returns the whole result with returnType 'full'", () => {
+    expect(buildCallResultBody('getPetById({ throwOnError: true })', { returnType: 'full' })).toBe('return getPetById({ throwOnError: true })')
+    expect(buildCallResultBody('getPetById({ throwOnError: true })', { clientReturnType: 'plain', returnType: 'full' })).toBe(
+      'return getPetById({ throwOnError: true })',
+    )
   })
 })
 

@@ -52,6 +52,7 @@ export const pluginSwr = defineExtension<PluginSwr>({
       mutationKey = mutationKeyTransformer,
       queryKey = queryKeyTransformer,
       client,
+      returnType = 'data',
       resolver: userResolver,
       macros: userMacros,
     } = options
@@ -68,6 +69,7 @@ export const pluginSwr = defineExtension<PluginSwr>({
     return {
       output,
       client: resolveContractClient({ plugin: pluginSwrName, client, plugins: useConfig().plugins }),
+      returnType,
       queryKey,
       query: resolveQueryConfig(query, { importPath: 'swr' }),
       mutationKey,

@@ -81,6 +81,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
         output,
         group,
         contractOp,
+        returnType: ctx.options.returnType,
         keyTypeName: queryKeyTypeName,
         extraTypeNames: infiniteOptions
           ? [
@@ -119,7 +120,8 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
                 initialPageParam={infiniteOptions.initialPageParam}
                 hasExplicitInitialPageParam={infiniteOptions.hasExplicitInitialPageParam}
                 queryParam={infiniteOptions.queryParam}
-                returnType={contractOp.returnType}
+                clientReturnType={contractOp.returnType}
+                returnType={hook.returnType}
               />
             </>
           ) : (
@@ -131,7 +133,8 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
                 queryKeyName={queryKeyName}
                 node={node}
                 tsResolver={hook.tsResolver}
-                returnType={contractOp.returnType}
+                clientReturnType={contractOp.returnType}
+                returnType={hook.returnType}
               />
             </>
           )}
@@ -148,6 +151,7 @@ export function createQueryGenerator({ name, variant }: { name: string; variant:
                 node={node}
                 tsResolver={hook.tsResolver}
                 customOptions={customOptions}
+                returnType={hook.returnType}
                 suspense={suspense}
                 infinite={infiniteOptions ? { initialPageParam: infiniteOptions.initialPageParam, queryParam: infiniteOptions.queryParam } : undefined}
               />

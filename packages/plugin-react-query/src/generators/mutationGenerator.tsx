@@ -35,7 +35,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
     const mutationOptionsName = resolver.mutation.optionsName(node)
     const mutationKeyName = resolver.mutation.keyName(node)
 
-    const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp })
+    const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp, returnType: ctx.options.returnType })
     const { tsResolver } = hook
 
     return (
@@ -50,7 +50,8 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
           mutationKeyName={mutationKeyName}
           node={node}
           tsResolver={tsResolver}
-          returnType={contractOp.returnType}
+          clientReturnType={contractOp.returnType}
+          returnType={hook.returnType}
         />
 
         {mutation && hooks && (
@@ -64,6 +65,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
               node={node}
               tsResolver={tsResolver}
               customOptions={customOptions}
+              returnType={hook.returnType}
             />
           </>
         )}

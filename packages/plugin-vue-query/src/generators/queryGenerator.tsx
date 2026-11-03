@@ -35,7 +35,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
     const queryKeyName = resolver.query.keyName(node)
     const queryKeyTypeName = resolver.query.keyTypeName(node)
 
-    const hook = resolveHookFile(node, ctx, { name: queryName, output, group, contractOp, keyTypeName: queryKeyTypeName })
+    const hook = resolveHookFile(node, ctx, { name: queryName, output, group, contractOp, keyTypeName: queryKeyTypeName, returnType: ctx.options.returnType })
     const { tsResolver } = hook
 
     return (
@@ -67,7 +67,8 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
           queryKeyName={queryKeyName}
           node={node}
           tsResolver={tsResolver}
-          returnType={contractOp.returnType}
+          clientReturnType={contractOp.returnType}
+          returnType={hook.returnType}
         />
 
         {query && hooks && (
@@ -81,6 +82,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
               queryKeyTypeName={queryKeyTypeName}
               node={node}
               tsResolver={tsResolver}
+              returnType={hook.returnType}
             />
           </>
         )}

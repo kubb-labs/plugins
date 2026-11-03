@@ -68,6 +68,7 @@ export const pluginReactQuery = defineExtension<PluginReactQuery>({
       customOptions,
       hooks = false,
       client,
+      returnType = 'data',
       resolver: userResolver,
       macros: userMacros,
     } = options
@@ -92,6 +93,7 @@ export const pluginReactQuery = defineExtension<PluginReactQuery>({
     return {
       output,
       client: resolveContractClient({ plugin: pluginReactQueryName, client, plugins: useConfig().plugins }),
+      returnType,
       queryKey,
       query: resolveQueryConfig(query, { importPath: '@tanstack/react-query' }),
       mutationKey,

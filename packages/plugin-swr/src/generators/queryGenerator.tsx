@@ -33,14 +33,21 @@ export const queryGenerator = defineGenerator<PluginSwr>({
     const queryKeyName = resolver.query.keyName(node)
     const queryKeyTypeName = resolver.query.keyTypeName(node)
 
-    const hook = resolveHookFile(node, ctx, { name: queryName, output, group, contractOp, keyTypeName: queryKeyTypeName })
+    const hook = resolveHookFile(node, ctx, { name: queryName, output, group, contractOp, keyTypeName: queryKeyTypeName, returnType: ctx.options.returnType })
     const { tsResolver } = hook
 
     return (
       <HookFile hook={hook}>
         <QueryKey name={queryKeyName} typeName={queryKeyTypeName} node={node} tsResolver={tsResolver} transformer={ctx.options.queryKey} variant="query" />
 
-        <QueryOptions name={queryOptionsName} clientName={contractOp.name} node={node} tsResolver={tsResolver} returnType={contractOp.returnType} />
+        <QueryOptions
+          name={queryOptionsName}
+          clientName={contractOp.name}
+          node={node}
+          tsResolver={tsResolver}
+          clientReturnType={contractOp.returnType}
+          returnType={hook.returnType}
+        />
 
         {query && (
           <>
@@ -53,6 +60,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
               queryKeyTypeName={queryKeyTypeName}
               node={node}
               tsResolver={tsResolver}
+              returnType={hook.returnType}
             />
           </>
         )}

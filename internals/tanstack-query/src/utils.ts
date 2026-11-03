@@ -12,6 +12,7 @@ import {
 import type { ast } from '@kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
+import type { ReturnTypeOption } from '@internals/client'
 import type { Infinite, Mutation, PageParamFn, Query } from './types.ts'
 
 /**
@@ -153,7 +154,7 @@ export function buildQueryOptionsParams(
  */
 export function buildClientCall(
   node: ast.OperationNode,
-  options: { clientName: string; signal?: boolean; unwrapName?: (name: string) => string; withContentType?: boolean; returnType?: 'full' | 'data' | 'plain' },
+  options: { clientName: string; signal?: boolean; unwrapName?: (name: string) => string; withContentType?: boolean; returnType?: ReturnTypeOption },
 ): string {
   const { clientName, signal = false, unwrapName, withContentType = false, returnType = 'full' } = options
   const { groups } = getRequestGroupOptionality(node)
@@ -173,11 +174,12 @@ export function buildClientCall(
 
 /**
  * Builds the query/mutation body that resolves a `buildClientCall` expression down to the bare
- * success body. `returnType` mirrors the registered client plugin's own `returnType` option: with
+ * success body. `clientReturnType` mirrors the registered client plugin's own `returnType` option: with
  * `'data'` the call already resolves to the bare body, so it is returned directly; with `'full'`
  * (the default) the call carries `unwrap()`, so the body calls it instead of destructuring `data`
  * off the full result by hand. With `'plain'` (plugin-client) the call resolves to the user's
- * `RequestResult`, so the body awaits it and reads `data`.
+ * `RequestResult`, so the body awaits it and reads `data`. With `returnType` `'full'` the body
+ * resolves to the whole `RequestResult`; `resolveHookFile` rejects that for a client that already stripped it.
  *
  * @example
  * ```ts
@@ -185,12 +187,12 @@ export function buildClientCall(
  * // return getPetById({ ...config, throwOnError: true }).unwrap()
  * ```
  */
-export function buildCallResultBody(call: string, options: { returnType?: 'full' | 'data' | 'plain' } = {}): string {
-  const { returnType = 'full' } = options
-  if (returnType === 'data') {
-    return `return await ${call}`
+export function buildCallResultBody(call: string, options: { clientReturnType?: ReturnTypeOption; returnType?: ReturnTypeOption } = {}): string {
+  const { clientReturnType = 'full', returnType = 'data' } = options
+  if (returnType !== 'data' || clientReturnType === 'data') {
+    return `return ${call}`
   }
-  if (returnType === 'plain') {
+  if (clientReturnType === 'plain') {
     return `return (await ${call}).data`
   }
   return `return ${call}.unwrap()`
@@ -215,15 +217,17 @@ type ResolvePageParamTypeParams = {
 /**
  * Builds the `TData` / `TError` type expressions shared by every generated hook, joining the resolved
  * success responses into `TData` and wrapping the error responses in `ResponseErrorConfig<...>`.
+ * With `returnType` `'full'`, `TData` is the client's `RequestResult` over the operation's responses record.
  */
-export function buildResponseTypes(node: ast.OperationNode, resolver: ResolverTs): ResponseTypes {
-  return resolver.memo(`responseTypes:${node.method}\0${node.path}`, () => {
+export function buildResponseTypes(node: ast.OperationNode, resolver: ResolverTs, options: { returnType?: ReturnTypeOption } = {}): ResponseTypes {
+  const { returnType = 'data' } = options
+  return resolver.memo(`responseTypes:${returnType}:${node.method}\0${node.path}`, () => {
     const successNames = resolveSuccessNames(node, resolver)
     const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
     const errorNames = resolveErrorNames(node, resolver)
 
     return {
-      TData: responseName,
+      TData: returnType !== 'data' ? `RequestResult<${resolver.response.responses(node)}, true>` : responseName,
       TError: `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`,
     }
   })

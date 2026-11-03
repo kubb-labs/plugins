@@ -1,11 +1,10 @@
 import { resolveOperationTypes } from '@internals/client'
 import { operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
-import type { ast, GeneratorContext, Group, Output } from '@kubb/kit'
+import { type ast, Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-
-type ContractOperation = { name: string; path: string; clientPath: string; clientPathIsFile: boolean }
+import type { ClientOperation, ReturnTypeOption } from '@internals/client'
 
 type HookFileContext = Pick<GeneratorContext, 'config' | 'root' | 'memo' | 'meta' | 'driver' | 'requirePlugin' | 'resolver'>
 
@@ -13,7 +12,7 @@ type ResolveHookFileOptions = {
   name: string
   output: Output
   group?: Group | null
-  contractOp: ContractOperation
+  contractOp: ClientOperation
   /**
    * The `<Key>` type alias declared in this file, left out of the imported type names.
    */
@@ -22,14 +21,16 @@ type ResolveHookFileOptions = {
    * Type names imported right after the response options type.
    */
   extraTypeNames?: Array<string | null | undefined>
+  returnType?: ReturnTypeOption
 }
 
 type ResolvedHookFile = {
   file: ast.FileNode
   fileTs: ast.FileNode
   tsResolver: ResolverTs
-  contractOp: ContractOperation
+  contractOp: ClientOperation
   importedTypeNames: Array<string>
+  returnType: ReturnTypeOption
   banner: string | null
   footer: string | null
 }
@@ -39,8 +40,18 @@ type ResolvedHookFile = {
  * `pluginZod({ inferred: 'codec' })`), banner and footer.
  */
 export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, options: ResolveHookFileOptions): ResolvedHookFile {
-  const { name, output, group, contractOp, keyTypeName, extraTypeNames = [] } = options
+  const { name, output, group, contractOp, keyTypeName, extraTypeNames = [], returnType = 'data' } = options
   const { config, root, resolver } = ctx
+  if (returnType !== 'data' && contractOp.returnType === 'data') {
+    throw new Diagnostics.Error({
+      code: Diagnostics.code.invalidPluginOptions,
+      severity: 'error',
+      message: `Option \`returnType\` is '${returnType}' for ${node.operationId}, but the client plugin has \`returnType: 'data'\` and only returns the response body.`,
+      help: "Set the client plugin's `returnType` to 'full', or set the hook plugin's `returnType` to 'data'.",
+      location: { kind: 'config' },
+      plugin: resolver.pluginName,
+    })
+  }
   const types = resolveOperationTypes(ctx.driver, resolver.pluginName)
   const tsResolver = types.resolver
 
@@ -55,9 +66,11 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
   })
   const importedTypeNames = [
     tsResolver.response.options(node),
+    tsResolver.response.responses(node),
     ...extraTypeNames,
     ...resolveOperationTypeNames(node, tsResolver, {
-      exclude: keyTypeName ? [keyTypeName] : undefined,
+      // The joined response alias is unused with the full result, and the printer keeps it as a substring of the responses record name.
+      exclude: [keyTypeName, returnType !== 'data' ? tsResolver.response.response(node) : null].filter((name): name is string => Boolean(name)),
       order: 'body-response-first',
       includeParams: false,
     }),
@@ -70,6 +83,7 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
     tsResolver,
     contractOp,
     importedTypeNames,
+    returnType,
     banner: resolver.default.banner(ctx.meta, { output, config, file: fileMeta }),
     footer: resolver.default.footer(ctx.meta, { output, config, file: fileMeta }),
   }
@@ -94,7 +108,7 @@ export function HookFile({ hook, imports, children }: HookFileProps): KubbReactN
     <File baseName={file.baseName} path={file.path} meta={file.meta} banner={banner} footer={footer}>
       <File.Import name={[contractOp.name]} root={file.path} path={contractOp.path} />
       <File.Import
-        name={['RequestConfig', 'ResponseErrorConfig']}
+        name={['RequestConfig', 'ResponseErrorConfig', 'RequestResult']}
         root={contractOp.clientPathIsFile ? file.path : undefined}
         path={contractOp.clientPath}
         isTypeOnly

@@ -142,6 +142,11 @@ export type Options = OutputOptions & {
    */
   client?: ClientSelector
   /**
+   * Shape of the value the hooks resolve to: `'data'` is the success body, `'full'` the client's whole `RequestResult` so a hook can read response headers. `'full'` needs a client plugin whose own `returnType` is `'full'` or `'plain'`.
+   * @default 'data'
+   */
+  returnType?: 'data' | 'full'
+  /**
    * Tags, operations, or paths to exclude from generation.
    */
   exclude?: Array<Exclude>
@@ -191,6 +196,7 @@ export type ResolvedOptions = {
    * The resolved contract client the generators import and call.
    */
   client: ResolvedContractClient
+  returnType?: 'data' | 'full'
   queryKey: QueryKey | undefined
   query: NonNullable<Required<Query>> | false
   mutationKey: MutationKey | undefined

@@ -16,7 +16,7 @@ export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omi
   return mutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext>({
     mutationKey,
     mutationFn: async({ path, headers }) => {
-      return await deletePet({ ...config, path, headers, throwOnError: true })
+      return deletePet({ ...config, path, headers, throwOnError: true })
     },
   })
 }
