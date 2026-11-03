@@ -68,7 +68,7 @@ export const pluginReactQuery = defineExtension<PluginReactQuery>({
       customOptions,
       hooks = false,
       client,
-      returnType,
+      returnType = 'data',
       resolver: userResolver,
       macros: userMacros,
     } = options
