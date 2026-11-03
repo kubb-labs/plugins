@@ -75,8 +75,8 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "^5.15.2",
-    "@kubb/renderer-jsx": "^5.15.2"
+    "@kubb/kit": "^5.15.3",
+    "@kubb/renderer-jsx": "^5.15.3"
   },
   "devDependencies": {
     "@internals/shared": "workspace:*",

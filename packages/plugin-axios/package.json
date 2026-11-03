@@ -86,15 +86,15 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "^5.15.2",
+    "@kubb/kit": "^5.15.3",
     "@kubb/plugin-ts": "workspace:^",
     "@kubb/plugin-zod": "workspace:^",
-    "@kubb/renderer-jsx": "^5.15.2"
+    "@kubb/renderer-jsx": "^5.15.3"
   },
   "devDependencies": {
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
-    "axios": "^1.20.0",
+    "axios": "^1.21.0",
     "typescript": "catalog:"
   },
   "peerDependencies": {
