@@ -1,5 +1,11 @@
 # @kubb/plugin-swr
 
+## 5.8.0
+
+### Minor Changes
+
+- [#1316](https://github.com/kubb-labs/plugins/pull/1316) [`59a7eb1`](https://github.com/kubb-labs/plugins/commit/59a7eb1479840823a7cf55ea047d851820d2b00d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add the `returnType` option, named after the client plugins' option. `returnType: 'full'` makes the generated hooks resolve to the client's whole `RequestResult` (`data`, `status`, `response`) instead of the success body, so a hook can read response headers such as `ETag` or `Location`. The default `'data'` keeps the current output.
+
 ## 5.7.0
 
 ### Minor Changes
