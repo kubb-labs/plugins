@@ -133,6 +133,16 @@ describe('printerZod', () => {
       expect(schema.safeParse('2').success).toBe(false)
     })
 
+    test('keeps an xor union of literals as z.xor', () => {
+      const node = ast.factory.createSchema({ type: 'union', strategy: 'one', members: [literal('a'), literal('a')] })
+      expect(printerZod({ oneOfType: 'xor' }).print(node)).toBe("z.xor([z.enum(['a']), z.enum(['a'])])")
+    })
+
+    test('passes each member to an enum override', () => {
+      const p = printerZod({ nodes: { enum: () => 'z.custom()' } })
+      expect(p.print(formattedUnion('int32', [0, 1]))).toBe('z.union([z.custom(), z.custom()])')
+    })
+
     test('keeps a literal union without a format uncoerced', () => {
       const node = ast.factory.createSchema({ type: 'union', members: [literal(0), literal(1)] })
       expect(printerZod({ coercion: { numbers: true } }).print(node)).toBe('z.union([z.literal(0), z.literal(1)])')

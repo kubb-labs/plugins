@@ -237,7 +237,9 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       return `z.tuple(${buildList(items)})`
     },
     union(node) {
-      const literalValues = getLiteralUnionValues(node.members ?? [])
+      const isXorUnion = node.strategy === 'one' && this.options.oneOfType === 'xor'
+      // `z.xor` rejects a value two members share, and an enum override expects each member, so both keep the member path.
+      const literalValues = isXorUnion || this.options.nodes?.enum ? undefined : getLiteralUnionValues(node.members ?? [])
       if (literalValues) {
         const schema = buildEnum(literalValues)
         // A formatted numeric enum printed as `z.coerce.number()` before it kept its values, so it still accepts input such as `"1"`.
