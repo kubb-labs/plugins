@@ -205,43 +205,6 @@ export function buildEnum(values: Array<unknown>): string {
 }
 
 /**
- * Returns the values of a union whose members are all bare single-value enums, such as the union the adapter
- * builds for an enum with a `format`, so the union prints as one enum. Returns `undefined` for any other union.
- */
-export function getLiteralUnionValues(members: ReadonlyArray<ast.SchemaNode>): Array<string | number | boolean> | undefined {
-  const values = members.map((member) => {
-    const enumNode = ast.narrowSchema(member, ast.schemaTypes.enum)
-    const isBareLiteral = !!enumNode && !enumNode.name && !enumNode.nullable && !enumNode.namedEnumValues && enumNode.enumValues?.length === 1
-    return isBareLiteral ? enumNode.enumValues![0] : undefined
-  })
-  const isLiteral = (value: unknown): value is string | number | boolean => typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
-
-  return values.length && values.every(isLiteral) ? values : undefined
-}
-
-/**
- * Finds the schema of a discriminator property in a discriminated union member, following refs, unions and
- * intersections such as an `allOf` that extends a base object.
- */
-export function getDiscriminatorSchema({
-  member,
-  propertyName,
-  seen = new WeakSet(),
-}: {
-  member: ast.SchemaNode
-  propertyName: string
-  seen?: WeakSet<ast.SchemaNode>
-}): ast.SchemaNode | undefined {
-  const node = syncSchemaRef(member)
-  if (seen.has(node)) return undefined
-  seen.add(node)
-  if (node.type === 'object') return node.properties.find((property) => property.name === propertyName)?.schema
-  if (node.type !== 'union' && node.type !== 'intersection') return undefined
-
-  return (node.members ?? []).map((item) => getDiscriminatorSchema({ member: item, propertyName, seen })).find(Boolean)
-}
-
-/**
  * Preserves the structure of JSON const values in both Zod APIs.
  */
 export function buildLiteral(value: unknown): string {

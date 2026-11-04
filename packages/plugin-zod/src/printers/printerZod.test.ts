@@ -168,6 +168,23 @@ describe('printerZod', () => {
         expect(schema.parse({ type: '2', dog: 'x' })).toStrictEqual({ type: 2, dog: 'x' })
         expect(schema.safeParse({ type: '3', dog: 'x' }).success).toBe(false)
       })
+
+      test('finds a coerced discriminator through a ref and an allOf', () => {
+        const viaRef = (value: number, key: string) =>
+          ast.factory.createSchema({
+            type: 'ref',
+            name: key,
+            ref: `#/components/schemas/${key}`,
+            schema: ast.factory.createSchema({
+              type: 'intersection',
+              members: [ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [] }), variant(value, key)],
+            }),
+          })
+        const refUnion = ast.factory.createSchema({ type: 'union', discriminatorPropertyName: 'type', members: [viaRef(1, 'cat'), viaRef(2, 'dog')] })
+
+        expect(printer.print(refUnion)).toMatch(/^z\.discriminatedUnion\('type'/)
+        expect(printerZod({ coercion: { numbers: true } }).print(refUnion)).toMatch(/^z\.union\(/)
+      })
     })
 
     test('keeps a literal union without a format uncoerced', () => {
