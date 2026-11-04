@@ -6,6 +6,7 @@ import {
   buildEnum,
   buildLiteral,
   type buildObjectShape,
+  getLiteralUnionValues,
   getMemberConstraint,
   integerFormatPattern,
   isClosedKeySchema,
@@ -47,6 +48,10 @@ export type ZodDialect<TOptions extends ZodNodeOptions = ZodNodeOptions> = {
    * The coerced integer base, without its numeric checks.
    */
   coercedInt: string
+  /**
+   * Wraps a schema so its input is coerced to a number before the schema checks it.
+   */
+  coercedNumber: (schema: string) => string
   catchall: (object: string, value: string) => string
   nullable: (value: string) => string
   unique: (array: string) => string
@@ -232,6 +237,14 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       return `z.tuple(${buildList(items)})`
     },
     union(node) {
+      const literalValues = getLiteralUnionValues(node.members ?? [])
+      if (literalValues) {
+        const schema = buildEnum(literalValues)
+        // A formatted numeric enum printed as `z.coerce.number()` before it kept its values, so it still accepts input such as `"1"`.
+        const coerce = !!node.format && literalValues.every((value) => typeof value === 'number') && shouldCoerce(this.options.coercion, 'numbers')
+        return coerce ? dialect.coercedNumber(schema) : schema
+      }
+
       const nodeMembers = node.members ?? []
       // z.discriminatedUnion needs every option to be a Zod object. Object variants (refs or
       // extend-composed `allOf`) qualify; intersections, cyclic `z.lazy(…)` refs, and
