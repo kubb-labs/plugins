@@ -143,6 +143,33 @@ describe('printerZod', () => {
       expect(p.print(formattedUnion('int32', [0, 1]))).toBe('z.union([z.custom(), z.custom()])')
     })
 
+    describe('as a discriminator', () => {
+      const variant = (value: number, key: string) =>
+        ast.factory.createSchema({
+          type: 'object',
+          primitive: 'object',
+          properties: [
+            ast.factory.createProperty({ name: 'type', required: true, schema: formattedUnion('int32', [value]) }),
+            ast.factory.createProperty({ name: key, required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+          ],
+        })
+      const node = ast.factory.createSchema({ type: 'union', discriminatorPropertyName: 'type', members: [variant(1, 'cat'), variant(2, 'dog')] })
+
+      test('keeps z.discriminatedUnion without coercion', () => {
+        const code = printer.print(node)
+        expect(code).toMatch(/^z\.discriminatedUnion\('type'/)
+        expect(new Function('z', `return ${code}`)(z).parse({ type: 1, cat: 'x' })).toStrictEqual({ type: 1, cat: 'x' })
+      })
+
+      test('falls back to z.union under number coercion, so the coerced discriminator still parses', () => {
+        const code = printerZod({ coercion: { numbers: true } }).print(node)
+        expect(code).toMatch(/^z\.union\(/)
+        const schema = new Function('z', `return ${code}`)(z)
+        expect(schema.parse({ type: '2', dog: 'x' })).toStrictEqual({ type: 2, dog: 'x' })
+        expect(schema.safeParse({ type: '3', dog: 'x' }).success).toBe(false)
+      })
+    })
+
     test('keeps a literal union without a format uncoerced', () => {
       const node = ast.factory.createSchema({ type: 'union', members: [literal(0), literal(1)] })
       expect(printerZod({ coercion: { numbers: true } }).print(node)).toBe('z.union([z.literal(0), z.literal(1)])')

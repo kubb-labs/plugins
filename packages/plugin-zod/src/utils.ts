@@ -220,6 +220,28 @@ export function getLiteralUnionValues(members: ReadonlyArray<ast.SchemaNode>): A
 }
 
 /**
+ * Finds the schema of a discriminator property in a discriminated union member, following refs, unions and
+ * intersections such as an `allOf` that extends a base object.
+ */
+export function getDiscriminatorSchema({
+  member,
+  propertyName,
+  seen = new WeakSet(),
+}: {
+  member: ast.SchemaNode
+  propertyName: string
+  seen?: WeakSet<ast.SchemaNode>
+}): ast.SchemaNode | undefined {
+  const node = syncSchemaRef(member)
+  if (seen.has(node)) return undefined
+  seen.add(node)
+  if (node.type === 'object') return node.properties.find((property) => property.name === propertyName)?.schema
+  if (node.type !== 'union' && node.type !== 'intersection') return undefined
+
+  return (node.members ?? []).map((item) => getDiscriminatorSchema({ member: item, propertyName, seen })).find(Boolean)
+}
+
+/**
  * Preserves the structure of JSON const values in both Zod APIs.
  */
 export function buildLiteral(value: unknown): string {

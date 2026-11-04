@@ -105,7 +105,7 @@ Chooses which primitives to coerce.
 ::
 
 > [!NOTE]
-> `numbers` also coerces an enum whose schema has a numeric `format`, such as `type: integer, format: int32`. Other enums are not coerced.
+> `numbers` also coerces an enum whose schema has a numeric `format`, such as `type: integer, format: int32`. Other enums are not coerced. When such an enum is the discriminator of a `oneOf`, the union prints as `z.union` instead of `z.discriminatedUnion`, which cannot read coerced values.
 >
 > `dates` coerces only `Date`-typed fields (from `dateType: 'date'`). ISO-string fields are never coerced, and neither are `format: time` fields, because `new Date()` cannot parse a bare `HH:mm:ss`. For a time-of-day type such as `Temporal.PlainTime`, see [Encode custom types](https://kubb.dev/extensions/kubb-labs/plugin-zod/guides/customization#encode-custom-types).
 
