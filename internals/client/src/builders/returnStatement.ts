@@ -54,11 +54,9 @@ export function buildReturnStatement({
 }
 
 /**
- * Builds the return type and statement of an operation that returns `text/event-stream`. The event type follows the
- * document: `EventOf` when each item declares its own `event` and `data`, `ServerSentEvent` around the payload otherwise.
- * The call is wrapped in `toEventStream` with a `send` function that takes the resume request after a drop, the call's
- * `config`, and what the generator knows: the method, the shape, the declared event names and the per-event validator.
- * With `returnType: 'plain'` the caller's own `toEventStream` takes only the call result.
+ * Builds the return type and statement of a `text/event-stream` operation: `EventOf` when each item declares its own
+ * `event` and `data`, `ServerSentEvent` around the payload otherwise. The call goes through `toEventStream` with a `send`
+ * function for the resume request, the call's `config`, and the method, shape, declared event names and per-event validator.
  */
 export function buildEventStreamReturn({
   node,

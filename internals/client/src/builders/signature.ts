@@ -45,9 +45,7 @@ export function buildGroupedOptionsSignature({
   types: OperationTypeNames
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
-  /**
-   * Adds the per-call stream options to the `options` type of a `text/event-stream` operation.
-   */
+  /** Adds the per-call stream options to the `options` type of a `text/event-stream` operation. */
   eventStream?: boolean
 }): GroupedOptionsSignature {
   const optionsName = types.response.options(node)

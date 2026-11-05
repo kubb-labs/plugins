@@ -1,9 +1,6 @@
 import type { HttpMethod } from './serializers.ts'
 import { ParseError, type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
 
-/**
- * The response type of this client's transport.
- */
 type NativeResponse = Response
 
 /**
@@ -17,54 +14,29 @@ export type ServerSentEvent<TData = unknown> = {
   retry?: number
 }
 
-/**
- * An event the document types by name: the member's own `event` and `data`, plus the `id` and `retry` any event may carry.
- */
+/** An event the document types by name: the member's own `event` and `data`, plus the `id` and `retry` any event may carry. */
 export type EventOf<T> = T & Pick<ServerSentEvent, 'id' | 'retry'>
 
-/**
- * Reconnects with `Last-Event-ID` after the stream drops, the way `EventSource` does.
- */
+/** Reconnects with `Last-Event-ID` after the stream drops, as `EventSource` does: 2 retries, from 1000 ms growing by 1.5 up to 30000 ms. */
 export type Reconnect = {
-  /**
-   * Reconnects after the first connection.
-   * @default 2
-   */
+  /** Reconnects after the first connection. */
   maxRetries?: number
-  /**
-   * Delay before the first reconnect in milliseconds, unless the server sent `retry`.
-   * @default 1000
-   */
+  /** Delay before the first reconnect in milliseconds, unless the server sent `retry`. */
   initialDelay?: number
-  /**
-   * Longest delay between reconnects in milliseconds.
-   * @default 30000
-   */
+  /** Longest delay between reconnects in milliseconds. */
   maxDelay?: number
-  /**
-   * Factor the delay grows by after each reconnect.
-   * @default 1.5
-   */
+  /** Factor the delay grows by after each reconnect. */
   growFactor?: number
-  /**
-   * Also reconnect after the server closes the stream cleanly. Off, a clean close ends the stream.
-   */
+  /** Also reconnect after a clean close, as `EventSource` does. Off, a clean close ends the stream. */
   onClose?: boolean
-  /**
-   * Builds the resume request from the last event ID. Required for any method but GET, because repeating a POST
-   * would start the operation again. Its headers merge over the call's own headers and `Last-Event-ID`.
-   */
+  /** Builds the resume request from the last event ID. Required for any method but GET, which would repeat the operation. */
   resume?: (lastEventId: string) => ResumeInit
 }
 
-/**
- * The part of a request a reconnect may change.
- */
+/** The part of a request a reconnect may change. */
 export type ResumeInit = { method?: HttpMethod; headers?: unknown }
 
-/**
- * Per-call options of a streamed operation, passed next to its request params.
- */
+/** Per-call options of a streamed operation, passed next to its request params. */
 export type EventStreamOptions = {
   /**
    * The largest number of characters, line breaks included, one event may hold before the blank line that ends it.
@@ -87,9 +59,7 @@ export type EventStreamOptions = {
   reconnect?: Reconnect
 }
 
-/**
- * What the generated function knows about the stream from the document.
- */
+/** What the generated function knows about the stream from the document. */
 export type EventStreamMeta = {
   /**
    * Method of the call. A reconnect repeats the call only for GET unless `reconnect.resume` is set.
@@ -110,9 +80,7 @@ export type EventStreamMeta = {
   validator?: StandardSchemaValidator
 }
 
-/**
- * The fields of the call's config the stream reads: its headers for a resume, its signal, and how validation errors are handled.
- */
+/** The fields of the call's config the stream reads: its headers for a resume, its signal, and how validation errors are handled. */
 export type EventStreamCallOptions = {
   headers?: unknown
   signal?: AbortSignal
@@ -123,19 +91,12 @@ export type EventStreamCallOptions = {
   ) => { value: unknown } | void | Promise<{ value: unknown } | void>
 }
 
-/**
- * The result of one call the stream reads from.
- */
 export type EventStreamCall<TResponse> = { data: unknown; contentType?: string; response: TResponse }
 
-/**
- * Sends the call, or the resume request after a drop.
- */
+/** Sends the call, or the resume request after a drop. */
 export type EventStreamSend<TResponse> = (init?: ResumeInit) => Promise<EventStreamCall<TResponse>>
 
-/**
- * Parsed events alongside the native response of the first connection.
- */
+/** Parsed events alongside the native response of the first connection. */
 export type EventStreamResult<TEvent = ServerSentEvent, TResponse = NativeResponse> = {
   stream: AsyncGenerator<TEvent>
   response: TResponse
@@ -145,9 +106,7 @@ export type EventStreamResult<TEvent = ServerSentEvent, TResponse = NativeRespon
   readonly lastEventId: string
 }
 
-/**
- * The fields that carry across events: the last event ID and the latest `retry`.
- */
+/** The fields that carry across events: the last event ID and the latest `retry`. */
 type Cursor = { lastEventId: string; retry?: number }
 
 async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>): AsyncGenerator<Uint8Array> {
@@ -177,10 +136,9 @@ function parseData<TData>(raw: string): TData {
 }
 
 /**
- * Parses a `text/event-stream` body into events as the WHATWG event stream interpretation does: an event is dispatched
- * at its blank line when it holds `data`, `event` defaults to `message`, `id` carries across events until an empty `id`
- * resets it, `retry` is read only when it is all digits, and an unfinished event at the end of the stream is dropped.
- * Consume with `for await`; break the loop to cancel the stream.
+ * Parses a `text/event-stream` body as the WHATWG event stream interpretation does: an event is dispatched at its blank line
+ * when it holds `data`, `event` defaults to `message`, `id` carries across events until an empty `id` resets it, `retry` needs
+ * all digits, and an unfinished event at the end is dropped. Consume with `for await`; break the loop to cancel the stream.
  */
 export async function* parseEventStream<TData = unknown>(
   stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>,
@@ -271,10 +229,9 @@ function sleep(ms: number, signal?: AbortSignal): Promise<void> {
 }
 
 /**
- * Reads a call as typed Server-Sent Events. The result's `stream` yields the events the document declares, transformed
- * and validated one by one, and ends on the terminator, on a `204`, on a body that is not an event stream, or when the
- * server closes it. With `reconnect`, a dropped stream is resumed with `Last-Event-ID` after the server's `retry` or
- * a growing delay, until `maxRetries`, an abort, a non-2xx response, or a response that is not an event stream.
+ * Reads a call as typed Server-Sent Events: only the declared events, transformed and validated one by one, until the
+ * terminator, a body that is not an event stream, or the server closes it. With `reconnect`, a dropped stream resumes with
+ * `Last-Event-ID` after the server's `retry` or a growing delay, until `maxRetries`, an abort, or a non-stream response.
  */
 export async function toEventStream<TEvent = ServerSentEvent, TResponse = NativeResponse>(
   send: EventStreamSend<TResponse> | Promise<EventStreamCall<TResponse>>,

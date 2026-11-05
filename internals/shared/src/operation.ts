@@ -169,9 +169,8 @@ export function isEventStream(node: ast.OperationNode): boolean {
 }
 
 /**
- * How the document types the events of a `text/event-stream` success response. `shape` is `event` when each item
- * describes the parsed event, `data` when it describes only the payload, and `events` lists the `event` names when
- * every member of the item schema declares one. `null` when the operation is not an event stream.
+ * How the document types a `text/event-stream` response: `shape` is `event` when each item is the parsed event and `data`
+ * when it is only the payload, `events` lists the names when every item declares one, `null` without an event stream.
  */
 export function getEventStream(node: ast.OperationNode): { shape: 'event' | 'data'; events?: Array<string> } | null {
   if (!isEventStream(node)) return null

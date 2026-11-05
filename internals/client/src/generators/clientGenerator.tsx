@@ -19,8 +19,7 @@ import type { ContractClientFactory } from '../types.ts'
  * generator `name` and the runtime templates differ between plugins. Every other resolution, import,
  * and rendering step is identical.
  *
- * `runtime.sse` is the Server-Sent Events template, copied into `.kubb/sse.ts` only when the
- * document has a `text/event-stream` operation. A custom client module brings its own.
+ * `runtime.sse` is the Server-Sent Events template, copied into `.kubb/sse.ts` only for a document with a `text/event-stream` operation.
  */
 export function createClientGenerator<TFactory extends ContractClientFactory>(name: string, runtime: { sse?: string } = {}): Generator<TFactory> {
   return defineGenerator<TFactory>({
@@ -82,7 +81,6 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       // The headers validator helper ships in `.kubb/standardSchema.ts`; a custom client module exports it
       // alongside its other runtime helpers.
       const standardSchemaPath = importPath ?? path.resolve(root, '.kubb/standardSchema.ts')
-      // The Server-Sent Events runtime is its own file, so a document without a stream never imports it.
       const ssePath = importPath ?? path.resolve(root, '.kubb/sse.ts')
       const stream = getEventStream(node)
 
