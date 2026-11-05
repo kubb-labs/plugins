@@ -9,7 +9,7 @@ import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function placeOrderHandlerResponse200(data: PlaceOrderResponse) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ export function placeOrderHandlerResponse200(data: PlaceOrderResponse) {
 }
 
 export function placeOrderHandlerResponse405(data?: PlaceOrderStatus405) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 405,
   })
 }
@@ -32,7 +32,7 @@ export function placeOrderHandler(
     function handler(info) {
       if (typeof data === 'function') return data(info)
 
-      return new HttpResponse(JSON.stringify(data), {
+      return new HttpResponse<string>(JSON.stringify(data), {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
