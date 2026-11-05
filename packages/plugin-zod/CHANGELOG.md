@@ -1,5 +1,11 @@
 # @kubb/plugin-zod
 
+## 5.8.1
+
+### Patch Changes
+
+- [#1324](https://github.com/kubb-labs/plugins/pull/1324) [`136b780`](https://github.com/kubb-labs/plugins/commit/136b7807c91e22f312edd7b755e0612ffb72e55b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Print an enum that has a `format` like other enums. String values print as one `z.enum([...])` instead of a union of single-value enums, and numeric values keep accepting numeric strings under `coercion` through `z.coerce.number().pipe(...)`. A union whose discriminator is such a coerced enum prints as `z.union`, because `z.discriminatedUnion` cannot read coerced values.
+
 ## 5.8.0
 
 ### Minor Changes
