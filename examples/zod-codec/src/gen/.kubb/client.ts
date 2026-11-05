@@ -554,7 +554,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 }: {
   config: ClientConfig<TRequest, TResponse>
   requestConfig: RequestConfig<TBody, TRequest, TResponse>
-}): Promise<{ request: ResolvedRequest; codecs: Record<string, Codec> }> {
+}): Promise<{ request: ResolvedRequest; codecs: Record<string, Codec>; validate: ValidateOption | undefined }> {
   const { querySerializer, bodySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
   const codecs = { ...config.codecs, ...requestConfig.codecs }
   const onValidationError = requestConfig.onValidationError ?? config.onValidationError
@@ -635,6 +635,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 
   return {
     codecs,
+    validate,
     request: {
       url,
       method: (requestConfig.method ?? 'GET').toUpperCase(),
@@ -665,7 +666,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
 
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
     const transport = requestConfig.transport ?? config.transport ?? defaultTransport
-    const { request, codecs } = await resolveRequest({ config, requestConfig })
+    const { request, codecs, validate } = await resolveRequest({ config, requestConfig })
 
     const resolvedRequest = await interceptors.request.run(request, requestConfig)
     const result = await interceptors.response.run(await transport(resolvedRequest), requestConfig)
@@ -679,7 +680,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     const codec = contentType ? codecs[contentType] : undefined
     const decoded = contentType && codec?.deserialize ? await codec.deserialize(result.data, contentType) : result.data
     const data = await runValidator({
-      validator: isValidationEnabled(requestConfig.validate ?? config.validate, direction) ? validator?.[direction] : undefined,
+      validator: isValidationEnabled(validate, direction) ? validator?.[direction] : undefined,
       value: decoded,
       context: { direction, source: 'body', method: resolvedRequest.method, url: resolvedRequest.url, status: result.status },
       onValidationError,

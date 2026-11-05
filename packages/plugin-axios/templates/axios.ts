@@ -548,7 +548,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 }: {
   config: ClientConfig
   requestConfig: RequestConfig<TBody, TRequest, TResponse>
-}): Promise<{ axiosConfig: AxiosRequestConfig; codecs: Record<string, Codec>; throwOnError: boolean }> {
+}): Promise<{ axiosConfig: AxiosRequestConfig; codecs: Record<string, Codec>; throwOnError: boolean; validate: ValidateOption | undefined }> {
   const { querySerializer, bodySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
   const codecs = { ...config.codecs, ...requestConfig.codecs }
   const onValidationError = requestConfig.onValidationError ?? config.onValidationError
@@ -653,7 +653,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     axiosConfig.adapter = 'fetch'
   }
 
-  return { axiosConfig, codecs, throwOnError }
+  return { axiosConfig, codecs, throwOnError, validate }
 }
 
 /**
@@ -731,7 +731,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
 
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
     const activeInstance = requestConfig.transport ?? instance
-    const { axiosConfig, codecs, throwOnError } = await resolveRequest({ config, requestConfig })
+    const { axiosConfig, codecs, throwOnError, validate } = await resolveRequest({ config, requestConfig })
     const contextId = ++requestContextId
     requestContexts.set(contextId, requestConfig)
     ;(axiosConfig as AxiosRequestConfig & { __kubbRequestContext: number }).__kubbRequestContext = contextId
@@ -746,7 +746,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       const codec = contentType ? codecs[contentType] : undefined
       const decoded: unknown = contentType && codec?.deserialize ? await codec.deserialize(response.data, contentType) : response.data
       const data = await runValidator({
-        validator: isValidationEnabled(requestConfig.validate ?? config.validate, direction) ? validator?.[direction] : undefined,
+        validator: isValidationEnabled(validate, direction) ? validator?.[direction] : undefined,
         value: decoded,
         context: {
           direction,
