@@ -658,6 +658,21 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 }
 
 /**
+ * Reads a streamed body that is not an event stream back into its value, as the fetch adapter streams every
+ * `responseType: 'stream'` answer, including a JSON error body.
+ */
+async function readStreamedBody(data: unknown, contentType: string | undefined): Promise<unknown> {
+  if (!(data instanceof ReadableStream) || contentType?.includes('text/event-stream')) return data
+  const text = await new Response(data).text()
+  if (!text) return undefined
+  try {
+    return JSON.parse(text)
+  } catch {
+    return text
+  }
+}
+
+/**
  * Uses the configured axios instance or creates one. `throwOnError` sets axios's default `validateStatus`.
  */
 export function createClientCore<TRequest = AxiosRequestConfig, TResponse = AxiosResponse>(
@@ -745,7 +760,8 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       const direction = isSuccess ? 'response' : 'error'
       const contentType = getResponseContentType(response.headers as Record<string, unknown>)
       const codec = contentType ? codecs[contentType] : undefined
-      const decoded: unknown = contentType && codec?.deserialize ? await codec.deserialize(response.data, contentType) : response.data
+      const raw = await readStreamedBody(response.data, contentType)
+      const decoded: unknown = contentType && codec?.deserialize ? await codec.deserialize(raw, contentType) : raw
       // A streamed success body is validated event by event in `toEventStream`, not as a whole.
       const streaming = isSuccess && requestConfig.responseType === 'stream'
       const data = await runValidator({
@@ -775,11 +791,12 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       setContextId(axiosError, undefined)
       if (axiosError.response) setContextId(axiosError.response, undefined)
       if (throwOnError && axiosError.response) {
+        const contentType = getResponseContentType(axiosError.response.headers as Record<string, unknown>)
         throw new ResponseError({
-          data: axiosError.response.data,
+          data: await readStreamedBody(axiosError.response.data, contentType),
           status: axiosError.response.status,
           statusText: axiosError.response.statusText,
-          contentType: getResponseContentType(axiosError.response.headers as Record<string, unknown>),
+          contentType,
           request: axiosError.config as TRequest,
           response: axiosError.response as TResponse,
           method: axiosError.config?.method?.toUpperCase(),
