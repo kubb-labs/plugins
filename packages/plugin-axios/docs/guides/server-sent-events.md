@@ -92,3 +92,24 @@ try {
 > [!NOTE]
 > A drop mid-stream ends the `for await` loop. Track the last event's `id` if you need to reconnect
 > from where the stream stopped.
+
+## Limit event size
+
+The parser keeps an event in memory until the blank line that ends it. When one event grows past
+`maxEventSize` characters, the `for await` loop throws a `RangeError` and the runtime cancels the
+stream. The default is 16,777,216 characters (`16 * 1024 * 1024`). Comment lines do not count.
+
+Pass `maxEventSize` per call to raise or lower the limit, or `Infinity` to turn it off:
+
+```typescript
+const { stream } = await streamEvents({ maxEventSize: 64 * 1024 * 1024 })
+
+try {
+  for await (const event of stream) {
+    handle(event.data)
+  }
+} catch (error) {
+  if (!(error instanceof RangeError)) throw error
+  console.error('event too large', error.message)
+}
+```

@@ -11,6 +11,7 @@ import {
   ResponseError,
   resolveAuth,
   type ServerSentEvent,
+  toEventStream,
   type Transport,
   type TransportResult,
   unwrapResult,
@@ -1441,5 +1442,50 @@ describe('parseEventStream', () => {
   test('skips a blank trailing event', async () => {
     const events: Array<ServerSentEvent> = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n\n\n'])))
     expect(events).toStrictEqual([{ data: { n: 1 } }])
+  })
+
+  test('reads a CRLF split across chunks as one line break', async () => {
+    const events = await collect(parseEventStream<string>(streamOf(['data: a\r', '\ndata: b\r', '\n\r', '\n'])))
+    expect(events).toStrictEqual([{ data: 'a\nb' }])
+  })
+
+  test('accepts a lone CR as a line break', async () => {
+    const events = await collect(parseEventStream<string>(streamOf(['data: a\rdata: b\r\rdata: c\r\r'])))
+    expect(events).toStrictEqual([{ data: 'a\nb' }, { data: 'c' }])
+  })
+
+  test('decodes a multi-byte character split across chunks', async () => {
+    const bytes = new TextEncoder().encode('data: ✓\n\n')
+    async function* split() {
+      yield bytes.slice(0, 7)
+      yield bytes.slice(7)
+    }
+    const events = await collect(parseEventStream<string>(split()))
+    expect(events).toStrictEqual([{ data: '✓' }])
+  })
+
+  test.each([
+    ['one unfinished line', 'x'.repeat(1024)],
+    ['one unfinished multi-line event', `data: ${'x'.repeat(1024)}\n`],
+  ])('cancels the stream when %s outgrows maxEventSize', async (_, chunk) => {
+    const bytes = new TextEncoder().encode(chunk)
+    const cancel = vi.fn()
+    const endless = new ReadableStream<Uint8Array>({ pull: (controller) => controller.enqueue(bytes), cancel })
+
+    await expect(collect(parseEventStream(endless, { maxEventSize: 64 * 1024 }))).rejects.toStrictEqual(
+      new RangeError('Server-sent event exceeds maxEventSize of 65536 characters'),
+    )
+    expect(cancel).toHaveBeenCalledOnce()
+  })
+
+  test('applies maxEventSize to an event that arrives in one chunk', async () => {
+    const chunk = `data: ${'x'.repeat(44)}\n\n`
+    expect(await collect(parseEventStream<string>(streamOf([chunk]), { maxEventSize: 50 }))).toStrictEqual([{ data: 'x'.repeat(44) }])
+    await expect(collect(parseEventStream(streamOf([chunk]), { maxEventSize: 49 }))).rejects.toThrow(RangeError)
+  })
+
+  test('toEventStream passes maxEventSize to the parser', async () => {
+    const { stream } = await toEventStream(Promise.resolve({ data: streamOf([`data: ${'x'.repeat(44)}\n\n`]), response: new Response() }), { maxEventSize: 49 })
+    await expect(collect(stream)).rejects.toThrow(RangeError)
   })
 })

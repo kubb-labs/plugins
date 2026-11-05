@@ -227,6 +227,11 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   validate?: ValidateOption
   security?: Array<Auth>
   auth?: AuthResolver
+  /**
+   * Most characters a server-sent event may buffer before its terminating blank line. Set `Infinity` to disable the limit.
+   * @default 16777216
+   */
+  maxEventSize?: number
 }
 
 /**
@@ -826,14 +831,11 @@ async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uin
   }
 }
 
-function parseEvent<TData>(raw: string): ServerSentEvent<TData> | undefined {
+function parseEvent<TData>(lines: Array<string>): ServerSentEvent<TData> {
   const data: Array<string> = []
   const event: ServerSentEvent<TData> = { data: undefined as TData }
-  let seen = false
 
-  for (const line of raw.split('\n')) {
-    if (!line || line.startsWith(':')) continue
-    seen = true
+  for (const line of lines) {
     const index = line.indexOf(':')
     const field = index === -1 ? line : line.slice(0, index)
     const value = index === -1 ? '' : line.slice(index + 1).replace(/^ /, '')
@@ -853,8 +855,6 @@ function parseEvent<TData>(raw: string): ServerSentEvent<TData> | undefined {
     }
   }
 
-  if (!seen) return undefined
-
   if (data.length) {
     const joined = data.join('\n')
     try {
@@ -868,25 +868,47 @@ function parseEvent<TData>(raw: string): ServerSentEvent<TData> | undefined {
 
 /**
  * Parses a `text/event-stream` body into typed Server-Sent Events, consumed with `for await` and stopped early by breaking the loop.
+ * An event that grows past `maxEventSize` characters before its blank line throws a `RangeError` and cancels the stream.
  */
 export async function* parseEventStream<TData = unknown>(
   stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>,
+  { maxEventSize = 16 * 1024 * 1024 }: Pick<RequestConfig, 'maxEventSize'> = {},
 ): AsyncGenerator<ServerSentEvent<TData>> {
   const decoder = new TextDecoder()
-  const normalize = (text: string) => text.replace(/\r\n|\r/g, '\n')
-  let buffer = ''
+  const tooLarge = `Server-sent event exceeds maxEventSize of ${maxEventSize} characters`
+  // Only the field lines of the current event and its unfinished last line are kept, so each chunk is scanned once.
+  let lines: Array<string> = []
+  let size = 0
+  let line = ''
+  let endsWithCR = false
 
   for await (const chunk of readBytes(stream)) {
-    const blocks = normalize(buffer + decoder.decode(chunk, { stream: true })).split('\n\n')
-    buffer = blocks.pop() ?? ''
-    for (const block of blocks) {
-      const event = parseEvent<TData>(block)
-      if (event) yield event
+    let text = decoder.decode(chunk, { stream: true })
+    if (!text) continue
+    // A CRLF split across chunks already ended its line on the `\r`.
+    if (endsWithCR && text.startsWith('\n')) text = text.slice(1)
+    endsWithCR = text.endsWith('\r')
+
+    const parts = text.split(/\r\n|\r|\n/)
+    parts[0] = line + parts[0]
+    line = parts.pop()!
+    for (const part of parts) {
+      if (!part) {
+        if (lines.length) yield parseEvent<TData>(lines)
+        lines = []
+        size = 0
+      } else if (!part.startsWith(':')) {
+        lines.push(part)
+        size += part.length
+        if (size > maxEventSize) throw new RangeError(tooLarge)
+      }
     }
+    if (size + line.length > maxEventSize) throw new RangeError(tooLarge)
   }
 
-  const event = parseEvent<TData>(normalize(buffer + decoder.decode()))
-  if (event) yield event
+  line += decoder.decode()
+  if (line && !line.startsWith(':')) lines.push(line)
+  if (lines.length) yield parseEvent<TData>(lines)
 }
 
 /**
@@ -898,13 +920,16 @@ export type EventStreamResult<TData = unknown, TResponse = Response> = {
 }
 
 /**
- * Exposes a streaming response body as typed Server-Sent Events.
+ * Exposes a streaming response body as typed Server-Sent Events, passing the call's `maxEventSize` to the parser.
  */
-export async function toEventStream<TData = unknown>(result: Promise<{ data: unknown; response: Response }>): Promise<EventStreamResult<TData>> {
+export async function toEventStream<TData = unknown>(
+  result: Promise<{ data: unknown; response: Response }>,
+  options?: Pick<RequestConfig, 'maxEventSize'>,
+): Promise<EventStreamResult<TData>> {
   const { data, response } = await result
   return {
     response,
-    stream: parseEventStream<TData>(data as ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>),
+    stream: parseEventStream<TData>(data as ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>, options),
   }
 }
 
