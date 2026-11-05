@@ -29,12 +29,12 @@ export function buildCallConfig({
   const eventStream = isEventStream(node)
   const securityLiteral = buildSecurityMetadata({ security })
   const stylesLiteral = buildStyles({ node })
-  // A stream's response validator runs per event in `toEventStream`, which also resends the call with `init` after a drop.
+  // Except for a plain custom client, a stream's response validator runs per event in `toEventStream`, which also resends the call with `init` after a drop.
+  const resumable = eventStream && returnType !== 'plain'
   const validatorLiteral = buildValidatorLiteral(
     validatorHooks,
-    eventStream ? ['request', 'path', 'query', 'headers', 'error'] : ['request', 'path', 'query', 'headers', 'response', 'error'],
+    resumable ? ['request', 'path', 'query', 'headers', 'error'] : ['request', 'path', 'query', 'headers', 'response', 'error'],
   )
-  const resumable = eventStream && returnType !== 'plain'
   const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node })
   const responseType = getResponseType(node)
 

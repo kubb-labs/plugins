@@ -336,6 +336,18 @@ describe('toEventStream', () => {
       expect(send.mock.calls[1]).toStrictEqual([{ method: 'GET', headers: { 'Last-Event-ID': '3', 'X-Resume': '3' } }])
     })
 
+    test('ends the stream instead of reconnecting on a failed validation or a too-large event', async () => {
+      const invalid = sender(call(streamOf(['data: "bad"\n\n'])), call(streamOf(['data: {"n":2}\n\n'])))
+      const { stream } = await toEventStream(invalid, { reconnect: { initialDelay: 0 } }, { method: 'GET', validator })
+      await expect(collect(stream)).rejects.toBeInstanceOf(ParseError)
+      expect(invalid).toHaveBeenCalledTimes(1)
+
+      const large = sender(call(streamOf([`data: ${'x'.repeat(64)}\n\n`])), call(streamOf(['data: a\n\n'])))
+      const { stream: capped } = await toEventStream(large, { maxEventSize: 32, reconnect: { initialDelay: 0 } }, { method: 'GET' })
+      await expect(collect(capped)).rejects.toThrow(RangeError)
+      expect(large).toHaveBeenCalledTimes(1)
+    })
+
     test('never reconnects a plain promise', async () => {
       const { stream } = await toEventStream(Promise.resolve(call(droppedAfter('data: a\n\n'))), { reconnect: { initialDelay: 0 } })
 

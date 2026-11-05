@@ -270,17 +270,24 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
       const body = call.data
       if (!isStreamBody(body) || (call.contentType && !call.contentType.includes('text/event-stream'))) return
       let dropped = false
-      try {
-        for await (const event of parseEventStream(body, { maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })) {
-          if (meta.events && !meta.events.includes(event.event)) {
-            options.onUnknownEvent?.(event)
-            continue
-          }
-          yield (await validateEvent(options.transform ? options.transform(event) : event)) as TEvent
+      const parsed = parseEventStream(body, { maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })
+      // Only a failed read is a drop worth a reconnect; a too-large event, a failed transform or validation, and a consumer error end the stream.
+      const read = async () => {
+        try {
+          return await parsed.next()
+        } catch (error) {
+          if (!reconnect || error instanceof RangeError || options.signal?.aborted || attempt >= maxRetries) throw error
+          dropped = true
+          return { done: true as const, value: undefined }
         }
-      } catch (error) {
-        if (!reconnect || options.signal?.aborted || attempt >= maxRetries) throw error
-        dropped = true
+      }
+      for (let next = await read(); !next.done; next = await read()) {
+        const event = next.value
+        if (meta.events && !meta.events.includes(event.event)) {
+          options.onUnknownEvent?.(event)
+          continue
+        }
+        yield (await validateEvent(options.transform ? options.transform(event) : event)) as TEvent
       }
       if (!reconnect || (!dropped && !onClose) || attempt >= maxRetries || options.signal?.aborted) return
 
