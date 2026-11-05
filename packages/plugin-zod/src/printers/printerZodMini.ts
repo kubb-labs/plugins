@@ -111,6 +111,7 @@ const miniDialect: ZodDialect<PrinterZodMiniOptions> = {
   patternKey: patternKeySchemaMini,
   objectShape: buildZodMiniObjectShape,
   coercedInt: 'z.coerce.number().check(z.int())',
+  coercedNumber: (schema) => `z.pipe(z.coerce.number(), ${schema})`,
   catchall: (object, value) => `z.catchall(${object}, ${value})`,
   nullable: (value) => `z.nullable(${value})`,
   unique: (array) => `${array}.check(z.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" }))`,

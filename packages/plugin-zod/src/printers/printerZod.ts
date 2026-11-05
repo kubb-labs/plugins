@@ -279,6 +279,7 @@ const standardDialect: ZodDialect<PrinterZodOptions> = {
   patternKey: patternKeySchema,
   objectShape: buildZodObjectShape,
   coercedInt: 'z.coerce.number().int()',
+  coercedNumber: (schema) => `z.coerce.number().pipe(${schema})`,
   catchall: (object, value) => `${object}.catchall(${value})`,
   nullable: (value) => `${value}.nullable()`,
   unique: (array) => `${array}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })`,

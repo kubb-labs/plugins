@@ -1,6 +1,6 @@
 import { mapSchemaItems, mapSchemaMembers } from '@internals/shared'
 import { buildList, stringify } from '@internals/utils'
-import { ast } from '@kubb/kit'
+import { ast, syncSchemaRef } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import {
   buildEnum,
@@ -47,6 +47,10 @@ export type ZodDialect<TOptions extends ZodNodeOptions = ZodNodeOptions> = {
    * The coerced integer base, without its numeric checks.
    */
   coercedInt: string
+  /**
+   * Wraps a schema so its input is coerced to a number before the schema checks it.
+   */
+  coercedNumber: (schema: string) => string
   catchall: (object: string, value: string) => string
   nullable: (value: string) => string
   unique: (array: string) => string
@@ -60,6 +64,39 @@ export type ZodDialect<TOptions extends ZodNodeOptions = ZodNodeOptions> = {
    * Whether a `$ref` resolves to its `${name}InputSchema` variant. `zod/mini` is direction-free, so it leaves this unset.
    */
   useInputVariant?: (node: ast.SchemaNode, options: TOptions) => boolean
+}
+
+/**
+ * Reads a union of bare single-value enums as one enum, except under `xor` or an enum override, which need each member.
+ * Only a numeric union with a `format` coerces, because it printed as `z.coerce.number()` before the adapter kept its values.
+ */
+function getLiteralUnion({
+  node,
+  options,
+}: {
+  node: ast.UnionSchemaNode
+  options: ZodNodeOptions
+}): { values: Array<string | number | boolean>; coerce: boolean } | undefined {
+  if ((node.strategy === 'one' && options.oneOfType === 'xor') || options.nodes?.enum) return undefined
+  const values = (node.members ?? []).map((member) => {
+    const enumNode = ast.narrowSchema(member, ast.schemaTypes.enum)
+    return enumNode && !enumNode.name && !enumNode.nullable && !enumNode.namedEnumValues && enumNode.enumValues?.length === 1
+      ? enumNode.enumValues[0]
+      : undefined
+  })
+  if (!values.length || !values.every((value): value is string | number | boolean => value !== undefined && value !== null)) return undefined
+
+  return { values, coerce: !!node.format && values.every((value) => typeof value === 'number') && shouldCoerce(options.coercion, 'numbers') }
+}
+
+/**
+ * Whether a discriminated union member's discriminator property prints as a coerced literal union.
+ */
+function hasCoercedDiscriminator({ member, propertyName, options }: { member: ast.SchemaNode; propertyName: string; options: ZodNodeOptions }): boolean {
+  return ast.resolveSchemaProperties({ node: member, propertyName }).some(({ schema }) => {
+    const resolved = syncSchemaRef(schema)
+    return resolved.type === 'union' && !!getLiteralUnion({ node: resolved, options })?.coerce
+  })
 }
 
 /**
@@ -232,11 +269,22 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       return `z.tuple(${buildList(items)})`
     },
     union(node) {
+      const literalUnion = getLiteralUnion({ node, options: this.options })
+      if (literalUnion) {
+        const schema = buildEnum(literalUnion.values)
+        return literalUnion.coerce ? dialect.coercedNumber(schema) : schema
+      }
+
       const nodeMembers = node.members ?? []
+      const { discriminatorPropertyName } = node
       // z.discriminatedUnion needs every option to be a Zod object. Object variants (refs or
       // extend-composed `allOf`) qualify; intersections, cyclic `z.lazy(…)` refs, and
-      // non-objects fall back to z.union.
-      const isDiscriminated = !!node.discriminatorPropertyName && nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemas))
+      // non-objects fall back to z.union. A coerced discriminator hides its values behind
+      // `z.coerce.number()`, which z.discriminatedUnion cannot read, so it falls back too.
+      const isDiscriminated =
+        !!discriminatorPropertyName &&
+        nodeMembers.every((m) => isObjectSchemaNode(m, cyclicSchemas)) &&
+        !nodeMembers.some((m) => hasCoercedDiscriminator({ member: m, propertyName: discriminatorPropertyName, options: this.options }))
       const isXor = node.strategy === 'one' && !isDiscriminated && this.options.oneOfType === 'xor'
       // `z.xor` already rejects a value matching several members, so its members stay as declared.
       const isStrict = node.strategy === 'one' && !isXor && !unionsWithSiblings.has(node)

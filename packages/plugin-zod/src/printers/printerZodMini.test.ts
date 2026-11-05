@@ -1315,6 +1315,17 @@ describe('printerZodMini', () => {
       expect(p.print(ast.factory.createSchema({ type: 'date', representation: 'date' }))).toBe('z.coerce.date()')
     })
 
+    test('coerces a formatted numeric literal union under number coercion', () => {
+      const literal = (value: number) => ast.factory.createSchema({ type: 'enum', primitive: 'number', enumValues: [value] })
+      const node = ast.factory.createSchema({ type: 'union', format: 'int32', members: [literal(0), literal(1)] })
+      const code = printerZodMini({ coercion: { numbers: true } }).print(node)
+      expect(code).toBe('z.pipe(z.coerce.number(), z.union([z.literal(0), z.literal(1)]))')
+
+      const schema = new Function('z', `return ${code}`)(z)
+      expect(z.parse(schema, '1')).toBe(1)
+      expect(z.safeParse(schema, '2').success).toBe(false)
+    })
+
     test('granular coercion only coerces the selected primitives', () => {
       const p = printerZodMini({ coercion: { strings: true, numbers: false } })
       expect(p.print(ast.factory.createSchema({ type: 'string' }))).toBe('z.coerce.string()')
