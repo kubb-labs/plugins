@@ -1641,6 +1641,16 @@ describe('parseEventStream', () => {
     expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
   })
 
+  test('joins data lines when a CRLF falls across two chunks', async () => {
+    const events = await collect(parseEventStream<string>(streamOf(['data: a\r', '\ndata: b\r\n\r\n'])))
+    expect(events).toStrictEqual([{ data: 'a\nb' }])
+  })
+
+  test('still ends an event when its blank line falls across two chunks', async () => {
+    const events = await collect(parseEventStream<string>(streamOf(['data: a\r\n\r', '\ndata: b\r', '\r'])))
+    expect(events).toStrictEqual([{ data: 'a' }, { data: 'b' }])
+  })
+
   test('consumes an async iterable of byte chunks, as the axios stream response yields', async () => {
     const events = await collect(parseEventStream(asyncIterableOf(['data: {"n":1}\n\n'])))
     expect(events).toStrictEqual([{ data: { n: 1 } }])
