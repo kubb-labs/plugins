@@ -54,8 +54,8 @@ export function buildReturnStatement({
 
 /**
  * Builds the return type and statement of an operation that returns `text/event-stream`: the call
- * is wrapped in `toEventStream`, so the caller iterates the typed success events. The bundled
- * clients also receive `config`, so a per-call `maxEventSize` reaches the parser.
+ * is wrapped in `toEventStream`, so the caller iterates the typed success events. Except with
+ * `returnType: 'plain'`, `toEventStream` also receives `config`, so a per-call `maxEventSize` reaches the parser.
  */
 export function buildEventStreamReturn({
   node,

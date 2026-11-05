@@ -97,7 +97,8 @@ try {
 
 The parser keeps an event in memory until the blank line that ends it. When one event grows past
 `maxEventSize` characters, the `for await` loop throws a `RangeError` and the runtime cancels the
-stream. The default is 16,777,216 characters (`16 * 1024 * 1024`). Comment lines do not count.
+stream. The default is 16,777,216 characters (`16 * 1024 * 1024`). Comment lines are dropped, so
+they do not add to the event's size, but each one must still fit within the limit.
 
 Pass `maxEventSize` per call to raise or lower the limit, or `Infinity` to turn it off:
 

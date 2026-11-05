@@ -228,7 +228,7 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   security?: Array<Auth>
   auth?: AuthResolver
   /**
-   * Most characters a server-sent event may buffer before its terminating blank line. Set `Infinity` to disable the limit.
+   * The largest number of characters one server-sent event may hold before the blank line that ends it. A larger event throws a `RangeError` and cancels the stream. Set `Infinity` to turn the limit off.
    * @default 16777216
    */
   maxEventSize?: number
@@ -883,25 +883,26 @@ export async function* parseEventStream<TData = unknown>(
   let endsWithCR = false
 
   for await (const chunk of readBytes(stream)) {
-    let text = decoder.decode(chunk, { stream: true })
-    if (!text) continue
+    const decoded = decoder.decode(chunk, { stream: true })
+    if (!decoded) continue
     // A CRLF split across chunks already ended its line on the `\r`.
-    if (endsWithCR && text.startsWith('\n')) text = text.slice(1)
+    const text: string = endsWithCR && decoded.startsWith('\n') ? decoded.slice(1) : decoded
     endsWithCR = text.endsWith('\r')
 
     const parts = text.split(/\r\n|\r|\n/)
     parts[0] = line + parts[0]
-    line = parts.pop()!
+    line = parts.pop() ?? ''
     for (const part of parts) {
-      if (!part) {
-        if (lines.length) yield parseEvent<TData>(lines)
-        lines = []
-        size = 0
-      } else if (!part.startsWith(':')) {
+      if (size + part.length > maxEventSize) throw new RangeError(tooLarge)
+      if (part.startsWith(':')) continue
+      if (part) {
         lines.push(part)
         size += part.length
-        if (size > maxEventSize) throw new RangeError(tooLarge)
+        continue
       }
+      if (lines.length) yield parseEvent<TData>(lines)
+      lines = []
+      size = 0
     }
     if (size + line.length > maxEventSize) throw new RangeError(tooLarge)
   }

@@ -16,6 +16,14 @@ describe('shared client templates', () => {
     const axiosCopy = readFileSync(path.join(axiosTemplates, name), 'utf8')
     expect(axiosCopy).toBe(fetchCopy)
   })
+
+  test('fetch.ts and axios.ts share one server-sent event parser', () => {
+    const parser = (name: string) => {
+      const source = readFileSync(name, 'utf8')
+      return source.slice(source.indexOf('async function* readBytes('), source.indexOf('export type EventStreamResult'))
+    }
+    expect(parser(path.join(axiosTemplates, 'axios.ts'))).toBe(parser(path.join(fetchTemplates, 'fetch.ts')))
+  })
 })
 
 function declarationNames(source: string): Array<string> {

@@ -1444,8 +1444,8 @@ describe('parseEventStream', () => {
     expect(events).toStrictEqual([{ data: { n: 1 } }])
   })
 
-  test('reads a CRLF split across chunks as one line break', async () => {
-    const events = await collect(parseEventStream<string>(streamOf(['data: a\r', '\ndata: b\r', '\n\r', '\n'])))
+  test('reads a CRLF split across chunks as one line break, even across an empty chunk', async () => {
+    const events = await collect(parseEventStream<string>(streamOf(['data: a\r', '', '\ndata: b\r', '\n\r', '\n'])))
     expect(events).toStrictEqual([{ data: 'a\nb' }])
   })
 
@@ -1482,6 +1482,13 @@ describe('parseEventStream', () => {
     const chunk = `data: ${'x'.repeat(44)}\n\n`
     expect(await collect(parseEventStream<string>(streamOf([chunk]), { maxEventSize: 50 }))).toStrictEqual([{ data: 'x'.repeat(44) }])
     await expect(collect(parseEventStream(streamOf([chunk]), { maxEventSize: 49 }))).rejects.toThrow(RangeError)
+  })
+
+  test.each([
+    ['one chunk', [`: ${'x'.repeat(60)}\ndata: a\n\n`]],
+    ['two chunks', [`: ${'x'.repeat(30)}`, `${'x'.repeat(30)}\ndata: a\n\n`]],
+  ])('applies maxEventSize to a comment line sent in %s', async (_, chunks) => {
+    await expect(collect(parseEventStream(streamOf(chunks), { maxEventSize: 50 }))).rejects.toThrow(RangeError)
   })
 
   test('toEventStream passes maxEventSize to the parser', async () => {
