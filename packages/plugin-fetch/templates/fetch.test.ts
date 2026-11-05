@@ -1423,9 +1423,14 @@ describe('parseEventStream', () => {
     expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
   })
 
-  test('keeps a CRLF split across two chunks as one line ending', async () => {
-    expect(await collect(parseEventStream<string>(streamOf(['data: a\r', '\ndata: b\r\n\r\n'])))).toStrictEqual([{ data: 'a\nb' }])
-    expect(await collect(parseEventStream<string>(streamOf(['data: a\r\n\r', '\ndata: b\r', '\r'])))).toStrictEqual([{ data: 'a' }, { data: 'b' }])
+  test('joins data lines when a CRLF falls across two chunks', async () => {
+    const events = await collect(parseEventStream<string>(streamOf(['data: a\r', '\ndata: b\r\n\r\n'])))
+    expect(events).toStrictEqual([{ data: 'a\nb' }])
+  })
+
+  test('still ends an event when its blank line falls across two chunks', async () => {
+    const events = await collect(parseEventStream<string>(streamOf(['data: a\r\n\r', '\ndata: b\r', '\r'])))
+    expect(events).toStrictEqual([{ data: 'a' }, { data: 'b' }])
   })
 
   test('reassembles events split across chunks', async () => {
