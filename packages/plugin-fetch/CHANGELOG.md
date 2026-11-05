@@ -1,5 +1,11 @@
 # @kubb/plugin-fetch
 
+## 5.12.0
+
+### Minor Changes
+
+- [#1329](https://github.com/kubb-labs/plugins/pull/1329) [`4db9c80`](https://github.com/kubb-labs/plugins/commit/4db9c8073a4c37822ddb8b410491a2c51e4c39c7) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add a `validate` setting to the generated client, so `client.setConfig({ validate: false })` skips generated validation at runtime. An object such as `{ response: false }` skips only those directions, and a per-call `validate` overrides the client setting. The default stays `true`.
+
 ## 5.11.0
 
 ### Minor Changes
