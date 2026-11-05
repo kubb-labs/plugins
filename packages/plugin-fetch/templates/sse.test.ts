@@ -247,9 +247,13 @@ describe('toEventStream', () => {
   })
 
   describe('reconnect', () => {
-    function sender(...calls: Array<EventStreamCall<Response>>): EventStreamSend<Response> & { mock: ReturnType<typeof vi.fn>['mock'] } {
+    function sender(...calls: Array<EventStreamCall<Response> | Error>): EventStreamSend<Response> & { mock: ReturnType<typeof vi.fn>['mock'] } {
       const queue = [...calls]
-      return vi.fn(async () => queue.shift() ?? call(undefined))
+      return vi.fn(async () => {
+        const next = queue.shift() ?? call(undefined)
+        if (next instanceof Error) throw next
+        return next
+      })
     }
 
     test('resumes a dropped GET stream with Last-Event-ID and the call headers', async () => {
@@ -261,7 +265,7 @@ describe('toEventStream', () => {
       )
 
       expect(await collect(result.stream)).toStrictEqual([message('a', { id: '1' }), message('b', { id: '1' })])
-      expect(send.mock.calls).toStrictEqual([[], [{ headers: { Authorization: 'Bearer t', 'Last-Event-ID': '1' } }]])
+      expect(send.mock.calls).toStrictEqual([[], [{ body: undefined, headers: { Authorization: 'Bearer t', 'Last-Event-ID': '1' } }]])
       expect(result.lastEventId).toBe('1')
     })
 
@@ -270,7 +274,7 @@ describe('toEventStream', () => {
       const { stream } = await toEventStream(send, { reconnect: { initialDelay: 0 } }, { method: 'GET' })
 
       expect(await collect(stream)).toHaveLength(3)
-      expect(send.mock.calls[1]).toStrictEqual([{ headers: {} }])
+      expect(send.mock.calls[1]).toStrictEqual([{ body: undefined, headers: {} }])
     })
 
     test('waits the server retry instead of the backoff', async () => {
@@ -333,7 +337,7 @@ describe('toEventStream', () => {
       await collect((await toEventStream(send, { reconnect: { initialDelay: 0, resume } }, { method: 'POST' })).stream)
 
       expect(resume).toHaveBeenCalledWith('3')
-      expect(send.mock.calls[1]).toStrictEqual([{ method: 'GET', headers: { 'Last-Event-ID': '3', 'X-Resume': '3' } }])
+      expect(send.mock.calls[1]).toStrictEqual([{ method: 'GET', body: undefined, headers: { 'Last-Event-ID': '3', 'X-Resume': '3' } }])
     })
 
     test('ends the stream instead of reconnecting on a failed validation or a too-large event', async () => {
@@ -346,6 +350,41 @@ describe('toEventStream', () => {
       const { stream: capped } = await toEventStream(large, { maxEventSize: 32, reconnect: { initialDelay: 0 } }, { method: 'GET' })
       await expect(collect(capped)).rejects.toThrow(RangeError)
       expect(large).toHaveBeenCalledTimes(1)
+    })
+
+    test('retries a reconnect that fails to connect and ends on a refused one', async () => {
+      const flaky = sender(call(droppedAfter('data: a\n\n')), new TypeError('fetch failed'), call(streamOf(['data: b\n\n'])))
+      expect(await collect((await toEventStream<ServerSentEvent<string>>(flaky, { reconnect: { initialDelay: 0 } }, { method: 'GET' })).stream)).toStrictEqual([
+        message('a'),
+        message('b'),
+      ])
+      expect(flaky).toHaveBeenCalledTimes(3)
+
+      const refused = Object.assign(new Error('GET /events failed with status 401'), { name: 'ResponseError' })
+      const rejected = sender(call(droppedAfter('data: a\n\n')), refused, call(streamOf(['data: b\n\n'])))
+      await expect(collect((await toEventStream(rejected, { reconnect: { initialDelay: 0 } }, { method: 'GET' })).stream)).rejects.toBe(refused)
+      expect(rejected).toHaveBeenCalledTimes(2)
+
+      const down = sender(call(droppedAfter('data: a\n\n')), new TypeError('fetch failed'), new TypeError('fetch failed'))
+      await expect(collect((await toEventStream(down, { reconnect: { initialDelay: 0, maxRetries: 2 } }, { method: 'GET' })).stream)).rejects.toThrow(
+        'fetch failed',
+      )
+      expect(down).toHaveBeenCalledTimes(3)
+    })
+
+    test('sends no body when a resume switches a POST to GET', async () => {
+      const send = sender(call(droppedAfter('id: 1\ndata: a\n\n')), call(streamOf(['data: b\n\n'])))
+      await collect((await toEventStream(send, { reconnect: { initialDelay: 0, resume: () => ({ method: 'GET' }) } }, { method: 'POST' })).stream)
+
+      expect(send.mock.calls[1]).toStrictEqual([{ method: 'GET', body: undefined, headers: { 'Last-Event-ID': '1' } }])
+    })
+
+    test('cancels a stream body that is not an event stream', async () => {
+      const cancel = vi.fn()
+      const body = new ReadableStream<Uint8Array>({ start: (controller) => controller.enqueue(encoder.encode('{"ok":true}')), cancel })
+
+      expect(await collect((await toEventStream(Promise.resolve(call(body, 'application/json')))).stream)).toStrictEqual([])
+      expect(cancel).toHaveBeenCalledOnce()
     })
 
     test('never reconnects a plain promise', async () => {

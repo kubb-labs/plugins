@@ -648,6 +648,41 @@ describe('createClientCore', () => {
     expect(client.getConfig().headers).toStrictEqual({ authorization: 'Bearer t' })
   })
 
+  describe('a streamed call answered without an event stream', () => {
+    const encoder = new TextEncoder()
+    const streamOf = (text: string) => new ReadableStream<Uint8Array>({ start: (controller) => (controller.enqueue(encoder.encode(text)), controller.close()) })
+    // Set on the call, since a stream request without its own adapter switches to the fetch adapter.
+    const streaming = (status: number, body: string, contentType: string) => ({
+      adapter: async (config: InternalAxiosRequestConfig) => {
+        const response = { data: streamOf(body), status, statusText: 'x', headers: { 'content-type': contentType }, config }
+        if (status >= 300)
+          throw new AxiosErrorClass(`Request failed with status code ${status}`, 'ERR_BAD_REQUEST', config, undefined, response as AxiosResponse)
+        return response as AxiosResponse
+      },
+    })
+
+    test('reads a JSON body back into its value and keeps an event stream as a stream', async () => {
+      const client = createClientCore()
+      const json = await client({ method: 'GET', url: '/events', responseType: 'stream', options: streaming(200, '{"ok":true}', 'application/json') })
+      expect(json.data).toStrictEqual({ ok: true })
+
+      const events = await client({ method: 'GET', url: '/events', responseType: 'stream', options: streaming(200, 'data: a\n\n', 'text/event-stream') })
+      expect(events.data).toBeInstanceOf(ReadableStream)
+    })
+
+    test('throws a ResponseError with the parsed JSON error body', async () => {
+      const client = createClientCore()
+
+      await expect(
+        client({ method: 'GET', url: '/events', responseType: 'stream', options: streaming(404, '{"message":"gone"}', 'application/json') }),
+      ).rejects.toMatchObject({
+        name: 'ResponseError',
+        status: 404,
+        data: { message: 'gone' },
+      })
+    })
+  })
+
   describe('interceptors across a transport set through setConfig', () => {
     // Real instances, so the interceptors run through axios's own managers.
     function realAxios(status = 200) {

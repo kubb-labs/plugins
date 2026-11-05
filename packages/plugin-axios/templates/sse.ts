@@ -35,7 +35,7 @@ export type Reconnect = {
 }
 
 /** The part of a request a reconnect may change. */
-export type ResumeInit = { method?: HttpMethod; headers?: unknown }
+export type ResumeInit = { method?: HttpMethod; headers?: unknown; body?: unknown }
 
 /** Per-call options of a streamed operation, passed next to its request params. */
 export type EventStreamOptions = {
@@ -265,30 +265,37 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
   }
 
   async function* events(): AsyncGenerator<TEvent> {
-    let call = first
+    let call: EventStreamCall<TResponse> | undefined = first
     let delay = initialDelay
     for (let attempt = 0; ; attempt++) {
-      const body = call.data
-      if (!isStreamBody(body) || (call.contentType && !call.contentType.includes('text/event-stream'))) return
-      let dropped = false
-      const parsed = parseEventStream(body, { maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })
-      // Only a failed read is a drop worth a reconnect; a too-large event, a failed transform or validation, and a consumer error end the stream.
-      const read = async () => {
-        try {
-          return await parsed.next()
-        } catch (error) {
-          if (!reconnect || error instanceof RangeError || options.signal?.aborted || attempt >= maxRetries) throw error
-          dropped = true
-          return { done: true as const, value: undefined }
+      // A reconnect that could not connect left no call, which counts as a drop.
+      let dropped = !call
+      if (call) {
+        const body = call.data
+        if (!isStreamBody(body)) return
+        if (call.contentType && !call.contentType.includes('text/event-stream')) {
+          if ('cancel' in body) await body.cancel().catch(() => {})
+          return
         }
-      }
-      for (let next = await read(); !next.done; next = await read()) {
-        const event = next.value
-        if (meta.events && !meta.events.includes(event.event)) {
-          options.onUnknownEvent?.(event)
-          continue
+        const parsed = parseEventStream(body, { maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })
+        // Only a failed read is a drop worth a reconnect; a too-large event, a failed transform or validation, and a consumer error end the stream.
+        const read = async () => {
+          try {
+            return await parsed.next()
+          } catch (error) {
+            if (!reconnect || error instanceof RangeError || options.signal?.aborted || attempt >= maxRetries) throw error
+            dropped = true
+            return { done: true as const, value: undefined }
+          }
         }
-        yield (await validateEvent(options.transform ? options.transform(event) : event)) as TEvent
+        for (let next = await read(); !next.done; next = await read()) {
+          const event = next.value
+          if (meta.events && !meta.events.includes(event.event)) {
+            options.onUnknownEvent?.(event)
+            continue
+          }
+          yield (await validateEvent(options.transform ? options.transform(event) : event)) as TEvent
+        }
       }
       if (!reconnect || (!dropped && !onClose) || attempt >= maxRetries || options.signal?.aborted) return
 
@@ -296,12 +303,19 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
       if (options.signal?.aborted) return
       delay = Math.min(delay * growFactor, maxDelay)
       const init: ResumeInit = resume?.(cursor.lastEventId) ?? {}
+      const method = init.method ?? meta.method
       const headers = {
         ...headerRecord(options.headers),
         ...(cursor.lastEventId ? { 'Last-Event-ID': cursor.lastEventId } : {}),
         ...headerRecord(init.headers),
       }
-      call = await (send as EventStreamSend<TResponse>)({ ...init, headers })
+      // A GET or HEAD resume carries no body. A connection that fails is retried like a drop; a refused one (`ResponseError`) ends the stream.
+      call = await (send as EventStreamSend<TResponse>)({ ...(method === 'GET' || method === 'HEAD' ? { body: undefined } : {}), ...init, headers }).catch(
+        (error: unknown) => {
+          if ((error as Error | undefined)?.name === 'ResponseError' || options.signal?.aborted || attempt + 1 >= maxRetries) throw error
+          return undefined
+        },
+      )
     }
   }
 
