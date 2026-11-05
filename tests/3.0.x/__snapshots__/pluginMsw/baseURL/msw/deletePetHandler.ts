@@ -7,7 +7,7 @@ import type { DeletePetStatus400 } from '../types/DeletePet'
 import { http, HttpResponse } from 'msw/http'
 
 export function deletePetHandlerResponse400(data?: DeletePetStatus400) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
   })
 }
@@ -16,7 +16,7 @@ export function deletePetHandler(data?: string | number | boolean | null | objec
   return http.delete(`${options?.baseURL ?? "http://localhost:3000"}/pet/:petId`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new HttpResponse(JSON.stringify(data), {
+      return new HttpResponse<string>(JSON.stringify(data), {
         status: 200,
       })
     })
