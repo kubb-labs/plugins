@@ -168,23 +168,68 @@ export function isEventStream(node: ast.OperationNode): boolean {
   return getPrimarySuccessContentType(node) === 'text/event-stream'
 }
 
-/**
- * Derives the default `responseType` for an operation from its primary success response.
- *
- * Returns a value only when that response declares a single non-JSON content type. `text/event-stream`
- * and other binary types (`application/octet-stream`, `application/pdf`, `image/*`, `audio/*`,
- * `video/*`) map to a stream or `'blob'`, and other `text/*` maps to `'text'`. Otherwise `undefined`,
- * leaving the runtime client's `Content-Type` auto-detection in charge.
- */
-export function getResponseType(node: ast.OperationNode): ResponseType | undefined {
-  const baseType = getPrimarySuccessContentType(node)
-  if (!baseType) return undefined
+function baseContentType(contentType: string): string {
+  return contentType.split(';')[0]!.trim().toLowerCase()
+}
 
+/**
+ * Parser for one response content entry.
+ *
+ * JSON stays unset so the runtime detects it. `text/event-stream` is a stream. A binary schema
+ * (`format: binary` / `contentMediaType`) is a blob even when the media type is not a well-known
+ * binary type. Other `text/*` is text, and `application/octet-stream`, `application/pdf`,
+ * `image/*`, `audio/*`, and `video/*` are blobs.
+ */
+function responseTypeForContent(contentType: string, schema?: ast.SchemaNode | null): ResponseType | undefined {
+  const baseType = baseContentType(contentType)
+  if (!baseType) return undefined
   if (baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json') return undefined
   if (baseType === 'text/event-stream') return 'stream'
+  if (schema?.type === 'blob') return 'blob'
   if (baseType.startsWith('text/')) return 'text'
   if (baseType === 'application/octet-stream' || baseType === 'application/pdf' || /^(image|audio|video)\//.test(baseType)) return 'blob'
   return undefined
+}
+
+/**
+ * Derives the default `responseType` string for an operation from its primary success response.
+ *
+ * One content type uses {@link responseTypeForContent}. Several content types that all use the same
+ * parser collapse to that string, so a call can keep `responseType: 'blob'`. Mixed parsers return
+ * `undefined`; {@link getResponseTypeMap} carries the per-type choice.
+ */
+export function getResponseType(node: ast.OperationNode): ResponseType | undefined {
+  const entries = getPrimarySuccessResponse(node)?.content ?? []
+  if (entries.length === 0) return undefined
+
+  const responseTypes = entries.map((entry) => responseTypeForContent(entry.contentType, entry.schema))
+  const first = responseTypes[0]
+  if (!first) return undefined
+  if (responseTypes.every((responseType) => responseType === first)) return first
+  return undefined
+}
+
+/**
+ * Maps each base content type of a primary success response to its parser when those parsers differ.
+ *
+ * Keys are lowercased and stripped of parameters. Returns `undefined` when {@link getResponseType}
+ * already covers the response with one string, or when no content type needs an explicit parser.
+ * The runtime matches the response `Content-Type` against this map instead of guessing from the media type.
+ */
+export function getResponseTypeMap(node: ast.OperationNode): Record<string, ResponseType> | undefined {
+  if (getResponseType(node)) return undefined
+
+  const entries = getPrimarySuccessResponse(node)?.content ?? []
+  if (entries.length <= 1) return undefined
+
+  const map: Record<string, ResponseType> = {}
+  for (const entry of entries) {
+    const baseType = baseContentType(entry.contentType)
+    const responseType = responseTypeForContent(entry.contentType, entry.schema)
+    if (baseType && responseType) map[baseType] = responseType
+  }
+
+  return Object.keys(map).length > 0 ? map : undefined
 }
 
 /**
