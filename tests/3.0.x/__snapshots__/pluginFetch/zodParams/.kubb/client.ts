@@ -125,6 +125,12 @@ export type RequestCredentials = 'omit' | 'same-origin' | 'include'
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
 
 /**
+ * Parser per response content type. Generated when one success response declares several content
+ * types that do not share a single parser. Keys are base media types, such as `audio/mpeg` or `audio/*`.
+ */
+export type ResponseTypeMap = Record<string, ResponseType>
+
+/**
  * Decodes a response body for a codec's media type.
  */
 export type Deserializer<T = unknown> = (raw: unknown, contentType: string) => T | Promise<T>
@@ -210,7 +216,7 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   credentials?: RequestCredentials
   options?: FetchOptions
   contentType?: ContentType
-  responseType?: ResponseType
+  responseType?: ResponseType | ResponseTypeMap
   throwOnError?: boolean
   client?: ClientInstance<TRequest, TResponse>
   transport?: Transport<TRequest, TResponse>
@@ -261,7 +267,7 @@ export type ResolvedRequest = {
   signal?: AbortSignal
   credentials?: RequestCredentials
   options?: FetchOptions
-  responseType?: ResponseType
+  responseType?: ResponseType | ResponseTypeMap
 }
 
 /**
@@ -527,6 +533,23 @@ function getResponseContentType(headers: Headers | Record<string, string> | unde
   return baseContentType(value)
 }
 
+/**
+ * Resolves a string parser or the map entry for the response content type.
+ * An exact base type wins, then a subtype wildcard such as `audio/*`, then the catch-all entry.
+ */
+function lookupResponseType(responseType: ResponseType | ResponseTypeMap | undefined, contentType: string | null | undefined): ResponseType | undefined {
+  if (typeof responseType === 'string') return responseType
+  if (!responseType) return undefined
+
+  const base = baseContentType(contentType)
+  if (!base) return undefined
+  const exact = responseType[base]
+  if (exact) return exact
+  const wildcard = responseType[`${base.split('/')[0]}/*`]
+  if (wildcard) return wildcard
+  return responseType['*/*']
+}
+
 function resolveSerializers({ config, requestConfig }: { config: { serializer?: Serializers }; requestConfig: { serializer?: Serializers } }) {
   return {
     querySerializer: requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer,
@@ -713,18 +736,27 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
 function detectResponseType(contentType: string | null): ResponseType | undefined {
   if (!contentType) return undefined
   if (contentType.includes('text/event-stream')) return 'stream'
-  if (contentType.includes('application/json') || contentType.includes('text/json')) return 'json'
+  if (contentType.includes('application/json') || contentType.includes('+json') || contentType.includes('text/json')) return 'json'
   if (contentType.includes('text/')) return 'text'
-  if (contentType.includes('image/') || contentType.includes('application/octet-stream')) return 'blob'
+  if (
+    contentType.includes('image/') ||
+    contentType.includes('audio/') ||
+    contentType.includes('video/') ||
+    contentType.includes('application/octet-stream') ||
+    contentType.includes('application/pdf')
+  ) {
+    return 'blob'
+  }
   return undefined
 }
 
-async function parseResponse(response: Response, responseType?: ResponseType): Promise<unknown> {
+async function parseResponse(response: Response, responseType?: ResponseType | ResponseTypeMap): Promise<unknown> {
   if (response.status === 204 || response.status === 205 || response.status === 304 || !response.body) {
     return undefined
   }
 
-  switch (responseType ?? detectResponseType(response.headers.get('Content-Type'))) {
+  const header = response.headers.get('Content-Type')
+  switch (lookupResponseType(responseType, header) ?? detectResponseType(header)) {
     case 'text':
     case 'document':
       return response.text()

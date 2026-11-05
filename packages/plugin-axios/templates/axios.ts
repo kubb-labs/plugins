@@ -128,6 +128,12 @@ export type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; 
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream' | 'formdata'
 
 /**
+ * Parser per response content type. Generated when one success response declares several content
+ * types that do not share a single parser. Keys are base media types, such as `audio/mpeg` or `audio/*`.
+ */
+export type ResponseTypeMap = Record<string, ResponseType>
+
+/**
  * Decodes a response body for a codec's media type.
  */
 export type Deserializer<T = unknown> = (raw: unknown, contentType: string) => T | Promise<T>
@@ -212,7 +218,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   signal?: AbortSignal
   options?: AxiosOptions
   contentType?: ContentType
-  responseType?: ResponseType
+  responseType?: ResponseType | ResponseTypeMap
   throwOnError?: boolean
   validateStatus?: (status: number) => boolean
   client?: ClientInstance<TRequest, TResponse>
@@ -521,6 +527,53 @@ function getResponseContentType(headers: Record<string, unknown> | undefined): s
   return baseContentType(typeof value === 'string' ? value : undefined)
 }
 
+/**
+ * Resolves a string parser, or the map entry for this response content type.
+ * An exact base type wins, then a subtype wildcard such as `audio/*`, then the catch-all entry.
+ */
+function lookupResponseType(responseType: ResponseType | ResponseTypeMap | undefined, contentType: string | null | undefined): ResponseType | undefined {
+  if (typeof responseType === 'string') return responseType
+  if (!responseType) return undefined
+
+  const base = baseContentType(contentType)
+  if (!base) return undefined
+  const exact = responseType[base]
+  if (exact) return exact
+  const wildcard = responseType[`${base.split('/')[0]}/*`]
+  if (wildcard) return wildcard
+  return responseType['*/*']
+}
+
+function toBytes(data: unknown): Uint8Array | undefined {
+  if (data instanceof ArrayBuffer) return new Uint8Array(data)
+  if (ArrayBuffer.isView(data)) return new Uint8Array(data.buffer, data.byteOffset, data.byteLength)
+  if (typeof data === 'string') return new TextEncoder().encode(data)
+  return undefined
+}
+
+/**
+ * Axios has to pick a responseType before the body arrives, so a content-type map is read as bytes
+ * and decoded once the response `Content-Type` is known.
+ */
+function decodeMappedBody(data: unknown, responseType: ResponseType | undefined): unknown {
+  if (responseType === 'formdata') return data
+
+  const bytes = toBytes(data)
+  if (responseType === 'blob') return bytes ? new Blob([bytes as BlobPart]) : data
+  if (responseType === 'arraybuffer') return bytes ? bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) : data
+  if (responseType === 'stream') return bytes ? new Blob([bytes as BlobPart]).stream() : data
+  if (responseType === 'text' || responseType === 'document') return bytes ? new TextDecoder().decode(bytes) : data
+
+  if (!bytes) return data
+  const text = new TextDecoder().decode(bytes)
+  if (!text) return undefined
+  try {
+    return JSON.parse(text)
+  } catch {
+    return text
+  }
+}
+
 function resolveSerializers({ config, requestConfig }: { config: { serializer?: Serializers }; requestConfig: { serializer?: Serializers } }) {
   return {
     querySerializer: requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer,
@@ -535,7 +588,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 }: {
   config: ClientConfig
   requestConfig: RequestConfig<TBody, TRequest, TResponse>
-}): Promise<{ axiosConfig: AxiosRequestConfig; codecs: Record<string, Codec>; throwOnError: boolean }> {
+}): Promise<{ axiosConfig: AxiosRequestConfig; codecs: Record<string, Codec>; throwOnError: boolean; responseTypeMap?: ResponseTypeMap }> {
   const { querySerializer, bodySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
   const codecs = { ...config.codecs, ...requestConfig.codecs }
   const onValidationError = requestConfig.onValidationError ?? config.onValidationError
@@ -624,9 +677,14 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     // Kubb already serialized the body; only URLSearchParams needs a string, since axios's Node adapter rejects it.
     transformRequest: (data) => (data instanceof URLSearchParams ? data.toString() : data),
     signal: requestConfig.signal,
-    responseType: requestConfig.responseType,
+    responseType: typeof requestConfig.responseType === 'string' ? requestConfig.responseType : undefined,
     validateStatus,
   }
+
+  // A map is chosen from the response Content-Type, which axios does not know until the body arrives.
+  // Buffer the bytes and decode them afterwards so a binary type is not parsed as text.
+  const responseTypeMap = typeof requestConfig.responseType === 'string' ? undefined : requestConfig.responseType
+  if (responseTypeMap) axiosConfig.responseType = 'arraybuffer'
 
   // Only the fetch adapter exposes a streaming `response.data` (a ReadableStream) in the browser.
   // The default XHR adapter buffers the whole body. Default streams to it, but respect an explicit adapter.
@@ -634,7 +692,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     axiosConfig.adapter = 'fetch'
   }
 
-  return { axiosConfig, codecs, throwOnError }
+  return { axiosConfig, codecs, throwOnError, responseTypeMap }
 }
 
 /**
@@ -712,7 +770,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
 
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
     const activeInstance = requestConfig.transport ?? instance
-    const { axiosConfig, codecs, throwOnError } = await resolveRequest({ config, requestConfig })
+    const { axiosConfig, codecs, throwOnError, responseTypeMap } = await resolveRequest({ config, requestConfig })
     const contextId = ++requestContextId
     requestContexts.set(contextId, requestConfig)
     ;(axiosConfig as AxiosRequestConfig & { __kubbRequestContext: number }).__kubbRequestContext = contextId
@@ -723,8 +781,9 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       const onValidationError = requestConfig.onValidationError ?? config.onValidationError
       const isSuccess = response.status >= 200 && response.status < 300
       const contentType = getResponseContentType(response.headers as Record<string, unknown>)
+      const body = applyResponseTypeMap(response.data, contentType, responseTypeMap)
       const codec = contentType ? codecs[contentType] : undefined
-      const decoded: unknown = contentType && codec?.deserialize ? await codec.deserialize(response.data, contentType) : response.data
+      const decoded: unknown = contentType && codec?.deserialize ? await codec.deserialize(body, contentType) : body
       const data = await runValidator({
         validator: isSuccess ? validator?.response : validator?.error,
         value: decoded,
@@ -752,11 +811,12 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       setContextId(axiosError, undefined)
       if (axiosError.response) setContextId(axiosError.response, undefined)
       if (throwOnError && axiosError.response) {
+        const errorContentType = getResponseContentType(axiosError.response.headers as Record<string, unknown>)
         throw new ResponseError({
-          data: axiosError.response.data,
+          data: applyResponseTypeMap(axiosError.response.data, errorContentType, responseTypeMap),
           status: axiosError.response.status,
           statusText: axiosError.response.statusText,
-          contentType: getResponseContentType(axiosError.response.headers as Record<string, unknown>),
+          contentType: errorContentType,
           request: axiosError.config as TRequest,
           response: axiosError.response as TResponse,
           method: axiosError.config?.method?.toUpperCase(),
@@ -802,6 +862,28 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
 /**
  * The axios instance the generated `client` sends through. Register axios interceptors on it or reuse it inside your own transport.
  */
+function detectResponseType(contentType: string | null): ResponseType | undefined {
+  if (!contentType) return undefined
+  if (contentType.includes('text/event-stream')) return 'stream'
+  if (contentType.includes('application/json') || contentType.includes('+json') || contentType.includes('text/json')) return 'json'
+  if (contentType.includes('text/')) return 'text'
+  if (
+    contentType.includes('image/') ||
+    contentType.includes('audio/') ||
+    contentType.includes('video/') ||
+    contentType.includes('application/octet-stream') ||
+    contentType.includes('application/pdf')
+  ) {
+    return 'blob'
+  }
+  return undefined
+}
+
+function applyResponseTypeMap(data: unknown, contentType: string | undefined, responseTypeMap: ResponseTypeMap | undefined): unknown {
+  if (!responseTypeMap) return data
+  return decodeMappedBody(data, lookupResponseType(responseTypeMap, contentType) ?? detectResponseType(contentType ?? null))
+}
+
 export const defaultTransport = axios.create()
 
 /**

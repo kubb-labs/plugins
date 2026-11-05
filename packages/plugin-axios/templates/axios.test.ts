@@ -1367,6 +1367,30 @@ describe('content type negotiation', () => {
     const client = createClientCore({ transport: instance })
     await expect(client({ method: 'POST', url: '/pet' })).rejects.toMatchObject({ status: 422, contentType: 'application/xml' })
   })
+
+  test('buffers a mapped body as an arraybuffer and decodes the matching content type to a Blob', async () => {
+    const bytes = new Uint8Array([0xff, 0xfb, 0x90, 0x00])
+    const { instance, calls } = fakeAxiosWith({ data: bytes.buffer, contentType: 'audio/mpeg' })
+    const client = createClientCore({ transport: instance })
+    const result = await client({
+      method: 'POST',
+      url: '/speech',
+      responseType: { 'audio/mpeg': 'blob', 'text/event-stream': 'stream' },
+    })
+
+    expect(calls[0]?.responseType).toBe('arraybuffer')
+    expect(result.data).toBeInstanceOf(Blob)
+    expect(new Uint8Array(await (result.data as Blob).arrayBuffer())).toEqual(bytes)
+    expect(result.contentType).toBe('audio/mpeg')
+  })
+
+  test('parses JSON when the map does not name that content type', async () => {
+    const payload = JSON.stringify({ delta: 'hi' })
+    const { instance } = fakeAxiosWith({ data: new TextEncoder().encode(payload).buffer, contentType: 'application/json' })
+    const client = createClientCore({ transport: instance })
+    const result = await client({ method: 'POST', url: '/speech', responseType: { 'audio/mpeg': 'blob' } })
+    expect(result.data).toStrictEqual({ delta: 'hi' })
+  })
 })
 
 describe('getUrl', () => {
