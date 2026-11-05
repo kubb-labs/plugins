@@ -1,5 +1,11 @@
 # @kubb/plugin-msw
 
+## 6.1.1
+
+### Patch Changes
+
+- [#1328](https://github.com/kubb-labs/plugins/pull/1328) [`ce6905b`](https://github.com/kubb-labs/plugins/commit/ce6905bee645cfc77e3d621f6e1128e49adb5ac2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Generate `new HttpResponse<string>(...)` in response factories and handlers. With MSW 3, the untyped call inferred `HttpResponse<DefaultBodyType>`, which `msw/http` does not export, so declaration emit failed with TS2883.
+
 ## 6.1.0
 
 ### Minor Changes
