@@ -173,6 +173,13 @@ export type ValidationErrorContext = {
 export type ValidationErrorHandler = (error: ParseError, context: ValidationErrorContext) => { value: unknown } | void | Promise<{ value: unknown } | void>
 
 /**
+ * Turns generated validation on or off. `false` skips every validator, an object skips only the directions set to `false`:
+ * `request` is the body, `params` are path, query, and header params, `response` and `error` are the response bodies.
+ * @default true
+ */
+export type ValidateOption = boolean | { request?: boolean; params?: boolean; response?: boolean; error?: boolean }
+
+/**
  * A resolved security scheme carried on each generated call's `security` array and passed to the `auth` resolver.
  */
 export type Auth = {
@@ -221,6 +228,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   codecs?: Record<string, Codec>
   validator?: { request?: Validator; path?: Validator; query?: Validator; headers?: Validator; response?: Validator; error?: Validator }
   onValidationError?: ValidationErrorHandler
+  validate?: ValidateOption
   security?: Array<Auth>
   auth?: AuthResolver
 }
@@ -250,6 +258,7 @@ export type ClientConfig = {
   serializer?: Serializers
   codecs?: Record<string, Codec>
   onValidationError?: ValidationErrorHandler
+  validate?: ValidateOption
   auth?: AuthResolver
 }
 
@@ -488,6 +497,10 @@ export async function resolveAuth(params: {
   }
 }
 
+function isValidationEnabled(validate: ValidateOption | undefined, direction: 'request' | 'params' | 'response' | 'error'): boolean {
+  return typeof validate === 'object' ? validate[direction] !== false : validate !== false
+}
+
 async function runValidator<T>({
   validator,
   value,
@@ -535,10 +548,11 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 }: {
   config: ClientConfig
   requestConfig: RequestConfig<TBody, TRequest, TResponse>
-}): Promise<{ axiosConfig: AxiosRequestConfig; codecs: Record<string, Codec>; throwOnError: boolean }> {
+}): Promise<{ axiosConfig: AxiosRequestConfig; codecs: Record<string, Codec>; throwOnError: boolean; validate: ValidateOption | undefined }> {
   const { querySerializer, bodySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
   const codecs = { ...config.codecs, ...requestConfig.codecs }
   const onValidationError = requestConfig.onValidationError ?? config.onValidationError
+  const validate = requestConfig.validate ?? config.validate
   const validationContext = { direction: 'request', method: requestConfig.method, url: requestConfig.url } as const
 
   // Params are encoded before anything reads them: headers before styling, query before auth adds its values.
@@ -549,7 +563,12 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   }
   const [validatedPath, validatedQuery, validatedHeaders] = await Promise.all(
     (['path', 'query', 'headers'] as const).map((source) =>
-      runValidator({ validator: requestConfig.validator?.[source], value: paramValues[source], context: { ...validationContext, source }, onValidationError }),
+      runValidator({
+        validator: isValidationEnabled(validate, 'params') ? requestConfig.validator?.[source] : undefined,
+        value: paramValues[source],
+        context: { ...validationContext, source },
+        onValidationError,
+      }),
     ),
   )
 
@@ -576,7 +595,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   }
 
   const validatedBody = await runValidator({
-    validator: requestConfig.validator?.request,
+    validator: isValidationEnabled(validate, 'request') ? requestConfig.validator?.request : undefined,
     value: requestConfig.body,
     context: { ...validationContext, source: 'body' },
     onValidationError,
@@ -634,7 +653,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     axiosConfig.adapter = 'fetch'
   }
 
-  return { axiosConfig, codecs, throwOnError }
+  return { axiosConfig, codecs, throwOnError, validate }
 }
 
 /**
@@ -712,7 +731,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
 
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
     const activeInstance = requestConfig.transport ?? instance
-    const { axiosConfig, codecs, throwOnError } = await resolveRequest({ config, requestConfig })
+    const { axiosConfig, codecs, throwOnError, validate } = await resolveRequest({ config, requestConfig })
     const contextId = ++requestContextId
     requestContexts.set(contextId, requestConfig)
     ;(axiosConfig as AxiosRequestConfig & { __kubbRequestContext: number }).__kubbRequestContext = contextId
@@ -722,14 +741,15 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       const validator = requestConfig.validator
       const onValidationError = requestConfig.onValidationError ?? config.onValidationError
       const isSuccess = response.status >= 200 && response.status < 300
+      const direction = isSuccess ? 'response' : 'error'
       const contentType = getResponseContentType(response.headers as Record<string, unknown>)
       const codec = contentType ? codecs[contentType] : undefined
       const decoded: unknown = contentType && codec?.deserialize ? await codec.deserialize(response.data, contentType) : response.data
       const data = await runValidator({
-        validator: isSuccess ? validator?.response : validator?.error,
+        validator: isValidationEnabled(validate, direction) ? validator?.[direction] : undefined,
         value: decoded,
         context: {
-          direction: isSuccess ? 'response' : 'error',
+          direction,
           source: 'body',
           method: response.config?.method?.toUpperCase(),
           url: response.config?.url,

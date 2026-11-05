@@ -556,6 +556,48 @@ describe('createClientCore', () => {
     expect(onValidationError).toHaveBeenCalledTimes(1)
   })
 
+  test('skips every validator when the client sets validate to false', async () => {
+    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
+    const client = createClientCore({ transport: instance, validate: false })
+    const result = (await client({
+      method: 'POST',
+      url: '/pet',
+      body: { name: 1 },
+      query: { limit: 1 },
+      validator: { request: toFailingSchema(), query: toFailingSchema(), response: toFailingSchema() },
+    })) as CallResult
+    expect(result.data).toStrictEqual({ id: 1 })
+  })
+
+  test('skips only the directions the client turns off', async () => {
+    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
+    const client = createClientCore({ transport: instance, validate: { response: false } })
+    const result = (await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })) as CallResult
+    expect(result.data).toStrictEqual({ id: 1 })
+    await expect(client({ method: 'POST', url: '/pet', body: { name: 1 }, validator: { request: toFailingSchema() } })).rejects.toMatchObject({
+      name: 'ParseError',
+    })
+  })
+
+  test('keeps the validate setting of a call when setConfig changes it mid-flight', async () => {
+    const { instance, request } = fakeAxios({ data: { id: 1 }, status: 200 })
+    const client = createClientCore({ transport: instance })
+    const send = request.getMockImplementation()!
+    request.mockImplementationOnce(async (config) => {
+      client.setConfig({ validate: false })
+      return send(config)
+    })
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({ name: 'ParseError' })
+  })
+
+  test('lets a per-call validate override the client setting', async () => {
+    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
+    const client = createClientCore({ transport: instance, validate: false })
+    await expect(client({ method: 'GET', url: '/pet/1', validate: true, validator: { response: toFailingSchema() } })).rejects.toMatchObject({
+      name: 'ParseError',
+    })
+  })
+
   test('reports a failing request body with the request direction', async () => {
     const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
     const onValidationError = vi.fn(() => ({ value: { name: 'odie' } }))
