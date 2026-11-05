@@ -55,5 +55,9 @@ describe('buildSdkMethod', () => {
     expect(method).toContain('): Promise<EventStreamResult<SuccessOf<')
     expect(method).toContain('return toEventStream<SuccessOf<')
     expect(method).toContain(`responseType: 'stream'`)
+    expect(method).toContain('}), config)')
+
+    const plain = buildSdkMethod({ node, name: 'streamEvents', types: resolverTs, validatorHooks: null, returnType: 'plain', throwOnErrorDefault: true })
+    expect(plain).not.toContain(', config)')
   })
 })
