@@ -89,16 +89,16 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "^5.15.3",
+    "@kubb/kit": "^5.15.4",
     "@kubb/plugin-ts": "workspace:^",
-    "@kubb/renderer-jsx": "^5.15.3"
+    "@kubb/renderer-jsx": "^5.15.4"
   },
   "devDependencies": {
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*",
-    "@tanstack/vue-query": "^5.105.0",
+    "@tanstack/vue-query": "^5.105.1",
     "vue": "^3.5.44"
   },
   "peerDependencies": {

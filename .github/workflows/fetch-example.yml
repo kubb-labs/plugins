@@ -43,7 +43,7 @@ jobs:
         run: pnpm build --concurrency=3
 
       - name: Generate Kubb Studio snapshot
-        uses: kubb-labs/action@ac0f75e9be8415fcfe9f0314ac354566bdade999 # main
+        uses: kubb-labs/action@8cde6df3cc826ec1ea39cd4116b40505e1536ae1 # main
         continue-on-error: ${{ github.event_name == 'pull_request' }}
         with:
           token: ${{ secrets.KUBB_TOKEN }}
