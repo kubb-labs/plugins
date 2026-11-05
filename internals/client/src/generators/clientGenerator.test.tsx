@@ -3,7 +3,7 @@ import { ast, memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation, renderGeneratorOperations } from '#mocks'
 import { resolverClient } from '../resolver.ts'
 import type { SecurityDocument } from '../builders/security.ts'
 import type { Options, ResolvedOptions, ResolverClient } from '../types.ts'
@@ -264,6 +264,34 @@ describe('clientGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('clientGenerator runtime files', () => {
+  const sseGenerator = createClientGenerator<PluginFetch>('fetch', { sse: '/templates/sse.ts' })
+
+  test.each([
+    { name: 'copies sse.ts when an operation streams events', nodes: [getPetByIdNode, streamEventsNode], expected: ['.kubb/sse.ts'] },
+    { name: 'skips sse.ts when no operation streams events', nodes: [getPetByIdNode, createPetNode], expected: [] },
+  ])('$name', async ({ nodes, expected }) => {
+    const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
+    const driver = createMockedPluginDriver({
+      name: 'runtime',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorOperations(sseGenerator, nodes, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverClient,
+    })
+
+    expect(driver.fileManager.files.map((file) => [file.path.split('/').slice(-2).join('/'), file.copy])).toStrictEqual(
+      expected.map((file) => [file, '/templates/sse.ts']),
+    )
   })
 })
 

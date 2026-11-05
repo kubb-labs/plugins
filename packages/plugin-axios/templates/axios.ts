@@ -3,10 +3,6 @@ import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, Inte
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers.ts'
 import type { HeadersInit, HttpMethod, PathParamStyle, PathSerializer, Serializers, Styles } from './serializers.ts'
 import { ParseError, type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
-import { toEventStream as readEventStream, type EventStreamOptions, type EventStreamResult as StreamResult, type ServerSentEvent } from './sse.ts'
-
-export { parseEventStream } from './sse.ts'
-export type { EventOf, EventStreamCall, EventStreamMeta, EventStreamOptions, EventStreamSend, Reconnect, ServerSentEvent } from './sse.ts'
 
 /**
  * HTTP status codes treated as a success, everything else is an error.
@@ -235,7 +231,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   validate?: ValidateOption
   security?: Array<Auth>
   auth?: AuthResolver
-} & EventStreamOptions
+}
 
 /**
  * Combines client options with the operation's typed request params and body.
@@ -829,17 +825,6 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
  * The axios instance the generated `client` sends through. Register axios interceptors on it or reuse it inside your own transport.
  */
 export const defaultTransport = axios.create()
-
-/**
- * Parsed events alongside the native response.
- */
-export type EventStreamResult<TEvent = ServerSentEvent, TResponse = AxiosResponse> = StreamResult<TEvent, TResponse>
-
-/**
- * Reads a call as typed Server-Sent Events. `sse.ts` holds the parser, the options and the reconnect rules.
- */
-export const toEventStream = <TEvent = ServerSentEvent>(...args: Parameters<typeof readEventStream<TEvent, AxiosResponse>>) =>
-  readEventStream<TEvent, AxiosResponse>(...args)
 
 export const client = createClientCore({ defaultTransport })
 

@@ -33,8 +33,8 @@ export function buildSdkMethod({
 }): string {
   if (!ast.isHttpOperationNode(node)) return ''
 
-  const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault })
   const { callConfig, mergeContentType, eventStream } = buildCallConfig({ node, validatorHooks, security, throwOnErrorDefault, returnType })
+  const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault, eventStream })
   const eventStreamReturn = eventStream ? buildEventStreamReturn({ node, types, callConfig, returnType, validatorHooks }) : null
   const methodReturnType = eventStreamReturn?.returnType ?? signature.returnType
   const returnStatement = eventStreamReturn?.statement ?? buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault })

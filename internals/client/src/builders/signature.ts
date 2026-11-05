@@ -39,19 +39,25 @@ export function buildGroupedOptionsSignature({
   types,
   returnType,
   throwOnErrorDefault,
+  eventStream = false,
 }: {
   node: ast.OperationNode
   types: OperationTypeNames
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
+  /**
+   * Adds the per-call stream options to the `options` type of a `text/event-stream` operation.
+   */
+  eventStream?: boolean
 }): GroupedOptionsSignature {
   const optionsName = types.response.options(node)
+  const optionsType = `Options<${optionsName}, ThrowOnError>${eventStream ? ' & EventStreamOptions' : ''}`
   const { isOptional } = getRequestGroupOptionality(node)
 
   const paramsSignature =
     declarationPrinter.print(
       createFunctionParameters({
-        params: [createFunctionParameter({ name: 'options', type: `Options<${optionsName}, ThrowOnError>`, ...(isOptional ? { default: '{}' } : {}) })],
+        params: [createFunctionParameter({ name: 'options', type: optionsType, ...(isOptional ? { default: '{}' } : {}) })],
       }),
     ) ?? ''
 

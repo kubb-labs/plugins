@@ -1,14 +1,16 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options, EventStreamResult, SuccessOf, ServerSentEvent } from './.kubb/client'
+import type { Options, SuccessOf } from './.kubb/client'
+import type { EventStreamOptions, EventStreamResult, ServerSentEvent } from './.kubb/sse'
 import type { StreamEventsOptions, StreamEventsResponses } from './StreamEvents'
-import { client, toEventStream } from './.kubb/client'
+import { client } from './.kubb/client'
+import { toEventStream } from './.kubb/sse'
 
 /**
  * {@link /events}
  */
 export function streamEvents<ThrowOnError extends boolean = true>(
-  options: Options<StreamEventsOptions, ThrowOnError> = {},
+  options: Options<StreamEventsOptions, ThrowOnError> & EventStreamOptions = {},
 ): Promise<EventStreamResult<ServerSentEvent<SuccessOf<StreamEventsResponses>>>> {
   const { client: request = client, ...config } = options
 

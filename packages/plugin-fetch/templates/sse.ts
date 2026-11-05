@@ -2,6 +2,11 @@ import type { HttpMethod } from './serializers.ts'
 import { ParseError, type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
 
 /**
+ * The response type of this client's transport.
+ */
+type NativeResponse = Response
+
+/**
  * One decoded Server-Sent Event. `data` is parsed as JSON when valid and kept as the raw string otherwise,
  * `event` is `message` when the server sent no `event` field, and `id` is the last event ID the stream has set.
  */
@@ -131,7 +136,7 @@ export type EventStreamSend<TResponse> = (init?: ResumeInit) => Promise<EventStr
 /**
  * Parsed events alongside the native response of the first connection.
  */
-export type EventStreamResult<TEvent = ServerSentEvent, TResponse = Response> = {
+export type EventStreamResult<TEvent = ServerSentEvent, TResponse = NativeResponse> = {
   stream: AsyncGenerator<TEvent>
   response: TResponse
   /**
@@ -271,7 +276,7 @@ function sleep(ms: number, signal?: AbortSignal): Promise<void> {
  * server closes it. With `reconnect`, a dropped stream is resumed with `Last-Event-ID` after the server's `retry` or
  * a growing delay, until `maxRetries`, an abort, a non-2xx response, or a response that is not an event stream.
  */
-export async function toEventStream<TEvent = ServerSentEvent, TResponse = Response>(
+export async function toEventStream<TEvent = ServerSentEvent, TResponse = NativeResponse>(
   send: EventStreamSend<TResponse> | Promise<EventStreamCall<TResponse>>,
   options: EventStreamOptions & EventStreamCallOptions = {},
   meta: EventStreamMeta = {},

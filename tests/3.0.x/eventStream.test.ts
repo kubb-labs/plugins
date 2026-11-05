@@ -70,6 +70,32 @@ describe('event stream hooks', () => {
   })
 })
 
+describe('event stream runtime', () => {
+  test('is not written for a document without an event stream', async () => {
+    const output = await fs.mkdtemp(path.join(dirname, '.no-event-stream-'))
+    try {
+      const { diagnostics } = await createKubb(
+        {
+          root: dirname,
+          input: '../../schemas/3.0.x/petStore.yaml',
+          output: { path: output, barrel: false },
+          adapter: adapterOas({ validate: false }),
+          parsers: [parserTs()],
+          reporters: [],
+          storage: fsStorage(),
+          plugins: [pluginTs({ output: { path: './types', barrel: false } }), pluginFetch({ output: { path: './clients', barrel: false } })],
+        } as Config,
+        { hooks: new Hookable<KubbHooks>() },
+      ).safeBuild()
+      expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
+
+      expect(await fs.readdir(path.join(output, '.kubb'))).toStrictEqual(['client.ts', 'serializers.ts', 'standardSchema.ts'])
+    } finally {
+      await fs.rm(output, { recursive: true, force: true })
+    }
+  })
+})
+
 describe('OpenAPI 3.2 item schemas', () => {
   async function readAll(dir: string): Promise<string> {
     const files = await fs.readdir(dir, { recursive: true })

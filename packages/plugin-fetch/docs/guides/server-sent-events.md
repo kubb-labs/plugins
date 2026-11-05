@@ -1,6 +1,6 @@
 # Server-sent events
 
-Operations returning `text/event-stream` produce a typed stream of events rather than a `RequestResult`. The event types come from the OpenAPI document: OpenAPI 3.2 describes each event with `itemSchema`, and OpenAPI 3.0 and 3.1 describe one event with `schema`. The runtime in `.kubb/sse.ts` parses the stream the way the WHATWG event stream specification does, yields only the events the document declares, validates them one by one, and can reconnect with `Last-Event-ID`.
+Operations returning `text/event-stream` produce a typed stream of events rather than a `RequestResult`. The event types come from the OpenAPI document: OpenAPI 3.2 describes each event with `itemSchema`, and OpenAPI 3.0 and 3.1 describe one event with `schema`. The runtime in `.kubb/sse.ts`, generated only when the document has such an operation, parses the stream the way the WHATWG event stream specification does, yields only the events the document declares, validates them one by one, and can reconnect with `Last-Event-ID`.
 
 ## Describe the stream in OpenAPI
 
@@ -282,4 +282,10 @@ try {
 
 ## The runtime files
 
-`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `EventOf`, `EventStreamOptions`, and `Reconnect` types. `.kubb/client.ts` re-exports them next to `client`, so existing imports keep working. Both files are regenerated on each run, so do not edit them.
+`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `EventOf`, `EventStreamOptions`, and `Reconnect` types. Kubb writes it only when the document has a `text/event-stream` operation, so a document without streams gets no stream runtime. Import the types from there when you need them:
+
+```typescript
+import type { ServerSentEvent } from './gen/.kubb/sse'
+```
+
+Both `.kubb/sse.ts` and `.kubb/client.ts` are regenerated on each run, so do not edit them.

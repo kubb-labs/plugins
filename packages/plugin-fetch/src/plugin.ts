@@ -79,7 +79,7 @@ export const pluginFetch = defineExtension<PluginFetch>({
 
     // `sdk` swaps the per-operation functions for the class-based SDK; left unset, the standalone
     // functions (which query plugins consume) stay.
-    addGenerator(resolved.sdk ? createSdkGenerator<PluginFetch>() : clientGenerator)
+    addGenerator(resolved.sdk ? createSdkGenerator<PluginFetch>({ sse: sseTemplatePath }) : clientGenerator)
 
     const root = path.resolve(config.root, config.output.path)
     const baseURLExpression = baseURL ? (baseURL.includes('${') ? `\`${baseURL.replaceAll('`', '\\`')}\`` : JSON.stringify(baseURL)) : undefined
@@ -95,12 +95,6 @@ export const pluginFetch = defineExtension<PluginFetch>({
       path: path.resolve(root, '.kubb/client.ts'),
       copy: fetchClientTemplatePath,
       footer: baseURLExpression ? `client.setConfig({ baseURL: ${baseURLExpression} })` : undefined,
-    })
-
-    injectFile({
-      baseName: 'sse.ts',
-      path: path.resolve(root, '.kubb/sse.ts'),
-      copy: sseTemplatePath,
     })
 
     injectFile({

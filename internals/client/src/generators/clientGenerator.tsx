@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { getEventStream, operationFileEntry, operationKey, resolveDependencyOperationFile } from '@internals/shared'
+import { getEventStream, isEventStream, operationFileEntry, operationKey, resolveDependencyOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -16,13 +16,20 @@ import type { ContractClientFactory } from '../types.ts'
  * `@kubb/plugin-axios`). Emits one async function per OpenAPI operation using the shared
  * `Operation` component: a grouped `<Name>Request` type and a function that forwards a single
  * `options` object to the bundled `client` and returns the `Unwrappable<RequestResult>`. Only the
- * generator `name` differs between plugins. Every other resolution, import, and rendering step is
- * identical.
+ * generator `name` and the runtime templates differ between plugins. Every other resolution, import,
+ * and rendering step is identical.
+ *
+ * `runtime.sse` is the Server-Sent Events template, copied into `.kubb/sse.ts` only when the
+ * document has a `text/event-stream` operation. A custom client module brings its own.
  */
-export function createClientGenerator<TFactory extends ContractClientFactory>(name: string): Generator<TFactory> {
+export function createClientGenerator<TFactory extends ContractClientFactory>(name: string, runtime: { sse?: string } = {}): Generator<TFactory> {
   return defineGenerator<TFactory>({
     name,
     renderer: jsxRenderer,
+    operations(nodes, ctx) {
+      if (!runtime.sse || !nodes.some(isEventStream)) return null
+      return <File baseName="sse.ts" path={path.resolve(ctx.root, '.kubb/sse.ts')} copy={runtime.sse} />
+    },
     operation(node, ctx) {
       if (!ast.isHttpOperationNode(node)) return null
 
@@ -75,17 +82,18 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       // The headers validator helper ships in `.kubb/standardSchema.ts`; a custom client module exports it
       // alongside its other runtime helpers.
       const standardSchemaPath = importPath ?? path.resolve(root, '.kubb/standardSchema.ts')
+      // The Server-Sent Events runtime is its own file, so a document without a stream never imports it.
+      const ssePath = importPath ?? path.resolve(root, '.kubb/sse.ts')
       const stream = getEventStream(node)
 
       const clientValueImports = (() => {
-        if (stream) return ['client', 'toEventStream']
-        if (returnType === 'plain') return ['client']
+        if (stream || returnType === 'plain') return ['client']
         if (returnType === 'data') return ['client', 'unwrapResult']
         return ['client', 'withUnwrap']
       })()
 
       const clientTypeImports = (() => {
-        if (stream) return ['Options', 'EventStreamResult', 'SuccessOf', stream.shape === 'event' ? 'EventOf' : 'ServerSentEvent']
+        if (stream) return ['Options', 'SuccessOf']
         if (returnType === 'plain') return ['Options', 'RequestResult']
         if (returnType === 'data') return ['Options', 'UnwrappedResult']
         return ['Options', 'Unwrappable', 'RequestResult']
@@ -101,6 +109,15 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
         >
           <File.Import name={clientValueImports} root={clientRoot} path={clientPath} />
           <File.Import name={clientTypeImports} root={clientRoot} path={clientPath} isTypeOnly />
+          {stream && <File.Import name={['toEventStream']} root={clientRoot} path={ssePath} />}
+          {stream && (
+            <File.Import
+              name={['EventStreamOptions', 'EventStreamResult', stream.shape === 'event' ? 'EventOf' : 'ServerSentEvent']}
+              root={clientRoot}
+              path={ssePath}
+              isTypeOnly
+            />
+          )}
 
           {meta.fileTypes && importedTypeNames.length > 0 && (
             <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTypes.path} isTypeOnly />

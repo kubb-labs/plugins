@@ -1,14 +1,16 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options, EventStreamResult, SuccessOf, EventOf } from './.kubb/client'
+import type { Options, SuccessOf } from './.kubb/client'
+import type { EventStreamOptions, EventStreamResult, EventOf } from './.kubb/sse'
 import type { StreamChatOptions, StreamChatResponses } from './StreamChat'
-import { client, toEventStream } from './.kubb/client'
+import { client } from './.kubb/client'
+import { toEventStream } from './.kubb/sse'
 
 /**
  * {@link /chat}
  */
 export function streamChat<ThrowOnError extends boolean = true>(
-  options: Options<StreamChatOptions, ThrowOnError> = {},
+  options: Options<StreamChatOptions, ThrowOnError> & EventStreamOptions = {},
 ): Promise<EventStreamResult<EventOf<SuccessOf<StreamChatResponses>>>> {
   const { client: request = client, ...config } = options
 
