@@ -1655,6 +1655,21 @@ describe('parseEventStream', () => {
     const events = await collect(parseEventStream(asyncIterableOf(['data: {"n":1}\n\n'])))
     expect(events).toStrictEqual([{ data: { n: 1 } }])
   })
+
+  test('closes the async iterable when an unfinished event outgrows maxEventSize', async () => {
+    const chunk = new TextEncoder().encode(`data: ${'x'.repeat(1024)}\n`)
+    let closed = false
+    async function* endless(): AsyncGenerator<Uint8Array> {
+      try {
+        while (true) yield chunk
+      } finally {
+        closed = true
+      }
+    }
+
+    await expect(collect(parseEventStream(endless(), { maxEventSize: 64 * 1024 }))).rejects.toThrow(RangeError)
+    expect(closed).toBe(true)
+  })
 })
 
 describe('JSON content parameters', () => {

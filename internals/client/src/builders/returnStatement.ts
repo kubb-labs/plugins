@@ -54,12 +54,25 @@ export function buildReturnStatement({
 
 /**
  * Builds the return type and statement of an operation that returns `text/event-stream`: the call
- * is wrapped in `toEventStream`, so the caller iterates the typed success events.
+ * is wrapped in `toEventStream`, so the caller iterates the typed success events. Except with
+ * `returnType: 'plain'`, `toEventStream` also receives `config`, so a per-call `maxEventSize` reaches the parser.
  */
-export function buildEventStreamReturn({ node, types, callConfig }: { node: ast.OperationNode; types: OperationTypeNames; callConfig: string }): {
+export function buildEventStreamReturn({
+  node,
+  types,
+  callConfig,
+  returnType,
+}: {
+  node: ast.OperationNode
+  types: OperationTypeNames
+  callConfig: string
+  returnType: ReturnTypeOption
+}): {
   returnType: string
   statement: string
 } {
   const eventType = `SuccessOf<${types.response.responses(node)}>`
-  return { returnType: `Promise<EventStreamResult<${eventType}>>`, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
+  // A `'plain'` client is the caller's own module, whose `toEventStream` takes only the call result.
+  const args = returnType === 'plain' ? `request(${callConfig})` : `request(${callConfig}), config`
+  return { returnType: `Promise<EventStreamResult<${eventType}>>`, statement: `return toEventStream<${eventType}>(${args})` }
 }

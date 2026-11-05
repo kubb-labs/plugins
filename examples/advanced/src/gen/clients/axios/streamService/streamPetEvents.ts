@@ -44,5 +44,6 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
       ...config,
       throwOnError: config.throwOnError ?? true,
     }),
+    config,
   )
 }
