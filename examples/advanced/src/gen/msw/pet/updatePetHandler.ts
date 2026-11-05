@@ -10,7 +10,7 @@ export function updatePetHandlerResponse200(
         id?: number
       },
 ) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ export function updatePetHandlerResponse202(
         id?: number
       },
 ) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 202,
     headers: {
       'Content-Type': 'application/json',
@@ -34,19 +34,19 @@ export function updatePetHandlerResponse202(
 }
 
 export function updatePetHandlerResponse400(data?: unknown) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
   })
 }
 
 export function updatePetHandlerResponse404(data?: unknown) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 404,
   })
 }
 
 export function updatePetHandlerResponse405(data?: unknown) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 405,
   })
 }
@@ -67,7 +67,7 @@ export function updatePetHandler(
     function handler(info) {
       if (typeof data === 'function') return data(info)
 
-      return new HttpResponse(JSON.stringify(data), {
+      return new HttpResponse<string>(JSON.stringify(data), {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
