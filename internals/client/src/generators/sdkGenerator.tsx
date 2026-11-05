@@ -126,8 +126,11 @@ function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationDat
  * emits one class per tag and, when `sdk.name` is set, a composed root that instantiates every tag
  * client. With `sdk.mode: 'flat'` it emits one class named by `sdk.name`, with every operation as a
  * direct method.
+ *
+ * `sse` is the Server-Sent Events runtime template, copied into `.kubb/sse.ts` only for a document with a
+ * `text/event-stream` operation.
  */
-export function createSdkGenerator<TFactory extends ContractClientFactory>(runtime: { sse?: string } = {}): Generator<TFactory> {
+export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse }: { sse?: string } = {}): Generator<TFactory> {
   return defineGenerator<TFactory>({
     name: 'sdk',
     renderer: jsxRenderer,
@@ -158,7 +161,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(runti
       const clientPath = path.resolve(root, '.kubb/client.ts')
       const standardSchemaPath = path.resolve(root, '.kubb/standardSchema.ts')
       const ssePath = path.resolve(root, '.kubb/sse.ts')
-      const sseFile = runtime.sse && nodes.some(isEventStream) ? <File key={ssePath} baseName="sse.ts" path={ssePath} copy={runtime.sse} /> : null
+      const sseFile = sse && nodes.some(isEventStream) ? <File key={ssePath} baseName="sse.ts" path={ssePath} copy={sse} /> : null
 
       const banner = (file: ast.FileNode) => resolver.default.banner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
       const footer = (file: ast.FileNode) => resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })

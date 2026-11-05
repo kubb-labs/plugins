@@ -23,7 +23,7 @@ data: {"text": "Hel"}
 
 ### Two shapes of an item
 
-Kubb reads each item in one of two shapes, and the generated types follow. The adapter stores the choice on the content node as `stream.shape`, so every plugin sees the same answer.
+Kubb reads each item in one of two shapes, and the generated types follow.
 
 | Shape   | The item schema                                                                              | What the stream yields                                                                 |
 | ------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -95,7 +95,7 @@ export type StreamChatStatus200 =
 
 ### A payload-only item
 
-An `itemSchema` without `event` or `data` properties describes only the payload. This is the form the Speakeasy guide uses, and `schema: { type: string }` next to it keeps the document valid for tools that read OpenAPI 3.0 or 3.1:
+An `itemSchema` without `event` or `data` properties describes only the payload. `schema: { type: string }` next to it keeps the document valid for tools that read OpenAPI 3.0 or 3.1:
 
 ```yaml
 text/event-stream:
@@ -287,7 +287,7 @@ try {
 }
 ```
 
-A server can answer a streamed operation with JSON, for example an error body. The client parses such a body as a normal response: a non-2xx status still throws a `ResponseError` with the parsed `data`, and a 2xx JSON body yields an empty stream.
+A server can answer a streamed operation with JSON, for example an error body. The client parses such a body as a normal response: a non-2xx status still throws a `ResponseError` with the parsed `data`, and a 2xx JSON body yields an empty stream. An operation that declares both `application/json` and `text/event-stream` for its success response is generated as a stream, so a JSON answer to it yields an empty stream too.
 
 Servers often send a heartbeat event such as `ping` every few seconds and an `error` event when something goes wrong. Declare both in the document, so the heartbeat has a type and the error reaches your `switch` instead of `onUnknownEvent`.
 
@@ -312,7 +312,7 @@ try {
 
 ## The runtime files
 
-`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `EventOf`, `EventStreamOptions`, and `Reconnect` types. Kubb writes it only when the document has a `text/event-stream` operation, so a document without streams gets no stream runtime. Import the types from there when you need them:
+`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `EventOf`, `EventStreamOptions`, and `Reconnect` types. Import the types from there when you need them:
 
 ```typescript
 import type { ServerSentEvent } from './gen/.kubb/sse'

@@ -57,6 +57,8 @@ export function buildReturnStatement({
  * Builds the return type and statement of a `text/event-stream` operation: `EventOf` when each item declares its own
  * `event` and `data`, `ServerSentEvent` around the payload otherwise. The call goes through `toEventStream` with a `send`
  * function for the resume request, the call's `config`, and the method, shape, declared event names and per-event validator.
+ * A `returnType: 'plain'` client gets the one-argument form, `toEventStream(request(config))`, and keeps its response
+ * validator in the call config.
  */
 export function buildEventStreamReturn({
   node,

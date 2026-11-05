@@ -11,7 +11,8 @@ import { buildValidatorLiteral, type ValidatorHooks } from './validator.ts'
  * functions and the SDK methods. The `throwOnError` fallback is applied after the `...config` spread.
  *
  * `mergeContentType` is `true` when the caller must destructure `contentType` from `options`, and
- * `eventStream` is `true` when the operation returns `text/event-stream`.
+ * `eventStream` is `true` when the operation returns `text/event-stream`. Unless `returnType` is `'plain'`, a
+ * stream's literal spreads `...init` for the resume request and leaves the `response` validator to `toEventStream`.
  */
 export function buildCallConfig({
   node,

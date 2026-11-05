@@ -658,11 +658,11 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 }
 
 /**
- * Reads a streamed body that is not an event stream back into its value, as the fetch adapter streams every
- * `responseType: 'stream'` answer, including a JSON error body.
+ * Reads a streamed JSON body, such as an error body, back into its value, as the fetch adapter streams every
+ * `responseType: 'stream'` answer. Any other streamed body stays a stream.
  */
 async function readStreamedBody(data: unknown, contentType: string | undefined): Promise<unknown> {
-  if (!(data instanceof ReadableStream) || contentType?.includes('text/event-stream')) return data
+  if (!(data instanceof ReadableStream) || !contentType?.includes('json')) return data
   const text = await new Response(data).text()
   if (!text) return undefined
   try {

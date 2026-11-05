@@ -12,7 +12,8 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
  */
 export type GroupedOptionsSignature = {
   /**
-   * The single function parameter: `options: Options<<Name>Options, ThrowOnError>`.
+   * The single function parameter: `options: Options<<Name>Options, ThrowOnError>`, with `& EventStreamOptions`
+   * for a `text/event-stream` operation.
    */
   paramsSignature: string
   /**
@@ -45,7 +46,9 @@ export function buildGroupedOptionsSignature({
   types: OperationTypeNames
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
-  /** Adds the per-call stream options to the `options` type of a `text/event-stream` operation. */
+  /**
+   * Adds the per-call stream options to the `options` type of a `text/event-stream` operation.
+   */
   eventStream?: boolean
 }): GroupedOptionsSignature {
   const optionsName = types.response.options(node)

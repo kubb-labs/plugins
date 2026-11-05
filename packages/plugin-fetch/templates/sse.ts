@@ -19,7 +19,7 @@ export type EventOf<T> = T & Pick<ServerSentEvent, 'id' | 'retry'>
 
 /** Reconnects with `Last-Event-ID` after the stream drops, as `EventSource` does: 2 retries, from 1000 ms growing by 1.5 up to 30000 ms. */
 export type Reconnect = {
-  /** Reconnects after the first connection. */
+  /** Most reconnects attempted after the first connection. */
   maxRetries?: number
   /** Delay before the first reconnect in milliseconds, unless the server sent `retry`. */
   initialDelay?: number
@@ -91,6 +91,9 @@ export type EventStreamCallOptions = {
   ) => { value: unknown } | void | Promise<{ value: unknown } | void>
 }
 
+/**
+ * The answer to one send: the body as a stream or a decoded value, its content type, and the native response.
+ */
 export type EventStreamCall<TResponse> = { data: unknown; contentType?: string; response: TResponse }
 
 /** Sends the call, or the resume request after a drop. */
@@ -316,7 +319,7 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
       // A GET or HEAD resume carries no body. A connection that fails is retried like a drop; a refused one (`ResponseError`) ends the stream.
       call = await (send as EventStreamSend<TResponse>)({ ...(method === 'GET' || method === 'HEAD' ? { body: undefined } : {}), ...init, headers }).catch(
         (error: unknown) => {
-          if ((error as Error | undefined)?.name === 'ResponseError' || options.signal?.aborted || attempt + 1 >= maxRetries) throw error
+          if ((error instanceof Error && error.name === 'ResponseError') || options.signal?.aborted || attempt + 1 >= maxRetries) throw error
           return undefined
         },
       )

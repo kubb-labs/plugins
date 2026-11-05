@@ -11,12 +11,12 @@ import { createClientGenerator } from './clientGenerator.tsx'
 
 type PluginFetch = PluginType<'plugin-fetch', Options, ResolvedOptions, ResolverClient>
 
-const clientGenerator = createClientGenerator<PluginFetch>('fetch')
+const clientGenerator = createClientGenerator<PluginFetch>({ name: 'fetch' })
 
 type PluginClient = PluginType<'plugin-client', Options, ResolvedOptions & { importPath: string }, ResolverClient>
 
 // What `@kubb/plugin-client` registers: a user-owned client module, imported exactly as configured.
-const customClientGenerator = createClientGenerator<PluginClient>('client')
+const customClientGenerator = createClientGenerator<PluginClient>({ name: 'client' })
 
 const testConfig: Config = {
   root: '.',
@@ -172,6 +172,20 @@ const streamEventsNode = ast.factory.createOperation({
   ],
 })
 
+const streamChatMember = (name: string) =>
+  ast.factory.createSchema({
+    type: 'object',
+    properties: [
+      ast.factory.createProperty({ name: 'event', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) }),
+      ast.factory.createProperty({ name: 'data', schema: ast.factory.createSchema({ type: 'string' }) }),
+    ],
+  })
+const streamChatSchema = ast.factory.createSchema({
+  type: 'union',
+  discriminatorPropertyName: 'event',
+  members: [streamChatMember('message_delta'), streamChatMember('ping')],
+})
+
 // An OpenAPI 3.2 `itemSchema` event union, as the adapter emits it: `stream.schema` is the item and `shape` says each item is a whole event.
 const streamChatNode = ast.factory.createOperation({
   operationId: 'streamChat',
@@ -183,18 +197,7 @@ const streamChatNode = ast.factory.createOperation({
       statusCode: '200',
       description: 'typed events',
       content: [
-        (() => {
-          const member = (name: string) =>
-            ast.factory.createSchema({
-              type: 'object',
-              properties: [
-                ast.factory.createProperty({ name: 'event', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) }),
-                ast.factory.createProperty({ name: 'data', schema: ast.factory.createSchema({ type: 'string' }) }),
-              ],
-            })
-          const schema = ast.factory.createSchema({ type: 'union', discriminatorPropertyName: 'event', members: [member('message_delta'), member('ping')] })
-          return ast.factory.createContent({ contentType: 'text/event-stream', schema, stream: { schema, shape: 'event' } })
-        })(),
+        ast.factory.createContent({ contentType: 'text/event-stream', schema: streamChatSchema, stream: { schema: streamChatSchema, shape: 'event' } }),
       ],
     }),
   ],
@@ -268,7 +271,7 @@ describe('clientGenerator operation', () => {
 })
 
 describe('clientGenerator runtime files', () => {
-  const sseGenerator = createClientGenerator<PluginFetch>('fetch', { sse: '/templates/sse.ts' })
+  const sseGenerator = createClientGenerator<PluginFetch>({ name: 'fetch', sse: '/templates/sse.ts' })
 
   test.each([
     { name: 'copies sse.ts when an operation streams events', nodes: [getPetByIdNode, streamEventsNode], expected: ['.kubb/sse.ts'] },

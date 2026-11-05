@@ -19,15 +19,16 @@ import type { ContractClientFactory } from '../types.ts'
  * generator `name` and the runtime templates differ between plugins. Every other resolution, import,
  * and rendering step is identical.
  *
- * `runtime.sse` is the Server-Sent Events template, copied into `.kubb/sse.ts` only for a document with a `text/event-stream` operation.
+ * `sse` is the Server-Sent Events runtime template, copied into `.kubb/sse.ts` only for a document with a
+ * `text/event-stream` operation.
  */
-export function createClientGenerator<TFactory extends ContractClientFactory>(name: string, runtime: { sse?: string } = {}): Generator<TFactory> {
+export function createClientGenerator<TFactory extends ContractClientFactory>({ name, sse }: { name: string; sse?: string }): Generator<TFactory> {
   return defineGenerator<TFactory>({
     name,
     renderer: jsxRenderer,
     operations(nodes, ctx) {
-      if (!runtime.sse || !nodes.some(isEventStream)) return null
-      return <File baseName="sse.ts" path={path.resolve(ctx.root, '.kubb/sse.ts')} copy={runtime.sse} />
+      if (!sse || !nodes.some(isEventStream)) return null
+      return <File baseName="sse.ts" path={path.resolve(ctx.root, '.kubb/sse.ts')} copy={sse} />
     },
     operation(node, ctx) {
       if (!ast.isHttpOperationNode(node)) return null

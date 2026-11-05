@@ -160,12 +160,19 @@ function getPrimarySuccessContentType(node: ast.OperationNode): string | undefin
 }
 
 /**
- * Whether an operation streams its primary success response as Server-Sent Events
- * (`text/event-stream`). The client generator uses this to return a typed event stream instead of a
- * one-shot `RequestResult`.
+ * The `text/event-stream` content of the primary success response, also when other content types sit next to it.
+ */
+function getEventStreamContent(node: ast.OperationNode): ast.ContentNode | undefined {
+  return getPrimarySuccessResponse(node)?.content?.find((entry) => entry.contentType.split(';')[0]!.trim().toLowerCase() === 'text/event-stream')
+}
+
+/**
+ * Whether an operation streams its primary success response as Server-Sent Events (`text/event-stream`), alone or
+ * next to other content types. The client generator uses this to return a typed event stream instead of a one-shot
+ * `RequestResult`.
  */
 export function isEventStream(node: ast.OperationNode): boolean {
-  return getPrimarySuccessContentType(node) === 'text/event-stream'
+  return getEventStreamContent(node) !== undefined
 }
 
 /**
@@ -173,10 +180,10 @@ export function isEventStream(node: ast.OperationNode): boolean {
  * when it is only the payload, `events` lists the names when every item declares one, `null` without an event stream.
  */
 export function getEventStream(node: ast.OperationNode): { shape: 'event' | 'data'; events?: Array<string> } | null {
-  if (!isEventStream(node)) return null
-  const content = getPrimarySuccessResponse(node)?.content?.[0]
-  const schema = content?.stream?.schema ?? content?.schema
-  const shape = content?.stream?.shape ?? 'data'
+  const content = getEventStreamContent(node)
+  if (!content) return null
+  const schema = content.stream?.schema ?? content.schema
+  const shape = content.stream?.shape ?? 'data'
   const members = schema ? (ast.narrowSchema(ast.resolveRef(schema), 'union')?.members ?? [schema]) : []
   const names = members.map((member) =>
     ast
@@ -190,17 +197,17 @@ export function getEventStream(node: ast.OperationNode): { shape: 'event' | 'dat
 /**
  * Derives the default `responseType` for an operation from its primary success response.
  *
- * Returns a value only when that response declares a single non-JSON content type. `text/event-stream`
- * and other binary types (`application/octet-stream`, `application/pdf`, `image/*`, `audio/*`,
- * `video/*`) map to a stream or `'blob'`, and other `text/*` maps to `'text'`. Otherwise `undefined`,
- * leaving the runtime client's `Content-Type` auto-detection in charge.
+ * `text/event-stream` maps to `'stream'`, also next to other content types. Otherwise a value is returned only when
+ * the response declares a single non-JSON content type: `application/octet-stream`, `application/pdf`, `image/*`,
+ * `audio/*` and `video/*` map to `'blob'`, and other `text/*` to `'text'`. `undefined` leaves the runtime client's
+ * `Content-Type` auto-detection in charge.
  */
 export function getResponseType(node: ast.OperationNode): ResponseType | undefined {
+  if (isEventStream(node)) return 'stream'
   const baseType = getPrimarySuccessContentType(node)
   if (!baseType) return undefined
 
   if (baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json') return undefined
-  if (baseType === 'text/event-stream') return 'stream'
   if (baseType.startsWith('text/')) return 'text'
   if (baseType === 'application/octet-stream' || baseType === 'application/pdf' || /^(image|audio|video)\//.test(baseType)) return 'blob'
   return undefined

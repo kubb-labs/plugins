@@ -10,6 +10,7 @@ import {
   getOperationParameters,
   getOperationSuccessResponses,
   getPrimarySuccessResponse,
+  getEventStream,
   getResponseType,
   getSuccessResponses,
   isErrorStatusCode,
@@ -401,6 +402,27 @@ describe('getResponseType / isEventStream', () => {
     expect(isEventStream(nodeWithResponseContentType('text/event-stream'))).toBe(true)
     expect(getResponseType(nodeWithResponseContentType('text/event-stream; charset=utf-8'))).toBe('stream')
     expect(isEventStream(nodeWithResponseContentType('text/event-stream; charset=utf-8'))).toBe(true)
+  })
+
+  test('treats text/event-stream next to another content type as a stream', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'streamEvents',
+      method: 'GET',
+      path: '/events',
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [
+            ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) }),
+            ast.factory.createContent({ contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'string' }) }),
+          ],
+        }),
+      ],
+    })
+
+    expect(isEventStream(node)).toBe(true)
+    expect(getResponseType(node)).toBe('stream')
+    expect(getEventStream(node)).toStrictEqual({ shape: 'data' })
   })
 
   test('leaves JSON responses to the runtime auto-detection', () => {
