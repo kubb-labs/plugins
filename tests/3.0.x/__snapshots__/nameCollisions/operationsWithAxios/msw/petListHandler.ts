@@ -8,7 +8,7 @@ import type { PetListResponse } from '../types/pet/List'
 import { http, HttpResponse } from 'msw/http'
 
 export function petListHandlerResponse200(data: PetListResponse) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -20,7 +20,7 @@ export function petListHandler(data?: PetListResponse | ((info: Parameters<Param
   return http.get(`${options?.baseURL ?? ''}/pets/first`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new HttpResponse(JSON.stringify(data), {
+      return new HttpResponse<string>(JSON.stringify(data), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'
@@ -30,7 +30,7 @@ export function petListHandler(data?: PetListResponse | ((info: Parameters<Param
 }
 
 export function petListHandler2Response200(data: PetListResponse2) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -42,7 +42,7 @@ export function petListHandler2(data?: PetListResponse2 | ((info: Parameters<Par
   return http.get(`${options?.baseURL ?? ''}/pets/second`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new HttpResponse(JSON.stringify(data), {
+      return new HttpResponse<string>(JSON.stringify(data), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'
