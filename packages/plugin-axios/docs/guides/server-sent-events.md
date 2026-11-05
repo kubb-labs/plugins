@@ -21,6 +21,36 @@ data: {"text": "Hel"}
 | `id`    | The last event ID. It carries over to the next events and resumes a dropped stream. |
 | `retry` | The reconnection delay in milliseconds.                                             |
 
+### Two shapes of an item
+
+Kubb reads each item in one of two shapes, and the generated types follow. The adapter stores the choice on the content node as `stream.shape`, so every plugin sees the same answer.
+
+| Shape   | The item schema                                                                              | What the stream yields                                                                 |
+| ------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `event` | Declares `event` or `data`, itself or in a `oneOf` member, so it describes the parsed event. | `EventOf<Item>`: the item as written, plus the `id` and `retry` any event may carry.   |
+| `data`  | Declares neither, so it describes only the payload.                                          | `ServerSentEvent<Item>`: `data` typed as the item, next to `event`, `id`, and `retry`. |
+
+Both shapes come from the same wire format. With an `event` shape, this stream:
+
+```text
+event: message_delta
+id: 7
+data: {"text": "Hel"}
+
+event: ping
+data: {}
+
+```
+
+yields `{ event: 'message_delta', id: '7', data: { text: 'Hel' } }` and then `{ event: 'ping', id: '7', data: {} }`, and a `switch` on `event` narrows `data`. With a `data` shape, a stream of stock updates:
+
+```text
+data: {"symbol": "AAPL", "price": "100.25"}
+
+```
+
+yields `{ event: 'message', data: { symbol: 'AAPL', price: '100.25' } }`, with `data` typed as `StockUpdate`. The sections below show how to write each shape in OpenAPI 3.2 and in 3.0 or 3.1.
+
 ### OpenAPI 3.2: one schema per event with itemSchema
 
 OpenAPI 3.2 adds `itemSchema` to a media type. It describes one item of a stream, while `schema` keeps describing the complete body. For `text/event-stream`, the item is the parsed event: `event`, `data`, `id`, and `retry` as strings and an integer. Describe each event name as a `oneOf` member with a `const` on `event`, and describe JSON inside `data` with `contentMediaType` and `contentSchema`:

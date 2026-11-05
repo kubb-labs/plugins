@@ -112,6 +112,17 @@ describe('parseEventStream', () => {
     expect(await collect(parseEventStream<string>(streamOf(['data: a\r', '', '\ndata: b\n\n'])))).toStrictEqual([message('a\nb')])
   })
 
+  test('strips a byte order mark, also when it is split across chunks', async () => {
+    const bytes = encoder.encode('\uFEFFdata: a\n\n')
+    async function* split() {
+      yield bytes.slice(0, 2)
+      yield bytes.slice(2)
+    }
+
+    expect(await collect(parseEventStream<string>(streamOf(['\uFEFFdata: a\n\n'])))).toStrictEqual([message('a')])
+    expect(await collect(parseEventStream<string>(split()))).toStrictEqual([message('a')])
+  })
+
   test('decodes a multi-byte character split across chunks', async () => {
     const bytes = encoder.encode('data: ✓\n\n')
     async function* split() {
