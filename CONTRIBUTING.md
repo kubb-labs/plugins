@@ -8,6 +8,8 @@ This repository is home to both official and community plugins for [Kubb](https:
 
 Please read our [Code of Conduct](https://github.com/kubb-labs/.github/blob/main/CODE_OF_CONDUCT.md) before participating. Search the [issue tracker](https://github.com/kubb-labs/plugins/issues) before opening a new issue or PR. For significant changes, open an issue first and wait for maintainer feedback. Small fixes (typos, docs, tests) can go straight to a PR.
 
+You may use AI tools to contribute. See our [AI Contribution Policy](./AI_POLICY.md).
+
 ## Prerequisites
 
 - Node.js 22.22 or newer
