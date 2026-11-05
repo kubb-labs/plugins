@@ -14,9 +14,11 @@ export function streamChat<ThrowOnError extends boolean = true>(
 ): Promise<EventStreamResult<EventOf<SuccessOf<StreamChatResponses>>>> {
   const { client: request = client, ...config } = options
 
-  return toEventStream<EventOf<SuccessOf<StreamChatResponses>>>(
-    (init) => request({ method: 'POST', url: '/chat', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true, ...init }),
+  return toEventStream<EventOf<SuccessOf<StreamChatResponses>>>({
+    send: (init) => request({ method: 'POST', url: '/chat', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true, ...init }),
     config,
-    { method: 'POST', shape: 'event', events: ['message_delta', 'ping'] },
-  )
+    method: 'POST',
+    shape: 'event',
+    events: ['message_delta', 'ping'],
+  })
 }

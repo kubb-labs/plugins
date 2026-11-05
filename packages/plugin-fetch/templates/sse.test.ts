@@ -195,7 +195,7 @@ describe('toEventStream', () => {
 
   test('passes maxEventSize to the parser and exposes the response', async () => {
     const response = new Response()
-    const result = await toEventStream(Promise.resolve({ data: streamOf([`data: ${'x'.repeat(44)}\n\n`]), response }), { maxEventSize: 49 })
+    const result = await toEventStream({ send: Promise.resolve({ data: streamOf([`data: ${'x'.repeat(44)}\n\n`]), response }), config: { maxEventSize: 49 } })
 
     expect(result.response).toBe(response)
     await expect(collect(result.stream)).rejects.toThrow(RangeError)
@@ -206,16 +206,16 @@ describe('toEventStream', () => {
     ['a JSON body on a streamed operation', call({ error: 'busy' }, 'application/json')],
     ['a stream that is not an event stream', call(streamOf(['data: a\n\n']), 'text/plain')],
   ])('yields nothing for %s', async (_, first) => {
-    expect(await collect((await toEventStream(Promise.resolve(first))).stream)).toStrictEqual([])
+    expect(await collect((await toEventStream({ send: Promise.resolve(first) })).stream)).toStrictEqual([])
   })
 
   test('yields only the declared events and hands the others to onUnknownEvent', async () => {
     const onUnknownEvent = vi.fn()
-    const { stream } = await toEventStream(
-      Promise.resolve(call(streamOf(['event: a\ndata: 1\n\nevent: b\ndata: 2\n\ndata: 3\n\n']))),
-      { onUnknownEvent },
-      { events: ['a'] },
-    )
+    const { stream } = await toEventStream({
+      send: Promise.resolve(call(streamOf(['event: a\ndata: 1\n\nevent: b\ndata: 2\n\ndata: 3\n\n']))),
+      config: { onUnknownEvent },
+      events: ['a'],
+    })
 
     expect(await collect(stream)).toStrictEqual([{ data: 1, event: 'a' }])
     expect(onUnknownEvent.mock.calls).toStrictEqual([[{ data: 2, event: 'b' }], [message(3)]])
@@ -223,14 +223,19 @@ describe('toEventStream', () => {
 
   test('runs transform before the validator and validates data for the data shape', async () => {
     const transform = vi.fn((event: ServerSentEvent) => ({ ...event, data: { n: (event.data as { count: number }).count } }))
-    const { stream } = await toEventStream(Promise.resolve(call(streamOf(['id: 9\ndata: {"count":1}\n\n']))), { transform }, { shape: 'data', validator })
+    const { stream } = await toEventStream({
+      send: Promise.resolve(call(streamOf(['id: 9\ndata: {"count":1}\n\n']))),
+      config: { transform },
+      shape: 'data',
+      validator,
+    })
 
     expect(await collect(stream)).toStrictEqual([message({ n: 1, checked: true }, { id: '9' })])
     expect(transform).toHaveBeenCalledOnce()
   })
 
   test('validates the whole event for the event shape and keeps id and retry', async () => {
-    const { stream } = await toEventStream(Promise.resolve(call(streamOf(['event: n\nid: 1\nretry: 5\ndata: 1\n\n']))), {}, { shape: 'event', validator })
+    const { stream } = await toEventStream({ send: Promise.resolve(call(streamOf(['event: n\nid: 1\nretry: 5\ndata: 1\n\n']))), shape: 'event', validator })
 
     expect(await collect(stream)).toStrictEqual([{ data: 1, event: 'n', id: '1', retry: 5, checked: true }])
   })
@@ -238,7 +243,7 @@ describe('toEventStream', () => {
   test('a failing validation calls onValidationError and keeps streaming when it is handled', async () => {
     const onValidationError = vi.fn((error: ParseError, context: { value: unknown }) => ({ value: { replaced: context.value } }))
     const first = call(streamOf(['data: {"n":1}\n\ndata: "bad"\n\ndata: {"n":2}\n\n']))
-    const { stream } = await toEventStream(Promise.resolve(first), { onValidationError }, { validator })
+    const { stream } = await toEventStream({ send: Promise.resolve(first), config: { onValidationError }, validator })
 
     expect(await collect(stream)).toStrictEqual([message({ n: 1, checked: true }), message({ replaced: 'bad' }), message({ n: 2, checked: true })])
     expect(onValidationError).toHaveBeenCalledOnce()
@@ -247,13 +252,17 @@ describe('toEventStream', () => {
   })
 
   test('a failing validation ends the stream when no handler takes it', async () => {
-    const { stream } = await toEventStream(Promise.resolve(call(streamOf(['data: "bad"\n\n']))), { onValidationError: () => undefined }, { validator })
+    const { stream } = await toEventStream({
+      send: Promise.resolve(call(streamOf(['data: "bad"\n\n']))),
+      config: { onValidationError: () => undefined },
+      validator,
+    })
 
     await expect(collect(stream)).rejects.toBeInstanceOf(ParseError)
   })
 
   test.each([false, { response: false }])('validate %o skips the validator', async (validate) => {
-    const { stream } = await toEventStream(Promise.resolve(call(streamOf(['data: "bad"\n\n']))), { validate }, { validator })
+    const { stream } = await toEventStream({ send: Promise.resolve(call(streamOf(['data: "bad"\n\n']))), config: { validate }, validator })
     expect(await collect(stream)).toStrictEqual([message('bad')])
   })
 
@@ -269,11 +278,11 @@ describe('toEventStream', () => {
 
     test('resumes a dropped GET stream with Last-Event-ID and the call headers', async () => {
       const send = sender(call(droppedAfter('id: 1\ndata: a\n\n')), call(streamOf(['data: b\n\n'])))
-      const result = await toEventStream<ServerSentEvent<string>>(
-        send,
-        { headers: { Authorization: 'Bearer t' }, reconnect: { initialDelay: 0 } },
-        { method: 'GET' },
-      )
+      const result = await toEventStream<ServerSentEvent<string>>({
+        send: send,
+        config: { headers: { Authorization: 'Bearer t' }, reconnect: { initialDelay: 0 } },
+        method: 'GET',
+      })
 
       expect(await collect(result.stream)).toStrictEqual([message('a', { id: '1' }), message('b', { id: '1' })])
       expect(send.mock.calls).toStrictEqual([[], [{ body: undefined, headers: { Authorization: 'Bearer t', 'Last-Event-ID': '1' } }]])
@@ -282,7 +291,7 @@ describe('toEventStream', () => {
 
     test('omits Last-Event-ID after an empty id', async () => {
       const send = sender(call(droppedAfter('id: 1\ndata: a\n\nid:\ndata: b\n\n')), call(streamOf(['data: c\n\n'])))
-      const { stream } = await toEventStream(send, { reconnect: { initialDelay: 0 } }, { method: 'GET' })
+      const { stream } = await toEventStream({ send: send, config: { reconnect: { initialDelay: 0 } }, method: 'GET' })
 
       expect(await collect(stream)).toHaveLength(3)
       expect(send.mock.calls[1]).toStrictEqual([{ body: undefined, headers: {} }])
@@ -292,14 +301,14 @@ describe('toEventStream', () => {
       using setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout')
       const send = sender(call(droppedAfter('retry: 2\ndata: a\n\n')), call(streamOf(['data: b\n\n'])))
 
-      await collect((await toEventStream(send, { reconnect: { initialDelay: 1 } }, { method: 'GET' })).stream)
+      await collect((await toEventStream({ send: send, config: { reconnect: { initialDelay: 1 } }, method: 'GET' })).stream)
       expect(setTimeoutSpy).toHaveBeenLastCalledWith(expect.any(Function), 2)
     })
 
     test('grows the delay and stops after maxRetries with the last drop', async () => {
       using setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout')
       const send = sender(call(droppedAfter('data: a\n\n')), call(droppedAfter('data: b\n\n')), call(droppedAfter('data: c\n\n')))
-      const { stream } = await toEventStream(send, { reconnect: { initialDelay: 1, growFactor: 2, maxRetries: 2 } }, { method: 'GET' })
+      const { stream } = await toEventStream({ send: send, config: { reconnect: { initialDelay: 1, growFactor: 2, maxRetries: 2 } }, method: 'GET' })
 
       await expect(collect(stream)).rejects.toThrow('connection lost')
       expect(send).toHaveBeenCalledTimes(3)
@@ -309,21 +318,23 @@ describe('toEventStream', () => {
     test('ends the stream after a clean close', async () => {
       const send = sender(call(streamOf(['data: a\n\n'])), call(streamOf(['data: b\n\n'])), call(undefined))
 
-      expect(await collect((await toEventStream(send, { reconnect: { initialDelay: 0 } }, { method: 'GET' })).stream)).toHaveLength(1)
+      expect(await collect((await toEventStream({ send: send, config: { reconnect: { initialDelay: 0 } }, method: 'GET' })).stream)).toHaveLength(1)
       expect(send).toHaveBeenCalledTimes(1)
     })
 
     test('reconnects after a clean close with onClose', async () => {
       const send = sender(call(streamOf(['data: a\n\n'])), call(streamOf(['data: b\n\n'])), call(undefined))
 
-      expect(await collect((await toEventStream(send, { reconnect: { initialDelay: 0, onClose: true } }, { method: 'GET' })).stream)).toHaveLength(2)
+      expect(
+        await collect((await toEventStream({ send: send, config: { reconnect: { initialDelay: 0, onClose: true } }, method: 'GET' })).stream),
+      ).toHaveLength(2)
       expect(send).toHaveBeenCalledTimes(3)
     })
 
     test('stops reconnecting on abort', async () => {
       const controller = new AbortController()
       const send = sender(call(droppedAfter('data: a\n\n')))
-      const { stream } = await toEventStream(send, { signal: controller.signal, reconnect: { initialDelay: 1000 } }, { method: 'GET' })
+      const { stream } = await toEventStream({ send: send, config: { signal: controller.signal, reconnect: { initialDelay: 1000 } }, method: 'GET' })
       setTimeout(() => controller.abort(), 5)
 
       expect(await collect(stream)).toStrictEqual([message('a')])
@@ -333,33 +344,35 @@ describe('toEventStream', () => {
     test('stops at a reconnect answered without a stream', async () => {
       const send = sender(call(droppedAfter('data: a\n\n')), call({ error: true }, 'application/json'))
 
-      expect(await collect((await toEventStream(send, { reconnect: { initialDelay: 0 } }, { method: 'GET' })).stream)).toStrictEqual([message('a')])
+      expect(await collect((await toEventStream({ send: send, config: { reconnect: { initialDelay: 0 } }, method: 'GET' })).stream)).toStrictEqual([
+        message('a'),
+      ])
     })
 
     test('stops reconnecting when the consumer breaks', async () => {
       const send = sender(call(droppedAfter('data: a\n\ndata: b\n\n')), call(streamOf(['data: c\n\n'])))
-      const { stream } = await toEventStream(send, { reconnect: { initialDelay: 0 } }, { method: 'GET' })
+      const { stream } = await toEventStream({ send: send, config: { reconnect: { initialDelay: 0 } }, method: 'GET' })
 
       for await (const event of stream) if (event.data === 'a') break
       expect(send).toHaveBeenCalledTimes(1)
     })
 
     test('requires resume for a method other than GET', async () => {
-      await expect(toEventStream(sender(), { reconnect: {} }, { method: 'POST' })).rejects.toThrow(TypeError)
+      await expect(toEventStream({ send: sender(), config: { reconnect: {} }, method: 'POST' })).rejects.toThrow(TypeError)
     })
 
     test('sends the request resume returns, with Last-Event-ID', async () => {
       const send = sender(call(droppedAfter('id: 3\ndata: a\n\n')), call(streamOf(['data: b\n\n'])))
       const resume = vi.fn((lastEventId: string) => ({ method: 'GET' as const, headers: { 'X-Resume': lastEventId } }))
 
-      await collect((await toEventStream(send, { reconnect: { initialDelay: 0, resume } }, { method: 'POST' })).stream)
+      await collect((await toEventStream({ send: send, config: { reconnect: { initialDelay: 0, resume } }, method: 'POST' })).stream)
       expect(resume).toHaveBeenCalledWith('3')
       expect(send.mock.calls[1]).toStrictEqual([{ method: 'GET', body: undefined, headers: { 'Last-Event-ID': '3', 'X-Resume': '3' } }])
     })
 
     test('ends the stream instead of reconnecting on a failed validation', async () => {
       const send = sender(call(streamOf(['data: "bad"\n\n'])), call(streamOf(['data: {"n":2}\n\n'])))
-      const { stream } = await toEventStream(send, { reconnect: { initialDelay: 0 } }, { method: 'GET', validator })
+      const { stream } = await toEventStream({ send: send, config: { reconnect: { initialDelay: 0 } }, method: 'GET', validator })
 
       await expect(collect(stream)).rejects.toBeInstanceOf(ParseError)
       expect(send).toHaveBeenCalledTimes(1)
@@ -367,7 +380,7 @@ describe('toEventStream', () => {
 
     test('ends the stream instead of reconnecting on a too-large event', async () => {
       const send = sender(call(streamOf([`data: ${'x'.repeat(64)}\n\n`])), call(streamOf(['data: a\n\n'])))
-      const { stream } = await toEventStream(send, { maxEventSize: 32, reconnect: { initialDelay: 0 } }, { method: 'GET' })
+      const { stream } = await toEventStream({ send: send, config: { maxEventSize: 32, reconnect: { initialDelay: 0 } }, method: 'GET' })
 
       await expect(collect(stream)).rejects.toThrow(RangeError)
       expect(send).toHaveBeenCalledTimes(1)
@@ -375,7 +388,7 @@ describe('toEventStream', () => {
 
     test('retries a reconnect that fails to connect', async () => {
       const send = sender(call(droppedAfter('data: a\n\n')), new TypeError('fetch failed'), call(streamOf(['data: b\n\n'])))
-      const { stream } = await toEventStream<ServerSentEvent<string>>(send, { reconnect: { initialDelay: 0 } }, { method: 'GET' })
+      const { stream } = await toEventStream<ServerSentEvent<string>>({ send: send, config: { reconnect: { initialDelay: 0 } }, method: 'GET' })
 
       expect(await collect(stream)).toStrictEqual([message('a'), message('b')])
       expect(send).toHaveBeenCalledTimes(3)
@@ -385,13 +398,13 @@ describe('toEventStream', () => {
       const refused = Object.assign(new Error('GET /events failed with status 401'), { name: 'ResponseError' })
       const send = sender(call(droppedAfter('data: a\n\n')), refused, call(streamOf(['data: b\n\n'])))
 
-      await expect(collect((await toEventStream(send, { reconnect: { initialDelay: 0 } }, { method: 'GET' })).stream)).rejects.toBe(refused)
+      await expect(collect((await toEventStream({ send: send, config: { reconnect: { initialDelay: 0 } }, method: 'GET' })).stream)).rejects.toBe(refused)
       expect(send).toHaveBeenCalledTimes(2)
     })
 
     test('gives up after maxRetries failed connects', async () => {
       const send = sender(call(droppedAfter('data: a\n\n')), new TypeError('fetch failed'), new TypeError('fetch failed'))
-      const { stream } = await toEventStream(send, { reconnect: { initialDelay: 0, maxRetries: 2 } }, { method: 'GET' })
+      const { stream } = await toEventStream({ send: send, config: { reconnect: { initialDelay: 0, maxRetries: 2 } }, method: 'GET' })
 
       await expect(collect(stream)).rejects.toThrow('fetch failed')
       expect(send).toHaveBeenCalledTimes(3)
@@ -399,7 +412,7 @@ describe('toEventStream', () => {
 
     test('sends no body when a resume switches a POST to GET', async () => {
       const send = sender(call(droppedAfter('id: 1\ndata: a\n\n')), call(streamOf(['data: b\n\n'])))
-      await collect((await toEventStream(send, { reconnect: { initialDelay: 0, resume: () => ({ method: 'GET' }) } }, { method: 'POST' })).stream)
+      await collect((await toEventStream({ send: send, config: { reconnect: { initialDelay: 0, resume: () => ({ method: 'GET' }) } }, method: 'POST' })).stream)
 
       expect(send.mock.calls[1]).toStrictEqual([{ method: 'GET', body: undefined, headers: { 'Last-Event-ID': '1' } }])
     })
@@ -408,14 +421,14 @@ describe('toEventStream', () => {
       const cancel = vi.fn()
       const body = new ReadableStream<Uint8Array>({ start: (controller) => controller.enqueue(encoder.encode('{"ok":true}')), cancel })
 
-      expect(await collect((await toEventStream(Promise.resolve(call(body, 'application/json')))).stream)).toStrictEqual([])
+      expect(await collect((await toEventStream({ send: Promise.resolve(call(body, 'application/json')) })).stream)).toStrictEqual([])
       expect(cancel).toHaveBeenCalledOnce()
     })
 
     test('cancels the reader when the consumer breaks', async () => {
       const cancel = vi.fn()
 
-      for await (const _event of (await toEventStream(Promise.resolve(call(endless(cancel))))).stream) break
+      for await (const _event of (await toEventStream({ send: Promise.resolve(call(endless(cancel))) })).stream) break
       expect(cancel).toHaveBeenCalledOnce()
     })
 
@@ -425,12 +438,12 @@ describe('toEventStream', () => {
         throw new Error('boom')
       }
 
-      await expect(collect((await toEventStream(Promise.resolve(call(endless(cancel))), { transform })).stream)).rejects.toThrow('boom')
+      await expect(collect((await toEventStream({ send: Promise.resolve(call(endless(cancel))), config: { transform } })).stream)).rejects.toThrow('boom')
       expect(cancel).toHaveBeenCalledOnce()
     })
 
     test('never reconnects a plain promise', async () => {
-      const { stream } = await toEventStream(Promise.resolve(call(droppedAfter('data: a\n\n'))), { reconnect: { initialDelay: 0 } })
+      const { stream } = await toEventStream({ send: Promise.resolve(call(droppedAfter('data: a\n\n'))), config: { reconnect: { initialDelay: 0 } } })
 
       await expect(collect(stream)).rejects.toThrow('connection lost')
     })

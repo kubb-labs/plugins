@@ -57,7 +57,7 @@ export function buildReturnStatement({
  * Builds the return type and statement of a `text/event-stream` operation: `EventOf` when each item declares its own
  * `event` and `data`, `ServerSentEvent` around the payload otherwise. The call goes through `toEventStream` with a `send`
  * function for the resume request, the call's `config`, and the method, shape, declared event names and per-event validator.
- * A `returnType: 'plain'` client gets the one-argument form, `toEventStream(request(config))`, and keeps its response
+ * A `returnType: 'plain'` client passes only `send`, `toEventStream({ send: request(config) })`, and keeps its response
  * validator in the call config.
  */
 export function buildEventStreamReturn({
@@ -79,7 +79,7 @@ export function buildEventStreamReturn({
   const stream = getEventStream(node)
   const eventType = `${stream?.shape === 'event' ? 'EventOf' : 'ServerSentEvent'}<SuccessOf<${types.response.responses(node)}>>`
   const promise = `Promise<EventStreamResult<${eventType}>>`
-  if (returnType === 'plain') return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
+  if (returnType === 'plain') return { returnType: promise, statement: `return toEventStream<${eventType}>({ send: request(${callConfig}) })` }
 
   const meta = [
     `method: '${node.method.toUpperCase()}'`,
@@ -89,5 +89,5 @@ export function buildEventStreamReturn({
   ]
     .filter(Boolean)
     .join(', ')
-  return { returnType: promise, statement: `return toEventStream<${eventType}>((init) => request(${callConfig}), config, { ${meta} })` }
+  return { returnType: promise, statement: `return toEventStream<${eventType}>({ send: (init) => request(${callConfig}), config, ${meta} })` }
 }

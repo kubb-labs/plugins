@@ -39,8 +39,8 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
         '200': PetEvent
       }>
     >
-  >(
-    (init) =>
+  >({
+    send: (init) =>
       request({
         method: 'GET',
         url: '/pet/{petId}/events',
@@ -54,6 +54,7 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
         ...init,
       }),
     config,
-    { method: 'GET', shape: 'data' },
-  )
+    method: 'GET',
+    shape: 'data',
+  })
 }

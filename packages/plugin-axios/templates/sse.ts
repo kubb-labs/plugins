@@ -237,11 +237,13 @@ function sleep(ms: number, signal?: AbortSignal): Promise<void> {
  * terminator, a body that is not an event stream, or the server closes it. With `reconnect`, a dropped stream resumes with
  * `Last-Event-ID` after the server's `retry` or a growing delay, until `maxRetries`, an abort, or a non-stream response.
  */
-export async function toEventStream<TEvent = ServerSentEvent, TResponse = NativeResponse>(
-  send: EventStreamSend<TResponse> | Promise<EventStreamCall<TResponse>>,
-  options: EventStreamOptions & EventStreamCallOptions = {},
-  meta: EventStreamMeta = {},
-): Promise<EventStreamResult<TEvent, TResponse>> {
+export async function toEventStream<TEvent = ServerSentEvent, TResponse = NativeResponse>({
+  send,
+  config: options = {},
+  ...meta
+}: { send: EventStreamSend<TResponse> | Promise<EventStreamCall<TResponse>>; config?: EventStreamOptions & EventStreamCallOptions } & EventStreamMeta): Promise<
+  EventStreamResult<TEvent, TResponse>
+> {
   // A plain promise cannot be sent again, so it never reconnects.
   const reconnect = typeof send === 'function' ? options.reconnect : undefined
   const { maxRetries = 2, initialDelay = 1000, maxDelay = 30_000, growFactor = 1.5, onClose = false, resume } = reconnect ?? {}
