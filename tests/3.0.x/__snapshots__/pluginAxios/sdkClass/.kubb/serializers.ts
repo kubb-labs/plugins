@@ -8,6 +8,11 @@ export type HeadersInit = Array<[string, HeaderValue]> | Record<string, HeaderVa
 export type RequestBody = NonNullable<RequestInit['body']>
 
 /**
+ * The HTTP methods a generated operation sends.
+ */
+export type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'QUERY'
+
+/**
  * The OpenAPI query-parameter serialization style. `form` is the default; `spaceDelimited` and
  * `pipeDelimited` join arrays with a space or pipe, and `deepObject` renders objects as
  * `key[prop]=value`.

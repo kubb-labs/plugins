@@ -10,6 +10,7 @@ import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginSwr } from '@kubb/plugin-swr'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginVueQuery } from '@kubb/plugin-vue-query'
+import { pluginZod } from '@kubb/plugin-zod'
 import { type Config, Diagnostics, fsStorage, type KubbHooks } from 'kubb/kit'
 import { describe, expect, test } from 'vitest'
 
@@ -63,6 +64,68 @@ describe('event stream hooks', () => {
           expect(source).not.toMatch(/streamGet|streamPost|useStream/)
         }
       }
+    } finally {
+      await fs.rm(output, { recursive: true, force: true })
+    }
+  })
+})
+
+describe('OpenAPI 3.2 item schemas', () => {
+  async function readAll(dir: string): Promise<string> {
+    const files = await fs.readdir(dir, { recursive: true })
+    const sources = await Promise.all(files.filter((file) => file.endsWith('.ts')).map((file) => fs.readFile(path.join(dir, file), 'utf8')))
+    return sources.join('\n')
+  }
+
+  test.each([
+    { name: 'axios', clientPlugin: pluginAxios },
+    { name: 'fetch', clientPlugin: pluginFetch },
+  ])('types each $name event by name, validates per event, and keeps a payload-only item', async ({ clientPlugin }) => {
+    const output = await fs.mkdtemp(path.join(dirname, '.event-stream-3-2-'))
+    try {
+      const { diagnostics } = await createKubb(
+        {
+          root: dirname,
+          input: '../../schemas/3.0.x/eventStream3_2.yaml',
+          output: { path: output, barrel: false },
+          adapter: adapterOas({ validate: false }),
+          parsers: [parserTs()],
+          reporters: [],
+          storage: fsStorage(),
+          plugins: [
+            pluginTs({ output: { path: './types', barrel: false } }),
+            pluginZod({ output: { path: './zod', barrel: false } }),
+            clientPlugin({ output: { path: './clients', barrel: false }, validator: 'zod' }),
+          ],
+        } as Config,
+        { hooks: new Hookable<KubbHooks>() },
+      ).safeBuild()
+      expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
+
+      const runtime = await fs.readFile(path.join(output, '.kubb', 'sse.ts'), 'utf8')
+      expect(runtime).toContain('export async function toEventStream')
+
+      const chat = await fs.readFile(path.join(output, 'clients', 'streamChat.ts'), 'utf8')
+      expect(chat).toContain('Promise<EventStreamResult<EventOf<SuccessOf<StreamChatResponses>>>>')
+      expect(chat).toContain("{ method: 'POST', shape: 'event', events: ['message_delta', 'ping'], validator: ")
+      expect(chat).not.toMatch(/validator: \{[^}]*response:/)
+
+      const ticks = await fs.readFile(path.join(output, 'clients', 'streamTicks.ts'), 'utf8')
+      expect(ticks).toContain('Promise<EventStreamResult<ServerSentEvent<SuccessOf<StreamTicksResponses>>>>')
+      expect(ticks).toContain("{ method: 'GET', shape: 'data', validator: ")
+
+      // JSON Lines is a stream of items too, but not an event stream, so it keeps the one-shot result typed with one item.
+      const logs = await fs.readFile(path.join(output, 'clients', 'streamLogs.ts'), 'utf8')
+      expect(logs).toContain('RequestResult<')
+      expect(logs).not.toContain('toEventStream')
+
+      const types = await readAll(path.join(output, 'types'))
+      expect(types).toMatch(/event: ['"]message_delta['"]/)
+      expect(types).toMatch(/data\?: MessageDelta/)
+      expect(types).toMatch(/StreamLogsStatus200 = LogEntry/)
+
+      const zod = await readAll(path.join(output, 'zod'))
+      expect(zod).toContain("z.discriminatedUnion('event'")
     } finally {
       await fs.rm(output, { recursive: true, force: true })
     }

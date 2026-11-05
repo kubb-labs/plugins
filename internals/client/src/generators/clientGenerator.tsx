@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { isEventStream, operationFileEntry, operationKey, resolveDependencyOperationFile } from '@internals/shared'
+import { getEventStream, operationFileEntry, operationKey, resolveDependencyOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -75,17 +75,17 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       // The headers validator helper ships in `.kubb/standardSchema.ts`; a custom client module exports it
       // alongside its other runtime helpers.
       const standardSchemaPath = importPath ?? path.resolve(root, '.kubb/standardSchema.ts')
-      const eventStream = isEventStream(node)
+      const stream = getEventStream(node)
 
       const clientValueImports = (() => {
-        if (eventStream) return ['client', 'toEventStream']
+        if (stream) return ['client', 'toEventStream']
         if (returnType === 'plain') return ['client']
         if (returnType === 'data') return ['client', 'unwrapResult']
         return ['client', 'withUnwrap']
       })()
 
       const clientTypeImports = (() => {
-        if (eventStream) return ['Options', 'EventStreamResult', 'SuccessOf']
+        if (stream) return ['Options', 'EventStreamResult', 'SuccessOf', stream.shape === 'event' ? 'EventOf' : 'ServerSentEvent']
         if (returnType === 'plain') return ['Options', 'RequestResult']
         if (returnType === 'data') return ['Options', 'UnwrappedResult']
         return ['Options', 'Unwrappable', 'RequestResult']

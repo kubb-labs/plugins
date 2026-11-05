@@ -1,7 +1,8 @@
-import { hasRequestContentTypeChoice } from '@internals/shared'
+import { getEventStream, hasRequestContentTypeChoice } from '@internals/shared'
 import type { ast } from '@kubb/kit'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption } from '../types.ts'
+import type { ValidatorHooks } from './validator.ts'
 import { buildRequestResultGenerics, buildResultType } from './generics.ts'
 
 /**
@@ -53,26 +54,40 @@ export function buildReturnStatement({
 }
 
 /**
- * Builds the return type and statement of an operation that returns `text/event-stream`: the call
- * is wrapped in `toEventStream`, so the caller iterates the typed success events. Except with
- * `returnType: 'plain'`, `toEventStream` also receives `config`, so a per-call `maxEventSize` reaches the parser.
+ * Builds the return type and statement of an operation that returns `text/event-stream`. The event type follows the
+ * document: `EventOf` when each item declares its own `event` and `data`, `ServerSentEvent` around the payload otherwise.
+ * The call is wrapped in `toEventStream` with a `send` function that takes the resume request after a drop, the call's
+ * `config`, and what the generator knows: the method, the shape, the declared event names and the per-event validator.
+ * With `returnType: 'plain'` the caller's own `toEventStream` takes only the call result.
  */
 export function buildEventStreamReturn({
   node,
   types,
   callConfig,
   returnType,
+  validatorHooks,
 }: {
-  node: ast.OperationNode
+  node: ast.HttpOperationNode
   types: OperationTypeNames
   callConfig: string
   returnType: ReturnTypeOption
+  validatorHooks: ValidatorHooks | null
 }): {
   returnType: string
   statement: string
 } {
-  const eventType = `SuccessOf<${types.response.responses(node)}>`
-  // A `'plain'` client is the caller's own module, whose `toEventStream` takes only the call result.
-  const args = returnType === 'plain' ? `request(${callConfig})` : `request(${callConfig}), config`
-  return { returnType: `Promise<EventStreamResult<${eventType}>>`, statement: `return toEventStream<${eventType}>(${args})` }
+  const stream = getEventStream(node)
+  const eventType = `${stream?.shape === 'event' ? 'EventOf' : 'ServerSentEvent'}<SuccessOf<${types.response.responses(node)}>>`
+  const promise = `Promise<EventStreamResult<${eventType}>>`
+  if (returnType === 'plain') return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
+
+  const meta = [
+    `method: '${node.method.toUpperCase()}'`,
+    `shape: '${stream?.shape ?? 'data'}'`,
+    stream?.events ? `events: [${stream.events.map((name) => `'${name.replaceAll("'", "\\'")}'`).join(', ')}]` : null,
+    validatorHooks?.response ? `validator: ${validatorHooks.response}` : null,
+  ]
+    .filter(Boolean)
+    .join(', ')
+  return { returnType: promise, statement: `return toEventStream<${eventType}>((init) => request(${callConfig}), config, { ${meta} })` }
 }

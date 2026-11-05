@@ -11,18 +11,10 @@ const axiosTemplates = path.resolve(fetchTemplates, '../../plugin-axios/template
  * must land in the other. A drift here means a fix reached one client but not the other.
  */
 describe('shared client templates', () => {
-  test.each(['serializers.ts', 'standardSchema.ts'])('%s is byte-identical in plugin-axios', (name) => {
+  test.each(['serializers.ts', 'sse.ts', 'standardSchema.ts'])('%s is byte-identical in plugin-axios', (name) => {
     const fetchCopy = readFileSync(path.join(fetchTemplates, name), 'utf8')
     const axiosCopy = readFileSync(path.join(axiosTemplates, name), 'utf8')
     expect(axiosCopy).toBe(fetchCopy)
-  })
-
-  test('fetch.ts and axios.ts share one server-sent event parser', () => {
-    const parser = (name: string) => {
-      const source = readFileSync(name, 'utf8')
-      return source.slice(source.indexOf('async function* readBytes('), source.indexOf('export type EventStreamResult'))
-    }
-    expect(parser(path.join(axiosTemplates, 'axios.ts'))).toBe(parser(path.join(fetchTemplates, 'fetch.ts')))
   })
 })
 

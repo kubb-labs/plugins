@@ -1,5 +1,6 @@
 import { getResponseType, isEventStream } from '@internals/shared'
 import type { ast } from '@kubb/kit'
+import type { ReturnTypeOption } from '../types.ts'
 import { buildContentType } from './contentType.ts'
 import { type Auth, buildSecurityMetadata } from './security.ts'
 import { buildStyles } from './styles.ts'
@@ -17,15 +18,23 @@ export function buildCallConfig({
   validatorHooks,
   security,
   throwOnErrorDefault,
+  returnType,
 }: {
   node: ast.HttpOperationNode
   validatorHooks: ValidatorHooks | null
   security?: Array<Auth>
   throwOnErrorDefault: boolean
+  returnType: ReturnTypeOption
 }): { callConfig: string; mergeContentType: boolean; eventStream: boolean } {
+  const eventStream = isEventStream(node)
   const securityLiteral = buildSecurityMetadata({ security })
   const stylesLiteral = buildStyles({ node })
-  const validatorLiteral = buildValidatorLiteral(validatorHooks, ['request', 'path', 'query', 'headers', 'response', 'error'])
+  // A stream's response validator runs per event in `toEventStream`, which also resends the call with `init` after a drop.
+  const validatorLiteral = buildValidatorLiteral(
+    validatorHooks,
+    eventStream ? ['request', 'path', 'query', 'headers', 'error'] : ['request', 'path', 'query', 'headers', 'response', 'error'],
+  )
+  const resumable = eventStream && returnType !== 'plain'
   const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node })
   const responseType = getResponseType(node)
 
@@ -39,9 +48,10 @@ export function buildCallConfig({
     responseType ? `responseType: '${responseType}'` : null,
     '...config',
     `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`,
+    resumable ? '...init' : null,
   ]
     .filter(Boolean)
     .join(', ')} }`
 
-  return { callConfig, mergeContentType, eventStream: isEventStream(node) }
+  return { callConfig, mergeContentType, eventStream }
 }

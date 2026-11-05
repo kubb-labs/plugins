@@ -14,6 +14,7 @@ export {
   getRequestGroupOptionality,
   getRequestGroups,
   hasRequestContentTypeChoice,
+  getEventStream,
   getResponseContentTypeInfo,
   getResponseType,
   getSuccessResponses,

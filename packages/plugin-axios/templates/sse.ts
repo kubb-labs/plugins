@@ -1,0 +1,345 @@
+import type { HttpMethod } from './serializers.ts'
+import { ParseError, type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
+
+/**
+ * One decoded Server-Sent Event. `data` is parsed as JSON when valid and kept as the raw string otherwise,
+ * `event` is `message` when the server sent no `event` field, and `id` is the last event ID the stream has set.
+ */
+export type ServerSentEvent<TData = unknown> = {
+  data: TData
+  event: string
+  id?: string
+  retry?: number
+}
+
+/**
+ * An event the document types by name: the member's own `event` and `data`, plus the `id` and `retry` any event may carry.
+ */
+export type EventOf<T> = T & Pick<ServerSentEvent, 'id' | 'retry'>
+
+/**
+ * Reconnects with `Last-Event-ID` after the stream drops, the way `EventSource` does.
+ */
+export type Reconnect = {
+  /**
+   * Reconnects after the first connection.
+   * @default 2
+   */
+  maxRetries?: number
+  /**
+   * Delay before the first reconnect in milliseconds, unless the server sent `retry`.
+   * @default 1000
+   */
+  initialDelay?: number
+  /**
+   * Longest delay between reconnects in milliseconds.
+   * @default 30000
+   */
+  maxDelay?: number
+  /**
+   * Factor the delay grows by after each reconnect.
+   * @default 1.5
+   */
+  growFactor?: number
+  /**
+   * Also reconnect after the server closes the stream cleanly. Off, a clean close ends the stream.
+   */
+  onClose?: boolean
+  /**
+   * Builds the resume request from the last event ID. Required for any method but GET, because repeating a POST
+   * would start the operation again. Its headers merge over the call's own headers and `Last-Event-ID`.
+   */
+  resume?: (lastEventId: string) => ResumeInit
+}
+
+/**
+ * The part of a request a reconnect may change.
+ */
+export type ResumeInit = { method?: HttpMethod; headers?: unknown }
+
+/**
+ * Per-call options of a streamed operation, passed next to its request params.
+ */
+export type EventStreamOptions = {
+  /**
+   * The largest number of characters, line breaks included, one event may hold before the blank line that ends it.
+   * A larger event throws a `RangeError` and cancels the stream. Set `Infinity` to turn the limit off.
+   * @default 16777216
+   */
+  maxEventSize?: number
+  /**
+   * Ends the stream when an event's raw `data` equals this value, such as `[DONE]`.
+   */
+  terminator?: string
+  /**
+   * Maps each event before validation.
+   */
+  transform?: (event: ServerSentEvent) => ServerSentEvent
+  /**
+   * Receives each event whose name the document does not declare. Such events are not yielded.
+   */
+  onUnknownEvent?: (event: ServerSentEvent) => void
+  reconnect?: Reconnect
+}
+
+/**
+ * What the generated function knows about the stream from the document.
+ */
+export type EventStreamMeta = {
+  /**
+   * Method of the call. A reconnect repeats the call only for GET unless `reconnect.resume` is set.
+   */
+  method?: string
+  /**
+   * `event` when the document types each event with its own `event` and `data`, `data` when it types only the payload.
+   * @default 'data'
+   */
+  shape?: 'event' | 'data'
+  /**
+   * Event names the document declares. Any other event goes to `onUnknownEvent` instead of the stream.
+   */
+  events?: ReadonlyArray<string>
+  /**
+   * Validates each event (`shape: 'event'`) or its `data` (`shape: 'data'`), after `transform`.
+   */
+  validator?: StandardSchemaValidator
+}
+
+/**
+ * The fields of the call's config the stream reads: its headers for a resume, its signal, and how validation errors are handled.
+ */
+export type EventStreamCallOptions = {
+  headers?: unknown
+  signal?: AbortSignal
+  validate?: boolean | { response?: boolean }
+  onValidationError?: (
+    error: ParseError,
+    context: { value: unknown; direction: 'response'; source: 'body'; method?: string },
+  ) => { value: unknown } | void | Promise<{ value: unknown } | void>
+}
+
+/**
+ * The result of one call the stream reads from.
+ */
+export type EventStreamCall<TResponse> = { data: unknown; contentType?: string; response: TResponse }
+
+/**
+ * Sends the call, or the resume request after a drop.
+ */
+export type EventStreamSend<TResponse> = (init?: ResumeInit) => Promise<EventStreamCall<TResponse>>
+
+/**
+ * Parsed events alongside the native response of the first connection.
+ */
+export type EventStreamResult<TEvent = ServerSentEvent, TResponse = Response> = {
+  stream: AsyncGenerator<TEvent>
+  response: TResponse
+  /**
+   * The last event ID the stream has set, to resume from later. Empty until the server sends `id`.
+   */
+  readonly lastEventId: string
+}
+
+/**
+ * The fields that carry across events: the last event ID and the latest `retry`.
+ */
+type Cursor = { lastEventId: string; retry?: number }
+
+async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>): AsyncGenerator<Uint8Array> {
+  if (!('getReader' in stream)) {
+    yield* stream
+    return
+  }
+
+  const reader = stream.getReader()
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) return
+      yield value
+    }
+  } finally {
+    await reader.cancel().catch(() => {})
+  }
+}
+
+function parseData<TData>(raw: string): TData {
+  try {
+    return JSON.parse(raw) as TData
+  } catch {
+    return raw as TData
+  }
+}
+
+/**
+ * Parses a `text/event-stream` body into events as the WHATWG event stream interpretation does: an event is dispatched
+ * at its blank line when it holds `data`, `event` defaults to `message`, `id` carries across events until an empty `id`
+ * resets it, `retry` is read only when it is all digits, and an unfinished event at the end of the stream is dropped.
+ * Consume with `for await`; break the loop to cancel the stream.
+ */
+export async function* parseEventStream<TData = unknown>(
+  stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>,
+  {
+    maxEventSize = 16 * 1024 * 1024,
+    terminator,
+    cursor = { lastEventId: '' },
+  }: Pick<EventStreamOptions, 'maxEventSize' | 'terminator'> & { cursor?: Cursor } = {},
+): AsyncGenerator<ServerSentEvent<TData>> {
+  const decoder = new TextDecoder()
+  const tooLarge = `Server-sent event exceeds maxEventSize of ${maxEventSize} characters`
+  let type = ''
+  let data: Array<string> = []
+  let retry: number | undefined
+  let size = 0
+  let line = ''
+  let endsWithCR = false
+
+  const readField = (part: string) => {
+    const index = part.indexOf(':')
+    const name = index === -1 ? part : part.slice(0, index)
+    const value = index === -1 ? '' : part.slice(index + 1).replace(/^ /, '')
+    if (name === 'data') data.push(value)
+    else if (name === 'event') type = value
+    else if (name === 'id' && !value.includes('\u0000')) cursor.lastEventId = value
+    else if (name === 'retry' && /^\d+$/.test(value)) {
+      retry = Number(value)
+      cursor.retry = retry
+    }
+  }
+
+  for await (const chunk of readBytes(stream)) {
+    const decoded = decoder.decode(chunk, { stream: true })
+    if (!decoded) continue
+    // A CRLF split across chunks already ended its line on the `\r`.
+    const text: string = endsWithCR && decoded.startsWith('\n') ? decoded.slice(1) : decoded
+    endsWithCR = text.endsWith('\r')
+
+    const parts = text.split(/\r\n|\r|\n/)
+    parts[0] = line + parts[0]
+    line = parts.pop() ?? ''
+    for (const part of parts) {
+      if (!part) {
+        if (data.length) {
+          const raw = data.join('\n')
+          if (raw === terminator) return
+          yield {
+            data: parseData<TData>(raw),
+            event: type || 'message',
+            ...(cursor.lastEventId ? { id: cursor.lastEventId } : {}),
+            ...(retry !== undefined ? { retry } : {}),
+          }
+        }
+        type = ''
+        data = []
+        retry = undefined
+        size = 0
+        continue
+      }
+      // A finished line counts one more character for its line break.
+      if (size + part.length + 1 > maxEventSize) throw new RangeError(tooLarge)
+      size += part.length + 1
+      if (!part.startsWith(':')) readField(part)
+    }
+    if (size + line.length > maxEventSize) throw new RangeError(tooLarge)
+  }
+}
+
+function isStreamBody(data: unknown): data is ReadableStream<Uint8Array> | AsyncIterable<Uint8Array> {
+  return !!data && typeof data === 'object' && (Symbol.asyncIterator in data || 'getReader' in data)
+}
+
+function headerRecord(headers: unknown): Record<string, string> {
+  if (!headers || typeof headers !== 'object') return {}
+  return Symbol.iterator in headers ? Object.fromEntries(headers as Iterable<[string, string]>) : { ...(headers as Record<string, string>) }
+}
+
+function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve) => {
+    const done = () => {
+      clearTimeout(timer)
+      signal?.removeEventListener('abort', done)
+      resolve()
+    }
+    const timer = setTimeout(done, ms)
+    signal?.addEventListener('abort', done)
+  })
+}
+
+/**
+ * Reads a call as typed Server-Sent Events. The result's `stream` yields the events the document declares, transformed
+ * and validated one by one, and ends on the terminator, on a `204`, on a body that is not an event stream, or when the
+ * server closes it. With `reconnect`, a dropped stream is resumed with `Last-Event-ID` after the server's `retry` or
+ * a growing delay, until `maxRetries`, an abort, a non-2xx response, or a response that is not an event stream.
+ */
+export async function toEventStream<TEvent = ServerSentEvent, TResponse = Response>(
+  send: EventStreamSend<TResponse> | Promise<EventStreamCall<TResponse>>,
+  options: EventStreamOptions & EventStreamCallOptions = {},
+  meta: EventStreamMeta = {},
+): Promise<EventStreamResult<TEvent, TResponse>> {
+  // A plain promise cannot be sent again, so it never reconnects.
+  const reconnect = typeof send === 'function' ? options.reconnect : undefined
+  const { maxRetries = 2, initialDelay = 1000, maxDelay = 30_000, growFactor = 1.5, onClose = false, resume } = reconnect ?? {}
+  if (reconnect && !resume && meta.method && meta.method !== 'GET') {
+    throw new TypeError(`reconnect.resume is required to resume a ${meta.method} stream without repeating the operation`)
+  }
+  const validate = typeof options.validate === 'object' ? options.validate.response !== false : options.validate !== false
+  const validator = validate ? meta.validator : undefined
+  const cursor: Cursor = { lastEventId: '' }
+  const first = await (typeof send === 'function' ? send() : send)
+
+  const validateEvent = async (event: ServerSentEvent): Promise<ServerSentEvent> => {
+    if (!validator) return event
+    const value = meta.shape === 'event' ? event : event.data
+    const context = { direction: 'response', source: 'body', method: meta.method, value } as const
+    const validated = await validateStandardSchema(validator, value).catch(async (error: unknown) => {
+      if (!options.onValidationError || !(error instanceof ParseError)) throw error
+      const handled = await options.onValidationError(error, context)
+      if (!handled) throw error
+      return handled.value
+    })
+    // The schema may not declare `id` and `retry`, so the parsed value is merged over the event instead of replacing it.
+    return meta.shape === 'event' ? { ...event, ...(validated as object) } : { ...event, data: validated }
+  }
+
+  async function* events(): AsyncGenerator<TEvent> {
+    let call = first
+    let delay = initialDelay
+    for (let attempt = 0; ; attempt++) {
+      const body = call.data
+      if (!isStreamBody(body) || (call.contentType && !call.contentType.includes('text/event-stream'))) return
+      let dropped = false
+      try {
+        for await (const event of parseEventStream(body, { maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })) {
+          if (meta.events && !meta.events.includes(event.event)) {
+            options.onUnknownEvent?.(event)
+            continue
+          }
+          yield (await validateEvent(options.transform ? options.transform(event) : event)) as TEvent
+        }
+      } catch (error) {
+        if (!reconnect || options.signal?.aborted || attempt >= maxRetries) throw error
+        dropped = true
+      }
+      if (!reconnect || (!dropped && !onClose) || attempt >= maxRetries || options.signal?.aborted) return
+
+      await sleep(cursor.retry ?? delay, options.signal)
+      if (options.signal?.aborted) return
+      delay = Math.min(delay * growFactor, maxDelay)
+      const init: ResumeInit = resume?.(cursor.lastEventId) ?? {}
+      const headers = {
+        ...headerRecord(options.headers),
+        ...(cursor.lastEventId ? { 'Last-Event-ID': cursor.lastEventId } : {}),
+        ...headerRecord(init.headers),
+      }
+      call = await (send as EventStreamSend<TResponse>)({ ...init, headers })
+    }
+  }
+
+  return {
+    stream: events(),
+    response: first.response,
+    get lastEventId() {
+      return cursor.lastEventId
+    },
+  }
+}

@@ -7,7 +7,7 @@ import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
-import { axiosClientTemplatePath, axiosSerializersTemplatePath, standardSchemaTemplatePath } from './templates.ts'
+import { axiosClientTemplatePath, axiosSerializersTemplatePath, sseTemplatePath, standardSchemaTemplatePath } from './templates.ts'
 import type { PluginAxios, ResolvedOptions, ResolverClient } from './types.ts'
 
 /**
@@ -95,6 +95,12 @@ export const pluginAxios = defineExtension<PluginAxios>({
       path: path.resolve(root, '.kubb/client.ts'),
       copy: axiosClientTemplatePath,
       footer: baseURLExpression ? `client.setConfig({ baseURL: ${baseURLExpression} })` : undefined,
+    })
+
+    injectFile({
+      baseName: 'sse.ts',
+      path: path.resolve(root, '.kubb/sse.ts'),
+      copy: sseTemplatePath,
     })
 
     injectFile({

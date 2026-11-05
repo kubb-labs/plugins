@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { isEventStream, operationFileEntry, operationKey } from '@internals/shared'
+import { getEventStream, isEventStream, operationFileEntry, operationKey } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
 import { ast, camelCase, defineGenerator, Diagnostics } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
@@ -169,7 +169,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
         const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = validatorEnabled
           ? collectImportsByFile(ops, (op) => ({ file: op.zodFile, names: op.validatorHooks?.importedZodNames ?? [] }))
           : { namesByPath: new Map<string, Set<string>>(), filesByPath: new Map<string, ast.FileNode>() }
-        const hasEventStream = ops.some((op) => isEventStream(op.node))
+        const shapes = new Set(ops.map((op) => getEventStream(op.node)?.shape).filter(Boolean))
+        const hasEventStream = shapes.size > 0
         const hasResult = ops.some((op) => !isEventStream(op.node))
 
         return (
@@ -190,6 +191,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
                 'Options',
                 ...(hasResult ? (returnType === 'data' ? ['UnwrappedResult'] : ['Unwrappable', 'RequestResult']) : []),
                 ...(hasEventStream ? ['EventStreamResult', 'SuccessOf'] : []),
+                ...(shapes.has('event') ? ['EventOf'] : []),
+                ...(shapes.has('data') ? ['ServerSentEvent'] : []),
               ]}
               root={file.path}
               path={clientPath}

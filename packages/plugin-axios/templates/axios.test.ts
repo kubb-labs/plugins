@@ -1,17 +1,7 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios, { AxiosError as AxiosErrorClass } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import {
-  type Auth,
-  type CallResult,
-  type ClientConfig,
-  createClientCore,
-  parseEventStream,
-  ResponseError,
-  resolveAuth,
-  unwrapResult,
-  withUnwrap,
-} from './axios.ts'
+import { type Auth, type CallResult, type ClientConfig, createClientCore, ResponseError, resolveAuth, unwrapResult, withUnwrap } from './axios.ts'
 import { applyHeaderStyles, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
@@ -1591,84 +1581,6 @@ describe('resolveAuth', () => {
     const query: Record<string, unknown> = { api_key: 'explicit' }
     await resolveAuth({ security: [{ type: 'apiKey', name: 'api_key', in: 'query' }], auth: () => 'secret', headers: {}, query })
     expect(query).toStrictEqual({ api_key: 'explicit' })
-  })
-})
-
-describe('parseEventStream', () => {
-  function streamOf(chunks: Array<string>): ReadableStream<Uint8Array> {
-    const encoder = new TextEncoder()
-    return new ReadableStream({
-      start(controller) {
-        for (const chunk of chunks) controller.enqueue(encoder.encode(chunk))
-        controller.close()
-      },
-    })
-  }
-
-  async function* asyncIterableOf(chunks: Array<string>): AsyncGenerator<Uint8Array> {
-    const encoder = new TextEncoder()
-    for (const chunk of chunks) yield encoder.encode(chunk)
-  }
-
-  async function collect<TData>(stream: AsyncIterable<TData>): Promise<Array<TData>> {
-    const events: Array<TData> = []
-    for await (const event of stream) events.push(event)
-    return events
-  }
-
-  test('keeps the last valid retry and ignores unknown event fields', async () => {
-    const events = await collect(parseEventStream(streamOf(['retry: 1000\nretry: 2000\nretry: invalid\nunknown: ignored\ndata: ok\n\n'])))
-    expect(events).toStrictEqual([{ data: 'ok', retry: 2000 }])
-  })
-
-  test('parses JSON data events split on a blank line', async () => {
-    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n', 'data: {"n":2}\n\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
-  })
-
-  test('concatenates multi-line data and reads event/id/retry fields', async () => {
-    const events = await collect(parseEventStream(streamOf(['event: ping\nid: 42\nretry: 3000\ndata: line one\ndata: line two\n\n'])))
-    expect(events).toStrictEqual([{ event: 'ping', id: '42', retry: 3000, data: 'line one\nline two' }])
-  })
-
-  test('ignores comment lines and keeps non-JSON data as a string', async () => {
-    const events = await collect(parseEventStream<string>(streamOf([': keep-alive\n\n', 'data: hello world\n\n'])))
-    expect(events).toStrictEqual([{ data: 'hello world' }])
-  })
-
-  test('normalizes CRLF endings and flushes a trailing event', async () => {
-    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\r\n\r\ndata: {"n":2}\r\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
-  })
-
-  test('joins data lines when a CRLF falls across two chunks', async () => {
-    const events = await collect(parseEventStream<string>(streamOf(['data: a\r', '\ndata: b\r\n\r\n'])))
-    expect(events).toStrictEqual([{ data: 'a\nb' }])
-  })
-
-  test('still ends an event when its blank line falls across two chunks', async () => {
-    const events = await collect(parseEventStream<string>(streamOf(['data: a\r\n\r', '\ndata: b\r', '\r'])))
-    expect(events).toStrictEqual([{ data: 'a' }, { data: 'b' }])
-  })
-
-  test('consumes an async iterable of byte chunks, as the axios stream response yields', async () => {
-    const events = await collect(parseEventStream(asyncIterableOf(['data: {"n":1}\n\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }])
-  })
-
-  test('closes the async iterable when an unfinished event outgrows maxEventSize', async () => {
-    const chunk = new TextEncoder().encode(`data: ${'x'.repeat(1024)}\n`)
-    let closed = false
-    async function* endless(): AsyncGenerator<Uint8Array> {
-      try {
-        while (true) yield chunk
-      } finally {
-        closed = true
-      }
-    }
-
-    await expect(collect(parseEventStream(endless(), { maxEventSize: 64 * 1024 }))).rejects.toThrow(RangeError)
-    expect(closed).toBe(true)
   })
 })
 

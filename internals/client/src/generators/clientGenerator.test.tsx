@@ -172,6 +172,34 @@ const streamEventsNode = ast.factory.createOperation({
   ],
 })
 
+// An OpenAPI 3.2 `itemSchema` event union, as the adapter emits it: `stream.schema` is the item and `shape` says each item is a whole event.
+const streamChatNode = ast.factory.createOperation({
+  operationId: 'streamChat',
+  method: 'POST',
+  path: '/chat',
+  tags: ['chat'],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      description: 'typed events',
+      content: [
+        (() => {
+          const member = (name: string) =>
+            ast.factory.createSchema({
+              type: 'object',
+              properties: [
+                ast.factory.createProperty({ name: 'event', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) }),
+                ast.factory.createProperty({ name: 'data', schema: ast.factory.createSchema({ type: 'string' }) }),
+              ],
+            })
+          const schema = ast.factory.createSchema({ type: 'union', discriminatorPropertyName: 'event', members: [member('message_delta'), member('ping')] })
+          return ast.factory.createContent({ contentType: 'text/event-stream', schema, stream: { schema, shape: 'event' } })
+        })(),
+      ],
+    }),
+  ],
+})
+
 const securityDocument: SecurityDocument = {
   security: [{ bearerAuth: [] }],
   components: {
@@ -206,6 +234,8 @@ describe('clientGenerator operation', () => {
     { name: 'listPetsWithStyles', node: listPetsStyledNode, options: {} },
     // text/event-stream response returns a typed event stream instead of a one-shot result.
     { name: 'streamEventsSse', node: streamEventsNode, options: {} },
+    // A `stream.shape` of `event` types each event by name and lists the declared names for the runtime filter.
+    { name: 'streamChatTypedEvents', node: streamChatNode, options: {} },
     // returnType: 'data' unwraps the resolved call down to the bare success body.
     { name: 'getPetByIdWithReturnTypeData', node: getPetByIdNode, options: { returnType: 'data' as const } },
     // Operation-level security overriding the global default, oauth2 reduced to bearer.

@@ -169,6 +169,26 @@ export function isEventStream(node: ast.OperationNode): boolean {
 }
 
 /**
+ * How the document types the events of a `text/event-stream` success response. `shape` is `event` when each item
+ * describes the parsed event, `data` when it describes only the payload, and `events` lists the `event` names when
+ * every member of the item schema declares one. `null` when the operation is not an event stream.
+ */
+export function getEventStream(node: ast.OperationNode): { shape: 'event' | 'data'; events?: Array<string> } | null {
+  if (!isEventStream(node)) return null
+  const content = getPrimarySuccessResponse(node)?.content?.[0]
+  const schema = content?.stream?.schema ?? content?.schema
+  const shape = content?.stream?.shape ?? 'data'
+  const members = schema ? (ast.narrowSchema(ast.resolveRef(schema), 'union')?.members ?? [schema]) : []
+  const names = members.map((member) =>
+    ast
+      .resolveSchemaProperties({ node: member, propertyName: 'event' })
+      .flatMap((property) => ast.getSchemaLiteralValues(property.schema).filter((value): value is string => typeof value === 'string')),
+  )
+  const events = shape === 'event' && names.length > 0 && names.every((list) => list.length > 0) ? [...new Set(names.flat())] : undefined
+  return events ? { shape, events } : { shape }
+}
+
+/**
  * Derives the default `responseType` for an operation from its primary success response.
  *
  * Returns a value only when that response declares a single non-JSON content type. `text/event-stream`

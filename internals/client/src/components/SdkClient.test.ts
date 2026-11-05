@@ -50,14 +50,20 @@ describe('buildSdkMethod', () => {
         }),
       ],
     })
-    const method = buildSdkMethod({ node, name: 'streamEvents', types: resolverTs, validatorHooks: null, returnType: 'full', throwOnErrorDefault: true })
+    const validatorHooks = { request: null, path: null, query: null, headers: null, response: 'streamEventsResponseSchema', error: null, importedZodNames: [] }
+    const method = buildSdkMethod({ node, name: 'streamEvents', types: resolverTs, validatorHooks, returnType: 'full', throwOnErrorDefault: true })
 
-    expect(method).toContain('): Promise<EventStreamResult<SuccessOf<')
-    expect(method).toContain('return toEventStream<SuccessOf<')
-    expect(method).toContain(`responseType: 'stream'`)
-    expect(method).toContain('}), config)')
+    expect(method).toContain('): Promise<EventStreamResult<ServerSentEvent<SuccessOf<')
+    expect(method).toContain('return toEventStream<ServerSentEvent<SuccessOf<')
+    // The response validator runs per event, so it moves from the call config into the stream meta.
+    expect(method).toContain(
+      `(init) => request({ method: 'GET', url: '/events', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true, ...init })`,
+    )
+    expect(method).toContain(`config, { method: 'GET', shape: 'data', validator: streamEventsResponseSchema })`)
 
     const plain = buildSdkMethod({ node, name: 'streamEvents', types: resolverTs, validatorHooks: null, returnType: 'plain', throwOnErrorDefault: true })
-    expect(plain).not.toContain(', config)')
+    expect(plain).toContain('return toEventStream<ServerSentEvent<SuccessOf<')
+    expect(plain).not.toContain('(init) =>')
+    expect(plain).not.toContain(', config')
   })
 })
