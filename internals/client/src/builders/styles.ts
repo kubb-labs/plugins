@@ -72,7 +72,7 @@ export function buildStyles({ node }: { node: ast.OperationNode }): string | nul
   for (const parameter of node.parameters) {
     const literal = serializeParameter(parameter)
     if (!literal) continue
-    groups[parameter.in].push(`${toKey(parameter.name)}: ${literal}`)
+    groups[parameter.in === 'querystring' ? 'query' : parameter.in].push(`${toKey(parameter.name)}: ${literal}`)
   }
 
   const entries = [

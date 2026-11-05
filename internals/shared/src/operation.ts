@@ -93,7 +93,7 @@ type ResponseLike = {
   statusCode: ast.StatusCode | number | string
 }
 
-export type OperationParameterGroups = Record<ast.ParameterNode['in'], Array<ast.ParameterNode>>
+export type OperationParameterGroups = Record<Exclude<ast.ParameterNode['in'], 'querystring'>, Array<ast.ParameterNode>>
 
 export type ResolveOperationTypeNameOptions = {
   responseStatusNames?: boolean | 'error'
@@ -398,7 +398,13 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
     })
   }
 
-  const groups: OperationParameterGroups = { path: group('path'), query: group('query'), header: group('header'), cookie: group('cookie') }
+  // An OpenAPI 3.2 `querystring` parameter is the whole query string as one object, so it joins the query group and the query serializer spreads its keys.
+  const groups: OperationParameterGroups = {
+    path: group('path'),
+    query: [...group('query'), ...group('querystring')],
+    header: group('header'),
+    cookie: group('cookie'),
+  }
 
   operationParameterGroupsByNode.set(node, groups)
   return groups
