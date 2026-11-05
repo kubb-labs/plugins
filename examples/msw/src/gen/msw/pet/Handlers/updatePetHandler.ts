@@ -9,7 +9,7 @@ import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function updatePetHandlerResponse200(data: UpdatePetResponse) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
@@ -18,19 +18,19 @@ export function updatePetHandlerResponse200(data: UpdatePetResponse) {
 }
 
 export function updatePetHandlerResponse400(data?: UpdatePetStatus400) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
   })
 }
 
 export function updatePetHandlerResponse404(data?: UpdatePetStatus404) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 404,
   })
 }
 
 export function updatePetHandlerResponse405(data?: UpdatePetStatus405) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 405,
   })
 }
@@ -44,7 +44,7 @@ export function updatePetHandler(
     function handler(info) {
       if (typeof data === 'function') return data(info)
 
-      return new HttpResponse(JSON.stringify(data), {
+      return new HttpResponse<string>(JSON.stringify(data), {
         status: 200,
         headers: {
           'Content-Type': 'application/json',

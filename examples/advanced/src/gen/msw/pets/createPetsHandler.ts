@@ -3,7 +3,7 @@ import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function createPetsHandlerResponse201(data?: unknown) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 201,
   })
 }
@@ -43,7 +43,7 @@ export function createPetsHandler(
   >(`${options?.baseURL ?? ''}/pets/:uuid`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse(JSON.stringify(data), {
+    return new HttpResponse<string>(JSON.stringify(data), {
       status: 201,
     })
   })

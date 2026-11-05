@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw/http'
 
 export function deletePetHandlerResponse400(data?: unknown) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
   })
 }
@@ -13,7 +13,7 @@ export function deletePetHandler(
   return http.delete(`${options?.baseURL ?? ''}/pet/:petId\\:search`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse(JSON.stringify(data), {
+    return new HttpResponse<string>(JSON.stringify(data), {
       status: 200,
     })
   })
