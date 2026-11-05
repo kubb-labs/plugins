@@ -228,7 +228,7 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   security?: Array<Auth>
   auth?: AuthResolver
   /**
-   * The largest number of characters one server-sent event may hold before the blank line that ends it. A larger event throws a `RangeError` and cancels the stream. Set `Infinity` to turn the limit off.
+   * The largest number of characters, line breaks included, one server-sent event may hold before the blank line that ends it. A larger event throws a `RangeError` and cancels the stream. Set `Infinity` to turn the limit off.
    * @default 16777216
    */
   maxEventSize?: number
@@ -893,16 +893,17 @@ export async function* parseEventStream<TData = unknown>(
     parts[0] = line + parts[0]
     line = parts.pop() ?? ''
     for (const part of parts) {
-      if (size + part.length > maxEventSize) throw new RangeError(tooLarge)
-      if (part.startsWith(':')) continue
-      if (part) {
-        lines.push(part)
-        size += part.length
+      if (!part) {
+        if (lines.length) yield parseEvent<TData>(lines)
+        lines = []
+        size = 0
         continue
       }
-      if (lines.length) yield parseEvent<TData>(lines)
-      lines = []
-      size = 0
+      // A finished line counts one more character for its line break.
+      if (size + part.length + 1 > maxEventSize) throw new RangeError(tooLarge)
+      if (part.startsWith(':')) continue
+      lines.push(part)
+      size += part.length + 1
     }
     if (size + line.length > maxEventSize) throw new RangeError(tooLarge)
   }

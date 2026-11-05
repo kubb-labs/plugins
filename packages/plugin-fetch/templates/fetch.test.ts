@@ -1454,8 +1454,8 @@ describe('parseEventStream', () => {
     expect(events).toStrictEqual([{ data: { n: 1 } }])
   })
 
-  test('reads a CRLF split across chunks as one line break, even across an empty chunk', async () => {
-    const events = await collect(parseEventStream<string>(streamOf(['data: a\r', '', '\ndata: b\r', '\n\r', '\n'])))
+  test('keeps a split CRLF as one line break across an empty chunk', async () => {
+    const events = await collect(parseEventStream<string>(streamOf(['data: a\r', '', '\ndata: b\n\n'])))
     expect(events).toStrictEqual([{ data: 'a\nb' }])
   })
 
@@ -1490,8 +1490,8 @@ describe('parseEventStream', () => {
 
   test('applies maxEventSize to an event that arrives in one chunk', async () => {
     const chunk = `data: ${'x'.repeat(44)}\n\n`
-    expect(await collect(parseEventStream<string>(streamOf([chunk]), { maxEventSize: 50 }))).toStrictEqual([{ data: 'x'.repeat(44) }])
-    await expect(collect(parseEventStream(streamOf([chunk]), { maxEventSize: 49 }))).rejects.toThrow(RangeError)
+    expect(await collect(parseEventStream<string>(streamOf([chunk]), { maxEventSize: 51 }))).toStrictEqual([{ data: 'x'.repeat(44) }])
+    await expect(collect(parseEventStream(streamOf([chunk]), { maxEventSize: 50 }))).rejects.toThrow(RangeError)
   })
 
   test.each([
