@@ -10,7 +10,7 @@ pluginClient({ importPath: '../api/client' })
 
 `importPath` is written into each generated import as-is, so it must resolve from the generated operation file (for example `../../../client`, or a package or alias specifier). The module must export `client`, plus the `Options` and `RequestResult` types. Generated operations call `client` with a config containing `method`, `url`, and the operation options, and return its promise typed as `RequestResult`. There are no `withUnwrap` or `unwrapResult` helpers to write, and `returnType` is not an option.
 
-If your spec has server-sent event operations, also export `toEventStream` and the `EventStreamResult` and `SuccessOf` types. Implement the behavior your application needs in that module.
+If your spec has server-sent event operations, also export `toEventStream` and the `EventStreamResult`, `SuccessOf`, `EventOf`, and `ServerSentEvent` types. A generated function calls `toEventStream<TEvent>(send, config, meta)`: `send` is a function that takes the resume request and returns your `client` promise, `config` is the call's options, and `meta` holds the method, the event `shape` (`'event'` or `'data'`), the declared `events`, and the per-event `validator`. Implement the behavior your application needs in that module.
 
 Set the base URL, auth, retries, and any other behavior inside your `client`. `sdk`, `returnType`, and `baseURL` are not options of this plugin. `validator: 'zod'` needs `pluginZod()` in the plugins, and generation stops with an error if it is missing. Your `client` receives the schemas on `config.validator` (`{ request?, response?, error? }`), so add that field to your `RequestConfig` and run them yourself.
 
