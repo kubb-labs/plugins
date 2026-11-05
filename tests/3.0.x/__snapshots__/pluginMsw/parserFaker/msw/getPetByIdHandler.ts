@@ -8,7 +8,7 @@ import { createGetPetByIdResponse } from '../faker/createGetPetById'
 import { http, HttpResponse } from 'msw/http'
 
 export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -17,13 +17,13 @@ export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
 }
 
 export function getPetByIdHandlerResponse400(data?: GetPetByIdStatus400) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
   })
 }
 
 export function getPetByIdHandlerResponse404(data?: GetPetByIdStatus404) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 404,
   })
 }
@@ -32,7 +32,7 @@ export function getPetByIdHandler(data?: GetPetByIdResponse | ((info: Parameters
   return http.get(`${options?.baseURL ?? ''}/pet/:petId`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new HttpResponse(JSON.stringify(data ?? createGetPetByIdResponse(data)), {
+      return new HttpResponse<string>(JSON.stringify(data ?? createGetPetByIdResponse(data)), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'
