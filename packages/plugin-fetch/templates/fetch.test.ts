@@ -736,6 +736,37 @@ describe('createClientCore', () => {
     expect(onValidationError).toHaveBeenCalledTimes(1)
   })
 
+  test('skips every validator when the client sets validate to false', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const client = createClientCore<string, string>({ defaultTransport: transport, validate: false })
+    const result = (await client({
+      method: 'POST',
+      url: '/pet',
+      body: { name: 1 },
+      query: { limit: 1 },
+      validator: { request: toFailingSchema(), query: toFailingSchema(), response: toFailingSchema() },
+    })) as CallResult<string, string>
+    expect(result.data).toStrictEqual({ id: 1 })
+  })
+
+  test('skips only the directions the client turns off', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const client = createClientCore<string, string>({ defaultTransport: transport, validate: { response: false } })
+    const result = (await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })) as CallResult<string, string>
+    expect(result.data).toStrictEqual({ id: 1 })
+    await expect(client({ method: 'POST', url: '/pet', body: { name: 1 }, validator: { request: toFailingSchema() } })).rejects.toMatchObject({
+      name: 'ParseError',
+    })
+  })
+
+  test('lets a per-call validate override the client setting', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const client = createClientCore<string, string>({ defaultTransport: transport, validate: false })
+    await expect(client({ method: 'GET', url: '/pet/1', validate: true, validator: { response: toFailingSchema() } })).rejects.toMatchObject({
+      name: 'ParseError',
+    })
+  })
+
   test('reports a failing request body with the request direction', async () => {
     const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
     const onValidationError = vi.fn(() => ({ value: { name: 'odie' } }))
