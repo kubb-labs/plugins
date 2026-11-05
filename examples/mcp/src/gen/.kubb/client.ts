@@ -902,9 +902,15 @@ export async function* parseEventStream<TData = unknown>(
   const decoder = new TextDecoder()
   const normalize = (text: string) => text.replace(/\r\n|\r/g, '\n')
   let buffer = ''
+  // A `\r` that ends one read and a `\n` that starts the next are one line ending, so drop that `\n`.
+  let pendingCR = false
 
   for await (const chunk of readBytes(stream)) {
-    const blocks = normalize(buffer + decoder.decode(chunk, { stream: true })).split('\n\n')
+    let text = decoder.decode(chunk, { stream: true })
+    if (!text) continue
+    if (pendingCR && text.startsWith('\n')) text = text.slice(1)
+    pendingCR = text.endsWith('\r')
+    const blocks = normalize(buffer + text).split('\n\n')
     buffer = blocks.pop() ?? ''
     for (const block of blocks) {
       const event = parseEvent<TData>(block)
