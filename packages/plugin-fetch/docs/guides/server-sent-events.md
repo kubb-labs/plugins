@@ -233,7 +233,7 @@ console.info(result.lastEventId) // store it to resume from a new page load
 | `maxDelay`     | `30000` | Longest delay between reconnects.                                                                                    |
 | `growFactor`   | `1.5`   | Factor the delay grows by after each reconnect.                                                                      |
 | `onClose`      | `false` | Also reconnect after the server closes the stream cleanly, as `EventSource` does.                                    |
-| `resume`       | none       | Builds the resume request from the last event ID. Required for any method but GET, which would repeat the operation. |
+| `resume`       | none    | Builds the resume request from the last event ID. Required for any method but GET, which would repeat the operation. |
 
 The runtime stops reconnecting on abort, when you break out of the loop, after `maxRetries`, on a non-2xx response, and on a response that is not an event stream, such as a `204`. The defaults match the MCP TypeScript SDK's Streamable HTTP transport, which resumes a POST stream with a GET and `Last-Event-ID`, as the `resume` example above does.
 
