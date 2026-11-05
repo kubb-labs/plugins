@@ -387,6 +387,20 @@ describe('toEventStream', () => {
       expect(cancel).toHaveBeenCalledOnce()
     })
 
+    test('cancels the reader when the consumer breaks or an event fails to process', async () => {
+      const cancel = vi.fn()
+      const endless = () => new ReadableStream<Uint8Array>({ pull: (controller) => controller.enqueue(encoder.encode('data: a\n\n')), cancel })
+
+      for await (const _event of (await toEventStream(Promise.resolve(call(endless())))).stream) break
+      expect(cancel).toHaveBeenCalledOnce()
+
+      const transform = () => {
+        throw new Error('boom')
+      }
+      await expect(collect((await toEventStream(Promise.resolve(call(endless())), { transform })).stream)).rejects.toThrow('boom')
+      expect(cancel).toHaveBeenCalledTimes(2)
+    })
+
     test('never reconnects a plain promise', async () => {
       const { stream } = await toEventStream(Promise.resolve(call(droppedAfter('data: a\n\n'))), { reconnect: { initialDelay: 0 } })
 

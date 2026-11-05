@@ -287,13 +287,18 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
             return { done: true as const, value: undefined }
           }
         }
-        for (let next = await read(); !next.done; next = await read()) {
-          const event = next.value
-          if (meta.events && !meta.events.includes(event.event)) {
-            options.onUnknownEvent?.(event)
-            continue
+        try {
+          for (let next = await read(); !next.done; next = await read()) {
+            const event = next.value
+            if (meta.events && !meta.events.includes(event.event)) {
+              options.onUnknownEvent?.(event)
+              continue
+            }
+            yield (await validateEvent(options.transform ? options.transform(event) : event)) as TEvent
           }
-          yield (await validateEvent(options.transform ? options.transform(event) : event)) as TEvent
+        } finally {
+          // A consumer `break` or a failed event leaves the parser suspended; closing it cancels the reader.
+          await parsed.return(undefined).catch(() => {})
         }
       }
       if (!reconnect || (!dropped && !onClose) || attempt >= maxRetries || options.signal?.aborted) return
