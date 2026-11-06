@@ -3,7 +3,7 @@ import { ast, memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation, renderGeneratorOperations } from '#mocks'
 import { resolverClient } from '../resolver.ts'
 import type { SecurityDocument } from '../builders/security.ts'
 import type { Options, ResolvedOptions, ResolverClient } from '../types.ts'
@@ -312,5 +312,43 @@ describe('clientGenerator without an operation type source', () => {
         help: 'Add `pluginTs()` before "plugin-fetch", or add `pluginZod({ inferred: true })`.',
       },
     })
+  })
+})
+
+describe('clientGenerator runtime files', () => {
+  const sseGenerator = createClientGenerator<PluginFetch>('fetch', { sse: '/templates/sse.ts' })
+
+  test.each([
+    {
+      name: 'copies sse.ts and re-exports it from client.ts when an operation streams events',
+      nodes: [getPetByIdNode, streamEventsNode],
+      baseURL: undefined,
+      expected: true,
+    },
+    { name: 'keeps the baseURL line next to the re-export', nodes: [streamEventsNode], baseURL: 'https://api.test', expected: true },
+    { name: 'skips sse.ts when no operation streams events', nodes: [getPetByIdNode, createPetNode], baseURL: undefined, expected: false },
+  ])('$name', async ({ nodes, baseURL, expected }) => {
+    const options = { ...defaultOptions, baseURL }
+    const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options, resolver: resolverClient })
+    const driver = createMockedPluginDriver({
+      name: 'runtime',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorOperations(sseGenerator, nodes, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverClient,
+    })
+
+    const runtime = driver.fileManager.files.filter((file) => file.path.includes('.kubb/'))
+    if (!expected) return expect(runtime).toStrictEqual([])
+    expect(runtime.map((file) => [file.path.split('/').slice(-2).join('/'), file.copy, file.footer]).sort()).toStrictEqual([
+      ['.kubb/client.ts', undefined, [baseURL ? `client.setConfig({ baseURL: "${baseURL}" })` : null, "export * from './sse.ts'"].filter(Boolean).join('\n')],
+      ['.kubb/sse.ts', '/templates/sse.ts', undefined],
+    ])
   })
 })

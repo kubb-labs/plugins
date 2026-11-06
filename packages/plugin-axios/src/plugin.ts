@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { createSdkGenerator, defaultMacros, isValidatorEnabled, resolverClient } from '@internals/client'
+import { buildClientFooter, createSdkGenerator, defaultMacros, isValidatorEnabled, resolverClient } from '@internals/client'
 import { createGroupConfig } from '@internals/shared'
 import { addGenerator, defineExtension, injectFile, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
@@ -79,10 +79,9 @@ export const pluginAxios = defineExtension<PluginAxios>({
 
     // `sdk` swaps the per-operation functions for the class-based SDK; left unset, the standalone
     // functions (which query plugins consume) stay.
-    addGenerator(resolved.sdk ? createSdkGenerator<PluginAxios>() : clientGenerator)
+    addGenerator(resolved.sdk ? createSdkGenerator<PluginAxios>({ sse: sseTemplatePath }) : clientGenerator)
 
     const root = path.resolve(config.root, config.output.path)
-    const baseURLExpression = baseURL ? (baseURL.includes('${') ? `\`${baseURL.replaceAll('`', '\\`')}\`` : JSON.stringify(baseURL)) : undefined
 
     injectFile({
       baseName: 'serializers.ts',
@@ -100,19 +99,13 @@ export const pluginAxios = defineExtension<PluginAxios>({
       baseName: 'client.ts',
       path: path.resolve(root, '.kubb/client.ts'),
       copy: axiosClientTemplatePath,
-      footer: baseURLExpression ? `client.setConfig({ baseURL: ${baseURLExpression} })` : undefined,
+      footer: buildClientFooter({ baseURL, sse: false }),
     })
 
     injectFile({
       baseName: 'standardSchema.ts',
       path: path.resolve(root, '.kubb/standardSchema.ts'),
       copy: standardSchemaTemplatePath,
-    })
-
-    injectFile({
-      baseName: 'sse.ts',
-      path: path.resolve(root, '.kubb/sse.ts'),
-      copy: sseTemplatePath,
     })
 
     return resolved

@@ -1,10 +1,8 @@
 import { createClientCore, getResponseContentType, type ResponseType } from './core.ts'
 import { isJsonMediaType } from './serializers.ts'
 import * as core from './core.ts'
-import * as sse from './sse.ts'
 
 export * from './core.ts'
-export * from './sse.ts'
 
 /** The request and response objects of this transport, carried on every result and error. */
 export type NativeRequest = Request
@@ -54,13 +52,6 @@ export const ResponseError = core.ResponseError as {
   // `instanceof` narrows to this type, so it carries the native request and response.
   prototype: core.ResponseError<unknown, NativeRequest, NativeResponse>
 }
-export type EventStreamResult<TData = unknown, TResponse = NativeResponse> = sse.EventStreamResult<TData, TResponse>
-
-/** `toEventStream` with the result bound to this transport's response. */
-export const toEventStream: <TData = unknown>(
-  call: Promise<sse.EventStreamCall<NativeResponse>>,
-  options?: Parameters<typeof sse.toEventStream>[1],
-) => Promise<EventStreamResult<TData>> = sse.toEventStream
 
 function detectResponseType(contentType: string | null): ResponseType | undefined {
   if (!contentType) return undefined

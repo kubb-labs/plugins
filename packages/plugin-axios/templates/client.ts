@@ -3,10 +3,8 @@ import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, Inte
 import { getResponseContentType, isStreamed } from './core.ts'
 import { isJsonMediaType } from './serializers.ts'
 import * as core from './core.ts'
-import * as sse from './sse.ts'
 
 export * from './core.ts'
-export * from './sse.ts'
 
 /** The request and response objects of this transport, carried on every result and error. */
 export type NativeRequest = AxiosRequestConfig
@@ -67,7 +65,6 @@ export const ResponseError = core.ResponseError as {
   // `instanceof` narrows to this type, so it carries the native request and response.
   prototype: core.ResponseError<unknown, NativeRequest, NativeResponse>
 }
-export type EventStreamResult<TData = unknown, TResponse = NativeResponse> = sse.EventStreamResult<TData, TResponse>
 
 /** An interceptor handler. It receives the native axios object; the second argument is kept for handlers written against earlier versions and is always `undefined`. */
 export type InterceptorFn<T> = (value: T, requestConfig?: RequestConfig) => T | Promise<T>
@@ -94,12 +91,6 @@ export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse>
   interceptors: Interceptors
   createClient: (config?: ClientConfig<TRequest, TResponse>) => ClientInstance<TRequest, TResponse>
 }
-
-/** `toEventStream` with the result bound to this transport's response. */
-export const toEventStream: <TData = unknown>(
-  call: Promise<sse.EventStreamCall<NativeResponse>>,
-  options?: Parameters<typeof sse.toEventStream>[1],
-) => Promise<EventStreamResult<TData>> = sse.toEventStream
 
 /**
  * Collects the headers axios read into a `Headers`, so the core and the interceptors see one shape for every transport.

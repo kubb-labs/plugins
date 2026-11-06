@@ -245,7 +245,7 @@ Declare heartbeat and `error` events in the document, so each has a `case` in yo
 
 ## The runtime files
 
-`.kubb/sse.ts` holds the parser and `toEventStream`, and `.kubb/client.ts` re-exports them with the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `EventStreamResult` types. Import the types from the client. Kubb regenerates `.kubb/sse.ts`, `.kubb/core.ts`, and `.kubb/client.ts` on each run, so do not edit them:
+`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `EventStreamResult` types. Kubb writes it only when the document has a `text/event-stream` operation, and `.kubb/client.ts` then re-exports it, so the types import from either file. Kubb regenerates both on each run, so do not edit them:
 
 ```typescript
 import type { ServerSentEvent } from './gen/.kubb/client'

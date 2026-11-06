@@ -1,3 +1,4 @@
+import type { NativeResponse } from './client.ts'
 import { baseContentType } from './serializers.ts'
 import { isValidationEnabled, runValidator, type StandardSchemaValidator, type ValidateOption, type ValidationErrorHandler } from './standardSchema.ts'
 
@@ -47,7 +48,7 @@ export type EventStreamCall<TResponse> = { data: unknown; contentType?: string; 
 type StreamEvent<TData> = TData extends { event: string } ? TData : ServerSentEvent<TData>
 
 /** Parsed events alongside the native response. `TData` is the payload, or the typed event. */
-export type EventStreamResult<TData = unknown, TResponse = unknown> = {
+export type EventStreamResult<TData = unknown, TResponse = NativeResponse> = {
   stream: AsyncGenerator<StreamEvent<TData>>
   response: TResponse
   /**
@@ -180,7 +181,7 @@ function isStreamBody(data: unknown): data is ReadableStream<Uint8Array> | Async
  * stream, or a body that is not an event stream. A dropped connection ends the loop with the
  * transport's error; `lastEventId` on the result is the ID to resume from.
  */
-export async function toEventStream<TData = unknown, TResponse = unknown>(
+export async function toEventStream<TData = unknown, TResponse = NativeResponse>(
   call: Promise<EventStreamCall<TResponse>>,
   {
     client,

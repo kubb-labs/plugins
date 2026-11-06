@@ -40,7 +40,6 @@ export default defineConfig([
       'templates/core': 'templates/core.ts',
       'templates/axios': 'templates/axios.ts',
       'templates/serializers': 'templates/serializers.ts',
-      'templates/sse': 'templates/sse.ts',
       'templates/standardSchema': 'templates/standardSchema.ts',
     },
     format: 'esm',

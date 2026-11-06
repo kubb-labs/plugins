@@ -1,5 +1,6 @@
 export type { SecurityDocument } from './builders/security.ts'
 export { isValidatorEnabled } from './builders/validatorOptions.ts'
+export { buildClientFooter } from './components/StreamRuntime.tsx'
 export { createClientGenerator } from './generators/clientGenerator.tsx'
 export { createSdkGenerator } from './generators/sdkGenerator.tsx'
 export { defaultMacros } from './macros.ts'

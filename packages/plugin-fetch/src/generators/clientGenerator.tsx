@@ -1,4 +1,5 @@
 import { createClientGenerator } from '@internals/client'
+import { sseTemplatePath } from '../templates.ts'
 import type { PluginFetch } from '../types.ts'
 
 /**
@@ -6,4 +7,4 @@ import type { PluginFetch } from '../types.ts'
  * operation using the shared `Operation` component: a grouped `<Name>Request` type and a function
  * that forwards a single `options` object to the bundled `client` and returns the `RequestResult`.
  */
-export const clientGenerator = createClientGenerator<PluginFetch>('fetch')
+export const clientGenerator = createClientGenerator<PluginFetch>('fetch', { sse: sseTemplatePath })
