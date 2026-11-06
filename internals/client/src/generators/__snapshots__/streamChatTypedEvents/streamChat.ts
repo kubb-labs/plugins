@@ -14,13 +14,8 @@ export function streamChat<ThrowOnError extends boolean = true>(
 ): Promise<EventStreamResult<TypedEvent<SuccessOf<StreamChatResponses>>>> {
   const { client: request = client, ...config } = options
 
-  return toEventStream<TypedEvent<SuccessOf<StreamChatResponses>>>({
-    send: (init) => request({ method: 'POST', url: '/chat', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true, ...init }),
-    client: request,
-    config,
-    method: 'POST',
-    shape: 'event',
-    events: ['message_delta', 'ping'],
-    text: ['message_delta', 'ping'],
-  })
+  return toEventStream<TypedEvent<SuccessOf<StreamChatResponses>>>(
+    request({ method: 'POST', url: '/chat', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }),
+    { client: request, config, shape: 'event' },
+  )
 }

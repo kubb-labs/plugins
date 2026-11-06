@@ -7,7 +7,6 @@ export {
   castToClientOptions,
   buildResponses,
   getContentTypeInfo,
-  type EventStreamInfo,
   getEventStream,
   getOperationParameters,
   getOperationSuccessResponses,

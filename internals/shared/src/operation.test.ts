@@ -425,7 +425,7 @@ describe('getResponseType / isEventStream', () => {
     expect(getEventStream(node)).toBeNull()
   })
 
-  test('marks a text payload and the events whose data is text', () => {
+  test('reads the item shape of the stream', () => {
     const textItem = ast.factory.createOperation({
       operationId: 'streamLines',
       method: 'GET',
@@ -456,8 +456,8 @@ describe('getResponseType / isEventStream', () => {
       ],
     })
 
-    expect(getEventStream(textItem)).toStrictEqual({ shape: 'data', text: true })
-    expect(getEventStream(typedEvents)).toStrictEqual({ shape: 'event', events: ['delta', 'ping'], text: ['ping'] })
+    expect(getEventStream(textItem)).toBe('data')
+    expect(getEventStream(typedEvents)).toBe('event')
   })
 
   test('leaves JSON responses to the runtime auto-detection', () => {

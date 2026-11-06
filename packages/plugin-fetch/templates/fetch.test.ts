@@ -14,7 +14,7 @@ import {
   unwrapResult,
   withUnwrap,
   defaultTransport,
-} from './fetch.ts'
+} from './client.ts'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type FakeResult = Partial<Pick<TransportResult, 'data' | 'status' | 'statusText'>>
@@ -871,6 +871,19 @@ describe('a streamed call answered without an event stream', () => {
     const client = createClientCore({ defaultTransport })
 
     expect((await client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream' })).data).toBeInstanceOf(ReadableStream)
+  })
+
+  test('decodes a text error body instead of handing the stream to the error path', async () => {
+    using _fetch = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation(async () => new Response('busy', { status: 503, headers: { 'content-type': 'text/plain' } }))
+    const client = createClientCore({ defaultTransport })
+
+    await expect(client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream' })).rejects.toMatchObject({
+      name: 'ResponseError',
+      status: 503,
+      data: 'busy',
+    })
   })
 })
 

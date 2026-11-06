@@ -853,6 +853,9 @@ importers:
       '@kubb/kit':
         specifier: 0.0.0-canary-20261105200211
         version: 0.0.0-canary-20261105200211
+      '@kubb/plugin-client':
+        specifier: workspace:^
+        version: link:../plugin-client
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
@@ -950,6 +953,9 @@ importers:
       '@kubb/kit':
         specifier: 0.0.0-canary-20261105200211
         version: 0.0.0-canary-20261105200211
+      '@kubb/plugin-client':
+        specifier: workspace:^
+        version: link:../plugin-client
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts

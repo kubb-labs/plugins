@@ -1,13 +1,15 @@
 import path from 'node:path'
-import { getEventStream, isEventStream, operationFileEntry, operationKey, resolveDependencyOperationFile } from '@internals/shared'
+import { getEventStream, operationFileEntry, operationKey, resolveDependencyOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { getOperationSecurity, type SecurityDocument } from '../builders/security.ts'
 import { buildValidatorHooks } from '../builders/validator.ts'
 import { Operation } from '../components/Operation.tsx'
+import { StreamRuntime } from '../components/StreamRuntime.tsx'
 import { resolveOperationTypes } from '../resolveOperationTypes.ts'
 import type { ContractClientFactory } from '../types.ts'
 
@@ -22,13 +24,12 @@ import type { ContractClientFactory } from '../types.ts'
  * `sse` is the Server-Sent Events runtime template, copied into `.kubb/sse.ts` only for a document with a
  * `text/event-stream` operation.
  */
-export function createClientGenerator<TFactory extends ContractClientFactory>({ name, sse }: { name: string; sse?: string }): Generator<TFactory> {
+export function createClientGenerator<TFactory extends ContractClientFactory>(name: string, { sse }: { sse?: string } = {}): Generator<TFactory> {
   return defineGenerator<TFactory>({
     name,
     renderer: jsxRenderer,
     operations(nodes, ctx) {
-      if (!sse || !nodes.some(isEventStream)) return null
-      return <File baseName="sse.ts" path={path.resolve(ctx.root, '.kubb/sse.ts')} copy={sse} />
+      return <StreamRuntime nodes={nodes} root={ctx.root} sse={sse} baseURL={ctx.options.baseURL} />
     },
     operation(node, ctx) {
       if (!ast.isHttpOperationNode(node)) return null
@@ -109,14 +110,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>({ 
           <File.Import name={clientValueImports} root={clientRoot} path={clientPath} />
           <File.Import name={clientTypeImports} root={clientRoot} path={clientPath} isTypeOnly />
           {stream && <File.Import name={['toEventStream']} root={clientRoot} path={ssePath} />}
-          {stream && (
-            <File.Import
-              name={['EventStreamResult', ...(returnType !== 'plain' ? ['EventStreamOptions'] : []), ...(stream.shape === 'event' ? ['TypedEvent'] : [])]}
-              root={clientRoot}
-              path={ssePath}
-              isTypeOnly
-            />
-          )}
+          {stream && <File.Import name={buildEventStreamImports({ returnType, typed: stream === 'event' })} root={clientRoot} path={ssePath} isTypeOnly />}
 
           {meta.fileTypes && importedTypeNames.length > 0 && (
             <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTypes.path} isTypeOnly />

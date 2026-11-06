@@ -89,7 +89,7 @@ describe('event stream runtime', () => {
       ).safeBuild()
       expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
 
-      expect(await fs.readdir(path.join(output, '.kubb'))).toStrictEqual(['client.ts', 'serializers.ts', 'standardSchema.ts'])
+      expect(await fs.readdir(path.join(output, '.kubb'))).toStrictEqual(['client.ts', 'core.ts', 'serializers.ts', 'standardSchema.ts'])
     } finally {
       await fs.rm(output, { recursive: true, force: true })
     }
@@ -130,15 +130,16 @@ describe('OpenAPI 3.2 item schemas', () => {
 
       const runtime = await fs.readFile(path.join(output, '.kubb', 'sse.ts'), 'utf8')
       expect(runtime).toContain('export async function toEventStream')
+      expect(await fs.readFile(path.join(output, '.kubb', 'client.ts'), 'utf8')).toMatch(/export \* from '\.\/sse\.ts'\s*$/)
 
       const chat = await fs.readFile(path.join(output, 'clients', 'streamChat.ts'), 'utf8')
       expect(chat).toContain('Promise<EventStreamResult<TypedEvent<SuccessOf<StreamChatResponses>>>>')
-      expect(chat).toContain("client: request, config, method: 'POST', shape: 'event', events: ['message_delta', 'ping'], text: ['ping'], validator: ")
+      expect(chat).toContain("{ client: request, config, shape: 'event', validator: ")
       expect(chat).not.toMatch(/validator: \{[^}]*response:/)
 
       const ticks = await fs.readFile(path.join(output, 'clients', 'streamTicks.ts'), 'utf8')
       expect(ticks).toContain('Promise<EventStreamResult<SuccessOf<StreamTicksResponses>>>')
-      expect(ticks).toContain("client: request, config, method: 'GET', shape: 'data', validator: ")
+      expect(ticks).toContain("{ client: request, config, shape: 'data', validator: ")
 
       // JSON Lines is a stream of items too, but not an event stream, so it keeps the one-shot result typed with one item.
       const logs = await fs.readFile(path.join(output, 'clients', 'streamLogs.ts'), 'utf8')

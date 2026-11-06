@@ -22,6 +22,7 @@
   "files": [
     "src",
     "dist",
+    "templates",
     "kubb-extension.json",
     "docs",
     "!/**/**.test.**",
@@ -45,7 +46,15 @@
       }
     },
     "./package.json": "./package.json",
-    "./kubb-extension.json": "./kubb-extension.json"
+    "./kubb-extension.json": "./kubb-extension.json",
+    "./templates/*.ts": {
+      "types": "./dist/templates/*.d.ts",
+      "default": "./templates/*.ts"
+    },
+    "./templates/*.js": {
+      "types": "./dist/templates/*.d.ts"
+    },
+    "./templates/*": "./templates/*"
   },
   "publishConfig": {
     "access": "public",

@@ -35,23 +35,18 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
     SuccessOf<{
       '200': PetEvent
     }>
-  >({
-    send: (init) =>
-      request({
-        method: 'GET',
-        url: '/pet/{petId}/events',
-        security: [
-          { type: 'apiKey', name: 'api_key', in: 'header' },
-          { type: 'oauth2', scopes: ['read:pets'] },
-        ],
-        responseType: 'stream',
-        ...config,
-        throwOnError: config.throwOnError ?? true,
-        ...init,
-      }),
-    client: request,
-    config,
-    method: 'GET',
-    shape: 'data',
-  })
+  >(
+    request({
+      method: 'GET',
+      url: '/pet/{petId}/events',
+      security: [
+        { type: 'apiKey', name: 'api_key', in: 'header' },
+        { type: 'oauth2', scopes: ['read:pets'] },
+      ],
+      responseType: 'stream',
+      ...config,
+      throwOnError: config.throwOnError ?? true,
+    }),
+    { client: request, config, shape: 'data' },
+  )
 }

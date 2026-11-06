@@ -11,12 +11,12 @@ import { createClientGenerator } from './clientGenerator.tsx'
 
 type PluginFetch = PluginType<'plugin-fetch', Options, ResolvedOptions, ResolverClient>
 
-const clientGenerator = createClientGenerator<PluginFetch>({ name: 'fetch' })
+const clientGenerator = createClientGenerator<PluginFetch>('fetch')
 
 type PluginClient = PluginType<'plugin-client', Options, ResolvedOptions & { importPath: string }, ResolverClient>
 
 // What `@kubb/plugin-client` registers: a user-owned client module, imported exactly as configured.
-const customClientGenerator = createClientGenerator<PluginClient>({ name: 'client' })
+const customClientGenerator = createClientGenerator<PluginClient>('client')
 
 const testConfig: Config = {
   root: '.',
@@ -237,7 +237,7 @@ describe('clientGenerator operation', () => {
     { name: 'listPetsWithStyles', node: listPetsStyledNode, options: {} },
     // text/event-stream response returns a typed event stream instead of a one-shot result.
     { name: 'streamEventsSse', node: streamEventsNode, options: {} },
-    // A `stream.shape` of `event` types each event by name and lists the declared names for the runtime filter.
+    // A `stream.shape` of `event` types each event by name.
     { name: 'streamChatTypedEvents', node: streamChatNode, options: {} },
     // returnType: 'data' unwraps the resolved call down to the bare success body.
     { name: 'getPetByIdWithReturnTypeData', node: getPetByIdNode, options: { returnType: 'data' as const } },
@@ -267,34 +267,6 @@ describe('clientGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
-  })
-})
-
-describe('clientGenerator runtime files', () => {
-  const sseGenerator = createClientGenerator<PluginFetch>({ name: 'fetch', sse: '/templates/sse.ts' })
-
-  test.each([
-    { name: 'copies sse.ts when an operation streams events', nodes: [getPetByIdNode, streamEventsNode], expected: ['.kubb/sse.ts'] },
-    { name: 'skips sse.ts when no operation streams events', nodes: [getPetByIdNode, createPetNode], expected: [] },
-  ])('$name', async ({ nodes, expected }) => {
-    const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
-    const driver = createMockedPluginDriver({
-      name: 'runtime',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
-
-    await renderGeneratorOperations(sseGenerator, nodes, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options: defaultOptions,
-      resolver: resolverClient,
-    })
-
-    expect(driver.fileManager.files.map((file) => [file.path.split('/').slice(-2).join('/'), file.copy])).toStrictEqual(
-      expected.map((file) => [file, '/templates/sse.ts']),
-    )
   })
 })
 
@@ -340,5 +312,43 @@ describe('clientGenerator without an operation type source', () => {
         help: 'Add `pluginTs()` before "plugin-fetch", or add `pluginZod({ inferred: true })`.',
       },
     })
+  })
+})
+
+describe('clientGenerator runtime files', () => {
+  const sseGenerator = createClientGenerator<PluginFetch>('fetch', { sse: '/templates/sse.ts' })
+
+  test.each([
+    {
+      name: 'copies sse.ts and re-exports it from client.ts when an operation streams events',
+      nodes: [getPetByIdNode, streamEventsNode],
+      baseURL: undefined,
+      expected: true,
+    },
+    { name: 'keeps the baseURL line next to the re-export', nodes: [streamEventsNode], baseURL: 'https://api.test', expected: true },
+    { name: 'skips sse.ts when no operation streams events', nodes: [getPetByIdNode, createPetNode], baseURL: undefined, expected: false },
+  ])('$name', async ({ nodes, baseURL, expected }) => {
+    const options = { ...defaultOptions, baseURL }
+    const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options, resolver: resolverClient })
+    const driver = createMockedPluginDriver({
+      name: 'runtime',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorOperations(sseGenerator, nodes, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverClient,
+    })
+
+    const runtime = driver.fileManager.files.filter((file) => file.path.includes('.kubb/'))
+    if (!expected) return expect(runtime).toStrictEqual([])
+    expect(runtime.map((file) => [file.path.split('/').slice(-2).join('/'), file.copy, file.footer]).sort()).toStrictEqual([
+      ['.kubb/client.ts', undefined, [baseURL ? `client.setConfig({ baseURL: "${baseURL}" })` : null, "export * from './sse.ts'"].filter(Boolean).join('\n')],
+      ['.kubb/sse.ts', '/templates/sse.ts', undefined],
+    ])
   })
 })

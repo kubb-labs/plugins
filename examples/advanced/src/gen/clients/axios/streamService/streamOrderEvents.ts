@@ -39,14 +39,9 @@ export function streamOrderEvents<ThrowOnError extends boolean = true>(
         '200': OrderEvent
       }>
     >
-  >({
-    send: (init) =>
-      request({ method: 'GET', url: '/store/order/{orderId}/events', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true, ...init }),
+  >(request({ method: 'GET', url: '/store/order/{orderId}/events', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }), {
     client: request,
     config,
-    method: 'GET',
     shape: 'event',
-    events: ['order_placed', 'order_shipped', 'ping'],
-    text: ['ping'],
   })
 }

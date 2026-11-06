@@ -111,11 +111,7 @@ for await (const event of stream) {
 }
 ```
 
-The stream yields only the event names the document declares, so the `switch` stays exhaustive when the API adds a name. Pass `onUnknownEvent` to see what it skips:
-
-```typescript
-const { stream } = await streamChat({ body, onUnknownEvent: (event) => console.warn('unknown event', event.event) })
-```
+The stream yields every event the server sends. An event name the document does not declare reaches the `default` of your `switch`, and with `validator: 'zod'` the event schema rejects it, as it would any other response that does not match the document.
 
 ## Payload only
 
@@ -181,14 +177,12 @@ for await (const { data } of stream) {
 
 Pass these on the call, next to its request params:
 
-| Option           | What it does                                                                                                                    |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `terminator`     | Ends the stream when `data` equals this value, such as `[DONE]`. Without it, the sentinel reaches your loop.                    |
-| `onUnknownEvent` | Receives each event whose name the document does not declare.                                                                   |
-| `transform`      | Maps each event before validation, for example to camelCase its keys.                                                           |
-| `maxEventSize`   | Largest event in characters. A larger one throws a `RangeError`. Defaults to `16 * 1024 * 1024`. Set `Infinity` to turn it off. |
-| `signal`         | An `AbortSignal` that ends the request, the loop, and any pending reconnect.                                                    |
-| `reconnect`      | Resumes a dropped stream. See [Reconnect](#reconnect).                                                                          |
+| Option         | What it does                                                                                                                    |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `terminator`   | Ends the stream when `data` equals this value, such as `[DONE]`. Without it, the sentinel reaches your loop.                    |
+| `transform`    | Maps each event before validation, for example to camelCase its keys.                                                           |
+| `maxEventSize` | Largest event in characters. A larger one throws a `RangeError`. Defaults to `16 * 1024 * 1024`. Set `Infinity` to turn it off. |
+| `signal`       | An `AbortSignal` that ends the request and the loop.                                                                            |
 
 To stop reading, `break` out of the loop. The runtime then cancels the reader and releases the connection.
 
@@ -208,28 +202,26 @@ const { stream } = await streamChat({
 
 Set `validate: false` on the call or the client to skip it. See [Handle errors](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/error-handling) for the validation options.
 
-## Reconnect
+## Resume after a drop
 
-A dropped connection ends the loop. Pass `reconnect` to resume the way `EventSource` does: the runtime waits, sends the last event ID as `Last-Event-ID`, and keeps yielding. It is off by default, because many streams, such as a chat completion, end on purpose.
+A dropped connection ends the loop with the transport's error. The result's `lastEventId` is the `id` of the last event the server completed, so a new call with a `Last-Event-ID` header continues where the stream stopped. The runtime does not reconnect by itself, because many streams, such as a chat completion, end on purpose, and the retry policy belongs to your app:
 
 ```typescript
-const result = await streamChat({ body, reconnect: { resume: () => ({ method: 'GET' }) } })
+let lastEventId = ''
 
-for await (const event of result.stream) render(event)
-
-console.info(result.lastEventId) // store it to resume after a page load
+for (let attempt = 0; attempt < 3; attempt++) {
+  const result = await streamChat({ body, headers: lastEventId ? { 'Last-Event-ID': lastEventId } : {} })
+  try {
+    for await (const event of result.stream) render(event)
+    break
+  } catch (error) {
+    if (ResponseError.is(error)) throw error
+    lastEventId = result.lastEventId || lastEventId
+  }
+}
 ```
 
-| Option       | Default | Meaning                                                                            |
-| ------------ | ------- | ---------------------------------------------------------------------------------- |
-| `maxRetries` | `2`     | Reconnects after the first connection.                                             |
-| `delay`      | `1000`  | Milliseconds before the first reconnect. The server's `retry` replaces it.         |
-| `maxDelay`   | `30000` | Longest the growing delay gets. The server's `retry` is used as sent.              |
-| `growFactor` | `1.5`   | Factor the delay grows by after each reconnect.                                    |
-| `onClose`    | `false` | Also reconnect after the server closes the stream cleanly.                         |
-| `resume`     | none    | Builds the resume request from the last event ID. Required for any method but GET. |
-
-The runtime stops reconnecting on abort, `break`, `maxRetries`, the `terminator`, a non-2xx response, or a response that is not an event stream. The runtime owns the `Last-Event-ID` header: a header you pass on the call seeds the ID, and an empty `id:` from the server clears it.
+`lastEventId` is empty until the server sends an `id`, and an empty `id:` field clears it. An `id` that contains a NULL character is ignored. Each event carries the server's `retry` hint as `retry`.
 
 ## Handle errors
 
@@ -249,12 +241,12 @@ try {
 
 A stream call that gets a JSON response, such as an error body, parses it like any other call, so a 2xx JSON body yields an empty stream. An operation that declares another content type next to `text/event-stream` is generated as a normal call.
 
-Declare heartbeat and `error` events in the document, so they reach your `switch` instead of `onUnknownEvent`.
+Declare heartbeat and `error` events in the document, so each has a `case` in your `switch`.
 
-## The runtime file
+## The runtime files
 
-`.kubb/sse.ts` exports the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `ReconnectOptions` types. Import the types from there. Kubb regenerates the file on each run, so do not edit it:
+`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `EventStreamResult` types. Kubb writes it only when the document has a `text/event-stream` operation, and `.kubb/client.ts` then re-exports it, so the types import from either file. Kubb regenerates both on each run, so do not edit them:
 
 ```typescript
-import type { ServerSentEvent } from './gen/.kubb/sse'
+import type { ServerSentEvent } from './gen/.kubb/client'
 ```

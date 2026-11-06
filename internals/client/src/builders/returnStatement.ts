@@ -53,17 +53,11 @@ export function buildReturnStatement({
   return `return withUnwrap(${request}(${callConfig}) as Promise<RequestResult<${buildRequestResultGenerics({ node, types })}>>)`
 }
 
-const ESCAPES: Record<string, string> = { '\\': '\\\\', "'": "\\'", '\n': '\\n', '\r': '\\r' }
-
-function quote(value: string): string {
-  return `'${value.replace(/[\\'\n\r]/g, (char) => ESCAPES[char]!)}'`
-}
-
 /**
  * Builds the return type and statement of a `text/event-stream` operation. The item type is `TypedEvent<...>` when each item
- * declares its own `event` and `data`, and otherwise the payload type, which `EventStreamResult` wraps in `ServerSentEvent`. The call goes
- * through `toEventStream` with a `send` function for the resume request, the `client` for its defaults, the call's
- * `config`, and the method, shape, declared event names, text events and per-event validator. A `returnType: 'plain'` client receives only the promise,
+ * declares its own `event` and `data`, and otherwise the payload type, which `EventStreamResult` wraps in `ServerSentEvent`. The call's
+ * promise goes through `toEventStream` with the `client` for its defaults, the call's `config`, the shape and the per-event
+ * validator. A `returnType: 'plain'` client receives only the promise,
  * `toEventStream(request(config))`, and keeps its response validator in the call config.
  */
 export function buildEventStreamReturn({
@@ -82,21 +76,17 @@ export function buildEventStreamReturn({
   returnType: string
   statement: string
 } {
-  const stream = getEventStream(node)
+  const shape = getEventStream(node) ?? 'data'
   const success = `SuccessOf<${types.response.responses(node)}>`
-  const eventType = stream?.shape === 'event' ? `TypedEvent<${success}>` : success
+  const eventType = shape === 'event' ? `TypedEvent<${success}>` : success
   const promise = `Promise<EventStreamResult<${eventType}>>`
   if (returnType === 'plain') return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
 
-  const meta = [
-    `method: '${node.method.toUpperCase()}'`,
-    `shape: '${stream?.shape ?? 'data'}'`,
-    stream?.events ? `events: [${stream.events.map(quote).join(', ')}]` : null,
-    stream?.text === true ? 'text: true' : null,
-    Array.isArray(stream?.text) ? `text: [${stream.text.map(quote).join(', ')}]` : null,
-    validatorHooks?.response ? `validator: ${validatorHooks.response}` : null,
-  ]
-    .filter(Boolean)
-    .join(', ')
-  return { returnType: promise, statement: `return toEventStream<${eventType}>({ send: (init) => request(${callConfig}), client: request, config, ${meta} })` }
+  const meta = [`shape: '${shape}'`, validatorHooks?.response ? `validator: ${validatorHooks.response}` : null].filter(Boolean).join(', ')
+  return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}), { client: request, config, ${meta} })` }
+}
+
+/** The stream types an operation file imports: the result, the per-call options except for a plain client, and `TypedEvent` for named events. */
+export function buildEventStreamImports({ returnType, typed }: { returnType: ReturnTypeOption; typed: boolean }): Array<string> {
+  return ['EventStreamResult', ...(returnType !== 'plain' ? ['EventStreamOptions'] : []), ...(typed ? ['TypedEvent'] : [])]
 }
