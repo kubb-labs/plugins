@@ -267,6 +267,19 @@ import { pluginFetch } from '@kubb/plugin-fetch'
 pluginFetch({ returnType: 'data' })
 ```
 
+Both modes read the same events. The table compares them for one call:
+
+|                                     | `returnType: 'full'` (default)                                 | `returnType: 'data'`                                           |
+| ----------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
+| The call returns                    | `Unwrappable<StreamResult<…>>`                                 | `Promise<UnwrappedStreamResult<…>>`                            |
+| Call it                             | `const result = await streamPetEvents({ path: { petId: 1 } })` | `const events = await streamPetEvents({ path: { petId: 1 } })` |
+| Loop over the events                | `for await (const event of result.stream)`                     | `for await (const event of events)`                            |
+| Other ways to loop                  | `result`, `result.data`, or `.unwrap()`                        | none                                                           |
+| `event.data`                        | `PetEvent`                                                     | `PetEvent`                                                     |
+| A failed call, by default           | throws a `ResponseError`                                       | throws a `ResponseError`                                       |
+| With `throwOnError: false`          | the full result                                                | the full result, as in `'full'`                                |
+| `status`, `response`, `lastEventId` | available                                                      | only with `throwOnError: false`                                |
+
 Loop over the events the call resolves to:
 
 ```typescript
