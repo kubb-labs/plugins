@@ -33,7 +33,7 @@ For one payload on every event, such as a feed of pet changes. The item declares
 
 ### Describe it
 
-In OpenAPI 3.2, put one `oneOf` member per event name on `itemSchema`, with a `const` on `event`. Describe JSON inside `data` with `contentMediaType` and `contentSchema`:
+In OpenAPI 3.2, put one `oneOf` member per event name on `itemSchema`, with a `const` on `event`. Reference the schema of a JSON payload from `data`, as any other property does. Kubb does not read `contentMediaType` and `contentSchema`, so a `data` described that way stays a string:
 
 ```yaml
 /chat:
@@ -53,13 +53,16 @@ In OpenAPI 3.2, put one `oneOf` member per event name on `itemSchema`, with a `c
                 id: { type: string }
                 retry: { type: integer, minimum: 0 }
               oneOf:
-                - properties:
-                    event: { const: message_delta }
-                    data:
-                      contentMediaType: application/json
-                      contentSchema: { $ref: '#/components/schemas/MessageDelta' }
-                - properties:
-                    event: { const: ping }
+                - type: object
+                  required: [event, data]
+                  properties:
+                    event: { type: string, const: message_delta }
+                    data: { $ref: '#/components/schemas/MessageDelta' }
+                - type: object
+                  required: [event]
+                  properties:
+                    event: { type: string, const: ping }
+                    data: { type: string }
 ```
 
 In OpenAPI 3.0 and 3.1, put the same `oneOf` on `schema`, with a `discriminator` on `event`. Kubb reads `schema` as one event.

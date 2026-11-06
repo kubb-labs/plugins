@@ -47,6 +47,14 @@ describe('createAxiosTransport', () => {
     expect((result.response as AxiosResponse).headers).toMatchObject({ 'x-count': 2 })
   })
 
+  test('reads a bodiless status as no data, as the fetch transport does, and keeps an empty 200 body', async () => {
+    const none = createClientCore({ defaultTransport: fakeAxios({ data: '', status: 204, statusText: 'No Content' }).transport })
+    const empty = createClientCore({ defaultTransport: fakeAxios({ data: '', headers: { 'content-type': 'text/plain' } }).transport })
+
+    expect(await none({ method: 'DELETE', url: '/pet/1' })).toMatchObject({ status: 204, data: undefined, error: undefined })
+    expect(await empty({ method: 'GET', url: '/pet/1' })).toMatchObject({ status: 200, data: '' })
+  })
+
   test('resolves every status so the core splits success from error', async () => {
     const { calls, transport } = fakeAxios({ data: { message: 'invalid' }, status: 405 })
     const client = createClientCore({ defaultTransport: transport })
@@ -129,6 +137,23 @@ describe('createAxiosTransport', () => {
     expect(calls[1]?.adapter).toBe('xhr')
     expect(calls[2]).toMatchObject({ responseType: 'blob' })
     expect(calls[2]?.adapter).toBeUndefined()
+  })
+
+  test('reads a blob as a buffer on the Node adapter and wraps it, and keeps blob on the fetch adapter and in the browser', async () => {
+    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47])
+    const { calls, transport } = fakeAxios({ data: png, headers: { 'content-type': 'image/png' } })
+    const client = createClientCore({ defaultTransport: transport })
+
+    const node = await client({ method: 'GET', url: '/image', responseType: 'blob' })
+    await client({ method: 'GET', url: '/image', responseType: 'blob', options: { adapter: 'fetch' } })
+    vi.stubGlobal('XMLHttpRequest', class {})
+    await client({ method: 'GET', url: '/image', responseType: 'blob' })
+    vi.unstubAllGlobals()
+
+    expect(calls.map((call) => call.responseType)).toStrictEqual(['arraybuffer', 'blob', 'blob'])
+    expect(node.data).toBeInstanceOf(Blob)
+    expect((node.data as Blob).type).toBe('image/png')
+    expect(new Uint8Array(await (node.data as Blob).arrayBuffer())).toStrictEqual(new Uint8Array(png))
   })
 
   test('keeps the instance adapter for a stream, and the Node adapter outside the browser', async () => {

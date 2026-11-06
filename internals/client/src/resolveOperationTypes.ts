@@ -12,7 +12,7 @@ type GeneratorDriver = Parameters<NonNullable<Generator<ContractClientFactory>['
 export type OperationTypeNames = {
   response: {
     /**
-     * Resolves the name of the operation's grouped `{ body, path, query, headers }` input type.
+     * Resolves the name of the operation's grouped `{ body, path, query, headers, cookies }` input type.
      */
     options(node: ast.OperationNode): string
     /**
@@ -59,6 +59,7 @@ function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
       path: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.path(node, p)),
       query: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.query(node, p)),
       headers: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.headers(node, p)),
+      cookies: (node: ast.OperationNode, p: ast.ParameterNode) => type(resolver.param.cookies(node, p)),
     },
     response: {
       body: (node: ast.OperationNode) => type(resolver.response.body(node)),

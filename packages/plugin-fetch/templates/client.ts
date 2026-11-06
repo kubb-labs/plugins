@@ -54,14 +54,17 @@ async function parseResponse(response: Response, responseType?: ResponseType): P
       return response.arrayBuffer()
     case 'stream':
       return response.body ?? undefined
-    case 'json': {
-      // An empty body with a JSON content-type would make response.json() throw, so treat it as no data.
-      const body = await response.text()
-      return body ? JSON.parse(body) : undefined
-    }
+    case 'json':
+      return parseJsonOrText(await response.text())
   }
 
-  const text = await response.text()
+  return parseJsonOrText(await response.text())
+}
+
+/**
+ * An empty body is no data, and a body that is not JSON stays text, since a server may label a plain message such as `Pet deleted` as JSON.
+ */
+function parseJsonOrText(text: string): unknown {
   if (!text) return undefined
   try {
     return JSON.parse(text)

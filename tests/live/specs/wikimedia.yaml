@@ -1,0 +1,41 @@
+openapi: 3.0.3
+info: { title: Wikimedia EventStreams, version: '2' }
+servers: [{ url: https://stream.wikimedia.org }]
+components:
+  schemas:
+    RecentChange:
+      type: object
+      required: [meta, type, title, wiki]
+      properties:
+        meta:
+          type: object
+          required: [dt, id, domain]
+          properties:
+            dt: { type: string, format: date-time }
+            id: { type: string }
+            domain: { type: string }
+            stream: { type: string }
+        id: { type: integer }
+        type: { type: string }
+        title: { type: string }
+        wiki: { type: string }
+        user: { type: string }
+        bot: { type: boolean }
+        timestamp: { type: integer }
+paths:
+  /v2/stream/{streams}:
+    get:
+      operationId: streamRecentChanges
+      parameters:
+        - { name: streams, in: path, required: true, schema: { type: string } }
+        - { name: since, in: query, schema: { type: string } }
+        - { name: Last-Event-ID, in: header, schema: { type: string } }
+      responses:
+        '200':
+          description: One recentchange per event
+          content:
+            text/event-stream: { schema: { $ref: '#/components/schemas/RecentChange' } }
+        '400':
+          description: Unknown stream
+          content:
+            application/json: { schema: { type: object, properties: { message: { type: string }, title: { type: string }, status: { type: integer } } } }

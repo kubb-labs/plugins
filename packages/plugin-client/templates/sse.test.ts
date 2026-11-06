@@ -337,6 +337,26 @@ describe('toEventStream', () => {
     expect(await collect(stream)).toStrictEqual([message({ data: 'bad' })])
   })
 
+  test('ends the loop with the abort reason once the signal is aborted, before the next event of the same chunk', async () => {
+    const controller = new AbortController()
+    const cancel = vi.fn()
+    const stream = new ReadableStream({ start: (c) => c.enqueue(encoder.encode('id: 1\ndata: a\n\nid: 2\ndata: b\n\n')), cancel })
+    const result = await toEventStream(Promise.resolve(call({ data: stream })), { config: { signal: controller.signal } })
+    const seen: Array<unknown> = []
+
+    const error = await (async () => {
+      for await (const event of result.stream) {
+        seen.push(event)
+        controller.abort(new Error('stop'))
+      }
+    })().catch((e: unknown) => e)
+
+    expect(seen).toStrictEqual([message({ data: 'a', id: '1' })])
+    expect(error).toStrictEqual(new Error('stop'))
+    expect(result.lastEventId).toBe('1')
+    expect(cancel).toHaveBeenCalledOnce()
+  })
+
   test('cancels the reader when the consumer breaks', async () => {
     const cancel = vi.fn()
 

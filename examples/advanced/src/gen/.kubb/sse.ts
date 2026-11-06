@@ -214,7 +214,7 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
      * The client the call went through, for the validation settings a call does not set itself.
      */
     client?: { getConfig: () => ValidationSettings }
-    config?: EventStreamOptions & ValidationSettings
+    config?: EventStreamOptions & ValidationSettings & { signal?: AbortSignal }
     /**
      * `event` when the document types each event with its own `event` and `data`, or `data` when it types only the payload.
      * @default 'data'
@@ -252,6 +252,8 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
     // A consumer `break` or a failed event closes this loop, which cancels the reader.
     for await (const event of parseEventStream({ stream: body, maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })) {
       yield (await validateEvent(options.transform ? options.transform(event) : event)) as TEvent
+      // A chunk may hold events past the one the consumer aborted on. The loop ends before the parser reads on, so `lastEventId` stays at the event the consumer saw.
+      if (options.signal?.aborted) throw options.signal.reason
     }
   }
 
