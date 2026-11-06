@@ -751,7 +751,7 @@ async function parseResponse(response: Response, responseType?: ResponseType): P
   }
 
   const contentType = response.headers.get('Content-Type')
-  // A server may answer a streamed operation with JSON, such as an error body; any other streamed body stays a stream.
+  // A server may answer a streamed operation with JSON, such as an error body. Any other streamed body stays a stream.
   const detected = responseType === 'stream' && isJsonContentType(contentType) ? 'json' : responseType
   switch (detected ?? detectResponseType(contentType)) {
     case 'text':

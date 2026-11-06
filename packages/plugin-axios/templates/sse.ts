@@ -28,7 +28,7 @@ export type ReconnectOptions = {
   maxDelay?: number
   /** Factor the delay grows by after each reconnect. */
   growFactor?: number
-  /** Also reconnect after a clean close, as `EventSource` does. Off, a clean close ends the stream. */
+  /** Also reconnect after a clean close, as `EventSource` does. When off, a clean close ends the stream. */
   onClose?: boolean
   /** Builds the resume request from the last event ID. Required for any method but GET, which would repeat the operation. */
   resume?: (lastEventId: string) => ResumeRequest
@@ -67,7 +67,7 @@ export type EventStreamSchema = {
    */
   method?: string
   /**
-   * `event` when the document types each event with its own `event` and `data`, `data` when it types only the payload.
+   * `event` when the document types each event with its own `event` and `data`, or `data` when it types only the payload.
    * @default 'data'
    */
   shape?: 'event' | 'data'
@@ -132,9 +132,9 @@ function parseData<TData>(raw: string): TData {
 }
 
 /**
- * Parses a `text/event-stream` body as the WHATWG event stream interpretation does: an event is dispatched at its blank line
+ * Parses a `text/event-stream` body as the WHATWG event stream specification does: an event is dispatched at its blank line
  * when it holds `data`, `event` defaults to `message`, `id` carries across events until an empty `id` resets it, `retry` needs
- * all digits, and an unfinished event at the end is dropped. Consume with `for await`; break the loop to cancel the stream.
+ * all digits, and an unfinished event at the end is dropped. Consume with `for await`, and break the loop to cancel the stream.
  */
 export async function* parseEventStream<TData = unknown>({
   stream,
@@ -235,7 +235,7 @@ function sleep({ ms, signal }: { ms: number; signal?: AbortSignal }): Promise<vo
 
 /**
  * Reads a call as typed Server-Sent Events: only the declared events, transformed and validated one by one, until the
- * terminator, a body that is not an event stream, or the server closes it. With `reconnect`, a dropped stream resumes with
+ * terminator, a body that is not an event stream, or a clean close. With `reconnect`, a dropped stream resumes with
  * `Last-Event-ID` after the server's `retry` or a growing delay, until `maxRetries`, an abort, or a non-stream response.
  */
 export async function toEventStream<TData = unknown, TResponse = NativeResponse>({
@@ -293,7 +293,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
           return
         }
         const parsed = parseEventStream({ stream: body, maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })
-        // Only a failed read is a drop worth a reconnect; a too-large event, a failed transform or validation, and a consumer error end the stream.
+        // Only a failed read is a drop worth a reconnect. A too-large event, a failed transform or validation, and a consumer error end the stream.
         const read = async () => {
           try {
             return await parsed.next()
@@ -313,7 +313,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
             yield (await validateEvent(options.transform ? options.transform(event) : event)) as StreamEvent<TData>
           }
         } finally {
-          // A consumer `break` or a failed event leaves the parser suspended; closing it cancels the reader.
+          // A consumer `break` or a failed event leaves the parser suspended, so closing it cancels the reader.
           await parsed.return(undefined).catch(() => {})
         }
       }
@@ -329,7 +329,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
         ...(cursor.lastEventId ? { 'Last-Event-ID': cursor.lastEventId } : {}),
         ...headerRecord(init.headers),
       }
-      // A GET or HEAD resume carries no body. A connection that fails is retried like a drop; a refused one (`ResponseError`) ends the stream.
+      // A GET or HEAD resume carries no body. A connection that fails is retried like a drop, and a refused one (`ResponseError`) ends the stream.
       call = await (send as EventStreamSend<TResponse>)({ ...(method === 'GET' || method === 'HEAD' ? { body: undefined } : {}), ...init, headers }).catch(
         (error: unknown) => {
           if ((error instanceof Error && error.name === 'ResponseError') || options.signal?.aborted || attempt + 1 >= maxRetries) throw error

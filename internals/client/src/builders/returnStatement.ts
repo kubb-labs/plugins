@@ -54,8 +54,8 @@ export function buildReturnStatement({
 }
 
 /**
- * Builds the return type and statement of a `text/event-stream` operation: `TypedEvent<...>` when each item declares its
- * own `event` and `data`, the payload type otherwise, which `EventStreamResult` wraps in `ServerSentEvent`. The call goes
+ * Builds the return type and statement of a `text/event-stream` operation. The item type is `TypedEvent<...>` when each item
+ * declares its own `event` and `data`, and otherwise the payload type, which `EventStreamResult` wraps in `ServerSentEvent`. The call goes
  * through `toEventStream` with a `send` function for the resume request, the call's `config`, and the method, shape,
  * declared event names and per-event validator. A `returnType: 'plain'` client receives only the promise,
  * `toEventStream(request(config))`, and keeps its response validator in the call config.

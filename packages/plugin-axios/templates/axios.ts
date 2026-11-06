@@ -657,7 +657,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 }
 
 /**
- * Reads a streamed JSON body, such as an error body, back into its value, as the fetch adapter streams every
+ * Reads a streamed JSON body, such as an error body, back into its value, because the fetch adapter streams every
  * `responseType: 'stream'` answer. Any other streamed body stays a stream.
  */
 async function readStreamedBody({ data, contentType }: { data: unknown; contentType: string | undefined }): Promise<unknown> {

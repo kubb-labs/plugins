@@ -1,6 +1,6 @@
 # Server-sent events
 
-Operations returning `text/event-stream` produce a typed stream of events rather than a `RequestResult`. The client switches to the axios fetch adapter for these calls unless you set `adapter` yourself, because the default XHR adapter buffers the whole body. The event types come from the OpenAPI document: OpenAPI 3.2 describes each event with `itemSchema`, and OpenAPI 3.0 and 3.1 describe one event with `schema`. The runtime in `.kubb/sse.ts` parses the stream the way the WHATWG event stream specification does, yields only the events the document declares, validates them one by one, and can reconnect with `Last-Event-ID`.
+Operations returning `text/event-stream` produce a typed stream of events rather than a `RequestResult`. The client switches to the axios fetch adapter for these calls unless you set `adapter` yourself, because the default XHR adapter buffers the whole body. The event types come from the OpenAPI document: OpenAPI 3.2 describes each event with `itemSchema`, and OpenAPI 3.0 and 3.1 describe one event with `schema`. The runtime in `.kubb/sse.ts` parses the stream the way the WHATWG event stream specification does.
 
 ## Describe the stream in OpenAPI
 
@@ -49,18 +49,18 @@ data: {}
 
 ```
 
-yields `{ event: 'message_delta', id: '7', data: { text: 'Hel' } }` and then `{ event: 'ping', id: '7', data: {} }`, and a `switch` on `event` narrows `data`. With a `data` shape, a stream of stock updates:
+yields `{ event: 'message_delta', id: '7', data: { text: 'Hel' } }` and then `{ event: 'ping', id: '7', data: {} }`. With a `data` shape, a stream of stock updates:
 
 ```text
 data: {"symbol": "AAPL", "price": "100.25"}
 
 ```
 
-yields `{ event: 'message', data: { symbol: 'AAPL', price: '100.25' } }`, with `data` typed as `StockUpdate`. The sections below show how to write each shape in OpenAPI 3.2 and in 3.0 or 3.1.
+yields `{ event: 'message', data: { symbol: 'AAPL', price: '100.25' } }`, with `data` typed as `StockUpdate`.
 
 ### OpenAPI 3.2: one schema per event with itemSchema
 
-OpenAPI 3.2 adds `itemSchema` to a media type. It describes one item of a stream, while `schema` keeps describing the complete body. For `text/event-stream`, the item is the parsed event: `event`, `data`, `id`, and `retry` as strings and an integer. Describe each event name as a `oneOf` member with a `const` on `event`, and describe JSON inside `data` with `contentMediaType` and `contentSchema`:
+OpenAPI 3.2 adds `itemSchema` to a media type. It describes one item of a stream, while `schema` keeps describing the complete body. For `text/event-stream`, the item is the parsed event: `event`, `data`, and `id` as strings and `retry` as an integer. Describe each event name as a `oneOf` member with a `const` on `event`, and describe JSON inside `data` with `contentMediaType` and `contentSchema`:
 
 ```yaml
 paths:
@@ -112,7 +112,7 @@ text/event-stream:
     $ref: '#/components/schemas/StockUpdate'
 ```
 
-The stream then yields `ServerSentEvent<StockUpdate>`, with the payload on `data` and the event name, id, and retry next to it:
+The stream then yields `ServerSentEvent<StockUpdate>`:
 
 ```typescript
 type ServerSentEvent<TData> = {
@@ -125,7 +125,7 @@ type ServerSentEvent<TData> = {
 
 ### OpenAPI 3.0 and 3.1: schema is one event
 
-Before 3.2, there is no `itemSchema`. By convention, `schema` on `text/event-stream` describes one event, and Kubb reads it that way. A `oneOf` of event schemas with a `discriminator` on `event` gives the same union as the 3.2 form:
+In OpenAPI 3.0 and 3.1, `schema` on `text/event-stream` describes one event by convention, and Kubb reads it that way. A `oneOf` of event schemas with a `discriminator` on `event` gives the same union as the 3.2 form:
 
 ```yaml
 text/event-stream:
@@ -137,7 +137,7 @@ text/event-stream:
       propertyName: event
 ```
 
-A `schema` without `event` or `data` properties is a payload-only item, as above. From 3.2 on, `schema` describes the complete stream, so put the item in `itemSchema`.
+A `schema` without `event` or `data` properties is a payload-only item, as above.
 
 ## Consume a stream
 
@@ -159,7 +159,7 @@ for await (const event of stream) {
 }
 ```
 
-The runtime parses `data` as JSON when it is valid and keeps the raw string otherwise. An event without `data` is never yielded, as the specification requires, and `event` is `message` when the server sent no name.
+The runtime parses `data` as JSON when it is valid and keeps the raw string otherwise. An event without `data` is never yielded.
 
 ## Handle unknown events
 
@@ -218,7 +218,7 @@ console.info(response.headers['x-stream-id'])
 
 ## Transform and validate events
 
-With `validator: 'zod'` in the plugin options, the response validator runs on each event instead of on the stream body. An event union validates the whole event, a payload-only item validates `data`. A failing event calls `onValidationError`, as any other validation failure does. When the handler returns a value the stream continues with it, otherwise the loop throws a `ParseError`:
+With `validator: 'zod'` in the plugin options, the response validator runs on each event instead of on the stream body. An event union validates the whole event, and a payload-only item validates `data`. A failing event calls `onValidationError`, as any other validation failure does. When the handler returns a value, the stream continues with it. Otherwise the loop throws a `ParseError`:
 
 ```typescript
 const { stream } = await streamChat({
@@ -243,7 +243,7 @@ Set `validate: false`, or `validate: { response: false }`, to skip the validator
 
 ## Reconnect with Last-Event-ID
 
-A dropped connection ends the loop. Pass `reconnect` to resume the stream the way `EventSource` does: the runtime waits, sends the last event ID in a `Last-Event-ID` header, and continues yielding from the new connection. Reconnect is off by default, because many request and response streams, such as a chat completion, end on purpose.
+A dropped connection ends the loop. Pass `reconnect` to resume the stream the way `EventSource` does: the runtime waits, sends the last event ID in a `Last-Event-ID` header, and continues yielding from the new connection. Reconnect is off by default, because many streams, such as a chat completion, end on purpose.
 
 ```typescript
 const result = await streamChat({
@@ -272,7 +272,7 @@ console.info(result.lastEventId) // store it to resume from a new page load
 | `onClose`    | `false` | Also reconnect after the server closes the stream cleanly, as `EventSource` does.                                    |
 | `resume`     | none    | Builds the resume request from the last event ID. Required for any method but GET, which would repeat the operation. |
 
-The runtime stops reconnecting on abort, when you break out of the loop, after `maxRetries`, on a non-2xx response, and on a response that is not an event stream, such as a `204`. The defaults match the MCP TypeScript SDK's Streamable HTTP transport, which resumes a POST stream with a GET and `Last-Event-ID`, as the `resume` example above does.
+The runtime stops reconnecting on abort, when you break out of the loop, after `maxRetries`, on a non-2xx response, and on a response that is not an event stream, such as a `204`. To resume an MCP Streamable HTTP POST stream, use the `resume` example above: a GET with `Last-Event-ID`.
 
 An empty `id:` field clears the last event ID, so the next reconnect sends no header. An `id` that contains a NULL character is ignored.
 
@@ -294,13 +294,13 @@ try {
 }
 ```
 
-A server can answer a streamed operation with JSON, for example an error body. The client parses such a body as a normal response: a non-2xx status still throws a `ResponseError` with the parsed `data`, and a 2xx JSON body yields an empty stream. An operation that declares both `application/json` and `text/event-stream` for its success response is generated as a stream, so a JSON answer to it yields an empty stream too.
+A server can answer a streamed operation with JSON, for example an error body. The client parses such a body as a normal response: a non-2xx status still throws a `ResponseError` with the parsed `data`, and a 2xx JSON body yields an empty stream. This also holds for an operation that declares both `application/json` and `text/event-stream` for its success response, which Kubb generates as a stream.
 
 Servers often send a heartbeat event such as `ping` every few seconds and an `error` event when something goes wrong. Declare both in the document, so the heartbeat has a type and the error reaches your `switch` instead of `onUnknownEvent`.
 
 ## Limit event size
 
-The parser keeps an event in memory until the blank line that ends it. When one event grows past `maxEventSize` characters, counting each line break as one, the loop throws a `RangeError` and the runtime cancels the stream. The default is 16,777,216 characters (`16 * 1024 * 1024`). Comment lines are dropped, so they do not add to the event's size, but each one must still fit within the limit.
+When one event grows past `maxEventSize` characters, counting each line break as one, the loop throws a `RangeError` and the runtime cancels the stream. The default is 16,777,216 characters (`16 * 1024 * 1024`). Comment lines are dropped, so they do not add to the event's size, but each one must still fit within the limit.
 
 Pass `maxEventSize` per call to raise or lower the limit, or `Infinity` to turn it off:
 
@@ -319,7 +319,7 @@ try {
 
 ## The runtime files
 
-`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `ReconnectOptions` types. Import the types from there when you need them:
+`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `ReconnectOptions` types. Import the types from there:
 
 ```typescript
 import type { ServerSentEvent } from './gen/.kubb/sse'

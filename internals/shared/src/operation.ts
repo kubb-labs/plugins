@@ -177,7 +177,7 @@ export function isEventStream(node: ast.OperationNode): boolean {
 
 /**
  * How the document types a `text/event-stream` response: `shape` is `event` when each item is the parsed event and `data`
- * when it is only the payload, `events` lists the names when every item declares one, `null` without an event stream.
+ * when it is only the payload, and `events` lists the names when every item declares one. Returns `null` without an event stream.
  */
 export function getEventStream(node: ast.OperationNode): { shape: 'event' | 'data'; events?: Array<string> } | null {
   const content = getEventStreamContent(node)
