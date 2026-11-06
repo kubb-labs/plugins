@@ -555,11 +555,11 @@ function toBytes(data: unknown): Uint8Array | undefined {
  * Axios has to pick a responseType before the body arrives, so a content-type map is read as bytes
  * and decoded once the response `Content-Type` is known.
  */
-function decodeMappedBody(data: unknown, responseType: ResponseType | undefined): unknown {
+function decodeMappedBody(data: unknown, responseType: ResponseType | undefined, contentType: string | undefined): unknown {
   if (responseType === 'formdata') return data
 
   const bytes = toBytes(data)
-  if (responseType === 'blob') return bytes ? new Blob([bytes as BlobPart]) : data
+  if (responseType === 'blob') return bytes ? new Blob([bytes as BlobPart], { type: contentType ?? '' }) : data
   if (responseType === 'arraybuffer') return bytes ? bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) : data
   if (responseType === 'stream') return bytes ? new Blob([bytes as BlobPart]).stream() : data
   if (responseType === 'text' || responseType === 'document') return bytes ? new TextDecoder().decode(bytes) : data
@@ -682,13 +682,17 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   }
 
   // A map is chosen from the response Content-Type, which axios does not know until the body arrives.
-  // Buffer the bytes and decode them afterwards so a binary type is not parsed as text.
+  // Read the raw body and decode it afterwards so a binary type is not parsed as text. A map with a
+  // stream entry reads a stream, so an event stream still arrives incrementally on the fetch adapter.
   const responseTypeMap = typeof requestConfig.responseType === 'string' ? undefined : requestConfig.responseType
-  if (responseTypeMap) axiosConfig.responseType = 'arraybuffer'
+  if (responseTypeMap) {
+    const streams = !axiosConfig.adapter && Object.values(responseTypeMap).includes('stream')
+    axiosConfig.responseType = streams ? 'stream' : 'arraybuffer'
+  }
 
   // Only the fetch adapter exposes a streaming `response.data` (a ReadableStream) in the browser.
   // The default XHR adapter buffers the whole body. Default streams to it, but respect an explicit adapter.
-  if (requestConfig.responseType === 'stream' && !axiosConfig.adapter) {
+  if (axiosConfig.responseType === 'stream' && !axiosConfig.adapter) {
     axiosConfig.adapter = 'fetch'
   }
 
@@ -781,7 +785,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       const onValidationError = requestConfig.onValidationError ?? config.onValidationError
       const isSuccess = response.status >= 200 && response.status < 300
       const contentType = getResponseContentType(response.headers as Record<string, unknown>)
-      const body = applyResponseTypeMap(response.data, contentType, responseTypeMap)
+      const body = await applyResponseTypeMap(response.data, contentType, responseTypeMap)
       const codec = contentType ? codecs[contentType] : undefined
       const decoded: unknown = contentType && codec?.deserialize ? await codec.deserialize(body, contentType) : body
       const data = await runValidator({
@@ -813,7 +817,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       if (throwOnError && axiosError.response) {
         const errorContentType = getResponseContentType(axiosError.response.headers as Record<string, unknown>)
         throw new ResponseError({
-          data: applyResponseTypeMap(axiosError.response.data, errorContentType, responseTypeMap),
+          data: await applyResponseTypeMap(axiosError.response.data, errorContentType, responseTypeMap),
           status: axiosError.response.status,
           statusText: axiosError.response.statusText,
           contentType: errorContentType,
@@ -859,9 +863,6 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
   return client
 }
 
-/**
- * The axios instance the generated `client` sends through. Register axios interceptors on it or reuse it inside your own transport.
- */
 function detectResponseType(contentType: string | null): ResponseType | undefined {
   if (!contentType) return undefined
   if (contentType.includes('text/event-stream')) return 'stream'
@@ -879,11 +880,19 @@ function detectResponseType(contentType: string | null): ResponseType | undefine
   return undefined
 }
 
-function applyResponseTypeMap(data: unknown, contentType: string | undefined, responseTypeMap: ResponseTypeMap | undefined): unknown {
+async function applyResponseTypeMap(data: unknown, contentType: string | undefined, responseTypeMap: ResponseTypeMap | undefined): Promise<unknown> {
   if (!responseTypeMap) return data
-  return decodeMappedBody(data, lookupResponseType(responseTypeMap, contentType) ?? detectResponseType(contentType ?? null))
+  const responseType = lookupResponseType(responseTypeMap, contentType) ?? detectResponseType(contentType ?? null)
+  if (data instanceof ReadableStream) {
+    if (responseType === 'stream') return data
+    return decodeMappedBody(await new Response(data).arrayBuffer(), responseType, contentType)
+  }
+  return decodeMappedBody(data, responseType, contentType)
 }
 
+/**
+ * The axios instance the generated `client` sends through. Register axios interceptors on it or reuse it inside your own transport.
+ */
 export const defaultTransport = axios.create()
 
 /**

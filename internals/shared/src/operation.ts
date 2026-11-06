@@ -172,6 +172,10 @@ function baseContentType(contentType: string): string {
   return contentType.split(';')[0]!.trim().toLowerCase()
 }
 
+function isJsonContentType(baseType: string): boolean {
+  return baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json'
+}
+
 /**
  * Parser for one response content entry.
  *
@@ -183,7 +187,7 @@ function baseContentType(contentType: string): string {
 function responseTypeForContent(contentType: string, schema?: ast.SchemaNode | null): ResponseType | undefined {
   const baseType = baseContentType(contentType)
   if (!baseType) return undefined
-  if (baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json') return undefined
+  if (isJsonContentType(baseType)) return undefined
   if (baseType === 'text/event-stream') return 'stream'
   if (schema?.type === 'blob') return 'blob'
   if (baseType.startsWith('text/')) return 'text'
@@ -212,8 +216,9 @@ export function getResponseType(node: ast.OperationNode): ResponseType | undefin
 /**
  * Maps each base content type of a primary success response to its parser when those parsers differ.
  *
- * Keys are lowercased and stripped of parameters. Returns `undefined` when {@link getResponseType}
- * already covers the response with one string, or when no content type needs an explicit parser.
+ * Keys are lowercased and stripped of parameters. JSON entries are kept as `'json'` so a wildcard such
+ * as the catch-all cannot claim a JSON response. Returns `undefined` when {@link getResponseType} already
+ * covers the response with one string, or when no content type needs a parser other than JSON.
  * The runtime matches the response `Content-Type` against this map instead of guessing from the media type.
  */
 export function getResponseTypeMap(node: ast.OperationNode): Record<string, ResponseType> | undefined {
@@ -225,11 +230,11 @@ export function getResponseTypeMap(node: ast.OperationNode): Record<string, Resp
   const map: Record<string, ResponseType> = {}
   for (const entry of entries) {
     const baseType = baseContentType(entry.contentType)
-    const responseType = responseTypeForContent(entry.contentType, entry.schema)
+    const responseType = responseTypeForContent(entry.contentType, entry.schema) ?? (isJsonContentType(baseType) ? 'json' : undefined)
     if (baseType && responseType) map[baseType] = responseType
   }
 
-  return Object.keys(map).length > 0 ? map : undefined
+  return Object.values(map).some((responseType) => responseType !== 'json') ? map : undefined
 }
 
 /**

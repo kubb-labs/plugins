@@ -63,10 +63,14 @@ more than one.
 
 When that success response declares several content types that do not share one parser, the
 generated call sets `responseType` to a map from content type to parser, for example
-`{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. Axios reads the body as bytes, then
-the runtime matches the response `Content-Type` against the map, including a `type/*` wildcard,
+`{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. Axios reads the raw body, then the
+runtime matches the response `Content-Type` against the map, including a `type/*` wildcard,
 before the media-type heuristic. A schema with `format: binary` is a blob even when the media
 type is not a well-known binary type.
+
+A map with a `'stream'` entry uses the fetch adapter, so an event stream arrives as it is sent.
+If you set your own `adapter`, the runtime buffers the whole body first, and a long-lived event
+stream only resolves when the server closes it.
 
 To decode a media type the runtime does not handle, register a codec's `deserialize` for it.
 `deserialize` receives the raw body and the content type and returns the parsed value. It runs

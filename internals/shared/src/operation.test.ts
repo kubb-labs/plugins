@@ -454,14 +454,24 @@ describe('getResponseType / isEventStream', () => {
     expect(isEventStream(node)).toBe(false)
   })
 
-  test('omits JSON from the map so the runtime still detects it', () => {
+  test('keeps JSON in the map so a wildcard cannot claim it', () => {
     const node = nodeWithResponseContents([
       { contentType: 'application/json', schemaType: 'object' },
-      { contentType: 'application/vnd.custom', schemaType: 'blob' },
+      { contentType: '*/*', schemaType: 'blob' },
     ])
 
     expect(getResponseType(node)).toBeUndefined()
-    expect(getResponseTypeMap(node)).toStrictEqual({ 'application/vnd.custom': 'blob' })
+    expect(getResponseTypeMap(node)).toStrictEqual({ 'application/json': 'json', '*/*': 'blob' })
+  })
+
+  test('returns no map when every content type is JSON', () => {
+    const node = nodeWithResponseContents([
+      { contentType: 'application/json', schemaType: 'object' },
+      { contentType: 'application/problem+json', schemaType: 'object' },
+    ])
+
+    expect(getResponseType(node)).toBeUndefined()
+    expect(getResponseTypeMap(node)).toBeUndefined()
   })
 })
 

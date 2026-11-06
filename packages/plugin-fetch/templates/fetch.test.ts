@@ -1179,6 +1179,20 @@ describe('defaultTransport binary responses', () => {
     expect(result.data).toBeTypeOf('string')
   })
 
+  test('an exact JSON entry wins over a catch-all blob entry', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(JSON.stringify({ delta: 'hi' }), { status: 200, headers: { 'Content-Type': 'application/json' } })),
+    )
+    const result = await defaultTransport({
+      url: 'https://example.test/speech',
+      method: 'POST',
+      headers: {},
+      responseType: { 'application/json': 'json', '*/*': 'blob' },
+    })
+    expect(result.data).toStrictEqual({ delta: 'hi' })
+  })
+
   test('still parses JSON that the map leaves unset', async () => {
     vi.stubGlobal(
       'fetch',
