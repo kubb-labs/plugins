@@ -417,19 +417,19 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
   // A malformed spec can declare the same name twice within one location. Both would resolve to the
   // same output property, so emitting both would yield an object type with a duplicate member,
   // which TypeScript rejects. Keep the first.
-  const group = (location: ast.ParameterNode['in']) => {
+  const dedupe = (params: Array<ast.ParameterNode>) => {
     const seen = new Set<string>()
-
-    return node.parameters.filter((param) => {
-      if (param.in !== location || seen.has(param.name)) return false
+    return params.filter((param) => {
+      if (seen.has(param.name)) return false
       seen.add(param.name)
       return true
     })
   }
+  const group = (location: ast.ParameterNode['in']) => dedupe(node.parameters.filter((param) => param.in === location))
 
   const groups: OperationParameterGroups = {
     path: group('path'),
-    query: [...group('query'), ...group('querystring').flatMap(spreadQuerystring)],
+    query: dedupe([...group('query'), ...group('querystring').flatMap(spreadQuerystring)]),
     header: group('header'),
     cookie: group('cookie'),
   }
