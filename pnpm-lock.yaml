@@ -1328,34 +1328,6 @@ importers:
         specifier: 'catalog:'
         version: 7.0.2
 
-  tests/live:
-    dependencies:
-      '@kubb/adapter-oas':
-        specifier: 'catalog:'
-        version: 5.16.0(openapi-types@12.1.3)
-      '@kubb/plugin-axios':
-        specifier: workspace:*
-        version: link:../../packages/plugin-axios
-      '@kubb/plugin-fetch':
-        specifier: workspace:*
-        version: link:../../packages/plugin-fetch
-      '@kubb/plugin-ts':
-        specifier: workspace:*
-        version: link:../../packages/plugin-ts
-      axios:
-        specifier: ^1.21.0
-        version: 1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
-      kubb:
-        specifier: 'catalog:'
-        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
-    devDependencies:
-      typescript:
-        specifier: 'catalog:'
-        version: 7.0.2
-      vitest:
-        specifier: 'catalog:'
-        version: 5.1.0(@types/node@22.20.2)(@vitest/coverage-v8@5.1.0)(@vitest/ui@5.1.0)(msw@3.0.3(@types/node@22.20.2)(graphql@16.14.2)(supports-color@8.1.1)(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1)))(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
-
   tests/performance:
     dependencies:
       '@kubb/adapter-oas':

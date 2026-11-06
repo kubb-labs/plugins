@@ -17,5 +17,5 @@
   "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
     "onlyUpdatePeerDependentsWhenOutOfRange": true
   },
-  "ignore": ["@internals/*", "*-pet-store", "e2e", "performance", "tests-3.0.x", "tests-live"]
+  "ignore": ["@internals/*", "*-pet-store", "e2e", "performance", "tests-3.0.x"]
 }
