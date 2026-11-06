@@ -212,9 +212,17 @@ function serializeUrlencodedBody(body: Record<string, unknown>, encoding: Record
   return parts.join('&')
 }
 
-function isJsonMediaType(contentType: string | undefined): boolean {
-  const type = contentType?.split(';')[0]?.trim().toLowerCase()
-  return type === 'application/json' || !!type?.endsWith('+json')
+/**
+ * The media type of a `Content-Type` value without its parameters, in lower case: `application/json; charset=utf-8` gives `application/json`.
+ */
+export function baseContentType(value: string | null | undefined): string | undefined {
+  if (!value) return undefined
+  return value.split(';')[0]!.trim().toLowerCase() || undefined
+}
+
+/** Whether a content type carries JSON: `application/json`, `text/json`, or a `+json` suffix. */
+export function isJsonMediaType(contentType: string | null | undefined): boolean {
+  return /[/+]json$/.test(baseContentType(contentType) ?? '')
 }
 
 function serializeCookie({ name, value, explode }: { name: string; value: unknown; explode: boolean }): string {
