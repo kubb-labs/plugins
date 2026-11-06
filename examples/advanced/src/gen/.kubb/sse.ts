@@ -1,6 +1,5 @@
 import type { DataShape, NativeRequest, NativeResponse, Options, RequestResult, SuccessOf } from './client'
 import type { StandardSchemaValidator, ValidateOption, ValidationErrorHandler } from './standardSchema'
-import { baseContentType } from './serializers'
 import { isValidationEnabled, runValidator } from './standardSchema'
 
 /**
@@ -199,9 +198,10 @@ function isStreamBody(data: unknown): data is ReadableStream<Uint8Array> | Async
 }
 
 /**
- * Reads a call as typed Server-Sent Events, transformed and validated one by one, until the terminator, the end of the
- * stream, or a body that is not an event stream. A dropped connection ends the loop with the
- * transport's error; `lastEventId` on the result is the ID to resume from.
+ * Reads a call as typed Server-Sent Events, transformed and validated one by one, until the terminator or the end of the
+ * stream. A successful call whose body is not a stream, such as a decoded JSON answer, throws a `TypeError` with the body
+ * as its `cause`. A dropped connection ends the loop with the transport's error; `lastEventId` on the result is the ID
+ * to resume from.
  */
 export async function toEventStream<TEvent = ServerSentEvent, TResponse = NativeResponse>(
   call: Promise<EventStreamCall<TResponse>>,
@@ -231,6 +231,12 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
   const validator = isValidationEnabled(options.validate ?? defaults.validate, 'response') ? meta.validator : undefined
   const cursor: Cursor = { lastEventId: '' }
   const { data: body, error, status, contentType, request, response } = await call
+  const ok = status === undefined || (status >= 200 && status < 300)
+  // A transport decodes a JSON answer, so a success that is not a stream would otherwise end as an empty stream.
+  if (ok && body !== undefined && !isStreamBody(body)) {
+    // `cause` is assigned, since the constructor option needs the ES2022 library a generated client cannot assume.
+    throw Object.assign(new TypeError(`Expected a text/event-stream body, got ${contentType ?? 'a body without a content type'}`), { cause: body })
+  }
 
   const validateEvent = async (event: ServerSentEvent): Promise<ServerSentEvent> => {
     if (!validator) return event
@@ -242,11 +248,6 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
 
   async function* events(): AsyncGenerator<TEvent> {
     if (!isStreamBody(body)) return
-    // A custom transport may pass the raw header, with a charset parameter.
-    if (baseContentType(contentType) !== 'text/event-stream') {
-      if ('cancel' in body) await body.cancel().catch(() => {})
-      return
-    }
     // A consumer `break` or a failed event closes this loop, which cancels the reader.
     for await (const event of parseEventStream({ stream: body, maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })) {
       yield (await validateEvent(options.transform ? options.transform(event) : event)) as TEvent
@@ -256,7 +257,7 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
   const stream = events()
   return {
     stream,
-    data: status === undefined || (status >= 200 && status < 300) ? stream : undefined,
+    data: ok ? stream : undefined,
     status,
     error,
     contentType,

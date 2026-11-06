@@ -91,8 +91,10 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
       validateStatus: () => true,
     }
 
-    // Only the fetch adapter exposes a streaming `response.data` in the browser. The default XHR adapter buffers the whole body.
-    if (request.responseType === 'stream' && !config.adapter) config.adapter = 'fetch'
+    // In the browser the default adapters pick XHR, which buffers the whole body, so a stream switches to fetch. An adapter set
+    // on the call or the instance, and the Node http adapter with its proxy and agent, are kept.
+    const defaultAdapter = !instance.defaults?.adapter || String(instance.defaults.adapter) === String(axios.defaults.adapter)
+    if (request.responseType === 'stream' && !config.adapter && defaultAdapter && typeof XMLHttpRequest !== 'undefined') config.adapter = 'fetch'
 
     const response = await instance.request<unknown>(config)
     const headers = toHeaders(response.headers)

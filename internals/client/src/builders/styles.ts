@@ -1,3 +1,4 @@
+import { getOperationParameters } from '@internals/shared'
 import { isValidVarName } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
@@ -69,10 +70,11 @@ export function buildStyles({ node }: { node: ast.OperationNode }): string | nul
 
   const groups: Record<StyledLocation, Array<string>> = { path: [], query: [], header: [], cookie: [] }
 
-  for (const parameter of node.parameters) {
-    const literal = serializeParameter(parameter)
-    if (!literal) continue
-    groups[parameter.in === 'querystring' ? 'query' : parameter.in].push(`${toKey(parameter.name)}: ${literal}`)
+  for (const [location, parameters] of Object.entries(getOperationParameters(node)) as Array<[StyledLocation, Array<ast.ParameterNode>]>) {
+    for (const parameter of parameters) {
+      const literal = serializeParameter(parameter)
+      if (literal) groups[location].push(`${toKey(parameter.name)}: ${literal}`)
+    }
   }
 
   const entries = [

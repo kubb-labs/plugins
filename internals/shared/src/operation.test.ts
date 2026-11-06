@@ -284,6 +284,30 @@ describe('getOperationParameters', () => {
     expect(getOperationParameters(node).query.map((param) => param.name)).toStrictEqual(['max-uploads', 'prefix', 'MaxUploads'])
   })
 
+  test('spreads a form-encoded querystring object into one query parameter per property', () => {
+    const filter = ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({ name: 'status', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+        ast.factory.createProperty({ name: 'limit', schema: ast.factory.createSchema({ type: 'number' }) }),
+      ],
+    })
+    const querystring = (contentType?: string) =>
+      ast.factory.createOperation({
+        operationId: 'findPets',
+        method: 'GET',
+        path: '/pets',
+        parameters: [ast.factory.createParameter({ name: 'filter', in: 'querystring', schema: filter, required: true, contentType })],
+      })
+
+    const spread = getOperationParameters(querystring('application/x-www-form-urlencoded')).query
+    expect(spread.map(({ name, in: location, required }) => ({ name, location, required }))).toStrictEqual([
+      { name: 'status', location: 'query', required: true },
+      { name: 'limit', location: 'query', required: false },
+    ])
+    expect(getOperationParameters(querystring('application/json')).query.map((param) => param.name)).toStrictEqual(['filter'])
+  })
+
   test('caches the grouped result per node so repeat calls for the same operation skip re-grouping', () => {
     const node = ast.factory.createOperation({
       operationId: 'showPet',
