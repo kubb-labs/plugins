@@ -66,27 +66,38 @@ export function buildEventStreamReturn({
   callConfig,
   returnType,
   validatorHooks,
+  throwOnErrorDefault,
 }: {
   node: ast.HttpOperationNode
   types: OperationTypeNames
   callConfig: string
   returnType: ReturnTypeOption
   validatorHooks: ValidatorHooks | null
+  throwOnErrorDefault: boolean
 }): {
   returnType: string
   statement: string
 } {
   const shape = getEventStream(node) ?? 'data'
-  const success = `SuccessOf<${types.response.responses(node)}>`
+  const responses = types.response.responses(node)
+  const success = `SuccessOf<${responses}>`
   const eventType = shape === 'event' ? `TypedEvent<${success}>` : success
-  const promise = `Promise<EventStreamResult<${eventType}>>`
-  if (returnType === 'plain') return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
+  if (returnType === 'plain') {
+    return { returnType: `Promise<EventStreamResult<${eventType}>>`, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
+  }
 
+  const generics = `${responses}, ThrowOnError${shape === 'event' ? `, ${eventType}` : ''}`
   const meta = [`shape: '${shape}'`, validatorHooks?.response ? `validator: ${validatorHooks.response}` : null].filter(Boolean).join(', ')
-  return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}), { client: request, config, ${meta} })` }
+  const call = `toEventStream<${eventType}>(request(${callConfig}), { client: request, config, ${meta} })`
+  if (returnType === 'data') {
+    const result = `Promise<UnwrappedStreamResult<${generics}>>`
+    return { returnType: result, statement: `return unwrapResult(${call}, config.throwOnError ?? ${throwOnErrorDefault}) as ${result}` }
+  }
+  return { returnType: `Unwrappable<StreamResult<${generics}>>`, statement: `return withUnwrap(${call} as Promise<StreamResult<${generics}>>)` }
 }
 
-/** The stream types an operation file imports: the result, the per-call options except for a plain client, and `TypedEvent` for named events. */
+/** The stream types an operation file imports: `StreamResult` and `StreamOptions`, `EventStreamResult` for a plain client, and `TypedEvent` for named events. */
 export function buildEventStreamImports({ returnType, typed }: { returnType: ReturnTypeOption; typed: boolean }): Array<string> {
-  return ['EventStreamResult', ...(returnType !== 'plain' ? ['EventStreamOptions'] : []), ...(typed ? ['TypedEvent'] : [])]
+  const result = { plain: ['EventStreamResult'], full: ['StreamResult', 'StreamOptions'], data: ['UnwrappedStreamResult', 'StreamOptions'] }[returnType]
+  return [...result, ...(typed ? ['TypedEvent'] : [])]
 }

@@ -1,7 +1,7 @@
-import type { Options, SuccessOf } from '../../../.kubb/client'
-import type { EventStreamResult, EventStreamOptions } from '../../../.kubb/sse'
+import type { SuccessOf, Unwrappable } from '../../../.kubb/client'
+import type { StreamResult, StreamOptions } from '../../../.kubb/sse'
 import type { PetEvent } from '../../../models/ts/PetEvent'
-import { client } from '../../../.kubb/client'
+import { client, withUnwrap } from '../../../.kubb/client'
 import { toEventStream } from '../../../.kubb/sse'
 
 /**
@@ -10,7 +10,7 @@ import { toEventStream } from '../../../.kubb/sse'
  * {@link /pet/:petId/events}
  */
 export function streamPetEvents<ThrowOnError extends boolean = true>(
-  options: Options<
+  options: StreamOptions<
     {
       body?: never
       path: {
@@ -20,33 +20,42 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
       headers?: never
     },
     ThrowOnError
-  > &
-    EventStreamOptions,
-): Promise<
-  EventStreamResult<
-    SuccessOf<{
+  >,
+): Unwrappable<
+  StreamResult<
+    {
       '200': PetEvent
-    }>
+    },
+    ThrowOnError
   >
 > {
   const { client: request = client, ...config } = options
 
-  return toEventStream<
-    SuccessOf<{
-      '200': PetEvent
-    }>
-  >(
-    request({
-      method: 'GET',
-      url: '/pet/{petId}/events',
-      security: [
-        { type: 'apiKey', name: 'api_key', in: 'header' },
-        { type: 'oauth2', scopes: ['read:pets'] },
-      ],
-      responseType: 'stream',
-      ...config,
-      throwOnError: config.throwOnError ?? true,
-    }),
-    { client: request, config, shape: 'data' },
+  return withUnwrap(
+    toEventStream<
+      SuccessOf<{
+        '200': PetEvent
+      }>
+    >(
+      request({
+        method: 'GET',
+        url: '/pet/{petId}/events',
+        security: [
+          { type: 'apiKey', name: 'api_key', in: 'header' },
+          { type: 'oauth2', scopes: ['read:pets'] },
+        ],
+        responseType: 'stream',
+        ...config,
+        throwOnError: config.throwOnError ?? true,
+      }),
+      { client: request, config, shape: 'data' },
+    ) as Promise<
+      StreamResult<
+        {
+          '200': PetEvent
+        },
+        ThrowOnError
+      >
+    >,
   )
 }

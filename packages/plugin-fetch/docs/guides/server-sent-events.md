@@ -239,13 +239,91 @@ try {
 }
 ```
 
+With `throwOnError: false`, the call resolves instead of throwing, as a regular call does. The result then carries the `status` and the `error` body, its `data` is `undefined`, and its stream yields nothing. Check `data` rather than `error`, because an empty error body leaves `error` undefined. Checking `status` narrows `error` to the body the document declares for that status:
+
+```typescript
+const result = await streamChat({ body, throwOnError: false })
+if (!result.data) console.error('stream rejected', result.status, result.error)
+else for await (const event of result.data) render(event)
+```
+
+As on a regular call, `.unwrap()` resolves to the events. A failed call rejects with a `ResponseError` by default, and with the `error` body when the call sets `throwOnError: false`:
+
+```typescript
+for await (const event of await streamChat({ body }).unwrap()) render(event)
+```
+
 A stream call that gets a JSON response, such as an error body, parses it like any other call, so a 2xx JSON body yields an empty stream. An operation that declares another content type next to `text/event-stream` is generated as a normal call.
 
 Declare heartbeat and `error` events in the document, so each has a `case` in your `switch`.
 
+## Return only the events
+
+With `returnType: 'data'` in the plugin options, a stream call returns its events, as a regular call returns only its body:
+
+```typescript
+import { pluginFetch } from '@kubb/plugin-fetch'
+
+pluginFetch({ returnType: 'data' })
+```
+
+Both modes read the same events. The table compares them for one call:
+
+|                                     | `returnType: 'full'` (default)                                 | `returnType: 'data'`                                           |
+| ----------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
+| The call returns                    | `Unwrappable<StreamResult<…>>`                                 | `Promise<UnwrappedStreamResult<…>>`                            |
+| Call it                             | `const result = await streamPetEvents({ path: { petId: 1 } })` | `const events = await streamPetEvents({ path: { petId: 1 } })` |
+| Loop over the events                | `for await (const event of result.stream)`                     | `for await (const event of events)`                            |
+| Other ways to loop                  | `result`, `result.data`, or `.unwrap()`                        | none                                                           |
+| `event.data`                        | `PetEvent`                                                     | `PetEvent`                                                     |
+| A failed call, by default           | throws a `ResponseError`                                       | throws a `ResponseError`                                       |
+| With `throwOnError: false`          | the full result                                                | the full result, as in `'full'`                                |
+| `status`, `response`, `lastEventId` | available                                                      | only with `throwOnError: false`                                |
+
+Loop over the events the call resolves to:
+
+```typescript
+import { streamOrderEvents } from './gen/clients/streamOrderEvents'
+import { streamPetEvents } from './gen/clients/streamPetEvents'
+
+const events = await streamOrderEvents({ path: { orderId: 7 } })
+
+for await (const event of events) {
+  if (event.event === 'order_placed') render(event.data) // Order
+}
+
+for await (const { data } of await streamPetEvents({ path: { petId: 1 } })) {
+  console.info(data.type) // PetEvent
+}
+```
+
+A failed call throws a `ResponseError` before the first event, and a dropped connection throws from the loop:
+
+```typescript
+import { ResponseError } from './gen/.kubb/client'
+
+try {
+  for await (const event of await streamPetEvents({ path: { petId: 1 } })) render(event)
+} catch (error) {
+  if (!ResponseError.is(error)) throw error
+  console.error('stream rejected', error.status)
+}
+```
+
+With `throwOnError: false`, the call returns the full result instead, as a regular call does in this mode. The events are its `data` on a 2xx response, and checking `status` narrows `error`:
+
+```typescript
+const result = await streamPetEvents({ path: { petId: 1 }, throwOnError: false })
+
+if (!result.data) console.error('stream rejected', result.status, result.error)
+else for await (const event of result.data) render(event)
+```
+
+The events alone carry no `response` or `lastEventId`. To resume a dropped stream, use the default `returnType: 'full'`, or pass `throwOnError: false` to get the full result.
+
 ## The runtime files
 
-`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `EventStreamResult` types. Kubb writes it only when the document has a `text/event-stream` operation, and `.kubb/client.ts` then re-exports it, so the types import from either file. Kubb regenerates both on each run, so do not edit them:
+`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `EventStreamResult` types. A stream operation takes `StreamOptions` and returns `StreamResult`, the stream versions of `Options` and `RequestResult`. Kubb writes it only when the document has a `text/event-stream` operation, and `.kubb/client.ts` then re-exports it, so the types import from either file. Kubb regenerates both on each run, so do not edit them:
 
 ```typescript
 import type { ServerSentEvent } from './gen/.kubb/client'

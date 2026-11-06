@@ -1,21 +1,23 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options, SuccessOf } from './.kubb/client'
-import type { EventStreamResult, EventStreamOptions, TypedEvent } from './.kubb/sse'
+import type { SuccessOf, Unwrappable } from './.kubb/client'
+import type { StreamResult, StreamOptions, TypedEvent } from './.kubb/sse'
 import type { StreamChatOptions, StreamChatResponses } from './StreamChat'
-import { client } from './.kubb/client'
+import { client, withUnwrap } from './.kubb/client'
 import { toEventStream } from './.kubb/sse'
 
 /**
  * {@link /chat}
  */
 export function streamChat<ThrowOnError extends boolean = true>(
-  options: Options<StreamChatOptions, ThrowOnError> & EventStreamOptions = {},
-): Promise<EventStreamResult<TypedEvent<SuccessOf<StreamChatResponses>>>> {
+  options: StreamOptions<StreamChatOptions, ThrowOnError> = {},
+): Unwrappable<StreamResult<StreamChatResponses, ThrowOnError, TypedEvent<SuccessOf<StreamChatResponses>>>> {
   const { client: request = client, ...config } = options
 
-  return toEventStream<TypedEvent<SuccessOf<StreamChatResponses>>>(
-    request({ method: 'POST', url: '/chat', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }),
-    { client: request, config, shape: 'event' },
+  return withUnwrap(
+    toEventStream<TypedEvent<SuccessOf<StreamChatResponses>>>(
+      request({ method: 'POST', url: '/chat', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }),
+      { client: request, config, shape: 'event' },
+    ) as Promise<StreamResult<StreamChatResponses, ThrowOnError, TypedEvent<SuccessOf<StreamChatResponses>>>>,
   )
 }
