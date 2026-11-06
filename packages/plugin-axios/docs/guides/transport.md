@@ -51,7 +51,7 @@ axiosInstance.interceptors.request.use((config) => {
 })
 ```
 
-Instances from `createClient()` inherit the `transport` set on `client`. They send through `axiosInstance` only when neither sets a `transport`.
+Instances from `createClient()` copy the `transport` set on `client` when you create them, and a `transport` passed to `createClient()` replaces that copy. A later `client.setConfig({ transport })` does not reach instances that already exist. An instance sends through `axiosInstance` only when neither sets a `transport`.
 
 ## Where to set it
 

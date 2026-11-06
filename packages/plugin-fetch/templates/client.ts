@@ -1,4 +1,4 @@
-import { createClientCore, getResponseContentType, type ResponseType, type Transport, type TransportResult } from './core.ts'
+import { createClientCore, getResponseContentType, type ResolvedRequest, type ResponseType, type Transport, type TransportResult } from './core.ts'
 import { isJsonMediaType } from './serializers.ts'
 import * as core from './core.ts'
 
@@ -13,17 +13,9 @@ export type NativeResponse = Response
  */
 export type FetchOptions = RequestInit & { next?: Record<string, unknown> }
 
-export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestConfig<TBody, TRequest, TResponse> & {
-  options?: FetchOptions
-}
-export type Options<TData extends core.DataShape, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.Options<
-  TData,
-  ThrowOnError,
-  TRequest,
-  TResponse
-> & { options?: FetchOptions }
-export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientConfig<TRequest, TResponse> & { options?: FetchOptions }
-export type ResolvedRequest = core.ResolvedRequest & { options?: FetchOptions }
+/** The `options` type of every request, client config, and resolved request. */
+export type NativeOptions = FetchOptions
+
 export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>
 /** The core's `ResponseError` class, typed with this transport's request and response. `instanceof` and `ResponseError.is` both match what the client throws. */
 export const ResponseError = core.ResponseError as {

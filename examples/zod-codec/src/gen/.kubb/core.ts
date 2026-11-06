@@ -1,4 +1,4 @@
-import type { NativeRequest, NativeResponse } from './client.ts'
+import type { NativeOptions, NativeRequest, NativeResponse } from './client.ts'
 import type { HeadersInit, HttpMethod, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers.ts'
 import type { StandardSchemaValidator, ValidateOption, ValidationErrorHandler } from './standardSchema.ts'
 import {
@@ -197,7 +197,7 @@ export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse =
   styles?: Styles
   signal?: AbortSignal
   credentials?: RequestCredentials
-  options?: Record<string, unknown>
+  options?: NativeOptions
   contentType?: ContentType
   responseType?: ResponseType
   throwOnError?: boolean
@@ -231,7 +231,7 @@ export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> =
   baseURL?: string
   headers?: HeadersInit
   credentials?: RequestCredentials
-  options?: Record<string, unknown>
+  options?: NativeOptions
   throwOnError?: boolean
   transport?: Transport<TRequest, TResponse>
   serializer?: Serializers
@@ -251,7 +251,7 @@ export type ResolvedRequest = {
   body?: RequestBody
   signal?: AbortSignal
   credentials?: RequestCredentials
-  options?: Record<string, unknown>
+  options?: NativeOptions
   responseType?: ResponseType
 }
 

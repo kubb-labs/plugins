@@ -67,6 +67,17 @@ describe('createAxiosTransport', () => {
     expect(calls[0]?.validateStatus?.(500)).toBe(true)
   })
 
+  test('maps credentials onto withCredentials', async () => {
+    const { calls, transport } = fakeAxios()
+    const client = createClientCore({ defaultTransport: transport, credentials: 'include' })
+
+    await client({ method: 'GET', url: '/pet' })
+    await client({ method: 'GET', url: '/pet', credentials: 'omit' })
+    await client({ method: 'GET', url: '/pet', credentials: 'same-origin' })
+
+    expect(calls.map((call) => call.withCredentials)).toStrictEqual([true, false, false])
+  })
+
   test('sends the serialized body and turns URLSearchParams into a string for the Node adapter', async () => {
     const { calls, transport } = fakeAxios()
     const client = createClientCore({ defaultTransport: transport })

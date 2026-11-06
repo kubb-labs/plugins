@@ -15,17 +15,9 @@ export type NativeResponse = AxiosResponse
  */
 export type AxiosOptions = AxiosRequestConfig
 
-export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestConfig<TBody, TRequest, TResponse> & {
-  options?: AxiosOptions
-}
-export type Options<TData extends core.DataShape, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.Options<
-  TData,
-  ThrowOnError,
-  TRequest,
-  TResponse
-> & { options?: AxiosOptions }
-export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientConfig<TRequest, TResponse> & { options?: AxiosOptions }
-export type ResolvedRequest = core.ResolvedRequest & { options?: AxiosOptions }
+/** The `options` type of every request, client config, and resolved request. */
+export type NativeOptions = AxiosOptions
+
 export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>
 /** The core's `ResponseError` class, typed with this transport's request and response. `instanceof` and `ResponseError.is` both match what the client throws. */
 export const ResponseError = core.ResponseError as {
@@ -87,6 +79,8 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
       // Kubb already serialized the body; only URLSearchParams needs a string, since axios's Node adapter rejects it.
       transformRequest: (data) => (data instanceof URLSearchParams ? data.toString() : data),
       signal: request.signal,
+      // axios has no `credentials`: `include` sends cookies cross-origin, `omit` and `same-origin` do not.
+      ...(request.credentials && { withCredentials: request.credentials === 'include' }),
       responseType: request.responseType,
       validateStatus: () => true,
     }
