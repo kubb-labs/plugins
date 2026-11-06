@@ -164,6 +164,24 @@ settings:
 
 catalogs:
   default:
+    '@kubb/adapter-oas':
+      specifier: ^5.16.0
+      version: 5.16.0
+    '@kubb/core':
+      specifier: ^5.16.0
+      version: 5.16.0
+    '@kubb/kit':
+      specifier: ^5.16.0
+      version: 5.16.0
+    '@kubb/parser-ts':
+      specifier: ^5.16.0
+      version: 5.16.0
+    '@kubb/plugin-barrel':
+      specifier: ^5.16.0
+      version: 5.16.0
+    '@kubb/renderer-jsx':
+      specifier: ^5.16.0
+      version: 5.16.0
     '@types/node':
       specifier: 22.20.2
       version: 22.20.2
@@ -176,6 +194,9 @@ catalogs:
     '@vitest/ui':
       specifier: ^5.1.0
       version: 5.1.0
+    kubb:
+      specifier: ^5.16.0
+      version: 5.16.0
     oxfmt:
       specifier: ^0.76.0
       version: 0.76.0
@@ -195,15 +216,6 @@ catalogs:
       specifier: ^5.1.0
       version: 5.1.0
 
-overrides:
-  '@kubb/adapter-oas': 0.0.0-canary-20261105200211
-  '@kubb/core': 0.0.0-canary-20261105200211
-  '@kubb/kit': 0.0.0-canary-20261105200211
-  '@kubb/plugin-barrel': 0.0.0-canary-20261105200211
-  '@kubb/renderer-jsx': 0.0.0-canary-20261105200211
-  '@kubb/parser-ts': 0.0.0-canary-20261105200211
-  kubb: 0.0.0-canary-20261105200211
-
 importers:
 
   .:
@@ -215,20 +227,20 @@ importers:
         specifier: ^3.0.3
         version: 3.0.3
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/core':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
       '@kubb/parser-ts':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
       '@kubb/plugin-barrel':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
       '@kubb/plugin-cypress':
         specifier: workspace:*
         version: link:packages/plugin-cypress
@@ -251,8 +263,8 @@ importers:
         specifier: ^1.4.4
         version: 1.4.4
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       oxfmt:
         specifier: 'catalog:'
         version: 0.76.0(svelte@5.57.3)
@@ -351,14 +363,14 @@ importers:
         version: 4.6.7
     devDependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -366,8 +378,8 @@ importers:
   examples/axios:
     dependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
@@ -378,8 +390,8 @@ importers:
         specifier: ^1.21.0
         version: 1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -388,8 +400,8 @@ importers:
   examples/client:
     dependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -397,8 +409,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/plugin-ts
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -407,8 +419,8 @@ importers:
   examples/cypress:
     dependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/plugin-cypress':
         specifier: workspace:*
         version: link:../../packages/plugin-cypress
@@ -416,8 +428,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/plugin-ts
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -435,8 +447,8 @@ importers:
         specifier: ^10.6.0
         version: 10.6.0
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/plugin-faker':
         specifier: workspace:*
         version: link:../../packages/plugin-faker
@@ -447,8 +459,8 @@ importers:
         specifier: ^1.11.23
         version: 1.11.23
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -460,8 +472,8 @@ importers:
   examples/fetch:
     dependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -469,8 +481,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/plugin-ts
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -479,11 +491,11 @@ importers:
   examples/mcp:
     dependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/parser-ts':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
@@ -503,8 +515,8 @@ importers:
         specifier: ^1.21.0
         version: 1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -519,8 +531,8 @@ importers:
         specifier: ^10.6.0
         version: 10.6.0
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/plugin-faker':
         specifier: workspace:*
         version: link:../../packages/plugin-faker
@@ -534,8 +546,8 @@ importers:
         specifier: ^0.11.0
         version: 0.11.0(msw@3.0.3(@types/node@22.20.2)(graphql@16.14.2)(supports-color@8.1.1)(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1)))
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       msw:
         specifier: ^3.0.3
         version: 3.0.3(@types/node@22.20.2)(graphql@16.14.2)(supports-color@8.1.1)(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
@@ -550,8 +562,8 @@ importers:
   examples/react-query:
     dependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -565,8 +577,8 @@ importers:
         specifier: ^5.105.3
         version: 5.105.3(@types/react@19.3.0)(react@19.3.1)
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -581,8 +593,8 @@ importers:
   examples/sdk:
     dependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -590,8 +602,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/plugin-ts
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -600,11 +612,11 @@ importers:
   examples/simple-single:
     dependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/parser-ts':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -627,8 +639,8 @@ importers:
         specifier: ^1.21.0
         version: 1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -642,8 +654,8 @@ importers:
   examples/swr:
     dependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -654,8 +666,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/plugin-ts
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -673,8 +685,8 @@ importers:
   examples/typescript:
     dependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
@@ -682,8 +694,8 @@ importers:
         specifier: ^1.21.0
         version: 1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -692,8 +704,8 @@ importers:
   examples/vue-query:
     dependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -707,8 +719,8 @@ importers:
         specifier: ^5.105.3
         version: 5.105.3(vue@3.5.44(typescript@7.0.2))
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       vue:
         specifier: ^3.5.44
         version: 3.5.44(typescript@7.0.2)
@@ -720,8 +732,8 @@ importers:
   examples/zod:
     dependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
@@ -732,8 +744,8 @@ importers:
         specifier: ^1.21.0
         version: 1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -747,11 +759,11 @@ importers:
   examples/zod-codec:
     dependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/parser-ts':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
       '@kubb/plugin-fetch':
         specifier: workspace:*
         version: link:../../packages/plugin-fetch
@@ -759,8 +771,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/plugin-zod
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -781,8 +793,8 @@ importers:
         specifier: workspace:*
         version: link:../utils
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
@@ -790,8 +802,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/plugin-zod
       '@kubb/renderer-jsx':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -803,12 +815,12 @@ importers:
         specifier: workspace:*
         version: link:../utils
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
     devDependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@types/node':
         specifier: 'catalog:'
         version: 22.20.2
@@ -825,14 +837,14 @@ importers:
         specifier: workspace:*
         version: link:../utils
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
       '@kubb/renderer-jsx':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -841,8 +853,8 @@ importers:
   internals/utils:
     dependencies:
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -851,8 +863,8 @@ importers:
   packages/plugin-axios:
     dependencies:
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
       '@kubb/plugin-client':
         specifier: workspace:^
         version: link:../plugin-client
@@ -863,8 +875,8 @@ importers:
         specifier: workspace:^
         version: link:../plugin-zod
       '@kubb/renderer-jsx':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
     devDependencies:
       '@internals/client':
         specifier: workspace:*
@@ -882,8 +894,8 @@ importers:
   packages/plugin-client:
     dependencies:
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
@@ -891,8 +903,8 @@ importers:
         specifier: workspace:^
         version: link:../plugin-zod
       '@kubb/renderer-jsx':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
     devDependencies:
       '@internals/client':
         specifier: workspace:*
@@ -907,14 +919,14 @@ importers:
   packages/plugin-cypress:
     dependencies:
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
     devDependencies:
       '@internals/shared':
         specifier: workspace:*
@@ -929,14 +941,14 @@ importers:
   packages/plugin-faker:
     dependencies:
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
     devDependencies:
       '@faker-js/faker':
         specifier: ^10.6.0
@@ -951,8 +963,8 @@ importers:
   packages/plugin-fetch:
     dependencies:
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
       '@kubb/plugin-client':
         specifier: workspace:^
         version: link:../plugin-client
@@ -963,8 +975,8 @@ importers:
         specifier: workspace:^
         version: link:../plugin-zod
       '@kubb/renderer-jsx':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
     devDependencies:
       '@internals/client':
         specifier: workspace:*
@@ -979,8 +991,8 @@ importers:
   packages/plugin-mcp:
     dependencies:
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
@@ -988,8 +1000,8 @@ importers:
         specifier: workspace:^
         version: link:../plugin-zod
       '@kubb/renderer-jsx':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
     devDependencies:
       '@internals/client':
         specifier: workspace:*
@@ -1010,8 +1022,8 @@ importers:
   packages/plugin-msw:
     dependencies:
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
       '@kubb/plugin-faker':
         specifier: workspace:^
         version: link:../plugin-faker
@@ -1019,8 +1031,8 @@ importers:
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
     devDependencies:
       '@internals/shared':
         specifier: workspace:*
@@ -1035,14 +1047,14 @@ importers:
   packages/plugin-react-query:
     dependencies:
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
     devDependencies:
       '@internals/client':
         specifier: workspace:*
@@ -1063,24 +1075,24 @@ importers:
   packages/plugin-redoc:
     dependencies:
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
     devDependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
 
   packages/plugin-swr:
     dependencies:
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
     devDependencies:
       '@internals/client':
         specifier: workspace:*
@@ -1101,11 +1113,11 @@ importers:
   packages/plugin-ts:
     dependencies:
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
       '@kubb/renderer-jsx':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
       '@typescript/typescript6':
         specifier: ^6.0.2
         version: 6.0.2
@@ -1120,8 +1132,8 @@ importers:
         specifier: workspace:*
         version: link:../../internals/utils
       '@kubb/parser-ts':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -1129,14 +1141,14 @@ importers:
   packages/plugin-vue-query:
     dependencies:
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
       '@kubb/plugin-ts':
         specifier: workspace:^
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
     devDependencies:
       '@internals/client':
         specifier: workspace:*
@@ -1160,11 +1172,11 @@ importers:
   packages/plugin-zod:
     dependencies:
       '@kubb/kit':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
       '@kubb/renderer-jsx':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: ^5.16.0
+        version: 5.16.0
     devDependencies:
       '@internals/shared':
         specifier: workspace:*
@@ -1182,14 +1194,14 @@ importers:
         specifier: workspace:*
         version: link:../../internals/utils
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/core':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
       '@kubb/parser-ts':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
@@ -1230,8 +1242,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/plugin-zod
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -1252,11 +1264,11 @@ importers:
         specifier: ^10.6.0
         version: 10.6.0
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/parser-ts':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
@@ -1291,8 +1303,8 @@ importers:
         specifier: ^16.2.1
         version: 16.2.1
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       msw:
         specifier: ^3.0.3
         version: 3.0.3(@types/node@22.20.2)(graphql@16.14.2)(supports-color@8.1.1)(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
@@ -1319,11 +1331,11 @@ importers:
   tests/performance:
     dependencies:
       '@kubb/adapter-oas':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)
       '@kubb/core':
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211
+        specifier: 'catalog:'
+        version: 5.16.0
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
@@ -1337,8 +1349,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/plugin-zod
       kubb:
-        specifier: 0.0.0-canary-20261105200211
-        version: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+        specifier: 'catalog:'
+        version: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -1543,22 +1555,22 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@kubb/adapter-oas@0.0.0-canary-20261105200211':
-    resolution: {integrity: sha512-dK2jjuXSzqUWKDzwsHneZL0FB5rX2vjdtNpGQMhjbo2Zx/uhe6eZba9Uym9WO+zmJHyXj/Nh+Od84uOOhxk7kw==}
+  '@kubb/adapter-oas@5.16.0':
+    resolution: {integrity: sha512-+SRqe+dposKOXcopYx/98dgVcGTjvkR0wVvzdzrRl6f/ahxNL8MgCUK6kDJV86UBnAdLExLtIov+7aU/z4KdUA==}
     engines: {node: '>=22.22'}
 
-  '@kubb/ast@0.0.0-canary-20261105200211':
-    resolution: {integrity: sha512-K3Ht6SdQ648NrL2VrDmHZcbfrP0njzgdRAHG2y2w8nybN0VWHSkfyRXKpUz8snY5tNkUQk00+rjbS+gqMmel2Q==}
+  '@kubb/ast@5.16.0':
+    resolution: {integrity: sha512-TSECJjYs2+RaBM/SNUh0vqN/Yu/Yz92dzHYouQY6r5M+5MCVklwqcLX0+wfDbePHK5K4SPWEbH4+ps8psqQmdA==}
     engines: {node: '>=22.22'}
 
-  '@kubb/cli@0.0.0-canary-20261105200211':
-    resolution: {integrity: sha512-Mcx0M1jRj7KTo4VBzYtKdn+AZ3jvzcccVcX6RJYXaPrbGRqAxVQIfo/RAGKZu8+kuY4n4PpBLxWisCOF1LYv6Q==}
+  '@kubb/cli@5.16.0':
+    resolution: {integrity: sha512-+qZ670oOpG4fjkM8ifUx1QUUIUqd199aTND260Z4xqgBfmsQ8amitg+0R47fMhuWGOqDD047nHVHRQzqnrqdgg==}
     engines: {node: '>=22.22'}
     hasBin: true
     peerDependencies:
-      '@kubb/adapter-oas': 0.0.0-canary-20261105200211
-      '@kubb/mcp': 0.0.0-canary-20261105200211
-      '@kubb/studio': 0.0.0-canary-20261105200211
+      '@kubb/adapter-oas': 5.16.0
+      '@kubb/mcp': 5.16.0
+      '@kubb/studio': 5.16.0
     peerDependenciesMeta:
       '@kubb/adapter-oas':
         optional: true
@@ -1567,39 +1579,39 @@ packages:
       '@kubb/studio':
         optional: true
 
-  '@kubb/core@0.0.0-canary-20261105200211':
-    resolution: {integrity: sha512-RlWqh1KFsuNzrng2q8zPhQk1dK9l50BH04L0j5qSxAXuPXtb3OchQ4spsbPXUt7pT8gB+KSJ+Hn/fsTM/0OAQA==}
+  '@kubb/core@5.16.0':
+    resolution: {integrity: sha512-UlprzWKUHmdcbiJucPv7f7JVpiKC3V9muVBNSr9BzP7KUAy2qneG6U9CvSHEjMh1ZGEmY4Ym71MTdTdtNwaNYQ==}
     engines: {node: '>=22.22'}
 
-  '@kubb/kit@0.0.0-canary-20261105200211':
-    resolution: {integrity: sha512-W5/fB3amSb5ifyNtB6712EbtSrquyF12SQPTAluPQXbEUeSishHYddv3ctQJpJQuWdUX+2vyrU8gj6M7nM+J4Q==}
+  '@kubb/kit@5.16.0':
+    resolution: {integrity: sha512-kF7TXawcCSqyy9j+W/19OCQ5FyqZYveWNWnEW+PIMkQvrwad4Y8Ghyiq7/zq8Th5YznuubmnMyJiJLJ6p1YjUA==}
     engines: {node: '>=22.22'}
 
-  '@kubb/mcp@0.0.0-canary-20261105200211':
-    resolution: {integrity: sha512-dpy8ox1ZKR8WbmahC1dHj5J9d4cpWCBr+rClaoNYx4XdA2d1bxl6d+KxyDK//M+D2YErQ9rLLY5jNiTm7P0vmw==}
+  '@kubb/mcp@5.16.0':
+    resolution: {integrity: sha512-dqX4OjV2AbyWsJv/U0TQkvPgL+8wPZunFDGk8nrTxY7cKMNUcjCOKWce0O4Yj6J15cRdYJ3j9cp3Oq59cM9hoA==}
     engines: {node: '>=22.22'}
     hasBin: true
     peerDependencies:
-      '@kubb/renderer-jsx': 0.0.0-canary-20261105200211
+      '@kubb/renderer-jsx': 5.16.0
 
-  '@kubb/parser-md@0.0.0-canary-20261105200211':
-    resolution: {integrity: sha512-APAVJJqctqmzJElxurWgK5/cqi0Zt3RZuRwSf7pc0R+YnZqfsY+yIFn1iXxGcWFU3d/QMQe9h/B4T+BEjf7ikg==}
+  '@kubb/parser-md@5.16.0':
+    resolution: {integrity: sha512-pG++3UX1eKPLrmtI/aW93pCGerSoyxSUWq7Y7MZiwf9cSXB9BFMXr+/LE3+S9i4pn+frAyxSNWAc7/GAe2igdw==}
     engines: {node: '>=22.22'}
 
-  '@kubb/parser-ts@0.0.0-canary-20261105200211':
-    resolution: {integrity: sha512-GZaAcC+M5AfTppJzDcoXofZrfBL90nD1VATzJFiOfVxTPjh08Ot7S9cA9IlPGL31F8fziHWgJXuERqV64HFaDA==}
+  '@kubb/parser-ts@5.16.0':
+    resolution: {integrity: sha512-mRMjtfuh5Ds74XOvjU9nrZCEduWHeMBpFim0pRPofMVY2T1TXd2ndBxcya5h3Xo0gNLViaE11xHo79zs6GY2yg==}
     engines: {node: '>=22.22'}
 
-  '@kubb/plugin-barrel@0.0.0-canary-20261105200211':
-    resolution: {integrity: sha512-+yB2WwRjipf6z/LG9gpL9EvHPiLreZFcnrNmpVmImMU5/JBfuaPAlYRHzEy/jw4mczkEtJwNszZougDwvWVN8w==}
+  '@kubb/plugin-barrel@5.16.0':
+    resolution: {integrity: sha512-xmLgcMt1TcquoOtIA3R9i35nutqJYL6yloSCufuWbsD7oDAg8dtbB5orq8GqU9/T4kS34DQ+IdNBJyFMOk4O1g==}
     engines: {node: '>=22.22'}
 
-  '@kubb/renderer-jsx@0.0.0-canary-20261105200211':
-    resolution: {integrity: sha512-YuqrqB6URgvd0gCBuKVcNZfVHzIdrXABgOXMCsD0RG4h/cNaPvvcmTeh6RwHVKL7ebaMnAvMI+KnGqIV1lTWLQ==}
+  '@kubb/renderer-jsx@5.16.0':
+    resolution: {integrity: sha512-XYhD2jreGcEF2m28xvjTv0hMoLLV9RxWLOoKHn9+UptJ8tfroHOCOQE6czoA3+W/VmySM5FDcT0oW6I/RkwMbQ==}
     engines: {node: '>=22.22'}
 
-  '@kubb/studio@0.0.0-canary-20261105200211':
-    resolution: {integrity: sha512-8SYYT+qmnSGLyyWv+GKjjsTeVSMwOcOQVRcVOR3MONpy8YPhXasO0MBro0EUi84UA3unk1zD0tgxZTJITBijuQ==}
+  '@kubb/studio@5.16.0':
+    resolution: {integrity: sha512-3UJ5vh1eVwoY2Wx4unRtKcTX8DplulU7xhebiflMdm3xWvVwqRkEGrHEhmSSY5PT7VZf1/e9XdRkKu1bHu1ZeA==}
     engines: {node: '>=22.22'}
     peerDependencies:
       tsdown: ^0.23.1
@@ -3053,8 +3065,8 @@ packages:
   jsprim@2.0.2:
     resolution: {integrity: sha512-gqXddjPqQ6G40VdnI6T6yObEC+pDNvyP95wdQhkWkg7crHH3km5qP1FsOXEkzEQwnz6gz5qGTn1c2Y52wP3OyQ==}
 
-  kubb@0.0.0-canary-20261105200211:
-    resolution: {integrity: sha512-naCtaOtJq9lylqG8cZ2CRMRTLSheqWjjdGNWbQfxX3v7TwP2AGZlR+6zc34qDlNFMlRDdapEuZfxBl2HcJJSPw==}
+  kubb@5.16.0:
+    resolution: {integrity: sha512-4AjSDSo+lgUg83HB97v55cCnbRWRt5FzcnluKOkOd4AO7Gqo4B6ZrvyPEy4Jb/HdkmFXdIjwbI3DnCJBFPeP2Q==}
     engines: {node: '>=22.22'}
     hasBin: true
 
@@ -3711,8 +3723,8 @@ packages:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
 
-  unplugin-kubb@0.0.0-canary-20261105200211:
-    resolution: {integrity: sha512-3HpAEHSp3+6PT1y9jIlQgsQ1vLQlDCZzTo3u3Ww0a+59IoOjUVt+82O9TXDxdjujYXE92XbAY8DTkaXFNIxQMA==}
+  unplugin-kubb@5.16.0:
+    resolution: {integrity: sha512-g+MQQ3LZ/4RXZj+HQVA0Zfzisf9dmyyDYqco5H3nr3tD5U5JYzyUd5zZzFCaQyZmgJuvsufEnCYRTbDK0nIwCg==}
     engines: {node: '>=22.22'}
     peerDependencies:
       '@farmfe/core': ^1.7.0
@@ -4245,10 +4257,10 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
 
-  '@kubb/adapter-oas@0.0.0-canary-20261105200211(openapi-types@12.1.3)':
+  '@kubb/adapter-oas@5.16.0(openapi-types@12.1.3)':
     dependencies:
-      '@kubb/core': 0.0.0-canary-20261105200211
-      '@kubb/kit': 0.0.0-canary-20261105200211
+      '@kubb/core': 5.16.0
+      '@kubb/kit': 5.16.0
       '@readme/openapi-parser': 10.0.0(openapi-types@12.1.3)
       '@scalar/openapi-upgrader': 0.4.6
       api-ref-bundler: 0.5.1
@@ -4257,13 +4269,13 @@ snapshots:
     transitivePeerDependencies:
       - openapi-types
 
-  '@kubb/ast@0.0.0-canary-20261105200211': {}
+  '@kubb/ast@5.16.0': {}
 
-  '@kubb/cli@0.0.0-canary-20261105200211(@kubb/adapter-oas@0.0.0-canary-20261105200211(openapi-types@12.1.3))(@kubb/mcp@0.0.0-canary-20261105200211(@kubb/renderer-jsx@0.0.0-canary-20261105200211)(openapi-types@12.1.3)(typescript@7.0.2))(@kubb/studio@0.0.0-canary-20261105200211(tsdown@0.23.1(typescript@7.0.2)))':
+  '@kubb/cli@5.16.0(@kubb/adapter-oas@5.16.0(openapi-types@12.1.3))(@kubb/mcp@5.16.0(@kubb/renderer-jsx@5.16.0)(openapi-types@12.1.3)(typescript@7.0.2))(@kubb/studio@5.16.0(tsdown@0.23.1(typescript@7.0.2)))':
     dependencies:
       '@clack/prompts': 1.8.1
       '@gunshi/plugin-dryrun': 0.37.3
-      '@kubb/core': 0.0.0-canary-20261105200211
+      '@kubb/core': 5.16.0
       chokidar: 6.0.0
       gunshi: 0.37.3
       jiti: 2.7.0
@@ -4272,26 +4284,26 @@ snapshots:
       verkit: 0.5.0
       yuku-parser: 0.19.0
     optionalDependencies:
-      '@kubb/adapter-oas': 0.0.0-canary-20261105200211(openapi-types@12.1.3)
-      '@kubb/mcp': 0.0.0-canary-20261105200211(@kubb/renderer-jsx@0.0.0-canary-20261105200211)(openapi-types@12.1.3)(typescript@7.0.2)
-      '@kubb/studio': 0.0.0-canary-20261105200211(tsdown@0.23.1(typescript@7.0.2))
+      '@kubb/adapter-oas': 5.16.0(openapi-types@12.1.3)
+      '@kubb/mcp': 5.16.0(@kubb/renderer-jsx@5.16.0)(openapi-types@12.1.3)(typescript@7.0.2)
+      '@kubb/studio': 5.16.0(tsdown@0.23.1(typescript@7.0.2))
 
-  '@kubb/core@0.0.0-canary-20261105200211':
+  '@kubb/core@5.16.0':
     dependencies:
-      '@kubb/ast': 0.0.0-canary-20261105200211
+      '@kubb/ast': 5.16.0
       tinyexec: 1.3.1
       verkit: 0.5.0
 
-  '@kubb/kit@0.0.0-canary-20261105200211':
+  '@kubb/kit@5.16.0':
     dependencies:
-      '@kubb/ast': 0.0.0-canary-20261105200211
-      '@kubb/core': 0.0.0-canary-20261105200211
+      '@kubb/ast': 5.16.0
+      '@kubb/core': 5.16.0
 
-  '@kubb/mcp@0.0.0-canary-20261105200211(@kubb/renderer-jsx@0.0.0-canary-20261105200211)(openapi-types@12.1.3)(typescript@7.0.2)':
+  '@kubb/mcp@5.16.0(@kubb/renderer-jsx@5.16.0)(openapi-types@12.1.3)(typescript@7.0.2)':
     dependencies:
-      '@kubb/adapter-oas': 0.0.0-canary-20261105200211(openapi-types@12.1.3)
-      '@kubb/core': 0.0.0-canary-20261105200211
-      '@kubb/renderer-jsx': 0.0.0-canary-20261105200211
+      '@kubb/adapter-oas': 5.16.0(openapi-types@12.1.3)
+      '@kubb/core': 5.16.0
+      '@kubb/renderer-jsx': 5.16.0
       '@tmcp/adapter-valibot': 0.1.7(tmcp@1.20.1(typescript@7.0.2))(valibot@1.5.0(typescript@7.0.2))
       '@tmcp/transport-stdio': 0.5.1(tmcp@1.20.1(typescript@7.0.2))
       jiti: 2.7.0
@@ -4301,31 +4313,31 @@ snapshots:
       - openapi-types
       - typescript
 
-  '@kubb/parser-md@0.0.0-canary-20261105200211':
+  '@kubb/parser-md@5.16.0':
     dependencies:
-      '@kubb/ast': 0.0.0-canary-20261105200211
-      '@kubb/core': 0.0.0-canary-20261105200211
+      '@kubb/ast': 5.16.0
+      '@kubb/core': 5.16.0
       yaml: 2.9.1
 
-  '@kubb/parser-ts@0.0.0-canary-20261105200211':
+  '@kubb/parser-ts@5.16.0':
     dependencies:
-      '@kubb/ast': 0.0.0-canary-20261105200211
-      '@kubb/core': 0.0.0-canary-20261105200211
+      '@kubb/ast': 5.16.0
+      '@kubb/core': 5.16.0
       yuku-parser: 0.19.0
 
-  '@kubb/plugin-barrel@0.0.0-canary-20261105200211':
+  '@kubb/plugin-barrel@5.16.0':
     dependencies:
-      '@kubb/kit': 0.0.0-canary-20261105200211
+      '@kubb/kit': 5.16.0
 
-  '@kubb/renderer-jsx@0.0.0-canary-20261105200211':
+  '@kubb/renderer-jsx@5.16.0':
     dependencies:
-      '@kubb/ast': 0.0.0-canary-20261105200211
+      '@kubb/ast': 5.16.0
       yaml: 2.9.1
 
-  '@kubb/studio@0.0.0-canary-20261105200211(tsdown@0.23.1(typescript@7.0.2))':
+  '@kubb/studio@5.16.0(tsdown@0.23.1(typescript@7.0.2))':
     dependencies:
-      '@kubb/ast': 0.0.0-canary-20261105200211
-      '@kubb/core': 0.0.0-canary-20261105200211
+      '@kubb/ast': 5.16.0
+      '@kubb/core': 5.16.0
       capnweb: 0.12.0
       diff: 9.0.0
       ofetch: 1.5.1
@@ -5471,19 +5483,19 @@ snapshots:
       json-schema: 0.4.0
       verror: 1.10.0
 
-  kubb@0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1)):
+  kubb@5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(tsdown@0.23.1(typescript@7.0.2))(typescript@7.0.2)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
-      '@kubb/adapter-oas': 0.0.0-canary-20261105200211(openapi-types@12.1.3)
-      '@kubb/cli': 0.0.0-canary-20261105200211(@kubb/adapter-oas@0.0.0-canary-20261105200211(openapi-types@12.1.3))(@kubb/mcp@0.0.0-canary-20261105200211(@kubb/renderer-jsx@0.0.0-canary-20261105200211)(openapi-types@12.1.3)(typescript@7.0.2))(@kubb/studio@0.0.0-canary-20261105200211(tsdown@0.23.1(typescript@7.0.2)))
-      '@kubb/core': 0.0.0-canary-20261105200211
-      '@kubb/kit': 0.0.0-canary-20261105200211
-      '@kubb/mcp': 0.0.0-canary-20261105200211(@kubb/renderer-jsx@0.0.0-canary-20261105200211)(openapi-types@12.1.3)(typescript@7.0.2)
-      '@kubb/parser-md': 0.0.0-canary-20261105200211
-      '@kubb/parser-ts': 0.0.0-canary-20261105200211
-      '@kubb/plugin-barrel': 0.0.0-canary-20261105200211
-      '@kubb/renderer-jsx': 0.0.0-canary-20261105200211
-      '@kubb/studio': 0.0.0-canary-20261105200211(tsdown@0.23.1(typescript@7.0.2))
-      unplugin-kubb: 0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
+      '@kubb/adapter-oas': 5.16.0(openapi-types@12.1.3)
+      '@kubb/cli': 5.16.0(@kubb/adapter-oas@5.16.0(openapi-types@12.1.3))(@kubb/mcp@5.16.0(@kubb/renderer-jsx@5.16.0)(openapi-types@12.1.3)(typescript@7.0.2))(@kubb/studio@5.16.0(tsdown@0.23.1(typescript@7.0.2)))
+      '@kubb/core': 5.16.0
+      '@kubb/kit': 5.16.0
+      '@kubb/mcp': 5.16.0(@kubb/renderer-jsx@5.16.0)(openapi-types@12.1.3)(typescript@7.0.2)
+      '@kubb/parser-md': 5.16.0
+      '@kubb/parser-ts': 5.16.0
+      '@kubb/plugin-barrel': 5.16.0
+      '@kubb/renderer-jsx': 5.16.0
+      '@kubb/studio': 5.16.0(tsdown@0.23.1(typescript@7.0.2))
+      unplugin-kubb: 5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
     transitivePeerDependencies:
       - '@farmfe/core'
       - '@nuxt/kit'
@@ -6158,13 +6170,13 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  unplugin-kubb@0.0.0-canary-20261105200211(openapi-types@12.1.3)(rolldown@1.2.15)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1)):
+  unplugin-kubb@5.16.0(openapi-types@12.1.3)(rolldown@1.2.15)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1)):
     dependencies:
-      '@kubb/adapter-oas': 0.0.0-canary-20261105200211(openapi-types@12.1.3)
-      '@kubb/core': 0.0.0-canary-20261105200211
-      '@kubb/parser-md': 0.0.0-canary-20261105200211
-      '@kubb/parser-ts': 0.0.0-canary-20261105200211
-      '@kubb/plugin-barrel': 0.0.0-canary-20261105200211
+      '@kubb/adapter-oas': 5.16.0(openapi-types@12.1.3)
+      '@kubb/core': 5.16.0
+      '@kubb/parser-md': 5.16.0
+      '@kubb/parser-ts': 5.16.0
+      '@kubb/plugin-barrel': 5.16.0
       jiti: 2.7.0
       unplugin: 3.7.0(rolldown@1.2.15)(vite@8.3.0(@types/node@22.20.2)(jiti@2.7.0)(yaml@2.9.1))
       yuku-codegen: 0.19.0
