@@ -1,3 +1,4 @@
+import type { NativeRequest, NativeResponse } from './client'
 import type { HeadersInit, HttpMethod, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers'
 import type { StandardSchemaValidator, ValidateOption, ValidationErrorHandler } from './standardSchema'
 import {
@@ -68,7 +69,7 @@ export type SuccessResultUnion<TResponses, TRequest, TResponse> = {
 /**
  * Narrows `data` and `error` by status. With `throwOnError`, includes only success variants.
  */
-export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = unknown, TResponse = unknown> = ThrowOnError extends true
+export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = ThrowOnError extends true
   ? [SuccessResultUnion<TResponses, TRequest, TResponse>] extends [never]
     ? {
         status: number
@@ -117,7 +118,7 @@ export function withUnwrap<T extends { data: unknown; error: unknown }>(promise:
  * The shape a generated operation returns with `returnType: 'data'`: the success body when
  * `throwOnError` is true, or the full `RequestResult` when it is false.
  */
-export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = unknown, TResponse = unknown> = ThrowOnError extends true
+export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = ThrowOnError extends true
   ? RequestResult<TResponses, true, TRequest, TResponse>['data']
   : RequestResult<TResponses, ThrowOnError, TRequest, TResponse>
 
@@ -182,7 +183,7 @@ export type AuthToken = string | undefined
  */
 export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<AuthToken>)
 
-export type RequestConfig<TBody = unknown, TRequest = unknown, TResponse = unknown> = {
+export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = {
   baseURL?: string
   url?: string
   method?: HttpMethod
@@ -214,7 +215,7 @@ export type RequestConfig<TBody = unknown, TRequest = unknown, TResponse = unkno
 /**
  * Combines client options with the operation's typed request params and body.
  */
-export type Options<TData extends DataShape, ThrowOnError extends boolean = true, TRequest = unknown, TResponse = unknown> = Omit<
+export type Options<TData extends DataShape, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = Omit<
   RequestConfig<unknown, TRequest, TResponse>,
   keyof DataShape | 'url'
 > &
@@ -226,7 +227,7 @@ export type Options<TData extends DataShape, ThrowOnError extends boolean = true
 /**
  * Client-level configuration shared by every call an instance makes, overridden by the per-call `RequestConfig`.
  */
-export type ClientConfig<TRequest = unknown, TResponse = unknown> = {
+export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = {
   baseURL?: string
   headers?: HeadersInit
   credentials?: RequestCredentials
@@ -257,7 +258,7 @@ export type ResolvedRequest = {
 /**
  * What a transport returns: the parsed body plus the native request and response objects.
  */
-export type TransportResult<TData = unknown, TRequest = unknown, TResponse = unknown> = {
+export type TransportResult<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = {
   data: TData
   status: number
   statusText: string
@@ -270,9 +271,11 @@ export type TransportResult<TData = unknown, TRequest = unknown, TResponse = unk
 /**
  * The per-plugin send, supplied to `createClientCore` as `defaultTransport`.
  */
-export type Transport<TRequest = unknown, TResponse = unknown> = (request: ResolvedRequest) => Promise<TransportResult<unknown, TRequest, TResponse>>
+export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = (
+  request: ResolvedRequest,
+) => Promise<TransportResult<unknown, TRequest, TResponse>>
 
-export type CallResult<TRequest = unknown, TResponse = unknown> = {
+export type CallResult<TRequest = NativeRequest, TResponse = NativeResponse> = {
   status: number
   data: unknown
   error: unknown
@@ -293,7 +296,7 @@ export type InterceptorStack<T, TContext = never> = {
   run: (value: T, context?: TContext) => Promise<T>
 }
 
-export type Interceptors<TRequest = unknown, TResponse = unknown> = {
+export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = {
   request: InterceptorStack<ResolvedRequest, RequestConfig<unknown, TRequest, TResponse>>
   response: InterceptorStack<TransportResult<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
   error: InterceptorStack<ResponseError<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
@@ -305,7 +308,7 @@ export type UrlConfig = Pick<RequestConfig, 'baseURL' | 'url' | 'path' | 'query'
  * A client instance: the callable send plus configuration, interceptors, and an isolated
  * `createClient` factory bound to the same transport.
  */
-export type ClientInstance<TRequest = unknown, TResponse = unknown> = {
+export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = {
   <TBody = unknown>(config: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>>
   getConfig: () => ClientConfig<TRequest, TResponse>
   setConfig: (config: ClientConfig<TRequest, TResponse>) => ClientConfig<TRequest, TResponse>
@@ -317,7 +320,7 @@ export type ClientInstance<TRequest = unknown, TResponse = unknown> = {
 /**
  * Thrown for a non-2xx response, so a resolved call always means success.
  */
-export class ResponseError<TError = unknown, TRequest = unknown, TResponse = unknown> extends Error {
+export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> extends Error {
   data: TError
   status: number
   statusText: string
@@ -608,7 +611,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 /**
  * Creates an isolated client using the supplied default transport.
  */
-export function createClientCore<TRequest = unknown, TResponse = unknown>(
+export function createClientCore<TRequest = NativeRequest, TResponse = NativeResponse>(
   options: { defaultTransport: Transport<TRequest, TResponse> } & ClientConfig<TRequest, TResponse>,
 ): ClientInstance<TRequest, TResponse> {
   const { defaultTransport, ...initialConfig } = options

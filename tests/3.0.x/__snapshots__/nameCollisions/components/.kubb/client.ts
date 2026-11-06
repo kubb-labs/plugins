@@ -1,5 +1,5 @@
 import * as core from './core'
-import type { ResponseType } from './core'
+import type { ResponseType, Transport, TransportResult } from './core'
 import { createClientCore, getResponseContentType } from './core'
 import { isJsonMediaType } from './serializers'
 export * from './core'
@@ -13,18 +13,6 @@ export type NativeResponse = Response
  */
 export type FetchOptions = RequestInit & { next?: Record<string, unknown> }
 
-export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestResult<
-  TResponses,
-  ThrowOnError,
-  TRequest,
-  TResponse
->
-export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.UnwrappedResult<
-  TResponses,
-  ThrowOnError,
-  TRequest,
-  TResponse
->
 export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestConfig<TBody, TRequest, TResponse> & {
   options?: FetchOptions
 }
@@ -36,12 +24,6 @@ export type Options<TData extends core.DataShape, ThrowOnError extends boolean =
 > & { options?: FetchOptions }
 export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientConfig<TRequest, TResponse> & { options?: FetchOptions }
 export type ResolvedRequest = core.ResolvedRequest & { options?: FetchOptions }
-export type TransportResult<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.TransportResult<TData, TRequest, TResponse>
-export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
-export type CallResult<TRequest = NativeRequest, TResponse = NativeResponse> = core.CallResult<TRequest, TResponse>
-export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
-export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
-export type ResponseErrorConfig<TError = unknown> = core.ResponseError<TError, NativeRequest, NativeResponse>
 export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>
 /** The core's `ResponseError` class, typed with this transport's request and response. `instanceof` and `ResponseError.is` both match what the client throws. */
 export const ResponseError = core.ResponseError as {
