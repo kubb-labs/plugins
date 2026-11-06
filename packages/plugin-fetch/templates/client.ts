@@ -199,7 +199,6 @@ export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse =
   method?: HttpMethod
   path?: unknown
   query?: unknown
-  params?: unknown
   cookies?: unknown
   body?: TBody
   headers?: unknown
@@ -311,7 +310,7 @@ export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> =
   error: InterceptorStack<ResponseError<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
 }
 
-export type UrlConfig = Pick<RequestConfig, 'baseURL' | 'url' | 'path' | 'query' | 'params' | 'serializer' | 'styles'>
+export type UrlConfig = Pick<RequestConfig, 'baseURL' | 'url' | 'path' | 'query' | 'serializer' | 'styles'>
 
 /**
  * A client instance: the callable send plus configuration, interceptors, and an isolated
@@ -496,6 +495,11 @@ export async function resolveAuth(params: {
   }
 }
 
+/** A body a transport left as a stream: a web `ReadableStream` or an async iterable such as a Node readable. */
+function isStreamed(data: unknown): data is ReadableStream<Uint8Array> | AsyncIterable<Uint8Array | string> {
+  return data instanceof ReadableStream || (!!data && typeof data === 'object' && Symbol.asyncIterator in data)
+}
+
 function getResponseContentType(headers: Headers | Record<string, string> | undefined): string | undefined {
   if (!headers) return undefined
   const value = headers instanceof Headers ? headers.get('Content-Type') : (headers['Content-Type'] ?? headers['content-type'])
@@ -526,7 +530,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   // Params are encoded before anything reads them: headers before styling, query before auth adds its values.
   const paramValues = {
     path: { ...(requestConfig.path as Record<string, unknown> | undefined) },
-    query: { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) },
+    query: { ...(requestConfig.query as Record<string, unknown> | undefined) },
     headers: collectHeadersCaseInsensitive(config.headers, requestConfig.headers),
   }
   const [validatedPath, validatedQuery, validatedHeaders] = await Promise.all(
@@ -642,7 +646,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const codec = contentType ? codecs[contentType] : undefined
     const decoded = contentType && codec?.deserialize ? await codec.deserialize(result.data, contentType) : result.data
     // A streamed success body is validated event by event in `toEventStream`, not as a whole. A JSON answer to a streamed call is a whole body.
-    const streaming = isSuccess && resolvedRequest.responseType === 'stream' && decoded instanceof ReadableStream
+    const streaming = isSuccess && resolvedRequest.responseType === 'stream' && isStreamed(decoded)
     const data = await runValidator({
       validator: isValidationEnabled(validate, direction) && !streaming ? validator?.[direction] : undefined,
       value: decoded,
@@ -680,7 +684,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
   }
   client.getUrl = (requestConfig) => {
     const { querySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
-    const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
+    const query: Record<string, unknown> = { ...(requestConfig.query as Record<string, unknown> | undefined) }
     return serializeUrl({
       parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
       pathParams: (requestConfig.path ?? {}) as Record<string, unknown>,
