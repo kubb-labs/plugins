@@ -308,6 +308,27 @@ describe('getOperationParameters', () => {
     expect(getOperationParameters(querystring('application/json')).query.map((param) => param.name)).toStrictEqual(['filter'])
   })
 
+  test('keeps the first of a query parameter and a querystring property with the same name', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'findPets',
+      method: 'GET',
+      path: '/pets',
+      parameters: [
+        ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({
+          name: 'filter',
+          in: 'querystring',
+          schema: ast.factory.createSchema({
+            type: 'object',
+            properties: [ast.factory.createProperty({ name: 'status', schema: ast.factory.createSchema({ type: 'number' }) })],
+          }),
+        }),
+      ],
+    })
+
+    expect(getOperationParameters(node).query.map((param) => [param.name, param.in])).toStrictEqual([['status', 'query']])
+  })
+
   test('caches the grouped result per node so repeat calls for the same operation skip re-grouping', () => {
     const node = ast.factory.createOperation({
       operationId: 'showPet',
