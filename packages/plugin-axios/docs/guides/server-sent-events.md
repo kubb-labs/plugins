@@ -33,7 +33,7 @@ For one payload on every event, such as a feed of pet changes. The item declares
 
 ### Describe it
 
-In OpenAPI 3.2, put one `oneOf` member per event name on `itemSchema`, with a `const` on `event`. Reference the schema of a JSON payload from `data`, as any other property does. Kubb does not read `contentMediaType` and `contentSchema`, so a `data` described that way stays a string:
+In OpenAPI 3.2, put one `oneOf` member per event name on `itemSchema`, with a `const` on `event`. Point `data` at the payload schema with `$ref`, as for any other property. Kubb does not read `contentMediaType` and `contentSchema`, so a `data` described that way stays a string:
 
 ```yaml
 /chat:

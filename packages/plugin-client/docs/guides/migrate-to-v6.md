@@ -4,7 +4,7 @@
 
 ## Stream exports of your client
 
-Your module also exports `ServerSentEvent`, and `toEventStream` and `EventStreamResult` take the full event type instead of the payload:
+Export `ServerSentEvent` next to `TypedEvent`, and make `toEventStream` and `EventStreamResult` take the full event type instead of the payload:
 
 ```typescript
 export type ServerSentEvent<TData = unknown> = { data: TData; event: string; id?: string; retry?: number }

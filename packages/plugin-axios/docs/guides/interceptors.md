@@ -21,8 +21,8 @@ The handler receives a `ResolvedRequest` (`url`, `method`, `headers`, `body`, `s
 ## Run after the send
 
 Response handlers run before calls resolve, and before the status split and codec deserialization.
-`data` is the body as the transport read it, so it may already be parsed: a JSON body is, unless the
-call sets `responseType: 'text'`. The handler receives a `TransportResult` (`data`, `status`, `statusText`,
+`data` is the body as the transport read it: a JSON body is already parsed, unless the call sets
+`responseType: 'text'`. The handler receives a `TransportResult` (`data`, `status`, `statusText`,
 `headers`, `contentType`, `request`, `response`):
 
 ```typescript
@@ -46,7 +46,7 @@ client.interceptors.error.use((error) => {
 
 This channel only fires on the throw path. When you read with `throwOnError: false`, a documented
 non-2xx response resolves and no error interceptor runs, so inspect the returned `error` on the
-result instead. A transport failure (no response) still throws. The error handler does not run,
+result instead. A transport failure (no response) still throws, but the error handler does not run,
 because there is no result to pass it. To react to a network error, add an error callback on
 `axiosInstance.interceptors.response`, as in [Native axios interceptors](#native-axios-interceptors).
 

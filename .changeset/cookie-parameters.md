@@ -11,4 +11,8 @@
 '@kubb/plugin-mcp': patch
 ---
 
-Add cookie parameters to the generated operation types. An operation with an `in: cookie` parameter now gets a `<Name>Cookies` type and a `cookies` member on its `<Name>Options`, so a generated call, SDK method, or query hook accepts `cookies`, which the client already serializes into the `Cookie` header. `@kubb/plugin-zod` and `@kubb/plugin-faker` emit the matching `cookies` group. Operations without cookie parameters are unchanged.
+Add cookie parameters to the generated operation types. An operation with an `in: cookie` parameter gets a `<Name>Cookies` type and a `cookies` member on its options, so a generated call, SDK method, or query hook accepts them. The Zod schema and faker get the matching group. Operations without cookie parameters are unchanged.
+
+```ts
+await getSession({ cookies: { session_id: 'abc' } })
+```
