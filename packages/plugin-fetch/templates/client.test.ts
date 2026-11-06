@@ -86,6 +86,13 @@ describe('defaultQuerySerializer', () => {
     expect(new URLSearchParams(query).get('filter')).toBe(JSON.stringify(filter))
   })
 
+  test('sends a JSON querystring parameter as the whole query string, without its name', () => {
+    const filter = { status: 'sold' }
+    expect(defaultQuerySerializer({ filter }, { filter: { contentType: 'application/json', querystring: true } })).toBe(
+      encodeURIComponent(JSON.stringify(filter)),
+    )
+  })
+
   test('fully encodes a JSON value even when allowReserved is set', () => {
     expect(defaultQuerySerializer({ f: { q: 'a&b#c' } }, { f: { contentType: 'application/json', allowReserved: true } })).toBe(
       `f=${encodeURIComponent('{"q":"a&b#c"}')}`,

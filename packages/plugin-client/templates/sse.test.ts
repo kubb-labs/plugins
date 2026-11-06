@@ -222,13 +222,22 @@ describe('toEventStream', () => {
     await expect(collect(result.stream)).rejects.toThrow(RangeError)
   })
 
+  test('yields nothing for a missing body', async () => {
+    expect(await collect((await toEventStream(Promise.resolve(call({ data: undefined })))).stream)).toStrictEqual([])
+  })
+
   test.each([
-    ['a missing body', call({ data: undefined })],
-    ['a JSON body on a streamed operation', call({ data: { error: 'busy' }, contentType: 'application/json' })],
-    ['a stream that is not an event stream', call({ data: streamOf(['data: a\n\n']), contentType: 'text/plain' })],
+    ['a stream labeled text/plain', call({ data: streamOf(['data: a\n\n']), contentType: 'text/plain' })],
     ['a stream without a content type', { data: streamOf(['data: a\n\n']), response: new Response() }],
-  ])('yields nothing for %s', async (_, first) => {
-    expect(await collect((await toEventStream(Promise.resolve(first))).stream)).toStrictEqual([])
+  ])('parses %s as an event stream', async (_, first) => {
+    expect(await collect((await toEventStream(Promise.resolve(first))).stream)).toStrictEqual([message({ data: 'a' })])
+  })
+
+  test('throws a TypeError with the body as cause for a successful answer that is not a stream', async () => {
+    const result = toEventStream(Promise.resolve({ data: { message: 'queued' }, status: 200, contentType: 'application/json', response: new Response() }))
+
+    await expect(result).rejects.toThrow(TypeError)
+    await expect(result).rejects.toMatchObject({ cause: { message: 'queued' } })
   })
 
   test('accepts a content type with parameters', async () => {
@@ -326,14 +335,6 @@ describe('toEventStream', () => {
   test.each([false, { response: false }])('validate %o skips the validator', async (validate) => {
     const { stream } = await toEventStream(Promise.resolve(call({ data: streamOf(['data: "bad"\n\n']) })), { config: { validate }, validator })
     expect(await collect(stream)).toStrictEqual([message({ data: 'bad' })])
-  })
-
-  test('cancels a stream body that is not an event stream', async () => {
-    const cancel = vi.fn()
-    const body = new ReadableStream<Uint8Array>({ start: (controller) => controller.enqueue(encoder.encode('{"ok":true}')), cancel })
-
-    expect(await collect((await toEventStream(Promise.resolve(call({ data: body, contentType: 'application/json' })))).stream)).toStrictEqual([])
-    expect(cancel).toHaveBeenCalledOnce()
   })
 
   test('cancels the reader when the consumer breaks', async () => {

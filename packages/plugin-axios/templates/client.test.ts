@@ -80,19 +80,38 @@ describe('createAxiosTransport', () => {
     expect(transform('kept')).toBe('kept')
   })
 
-  test('passes the signal and the response type, and streams through the fetch adapter unless one is set', async () => {
+  test('passes the signal and the response type, and streams through the fetch adapter in the browser unless one is set', async () => {
     const { calls, transport } = fakeAxios()
     const client = createClientCore({ defaultTransport: transport })
     const controller = new AbortController()
+    vi.stubGlobal('XMLHttpRequest', class {})
 
     await client({ method: 'GET', url: '/events', responseType: 'stream', signal: controller.signal })
     await client({ method: 'GET', url: '/events', responseType: 'stream', options: { adapter: 'xhr' } })
     await client({ method: 'GET', url: '/pet', responseType: 'blob' })
+    vi.unstubAllGlobals()
 
     expect(calls[0]).toMatchObject({ responseType: 'stream', adapter: 'fetch', signal: controller.signal })
     expect(calls[1]?.adapter).toBe('xhr')
     expect(calls[2]).toMatchObject({ responseType: 'blob' })
     expect(calls[2]?.adapter).toBeUndefined()
+  })
+
+  test('keeps the instance adapter for a stream, and the Node adapter outside the browser', async () => {
+    const seen: Array<unknown> = []
+    const adapter = async (config: InternalAxiosRequestConfig) =>
+      (seen.push(config.adapter), { data: {}, status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse
+    const custom = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter })) })
+    const { calls, transport } = fakeAxios()
+    const node = createClientCore({ defaultTransport: transport })
+    vi.stubGlobal('XMLHttpRequest', class {})
+
+    await custom({ method: 'GET', url: '/events', responseType: 'stream' })
+    vi.unstubAllGlobals()
+    await node({ method: 'GET', url: '/events', responseType: 'stream' })
+
+    expect(seen).toStrictEqual([adapter])
+    expect(calls[0]?.adapter).toBeUndefined()
   })
 
   test('rethrows a network error from axios', async () => {
