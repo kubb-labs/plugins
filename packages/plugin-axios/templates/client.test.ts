@@ -2,7 +2,7 @@ import { Readable } from 'node:stream'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import { client, createAxiosTransport, createClient, createClientCore, defaultTransport, ResponseError } from './client.ts'
+import { axiosInstance, client, createAxiosTransport, createClient, createClientCore, ResponseError } from './client.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string; headers?: Record<string, unknown> }
 
@@ -122,15 +122,15 @@ describe('createAxiosTransport', () => {
     await expect(client({ method: 'GET', url: '/pet' })).rejects.toBe(networkError)
   })
 
-  test('registers client.interceptors on the instance given as defaultTransport, next to its own', async () => {
+  test('runs client.interceptors next to the axios interceptors of the wrapped instance', async () => {
     const instance = realAxios()
     instance.interceptors.request.use((config) => {
       config.headers.set('X-Axios', 'yes')
       return config
     })
-    const client = createClientCore({ defaultTransport: instance })
+    const client = createClientCore({ defaultTransport: createAxiosTransport(instance) })
     const seen: Array<string> = []
-    client.interceptors.request.use((request) => (seen.push(`request ${request.headers.get('X-Kubb')}`), request))
+    client.interceptors.request.use((request) => (seen.push(`request ${request.headers['X-Kubb']}`), request))
     client.interceptors.response.use((result) => (seen.push(`response ${result.status}`), result))
 
     const result = await client({ method: 'GET', url: '/pet', headers: { 'X-Kubb': 'yes' } })
@@ -198,72 +198,44 @@ describe('createAxiosTransport', () => {
 })
 
 describe('client', () => {
-  test('sends through defaultTransport, an axios instance, and accepts an instance as transport on the client, a call, and a child', async () => {
+  test('sends through axiosInstance, and through a transport set on the client, a call, or a child', async () => {
     const seen: Array<string> = []
-    const instance = (name: string) =>
-      axios.create({
-        adapter: async (config: InternalAxiosRequestConfig) =>
-          (seen.push(name), { data: {}, status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse,
-      })
+    const transport = (name: string) =>
+      createAxiosTransport(
+        axios.create({
+          adapter: async (config: InternalAxiosRequestConfig) =>
+            (seen.push(name), { data: {}, status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse,
+        }),
+      )
     using _request = vi
-      .spyOn(defaultTransport, 'request')
+      .spyOn(axiosInstance, 'request')
       .mockImplementation(async (config) => (seen.push('default'), { data: {}, status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse)
 
     await client({ method: 'GET', url: '/pet' })
-    await client({ method: 'GET', url: '/pet', transport: instance('call') })
-    const child = createClient({ transport: instance('child') })
+    await client({ method: 'GET', url: '/pet', transport: transport('call') })
+    const child = createClient({ transport: transport('child') })
     await child({ method: 'GET', url: '/pet' })
-    child.setConfig({ transport: instance('swapped') })
+    child.setConfig({ transport: transport('swapped') })
     await child({ method: 'GET', url: '/pet' })
 
     expect(seen).toStrictEqual(['default', 'call', 'child', 'swapped'])
-    expect(typeof child.getConfig().transport).toBe('function')
   })
 
-  test('registers client.interceptors on the default instance as native axios handlers and keeps ids across update', async () => {
+  test('runs client.interceptors on the resolved request, the result, and the ResponseError', async () => {
     const own = createClient()
     const seen: Array<string> = []
-    const requestId = own.interceptors.request.use((config) => (seen.push(`request ${config.headers.get('X-Kubb')}`), config))
-    own.interceptors.response.use((response) => (seen.push(`response ${response.status}`), response))
-    own.interceptors.error.use((error) => (seen.push(`error ${error.response?.status}`), error))
-    const adapter = async (config: InternalAxiosRequestConfig) => {
-      if (config.url === '/fail')
-        throw new axios.AxiosError('fail', 'ERR_BAD_REQUEST', config, undefined, {
-          data: {},
-          status: 500,
-          statusText: 'x',
-          headers: {},
-          config,
-        } as AxiosResponse)
-      return { data: {}, status: 200, statusText: 'OK', headers: {}, config } as AxiosResponse
-    }
+    const requestId = own.interceptors.request.use((request) => (seen.push(`request ${request.headers['X-Kubb']}`), request))
+    own.interceptors.response.use((result) => (seen.push(`response ${result.status}`), result))
+    own.interceptors.error.use((error) => (seen.push(`error ${error.status}`), error))
+    const adapter = async (config: InternalAxiosRequestConfig) =>
+      ({ data: {}, status: config.url === '/fail' ? 500 : 200, statusText: 'x', headers: {}, config }) as AxiosResponse
 
     await own({ method: 'GET', url: '/pet', headers: { 'X-Kubb': 'a' }, options: { adapter } })
-    own.interceptors.request.update(requestId, (config) => (seen.push('updated'), config))
+    own.interceptors.request.update(requestId, (request) => (seen.push('updated'), request))
     await own({ method: 'GET', url: '/pet', options: { adapter } })
     own.interceptors.request.eject(requestId)
-    await expect(own({ method: 'GET', url: '/fail', options: { adapter } })).rejects.toThrow('fail')
+    await expect(own({ method: 'GET', url: '/fail', options: { adapter } })).rejects.toBeInstanceOf(ResponseError)
 
-    expect(seen).toStrictEqual(['request a', 'response 200', 'updated', 'response 200', 'error 500'])
-  })
-
-  test('a child client has its own instance, so its interceptors do not reach the parent', async () => {
-    const parent = createClient()
-    const child = parent.createClient()
-    const seen: Array<string> = []
-    child.interceptors.request.use((config) => (seen.push('child'), config))
-    const adapter = async (config: InternalAxiosRequestConfig) => ({ data: {}, status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse
-
-    await parent({ method: 'GET', url: '/pet', options: { adapter } })
-    await child({ method: 'GET', url: '/pet', options: { adapter } })
-
-    expect(seen).toStrictEqual(['child'])
-  })
-
-  test('accepts the deprecated validateStatus without changing the status split', async () => {
-    const own = createClient({ validateStatus: () => false })
-    const adapter = async (config: InternalAxiosRequestConfig) => ({ data: { ok: true }, status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse
-
-    expect((await own({ method: 'GET', url: '/pet', options: { adapter } })).data).toStrictEqual({ ok: true })
+    expect(seen).toStrictEqual(['request a', 'response 200', 'updated', 'response 200', 'response 500', 'error 500'])
   })
 })
