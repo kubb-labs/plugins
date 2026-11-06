@@ -25,10 +25,17 @@ data: {"text": "Hel"}
 
 Kubb reads each item in one of two shapes, and the generated types follow.
 
-| Shape   | The item schema                                                                              | What the stream yields                                                                  |
-| ------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `event` | Declares `event` or `data`, itself or in a `oneOf` member, so it describes the parsed event. | `TypedEvent<Item>`: the item as written, plus the `id` and `retry` any event may carry. |
-| `data`  | Declares neither, so it describes only the payload.                                          | `ServerSentEvent<Item>`: `data` typed as the item, next to `event`, `id`, and `retry`.  |
+::field-group
+
+:::field{name="event"}
+The item declares `event` or `data`, itself or in a `oneOf` member, so it describes the parsed event. The stream yields `TypedEvent<Item>`: the item as written, plus the `id` and `retry` any event may carry.
+:::
+
+:::field{name="data"}
+The item declares neither, so it describes only the payload. The stream yields `ServerSentEvent<Item>`: `data` typed as the item, next to `event`, `id`, and `retry`.
+:::
+
+::
 
 Both shapes come from the same wire format. With an `event` shape, this stream:
 
