@@ -33,9 +33,10 @@ export type ParamContentType = {
 }
 
 /**
- * The per-parameter query serialization metadata carried by the generated request.
+ * The per-parameter query serialization metadata carried by the generated request. `querystring` marks an OpenAPI 3.2
+ * `in: querystring` parameter, whose JSON value is the whole query string, sent without its name.
  */
-export type QueryParamStyle = SerializationStyle<QueryStyle> & ParamContentType
+export type QueryParamStyle = SerializationStyle<QueryStyle> & ParamContentType & { querystring?: boolean }
 
 /**
  * Serializes the query object into a search string. The optional second argument carries the
@@ -404,7 +405,8 @@ export const defaultQuerySerializer: QuerySerializer = (params, options) => {
   for (const [key, value] of Object.entries(params)) {
     const paramOptions = options?.[key]
     if (notNullish(value) && isJsonMediaType(paramOptions?.contentType)) {
-      parts.push(`${encodeComponent(key)}=${encodeComponent(JSON.stringify(value, jsonReplacer))}`)
+      const json = encodeComponent(JSON.stringify(value, jsonReplacer))
+      parts.push(paramOptions?.querystring ? json : `${encodeComponent(key)}=${json}`)
       continue
     }
     parts.push(...(paramOptions ? serializeStyledQueryParam({ key, value, options: paramOptions }) : serializeDefaultQueryParam(key, value)))

@@ -393,7 +393,7 @@ const operationParameterGroupsByNode = new WeakMap<ast.OperationNode, OperationP
 /**
  * An OpenAPI 3.2 `querystring` parameter is the whole query string, so a form-encoded object becomes one query parameter
  * per property, typed and serialized like any other.
- * shortcut: another content type, such as JSON, stays one parameter named after it; spread it when such a document turns up.
+ * Another content type, such as JSON, stays one parameter named after it, and the runtime sends its value as the whole query string.
  */
 function spreadQuerystring(param: ast.ParameterNode): Array<ast.ParameterNode> {
   const schema = param.schema.type === 'ref' ? param.schema.schema : param.schema

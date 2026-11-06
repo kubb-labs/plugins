@@ -34,7 +34,7 @@ A stream whose document names each event already used `TypedEvent<…>`, which s
 
 ## Stream answers that are not a stream
 
-A successful stream call whose answer is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. It used to end as an empty stream. An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.
+A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream. An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.
 
 ## Query plugins
 
