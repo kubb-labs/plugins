@@ -274,7 +274,10 @@ jobs:
         uses: IgnaceMaes/comment-ratio@8667d710c02c19dcca42be02f97d5f6824012932 # v1.0.0
         with:
           max-comment-ratio: 0.15
+          # `packages/plugin-client/templates/**` is temporary for #1340: the client templates moved there with their
+          # JSDoc, and git reads the move as new lines because the old paths keep re-export stubs. Remove it once #1340 is merged.
           exclude: |
             examples/**
             **/__snapshots__/**
             **/gen/**
+            packages/plugin-client/templates/**
