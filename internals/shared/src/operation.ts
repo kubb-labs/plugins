@@ -483,7 +483,7 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
       deprecated: node.deprecated,
       properties: [
         ast.factory.createProperty({ name: 'body', required: hasBody, schema: body }),
-        // `cookies` is rare, so it appears only on an operation that declares one, which keeps the other types as they were.
+        // `cookies` is rare, so it appears only on an operation that declares one.
         ...groups
           .filter(({ name, params }) => name !== 'cookies' || params.length > 0)
           .map(({ name, params, resolve }) => {
