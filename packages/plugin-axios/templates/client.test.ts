@@ -47,6 +47,13 @@ describe('createAxiosTransport', () => {
     expect((result.response as AxiosResponse).headers).toMatchObject({ 'x-count': 2 })
   })
 
+  test('reads an empty body as no data, as the fetch transport does', async () => {
+    const { transport } = fakeAxios({ data: '', status: 204, statusText: 'No Content' })
+    const client = createClientCore({ defaultTransport: transport })
+
+    expect(await client({ method: 'DELETE', url: '/pet/1' })).toMatchObject({ status: 204, data: undefined, error: undefined })
+  })
+
   test('resolves every status so the core splits success from error', async () => {
     const { calls, transport } = fakeAxios({ data: { message: 'invalid' }, status: 405 })
     const client = createClientCore({ defaultTransport: transport })

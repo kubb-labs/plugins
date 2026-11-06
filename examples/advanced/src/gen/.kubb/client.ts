@@ -102,7 +102,8 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
     const contentType = getResponseContentType(headers)
 
     return {
-      data: await readStreamedBody({ data: response.data, contentType, status: response.status }),
+      // axios reads an empty body, such as a 204, as '': the fetch transport reads it as no data.
+      data: response.data === '' ? undefined : await readStreamedBody({ data: response.data, contentType, status: response.status }),
       status: response.status,
       statusText: response.statusText,
       headers,

@@ -865,6 +865,15 @@ describe('a streamed call answered without an event stream', () => {
     expect((await client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream' })).data).toStrictEqual({ ok: true })
   })
 
+  test('keeps a JSON-labeled body that is not JSON as text, and reads an empty one as no data', async () => {
+    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('Pet deleted', 'application/json'))
+    const client = createClientCore({ defaultTransport })
+
+    expect((await client({ method: 'DELETE', url: 'https://api.test/pet/1' })).data).toBe('Pet deleted')
+    _fetch.mockImplementation(answer('', 'application/json'))
+    expect((await client({ method: 'DELETE', url: 'https://api.test/pet/1' })).data).toBeUndefined()
+  })
+
   test('runs the response validator on a JSON body', async () => {
     using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('{"ok":true}', 'application/json'))
     const client = createClientCore({ defaultTransport })
