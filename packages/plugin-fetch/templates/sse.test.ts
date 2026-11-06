@@ -255,6 +255,12 @@ describe('toEventStream', () => {
     expect(await collect((await toEventStream({ send: Promise.resolve(first) })).stream)).toStrictEqual([])
   })
 
+  test('accepts a content type with parameters', async () => {
+    const first = call({ data: streamOf(['data: a\n\n']), contentType: 'Text/Event-Stream; charset=utf-8' })
+
+    expect(await collect((await toEventStream<string>({ send: Promise.resolve(first) })).stream)).toStrictEqual([message({ data: 'a' })])
+  })
+
   test('reports the Last-Event-ID header of the call until the server sends an id', async () => {
     const result = await toEventStream({ send: Promise.resolve(call({ data: streamOf([]) })), config: { headers: { 'Last-Event-ID': '3' } } })
 

@@ -325,7 +325,8 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
       if (call) {
         const body = call.data
         if (!isStreamBody(body)) return
-        if (call.contentType !== 'text/event-stream') {
+        // A custom transport may pass the raw header, with a charset parameter.
+        if (call.contentType?.split(';')[0]?.trim().toLowerCase() !== 'text/event-stream') {
           if ('cancel' in body) await body.cancel().catch(() => {})
           return
         }
