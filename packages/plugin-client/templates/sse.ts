@@ -33,19 +33,6 @@ export type EventStreamOptions = {
   transform?: (event: ServerSentEvent) => ServerSentEvent
 }
 
-/** What the generated function knows about the stream from the document. */
-export type EventStreamSchema = {
-  /**
-   * `event` when the document types each event with its own `event` and `data`, or `data` when it types only the payload.
-   * @default 'data'
-   */
-  shape?: 'event' | 'data'
-  /**
-   * Validates each event (`shape: 'event'`) or its `data` (`shape: 'data'`), after `transform`.
-   */
-  validator?: StandardSchemaValidator
-}
-
 /**
  * The validation settings a call or its client may set.
  */
@@ -207,7 +194,16 @@ export async function toEventStream<TData = unknown, TResponse = unknown>(
      */
     client?: { getConfig: () => ValidationSettings }
     config?: EventStreamOptions & ValidationSettings
-  } & EventStreamSchema = {},
+    /**
+     * `event` when the document types each event with its own `event` and `data`, or `data` when it types only the payload.
+     * @default 'data'
+     */
+    shape?: 'event' | 'data'
+    /**
+     * Validates each event (`shape: 'event'`) or its `data` (`shape: 'data'`), after `transform`.
+     */
+    validator?: StandardSchemaValidator
+  } = {},
 ): Promise<EventStreamResult<TData, TResponse>> {
   const defaults = client?.getConfig() ?? {}
   const onValidationError = options.onValidationError ?? defaults.onValidationError

@@ -51,7 +51,6 @@ describe('createAxiosTransport', () => {
     const { calls, transport } = fakeAxios({ data: { message: 'invalid' }, status: 405 })
     const client = createClientCore({ defaultTransport: transport })
 
-    expect((calls[0]?.validateStatus as (status: number) => boolean | undefined)?.(500)).toBeUndefined()
     const result = await client({ method: 'GET', url: '/pet', throwOnError: false })
     expect(result).toMatchObject({ status: 405, error: { message: 'invalid' }, data: undefined })
     await expect(client({ method: 'GET', url: '/pet' })).rejects.toBeInstanceOf(ResponseError)

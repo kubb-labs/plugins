@@ -170,7 +170,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
         const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = validatorEnabled
           ? collectImportsByFile(ops, (op) => ({ file: op.zodFile, names: op.validatorHooks?.importedZodNames ?? [] }))
           : { namesByPath: new Map<string, Set<string>>(), filesByPath: new Map<string, ast.FileNode>() }
-        const shapes = new Set(ops.map((op) => getEventStream(op.node)?.shape).filter(Boolean))
+        const shapes = new Set(ops.map((op) => getEventStream(op.node)).filter(Boolean))
         const hasEventStream = shapes.size > 0
         const hasResult = ops.some((op) => !isEventStream(op.node))
 

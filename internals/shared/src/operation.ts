@@ -177,20 +177,13 @@ export function isEventStream(node: ast.OperationNode): boolean {
   return getEventStreamContent(node) !== undefined
 }
 
-export type EventStreamInfo = {
-  /**
-   * `event` when each item is the parsed event with its own `event` and `data`, `data` when it is only the payload.
-   */
-  shape: 'event' | 'data'
-}
-
 /**
- * How the document types a `text/event-stream` response, as the adapter read it from `itemSchema`. Returns `null` without
- * an event stream.
+ * How the document types a `text/event-stream` response, as the adapter read it from `itemSchema`: `event` when each item is
+ * the parsed event with its own `event` and `data`, `data` when it is only the payload. Returns `null` without an event stream.
  */
-export function getEventStream(node: ast.OperationNode): EventStreamInfo | null {
+export function getEventStream(node: ast.OperationNode): 'event' | 'data' | null {
   const content = getEventStreamContent(node)
-  return content ? { shape: content.stream?.shape ?? 'data' } : null
+  return content ? (content.stream?.shape ?? 'data') : null
 }
 
 /**

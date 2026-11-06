@@ -456,8 +456,8 @@ describe('getResponseType / isEventStream', () => {
       ],
     })
 
-    expect(getEventStream(textItem)).toStrictEqual({ shape: 'data' })
-    expect(getEventStream(typedEvents)).toStrictEqual({ shape: 'event' })
+    expect(getEventStream(textItem)).toBe('data')
+    expect(getEventStream(typedEvents)).toBe('event')
   })
 
   test('leaves JSON responses to the runtime auto-detection', () => {

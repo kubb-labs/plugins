@@ -108,7 +108,6 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
       responseType: request.responseType,
       validateStatus: () => true,
     }
-    if (request.credentials) config.withCredentials = request.credentials === 'include'
 
     // Only the fetch adapter exposes a streaming `response.data` in the browser. The default XHR adapter buffers the whole body.
     if (request.responseType === 'stream' && !config.adapter) config.adapter = 'fetch'

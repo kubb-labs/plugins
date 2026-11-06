@@ -76,13 +76,13 @@ export function buildEventStreamReturn({
   returnType: string
   statement: string
 } {
-  const stream = getEventStream(node)
+  const shape = getEventStream(node) ?? 'data'
   const success = `SuccessOf<${types.response.responses(node)}>`
-  const eventType = stream?.shape === 'event' ? `TypedEvent<${success}>` : success
+  const eventType = shape === 'event' ? `TypedEvent<${success}>` : success
   const promise = `Promise<EventStreamResult<${eventType}>>`
   if (returnType === 'plain') return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
 
-  const meta = [`shape: '${stream?.shape ?? 'data'}'`, validatorHooks?.response ? `validator: ${validatorHooks.response}` : null].filter(Boolean).join(', ')
+  const meta = [`shape: '${shape}'`, validatorHooks?.response ? `validator: ${validatorHooks.response}` : null].filter(Boolean).join(', ')
   return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}), { client: request, config, ${meta} })` }
 }
 
