@@ -187,7 +187,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
                 'ClientConfig',
                 'ClientInstance',
                 'Options',
-                ...(returnType === 'data' ? (hasResult ? ['UnwrappedResult'] : []) : ['Unwrappable', ...(hasResult ? ['RequestResult'] : [])]),
+                ...(returnType === 'data' ? [] : ['Unwrappable']),
+                ...(hasResult ? [returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'] : []),
                 ...(hasEventStream ? ['SuccessOf'] : []),
               ]}
               root={file.path}

@@ -52,13 +52,13 @@ export type EventStreamCall<TResponse> = { data: unknown; error?: unknown; statu
 type StreamEvent<TData> = TData extends { event: string } ? TData : ServerSentEvent<TData>
 
 /** Parsed events with the fields a `RequestResult` carries. `TData` is the payload, or the typed event. Iterating the result reads `stream`. */
-export type EventStreamResult<TData = unknown, TResponse = NativeResponse, ThrowOnError extends boolean = true> = AsyncIterable<StreamEvent<TData>> & {
+export type EventStreamResult<TData = unknown, TResponse = NativeResponse> = AsyncIterable<StreamEvent<TData>> & {
   stream: AsyncGenerator<StreamEvent<TData>>
   /** The same events as `stream` on a 2xx response, so `.unwrap()` and `returnType: 'data'` return them. */
   data: AsyncGenerator<StreamEvent<TData>> | undefined
   status: number | undefined
   /** The error body of a failed call with `throwOnError: false`, whose `stream` then yields nothing. */
-  error: ThrowOnError extends true ? undefined : unknown
+  error: unknown
   contentType: string | undefined
   request: NativeRequest | undefined
   response: TResponse
@@ -206,7 +206,7 @@ function isStreamBody(data: unknown): data is ReadableStream<Uint8Array> | Async
  * stream, or a body that is not an event stream. A dropped connection ends the loop with the
  * transport's error; `lastEventId` on the result is the ID to resume from.
  */
-export async function toEventStream<TData = unknown, TResponse = NativeResponse, ThrowOnError extends boolean = true>(
+export async function toEventStream<TData = unknown, TResponse = NativeResponse>(
   call: Promise<EventStreamCall<TResponse>>,
   {
     client,
@@ -228,7 +228,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse,
      */
     validator?: StandardSchemaValidator
   } = {},
-): Promise<EventStreamResult<TData, TResponse, ThrowOnError>> {
+): Promise<EventStreamResult<TData, TResponse>> {
   const defaults = client?.getConfig() ?? {}
   const onValidationError = options.onValidationError ?? defaults.onValidationError
   const validator = isValidationEnabled(options.validate ?? defaults.validate, 'response') ? meta.validator : undefined
@@ -261,7 +261,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse,
     stream,
     data: status === undefined || (status >= 200 && status < 300) ? stream : undefined,
     status,
-    error: error as EventStreamResult<TData, TResponse, ThrowOnError>['error'],
+    error,
     contentType,
     request,
     response,

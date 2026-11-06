@@ -239,7 +239,7 @@ describe('toEventStream', () => {
 
   test('keeps the status and error of a failed call made with throwOnError false', async () => {
     const response = new Response(null, { status: 503 })
-    const result = await toEventStream<string, Response, false>(
+    const result = await toEventStream<string>(
       Promise.resolve({ data: undefined, error: { message: 'busy' }, status: 503, contentType: 'application/json', response }),
     )
 
@@ -253,7 +253,7 @@ describe('toEventStream', () => {
   })
 
   test('leaves data undefined for a failed call whose error body is empty', async () => {
-    const result = await toEventStream<string, Response, false>(
+    const result = await toEventStream<string>(
       Promise.resolve({ data: undefined, error: undefined, status: 503, response: new Response(null, { status: 503 }) }),
     )
 
