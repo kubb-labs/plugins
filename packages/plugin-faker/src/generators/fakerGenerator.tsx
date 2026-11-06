@@ -111,12 +111,13 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
-    const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
+    const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = getOperationParameters(node)
     const paramGroups = (
       [
         { params: pathParams, name: resolver.param.path, typeName: tsResolver.param.path },
         { params: queryParams, name: resolver.param.query, typeName: tsResolver.param.query },
         { params: headerParams, name: resolver.param.headers, typeName: tsResolver.param.headers },
+        { params: cookieParams, name: resolver.param.cookies, typeName: tsResolver.param.cookies },
       ] as const
     )
       .filter((group) => group.params.length > 0)

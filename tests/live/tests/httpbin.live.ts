@@ -124,8 +124,7 @@ describe.each(Object.entries(flavors))('httpbin over %s', (_flavor, gen) => {
   })
 
   test('sends cookie parameters as a Cookie header', async () => {
-    // The generated options have no `cookies` field (see findings), so the raw client is used for the runtime check.
-    const { data } = (await client({ method: 'GET', url: '/cookies', cookies: { session: 'abc', theme: 'dark' } })) as { data: { cookies: unknown } }
+    const { data } = await gen.getCookies({ cookies: { session: 'abc', theme: 'dark' } })
     expect(data.cookies).toStrictEqual({ session: 'abc', theme: 'dark' })
   })
 
