@@ -6,9 +6,9 @@
 
 Remove the compatibility layer around the shared client runtime. The fetch and axios clients now share one interceptor API and one client factory, and stream results take the full event type.
 
-Migrate as follows:
+Each plugin has a "Migrate to v6" guide with before-and-after code. In short:
 
-- **Template subpaths.** `@kubb/plugin-fetch/templates/fetch.ts` and `@kubb/plugin-axios/templates/axios.ts` are gone. Import `templates/client.ts` instead.
+- **Template subpaths.** `@kubb/plugin-fetch/templates/fetch.ts` and `@kubb/plugin-axios/templates/axios.ts` are gone. Import `templates/client.ts` instead. Both plugins also stop publishing `templates/core.ts`, `templates/serializers.ts`, and `templates/standardSchema.ts`, which only re-exported `@kubb/plugin-client/templates/*`. Import those from `@kubb/plugin-client`.
 - **axios interceptors.** `client.interceptors` handlers receive the `ResolvedRequest`, `TransportResult`, and `ResponseError`, as on the fetch client. Register native axios handlers on `axiosInstance.interceptors` instead. `client.interceptors.error` now runs for a `ResponseError` only, not for a network error with no response. To log network errors, add an error callback with `axiosInstance.interceptors.response.use(undefined, onError)`.
 - **axios transport.** `transport` takes a transport function. Wrap an axios instance with `createAxiosTransport(instance)`.
 - **axios default instance.** `defaultTransport` is now the transport function, and the instance it sends through is `axiosInstance`. Replace `defaultTransport.defaults` and `defaultTransport.interceptors` with `axiosInstance.defaults` and `axiosInstance.interceptors`. Clients from `createClient()` inherit the `transport` of `client`, and send through `axiosInstance` when neither sets one.
