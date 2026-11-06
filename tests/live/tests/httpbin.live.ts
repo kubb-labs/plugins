@@ -6,7 +6,7 @@ import { toEventStream } from '../gen/httpbin-fetch/.kubb/sse.ts'
 
 const flavors = { fetch: fetchGen, axios: axiosGen as unknown as typeof fetchGen }
 
-describe.each(Object.entries(flavors))('httpbin over %s', (flavor, gen) => {
+describe.each(Object.entries(flavors))('httpbin over %s', (_flavor, gen) => {
   const { client, createClient, ResponseError } = gen
 
   test('serializes query styles and a header parameter', async () => {
