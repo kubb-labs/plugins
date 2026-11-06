@@ -1,5 +1,11 @@
 # @kubb/plugin-ts
 
+## 5.4.1
+
+### Patch Changes
+
+- [#1338](https://github.com/kubb-labs/plugins/pull/1338) [`4253a3f`](https://github.com/kubb-labs/plugins/commit/4253a3f4987b273bcb80a844455b6193bc0618a6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Read an OpenAPI 3.2 `in: querystring` parameter as the operation's whole query string. A form-encoded object spreads into `query`, so its keys are typed and serialized like query parameters. A JSON one stays one value, sent as the whole query string without its name.
+
 ## 5.4.0
 
 ### Minor Changes
