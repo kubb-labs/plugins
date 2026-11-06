@@ -21,7 +21,8 @@ The handler receives a `ResolvedRequest` (`url`, `method`, `headers`, `body`, `s
 ## Run after the send
 
 Response handlers run before calls resolve, and before the status split and codec deserialization.
-`data` is the body as the transport read it, so a JSON body is already parsed. The handler receives a `TransportResult` (`data`, `status`, `statusText`,
+`data` is the body as the transport read it, so it may already be parsed: a JSON body is, unless the
+call sets `responseType: 'text'`. The handler receives a `TransportResult` (`data`, `status`, `statusText`,
 `headers`, `contentType`, `request`, `response`):
 
 ```typescript
