@@ -61,9 +61,9 @@ function quote(value: string): string {
 
 /**
  * Builds the return type and statement of a `text/event-stream` operation. The item type is `TypedEvent<...>` when each item
- * declares its own `event` and `data`, and otherwise the payload type, which `EventStreamResult` wraps in `ServerSentEvent`. The call goes
- * through `toEventStream` with a `send` function for the resume request, the `client` for its defaults, the call's
- * `config`, and the method, shape, declared event names, text events and per-event validator. A `returnType: 'plain'` client receives only the promise,
+ * declares its own `event` and `data`, and otherwise the payload type, which `EventStreamResult` wraps in `ServerSentEvent`. The call's
+ * promise goes through `toEventStream` with the `client` for its defaults, the call's `config`, and the shape, declared event
+ * names, text events and per-event validator. A `returnType: 'plain'` client receives only the promise,
  * `toEventStream(request(config))`, and keeps its response validator in the call config.
  */
 export function buildEventStreamReturn({
@@ -89,7 +89,6 @@ export function buildEventStreamReturn({
   if (returnType === 'plain') return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
 
   const meta = [
-    `method: '${node.method.toUpperCase()}'`,
     `shape: '${stream?.shape ?? 'data'}'`,
     stream?.events ? `events: [${stream.events.map(quote).join(', ')}]` : null,
     stream?.text === true ? 'text: true' : null,
@@ -98,5 +97,5 @@ export function buildEventStreamReturn({
   ]
     .filter(Boolean)
     .join(', ')
-  return { returnType: promise, statement: `return toEventStream<${eventType}>({ send: (init) => request(${callConfig}), client: request, config, ${meta} })` }
+  return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}), { client: request, config, ${meta} })` }
 }

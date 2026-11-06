@@ -12,7 +12,7 @@ import { buildValidatorLiteral, type ValidatorHooks } from './validator.ts'
  *
  * `mergeContentType` is `true` when the caller must destructure `contentType` from `options`, and
  * `eventStream` is `true` when the operation returns `text/event-stream`. Unless `returnType` is `'plain'`, a
- * stream's literal spreads `...init` for the resume request and leaves the `response` validator to `toEventStream`.
+ * stream's literal leaves the `response` validator to `toEventStream`, which runs it per event.
  */
 export function buildCallConfig({
   node,
@@ -31,10 +31,10 @@ export function buildCallConfig({
   const securityLiteral = buildSecurityMetadata({ security })
   const stylesLiteral = buildStyles({ node })
   // Unless `returnType` is `'plain'`, `toEventStream` validates per event, so `response` stays out of the call config.
-  const resumable = eventStream && returnType !== 'plain'
+  const perEvent = eventStream && returnType !== 'plain'
   const validatorLiteral = buildValidatorLiteral(
     validatorHooks,
-    resumable ? ['request', 'path', 'query', 'headers', 'error'] : ['request', 'path', 'query', 'headers', 'response', 'error'],
+    perEvent ? ['request', 'path', 'query', 'headers', 'error'] : ['request', 'path', 'query', 'headers', 'response', 'error'],
   )
   const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node })
   const responseType = getResponseType(node)
@@ -49,7 +49,6 @@ export function buildCallConfig({
     responseType ? `responseType: '${responseType}'` : null,
     '...config',
     `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`,
-    resumable ? '...init' : null,
   ]
     .filter(Boolean)
     .join(', ')} }`
