@@ -164,9 +164,7 @@ function getPrimarySuccessContentType(node: ast.OperationNode): string | undefin
  * declares another type stays a normal call with its query hooks.
  */
 function getEventStreamContent(node: ast.OperationNode): ast.ContentNode | undefined {
-  const content = getPrimarySuccessResponse(node)?.content ?? []
-  const entry = content[0]
-  return content.length === 1 && entry && entry.contentType.split(';')[0]!.trim().toLowerCase() === 'text/event-stream' ? entry : undefined
+  return getPrimarySuccessContentType(node) === 'text/event-stream' ? getPrimarySuccessResponse(node)?.content?.[0] : undefined
 }
 
 /**
@@ -393,6 +391,20 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
 const operationParameterGroupsByNode = new WeakMap<ast.OperationNode, OperationParameterGroups>()
 
 /**
+ * An OpenAPI 3.2 `querystring` parameter is the whole query string, so a form-encoded object becomes one query parameter
+ * per property, typed and serialized like any other.
+ * Another content type, such as JSON, stays one parameter named after it, and the runtime sends its value as the whole query string.
+ */
+function spreadQuerystring(param: ast.ParameterNode): Array<ast.ParameterNode> {
+  const schema = param.schema.type === 'ref' ? param.schema.schema : param.schema
+  const formEncoded = !param.contentType || param.contentType.split(';')[0]!.trim().toLowerCase() === 'application/x-www-form-urlencoded'
+  if (schema?.type !== 'object' || !formEncoded) return [param]
+  return schema.properties.map((property) =>
+    ast.factory.createParameter({ name: property.name, in: 'query', schema: property.schema, required: param.required && property.required }),
+  )
+}
+
+/**
  * Groups an operation's parameters by location (`path`/`query`/`header`/`cookie`), deduping each
  * group by name. Every plugin generator visiting the same `OperationNode` shares one AST instance
  * (see `KubbDriver`), so the result is cached per node to avoid re-filtering and re-deduping the
@@ -415,10 +427,9 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
     })
   }
 
-  // An OpenAPI 3.2 `querystring` parameter is the whole query string as one object, so it joins the query group and the query serializer spreads its keys.
   const groups: OperationParameterGroups = {
     path: group('path'),
-    query: [...group('query'), ...group('querystring')],
+    query: [...group('query'), ...group('querystring').flatMap(spreadQuerystring)],
     header: group('header'),
     cookie: group('cookie'),
   }

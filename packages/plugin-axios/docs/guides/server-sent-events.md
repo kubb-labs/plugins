@@ -1,6 +1,6 @@
 # Server-sent events
 
-An operation that returns `text/event-stream` gives you a typed stream of events instead of a `RequestResult`. Stream calls use the axios fetch adapter, because the default XHR adapter buffers the whole body. Set `adapter` to use another one. Kubb takes the event types from the OpenAPI document. The runtime in `.kubb/sse.ts` parses the stream the way the WHATWG event stream specification does.
+An operation that returns `text/event-stream` gives you a typed stream of events instead of a `RequestResult`. In the browser, stream calls use the axios fetch adapter, because the default XHR adapter buffers the whole body. An `adapter` set on the call or on `axiosInstance` is kept, and in Node the http adapter streams with its proxy and agent settings. Kubb takes the event types from the OpenAPI document. The runtime in `.kubb/sse.ts` parses the stream the way the WHATWG event stream specification does.
 
 Each event on the wire has up to four fields, and a blank line ends it:
 
