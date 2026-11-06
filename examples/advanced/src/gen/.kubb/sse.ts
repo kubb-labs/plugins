@@ -51,16 +51,11 @@ export type EventStreamCall<TResponse> = { data: unknown; error?: unknown; statu
 /** The payload wrapped in `ServerSentEvent`, or the item itself when the document types it as a whole event. */
 type StreamEvent<TData> = TData extends { event: string } ? TData : ServerSentEvent<TData>
 
-/**
- * Parsed events with the call's status, error, and native request and response, the fields a `RequestResult` carries. `TData` is
- * the payload, or the typed event. Iterating the result reads `stream`.
- */
+/** Parsed events with the fields a `RequestResult` carries. `TData` is the payload, or the typed event. Iterating the result reads `stream`. */
 export type EventStreamResult<TData = unknown, TResponse = NativeResponse, ThrowOnError extends boolean = true> = AsyncIterable<StreamEvent<TData>> & {
   stream: AsyncGenerator<StreamEvent<TData>>
   status: number | undefined
-  /**
-   * The error body of a failed call with `throwOnError: false`, whose `stream` then yields nothing.
-   */
+  /** The error body of a failed call with `throwOnError: false`, whose `stream` then yields nothing. */
   error: ThrowOnError extends true ? undefined : unknown
   contentType: string | undefined
   request: NativeRequest | undefined
@@ -75,11 +70,7 @@ type StreamParts<TData> = AsyncIterable<StreamEvent<TData>> & { stream: AsyncGen
 
 type WithoutData<TResult> = TResult extends unknown ? Omit<TResult, 'data'> : never
 
-/**
- * A streamed call's result, as `RequestResult` is a regular call's: `status` narrows `error` to the body the document declares
- * for it, and the events take the place of `data`. `TData` is the event payload, or the typed event. It branches on `ThrowOnError`
- * as `RequestResult` does, so a generated call can cast to it while `ThrowOnError` is generic.
- */
+/** A stream call's result, as `RequestResult` is a regular call's: `status` narrows `error`, and the events replace `data`. Branching on `ThrowOnError` lets a generated call cast to it. */
 export type StreamResult<TResponses, ThrowOnError extends boolean = true, TData = SuccessOf<TResponses>> = ThrowOnError extends true
   ? WithoutData<RequestResult<TResponses, true>> & StreamParts<TData>
   : WithoutData<RequestResult<TResponses, false>> & StreamParts<TData>
