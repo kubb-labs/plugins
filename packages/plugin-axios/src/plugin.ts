@@ -7,7 +7,7 @@ import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
-import { axiosClientTemplatePath, axiosSerializersTemplatePath, sseTemplatePath, standardSchemaTemplatePath } from './templates.ts'
+import { axiosClientTemplatePath, coreTemplatePath, serializersTemplatePath, sseTemplatePath, standardSchemaTemplatePath } from './templates.ts'
 import type { PluginAxios, ResolvedOptions, ResolverClient } from './types.ts'
 
 /**
@@ -79,7 +79,7 @@ export const pluginAxios = defineExtension<PluginAxios>({
 
     // `sdk` swaps the per-operation functions for the class-based SDK; left unset, the standalone
     // functions (which query plugins consume) stay.
-    addGenerator(resolved.sdk ? createSdkGenerator<PluginAxios>({ sse: sseTemplatePath }) : clientGenerator)
+    addGenerator(resolved.sdk ? createSdkGenerator<PluginAxios>() : clientGenerator)
 
     const root = path.resolve(config.root, config.output.path)
     const baseURLExpression = baseURL ? (baseURL.includes('${') ? `\`${baseURL.replaceAll('`', '\\`')}\`` : JSON.stringify(baseURL)) : undefined
@@ -87,7 +87,13 @@ export const pluginAxios = defineExtension<PluginAxios>({
     injectFile({
       baseName: 'serializers.ts',
       path: path.resolve(root, '.kubb/serializers.ts'),
-      copy: axiosSerializersTemplatePath,
+      copy: serializersTemplatePath,
+    })
+
+    injectFile({
+      baseName: 'core.ts',
+      path: path.resolve(root, '.kubb/core.ts'),
+      copy: coreTemplatePath,
     })
 
     injectFile({
@@ -101,6 +107,12 @@ export const pluginAxios = defineExtension<PluginAxios>({
       baseName: 'standardSchema.ts',
       path: path.resolve(root, '.kubb/standardSchema.ts'),
       copy: standardSchemaTemplatePath,
+    })
+
+    injectFile({
+      baseName: 'sse.ts',
+      path: path.resolve(root, '.kubb/sse.ts'),
+      copy: sseTemplatePath,
     })
 
     return resolved

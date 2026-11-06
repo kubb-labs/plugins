@@ -1,16 +1,16 @@
+import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
+
+const require = createRequire(import.meta.url)
 
 /** Absolute path to the fetch client template, copied into `.kubb/client.ts`. */
 export const fetchClientTemplatePath = fileURLToPath(new URL('../templates/client.ts', import.meta.url))
 
-/** Absolute path to the Server-Sent Events runtime template, copied into `.kubb/sse.ts`. */
-export const sseTemplatePath = fileURLToPath(new URL('../templates/sse.ts', import.meta.url))
-
-/** Absolute path to the fetch serializers template, copied into `.kubb/serializers.ts`. */
-export const fetchSerializersTemplatePath = fileURLToPath(new URL('../templates/serializers.ts', import.meta.url))
-
 /**
- * Absolute path to the Standard Schema runtime template. Pass it to a file node's `copy` field to
- * emit the helper into the generated `.kubb/standardSchema.ts` verbatim.
+ * Absolute paths to the runtime templates `@kubb/plugin-client` ships for every client plugin, copied into `.kubb/core.ts`,
+ * `.kubb/serializers.ts`, `.kubb/standardSchema.ts`, and `.kubb/sse.ts`.
  */
-export const standardSchemaTemplatePath = fileURLToPath(new URL('../templates/standardSchema.ts', import.meta.url))
+export const coreTemplatePath = require.resolve('@kubb/plugin-client/templates/core.ts')
+export const serializersTemplatePath = require.resolve('@kubb/plugin-client/templates/serializers.ts')
+export const standardSchemaTemplatePath = require.resolve('@kubb/plugin-client/templates/standardSchema.ts')
+export const sseTemplatePath = require.resolve('@kubb/plugin-client/templates/sse.ts')

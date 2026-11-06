@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { getEventStream, isEventStream, operationFileEntry, operationKey, resolveDependencyOperationFile } from '@internals/shared'
+import { getEventStream, operationFileEntry, operationKey, resolveDependencyOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -17,20 +17,13 @@ import type { ContractClientFactory } from '../types.ts'
  * `@kubb/plugin-axios`). Emits one async function per OpenAPI operation using the shared
  * `Operation` component: a grouped `<Name>Request` type and a function that forwards a single
  * `options` object to the bundled `client` and returns the `Unwrappable<RequestResult>`. Only the
- * generator `name` and the runtime templates differ between plugins. Every other resolution, import,
- * and rendering step is identical.
- *
- * `sse` is the Server-Sent Events runtime template, copied into `.kubb/sse.ts` only for a document with a
- * `text/event-stream` operation.
+ * generator `name` differs between plugins. Every other resolution, import, and rendering step is
+ * identical.
  */
-export function createClientGenerator<TFactory extends ContractClientFactory>({ name, sse }: { name: string; sse?: string }): Generator<TFactory> {
+export function createClientGenerator<TFactory extends ContractClientFactory>(name: string): Generator<TFactory> {
   return defineGenerator<TFactory>({
     name,
     renderer: jsxRenderer,
-    operations(nodes, ctx) {
-      if (!sse || !nodes.some(isEventStream)) return null
-      return <File baseName="sse.ts" path={path.resolve(ctx.root, '.kubb/sse.ts')} copy={sse} />
-    },
     operation(node, ctx) {
       if (!ast.isHttpOperationNode(node)) return null
 
@@ -83,17 +76,17 @@ export function createClientGenerator<TFactory extends ContractClientFactory>({ 
       // The headers validator helper ships in `.kubb/standardSchema.ts`; a custom client module exports it
       // alongside its other runtime helpers.
       const standardSchemaPath = importPath ?? path.resolve(root, '.kubb/standardSchema.ts')
-      const ssePath = importPath ?? path.resolve(root, '.kubb/sse.ts')
       const stream = getEventStream(node)
 
       const clientValueImports = (() => {
-        if (stream || returnType === 'plain') return ['client']
+        if (stream) return ['client', 'toEventStream']
+        if (returnType === 'plain') return ['client']
         if (returnType === 'data') return ['client', 'unwrapResult']
         return ['client', 'withUnwrap']
       })()
 
       const clientTypeImports = (() => {
-        if (stream) return ['Options', 'SuccessOf']
+        if (stream) return ['Options', 'SuccessOf', ...buildEventStreamImports({ returnType, typed: stream.shape === 'event' })]
         if (returnType === 'plain') return ['Options', 'RequestResult']
         if (returnType === 'data') return ['Options', 'UnwrappedResult']
         return ['Options', 'Unwrappable', 'RequestResult']
@@ -109,10 +102,6 @@ export function createClientGenerator<TFactory extends ContractClientFactory>({ 
         >
           <File.Import name={clientValueImports} root={clientRoot} path={clientPath} />
           <File.Import name={clientTypeImports} root={clientRoot} path={clientPath} isTypeOnly />
-          {stream && <File.Import name={['toEventStream']} root={clientRoot} path={ssePath} />}
-          {stream && (
-            <File.Import name={buildEventStreamImports({ returnType, typed: stream.shape === 'event' })} root={clientRoot} path={ssePath} isTypeOnly />
-          )}
 
           {meta.fileTypes && importedTypeNames.length > 0 && (
             <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTypes.path} isTypeOnly />

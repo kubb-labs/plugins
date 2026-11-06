@@ -71,7 +71,7 @@ describe('event stream hooks', () => {
 })
 
 describe('event stream runtime', () => {
-  test('is not written for a document without an event stream', async () => {
+  test('is written next to the client for every document', async () => {
     const output = await fs.mkdtemp(path.join(dirname, '.no-event-stream-'))
     try {
       const { diagnostics } = await createKubb(
@@ -89,7 +89,7 @@ describe('event stream runtime', () => {
       ).safeBuild()
       expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
 
-      expect(await fs.readdir(path.join(output, '.kubb'))).toStrictEqual(['client.ts', 'serializers.ts', 'standardSchema.ts'])
+      expect(await fs.readdir(path.join(output, '.kubb'))).toStrictEqual(['client.ts', 'core.ts', 'serializers.ts', 'sse.ts', 'standardSchema.ts'])
     } finally {
       await fs.rm(output, { recursive: true, force: true })
     }

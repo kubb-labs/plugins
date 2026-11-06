@@ -33,4 +33,16 @@ export default defineConfig([
     outputOptions: (options, format, { cjsDts }) => ({ ...options, keepNames: format === 'cjs' && !cjsDts }),
     dts: { emitDtsOnly: true, tsconfig: '../../tsconfig.dts.json' },
   },
+  {
+    // Declarations for the raw templates so consumers can import their types without `allowImportingTsExtensions`.
+    entry: {
+      'templates/core': 'templates/core.ts',
+      'templates/serializers': 'templates/serializers.ts',
+      'templates/sse': 'templates/sse.ts',
+      'templates/standardSchema': 'templates/standardSchema.ts',
+    },
+    format: 'esm',
+    fixedExtension: false,
+    dts: { emitDtsOnly: true, tsconfig: '../../tsconfig.dts.json' },
+  },
 ])

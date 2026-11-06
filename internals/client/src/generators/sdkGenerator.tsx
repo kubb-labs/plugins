@@ -127,11 +127,8 @@ function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationDat
  * emits one class per tag and, when `sdk.name` is set, a composed root that instantiates every tag
  * client. With `sdk.mode: 'flat'` it emits one class named by `sdk.name`, with every operation as a
  * direct method.
- *
- * `sse` is the Server-Sent Events runtime template, copied into `.kubb/sse.ts` only for a document with a
- * `text/event-stream` operation.
  */
-export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse }: { sse: string }): Generator<TFactory> {
+export function createSdkGenerator<TFactory extends ContractClientFactory>(): Generator<TFactory> {
   return defineGenerator<TFactory>({
     name: 'sdk',
     renderer: jsxRenderer,
@@ -161,8 +158,6 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
       const controllers = buildControllers(nodes, ctx, types, validatorEnabled)
       const clientPath = path.resolve(root, '.kubb/client.ts')
       const standardSchemaPath = path.resolve(root, '.kubb/standardSchema.ts')
-      const ssePath = path.resolve(root, '.kubb/sse.ts')
-      const sseFile = nodes.some(isEventStream) ? <File key={ssePath} baseName="sse.ts" path={ssePath} copy={sse} /> : null
 
       const banner = (file: ast.FileNode) => resolver.default.banner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
       const footer = (file: ast.FileNode) => resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
@@ -182,7 +177,11 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
         return (
           <File key={file.path} baseName={file.baseName} path={file.path} meta={file.meta} banner={banner(file)} footer={footer(file)}>
             <File.Import
-              name={['createClient', ...(hasResult ? [returnType === 'data' ? 'unwrapResult' : 'withUnwrap'] : [])]}
+              name={[
+                'createClient',
+                ...(hasResult ? [returnType === 'data' ? 'unwrapResult' : 'withUnwrap'] : []),
+                ...(hasEventStream ? ['toEventStream'] : []),
+              ]}
               root={file.path}
               path={clientPath}
             />
@@ -192,16 +191,12 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
                 'ClientInstance',
                 'Options',
                 ...(hasResult ? (returnType === 'data' ? ['UnwrappedResult'] : ['Unwrappable', 'RequestResult']) : []),
-                ...(hasEventStream ? ['SuccessOf'] : []),
+                ...(hasEventStream ? ['SuccessOf', ...buildEventStreamImports({ returnType, typed: shapes.has('event') })] : []),
               ]}
               root={file.path}
               path={clientPath}
               isTypeOnly
             />
-            {hasEventStream && <File.Import name={['toEventStream']} root={file.path} path={ssePath} />}
-            {hasEventStream && (
-              <File.Import name={buildEventStreamImports({ returnType, typed: shapes.has('event') })} root={file.path} path={ssePath} isTypeOnly />
-            )}
 
             {validator === 'zod' && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
 
@@ -228,24 +223,12 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
         const flatFile = resolver.file({ name: sdk.name ?? 'sdk', extname: '.ts', root, output, group: group ?? undefined })
         const allOps = controllers.flatMap((controller) => controller.operations)
 
-        return (
-          <>
-            {sseFile}
-            {renderClassFile(flatName, flatFile, allOps)}
-          </>
-        )
+        return renderClassFile(flatName, flatFile, allOps)
       }
 
       const classFiles = controllers.map(({ name, file, operations: ops }) => renderClassFile(name, file, ops))
 
-      if (!sdk.name) {
-        return (
-          <>
-            {sseFile}
-            {classFiles}
-          </>
-        )
-      }
+      if (!sdk.name) return <>{classFiles}</>
 
       const sdkFile = resolver.file({ name: sdk.name, extname: '.ts', root, output, group: group ?? undefined })
       const facadeName = resolver.className(sdk.name)
@@ -253,7 +236,6 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
 
       return (
         <>
-          {sseFile}
           {classFiles}
           <File key={sdkFile.path} baseName={sdkFile.baseName} path={sdkFile.path} meta={sdkFile.meta} banner={banner(sdkFile)} footer={footer(sdkFile)}>
             <File.Import name={['ClientConfig']} root={sdkFile.path} path={clientPath} isTypeOnly />
