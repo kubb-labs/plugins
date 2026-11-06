@@ -91,15 +91,13 @@ function parseData<TData>(raw: string): TData {
  * all digits, and an unfinished event at the end is dropped. `data` is parsed as JSON when it is valid and kept as text
  * otherwise. Consume with `for await`, and break the loop to cancel the stream.
  */
-export async function* parseEventStream<TData = unknown>({
-  stream,
-  maxEventSize = 16 * 1024 * 1024,
-  terminator,
-  cursor = { lastEventId: '' },
-}: Pick<EventStreamOptions, 'maxEventSize' | 'terminator'> & {
-  stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>
-  cursor?: Cursor
-}): AsyncGenerator<ServerSentEvent<TData>> {
+type EventStreamInput = ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>
+
+export async function* parseEventStream<TData = unknown>(
+  input: EventStreamInput | (Pick<EventStreamOptions, 'maxEventSize' | 'terminator'> & { stream: EventStreamInput; cursor?: Cursor }),
+): AsyncGenerator<ServerSentEvent<TData>> {
+  // The stream alone is the form earlier releases took.
+  const { stream, maxEventSize = 16 * 1024 * 1024, terminator, cursor = { lastEventId: '' } } = isStreamBody(input) ? { stream: input } : input
   const decoder = new TextDecoder()
   const tooLarge = `Server-sent event exceeds maxEventSize of ${maxEventSize} characters`
   let type = ''

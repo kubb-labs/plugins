@@ -1,8 +1,8 @@
 import axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
-import { createClientCore, getResponseContentType, isStreamed } from './core.ts'
+import { getResponseContentType, isStreamed } from './core.ts'
 import { isJsonMediaType } from './serializers.ts'
-import type * as core from './core.ts'
+import * as core from './core.ts'
 import * as sse from './sse.ts'
 
 export * from './core.ts'
@@ -43,20 +43,30 @@ export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRe
 >
 export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = Omit<
   core.RequestConfig<TBody, TRequest, TResponse>,
-  'transport'
+  'transport' | 'client'
 > &
-  AxiosOverrides
+  AxiosOverrides & { client?: ClientInstance<TRequest, TResponse> }
 export type Options<TData extends core.DataShape, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = Omit<
   core.Options<TData, ThrowOnError, TRequest, TResponse>,
-  'transport'
+  'transport' | 'client'
 > &
-  AxiosOverrides
+  AxiosOverrides & { client?: ClientInstance<TRequest, TResponse> }
 export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = Omit<core.ClientConfig<TRequest, TResponse>, 'transport'> & AxiosOverrides
 export type ResolvedRequest = core.ResolvedRequest & { options?: AxiosOptions }
 export type TransportResult<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.TransportResult<TData, TRequest, TResponse>
 export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
 export type CallResult<TRequest = NativeRequest, TResponse = NativeResponse> = core.CallResult<TRequest, TResponse>
 export type ResponseErrorConfig<TError = unknown> = core.ResponseError<TError, NativeRequest, NativeResponse>
+export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>
+/** The core's `ResponseError` class, typed with this transport's request and response. `instanceof` and `ResponseError.is` both match what the client throws. */
+export const ResponseError = core.ResponseError as {
+  new <TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse>(
+    config: ConstructorParameters<typeof core.ResponseError<TError, TRequest, TResponse>>[0],
+  ): core.ResponseError<TError, TRequest, TResponse>
+  is: typeof core.ResponseError.is
+  // `instanceof` narrows to this type, so it carries the native request and response.
+  prototype: core.ResponseError<unknown, NativeRequest, NativeResponse>
+}
 export type EventStreamResult<TData = unknown, TResponse = NativeResponse> = sse.EventStreamResult<TData, TResponse>
 
 /** An interceptor handler. It receives the native axios object; the second argument is kept for handlers written against earlier versions and is always `undefined`. */
@@ -217,9 +227,10 @@ function nativeInterceptors(instance: AxiosInstance): Interceptors {
  * Wraps a core client for axios callers: an `AxiosInstance` passed as `transport` is wrapped by `createAxiosTransport`,
  * `client.interceptors` registers on `instance`, and `createClient` gives the child its own instance.
  */
-function createAxiosClient(instance: AxiosInstance, config: ClientConfig = {}): ClientInstance {
-  const inner = createClientCore<NativeRequest, NativeResponse>({ defaultTransport: createAxiosTransport(instance), ...toTransport(config) })
-  const client = ((requestConfig) => inner(toTransport(requestConfig))) as ClientInstance
+function createAxiosClient(instance: AxiosInstance, config: ClientConfig = {}, defaultTransport: Transport = createAxiosTransport(instance)): ClientInstance {
+  const inner = core.createClientCore<NativeRequest, NativeResponse>({ defaultTransport, ...toTransport(config) })
+  // `client` never reaches the core: the generated operation destructures it before the call.
+  const client = ((requestConfig) => inner(toTransport(requestConfig) as core.RequestConfig<unknown, NativeRequest, NativeResponse>)) as ClientInstance
   client.getConfig = inner.getConfig
   client.setConfig = (next) => inner.setConfig(toTransport(next))
   client.getUrl = inner.getUrl
@@ -233,6 +244,16 @@ function createAxiosClient(instance: AxiosInstance, config: ClientConfig = {}): 
  * interceptors on it. Instances from `createClient()` get their own.
  */
 export const defaultTransport = axios.create()
+
+/**
+ * Creates an isolated client. `defaultTransport` is the axios instance to send through, a transport function, or left out
+ * for a new `axios.create()`.
+ */
+export function createClientCore(options: { defaultTransport?: AxiosTransport } & ClientConfig = {}): ClientInstance {
+  const { defaultTransport: transport, ...config } = options
+  const instance = isAxiosInstance(transport) ? transport : axios.create()
+  return createAxiosClient(instance, config, transport && !isAxiosInstance(transport) ? transport : createAxiosTransport(instance))
+}
 
 export const client = createAxiosClient(defaultTransport)
 

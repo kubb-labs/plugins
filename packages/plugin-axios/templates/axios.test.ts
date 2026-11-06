@@ -103,15 +103,15 @@ describe('createAxiosTransport', () => {
     await expect(client({ method: 'GET', url: '/pet' })).rejects.toBe(networkError)
   })
 
-  test('runs the axios interceptors of the instance inside the kubb interceptors', async () => {
+  test('registers client.interceptors on the instance given as defaultTransport, next to its own', async () => {
     const instance = realAxios()
     instance.interceptors.request.use((config) => {
       config.headers.set('X-Axios', 'yes')
       return config
     })
-    const client = createClientCore({ defaultTransport: createAxiosTransport(instance) })
+    const client = createClientCore({ defaultTransport: instance })
     const seen: Array<string> = []
-    client.interceptors.request.use((request) => (seen.push(`request ${request.headers['X-Kubb'] ?? ''}`), request))
+    client.interceptors.request.use((request) => (seen.push(`request ${request.headers.get('X-Kubb')}`), request))
     client.interceptors.response.use((result) => (seen.push(`response ${result.status}`), result))
 
     const result = await client({ method: 'GET', url: '/pet', headers: { 'X-Kubb': 'yes' } })

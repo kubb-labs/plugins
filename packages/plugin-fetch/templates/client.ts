@@ -1,6 +1,6 @@
 import { createClientCore, getResponseContentType, type ResponseType } from './core.ts'
 import { isJsonMediaType } from './serializers.ts'
-import type * as core from './core.ts'
+import * as core from './core.ts'
 import * as sse from './sse.ts'
 
 export * from './core.ts'
@@ -44,6 +44,16 @@ export type CallResult<TRequest = NativeRequest, TResponse = NativeResponse> = c
 export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
 export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
 export type ResponseErrorConfig<TError = unknown> = core.ResponseError<TError, NativeRequest, NativeResponse>
+export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>
+/** The core's `ResponseError` class, typed with this transport's request and response. `instanceof` and `ResponseError.is` both match what the client throws. */
+export const ResponseError = core.ResponseError as {
+  new <TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse>(
+    config: ConstructorParameters<typeof core.ResponseError<TError, TRequest, TResponse>>[0],
+  ): core.ResponseError<TError, TRequest, TResponse>
+  is: typeof core.ResponseError.is
+  // `instanceof` narrows to this type, so it carries the native request and response.
+  prototype: core.ResponseError<unknown, NativeRequest, NativeResponse>
+}
 export type EventStreamResult<TData = unknown, TResponse = NativeResponse> = sse.EventStreamResult<TData, TResponse>
 
 /** `toEventStream` with the result bound to this transport's response. */
