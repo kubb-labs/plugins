@@ -159,7 +159,7 @@ for await (const event of stream) {
 }
 ```
 
-The runtime parses `data` as JSON when it is valid and keeps the raw string otherwise. An event without `data` is never yielded.
+The runtime parses `data` as JSON when it is valid, and keeps it as text when the document types it as a string. An event without `data` is never yielded, and so is an event the server does not end with a blank line before closing.
 
 ## Handle unknown events
 
@@ -239,7 +239,7 @@ const { stream } = await streamChat({
 })
 ```
 
-Set `validate: false`, or `validate: { response: false }`, to skip the validator for one call. See [Handle errors](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/error-handling) for the validation options.
+Set `validate: false`, or `validate: { response: false }`, on the call or on the client to skip the validator. See [Handle errors](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/error-handling) for the validation options.
 
 ## Reconnect with Last-Event-ID
 
@@ -294,7 +294,7 @@ try {
 }
 ```
 
-A server can answer a streamed operation with JSON, for example an error body. The client parses such a body as a normal response: a non-2xx status still throws a `ResponseError` with the parsed `data`, and a 2xx JSON body yields an empty stream. This also holds for an operation that declares both `application/json` and `text/event-stream` for its success response, which Kubb generates as a stream.
+A server can answer a streamed operation with JSON, for example an error body. The client parses such a body as a normal response: a non-2xx status still throws a `ResponseError` with the parsed `data`, and a 2xx JSON body yields an empty stream. An operation that declares another content type next to `text/event-stream` is generated as a normal call, not a stream.
 
 Servers often send a heartbeat event such as `ping` every few seconds and an `error` event when something goes wrong. Declare both in the document, so the heartbeat has a type and the error reaches your `switch` instead of `onUnknownEvent`.
 

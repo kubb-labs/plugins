@@ -1,5 +1,6 @@
 import { describe, expect, type Mock, test, vi } from 'vitest'
 import { type EventStreamCall, type EventStreamSend, parseEventStream, type ServerSentEvent, toEventStream } from './sse.ts'
+import type { HttpMethod } from './serializers.ts'
 import { ParseError, type StandardSchemaValidator } from './standardSchema.ts'
 
 const encoder = new TextEncoder()
@@ -127,6 +128,26 @@ describe('parseEventStream', () => {
 
   test('joins a CRLF split across an empty chunk', async () => {
     expect(await collect(parseEventStream<string>({ stream: streamOf(['data: a\r', '', '\ndata: b\n\n']) }))).toStrictEqual([message({ data: 'a\nb' })])
+  })
+
+  test('drops comment lines without counting them toward maxEventSize', async () => {
+    const events = await collect(parseEventStream<string>({ stream: streamOf([': keep alive!!\ndata: a\n\n']), maxEventSize: 20 }))
+
+    expect(events).toStrictEqual([message({ data: 'a' })])
+  })
+
+  test('throws when a comment line alone outgrows maxEventSize', async () => {
+    await expect(collect(parseEventStream({ stream: streamOf([': too long\ndata: a\n\n']), maxEventSize: 8 }))).rejects.toThrow(RangeError)
+  })
+
+  test('keeps data as text for the events in text', async () => {
+    const events = await collect(parseEventStream({ stream: streamOf(['event: ping\ndata: 42\n\ndata: {"n":1}\n\n']), text: ['ping'] }))
+
+    expect(events).toStrictEqual([message({ data: '42', event: 'ping' }), message({ data: { n: 1 } })])
+  })
+
+  test('keeps every data as text with text: true', async () => {
+    expect(await collect(parseEventStream({ stream: streamOf(['data: {"n":1}\n\n']), text: true }))).toStrictEqual([message({ data: '{"n":1}' })])
   })
 
   test('strips a byte order mark', async () => {
@@ -276,6 +297,17 @@ describe('toEventStream', () => {
     await expect(collect(stream)).rejects.toBeInstanceOf(ParseError)
   })
 
+  test('reads validate and onValidationError from the client when the call does not set them', async () => {
+    const onValidationError = vi.fn(() => ({ value: 'replaced' }))
+    const client = { getConfig: () => ({ onValidationError }) }
+    const { stream } = await toEventStream({ send: Promise.resolve(call({ data: streamOf(['data: "bad"\n\n']) })), client, validator })
+    expect(await collect(stream)).toStrictEqual([message({ data: 'replaced' })])
+
+    const skipped = { getConfig: () => ({ validate: false }) }
+    const { stream: unvalidated } = await toEventStream({ send: Promise.resolve(call({ data: streamOf(['data: "bad"\n\n']) })), client: skipped, validator })
+    expect(await collect(unvalidated)).toStrictEqual([message({ data: 'bad' })])
+  })
+
   test.each([false, { response: false }])('validate %o skips the validator', async (validate) => {
     const { stream } = await toEventStream({ send: Promise.resolve(call({ data: streamOf(['data: "bad"\n\n']) })), config: { validate }, validator })
     expect(await collect(stream)).toStrictEqual([message({ data: 'bad' })])
@@ -419,6 +451,15 @@ describe('toEventStream', () => {
 
       await expect(collect(stream)).rejects.toThrow('fetch failed')
       expect(send).toHaveBeenCalledTimes(3)
+    })
+
+    test('sends no body when a resume switches a POST to a lower-case get', async () => {
+      const send = sender(call({ data: droppedAfter('id: 1\ndata: a\n\n') }), call({ data: streamOf(['data: b\n\n']) }))
+      await collect(
+        (await toEventStream({ send, config: { reconnect: { delay: 0, resume: () => ({ method: 'get' as HttpMethod }) } }, method: 'post' })).stream,
+      )
+
+      expect(send.mock.calls[1]).toStrictEqual([{ method: 'get', body: undefined, headers: { 'Last-Event-ID': '1' } }])
     })
 
     test('sends no body when a resume switches a POST to GET', async () => {

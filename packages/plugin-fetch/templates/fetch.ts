@@ -678,8 +678,8 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     const contentType = result.contentType ?? getResponseContentType(result.headers)
     const codec = contentType ? codecs[contentType] : undefined
     const decoded = contentType && codec?.deserialize ? await codec.deserialize(result.data, contentType) : result.data
-    // A streamed success body is validated event by event in `toEventStream`, not as a whole.
-    const streaming = isSuccess && resolvedRequest.responseType === 'stream'
+    // A streamed success body is validated event by event in `toEventStream`, not as a whole. A JSON answer to a streamed call is a whole body.
+    const streaming = isSuccess && resolvedRequest.responseType === 'stream' && decoded instanceof ReadableStream
     const data = await runValidator({
       validator: isValidationEnabled(validate, direction) && !streaming ? validator?.[direction] : undefined,
       value: decoded,

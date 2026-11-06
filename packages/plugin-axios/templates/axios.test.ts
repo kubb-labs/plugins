@@ -1,3 +1,4 @@
+import { Readable } from 'node:stream'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios, { AxiosError as AxiosErrorClass } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
@@ -675,6 +676,35 @@ describe('createClientCore', () => {
       const result = await client({ method: 'GET', url: '/events', responseType: 'stream', options: streaming(200, '{"ok":true}', 'application/problem+json') })
 
       expect(result.data).toStrictEqual({ ok: true })
+    })
+
+    test('reads a JSON body the Node adapter streams as a readable', async () => {
+      const client = createClientCore()
+      const adapter = async (config: InternalAxiosRequestConfig) =>
+        ({
+          data: Readable.from([Buffer.from('{"ok":true}')]),
+          status: 200,
+          statusText: 'x',
+          headers: { 'content-type': 'application/json' },
+          config,
+        }) as AxiosResponse
+      const result = await client({ method: 'GET', url: '/events', responseType: 'stream', options: { adapter } })
+
+      expect(result.data).toStrictEqual({ ok: true })
+    })
+
+    test('runs the response validator on a JSON body', async () => {
+      const client = createClientCore()
+      const validator = { response: { '~standard': { validate: () => ({ value: 'validated' }) } } }
+      const result = await client({
+        method: 'GET',
+        url: '/events',
+        responseType: 'stream',
+        validator,
+        options: streaming(200, '{"ok":true}', 'application/json'),
+      })
+
+      expect(result.data).toBe('validated')
     })
 
     test('keeps an application/x-ndjson body a stream', async () => {

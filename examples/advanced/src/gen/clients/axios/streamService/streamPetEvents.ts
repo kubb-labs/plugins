@@ -1,5 +1,5 @@
 import type { Options, SuccessOf } from '../../../.kubb/client'
-import type { EventStreamOptions, EventStreamResult } from '../../../.kubb/sse'
+import type { EventStreamResult, EventStreamOptions } from '../../../.kubb/sse'
 import type { PetEvent } from '../../../models/ts/PetEvent'
 import { client } from '../../../.kubb/client'
 import { toEventStream } from '../../../.kubb/sse'
@@ -49,6 +49,7 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
         throwOnError: config.throwOnError ?? true,
         ...init,
       }),
+    client: request,
     config,
     method: 'GET',
     shape: 'data',

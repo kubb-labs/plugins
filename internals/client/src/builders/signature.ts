@@ -47,12 +47,13 @@ export function buildGroupedOptionsSignature({
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
   /**
-   * Adds the per-call stream options to the `options` type of a `text/event-stream` operation.
+   * Adds the per-call stream options to the `options` type of a `text/event-stream` operation, except for a plain custom
+   * client, whose `toEventStream(promise)` does not read them.
    */
   eventStream?: boolean
 }): GroupedOptionsSignature {
   const optionsName = types.response.options(node)
-  const optionsType = `Options<${optionsName}, ThrowOnError>${eventStream ? ' & EventStreamOptions' : ''}`
+  const optionsType = `Options<${optionsName}, ThrowOnError>${eventStream && returnType !== 'plain' ? ' & EventStreamOptions' : ''}`
   const { isOptional } = getRequestGroupOptionality(node)
 
   const paramsSignature =

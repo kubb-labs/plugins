@@ -656,13 +656,26 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   return { axiosConfig, codecs, throwOnError, validate }
 }
 
+function isStreamed(data: unknown): data is ReadableStream<Uint8Array> | AsyncIterable<Uint8Array | string> {
+  return data instanceof ReadableStream || (!!data && typeof data === 'object' && Symbol.asyncIterator in data)
+}
+
+async function readStreamedText(data: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array | string>): Promise<string> {
+  if (data instanceof ReadableStream) return new Response(data).text()
+  const decoder = new TextDecoder()
+  let text = ''
+  for await (const chunk of data) text += typeof chunk === 'string' ? chunk : decoder.decode(chunk, { stream: true })
+  return text + decoder.decode()
+}
+
 /**
- * Reads a streamed JSON body, such as an error body, back into its value, because the fetch adapter streams every
- * `responseType: 'stream'` answer. Any other streamed body stays a stream.
+ * Reads a streamed JSON body, such as an error body, back into its value, because every adapter streams a
+ * `responseType: 'stream'` answer: the fetch adapter as a `ReadableStream`, the Node adapter as a readable. Any other
+ * streamed body stays a stream.
  */
 async function readStreamedBody({ data, contentType }: { data: unknown; contentType: string | undefined }): Promise<unknown> {
-  if (!(data instanceof ReadableStream) || !/[/+]json$/.test(contentType?.split(';')[0]?.trim() ?? '')) return data
-  const text = await new Response(data).text()
+  if (!isStreamed(data) || !/[/+]json$/.test(contentType?.split(';')[0]?.trim() ?? '')) return data
+  const text = await readStreamedText(data)
   if (!text) return undefined
   try {
     return JSON.parse(text)
@@ -761,8 +774,8 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       const codec = contentType ? codecs[contentType] : undefined
       const raw = await readStreamedBody({ data: response.data, contentType })
       const decoded: unknown = contentType && codec?.deserialize ? await codec.deserialize(raw, contentType) : raw
-      // A streamed success body is validated event by event in `toEventStream`, not as a whole.
-      const streaming = isSuccess && requestConfig.responseType === 'stream'
+      // A streamed success body is validated event by event in `toEventStream`, not as a whole. A JSON answer to a streamed call is a whole body.
+      const streaming = isSuccess && requestConfig.responseType === 'stream' && isStreamed(decoded)
       const data = await runValidator({
         validator: isValidationEnabled(validate, direction) && !streaming ? validator?.[direction] : undefined,
         value: decoded,

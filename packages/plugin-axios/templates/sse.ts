@@ -79,6 +79,22 @@ export type EventStreamSchema = {
    * Validates each event (`shape: 'event'`) or its `data` (`shape: 'data'`), after `transform`.
    */
   validator?: StandardSchemaValidator
+  /**
+   * Keeps `data` as text instead of parsing JSON: `true` for every event, or the names of the events whose `data` the
+   * document types as a string.
+   */
+  text?: boolean | ReadonlyArray<string>
+}
+
+/**
+ * The validation settings a call or its client may set.
+ */
+type ValidationSettings = {
+  validate?: boolean | { response?: boolean }
+  onValidationError?: (
+    error: ParseError,
+    context: { value: unknown; direction: 'response'; source: 'body'; method?: string },
+  ) => { value: unknown } | void | Promise<{ value: unknown } | void>
 }
 
 /**
@@ -134,19 +150,23 @@ function parseData<TData>(raw: string): TData {
 /**
  * Parses a `text/event-stream` body as the WHATWG event stream specification does: an event is dispatched at its blank line
  * when it holds `data`, `event` defaults to `message`, `id` carries across events until an empty `id` resets it, `retry` needs
- * all digits, and an unfinished event at the end is dropped. Consume with `for await`, and break the loop to cancel the stream.
+ * all digits, and an unfinished event at the end is dropped. `data` is parsed as JSON when it is valid, except for the events
+ * in `text`. Consume with `for await`, and break the loop to cancel the stream.
  */
 export async function* parseEventStream<TData = unknown>({
   stream,
   maxEventSize = 16 * 1024 * 1024,
   terminator,
+  text = false,
   cursor = { lastEventId: '' },
 }: Pick<EventStreamOptions, 'maxEventSize' | 'terminator'> & {
   stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>
+  text?: boolean | ReadonlyArray<string>
   cursor?: Cursor
 }): AsyncGenerator<ServerSentEvent<TData>> {
   const decoder = new TextDecoder()
   const tooLarge = `Server-sent event exceeds maxEventSize of ${maxEventSize} characters`
+  const isText = (name: string) => text === true || (Array.isArray(text) && text.includes(name))
   let type = ''
   let data: Array<string> = []
   let retry: number | undefined
@@ -189,10 +209,11 @@ export async function* parseEventStream<TData = unknown>({
       if (!part) {
         if (data.length) {
           const raw = data.join('\n')
+          const name = type || 'message'
           if (raw === terminator) return
           yield {
-            data: parseData<TData>(raw),
-            event: type || 'message',
+            data: isText(name) ? (raw as TData) : parseData<TData>(raw),
+            event: name,
             ...(cursor.lastEventId ? { id: cursor.lastEventId } : {}),
             ...(retry !== undefined ? { retry } : {}),
           }
@@ -203,10 +224,15 @@ export async function* parseEventStream<TData = unknown>({
         size = 0
         continue
       }
+      // A comment line is dropped and does not count toward the event, but must fit the limit on its own.
+      if (part.startsWith(':')) {
+        if (part.length + 1 > maxEventSize) throw new RangeError(tooLarge)
+        continue
+      }
       // A finished line counts one more character for its line break.
       if (size + part.length + 1 > maxEventSize) throw new RangeError(tooLarge)
       size += part.length + 1
-      if (!part.startsWith(':')) readField(part)
+      readField(part)
     }
     if (size + line.length > maxEventSize) throw new RangeError(tooLarge)
   }
@@ -240,27 +266,27 @@ function sleep({ ms, signal }: { ms: number; signal?: AbortSignal }): Promise<vo
  */
 export async function toEventStream<TData = unknown, TResponse = NativeResponse>({
   send,
+  client,
   config: options = {},
   ...meta
 }: {
   send: EventStreamSend<TResponse> | Promise<EventStreamCall<TResponse>>
-  config?: EventStreamOptions & {
-    headers?: unknown
-    signal?: AbortSignal
-    validate?: boolean | { response?: boolean }
-    onValidationError?: (
-      error: ParseError,
-      context: { value: unknown; direction: 'response'; source: 'body'; method?: string },
-    ) => { value: unknown } | void | Promise<{ value: unknown } | void>
-  }
+  /**
+   * The client the call went through, for the validation settings a call does not set itself.
+   */
+  client?: { getConfig: () => ValidationSettings }
+  config?: EventStreamOptions & ValidationSettings & { headers?: unknown; signal?: AbortSignal }
 } & EventStreamSchema): Promise<EventStreamResult<TData, TResponse>> {
   // A plain promise cannot be sent again, so it never reconnects.
   const reconnect = typeof send === 'function' ? options.reconnect : undefined
   const { maxRetries = 2, delay = 1000, maxDelay = 30_000, growFactor = 1.5, onClose = false, resume } = reconnect ?? {}
-  if (reconnect && !resume && meta.method && meta.method !== 'GET') {
+  if (reconnect && !resume && meta.method && meta.method.toUpperCase() !== 'GET') {
     throw new TypeError(`reconnect.resume is required to resume a ${meta.method} stream without repeating the operation`)
   }
-  const validate = typeof options.validate === 'object' ? options.validate.response !== false : options.validate !== false
+  const defaults = client?.getConfig() ?? {}
+  const validateSetting = options.validate ?? defaults.validate
+  const onValidationError = options.onValidationError ?? defaults.onValidationError
+  const validate = typeof validateSetting === 'object' ? validateSetting.response !== false : validateSetting !== false
   const validator = validate ? meta.validator : undefined
   const cursor: Cursor = { lastEventId: '' }
   const first = await (typeof send === 'function' ? send() : send)
@@ -270,8 +296,8 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
     const value = meta.shape === 'event' ? event : event.data
     const context = { direction: 'response', source: 'body', method: meta.method, value } as const
     const validated = await validateStandardSchema(validator, value).catch(async (error: unknown) => {
-      if (!options.onValidationError || !(error instanceof ParseError)) throw error
-      const handled = await options.onValidationError(error, context)
+      if (!onValidationError || !(error instanceof ParseError)) throw error
+      const handled = await onValidationError(error, context)
       if (!handled) throw error
       return handled.value
     })
@@ -292,7 +318,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
           if ('cancel' in body) await body.cancel().catch(() => {})
           return
         }
-        const parsed = parseEventStream({ stream: body, maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })
+        const parsed = parseEventStream({ stream: body, maxEventSize: options.maxEventSize, terminator: options.terminator, text: meta.text, cursor })
         // Only a failed read is a drop worth a reconnect. A too-large event, a failed transform or validation, and a consumer error end the stream.
         const read = async () => {
           try {
@@ -323,7 +349,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
       if (options.signal?.aborted) return
       wait = Math.min(wait * growFactor, maxDelay)
       const init: ResumeRequest = resume?.(cursor.lastEventId) ?? {}
-      const method = init.method ?? meta.method
+      const method = (init.method ?? meta.method)?.toUpperCase()
       const headers = {
         ...headerRecord(options.headers),
         ...(cursor.lastEventId ? { 'Last-Event-ID': cursor.lastEventId } : {}),

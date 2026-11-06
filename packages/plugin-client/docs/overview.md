@@ -6,7 +6,7 @@ Each function takes grouped `path`, `query`, `headers`, and `body` parameters an
 
 ## Setup
 
-- Set the required `importPath` option to your client module. The module must export `client` and the `Options` and `RequestResult` types. When the spec has server-sent event operations, it must also export `toEventStream` and the `EventStreamResult`, `EventStreamOptions`, `SuccessOf`, and `TypedEvent` types.
+- Set the required `importPath` option to your client module. The module must export `client` and the `Options` and `RequestResult` types. When the spec has server-sent event operations, it must also export `toEventStream` and the `EventStreamResult`, `SuccessOf`, and `TypedEvent` types.
 - Add `@kubb/plugin-ts` for the operation types, or `@kubb/plugin-zod` with `inferred: true`.
 - Add `@kubb/plugin-zod` when you set `validator`, and install `zod` v4. Generation fails without the plugin.
 

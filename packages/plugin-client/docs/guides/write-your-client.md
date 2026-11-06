@@ -10,7 +10,7 @@ The generated functions import your module through [`importPath`](https://kubb.d
 | `Options`       | type     | The grouped options object a generated function accepts.                                     |
 | `RequestResult` | type     | What a generated function resolves to.                                                       |
 
-If your spec has server-sent event operations, also export `toEventStream` and the `EventStreamResult`, `EventStreamOptions`, `SuccessOf`, and `TypedEvent` types. A generated function calls `toEventStream<TData>(promise)` with the promise your `client` returns and nothing else, and leaves the response validator on `config.validator.response`, so your module decides how to validate events.
+If your spec has server-sent event operations, also export `toEventStream` and the `EventStreamResult`, `SuccessOf`, and `TypedEvent` types. A generated function calls `toEventStream<TData>(promise)` with the promise your `client` returns and nothing else, and leaves the response validator on `config.validator.response`, so your module decides how to validate events.
 
 The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-swr`) and `@kubb/plugin-mcp` call the generated functions with `throwOnError: true` and read `data` off the result. The query plugins also import two more types from your module:
 

@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Options, SuccessOf } from './.kubb/client'
-import type { EventStreamOptions, EventStreamResult, TypedEvent } from './.kubb/sse'
+import type { EventStreamResult, EventStreamOptions, TypedEvent } from './.kubb/sse'
 import type { StreamChatOptions, StreamChatResponses } from './StreamChat'
 import { client } from './.kubb/client'
 import { toEventStream } from './.kubb/sse'
@@ -16,9 +16,11 @@ export function streamChat<ThrowOnError extends boolean = true>(
 
   return toEventStream<TypedEvent<SuccessOf<StreamChatResponses>>>({
     send: (init) => request({ method: 'POST', url: '/chat', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true, ...init }),
+    client: request,
     config,
     method: 'POST',
     shape: 'event',
     events: ['message_delta', 'ping'],
+    text: ['message_delta', 'ping'],
   })
 }

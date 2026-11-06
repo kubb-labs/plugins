@@ -1,5 +1,5 @@
 import type { Options, SuccessOf } from '../../../.kubb/client'
-import type { EventStreamOptions, EventStreamResult, TypedEvent } from '../../../.kubb/sse'
+import type { EventStreamResult, EventStreamOptions, TypedEvent } from '../../../.kubb/sse'
 import type { OrderEvent } from '../../../models/ts/OrderEvent'
 import { client } from '../../../.kubb/client'
 import { toEventStream } from '../../../.kubb/sse'
@@ -42,9 +42,11 @@ export function streamOrderEvents<ThrowOnError extends boolean = true>(
   >({
     send: (init) =>
       request({ method: 'GET', url: '/store/order/{orderId}/events', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true, ...init }),
+    client: request,
     config,
     method: 'GET',
     shape: 'event',
     events: ['order_placed', 'order_shipped', 'ping'],
+    text: ['ping'],
   })
 }
