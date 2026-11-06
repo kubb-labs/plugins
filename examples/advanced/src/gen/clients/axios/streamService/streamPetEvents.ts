@@ -23,9 +23,9 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
   >,
 ): Promise<
   StreamResult<
-    SuccessOf<{
+    {
       '200': PetEvent
-    }>,
+    },
     ThrowOnError
   >
 > {
@@ -50,9 +50,9 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
     { client: request, config, shape: 'data' },
   ) as Promise<
     StreamResult<
-      SuccessOf<{
+      {
         '200': PetEvent
-      }>,
+      },
       ThrowOnError
     >
   >

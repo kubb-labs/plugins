@@ -11,11 +11,11 @@ import { toEventStream } from './.kubb/sse'
  */
 export function streamChat<ThrowOnError extends boolean = true>(
   options: StreamOptions<StreamChatOptions, ThrowOnError> = {},
-): Promise<StreamResult<TypedEvent<SuccessOf<StreamChatResponses>>, ThrowOnError>> {
+): Promise<StreamResult<StreamChatResponses, ThrowOnError, TypedEvent<SuccessOf<StreamChatResponses>>>> {
   const { client: request = client, ...config } = options
 
   return toEventStream<TypedEvent<SuccessOf<StreamChatResponses>>>(
     request({ method: 'POST', url: '/chat', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }),
     { client: request, config, shape: 'event' },
-  ) as Promise<StreamResult<TypedEvent<SuccessOf<StreamChatResponses>>, ThrowOnError>>
+  ) as Promise<StreamResult<StreamChatResponses, ThrowOnError, TypedEvent<SuccessOf<StreamChatResponses>>>>
 }

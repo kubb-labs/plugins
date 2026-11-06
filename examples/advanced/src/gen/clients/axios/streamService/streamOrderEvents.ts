@@ -23,12 +23,15 @@ export function streamOrderEvents<ThrowOnError extends boolean = true>(
   >,
 ): Promise<
   StreamResult<
+    {
+      '200': OrderEvent
+    },
+    ThrowOnError,
     TypedEvent<
       SuccessOf<{
         '200': OrderEvent
       }>
-    >,
-    ThrowOnError
+    >
   >
 > {
   const { client: request = client, ...config } = options
@@ -45,12 +48,15 @@ export function streamOrderEvents<ThrowOnError extends boolean = true>(
     shape: 'event',
   }) as Promise<
     StreamResult<
+      {
+        '200': OrderEvent
+      },
+      ThrowOnError,
       TypedEvent<
         SuccessOf<{
           '200': OrderEvent
         }>
-      >,
-      ThrowOnError
+      >
     >
   >
 }

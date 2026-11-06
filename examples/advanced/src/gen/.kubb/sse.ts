@@ -1,4 +1,4 @@
-import type { DataShape, NativeRequest, NativeResponse, Options } from './client'
+import type { DataShape, NativeRequest, NativeResponse, Options, RequestResult, SuccessOf } from './client'
 import type { StandardSchemaValidator, ValidateOption, ValidationErrorHandler } from './standardSchema'
 import { baseContentType } from './serializers'
 import { isValidationEnabled, runValidator } from './standardSchema'
@@ -71,8 +71,18 @@ export type EventStreamResult<TData = unknown, TResponse = NativeResponse, Throw
   readonly lastEventId: string
 }
 
-/** A streamed call's result, as `RequestResult` is a regular call's. */
-export type StreamResult<TData, ThrowOnError extends boolean = true> = EventStreamResult<TData, NativeResponse, ThrowOnError>
+type StreamParts<TData> = AsyncIterable<StreamEvent<TData>> & { stream: AsyncGenerator<StreamEvent<TData>>; readonly lastEventId: string }
+
+type WithoutData<TResult> = TResult extends unknown ? Omit<TResult, 'data'> : never
+
+/**
+ * A streamed call's result, as `RequestResult` is a regular call's: `status` narrows `error` to the body the document declares
+ * for it, and the events take the place of `data`. `TData` is the event payload, or the typed event. It branches on `ThrowOnError`
+ * as `RequestResult` does, so a generated call can cast to it while `ThrowOnError` is generic.
+ */
+export type StreamResult<TResponses, ThrowOnError extends boolean = true, TData = SuccessOf<TResponses>> = ThrowOnError extends true
+  ? WithoutData<RequestResult<TResponses, true>> & StreamParts<TData>
+  : WithoutData<RequestResult<TResponses, false>> & StreamParts<TData>
 
 /** The last event ID, shared with the result so it can be read after the loop. */
 type Cursor = { lastEventId: string }

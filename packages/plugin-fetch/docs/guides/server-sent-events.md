@@ -239,7 +239,7 @@ try {
 }
 ```
 
-With `throwOnError: false`, the call resolves instead of throwing, as a regular call does. The result then carries the `status` and the `error` body, and its stream yields nothing:
+With `throwOnError: false`, the call resolves instead of throwing, as a regular call does. The result then carries the `status` and the `error` body, and its stream yields nothing. Checking `status` narrows `error` to the body the document declares for that status:
 
 ```typescript
 const result = await streamChat({ body, throwOnError: false })

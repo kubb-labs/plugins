@@ -11,11 +11,11 @@ import { toEventStream } from './.kubb/sse'
  */
 export function streamEvents<ThrowOnError extends boolean = true>(
   options: StreamOptions<StreamEventsOptions, ThrowOnError> = {},
-): Promise<StreamResult<SuccessOf<StreamEventsResponses>, ThrowOnError>> {
+): Promise<StreamResult<StreamEventsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
   return toEventStream<SuccessOf<StreamEventsResponses>>(
     request({ method: 'GET', url: '/events', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }),
     { client: request, config, shape: 'data' },
-  ) as Promise<StreamResult<SuccessOf<StreamEventsResponses>, ThrowOnError>>
+  ) as Promise<StreamResult<StreamEventsResponses, ThrowOnError>>
 }
