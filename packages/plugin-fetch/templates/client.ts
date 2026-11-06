@@ -1,6 +1,16 @@
-import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers.ts'
+import {
+  applyHeaderStyles,
+  baseContentType,
+  defaultBodySerializer,
+  defaultPathSerializer,
+  defaultQuerySerializer,
+  isDefaultJsonBody,
+  isJsonMediaType,
+  serializeCookies,
+} from './serializers.ts'
 import type { HeadersInit, HttpMethod, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers.ts'
-import { ParseError, type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
+import { isValidationEnabled, runValidator, type StandardSchemaValidator } from './standardSchema.ts'
+import type { ValidateOption, ValidationErrorHandler } from './standardSchema.ts'
 
 /** The request and response objects of this transport, carried on every result and error. */
 export type NativeRequest = Request
@@ -155,29 +165,7 @@ export type ContentType = string | { request?: string; response?: string }
  */
 export type Validator<T = unknown> = StandardSchemaValidator<T>
 
-/**
- * Identifies the value and request that failed validation in `onValidationError`.
- */
-export type ValidationErrorContext = {
-  value: unknown
-  direction: 'request' | 'response' | 'error'
-  source: 'body' | 'path' | 'query' | 'headers'
-  method?: string
-  url?: string
-  status?: number
-}
-
-/**
- * Return `{ value }` to substitute a failed value, including `undefined`. Returning nothing rethrows the `ParseError`.
- */
-export type ValidationErrorHandler = (error: ParseError, context: ValidationErrorContext) => { value: unknown } | void | Promise<{ value: unknown } | void>
-
-/**
- * Turns generated validation on or off. `false` skips every validator, an object skips only the directions set to `false`:
- * `request` is the body, `params` are path, query, and header params, `response` and `error` are the response bodies.
- * @default true
- */
-export type ValidateOption = boolean | { request?: boolean; params?: boolean; response?: boolean; error?: boolean }
+export type { ValidateOption, ValidationErrorContext, ValidationErrorHandler } from './standardSchema.ts'
 
 /**
  * A resolved security scheme carried on each generated call's `security` array and passed to the `auth` resolver.
@@ -508,37 +496,6 @@ export async function resolveAuth(params: {
   }
 }
 
-function isValidationEnabled(validate: ValidateOption | undefined, direction: 'request' | 'params' | 'response' | 'error'): boolean {
-  return typeof validate === 'object' ? validate[direction] !== false : validate !== false
-}
-
-async function runValidator<T>({
-  validator,
-  value,
-  context,
-  onValidationError,
-}: {
-  validator: Validator<T> | undefined
-  value: T
-  context: Omit<ValidationErrorContext, 'value'>
-  onValidationError: ValidationErrorHandler | undefined
-}): Promise<T> {
-  if (!validator) return value
-  try {
-    return await validateStandardSchema(validator, value)
-  } catch (error) {
-    if (!onValidationError || !(error instanceof ParseError)) throw error
-    const handled = await onValidationError(error, { ...context, value })
-    if (!handled) throw error
-    return handled.value as T
-  }
-}
-
-function baseContentType(value: string | null | undefined): string | undefined {
-  if (!value) return undefined
-  return value.split(';')[0]!.trim().toLowerCase() || undefined
-}
-
 function getResponseContentType(headers: Headers | Record<string, string> | undefined): string | undefined {
   if (!headers) return undefined
   const value = headers instanceof Headers ? headers.get('Content-Type') : (headers['Content-Type'] ?? headers['content-type'])
@@ -738,10 +695,6 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
   return client
 }
 
-function isJsonContentType(contentType: string | null | undefined): boolean {
-  return /[/+]json$/.test(contentType?.split(';')[0]?.trim() ?? '')
-}
-
 function detectResponseType(contentType: string | null): ResponseType | undefined {
   if (!contentType) return undefined
   if (contentType.includes('text/event-stream')) return 'stream'
@@ -758,7 +711,7 @@ async function parseResponse(response: Response, responseType?: ResponseType): P
 
   const contentType = response.headers.get('Content-Type')
   // A server may answer a streamed operation with JSON, such as an error body. Any other streamed body stays a stream.
-  const detected = responseType === 'stream' && isJsonContentType(contentType) ? 'json' : responseType
+  const detected = responseType === 'stream' && isJsonMediaType(contentType) ? 'json' : responseType
   switch (detected ?? detectResponseType(contentType)) {
     case 'text':
     case 'document':

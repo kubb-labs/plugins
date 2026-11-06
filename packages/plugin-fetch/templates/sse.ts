@@ -1,6 +1,6 @@
 import type { NativeResponse } from './client.ts'
-import type { HttpMethod } from './serializers.ts'
-import { ParseError, type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
+import { baseContentType, type HttpMethod } from './serializers.ts'
+import { isValidationEnabled, runValidator, type StandardSchemaValidator, type ValidateOption, type ValidationErrorHandler } from './standardSchema.ts'
 
 /**
  * One decoded Server-Sent Event. `data` is parsed as JSON when valid and kept as the raw string otherwise,
@@ -87,13 +87,7 @@ export type EventStreamSchema = {
 /**
  * The validation settings a call or its client may set.
  */
-type ValidationSettings = {
-  validate?: boolean | { response?: boolean }
-  onValidationError?: (
-    error: ParseError,
-    context: { value: unknown; direction: 'response'; source: 'body'; method?: string },
-  ) => { value: unknown } | void | Promise<{ value: unknown } | void>
-}
+type ValidationSettings = { validate?: ValidateOption; onValidationError?: ValidationErrorHandler }
 
 /**
  * The answer to one send: the body as a stream or a decoded value, its content type, and the native response.
@@ -290,10 +284,8 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
     throw new TypeError(`reconnect.resume is required to resume a ${meta.method} stream without repeating the operation`)
   }
   const defaults = client?.getConfig() ?? {}
-  const validateSetting = options.validate ?? defaults.validate
   const onValidationError = options.onValidationError ?? defaults.onValidationError
-  const validate = typeof validateSetting === 'object' ? validateSetting.response !== false : validateSetting !== false
-  const validator = validate ? meta.validator : undefined
+  const validator = isValidationEnabled(options.validate ?? defaults.validate, 'response') ? meta.validator : undefined
   const callHeaders = headerEntries(options.headers)
   // The runtime owns `Last-Event-ID`: a header on the call seeds the cursor and is not repeated once the server clears the ID.
   const cursor: Cursor = { lastEventId: callHeaders.find(isLastEventId)?.[1] ?? '' }
@@ -302,13 +294,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
   const validateEvent = async (event: ServerSentEvent): Promise<ServerSentEvent> => {
     if (!validator) return event
     const value = meta.shape === 'event' ? event : event.data
-    const context = { direction: 'response', source: 'body', method: meta.method, value } as const
-    const validated = await validateStandardSchema(validator, value).catch(async (error: unknown) => {
-      if (!onValidationError || !(error instanceof ParseError)) throw error
-      const handled = await onValidationError(error, context)
-      if (!handled) throw error
-      return handled.value
-    })
+    const validated = await runValidator({ validator, value, context: { direction: 'response', source: 'body', method: meta.method }, onValidationError })
     // The schema may not declare `id` and `retry`, so the parsed value is merged over the event instead of replacing it.
     return meta.shape === 'event' ? { ...event, ...(validated as object) } : { ...event, data: validated }
   }
@@ -323,7 +309,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
         const body = call.data
         if (!isStreamBody(body)) return
         // A custom transport may pass the raw header, with a charset parameter.
-        if (call.contentType?.split(';')[0]?.trim().toLowerCase() !== 'text/event-stream') {
+        if (baseContentType(call.contentType) !== 'text/event-stream') {
           if ('cancel' in body) await body.cancel().catch(() => {})
           return
         }
