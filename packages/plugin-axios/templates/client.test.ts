@@ -67,15 +67,38 @@ describe('createAxiosTransport', () => {
     expect(calls[0]?.validateStatus?.(500)).toBe(true)
   })
 
-  test('maps credentials onto the request the fetch adapter sends', async () => {
+  test('maps credentials onto the request the fetch adapter sends, over withCredentials in the defaults or the options', async () => {
     const sent: Array<RequestCredentials> = []
     const fetch = async (input: Request) => (sent.push(input.credentials), new Response('{}', { headers: { 'content-type': 'application/json' } }))
-    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch } })) })
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch }, withCredentials: true })) })
+    const url = 'https://petstore.dev/pet'
 
-    for (const credentials of ['include', 'omit', 'same-origin'] as const) await client({ method: 'GET', url: 'https://petstore.dev/pet', credentials })
-    await client({ method: 'GET', url: 'https://petstore.dev/pet' })
+    for (const credentials of ['include', 'omit', 'same-origin'] as const) await client({ method: 'GET', url, credentials })
+    await client({ method: 'GET', url, credentials: 'same-origin', options: { withCredentials: true } })
+    await client({ method: 'GET', url })
 
-    expect(sent).toStrictEqual(['include', 'omit', 'same-origin', 'same-origin'])
+    expect(sent).toStrictEqual(['include', 'omit', 'same-origin', 'same-origin', 'include'])
+  })
+
+  test('maps credentials onto withCredentials for the other adapters, and sends omit through fetch in the browser', async () => {
+    const { calls, transport } = fakeAxios()
+    const client = createClientCore({ defaultTransport: transport })
+
+    await client({ method: 'GET', url: '/pet', credentials: 'include' })
+    await client({ method: 'GET', url: '/pet', credentials: 'same-origin', options: { withCredentials: true } })
+    await client({ method: 'GET', url: '/pet', credentials: 'omit' })
+    vi.stubGlobal('XMLHttpRequest', class {})
+    await client({ method: 'GET', url: '/pet', credentials: 'omit' })
+    await client({ method: 'GET', url: '/pet', credentials: 'omit', options: { adapter: 'xhr' } })
+    vi.unstubAllGlobals()
+
+    expect(calls.map(({ adapter, withCredentials }) => ({ adapter, withCredentials }))).toStrictEqual([
+      { adapter: undefined, withCredentials: true },
+      { adapter: undefined, withCredentials: false },
+      { adapter: undefined, withCredentials: false },
+      { adapter: 'fetch', withCredentials: 'omit' },
+      { adapter: 'xhr', withCredentials: false },
+    ])
   })
 
   test('sends the serialized body and turns URLSearchParams into a string for the Node adapter', async () => {

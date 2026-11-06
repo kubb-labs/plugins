@@ -79,17 +79,23 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
       // Kubb already serialized the body; only URLSearchParams needs a string, since axios's Node adapter rejects it.
       transformRequest: (data) => (data instanceof URLSearchParams ? data.toString() : data),
       signal: request.signal,
-      // axios only has `withCredentials`, and its fetch adapter reads `false` as `omit`, so `same-origin` keeps the adapter default.
-      // The browser XHR adapter cannot omit same-origin cookies, so there `omit` acts as `same-origin`.
-      ...(request.credentials && request.credentials !== 'same-origin' && { withCredentials: request.credentials === 'include' }),
       responseType: request.responseType,
       validateStatus: () => true,
     }
 
-    // In the browser the default adapters pick XHR, which buffers the whole body, so a stream switches to fetch. An adapter set
-    // on the call or the instance, and the Node http adapter with its proxy and agent, are kept.
+    // In the browser the default adapters pick XHR, which buffers the whole body and cannot omit same-origin cookies, so a stream
+    // or `credentials: 'omit'` switches to fetch. An adapter set on the call or the instance, and the Node http adapter with its
+    // proxy and agent, are kept.
     const defaultAdapter = !instance.defaults?.adapter || String(instance.defaults.adapter) === String(axios.defaults.adapter)
-    if (request.responseType === 'stream' && !config.adapter && defaultAdapter && typeof XMLHttpRequest !== 'undefined') config.adapter = 'fetch'
+    const needsFetch = request.responseType === 'stream' || request.credentials === 'omit'
+    if (needsFetch && !config.adapter && defaultAdapter && typeof XMLHttpRequest !== 'undefined') config.adapter = 'fetch'
+
+    // `credentials` wins over `withCredentials` in the options or the instance defaults. The fetch adapter takes the value as is,
+    // while the other adapters only know a boolean, where `false` keeps cookies same-origin.
+    if (request.credentials) {
+      const fetchAdapter = (config.adapter ?? instance.defaults?.adapter) === 'fetch'
+      config.withCredentials = fetchAdapter ? (request.credentials as unknown as boolean) : request.credentials === 'include'
+    }
 
     const response = await instance.request<unknown>(config)
     const headers = toHeaders(response.headers)
