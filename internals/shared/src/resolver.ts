@@ -25,7 +25,7 @@ export function operationKey(node: ast.OperationNode, ...scope: Array<string | n
 
 /**
  * The `param` namespace shared by the schema-producing plugins (ts, zod, faker):
- * per-parameter names plus the grouped `Path`/`Query`/`Headers` names, all routed
+ * per-parameter names plus the grouped `Path`/`Query`/`Headers`/`Cookies` names, all routed
  * through the plugin's top-level `name` casing.
  */
 export type OperationParamResolver = {
@@ -33,6 +33,7 @@ export type OperationParamResolver = {
   path(this: Resolver, node: ast.OperationNode): string
   query(this: Resolver, node: ast.OperationNode): string
   headers(this: Resolver, node: ast.OperationNode): string
+  cookies(this: Resolver, node: ast.OperationNode): string
 }
 
 /**
@@ -73,6 +74,10 @@ export function createOperationParamResolver(): OperationParamResolver {
     headers(node) {
       const name = this.name(`${node.operationId} Headers`)
       return this.resolveName({ key: operationKey(node, 'param', 'headers'), name })
+    },
+    cookies(node) {
+      const name = this.name(`${node.operationId} Cookies`)
+      return this.resolveName({ key: operationKey(node, 'param', 'cookies'), name })
     },
   }
 }

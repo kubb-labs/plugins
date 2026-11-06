@@ -6,7 +6,7 @@ import { toEventStream } from '../gen/httpbin-fetch/.kubb/sse.ts'
 
 const flavors = { fetch: fetchGen, axios: axiosGen as unknown as typeof fetchGen }
 
-describe.each(Object.entries(flavors))('httpbin over %s', (flavor, gen) => {
+describe.each(Object.entries(flavors))('httpbin over %s', (_flavor, gen) => {
   const { client, createClient, ResponseError } = gen
 
   test('serializes query styles and a header parameter', async () => {
@@ -76,21 +76,12 @@ describe.each(Object.entries(flavors))('httpbin over %s', (flavor, gen) => {
 
     const bytes = await gen.getBytes({ path: { n: 64 } })
     expect(bytes.contentType).toBe('application/octet-stream')
-    if (flavor === 'fetch') {
-      expect(bytes.data).toBeInstanceOf(Blob)
-      expect((bytes.data as Blob).size).toBe(64)
-    } else {
-      // The generated `responseType: 'blob'` is not supported by the axios Node adapter, which decodes the bytes as text (see findings).
-      expect(typeof bytes.data).toBe('string')
-      const buffer = await gen.getBytes({ path: { n: 64 }, responseType: 'arraybuffer' })
-      expect(Buffer.isBuffer(buffer.data)).toBe(true)
-      expect((buffer.data as unknown as Buffer).length).toBe(64)
-    }
+    expect(bytes.data).toBeInstanceOf(Blob)
+    expect((bytes.data as Blob).size).toBe(64)
 
-    const png = await gen.getPng({ ...(flavor === 'axios' ? { responseType: 'arraybuffer' as const } : {}) })
+    const png = await gen.getPng({})
     expect(png.contentType).toBe('image/png')
-    const head =
-      flavor === 'fetch' ? new Uint8Array(await (png.data as Blob).slice(0, 4).arrayBuffer()) : new Uint8Array(png.data as unknown as Buffer).slice(0, 4)
+    const head = new Uint8Array(await (png.data as Blob).slice(0, 4).arrayBuffer())
     expect([...head]).toStrictEqual([0x89, 0x50, 0x4e, 0x47])
   })
 
@@ -133,8 +124,7 @@ describe.each(Object.entries(flavors))('httpbin over %s', (flavor, gen) => {
   })
 
   test('sends cookie parameters as a Cookie header', async () => {
-    // The generated options have no `cookies` field (see findings), so the raw client is used for the runtime check.
-    const { data } = (await client({ method: 'GET', url: '/cookies', cookies: { session: 'abc', theme: 'dark' } })) as { data: { cookies: unknown } }
+    const { data } = await gen.getCookies({ cookies: { session: 'abc', theme: 'dark' } })
     expect(data.cookies).toStrictEqual({ session: 'abc', theme: 'dark' })
   })
 

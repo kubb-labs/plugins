@@ -92,18 +92,26 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
 
     // `credentials` wins over `withCredentials` in the options or the instance defaults. The fetch adapter takes the value as is,
     // while the other adapters only know a boolean, where `false` keeps cookies same-origin.
+    const fetchAdapter = (config.adapter ?? instance.defaults?.adapter) === 'fetch'
     if (request.credentials) {
-      const fetchAdapter = (config.adapter ?? instance.defaults?.adapter) === 'fetch'
       config.withCredentials = fetchAdapter ? (request.credentials as unknown as boolean) : request.credentials === 'include'
     }
+
+    // The Node http adapter has no 'blob' and would decode the bytes as text, so it reads a buffer that is wrapped as the fetch transport returns it.
+    const blobFromBuffer = request.responseType === 'blob' && typeof XMLHttpRequest === 'undefined' && !fetchAdapter
+    if (blobFromBuffer) config.responseType = 'arraybuffer'
 
     const response = await instance.request<unknown>(config)
     const headers = toHeaders(response.headers)
     const contentType = getResponseContentType(headers)
+    const raw =
+      blobFromBuffer && (response.data instanceof Uint8Array || response.data instanceof ArrayBuffer)
+        ? new Blob([new Uint8Array(response.data)], { type: headers.get('Content-Type') ?? '' })
+        : response.data
 
     return {
       // axios reads a bodiless status as '', while the fetch transport reads it as no data. Any other empty body stays '' on both.
-      data: [204, 205, 304].includes(response.status) ? undefined : await readStreamedBody({ data: response.data, contentType, status: response.status }),
+      data: [204, 205, 304].includes(response.status) ? undefined : await readStreamedBody({ data: raw, contentType, status: response.status }),
       status: response.status,
       statusText: response.statusText,
       headers,

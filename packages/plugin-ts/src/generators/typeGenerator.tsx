@@ -148,12 +148,13 @@ export const typeGenerator = defineGenerator<PluginTs>({
       )
     }
 
-    const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
+    const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = getOperationParameters(node)
 
     const paramGroupTypes = [
       pathParams.length > 0 && renderSchemaType({ schema: buildParams({ params: pathParams }), name: resolver.param.path(node, pathParams[0]!) }),
       queryParams.length > 0 && renderSchemaType({ schema: buildParams({ params: queryParams }), name: resolver.param.query(node, queryParams[0]!) }),
       headerParams.length > 0 && renderSchemaType({ schema: buildParams({ params: headerParams }), name: resolver.param.headers(node, headerParams[0]!) }),
+      cookieParams.length > 0 && renderSchemaType({ schema: buildParams({ params: cookieParams }), name: resolver.param.cookies(node, cookieParams[0]!) }),
     ]
 
     const requestBodyContent = node.requestBody?.content ?? []

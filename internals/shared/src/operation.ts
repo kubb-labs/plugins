@@ -78,6 +78,7 @@ export type OperationTypeNameResolver = RequestConfigResolver &
       path(node: ast.OperationNode, param: ast.ParameterNode): string
       query(node: ast.OperationNode, param: ast.ParameterNode): string
       headers(node: ast.OperationNode, param: ast.ParameterNode): string
+      cookies(node: ast.OperationNode, param: ast.ParameterNode): string
     }
   }
 
@@ -288,18 +289,20 @@ export type RequestGroups = {
   query: boolean
   body: boolean
   headers: boolean
+  cookies: boolean
 }
 
 /**
  * Which of the grouped request options an operation carries.
  */
 export function getRequestGroups(node: ast.OperationNode): RequestGroups {
-  const { path, query, header } = getOperationParameters(node)
+  const { path, query, header, cookie } = getOperationParameters(node)
   return {
     path: path.length > 0,
     query: query.length > 0,
     body: Boolean(node.requestBody?.content?.[0]?.schema),
     headers: header.length > 0,
+    cookies: cookie.length > 0,
   }
 }
 
@@ -308,6 +311,7 @@ export type RequestGroupOptionality = {
   hasRequiredPath: boolean
   hasRequiredQuery: boolean
   hasRequiredHeader: boolean
+  hasRequiredCookie: boolean
   /**
    * Whether the grouped request parameter can default to `{}`. True only when no group carries a
    * required member, so every member is safe to omit.
@@ -322,17 +326,19 @@ export type RequestGroupOptionality = {
  */
 export function getRequestGroupOptionality(node: ast.OperationNode): RequestGroupOptionality {
   const groups = getRequestGroups(node)
-  const { path, query, header } = getOperationParameters(node)
+  const { path, query, header, cookie } = getOperationParameters(node)
   const hasRequiredPath = path.some((param) => param.required)
   const hasRequiredQuery = query.some((param) => param.required)
   const hasRequiredHeader = header.some((param) => param.required)
+  const hasRequiredCookie = cookie.some((param) => param.required)
 
   return {
     groups,
     hasRequiredPath,
     hasRequiredQuery,
     hasRequiredHeader,
-    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !groups.body,
+    hasRequiredCookie,
+    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !hasRequiredCookie && !groups.body,
   }
 }
 
@@ -343,7 +349,7 @@ export type RequestOptionsNameResolver = RequestConfigResolver & {
 }
 
 /**
- * Builds the grouped `{ path, query, body, headers }` parameter for a generated client
+ * Builds the grouped `{ path, query, body, headers, cookies }` parameter for a generated client
  * function, typed from the operation's `Options` (minus `url`). Only the groups the
  * operation actually has are destructured. The trailing `config` parameter carries the
  * runtime `RequestConfig` overrides plus `client`.
@@ -356,7 +362,7 @@ export function buildRequestParamsSignature(
   const { isConfigurable = true } = options
   const { groups, isOptional } = getRequestGroupOptionality(node)
 
-  const names = (['path', 'query', 'body', 'headers'] as const).filter((key) => groups[key])
+  const names = (['path', 'query', 'body', 'headers', 'cookies'] as const).filter((key) => groups[key])
 
   // These callers never carry the `contentType` that several media types require.
   const optionsType = hasRequestContentTypeChoice(node)
@@ -439,7 +445,7 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
 }
 
 /**
- * Builds the combined `{ body, path, query, headers }` options object schema for an operation,
+ * Builds the combined `{ body, path, query, headers, cookies }` options object schema for an operation,
  * referencing the already-resolved body and grouped param names. Shared by `@kubb/plugin-ts`'s
  * `Options` type and `@kubb/plugin-zod`'s inferred options schema, so both printers emit the same
  * shape from the same inputs. `primitive: 'object'` is a no-op for the TS printer and tells the Zod
@@ -457,13 +463,14 @@ export function castToClientOptions(callArg: string, clientName: string, returnT
 }
 
 export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver, { pairContentTypes = false } = {}): ast.SchemaNode {
-  const { path, query, header } = getOperationParameters(node)
+  const { path, query, header, cookie } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
   const groups = [
     { name: 'path', params: path, resolve: resolver.param.path },
     { name: 'query', params: query, resolve: resolver.param.query },
     { name: 'headers', params: header, resolve: resolver.param.headers },
+    { name: 'cookies', params: cookie, resolve: resolver.param.cookies },
   ] as const
 
   const createOptions = (body: ast.SchemaNode, extra: Array<ast.PropertyNode> = []) =>
@@ -476,18 +483,21 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
       deprecated: node.deprecated,
       properties: [
         ast.factory.createProperty({ name: 'body', required: hasBody, schema: body }),
-        ...groups.map(({ name, params, resolve }) => {
-          const required = params.some((param) => param.required)
+        // `cookies` is rare, so it appears only on an operation that declares one.
+        ...groups
+          .filter(({ name, params }) => name !== 'cookies' || params.length > 0)
+          .map(({ name, params, resolve }) => {
+            const required = params.some((param) => param.required)
 
-          return ast.factory.createProperty({
-            name,
-            required,
-            schema:
-              params.length > 0
-                ? ast.factory.createSchema({ type: 'ref', name: resolve.call(resolver.param, node, params[0]!), optional: !required })
-                : createNever(),
-          })
-        }),
+            return ast.factory.createProperty({
+              name,
+              required,
+              schema:
+                params.length > 0
+                  ? ast.factory.createSchema({ type: 'ref', name: resolve.call(resolver.param, node, params[0]!), optional: !required })
+                  : createNever(),
+            })
+          }),
         ...extra,
       ],
     })
@@ -635,7 +645,7 @@ export function resolveOperationTypeNames(
 ): string[] {
   const key = `${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
   return resolver.memo(`operationTypeNames:${key}`, () => {
-    const { path, query, header } = getOperationParameters(node)
+    const { path, query, header, cookie } = getOperationParameters(node)
     const responseStatusNames =
       options.responseStatusNames === 'error'
         ? resolveErrorNames(node, resolver)
@@ -650,6 +660,7 @@ export function resolveOperationTypeNames(
             ...path.map((param) => resolver.param.path(node, param)),
             ...query.map((param) => resolver.param.query(node, param)),
             ...header.map((param) => resolver.param.headers(node, param)),
+            ...cookie.map((param) => resolver.param.cookies(node, param)),
           ]
     const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.response.body(node) : null, resolver.response.response(node)]
     const names =

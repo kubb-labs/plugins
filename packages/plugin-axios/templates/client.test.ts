@@ -139,6 +139,23 @@ describe('createAxiosTransport', () => {
     expect(calls[2]?.adapter).toBeUndefined()
   })
 
+  test('reads a blob as a buffer on the Node adapter and wraps it, and keeps blob on the fetch adapter and in the browser', async () => {
+    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47])
+    const { calls, transport } = fakeAxios({ data: png, headers: { 'content-type': 'image/png' } })
+    const client = createClientCore({ defaultTransport: transport })
+
+    const node = await client({ method: 'GET', url: '/image', responseType: 'blob' })
+    await client({ method: 'GET', url: '/image', responseType: 'blob', options: { adapter: 'fetch' } })
+    vi.stubGlobal('XMLHttpRequest', class {})
+    await client({ method: 'GET', url: '/image', responseType: 'blob' })
+    vi.unstubAllGlobals()
+
+    expect(calls.map((call) => call.responseType)).toStrictEqual(['arraybuffer', 'blob', 'blob'])
+    expect(node.data).toBeInstanceOf(Blob)
+    expect((node.data as Blob).type).toBe('image/png')
+    expect(new Uint8Array(await (node.data as Blob).arrayBuffer())).toStrictEqual(new Uint8Array(png))
+  })
+
   test('keeps the instance adapter for a stream, and the Node adapter outside the browser', async () => {
     const seen: Array<unknown> = []
     const adapter = async (config: InternalAxiosRequestConfig) =>

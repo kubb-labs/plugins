@@ -92,6 +92,8 @@ export type ResolverZod = Resolver & {
      * `resolver.param.headers(node, param) // → 'deletePetHeadersSchema'`
      */
     headers(node: ast.OperationNode, param: ast.ParameterNode): string
+    /** The grouped cookie parameters, as `resolver.param.cookies(node, param) // → 'getCookiesCookiesSchema'` */
+    cookies(node: ast.OperationNode, param: ast.ParameterNode): string
   }
   /**
    * Names for an operation's responses: per-status schemas, the request body, and the combined,
