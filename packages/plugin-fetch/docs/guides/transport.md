@@ -18,7 +18,7 @@ type ResolvedRequest = {
   body?: RequestBody
   signal?: AbortSignal
   credentials?: RequestCredentials
-  options?: FetchOptions
+  options?: NativeOptions
   responseType?: ResponseType
 }
 

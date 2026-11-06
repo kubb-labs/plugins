@@ -39,7 +39,19 @@ import type { RequestConfig } from '@kubb/plugin-fetch/templates/client.ts'
 import type { ResolvedRequest } from '@kubb/plugin-client/templates/core.ts'
 ```
 
-Code that imports from the generated `.kubb/client.ts` needs no change.
+Code that imports from the generated `.kubb/client.ts` needs no change, except for `FetchOptions`.
+
+## Removed exports
+
+`FetchOptions` is removed. The `options` type is `NativeOptions`, which is `RequestInit` plus Next.js's `next`:
+
+```typescript
+// before
+import type { FetchOptions } from './gen/.kubb/client'
+
+// after
+import type { NativeOptions } from './gen/.kubb/client'
+```
 
 ## Stream result types
 

@@ -9,14 +9,10 @@ export type NativeRequest = Request
 export type NativeResponse = Response
 
 /**
- * Extra `fetch` init the transport spreads onto every `Request`, an escape hatch for fields the runtime does not set itself such as `cache`, `redirect`, and Next.js's `next`.
+ * The `options` of every request, client config, and resolved request: extra `fetch` init the transport spreads onto
+ * the `Request`, for fields the runtime does not set itself such as `cache`, `redirect`, and Next.js's `next`.
  */
-export type FetchOptions = RequestInit & { next?: Record<string, unknown> }
-
-/**
- * The `options` type of every request, client config, and resolved request.
- */
-export type NativeOptions = FetchOptions
+export type NativeOptions = RequestInit & { next?: Record<string, unknown> }
 
 export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>
 /** The core's `ResponseError` class, typed with this transport's request and response. `instanceof` and `ResponseError.is` both match what the client throws. */

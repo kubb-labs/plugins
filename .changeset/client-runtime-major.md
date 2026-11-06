@@ -6,7 +6,7 @@
 
 Remove the compatibility layer around the client runtime. The fetch and axios clients share one interceptor API and one client factory, and stream results take the full event type.
 
-- Import client types from `templates/client.ts`. `templates/fetch.ts` and `templates/axios.ts` are gone, and the shared runtime comes from `@kubb/plugin-client/templates/*` instead of a copy in each plugin.
+- Import client types from `templates/client.ts`, and `NativeOptions` for the `options` type of a call. `templates/fetch.ts`, `templates/axios.ts`, `FetchOptions`, and `AxiosOptions` are gone, and the shared runtime comes from `@kubb/plugin-client/templates/*`.
 - Pass the full event type to `EventStreamResult`, `StreamResult`, and `UnwrappedStreamResult`: `EventStreamResult<ServerSentEvent<Pet>>` where you wrote `EventStreamResult<Pet>`.
 - Receive `ResolvedRequest`, `TransportResult`, and `ResponseError` in axios `client.interceptors` handlers, as on fetch. Native axios handlers go on `axiosInstance.interceptors`, and `client.interceptors.error` no longer runs for a network error.
 - Wrap an axios instance with `createAxiosTransport(instance)` to use it as `transport`. `defaultTransport` is now a function, and `axiosInstance` is the instance behind it.

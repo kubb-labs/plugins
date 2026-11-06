@@ -99,6 +99,7 @@ Native axios interceptors for a custom transport go on the instance you pass to 
 ## Removed exports
 
 - `validateStatus` had no effect and is removed. The client splits success from error by status.
+- `AxiosOptions` is removed. The `options` type is `NativeOptions`, which is `AxiosRequestConfig`.
 - `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are removed. `createClientCore`, `ClientInstance`, and `Interceptors` come from the shared core, and `createClientCore({ defaultTransport })` takes a transport function.
 
 ## Template subpaths

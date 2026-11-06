@@ -11,14 +11,10 @@ export type NativeRequest = AxiosRequestConfig
 export type NativeResponse = AxiosResponse
 
 /**
- * Extra axios config the transport spreads onto every request, an escape hatch for per-call fields the runtime does not set itself such as `timeout`, `proxy`, and the progress callbacks.
+ * The `options` of every request, client config, and resolved request: extra axios config the transport spreads onto
+ * the request, for per-call fields the runtime does not set itself such as `timeout`, `proxy`, and the progress callbacks.
  */
-export type AxiosOptions = AxiosRequestConfig
-
-/**
- * The `options` type of every request, client config, and resolved request.
- */
-export type NativeOptions = AxiosOptions
+export type NativeOptions = AxiosRequestConfig
 
 export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>
 /** The core's `ResponseError` class, typed with this transport's request and response. `instanceof` and `ResponseError.is` both match what the client throws. */
