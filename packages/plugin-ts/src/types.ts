@@ -39,12 +39,7 @@ export type ResolverTs = Resolver & {
      * `resolver.param.headers(node, param) // → 'DeletePetHeaders'`
      */
     headers(node: ast.OperationNode, param: ast.ParameterNode): string
-    /**
-     * Resolves the name for an operation's grouped cookie parameters type.
-     *
-     * @example Cookie parameters names
-     * `resolver.param.cookies(node, param) // → 'GetCookiesCookies'`
-     */
+    /** The grouped cookie parameters, as `resolver.param.cookies(node, param) // → 'GetCookiesCookies'` */
     cookies(node: ast.OperationNode, param: ast.ParameterNode): string
   }
   /**
