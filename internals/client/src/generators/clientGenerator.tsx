@@ -93,7 +93,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       })()
 
       const clientTypeImports = (() => {
-        if (stream) return ['Options', 'SuccessOf']
+        if (stream) return returnType === 'plain' ? ['Options', 'SuccessOf'] : ['SuccessOf']
         if (returnType === 'plain') return ['Options', 'RequestResult']
         if (returnType === 'data') return ['Options', 'UnwrappedResult']
         return ['Options', 'Unwrappable', 'RequestResult']

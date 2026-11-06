@@ -237,6 +237,16 @@ describe('toEventStream', () => {
     expect(await collect((await toEventStream<string>(Promise.resolve(first))).stream)).toStrictEqual([message({ data: 'a' })])
   })
 
+  test('keeps the status and error of a failed call made with throwOnError false', async () => {
+    const response = new Response(null, { status: 503 })
+    const result = await toEventStream<string, Response, false>(
+      Promise.resolve({ data: undefined, error: { message: 'busy' }, status: 503, contentType: 'application/json', response }),
+    )
+
+    expect({ status: result.status, error: result.error, response: result.response }).toStrictEqual({ status: 503, error: { message: 'busy' }, response })
+    expect(await collect(result)).toStrictEqual([])
+  })
+
   test('iterates the result as its stream', async () => {
     const result = await toEventStream<string>(Promise.resolve(call({ data: streamOf(['data: a\n\n', 'data: b\n\n']) })))
 

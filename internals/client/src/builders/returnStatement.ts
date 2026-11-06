@@ -79,14 +79,16 @@ export function buildEventStreamReturn({
   const shape = getEventStream(node) ?? 'data'
   const success = `SuccessOf<${types.response.responses(node)}>`
   const eventType = shape === 'event' ? `TypedEvent<${success}>` : success
-  const promise = `Promise<EventStreamResult<${eventType}>>`
-  if (returnType === 'plain') return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
+  if (returnType === 'plain') {
+    return { returnType: `Promise<EventStreamResult<${eventType}>>`, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
+  }
 
+  const promise = `Promise<StreamResult<${eventType}, ThrowOnError>>`
   const meta = [`shape: '${shape}'`, validatorHooks?.response ? `validator: ${validatorHooks.response}` : null].filter(Boolean).join(', ')
-  return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}), { client: request, config, ${meta} })` }
+  return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}), { client: request, config, ${meta} }) as ${promise}` }
 }
 
-/** The stream types an operation file imports: the result, the per-call options except for a plain client, and `TypedEvent` for named events. */
+/** The stream types an operation file imports: `StreamResult` and `StreamOptions`, `EventStreamResult` for a plain client, and `TypedEvent` for named events. */
 export function buildEventStreamImports({ returnType, typed }: { returnType: ReturnTypeOption; typed: boolean }): Array<string> {
-  return ['EventStreamResult', ...(returnType !== 'plain' ? ['EventStreamOptions'] : []), ...(typed ? ['TypedEvent'] : [])]
+  return [...(returnType === 'plain' ? ['EventStreamResult'] : ['StreamResult', 'StreamOptions']), ...(typed ? ['TypedEvent'] : [])]
 }

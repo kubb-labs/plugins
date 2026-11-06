@@ -260,13 +260,21 @@ try {
 }
 ```
 
+With `throwOnError: false`, the call resolves instead of throwing, as a regular call does. The result then carries the `status` and the `error` body, and its stream yields nothing:
+
+```typescript
+const result = await streamChat({ body, throwOnError: false })
+if (result.error) console.error('stream rejected', result.status, result.error)
+else for await (const event of result) render(event)
+```
+
 A stream call that gets a JSON response, such as an error body, parses it like any other call, so a 2xx JSON body yields an empty stream. An operation that declares another content type next to `text/event-stream` is generated as a normal call.
 
 Declare heartbeat and `error` events in the document, so each has a `case` in your `switch`.
 
 ## The runtime files
 
-`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `EventStreamResult` types. Kubb writes it only when the document has a `text/event-stream` operation, and `.kubb/client.ts` then re-exports it, so the types import from either file. Kubb regenerates both on each run, so do not edit them:
+`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `EventStreamResult` types. A stream operation takes `StreamOptions` and returns `StreamResult`, the stream versions of `Options` and `RequestResult`. Kubb writes it only when the document has a `text/event-stream` operation, and `.kubb/client.ts` then re-exports it, so the types import from either file. Kubb regenerates both on each run, so do not edit them:
 
 ```typescript
 import type { ServerSentEvent } from './gen/.kubb/client'

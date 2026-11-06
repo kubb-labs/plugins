@@ -1,4 +1,4 @@
-import type { NativeResponse } from './client.ts'
+import type { DataShape, NativeRequest, NativeResponse, Options } from './client.ts'
 import { baseContentType } from './serializers.ts'
 import { isValidationEnabled, runValidator, type StandardSchemaValidator, type ValidateOption, type ValidationErrorHandler } from './standardSchema.ts'
 
@@ -34,6 +34,9 @@ export type EventStreamOptions = {
   transform?: (event: ServerSentEvent) => ServerSentEvent
 }
 
+/** The options of a streamed operation: the call's `Options` with the per-call stream options, as `Options` is for a regular call. */
+export type StreamOptions<TData extends DataShape, ThrowOnError extends boolean = true> = Options<TData, ThrowOnError> & EventStreamOptions
+
 /**
  * The validation settings a call or its client may set.
  */
@@ -42,20 +45,33 @@ type ValidationSettings = { validate?: ValidateOption; onValidationError?: Valid
 /**
  * What the client resolves a streamed call to: the body as a stream or a decoded value, its content type, and the native response.
  */
-export type EventStreamCall<TResponse> = { data: unknown; contentType?: string; response: TResponse }
+export type EventStreamCall<TResponse> = { data: unknown; error?: unknown; status?: number; contentType?: string; request?: NativeRequest; response: TResponse }
 
 /** The payload wrapped in `ServerSentEvent`, or the item itself when the document types it as a whole event. */
 type StreamEvent<TData> = TData extends { event: string } ? TData : ServerSentEvent<TData>
 
-/** Parsed events alongside the native response. `TData` is the payload, or the typed event. Iterating the result reads `stream`. */
-export type EventStreamResult<TData = unknown, TResponse = NativeResponse> = AsyncIterable<StreamEvent<TData>> & {
+/**
+ * Parsed events with the call's status, error, and native request and response, the fields a `RequestResult` carries. `TData` is
+ * the payload, or the typed event. Iterating the result reads `stream`.
+ */
+export type EventStreamResult<TData = unknown, TResponse = NativeResponse, ThrowOnError extends boolean = true> = AsyncIterable<StreamEvent<TData>> & {
   stream: AsyncGenerator<StreamEvent<TData>>
+  status: number | undefined
+  /**
+   * The error body of a failed call with `throwOnError: false`, whose `stream` then yields nothing.
+   */
+  error: ThrowOnError extends true ? undefined : unknown
+  contentType: string | undefined
+  request: NativeRequest | undefined
   response: TResponse
   /**
    * The last event ID the server sent, to resume from with a `Last-Event-ID` header on a new call. Empty until the server sends `id`.
    */
   readonly lastEventId: string
 }
+
+/** A streamed call's result, as `RequestResult` is a regular call's. */
+export type StreamResult<TData, ThrowOnError extends boolean = true> = EventStreamResult<TData, NativeResponse, ThrowOnError>
 
 /** The last event ID, shared with the result so it can be read after the loop. */
 type Cursor = { lastEventId: string }
@@ -181,7 +197,7 @@ function isStreamBody(data: unknown): data is ReadableStream<Uint8Array> | Async
  * stream, or a body that is not an event stream. A dropped connection ends the loop with the
  * transport's error; `lastEventId` on the result is the ID to resume from.
  */
-export async function toEventStream<TData = unknown, TResponse = NativeResponse>(
+export async function toEventStream<TData = unknown, TResponse = NativeResponse, ThrowOnError extends boolean = true>(
   call: Promise<EventStreamCall<TResponse>>,
   {
     client,
@@ -203,12 +219,12 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
      */
     validator?: StandardSchemaValidator
   } = {},
-): Promise<EventStreamResult<TData, TResponse>> {
+): Promise<EventStreamResult<TData, TResponse, ThrowOnError>> {
   const defaults = client?.getConfig() ?? {}
   const onValidationError = options.onValidationError ?? defaults.onValidationError
   const validator = isValidationEnabled(options.validate ?? defaults.validate, 'response') ? meta.validator : undefined
   const cursor: Cursor = { lastEventId: '' }
-  const { data: body, contentType, response } = await call
+  const { data: body, error, status, contentType, request, response } = await call
 
   const validateEvent = async (event: ServerSentEvent): Promise<ServerSentEvent> => {
     if (!validator) return event
@@ -234,6 +250,10 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
   const stream = events()
   return {
     stream,
+    status,
+    error: error as EventStreamResult<TData, TResponse, ThrowOnError>['error'],
+    contentType,
+    request,
     response,
     get lastEventId() {
       return cursor.lastEventId

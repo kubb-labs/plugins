@@ -52,7 +52,7 @@ describe('event stream hooks', () => {
 
       for (const operation of ['streamGet', 'streamPost']) {
         const client = await fs.readFile(path.join(output, 'clients', `${operation}.ts`), 'utf8')
-        expect(client).toContain('EventStreamResult<')
+        expect(client).toContain('StreamResult<')
       }
 
       for (const dir of ['react', 'vue', 'swr']) {
@@ -133,12 +133,12 @@ describe('OpenAPI 3.2 item schemas', () => {
       expect(await fs.readFile(path.join(output, '.kubb', 'client.ts'), 'utf8')).toMatch(/export \* from '\.\/sse\.ts'\s*$/)
 
       const chat = await fs.readFile(path.join(output, 'clients', 'streamChat.ts'), 'utf8')
-      expect(chat).toContain('Promise<EventStreamResult<TypedEvent<SuccessOf<StreamChatResponses>>>>')
+      expect(chat).toContain('Promise<StreamResult<TypedEvent<SuccessOf<StreamChatResponses>>, ThrowOnError>>')
       expect(chat).toContain("{ client: request, config, shape: 'event', validator: ")
       expect(chat).not.toMatch(/validator: \{[^}]*response:/)
 
       const ticks = await fs.readFile(path.join(output, 'clients', 'streamTicks.ts'), 'utf8')
-      expect(ticks).toContain('Promise<EventStreamResult<SuccessOf<StreamTicksResponses>>>')
+      expect(ticks).toContain('Promise<StreamResult<SuccessOf<StreamTicksResponses>, ThrowOnError>>')
       expect(ticks).toContain("{ client: request, config, shape: 'data', validator: ")
 
       // JSON Lines is a stream of items too, but not an event stream, so it keeps the one-shot result typed with one item.

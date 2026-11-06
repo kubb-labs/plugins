@@ -12,7 +12,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
  */
 export type GroupedOptionsSignature = {
   /**
-   * The single function parameter: `options: Options<<Name>Options, ThrowOnError>`, with `& EventStreamOptions`
+   * The single function parameter: `options: Options<<Name>Options, ThrowOnError>`, or `StreamOptions<...>`
    * for a `text/event-stream` operation.
    */
   paramsSignature: string
@@ -53,7 +53,7 @@ export function buildGroupedOptionsSignature({
   eventStream?: boolean
 }): GroupedOptionsSignature {
   const optionsName = types.response.options(node)
-  const optionsType = `Options<${optionsName}, ThrowOnError>${eventStream && returnType !== 'plain' ? ' & EventStreamOptions' : ''}`
+  const optionsType = `${eventStream && returnType !== 'plain' ? 'StreamOptions' : 'Options'}<${optionsName}, ThrowOnError>`
   const { isOptional } = getRequestGroupOptionality(node)
 
   const paramsSignature =

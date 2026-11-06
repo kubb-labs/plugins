@@ -53,7 +53,7 @@ describe('buildSdkMethod', () => {
     const validatorHooks = { request: null, path: null, query: null, headers: null, response: 'streamEventsResponseSchema', error: null, importedZodNames: [] }
     const method = buildSdkMethod({ node, name: 'streamEvents', types: resolverTs, validatorHooks, returnType: 'full', throwOnErrorDefault: true })
 
-    expect(method).toContain('): Promise<EventStreamResult<SuccessOf<')
+    expect(method).toContain('): Promise<StreamResult<SuccessOf<')
     expect(method).toContain('return toEventStream<SuccessOf<')
     // The response validator runs per event, so it moves from the call config into the stream meta.
     expect(method).toContain(
