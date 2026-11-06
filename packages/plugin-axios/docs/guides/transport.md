@@ -2,24 +2,22 @@
 
 Set a transport at runtime to replace the network send. The client still builds URLs, serializes parameters, resolves authentication, and handles results.
 
-The transport is an `AxiosInstance`, or a function that takes the resolved request and returns a result, as in `@kubb/plugin-fetch`. The default is `defaultTransport`, an `axios.create()` instance exported from the generated client, and you can replace it with your own pre-configured instance. Use interceptors for request headers or response logging.
+The transport is a function that takes the resolved request and returns the parsed body with the native request and response, as in `@kubb/plugin-fetch`. The default is `defaultTransport`, which sends through `axiosInstance`, an `axios.create()` instance exported from the generated client. `createAxiosTransport(instance)` turns any axios instance into a transport.
 
 ```typescript
 type ClientConfig = {
   // ...
-  transport?: AxiosInstance | Transport
+  transport?: Transport
 }
 ```
 
-Kubb forwards the resolved URL, query, body, and authentication to the instance.
+## Send through a pre-configured instance
 
-## Pass a pre-configured instance
-
-Give the client an instance with a timeout, default headers, and a logging interceptor:
+Wrap an instance with a timeout, default headers, and a logging interceptor:
 
 ```typescript
 import axios from 'axios'
-import { client } from './gen/.kubb/client'
+import { client, createAxiosTransport } from './gen/.kubb/client'
 
 const instance = axios.create({
   timeout: 10_000,
@@ -31,29 +29,29 @@ instance.interceptors.response.use((response) => {
   return response
 })
 
-client.setConfig({ transport: instance })
+client.setConfig({ transport: createAxiosTransport(instance) })
 ```
 
-Every generated function now sends through your instance, so its timeout, headers, and interceptors apply to each call. Handlers registered through `client.interceptors` stay on `defaultTransport`, so register them on your instance.
+Every generated function now sends through your instance, so its timeout, headers, and axios interceptors apply to each call. Handlers registered through `client.interceptors` keep running, whatever the transport.
 
 > [!NOTE]
 > Kubb sets `url`, `method`, `headers`, `data`, `transformRequest`, `responseType`, and `validateStatus` on each request for its own serialization and status handling, so leave those fields alone. Set timeouts, retries, and interceptors on the instance. For one call, pass `options`, such as `{ timeout }` or `{ onUploadProgress }`, instead of building a new instance.
 
-## Use the default instance
+## Configure the default instance
 
-The generated client exports `defaultTransport`, the instance it sends through when no transport is set. Configure it directly to add tracing or headers without replacing the transport:
+The generated client exports `axiosInstance`, the instance `defaultTransport` sends through. Configure it directly to add tracing or headers without replacing the transport:
 
 ```typescript
-import { defaultTransport } from './gen/.kubb/client'
+import { axiosInstance } from './gen/.kubb/client'
 
-defaultTransport.defaults.timeout = 10_000
-defaultTransport.interceptors.request.use((config) => {
+axiosInstance.defaults.timeout = 10_000
+axiosInstance.interceptors.request.use((config) => {
   config.headers.set('traceparent', currentTraceparent())
   return config
 })
 ```
 
-Instances from `createClient()` get their own `axios.create()` and do not share these settings.
+Instances from `createClient()` send through the same `axiosInstance` unless you give them a `transport`.
 
 ## Where to set it
 
@@ -61,14 +59,12 @@ Use `client.setConfig({ transport })` for shared configuration, `createClient({ 
 
 ## Write a transport function
 
-A function transport receives the resolved request and returns the parsed body with the native request and response. `createAxiosTransport(instance)` is the one the client uses for an instance, and a custom function can wrap it:
+A custom function can wrap `defaultTransport`, or the transport of any instance:
 
 ```typescript
-import { client, createAxiosTransport, defaultTransport } from './gen/.kubb/client'
-
-const send = createAxiosTransport(defaultTransport)
+import { client, defaultTransport } from './gen/.kubb/client'
 
 client.setConfig({
-  transport: (request) => withSpan(request, () => send(request)),
+  transport: (request) => withSpan(request, () => defaultTransport(request)),
 })
 ```
