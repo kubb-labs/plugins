@@ -65,7 +65,7 @@ In OpenAPI 3.2, put one `oneOf` member per event name on `itemSchema`, with a `c
                     data: { type: string }
 ```
 
-In OpenAPI 3.0 and 3.1, put the same `oneOf` on `schema`, with a `discriminator` on `event`. Kubb reads `schema` as one event. `examples/advanced/petStore.yaml` declares `OrderEvent` this way, with one named schema per member.
+In OpenAPI 3.0 and 3.1, put the same `oneOf` on `schema`, with a `discriminator` on `event`. Kubb reads `schema` as one event.
 
 ### The stream
 
