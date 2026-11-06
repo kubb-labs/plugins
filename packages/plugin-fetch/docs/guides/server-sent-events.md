@@ -247,7 +247,7 @@ if (result.error) console.error('stream rejected', result.status, result.error)
 else for await (const event of result) render(event)
 ```
 
-As on a regular call, `.unwrap()` resolves to the events and rejects with the `error` body when the call failed. With `returnType: 'data'` in the plugin options, a stream call returns its events directly:
+As on a regular call, `.unwrap()` resolves to the events and rejects with the `error` body when the call failed:
 
 ```typescript
 for await (const event of await streamChat({ body }).unwrap()) render(event)
@@ -256,6 +256,57 @@ for await (const event of await streamChat({ body }).unwrap()) render(event)
 A stream call that gets a JSON response, such as an error body, parses it like any other call, so a 2xx JSON body yields an empty stream. An operation that declares another content type next to `text/event-stream` is generated as a normal call.
 
 Declare heartbeat and `error` events in the document, so each has a `case` in your `switch`.
+
+## Return only the events
+
+With `returnType: 'data'` in the plugin options, a stream call returns its events, as a regular call returns only its body:
+
+```typescript
+import { pluginFetch } from '@kubb/plugin-fetch'
+
+pluginFetch({ returnType: 'data' })
+```
+
+Loop over the events the call resolves to:
+
+```typescript
+import { streamOrderEvents } from './gen/clients/streamOrderEvents'
+import { streamPetEvents } from './gen/clients/streamPetEvents'
+
+const events = await streamOrderEvents({ path: { orderId: 7 } })
+
+for await (const event of events) {
+  if (event.event === 'order_placed') render(event.data) // Order
+}
+
+for await (const { data } of await streamPetEvents({ path: { petId: 1 } })) {
+  console.info(data.type) // PetEvent
+}
+```
+
+A failed call throws a `ResponseError` before the first event, and a dropped connection throws from the loop:
+
+```typescript
+import { ResponseError } from './gen/.kubb/client'
+
+try {
+  for await (const event of await streamPetEvents({ path: { petId: 1 } })) render(event)
+} catch (error) {
+  if (!ResponseError.is(error)) throw error
+  console.error('stream rejected', error.status)
+}
+```
+
+With `throwOnError: false`, the call returns the full result instead, as a regular call does in this mode. The events are its `data`, and checking `status` narrows `error`:
+
+```typescript
+const result = await streamPetEvents({ path: { petId: 1 }, throwOnError: false })
+
+if (result.error) console.error('stream rejected', result.status, result.error)
+else for await (const event of result.data) render(event)
+```
+
+The events alone carry no `response` or `lastEventId`. To resume a dropped stream, use the default `returnType: 'full'`, or pass `throwOnError: false` to get the full result.
 
 ## The runtime files
 
