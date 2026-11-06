@@ -163,7 +163,6 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
       const clientPath = path.resolve(root, '.kubb/client.ts')
       const standardSchemaPath = path.resolve(root, '.kubb/standardSchema.ts')
       const ssePath = path.resolve(root, '.kubb/sse.ts')
-      const runtime = <StreamRuntime nodes={nodes} root={root} sse={sse} baseURL={ctx.options.baseURL} />
 
       const banner = (file: ast.FileNode) => resolver.default.banner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
       const footer = (file: ast.FileNode) => resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
@@ -224,45 +223,34 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
 
       // `flat` collapses every operation into one class named by `sdk.name`, so callers reach
       // an operation as `new PetStore(config).getPetById(...)` without a per-tag sub-client.
-      if (sdk.mode === 'flat') {
-        const flatName = resolver.className(sdk.name ?? 'sdk')
-        const flatFile = resolver.file({ name: sdk.name ?? 'sdk', extname: '.ts', root, output, group: group ?? undefined })
-        const allOps = controllers.flatMap((controller) => controller.operations)
+      const renderFacadeFile = (name: string) => {
+        const sdkFile = resolver.file({ name, extname: '.ts', root, output, group: group ?? undefined })
+        const members = controllers.map(({ name, tag }) => ({ className: name, propName: resolver.propertyName(tag ?? name) }))
 
         return (
-          <>
-            {runtime}
-            {renderClassFile(flatName, flatFile, allOps)}
-          </>
-        )
-      }
-
-      const classFiles = controllers.map(({ name, file, operations: ops }) => renderClassFile(name, file, ops))
-
-      if (!sdk.name) {
-        return (
-          <>
-            {runtime}
-            {classFiles}
-          </>
-        )
-      }
-
-      const sdkFile = resolver.file({ name: sdk.name, extname: '.ts', root, output, group: group ?? undefined })
-      const facadeName = resolver.className(sdk.name)
-      const members = controllers.map(({ name, tag }) => ({ className: name, propName: resolver.propertyName(tag ?? name) }))
-
-      return (
-        <>
-          {runtime}
-          {classFiles}
           <File key={sdkFile.path} baseName={sdkFile.baseName} path={sdkFile.path} meta={sdkFile.meta} banner={banner(sdkFile)} footer={footer(sdkFile)}>
             <File.Import name={['ClientConfig']} root={sdkFile.path} path={clientPath} isTypeOnly />
             {controllers.map(({ name, file }) => (
               <File.Import key={name} name={[name]} root={sdkFile.path} path={file.path} />
             ))}
-            <SdkFacade name={facadeName} members={members} />
+            <SdkFacade name={resolver.className(name)} members={members} />
           </File>
+        )
+      }
+
+      const files =
+        sdk.mode === 'flat'
+          ? renderClassFile(
+              resolver.className(sdk.name ?? 'sdk'),
+              resolver.file({ name: sdk.name ?? 'sdk', extname: '.ts', root, output, group: group ?? undefined }),
+              controllers.flatMap((controller) => controller.operations),
+            )
+          : [...controllers.map(({ name, file, operations: ops }) => renderClassFile(name, file, ops)), sdk.name && renderFacadeFile(sdk.name)]
+
+      return (
+        <>
+          <StreamRuntime nodes={nodes} root={root} sse={sse} baseURL={ctx.options.baseURL} />
+          {files}
         </>
       )
     },
