@@ -574,6 +574,28 @@ paths:
         - api_key: []
         - petstore_auth:
             - read:pets
+  /store/order/{orderId}/events:
+    get:
+      tags:
+        - stream
+      summary: Stream order updates
+      description: Server-Sent Events stream of an order, one event per step. Each event names itself with `event` and carries the order in `data`.
+      operationId: streamOrderEvents
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of the order to stream events for
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Server-Sent Events stream of order updates
+          content:
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/OrderEvent'
 components:
   schemas:
     PetEvent:
@@ -596,6 +618,62 @@ components:
           format: date-time
       xml:
         name: petEvent
+    OrderPlacedEvent:
+      type: object
+      required:
+        - event
+        - data
+      properties:
+        event:
+          type: string
+          enum:
+            - order_placed
+        data:
+          $ref: '#/components/schemas/Order'
+        id:
+          type: string
+        retry:
+          type: integer
+          minimum: 0
+    OrderShippedEvent:
+      type: object
+      required:
+        - event
+        - data
+      properties:
+        event:
+          type: string
+          enum:
+            - order_shipped
+        data:
+          $ref: '#/components/schemas/Order'
+        id:
+          type: string
+        retry:
+          type: integer
+          minimum: 0
+    PingEvent:
+      type: object
+      required:
+        - event
+      properties:
+        event:
+          type: string
+          enum:
+            - ping
+        data:
+          type: string
+    OrderEvent:
+      oneOf:
+        - $ref: '#/components/schemas/OrderPlacedEvent'
+        - $ref: '#/components/schemas/OrderShippedEvent'
+        - $ref: '#/components/schemas/PingEvent'
+      discriminator:
+        propertyName: event
+        mapping:
+          order_placed: '#/components/schemas/OrderPlacedEvent'
+          order_shipped: '#/components/schemas/OrderShippedEvent'
+          ping: '#/components/schemas/PingEvent'
     Order:
       type: object
       properties:

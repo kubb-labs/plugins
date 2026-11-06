@@ -10,10 +10,15 @@ export type { CreatePetsXEXAMPLESchemaType } from './createPetsXEXAMPLESchema'
 export type { DogSchemaType } from './dogSchema'
 export type { FindPetsByTagsXEXAMPLESchemaType } from './findPetsByTagsXEXAMPLESchema'
 export type { ImageSchemaType } from './imageSchema'
+export type { OrderEventSchemaType } from './orderEventSchema'
 export type { OrderHttpStatusEnumSchemaType } from './orderHttpStatusEnumSchema'
 export type { OrderOrderTypeEnumSchemaType } from './orderOrderTypeEnumSchema'
 export type { OrderParamsStatusEnumSchemaType } from './orderParamsStatusEnumSchema'
+export type { OrderPlacedEventEventEnumSchemaType } from './orderPlacedEventEventEnumSchema'
+export type { OrderPlacedEventSchemaType } from './orderPlacedEventSchema'
 export type { OrderSchemaType } from './orderSchema'
+export type { OrderShippedEventEventEnumSchemaType } from './orderShippedEventEventEnumSchema'
+export type { OrderShippedEventSchemaType } from './orderShippedEventSchema'
 export type { OrderStatusEnumSchemaType } from './orderStatusEnumSchema'
 export type {
   AddFilesBodySchemaFormDataType,
@@ -153,6 +158,16 @@ export type {
   CreatePetsStatus201SchemaType,
   CreatePetsStatusDefaultSchemaType,
 } from './pets/createPetsSchema'
+export type { PingEventEventEnumSchemaType } from './pingEventEventEnumSchema'
+export type { PingEventSchemaType } from './pingEventSchema'
+export type {
+  StreamOrderEventsOptionsSchemaType,
+  StreamOrderEventsPathOrderIdSchemaType,
+  StreamOrderEventsPathSchemaType,
+  StreamOrderEventsResponseSchemaType,
+  StreamOrderEventsResponsesSchemaType,
+  StreamOrderEventsStatus200SchemaType,
+} from './stream/streamOrderEventsSchema'
 export type {
   StreamPetEventsOptionsSchemaType,
   StreamPetEventsPathPetIdSchemaType,
@@ -174,10 +189,15 @@ export { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema'
 export { dogSchema } from './dogSchema'
 export { findPetsByTagsXEXAMPLESchema } from './findPetsByTagsXEXAMPLESchema'
 export { imageSchema } from './imageSchema'
+export { orderEventSchema } from './orderEventSchema'
 export { orderHttpStatusEnumSchema } from './orderHttpStatusEnumSchema'
 export { orderOrderTypeEnumSchema } from './orderOrderTypeEnumSchema'
 export { orderParamsStatusEnumSchema } from './orderParamsStatusEnumSchema'
+export { orderPlacedEventEventEnumSchema } from './orderPlacedEventEventEnumSchema'
+export { orderPlacedEventSchema } from './orderPlacedEventSchema'
 export { orderSchema } from './orderSchema'
+export { orderShippedEventEventEnumSchema } from './orderShippedEventEventEnumSchema'
+export { orderShippedEventSchema } from './orderShippedEventSchema'
 export { orderStatusEnumSchema } from './orderStatusEnumSchema'
 export {
   addFilesBodySchema,
@@ -317,6 +337,16 @@ export {
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
 } from './pets/createPetsSchema'
+export { pingEventEventEnumSchema } from './pingEventEventEnumSchema'
+export { pingEventSchema } from './pingEventSchema'
+export {
+  streamOrderEventsOptionsSchema,
+  streamOrderEventsPathOrderIdSchema,
+  streamOrderEventsPathSchema,
+  streamOrderEventsResponseSchema,
+  streamOrderEventsResponsesSchema,
+  streamOrderEventsStatus200Schema,
+} from './stream/streamOrderEventsSchema'
 export {
   streamPetEventsOptionsSchema,
   streamPetEventsPathPetIdSchema,

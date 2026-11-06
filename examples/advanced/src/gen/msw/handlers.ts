@@ -8,6 +8,7 @@ import { updatePetHandler } from './pet/updatePetHandler'
 import { updatePetWithFormHandler } from './pet/updatePetWithFormHandler'
 import { uploadFileHandler } from './pet/uploadFileHandler'
 import { createPetsHandler } from './pets/createPetsHandler'
+import { streamOrderEventsHandler } from './stream/streamOrderEventsHandler'
 import { streamPetEventsHandler } from './stream/streamPetEventsHandler'
 
 export function createHandlers(options?: { baseURL?: string }) {
@@ -23,6 +24,7 @@ export function createHandlers(options?: { baseURL?: string }) {
     addFilesHandler(undefined, options),
     uploadFileHandler(undefined, options),
     streamPetEventsHandler(undefined, options),
+    streamOrderEventsHandler(undefined, options),
   ] as const
 }
 
