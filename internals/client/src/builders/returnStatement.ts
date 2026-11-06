@@ -86,11 +86,7 @@ export function buildEventStreamReturn({
   return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}), { client: request, config, ${meta} })` }
 }
 
-/**
- * The stream types a file with `text/event-stream` operations imports from `.kubb/sse.ts`, or from the custom client
- * module: the result, the per-call options unless the client is a plain custom module, and `TypedEvent` when an operation
- * types its events by name.
- */
+/** The stream types an operation file imports: the result, the per-call options except for a plain client, and `TypedEvent` for named events. */
 export function buildEventStreamImports({ returnType, typed }: { returnType: ReturnTypeOption; typed: boolean }): Array<string> {
   return ['EventStreamResult', ...(returnType !== 'plain' ? ['EventStreamOptions'] : []), ...(typed ? ['TypedEvent'] : [])]
 }
