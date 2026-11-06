@@ -40,6 +40,13 @@ export type ResolverFaker = Resolver & {
      * `resolver.param.headers(node, param) // -> 'createDeletePetHeaders'`
      */
     headers(node: ast.OperationNode, param: ast.ParameterNode): string
+    /**
+     * Resolves the name for an operation's grouped cookie parameters faker.
+     *
+     * @example Cookie parameters names
+     * `resolver.param.cookies(node, param) // -> 'createGetCookiesCookies'`
+     */
+    cookies(node: ast.OperationNode, param: ast.ParameterNode): string
   }
   /**
    * Naming for operation request bodies and responses.

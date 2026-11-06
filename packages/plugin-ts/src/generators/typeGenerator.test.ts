@@ -620,6 +620,26 @@ describe('typeGenerator — Operation', () => {
         ],
       }),
     },
+    {
+      name: 'getCookies — GET with cookie params',
+      node: ast.factory.createOperation({
+        operationId: 'getCookies',
+        method: 'GET',
+        path: '/cookies',
+        tags: ['cookies'],
+        parameters: [
+          ast.factory.createParameter({ name: 'session', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+          ast.factory.createParameter({ name: 'theme', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+            description: 'The cookies the request sent',
+          }),
+        ],
+      }),
+    },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode }>
 
   test.each(operations)('$name', async (props) => {
