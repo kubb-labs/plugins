@@ -29,7 +29,7 @@ export function buildOperationBody({
 }): { generics: Array<string>; paramsSignature: string; returnType: string; statement: string; mergeContentType: boolean } {
   const { callConfig, mergeContentType, eventStream } = buildCallConfig({ node, validatorHooks, security, throwOnErrorDefault, returnType })
   const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault, eventStream })
-  const stream = eventStream ? buildEventStreamReturn({ node, types, callConfig, returnType, validatorHooks }) : null
+  const stream = eventStream ? buildEventStreamReturn({ node, types, callConfig, returnType, validatorHooks, throwOnErrorDefault }) : null
 
   return {
     generics: signature.generics,

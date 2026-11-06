@@ -1,7 +1,7 @@
-import type { SuccessOf } from '../../../.kubb/client'
+import type { SuccessOf, Unwrappable } from '../../../.kubb/client'
 import type { StreamResult, StreamOptions, TypedEvent } from '../../../.kubb/sse'
 import type { OrderEvent } from '../../../models/ts/OrderEvent'
-import { client } from '../../../.kubb/client'
+import { client, withUnwrap } from '../../../.kubb/client'
 import { toEventStream } from '../../../.kubb/sse'
 
 /**
@@ -21,7 +21,7 @@ export function streamOrderEvents<ThrowOnError extends boolean = true>(
     },
     ThrowOnError
   >,
-): Promise<
+): Unwrappable<
   StreamResult<
     {
       '200': OrderEvent
@@ -36,27 +36,29 @@ export function streamOrderEvents<ThrowOnError extends boolean = true>(
 > {
   const { client: request = client, ...config } = options
 
-  return toEventStream<
-    TypedEvent<
-      SuccessOf<{
-        '200': OrderEvent
-      }>
-    >
-  >(request({ method: 'GET', url: '/store/order/{orderId}/events', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }), {
-    client: request,
-    config,
-    shape: 'event',
-  }) as Promise<
-    StreamResult<
-      {
-        '200': OrderEvent
-      },
-      ThrowOnError,
+  return withUnwrap(
+    toEventStream<
       TypedEvent<
         SuccessOf<{
           '200': OrderEvent
         }>
       >
-    >
-  >
+    >(request({ method: 'GET', url: '/store/order/{orderId}/events', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }), {
+      client: request,
+      config,
+      shape: 'event',
+    }) as Promise<
+      StreamResult<
+        {
+          '200': OrderEvent
+        },
+        ThrowOnError,
+        TypedEvent<
+          SuccessOf<{
+            '200': OrderEvent
+          }>
+        >
+      >
+    >,
+  )
 }

@@ -247,6 +247,12 @@ if (result.error) console.error('stream rejected', result.status, result.error)
 else for await (const event of result) render(event)
 ```
 
+As on a regular call, `.unwrap()` resolves to the events and rejects with the `error` body when the call failed. With `returnType: 'data'` in the plugin options, a stream call returns its events directly:
+
+```typescript
+for await (const event of await streamChat({ body }).unwrap()) render(event)
+```
+
 A stream call that gets a JSON response, such as an error body, parses it like any other call, so a 2xx JSON body yields an empty stream. An operation that declares another content type next to `text/event-stream` is generated as a normal call.
 
 Declare heartbeat and `error` events in the document, so each has a `case` in your `switch`.

@@ -53,6 +53,8 @@ type StreamEvent<TData> = TData extends { event: string } ? TData : ServerSentEv
 /** Parsed events with the fields a `RequestResult` carries. `TData` is the payload, or the typed event. Iterating the result reads `stream`. */
 export type EventStreamResult<TData = unknown, TResponse = NativeResponse, ThrowOnError extends boolean = true> = AsyncIterable<StreamEvent<TData>> & {
   stream: AsyncGenerator<StreamEvent<TData>>
+  /** The same events as `stream` on a 2xx response, so `.unwrap()` and `returnType: 'data'` return them. */
+  data: AsyncGenerator<StreamEvent<TData>> | undefined
   status: number | undefined
   /** The error body of a failed call with `throwOnError: false`, whose `stream` then yields nothing. */
   error: ThrowOnError extends true ? undefined : unknown
@@ -67,12 +69,17 @@ export type EventStreamResult<TData = unknown, TResponse = NativeResponse, Throw
 
 type StreamParts<TData> = AsyncIterable<StreamEvent<TData>> & { stream: AsyncGenerator<StreamEvent<TData>>; readonly lastEventId: string }
 
-type WithoutData<TResult> = TResult extends unknown ? Omit<TResult, 'data'> : never
+type WithEvents<TResult, TData> = TResult extends { error: undefined } ? Omit<TResult, 'data'> & { data: AsyncGenerator<StreamEvent<TData>> } : TResult
 
-/** A stream call's result, as `RequestResult` is a regular call's: `status` narrows `error`, and the events replace `data`. Branching on `ThrowOnError` lets a generated call cast to it. */
+/** A stream call's result, as `RequestResult` is a regular call's: `status` narrows `error`, and the events are its `data`. Branching on `ThrowOnError` lets a generated call cast to it. */
 export type StreamResult<TResponses, ThrowOnError extends boolean = true, TData = SuccessOf<TResponses>> = ThrowOnError extends true
-  ? WithoutData<RequestResult<TResponses, true>> & StreamParts<TData>
-  : WithoutData<RequestResult<TResponses, false>> & StreamParts<TData>
+  ? WithEvents<RequestResult<TResponses, true>, TData> & StreamParts<TData>
+  : WithEvents<RequestResult<TResponses, false>, TData> & StreamParts<TData>
+
+/** What a stream operation returns with `returnType: 'data'`, as `UnwrappedResult` is for a regular call. */
+export type UnwrappedStreamResult<TResponses, ThrowOnError extends boolean = true, TData = SuccessOf<TResponses>> = ThrowOnError extends true
+  ? AsyncGenerator<StreamEvent<TData>>
+  : StreamResult<TResponses, false, TData>
 
 /** The last event ID, shared with the result so it can be read after the loop. */
 type Cursor = { lastEventId: string }
@@ -251,6 +258,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse,
   const stream = events()
   return {
     stream,
+    data: error === undefined ? stream : undefined,
     status,
     error: error as EventStreamResult<TData, TResponse, ThrowOnError>['error'],
     contentType,

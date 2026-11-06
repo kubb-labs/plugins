@@ -66,12 +66,14 @@ export function buildEventStreamReturn({
   callConfig,
   returnType,
   validatorHooks,
+  throwOnErrorDefault,
 }: {
   node: ast.HttpOperationNode
   types: OperationTypeNames
   callConfig: string
   returnType: ReturnTypeOption
   validatorHooks: ValidatorHooks | null
+  throwOnErrorDefault: boolean
 }): {
   returnType: string
   statement: string
@@ -84,12 +86,18 @@ export function buildEventStreamReturn({
     return { returnType: `Promise<EventStreamResult<${eventType}>>`, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
   }
 
-  const promise = `Promise<StreamResult<${responses}, ThrowOnError${shape === 'event' ? `, ${eventType}` : ''}>>`
+  const generics = `${responses}, ThrowOnError${shape === 'event' ? `, ${eventType}` : ''}`
   const meta = [`shape: '${shape}'`, validatorHooks?.response ? `validator: ${validatorHooks.response}` : null].filter(Boolean).join(', ')
-  return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}), { client: request, config, ${meta} }) as ${promise}` }
+  const call = `toEventStream<${eventType}>(request(${callConfig}), { client: request, config, ${meta} })`
+  if (returnType === 'data') {
+    const result = `Promise<UnwrappedStreamResult<${generics}>>`
+    return { returnType: result, statement: `return unwrapResult(${call}, config.throwOnError ?? ${throwOnErrorDefault}) as ${result}` }
+  }
+  return { returnType: `Unwrappable<StreamResult<${generics}>>`, statement: `return withUnwrap(${call} as Promise<StreamResult<${generics}>>)` }
 }
 
 /** The stream types an operation file imports: `StreamResult` and `StreamOptions`, `EventStreamResult` for a plain client, and `TypedEvent` for named events. */
 export function buildEventStreamImports({ returnType, typed }: { returnType: ReturnTypeOption; typed: boolean }): Array<string> {
-  return [...(returnType === 'plain' ? ['EventStreamResult'] : ['StreamResult', 'StreamOptions']), ...(typed ? ['TypedEvent'] : [])]
+  const result = { plain: ['EventStreamResult'], full: ['StreamResult', 'StreamOptions'], data: ['UnwrappedStreamResult', 'StreamOptions'] }[returnType]
+  return [...result, ...(typed ? ['TypedEvent'] : [])]
 }
