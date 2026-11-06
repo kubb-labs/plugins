@@ -234,12 +234,12 @@ describe('toEventStream', () => {
   test('accepts a content type with parameters', async () => {
     const first = call({ data: streamOf(['data: a\n\n']), contentType: 'Text/Event-Stream; charset=utf-8' })
 
-    expect(await collect((await toEventStream<string>(Promise.resolve(first))).stream)).toStrictEqual([message({ data: 'a' })])
+    expect(await collect((await toEventStream<ServerSentEvent<string>>(Promise.resolve(first))).stream)).toStrictEqual([message({ data: 'a' })])
   })
 
   test('keeps the status and error of a failed call made with throwOnError false', async () => {
     const response = new Response(null, { status: 503 })
-    const result = await toEventStream<string>(
+    const result = await toEventStream<ServerSentEvent<string>>(
       Promise.resolve({ data: undefined, error: { message: 'busy' }, status: 503, contentType: 'application/json', response }),
     )
 
@@ -253,7 +253,7 @@ describe('toEventStream', () => {
   })
 
   test('leaves data undefined for a failed call whose error body is empty', async () => {
-    const result = await toEventStream<string>(
+    const result = await toEventStream<ServerSentEvent<string>>(
       Promise.resolve({ data: undefined, error: undefined, status: 503, response: new Response(null, { status: 503 }) }),
     )
 
@@ -261,7 +261,7 @@ describe('toEventStream', () => {
   })
 
   test('iterates the result as its stream', async () => {
-    const result = await toEventStream<string>(Promise.resolve(call({ data: streamOf(['data: a\n\n', 'data: b\n\n']) })))
+    const result = await toEventStream<ServerSentEvent<string>>(Promise.resolve(call({ data: streamOf(['data: a\n\n', 'data: b\n\n']) })))
 
     expect(result.data).toBe(result.stream)
     expect(await collect(result)).toStrictEqual([message({ data: 'a' }), message({ data: 'b' })])

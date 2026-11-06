@@ -51,7 +51,7 @@ axiosInstance.interceptors.request.use((config) => {
 })
 ```
 
-Instances from `createClient()` send through the same `axiosInstance` unless you give them a `transport`.
+Instances from `createClient()` inherit the `transport` set on `client`. They send through `axiosInstance` only when neither sets a `transport`.
 
 ## Where to set it
 
