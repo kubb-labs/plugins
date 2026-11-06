@@ -237,6 +237,12 @@ describe('toEventStream', () => {
     expect(await collect((await toEventStream<string>(Promise.resolve(first))).stream)).toStrictEqual([message({ data: 'a' })])
   })
 
+  test('iterates the result as its stream', async () => {
+    const result = await toEventStream<string>(Promise.resolve(call({ data: streamOf(['data: a\n\n', 'data: b\n\n']) })))
+
+    expect(await collect(result)).toStrictEqual([message({ data: 'a' }), message({ data: 'b' })])
+  })
+
   test('runs transform before the validator and validates data for the data shape', async () => {
     const transform = vi.fn((event: ServerSentEvent) => ({ ...event, data: { n: (event.data as { count: number }).count } }))
     const { stream } = await toEventStream(Promise.resolve(call({ data: streamOf(['id: 9\ndata: {"count":1}\n\n']) })), {

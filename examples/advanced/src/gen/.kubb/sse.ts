@@ -48,8 +48,8 @@ export type EventStreamCall<TResponse> = { data: unknown; contentType?: string; 
 /** The payload wrapped in `ServerSentEvent`, or the item itself when the document types it as a whole event. */
 type StreamEvent<TData> = TData extends { event: string } ? TData : ServerSentEvent<TData>
 
-/** Parsed events alongside the native response. `TData` is the payload, or the typed event. */
-export type EventStreamResult<TData = unknown, TResponse = NativeResponse> = {
+/** Parsed events alongside the native response. `TData` is the payload, or the typed event. Iterating the result reads `stream`. */
+export type EventStreamResult<TData = unknown, TResponse = NativeResponse> = AsyncIterable<StreamEvent<TData>> & {
   stream: AsyncGenerator<StreamEvent<TData>>
   response: TResponse
   /**
@@ -232,11 +232,13 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
     }
   }
 
+  const stream = events()
   return {
-    stream: events(),
+    stream,
     response,
     get lastEventId() {
       return cursor.lastEventId
     },
+    [Symbol.asyncIterator]: () => stream,
   }
 }

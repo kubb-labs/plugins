@@ -173,6 +173,27 @@ for await (const { data } of stream) {
 }
 ```
 
+## Use with TanStack Query
+
+The result is an `AsyncIterable` of its events, so TanStack Query's `experimental_streamedQuery` takes the call as it is. `data` is the list of events received so far, and unmounting aborts the request through `signal`:
+
+```typescript
+import { experimental_streamedQuery, queryOptions, useQuery } from '@tanstack/react-query'
+import { streamPetEvents } from './gen/clients/streamPetEvents'
+
+const petEventsOptions = (petId: number) =>
+  queryOptions({
+    queryKey: ['petEvents', petId],
+    queryFn: experimental_streamedQuery({
+      streamFn: ({ signal }) => streamPetEvents({ path: { petId }, signal }),
+    }),
+  })
+
+const { data: events = [] } = useQuery(petEventsOptions(1))
+```
+
+A refetch, such as on window focus, opens a new stream and by default clears the events.
+
 ## Stream options
 
 Pass these on the call, next to its request params:
