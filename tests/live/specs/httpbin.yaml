@@ -190,7 +190,7 @@ paths:
   /status/{code}/events:
     get:
       operationId: streamStatus
-      description: httpbin ignores the suffix? no, so path is mapped at call time via url override
+      description: A stream call answered with the status in the path
       parameters: [{ name: code, in: path, required: true, schema: { type: integer } }]
       responses:
         '200': { description: events, content: { text/event-stream: { schema: { type: object } } } }
