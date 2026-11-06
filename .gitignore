@@ -75,3 +75,6 @@ codecov.*
 # codecParams.test.ts output, left behind when a run fails before cleanup
 tests/**/.codec-*
 tests/**/.operation-types-*
+
+# tests/live generates its clients on each run
+tests/live/gen

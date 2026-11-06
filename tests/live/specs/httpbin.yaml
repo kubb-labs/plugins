@@ -1,0 +1,197 @@
+openapi: 3.0.3
+info: { title: httpbin, version: '1.0' }
+servers: [{ url: https://httpbin.org }]
+components:
+  securitySchemes:
+    basicAuth: { type: http, scheme: basic }
+    bearerAuth: { type: http, scheme: bearer }
+    apiKeyHeader: { type: apiKey, in: header, name: X-Api-Key }
+    apiKeyQuery: { type: apiKey, in: query, name: api_key }
+  schemas:
+    Echo:
+      type: object
+      properties:
+        args: { type: object, additionalProperties: {} }
+        headers: { type: object, additionalProperties: { type: string } }
+        json: { nullable: true }
+        form: { type: object, additionalProperties: {} }
+        files: { type: object, additionalProperties: { type: string } }
+        data: { type: string }
+        url: { type: string }
+        origin: { type: string }
+        cookies: { type: object, additionalProperties: { type: string } }
+        method: { type: string }
+        gzipped: { type: boolean }
+        authenticated: { type: boolean }
+        user: { type: string }
+        token: { type: string }
+    Person:
+      type: object
+      required: [name, age]
+      properties:
+        name: { type: string }
+        age: { type: integer }
+        tags: { type: array, items: { type: string } }
+    Problem:
+      type: object
+      properties:
+        message: { type: string }
+paths:
+  /get:
+    get:
+      operationId: getArgs
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - { name: tags, in: query, schema: { type: array, items: { type: string } } }
+        - { name: csv, in: query, explode: false, schema: { type: array, items: { type: string } } }
+        - { name: filter, in: query, style: deepObject, schema: { type: object, properties: { status: { type: string }, min: { type: integer } } } }
+        - { name: X-Custom, in: header, schema: { type: string } }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+  /anything/{id}:
+    get:
+      operationId: getAnything
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+  /post:
+    post:
+      operationId: postJson
+      requestBody:
+        required: true
+        content:
+          application/json: { schema: { $ref: '#/components/schemas/Person' } }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+  /anything/form:
+    post:
+      operationId: postForm
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema: { type: object, properties: { name: { type: string }, roles: { type: array, items: { type: string } } } }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+  /anything/upload:
+    post:
+      operationId: postMultipart
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                note: { type: string }
+                file: { type: string, format: binary }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+  /put:
+    put:
+      operationId: putJson
+      requestBody: { content: { application/json: { schema: { $ref: '#/components/schemas/Person' } } } }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+  /patch:
+    patch:
+      operationId: patchJson
+      requestBody: { content: { application/json: { schema: { $ref: '#/components/schemas/Person' } } } }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+  /delete:
+    delete:
+      operationId: deleteIt
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+  /status/{code}:
+    get:
+      operationId: getStatus
+      parameters: [{ name: code, in: path, required: true, schema: { type: integer } }]
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+        '204': { description: no content }
+        '404': { description: not found, content: { application/json: { schema: { $ref: '#/components/schemas/Problem' } } } }
+        '500': { description: boom }
+  /bytes/{n}:
+    get:
+      operationId: getBytes
+      parameters: [{ name: n, in: path, required: true, schema: { type: integer } }]
+      responses:
+        '200': { description: ok, content: { application/octet-stream: { schema: { type: string, format: binary } } } }
+  /image/png:
+    get:
+      operationId: getPng
+      responses:
+        '200': { description: ok, content: { image/png: { schema: { type: string, format: binary } } } }
+  /html:
+    get:
+      operationId: getHtml
+      responses:
+        '200': { description: ok, content: { text/html: { schema: { type: string } } } }
+  /delay/{seconds}:
+    get:
+      operationId: getDelay
+      parameters: [{ name: seconds, in: path, required: true, schema: { type: integer } }]
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+  /basic-auth/{user}/{passwd}:
+    get:
+      operationId: getBasicAuth
+      security: [{ basicAuth: [] }]
+      parameters:
+        - { name: user, in: path, required: true, schema: { type: string } }
+        - { name: passwd, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+        '401': { description: nope }
+  /bearer:
+    get:
+      operationId: getBearer
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+        '401': { description: nope }
+  /headers:
+    get:
+      operationId: getHeaders
+      security: [{ apiKeyHeader: [] }, { apiKeyQuery: [] }]
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+  /cookies:
+    get:
+      operationId: getCookies
+      parameters:
+        - { name: session, in: cookie, schema: { type: string } }
+        - { name: theme, in: cookie, schema: { type: string } }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+  /redirect-to:
+    get:
+      operationId: redirectTo
+      parameters:
+        - { name: url, in: query, required: true, schema: { type: string } }
+        - { name: status_code, in: query, schema: { type: integer } }
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+        '302': { description: moved }
+  /gzip:
+    get:
+      operationId: getGzip
+      responses:
+        '200': { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Echo' } } } }
+  /json:
+    get:
+      operationId: streamJsonAnswer
+      description: A stream call the server answers with JSON
+      responses:
+        '200': { description: events, content: { text/event-stream: { schema: { type: object } } } }
+  /status/{code}/events:
+    get:
+      operationId: streamStatus
+      description: httpbin ignores the suffix? no, so path is mapped at call time via url override
+      parameters: [{ name: code, in: path, required: true, schema: { type: integer } }]
+      responses:
+        '200': { description: events, content: { text/event-stream: { schema: { type: object } } } }
+        '404': { description: gone, content: { application/json: { schema: { $ref: '#/components/schemas/Problem' } } } }
