@@ -445,11 +445,7 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
 }
 
 /**
- * Builds the combined `{ body, path, query, headers, cookies }` options object schema for an operation,
- * referencing the already-resolved body and grouped param names. Shared by `@kubb/plugin-ts`'s
- * `Options` type and `@kubb/plugin-zod`'s inferred options schema, so both printers emit the same
- * shape from the same inputs. `primitive: 'object'` is a no-op for the TS printer and tells the Zod
- * printer to emit `z.object(…)` rather than a record.
+ * Whether the operation declares more than one request media type with a schema, so a caller must pick one on `contentType`.
  */
 export function hasRequestContentTypeChoice(node: ast.OperationNode): boolean {
   return (node.requestBody?.content ?? []).filter((entry) => entry.schema).length > 1
@@ -462,6 +458,14 @@ export function castToClientOptions(callArg: string, clientName: string, returnT
   return `${callArg} as Parameters<typeof ${clientName}${returnType === 'plain' ? '' : '<true>'}>[0]`
 }
 
+/**
+ * Builds the combined `{ body, path, query, headers, cookies }` options object schema for an operation,
+ * referencing the already-resolved body and grouped param names. `cookies` appears only when the operation
+ * declares a cookie parameter, the other groups always. Shared by `@kubb/plugin-ts`'s `Options` type and
+ * `@kubb/plugin-zod`'s inferred options schema, so both printers emit the same shape from the same inputs.
+ * `primitive: 'object'` is a no-op for the TS printer and tells the Zod printer to emit `z.object(…)` rather
+ * than a record.
+ */
 export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver, { pairContentTypes = false } = {}): ast.SchemaNode {
   const { path, query, header, cookie } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)

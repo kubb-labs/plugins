@@ -13,7 +13,9 @@ export type NativeResponse = Response
  */
 export type FetchOptions = RequestInit & { next?: Record<string, unknown> }
 
-/** The `options` type of every request, client config, and resolved request. */
+/**
+ * The `options` type of every request, client config, and resolved request.
+ */
 export type NativeOptions = FetchOptions
 
 export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>

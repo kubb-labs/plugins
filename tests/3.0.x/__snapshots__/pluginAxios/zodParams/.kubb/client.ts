@@ -15,7 +15,9 @@ export type NativeResponse = AxiosResponse
  */
 export type AxiosOptions = AxiosRequestConfig
 
-/** The `options` type of every request, client config, and resolved request. */
+/**
+ * The `options` type of every request, client config, and resolved request.
+ */
 export type NativeOptions = AxiosOptions
 
 export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>

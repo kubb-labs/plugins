@@ -2,10 +2,11 @@ import { getContentTypeInfo, getResponseContentTypeInfo, isEventStream } from '@
 import { ast } from '@kubb/kit'
 
 /**
- * Builds the `contentType` entry baked into the call config, or `null` without a request body.
+ * Builds the `contentType` entry baked into the call config. It holds the request default when the operation has a body
+ * and `response: 'text/event-stream'` when it streams events, and is `null` with neither.
  *
- * `merge` is `true` when the generated function must destructure `contentType` from `options` and
- * merge it over the baked request default, because the caller can also pick a response content type.
+ * `merge` is `true` when the generated function must destructure `contentType` from `options` and merge it over the
+ * baked defaults, because the caller can also pick a response content type or a stream must keep its `Accept`.
  */
 export function buildContentType({ node }: { node: ast.HttpOperationNode }): { literal: string | null; merge: boolean } {
   const { defaultContentType } = getContentTypeInfo(node)

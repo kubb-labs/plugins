@@ -96,7 +96,10 @@ export function buildEventStreamReturn({
   return { returnType: `Unwrappable<StreamResult<${generics}>>`, statement: `return withUnwrap(${call} as Promise<StreamResult<${generics}>>)` }
 }
 
-/** The stream types an operation file imports: the result and options types, `TypedEvent` for named events, and `ServerSentEvent` for a payload-only stream. */
+/**
+ * The stream types an operation file imports: the result and options types for `returnType`, `TypedEvent` for named
+ * events, and `ServerSentEvent` for a payload-only stream.
+ */
 export function buildEventStreamImports({ returnType, typed, payload }: { returnType: ReturnTypeOption; typed: boolean; payload: boolean }): Array<string> {
   const result = { plain: ['EventStreamResult'], full: ['StreamResult', 'StreamOptions'], data: ['UnwrappedStreamResult', 'StreamOptions'] }[returnType]
   return [...result, ...(typed ? ['TypedEvent'] : []), ...(payload ? ['ServerSentEvent'] : [])]
