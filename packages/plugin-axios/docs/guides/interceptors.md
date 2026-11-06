@@ -46,7 +46,8 @@ client.interceptors.error.use((error) => {
 This channel only fires on the throw path. When you read with `throwOnError: false`, a documented
 non-2xx response resolves and no error interceptor runs, so inspect the returned `error` on the
 result instead. A transport failure (no response) still throws. The error handler does not run,
-because there is no result to pass it.
+because there is no result to pass it. To react to a network error, add an error callback on
+`axiosInstance.interceptors.response`, as in [Native axios interceptors](#native-axios-interceptors).
 
 ## Add, replace, and remove handlers
 
