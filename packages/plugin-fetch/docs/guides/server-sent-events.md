@@ -4,12 +4,12 @@ An operation that returns `text/event-stream` gives you a typed stream of events
 
 Each event on the wire has up to four fields, and a blank line ends it:
 
-| Field   | Meaning                                                                |
-| ------- | ---------------------------------------------------------------------- |
-| `event` | The event name. `message` when the server sends none.                  |
-| `data`  | The payload. Parsed as JSON unless the document types it as a string.  |
-| `id`    | The last event ID. It carries over to later events and resumes a drop. |
-| `retry` | The reconnect delay in milliseconds.                                   |
+| Field   | Meaning                                                                          |
+| ------- | -------------------------------------------------------------------------------- |
+| `event` | The event name. `message` when the server sends none.                            |
+| `data`  | The payload. Parsed as JSON unless the document types it as a string.            |
+| `id`    | The last event ID. It carries over to later events and resumes a dropped stream. |
+| `retry` | The reconnect delay in milliseconds.                                             |
 
 ## Pick a shape
 
@@ -164,7 +164,7 @@ Each event is a `ServerSentEvent<PetEvent>`:
 type ServerSentEvent<TData> = { data: TData; event: string; id?: string; retry?: number }
 ```
 
-Read `data` straight from each event. The native `response` of the first connection sits next to the stream:
+Read `data` straight from each event. The result also holds the native `response` of the first connection:
 
 ```typescript
 import { streamPetEvents } from './gen/clients/streamPetEvents'
@@ -181,14 +181,14 @@ for await (const { data } of stream) {
 
 Pass these on the call, next to its request params:
 
-| Option           | What it does                                                                                                              |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `terminator`     | Ends the stream when `data` equals this value, such as `[DONE]`. Without it, the sentinel reaches your loop.              |
-| `onUnknownEvent` | Receives each event whose name the document does not declare.                                                             |
-| `transform`      | Maps each event before validation, for example to camelCase its keys.                                                     |
-| `maxEventSize`   | Largest event in characters. A larger one throws a `RangeError`. Defaults to `16 * 1024 * 1024`; `Infinity` turns it off. |
-| `signal`         | An `AbortSignal` that ends the request, the loop, and any pending reconnect.                                              |
-| `reconnect`      | Resumes a dropped stream. See [Reconnect](#reconnect).                                                                    |
+| Option           | What it does                                                                                                                    |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `terminator`     | Ends the stream when `data` equals this value, such as `[DONE]`. Without it, the sentinel reaches your loop.                    |
+| `onUnknownEvent` | Receives each event whose name the document does not declare.                                                                   |
+| `transform`      | Maps each event before validation, for example to camelCase its keys.                                                           |
+| `maxEventSize`   | Largest event in characters. A larger one throws a `RangeError`. Defaults to `16 * 1024 * 1024`. Set `Infinity` to turn it off. |
+| `signal`         | An `AbortSignal` that ends the request, the loop, and any pending reconnect.                                                    |
+| `reconnect`      | Resumes a dropped stream. See [Reconnect](#reconnect).                                                                          |
 
 To stop reading, `break` out of the loop. The runtime then cancels the reader and releases the connection.
 
@@ -229,7 +229,7 @@ console.info(result.lastEventId) // store it to resume after a page load
 | `onClose`    | `false` | Also reconnect after the server closes the stream cleanly.                         |
 | `resume`     | none    | Builds the resume request from the last event ID. Required for any method but GET. |
 
-The runtime stops reconnecting on abort, `break`, `maxRetries`, the `terminator`, a non-2xx response, or a response that is not an event stream. It owns the `Last-Event-ID` header: a header you pass on the call seeds the ID, and an empty `id:` from the server clears it.
+The runtime stops reconnecting on abort, `break`, `maxRetries`, the `terminator`, a non-2xx response, or a response that is not an event stream. The runtime owns the `Last-Event-ID` header: a header you pass on the call seeds the ID, and an empty `id:` from the server clears it.
 
 ## Handle errors
 
@@ -247,11 +247,13 @@ try {
 }
 ```
 
-A JSON answer, such as an error body, is parsed as a normal response, so a 2xx JSON body yields an empty stream. An operation that declares another content type next to `text/event-stream` is generated as a normal call. Declare heartbeat and `error` events in the document, so they reach your `switch` instead of `onUnknownEvent`.
+A stream call that gets a JSON response, such as an error body, parses it like any other call, so a 2xx JSON body yields an empty stream. An operation that declares another content type next to `text/event-stream` is generated as a normal call.
+
+Declare heartbeat and `error` events in the document, so they reach your `switch` instead of `onUnknownEvent`.
 
 ## The runtime file
 
-`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `ReconnectOptions` types. Import the types from there, and do not edit the file, because Kubb regenerates it on each run:
+`.kubb/sse.ts` exports the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `ReconnectOptions` types. Import the types from there. Kubb regenerates the file on each run, so do not edit it:
 
 ```typescript
 import type { ServerSentEvent } from './gen/.kubb/sse'
