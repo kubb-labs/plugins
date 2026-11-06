@@ -152,6 +152,7 @@ describe('createAxiosTransport', () => {
 
     expect(calls.map((call) => call.responseType)).toStrictEqual(['arraybuffer', 'blob', 'blob'])
     expect(node.data).toBeInstanceOf(Blob)
+    expect((node.data as Blob).type).toBe('image/png')
     expect(new Uint8Array(await (node.data as Blob).arrayBuffer())).toStrictEqual(new Uint8Array(png))
   })
 

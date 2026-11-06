@@ -106,7 +106,7 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
     const contentType = getResponseContentType(headers)
     const raw =
       blobFromBuffer && (response.data instanceof Uint8Array || response.data instanceof ArrayBuffer)
-        ? new Blob([new Uint8Array(response.data)])
+        ? new Blob([new Uint8Array(response.data)], { type: headers.get('Content-Type') ?? '' })
         : response.data
 
     return {
