@@ -47,11 +47,12 @@ describe('createAxiosTransport', () => {
     expect((result.response as AxiosResponse).headers).toMatchObject({ 'x-count': 2 })
   })
 
-  test('reads an empty body as no data, as the fetch transport does', async () => {
-    const { transport } = fakeAxios({ data: '', status: 204, statusText: 'No Content' })
-    const client = createClientCore({ defaultTransport: transport })
+  test('reads a bodiless status as no data, as the fetch transport does, and keeps an empty 200 body', async () => {
+    const none = createClientCore({ defaultTransport: fakeAxios({ data: '', status: 204, statusText: 'No Content' }).transport })
+    const empty = createClientCore({ defaultTransport: fakeAxios({ data: '', headers: { 'content-type': 'text/plain' } }).transport })
 
-    expect(await client({ method: 'DELETE', url: '/pet/1' })).toMatchObject({ status: 204, data: undefined, error: undefined })
+    expect(await none({ method: 'DELETE', url: '/pet/1' })).toMatchObject({ status: 204, data: undefined, error: undefined })
+    expect(await empty({ method: 'GET', url: '/pet/1' })).toMatchObject({ status: 200, data: '' })
   })
 
   test('resolves every status so the core splits success from error', async () => {
