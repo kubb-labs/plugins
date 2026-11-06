@@ -79,8 +79,9 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
       // Kubb already serialized the body; only URLSearchParams needs a string, since axios's Node adapter rejects it.
       transformRequest: (data) => (data instanceof URLSearchParams ? data.toString() : data),
       signal: request.signal,
-      // axios has no `credentials`: `include` sends cookies cross-origin, `omit` and `same-origin` do not.
-      ...(request.credentials && { withCredentials: request.credentials === 'include' }),
+      // axios only has `withCredentials`, and its fetch adapter reads `false` as `omit`, so `same-origin` keeps the adapter default.
+      // The browser XHR adapter cannot omit same-origin cookies, so there `omit` acts as `same-origin`.
+      ...(request.credentials && request.credentials !== 'same-origin' && { withCredentials: request.credentials === 'include' }),
       responseType: request.responseType,
       validateStatus: () => true,
     }

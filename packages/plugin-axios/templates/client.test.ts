@@ -67,15 +67,15 @@ describe('createAxiosTransport', () => {
     expect(calls[0]?.validateStatus?.(500)).toBe(true)
   })
 
-  test('maps credentials onto withCredentials', async () => {
-    const { calls, transport } = fakeAxios()
-    const client = createClientCore({ defaultTransport: transport, credentials: 'include' })
+  test('maps credentials onto the request the fetch adapter sends', async () => {
+    const sent: Array<RequestCredentials> = []
+    const fetch = async (input: Request) => (sent.push(input.credentials), new Response('{}', { headers: { 'content-type': 'application/json' } }))
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch } })) })
 
-    await client({ method: 'GET', url: '/pet' })
-    await client({ method: 'GET', url: '/pet', credentials: 'omit' })
-    await client({ method: 'GET', url: '/pet', credentials: 'same-origin' })
+    for (const credentials of ['include', 'omit', 'same-origin'] as const) await client({ method: 'GET', url: 'https://petstore.dev/pet', credentials })
+    await client({ method: 'GET', url: 'https://petstore.dev/pet' })
 
-    expect(calls.map((call) => call.withCredentials)).toStrictEqual([true, false, false])
+    expect(sent).toStrictEqual(['include', 'omit', 'same-origin', 'same-origin'])
   })
 
   test('sends the serialized body and turns URLSearchParams into a string for the Node adapter', async () => {
