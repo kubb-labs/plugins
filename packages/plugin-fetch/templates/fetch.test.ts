@@ -14,7 +14,7 @@ import {
   unwrapResult,
   withUnwrap,
   defaultTransport,
-} from './fetch.ts'
+} from './client.ts'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type FakeResult = Partial<Pick<TransportResult, 'data' | 'status' | 'statusText'>>

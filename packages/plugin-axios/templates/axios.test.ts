@@ -2,7 +2,7 @@ import { Readable } from 'node:stream'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios, { AxiosError as AxiosErrorClass } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import { type Auth, type CallResult, type ClientConfig, createClientCore, ResponseError, resolveAuth, unwrapResult, withUnwrap } from './axios.ts'
+import { type Auth, type CallResult, type ClientConfig, createClientCore, ResponseError, resolveAuth, unwrapResult, withUnwrap } from './client.ts'
 import { applyHeaderStyles, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }

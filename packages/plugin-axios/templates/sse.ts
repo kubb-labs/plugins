@@ -1,8 +1,6 @@
-import type { AxiosResponse } from 'axios'
+import type { NativeResponse } from './client.ts'
 import type { HttpMethod } from './serializers.ts'
 import { ParseError, type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
-
-type NativeResponse = AxiosResponse
 
 /**
  * One decoded Server-Sent Event. `data` is parsed as JSON when valid and kept as the raw string otherwise,

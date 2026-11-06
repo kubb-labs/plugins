@@ -11,19 +11,10 @@ const axiosTemplates = path.resolve(fetchTemplates, '../../plugin-axios/template
  * must land in the other. A drift here means a fix reached one client but not the other.
  */
 describe('shared client templates', () => {
-  test.each(['serializers.ts', 'standardSchema.ts'])('%s is byte-identical in plugin-axios', (name) => {
+  test.each(['serializers.ts', 'standardSchema.ts', 'sse.ts'])('%s is byte-identical in plugin-axios', (name) => {
     const fetchCopy = readFileSync(path.join(fetchTemplates, name), 'utf8')
     const axiosCopy = readFileSync(path.join(axiosTemplates, name), 'utf8')
     expect(axiosCopy).toBe(fetchCopy)
-  })
-
-  test('sse.ts differs only in the native response type', () => {
-    const withoutResponseType = (file: string) =>
-      readFileSync(file, 'utf8')
-        .split('\n')
-        .filter((line) => !line.includes('NativeResponse =') && !line.includes("from 'axios'"))
-        .join('\n')
-    expect(withoutResponseType(path.join(axiosTemplates, 'sse.ts'))).toBe(withoutResponseType(path.join(fetchTemplates, 'sse.ts')))
   })
 })
 
@@ -32,14 +23,14 @@ function declarationNames(source: string): Array<string> {
 }
 
 /**
- * fetch.ts and axios.ts mirror each other section by section, differing only in transport-specific
+ * the fetch and axios client.ts mirror each other section by section, differing only in transport-specific
  * members. Comparing the order of the declarations both files share keeps that structure aligned,
  * so the two clients stay reviewable side by side.
  */
 describe('client template structure', () => {
-  test('fetch.ts and axios.ts declare their shared members in the same order', () => {
-    const fetchNames = declarationNames(readFileSync(path.join(fetchTemplates, 'fetch.ts'), 'utf8'))
-    const axiosNames = declarationNames(readFileSync(path.join(axiosTemplates, 'axios.ts'), 'utf8'))
+  test('the fetch and axios client.ts declare their shared members in the same order', () => {
+    const fetchNames = declarationNames(readFileSync(path.join(fetchTemplates, 'client.ts'), 'utf8'))
+    const axiosNames = declarationNames(readFileSync(path.join(axiosTemplates, 'client.ts'), 'utf8'))
 
     const shared = new Set(fetchNames.filter((name) => axiosNames.includes(name)))
     expect(fetchNames.filter((name) => shared.has(name))).toStrictEqual(axiosNames.filter((name) => shared.has(name)))
