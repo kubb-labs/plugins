@@ -222,8 +222,8 @@ describe('toEventStream', () => {
     await expect(collect(result.stream)).rejects.toThrow(RangeError)
   })
 
-  test('yields nothing for a missing body', async () => {
-    expect(await collect((await toEventStream(Promise.resolve(call({ data: undefined })))).stream)).toStrictEqual([])
+  test.each([undefined, null])('yields nothing for a missing body (%s)', async (data) => {
+    expect(await collect((await toEventStream(Promise.resolve({ data, status: 204, response: new Response(null, { status: 204 }) }))).stream)).toStrictEqual([])
   })
 
   test.each([
