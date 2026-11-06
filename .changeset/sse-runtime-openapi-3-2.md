@@ -18,7 +18,7 @@ Type server-sent events by name from OpenAPI 3.2 `itemSchema`, parse them as the
 const { stream } = await streamChat({
   body,
   terminator: '[DONE]',
-  reconnect: { resume: (lastEventId) => ({ method: 'GET', headers: { 'Last-Event-ID': lastEventId } }) },
+  reconnect: { resume: () => ({ method: 'GET' }) },
 })
 
 for await (const event of stream) {

@@ -63,6 +63,14 @@ describe('parseEventStream', () => {
     expect(cursor.lastEventId).toBe('7')
   })
 
+  test('commits the last event ID at the blank line, not when the id line is read', async () => {
+    const cursor = { lastEventId: '' }
+    const events = await collect(parseEventStream<string>({ stream: streamOf(['id: 1\ndata: a\n\nid: 2\ndata: half']), cursor }))
+
+    expect(events).toStrictEqual([message({ data: 'a', id: '1' })])
+    expect(cursor.lastEventId).toBe('1')
+  })
+
   test('reads retry only when it is all ASCII digits', async () => {
     const events = await collect(
       parseEventStream<string>({ stream: streamOf(['retry:\ndata: a\n\nretry: 1e3\ndata: b\n\nretry: -5\ndata: c\n\nretry: 1000\ndata: d\n\n']) }),
@@ -134,6 +142,12 @@ describe('parseEventStream', () => {
     const events = await collect(parseEventStream<string>({ stream: streamOf([': keep alive!!\ndata: a\n\n']), maxEventSize: 20 }))
 
     expect(events).toStrictEqual([message({ data: 'a' })])
+  })
+
+  test('measures an unfinished comment line on its own at a chunk boundary', async () => {
+    const events = await collect(parseEventStream<string>({ stream: streamOf(['data: abcdefghi\n', ': keep alive', '\n\n']), maxEventSize: 20 }))
+
+    expect(events).toStrictEqual([message({ data: 'abcdefghi' })])
   })
 
   test('throws when a comment line alone outgrows maxEventSize', async () => {
@@ -223,7 +237,10 @@ describe('toEventStream', () => {
 
   test('passes maxEventSize to the parser and exposes the response', async () => {
     const response = new Response()
-    const result = await toEventStream({ send: Promise.resolve({ data: streamOf([`data: ${'x'.repeat(44)}\n\n`]), response }), config: { maxEventSize: 49 } })
+    const result = await toEventStream({
+      send: Promise.resolve({ ...call({ data: streamOf([`data: ${'x'.repeat(44)}\n\n`]) }), response }),
+      config: { maxEventSize: 49 },
+    })
 
     expect(result.response).toBe(response)
     await expect(collect(result.stream)).rejects.toThrow(RangeError)
@@ -233,8 +250,15 @@ describe('toEventStream', () => {
     ['a missing body', call({ data: undefined })],
     ['a JSON body on a streamed operation', call({ data: { error: 'busy' }, contentType: 'application/json' })],
     ['a stream that is not an event stream', call({ data: streamOf(['data: a\n\n']), contentType: 'text/plain' })],
+    ['a stream without a content type', { data: streamOf(['data: a\n\n']), response: new Response() }],
   ])('yields nothing for %s', async (_, first) => {
     expect(await collect((await toEventStream({ send: Promise.resolve(first) })).stream)).toStrictEqual([])
+  })
+
+  test('reports the Last-Event-ID header of the call until the server sends an id', async () => {
+    const result = await toEventStream({ send: Promise.resolve(call({ data: streamOf([]) })), config: { headers: { 'Last-Event-ID': '3' } } })
+
+    expect(result.lastEventId).toBe('3')
   })
 
   test('yields only the declared events and hands the others to onUnknownEvent', async () => {
@@ -384,6 +408,22 @@ describe('toEventStream', () => {
 
       expect(await collect(stream)).toStrictEqual([message({ data: 'a' })])
       expect(send).toHaveBeenCalledTimes(1)
+    })
+
+    test('ends at the terminator instead of reconnecting with onClose', async () => {
+      const send = sender(call({ data: streamOf(['data: a\n\ndata: [DONE]\n\n']) }), call({ data: streamOf(['data: b\n\n']) }))
+      const { stream } = await toEventStream<string>({ send, config: { terminator: '[DONE]', reconnect: { delay: 0, onClose: true } }, method: 'GET' })
+
+      expect(await collect(stream)).toStrictEqual([message({ data: 'a' })])
+      expect(send).toHaveBeenCalledTimes(1)
+    })
+
+    test('drops the Last-Event-ID header of the call after an empty id', async () => {
+      const send = sender(call({ data: droppedAfter('id:\ndata: a\n\n') }), call({ data: streamOf(['data: b\n\n']) }))
+      const { stream } = await toEventStream<string>({ send, config: { headers: { 'last-event-id': '3' }, reconnect: { delay: 0 } }, method: 'GET' })
+
+      await collect(stream)
+      expect(send.mock.calls[1]).toStrictEqual([{ body: undefined, headers: {} }])
     })
 
     test('stops at a reconnect answered without a stream', async () => {

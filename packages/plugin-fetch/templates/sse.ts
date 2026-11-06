@@ -23,7 +23,7 @@ export type ReconnectOptions = {
   maxRetries?: number
   /** Delay before the first reconnect in milliseconds, unless the server sent `retry`. */
   delay?: number
-  /** Longest delay between reconnects in milliseconds. */
+  /** Longest delay the backoff grows to in milliseconds. The server's `retry` replaces the backoff and is not capped. */
   maxDelay?: number
   /** Factor the delay grows by after each reconnect. */
   growFactor?: number
@@ -112,13 +112,13 @@ export type EventStreamResult<TData = unknown, TResponse = NativeResponse> = {
   stream: AsyncGenerator<StreamEvent<TData>>
   response: TResponse
   /**
-   * The last event ID the stream has set, to resume from later. Empty until the server sends `id`.
+   * The last event ID to resume from later: the call's `Last-Event-ID` header until the server sends `id`, then the server's.
    */
   readonly lastEventId: string
 }
 
-/** The fields that carry across events: the last event ID and the latest `retry`. */
-type Cursor = { lastEventId: string; retry?: number }
+/** What carries across events and connections: the last event ID, the latest `retry`, and whether the terminator ended the stream. */
+type Cursor = { lastEventId: string; retry?: number; done?: boolean }
 
 async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>): AsyncGenerator<Uint8Array> {
   if (!('getReader' in stream)) {
@@ -172,6 +172,7 @@ export async function* parseEventStream<TData = unknown>({
   let size = 0
   let line = ''
   let endsWithCR = false
+  let pendingId = cursor.lastEventId
 
   const readField = (part: string) => {
     const index = part.indexOf(':')
@@ -185,7 +186,7 @@ export async function* parseEventStream<TData = unknown>({
         type = value
         break
       case 'id':
-        if (!value.includes('\u0000')) cursor.lastEventId = value
+        if (!value.includes('\u0000')) pendingId = value
         break
       case 'retry':
         if (!/^\d+$/.test(value)) break
@@ -206,10 +207,15 @@ export async function* parseEventStream<TData = unknown>({
     line = parts.pop() ?? ''
     for (const part of parts) {
       if (!part) {
+        // The ID is committed at the blank line, so a drop inside an event does not resume past it.
+        cursor.lastEventId = pendingId
         if (data.length) {
           const raw = data.join('\n')
           const name = type || 'message'
-          if (raw === terminator) return
+          if (raw === terminator) {
+            cursor.done = true
+            return
+          }
           yield {
             data: isText(name) ? (raw as TData) : parseData<TData>(raw),
             event: name,
@@ -233,7 +239,7 @@ export async function* parseEventStream<TData = unknown>({
       size += part.length + 1
       readField(part)
     }
-    if (size + line.length > maxEventSize) throw new RangeError(tooLarge)
+    if ((line.startsWith(':') ? line.length : size + line.length) > maxEventSize) throw new RangeError(tooLarge)
   }
 }
 
@@ -241,10 +247,12 @@ function isStreamBody(data: unknown): data is ReadableStream<Uint8Array> | Async
   return !!data && typeof data === 'object' && (Symbol.asyncIterator in data || 'getReader' in data)
 }
 
-function headerRecord(headers: unknown): Record<string, string> {
-  if (!headers || typeof headers !== 'object') return {}
-  return Symbol.iterator in headers ? Object.fromEntries(headers as Iterable<[string, string]>) : { ...(headers as Record<string, string>) }
+function headerEntries(headers: unknown): Array<[string, string]> {
+  if (!headers || typeof headers !== 'object') return []
+  return Symbol.iterator in headers ? [...(headers as Iterable<[string, string]>)] : Object.entries(headers as Record<string, string>)
 }
+
+const isLastEventId = ([name]: [string, string]) => name.toLowerCase() === 'last-event-id'
 
 function sleep({ ms, signal }: { ms: number; signal?: AbortSignal }): Promise<void> {
   return new Promise((resolve) => {
@@ -287,7 +295,9 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
   const onValidationError = options.onValidationError ?? defaults.onValidationError
   const validate = typeof validateSetting === 'object' ? validateSetting.response !== false : validateSetting !== false
   const validator = validate ? meta.validator : undefined
-  const cursor: Cursor = { lastEventId: '' }
+  const callHeaders = headerEntries(options.headers)
+  // The runtime owns `Last-Event-ID`: a header on the call seeds the cursor and is not repeated once the server clears the ID.
+  const cursor: Cursor = { lastEventId: callHeaders.find(isLastEventId)?.[1] ?? '' }
   const first = await (typeof send === 'function' ? send() : send)
 
   const validateEvent = async (event: ServerSentEvent): Promise<ServerSentEvent> => {
@@ -313,7 +323,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
       if (call) {
         const body = call.data
         if (!isStreamBody(body)) return
-        if (call.contentType && !call.contentType.includes('text/event-stream')) {
+        if (call.contentType !== 'text/event-stream') {
           if ('cancel' in body) await body.cancel().catch(() => {})
           return
         }
@@ -342,18 +352,15 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
           await parsed.return(undefined).catch(() => {})
         }
       }
-      if (!reconnect || (!dropped && !onClose) || attempt >= maxRetries || options.signal?.aborted) return
+      if (cursor.done || !reconnect || (!dropped && !onClose) || attempt >= maxRetries || options.signal?.aborted) return
 
       await sleep({ ms: cursor.retry ?? wait, signal: options.signal })
       if (options.signal?.aborted) return
       wait = Math.min(wait * growFactor, maxDelay)
       const init: ResumeRequest = resume?.(cursor.lastEventId) ?? {}
       const method = (init.method ?? meta.method)?.toUpperCase()
-      const headers = {
-        ...headerRecord(options.headers),
-        ...(cursor.lastEventId ? { 'Last-Event-ID': cursor.lastEventId } : {}),
-        ...headerRecord(init.headers),
-      }
+      const headers: Record<string, string> = Object.fromEntries([...callHeaders, ...headerEntries(init.headers)].filter((entry) => !isLastEventId(entry)))
+      if (cursor.lastEventId) headers['Last-Event-ID'] = cursor.lastEventId
       // A GET or HEAD resume carries no body. A connection that fails is retried like a drop, and a refused one (`ResponseError`) ends the stream.
       call = await (send as EventStreamSend<TResponse>)({ ...(method === 'GET' || method === 'HEAD' ? { body: undefined } : {}), ...init, headers }).catch(
         (error: unknown) => {

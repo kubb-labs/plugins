@@ -253,7 +253,7 @@ const result = await streamChat({
     delay: 1000,
     maxDelay: 30_000,
     growFactor: 1.5,
-    resume: (lastEventId) => ({ method: 'GET', headers: { 'Last-Event-ID': lastEventId } }),
+    resume: () => ({ method: 'GET' }),
   },
 })
 
@@ -263,18 +263,18 @@ for await (const event of result.stream) {
 console.info(result.lastEventId) // store it to resume from a new page load
 ```
 
-| Option       | Default | Meaning                                                                                                              |
-| ------------ | ------- | -------------------------------------------------------------------------------------------------------------------- |
-| `maxRetries` | `2`     | Reconnects after the first connection.                                                                               |
-| `delay`      | `1000`  | Delay before the first reconnect in milliseconds. The server's `retry` field replaces it.                            |
-| `maxDelay`   | `30000` | Longest delay between reconnects.                                                                                    |
-| `growFactor` | `1.5`   | Factor the delay grows by after each reconnect.                                                                      |
-| `onClose`    | `false` | Also reconnect after the server closes the stream cleanly, as `EventSource` does.                                    |
-| `resume`     | none    | Builds the resume request from the last event ID. Required for any method but GET, which would repeat the operation. |
+| Option       | Default | Meaning                                                                                                                                                          |
+| ------------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `maxRetries` | `2`     | Reconnects after the first connection.                                                                                                                           |
+| `delay`      | `1000`  | Delay before the first reconnect in milliseconds. The server's `retry` field replaces it.                                                                        |
+| `maxDelay`   | `30000` | Longest delay the backoff grows to. The server's `retry` replaces the backoff and is not capped.                                                                 |
+| `growFactor` | `1.5`   | Factor the delay grows by after each reconnect.                                                                                                                  |
+| `onClose`    | `false` | Also reconnect after the server closes the stream cleanly, as `EventSource` does.                                                                                |
+| `resume`     | none    | Builds the resume request from the last event ID, which the runtime sends as `Last-Event-ID`. Required for any method but GET, which would repeat the operation. |
 
-The runtime stops reconnecting on abort, when you break out of the loop, after `maxRetries`, on a non-2xx response, and on a response that is not an event stream, such as a `204`. To resume an MCP Streamable HTTP POST stream, use the `resume` example above: a GET with `Last-Event-ID`.
+The runtime stops reconnecting on abort, when you break out of the loop, after `maxRetries`, on a non-2xx response, and on a response that is not an event stream, such as a `204` or a body without a `text/event-stream` content type. To resume an MCP Streamable HTTP POST stream, use the `resume` example above: a GET, to which the runtime adds `Last-Event-ID`.
 
-An empty `id:` field clears the last event ID, so the next reconnect sends no header. An `id` that contains a NULL character is ignored.
+A `Last-Event-ID` header you pass on the call seeds the last event ID, and the runtime owns the header from then on. An empty `id:` field clears the ID, so the next reconnect sends no header. An `id` that contains a NULL character is ignored.
 
 ## Handle errors
 
