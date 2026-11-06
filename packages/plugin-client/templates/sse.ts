@@ -47,14 +47,11 @@ type ValidationSettings = { validate?: ValidateOption; onValidationError?: Valid
  */
 export type EventStreamCall<TResponse> = { data: unknown; error?: unknown; status?: number; contentType?: string; request?: NativeRequest; response: TResponse }
 
-/** The payload wrapped in `ServerSentEvent`, or the item itself when the document types it as a whole event. */
-type StreamEvent<TData> = TData extends { event: string } ? TData : ServerSentEvent<TData>
-
-/** Parsed events with the fields a `RequestResult` carries. `TData` is the payload, or the typed event. Iterating the result reads `stream`. */
-export type EventStreamResult<TData = unknown, TResponse = NativeResponse> = AsyncIterable<StreamEvent<TData>> & {
-  stream: AsyncGenerator<StreamEvent<TData>>
+/** Parsed events with the fields a `RequestResult` carries. `TEvent` is the event type, such as `ServerSentEvent<Pet>` or `TypedEvent<ChatEvent>`. Iterating the result reads `stream`. */
+export type EventStreamResult<TEvent = ServerSentEvent, TResponse = NativeResponse> = AsyncIterable<TEvent> & {
+  stream: AsyncGenerator<TEvent>
   /** The same events as `stream` on a 2xx response, so `.unwrap()` and `returnType: 'data'` return them. */
-  data: AsyncGenerator<StreamEvent<TData>> | undefined
+  data: AsyncGenerator<TEvent> | undefined
   status: number | undefined
   /** The error body of a failed call with `throwOnError: false`, whose `stream` then yields nothing. */
   error: unknown
@@ -67,19 +64,19 @@ export type EventStreamResult<TData = unknown, TResponse = NativeResponse> = Asy
   readonly lastEventId: string
 }
 
-type StreamParts<TData> = AsyncIterable<StreamEvent<TData>> & { stream: AsyncGenerator<StreamEvent<TData>>; readonly lastEventId: string }
+type StreamParts<TEvent> = AsyncIterable<TEvent> & { stream: AsyncGenerator<TEvent>; readonly lastEventId: string }
 
-type WithEvents<TResult, TData> = TResult extends { error: undefined } ? Omit<TResult, 'data'> & { data: AsyncGenerator<StreamEvent<TData>> } : TResult
+type WithEvents<TResult, TEvent> = TResult extends { error: undefined } ? Omit<TResult, 'data'> & { data: AsyncGenerator<TEvent> } : TResult
 
 /** A stream call's result, as `RequestResult` is a regular call's: `status` narrows `error`, and the events are its `data`. Branching on `ThrowOnError` lets a generated call cast to it. */
-export type StreamResult<TResponses, ThrowOnError extends boolean = true, TData = SuccessOf<TResponses>> = ThrowOnError extends true
-  ? WithEvents<RequestResult<TResponses, true>, TData> & StreamParts<TData>
-  : WithEvents<RequestResult<TResponses, false>, TData> & StreamParts<TData>
+export type StreamResult<TResponses, ThrowOnError extends boolean = true, TEvent = ServerSentEvent<SuccessOf<TResponses>>> = ThrowOnError extends true
+  ? WithEvents<RequestResult<TResponses, true>, TEvent> & StreamParts<TEvent>
+  : WithEvents<RequestResult<TResponses, false>, TEvent> & StreamParts<TEvent>
 
 /** What a stream operation returns with `returnType: 'data'`, as `UnwrappedResult` is for a regular call. */
-export type UnwrappedStreamResult<TResponses, ThrowOnError extends boolean = true, TData = SuccessOf<TResponses>> = ThrowOnError extends true
-  ? AsyncGenerator<StreamEvent<TData>>
-  : StreamResult<TResponses, false, TData>
+export type UnwrappedStreamResult<TResponses, ThrowOnError extends boolean = true, TEvent = ServerSentEvent<SuccessOf<TResponses>>> = ThrowOnError extends true
+  ? AsyncGenerator<TEvent>
+  : StreamResult<TResponses, false, TEvent>
 
 /** The last event ID, shared with the result so it can be read after the loop. */
 type Cursor = { lastEventId: string }
@@ -205,7 +202,7 @@ function isStreamBody(data: unknown): data is ReadableStream<Uint8Array> | Async
  * stream, or a body that is not an event stream. A dropped connection ends the loop with the
  * transport's error; `lastEventId` on the result is the ID to resume from.
  */
-export async function toEventStream<TData = unknown, TResponse = NativeResponse>(
+export async function toEventStream<TEvent = ServerSentEvent, TResponse = NativeResponse>(
   call: Promise<EventStreamCall<TResponse>>,
   {
     client,
@@ -227,7 +224,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
      */
     validator?: StandardSchemaValidator
   } = {},
-): Promise<EventStreamResult<TData, TResponse>> {
+): Promise<EventStreamResult<TEvent, TResponse>> {
   const defaults = client?.getConfig() ?? {}
   const onValidationError = options.onValidationError ?? defaults.onValidationError
   const validator = isValidationEnabled(options.validate ?? defaults.validate, 'response') ? meta.validator : undefined
@@ -242,7 +239,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
     return meta.shape === 'event' ? { ...event, ...(validated as object) } : { ...event, data: validated }
   }
 
-  async function* events(): AsyncGenerator<StreamEvent<TData>> {
+  async function* events(): AsyncGenerator<TEvent> {
     if (!isStreamBody(body)) return
     // A custom transport may pass the raw header, with a charset parameter.
     if (baseContentType(contentType) !== 'text/event-stream') {
@@ -251,7 +248,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
     }
     // A consumer `break` or a failed event closes this loop, which cancels the reader.
     for await (const event of parseEventStream({ stream: body, maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })) {
-      yield (await validateEvent(options.transform ? options.transform(event) : event)) as StreamEvent<TData>
+      yield (await validateEvent(options.transform ? options.transform(event) : event)) as TEvent
     }
   }
 
