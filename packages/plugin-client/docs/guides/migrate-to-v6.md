@@ -1,0 +1,23 @@
+# Migrate to v6
+
+`@kubb/plugin-client` 6 passes the full event type to a custom client's stream helpers. Projects without server-sent event operations need no change.
+
+## Stream exports of your client
+
+Your module also exports `ServerSentEvent`, and `toEventStream` and `EventStreamResult` take the full event type instead of the payload:
+
+```typescript
+export type ServerSentEvent<TData = unknown> = { data: TData; event: string; id?: string; retry?: number }
+
+export type EventStreamResult<TEvent = ServerSentEvent> = { stream: AsyncGenerator<TEvent>; response: Response }
+
+export async function toEventStream<TEvent = ServerSentEvent>(result: Promise<{ data: unknown; response: Response }>): Promise<EventStreamResult<TEvent>> {
+  // parse the stream into TEvent values
+}
+```
+
+A generated function calls `toEventStream<ServerSentEvent<Payload>>` when the document types only the payload, and `toEventStream<TypedEvent<Event>>` when it names each event. See [Write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client).
+
+## Shared runtime templates
+
+`@kubb/plugin-client/templates/*` is now the only place the shared runtime ships. `@kubb/plugin-fetch` and `@kubb/plugin-axios` no longer re-export `templates/core.ts`, `templates/serializers.ts`, or `templates/standardSchema.ts`.

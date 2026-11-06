@@ -1,0 +1,41 @@
+# Migrate to v6
+
+`@kubb/plugin-fetch` 6 removes the compatibility layer around the client runtime that `@kubb/plugin-client` ships. The fetch client keeps its API, so most projects only regenerate. Check the items below.
+
+## Template subpaths
+
+`@kubb/plugin-fetch/templates/fetch.ts`, `templates/core.ts`, `templates/serializers.ts`, and `templates/standardSchema.ts` are gone. Import the client types from `@kubb/plugin-fetch/templates/client.ts`, and the shared runtime from `@kubb/plugin-client/templates/*`:
+
+```typescript
+// before
+import type { RequestConfig } from '@kubb/plugin-fetch/templates/fetch.ts'
+import type { ResolvedRequest } from '@kubb/plugin-fetch/templates/core.ts'
+
+// after
+import type { RequestConfig } from '@kubb/plugin-fetch/templates/client.ts'
+import type { ResolvedRequest } from '@kubb/plugin-client/templates/core.ts'
+```
+
+Code that imports from the generated `.kubb/client.ts` needs no change.
+
+## Stream result types
+
+`EventStreamResult`, `StreamResult`, and `UnwrappedStreamResult` take the full event type, not the payload. Wrap a payload in `ServerSentEvent`:
+
+```typescript
+// before
+let result: EventStreamResult<PetEvent>
+
+// after
+let result: EventStreamResult<ServerSentEvent<PetEvent>>
+```
+
+A stream whose document names each event already used `TypedEvent<…>`, which stays the same.
+
+## Stream answers that are not a stream
+
+A successful stream call whose answer is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. It used to end as an empty stream. An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.
+
+## Query plugins
+
+`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-swr`, and `@kubb/plugin-mcp` work with v5 and v6, so you can upgrade them separately.
