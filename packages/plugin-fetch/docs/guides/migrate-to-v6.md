@@ -4,13 +4,11 @@
 
 ## Upgrade steps
 
-1. Upgrade `kubb` and `@kubb/plugin-fetch` together. v6 needs the Kubb release that follows 5.15.4:
+1. Upgrade `kubb` and `@kubb/plugin-fetch` together. v6 needs Kubb 5.16.0 or later:
 
    ```bash
    npm install --save-dev kubb@latest @kubb/plugin-fetch@6
    ```
-
-   While v6 is in beta, install `@kubb/plugin-fetch@beta` instead of `@6`.
 
 2. Regenerate the client. This rewrites `.kubb/` and the operation files, so generated code needs no hand edits:
 
