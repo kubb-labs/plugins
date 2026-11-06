@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { createClientCore, getResponseContentType, isStreamed } from './core.ts'
 import { isJsonMediaType } from './serializers.ts'
 import type * as core from './core.ts'
@@ -17,6 +17,18 @@ export type NativeResponse = AxiosResponse
  */
 export type AxiosOptions = AxiosRequestConfig
 
+/** A transport as this client accepts it: an axios instance, which `createAxiosTransport` wraps, or a transport function. */
+export type AxiosTransport = AxiosInstance | Transport
+
+type AxiosOverrides = {
+  options?: AxiosOptions
+  transport?: AxiosTransport
+  /**
+   * @deprecated Has no effect. The client splits success from error by status, so axios never throws on a status.
+   */
+  validateStatus?: (status: number) => boolean
+}
+
 export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestResult<
   TResponses,
   ThrowOnError,
@@ -29,24 +41,49 @@ export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRe
   TRequest,
   TResponse
 >
-export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestConfig<TBody, TRequest, TResponse> & {
-  options?: AxiosOptions
-}
-export type Options<TData extends core.DataShape, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.Options<
-  TData,
-  ThrowOnError,
-  TRequest,
-  TResponse
-> & { options?: AxiosOptions }
-export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientConfig<TRequest, TResponse> & { options?: AxiosOptions }
+export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = Omit<
+  core.RequestConfig<TBody, TRequest, TResponse>,
+  'transport'
+> &
+  AxiosOverrides
+export type Options<TData extends core.DataShape, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = Omit<
+  core.Options<TData, ThrowOnError, TRequest, TResponse>,
+  'transport'
+> &
+  AxiosOverrides
+export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = Omit<core.ClientConfig<TRequest, TResponse>, 'transport'> & AxiosOverrides
 export type ResolvedRequest = core.ResolvedRequest & { options?: AxiosOptions }
 export type TransportResult<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.TransportResult<TData, TRequest, TResponse>
 export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
 export type CallResult<TRequest = NativeRequest, TResponse = NativeResponse> = core.CallResult<TRequest, TResponse>
-export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
-export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
 export type ResponseErrorConfig<TError = unknown> = core.ResponseError<TError, NativeRequest, NativeResponse>
 export type EventStreamResult<TData = unknown, TResponse = NativeResponse> = sse.EventStreamResult<TData, TResponse>
+
+/** An interceptor handler. It receives the native axios object; the second argument is kept for handlers written against earlier versions and is always `undefined`. */
+export type InterceptorFn<T> = (value: T, requestConfig?: RequestConfig) => T | Promise<T>
+
+/** Registers, removes, or replaces handlers on axios's own interceptor managers. */
+export type InterceptorChannel<T> = {
+  use: (fn: InterceptorFn<T>) => number
+  eject: (id: number) => void
+  update: (id: number, fn: InterceptorFn<T>) => void
+}
+
+/** The interceptors of `defaultTransport`: request handlers see the `InternalAxiosRequestConfig`, response handlers the `AxiosResponse`, error handlers the `AxiosError`. */
+export type Interceptors = {
+  request: InterceptorChannel<InternalAxiosRequestConfig>
+  response: InterceptorChannel<AxiosResponse>
+  error: InterceptorChannel<AxiosError>
+}
+
+export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = {
+  <TBody = unknown>(config: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>>
+  getConfig: () => ClientConfig<TRequest, TResponse>
+  setConfig: (config: ClientConfig<TRequest, TResponse>) => ClientConfig<TRequest, TResponse>
+  getUrl: core.ClientInstance<TRequest, TResponse>['getUrl']
+  interceptors: Interceptors
+  createClient: (config?: ClientConfig<TRequest, TResponse>) => ClientInstance<TRequest, TResponse>
+}
 
 /** `toEventStream` with the result bound to this transport's response. */
 export const toEventStream: <TData = unknown>(
@@ -128,16 +165,75 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
   }
 }
 
-/**
- * The axios instance the generated `client` sends through. Set its defaults or register axios interceptors on it.
- */
-export const axiosInstance = axios.create()
+function isAxiosInstance(value: unknown): value is AxiosInstance {
+  return typeof value === 'function' && 'request' in value && 'interceptors' in value
+}
+
+function toTransport<T extends { transport?: AxiosTransport }>(config: T): Omit<T, 'transport'> & { transport?: Transport } {
+  return { ...config, transport: isAxiosInstance(config.transport) ? createAxiosTransport(config.transport) : config.transport }
+}
 
 /**
- * The default transport: `axiosInstance` behind `createAxiosTransport`.
+ * Maps the kubb interceptor API onto the native managers of `instance`, keeping one id per handler so `eject` and `update`
+ * keep working after an `update`.
  */
-export const defaultTransport: Transport = createAxiosTransport(axiosInstance)
+function nativeInterceptors(instance: AxiosInstance): Interceptors {
+  const channel = <T>(eject: (nativeId: number) => void, register: (fn: InterceptorFn<T>) => number): InterceptorChannel<T> => {
+    const nativeIds = new Map<number, number>()
+    let counter = 0
+    return {
+      use(fn) {
+        const id = ++counter
+        nativeIds.set(id, register(fn))
+        return id
+      },
+      eject(id) {
+        const nativeId = nativeIds.get(id)
+        if (nativeId !== undefined) eject(nativeId)
+        nativeIds.delete(id)
+      },
+      update(id, fn) {
+        const nativeId = nativeIds.get(id)
+        if (nativeId === undefined) return
+        eject(nativeId)
+        nativeIds.set(id, register(fn))
+      },
+    }
+  }
+  const ejectRequest = (id: number) => instance.interceptors.request.eject(id)
+  const ejectResponse = (id: number) => instance.interceptors.response.eject(id)
+  return {
+    request: channel(ejectRequest, (fn) => instance.interceptors.request.use((config) => fn(config))),
+    response: channel(ejectResponse, (fn) => instance.interceptors.response.use((response) => fn(response))),
+    error: channel(ejectResponse, (fn) =>
+      instance.interceptors.response.use(undefined, async (error: AxiosError) => {
+        throw (await fn(error)) ?? error
+      }),
+    ),
+  }
+}
 
-export const client = createClientCore({ defaultTransport })
+/**
+ * Wraps a core client for axios callers: an `AxiosInstance` passed as `transport` is wrapped by `createAxiosTransport`,
+ * `client.interceptors` registers on `instance`, and `createClient` gives the child its own instance.
+ */
+function createAxiosClient(instance: AxiosInstance, config: ClientConfig = {}): ClientInstance {
+  const inner = createClientCore<NativeRequest, NativeResponse>({ defaultTransport: createAxiosTransport(instance), ...toTransport(config) })
+  const client = ((requestConfig) => inner(toTransport(requestConfig))) as ClientInstance
+  client.getConfig = inner.getConfig
+  client.setConfig = (next) => inner.setConfig(toTransport(next))
+  client.getUrl = inner.getUrl
+  client.interceptors = nativeInterceptors(instance)
+  client.createClient = (next = {}) => createAxiosClient(axios.create(), { ...inner.getConfig(), ...next })
+  return client
+}
 
-export const createClient = (config?: Parameters<typeof client.createClient>[0]) => client.createClient(config)
+/**
+ * The axios instance the generated `client` sends through when no transport is set. Set its defaults or register axios
+ * interceptors on it. Instances from `createClient()` get their own.
+ */
+export const defaultTransport = axios.create()
+
+export const client = createAxiosClient(defaultTransport)
+
+export const createClient = (config?: ClientConfig) => client.createClient(config)

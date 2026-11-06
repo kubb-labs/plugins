@@ -189,6 +189,8 @@ export type RequestConfig<TBody = unknown, TRequest = unknown, TResponse = unkno
   method?: HttpMethod
   path?: unknown
   query?: unknown
+  /** Alias of `query`, kept for callers that pass the query under this name. */
+  params?: unknown
   cookies?: unknown
   body?: TBody
   headers?: unknown
@@ -298,7 +300,7 @@ export type Interceptors<TRequest = unknown, TResponse = unknown> = {
   error: InterceptorStack<ResponseError<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
 }
 
-export type UrlConfig = Pick<RequestConfig, 'baseURL' | 'url' | 'path' | 'query' | 'serializer' | 'styles'>
+export type UrlConfig = Pick<RequestConfig, 'baseURL' | 'url' | 'path' | 'query' | 'params' | 'serializer' | 'styles'>
 
 /**
  * A client instance: the callable send plus configuration, interceptors, and an isolated
@@ -519,7 +521,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   // Params are encoded before anything reads them: headers before styling, query before auth adds its values.
   const paramValues = {
     path: { ...(requestConfig.path as Record<string, unknown> | undefined) },
-    query: { ...(requestConfig.query as Record<string, unknown> | undefined) },
+    query: { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) },
     headers: collectHeadersCaseInsensitive(config.headers, requestConfig.headers),
   }
   const [validatedPath, validatedQuery, validatedHeaders] = await Promise.all(
@@ -673,7 +675,7 @@ export function createClientCore<TRequest = unknown, TResponse = unknown>(
   }
   client.getUrl = (requestConfig) => {
     const { querySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
-    const query: Record<string, unknown> = { ...(requestConfig.query as Record<string, unknown> | undefined) }
+    const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
     return serializeUrl({
       parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
       pathParams: (requestConfig.path ?? {}) as Record<string, unknown>,

@@ -38,6 +38,7 @@ export default defineConfig([
     entry: {
       'templates/client': 'templates/client.ts',
       'templates/core': 'templates/core.ts',
+      'templates/fetch': 'templates/fetch.ts',
       'templates/serializers': 'templates/serializers.ts',
       'templates/sse': 'templates/sse.ts',
       'templates/standardSchema': 'templates/standardSchema.ts',
