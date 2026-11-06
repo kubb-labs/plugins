@@ -200,12 +200,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
             {hasEventStream && <File.Import name={['toEventStream']} root={file.path} path={ssePath} />}
             {hasEventStream && (
               <File.Import
-                name={[
-                  'EventStreamOptions',
-                  'EventStreamResult',
-                  ...(shapes.has('event') ? ['EventOf'] : []),
-                  ...(shapes.has('data') ? ['ServerSentEvent'] : []),
-                ]}
+                name={['EventStreamOptions', 'EventStreamResult', ...(shapes.has('event') ? ['TypedEvent'] : [])]}
                 root={file.path}
                 path={ssePath}
                 isTypeOnly

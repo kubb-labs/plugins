@@ -25,10 +25,10 @@ data: {"text": "Hel"}
 
 Kubb reads each item in one of two shapes, and the generated types follow.
 
-| Shape   | The item schema                                                                              | What the stream yields                                                                 |
-| ------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `event` | Declares `event` or `data`, itself or in a `oneOf` member, so it describes the parsed event. | `EventOf<Item>`: the item as written, plus the `id` and `retry` any event may carry.   |
-| `data`  | Declares neither, so it describes only the payload.                                          | `ServerSentEvent<Item>`: `data` typed as the item, next to `event`, `id`, and `retry`. |
+| Shape   | The item schema                                                                              | What the stream yields                                                                  |
+| ------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `event` | Declares `event` or `data`, itself or in a `oneOf` member, so it describes the parsed event. | `TypedEvent<Item>`: the item as written, plus the `id` and `retry` any event may carry. |
+| `data`  | Declares neither, so it describes only the payload.                                          | `ServerSentEvent<Item>`: `data` typed as the item, next to `event`, `id`, and `retry`.  |
 
 Both shapes come from the same wire format. With an `event` shape, this stream:
 
@@ -243,7 +243,7 @@ const result = await streamChat({
   body,
   reconnect: {
     maxRetries: 2,
-    initialDelay: 1000,
+    delay: 1000,
     maxDelay: 30_000,
     growFactor: 1.5,
     resume: (lastEventId) => ({ method: 'GET', headers: { 'Last-Event-ID': lastEventId } }),
@@ -256,14 +256,14 @@ for await (const event of result.stream) {
 console.info(result.lastEventId) // store it to resume from a new page load
 ```
 
-| Option         | Default | Meaning                                                                                                              |
-| -------------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
-| `maxRetries`   | `2`     | Reconnects after the first connection.                                                                               |
-| `initialDelay` | `1000`  | Delay before the first reconnect in milliseconds. The server's `retry` field replaces it.                            |
-| `maxDelay`     | `30000` | Longest delay between reconnects.                                                                                    |
-| `growFactor`   | `1.5`   | Factor the delay grows by after each reconnect.                                                                      |
-| `onClose`      | `false` | Also reconnect after the server closes the stream cleanly, as `EventSource` does.                                    |
-| `resume`       | none    | Builds the resume request from the last event ID. Required for any method but GET, which would repeat the operation. |
+| Option       | Default | Meaning                                                                                                              |
+| ------------ | ------- | -------------------------------------------------------------------------------------------------------------------- |
+| `maxRetries` | `2`     | Reconnects after the first connection.                                                                               |
+| `delay`      | `1000`  | Delay before the first reconnect in milliseconds. The server's `retry` field replaces it.                            |
+| `maxDelay`   | `30000` | Longest delay between reconnects.                                                                                    |
+| `growFactor` | `1.5`   | Factor the delay grows by after each reconnect.                                                                      |
+| `onClose`    | `false` | Also reconnect after the server closes the stream cleanly, as `EventSource` does.                                    |
+| `resume`     | none    | Builds the resume request from the last event ID. Required for any method but GET, which would repeat the operation. |
 
 The runtime stops reconnecting on abort, when you break out of the loop, after `maxRetries`, on a non-2xx response, and on a response that is not an event stream, such as a `204`. The defaults match the MCP TypeScript SDK's Streamable HTTP transport, which resumes a POST stream with a GET and `Last-Event-ID`, as the `resume` example above does.
 
@@ -312,7 +312,7 @@ try {
 
 ## The runtime files
 
-`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `EventOf`, `EventStreamOptions`, and `Reconnect` types. Import the types from there when you need them:
+`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `ReconnectOptions` types. Import the types from there when you need them:
 
 ```typescript
 import type { ServerSentEvent } from './gen/.kubb/sse'

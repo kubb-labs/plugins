@@ -132,12 +132,12 @@ describe('OpenAPI 3.2 item schemas', () => {
       expect(runtime).toContain('export async function toEventStream')
 
       const chat = await fs.readFile(path.join(output, 'clients', 'streamChat.ts'), 'utf8')
-      expect(chat).toContain('Promise<EventStreamResult<EventOf<SuccessOf<StreamChatResponses>>>>')
+      expect(chat).toContain('Promise<EventStreamResult<TypedEvent<SuccessOf<StreamChatResponses>>>>')
       expect(chat).toContain("config, method: 'POST', shape: 'event', events: ['message_delta', 'ping'], validator: ")
       expect(chat).not.toMatch(/validator: \{[^}]*response:/)
 
       const ticks = await fs.readFile(path.join(output, 'clients', 'streamTicks.ts'), 'utf8')
-      expect(ticks).toContain('Promise<EventStreamResult<ServerSentEvent<SuccessOf<StreamTicksResponses>>>>')
+      expect(ticks).toContain('Promise<EventStreamResult<SuccessOf<StreamTicksResponses>>>')
       expect(ticks).toContain("config, method: 'GET', shape: 'data', validator: ")
 
       // JSON Lines is a stream of items too, but not an event stream, so it keeps the one-shot result typed with one item.

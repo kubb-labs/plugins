@@ -111,7 +111,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>({ 
           {stream && <File.Import name={['toEventStream']} root={clientRoot} path={ssePath} />}
           {stream && (
             <File.Import
-              name={['EventStreamOptions', 'EventStreamResult', stream.shape === 'event' ? 'EventOf' : 'ServerSentEvent']}
+              name={['EventStreamOptions', 'EventStreamResult', ...(stream.shape === 'event' ? ['TypedEvent'] : [])]}
               root={clientRoot}
               path={ssePath}
               isTypeOnly
