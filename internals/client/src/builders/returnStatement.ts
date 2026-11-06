@@ -85,3 +85,11 @@ export function buildEventStreamReturn({
   const meta = [`shape: '${stream?.shape ?? 'data'}'`, validatorHooks?.response ? `validator: ${validatorHooks.response}` : null].filter(Boolean).join(', ')
   return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}), { client: request, config, ${meta} })` }
 }
+
+/**
+ * The types a file with `text/event-stream` operations imports from `.kubb/sse.ts`: the result, the per-call options unless
+ * the client is a plain custom module, and `TypedEvent` when an operation types its events by name.
+ */
+export function buildEventStreamImports({ returnType, typed }: { returnType: ReturnTypeOption; typed: boolean }): Array<string> {
+  return ['EventStreamResult', ...(returnType !== 'plain' ? ['EventStreamOptions'] : []), ...(typed ? ['TypedEvent'] : [])]
+}

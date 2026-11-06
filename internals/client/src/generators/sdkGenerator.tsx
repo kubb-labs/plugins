@@ -5,6 +5,7 @@ import { ast, camelCase, defineGenerator, Diagnostics } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { type Auth, getOperationSecurity, type SecurityDocument } from '../builders/security.ts'
 import { buildValidatorHooks, type ValidatorHooks } from '../builders/validator.ts'
@@ -199,12 +200,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
             />
             {hasEventStream && <File.Import name={['toEventStream']} root={file.path} path={ssePath} />}
             {hasEventStream && (
-              <File.Import
-                name={['EventStreamResult', ...(returnType !== 'plain' ? ['EventStreamOptions'] : []), ...(shapes.has('event') ? ['TypedEvent'] : [])]}
-                root={file.path}
-                path={ssePath}
-                isTypeOnly
-              />
+              <File.Import name={buildEventStreamImports({ returnType, typed: shapes.has('event') })} root={file.path} path={ssePath} isTypeOnly />
             )}
 
             {validator === 'zod' && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && <File.Import name={['z']} path="zod" isTypeOnly />}

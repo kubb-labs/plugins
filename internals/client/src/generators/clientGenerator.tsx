@@ -4,6 +4,7 @@ import { ast, defineGenerator } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { getOperationSecurity, type SecurityDocument } from '../builders/security.ts'
 import { buildValidatorHooks } from '../builders/validator.ts'
@@ -110,12 +111,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>({ 
           <File.Import name={clientTypeImports} root={clientRoot} path={clientPath} isTypeOnly />
           {stream && <File.Import name={['toEventStream']} root={clientRoot} path={ssePath} />}
           {stream && (
-            <File.Import
-              name={['EventStreamResult', ...(returnType !== 'plain' ? ['EventStreamOptions'] : []), ...(stream.shape === 'event' ? ['TypedEvent'] : [])]}
-              root={clientRoot}
-              path={ssePath}
-              isTypeOnly
-            />
+            <File.Import name={buildEventStreamImports({ returnType, typed: stream.shape === 'event' })} root={clientRoot} path={ssePath} isTypeOnly />
           )}
 
           {meta.fileTypes && importedTypeNames.length > 0 && (
