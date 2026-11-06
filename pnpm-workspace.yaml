@@ -25,7 +25,7 @@ catalog:
   '@vitest/coverage-v8': ^5.1.0
   '@vitest/ui': ^5.1.0
   kubb: ^5.15.4
-  oxfmt: ^0.75.0
+  oxfmt: ^0.76.0
   oxlint: ^1.91.0
   prettier: ^3.9.10
   # pinned: 0.23.2 needs TypeScript 7.1+ for dts emit, 7.0.x fails with "does not provide the classic TypeScript API"
