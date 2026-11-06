@@ -1,10 +1,57 @@
 # Migrate to v6
 
-`@kubb/plugin-axios` 6 runs on the same client core as `@kubb/plugin-fetch`. The axios client keeps its generated functions, and its runtime API moves to the shared core. Check the items below.
+`@kubb/plugin-axios` 6 runs on the same client core as `@kubb/plugin-fetch`. The axios client keeps its generated functions, and its runtime API moves to the shared core. Code that only calls the generated functions or hooks needs no change. Most of the work is in the file that configures `client`.
+
+## Upgrade steps
+
+1. Upgrade `kubb` and `@kubb/plugin-axios` together. v6 needs the Kubb release that follows 5.15.4:
+
+   ```bash
+   npm install --save-dev kubb@latest @kubb/plugin-axios@6
+   ```
+
+2. Regenerate the client. This rewrites `.kubb/` and the operation files, so generated code needs no hand edits:
+
+   ```bash
+   npx kubb generate
+   ```
+
+3. Run the type checker. Each breaking change shows up as a compile error in your own code:
+
+   ```bash
+   npx tsc --noEmit
+   ```
+
+4. Fix each error with the matching section below.
+5. Check the changes that do not fail the type checker, listed under [Behavior changes](#behavior-changes).
+
+## Keep your axios interceptors as they are
+
+The shortest path moves each handler from `client.interceptors` to `axiosInstance.interceptors`. Their bodies stay the same, because `axiosInstance` takes the place `defaultTransport` had in v5, and its interceptors still receive axios objects in the same order:
+
+```typescript
+// before
+import { client } from './gen/.kubb/client'
+
+client.interceptors.request.use((config) => {
+  config.headers.set('X-Request-ID', crypto.randomUUID())
+  return config
+})
+
+// after
+import { axiosInstance } from './gen/.kubb/client'
+
+axiosInstance.interceptors.request.use((config) => {
+  config.headers.set('X-Request-ID', crypto.randomUUID())
+  return config
+})
+```
+
+To share interceptor code with `@kubb/plugin-fetch` instead, rewrite the handlers for the core objects, as the next section shows.
 
 ## Interceptors
 
-`client.interceptors` handlers receive the core's `ResolvedRequest`, `TransportResult`, and `ResponseError`, as on the fetch client, and run in registration order:
+`client.interceptors` handlers receive the core's `ResolvedRequest`, `TransportResult`, and `ResponseError`, as on the fetch client:
 
 ```typescript
 // before: native axios objects
@@ -58,12 +105,28 @@ Native axios interceptors for a custom transport go on the instance you pass to 
 
 `@kubb/plugin-axios/templates/axios.ts`, `templates/core.ts`, `templates/serializers.ts`, and `templates/standardSchema.ts` are gone. Import the client types from `@kubb/plugin-axios/templates/client.ts`, and the shared runtime from `@kubb/plugin-client/templates/*`. Generated operations and imports from the generated `.kubb/client.ts` need no change, except imports of the removed exports listed above.
 
-## Stream calls
+## Stream result types
 
-- `EventStreamResult`, `StreamResult`, and `UnwrappedStreamResult` take the full event type: write `EventStreamResult<ServerSentEvent<PetEvent>>` where you wrote `EventStreamResult<PetEvent>`.
+`EventStreamResult`, `StreamResult`, and `UnwrappedStreamResult` take the full event type, not the payload:
+
+```typescript
+// before
+let result: EventStreamResult<PetEvent>
+
+// after
+let result: EventStreamResult<ServerSentEvent<PetEvent>>
+```
+
+## Behavior changes
+
+These changes compile without errors, so check them by hand:
+
+- `client.interceptors.request` handlers run in the order you register them. axios ran its request handlers in reverse.
+- `client.interceptors.error` no longer runs for a network error. See [Interceptors](#interceptors).
+- A child from `createClient()` inherits the `transport` of `client`. It used to get its own `axios.create()`.
+- A stream call keeps the adapter set on the call or on the instance, such as a mock adapter in tests. Only a browser call with the default adapters switches to the fetch adapter.
 - A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream.
-- An event the server ends without a blank line is dropped, as browser `EventSource` does.
-- Only a browser call with the default adapters switches to the fetch adapter. An adapter set on the call or on `axiosInstance` is kept.
+- An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.
 
 ## Query plugins
 
