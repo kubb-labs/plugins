@@ -1,6 +1,8 @@
-import type { Options, EventStreamResult, SuccessOf } from '../../../.kubb/client'
+import type { Options, SuccessOf } from '../../../.kubb/client'
+import type { EventStreamResult, EventStreamOptions } from '../../../.kubb/sse'
 import type { PetEvent } from '../../../models/ts/PetEvent'
-import { client, toEventStream } from '../../../.kubb/client'
+import { client } from '../../../.kubb/client'
+import { toEventStream } from '../../../.kubb/sse'
 
 /**
  * @description Server-Sent Events stream of changes for a single pet
@@ -18,7 +20,8 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
       headers?: never
     },
     ThrowOnError
-  >,
+  > &
+    EventStreamOptions,
 ): Promise<
   EventStreamResult<
     SuccessOf<{
@@ -32,18 +35,23 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
     SuccessOf<{
       '200': PetEvent
     }>
-  >(
-    request({
-      method: 'GET',
-      url: '/pet/{petId}/events',
-      security: [
-        { type: 'apiKey', name: 'api_key', in: 'header' },
-        { type: 'oauth2', scopes: ['read:pets'] },
-      ],
-      responseType: 'stream',
-      ...config,
-      throwOnError: config.throwOnError ?? true,
-    }),
+  >({
+    send: (init) =>
+      request({
+        method: 'GET',
+        url: '/pet/{petId}/events',
+        security: [
+          { type: 'apiKey', name: 'api_key', in: 'header' },
+          { type: 'oauth2', scopes: ['read:pets'] },
+        ],
+        responseType: 'stream',
+        ...config,
+        throwOnError: config.throwOnError ?? true,
+        ...init,
+      }),
+    client: request,
     config,
-  )
+    method: 'GET',
+    shape: 'data',
+  })
 }

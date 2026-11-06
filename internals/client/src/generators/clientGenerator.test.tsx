@@ -3,7 +3,7 @@ import { ast, memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation, renderGeneratorOperations } from '#mocks'
 import { resolverClient } from '../resolver.ts'
 import type { SecurityDocument } from '../builders/security.ts'
 import type { Options, ResolvedOptions, ResolverClient } from '../types.ts'
@@ -11,12 +11,12 @@ import { createClientGenerator } from './clientGenerator.tsx'
 
 type PluginFetch = PluginType<'plugin-fetch', Options, ResolvedOptions, ResolverClient>
 
-const clientGenerator = createClientGenerator<PluginFetch>('fetch')
+const clientGenerator = createClientGenerator<PluginFetch>({ name: 'fetch' })
 
 type PluginClient = PluginType<'plugin-client', Options, ResolvedOptions & { importPath: string }, ResolverClient>
 
 // What `@kubb/plugin-client` registers: a user-owned client module, imported exactly as configured.
-const customClientGenerator = createClientGenerator<PluginClient>('client')
+const customClientGenerator = createClientGenerator<PluginClient>({ name: 'client' })
 
 const testConfig: Config = {
   root: '.',
@@ -172,6 +172,37 @@ const streamEventsNode = ast.factory.createOperation({
   ],
 })
 
+const streamChatMember = (name: string) =>
+  ast.factory.createSchema({
+    type: 'object',
+    properties: [
+      ast.factory.createProperty({ name: 'event', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) }),
+      ast.factory.createProperty({ name: 'data', schema: ast.factory.createSchema({ type: 'string' }) }),
+    ],
+  })
+const streamChatSchema = ast.factory.createSchema({
+  type: 'union',
+  discriminatorPropertyName: 'event',
+  members: [streamChatMember('message_delta'), streamChatMember('ping')],
+})
+
+// An OpenAPI 3.2 `itemSchema` event union, as the adapter emits it: `stream.schema` is the item and `shape` says each item is a whole event.
+const streamChatNode = ast.factory.createOperation({
+  operationId: 'streamChat',
+  method: 'POST',
+  path: '/chat',
+  tags: ['chat'],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      description: 'typed events',
+      content: [
+        ast.factory.createContent({ contentType: 'text/event-stream', schema: streamChatSchema, stream: { schema: streamChatSchema, shape: 'event' } }),
+      ],
+    }),
+  ],
+})
+
 const securityDocument: SecurityDocument = {
   security: [{ bearerAuth: [] }],
   components: {
@@ -206,6 +237,8 @@ describe('clientGenerator operation', () => {
     { name: 'listPetsWithStyles', node: listPetsStyledNode, options: {} },
     // text/event-stream response returns a typed event stream instead of a one-shot result.
     { name: 'streamEventsSse', node: streamEventsNode, options: {} },
+    // A `stream.shape` of `event` types each event by name and lists the declared names for the runtime filter.
+    { name: 'streamChatTypedEvents', node: streamChatNode, options: {} },
     // returnType: 'data' unwraps the resolved call down to the bare success body.
     { name: 'getPetByIdWithReturnTypeData', node: getPetByIdNode, options: { returnType: 'data' as const } },
     // Operation-level security overriding the global default, oauth2 reduced to bearer.
@@ -234,6 +267,34 @@ describe('clientGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('clientGenerator runtime files', () => {
+  const sseGenerator = createClientGenerator<PluginFetch>({ name: 'fetch', sse: '/templates/sse.ts' })
+
+  test.each([
+    { name: 'copies sse.ts when an operation streams events', nodes: [getPetByIdNode, streamEventsNode], expected: ['.kubb/sse.ts'] },
+    { name: 'skips sse.ts when no operation streams events', nodes: [getPetByIdNode, createPetNode], expected: [] },
+  ])('$name', async ({ nodes, expected }) => {
+    const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
+    const driver = createMockedPluginDriver({
+      name: 'runtime',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorOperations(sseGenerator, nodes, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverClient,
+    })
+
+    expect(driver.fileManager.files.map((file) => [file.path.split('/').slice(-2).join('/'), file.copy])).toStrictEqual(
+      expected.map((file) => [file, '/templates/sse.ts']),
+    )
   })
 })
 

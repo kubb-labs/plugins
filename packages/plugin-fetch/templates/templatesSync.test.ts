@@ -17,12 +17,13 @@ describe('shared client templates', () => {
     expect(axiosCopy).toBe(fetchCopy)
   })
 
-  test('fetch.ts and axios.ts share one server-sent event parser', () => {
-    const parser = (name: string) => {
-      const source = readFileSync(name, 'utf8')
-      return source.slice(source.indexOf('async function* readBytes('), source.indexOf('export type EventStreamResult'))
-    }
-    expect(parser(path.join(axiosTemplates, 'axios.ts'))).toBe(parser(path.join(fetchTemplates, 'fetch.ts')))
+  test('sse.ts differs only in the native response type', () => {
+    const withoutResponseType = (file: string) =>
+      readFileSync(file, 'utf8')
+        .split('\n')
+        .filter((line) => !line.includes('NativeResponse =') && !line.includes("from 'axios'"))
+        .join('\n')
+    expect(withoutResponseType(path.join(axiosTemplates, 'sse.ts'))).toBe(withoutResponseType(path.join(fetchTemplates, 'sse.ts')))
   })
 })
 

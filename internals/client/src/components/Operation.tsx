@@ -49,9 +49,9 @@ type Props = {
 export function Operation({ name, node, types, validatorHooks, returnType, throwOnErrorDefault, security }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
 
-  const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault })
-  const { callConfig, mergeContentType, eventStream } = buildCallConfig({ node, validatorHooks, security, throwOnErrorDefault })
-  const eventStreamReturn = eventStream ? buildEventStreamReturn({ node, types, callConfig, returnType }) : null
+  const { callConfig, mergeContentType, eventStream } = buildCallConfig({ node, validatorHooks, security, throwOnErrorDefault, returnType })
+  const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault, eventStream })
+  const eventStreamReturn = eventStream ? buildEventStreamReturn({ node, types, callConfig, returnType, validatorHooks }) : null
   const functionReturnType = eventStreamReturn?.returnType ?? signature.returnType
   const returnStatement = eventStreamReturn?.statement ?? buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault })
 

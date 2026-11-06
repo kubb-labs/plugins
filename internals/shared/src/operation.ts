@@ -93,7 +93,7 @@ type ResponseLike = {
   statusCode: ast.StatusCode | number | string
 }
 
-export type OperationParameterGroups = Record<ast.ParameterNode['in'], Array<ast.ParameterNode>>
+export type OperationParameterGroups = Record<Exclude<ast.ParameterNode['in'], 'querystring'>, Array<ast.ParameterNode>>
 
 export type ResolveOperationTypeNameOptions = {
   responseStatusNames?: boolean | 'error'
@@ -160,21 +160,81 @@ function getPrimarySuccessContentType(node: ast.OperationNode): string | undefin
 }
 
 /**
- * Whether an operation streams its primary success response as Server-Sent Events
- * (`text/event-stream`). The client generator uses this to return a typed event stream instead of a
- * one-shot `RequestResult`.
+ * The `text/event-stream` content of the primary success response, when it is the only content type. A response that also
+ * declares another type stays a normal call with its query hooks.
+ */
+function getEventStreamContent(node: ast.OperationNode): ast.ContentNode | undefined {
+  const content = getPrimarySuccessResponse(node)?.content ?? []
+  const entry = content[0]
+  return content.length === 1 && entry && entry.contentType.split(';')[0]!.trim().toLowerCase() === 'text/event-stream' ? entry : undefined
+}
+
+/**
+ * Whether an operation streams its primary success response as Server-Sent Events (`text/event-stream`). The client
+ * generator uses this to return a typed event stream instead of a one-shot `RequestResult`.
  */
 export function isEventStream(node: ast.OperationNode): boolean {
-  return getPrimarySuccessContentType(node) === 'text/event-stream'
+  return getEventStreamContent(node) !== undefined
+}
+
+const TEXT_SCHEMA_TYPES = new Set(['string', 'uuid', 'email', 'url', 'datetime', 'date', 'time', 'ipv4', 'ipv6'])
+
+function isTextSchema(schema: ast.SchemaNode): boolean {
+  const resolved = ast.resolveRef(schema)
+  if (TEXT_SCHEMA_TYPES.has(resolved.type)) return true
+  return resolved.type === 'enum' && ast.getSchemaLiteralValues(resolved).every((value) => typeof value === 'string')
+}
+
+function hasTextData(member: ast.SchemaNode): boolean {
+  const properties = ast.resolveSchemaProperties({ node: member, propertyName: 'data' })
+  return properties.length > 0 && properties.every((property) => isTextSchema(property.schema))
+}
+
+export type EventStreamInfo = {
+  shape: 'event' | 'data'
+  /**
+   * The event names the document declares, when every item names one.
+   */
+  events?: Array<string>
+  /**
+   * The events whose `data` the document types as text, or `true` when the payload itself is text, so the runtime keeps
+   * it as a string instead of parsing JSON.
+   */
+  text?: true | Array<string>
+}
+
+/**
+ * How the document types a `text/event-stream` response: `shape` is `event` when each item is the parsed event and `data`
+ * when it is only the payload, `events` lists the names when every item declares one, and `text` says which `data` stays
+ * a string. Returns `null` without an event stream.
+ */
+export function getEventStream(node: ast.OperationNode): EventStreamInfo | null {
+  const content = getEventStreamContent(node)
+  if (!content) return null
+  const schema = content.stream?.schema ?? content.schema
+  const shape = content.stream?.shape ?? 'data'
+  const members = schema ? (ast.narrowSchema(ast.resolveRef(schema), 'union')?.members ?? [schema]) : []
+  const names = members.map((member) =>
+    ast
+      .resolveSchemaProperties({ node: member, propertyName: 'event' })
+      .flatMap((property) => ast.getSchemaLiteralValues(property.schema).filter((value): value is string => typeof value === 'string')),
+  )
+  const events = shape === 'event' && names.length > 0 && names.every((list) => list.length > 0) ? [...new Set(names.flat())] : undefined
+  const text = (() => {
+    if (shape === 'data') return schema && isTextSchema(schema) ? true : undefined
+    if (!events) return undefined
+    const textNames = [...new Set(members.flatMap((member, index) => (hasTextData(member) ? names[index]! : [])))]
+    return textNames.length > 0 ? textNames : undefined
+  })()
+  return { shape, ...(events ? { events } : {}), ...(text ? { text } : {}) }
 }
 
 /**
  * Derives the default `responseType` for an operation from its primary success response.
  *
- * Returns a value only when that response declares a single non-JSON content type. `text/event-stream`
- * and other binary types (`application/octet-stream`, `application/pdf`, `image/*`, `audio/*`,
- * `video/*`) map to a stream or `'blob'`, and other `text/*` maps to `'text'`. Otherwise `undefined`,
- * leaving the runtime client's `Content-Type` auto-detection in charge.
+ * Returns a value only when that response declares a single non-JSON content type. `text/event-stream` maps to
+ * `'stream'`, `application/octet-stream`, `application/pdf`, `image/*`, `audio/*` and `video/*` map to `'blob'`, and
+ * other `text/*` to `'text'`. Otherwise `undefined`, leaving the runtime client's `Content-Type` auto-detection in charge.
  */
 export function getResponseType(node: ast.OperationNode): ResponseType | undefined {
   const baseType = getPrimarySuccessContentType(node)
@@ -398,7 +458,13 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
     })
   }
 
-  const groups: OperationParameterGroups = { path: group('path'), query: group('query'), header: group('header'), cookie: group('cookie') }
+  // An OpenAPI 3.2 `querystring` parameter is the whole query string as one object, so it joins the query group and the query serializer spreads its keys.
+  const groups: OperationParameterGroups = {
+    path: group('path'),
+    query: [...group('query'), ...group('querystring')],
+    header: group('header'),
+    cookie: group('cookie'),
+  }
 
   operationParameterGroupsByNode.set(node, groups)
   return groups

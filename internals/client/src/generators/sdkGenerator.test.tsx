@@ -134,7 +134,7 @@ describe('sdkGenerator operations', () => {
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorOperations(createSdkGenerator<PluginFetch>(), operationNodes, {
+    await renderGeneratorOperations(createSdkGenerator<PluginFetch>({ sse: '/templates/sse.ts' }), operationNodes, {
       config: testConfig,
       adapter: 'adapter' in props ? props.adapter : createMockedAdapter(),
       driver,
@@ -161,7 +161,7 @@ describe('sdkGenerator operations invalid options', () => {
     })
 
     await expect(
-      renderGeneratorOperations(createSdkGenerator<PluginFetch>(), operationNodes, {
+      renderGeneratorOperations(createSdkGenerator<PluginFetch>({ sse: '/templates/sse.ts' }), operationNodes, {
         config: testConfig,
         adapter: createMockedAdapter(),
         driver,

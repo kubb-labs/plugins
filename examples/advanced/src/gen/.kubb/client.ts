@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { HeadersInit, PathParamStyle, PathSerializer, Serializers, Styles } from './serializers'
+import type { HeadersInit, HttpMethod, PathParamStyle, PathSerializer, Serializers, Styles } from './serializers'
 import type { StandardSchemaValidator } from './standardSchema'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers'
@@ -209,7 +209,7 @@ export type AxiosOptions = AxiosRequestConfig
 export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TResponse = AxiosResponse> = {
   baseURL?: string
   url?: string
-  method?: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'QUERY'
+  method?: HttpMethod
   path?: unknown
   query?: unknown
   params?: unknown
@@ -232,11 +232,6 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   validate?: ValidateOption
   security?: Array<Auth>
   auth?: AuthResolver
-  /**
-   * The largest number of characters, line breaks included, one server-sent event may hold before the blank line that ends it. A larger event throws a `RangeError` and cancels the stream. Set `Infinity` to turn the limit off.
-   * @default 16777216
-   */
-  maxEventSize?: number
 }
 
 /**
@@ -662,6 +657,34 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   return { axiosConfig, codecs, throwOnError, validate }
 }
 
+function isStreamed(data: unknown): data is ReadableStream<Uint8Array> | AsyncIterable<Uint8Array | string> {
+  return data instanceof ReadableStream || (!!data && typeof data === 'object' && Symbol.asyncIterator in data)
+}
+
+async function readStreamedText(data: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array | string>): Promise<string> {
+  if (data instanceof ReadableStream) return new Response(data).text()
+  const decoder = new TextDecoder()
+  let text = ''
+  for await (const chunk of data) text += typeof chunk === 'string' ? chunk : decoder.decode(chunk, { stream: true })
+  return text + decoder.decode()
+}
+
+/**
+ * Reads a streamed JSON body, such as an error body, back into its value, because every adapter streams a
+ * `responseType: 'stream'` answer: the fetch adapter as a `ReadableStream`, the Node adapter as a readable. Any other
+ * streamed body stays a stream.
+ */
+async function readStreamedBody({ data, contentType }: { data: unknown; contentType: string | undefined }): Promise<unknown> {
+  if (!isStreamed(data) || !/[/+]json$/.test(contentType?.split(';')[0]?.trim() ?? '')) return data
+  const text = await readStreamedText(data)
+  if (!text) return undefined
+  try {
+    return JSON.parse(text)
+  } catch {
+    return text
+  }
+}
+
 /**
  * Uses the configured axios instance or creates one. `throwOnError` sets axios's default `validateStatus`.
  */
@@ -750,9 +773,12 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       const direction = isSuccess ? 'response' : 'error'
       const contentType = getResponseContentType(response.headers as Record<string, unknown>)
       const codec = contentType ? codecs[contentType] : undefined
-      const decoded: unknown = contentType && codec?.deserialize ? await codec.deserialize(response.data, contentType) : response.data
+      const raw = await readStreamedBody({ data: response.data, contentType })
+      const decoded: unknown = contentType && codec?.deserialize ? await codec.deserialize(raw, contentType) : raw
+      // A streamed success body is validated event by event in `toEventStream`, not as a whole. A JSON answer to a streamed call is a whole body.
+      const streaming = isSuccess && requestConfig.responseType === 'stream' && isStreamed(decoded)
       const data = await runValidator({
-        validator: isValidationEnabled(validate, direction) ? validator?.[direction] : undefined,
+        validator: isValidationEnabled(validate, direction) && !streaming ? validator?.[direction] : undefined,
         value: decoded,
         context: {
           direction,
@@ -778,11 +804,12 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       setContextId(axiosError, undefined)
       if (axiosError.response) setContextId(axiosError.response, undefined)
       if (throwOnError && axiosError.response) {
+        const contentType = getResponseContentType(axiosError.response.headers as Record<string, unknown>)
         throw new ResponseError({
-          data: axiosError.response.data,
+          data: await readStreamedBody({ data: axiosError.response.data, contentType }),
           status: axiosError.response.status,
           statusText: axiosError.response.statusText,
-          contentType: getResponseContentType(axiosError.response.headers as Record<string, unknown>),
+          contentType,
           request: axiosError.config as TRequest,
           response: axiosError.response as TResponse,
           method: axiosError.config?.method?.toUpperCase(),
@@ -829,138 +856,6 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
  * The axios instance the generated `client` sends through. Register axios interceptors on it or reuse it inside your own transport.
  */
 export const defaultTransport = axios.create()
-
-/**
- * One decoded Server-Sent Event, with `data` parsed as JSON when valid and kept as the raw string otherwise.
- */
-export type ServerSentEvent<TData = unknown> = {
-  data: TData
-  event?: string
-  id?: string
-  retry?: number
-}
-
-async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>): AsyncGenerator<Uint8Array> {
-  if (!('getReader' in stream)) {
-    yield* stream
-    return
-  }
-
-  const reader = stream.getReader()
-  try {
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) return
-      yield value
-    }
-  } finally {
-    await reader.cancel().catch(() => {})
-  }
-}
-
-function parseEvent<TData>(lines: Array<string>): ServerSentEvent<TData> {
-  const data: Array<string> = []
-  const event: ServerSentEvent<TData> = { data: undefined as TData }
-
-  for (const line of lines) {
-    const index = line.indexOf(':')
-    const field = index === -1 ? line : line.slice(0, index)
-    const value = index === -1 ? '' : line.slice(index + 1).replace(/^ /, '')
-    switch (field) {
-      case 'data':
-        data.push(value)
-        break
-      case 'event':
-        event.event = value
-        break
-      case 'id':
-        event.id = value
-        break
-      case 'retry':
-        if (Number.isFinite(Number(value))) event.retry = Number(value)
-        break
-    }
-  }
-
-  if (data.length) {
-    const joined = data.join('\n')
-    try {
-      event.data = JSON.parse(joined) as TData
-    } catch {
-      event.data = joined as TData
-    }
-  }
-  return event
-}
-
-/**
- * Parses a `text/event-stream` body into typed Server-Sent Events, consumed with `for await` and stopped early by breaking the loop.
- * An event that grows past `maxEventSize` characters before its blank line throws a `RangeError` and cancels the stream.
- */
-export async function* parseEventStream<TData = unknown>(
-  stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>,
-  { maxEventSize = 16 * 1024 * 1024 }: Pick<RequestConfig, 'maxEventSize'> = {},
-): AsyncGenerator<ServerSentEvent<TData>> {
-  const decoder = new TextDecoder()
-  const tooLarge = `Server-sent event exceeds maxEventSize of ${maxEventSize} characters`
-  // Only the field lines of the current event and its unfinished last line are kept, so each chunk is scanned once.
-  let lines: Array<string> = []
-  let size = 0
-  let line = ''
-  let endsWithCR = false
-
-  for await (const chunk of readBytes(stream)) {
-    const decoded = decoder.decode(chunk, { stream: true })
-    if (!decoded) continue
-    // A CRLF split across chunks already ended its line on the `\r`.
-    const text: string = endsWithCR && decoded.startsWith('\n') ? decoded.slice(1) : decoded
-    endsWithCR = text.endsWith('\r')
-
-    const parts = text.split(/\r\n|\r|\n/)
-    parts[0] = line + parts[0]
-    line = parts.pop() ?? ''
-    for (const part of parts) {
-      if (!part) {
-        if (lines.length) yield parseEvent<TData>(lines)
-        lines = []
-        size = 0
-        continue
-      }
-      // A finished line counts one more character for its line break.
-      if (size + part.length + 1 > maxEventSize) throw new RangeError(tooLarge)
-      if (part.startsWith(':')) continue
-      lines.push(part)
-      size += part.length + 1
-    }
-    if (size + line.length > maxEventSize) throw new RangeError(tooLarge)
-  }
-
-  line += decoder.decode()
-  if (line && !line.startsWith(':')) lines.push(line)
-  if (lines.length) yield parseEvent<TData>(lines)
-}
-
-/**
- * Returns parsed events alongside the native response.
- */
-export type EventStreamResult<TData = unknown, TResponse = AxiosResponse> = {
-  stream: AsyncGenerator<ServerSentEvent<TData>>
-  response: TResponse
-}
-
-/**
- * Exposes a streaming response body as typed Server-Sent Events, passing the call's `maxEventSize` to the parser.
- */
-export async function toEventStream<TData = unknown>(
-  result: Promise<{ data: unknown; response: AxiosResponse }>,
-  options?: Pick<RequestConfig, 'maxEventSize'>,
-): Promise<EventStreamResult<TData>> {
-  const { data, response } = await result
-  return {
-    response,
-    stream: parseEventStream<TData>(data as ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>, options),
-  }
-}
 
 export const client = createClientCore({ defaultTransport })
 

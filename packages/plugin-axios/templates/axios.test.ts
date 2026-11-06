@@ -1,17 +1,8 @@
+import { Readable } from 'node:stream'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios, { AxiosError as AxiosErrorClass } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import {
-  type Auth,
-  type CallResult,
-  type ClientConfig,
-  createClientCore,
-  parseEventStream,
-  ResponseError,
-  resolveAuth,
-  unwrapResult,
-  withUnwrap,
-} from './axios.ts'
+import { type Auth, type CallResult, type ClientConfig, createClientCore, ResponseError, resolveAuth, unwrapResult, withUnwrap } from './axios.ts'
 import { applyHeaderStyles, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
@@ -656,6 +647,89 @@ describe('createClientCore', () => {
     const client = createClientCore({ transport: instance })
     client.setConfig({ headers: new Headers({ Authorization: 'Bearer t' }) })
     expect(client.getConfig().headers).toStrictEqual({ authorization: 'Bearer t' })
+  })
+
+  describe('a streamed call answered without an event stream', () => {
+    const encoder = new TextEncoder()
+    const streamOf = (text: string) => new ReadableStream<Uint8Array>({ start: (controller) => (controller.enqueue(encoder.encode(text)), controller.close()) })
+    // Set on the call, since a stream request without its own adapter switches to the fetch adapter.
+    const streaming = (status: number, body: string, contentType: string) => ({
+      adapter: async (config: InternalAxiosRequestConfig) => {
+        const response = { data: streamOf(body), status, statusText: 'x', headers: { 'content-type': contentType }, config }
+        if (status >= 300)
+          throw new AxiosErrorClass(`Request failed with status code ${status}`, 'ERR_BAD_REQUEST', config, undefined, response as AxiosResponse)
+        return response as AxiosResponse
+      },
+    })
+
+    test('reads a JSON body back into its value and keeps an event stream as a stream', async () => {
+      const client = createClientCore()
+      const json = await client({ method: 'GET', url: '/events', responseType: 'stream', options: streaming(200, '{"ok":true}', 'application/json') })
+      expect(json.data).toStrictEqual({ ok: true })
+
+      const events = await client({ method: 'GET', url: '/events', responseType: 'stream', options: streaming(200, 'data: a\n\n', 'text/event-stream') })
+      expect(events.data).toBeInstanceOf(ReadableStream)
+    })
+
+    test('reads an application/problem+json body back into its value', async () => {
+      const client = createClientCore()
+      const result = await client({ method: 'GET', url: '/events', responseType: 'stream', options: streaming(200, '{"ok":true}', 'application/problem+json') })
+
+      expect(result.data).toStrictEqual({ ok: true })
+    })
+
+    test('reads a JSON body the Node adapter streams as a readable', async () => {
+      const client = createClientCore()
+      const adapter = async (config: InternalAxiosRequestConfig) =>
+        ({
+          data: Readable.from([Buffer.from('{"ok":true}')]),
+          status: 200,
+          statusText: 'x',
+          headers: { 'content-type': 'application/json' },
+          config,
+        }) as AxiosResponse
+      const result = await client({ method: 'GET', url: '/events', responseType: 'stream', options: { adapter } })
+
+      expect(result.data).toStrictEqual({ ok: true })
+    })
+
+    test('runs the response validator on a JSON body', async () => {
+      const client = createClientCore()
+      const validator = { response: { '~standard': { validate: () => ({ value: 'validated' }) } } }
+      const result = await client({
+        method: 'GET',
+        url: '/events',
+        responseType: 'stream',
+        validator,
+        options: streaming(200, '{"ok":true}', 'application/json'),
+      })
+
+      expect(result.data).toBe('validated')
+    })
+
+    test('keeps an application/x-ndjson body a stream', async () => {
+      const client = createClientCore()
+      const result = await client({
+        method: 'GET',
+        url: '/events',
+        responseType: 'stream',
+        options: streaming(200, '{"a":1}\n{"a":2}\n', 'application/x-ndjson'),
+      })
+
+      expect(result.data).toBeInstanceOf(ReadableStream)
+    })
+
+    test('throws a ResponseError with the parsed JSON error body', async () => {
+      const client = createClientCore()
+
+      await expect(
+        client({ method: 'GET', url: '/events', responseType: 'stream', options: streaming(404, '{"message":"gone"}', 'application/json') }),
+      ).rejects.toMatchObject({
+        name: 'ResponseError',
+        status: 404,
+        data: { message: 'gone' },
+      })
+    })
   })
 
   describe('interceptors across a transport set through setConfig', () => {
@@ -1591,84 +1665,6 @@ describe('resolveAuth', () => {
     const query: Record<string, unknown> = { api_key: 'explicit' }
     await resolveAuth({ security: [{ type: 'apiKey', name: 'api_key', in: 'query' }], auth: () => 'secret', headers: {}, query })
     expect(query).toStrictEqual({ api_key: 'explicit' })
-  })
-})
-
-describe('parseEventStream', () => {
-  function streamOf(chunks: Array<string>): ReadableStream<Uint8Array> {
-    const encoder = new TextEncoder()
-    return new ReadableStream({
-      start(controller) {
-        for (const chunk of chunks) controller.enqueue(encoder.encode(chunk))
-        controller.close()
-      },
-    })
-  }
-
-  async function* asyncIterableOf(chunks: Array<string>): AsyncGenerator<Uint8Array> {
-    const encoder = new TextEncoder()
-    for (const chunk of chunks) yield encoder.encode(chunk)
-  }
-
-  async function collect<TData>(stream: AsyncIterable<TData>): Promise<Array<TData>> {
-    const events: Array<TData> = []
-    for await (const event of stream) events.push(event)
-    return events
-  }
-
-  test('keeps the last valid retry and ignores unknown event fields', async () => {
-    const events = await collect(parseEventStream(streamOf(['retry: 1000\nretry: 2000\nretry: invalid\nunknown: ignored\ndata: ok\n\n'])))
-    expect(events).toStrictEqual([{ data: 'ok', retry: 2000 }])
-  })
-
-  test('parses JSON data events split on a blank line', async () => {
-    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n', 'data: {"n":2}\n\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
-  })
-
-  test('concatenates multi-line data and reads event/id/retry fields', async () => {
-    const events = await collect(parseEventStream(streamOf(['event: ping\nid: 42\nretry: 3000\ndata: line one\ndata: line two\n\n'])))
-    expect(events).toStrictEqual([{ event: 'ping', id: '42', retry: 3000, data: 'line one\nline two' }])
-  })
-
-  test('ignores comment lines and keeps non-JSON data as a string', async () => {
-    const events = await collect(parseEventStream<string>(streamOf([': keep-alive\n\n', 'data: hello world\n\n'])))
-    expect(events).toStrictEqual([{ data: 'hello world' }])
-  })
-
-  test('normalizes CRLF endings and flushes a trailing event', async () => {
-    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\r\n\r\ndata: {"n":2}\r\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
-  })
-
-  test('joins data lines when a CRLF falls across two chunks', async () => {
-    const events = await collect(parseEventStream<string>(streamOf(['data: a\r', '\ndata: b\r\n\r\n'])))
-    expect(events).toStrictEqual([{ data: 'a\nb' }])
-  })
-
-  test('still ends an event when its blank line falls across two chunks', async () => {
-    const events = await collect(parseEventStream<string>(streamOf(['data: a\r\n\r', '\ndata: b\r', '\r'])))
-    expect(events).toStrictEqual([{ data: 'a' }, { data: 'b' }])
-  })
-
-  test('consumes an async iterable of byte chunks, as the axios stream response yields', async () => {
-    const events = await collect(parseEventStream(asyncIterableOf(['data: {"n":1}\n\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }])
-  })
-
-  test('closes the async iterable when an unfinished event outgrows maxEventSize', async () => {
-    const chunk = new TextEncoder().encode(`data: ${'x'.repeat(1024)}\n`)
-    let closed = false
-    async function* endless(): AsyncGenerator<Uint8Array> {
-      try {
-        while (true) yield chunk
-      } finally {
-        closed = true
-      }
-    }
-
-    await expect(collect(parseEventStream(endless(), { maxEventSize: 64 * 1024 }))).rejects.toThrow(RangeError)
-    expect(closed).toBe(true)
   })
 })
 

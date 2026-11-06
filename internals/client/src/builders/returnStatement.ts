@@ -1,7 +1,8 @@
-import { hasRequestContentTypeChoice } from '@internals/shared'
+import { getEventStream, hasRequestContentTypeChoice } from '@internals/shared'
 import type { ast } from '@kubb/kit'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption } from '../types.ts'
+import type { ValidatorHooks } from './validator.ts'
 import { buildRequestResultGenerics, buildResultType } from './generics.ts'
 
 /**
@@ -52,27 +53,50 @@ export function buildReturnStatement({
   return `return withUnwrap(${request}(${callConfig}) as Promise<RequestResult<${buildRequestResultGenerics({ node, types })}>>)`
 }
 
+const ESCAPES: Record<string, string> = { '\\': '\\\\', "'": "\\'", '\n': '\\n', '\r': '\\r' }
+
+function quote(value: string): string {
+  return `'${value.replace(/[\\'\n\r]/g, (char) => ESCAPES[char]!)}'`
+}
+
 /**
- * Builds the return type and statement of an operation that returns `text/event-stream`: the call
- * is wrapped in `toEventStream`, so the caller iterates the typed success events. Except with
- * `returnType: 'plain'`, `toEventStream` also receives `config`, so a per-call `maxEventSize` reaches the parser.
+ * Builds the return type and statement of a `text/event-stream` operation. The item type is `TypedEvent<...>` when each item
+ * declares its own `event` and `data`, and otherwise the payload type, which `EventStreamResult` wraps in `ServerSentEvent`. The call goes
+ * through `toEventStream` with a `send` function for the resume request, the `client` for its defaults, the call's
+ * `config`, and the method, shape, declared event names, text events and per-event validator. A `returnType: 'plain'` client receives only the promise,
+ * `toEventStream(request(config))`, and keeps its response validator in the call config.
  */
 export function buildEventStreamReturn({
   node,
   types,
   callConfig,
   returnType,
+  validatorHooks,
 }: {
-  node: ast.OperationNode
+  node: ast.HttpOperationNode
   types: OperationTypeNames
   callConfig: string
   returnType: ReturnTypeOption
+  validatorHooks: ValidatorHooks | null
 }): {
   returnType: string
   statement: string
 } {
-  const eventType = `SuccessOf<${types.response.responses(node)}>`
-  // A `'plain'` client is the caller's own module, whose `toEventStream` takes only the call result.
-  const args = returnType === 'plain' ? `request(${callConfig})` : `request(${callConfig}), config`
-  return { returnType: `Promise<EventStreamResult<${eventType}>>`, statement: `return toEventStream<${eventType}>(${args})` }
+  const stream = getEventStream(node)
+  const success = `SuccessOf<${types.response.responses(node)}>`
+  const eventType = stream?.shape === 'event' ? `TypedEvent<${success}>` : success
+  const promise = `Promise<EventStreamResult<${eventType}>>`
+  if (returnType === 'plain') return { returnType: promise, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
+
+  const meta = [
+    `method: '${node.method.toUpperCase()}'`,
+    `shape: '${stream?.shape ?? 'data'}'`,
+    stream?.events ? `events: [${stream.events.map(quote).join(', ')}]` : null,
+    stream?.text === true ? 'text: true' : null,
+    Array.isArray(stream?.text) ? `text: [${stream.text.map(quote).join(', ')}]` : null,
+    validatorHooks?.response ? `validator: ${validatorHooks.response}` : null,
+  ]
+    .filter(Boolean)
+    .join(', ')
+  return { returnType: promise, statement: `return toEventStream<${eventType}>({ send: (init) => request(${callConfig}), client: request, config, ${meta} })` }
 }

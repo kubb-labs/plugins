@@ -6,16 +6,14 @@ import {
   createClient as createFetchClient,
   createClientCore,
   createInterceptorStack,
-  parseEventStream,
   type ResolvedRequest,
   ResponseError,
   resolveAuth,
-  type ServerSentEvent,
-  toEventStream,
   type Transport,
   type TransportResult,
   unwrapResult,
   withUnwrap,
+  defaultTransport,
 } from './fetch.ts'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
@@ -850,6 +848,32 @@ describe('createClientCore', () => {
   })
 })
 
+describe('a streamed call answered without an event stream', () => {
+  const answer = (body: string, contentType: string) => async () => new Response(body, { status: 200, headers: { 'content-type': contentType } })
+
+  test.each(['application/json', 'application/problem+json'])('parses a %s body', async (contentType) => {
+    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('{"ok":true}', contentType))
+    const client = createClientCore({ defaultTransport })
+
+    expect((await client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream' })).data).toStrictEqual({ ok: true })
+  })
+
+  test('runs the response validator on a JSON body', async () => {
+    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('{"ok":true}', 'application/json'))
+    const client = createClientCore({ defaultTransport })
+
+    const result = await client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream', validator: { response: toSchema(() => 'validated') } })
+    expect(result.data).toBe('validated')
+  })
+
+  test('keeps an application/x-ndjson body a stream', async () => {
+    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('{"a":1}\n{"a":2}\n', 'application/x-ndjson'))
+    const client = createClientCore({ defaultTransport })
+
+    expect((await client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream' })).data).toBeInstanceOf(ReadableStream)
+  })
+})
+
 describe('header merging', () => {
   // Client defaults and call headers are merged into one set for every request, with or without a headers
   // validator. Header names are case-insensitive, so each header is sent once.
@@ -1364,145 +1388,5 @@ describe('resolveAuth', () => {
     const query: Record<string, unknown> = { api_key: 'explicit' }
     await resolveAuth({ security: [{ type: 'apiKey', name: 'api_key', in: 'query' }], auth: () => 'secret', headers: {}, query })
     expect(query).toStrictEqual({ api_key: 'explicit' })
-  })
-})
-
-describe('parseEventStream', () => {
-  function streamOf(chunks: Array<string>): ReadableStream<Uint8Array> {
-    const encoder = new TextEncoder()
-    return new ReadableStream({
-      start(controller) {
-        for (const chunk of chunks) controller.enqueue(encoder.encode(chunk))
-        controller.close()
-      },
-    })
-  }
-
-  async function* asyncIterableOf(chunks: Array<string>): AsyncGenerator<Uint8Array> {
-    const encoder = new TextEncoder()
-    for (const chunk of chunks) yield encoder.encode(chunk)
-  }
-
-  async function collect<TData>(stream: AsyncIterable<TData>): Promise<Array<TData>> {
-    const events: Array<TData> = []
-    for await (const event of stream) events.push(event)
-    return events
-  }
-
-  test('keeps the last valid retry and ignores unknown event fields', async () => {
-    const events = await collect(parseEventStream(streamOf(['retry: 1000\nretry: 2000\nretry: invalid\nunknown: ignored\ndata: ok\n\n'])))
-    expect(events).toStrictEqual([{ data: 'ok', retry: 2000 }])
-  })
-
-  test('parses JSON data events split on a blank line', async () => {
-    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n', 'data: {"n":2}\n\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
-  })
-
-  test('concatenates multi-line data with a newline', async () => {
-    const events = await collect(parseEventStream<string>(streamOf(['data: line one\ndata: line two\n\n'])))
-    expect(events).toStrictEqual([{ data: 'line one\nline two' }])
-  })
-
-  test('reads event, id, and retry fields', async () => {
-    const events = await collect(parseEventStream(streamOf(['event: ping\nid: 42\nretry: 3000\ndata: {"ok":true}\n\n'])))
-    expect(events).toStrictEqual([{ event: 'ping', id: '42', retry: 3000, data: { ok: true } }])
-  })
-
-  test('ignores comment and heartbeat lines', async () => {
-    const events = await collect(parseEventStream(streamOf([': keep-alive\n\n', 'data: {"n":1}\n\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }])
-  })
-
-  test('keeps non-JSON data as a string', async () => {
-    const events = await collect(parseEventStream<string>(streamOf(['data: hello world\n\n'])))
-    expect(events).toStrictEqual([{ data: 'hello world' }])
-  })
-
-  test('normalizes CRLF line endings and flushes a trailing event', async () => {
-    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\r\n\r\ndata: {"n":2}\r\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
-  })
-
-  test('joins data lines when a CRLF falls across two chunks', async () => {
-    const events = await collect(parseEventStream<string>(streamOf(['data: a\r', '\ndata: b\r\n\r\n'])))
-    expect(events).toStrictEqual([{ data: 'a\nb' }])
-  })
-
-  test('still ends an event when its blank line falls across two chunks', async () => {
-    const events = await collect(parseEventStream<string>(streamOf(['data: a\r\n\r', '\ndata: b\r', '\r'])))
-    expect(events).toStrictEqual([{ data: 'a' }, { data: 'b' }])
-  })
-
-  test('reassembles events split across chunks', async () => {
-    const events = await collect(parseEventStream(streamOf(['data: {"hal', 'f":true}\n\n'])))
-    expect(events).toStrictEqual([{ data: { half: true } }])
-  })
-
-  test('consumes an async iterable of byte chunks', async () => {
-    const events = await collect(parseEventStream(asyncIterableOf(['data: {"n":1}\n\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }])
-  })
-
-  test('ignores a comment-only trailer without a blank-line terminator', async () => {
-    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n: keep-alive\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }])
-  })
-
-  test('skips a blank trailing event', async () => {
-    const events: Array<ServerSentEvent> = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n\n\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }])
-  })
-
-  test('keeps a split CRLF as one line break across an empty chunk', async () => {
-    const events = await collect(parseEventStream<string>(streamOf(['data: a\r', '', '\ndata: b\n\n'])))
-    expect(events).toStrictEqual([{ data: 'a\nb' }])
-  })
-
-  test('accepts a lone CR as a line break', async () => {
-    const events = await collect(parseEventStream<string>(streamOf(['data: a\rdata: b\r\rdata: c\r\r'])))
-    expect(events).toStrictEqual([{ data: 'a\nb' }, { data: 'c' }])
-  })
-
-  test('decodes a multi-byte character split across chunks', async () => {
-    const bytes = new TextEncoder().encode('data: ✓\n\n')
-    async function* split() {
-      yield bytes.slice(0, 7)
-      yield bytes.slice(7)
-    }
-    const events = await collect(parseEventStream<string>(split()))
-    expect(events).toStrictEqual([{ data: '✓' }])
-  })
-
-  test.each([
-    ['one unfinished line', 'x'.repeat(1024)],
-    ['one unfinished multi-line event', `data: ${'x'.repeat(1024)}\n`],
-  ])('cancels the stream when %s outgrows maxEventSize', async (_, chunk) => {
-    const bytes = new TextEncoder().encode(chunk)
-    const cancel = vi.fn()
-    const endless = new ReadableStream<Uint8Array>({ pull: (controller) => controller.enqueue(bytes), cancel })
-
-    await expect(collect(parseEventStream(endless, { maxEventSize: 64 * 1024 }))).rejects.toStrictEqual(
-      new RangeError('Server-sent event exceeds maxEventSize of 65536 characters'),
-    )
-    expect(cancel).toHaveBeenCalledOnce()
-  })
-
-  test('applies maxEventSize to an event that arrives in one chunk', async () => {
-    const chunk = `data: ${'x'.repeat(44)}\n\n`
-    expect(await collect(parseEventStream<string>(streamOf([chunk]), { maxEventSize: 51 }))).toStrictEqual([{ data: 'x'.repeat(44) }])
-    await expect(collect(parseEventStream(streamOf([chunk]), { maxEventSize: 50 }))).rejects.toThrow(RangeError)
-  })
-
-  test.each([
-    ['one chunk', [`: ${'x'.repeat(60)}\ndata: a\n\n`]],
-    ['two chunks', [`: ${'x'.repeat(30)}`, `${'x'.repeat(30)}\ndata: a\n\n`]],
-  ])('applies maxEventSize to a comment line sent in %s', async (_, chunks) => {
-    await expect(collect(parseEventStream(streamOf(chunks), { maxEventSize: 50 }))).rejects.toThrow(RangeError)
-  })
-
-  test('toEventStream passes maxEventSize to the parser', async () => {
-    const { stream } = await toEventStream(Promise.resolve({ data: streamOf([`data: ${'x'.repeat(44)}\n\n`]), response: new Response() }), { maxEventSize: 49 })
-    await expect(collect(stream)).rejects.toThrow(RangeError)
   })
 })
