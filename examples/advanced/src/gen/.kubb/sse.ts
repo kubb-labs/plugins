@@ -233,7 +233,8 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
   const { data: body, error, status, contentType, request, response } = await call
   const ok = status === undefined || (status >= 200 && status < 300)
   // A transport decodes a JSON answer, so a success that is not a stream would otherwise end as an empty stream.
-  if (ok && body !== undefined && !isStreamBody(body)) {
+  // A 204 or empty answer has no body, `undefined` or `null`, and still ends as an empty stream.
+  if (ok && body != null && !isStreamBody(body)) {
     // `cause` is assigned, since the constructor option needs the ES2022 library a generated client cannot assume.
     throw Object.assign(new TypeError(`Expected a text/event-stream body, got ${contentType ?? 'a body without a content type'}`), { cause: body })
   }
