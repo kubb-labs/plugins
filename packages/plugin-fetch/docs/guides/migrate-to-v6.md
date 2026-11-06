@@ -1,6 +1,29 @@
 # Migrate to v6
 
-`@kubb/plugin-fetch` 6 removes the compatibility layer around the client runtime that `@kubb/plugin-client` ships. The fetch client keeps its API, so most projects only regenerate. Check the items below.
+`@kubb/plugin-fetch` 6 removes the compatibility layer around the client runtime that `@kubb/plugin-client` ships. The fetch client keeps its API, so most projects only regenerate. Code that only calls the generated functions or hooks needs no change.
+
+## Upgrade steps
+
+1. Upgrade `kubb` and `@kubb/plugin-fetch` together. v6 needs the Kubb release that follows 5.15.4:
+
+   ```bash
+   npm install --save-dev kubb@latest @kubb/plugin-fetch@6
+   ```
+
+2. Regenerate the client. This rewrites `.kubb/` and the operation files, so generated code needs no hand edits:
+
+   ```bash
+   npx kubb generate
+   ```
+
+3. Run the type checker. Each breaking change shows up as a compile error in your own code:
+
+   ```bash
+   npx tsc --noEmit
+   ```
+
+4. Fix each error with the matching section below.
+5. Check the changes that do not fail the type checker, listed under [Behavior changes](#behavior-changes).
 
 ## Template subpaths
 
@@ -32,9 +55,12 @@ let result: EventStreamResult<ServerSentEvent<PetEvent>>
 
 A stream whose document names each event already used `TypedEvent<…>`, which stays the same.
 
-## Stream answers that are not a stream
+## Behavior changes
 
-A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream. An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.
+These changes compile without errors, so check them by hand:
+
+- A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream.
+- An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.
 
 ## Query plugins
 
