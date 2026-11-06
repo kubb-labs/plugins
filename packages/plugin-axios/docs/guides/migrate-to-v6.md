@@ -45,6 +45,8 @@ client.setConfig({ transport: axios.create({ timeout: 10_000 }) })
 client.setConfig({ transport: createAxiosTransport(axios.create({ timeout: 10_000 })) })
 ```
 
+Native axios interceptors for a custom transport go on the instance you pass to `createAxiosTransport`. `axiosInstance` only backs `defaultTransport`.
+
 `defaultTransport` is now that function, and the instance it sends through is `axiosInstance`. Replace `defaultTransport.defaults` and `defaultTransport.interceptors` with `axiosInstance.defaults` and `axiosInstance.interceptors`. Clients from `createClient()` inherit the `transport` of `client`, and send through `axiosInstance` when neither sets one.
 
 ## Removed exports
@@ -54,12 +56,12 @@ client.setConfig({ transport: createAxiosTransport(axios.create({ timeout: 10_00
 
 ## Template subpaths
 
-`@kubb/plugin-axios/templates/axios.ts`, `templates/core.ts`, `templates/serializers.ts`, and `templates/standardSchema.ts` are gone. Import the client types from `@kubb/plugin-axios/templates/client.ts`, and the shared runtime from `@kubb/plugin-client/templates/*`. Code that imports from the generated `.kubb/client.ts` needs no change.
+`@kubb/plugin-axios/templates/axios.ts`, `templates/core.ts`, `templates/serializers.ts`, and `templates/standardSchema.ts` are gone. Import the client types from `@kubb/plugin-axios/templates/client.ts`, and the shared runtime from `@kubb/plugin-client/templates/*`. Generated operations and imports from the generated `.kubb/client.ts` need no change, except imports of the removed exports listed above.
 
 ## Stream calls
 
 - `EventStreamResult`, `StreamResult`, and `UnwrappedStreamResult` take the full event type: write `EventStreamResult<ServerSentEvent<PetEvent>>` where you wrote `EventStreamResult<PetEvent>`.
-- A successful stream call whose answer is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`.
+- A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream.
 - An event the server ends without a blank line is dropped, as browser `EventSource` does.
 - Only a browser call with the default adapters switches to the fetch adapter. An adapter set on the call or on `axiosInstance` is kept.
 
