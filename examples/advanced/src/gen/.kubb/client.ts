@@ -61,7 +61,6 @@ export const ResponseError = core.ResponseError as {
     config: ConstructorParameters<typeof core.ResponseError<TError, TRequest, TResponse>>[0],
   ): core.ResponseError<TError, TRequest, TResponse>
   is: typeof core.ResponseError.is
-  // `instanceof` narrows to this type, so it carries the native request and response.
   prototype: core.ResponseError<unknown, NativeRequest, NativeResponse>
 }
 
