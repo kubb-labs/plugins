@@ -662,7 +662,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
  * `responseType: 'stream'` answer. Any other streamed body stays a stream.
  */
 async function readStreamedBody({ data, contentType }: { data: unknown; contentType: string | undefined }): Promise<unknown> {
-  if (!(data instanceof ReadableStream) || !contentType?.includes('json')) return data
+  if (!(data instanceof ReadableStream) || !/[/+]json$/.test(contentType?.split(';')[0]?.trim() ?? '')) return data
   const text = await new Response(data).text()
   if (!text) return undefined
   try {

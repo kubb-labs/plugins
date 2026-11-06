@@ -13,6 +13,7 @@ import {
   type TransportResult,
   unwrapResult,
   withUnwrap,
+  defaultTransport,
 } from './fetch.ts'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
@@ -844,6 +845,24 @@ describe('createClientCore', () => {
     const child = client.createClient()
     child.interceptors.request.use((request) => request)
     expect(child).not.toBe(client)
+  })
+})
+
+describe('a streamed call answered without an event stream', () => {
+  const answer = (body: string, contentType: string) => async () => new Response(body, { status: 200, headers: { 'content-type': contentType } })
+
+  test.each(['application/json', 'application/problem+json'])('parses a %s body', async (contentType) => {
+    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('{"ok":true}', contentType))
+    const client = createClientCore({ defaultTransport })
+
+    expect((await client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream' })).data).toStrictEqual({ ok: true })
+  })
+
+  test('keeps an application/x-ndjson body a stream', async () => {
+    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('{"a":1}\n{"a":2}\n', 'application/x-ndjson'))
+    const client = createClientCore({ defaultTransport })
+
+    expect((await client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream' })).data).toBeInstanceOf(ReadableStream)
   })
 })
 

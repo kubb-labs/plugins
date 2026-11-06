@@ -670,6 +670,25 @@ describe('createClientCore', () => {
       expect(events.data).toBeInstanceOf(ReadableStream)
     })
 
+    test('reads an application/problem+json body back into its value', async () => {
+      const client = createClientCore()
+      const result = await client({ method: 'GET', url: '/events', responseType: 'stream', options: streaming(200, '{"ok":true}', 'application/problem+json') })
+
+      expect(result.data).toStrictEqual({ ok: true })
+    })
+
+    test('keeps an application/x-ndjson body a stream', async () => {
+      const client = createClientCore()
+      const result = await client({
+        method: 'GET',
+        url: '/events',
+        responseType: 'stream',
+        options: streaming(200, '{"a":1}\n{"a":2}\n', 'application/x-ndjson'),
+      })
+
+      expect(result.data).toBeInstanceOf(ReadableStream)
+    })
+
     test('throws a ResponseError with the parsed JSON error body', async () => {
       const client = createClientCore()
 

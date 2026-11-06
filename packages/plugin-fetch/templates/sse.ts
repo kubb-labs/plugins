@@ -15,11 +15,11 @@ export type ServerSentEvent<TData = unknown> = {
 }
 
 /** An event the document types by name: the member's own `event` and `data`, plus the `id` and `retry` any event may carry. */
-export type TypedEvent<T> = T & Pick<ServerSentEvent, 'id' | 'retry'>
+export type TypedEvent<TEvent> = TEvent & Pick<ServerSentEvent, 'id' | 'retry'>
 
 /** Reconnects with `Last-Event-ID` after the stream drops, as `EventSource` does: 2 retries, from 1000 ms growing by 1.5 up to 30000 ms. */
 export type ReconnectOptions = {
-  /** Most reconnects attempted after the first connection. */
+  /** The largest number of reconnects after the first connection. */
   maxRetries?: number
   /** Delay before the first reconnect in milliseconds, unless the server sent `retry`. */
   delay?: number

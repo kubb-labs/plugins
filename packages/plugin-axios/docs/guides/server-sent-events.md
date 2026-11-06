@@ -1,6 +1,6 @@
 # Server-sent events
 
-Operations returning `text/event-stream` produce a typed stream of events rather than a `RequestResult`. The client switches to the axios fetch adapter for these calls unless you set `adapter` yourself, because the default XHR adapter buffers the whole body. The event types come from the OpenAPI document: OpenAPI 3.2 describes each event with `itemSchema`, and OpenAPI 3.0 and 3.1 describe one event with `schema`. The runtime in `.kubb/sse.ts`, generated only when the document has such an operation, parses the stream the way the WHATWG event stream specification does, yields only the events the document declares, validates them one by one, and can reconnect with `Last-Event-ID`.
+Operations returning `text/event-stream` produce a typed stream of events rather than a `RequestResult`. The client switches to the axios fetch adapter for these calls unless you set `adapter` yourself, because the default XHR adapter buffers the whole body. The event types come from the OpenAPI document: OpenAPI 3.2 describes each event with `itemSchema`, and OpenAPI 3.0 and 3.1 describe one event with `schema`. The runtime in `.kubb/sse.ts` parses the stream the way the WHATWG event stream specification does, yields only the events the document declares, validates them one by one, and can reconnect with `Last-Event-ID`.
 
 ## Describe the stream in OpenAPI
 

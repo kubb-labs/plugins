@@ -733,6 +733,10 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
   return client
 }
 
+function isJsonContentType(contentType: string | null | undefined): boolean {
+  return /[/+]json$/.test(contentType?.split(';')[0]?.trim() ?? '')
+}
+
 function detectResponseType(contentType: string | null): ResponseType | undefined {
   if (!contentType) return undefined
   if (contentType.includes('text/event-stream')) return 'stream'
@@ -749,7 +753,7 @@ async function parseResponse(response: Response, responseType?: ResponseType): P
 
   const contentType = response.headers.get('Content-Type')
   // A server may answer a streamed operation with JSON, such as an error body; any other streamed body stays a stream.
-  const detected = responseType === 'stream' && detectResponseType(contentType) === 'json' ? 'json' : responseType
+  const detected = responseType === 'stream' && isJsonContentType(contentType) ? 'json' : responseType
   switch (detected ?? detectResponseType(contentType)) {
     case 'text':
     case 'document':
