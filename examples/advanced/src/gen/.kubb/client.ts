@@ -661,7 +661,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
  * Reads a streamed JSON body, such as an error body, back into its value, as the fetch adapter streams every
  * `responseType: 'stream'` answer. Any other streamed body stays a stream.
  */
-async function readStreamedBody(data: unknown, contentType: string | undefined): Promise<unknown> {
+async function readStreamedBody({ data, contentType }: { data: unknown; contentType: string | undefined }): Promise<unknown> {
   if (!(data instanceof ReadableStream) || !contentType?.includes('json')) return data
   const text = await new Response(data).text()
   if (!text) return undefined
@@ -760,7 +760,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       const direction = isSuccess ? 'response' : 'error'
       const contentType = getResponseContentType(response.headers as Record<string, unknown>)
       const codec = contentType ? codecs[contentType] : undefined
-      const raw = await readStreamedBody(response.data, contentType)
+      const raw = await readStreamedBody({ data: response.data, contentType })
       const decoded: unknown = contentType && codec?.deserialize ? await codec.deserialize(raw, contentType) : raw
       // A streamed success body is validated event by event in `toEventStream`, not as a whole.
       const streaming = isSuccess && requestConfig.responseType === 'stream'
@@ -793,7 +793,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       if (throwOnError && axiosError.response) {
         const contentType = getResponseContentType(axiosError.response.headers as Record<string, unknown>)
         throw new ResponseError({
-          data: await readStreamedBody(axiosError.response.data, contentType),
+          data: await readStreamedBody({ data: axiosError.response.data, contentType }),
           status: axiosError.response.status,
           statusText: axiosError.response.statusText,
           contentType,

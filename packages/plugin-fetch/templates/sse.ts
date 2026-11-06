@@ -143,14 +143,15 @@ function parseData<TData>(raw: string): TData {
  * when it holds `data`, `event` defaults to `message`, `id` carries across events until an empty `id` resets it, `retry` needs
  * all digits, and an unfinished event at the end is dropped. Consume with `for await`; break the loop to cancel the stream.
  */
-export async function* parseEventStream<TData = unknown>(
-  stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>,
-  {
-    maxEventSize = 16 * 1024 * 1024,
-    terminator,
-    cursor = { lastEventId: '' },
-  }: Pick<EventStreamOptions, 'maxEventSize' | 'terminator'> & { cursor?: Cursor } = {},
-): AsyncGenerator<ServerSentEvent<TData>> {
+export async function* parseEventStream<TData = unknown>({
+  stream,
+  maxEventSize = 16 * 1024 * 1024,
+  terminator,
+  cursor = { lastEventId: '' },
+}: Pick<EventStreamOptions, 'maxEventSize' | 'terminator'> & {
+  stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>
+  cursor?: Cursor
+}): AsyncGenerator<ServerSentEvent<TData>> {
   const decoder = new TextDecoder()
   const tooLarge = `Server-sent event exceeds maxEventSize of ${maxEventSize} characters`
   let type = ''
@@ -164,12 +165,20 @@ export async function* parseEventStream<TData = unknown>(
     const index = part.indexOf(':')
     const name = index === -1 ? part : part.slice(0, index)
     const value = index === -1 ? '' : part.slice(index + 1).replace(/^ /, '')
-    if (name === 'data') data.push(value)
-    else if (name === 'event') type = value
-    else if (name === 'id' && !value.includes('\u0000')) cursor.lastEventId = value
-    else if (name === 'retry' && /^\d+$/.test(value)) {
-      retry = Number(value)
-      cursor.retry = retry
+    switch (name) {
+      case 'data':
+        data.push(value)
+        break
+      case 'event':
+        type = value
+        break
+      case 'id':
+        if (!value.includes('\u0000')) cursor.lastEventId = value
+        break
+      case 'retry':
+        if (!/^\d+$/.test(value)) break
+        retry = Number(value)
+        cursor.retry = retry
     }
   }
 
@@ -219,7 +228,7 @@ function headerRecord(headers: unknown): Record<string, string> {
   return Symbol.iterator in headers ? Object.fromEntries(headers as Iterable<[string, string]>) : { ...(headers as Record<string, string>) }
 }
 
-function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+function sleep({ ms, signal }: { ms: number; signal?: AbortSignal }): Promise<void> {
   return new Promise((resolve) => {
     const done = () => {
       clearTimeout(timer)
@@ -281,7 +290,7 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
           if ('cancel' in body) await body.cancel().catch(() => {})
           return
         }
-        const parsed = parseEventStream(body, { maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })
+        const parsed = parseEventStream({ stream: body, maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })
         // Only a failed read is a drop worth a reconnect; a too-large event, a failed transform or validation, and a consumer error end the stream.
         const read = async () => {
           try {
@@ -308,7 +317,7 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
       }
       if (!reconnect || (!dropped && !onClose) || attempt >= maxRetries || options.signal?.aborted) return
 
-      await sleep(cursor.retry ?? delay, options.signal)
+      await sleep({ ms: cursor.retry ?? delay, signal: options.signal })
       if (options.signal?.aborted) return
       delay = Math.min(delay * growFactor, maxDelay)
       const init: ResumeInit = resume?.(cursor.lastEventId) ?? {}
