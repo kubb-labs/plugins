@@ -10,6 +10,8 @@
    npm install --save-dev kubb@latest @kubb/plugin-fetch@6
    ```
 
+   While v6 is in beta, install `@kubb/plugin-fetch@beta` instead of `@6`.
+
 2. Regenerate the client. This rewrites `.kubb/` and the operation files, so generated code needs no hand edits:
 
    ```bash
