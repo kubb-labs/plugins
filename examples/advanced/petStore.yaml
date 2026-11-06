@@ -1,8 +1,8 @@
-openapi: 3.0.3
+openapi: 3.2.0
 info:
-  title: Swagger PetStore - OpenAPI 3.0
+  title: Swagger PetStore - OpenAPI 3.2
   description: |-
-    This is a sample Pet Store Server based on the OpenAPI 3.0 specification.  You can find out more about
+    This is a sample Pet Store Server based on the OpenAPI 3.2 specification.  You can find out more about
     Swagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!
     You can now help us improve the API whether it's by making changes to the definition itself or to the code.
     That way, with time, we can improve the API in general, and expose some of the new features in OAS3.
@@ -133,7 +133,8 @@ paths:
                   id:
                     type: integer
                     format: int64
-                    example: 10
+                    examples:
+                      - 10
         '400':
           description: Invalid ID supplied
         '404':
@@ -569,6 +570,8 @@ paths:
           content:
             text/event-stream:
               schema:
+                type: string
+              itemSchema:
                 $ref: '#/components/schemas/PetEvent'
       security:
         - api_key: []
@@ -595,6 +598,8 @@ paths:
           content:
             text/event-stream:
               schema:
+                type: string
+              itemSchema:
                 $ref: '#/components/schemas/OrderEvent'
 components:
   schemas:
@@ -626,8 +631,7 @@ components:
       properties:
         event:
           type: string
-          enum:
-            - order_placed
+          const: order_placed
         data:
           $ref: '#/components/schemas/Order'
         id:
@@ -643,8 +647,7 @@ components:
       properties:
         event:
           type: string
-          enum:
-            - order_shipped
+          const: order_shipped
         data:
           $ref: '#/components/schemas/Order'
         id:
@@ -659,8 +662,7 @@ components:
       properties:
         event:
           type: string
-          enum:
-            - ping
+          const: ping
         data:
           type: string
     OrderEvent:
@@ -680,20 +682,23 @@ components:
         id:
           type: integer
           format: int64
-          example: 10
+          examples:
+            - 10
           minLength: 3
           maxLength: 100
         petId:
           type: integer
           format: int64
-          example: 198772
+          examples:
+            - 198772
         params:
           type: object
           properties:
             status:
               type: string
               description: Order Status
-              example: approved
+              examples:
+                - approved
               enum:
                 - placed
                 - approved
@@ -706,7 +711,8 @@ components:
         quantity:
           type: integer
           format: int32
-          example: 7
+          examples:
+            - 7
         orderType:
           type: string
           enum:
@@ -715,14 +721,16 @@ components:
         type:
           type: string
           description: Order Status
-          example: approved
+          examples:
+            - approved
         shipDate:
           type: string
           format: date-time
         status:
           type: string
           description: Order Status
-          example: approved
+          examples:
+            - approved
           enum:
             - placed
             - approved
@@ -730,7 +738,8 @@ components:
         http_status:
           type: number
           description: HTTP Status
-          example: 200
+          examples:
+            - 200
           enum:
             - 200
             - 400
@@ -748,10 +757,12 @@ components:
         id:
           type: integer
           format: int64
-          example: 1
+          examples:
+            - 1
         name:
           type: string
-          example: Dogs
+          examples:
+            - Dogs
       xml:
         name: category
     tag.Tag:
@@ -778,7 +789,8 @@ components:
         id:
           type: integer
           format: int64
-          example: 10
+          examples:
+            - 10
           readOnly: true
         parent:
           type: array
@@ -789,7 +801,8 @@ components:
           pattern: "^data:image\\/(png|jpeg|gif|webp);base64,([A-Za-z0-9+/]+={0,2})$"
         name:
           type: string
-          example: doggie
+          examples:
+            - doggie
           writeOnly: true
         url:
           type: string
@@ -829,10 +842,12 @@ components:
         id:
           type: integer
           format: int64
-          example: 10
+          examples:
+            - 10
         name:
           type: string
-          example: doggie
+          examples:
+            - doggie
         category:
           $ref: '#/components/schemas/Category'
         photoUrls:
@@ -909,11 +924,13 @@ components:
           type: boolean
       additionalProperties: false
     Image:
-      example: linode/debian10
+      examples:
+        - linode/debian10
       readOnly: true
       allOf:
-        - type: string
-          nullable: true
+        - type:
+            - string
+            - 'null'
     Dog:
       title: Dog
       type: object
