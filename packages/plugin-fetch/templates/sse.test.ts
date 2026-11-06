@@ -141,16 +141,6 @@ describe('parseEventStream', () => {
     await expect(collect(parseEventStream({ stream: streamOf([': too long\ndata: a\n\n']), maxEventSize: 8 }))).rejects.toThrow(RangeError)
   })
 
-  test('keeps data as text for the events in text', async () => {
-    const events = await collect(parseEventStream({ stream: streamOf(['event: ping\ndata: 42\n\ndata: {"n":1}\n\n']), text: ['ping'] }))
-
-    expect(events).toStrictEqual([message({ data: '42', event: 'ping' }), message({ data: { n: 1 } })])
-  })
-
-  test('keeps every data as text with text: true', async () => {
-    expect(await collect(parseEventStream({ stream: streamOf(['data: {"n":1}\n\n']), text: true }))).toStrictEqual([message({ data: '{"n":1}' })])
-  })
-
   test('strips a byte order mark', async () => {
     expect(await collect(parseEventStream<string>({ stream: streamOf(['\uFEFFdata: a\n\n']) }))).toStrictEqual([message({ data: 'a' })])
   })
@@ -245,17 +235,6 @@ describe('toEventStream', () => {
     const first = call({ data: streamOf(['data: a\n\n']), contentType: 'Text/Event-Stream; charset=utf-8' })
 
     expect(await collect((await toEventStream<string>(Promise.resolve(first))).stream)).toStrictEqual([message({ data: 'a' })])
-  })
-
-  test('yields only the declared events and hands the others to onUnknownEvent', async () => {
-    const onUnknownEvent = vi.fn()
-    const { stream } = await toEventStream(Promise.resolve(call({ data: streamOf(['event: a\ndata: 1\n\nevent: b\ndata: 2\n\ndata: 3\n\n']) })), {
-      config: { onUnknownEvent },
-      events: ['a'],
-    })
-
-    expect(await collect(stream)).toStrictEqual([{ data: 1, event: 'a' }])
-    expect(onUnknownEvent.mock.calls).toStrictEqual([[{ data: 2, event: 'b' }], [message({ data: 3 })]])
   })
 
   test('runs transform before the validator and validates data for the data shape', async () => {

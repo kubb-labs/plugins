@@ -32,10 +32,6 @@ export type EventStreamOptions = {
    * Maps each event before validation.
    */
   transform?: (event: ServerSentEvent) => ServerSentEvent
-  /**
-   * Receives each event whose name the document does not declare. Such events are not yielded.
-   */
-  onUnknownEvent?: (event: ServerSentEvent) => void
 }
 
 /** What the generated function knows about the stream from the document. */
@@ -46,18 +42,9 @@ export type EventStreamSchema = {
    */
   shape?: 'event' | 'data'
   /**
-   * Event names the document declares. Any other event goes to `onUnknownEvent` instead of the stream.
-   */
-  events?: ReadonlyArray<string>
-  /**
    * Validates each event (`shape: 'event'`) or its `data` (`shape: 'data'`), after `transform`.
    */
   validator?: StandardSchemaValidator
-  /**
-   * Keeps `data` as text instead of parsing JSON: `true` for every event, or the names of the events whose `data` the
-   * document types as a string.
-   */
-  text?: boolean | ReadonlyArray<string>
 }
 
 /**
@@ -115,23 +102,20 @@ function parseData<TData>(raw: string): TData {
 /**
  * Parses a `text/event-stream` body as the WHATWG event stream specification does: an event is dispatched at its blank line
  * when it holds `data`, `event` defaults to `message`, `id` carries across events until an empty `id` resets it, `retry` needs
- * all digits, and an unfinished event at the end is dropped. `data` is parsed as JSON when it is valid, except for the events
- * in `text`. Consume with `for await`, and break the loop to cancel the stream.
+ * all digits, and an unfinished event at the end is dropped. `data` is parsed as JSON when it is valid and kept as text
+ * otherwise. Consume with `for await`, and break the loop to cancel the stream.
  */
 export async function* parseEventStream<TData = unknown>({
   stream,
   maxEventSize = 16 * 1024 * 1024,
   terminator,
-  text = false,
   cursor = { lastEventId: '' },
 }: Pick<EventStreamOptions, 'maxEventSize' | 'terminator'> & {
   stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>
-  text?: boolean | ReadonlyArray<string>
   cursor?: Cursor
 }): AsyncGenerator<ServerSentEvent<TData>> {
   const decoder = new TextDecoder()
   const tooLarge = `Server-sent event exceeds maxEventSize of ${maxEventSize} characters`
-  const isText = (name: string) => text === true || (Array.isArray(text) && text.includes(name))
   let type = ''
   let data: Array<string> = []
   let retry: number | undefined
@@ -175,11 +159,10 @@ export async function* parseEventStream<TData = unknown>({
         cursor.lastEventId = pendingId
         if (data.length) {
           const raw = data.join('\n')
-          const name = type || 'message'
           if (raw === terminator) return
           yield {
-            data: isText(name) ? (raw as TData) : parseData<TData>(raw),
-            event: name,
+            data: parseData<TData>(raw),
+            event: type || 'message',
             ...(cursor.lastEventId ? { id: cursor.lastEventId } : {}),
             ...(retry !== undefined ? { retry } : {}),
           }
@@ -209,8 +192,8 @@ function isStreamBody(data: unknown): data is ReadableStream<Uint8Array> | Async
 }
 
 /**
- * Reads a call as typed Server-Sent Events: only the declared events, transformed and validated one by one, until the
- * terminator, the end of the stream, or a body that is not an event stream. A dropped connection ends the loop with the
+ * Reads a call as typed Server-Sent Events, transformed and validated one by one, until the terminator, the end of the
+ * stream, or a body that is not an event stream. A dropped connection ends the loop with the
  * transport's error; `lastEventId` on the result is the ID to resume from.
  */
 export async function toEventStream<TData = unknown, TResponse = NativeResponse>(
@@ -249,11 +232,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse>
       return
     }
     // A consumer `break` or a failed event closes this loop, which cancels the reader.
-    for await (const event of parseEventStream({ stream: body, maxEventSize: options.maxEventSize, terminator: options.terminator, text: meta.text, cursor })) {
-      if (meta.events && !meta.events.includes(event.event)) {
-        options.onUnknownEvent?.(event)
-        continue
-      }
+    for await (const event of parseEventStream({ stream: body, maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })) {
       yield (await validateEvent(options.transform ? options.transform(event) : event)) as StreamEvent<TData>
     }
   }

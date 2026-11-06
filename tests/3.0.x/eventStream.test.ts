@@ -133,7 +133,7 @@ describe('OpenAPI 3.2 item schemas', () => {
 
       const chat = await fs.readFile(path.join(output, 'clients', 'streamChat.ts'), 'utf8')
       expect(chat).toContain('Promise<EventStreamResult<TypedEvent<SuccessOf<StreamChatResponses>>>>')
-      expect(chat).toContain("{ client: request, config, shape: 'event', events: ['message_delta', 'ping'], text: ['ping'], validator: ")
+      expect(chat).toContain("{ client: request, config, shape: 'event', validator: ")
       expect(chat).not.toMatch(/validator: \{[^}]*response:/)
 
       const ticks = await fs.readFile(path.join(output, 'clients', 'streamTicks.ts'), 'utf8')

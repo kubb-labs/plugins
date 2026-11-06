@@ -237,7 +237,7 @@ describe('clientGenerator operation', () => {
     { name: 'listPetsWithStyles', node: listPetsStyledNode, options: {} },
     // text/event-stream response returns a typed event stream instead of a one-shot result.
     { name: 'streamEventsSse', node: streamEventsNode, options: {} },
-    // A `stream.shape` of `event` types each event by name and lists the declared names for the runtime filter.
+    // A `stream.shape` of `event` types each event by name.
     { name: 'streamChatTypedEvents', node: streamChatNode, options: {} },
     // returnType: 'data' unwraps the resolved call down to the bare success body.
     { name: 'getPetByIdWithReturnTypeData', node: getPetByIdNode, options: { returnType: 'data' as const } },
