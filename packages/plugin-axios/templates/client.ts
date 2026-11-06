@@ -75,12 +75,12 @@ async function readStreamedText(data: ReadableStream<Uint8Array> | AsyncIterable
 }
 
 /**
- * Reads a streamed JSON body, such as an error body, back into its value, because every adapter streams a
+ * Reads a streamed JSON body, or any streamed error body, back into its value, because every adapter streams a
  * `responseType: 'stream'` answer: the fetch adapter as a `ReadableStream`, the Node adapter as a readable. Any other
- * streamed body stays a stream.
+ * streamed success body stays a stream.
  */
-async function readStreamedBody({ data, contentType }: { data: unknown; contentType: string | undefined }): Promise<unknown> {
-  if (!isStreamed(data) || !isJsonMediaType(contentType)) return data
+async function readStreamedBody({ data, contentType, status }: { data: unknown; contentType: string | undefined; status: number }): Promise<unknown> {
+  if (!isStreamed(data) || !(status >= 300 || isJsonMediaType(contentType))) return data
   const text = await readStreamedText(data)
   if (!text) return undefined
   try {
@@ -118,7 +118,7 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
     const contentType = getResponseContentType(headers)
 
     return {
-      data: await readStreamedBody({ data: response.data, contentType }),
+      data: await readStreamedBody({ data: response.data, contentType, status: response.status }),
       status: response.status,
       statusText: response.statusText,
       headers,

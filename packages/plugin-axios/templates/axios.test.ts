@@ -170,6 +170,11 @@ describe('createAxiosTransport', () => {
         status: 404,
         data: { message: 'gone' },
       })
+      await expect(streaming(503, 'busy', 'text/plain')({ method: 'GET', url: '/events', responseType: 'stream' })).rejects.toMatchObject({
+        name: 'ResponseError',
+        status: 503,
+        data: 'busy',
+      })
     })
   })
 })

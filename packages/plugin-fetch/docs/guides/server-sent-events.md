@@ -216,7 +216,7 @@ for (let attempt = 0; attempt < 3; attempt++) {
     break
   } catch (error) {
     if (ResponseError.is(error)) throw error
-    lastEventId = result.lastEventId
+    lastEventId = result.lastEventId || lastEventId
   }
 }
 ```
