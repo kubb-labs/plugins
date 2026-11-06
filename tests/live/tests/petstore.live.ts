@@ -23,7 +23,7 @@ describe.each(Object.entries(flavors))('petstore3 over %s', (flavor, gen) => {
     const created = await gen.addPet({ body: pet })
     expect(created.status).toBe(200)
     expect(created.data.name).toBe(pet.name)
-    // int64 is typed as bigint, but the JSON body arrives as a number (see findings).
+    // int64 is typed as bigint, but the JSON body arrives as a number (issue #1354).
     expect(BigInt(created.data.id as unknown as number)).toBe(petId)
 
     const fetched = await gen.getPetById({ path: { petId } }).unwrap()
@@ -42,7 +42,6 @@ describe.each(Object.entries(flavors))('petstore3 over %s', (flavor, gen) => {
   test('404 throws a ResponseError by default and resolves with throwOnError false', async () => {
     const missing = 999_999_999_999n
     const error = await gen.getPetById({ path: { petId: missing } }).catch((e: unknown) => e)
-    expect(ResponseError.is(error)).toBe(true)
     if (!ResponseError.is(error)) throw error
     expect(error.status).toBe(404)
     expect(error.data).toBe('Pet not found')

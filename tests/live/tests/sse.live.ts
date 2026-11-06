@@ -60,7 +60,7 @@ describe.each(Object.entries(wiki))('Wikimedia EventStreams over %s', (_flavor, 
     expect(new Date(next!.data.meta.dt).getTime()).toBeGreaterThanOrEqual(new Date(last!.data.meta.dt).getTime())
   })
 
-  test('.unwrap() and returnType data style iteration', async () => {
+  test('.unwrap() resolves to the events', async () => {
     const events = await gen.streamRecentChanges({ path: { streams: 'recentchange' }, query: { since } }).unwrap()
     for await (const { data } of events) {
       expect(typeof data.wiki).toBe('string')
