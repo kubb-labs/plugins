@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
-import { getResponseContentType, isStreamed } from './core.ts'
+import { getResponseContentType, isStreamed, type CallResult, type Transport } from './core.ts'
 import { isJsonMediaType } from './serializers.ts'
 import * as core from './core.ts'
 
@@ -27,18 +27,6 @@ type AxiosOverrides = {
   validateStatus?: (status: number) => boolean
 }
 
-export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestResult<
-  TResponses,
-  ThrowOnError,
-  TRequest,
-  TResponse
->
-export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.UnwrappedResult<
-  TResponses,
-  ThrowOnError,
-  TRequest,
-  TResponse
->
 export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = Omit<
   core.RequestConfig<TBody, TRequest, TResponse>,
   'transport' | 'client'
@@ -51,10 +39,6 @@ export type Options<TData extends core.DataShape, ThrowOnError extends boolean =
   AxiosOverrides & { client?: ClientInstance<TRequest, TResponse> }
 export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = Omit<core.ClientConfig<TRequest, TResponse>, 'transport'> & AxiosOverrides
 export type ResolvedRequest = core.ResolvedRequest & { options?: AxiosOptions }
-export type TransportResult<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.TransportResult<TData, TRequest, TResponse>
-export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
-export type CallResult<TRequest = NativeRequest, TResponse = NativeResponse> = core.CallResult<TRequest, TResponse>
-export type ResponseErrorConfig<TError = unknown> = core.ResponseError<TError, NativeRequest, NativeResponse>
 export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>
 /** The core's `ResponseError` class, typed with this transport's request and response. `instanceof` and `ResponseError.is` both match what the client throws. */
 export const ResponseError = core.ResponseError as {
