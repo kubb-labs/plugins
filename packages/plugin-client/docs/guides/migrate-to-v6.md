@@ -17,7 +17,3 @@ export async function toEventStream<TEvent = ServerSentEvent>(result: Promise<{ 
 ```
 
 A generated function calls `toEventStream<ServerSentEvent<Payload>>` when the document types only the payload, and `toEventStream<TypedEvent<Event>>` when it names each event. See [Write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client).
-
-## Shared runtime templates
-
-`@kubb/plugin-client/templates/*` is now the only place the shared runtime ships. `@kubb/plugin-fetch` and `@kubb/plugin-axios` no longer re-export `templates/core.ts`, `templates/serializers.ts`, or `templates/standardSchema.ts`.

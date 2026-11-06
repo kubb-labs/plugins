@@ -23,7 +23,7 @@
    ```
 
 4. Fix each error with the matching section below.
-5. Check the changes that do not fail the type checker, listed under [Behavior changes](#behavior-changes).
+5. Coming from 5.12 or earlier, also check the changes listed under [From 5.12 or earlier](#from-5-12-or-earlier).
 
 ## Template subpaths
 
@@ -55,9 +55,9 @@ let result: EventStreamResult<ServerSentEvent<PetEvent>>
 
 A stream whose document names each event already used `TypedEvent<…>`, which stays the same.
 
-## Behavior changes
+## From 5.12 or earlier
 
-These changes compile without errors, so check them by hand:
+5.13 already changed these, and they compile without errors, so check them by hand:
 
 - A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream.
 - An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.

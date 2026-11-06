@@ -23,7 +23,7 @@
    ```
 
 4. Fix each error with the matching section below.
-5. Check the changes that do not fail the type checker, listed under [Behavior changes](#behavior-changes).
+5. Check the changes that do not fail the type checker, listed under [Behavior changes](#behavior-changes), and, coming from 5.12 or earlier, [From 5.12 or earlier](#from-5-12-or-earlier).
 
 ## Keep your axios interceptors as they are
 
@@ -124,6 +124,11 @@ These changes compile without errors, so check them by hand:
 - `client.interceptors.request` handlers run in the order you register them. axios ran its request handlers in reverse.
 - `client.interceptors.error` no longer runs for a network error. See [Interceptors](#interceptors).
 - A child from `createClient()` inherits the `transport` of `client`. It used to get its own `axios.create()`.
+
+## From 5.12 or earlier
+
+5.13 already changed these, and they compile without errors, so check them by hand:
+
 - A stream call keeps the adapter set on the call or on the instance, such as a mock adapter in tests. Only a browser call with the default adapters switches to the fetch adapter.
 - A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream.
 - An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.
