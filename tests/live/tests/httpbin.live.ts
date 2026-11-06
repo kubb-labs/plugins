@@ -9,7 +9,7 @@ const flavors = { fetch: fetchGen, axios: axiosGen as unknown as typeof fetchGen
 describe.each(Object.entries(flavors))('httpbin over %s', (flavor, gen) => {
   const { client, createClient, ResponseError } = gen
 
-  test('serializes query styles, a header parameter, and sends a default Accept', async () => {
+  test('serializes query styles and a header parameter', async () => {
     const { data } = await gen.getArgs({
       query: { q: 'a b&c', tags: ['x', 'y'], csv: ['1', '2'], filter: { status: 'ok', min: 3 } },
       headers: { 'X-Custom': 'yes' },
@@ -33,7 +33,8 @@ describe.each(Object.entries(flavors))('httpbin over %s', (flavor, gen) => {
     const patched = await gen.patchJson({ body: { name: 'patch', age: 2 } })
     expect(patched.data.json).toStrictEqual({ name: 'patch', age: 2 })
     const deleted = await gen.deleteIt({})
-    expect(deleted.data.method ?? 'DELETE').toBe('DELETE')
+    expect(deleted.status).toBe(200)
+    expect(deleted.data.url).toBe('https://httpbin.org/delete')
   })
 
   test('sends a urlencoded form', async () => {
@@ -58,13 +59,13 @@ describe.each(Object.entries(flavors))('httpbin over %s', (flavor, gen) => {
     const error = await gen.getStatus({ path: { code: 404 } }).catch((e: unknown) => e)
     if (!ResponseError.is(error)) throw error
     expect(error.status).toBe(404)
-    // httpbin sends an empty text/html body: both transports read it as ''.
-    expect([undefined, '']).toContain(error.data)
+    // httpbin sends an empty text/html body, which both transports read as ''.
+    expect(error.data).toBe('')
     expect(error.message).toMatch(/^GET https:\/\/httpbin\.org\/status\/404 failed with status 404( Not Found| NOT FOUND)?$/)
 
     const boom = await gen.getStatus({ path: { code: 500 }, throwOnError: false })
     expect(boom.status).toBe(500)
-    expect([undefined, '']).toContain(boom.error)
+    expect(boom.error).toBe('')
     expect(boom.data).toBeUndefined()
   })
 
@@ -188,7 +189,7 @@ describe.each(Object.entries(flavors))('httpbin over %s', (flavor, gen) => {
     expect(events).toStrictEqual([])
   })
 
-  test(`${flavor}: a network error rejects without running the error interceptor`, async () => {
+  test('a network error rejects without running the error interceptor', async () => {
     // 127.0.0.1 is on NO_PROXY, so neither transport goes through the sandbox proxy, which answers 502 for a bad host.
     const own = createClient({ baseURL: 'http://127.0.0.1:1' })
     let ran = false
