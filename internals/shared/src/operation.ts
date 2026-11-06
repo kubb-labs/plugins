@@ -645,7 +645,7 @@ export function resolveOperationTypeNames(
 ): string[] {
   const key = `${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
   return resolver.memo(`operationTypeNames:${key}`, () => {
-    const { path, query, header } = getOperationParameters(node)
+    const { path, query, header, cookie } = getOperationParameters(node)
     const responseStatusNames =
       options.responseStatusNames === 'error'
         ? resolveErrorNames(node, resolver)
@@ -660,6 +660,7 @@ export function resolveOperationTypeNames(
             ...path.map((param) => resolver.param.path(node, param)),
             ...query.map((param) => resolver.param.query(node, param)),
             ...header.map((param) => resolver.param.headers(node, param)),
+            ...cookie.map((param) => resolver.param.cookies(node, param)),
           ]
     const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.response.body(node) : null, resolver.response.response(node)]
     const names =
