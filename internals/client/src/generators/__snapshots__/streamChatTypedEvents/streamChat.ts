@@ -16,7 +16,14 @@ export function streamChat<ThrowOnError extends boolean = true>(
 
   return withUnwrap(
     toEventStream<TypedEvent<SuccessOf<StreamChatResponses>>>(
-      request({ method: 'POST', url: '/chat', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }),
+      request({
+        method: 'POST',
+        url: '/chat',
+        contentType: { response: 'text/event-stream' },
+        responseType: 'stream',
+        ...config,
+        throwOnError: config.throwOnError ?? true,
+      }),
       { client: request, config, shape: 'event' },
     ) as Promise<StreamResult<StreamChatResponses, ThrowOnError, TypedEvent<SuccessOf<StreamChatResponses>>>>,
   )

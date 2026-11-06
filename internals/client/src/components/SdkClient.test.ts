@@ -57,7 +57,7 @@ describe('buildSdkMethod', () => {
     expect(method).toContain('return withUnwrap(toEventStream<ServerSentEvent<SuccessOf<')
     // The response validator runs per event, so it moves from the call config into the stream meta.
     expect(method).toContain(
-      `request({ method: 'GET', url: '/events', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }), { client: request, config, shape: 'data', validator: streamEventsResponseSchema })`,
+      `request({ method: 'GET', url: '/events', contentType: { response: 'text/event-stream' }, responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }), { client: request, config, shape: 'data', validator: streamEventsResponseSchema })`,
     )
 
     // A plain custom client gets no stream meta, so its response validator stays in the call config.

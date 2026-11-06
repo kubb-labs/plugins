@@ -16,7 +16,14 @@ export function streamEvents<ThrowOnError extends boolean = true>(
 
   return withUnwrap(
     toEventStream<ServerSentEvent<SuccessOf<StreamEventsResponses>>>(
-      request({ method: 'GET', url: '/events', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }),
+      request({
+        method: 'GET',
+        url: '/events',
+        contentType: { response: 'text/event-stream' },
+        responseType: 'stream',
+        ...config,
+        throwOnError: config.throwOnError ?? true,
+      }),
       { client: request, config, shape: 'data' },
     ) as Promise<StreamResult<StreamEventsResponses, ThrowOnError>>,
   )
