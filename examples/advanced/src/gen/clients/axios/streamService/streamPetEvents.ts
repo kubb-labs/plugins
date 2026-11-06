@@ -1,5 +1,5 @@
 import type { SuccessOf, Unwrappable } from '../../../.kubb/client'
-import type { StreamResult, StreamOptions } from '../../../.kubb/sse'
+import type { StreamResult, StreamOptions, ServerSentEvent } from '../../../.kubb/sse'
 import type { PetEvent } from '../../../models/ts/PetEvent'
 import { client, withUnwrap } from '../../../.kubb/client'
 import { toEventStream } from '../../../.kubb/sse'
@@ -33,9 +33,11 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
 
   return withUnwrap(
     toEventStream<
-      SuccessOf<{
-        '200': PetEvent
-      }>
+      ServerSentEvent<
+        SuccessOf<{
+          '200': PetEvent
+        }>
+      >
     >(
       request({
         method: 'GET',
