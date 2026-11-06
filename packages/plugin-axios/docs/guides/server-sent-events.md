@@ -239,15 +239,15 @@ try {
 }
 ```
 
-With `throwOnError: false`, the call resolves instead of throwing, as a regular call does. The result then carries the `status` and the `error` body, and its stream yields nothing. Checking `status` narrows `error` to the body the document declares for that status:
+With `throwOnError: false`, the call resolves instead of throwing, as a regular call does. The result then carries the `status` and the `error` body, its `data` is `undefined`, and its stream yields nothing. Check `data` rather than `error`, because an empty error body leaves `error` undefined. Checking `status` narrows `error` to the body the document declares for that status:
 
 ```typescript
 const result = await streamChat({ body, throwOnError: false })
-if (result.error) console.error('stream rejected', result.status, result.error)
-else for await (const event of result) render(event)
+if (!result.data) console.error('stream rejected', result.status, result.error)
+else for await (const event of result.data) render(event)
 ```
 
-As on a regular call, `.unwrap()` resolves to the events and rejects with the `error` body when the call failed:
+As on a regular call, `.unwrap()` resolves to the events. A failed call rejects with a `ResponseError` by default, and with the `error` body when the call sets `throwOnError: false`:
 
 ```typescript
 for await (const event of await streamChat({ body }).unwrap()) render(event)
@@ -297,12 +297,12 @@ try {
 }
 ```
 
-With `throwOnError: false`, the call returns the full result instead, as a regular call does in this mode. The events are its `data`, and checking `status` narrows `error`:
+With `throwOnError: false`, the call returns the full result instead, as a regular call does in this mode. The events are its `data` on a 2xx response, and checking `status` narrows `error`:
 
 ```typescript
 const result = await streamPetEvents({ path: { petId: 1 }, throwOnError: false })
 
-if (result.error) console.error('stream rejected', result.status, result.error)
+if (!result.data) console.error('stream rejected', result.status, result.error)
 else for await (const event of result.data) render(event)
 ```
 

@@ -259,7 +259,7 @@ export async function toEventStream<TData = unknown, TResponse = NativeResponse,
   const stream = events()
   return {
     stream,
-    data: error === undefined ? stream : undefined,
+    data: status === undefined || (status >= 200 && status < 300) ? stream : undefined,
     status,
     error: error as EventStreamResult<TData, TResponse, ThrowOnError>['error'],
     contentType,
