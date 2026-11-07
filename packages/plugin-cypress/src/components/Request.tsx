@@ -31,14 +31,13 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   // Bracket-access the path object with the raw OpenAPI param names, matching the generated `path` type's keys.
   const urlTemplate = Url.toGroupedTemplateString(node.path, { prefix: baseURL })
 
-  const requestOptions = [
-    `method: '${node.method}'`,
-    `url: ${urlTemplate}`,
-    groups.query && 'qs: query',
-    groups.headers && 'headers',
-    groups.body && 'body',
-    '...options',
-  ].filter(Boolean)
+  // `cy.request` has no cookie option, so the cookie group goes out as a `Cookie` header.
+  const cookieHeader = groups.cookies ? "Cookie: Object.entries(cookies).map(([name, value]) => `${name}=${value}`).join('; ')" : null
+  const headers = cookieHeader ? `headers: { ${[groups.headers && '...headers', cookieHeader].filter(Boolean).join(', ')} }` : groups.headers && 'headers'
+
+  const requestOptions = [`method: '${node.method}'`, `url: ${urlTemplate}`, groups.query && 'qs: query', headers, groups.body && 'body', '...options'].filter(
+    Boolean,
+  )
 
   const requestCall = `return cy.request<${responseType}>({
   ${requestOptions.join(',\n  ')}

@@ -118,6 +118,15 @@ const deletePetNode = ast.factory.createOperation({
   responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'void' }), description: 'successful operation' })],
 })
 
+const logoutNode = ast.factory.createOperation({
+  operationId: 'logout',
+  method: 'POST',
+  path: '/logout',
+  tags: ['session'],
+  parameters: [ast.factory.createParameter({ name: 'session', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+  responses: [ast.factory.createResponse({ statusCode: '204', schema: ast.factory.createSchema({ type: 'void' }), description: 'logged out' })],
+})
+
 describe('mutationGenerator operation', () => {
   const testData = [
     { name: 'getAsMutation', node: findByTagsNode, options: { mutation: { importPath: 'custom-swr/mutation', methods: ['get'] } } },
@@ -134,6 +143,7 @@ describe('mutationGenerator operation', () => {
     },
     { name: 'updatePetById', node: updatePetWithFormNode, options: {} },
     { name: 'deletePet', node: deletePetNode, options: {} },
+    { name: 'logoutWithCookies', node: logoutNode, options: {} },
     { name: 'bodyWithValueProperty', node: setPropertyNode, options: { mutation: { importPath: '@tanstack/vue-query', methods: ['PUT'] } } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginVueQuery['resolvedOptions']> }>
 

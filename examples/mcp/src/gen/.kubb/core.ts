@@ -1,4 +1,4 @@
-import type { NativeRequest, NativeResponse } from './client'
+import type { NativeOptions, NativeRequest, NativeResponse } from './client'
 import type { HeadersInit, HttpMethod, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers'
 import type { StandardSchemaValidator, ValidateOption, ValidationErrorHandler } from './standardSchema'
 import {
@@ -8,6 +8,7 @@ import {
   defaultPathSerializer,
   defaultQuerySerializer,
   isDefaultJsonBody,
+  isJsonMediaType,
   serializeCookies,
 } from './serializers'
 import { isValidationEnabled, runValidator } from './standardSchema'
@@ -133,6 +134,11 @@ export type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; 
 
 export type RequestCredentials = 'omit' | 'same-origin' | 'include'
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream' | 'formdata'
+/**
+ * The parser per response content type, generated when one success response declares several that differ. A key is a
+ * base media type such as `audio/mpeg`, a `type/*` wildcard, or a catch-all entry.
+ */
+export type ResponseTypeMap = Record<string, ResponseType>
 
 /**
  * Decodes a response body for a codec's media type.
@@ -197,15 +203,15 @@ export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse =
   styles?: Styles
   signal?: AbortSignal
   credentials?: RequestCredentials
-  options?: Record<string, unknown>
+  options?: NativeOptions
   contentType?: ContentType
-  responseType?: ResponseType
+  responseType?: ResponseType | ResponseTypeMap
   throwOnError?: boolean
   client?: ClientInstance<TRequest, TResponse>
   transport?: Transport<TRequest, TResponse>
   serializer?: Serializers
   codecs?: Record<string, Codec>
-  validator?: { request?: Validator; path?: Validator; query?: Validator; headers?: Validator; response?: Validator; error?: Validator }
+  validator?: { request?: Validator; path?: Validator; query?: Validator; headers?: Validator; cookies?: Validator; response?: Validator; error?: Validator }
   onValidationError?: ValidationErrorHandler
   validate?: ValidateOption
   security?: Array<Auth>
@@ -231,7 +237,7 @@ export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> =
   baseURL?: string
   headers?: HeadersInit
   credentials?: RequestCredentials
-  options?: Record<string, unknown>
+  options?: NativeOptions
   throwOnError?: boolean
   transport?: Transport<TRequest, TResponse>
   serializer?: Serializers
@@ -251,8 +257,8 @@ export type ResolvedRequest = {
   body?: RequestBody
   signal?: AbortSignal
   credentials?: RequestCredentials
-  options?: Record<string, unknown>
-  responseType?: ResponseType
+  options?: NativeOptions
+  responseType?: ResponseType | ResponseTypeMap
 }
 
 /**
@@ -492,6 +498,44 @@ export function isStreamed(data: unknown): data is ReadableStream<Uint8Array> | 
   return data instanceof ReadableStream || (!!data && typeof data === 'object' && Symbol.asyncIterator in data)
 }
 
+/**
+ * Reads a body a transport decoded as text: an empty body is no data, and a body that is not JSON stays text, since a
+ * server may label a plain message such as `Pet deleted` as JSON.
+ */
+export function parseJsonOrText(text: string): unknown {
+  if (!text) return undefined
+  try {
+    return JSON.parse(text)
+  } catch {
+    return text
+  }
+}
+
+/** The parser a response `Content-Type` suggests, or `undefined` for a media type the runtime does not know. */
+export function detectResponseType(contentType: string | null | undefined): ResponseType | undefined {
+  const base = baseContentType(contentType)
+  if (!base) return undefined
+  if (base === 'text/event-stream') return 'stream'
+  if (isJsonMediaType(base)) return 'json'
+  if (base.startsWith('text/')) return 'text'
+  if (base === 'application/octet-stream' || base === 'application/pdf' || /^(image|audio|video)\//.test(base)) return 'blob'
+  return undefined
+}
+
+/**
+ * The parser for a response: the call's `responseType`, or for a map the entry matching the response `Content-Type`
+ * (the exact base type, then `type/*`, then the catch-all), or else what the media type suggests.
+ */
+export function resolveResponseType(
+  responseType: ResponseType | ResponseTypeMap | undefined,
+  contentType: string | null | undefined,
+): ResponseType | undefined {
+  if (typeof responseType === 'string') return responseType
+  const base = baseContentType(contentType)
+  const matched = base ? (responseType?.[base] ?? responseType?.[`${base.split('/')[0]}/*`]) : undefined
+  return matched ?? responseType?.['*/*'] ?? detectResponseType(contentType)
+}
+
 /** The media type of the `Content-Type` response header, without its parameters. */
 export function getResponseContentType(headers: Headers | Record<string, string> | undefined): string | undefined {
   if (!headers) return undefined
@@ -525,9 +569,10 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     path: { ...(requestConfig.path as Record<string, unknown> | undefined) },
     query: { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) },
     headers: collectHeadersCaseInsensitive(config.headers, requestConfig.headers),
+    cookies: { ...(requestConfig.cookies as Record<string, unknown> | undefined) },
   }
-  const [validatedPath, validatedQuery, validatedHeaders] = await Promise.all(
-    (['path', 'query', 'headers'] as const).map((source) =>
+  const [validatedPath, validatedQuery, validatedHeaders, validatedCookies] = await Promise.all(
+    (['path', 'query', 'headers', 'cookies'] as const).map((source) =>
       runValidator({
         validator: isValidationEnabled(validate, 'params') ? requestConfig.validator?.[source] : undefined,
         value: paramValues[source],
@@ -554,10 +599,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     query,
   })
 
-  if (requestConfig.cookies) {
-    const cookie = serializeCookies(requestConfig.cookies as Record<string, unknown>, requestConfig.styles?.cookie)
-    if (cookie) headers['Cookie'] = [headers['Cookie'], cookie].filter(Boolean).join('; ')
-  }
+  const cookie = serializeCookies(validatedCookies as Record<string, unknown>, requestConfig.styles?.cookie)
+  if (cookie) headers['Cookie'] = [headers['Cookie'], cookie].filter(Boolean).join('; ')
 
   const validatedBody = await runValidator({
     validator: isValidationEnabled(validate, 'request') ? requestConfig.validator?.request : undefined,
@@ -639,7 +682,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const codec = contentType ? codecs[contentType] : undefined
     const decoded = contentType && codec?.deserialize ? await codec.deserialize(result.data, contentType) : result.data
     // A streamed success body is validated event by event in `toEventStream`, not as a whole. A JSON answer to a streamed call is a whole body.
-    const streaming = isSuccess && resolvedRequest.responseType === 'stream' && isStreamed(decoded)
+    const streaming = isSuccess && resolveResponseType(resolvedRequest.responseType, contentType) === 'stream' && isStreamed(decoded)
     const data = await runValidator({
       validator: isValidationEnabled(validate, direction) && !streaming ? validator?.[direction] : undefined,
       value: decoded,

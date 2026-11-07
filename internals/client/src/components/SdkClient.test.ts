@@ -54,15 +54,15 @@ describe('buildSdkMethod', () => {
     const method = buildSdkMethod({ node, name: 'streamEvents', types: resolverTs, validatorHooks, returnType: 'full', throwOnErrorDefault: true })
 
     expect(method).toContain('): Unwrappable<StreamResult<StreamEventsResponses, ThrowOnError>>')
-    expect(method).toContain('return withUnwrap(toEventStream<SuccessOf<')
+    expect(method).toContain('return withUnwrap(toEventStream<ServerSentEvent<SuccessOf<')
     // The response validator runs per event, so it moves from the call config into the stream meta.
     expect(method).toContain(
-      `request({ method: 'GET', url: '/events', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }), { client: request, config, shape: 'data', validator: streamEventsResponseSchema })`,
+      `request({ method: 'GET', url: '/events', contentType: { response: 'text/event-stream' }, responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }), { client: request, config, shape: 'data', validator: streamEventsResponseSchema })`,
     )
 
     // A plain custom client gets no stream meta, so its response validator stays in the call config.
     const plain = buildSdkMethod({ node, name: 'streamEvents', types: resolverTs, validatorHooks, returnType: 'plain', throwOnErrorDefault: true })
-    expect(plain).toContain('return toEventStream<SuccessOf<')
+    expect(plain).toContain('return toEventStream<ServerSentEvent<SuccessOf<')
     expect(plain).toContain('validator: { response: streamEventsResponseSchema }')
     expect(plain).not.toContain(', config')
   })
@@ -84,7 +84,7 @@ describe('buildSdkMethod', () => {
     const method = buildSdkMethod({ node, name: 'streamEvents', types: resolverTs, validatorHooks: null, returnType: 'data', throwOnErrorDefault: true })
 
     expect(method).toContain('): Promise<UnwrappedStreamResult<StreamEventsResponses, ThrowOnError>>')
-    expect(method).toContain('return unwrapResult(toEventStream<SuccessOf<')
+    expect(method).toContain('return unwrapResult(toEventStream<ServerSentEvent<SuccessOf<')
     expect(method).toContain('config.throwOnError ?? true) as Promise<UnwrappedStreamResult<StreamEventsResponses, ThrowOnError>>')
   })
 })

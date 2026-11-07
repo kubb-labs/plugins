@@ -39,6 +39,9 @@
     "src",
     "dist",
     "templates",
+    "!templates/core.ts",
+    "!templates/serializers.ts",
+    "!templates/standardSchema.ts",
     "kubb-extension.json",
     "docs",
     "!/**/**.test.**",
@@ -67,8 +70,7 @@
     "./package.json": "./package.json",
     "./kubb-extension.json": "./kubb-extension.json",
     "./templates/*.ts": {
-      "types": "./dist/templates/*.d.ts",
-      "default": "./templates/*.ts"
+      "types": "./dist/templates/*.d.ts"
     },
     "./templates/*.js": {
       "types": "./dist/templates/*.d.ts"

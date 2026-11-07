@@ -314,15 +314,16 @@ export const zodGenerator = defineGenerator<PluginZod>({
       )
     })()
 
-    // Grouped path/query/headers schemas, one object per group: what a client's `validator.path` /
+    // Grouped path/query/headers/cookies schemas, one object per group: what a client's `validator.path` /
     // `query` / `headers` runs at request time, and what the options schema below references.
-    const { path, query, header } = getOperationParameters(node)
+    const { path, query, header, cookie } = getOperationParameters(node)
 
     const paramGroupSchemas = (
       [
         { kind: 'path', params: path },
         { kind: 'query', params: query },
         { kind: 'headers', params: header },
+        { kind: 'cookies', params: cookie },
       ] as const
     )
       .filter(({ params }) => params.length > 0)

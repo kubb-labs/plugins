@@ -17,6 +17,7 @@ export {
   hasRequestContentTypeChoice,
   getResponseContentTypeInfo,
   getResponseType,
+  getResponseTypeMap,
   getSuccessResponses,
   isEventStream,
   isSuccessStatusCode,

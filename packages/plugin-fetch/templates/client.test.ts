@@ -9,6 +9,7 @@ import {
   type ResolvedRequest,
   ResponseError,
   resolveAuth,
+  resolveResponseType,
   type Transport,
   type TransportResult,
   unwrapResult,
@@ -865,6 +866,48 @@ describe('a streamed call answered without an event stream', () => {
     expect((await client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream' })).data).toStrictEqual({ ok: true })
   })
 
+  test('keeps a JSON-labeled body that is not JSON as text, and reads an empty one as no data', async () => {
+    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('Pet deleted', 'application/json'))
+    const client = createClientCore({ defaultTransport })
+
+    expect((await client({ method: 'DELETE', url: 'https://api.test/pet/1' })).data).toBe('Pet deleted')
+    _fetch.mockImplementation(answer('', 'application/json'))
+    expect((await client({ method: 'DELETE', url: 'https://api.test/pet/1' })).data).toBeUndefined()
+  })
+
+  test('picks the parser from a responseType map by the response content type, with a type/* wildcard', async () => {
+    const bytes = new Uint8Array([0xff, 0xfb, 0x90, 0x00])
+    const answerWith = (contentType: string, body: BodyInit) => async () => new Response(body, { status: 200, headers: { 'content-type': contentType } })
+    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answerWith('audio/mpeg; codecs=mp3', bytes))
+    const client = createClientCore({ defaultTransport })
+    const responseType = { 'audio/*': 'blob', 'application/vnd.custom': 'blob', 'text/event-stream': 'stream' } as const
+
+    const audio = await client({ method: 'POST', url: 'https://api.test/speech', responseType })
+    expect(audio.data).toBeInstanceOf(Blob)
+    expect(new Uint8Array(await (audio.data as Blob).arrayBuffer())).toStrictEqual(bytes)
+
+    _fetch.mockImplementation(answerWith('application/vnd.custom', bytes))
+    expect((await client({ method: 'POST', url: 'https://api.test/speech', responseType })).data).toBeInstanceOf(Blob)
+
+    _fetch.mockImplementation(answerWith('text/event-stream', 'data: 1\n\n'))
+    expect((await client({ method: 'POST', url: 'https://api.test/speech', responseType })).data).toBeInstanceOf(ReadableStream)
+
+    _fetch.mockImplementation(answerWith('application/json', '{"ok":true}'))
+    expect((await client({ method: 'POST', url: 'https://api.test/speech', responseType })).data).toStrictEqual({ ok: true })
+
+    expect(resolveResponseType({ '*/*': 'blob' }, undefined)).toBe('blob')
+    expect(resolveResponseType({ 'audio/*': 'blob', '*/*': 'text' }, 'video/mp4')).toBe('text')
+  })
+
+  test('decodes the error body of a blob call by its content type, instead of returning a Blob', async () => {
+    using _fetch = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation(async () => new Response('{"message":"gone"}', { status: 404, headers: { 'content-type': 'application/json' } }))
+    const client = createClientCore({ defaultTransport, throwOnError: false })
+
+    expect((await client({ method: 'GET', url: 'https://api.test/image', responseType: 'blob' })).error).toStrictEqual({ message: 'gone' })
+  })
+
   test('runs the response validator on a JSON body', async () => {
     using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('{"ok":true}', 'application/json'))
     const client = createClientCore({ defaultTransport })
@@ -948,6 +991,20 @@ describe('params validators', () => {
       ...(value as object),
       ...Object.fromEntries(keys.filter((key) => key in (value as object)).map((key) => [key, (value as Record<string, Date>)[key]!.toISOString()])),
     }))
+
+  test('validates omitted cookies as an empty object, as it does the other groups', async () => {
+    const { client, calls } = createClient()
+    const seen: Array<unknown> = []
+    const cookies = toSchema((value) => {
+      seen.push(value)
+      return value
+    })
+
+    await client({ method: 'GET', url: '/cookies', validator: { cookies } })
+
+    expect(seen).toStrictEqual([{}])
+    expect(calls[0]?.headers['Cookie']).toBeUndefined()
+  })
 
   test('encodes the path, query, and headers before they are serialized', async () => {
     const { client, calls } = createClient()

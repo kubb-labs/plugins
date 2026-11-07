@@ -17,7 +17,7 @@ type CreateUsersWithListInputQueryKey = ReturnType<typeof createUsersWithListInp
 
 export function createUsersWithListInputQueryOptions(
   { body }: CreateUsersWithListInputOptions,
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>> = {},
 ) {
   const queryKey = createUsersWithListInputQueryKey({ body })
   return queryOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputStatus200, typeof queryKey>({

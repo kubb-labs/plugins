@@ -39,6 +39,13 @@ export type ResolverTs = Resolver & {
      * `resolver.param.headers(node, param) // → 'DeletePetHeaders'`
      */
     headers(node: ast.OperationNode, param: ast.ParameterNode): string
+    /**
+     * Resolves the name for an operation's grouped cookie parameters type.
+     *
+     * @example Cookie parameters names
+     * `resolver.param.cookies(node, param) // → 'GetCookiesCookies'`
+     */
+    cookies(node: ast.OperationNode, param: ast.ParameterNode): string
   }
   /**
    * Naming for an operation's request and response types.
@@ -54,7 +61,7 @@ export type ResolverTs = Resolver & {
     status(node: ast.OperationNode, statusCode: ast.StatusCode): string
     /**
      * Resolves the name for an operation's grouped request options type (`Options`), the
-     * `{ body, path, query, headers }` bag passed to call an operation.
+     * `{ body, path, query, headers, cookies }` bag passed to call an operation.
      *
      * @example Options type names
      * `resolver.response.options(node) // → 'ListPetsOptions'`

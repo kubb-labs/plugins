@@ -43,11 +43,17 @@ export function streamOrderEvents<ThrowOnError extends boolean = true>(
           '200': OrderEvent
         }>
       >
-    >(request({ method: 'GET', url: '/store/order/{orderId}/events', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }), {
-      client: request,
-      config,
-      shape: 'event',
-    }) as Promise<
+    >(
+      request({
+        method: 'GET',
+        url: '/store/order/{orderId}/events',
+        contentType: { response: 'text/event-stream' },
+        responseType: 'stream',
+        ...config,
+        throwOnError: config.throwOnError ?? true,
+      }),
+      { client: request, config, shape: 'event' },
+    ) as Promise<
       StreamResult<
         {
           '200': OrderEvent

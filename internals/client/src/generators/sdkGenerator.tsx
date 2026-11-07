@@ -197,7 +197,12 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
             />
             {hasEventStream && <File.Import name={['toEventStream']} root={file.path} path={ssePath} />}
             {hasEventStream && (
-              <File.Import name={buildEventStreamImports({ returnType, typed: shapes.has('event') })} root={file.path} path={ssePath} isTypeOnly />
+              <File.Import
+                name={buildEventStreamImports({ returnType, typed: shapes.has('event'), payload: shapes.has('data') })}
+                root={file.path}
+                path={ssePath}
+                isTypeOnly
+              />
             )}
 
             {validator === 'zod' && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && <File.Import name={['z']} path="zod" isTypeOnly />}

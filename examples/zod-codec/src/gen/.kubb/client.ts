@@ -1,6 +1,6 @@
 import * as core from './core.ts'
-import type { ResponseType, Transport, TransportResult } from './core.ts'
-import { createClientCore, getResponseContentType } from './core.ts'
+import type { ResponseType, ResponseTypeMap } from './core.ts'
+import { createClientCore, detectResponseType, getResponseContentType, parseJsonOrText, resolveResponseType } from './core.ts'
 import { isJsonMediaType } from './serializers.ts'
 export * from './core.ts'
 
@@ -9,21 +9,11 @@ export type NativeRequest = Request
 export type NativeResponse = Response
 
 /**
- * Extra `fetch` init the transport spreads onto every `Request`, an escape hatch for fields the runtime does not set itself such as `cache`, `redirect`, and Next.js's `next`.
+ * The `options` of every request, client config, and resolved request: extra `fetch` init the transport spreads onto
+ * the `Request`, for fields the runtime does not set itself such as `cache`, `redirect`, and Next.js's `next`.
  */
-export type FetchOptions = RequestInit & { next?: Record<string, unknown> }
+export type NativeOptions = RequestInit & { next?: Record<string, unknown> }
 
-export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestConfig<TBody, TRequest, TResponse> & {
-  options?: FetchOptions
-}
-export type Options<TData extends core.DataShape, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.Options<
-  TData,
-  ThrowOnError,
-  TRequest,
-  TResponse
-> & { options?: FetchOptions }
-export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientConfig<TRequest, TResponse> & { options?: FetchOptions }
-export type ResolvedRequest = core.ResolvedRequest & { options?: FetchOptions }
 export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>
 /** The core's `ResponseError` class, typed with this transport's request and response. `instanceof` and `ResponseError.is` both match what the client throws. */
 export const ResponseError = core.ResponseError as {
@@ -35,24 +25,46 @@ export const ResponseError = core.ResponseError as {
   prototype: core.ResponseError<unknown, NativeRequest, NativeResponse>
 }
 
-function detectResponseType(contentType: string | null): ResponseType | undefined {
-  if (!contentType) return undefined
-  if (contentType.includes('text/event-stream')) return 'stream'
-  if (contentType.includes('application/json') || contentType.includes('text/json')) return 'json'
-  if (contentType.includes('text/')) return 'text'
-  if (contentType.includes('image/') || contentType.includes('application/octet-stream')) return 'blob'
-  return undefined
+/** The core's request, result, and client types, bound to this transport's request, response, and options. */
+export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestConfig<TBody, TRequest, TResponse> & {
+  options?: NativeOptions
 }
+export type Options<TData extends core.DataShape, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.Options<
+  TData,
+  ThrowOnError,
+  TRequest,
+  TResponse
+> & { options?: NativeOptions }
+export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientConfig<TRequest, TResponse> & { options?: NativeOptions }
+export type ResolvedRequest = core.ResolvedRequest & { options?: NativeOptions }
+export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestResult<
+  TResponses,
+  ThrowOnError,
+  TRequest,
+  TResponse
+>
+export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.UnwrappedResult<
+  TResponses,
+  ThrowOnError,
+  TRequest,
+  TResponse
+>
+export type ResponseErrorConfig<TError = unknown> = core.ResponseError<TError, NativeRequest, NativeResponse>
+export type TransportResult<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.TransportResult<TData, TRequest, TResponse>
+export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
+export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
+export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
 
-async function parseResponse(response: Response, responseType?: ResponseType): Promise<unknown> {
+async function parseResponse(response: Response, responseType?: ResponseType | ResponseTypeMap): Promise<unknown> {
   if (response.status === 204 || response.status === 205 || response.status === 304 || !response.body) {
     return undefined
   }
 
   const contentType = response.headers.get('Content-Type')
-  // A server may answer a streamed operation with JSON, or with an error body: both are decoded by their content type. Any other streamed success body stays a stream.
-  const detected = responseType === 'stream' && (!response.ok || isJsonMediaType(contentType)) ? undefined : responseType
-  switch (detected ?? detectResponseType(contentType)) {
+  const requested = resolveResponseType(responseType, contentType)
+  // An error body, and a JSON answer to a streamed operation, are decoded by their content type. Any other body keeps the requested type.
+  const type = !response.ok || (requested === 'stream' && isJsonMediaType(contentType)) ? detectResponseType(contentType) : requested
+  switch (type) {
     case 'text':
     case 'document':
       return response.text()
@@ -62,26 +74,17 @@ async function parseResponse(response: Response, responseType?: ResponseType): P
       return response.arrayBuffer()
     case 'stream':
       return response.body ?? undefined
-    case 'json': {
-      // An empty body with a JSON content-type would make response.json() throw, so treat it as no data.
-      const body = await response.text()
-      return body ? JSON.parse(body) : undefined
-    }
+    case 'json':
+      return parseJsonOrText(await response.text())
   }
 
-  const text = await response.text()
-  if (!text) return undefined
-  try {
-    return JSON.parse(text)
-  } catch {
-    return text
-  }
+  return parseJsonOrText(await response.text())
 }
 
 /**
  * The default transport that sends the resolved request through `globalThis.fetch` and returns the parsed body with the native request and response.
  */
-export const defaultTransport: Transport = async (request: ResolvedRequest): Promise<TransportResult> => {
+export const defaultTransport: Transport = async (request) => {
   const init: RequestInit = {
     ...request.options,
     method: request.method,
@@ -108,4 +111,4 @@ export const defaultTransport: Transport = async (request: ResolvedRequest): Pro
 
 export const client = createClientCore({ defaultTransport })
 
-export const createClient = (config?: Parameters<typeof client.createClient>[0]) => client.createClient(config)
+export const createClient = client.createClient

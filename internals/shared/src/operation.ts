@@ -78,6 +78,7 @@ export type OperationTypeNameResolver = RequestConfigResolver &
       path(node: ast.OperationNode, param: ast.ParameterNode): string
       query(node: ast.OperationNode, param: ast.ParameterNode): string
       headers(node: ast.OperationNode, param: ast.ParameterNode): string
+      cookies(node: ast.OperationNode, param: ast.ParameterNode): string
     }
   }
 
@@ -155,8 +156,12 @@ export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text'
  */
 function getPrimarySuccessContentType(node: ast.OperationNode): string | undefined {
   const contentTypes = getPrimarySuccessResponse(node)?.content?.map((entry) => entry.contentType) ?? []
-  if (contentTypes.length !== 1) return undefined
-  return contentTypes[0]!.split(';')[0]!.trim().toLowerCase()
+  return contentTypes.length === 1 ? baseContentType(contentTypes[0]!) : undefined
+}
+
+/** The media type without its parameters, lowercased: `audio/mpeg` for `audio/mpeg; codecs=mp3`. */
+function baseContentType(contentType: string): string {
+  return contentType.split(';')[0]!.trim().toLowerCase()
 }
 
 /**
@@ -184,22 +189,51 @@ export function getEventStream(node: ast.OperationNode): 'event' | 'data' | null
   return content ? (content.stream?.shape ?? 'data') : null
 }
 
-/**
- * Derives the default `responseType` for an operation from its primary success response.
- *
- * Returns a value only when that response declares a single non-JSON content type. `text/event-stream` maps to
- * `'stream'`, `application/octet-stream`, `application/pdf`, `image/*`, `audio/*` and `video/*` map to `'blob'`, and
- * other `text/*` to `'text'`. Otherwise `undefined`, leaving the runtime client's `Content-Type` auto-detection in charge.
- */
-export function getResponseType(node: ast.OperationNode): ResponseType | undefined {
-  const baseType = getPrimarySuccessContentType(node)
-  if (!baseType) return undefined
+function isJsonContentType(baseType: string): boolean {
+  return baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json'
+}
 
-  if (baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json') return undefined
+/**
+ * The parser for one response content entry: `undefined` for JSON, which the runtime detects, `'stream'` for
+ * `text/event-stream`, `'blob'` for a binary schema or a binary media type, and `'text'` for other `text/*`.
+ */
+function responseTypeForContent(entry: ast.ContentNode): ResponseType | undefined {
+  const baseType = baseContentType(entry.contentType)
+  if (!baseType || isJsonContentType(baseType)) return undefined
   if (baseType === 'text/event-stream') return 'stream'
+  if (entry.schema?.type === 'blob') return 'blob'
   if (baseType.startsWith('text/')) return 'text'
   if (baseType === 'application/octet-stream' || baseType === 'application/pdf' || /^(image|audio|video)\//.test(baseType)) return 'blob'
   return undefined
+}
+
+/**
+ * Derives the `responseType` string of an operation from its primary success response. Content types that share one
+ * parser collapse to it, so `audio/mpeg` next to `application/octet-stream` stays `'blob'`. Mixed parsers return
+ * `undefined`, and `getResponseTypeMap` carries the choice per content type.
+ */
+export function getResponseType(node: ast.OperationNode): ResponseType | undefined {
+  const types = (getPrimarySuccessResponse(node)?.content ?? []).map(responseTypeForContent)
+  return types[0] && types.every((type) => type === types[0]) ? types[0] : undefined
+}
+
+/**
+ * Maps each base content type of the primary success response to its parser when the parsers differ, so the runtime
+ * picks one from the response `Content-Type` instead of guessing from the media type. JSON entries are kept as `'json'`
+ * so a wildcard entry cannot claim them. `undefined` when `getResponseType` already covers the response, or when no
+ * entry needs a parser other than JSON.
+ */
+export function getResponseTypeMap(node: ast.OperationNode): Record<string, ResponseType> | undefined {
+  const entries = getPrimarySuccessResponse(node)?.content ?? []
+  if (entries.length <= 1 || getResponseType(node)) return undefined
+
+  const map: Record<string, ResponseType> = {}
+  for (const entry of entries) {
+    const baseType = baseContentType(entry.contentType)
+    const type = responseTypeForContent(entry) ?? (isJsonContentType(baseType) ? 'json' : undefined)
+    if (baseType && type) map[baseType] = type
+  }
+  return Object.values(map).some((type) => type !== 'json') ? map : undefined
 }
 
 /**
@@ -288,18 +322,20 @@ export type RequestGroups = {
   query: boolean
   body: boolean
   headers: boolean
+  cookies: boolean
 }
 
 /**
  * Which of the grouped request options an operation carries.
  */
 export function getRequestGroups(node: ast.OperationNode): RequestGroups {
-  const { path, query, header } = getOperationParameters(node)
+  const { path, query, header, cookie } = getOperationParameters(node)
   return {
     path: path.length > 0,
     query: query.length > 0,
     body: Boolean(node.requestBody?.content?.[0]?.schema),
     headers: header.length > 0,
+    cookies: cookie.length > 0,
   }
 }
 
@@ -308,6 +344,7 @@ export type RequestGroupOptionality = {
   hasRequiredPath: boolean
   hasRequiredQuery: boolean
   hasRequiredHeader: boolean
+  hasRequiredCookie: boolean
   /**
    * Whether the grouped request parameter can default to `{}`. True only when no group carries a
    * required member, so every member is safe to omit.
@@ -322,17 +359,19 @@ export type RequestGroupOptionality = {
  */
 export function getRequestGroupOptionality(node: ast.OperationNode): RequestGroupOptionality {
   const groups = getRequestGroups(node)
-  const { path, query, header } = getOperationParameters(node)
+  const { path, query, header, cookie } = getOperationParameters(node)
   const hasRequiredPath = path.some((param) => param.required)
   const hasRequiredQuery = query.some((param) => param.required)
   const hasRequiredHeader = header.some((param) => param.required)
+  const hasRequiredCookie = cookie.some((param) => param.required)
 
   return {
     groups,
     hasRequiredPath,
     hasRequiredQuery,
     hasRequiredHeader,
-    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !groups.body,
+    hasRequiredCookie,
+    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !hasRequiredCookie && !groups.body,
   }
 }
 
@@ -343,7 +382,7 @@ export type RequestOptionsNameResolver = RequestConfigResolver & {
 }
 
 /**
- * Builds the grouped `{ path, query, body, headers }` parameter for a generated client
+ * Builds the grouped `{ path, query, body, headers, cookies }` parameter for a generated client
  * function, typed from the operation's `Options` (minus `url`). Only the groups the
  * operation actually has are destructured. The trailing `config` parameter carries the
  * runtime `RequestConfig` overrides plus `client`.
@@ -356,7 +395,7 @@ export function buildRequestParamsSignature(
   const { isConfigurable = true } = options
   const { groups, isOptional } = getRequestGroupOptionality(node)
 
-  const names = (['path', 'query', 'body', 'headers'] as const).filter((key) => groups[key])
+  const names = (['path', 'query', 'body', 'headers', 'cookies'] as const).filter((key) => groups[key])
 
   // These callers never carry the `contentType` that several media types require.
   const optionsType = hasRequestContentTypeChoice(node)
@@ -439,11 +478,7 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
 }
 
 /**
- * Builds the combined `{ body, path, query, headers }` options object schema for an operation,
- * referencing the already-resolved body and grouped param names. Shared by `@kubb/plugin-ts`'s
- * `Options` type and `@kubb/plugin-zod`'s inferred options schema, so both printers emit the same
- * shape from the same inputs. `primitive: 'object'` is a no-op for the TS printer and tells the Zod
- * printer to emit `z.object(…)` rather than a record.
+ * Whether the operation declares more than one request media type with a schema, so a caller must pick one on `contentType`.
  */
 export function hasRequestContentTypeChoice(node: ast.OperationNode): boolean {
   return (node.requestBody?.content ?? []).filter((entry) => entry.schema).length > 1
@@ -456,14 +491,23 @@ export function castToClientOptions(callArg: string, clientName: string, returnT
   return `${callArg} as Parameters<typeof ${clientName}${returnType === 'plain' ? '' : '<true>'}>[0]`
 }
 
+/**
+ * Builds the combined `{ body, path, query, headers, cookies }` options object schema for an operation,
+ * referencing the already-resolved body and grouped param names. `cookies` appears only when the operation
+ * declares a cookie parameter, the other groups always. Shared by `@kubb/plugin-ts`'s `Options` type and
+ * `@kubb/plugin-zod`'s inferred options schema, so both printers emit the same shape from the same inputs.
+ * `primitive: 'object'` is a no-op for the TS printer and tells the Zod printer to emit `z.object(…)` rather
+ * than a record.
+ */
 export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver, { pairContentTypes = false } = {}): ast.SchemaNode {
-  const { path, query, header } = getOperationParameters(node)
+  const { path, query, header, cookie } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
   const groups = [
     { name: 'path', params: path, resolve: resolver.param.path },
     { name: 'query', params: query, resolve: resolver.param.query },
     { name: 'headers', params: header, resolve: resolver.param.headers },
+    { name: 'cookies', params: cookie, resolve: resolver.param.cookies },
   ] as const
 
   const createOptions = (body: ast.SchemaNode, extra: Array<ast.PropertyNode> = []) =>
@@ -476,18 +520,21 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
       deprecated: node.deprecated,
       properties: [
         ast.factory.createProperty({ name: 'body', required: hasBody, schema: body }),
-        ...groups.map(({ name, params, resolve }) => {
-          const required = params.some((param) => param.required)
+        // `cookies` is rare, so it appears only on an operation that declares one.
+        ...groups
+          .filter(({ name, params }) => name !== 'cookies' || params.length > 0)
+          .map(({ name, params, resolve }) => {
+            const required = params.some((param) => param.required)
 
-          return ast.factory.createProperty({
-            name,
-            required,
-            schema:
-              params.length > 0
-                ? ast.factory.createSchema({ type: 'ref', name: resolve.call(resolver.param, node, params[0]!), optional: !required })
-                : createNever(),
-          })
-        }),
+            return ast.factory.createProperty({
+              name,
+              required,
+              schema:
+                params.length > 0
+                  ? ast.factory.createSchema({ type: 'ref', name: resolve.call(resolver.param, node, params[0]!), optional: !required })
+                  : createNever(),
+            })
+          }),
         ...extra,
       ],
     })
@@ -635,7 +682,7 @@ export function resolveOperationTypeNames(
 ): string[] {
   const key = `${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
   return resolver.memo(`operationTypeNames:${key}`, () => {
-    const { path, query, header } = getOperationParameters(node)
+    const { path, query, header, cookie } = getOperationParameters(node)
     const responseStatusNames =
       options.responseStatusNames === 'error'
         ? resolveErrorNames(node, resolver)
@@ -650,6 +697,7 @@ export function resolveOperationTypeNames(
             ...path.map((param) => resolver.param.path(node, param)),
             ...query.map((param) => resolver.param.query(node, param)),
             ...header.map((param) => resolver.param.headers(node, param)),
+            ...cookie.map((param) => resolver.param.cookies(node, param)),
           ]
     const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.response.body(node) : null, resolver.response.response(node)]
     const names =

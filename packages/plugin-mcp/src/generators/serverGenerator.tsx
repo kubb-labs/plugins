@@ -47,7 +47,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
     }
 
     const operationsMapped = nodes.filter(ast.isHttpOperationNode).map((node) => {
-      const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
+      const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = getOperationParameters(node)
 
       const fileEntry = operationFileEntry(node, node.operationId)
       const mcpFile = resolver.file({ ...fileEntry, root, output, group: group ?? undefined })
@@ -78,6 +78,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           pathParams: resolveParams(pathParams),
           queryParams: queryParams.length ? resolveParams(queryParams) : null,
           headerParams: headerParams.length ? resolveParams(headerParams) : null,
+          cookieParams: cookieParams.length ? resolveParams(cookieParams) : null,
           requestName,
           responseName,
           file: zodFile,
@@ -90,6 +91,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         ...zod.pathParams.map((p) => p.schemaName),
         ...(zod.queryParams ?? []).map((p) => p.schemaName),
         ...(zod.headerParams ?? []).map((p) => p.schemaName),
+        ...(zod.cookieParams ?? []).map((p) => p.schemaName),
         zod.requestName,
         zod.responseName,
       ].filter((name): name is string => Boolean(name))

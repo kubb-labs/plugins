@@ -10,7 +10,7 @@ The generated functions import your module through [`importPath`](https://kubb.d
 | `Options`       | type     | The grouped options object a generated function accepts.                                     |
 | `RequestResult` | type     | What a generated function resolves to.                                                       |
 
-If your spec has server-sent event operations, also export `toEventStream` and the `EventStreamResult`, `SuccessOf`, and `TypedEvent` types. A generated function calls `toEventStream<TData>(promise)` with the promise your `client` returns and nothing else, and leaves the response validator on `config.validator.response`, so your module decides how to validate events.
+If your spec has server-sent event operations, also export `toEventStream` and the `EventStreamResult`, `SuccessOf`, `TypedEvent`, and `ServerSentEvent` types. A generated function calls `toEventStream<TEvent>(promise)` with the promise your `client` returns and nothing else, and returns `EventStreamResult<TEvent>`. `TEvent` is `TypedEvent<…>` when the document names each event, and `ServerSentEvent<…>` when it types only the payload. The function leaves the response validator on `config.validator.response`, so your module decides how to validate events.
 
 The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-swr`) and `@kubb/plugin-mcp` call the generated functions with `throwOnError: true` and read `data` off the result. The query plugins also import two more types from your module:
 
@@ -20,6 +20,18 @@ The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/
 | `ResponseErrorConfig` | type | The error type of a failed hook, given the spec's error type.           |
 
 With a relative `importPath`, the hooks resolve it from the generated operation file, so one path serves both.
+
+## Build on the shared runtime
+
+Instead of writing the request pipeline, copy `core.ts`, `serializers.ts`, `standardSchema.ts`, and `sse.ts` from `@kubb/plugin-client/templates` next to your `client.ts`, as `@kubb/plugin-fetch` and `@kubb/plugin-axios` do. The core cannot know your HTTP library, so it imports three types from `./client.ts`:
+
+| Export           | Purpose                                                      | On fetch      | On axios             |
+| ---------------- | ------------------------------------------------------------ | ------------- | -------------------- |
+| `NativeRequest`  | The request object a result and a `ResponseError` carry.     | `Request`     | `AxiosRequestConfig` |
+| `NativeResponse` | The response object they carry.                              | `Response`    | `AxiosResponse`      |
+| `NativeOptions`  | The `options` a call passes through to the library as it is. | `RequestInit` | `AxiosRequestConfig` |
+
+Define the three, write a `Transport` function that sends a `ResolvedRequest` and returns a `TransportResult`, and export `createClientCore({ defaultTransport })` as `client`. `export * from './core.ts'` provides every other required export, and `export * from './sse.ts'` the stream exports. [`@kubb/plugin-fetch/templates/client.ts`](https://github.com/kubb-labs/plugins/blob/main/packages/plugin-fetch/templates/client.ts) does exactly this in about a hundred lines.
 
 ## What a generated function looks like
 
@@ -43,7 +55,9 @@ export function getPetById<ThrowOnError extends boolean = true>(
 }
 ```
 
-Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, and `body`, and `throwOnError`. It returns a promise.
+Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, `cookies`, and `body`, and `throwOnError`. It returns a promise. A cookie operation passes `cookies` as an object, which the client joins into a `Cookie` header.
+
+A non-JSON response also passes `responseType`: a string such as `'blob'` when every content type of the response uses one parser, or a map from content type to parser when they differ, such as `{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. Pick the entry matching the response `Content-Type`, the exact type first and then `type/*`, and parse the body with it.
 
 ## A minimal client
 
@@ -57,14 +71,16 @@ export type RequestConfig = {
   headers?: object
   path?: object
   query?: object
+  cookies?: object
   body?: unknown
   signal?: AbortSignal
+  responseType?: string | Record<string, string>
   throwOnError?: boolean
   security?: Array<{ type: string; name?: string; in?: string; scopes?: Array<string> }>
   client?: typeof client
 }
 
-type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown }
+type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; path?: unknown; query?: unknown }
 
 export type Options<TData extends DataShape, ThrowOnError extends boolean = true> = Omit<RequestConfig, keyof DataShape | 'url' | 'method'> &
   TData & { throwOnError?: ThrowOnError }
@@ -85,7 +101,10 @@ export async function client(config: RequestConfig) {
 
   const response = await fetch(url, {
     method: config.method,
-    headers: config.headers as Record<string, string>,
+    headers: {
+      ...(config.headers as Record<string, string>),
+      ...(config.cookies ? { Cookie: Object.entries(config.cookies).map(([name, value]) => `${name}=${value}`).join('; ') } : {}),
+    },
     body: config.body === undefined ? undefined : JSON.stringify(config.body),
     signal: config.signal,
   })

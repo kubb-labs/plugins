@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import type { SuccessOf, Unwrappable } from './.kubb/client'
-import type { StreamResult, StreamOptions } from './.kubb/sse'
+import type { StreamResult, StreamOptions, ServerSentEvent } from './.kubb/sse'
 import type { StreamEventsOptions, StreamEventsResponses } from './StreamEvents'
 import { client, withUnwrap } from './.kubb/client'
 import { toEventStream } from './.kubb/sse'
@@ -15,8 +15,15 @@ export function streamEvents<ThrowOnError extends boolean = true>(
   const { client: request = client, ...config } = options
 
   return withUnwrap(
-    toEventStream<SuccessOf<StreamEventsResponses>>(
-      request({ method: 'GET', url: '/events', responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }),
+    toEventStream<ServerSentEvent<SuccessOf<StreamEventsResponses>>>(
+      request({
+        method: 'GET',
+        url: '/events',
+        contentType: { response: 'text/event-stream' },
+        responseType: 'stream',
+        ...config,
+        throwOnError: config.throwOnError ?? true,
+      }),
       { client: request, config, shape: 'data' },
     ) as Promise<StreamResult<StreamEventsResponses, ThrowOnError>>,
   )
