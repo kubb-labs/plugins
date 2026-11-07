@@ -1,5 +1,5 @@
 import { createClientCore, getResponseContentType, type ResolvedRequest, type ResponseType, type Transport, type TransportResult } from './core.ts'
-import { isJsonMediaType } from './serializers.ts'
+import { isJsonMediaType, parseJsonOrText } from './serializers.ts'
 import * as core from './core.ts'
 
 export * from './core.ts'
@@ -57,18 +57,6 @@ async function parseResponse(response: Response, responseType?: ResponseType): P
   }
 
   return parseJsonOrText(await response.text())
-}
-
-/**
- * An empty body is no data, and a body that is not JSON stays text, since a server may label a plain message such as `Pet deleted` as JSON.
- */
-function parseJsonOrText(text: string): unknown {
-  if (!text) return undefined
-  try {
-    return JSON.parse(text)
-  } catch {
-    return text
-  }
 }
 
 /**

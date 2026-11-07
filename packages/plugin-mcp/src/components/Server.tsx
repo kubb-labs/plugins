@@ -46,7 +46,7 @@ type Props = {
        */
       headerParams?: Array<ZodParam> | null
       /**
-       * Cookie params — individual schemas to compose into `z.object({ ... })`.
+       * The cookie params, each a schema to compose into `z.object({ ... })`.
        */
       cookieParams?: Array<ZodParam> | null
       requestName?: string | null

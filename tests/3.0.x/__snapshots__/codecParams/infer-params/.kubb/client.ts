@@ -1,7 +1,7 @@
 import * as core from './core'
 import type { ResolvedRequest, ResponseType, Transport, TransportResult } from './core'
 import { createClientCore, getResponseContentType } from './core'
-import { isJsonMediaType } from './serializers'
+import { isJsonMediaType, parseJsonOrText } from './serializers'
 export * from './core'
 
 /** The request and response objects of this transport, carried on every result and error. */
@@ -57,18 +57,6 @@ async function parseResponse(response: Response, responseType?: ResponseType): P
   }
 
   return parseJsonOrText(await response.text())
-}
-
-/**
- * An empty body is no data, and a body that is not JSON stays text, since a server may label a plain message such as `Pet deleted` as JSON.
- */
-function parseJsonOrText(text: string): unknown {
-  if (!text) return undefined
-  try {
-    return JSON.parse(text)
-  } catch {
-    return text
-  }
 }
 
 /**

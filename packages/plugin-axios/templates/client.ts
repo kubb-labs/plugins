@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios'
 import { createClientCore, getResponseContentType, isStreamed, type Transport } from './core.ts'
-import { isJsonMediaType } from './serializers.ts'
+import { isJsonMediaType, parseJsonOrText } from './serializers.ts'
 import * as core from './core.ts'
 
 export * from './core.ts'
@@ -52,20 +52,11 @@ async function readStreamedText(data: ReadableStream<Uint8Array> | AsyncIterable
  * success body is returned as read.
  */
 async function readBody({ data, contentType, status }: { data: unknown; contentType: string | undefined; status: number }): Promise<unknown> {
-  const bytes =
-    status >= 300 && (data instanceof Blob ? data : data instanceof ArrayBuffer || data instanceof Uint8Array ? new Blob([new Uint8Array(data)]) : null)
-  if (bytes) return parseJsonOrText(await bytes.text())
+  if (status >= 300 && (data instanceof Blob || data instanceof ArrayBuffer || data instanceof Uint8Array)) {
+    return parseJsonOrText(await new Blob([data instanceof Blob ? data : new Uint8Array(data)]).text())
+  }
   if (!isStreamed(data) || !(status >= 300 || isJsonMediaType(contentType))) return data
   return parseJsonOrText(await readStreamedText(data))
-}
-
-function parseJsonOrText(text: string): unknown {
-  if (!text) return undefined
-  try {
-    return JSON.parse(text)
-  } catch {
-    return text
-  }
 }
 
 /**

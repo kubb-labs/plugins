@@ -226,6 +226,19 @@ export function isJsonMediaType(contentType: string | null | undefined): boolean
   return /[/+]json$/.test(baseContentType(contentType) ?? '')
 }
 
+/**
+ * Reads a body a transport decoded as text: an empty body is no data, and a body that is not JSON stays text, since a
+ * server may label a plain message such as `Pet deleted` as JSON.
+ */
+export function parseJsonOrText(text: string): unknown {
+  if (!text) return undefined
+  try {
+    return JSON.parse(text)
+  } catch {
+    return text
+  }
+}
+
 function serializeCookie({ name, value, explode }: { name: string; value: unknown; explode: boolean }): string {
   if (Array.isArray(value)) {
     const items = value.filter(notNullish).map((item) => encodeURIComponent(toValue(item)))
