@@ -205,7 +205,7 @@ export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse =
   transport?: Transport<TRequest, TResponse>
   serializer?: Serializers
   codecs?: Record<string, Codec>
-  validator?: { request?: Validator; path?: Validator; query?: Validator; headers?: Validator; response?: Validator; error?: Validator }
+  validator?: { request?: Validator; path?: Validator; query?: Validator; headers?: Validator; cookies?: Validator; response?: Validator; error?: Validator }
   onValidationError?: ValidationErrorHandler
   validate?: ValidateOption
   security?: Array<Auth>
@@ -525,9 +525,10 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     path: { ...(requestConfig.path as Record<string, unknown> | undefined) },
     query: { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) },
     headers: collectHeadersCaseInsensitive(config.headers, requestConfig.headers),
+    cookies: requestConfig.cookies as Record<string, unknown> | undefined,
   }
-  const [validatedPath, validatedQuery, validatedHeaders] = await Promise.all(
-    (['path', 'query', 'headers'] as const).map((source) =>
+  const [validatedPath, validatedQuery, validatedHeaders, validatedCookies] = await Promise.all(
+    (['path', 'query', 'headers', 'cookies'] as const).map((source) =>
       runValidator({
         validator: isValidationEnabled(validate, 'params') ? requestConfig.validator?.[source] : undefined,
         value: paramValues[source],
@@ -554,8 +555,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     query,
   })
 
-  if (requestConfig.cookies) {
-    const cookie = serializeCookies(requestConfig.cookies as Record<string, unknown>, requestConfig.styles?.cookie)
+  if (validatedCookies) {
+    const cookie = serializeCookies(validatedCookies as Record<string, unknown>, requestConfig.styles?.cookie)
     if (cookie) headers['Cookie'] = [headers['Cookie'], cookie].filter(Boolean).join('; ')
   }
 

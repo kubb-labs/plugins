@@ -45,6 +45,10 @@ type Props = {
        * Header params — individual schemas to compose into `z.object({ ... })`.
        */
       headerParams?: Array<ZodParam> | null
+      /**
+       * Cookie params — individual schemas to compose into `z.object({ ... })`.
+       */
+      cookieParams?: Array<ZodParam> | null
       requestName?: string | null
       responseName?: string | null
     }
@@ -54,7 +58,7 @@ type Props = {
 export function Server({ serverName, serverVersion, operations }: Props): KubbReactNode {
   const registrations = operations
     .map(({ tool, mcp, zod }) => {
-      // Group params into the same `{ path, query, headers, body }` shape the contract `<op>`
+      // Group params into the same `{ path, query, headers, cookies, body }` shape the contract `<op>`
       // expects, so the MCP tool input mirrors every other client consumer.
       const entries: Array<{ key: string; value: string }> = []
 
@@ -68,6 +72,10 @@ export function Server({ serverName, serverVersion, operations }: Props): KubbRe
 
       if (zod.headerParams) {
         entries.push({ key: 'headers', value: zodObject(zod.headerParams) })
+      }
+
+      if (zod.cookieParams) {
+        entries.push({ key: 'cookies', value: zodObject(zod.cookieParams) })
       }
 
       if (zod.requestName) {
@@ -94,7 +102,7 @@ server.registerTool(${JSON.stringify(tool.name)}, {
 }, async (${destructured}, ctx) => {
   return ${mcp.name}(${destructured}, ctx)
 })
-          `
+`
       }
 
       return `
@@ -103,10 +111,10 @@ server.registerTool(${JSON.stringify(tool.name)}, {
 }, async (ctx) => {
   return ${mcp.name}(ctx)
 })
-          `
+`
     })
     .filter(Boolean)
-    .join('\n')
+    .join('')
 
   return (
     <>

@@ -114,7 +114,7 @@ export function toHeadersStandardSchema(schema: StandardSchemaValidator, entries
 export type ValidationErrorContext = {
   value: unknown
   direction: 'request' | 'response' | 'error'
-  source: 'body' | 'path' | 'query' | 'headers'
+  source: 'body' | 'path' | 'query' | 'headers' | 'cookies'
   method?: string
   url?: string
   status?: number

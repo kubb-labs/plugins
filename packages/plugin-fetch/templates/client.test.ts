@@ -874,6 +874,15 @@ describe('a streamed call answered without an event stream', () => {
     expect((await client({ method: 'DELETE', url: 'https://api.test/pet/1' })).data).toBeUndefined()
   })
 
+  test('decodes the error body of a blob call by its content type, instead of returning a Blob', async () => {
+    using _fetch = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation(async () => new Response('{"message":"gone"}', { status: 404, headers: { 'content-type': 'application/json' } }))
+    const client = createClientCore({ defaultTransport, throwOnError: false })
+
+    expect((await client({ method: 'GET', url: 'https://api.test/image', responseType: 'blob' })).error).toStrictEqual({ message: 'gone' })
+  })
+
   test('runs the response validator on a JSON body', async () => {
     using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('{"ok":true}', 'application/json'))
     const client = createClientCore({ defaultTransport })

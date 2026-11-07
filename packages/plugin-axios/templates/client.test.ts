@@ -156,6 +156,17 @@ describe('createAxiosTransport', () => {
     expect(new Uint8Array(await (node.data as Blob).arrayBuffer())).toStrictEqual(new Uint8Array(png))
   })
 
+  test('decodes the error body of a blob call on every adapter, instead of returning bytes', async () => {
+    const body = Buffer.from('{"message":"gone"}')
+    const { transport } = fakeAxios({ data: body, status: 404, headers: { 'content-type': 'application/json' } })
+    const client = createClientCore({ defaultTransport: transport, throwOnError: false })
+
+    expect((await client({ method: 'GET', url: '/image', responseType: 'blob' })).error).toStrictEqual({ message: 'gone' })
+    const { transport: fetchTransport } = fakeAxios({ data: new Blob([body]), status: 404, headers: { 'content-type': 'application/json' } })
+    const fetchClient = createClientCore({ defaultTransport: fetchTransport, throwOnError: false })
+    expect((await fetchClient({ method: 'GET', url: '/image', responseType: 'blob', options: { adapter: 'fetch' } })).error).toStrictEqual({ message: 'gone' })
+  })
+
   test('keeps the instance adapter for a stream, and the Node adapter outside the browser', async () => {
     const seen: Array<unknown> = []
     const adapter = async (config: InternalAxiosRequestConfig) =>

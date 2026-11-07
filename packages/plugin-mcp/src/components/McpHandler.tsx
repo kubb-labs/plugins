@@ -27,7 +27,7 @@ type Props = {
   returnType?: 'full' | 'data' | 'plain'
 }
 
-const requestGroupOrder = ['path', 'query', 'headers', 'body'] as const
+const requestGroupOrder = ['path', 'query', 'headers', 'cookies', 'body'] as const
 
 export function McpHandler({ name, clientName, node, resolver, returnType = 'full' }: Props): KubbReactNode {
   const { signature, groups } = buildRequestParamsSignature(node, resolver, { isConfigurable: false })

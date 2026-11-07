@@ -4,6 +4,8 @@
  * Source: text content
  */
 
+import { getCookiesHandler } from './getCookies'
+import { getCookiesCookieSessionSchema, getCookiesStatus200Schema } from './getCookiesSchema'
 import { showPetByIdHandler } from './showPetById'
 import { showPetByIdPathPetIdSchema, showPetByIdStatus200Schema } from './showPetByIdSchema'
 import { serveStdio } from '@modelcontextprotocol/server/stdio'
@@ -25,6 +27,18 @@ export function getServer() {
     },
     async ({ path }, ctx) => {
       return showPetByIdHandler({ path }, ctx)
+    },
+  )
+
+  server.registerTool(
+    'getCookies',
+    {
+      description: 'Make a GET request to /cookies',
+      outputSchema: z.object({ data: getCookiesStatus200Schema }),
+      inputSchema: z.object({ cookies: z.object({ session: getCookiesCookieSessionSchema }) }),
+    },
+    async ({ cookies }, ctx) => {
+      return getCookiesHandler({ cookies }, ctx)
     },
   )
 

@@ -47,6 +47,20 @@ describe('serverGenerator — Operations', () => {
         }),
       ],
     }),
+    ast.factory.createOperation({
+      operationId: 'getCookies',
+      method: 'GET',
+      path: '/cookies',
+      tags: ['cookies'],
+      parameters: [ast.factory.createParameter({ name: 'session', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+          description: 'The cookies the request sent',
+        }),
+      ],
+    }),
   ]
 
   test('showPetById', async () => {

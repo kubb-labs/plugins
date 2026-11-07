@@ -47,13 +47,19 @@ async function readStreamedText(data: ReadableStream<Uint8Array> | AsyncIterable
 }
 
 /**
- * Reads a streamed JSON body, or any streamed error body, back into its value, because every adapter streams a
- * `responseType: 'stream'` answer: the fetch adapter as a `ReadableStream`, the Node adapter as a readable. Any other
- * streamed success body stays a stream.
+ * Reads a streamed JSON body, or any error body the adapter read as a stream or as bytes, back into its value. Every
+ * adapter streams a `responseType: 'stream'` answer, and a `'blob'` or `'arraybuffer'` error body is bytes. Any other
+ * success body is returned as read.
  */
-async function readStreamedBody({ data, contentType, status }: { data: unknown; contentType: string | undefined; status: number }): Promise<unknown> {
+async function readBody({ data, contentType, status }: { data: unknown; contentType: string | undefined; status: number }): Promise<unknown> {
+  const bytes =
+    status >= 300 && (data instanceof Blob ? data : data instanceof ArrayBuffer || data instanceof Uint8Array ? new Blob([new Uint8Array(data)]) : null)
+  if (bytes) return parseJsonOrText(await bytes.text())
   if (!isStreamed(data) || !(status >= 300 || isJsonMediaType(contentType))) return data
-  const text = await readStreamedText(data)
+  return parseJsonOrText(await readStreamedText(data))
+}
+
+function parseJsonOrText(text: string): unknown {
   if (!text) return undefined
   try {
     return JSON.parse(text)
@@ -109,7 +115,7 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
 
     return {
       // axios reads a bodiless status as '', while the fetch transport reads it as no data. Any other empty body stays '' on both.
-      data: [204, 205, 304].includes(response.status) ? undefined : await readStreamedBody({ data: raw, contentType, status: response.status }),
+      data: [204, 205, 304].includes(response.status) ? undefined : await readBody({ data: raw, contentType, status: response.status }),
       status: response.status,
       statusText: response.statusText,
       headers,
@@ -132,6 +138,6 @@ export const defaultTransport: Transport = createAxiosTransport(axiosInstance)
 
 export const client = createClientCore({ defaultTransport })
 
-export const createClient = (config?: Parameters<typeof client.createClient>[0]) => client.createClient(config)
+export const createClient = client.createClient
 
 client.setConfig({ baseURL: 'https://petstore.swagger.io/v2' })

@@ -34,7 +34,7 @@ export function buildCallConfig({
   const perEvent = eventStream && returnType !== 'plain'
   const validatorLiteral = buildValidatorLiteral(
     validatorHooks,
-    perEvent ? ['request', 'path', 'query', 'headers', 'error'] : ['request', 'path', 'query', 'headers', 'response', 'error'],
+    perEvent ? ['request', 'path', 'query', 'headers', 'cookies', 'error'] : ['request', 'path', 'query', 'headers', 'cookies', 'response', 'error'],
   )
   const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node })
   const responseType = getResponseType(node)

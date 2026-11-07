@@ -42,7 +42,7 @@ export function maybeValueOrGetter(type: string): string {
 }
 
 /**
- * Builds the grouped `{ path, query, body, headers }` parameter that mirrors the client
+ * Builds the grouped `{ path, query, body, headers, cookies }` parameter that mirrors the client
  * function signature. Only the groups the operation carries are emitted, typed from the
  * operation's `Options`. `keys` narrows the emitted groups, used by the query key which
  * never carries `headers`.
@@ -117,7 +117,7 @@ export function buildGroupedRequestParam(
 }
 
 /**
- * Builds the shared `({ path, query, body, headers }, config = {})` parameter list for a
+ * Builds the shared `({ path, query, body, headers, cookies }, config = {})` parameter list for a
  * TanStack query-options function. The leading parameter mirrors the client signature, and the
  * trailing `config` is a partial `RequestConfig` minus the grouped data-shape keys, which are passed
  * explicitly. Framework plugins wrap the result when needed, for example vue-query applies `MaybeRefOrGetter`.
@@ -132,7 +132,7 @@ export function buildQueryOptionsParams(
 
   const configParam = createFunctionParameter({
     name: 'config',
-    type: `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`,
+    type: `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>>`,
     default: '{}',
   })
 

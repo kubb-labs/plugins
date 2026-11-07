@@ -32,7 +32,6 @@ export function getServer() {
     return findPetsByStatusHandler({ query }, ctx)
   })
 
-
   server.registerTool("getPetById", {
     title: "Find pet by ID",
     description: "Returns a single pet",
@@ -41,7 +40,6 @@ export function getServer() {
   }, async ({ path }, ctx) => {
     return getPetByIdHandler({ path }, ctx)
   })
-
 
   server.registerTool("uploadFile", {
     title: "uploads an image",
@@ -52,7 +50,6 @@ export function getServer() {
     return uploadFileHandler({ path, query, body }, ctx)
   })
 
-
   server.registerTool("getInventory", {
     title: "Returns pet inventories by status",
     description: "Returns a map of status codes to quantities",
@@ -60,7 +57,6 @@ export function getServer() {
   }, async (ctx) => {
     return getInventoryHandler(ctx)
   })
-
 
   server.registerTool("placeOrder", {
     title: "Place an order for a pet",

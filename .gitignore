@@ -75,4 +75,3 @@ codecov.*
 # codecParams.test.ts output, left behind when a run fails before cleanup
 tests/**/.codec-*
 tests/**/.operation-types-*
-
