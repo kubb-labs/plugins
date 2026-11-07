@@ -493,6 +493,19 @@ export function isStreamed(data: unknown): data is ReadableStream<Uint8Array> | 
   return data instanceof ReadableStream || (!!data && typeof data === 'object' && Symbol.asyncIterator in data)
 }
 
+/**
+ * Reads a body a transport decoded as text: an empty body is no data, and a body that is not JSON stays text, since a
+ * server may label a plain message such as `Pet deleted` as JSON.
+ */
+export function parseJsonOrText(text: string): unknown {
+  if (!text) return undefined
+  try {
+    return JSON.parse(text)
+  } catch {
+    return text
+  }
+}
+
 /** The media type of the `Content-Type` response header, without its parameters. */
 export function getResponseContentType(headers: Headers | Record<string, string> | undefined): string | undefined {
   if (!headers) return undefined

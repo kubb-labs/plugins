@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios'
-import { createClientCore, getResponseContentType, isStreamed, type Transport } from './core.ts'
-import { isJsonMediaType, parseJsonOrText } from './serializers.ts'
+import { createClientCore, getResponseContentType, isStreamed, parseJsonOrText, type Transport } from './core.ts'
+import { isJsonMediaType } from './serializers.ts'
 import * as core from './core.ts'
 
 export * from './core.ts'

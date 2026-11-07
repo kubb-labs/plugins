@@ -1,7 +1,7 @@
 import * as core from './core.ts'
 import type { ResolvedRequest, ResponseType, Transport, TransportResult } from './core.ts'
-import { createClientCore, getResponseContentType } from './core.ts'
-import { isJsonMediaType, parseJsonOrText } from './serializers.ts'
+import { createClientCore, getResponseContentType, parseJsonOrText } from './core.ts'
+import { isJsonMediaType } from './serializers.ts'
 export * from './core.ts'
 
 /** The request and response objects of this transport, carried on every result and error. */

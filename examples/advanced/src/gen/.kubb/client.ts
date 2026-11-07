@@ -2,8 +2,8 @@ import * as core from './core'
 import axios from 'axios'
 import type { Transport } from './core'
 import type { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios'
-import { createClientCore, getResponseContentType, isStreamed } from './core'
-import { isJsonMediaType, parseJsonOrText } from './serializers'
+import { createClientCore, getResponseContentType, isStreamed, parseJsonOrText } from './core'
+import { isJsonMediaType } from './serializers'
 export * from './core'
 
 /** The request and response objects of this transport, carried on every result and error. */

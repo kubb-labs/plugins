@@ -1,7 +1,7 @@
 import * as core from './core'
 import type { ResolvedRequest, ResponseType, Transport, TransportResult } from './core'
-import { createClientCore, getResponseContentType } from './core'
-import { isJsonMediaType, parseJsonOrText } from './serializers'
+import { createClientCore, getResponseContentType, parseJsonOrText } from './core'
+import { isJsonMediaType } from './serializers'
 export * from './core'
 
 /** The request and response objects of this transport, carried on every result and error. */
