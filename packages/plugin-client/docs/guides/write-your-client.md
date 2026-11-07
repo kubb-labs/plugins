@@ -21,6 +21,18 @@ The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/
 
 With a relative `importPath`, the hooks resolve it from the generated operation file, so one path serves both.
 
+## Build on the shared runtime
+
+Instead of writing the request pipeline, copy `core.ts`, `serializers.ts`, `standardSchema.ts`, and `sse.ts` from `@kubb/plugin-client/templates` next to your `client.ts`, as `@kubb/plugin-fetch` and `@kubb/plugin-axios` do. The core cannot know your HTTP library, so it imports three types from `./client.ts`:
+
+| Export           | Purpose                                                      | On fetch      | On axios             |
+| ---------------- | ------------------------------------------------------------ | ------------- | -------------------- |
+| `NativeRequest`  | The request object a result and a `ResponseError` carry.     | `Request`     | `AxiosRequestConfig` |
+| `NativeResponse` | The response object they carry.                              | `Response`    | `AxiosResponse`      |
+| `NativeOptions`  | The `options` a call passes through to the library as it is. | `RequestInit` | `AxiosRequestConfig` |
+
+Define the three, write a `Transport` function that sends a `ResolvedRequest` and returns a `TransportResult`, and export `createClientCore({ defaultTransport })` as `client`. `export * from './core.ts'` provides every other required export, and `export * from './sse.ts'` the stream exports. [`@kubb/plugin-fetch/templates/client.ts`](https://github.com/kubb-labs/plugins/blob/main/packages/plugin-fetch/templates/client.ts) does exactly this in about a hundred lines.
+
 ## What a generated function looks like
 
 ```typescript
