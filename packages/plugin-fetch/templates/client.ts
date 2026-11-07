@@ -44,7 +44,8 @@ async function parseResponse(response: Response, responseType?: ResponseType | R
   const contentType = response.headers.get('Content-Type')
   const requested = resolveResponseType(responseType, contentType)
   // An error body, and a JSON answer to a streamed operation, are decoded by their content type. Any other body keeps the requested type.
-  switch (!response.ok || (requested === 'stream' && isJsonMediaType(contentType)) ? detectResponseType(contentType) : requested) {
+  const type = !response.ok || (requested === 'stream' && isJsonMediaType(contentType)) ? detectResponseType(contentType) : requested
+  switch (type) {
     case 'text':
     case 'document':
       return response.text()

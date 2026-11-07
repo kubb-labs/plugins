@@ -47,7 +47,11 @@ async function toArrayBuffer(data: unknown): Promise<ArrayBuffer | undefined> {
   const chunks: Array<Uint8Array> = []
   for await (const chunk of data) chunks.push(typeof chunk === 'string' ? new TextEncoder().encode(chunk) : chunk)
   const bytes = new Uint8Array(chunks.reduce((length, chunk) => length + chunk.byteLength, 0))
-  chunks.reduce((offset, chunk) => (bytes.set(chunk, offset), offset + chunk.byteLength), 0)
+  let offset = 0
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset)
+    offset += chunk.byteLength
+  }
   return bytes.buffer
 }
 

@@ -135,7 +135,7 @@ export type RequestCredentials = 'omit' | 'same-origin' | 'include'
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream' | 'formdata'
 /**
  * The parser per response content type, generated when one success response declares several that differ. A key is a
- * base media type such as `audio/mpeg`, a `type/*` wildcard, or the catch-all star-slash-star.
+ * base media type such as `audio/mpeg`, a `type/*` wildcard, or a catch-all entry.
  */
 export type ResponseTypeMap = Record<string, ResponseType>
 

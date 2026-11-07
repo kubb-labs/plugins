@@ -156,8 +156,12 @@ export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text'
  */
 function getPrimarySuccessContentType(node: ast.OperationNode): string | undefined {
   const contentTypes = getPrimarySuccessResponse(node)?.content?.map((entry) => entry.contentType) ?? []
-  if (contentTypes.length !== 1) return undefined
-  return contentTypes[0]!.split(';')[0]!.trim().toLowerCase()
+  return contentTypes.length === 1 ? baseContentType(contentTypes[0]!) : undefined
+}
+
+/** The media type without its parameters, lowercased: `audio/mpeg` for `audio/mpeg; codecs=mp3`. */
+function baseContentType(contentType: string): string {
+  return contentType.split(';')[0]!.trim().toLowerCase()
 }
 
 /**
@@ -194,7 +198,7 @@ function isJsonContentType(baseType: string): boolean {
  * `text/event-stream`, `'blob'` for a binary schema or a binary media type, and `'text'` for other `text/*`.
  */
 function responseTypeForContent(entry: ast.ContentNode): ResponseType | undefined {
-  const baseType = entry.contentType.split(';')[0]!.trim().toLowerCase()
+  const baseType = baseContentType(entry.contentType)
   if (!baseType || isJsonContentType(baseType)) return undefined
   if (baseType === 'text/event-stream') return 'stream'
   if (entry.schema?.type === 'blob') return 'blob'
@@ -225,7 +229,7 @@ export function getResponseTypeMap(node: ast.OperationNode): Record<string, Resp
 
   const map: Record<string, ResponseType> = {}
   for (const entry of entries) {
-    const baseType = entry.contentType.split(';')[0]!.trim().toLowerCase()
+    const baseType = baseContentType(entry.contentType)
     const type = responseTypeForContent(entry) ?? (isJsonContentType(baseType) ? 'json' : undefined)
     if (baseType && type) map[baseType] = type
   }
