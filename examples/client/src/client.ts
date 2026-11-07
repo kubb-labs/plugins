@@ -16,7 +16,7 @@ export type SuccessOf<TResponses> = TResponses[Extract<keyof TResponses, '200' |
  */
 type DataOf<T> = T extends { contentType: string; data: infer TData } ? TData : T
 
-type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown }
+type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; path?: unknown; query?: unknown }
 
 type ErrorBody = NonNullable<unknown>
 
@@ -30,6 +30,7 @@ export type RequestConfig = {
   headers?: object
   path?: object
   query?: object
+  cookies?: object
   body?: unknown
   /**
    * Media type hints from the operation. This skeleton assumes JSON.
@@ -127,6 +128,13 @@ export async function client(config: RequestConfig): Promise<{ data: unknown; er
       ...(config.body === undefined ? {} : { 'Content-Type': 'application/json' }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(config.headers as Record<string, string>),
+      ...(config.cookies
+        ? {
+            Cookie: Object.entries(config.cookies)
+              .map(([name, value]) => `${name}=${value}`)
+              .join('; '),
+          }
+        : {}),
     },
     body: config.body === undefined ? undefined : JSON.stringify(config.body, (_, value) => (typeof value === 'bigint' ? value.toString() : value)),
     signal: config.signal,

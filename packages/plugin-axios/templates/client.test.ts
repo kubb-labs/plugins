@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
-import { describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import { axiosInstance, client, createAxiosTransport, createClient, createClientCore, ResponseError } from './client.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string; headers?: Record<string, unknown> }
@@ -33,6 +33,8 @@ function realAxios() {
       ({ data: { ok: true }, status: 200, statusText: 'OK', headers: { 'content-type': 'application/json' }, config }) as AxiosResponse,
   })
 }
+
+afterEach(() => vi.unstubAllGlobals())
 
 describe('createAxiosTransport', () => {
   test('sends the resolved request as one axios request and returns its response', async () => {
@@ -178,6 +180,13 @@ describe('createAxiosTransport', () => {
     const events = fakeAxios({ data: Readable.from([Buffer.from('data: 1\n\n')]), headers: { 'content-type': 'text/event-stream' } })
     const eventClient = createClientCore({ defaultTransport: events.transport })
     expect(typeof ((await eventClient({ method: 'POST', url: '/speech', responseType })).data as AsyncIterable<unknown>)[Symbol.asyncIterator]).toBe('function')
+  })
+
+  test('decodes a text-mode error body by its content type, as the fetch transport does', async () => {
+    const { transport } = fakeAxios({ data: '{"message":"gone"}', status: 404, headers: { 'content-type': 'application/json' } })
+    const client = createClientCore({ defaultTransport: transport, throwOnError: false })
+
+    expect((await client({ method: 'GET', url: '/pet', responseType: 'text' })).error).toStrictEqual({ message: 'gone' })
   })
 
   test('decodes the error body of a blob call on every adapter, instead of returning bytes', async () => {

@@ -104,7 +104,7 @@ Native axios interceptors for a custom transport go on the instance you pass to 
 
 ## Template subpaths
 
-`@kubb/plugin-axios/templates/axios.ts`, `templates/core.ts`, `templates/serializers.ts`, and `templates/standardSchema.ts` are gone. Import the client types from `@kubb/plugin-axios/templates/client.ts`, and the shared runtime from `@kubb/plugin-client/templates/*`. Generated operations and imports from the generated `.kubb/client.ts` need no change, except imports of the removed exports listed above.
+`@kubb/plugin-axios/templates/axios.ts`, `templates/core.ts`, `templates/serializers.ts`, and `templates/standardSchema.ts` are gone. Import the client types from `@kubb/plugin-axios/templates/client.ts`, and the shared runtime from `@kubb/plugin-client/templates/*`. The package exports `templates/client.ts` for its types only, and the runtime is the generated `.kubb/client.ts`. Generated operations and imports from `.kubb/client.ts` need no change, except imports of the removed exports listed above.
 
 ## Stream result types
 

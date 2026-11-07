@@ -1,5 +1,5 @@
 import * as core from './core.ts'
-import type { ResolvedRequest, ResponseType, ResponseTypeMap, Transport, TransportResult } from './core.ts'
+import type { ResponseType, ResponseTypeMap } from './core.ts'
 import { createClientCore, detectResponseType, getResponseContentType, parseJsonOrText, resolveResponseType } from './core.ts'
 import { isJsonMediaType } from './serializers.ts'
 export * from './core.ts'
@@ -24,6 +24,36 @@ export const ResponseError = core.ResponseError as {
   // `instanceof` narrows to this type, so it carries the native request and response.
   prototype: core.ResponseError<unknown, NativeRequest, NativeResponse>
 }
+
+/** The core's request, result, and client types, bound to this transport's request, response, and options. */
+export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestConfig<TBody, TRequest, TResponse> & {
+  options?: NativeOptions
+}
+export type Options<TData extends core.DataShape, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.Options<
+  TData,
+  ThrowOnError,
+  TRequest,
+  TResponse
+> & { options?: NativeOptions }
+export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientConfig<TRequest, TResponse> & { options?: NativeOptions }
+export type ResolvedRequest = core.ResolvedRequest & { options?: NativeOptions }
+export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestResult<
+  TResponses,
+  ThrowOnError,
+  TRequest,
+  TResponse
+>
+export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.UnwrappedResult<
+  TResponses,
+  ThrowOnError,
+  TRequest,
+  TResponse
+>
+export type ResponseErrorConfig<TError = unknown> = core.ResponseError<TError, NativeRequest, NativeResponse>
+export type TransportResult<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.TransportResult<TData, TRequest, TResponse>
+export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
+export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
+export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
 
 async function parseResponse(response: Response, responseType?: ResponseType | ResponseTypeMap): Promise<unknown> {
   if (response.status === 204 || response.status === 205 || response.status === 304 || !response.body) {
@@ -54,7 +84,7 @@ async function parseResponse(response: Response, responseType?: ResponseType | R
 /**
  * The default transport that sends the resolved request through `globalThis.fetch` and returns the parsed body with the native request and response.
  */
-export const defaultTransport: Transport = async (request: ResolvedRequest): Promise<TransportResult> => {
+export const defaultTransport: Transport = async (request) => {
   const init: RequestInit = {
     ...request.options,
     method: request.method,

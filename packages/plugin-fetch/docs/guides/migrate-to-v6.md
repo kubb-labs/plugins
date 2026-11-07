@@ -39,7 +39,7 @@ import type { RequestConfig } from '@kubb/plugin-fetch/templates/client.ts'
 import type { ResolvedRequest } from '@kubb/plugin-client/templates/core.ts'
 ```
 
-Code that imports from the generated `.kubb/client.ts` needs no change, except for `FetchOptions`.
+The package exports `templates/client.ts` for its types only. The runtime is the generated `.kubb/client.ts`. Code that imports from it needs no change, except for `FetchOptions`.
 
 ## Removed exports
 

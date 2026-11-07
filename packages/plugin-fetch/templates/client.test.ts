@@ -9,6 +9,7 @@ import {
   type ResolvedRequest,
   ResponseError,
   resolveAuth,
+  resolveResponseType,
   type Transport,
   type TransportResult,
   unwrapResult,
@@ -893,6 +894,9 @@ describe('a streamed call answered without an event stream', () => {
 
     _fetch.mockImplementation(answerWith('application/json', '{"ok":true}'))
     expect((await client({ method: 'POST', url: 'https://api.test/speech', responseType })).data).toStrictEqual({ ok: true })
+
+    expect(resolveResponseType({ '*/*': 'blob' }, undefined)).toBe('blob')
+    expect(resolveResponseType({ 'audio/*': 'blob', '*/*': 'text' }, 'video/mp4')).toBe('text')
   })
 
   test('decodes the error body of a blob call by its content type, instead of returning a Blob', async () => {
@@ -987,6 +991,20 @@ describe('params validators', () => {
       ...(value as object),
       ...Object.fromEntries(keys.filter((key) => key in (value as object)).map((key) => [key, (value as Record<string, Date>)[key]!.toISOString()])),
     }))
+
+  test('validates omitted cookies as an empty object, as it does the other groups', async () => {
+    const { client, calls } = createClient()
+    const seen: Array<unknown> = []
+    const cookies = toSchema((value) => {
+      seen.push(value)
+      return value
+    })
+
+    await client({ method: 'GET', url: '/cookies', validator: { cookies } })
+
+    expect(seen).toStrictEqual([{}])
+    expect(calls[0]?.headers['Cookie']).toBeUndefined()
+  })
 
   test('encodes the path, query, and headers before they are serialized', async () => {
     const { client, calls } = createClient()

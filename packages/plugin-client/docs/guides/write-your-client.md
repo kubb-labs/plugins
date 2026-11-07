@@ -55,7 +55,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
 }
 ```
 
-Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, and `body`, and `throwOnError`. It returns a promise.
+Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, `cookies`, and `body`, and `throwOnError`. It returns a promise. A cookie operation passes `cookies` as an object, which the client joins into a `Cookie` header.
 
 A non-JSON response also passes `responseType`: a string such as `'blob'` when every content type of the response uses one parser, or a map from content type to parser when they differ, such as `{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. Pick the entry matching the response `Content-Type`, the exact type first and then `type/*`, and parse the body with it.
 
@@ -71,6 +71,7 @@ export type RequestConfig = {
   headers?: object
   path?: object
   query?: object
+  cookies?: object
   body?: unknown
   signal?: AbortSignal
   responseType?: string | Record<string, string>
@@ -79,7 +80,7 @@ export type RequestConfig = {
   client?: typeof client
 }
 
-type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown }
+type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; path?: unknown; query?: unknown }
 
 export type Options<TData extends DataShape, ThrowOnError extends boolean = true> = Omit<RequestConfig, keyof DataShape | 'url' | 'method'> &
   TData & { throwOnError?: ThrowOnError }
@@ -100,7 +101,10 @@ export async function client(config: RequestConfig) {
 
   const response = await fetch(url, {
     method: config.method,
-    headers: config.headers as Record<string, string>,
+    headers: {
+      ...(config.headers as Record<string, string>),
+      ...(config.cookies ? { Cookie: Object.entries(config.cookies).map(([name, value]) => `${name}=${value}`).join('; ') } : {}),
+    },
     body: config.body === undefined ? undefined : JSON.stringify(config.body),
     signal: config.signal,
   })

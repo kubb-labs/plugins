@@ -1,6 +1,6 @@
 import * as core from './core'
 import axios from 'axios'
-import type { ResponseType, Transport } from './core'
+import type { ResponseType } from './core'
 import type { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios'
 import { createClientCore, getResponseContentType, isStreamed, parseJsonOrText, resolveResponseType } from './core'
 import { isJsonMediaType } from './serializers'
@@ -25,6 +25,36 @@ export const ResponseError = core.ResponseError as {
   is: typeof core.ResponseError.is
   prototype: core.ResponseError<unknown, NativeRequest, NativeResponse>
 }
+
+/** The core's request, result, and client types, bound to this transport's request, response, and options. */
+export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestConfig<TBody, TRequest, TResponse> & {
+  options?: NativeOptions
+}
+export type Options<TData extends core.DataShape, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.Options<
+  TData,
+  ThrowOnError,
+  TRequest,
+  TResponse
+> & { options?: NativeOptions }
+export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientConfig<TRequest, TResponse> & { options?: NativeOptions }
+export type ResolvedRequest = core.ResolvedRequest & { options?: NativeOptions }
+export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestResult<
+  TResponses,
+  ThrowOnError,
+  TRequest,
+  TResponse
+>
+export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.UnwrappedResult<
+  TResponses,
+  ThrowOnError,
+  TRequest,
+  TResponse
+>
+export type ResponseErrorConfig<TError = unknown> = core.ResponseError<TError, NativeRequest, NativeResponse>
+export type TransportResult<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.TransportResult<TData, TRequest, TResponse>
+export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
+export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
+export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
 
 /**
  * Collects the headers axios read into a `Headers`, so the core and the interceptors see one shape for every transport.
@@ -74,13 +104,15 @@ async function decodeMappedBody(data: unknown, responseType: ResponseType | unde
 }
 
 /**
- * Reads a streamed JSON body, or any error body the adapter read as a stream or as bytes, back into its value. Every
- * adapter streams a `responseType: 'stream'` answer, and a `'blob'` or `'arraybuffer'` error body is bytes. Any other
- * success body is returned as read.
+ * Reads a streamed JSON body, or any error body the adapter read as text, bytes, or a stream, back into its value, as
+ * the fetch transport decodes an error by its content type. Every adapter streams a `responseType: 'stream'` answer, and
+ * a `'text'`, `'blob'`, or `'arraybuffer'` error body arrives as read. Any other success body is returned as read.
  */
 async function readBody({ data, contentType, status }: { data: unknown; contentType: string | undefined; status: number }): Promise<unknown> {
-  if (status >= 300 && (data instanceof Blob || data instanceof ArrayBuffer || data instanceof Uint8Array)) {
-    return parseJsonOrText(await new Blob([data instanceof Blob ? data : new Uint8Array(data)]).text())
+  if (status >= 300) {
+    if (typeof data === 'string' && data) return parseJsonOrText(data)
+    if (data instanceof Blob) return parseJsonOrText(await data.text())
+    if (data instanceof ArrayBuffer || data instanceof Uint8Array) return parseJsonOrText(new TextDecoder().decode(data))
   }
   if (!isStreamed(data) || !(status >= 300 || isJsonMediaType(contentType))) return data
   return parseJsonOrText(await readStreamedText(data))

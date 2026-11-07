@@ -525,8 +525,8 @@ export function resolveResponseType(
 ): ResponseType | undefined {
   if (typeof responseType === 'string') return responseType
   const base = baseContentType(contentType)
-  const mapped = responseType && base ? (responseType[base] ?? responseType[`${base.split('/')[0]}/*`] ?? responseType['*/*']) : undefined
-  return mapped ?? detectResponseType(contentType)
+  const matched = base ? (responseType?.[base] ?? responseType?.[`${base.split('/')[0]}/*`]) : undefined
+  return matched ?? responseType?.['*/*'] ?? detectResponseType(contentType)
 }
 
 /** The media type of the `Content-Type` response header, without its parameters. */
@@ -562,7 +562,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     path: { ...(requestConfig.path as Record<string, unknown> | undefined) },
     query: { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) },
     headers: collectHeadersCaseInsensitive(config.headers, requestConfig.headers),
-    cookies: requestConfig.cookies as Record<string, unknown> | undefined,
+    cookies: { ...(requestConfig.cookies as Record<string, unknown> | undefined) },
   }
   const [validatedPath, validatedQuery, validatedHeaders, validatedCookies] = await Promise.all(
     (['path', 'query', 'headers', 'cookies'] as const).map((source) =>
@@ -592,10 +592,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     query,
   })
 
-  if (validatedCookies) {
-    const cookie = serializeCookies(validatedCookies as Record<string, unknown>, requestConfig.styles?.cookie)
-    if (cookie) headers['Cookie'] = [headers['Cookie'], cookie].filter(Boolean).join('; ')
-  }
+  const cookie = serializeCookies(validatedCookies as Record<string, unknown>, requestConfig.styles?.cookie)
+  if (cookie) headers['Cookie'] = [headers['Cookie'], cookie].filter(Boolean).join('; ')
 
   const validatedBody = await runValidator({
     validator: isValidationEnabled(validate, 'request') ? requestConfig.validator?.request : undefined,
