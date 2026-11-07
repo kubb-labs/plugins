@@ -12,6 +12,7 @@ import {
   getOperationSuccessResponses,
   getPrimarySuccessResponse,
   getResponseType,
+  getResponseTypeMap,
   getSuccessResponses,
   isErrorStatusCode,
   isEventStream,
@@ -473,6 +474,52 @@ describe('getResponseType / isEventStream', () => {
     expect(isEventStream(node)).toBe(false)
     expect(getResponseType(node)).toBeUndefined()
     expect(getEventStream(node)).toBeNull()
+  })
+
+  function nodeWithResponseContents(contents: Array<{ contentType: string; schema: ast.SchemaNode }>): ast.OperationNode {
+    return ast.factory.createOperation({
+      operationId: 'speech',
+      method: 'POST',
+      path: '/speech',
+      responses: [ast.factory.createResponse({ statusCode: '200', content: contents.map((content) => ast.factory.createContent(content)) })],
+    })
+  }
+
+  test('collapses several content types that share one parser to that string', () => {
+    const node = nodeWithResponseContents([
+      { contentType: 'audio/mpeg', schema: ast.factory.createSchema({ type: 'blob' }) },
+      { contentType: 'application/octet-stream', schema: ast.factory.createSchema({ type: 'blob' }) },
+    ])
+
+    expect(getResponseType(node)).toBe('blob')
+    expect(getResponseTypeMap(node)).toBeUndefined()
+  })
+
+  test('maps each content type to its parser when they differ, keeping JSON as json and a binary schema as blob', () => {
+    const node = nodeWithResponseContents([
+      { contentType: 'audio/mpeg; codecs=mp3', schema: ast.factory.createSchema({ type: 'blob' }) },
+      { contentType: 'application/vnd.custom', schema: ast.factory.createSchema({ type: 'blob' }) },
+      { contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) },
+      { contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'object' }) },
+    ])
+
+    expect(getResponseType(node)).toBeUndefined()
+    expect(getResponseTypeMap(node)).toStrictEqual({
+      'audio/mpeg': 'blob',
+      'application/vnd.custom': 'blob',
+      'application/json': 'json',
+      'text/event-stream': 'stream',
+    })
+  })
+
+  test('leaves a response whose content types are all JSON to the runtime', () => {
+    const node = nodeWithResponseContents([
+      { contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) },
+      { contentType: 'application/problem+json', schema: ast.factory.createSchema({ type: 'object' }) },
+    ])
+
+    expect(getResponseType(node)).toBeUndefined()
+    expect(getResponseTypeMap(node)).toBeUndefined()
   })
 
   test('reads the item shape of the stream', () => {

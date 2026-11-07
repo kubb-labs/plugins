@@ -185,22 +185,51 @@ export function getEventStream(node: ast.OperationNode): 'event' | 'data' | null
   return content ? (content.stream?.shape ?? 'data') : null
 }
 
-/**
- * Derives the default `responseType` for an operation from its primary success response.
- *
- * Returns a value only when that response declares a single non-JSON content type. `text/event-stream` maps to
- * `'stream'`, `application/octet-stream`, `application/pdf`, `image/*`, `audio/*` and `video/*` map to `'blob'`, and
- * other `text/*` to `'text'`. Otherwise `undefined`, leaving the runtime client's `Content-Type` auto-detection in charge.
- */
-export function getResponseType(node: ast.OperationNode): ResponseType | undefined {
-  const baseType = getPrimarySuccessContentType(node)
-  if (!baseType) return undefined
+function isJsonContentType(baseType: string): boolean {
+  return baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json'
+}
 
-  if (baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json') return undefined
+/**
+ * The parser for one response content entry: `undefined` for JSON, which the runtime detects, `'stream'` for
+ * `text/event-stream`, `'blob'` for a binary schema or a binary media type, and `'text'` for other `text/*`.
+ */
+function responseTypeForContent(entry: ast.ContentNode): ResponseType | undefined {
+  const baseType = entry.contentType.split(';')[0]!.trim().toLowerCase()
+  if (!baseType || isJsonContentType(baseType)) return undefined
   if (baseType === 'text/event-stream') return 'stream'
+  if (entry.schema?.type === 'blob') return 'blob'
   if (baseType.startsWith('text/')) return 'text'
   if (baseType === 'application/octet-stream' || baseType === 'application/pdf' || /^(image|audio|video)\//.test(baseType)) return 'blob'
   return undefined
+}
+
+/**
+ * Derives the `responseType` string of an operation from its primary success response. Content types that share one
+ * parser collapse to it, so `audio/mpeg` next to `application/octet-stream` stays `'blob'`. Mixed parsers return
+ * `undefined`, and `getResponseTypeMap` carries the choice per content type.
+ */
+export function getResponseType(node: ast.OperationNode): ResponseType | undefined {
+  const types = (getPrimarySuccessResponse(node)?.content ?? []).map(responseTypeForContent)
+  return types[0] && types.every((type) => type === types[0]) ? types[0] : undefined
+}
+
+/**
+ * Maps each base content type of the primary success response to its parser when the parsers differ, so the runtime
+ * picks one from the response `Content-Type` instead of guessing from the media type. JSON entries are kept as `'json'`
+ * so a wildcard entry cannot claim them. `undefined` when `getResponseType` already covers the response, or when no
+ * entry needs a parser other than JSON.
+ */
+export function getResponseTypeMap(node: ast.OperationNode): Record<string, ResponseType> | undefined {
+  const entries = getPrimarySuccessResponse(node)?.content ?? []
+  if (entries.length <= 1 || getResponseType(node)) return undefined
+
+  const map: Record<string, ResponseType> = {}
+  for (const entry of entries) {
+    const baseType = entry.contentType.split(';')[0]!.trim().toLowerCase()
+    const type = responseTypeForContent(entry) ?? (isJsonContentType(baseType) ? 'json' : undefined)
+    if (baseType && type) map[baseType] = type
+  }
+  return Object.values(map).some((type) => type !== 'json') ? map : undefined
 }
 
 /**

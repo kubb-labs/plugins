@@ -1,10 +1,24 @@
-import { getResponseType, isEventStream } from '@internals/shared'
+import { getResponseType, getResponseTypeMap, isEventStream } from '@internals/shared'
 import type { ast } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildContentType } from './contentType.ts'
 import { type Auth, buildSecurityMetadata } from './security.ts'
 import { buildStyles } from './styles.ts'
 import { buildValidatorLiteral, type ValidatorHooks } from './validator.ts'
+
+/**
+ * The `responseType` baked into a call: one parser as a string, or a map from content type to parser when the success
+ * response declares several that differ, so the runtime chooses from the response `Content-Type`.
+ */
+function buildResponseTypeLiteral(node: ast.HttpOperationNode): string | null {
+  const responseType = getResponseType(node)
+  if (responseType) return `responseType: '${responseType}'`
+  const map = getResponseTypeMap(node)
+  if (!map) return null
+  return `responseType: { ${Object.entries(map)
+    .map(([contentType, type]) => `'${contentType}': '${type}'`)
+    .join(', ')} }`
+}
 
 /**
  * Builds the call config literal a generated operation forwards to the client, shared by the standalone
@@ -37,8 +51,6 @@ export function buildCallConfig({
     perEvent ? ['request', 'path', 'query', 'headers', 'cookies', 'error'] : ['request', 'path', 'query', 'headers', 'cookies', 'response', 'error'],
   )
   const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node })
-  const responseType = getResponseType(node)
-
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
     `url: '${node.path}'`,
@@ -46,7 +58,7 @@ export function buildCallConfig({
     stylesLiteral ? `styles: ${stylesLiteral}` : null,
     validatorLiteral,
     contentTypeLiteral,
-    responseType ? `responseType: '${responseType}'` : null,
+    buildResponseTypeLiteral(node),
     '...config',
     `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`,
   ]

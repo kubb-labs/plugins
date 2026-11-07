@@ -1,7 +1,7 @@
 import type { NativeOptions, NativeRequest, NativeResponse } from './client'
 import type { HeadersInit, HttpMethod, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers'
 import type { StandardSchemaValidator, ValidateOption, ValidationErrorHandler } from './standardSchema'
-import { applyHeaderStyles, baseContentType, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, serializeCookies } from './serializers'
+import { applyHeaderStyles, baseContentType, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, isDefaultJsonBody, isJsonMediaType, serializeCookies } from './serializers'
 import { isValidationEnabled, runValidator } from './standardSchema'
 export type { ValidateOption, ValidationErrorContext, ValidationErrorHandler } from './standardSchema'
 
@@ -125,6 +125,11 @@ export type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; 
 
 export type RequestCredentials = 'omit' | 'same-origin' | 'include'
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream' | 'formdata'
+/**
+ * The parser per response content type, generated when one success response declares several that differ. A key is a
+ * base media type such as `audio/mpeg`, a `type/*` wildcard, or the catch-all star-slash-star.
+ */
+export type ResponseTypeMap = Record<string, ResponseType>
 
 /**
  * Decodes a response body for a codec's media type.
@@ -193,7 +198,7 @@ export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse =
   credentials?: RequestCredentials
   options?: NativeOptions
   contentType?: ContentType
-  responseType?: ResponseType
+  responseType?: ResponseType | ResponseTypeMap
   throwOnError?: boolean
   client?: ClientInstance<TRequest, TResponse>
   transport?: Transport<TRequest, TResponse>
@@ -246,7 +251,7 @@ export type ResolvedRequest = {
   signal?: AbortSignal
   credentials?: RequestCredentials
   options?: NativeOptions
-  responseType?: ResponseType
+  responseType?: ResponseType | ResponseTypeMap
 }
 
 /**
@@ -499,6 +504,31 @@ export function parseJsonOrText(text: string): unknown {
   }
 }
 
+/** The parser a response `Content-Type` suggests, or `undefined` for a media type the runtime does not know. */
+export function detectResponseType(contentType: string | null | undefined): ResponseType | undefined {
+  const base = baseContentType(contentType)
+  if (!base) return undefined
+  if (base === 'text/event-stream') return 'stream'
+  if (isJsonMediaType(base)) return 'json'
+  if (base.startsWith('text/')) return 'text'
+  if (base === 'application/octet-stream' || base === 'application/pdf' || /^(image|audio|video)\//.test(base)) return 'blob'
+  return undefined
+}
+
+/**
+ * The parser for a response: the call's `responseType`, or for a map the entry matching the response `Content-Type`
+ * (the exact base type, then `type/*`, then the catch-all), or else what the media type suggests.
+ */
+export function resolveResponseType(
+  responseType: ResponseType | ResponseTypeMap | undefined,
+  contentType: string | null | undefined,
+): ResponseType | undefined {
+  if (typeof responseType === 'string') return responseType
+  const base = baseContentType(contentType)
+  const mapped = responseType && base ? (responseType[base] ?? responseType[`${base.split('/')[0]}/*`] ?? responseType['*/*']) : undefined
+  return mapped ?? detectResponseType(contentType)
+}
+
 /** The media type of the `Content-Type` response header, without its parameters. */
 export function getResponseContentType(headers: Headers | Record<string, string> | undefined): string | undefined {
   if (!headers) return undefined
@@ -647,7 +677,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const codec = contentType ? codecs[contentType] : undefined
     const decoded = contentType && codec?.deserialize ? await codec.deserialize(result.data, contentType) : result.data
     // A streamed success body is validated event by event in `toEventStream`, not as a whole. A JSON answer to a streamed call is a whole body.
-    const streaming = isSuccess && resolvedRequest.responseType === 'stream' && isStreamed(decoded)
+    const streaming = isSuccess && resolveResponseType(resolvedRequest.responseType, contentType) === 'stream' && isStreamed(decoded)
     const data = await runValidator({
       validator: isValidationEnabled(validate, direction) && !streaming ? validator?.[direction] : undefined,
       value: decoded,

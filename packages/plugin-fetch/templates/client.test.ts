@@ -874,6 +874,27 @@ describe('a streamed call answered without an event stream', () => {
     expect((await client({ method: 'DELETE', url: 'https://api.test/pet/1' })).data).toBeUndefined()
   })
 
+  test('picks the parser from a responseType map by the response content type, with a type/* wildcard', async () => {
+    const bytes = new Uint8Array([0xff, 0xfb, 0x90, 0x00])
+    const answerWith = (contentType: string, body: BodyInit) => async () => new Response(body, { status: 200, headers: { 'content-type': contentType } })
+    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answerWith('audio/mpeg; codecs=mp3', bytes))
+    const client = createClientCore({ defaultTransport })
+    const responseType = { 'audio/*': 'blob', 'application/vnd.custom': 'blob', 'text/event-stream': 'stream' } as const
+
+    const audio = await client({ method: 'POST', url: 'https://api.test/speech', responseType })
+    expect(audio.data).toBeInstanceOf(Blob)
+    expect(new Uint8Array(await (audio.data as Blob).arrayBuffer())).toStrictEqual(bytes)
+
+    _fetch.mockImplementation(answerWith('application/vnd.custom', bytes))
+    expect((await client({ method: 'POST', url: 'https://api.test/speech', responseType })).data).toBeInstanceOf(Blob)
+
+    _fetch.mockImplementation(answerWith('text/event-stream', 'data: 1\n\n'))
+    expect((await client({ method: 'POST', url: 'https://api.test/speech', responseType })).data).toBeInstanceOf(ReadableStream)
+
+    _fetch.mockImplementation(answerWith('application/json', '{"ok":true}'))
+    expect((await client({ method: 'POST', url: 'https://api.test/speech', responseType })).data).toStrictEqual({ ok: true })
+  })
+
   test('decodes the error body of a blob call by its content type, instead of returning a Blob', async () => {
     using _fetch = vi
       .spyOn(globalThis, 'fetch')

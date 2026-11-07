@@ -61,6 +61,12 @@ stays a string, and a binary type becomes a `Blob`. The negotiated media type is
 `contentType`, so a `switch (result.contentType)` narrows `data` for an operation that returns
 more than one.
 
+When that response declares several content types that need different parsers, the generated call
+sets `responseType` to a map from content type to parser, such as
+`{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. The runtime picks the entry matching the
+response `Content-Type`, the exact type first and then a `type/*` wildcard, before it guesses from
+the media type. A schema with `format: binary` is a `Blob` whatever its media type.
+
 To decode a media type the runtime does not handle, register a codec's `deserialize` for it.
 `deserialize` receives the raw body and the content type and returns the parsed value. It runs
 before validation, so the schema checks the parsed value:

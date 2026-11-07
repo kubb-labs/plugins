@@ -1,9 +1,12 @@
 import {
   createClientCore,
+  detectResponseType,
   getResponseContentType,
   parseJsonOrText,
+  resolveResponseType,
   type ResolvedRequest,
   type ResponseType,
+  type ResponseTypeMap,
   type Transport,
   type TransportResult,
 } from './core.ts'
@@ -33,24 +36,15 @@ export const ResponseError = core.ResponseError as {
   prototype: core.ResponseError<unknown, NativeRequest, NativeResponse>
 }
 
-function detectResponseType(contentType: string | null): ResponseType | undefined {
-  if (!contentType) return undefined
-  if (contentType.includes('text/event-stream')) return 'stream'
-  if (contentType.includes('application/json') || contentType.includes('text/json')) return 'json'
-  if (contentType.includes('text/')) return 'text'
-  if (contentType.includes('image/') || contentType.includes('application/octet-stream')) return 'blob'
-  return undefined
-}
-
-async function parseResponse(response: Response, responseType?: ResponseType): Promise<unknown> {
+async function parseResponse(response: Response, responseType?: ResponseType | ResponseTypeMap): Promise<unknown> {
   if (response.status === 204 || response.status === 205 || response.status === 304 || !response.body) {
     return undefined
   }
 
   const contentType = response.headers.get('Content-Type')
+  const requested = resolveResponseType(responseType, contentType)
   // An error body, and a JSON answer to a streamed operation, are decoded by their content type. Any other body keeps the requested type.
-  const detected = !response.ok || (responseType === 'stream' && isJsonMediaType(contentType)) ? undefined : responseType
-  switch (detected ?? detectResponseType(contentType)) {
+  switch (!response.ok || (requested === 'stream' && isJsonMediaType(contentType)) ? detectResponseType(contentType) : requested) {
     case 'text':
     case 'document':
       return response.text()

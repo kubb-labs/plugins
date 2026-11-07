@@ -57,6 +57,8 @@ export function getPetById<ThrowOnError extends boolean = true>(
 
 Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, and `body`, and `throwOnError`. It returns a promise.
 
+A non-JSON response also passes `responseType`: a string such as `'blob'` when every content type of the response uses one parser, or a map from content type to parser when they differ, such as `{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. Pick the entry matching the response `Content-Type`, the exact type first and then `type/*`, and parse the body with it.
+
 ## A minimal client
 
 The client below uses `fetch`. Replace the transport with the HTTP library you use.
@@ -71,6 +73,7 @@ export type RequestConfig = {
   query?: object
   body?: unknown
   signal?: AbortSignal
+  responseType?: string | Record<string, string>
   throwOnError?: boolean
   security?: Array<{ type: string; name?: string; in?: string; scopes?: Array<string> }>
   client?: typeof client

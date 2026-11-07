@@ -156,6 +156,30 @@ describe('createAxiosTransport', () => {
     expect(new Uint8Array(await (node.data as Blob).arrayBuffer())).toStrictEqual(new Uint8Array(png))
   })
 
+  test('reads a responseType map as bytes, or as a stream when an entry asks for one, and decodes by the response content type', async () => {
+    const bytes = Buffer.from([0xff, 0xfb, 0x90, 0x00])
+    const buffered = fakeAxios({ data: bytes, headers: { 'content-type': 'audio/mpeg' } })
+    const client = createClientCore({ defaultTransport: buffered.transport })
+
+    const audio = await client({ method: 'POST', url: '/speech', responseType: { 'audio/mpeg': 'blob', 'application/json': 'json' } })
+    expect(buffered.calls[0]?.responseType).toBe('arraybuffer')
+    expect(audio.data).toBeInstanceOf(Blob)
+    expect((audio.data as Blob).type).toBe('audio/mpeg')
+    expect(new Uint8Array(await (audio.data as Blob).arrayBuffer())).toStrictEqual(new Uint8Array(bytes))
+
+    const streamed = fakeAxios({ data: Readable.from([bytes]), headers: { 'content-type': 'audio/mpeg' } })
+    const streamClient = createClientCore({ defaultTransport: streamed.transport })
+    const responseType = { 'audio/mpeg': 'blob', 'text/event-stream': 'stream' } as const
+    const fromStream = await streamClient({ method: 'POST', url: '/speech', responseType })
+    expect(streamed.calls[0]?.responseType).toBe('stream')
+    expect(fromStream.data).toBeInstanceOf(Blob)
+    expect(new Uint8Array(await (fromStream.data as Blob).arrayBuffer())).toStrictEqual(new Uint8Array(bytes))
+
+    const events = fakeAxios({ data: Readable.from([Buffer.from('data: 1\n\n')]), headers: { 'content-type': 'text/event-stream' } })
+    const eventClient = createClientCore({ defaultTransport: events.transport })
+    expect(typeof ((await eventClient({ method: 'POST', url: '/speech', responseType })).data as AsyncIterable<unknown>)[Symbol.asyncIterator]).toBe('function')
+  })
+
   test('decodes the error body of a blob call on every adapter, instead of returning bytes', async () => {
     const body = Buffer.from('{"message":"gone"}')
     const { transport } = fakeAxios({ data: body, status: 404, headers: { 'content-type': 'application/json' } })
