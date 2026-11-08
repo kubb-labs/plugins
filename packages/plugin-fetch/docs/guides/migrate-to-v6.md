@@ -1,6 +1,16 @@
 # Migrate to v6
 
-The fetch client keeps its API in v6, so most projects only regenerate. Code that calls the generated functions or hooks needs no change. Code that imports from the package's template files, or names a stream result type, needs the edits below.
+The fetch client keeps its API in v6, so most projects only regenerate. Find your code in the table, then follow its section.
+
+## What to change
+
+| Your code                                                                                                            | What to do                                                                                                           |
+| -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Calls generated functions, SDK methods, or hooks                                                                     | Regenerate. Nothing else.                                                                                            |
+| Imports from `templates/fetch.ts`, `templates/core.ts`, `templates/serializers.ts`, or `templates/standardSchema.ts` | Import from `templates/client.ts` or `@kubb/plugin-client/templates/*`. See [Template subpaths](#template-subpaths). |
+| Uses `FetchOptions`                                                                                                  | Rename it to `NativeOptions`. See [Removed exports](#removed-exports).                                               |
+| Names `EventStreamResult<Pet>`, `StreamResult`, or `UnwrappedStreamResult`                                           | Wrap the payload: `EventStreamResult<ServerSentEvent<Pet>>`. See [Stream result types](#stream-result-types).        |
+| Comes from 5.12 or earlier and uses streams                                                                          | Check [From 5.12 or earlier](#from-5-12-or-earlier). It compiles, so the type checker does not catch it.             |
 
 ## Upgrade steps
 
@@ -22,8 +32,7 @@ The fetch client keeps its API in v6, so most projects only regenerate. Code tha
    npx tsc --noEmit
    ```
 
-4. Fix each error with the matching section below.
-5. If you come from 5.12 or earlier, also check [From 5.12 or earlier](#from-5-12-or-earlier).
+4. Fix each error with its row in [What to change](#what-to-change).
 
 ## Template subpaths
 

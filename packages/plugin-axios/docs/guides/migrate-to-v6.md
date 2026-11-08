@@ -1,6 +1,19 @@
 # Migrate to v6
 
-In v6 the axios client runs on the same core as `@kubb/plugin-fetch`. Code that calls the generated functions or hooks needs no change. Most edits land in the file that configures `client`, where interceptors, the transport, and the default instance change.
+In v6 the axios client runs on the same core as `@kubb/plugin-fetch`. Most edits land in the file that configures `client`. Find your code in the table, then follow its section.
+
+## What to change
+
+| Your code                                                                                                            | What to do                                                                                                                                                                                                    |
+| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Calls generated functions, SDK methods, or hooks                                                                     | Regenerate. Nothing else.                                                                                                                                                                                     |
+| Registers handlers on `client.interceptors`                                                                          | Move them to `axiosInstance.interceptors`, or rewrite them for the core objects. See [Keep your axios interceptors as they are](#keep-your-axios-interceptors-as-they-are) and [Interceptors](#interceptors). |
+| Passes an axios instance as `transport`, or sets `defaultTransport.defaults`                                         | Wrap it with `createAxiosTransport(instance)`, and set defaults on `axiosInstance`. See [Transport and default instance](#transport-and-default-instance).                                                    |
+| Uses `AxiosOptions`, `validateStatus`, `AxiosTransport`, `InterceptorFn`, or `InterceptorChannel`                    | Rename `AxiosOptions` to `NativeOptions`, and drop the rest. See [Removed exports](#removed-exports).                                                                                                         |
+| Imports from `templates/axios.ts`, `templates/core.ts`, `templates/serializers.ts`, or `templates/standardSchema.ts` | Import from `templates/client.ts` or `@kubb/plugin-client/templates/*`. See [Template subpaths](#template-subpaths).                                                                                          |
+| Names `EventStreamResult<Pet>`, `StreamResult`, or `UnwrappedStreamResult`                                           | Wrap the payload: `EventStreamResult<ServerSentEvent<Pet>>`. See [Stream result types](#stream-result-types).                                                                                                 |
+| Relies on interceptor order, the error interceptor for network errors, or a separate instance per `createClient()`   | Check [Behavior changes](#behavior-changes). It compiles, so the type checker does not catch it.                                                                                                              |
+| Comes from 5.12 or earlier and uses streams                                                                          | Check [From 5.12 or earlier](#from-5-12-or-earlier).                                                                                                                                                          |
 
 ## Upgrade steps
 
@@ -22,8 +35,7 @@ In v6 the axios client runs on the same core as `@kubb/plugin-fetch`. Code that 
    npx tsc --noEmit
    ```
 
-4. Fix each error with the matching section below.
-5. Check [Behavior changes](#behavior-changes), which compile without errors. If you come from 5.12 or earlier, also check [From 5.12 or earlier](#from-5-12-or-earlier).
+4. Fix each error with its row in [What to change](#what-to-change), then check the rows that compile.
 
 ## Keep your axios interceptors as they are
 
