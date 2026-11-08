@@ -28,6 +28,11 @@ export type ErrorOf<TResponses> = TResponses[Exclude<keyof TResponses, SuccessSt
 export type ToStatusNumber<TStatus> = TStatus extends `${infer TNumber extends number}` ? TNumber : number
 
 /**
+ * The `error` of a failed call whose response has no body, so `if (error)` still sees the failure.
+ */
+export type EmptyErrorBody = { status: number; statusText: string }
+
+/**
  * Unwraps content-type variants to keep the bare body on `error`.
  */
 export type DataOf<T> = T extends { contentType: string; data: infer TData } ? TData : T
@@ -49,7 +54,7 @@ export type ResultByStatus<TResponses, TStatus extends keyof TResponses, TReques
   : {
       status: ToStatusNumber<TStatus>
       data: undefined
-      error: DataOf<TResponses[TStatus]>
+      error: DataOf<TResponses[TStatus]> | EmptyErrorBody
       contentType: string | undefined
       request: TRequest
       response: TResponse
@@ -603,12 +608,13 @@ function isResponse(value: unknown): value is Response {
 }
 
 /**
- * The `Request` a transport that returns a plain `Response` would have sent, for `result.request`. A relative URL or a
- * runtime without `Request` keeps the resolved request.
+ * The `Request` a transport that returns a plain `Response` would have sent, for `result.request`. It leaves out the
+ * body, which was already sent, so a large body is not copied again. A relative URL or a runtime without `Request` keeps
+ * the resolved request.
  */
 function toNativeRequest(request: ResolvedRequest): Request | ResolvedRequest {
   try {
-    return new Request(request.url, toRequestInit(request))
+    return new Request(request.url, { ...toRequestInit(request), body: undefined })
   } catch {
     return request
   }
@@ -737,7 +743,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
       method: (requestConfig.method ?? 'GET').toUpperCase(),
       headers,
       body,
-      signal: requestConfig.signal,
+      // A signal passed in `options` counts too, since every transport spreads `options` under the resolved fields.
+      signal: requestConfig.signal ?? (options as { signal?: AbortSignal } | undefined)?.signal,
       credentials: requestConfig.credentials ?? config.credentials,
       options,
       responseType: requestConfig.responseType,
@@ -805,7 +812,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       status: result.status,
       data: isSuccess ? data : undefined,
       // An empty error body still reports the failure, so `if (error)` and `.unwrap()` see a value.
-      error: isSuccess ? undefined : (data ?? { status: result.status, statusText: result.statusText }),
+      error: isSuccess ? undefined : (data ?? ({ status: result.status, statusText: result.statusText } satisfies EmptyErrorBody)),
       contentType,
       request: result.request,
       response: result.response,

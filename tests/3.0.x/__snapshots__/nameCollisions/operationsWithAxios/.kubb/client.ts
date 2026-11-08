@@ -95,6 +95,12 @@ function resolveAdapter(adapter: AxiosRequestConfig['adapter']): unknown {
 const axiosFetchAdapter = resolveAdapter('fetch')
 
 /**
+ * axios's own default adapter list, read once. A mock such as `axios-mock-adapter` replaces it with a function, so the
+ * axios 1.x list is the fallback when the module loads after one.
+ */
+const axiosDefaultAdapters = Array.isArray(axios.defaults.adapter) ? String(axios.defaults.adapter) : 'xhr,http,fetch'
+
+/**
  * Turns an axios instance into a transport: each resolved request becomes one `instance.request` with the instance's
  * defaults, adapter, and axios interceptors. Every status resolves, because the core splits success from error itself.
  */
@@ -130,9 +136,9 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
 
     // In the browser the default adapters pick XHR, which buffers the whole body and cannot omit same-origin cookies, so a stream
     // or `credentials: 'omit'` switches to fetch. An adapter set on the call or the instance, and the Node http adapter with its
-    // proxy and agent, are kept. axios's own default is the list `['xhr', 'http', 'fetch']`.
+    // proxy and agent, are kept.
     const instanceAdapter = instance.defaults?.adapter
-    const defaultAdapter = !instanceAdapter || String(instanceAdapter) === 'xhr,http,fetch'
+    const defaultAdapter = !instanceAdapter || String(instanceAdapter) === axiosDefaultAdapters
     const needsFetch = streamed || request.credentials === 'omit'
     if (needsFetch && !config.adapter && defaultAdapter && typeof XMLHttpRequest !== 'undefined') config.adapter = 'fetch'
 

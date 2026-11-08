@@ -27,7 +27,7 @@ To reuse the runtime of the fetch and axios clients instead of writing your own 
 
 1. Copy `core.ts`, `serializers.ts`, `standardSchema.ts`, and `sse.ts` from `@kubb/plugin-client/templates` next to your `client.ts`.
 2. In `client.ts`, export the three types the core imports, listed below.
-3. Write a `Transport` function that sends a `ResolvedRequest` and returns a `TransportResult`.
+3. Write a `Transport` function that sends a `ResolvedRequest`. It can return a web `Response`, which the core parses for you, or a `TransportResult` when your library does not return one.
 4. Export `createClientCore({ defaultTransport })` as `client`, and add `export * from './core.ts'` and `export * from './sse.ts'`.
 
 | Export           | Purpose                                                 | On fetch      | On axios             |

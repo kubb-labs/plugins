@@ -1404,6 +1404,13 @@ describe('a transport that returns a Response', () => {
     expect(result.response).toBeInstanceOf(Response)
   })
 
+  test('builds that Request without the body, which was already sent', async () => {
+    const client = createClientCore({ defaultTransport: respondWith(new Response('{}', { headers: { 'Content-Type': 'application/json' } })) })
+    const result = await client({ method: 'POST', url: 'https://petstore.dev/pet', body: { name: 'odie' } })
+    expect((result.request as unknown as Request).method).toBe('POST')
+    expect((result.request as unknown as Request).body).toBeNull()
+  })
+
   test('keeps the resolved request when the URL is relative, since a Request needs an absolute one', async () => {
     const client = createClientCore({ defaultTransport: respondWith(new Response('{}', { headers: { 'Content-Type': 'application/json' } })) })
     const result = await client({ method: 'GET', url: '/pet/1' })
@@ -1437,6 +1444,13 @@ describe('a transport that returns a Response', () => {
 })
 
 describe('toRequestInit', () => {
+  test('takes the signal from options when the call passes none at the top level', async () => {
+    const { client, calls } = createClient()
+    const controller = new AbortController()
+    await client({ method: 'GET', url: '/pet', options: { signal: controller.signal } })
+    expect(calls[0]?.signal).toBe(controller.signal)
+  })
+
   test('puts the options first, so the resolved fields win', () => {
     const signal = new AbortController().signal
     const init = toRequestInit({
