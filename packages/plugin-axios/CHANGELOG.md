@@ -1,5 +1,15 @@
 # @kubb/plugin-axios
 
+## 5.13.1
+
+### Patch Changes
+
+- [#1332](https://github.com/kubb-labs/plugins/pull/1332) [`d52d796`](https://github.com/kubb-labs/plugins/commit/d52d796bde29fed3f99e87438f410bbbec092b2a) Thanks [@tombeckenham](https://github.com/tombeckenham)! - Choose the response parser from each content type when one success response declares more than one. A binary body such as `audio/mpeg` stays a `Blob` when the same response also returns `text/event-stream`, including media types Kubb only knows are binary from `format: binary`.
+  
+  Custom clients: `responseType` can now be a map from content type to parser, such as `{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. Widen its type to `string | Record<string, string>` and pick the parser from the response `Content-Type`.
+- Updated dependencies [[`d52d796`](https://github.com/kubb-labs/plugins/commit/d52d796bde29fed3f99e87438f410bbbec092b2a)]:
+  - @kubb/plugin-client@5.11.0
+
 ## 5.13.0
 
 ### Minor Changes
