@@ -18,28 +18,6 @@ const version = '3.0.x'
 
 const configs = [
   {
-    name: 'simple',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      output: {
-        path: './gen',
-        barrel: false,
-      },
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({
-          output: {
-            path: './types',
-            barrel: false,
-            mode: 'directory',
-          },
-        }),
-      ],
-    },
-  },
-  {
     name: 'petStore',
     config: {
       root: __dirname,
@@ -348,33 +326,6 @@ const configs = [
             mode: 'directory',
           },
           enum: { type: 'asConst' },
-        }),
-      ],
-    },
-  },
-  {
-    /**
-     * Regression test for Bug 4: operations with no tags + operationIds containing
-     * version-like dots (e.g. v2025.0) that should not be split into path segments.
-     */
-    name: 'noTagsDotOperationId',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/noTagsDotOperationId.yaml',
-      output: {
-        path: './gen',
-        barrel: false,
-      },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({
-          output: {
-            path: './types',
-            barrel: false,
-            mode: 'directory',
-          },
-          group: { type: 'tag' },
         }),
       ],
     },

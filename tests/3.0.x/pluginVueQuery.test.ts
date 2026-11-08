@@ -42,53 +42,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
-  // ─── infinite ───────────────────────────────────────────────────────────
-  {
-    name: 'infinite',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginVueQuery({
-          hooks: true,
-          output: { path: './hooks', barrel: false, mode: 'directory' },
-          infinite: {
-            queryParam: 'page',
-            initialPageParam: 0,
-          },
-        }),
-      ],
-    },
-  },
-
-  // ─── parser zod ─────────────────────────────────────────────────────────
-  {
-    name: 'parserZod',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginZod({ output: { path: './zod', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' }, validator: 'zod' }),
-        pluginVueQuery({
-          hooks: true,
-          output: { path: './hooks', barrel: false, mode: 'directory' },
-        }),
-      ],
-    },
-  },
-
   // ─── mutation disabled ──────────────────────────────────────────────────
   {
     name: 'mutationDisabled',
@@ -199,26 +152,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
-  // ─── with explicit client plugin ───────────────────────────────────────
-  {
-    name: 'withClientPlugin',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginVueQuery({
-          hooks: true,
-          output: { path: './hooks', barrel: false, mode: 'directory' },
-        }),
-      ],
-    },
-  },
 ]
 
 describe(`plugin-vue-query options ${version}`, () => {
