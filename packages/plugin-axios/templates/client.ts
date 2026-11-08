@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
-import { getResponseContentType, isStreamed, type CallResult, type Transport } from './core.ts'
+import { getResponseContentType, isStreamed, resolveResponseType, type CallResult, type ResponseType, type ResponseTypeMap, type Transport } from './core.ts'
 import { isJsonMediaType } from './serializers.ts'
 import * as core from './core.ts'
 
@@ -111,6 +111,65 @@ async function readStreamedBody({ data, contentType, status }: { data: unknown; 
   }
 }
 
+async function readStreamedBytes(data: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array | string>): Promise<Uint8Array> {
+  if (data instanceof ReadableStream) return new Uint8Array(await new Response(data).arrayBuffer())
+  const chunks: Array<Uint8Array> = []
+  for await (const chunk of data) chunks.push(typeof chunk === 'string' ? new TextEncoder().encode(chunk) : chunk)
+  return new Uint8Array(await new Blob(chunks as Array<BlobPart>).arrayBuffer())
+}
+
+function toBytes(data: unknown): Uint8Array | undefined {
+  if (data instanceof ArrayBuffer) return new Uint8Array(data)
+  if (ArrayBuffer.isView(data)) return new Uint8Array(data.buffer, data.byteOffset, data.byteLength)
+  return undefined
+}
+
+/** Decodes raw bytes with the parser a `responseType` map picked for the response content type. */
+function decodeBytes(bytes: Uint8Array, responseType: ResponseType | undefined, contentType: string | undefined): unknown {
+  switch (responseType) {
+    case 'blob':
+      return new Blob([bytes as BlobPart], { type: contentType ?? '' })
+    case 'arraybuffer':
+      return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+    case 'stream':
+      return new Blob([bytes as BlobPart]).stream()
+    case 'text':
+    case 'document':
+      return new TextDecoder().decode(bytes)
+  }
+  const text = new TextDecoder().decode(bytes)
+  if (!text) return undefined
+  try {
+    return JSON.parse(text)
+  } catch {
+    return text
+  }
+}
+
+/**
+ * Decodes a body read for a `responseType` map. Bytes are decoded by the mapped parser. A streamed body stays a stream
+ * when the map picks `'stream'` for a success, and is read and decoded otherwise. Anything else was already decoded.
+ */
+async function decodeMappedBody({
+  data,
+  responseTypeMap,
+  contentType,
+  status,
+}: {
+  data: unknown
+  responseTypeMap: ResponseTypeMap
+  contentType: string | undefined
+  status: number
+}): Promise<unknown> {
+  const responseType = resolveResponseType(responseTypeMap, contentType)
+  if (isStreamed(data)) {
+    if (responseType === 'stream' && status < 300) return data
+    return decodeBytes(await readStreamedBytes(data), responseType, contentType)
+  }
+  const bytes = toBytes(data)
+  return bytes ? decodeBytes(bytes, responseType, contentType) : data
+}
+
 /**
  * Turns an axios instance into a transport: each resolved request becomes one `instance.request` with the instance's
  * defaults, adapter, and axios interceptors. Every status resolves, because the core splits success from error itself.
@@ -126,21 +185,37 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
       // Kubb already serialized the body; only URLSearchParams needs a string, since axios's Node adapter rejects it.
       transformRequest: (data) => (data instanceof URLSearchParams ? data.toString() : data),
       signal: request.signal,
-      responseType: request.responseType,
+      responseType: typeof request.responseType === 'object' ? undefined : request.responseType,
       validateStatus: () => true,
+    }
+
+    // Axios picks how to read the body before the Content-Type is known, so a map reads raw bytes and decodes them once it
+    // is. A map with a stream entry reads a stream, so an event stream still arrives incrementally. Bytes are decoded in
+    // `transformResponse`, before the axios interceptors run, so they see the parsed body.
+    const responseTypeMap = typeof request.responseType === 'object' ? request.responseType : undefined
+    if (responseTypeMap) {
+      config.responseType = Object.values(responseTypeMap).includes('stream') ? 'stream' : 'arraybuffer'
+      config.transformResponse = (data, headers) => {
+        const bytes = toBytes(data)
+        if (!bytes) return data
+        const contentType = getResponseContentType(toHeaders(headers))
+        return decodeBytes(bytes, resolveResponseType(responseTypeMap, contentType), contentType)
+      }
     }
 
     // In the browser the default adapters pick XHR, which buffers the whole body, so a stream switches to fetch. An adapter set
     // on the call or the instance, and the Node http adapter with its proxy and agent, are kept.
     const defaultAdapter = !instance.defaults?.adapter || String(instance.defaults.adapter) === String(axios.defaults.adapter)
-    if (request.responseType === 'stream' && !config.adapter && defaultAdapter && typeof XMLHttpRequest !== 'undefined') config.adapter = 'fetch'
+    if (config.responseType === 'stream' && !config.adapter && defaultAdapter && typeof XMLHttpRequest !== 'undefined') config.adapter = 'fetch'
 
     const response = await instance.request<unknown>(config)
     const headers = toHeaders(response.headers)
     const contentType = getResponseContentType(headers)
 
     return {
-      data: await readStreamedBody({ data: response.data, contentType, status: response.status }),
+      data: responseTypeMap
+        ? await decodeMappedBody({ data: response.data, responseTypeMap, contentType, status: response.status })
+        : await readStreamedBody({ data: response.data, contentType, status: response.status }),
       status: response.status,
       statusText: response.statusText,
       headers,

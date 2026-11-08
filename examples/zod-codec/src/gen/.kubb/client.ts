@@ -1,6 +1,6 @@
 import * as core from './core.ts'
-import type { ResponseType, Transport, TransportResult } from './core.ts'
-import { createClientCore, getResponseContentType } from './core.ts'
+import type { ResponseType, ResponseTypeMap, Transport, TransportResult } from './core.ts'
+import { createClientCore, getResponseContentType, resolveResponseType } from './core.ts'
 import { isJsonMediaType } from './serializers.ts'
 export * from './core.ts'
 
@@ -35,24 +35,16 @@ export const ResponseError = core.ResponseError as {
   prototype: core.ResponseError<unknown, NativeRequest, NativeResponse>
 }
 
-function detectResponseType(contentType: string | null): ResponseType | undefined {
-  if (!contentType) return undefined
-  if (contentType.includes('text/event-stream')) return 'stream'
-  if (contentType.includes('application/json') || contentType.includes('text/json')) return 'json'
-  if (contentType.includes('text/')) return 'text'
-  if (contentType.includes('image/') || contentType.includes('application/octet-stream')) return 'blob'
-  return undefined
-}
-
-async function parseResponse(response: Response, responseType?: ResponseType): Promise<unknown> {
+async function parseResponse(response: Response, responseType?: ResponseType | ResponseTypeMap): Promise<unknown> {
   if (response.status === 204 || response.status === 205 || response.status === 304 || !response.body) {
     return undefined
   }
 
   const contentType = response.headers.get('Content-Type')
   // A server may answer a streamed operation with JSON, or with an error body: both are decoded by their content type. Any other streamed success body stays a stream.
-  const detected = responseType === 'stream' && (!response.ok || isJsonMediaType(contentType)) ? undefined : responseType
-  switch (detected ?? detectResponseType(contentType)) {
+  const resolved = resolveResponseType(responseType, contentType)
+  const detected = resolved === 'stream' && (!response.ok || isJsonMediaType(contentType)) ? resolveResponseType(undefined, contentType) : resolved
+  switch (detected) {
     case 'text':
     case 'document':
       return response.text()

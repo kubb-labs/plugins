@@ -12,6 +12,7 @@ import {
   getOperationSuccessResponses,
   getPrimarySuccessResponse,
   getResponseType,
+  getResponseTypeMap,
   getSuccessResponses,
   isErrorStatusCode,
   isEventStream,
@@ -515,7 +516,82 @@ describe('getResponseType / isEventStream', () => {
     expect(getResponseType(nodeWithResponseContentType('application/octet-stream'))).toBe('blob')
     expect(isEventStream(nodeWithResponseContentType('application/octet-stream'))).toBe(false)
   })
+
+  test('maps a single binary schema to blob even when the media type is not a known binary type', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'download',
+      method: 'GET',
+      path: '/file',
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [ast.factory.createContent({ contentType: 'application/vnd.custom', schema: ast.factory.createSchema({ type: 'blob' }) })],
+        }),
+      ],
+    })
+
+    expect(getResponseType(node)).toBe('blob')
+    expect(getResponseTypeMap(node)).toBeUndefined()
+  })
+
+  test('keeps one shared parser when every content type uses it', () => {
+    const node = nodeWithResponseContents([
+      { contentType: 'audio/mpeg', schemaType: 'blob' },
+      { contentType: 'application/octet-stream', schemaType: 'blob' },
+    ])
+
+    expect(getResponseType(node)).toBe('blob')
+    expect(getResponseTypeMap(node)).toBeUndefined()
+    expect(isEventStream(node)).toBe(false)
+  })
+
+  test('maps each content type when a binary body shares the response with an event stream', () => {
+    const node = nodeWithResponseContents([
+      { contentType: 'audio/mpeg', schemaType: 'blob' },
+      { contentType: 'text/event-stream; charset=utf-8', schemaType: 'object' },
+    ])
+
+    expect(getResponseType(node)).toBeUndefined()
+    expect(getResponseTypeMap(node)).toStrictEqual({ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' })
+    expect(isEventStream(node)).toBe(false)
+  })
+
+  test('keeps JSON in the map so a wildcard cannot claim it', () => {
+    const node = nodeWithResponseContents([
+      { contentType: 'application/json', schemaType: 'object' },
+      { contentType: '*/*', schemaType: 'blob' },
+    ])
+
+    expect(getResponseType(node)).toBeUndefined()
+    expect(getResponseTypeMap(node)).toStrictEqual({ 'application/json': 'json', '*/*': 'blob' })
+  })
+
+  test('returns no map when every content type is JSON', () => {
+    const node = nodeWithResponseContents([
+      { contentType: 'application/json', schemaType: 'object' },
+      { contentType: 'application/problem+json', schemaType: 'object' },
+    ])
+
+    expect(getResponseType(node)).toBeUndefined()
+    expect(getResponseTypeMap(node)).toBeUndefined()
+  })
 })
+
+function nodeWithResponseContents(entries: Array<{ contentType: string; schemaType: 'blob' | 'object' }>): ast.OperationNode {
+  return ast.factory.createOperation({
+    operationId: 'speech',
+    method: 'POST',
+    path: '/speech',
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '200',
+        content: entries.map((entry) =>
+          ast.factory.createContent({ contentType: entry.contentType, schema: ast.factory.createSchema({ type: entry.schemaType }) }),
+        ),
+      }),
+    ],
+  })
+}
 
 describe('resolveDependencyOperationFile', () => {
   function createTestMemo(): Memo {
