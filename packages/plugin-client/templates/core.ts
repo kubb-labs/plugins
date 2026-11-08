@@ -6,6 +6,7 @@ import {
   defaultPathSerializer,
   defaultQuerySerializer,
   isDefaultJsonBody,
+  isJsonMediaType,
   serializeCookies,
 } from './serializers.ts'
 import type { HeadersInit, HttpMethod, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers.ts'
@@ -134,6 +135,12 @@ export type RequestCredentials = 'omit' | 'same-origin' | 'include'
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream' | 'formdata'
 
 /**
+ * Parser per response content type. Generated when one success response declares several content
+ * types that do not share a single parser. Keys are base media types, such as `audio/mpeg` or `audio/*`.
+ */
+export type ResponseTypeMap = Record<string, ResponseType>
+
+/**
  * Decodes a response body for a codec's media type.
  */
 export type Deserializer<T = unknown> = (raw: unknown, contentType: string) => T | Promise<T>
@@ -200,7 +207,7 @@ export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse =
   credentials?: RequestCredentials
   options?: Record<string, unknown>
   contentType?: ContentType
-  responseType?: ResponseType
+  responseType?: ResponseType | ResponseTypeMap
   throwOnError?: boolean
   client?: ClientInstance<TRequest, TResponse>
   transport?: Transport<TRequest, TResponse>
@@ -253,7 +260,7 @@ export type ResolvedRequest = {
   signal?: AbortSignal
   credentials?: RequestCredentials
   options?: Record<string, unknown>
-  responseType?: ResponseType
+  responseType?: ResponseType | ResponseTypeMap
 }
 
 /**
@@ -493,6 +500,26 @@ export function isStreamed(data: unknown): data is ReadableStream<Uint8Array> | 
   return data instanceof ReadableStream || (!!data && typeof data === 'object' && Symbol.asyncIterator in data)
 }
 
+/**
+ * Picks the parser for a response. A string `responseType` wins. A map is matched against the media type: the exact
+ * type, then a wildcard such as `audio/*`, then a catch-all entry. Otherwise the parser is guessed from the media type.
+ */
+export function resolveResponseType(
+  responseType: ResponseType | ResponseTypeMap | undefined,
+  contentType: string | null | undefined,
+): ResponseType | undefined {
+  if (typeof responseType === 'string') return responseType
+  const base = baseContentType(contentType)
+  if (!base) return undefined
+  const mapped = responseType?.[base] ?? responseType?.[`${base.split('/')[0]}/*`] ?? responseType?.['*/*']
+  if (mapped) return mapped
+  if (base === 'text/event-stream') return 'stream'
+  if (isJsonMediaType(base)) return 'json'
+  if (base.startsWith('text/')) return 'text'
+  if (base === 'application/octet-stream' || base === 'application/pdf' || /^(image|audio|video)\//.test(base)) return 'blob'
+  return undefined
+}
+
 /** The media type of the `Content-Type` response header, without its parameters. */
 export function getResponseContentType(headers: Headers | Record<string, string> | undefined): string | undefined {
   if (!headers) return undefined
@@ -640,7 +667,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const codec = contentType ? codecs[contentType] : undefined
     const decoded = contentType && codec?.deserialize ? await codec.deserialize(result.data, contentType) : result.data
     // A streamed success body is validated event by event in `toEventStream`, not as a whole. A JSON answer to a streamed call is a whole body.
-    const streaming = isSuccess && resolvedRequest.responseType === 'stream' && isStreamed(decoded)
+    const streaming = isSuccess && resolveResponseType(resolvedRequest.responseType, contentType) === 'stream' && isStreamed(decoded)
     const data = await runValidator({
       validator: isValidationEnabled(validate, direction) && !streaming ? validator?.[direction] : undefined,
       value: decoded,
