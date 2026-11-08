@@ -540,6 +540,58 @@ export function getResponseContentType(headers: Headers | Record<string, string>
   return baseContentType(value)
 }
 
+/**
+ * Builds a transport result from a web `Response`, for any HTTP library that returns one, such as `fetch` or ky. The body
+ * is parsed by `responseType` and the `Content-Type`. A 204, 205, 304, or bodiless response is no data, a streamed call
+ * answered with JSON or an error is decoded by its content type, and a failed blob or arraybuffer call is too when the
+ * runtime knows the type, so `error` is the error object. An unknown type, which a codec may own, keeps the bytes.
+ *
+ * @example
+ * ```ts
+ * const transport: Transport = async (request) => {
+ *   const response = await ky(request.url, { ...request.options, method: request.method, headers: request.headers, body: request.body, signal: request.signal, throwHttpErrors: false })
+ *   return readResponse(response, { request, responseType: request.responseType })
+ * }
+ * ```
+ */
+export async function readResponse<TRequest, TResponse extends Response>(
+  response: TResponse,
+  { request, responseType }: { request: TRequest; responseType?: ResponseType | ResponseTypeMap },
+): Promise<TransportResult<unknown, TRequest, TResponse>> {
+  return {
+    data: await parseResponseBody(response, responseType),
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+    contentType: getResponseContentType(response.headers),
+    request,
+    response,
+  }
+}
+
+async function parseResponseBody(response: Response, responseType: ResponseType | ResponseTypeMap | undefined): Promise<unknown> {
+  if (response.status === 204 || response.status === 205 || response.status === 304 || !response.body) return undefined
+
+  const contentType = response.headers.get('Content-Type')
+  const requested = resolveResponseType(responseType, contentType)
+  const detected = resolveResponseType(undefined, contentType)
+  const binaryError = !response.ok && (requested === 'blob' || requested === 'arraybuffer')
+  const type = requested === 'stream' && (!response.ok || isJsonMediaType(contentType)) ? detected : binaryError ? (detected ?? requested) : requested
+  switch (type) {
+    case 'text':
+    case 'document':
+      return response.text()
+    case 'blob':
+      return response.blob()
+    case 'arraybuffer':
+      return response.arrayBuffer()
+    case 'stream':
+      return response.body ?? undefined
+  }
+
+  return parseJsonOrText(await response.text())
+}
+
 function resolveSerializers({ config, requestConfig }: { config: { serializer?: Serializers }; requestConfig: { serializer?: Serializers } }) {
   return {
     querySerializer: requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer,

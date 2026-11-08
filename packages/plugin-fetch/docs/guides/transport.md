@@ -35,6 +35,34 @@ type TransportResult<TData = unknown> = {
 
 The core hands you a `ResolvedRequest` with the URL built, the query and body serialized, and auth headers set. Return the parsed `data` along with the native `request` and `response`, so status, headers, and the raw body stay reachable on the result. `responseType` is one parser, or a map from content type to parser when the operation returns several types. Call `resolveResponseType(request.responseType, contentType)` from the generated client to get the parser for a response.
 
+## Send with another library
+
+Any HTTP library that returns a web `Response`, such as [ky](https://github.com/sindresorhus/ky), needs only the send. Pass the `Response` to `readResponse` from the generated client, which parses the body the way `defaultTransport` does:
+
+```typescript
+import ky from 'ky'
+import { client, readResponse, type Transport } from './gen/.kubb/client'
+
+const kyTransport: Transport = async (request) => {
+  const response = await ky(request.url, {
+    ...request.options,
+    method: request.method,
+    headers: request.headers,
+    body: request.body,
+    signal: request.signal,
+    credentials: request.credentials,
+    // The client splits success from error itself, and retries belong in an interceptor or your own wrapper.
+    throwHttpErrors: false,
+    retry: 0,
+  })
+  return readResponse(response, { request, responseType: request.responseType })
+}
+
+client.setConfig({ transport: kyTransport })
+```
+
+The library must hand back the body unread, so `readResponse` can parse it.
+
 ## Mock the network in tests
 
 Return a fixed result from an isolated client in tests:

@@ -7,6 +7,7 @@ import {
   createClientCore,
   defaultTransport,
   createInterceptorStack,
+  readResponse,
   type ResolvedRequest,
   ResponseError,
   resolveAuth,
@@ -1366,6 +1367,33 @@ describe('defaultTransport binary responses', () => {
       responseType: { 'application/vnd.custom': 'blob' },
     })
     expect(result.data).toStrictEqual({ delta: 'hi' })
+  })
+})
+
+describe('readResponse', () => {
+  // A ky-like library: it returns a web `Response` without throwing on an error status.
+  function libraryTransport(response: Response): Transport {
+    return async (request) => readResponse(response, { request, responseType: request.responseType })
+  }
+
+  test('lets a transport for another library parse bodies as defaultTransport does', async () => {
+    const ok = createClientCore({ defaultTransport: libraryTransport(new Response('{"id":1}', { headers: { 'Content-Type': 'application/json' } })) })
+    const failed = createClientCore({
+      defaultTransport: libraryTransport(new Response('{"message":"gone"}', { status: 404, headers: { 'Content-Type': 'application/json' } })),
+      throwOnError: false,
+    })
+    const empty = createClientCore({ defaultTransport: libraryTransport(new Response(null, { status: 204 })) })
+
+    expect(await ok({ method: 'GET', url: '/pet/1' })).toMatchObject({ data: { id: 1 }, status: 200, contentType: 'application/json' })
+    expect(await failed({ method: 'GET', url: '/pet/1', responseType: 'blob' })).toMatchObject({ error: { message: 'gone' }, status: 404 })
+    expect(await empty({ method: 'DELETE', url: '/pet/1' })).toMatchObject({ data: undefined, status: 204 })
+  })
+
+  test('keeps the request it is given and the response as is', async () => {
+    const response = new Response('ok', { headers: { 'Content-Type': 'text/plain' } })
+    const result = await readResponse(response, { request: 'REQ' })
+    expect(result).toMatchObject({ data: 'ok', request: 'REQ' })
+    expect(result.response).toBe(response)
   })
 })
 

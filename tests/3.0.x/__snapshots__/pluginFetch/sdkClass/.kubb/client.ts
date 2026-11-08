@@ -1,7 +1,5 @@
 import * as core from './core'
-import type { ResponseType, ResponseTypeMap } from './core'
-import { createClientCore, getResponseContentType, parseJsonOrText, resolveResponseType } from './core'
-import { isJsonMediaType } from './serializers'
+import { createClientCore, readResponse } from './core'
 export * from './core'
 
 /** The request and response objects of this transport, carried on every result and error. */
@@ -55,33 +53,6 @@ export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = co
 export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
 export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
 
-async function parseResponse(response: Response, responseType?: ResponseType | ResponseTypeMap): Promise<unknown> {
-  if (response.status === 204 || response.status === 205 || response.status === 304 || !response.body) {
-    return undefined
-  }
-
-  const contentType = response.headers.get('Content-Type')
-  const requested = resolveResponseType(responseType, contentType)
-  const detected = resolveResponseType(undefined, contentType)
-  // A streamed call answered with JSON or an error is decoded by its content type. A failed blob or arraybuffer call is too,
-  // when the runtime knows the type, so `error` is the error object; an unknown type, which a codec may own, keeps the bytes.
-  const binaryError = !response.ok && (requested === 'blob' || requested === 'arraybuffer')
-  const type = requested === 'stream' && (!response.ok || isJsonMediaType(contentType)) ? detected : binaryError ? (detected ?? requested) : requested
-  switch (type) {
-    case 'text':
-    case 'document':
-      return response.text()
-    case 'blob':
-      return response.blob()
-    case 'arraybuffer':
-      return response.arrayBuffer()
-    case 'stream':
-      return response.body ?? undefined
-  }
-
-  return parseJsonOrText(await response.text())
-}
-
 /**
  * The default transport that sends the resolved request through `globalThis.fetch` and returns the parsed body with the native request and response.
  */
@@ -99,17 +70,8 @@ export const defaultTransport: Transport = async (request) => {
   // `Request` drops the non-standard `next` field, so Next.js reads it from the init.
   const nextInit: NativeOptions | undefined = request.options?.next ? { next: request.options.next } : undefined
   const response = await globalThis.fetch(nativeRequest, nextInit)
-  const data = await parseResponse(response, request.responseType)
 
-  return {
-    data,
-    status: response.status,
-    statusText: response.statusText,
-    headers: response.headers,
-    contentType: getResponseContentType(response.headers),
-    request: nativeRequest,
-    response,
-  }
+  return readResponse(response, { request: nativeRequest, responseType: request.responseType })
 }
 
 export const client = createClientCore({ defaultTransport })
