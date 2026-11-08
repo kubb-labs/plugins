@@ -176,11 +176,13 @@ describe('createAxiosTransport', () => {
     expect((await client({ method: 'GET', url: '/pet', responseType: 'text' })).error).toBe('404')
   })
 
-  test('keeps the bytes of a failed blob call whose content type the runtime does not know', async () => {
+  test('keeps a failed blob call whose content type the runtime does not know as a Blob, as the fetch transport does', async () => {
     const { transport } = fakeAxios({ data: Buffer.from([1, 2, 3]), status: 500, headers: { 'content-type': 'application/vnd.custom' } })
     const client = createClientCore({ defaultTransport: transport, throwOnError: false })
 
-    expect((await client({ method: 'GET', url: '/image', responseType: 'blob' })).error).toBeInstanceOf(Uint8Array)
+    const { error } = await client({ method: 'GET', url: '/image', responseType: 'blob' })
+    expect(error).toBeInstanceOf(Blob)
+    expect(new Uint8Array(await (error as Blob).arrayBuffer())).toEqual(new Uint8Array([1, 2, 3]))
   })
 
   test('decodes the error body of a blob call on every adapter, instead of returning bytes', async () => {

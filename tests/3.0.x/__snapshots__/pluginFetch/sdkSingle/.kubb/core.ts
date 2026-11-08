@@ -591,7 +591,7 @@ export async function readResponse<TRequest, TResponse extends Response>(
  * from another realm or a polyfill such as node-fetch counts too.
  */
 function isResponse(value: unknown): value is Response {
-  return !!value && typeof value === 'object' && !('data' in value) && typeof (value as Response).arrayBuffer === 'function' && 'status' in value
+  return typeof (value as Response | undefined)?.arrayBuffer === 'function'
 }
 
 /**

@@ -1,7 +1,6 @@
 import axios from 'axios'
 import type { AxiosHeaders, AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios'
-import { createClientCore, getResponseContentType, isStreamed, parseJsonOrText, resolveResponseType, type ResponseType } from './core.ts'
-import { isJsonMediaType } from './serializers.ts'
+import { createClientCore, getResponseContentType, isStreamed, parseJsonOrText, readResponse, resolveResponseType, type ResponseType } from './core.ts'
 import * as core from './core.ts'
 
 export * from './core.ts'
@@ -68,13 +67,6 @@ function toHeaders(raw: AxiosResponse['headers']): Headers {
   return headers
 }
 
-async function readStreamedBytes(data: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array | string>): Promise<ArrayBuffer> {
-  if (data instanceof ReadableStream) return new Response(data).arrayBuffer()
-  const chunks: Array<BlobPart> = []
-  for await (const chunk of data) chunks.push(chunk as BlobPart)
-  return new Blob(chunks).arrayBuffer()
-}
-
 /**
  * Decodes bytes with the given parser, as the fetch transport reads them. Anything that is not bytes is returned as is.
  */
@@ -86,25 +78,8 @@ function decodeBytes(data: unknown, responseType: ResponseType | undefined, cont
     const whole = bytes.byteOffset === 0 && bytes.byteLength === bytes.buffer.byteLength
     return whole ? bytes.buffer : bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
   }
-  if (responseType === 'stream') return new Blob([bytes as Uint8Array<ArrayBuffer>]).stream()
   const text = new TextDecoder().decode(bytes)
   return responseType === 'text' || responseType === 'document' ? text : parseJsonOrText(text)
-}
-
-/**
- * Reads an error body or a streamed JSON body back into its value, as the fetch transport does. A text error stays text.
- * A `'blob'` or `'arraybuffer'` error is decoded when its content type is JSON or text, and kept as read otherwise.
- * Any other success body is returned as read.
- */
-async function readBody({ data, contentType, status }: { data: unknown; contentType: string | undefined; status: number }): Promise<unknown> {
-  if (status >= 300 && (data instanceof Blob || data instanceof ArrayBuffer || data instanceof Uint8Array)) {
-    const type = resolveResponseType(undefined, contentType)
-    if (type !== 'json' && type !== 'text') return data
-    const text = data instanceof Blob ? await data.text() : new TextDecoder().decode(data)
-    return type === 'json' ? parseJsonOrText(text) : text
-  }
-  if (!isStreamed(data) || !(status >= 300 || isJsonMediaType(contentType))) return data
-  return parseJsonOrText(new TextDecoder().decode(await readStreamedBytes(data)))
 }
 
 /** Resolves an adapter setting to the function axios runs, or `undefined` when axios cannot resolve it here. */
@@ -145,7 +120,7 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
     const streamed = request.responseType === 'stream' || Boolean(map && Object.values(map).includes('stream'))
     if (map) {
       config.responseType = streamed ? 'stream' : 'arraybuffer'
-      // An error body is left as read, and `readBody` decodes it by its content type.
+      // An error body is left as read, and `readResponse` below decodes it as the fetch transport does.
       config.transformResponse = (data, responseHeaders, status) => {
         if (status !== undefined && status >= 300) return data
         const header = (responseHeaders as AxiosHeaders).get('Content-Type')?.toString() ?? null
@@ -169,33 +144,29 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
       config.withCredentials = fetchAdapter ? (request.credentials as unknown as boolean) : request.credentials === 'include'
     }
 
-    // The Node http adapter has no 'blob' and would decode the bytes as text, so it reads a buffer that is wrapped as the fetch transport returns it.
-    const blobFromBuffer = request.responseType === 'blob' && typeof XMLHttpRequest === 'undefined' && !fetchAdapter
-    if (blobFromBuffer) config.responseType = 'arraybuffer'
+    // The Node http adapter has no 'blob' and would decode the bytes as text, so it reads a buffer instead.
+    if (request.responseType === 'blob' && typeof XMLHttpRequest === 'undefined' && !fetchAdapter) config.responseType = 'arraybuffer'
 
     const response = await instance.request<unknown>(config)
+    const { data, status, statusText } = response
     const headers = toHeaders(response.headers)
-    const contentType = getResponseContentType(headers)
-    const header = headers.get('Content-Type')
-    const ok = response.status < 300
-    let raw = blobFromBuffer && ok ? decodeBytes(response.data, 'blob', header) : response.data
-    if (map && ok && isStreamed(raw)) {
-      const resolved = resolveResponseType(map, contentType)
-      if (resolved !== 'stream') raw = decodeBytes(await readStreamedBytes(raw), resolved, header)
-    }
-    // axios reads an empty body as '', while the fetch transport reads it as no data unless the body is text.
-    const textBody = request.responseType === 'text' || resolveResponseType(undefined, contentType) === 'text'
-    if (raw === '' && !textBody) raw = undefined
+    const result = { status, statusText, headers, contentType: getResponseContentType(headers), request: response.config, response }
+    if ([204, 205, 304].includes(status)) return { ...result, data: undefined }
 
-    return {
-      data: [204, 205, 304].includes(response.status) ? undefined : await readBody({ data: raw, contentType, status: response.status }),
-      status: response.status,
-      statusText: response.statusText,
-      headers,
-      contentType,
-      request: response.config,
-      response,
+    // Bytes and streams are read as the fetch transport reads a body, so both clients decode alike. A map's success body
+    // was already decoded in `transformResponse`.
+    const bytes = data instanceof Blob || data instanceof ArrayBuffer || data instanceof Uint8Array
+    if (isStreamed(data) || (bytes && !(map && status < 300))) {
+      const read = await readResponse(new Response(data as BodyInit, { status, statusText, headers }), {
+        request: response.config,
+        responseType: request.responseType,
+      })
+      return { ...result, data: read.data }
     }
+
+    // axios reads an empty body as '', while the fetch transport reads it as no data unless the body is text.
+    const textBody = request.responseType === 'text' || resolveResponseType(undefined, result.contentType) === 'text'
+    return { ...result, data: data === '' && !textBody ? undefined : data }
   }
 }
 
