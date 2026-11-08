@@ -2,7 +2,7 @@ import type { Pet } from '../../models/ts/Pet'
 import { http, HttpResponse } from 'msw/http'
 
 export function findPetsByStatusHandlerResponse200(data: Array<Pet>) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
@@ -11,7 +11,7 @@ export function findPetsByStatusHandlerResponse200(data: Array<Pet>) {
 }
 
 export function findPetsByStatusHandlerResponse400(data?: unknown) {
-  return new HttpResponse(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data), {
     status: 400,
   })
 }
@@ -23,7 +23,7 @@ export function findPetsByStatusHandler(
   return http.get(`${options?.baseURL ?? ''}/pet/findByStatus/:step_id`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse(JSON.stringify(data), {
+    return new HttpResponse<string>(JSON.stringify(data), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

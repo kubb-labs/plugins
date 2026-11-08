@@ -7,16 +7,14 @@ import {
   createClientCore,
   defaultTransport,
   createInterceptorStack,
-  parseEventStream,
   type ResolvedRequest,
   ResponseError,
   resolveAuth,
-  type ServerSentEvent,
   type Transport,
   type TransportResult,
   unwrapResult,
   withUnwrap,
-} from './fetch.ts'
+} from './client.ts'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
 type FakeResult = Partial<Pick<TransportResult, 'data' | 'status' | 'statusText'>>
@@ -86,6 +84,13 @@ describe('defaultQuerySerializer', () => {
     const query = defaultQuerySerializer({ filter, page: 2 }, { filter: { contentType: 'application/json' } })
     expect(query).toBe(`filter=${encodeURIComponent(JSON.stringify(filter))}&page=2`)
     expect(new URLSearchParams(query).get('filter')).toBe(JSON.stringify(filter))
+  })
+
+  test('sends a JSON querystring parameter as the whole query string, without its name', () => {
+    const filter = { status: 'sold' }
+    expect(defaultQuerySerializer({ filter }, { filter: { contentType: 'application/json', querystring: true } })).toBe(
+      encodeURIComponent(JSON.stringify(filter)),
+    )
   })
 
   test('fully encodes a JSON value even when allowReserved is set', () => {
@@ -737,6 +742,48 @@ describe('createClientCore', () => {
     expect(onValidationError).toHaveBeenCalledTimes(1)
   })
 
+  test('skips every validator when the client sets validate to false', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const client = createClientCore<string, string>({ defaultTransport: transport, validate: false })
+    const result = (await client({
+      method: 'POST',
+      url: '/pet',
+      body: { name: 1 },
+      query: { limit: 1 },
+      validator: { request: toFailingSchema(), query: toFailingSchema(), response: toFailingSchema() },
+    })) as CallResult<string, string>
+    expect(result.data).toStrictEqual({ id: 1 })
+  })
+
+  test('skips only the directions the client turns off', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const client = createClientCore<string, string>({ defaultTransport: transport, validate: { response: false } })
+    const result = (await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })) as CallResult<string, string>
+    expect(result.data).toStrictEqual({ id: 1 })
+    await expect(client({ method: 'POST', url: '/pet', body: { name: 1 }, validator: { request: toFailingSchema() } })).rejects.toMatchObject({
+      name: 'ParseError',
+    })
+  })
+
+  test('keeps the validate setting of a call when setConfig changes it mid-flight', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const client = createClientCore<string, string>({
+      defaultTransport: async (request) => {
+        client.setConfig({ validate: false })
+        return transport(request)
+      },
+    })
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({ name: 'ParseError' })
+  })
+
+  test('lets a per-call validate override the client setting', async () => {
+    const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
+    const client = createClientCore<string, string>({ defaultTransport: transport, validate: false })
+    await expect(client({ method: 'GET', url: '/pet/1', validate: true, validator: { response: toFailingSchema() } })).rejects.toMatchObject({
+      name: 'ParseError',
+    })
+  })
+
   test('reports a failing request body with the request direction', async () => {
     const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
     const onValidationError = vi.fn(() => ({ value: { name: 'odie' } }))
@@ -805,6 +852,45 @@ describe('createClientCore', () => {
     const child = client.createClient()
     child.interceptors.request.use((request) => request)
     expect(child).not.toBe(client)
+  })
+})
+
+describe('a streamed call answered without an event stream', () => {
+  const answer = (body: string, contentType: string) => async () => new Response(body, { status: 200, headers: { 'content-type': contentType } })
+
+  test.each(['application/json', 'application/problem+json'])('parses a %s body', async (contentType) => {
+    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('{"ok":true}', contentType))
+    const client = createClientCore({ defaultTransport })
+
+    expect((await client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream' })).data).toStrictEqual({ ok: true })
+  })
+
+  test('runs the response validator on a JSON body', async () => {
+    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('{"ok":true}', 'application/json'))
+    const client = createClientCore({ defaultTransport })
+
+    const result = await client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream', validator: { response: toSchema(() => 'validated') } })
+    expect(result.data).toBe('validated')
+  })
+
+  test('keeps an application/x-ndjson body a stream', async () => {
+    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('{"a":1}\n{"a":2}\n', 'application/x-ndjson'))
+    const client = createClientCore({ defaultTransport })
+
+    expect((await client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream' })).data).toBeInstanceOf(ReadableStream)
+  })
+
+  test('decodes a text error body instead of handing the stream to the error path', async () => {
+    using _fetch = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation(async () => new Response('busy', { status: 503, headers: { 'content-type': 'text/plain' } }))
+    const client = createClientCore({ defaultTransport })
+
+    await expect(client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream' })).rejects.toMatchObject({
+      name: 'ResponseError',
+      status: 503,
+      data: 'busy',
+    })
   })
 })
 
@@ -1392,83 +1478,5 @@ describe('resolveAuth', () => {
     const query: Record<string, unknown> = { api_key: 'explicit' }
     await resolveAuth({ security: [{ type: 'apiKey', name: 'api_key', in: 'query' }], auth: () => 'secret', headers: {}, query })
     expect(query).toStrictEqual({ api_key: 'explicit' })
-  })
-})
-
-describe('parseEventStream', () => {
-  function streamOf(chunks: Array<string>): ReadableStream<Uint8Array> {
-    const encoder = new TextEncoder()
-    return new ReadableStream({
-      start(controller) {
-        for (const chunk of chunks) controller.enqueue(encoder.encode(chunk))
-        controller.close()
-      },
-    })
-  }
-
-  async function* asyncIterableOf(chunks: Array<string>): AsyncGenerator<Uint8Array> {
-    const encoder = new TextEncoder()
-    for (const chunk of chunks) yield encoder.encode(chunk)
-  }
-
-  async function collect<TData>(stream: AsyncIterable<TData>): Promise<Array<TData>> {
-    const events: Array<TData> = []
-    for await (const event of stream) events.push(event)
-    return events
-  }
-
-  test('keeps the last valid retry and ignores unknown event fields', async () => {
-    const events = await collect(parseEventStream(streamOf(['retry: 1000\nretry: 2000\nretry: invalid\nunknown: ignored\ndata: ok\n\n'])))
-    expect(events).toStrictEqual([{ data: 'ok', retry: 2000 }])
-  })
-
-  test('parses JSON data events split on a blank line', async () => {
-    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n', 'data: {"n":2}\n\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
-  })
-
-  test('concatenates multi-line data with a newline', async () => {
-    const events = await collect(parseEventStream<string>(streamOf(['data: line one\ndata: line two\n\n'])))
-    expect(events).toStrictEqual([{ data: 'line one\nline two' }])
-  })
-
-  test('reads event, id, and retry fields', async () => {
-    const events = await collect(parseEventStream(streamOf(['event: ping\nid: 42\nretry: 3000\ndata: {"ok":true}\n\n'])))
-    expect(events).toStrictEqual([{ event: 'ping', id: '42', retry: 3000, data: { ok: true } }])
-  })
-
-  test('ignores comment and heartbeat lines', async () => {
-    const events = await collect(parseEventStream(streamOf([': keep-alive\n\n', 'data: {"n":1}\n\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }])
-  })
-
-  test('keeps non-JSON data as a string', async () => {
-    const events = await collect(parseEventStream<string>(streamOf(['data: hello world\n\n'])))
-    expect(events).toStrictEqual([{ data: 'hello world' }])
-  })
-
-  test('normalizes CRLF line endings and flushes a trailing event', async () => {
-    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\r\n\r\ndata: {"n":2}\r\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }, { data: { n: 2 } }])
-  })
-
-  test('reassembles events split across chunks', async () => {
-    const events = await collect(parseEventStream(streamOf(['data: {"hal', 'f":true}\n\n'])))
-    expect(events).toStrictEqual([{ data: { half: true } }])
-  })
-
-  test('consumes an async iterable of byte chunks', async () => {
-    const events = await collect(parseEventStream(asyncIterableOf(['data: {"n":1}\n\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }])
-  })
-
-  test('ignores a comment-only trailer without a blank-line terminator', async () => {
-    const events = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n: keep-alive\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }])
-  })
-
-  test('skips a blank trailing event', async () => {
-    const events: Array<ServerSentEvent> = await collect(parseEventStream(streamOf(['data: {"n":1}\n\n\n\n'])))
-    expect(events).toStrictEqual([{ data: { n: 1 } }])
   })
 })

@@ -49,6 +49,11 @@ describe('buildStyles', () => {
     )
   })
 
+  test('marks a JSON querystring parameter so the runtime sends it as the whole query string', () => {
+    const node = createOperation([{ name: 'filter', in: 'querystring', schema: stringSchema(), contentType: 'application/json' }])
+    expect(buildStyles({ node })).toBe("{ query: { filter: { contentType: 'application/json', querystring: true } } }")
+  })
+
   test('keys path styles by the spec name, quoted when it is not a bare identifier', () => {
     const node = createOperation([
       { name: 'pet_id', in: 'path', schema: stringSchema(), style: 'matrix', explode: true },

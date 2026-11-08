@@ -7,6 +7,7 @@ import {
   buildRequestConfigType,
   getContentTypeInfo,
   hasRequestContentTypeChoice,
+  getEventStream,
   getOperationParameters,
   getOperationSuccessResponses,
   getPrimarySuccessResponse,
@@ -284,6 +285,51 @@ describe('getOperationParameters', () => {
     expect(getOperationParameters(node).query.map((param) => param.name)).toStrictEqual(['max-uploads', 'prefix', 'MaxUploads'])
   })
 
+  test('spreads a form-encoded querystring object into one query parameter per property', () => {
+    const filter = ast.factory.createSchema({
+      type: 'object',
+      properties: [
+        ast.factory.createProperty({ name: 'status', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+        ast.factory.createProperty({ name: 'limit', schema: ast.factory.createSchema({ type: 'number' }) }),
+      ],
+    })
+    const querystring = (contentType?: string) =>
+      ast.factory.createOperation({
+        operationId: 'findPets',
+        method: 'GET',
+        path: '/pets',
+        parameters: [ast.factory.createParameter({ name: 'filter', in: 'querystring', schema: filter, required: true, contentType })],
+      })
+
+    const spread = getOperationParameters(querystring('application/x-www-form-urlencoded')).query
+    expect(spread.map(({ name, in: location, required }) => ({ name, location, required }))).toStrictEqual([
+      { name: 'status', location: 'query', required: true },
+      { name: 'limit', location: 'query', required: false },
+    ])
+    expect(getOperationParameters(querystring('application/json')).query.map((param) => param.name)).toStrictEqual(['filter'])
+  })
+
+  test('keeps the first of a query parameter and a querystring property with the same name', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'findPets',
+      method: 'GET',
+      path: '/pets',
+      parameters: [
+        ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({
+          name: 'filter',
+          in: 'querystring',
+          schema: ast.factory.createSchema({
+            type: 'object',
+            properties: [ast.factory.createProperty({ name: 'status', schema: ast.factory.createSchema({ type: 'number' }) })],
+          }),
+        }),
+      ],
+    })
+
+    expect(getOperationParameters(node).query.map((param) => [param.name, param.in])).toStrictEqual([['status', 'query']])
+  })
+
   test('caches the grouped result per node so repeat calls for the same operation skip re-grouping', () => {
     const node = ast.factory.createOperation({
       operationId: 'showPet',
@@ -402,6 +448,62 @@ describe('getResponseType / isEventStream', () => {
     expect(isEventStream(nodeWithResponseContentType('text/event-stream'))).toBe(true)
     expect(getResponseType(nodeWithResponseContentType('text/event-stream; charset=utf-8'))).toBe('stream')
     expect(isEventStream(nodeWithResponseContentType('text/event-stream; charset=utf-8'))).toBe(true)
+  })
+
+  test('keeps an operation that declares another content type next to text/event-stream a normal call', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'streamEvents',
+      method: 'GET',
+      path: '/events',
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [
+            ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) }),
+            ast.factory.createContent({ contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'string' }) }),
+          ],
+        }),
+      ],
+    })
+
+    expect(isEventStream(node)).toBe(false)
+    expect(getResponseType(node)).toBeUndefined()
+    expect(getEventStream(node)).toBeNull()
+  })
+
+  test('reads the item shape of the stream', () => {
+    const textItem = ast.factory.createOperation({
+      operationId: 'streamLines',
+      method: 'GET',
+      path: '/lines',
+      responses: [ast.factory.createResponse({ statusCode: '200', mediaType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'string' }) })],
+    })
+    const member = (name: string, data: ast.SchemaNode) =>
+      ast.factory.createSchema({
+        type: 'object',
+        properties: [
+          ast.factory.createProperty({ name: 'event', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) }),
+          ast.factory.createProperty({ name: 'data', schema: data }),
+        ],
+      })
+    const union = ast.factory.createSchema({
+      type: 'union',
+      members: [member('delta', ast.factory.createSchema({ type: 'object' })), member('ping', ast.factory.createSchema({ type: 'string' }))],
+    })
+    const typedEvents = ast.factory.createOperation({
+      operationId: 'streamChat',
+      method: 'POST',
+      path: '/chat',
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [ast.factory.createContent({ contentType: 'text/event-stream', schema: union, stream: { schema: union, shape: 'event' } })],
+        }),
+      ],
+    })
+
+    expect(getEventStream(textItem)).toBe('data')
+    expect(getEventStream(typedEvents)).toBe('event')
   })
 
   test('leaves JSON responses to the runtime auto-detection', () => {

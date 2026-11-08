@@ -1,0 +1,87 @@
+openapi: 3.2.0
+info:
+  title: Event streams with OpenAPI 3.2 item schemas
+  version: '1'
+paths:
+  /chat:
+    post:
+      operationId: streamChat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompt:
+                  type: string
+      responses:
+        '200':
+          description: One event per oneOf member, typed by its event name
+          content:
+            text/event-stream:
+              itemSchema:
+                type: object
+                required: [event]
+                properties:
+                  data:
+                    type: string
+                  event:
+                    type: string
+                  id:
+                    type: string
+                  retry:
+                    type: integer
+                    minimum: 0
+                oneOf:
+                  - properties:
+                      event:
+                        const: message_delta
+                      data:
+                        contentMediaType: application/json
+                        contentSchema:
+                          $ref: '#/components/schemas/MessageDelta'
+                  - properties:
+                      event:
+                        const: ping
+  /ticks:
+    get:
+      operationId: streamTicks
+      responses:
+        '200':
+          description: The item schema describes only the data payload
+          content:
+            text/event-stream:
+              schema:
+                type: string
+              itemSchema:
+                $ref: '#/components/schemas/StockUpdate'
+  /logs:
+    get:
+      operationId: streamLogs
+      responses:
+        '200':
+          description: JSON Lines, one LogEntry per line
+          content:
+            application/jsonl:
+              itemSchema:
+                $ref: '#/components/schemas/LogEntry'
+components:
+  schemas:
+    MessageDelta:
+      type: object
+      required: [text]
+      properties:
+        text:
+          type: string
+    StockUpdate:
+      type: object
+      properties:
+        symbol:
+          type: string
+        price:
+          type: string
+    LogEntry:
+      type: object
+      properties:
+        message:
+          type: string

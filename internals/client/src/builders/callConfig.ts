@@ -1,5 +1,6 @@
 import { getResponseType, getResponseTypeMap, isEventStream } from '@internals/shared'
 import type { ast } from '@kubb/kit'
+import type { ReturnTypeOption } from '../types.ts'
 import { buildContentType } from './contentType.ts'
 import { type Auth, buildSecurityMetadata } from './security.ts'
 import { buildStyles } from './styles.ts'
@@ -27,22 +28,31 @@ function buildResponseTypeLiteral(node: ast.HttpOperationNode): string | null {
  * functions and the SDK methods. The `throwOnError` fallback is applied after the `...config` spread.
  *
  * `mergeContentType` is `true` when the caller must destructure `contentType` from `options`, and
- * `eventStream` is `true` when the operation returns `text/event-stream`.
+ * `eventStream` is `true` when the operation returns `text/event-stream`. Unless `returnType` is `'plain'`, a
+ * stream's literal leaves the `response` validator to `toEventStream`, which runs it per event.
  */
 export function buildCallConfig({
   node,
   validatorHooks,
   security,
   throwOnErrorDefault,
+  returnType,
 }: {
   node: ast.HttpOperationNode
   validatorHooks: ValidatorHooks | null
   security?: Array<Auth>
   throwOnErrorDefault: boolean
+  returnType: ReturnTypeOption
 }): { callConfig: string; mergeContentType: boolean; eventStream: boolean } {
+  const eventStream = isEventStream(node)
   const securityLiteral = buildSecurityMetadata({ security })
   const stylesLiteral = buildStyles({ node })
-  const validatorLiteral = buildValidatorLiteral(validatorHooks, ['request', 'path', 'query', 'headers', 'response', 'error'])
+  // Unless `returnType` is `'plain'`, `toEventStream` validates per event, so `response` stays out of the call config.
+  const perEvent = eventStream && returnType !== 'plain'
+  const validatorLiteral = buildValidatorLiteral(
+    validatorHooks,
+    perEvent ? ['request', 'path', 'query', 'headers', 'error'] : ['request', 'path', 'query', 'headers', 'response', 'error'],
+  )
   const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node })
 
   const callConfig = `{ ${[
@@ -59,5 +69,5 @@ export function buildCallConfig({
     .filter(Boolean)
     .join(', ')} }`
 
-  return { callConfig, mergeContentType, eventStream: isEventStream(node) }
+  return { callConfig, mergeContentType, eventStream }
 }

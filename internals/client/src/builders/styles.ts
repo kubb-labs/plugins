@@ -1,3 +1,4 @@
+import { getOperationParameters } from '@internals/shared'
 import { isValidVarName } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
@@ -25,6 +26,7 @@ function serializeParameter(parameter: ast.ParameterNode): string | null {
   if (parameter.explode !== undefined) parts.push(`explode: ${parameter.explode}`)
   if (parameter.in === 'query' && parameter.allowReserved !== undefined) parts.push(`allowReserved: ${parameter.allowReserved}`)
   if (parameter.in !== 'path' && parameter.contentType) parts.push(`contentType: '${parameter.contentType}'`)
+  if (parameter.in === 'querystring') parts.push('querystring: true')
   return parts.length > 0 ? `{ ${parts.join(', ')} }` : null
 }
 
@@ -69,10 +71,11 @@ export function buildStyles({ node }: { node: ast.OperationNode }): string | nul
 
   const groups: Record<StyledLocation, Array<string>> = { path: [], query: [], header: [], cookie: [] }
 
-  for (const parameter of node.parameters) {
-    const literal = serializeParameter(parameter)
-    if (!literal) continue
-    groups[parameter.in].push(`${toKey(parameter.name)}: ${literal}`)
+  for (const [location, parameters] of Object.entries(getOperationParameters(node)) as Array<[StyledLocation, Array<ast.ParameterNode>]>) {
+    for (const parameter of parameters) {
+      const literal = serializeParameter(parameter)
+      if (literal) groups[location].push(`${toKey(parameter.name)}: ${literal}`)
+    }
   }
 
   const entries = [

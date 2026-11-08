@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-mcp",
-  "version": "5.4.0",
+  "version": "5.4.1",
   "description": "Generate Model Context Protocol (MCP) tool definitions with Kubb. Expose your REST APIs as AI-callable tools for LLMs, Claude, ChatGPT, and other AI assistants.",
   "keywords": [
     "ai",
@@ -74,10 +74,10 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "^5.15.4",
+    "@kubb/kit": "^5.16.0",
     "@kubb/plugin-ts": "workspace:^",
     "@kubb/plugin-zod": "workspace:^",
-    "@kubb/renderer-jsx": "^5.15.4"
+    "@kubb/renderer-jsx": "^5.16.0"
   },
   "devDependencies": {
     "@internals/client": "workspace:*",

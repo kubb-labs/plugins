@@ -3,10 +3,8 @@ import { buildJSDoc } from '@internals/utils'
 import { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import { buildCallConfig } from '../builders/callConfig.ts'
-import { buildEventStreamReturn, buildReturnStatement } from '../builders/returnStatement.ts'
+import { buildOperationBody } from '../builders/operationBody.ts'
 import type { Auth } from '../builders/security.ts'
-import { buildGroupedOptionsSignature } from '../builders/signature.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption } from '../types.ts'
@@ -33,20 +31,16 @@ export function buildSdkMethod({
 }): string {
   if (!ast.isHttpOperationNode(node)) return ''
 
-  const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault })
-  const { callConfig, mergeContentType, eventStream } = buildCallConfig({ node, validatorHooks, security, throwOnErrorDefault })
-  const eventStreamReturn = eventStream ? buildEventStreamReturn({ node, types, callConfig }) : null
-  const methodReturnType = eventStreamReturn?.returnType ?? signature.returnType
-  const returnStatement = eventStreamReturn?.statement ?? buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault })
-  const generics = signature.generics.length ? `<${signature.generics.join(', ')}>` : ''
+  const body = buildOperationBody({ node, types, validatorHooks, security, returnType, throwOnErrorDefault })
+  const generics = body.generics.length ? `<${body.generics.join(', ')}>` : ''
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
-  const destructure = mergeContentType
+  const destructure = body.mergeContentType
     ? 'const { client: request = this.client, contentType, ...config } = options'
     : 'const { client: request = this.client, ...config } = options'
-  const methodBody = [destructure, '', returnStatement].map((line) => (line ? `    ${line}` : '')).join('\n')
+  const methodBody = [destructure, '', body.statement].map((line) => (line ? `    ${line}` : '')).join('\n')
 
-  return `${jsdoc}  public ${name}${generics}(${signature.paramsSignature}): ${methodReturnType} {\n${methodBody}\n  }`
+  return `${jsdoc}  public ${name}${generics}(${body.paramsSignature}): ${body.returnType} {\n${methodBody}\n  }`
 }
 
 type OperationData = {

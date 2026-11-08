@@ -7,7 +7,7 @@ import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
-import { fetchClientTemplatePath, fetchSerializersTemplatePath, standardSchemaTemplatePath } from './templates.ts'
+import { fetchClientTemplatePath, coreTemplatePath, serializersTemplatePath, sseTemplatePath, standardSchemaTemplatePath } from './templates.ts'
 import type { PluginFetch, ResolvedOptions, ResolverClient } from './types.ts'
 
 /**
@@ -79,22 +79,26 @@ export const pluginFetch = defineExtension<PluginFetch>({
 
     // `sdk` swaps the per-operation functions for the class-based SDK; left unset, the standalone
     // functions (which query plugins consume) stay.
-    addGenerator(resolved.sdk ? createSdkGenerator<PluginFetch>() : clientGenerator)
+    addGenerator(resolved.sdk ? createSdkGenerator<PluginFetch>({ sse: sseTemplatePath }) : clientGenerator)
 
     const root = path.resolve(config.root, config.output.path)
-    const baseURLExpression = baseURL ? (baseURL.includes('${') ? `\`${baseURL.replaceAll('`', '\\`')}\`` : JSON.stringify(baseURL)) : undefined
 
     injectFile({
       baseName: 'serializers.ts',
       path: path.resolve(root, '.kubb/serializers.ts'),
-      copy: fetchSerializersTemplatePath,
+      copy: serializersTemplatePath,
+    })
+
+    injectFile({
+      baseName: 'core.ts',
+      path: path.resolve(root, '.kubb/core.ts'),
+      copy: coreTemplatePath,
     })
 
     injectFile({
       baseName: 'client.ts',
       path: path.resolve(root, '.kubb/client.ts'),
       copy: fetchClientTemplatePath,
-      footer: baseURLExpression ? `client.setConfig({ baseURL: ${baseURLExpression} })` : undefined,
     })
 
     injectFile({

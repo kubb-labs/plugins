@@ -1,5 +1,20 @@
 # @kubb/plugin-msw
 
+## 6.1.2
+
+### Patch Changes
+
+- [#1338](https://github.com/kubb-labs/plugins/pull/1338) [`4253a3f`](https://github.com/kubb-labs/plugins/commit/4253a3f4987b273bcb80a844455b6193bc0618a6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Read an OpenAPI 3.2 `in: querystring` parameter as the operation's whole query string. A form-encoded object spreads into `query`, so its keys are typed and serialized like query parameters. A JSON one stays one value, sent as the whole query string without its name.
+- Updated dependencies [[`4253a3f`](https://github.com/kubb-labs/plugins/commit/4253a3f4987b273bcb80a844455b6193bc0618a6)]:
+  - @kubb/plugin-faker@5.3.1
+  - @kubb/plugin-ts@5.4.1
+
+## 6.1.1
+
+### Patch Changes
+
+- [#1328](https://github.com/kubb-labs/plugins/pull/1328) [`ce6905b`](https://github.com/kubb-labs/plugins/commit/ce6905bee645cfc77e3d621f6e1128e49adb5ac2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Generate `new HttpResponse<string>(...)` in response factories and handlers. With MSW 3, the untyped call inferred `HttpResponse<DefaultBodyType>`, which `msw/http` does not export, so declaration emit failed with TS2883.
+
 ## 6.1.0
 
 ### Minor Changes

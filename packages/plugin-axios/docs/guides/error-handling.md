@@ -116,3 +116,21 @@ A `ParseError` reports schema validation issues. A `ResponseError` reports a non
 
 Calling `.unwrap()` on a `throwOnError: false` call turns that same `error` into a rejection, so a
 `try`/`catch` works there too.
+
+## Turn validation off at runtime
+
+The `validator` option decides at generation time which schemas each call carries. Set `validate` on the client to skip them at runtime, for example in production or in tests with partial fixtures:
+
+```typescript
+import { client } from './gen/.kubb/client'
+
+client.setConfig({ validate: import.meta.env.DEV })
+```
+
+`validate: false` skips every schema. An object skips only the directions set to `false`: `request` (the body), `params` (path, query, and header params), `response`, and `error`:
+
+```typescript
+client.setConfig({ validate: { response: false } })
+```
+
+A per-call `validate` overrides the client setting, such as `getPetById({ path: { petId: 1 }, validate: true })`. The default is `true`.

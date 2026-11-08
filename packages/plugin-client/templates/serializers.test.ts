@@ -1,11 +1,7 @@
 import { describe, expect, test } from 'vitest'
-import { defaultBodySerializer as axiosBodySerializer } from '../../plugin-axios/templates/serializers.ts'
-import { defaultBodySerializer as fetchBodySerializer } from './serializers.ts'
+import { defaultBodySerializer as serialize } from './serializers.ts'
 
-describe.each([
-  ['fetch', fetchBodySerializer],
-  ['axios', axiosBodySerializer],
-] as const)('%s urlencoded body serialization', (_, serialize) => {
+describe('urlencoded body serialization', () => {
   test('uses query defaults without encoding metadata', () => {
     const result = serialize({
       body: { d: new Date(0), o: { a: 1 }, arr: ['x', 'y'], nil: null, missing: undefined, zero: 0, flag: false, text: 'a b' },

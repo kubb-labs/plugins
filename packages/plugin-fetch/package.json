@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-fetch",
-  "version": "5.11.0",
+  "version": "5.13.0",
   "description": "Generate a slim, type-safe HTTP client with Kubb based on the native Fetch api.",
   "keywords": [
     "api-client",
@@ -86,10 +86,11 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "^5.15.4",
+    "@kubb/kit": "^5.16.0",
+    "@kubb/plugin-client": "workspace:^",
     "@kubb/plugin-ts": "workspace:^",
     "@kubb/plugin-zod": "workspace:^",
-    "@kubb/renderer-jsx": "^5.15.4"
+    "@kubb/renderer-jsx": "^5.16.0"
   },
   "devDependencies": {
     "@internals/client": "workspace:*",

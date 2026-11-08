@@ -42,7 +42,7 @@ import { z } from 'zod'
 
 export function getServer() {
   const server = new McpServer({
-    name: 'Swagger PetStore - OpenAPI 3.0',
+    name: 'Swagger PetStore - OpenAPI 3.2',
     version: '1.0.11',
   })
 

@@ -1,7 +1,8 @@
-import { hasRequestContentTypeChoice } from '@internals/shared'
+import { getEventStream, hasRequestContentTypeChoice } from '@internals/shared'
 import type { ast } from '@kubb/kit'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption } from '../types.ts'
+import type { ValidatorHooks } from './validator.ts'
 import { buildRequestResultGenerics, buildResultType } from './generics.ts'
 
 /**
@@ -53,13 +54,50 @@ export function buildReturnStatement({
 }
 
 /**
- * Builds the return type and statement of an operation that returns `text/event-stream`: the call
- * is wrapped in `toEventStream`, so the caller iterates the typed success events.
+ * Builds the return type and statement of a `text/event-stream` operation. The item type is `TypedEvent<...>` when each item
+ * declares its own `event` and `data`, and otherwise the payload type, which `EventStreamResult` wraps in `ServerSentEvent`. The call's
+ * promise goes through `toEventStream` with the `client` for its defaults, the call's `config`, the shape and the per-event
+ * validator. A `returnType: 'plain'` client receives only the promise,
+ * `toEventStream(request(config))`, and keeps its response validator in the call config.
  */
-export function buildEventStreamReturn({ node, types, callConfig }: { node: ast.OperationNode; types: OperationTypeNames; callConfig: string }): {
+export function buildEventStreamReturn({
+  node,
+  types,
+  callConfig,
+  returnType,
+  validatorHooks,
+  throwOnErrorDefault,
+}: {
+  node: ast.HttpOperationNode
+  types: OperationTypeNames
+  callConfig: string
+  returnType: ReturnTypeOption
+  validatorHooks: ValidatorHooks | null
+  throwOnErrorDefault: boolean
+}): {
   returnType: string
   statement: string
 } {
-  const eventType = `SuccessOf<${types.response.responses(node)}>`
-  return { returnType: `Promise<EventStreamResult<${eventType}>>`, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
+  const shape = getEventStream(node) ?? 'data'
+  const responses = types.response.responses(node)
+  const success = `SuccessOf<${responses}>`
+  const eventType = shape === 'event' ? `TypedEvent<${success}>` : success
+  if (returnType === 'plain') {
+    return { returnType: `Promise<EventStreamResult<${eventType}>>`, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
+  }
+
+  const generics = `${responses}, ThrowOnError${shape === 'event' ? `, ${eventType}` : ''}`
+  const meta = [`shape: '${shape}'`, validatorHooks?.response ? `validator: ${validatorHooks.response}` : null].filter(Boolean).join(', ')
+  const call = `toEventStream<${eventType}>(request(${callConfig}), { client: request, config, ${meta} })`
+  if (returnType === 'data') {
+    const result = `Promise<UnwrappedStreamResult<${generics}>>`
+    return { returnType: result, statement: `return unwrapResult(${call}, config.throwOnError ?? ${throwOnErrorDefault}) as ${result}` }
+  }
+  return { returnType: `Unwrappable<StreamResult<${generics}>>`, statement: `return withUnwrap(${call} as Promise<StreamResult<${generics}>>)` }
+}
+
+/** The stream types an operation file imports: `StreamResult` and `StreamOptions`, `EventStreamResult` for a plain client, and `TypedEvent` for named events. */
+export function buildEventStreamImports({ returnType, typed }: { returnType: ReturnTypeOption; typed: boolean }): Array<string> {
+  const result = { plain: ['EventStreamResult'], full: ['StreamResult', 'StreamOptions'], data: ['UnwrappedStreamResult', 'StreamOptions'] }[returnType]
+  return [...result, ...(typed ? ['TypedEvent'] : [])]
 }

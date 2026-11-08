@@ -12,7 +12,8 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
  */
 export type GroupedOptionsSignature = {
   /**
-   * The single function parameter: `options: Options<<Name>Options, ThrowOnError>`.
+   * The single function parameter: `options: Options<<Name>Options, ThrowOnError>`, or `StreamOptions<...>`
+   * for a `text/event-stream` operation.
    */
   paramsSignature: string
   /**
@@ -39,19 +40,26 @@ export function buildGroupedOptionsSignature({
   types,
   returnType,
   throwOnErrorDefault,
+  eventStream = false,
 }: {
   node: ast.OperationNode
   types: OperationTypeNames
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
+  /**
+   * Adds the per-call stream options to the `options` type of a `text/event-stream` operation, except for a plain custom
+   * client, whose `toEventStream(promise)` does not read them.
+   */
+  eventStream?: boolean
 }): GroupedOptionsSignature {
   const optionsName = types.response.options(node)
+  const optionsType = `${eventStream && returnType !== 'plain' ? 'StreamOptions' : 'Options'}<${optionsName}, ThrowOnError>`
   const { isOptional } = getRequestGroupOptionality(node)
 
   const paramsSignature =
     declarationPrinter.print(
       createFunctionParameters({
-        params: [createFunctionParameter({ name: 'options', type: `Options<${optionsName}, ThrowOnError>`, ...(isOptional ? { default: '{}' } : {}) })],
+        params: [createFunctionParameter({ name: 'options', type: optionsType, ...(isOptional ? { default: '{}' } : {}) })],
       }),
     ) ?? ''
 

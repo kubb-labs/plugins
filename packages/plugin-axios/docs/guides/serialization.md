@@ -68,9 +68,10 @@ runtime matches the response `Content-Type` against the map, including a `type/*
 before the media-type heuristic. A schema with `format: binary` is a blob even when the media
 type is not a well-known binary type.
 
-A map with a `'stream'` entry uses the fetch adapter, so an event stream arrives as it is sent.
-If you set your own `adapter`, the runtime buffers the whole body first, and a long-lived event
-stream only resolves when the server closes it.
+Axios response interceptors see the decoded body: parsed JSON, a string, or a `Blob`. A map with
+a `'stream'` entry reads the body as a stream, the same way as `responseType: 'stream'`, so an
+event stream arrives as it is sent. Interceptors then see the stream, and the runtime reads any
+other content type from it afterwards.
 
 To decode a media type the runtime does not handle, register a codec's `deserialize` for it.
 `deserialize` receives the raw body and the content type and returns the parsed value. It runs

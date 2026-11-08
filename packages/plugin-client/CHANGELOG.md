@@ -1,5 +1,49 @@
 # @kubb/plugin-client
 
+## 5.10.0
+
+### Minor Changes
+
+- [#1340](https://github.com/kubb-labs/plugins/pull/1340) [`6714ffe`](https://github.com/kubb-labs/plugins/commit/6714ffea747595ce37fd90455c5507fed545991e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Ship the client runtime once. `@kubb/plugin-client` now holds the templates every client plugin copies: `core.ts` (the request pipeline, interceptors, validation, and result types), `serializers.ts`, `standardSchema.ts`, and `sse.ts`. `@kubb/plugin-fetch` and `@kubb/plugin-axios` depend on it, copy those files into `.kubb/`, and keep one template of their own, `client.ts`, with the transport and the types bound to its native request and response.
+  
+  - Generated output gains `.kubb/core.ts`, which `.kubb/client.ts` re-exports with the result types bound to the transport's native request and response.
+  - `.kubb/sse.ts` is still written only for a document with a `text/event-stream` operation. `.kubb/client.ts` then re-exports it, so `ServerSentEvent` and `toEventStream` stay importable from the client.
+
+- [#1345](https://github.com/kubb-labs/plugins/pull/1345) [`0a5a254`](https://github.com/kubb-labs/plugins/commit/0a5a2546d50ae159e87e09e7ff7017140309013a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Iterate a stream call's result directly. `EventStreamResult` is now an `AsyncIterable` of its events, so `for await (const event of await streamChat(...))` works, and the call can go to anything that reads an `AsyncIterable` without `.stream`. The `stream` property stays and yields the same events.
+
+- [#1338](https://github.com/kubb-labs/plugins/pull/1338) [`4253a3f`](https://github.com/kubb-labs/plugins/commit/4253a3f4987b273bcb80a844455b6193bc0618a6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Type server-sent events by name from OpenAPI 3.2 `itemSchema` and validate them one by one.
+  
+  - Import `ServerSentEvent` and `toEventStream` from the new `.kubb/sse.ts` instead of `.kubb/client.ts`.
+  - Narrow `event.data` with `switch (event.event)` when the `itemSchema` names each event.
+  - Validate each event with `validator: 'zod'`, map it first with `transform`, and end the stream on a sentinel with `terminator`.
+  - Read `lastEventId` on the result to resume a dropped stream with a `Last-Event-ID` header on a new call.
+  - Export `TypedEvent` from a custom `@kubb/plugin-client` module.
+  
+  ```ts
+  const { stream } = await streamChat({ body, terminator: '[DONE]' })
+  
+  for await (const event of stream) {
+    if (event.event === 'message_delta') render(event.data)
+  }
+  ```
+
+- [#1345](https://github.com/kubb-labs/plugins/pull/1345) [`0a5a254`](https://github.com/kubb-labs/plugins/commit/0a5a2546d50ae159e87e09e7ff7017140309013a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Give stream calls the same shape as regular calls. A stream operation now takes `StreamOptions<TData, ThrowOnError>` and returns `StreamResult<TResponses, ThrowOnError>`, the stream versions of `Options` and `RequestResult`. The result also carries `status`, `error`, `contentType`, and `request`, and checking `status` narrows `error` to the declared error body, as on a regular call. With `throwOnError: false`, a failed stream call now returns its `status` and `error` body. It used to return an empty stream and drop the error. The events are also the result's `data`, so `.unwrap()` resolves to them, and with `returnType: 'data'` a stream call now returns only its events, as a regular call returns only its body. It used to return the full result. `EventStreamOptions` is unchanged. `EventStreamResult` keeps its type parameters and gains `data`, `status`, `error`, `contentType`, `request`, and `[Symbol.asyncIterator]`, so a hand-built `EventStreamResult`, such as a test mock, needs those members to typecheck.
+
+- [#1348](https://github.com/kubb-labs/plugins/pull/1348) [`0560f5d`](https://github.com/kubb-labs/plugins/commit/0560f5d823833980831fffef39378324c7302ae0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Make a stream call fail loudly on an answer that is not an event stream.
+  
+  - A successful answer with a body that is not a stream, such as a JSON body, now throws a `TypeError` with the decoded body as its `cause`. It used to return an empty stream and lose the body. A successful answer with no body still returns an empty stream.
+  - A streamed body is parsed as server-sent events whatever its content type says, as in earlier releases, so a server or proxy that drops the `text/event-stream` header still delivers its events.
+  - An event the server ends without a blank line is now dropped, as the WHATWG event stream specification and browser `EventSource` do. End each event with a blank line, including the last one.
+
+### Patch Changes
+
+- [#1343](https://github.com/kubb-labs/plugins/pull/1343) [`eb2069f`](https://github.com/kubb-labs/plugins/commit/eb2069fc108d0d70b6fbae36bf63dad26ccc6a8d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Generate a shorter `.kubb/client.ts`. The shared `core.ts` now reads `NativeRequest` and `NativeResponse` from the `client.ts` next to it and uses them as its type defaults, so the client no longer re-declares `RequestResult`, `UnwrappedResult`, `Transport`, `TransportResult`, `CallResult`, and `ResponseErrorConfig` only to bind them. Every name is still exported from `.kubb/client.ts` with the same type.
+
+- [#1338](https://github.com/kubb-labs/plugins/pull/1338) [`4253a3f`](https://github.com/kubb-labs/plugins/commit/4253a3f4987b273bcb80a844455b6193bc0618a6) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Read an OpenAPI 3.2 `in: querystring` parameter as the operation's whole query string. A form-encoded object spreads into `query`, so its keys are typed and serialized like query parameters. A JSON one stays one value, sent as the whole query string without its name.
+- Updated dependencies [[`4253a3f`](https://github.com/kubb-labs/plugins/commit/4253a3f4987b273bcb80a844455b6193bc0618a6)]:
+  - @kubb/plugin-ts@5.4.1
+  - @kubb/plugin-zod@5.8.2
+
 ## 5.9.0
 
 ### Minor Changes

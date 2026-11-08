@@ -36,6 +36,8 @@ export default defineConfig([
   {
     // Declarations for the raw templates so consumers can import their types without `allowImportingTsExtensions`.
     entry: {
+      'templates/client': 'templates/client.ts',
+      'templates/core': 'templates/core.ts',
       'templates/fetch': 'templates/fetch.ts',
       'templates/serializers': 'templates/serializers.ts',
       'templates/standardSchema': 'templates/standardSchema.ts',

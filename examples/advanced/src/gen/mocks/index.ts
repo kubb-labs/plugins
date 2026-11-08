@@ -10,16 +10,23 @@ export { createCreatePetsXEXAMPLEFaker } from './createCreatePetsXEXAMPLEFaker'
 export { createDogFaker } from './createDogFaker'
 export { createFindPetsByTagsXEXAMPLEFaker } from './createFindPetsByTagsXEXAMPLEFaker'
 export { createImageFaker } from './createImageFaker'
+export { createOrderEventFaker } from './createOrderEventFaker'
 export { createOrderFaker } from './createOrderFaker'
 export { createOrderHttpStatusEnumFaker } from './createOrderHttpStatusEnumFaker'
 export { createOrderOrderTypeEnumFaker } from './createOrderOrderTypeEnumFaker'
 export { createOrderParamsStatusEnumFaker } from './createOrderParamsStatusEnumFaker'
+export { createOrderPlacedEventEventEnumFaker } from './createOrderPlacedEventEventEnumFaker'
+export { createOrderPlacedEventFaker } from './createOrderPlacedEventFaker'
+export { createOrderShippedEventEventEnumFaker } from './createOrderShippedEventEventEnumFaker'
+export { createOrderShippedEventFaker } from './createOrderShippedEventFaker'
 export { createOrderStatusEnumFaker } from './createOrderStatusEnumFaker'
 export { createPetEventFaker } from './createPetEventFaker'
 export { createPetEventTypeEnumFaker } from './createPetEventTypeEnumFaker'
 export { createPetFaker } from './createPetFaker'
 export { createPetNotFoundFaker } from './createPetNotFoundFaker'
 export { createPetStatusEnumFaker } from './createPetStatusEnumFaker'
+export { createPingEventEventEnumFaker } from './createPingEventEventEnumFaker'
+export { createPingEventFaker } from './createPingEventFaker'
 export { createTagTagFaker } from './createTagTagFaker'
 export {
   createAddFilesBodyFaker,
@@ -103,4 +110,9 @@ export {
   createCreatePetsStatus201Faker,
   createCreatePetsStatusDefaultFaker,
 } from './pets/createCreatePetsFaker'
+export {
+  createStreamOrderEventsPathFaker,
+  createStreamOrderEventsResponseFaker,
+  createStreamOrderEventsStatus200Faker,
+} from './stream/createStreamOrderEventsFaker'
 export { createStreamPetEventsPathFaker, createStreamPetEventsResponseFaker, createStreamPetEventsStatus200Faker } from './stream/createStreamPetEventsFaker'

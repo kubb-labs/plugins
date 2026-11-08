@@ -93,7 +93,7 @@ type ResponseLike = {
   statusCode: ast.StatusCode | number | string
 }
 
-export type OperationParameterGroups = Record<ast.ParameterNode['in'], Array<ast.ParameterNode>>
+export type OperationParameterGroups = Record<Exclude<ast.ParameterNode['in'], 'querystring'>, Array<ast.ParameterNode>>
 
 export type ResolveOperationTypeNameOptions = {
   responseStatusNames?: boolean | 'error'
@@ -160,12 +160,28 @@ function getPrimarySuccessContentType(node: ast.OperationNode): string | undefin
 }
 
 /**
- * Whether an operation streams its primary success response as Server-Sent Events
- * (`text/event-stream`). The client generator uses this to return a typed event stream instead of a
- * one-shot `RequestResult`.
+ * The `text/event-stream` content of the primary success response, when it is the only content type. A response that also
+ * declares another type stays a normal call with its query hooks.
+ */
+function getEventStreamContent(node: ast.OperationNode): ast.ContentNode | undefined {
+  return getPrimarySuccessContentType(node) === 'text/event-stream' ? getPrimarySuccessResponse(node)?.content?.[0] : undefined
+}
+
+/**
+ * Whether an operation streams its primary success response as Server-Sent Events (`text/event-stream`). The client
+ * generator uses this to return a typed event stream instead of a one-shot `RequestResult`.
  */
 export function isEventStream(node: ast.OperationNode): boolean {
-  return getPrimarySuccessContentType(node) === 'text/event-stream'
+  return getEventStreamContent(node) !== undefined
+}
+
+/**
+ * How the document types a `text/event-stream` response, as the adapter read it from `itemSchema`: `event` when each item is
+ * the parsed event with its own `event` and `data`, `data` when it is only the payload. Returns `null` without an event stream.
+ */
+export function getEventStream(node: ast.OperationNode): 'event' | 'data' | null {
+  const content = getEventStreamContent(node)
+  return content ? (content.stream?.shape ?? 'data') : null
 }
 
 function baseContentType(contentType: string): string {
@@ -216,8 +232,8 @@ export function getResponseType(node: ast.OperationNode): ResponseType | undefin
 /**
  * Maps each base content type of a primary success response to its parser when those parsers differ.
  *
- * Keys are lowercased and stripped of parameters. JSON entries are kept as `'json'` so a wildcard such
- * as the catch-all cannot claim a JSON response. Returns `undefined` when {@link getResponseType} already
+ * Keys are lowercased and stripped of parameters. JSON entries are kept as `'json'` so a catch-all
+ * entry cannot claim a JSON response. Returns `undefined` when {@link getResponseType} already
  * covers the response with one string, or when no content type needs a parser other than JSON.
  * The runtime matches the response `Content-Type` against this map instead of guessing from the media type.
  */
@@ -426,6 +442,20 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
 const operationParameterGroupsByNode = new WeakMap<ast.OperationNode, OperationParameterGroups>()
 
 /**
+ * An OpenAPI 3.2 `querystring` parameter is the whole query string, so a form-encoded object becomes one query parameter
+ * per property, typed and serialized like any other.
+ * Another content type, such as JSON, stays one parameter named after it, and the runtime sends its value as the whole query string.
+ */
+function spreadQuerystring(param: ast.ParameterNode): Array<ast.ParameterNode> {
+  const schema = param.schema.type === 'ref' ? param.schema.schema : param.schema
+  const formEncoded = !param.contentType || param.contentType.split(';')[0]!.trim().toLowerCase() === 'application/x-www-form-urlencoded'
+  if (schema?.type !== 'object' || !formEncoded) return [param]
+  return schema.properties.map((property) =>
+    ast.factory.createParameter({ name: property.name, in: 'query', schema: property.schema, required: param.required && property.required }),
+  )
+}
+
+/**
  * Groups an operation's parameters by location (`path`/`query`/`header`/`cookie`), deduping each
  * group by name. Every plugin generator visiting the same `OperationNode` shares one AST instance
  * (see `KubbDriver`), so the result is cached per node to avoid re-filtering and re-deduping the
@@ -438,17 +468,22 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
   // A malformed spec can declare the same name twice within one location. Both would resolve to the
   // same output property, so emitting both would yield an object type with a duplicate member,
   // which TypeScript rejects. Keep the first.
-  const group = (location: ast.ParameterNode['in']) => {
+  const dedupe = (params: Array<ast.ParameterNode>) => {
     const seen = new Set<string>()
-
-    return node.parameters.filter((param) => {
-      if (param.in !== location || seen.has(param.name)) return false
+    return params.filter((param) => {
+      if (seen.has(param.name)) return false
       seen.add(param.name)
       return true
     })
   }
+  const group = (location: ast.ParameterNode['in']) => dedupe(node.parameters.filter((param) => param.in === location))
 
-  const groups: OperationParameterGroups = { path: group('path'), query: group('query'), header: group('header'), cookie: group('cookie') }
+  const groups: OperationParameterGroups = {
+    path: group('path'),
+    query: dedupe([...group('query'), ...group('querystring').flatMap(spreadQuerystring)]),
+    header: group('header'),
+    cookie: group('cookie'),
+  }
 
   operationParameterGroupsByNode.set(node, groups)
   return groups

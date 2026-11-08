@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-client",
-  "version": "5.9.0",
+  "version": "5.10.0",
   "description": "Generate typed API operations against your own client module.",
   "keywords": [
     "api-client",
@@ -22,6 +22,7 @@
   "files": [
     "src",
     "dist",
+    "templates",
     "kubb-extension.json",
     "docs",
     "!/**/**.test.**",
@@ -45,7 +46,15 @@
       }
     },
     "./package.json": "./package.json",
-    "./kubb-extension.json": "./kubb-extension.json"
+    "./kubb-extension.json": "./kubb-extension.json",
+    "./templates/*.ts": {
+      "types": "./dist/templates/*.d.ts",
+      "default": "./templates/*.ts"
+    },
+    "./templates/*.js": {
+      "types": "./dist/templates/*.d.ts"
+    },
+    "./templates/*": "./templates/*"
   },
   "publishConfig": {
     "access": "public",
@@ -58,10 +67,10 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "^5.15.4",
+    "@kubb/kit": "^5.16.0",
     "@kubb/plugin-ts": "workspace:^",
     "@kubb/plugin-zod": "workspace:^",
-    "@kubb/renderer-jsx": "^5.15.4"
+    "@kubb/renderer-jsx": "^5.16.0"
   },
   "devDependencies": {
     "@internals/client": "workspace:*",

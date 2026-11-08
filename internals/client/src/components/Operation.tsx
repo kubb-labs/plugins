@@ -2,10 +2,8 @@ import { buildOperationComments } from '@internals/shared'
 import { ast } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import { buildCallConfig } from '../builders/callConfig.ts'
-import { buildEventStreamReturn, buildReturnStatement } from '../builders/returnStatement.ts'
+import { buildOperationBody } from '../builders/operationBody.ts'
 import type { Auth } from '../builders/security.ts'
-import { buildGroupedOptionsSignature } from '../builders/signature.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption } from '../types.ts'
@@ -49,25 +47,23 @@ type Props = {
 export function Operation({ name, node, types, validatorHooks, returnType, throwOnErrorDefault, security }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
 
-  const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault })
-  const { callConfig, mergeContentType, eventStream } = buildCallConfig({ node, validatorHooks, security, throwOnErrorDefault })
-  const eventStreamReturn = eventStream ? buildEventStreamReturn({ node, types, callConfig }) : null
-  const functionReturnType = eventStreamReturn?.returnType ?? signature.returnType
-  const returnStatement = eventStreamReturn?.statement ?? buildReturnStatement({ node, types, callConfig, returnType, throwOnErrorDefault })
+  const body = buildOperationBody({ node, types, validatorHooks, security, returnType, throwOnErrorDefault })
 
   return (
     <File.Source name={name} isExportable isIndexable>
       <Function
         name={name}
         export
-        generics={signature.generics}
-        params={signature.paramsSignature}
-        returnType={functionReturnType}
+        generics={body.generics}
+        params={body.paramsSignature}
+        returnType={body.returnType}
         JSDoc={{ comments: buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }) }}
       >
-        {mergeContentType ? 'const { client: request = client, contentType, ...config } = options' : 'const { client: request = client, ...config } = options'}
+        {body.mergeContentType
+          ? 'const { client: request = client, contentType, ...config } = options'
+          : 'const { client: request = client, ...config } = options'}
         <br />
-        {returnStatement}
+        {body.statement}
       </Function>
     </File.Source>
   )
