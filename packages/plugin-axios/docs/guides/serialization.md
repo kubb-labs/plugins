@@ -61,11 +61,17 @@ stays a string, and a binary type becomes a `Blob`. The negotiated media type is
 `contentType`, so a `switch (result.contentType)` narrows `data` for an operation that returns
 more than one.
 
-When that response declares several content types that need different parsers, the generated call
-sets `responseType` to a map from content type to parser, such as
-`{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. The runtime picks the entry matching the
-response `Content-Type`, the exact type first and then a `type/*` wildcard, before it guesses from
-the media type. A schema with `format: binary` is a `Blob` whatever its media type.
+When that success response declares several content types that do not share one parser, the
+generated call sets `responseType` to a map from content type to parser, for example
+`{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. Axios reads the raw body, then the
+runtime matches the response `Content-Type` against the map, including a `type/*` wildcard,
+before the media-type heuristic. A schema with `format: binary` is a blob even when the media
+type is not a well-known binary type.
+
+Axios response interceptors see the decoded body: parsed JSON, a string, or a `Blob`. A map with
+a `'stream'` entry reads the body as a stream, the same way as `responseType: 'stream'`, so an
+event stream arrives as it is sent. Interceptors then see the stream, and the runtime reads any
+other content type from it afterwards.
 
 To decode a media type the runtime does not handle, register a codec's `deserialize` for it.
 `deserialize` receives the raw body and the content type and returns the parsed value. It runs
@@ -94,9 +100,6 @@ const { data } = await downloadInvoice({ path: { id: '123' }, responseType: 'blo
 ```
 
 [Server-sent events](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/server-sent-events) covers `responseType: 'stream'`.
-
-> [!NOTE]
-> With the adapter's default [`integerType: 'bigint'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype), a `format: int64` field is typed `bigint`, but `JSON.parse` returns a `number`, and nothing converts it unless a validator runs. For a JSON API, set `integerType: 'number'` on `adapterOas`, or turn on [`validator: 'zod'`](#validate-responses), whose schemas coerce an `int64` field to `bigint`. `JSON.parse` truncates a value past `Number.MAX_SAFE_INTEGER` before either step, so an exact 64-bit ID needs a string in the document.
 
 For bidirectional formats, supply both `serialize` and `deserialize` in the media type codec, then set the operation's request and response `contentType`.
 

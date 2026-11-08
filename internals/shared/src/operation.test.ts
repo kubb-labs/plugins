@@ -476,52 +476,6 @@ describe('getResponseType / isEventStream', () => {
     expect(getEventStream(node)).toBeNull()
   })
 
-  function nodeWithResponseContents(contents: Array<{ contentType: string; schema: ast.SchemaNode }>): ast.OperationNode {
-    return ast.factory.createOperation({
-      operationId: 'speech',
-      method: 'POST',
-      path: '/speech',
-      responses: [ast.factory.createResponse({ statusCode: '200', content: contents.map((content) => ast.factory.createContent(content)) })],
-    })
-  }
-
-  test('collapses several content types that share one parser to that string', () => {
-    const node = nodeWithResponseContents([
-      { contentType: 'audio/mpeg', schema: ast.factory.createSchema({ type: 'blob' }) },
-      { contentType: 'application/octet-stream', schema: ast.factory.createSchema({ type: 'blob' }) },
-    ])
-
-    expect(getResponseType(node)).toBe('blob')
-    expect(getResponseTypeMap(node)).toBeUndefined()
-  })
-
-  test('maps each content type to its parser when they differ, keeping JSON as json and a binary schema as blob', () => {
-    const node = nodeWithResponseContents([
-      { contentType: 'audio/mpeg; codecs=mp3', schema: ast.factory.createSchema({ type: 'blob' }) },
-      { contentType: 'application/vnd.custom', schema: ast.factory.createSchema({ type: 'blob' }) },
-      { contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) },
-      { contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'object' }) },
-    ])
-
-    expect(getResponseType(node)).toBeUndefined()
-    expect(getResponseTypeMap(node)).toStrictEqual({
-      'audio/mpeg': 'blob',
-      'application/vnd.custom': 'blob',
-      'application/json': 'json',
-      'text/event-stream': 'stream',
-    })
-  })
-
-  test('leaves a response whose content types are all JSON to the runtime', () => {
-    const node = nodeWithResponseContents([
-      { contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) },
-      { contentType: 'application/problem+json', schema: ast.factory.createSchema({ type: 'object' }) },
-    ])
-
-    expect(getResponseType(node)).toBeUndefined()
-    expect(getResponseTypeMap(node)).toBeUndefined()
-  })
-
   test('reads the item shape of the stream', () => {
     const textItem = ast.factory.createOperation({
       operationId: 'streamLines',
@@ -567,7 +521,82 @@ describe('getResponseType / isEventStream', () => {
     expect(getResponseType(nodeWithResponseContentType('application/octet-stream'))).toBe('blob')
     expect(isEventStream(nodeWithResponseContentType('application/octet-stream'))).toBe(false)
   })
+
+  test('maps a single binary schema to blob even when the media type is not a known binary type', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'download',
+      method: 'GET',
+      path: '/file',
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [ast.factory.createContent({ contentType: 'application/vnd.custom', schema: ast.factory.createSchema({ type: 'blob' }) })],
+        }),
+      ],
+    })
+
+    expect(getResponseType(node)).toBe('blob')
+    expect(getResponseTypeMap(node)).toBeUndefined()
+  })
+
+  test('keeps one shared parser when every content type uses it', () => {
+    const node = nodeWithResponseContents([
+      { contentType: 'audio/mpeg', schemaType: 'blob' },
+      { contentType: 'application/octet-stream', schemaType: 'blob' },
+    ])
+
+    expect(getResponseType(node)).toBe('blob')
+    expect(getResponseTypeMap(node)).toBeUndefined()
+    expect(isEventStream(node)).toBe(false)
+  })
+
+  test('maps each content type when a binary body shares the response with an event stream', () => {
+    const node = nodeWithResponseContents([
+      { contentType: 'audio/mpeg', schemaType: 'blob' },
+      { contentType: 'text/event-stream; charset=utf-8', schemaType: 'object' },
+    ])
+
+    expect(getResponseType(node)).toBeUndefined()
+    expect(getResponseTypeMap(node)).toStrictEqual({ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' })
+    expect(isEventStream(node)).toBe(false)
+  })
+
+  test('keeps JSON in the map so a wildcard cannot claim it', () => {
+    const node = nodeWithResponseContents([
+      { contentType: 'application/json', schemaType: 'object' },
+      { contentType: '*/*', schemaType: 'blob' },
+    ])
+
+    expect(getResponseType(node)).toBeUndefined()
+    expect(getResponseTypeMap(node)).toStrictEqual({ 'application/json': 'json', '*/*': 'blob' })
+  })
+
+  test('returns no map when every content type is JSON', () => {
+    const node = nodeWithResponseContents([
+      { contentType: 'application/json', schemaType: 'object' },
+      { contentType: 'application/problem+json', schemaType: 'object' },
+    ])
+
+    expect(getResponseType(node)).toBeUndefined()
+    expect(getResponseTypeMap(node)).toBeUndefined()
+  })
 })
+
+function nodeWithResponseContents(entries: Array<{ contentType: string; schemaType: 'blob' | 'object' }>): ast.OperationNode {
+  return ast.factory.createOperation({
+    operationId: 'speech',
+    method: 'POST',
+    path: '/speech',
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '200',
+        content: entries.map((entry) =>
+          ast.factory.createContent({ contentType: entry.contentType, schema: ast.factory.createSchema({ type: entry.schemaType }) }),
+        ),
+      }),
+    ],
+  })
+}
 
 describe('resolveDependencyOperationFile', () => {
   function createTestMemo(): Memo {

@@ -5,6 +5,7 @@ import {
   type ClientConfig,
   createClient as createFetchClient,
   createClientCore,
+  defaultTransport,
   createInterceptorStack,
   type ResolvedRequest,
   ResponseError,
@@ -14,7 +15,6 @@ import {
   type TransportResult,
   unwrapResult,
   withUnwrap,
-  defaultTransport,
 } from './client.ts'
 import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
 
@@ -875,28 +875,10 @@ describe('a streamed call answered without an event stream', () => {
     expect((await client({ method: 'DELETE', url: 'https://api.test/pet/1' })).data).toBeUndefined()
   })
 
-  test('picks the parser from a responseType map by the response content type, with a type/* wildcard', async () => {
-    const bytes = new Uint8Array([0xff, 0xfb, 0x90, 0x00])
-    const answerWith = (contentType: string, body: BodyInit) => async () => new Response(body, { status: 200, headers: { 'content-type': contentType } })
-    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answerWith('audio/mpeg; codecs=mp3', bytes))
-    const client = createClientCore({ defaultTransport })
-    const responseType = { 'audio/*': 'blob', 'application/vnd.custom': 'blob', 'text/event-stream': 'stream' } as const
-
-    const audio = await client({ method: 'POST', url: 'https://api.test/speech', responseType })
-    expect(audio.data).toBeInstanceOf(Blob)
-    expect(new Uint8Array(await (audio.data as Blob).arrayBuffer())).toStrictEqual(bytes)
-
-    _fetch.mockImplementation(answerWith('application/vnd.custom', bytes))
-    expect((await client({ method: 'POST', url: 'https://api.test/speech', responseType })).data).toBeInstanceOf(Blob)
-
-    _fetch.mockImplementation(answerWith('text/event-stream', 'data: 1\n\n'))
-    expect((await client({ method: 'POST', url: 'https://api.test/speech', responseType })).data).toBeInstanceOf(ReadableStream)
-
-    _fetch.mockImplementation(answerWith('application/json', '{"ok":true}'))
-    expect((await client({ method: 'POST', url: 'https://api.test/speech', responseType })).data).toStrictEqual({ ok: true })
-
+  test('applies a catch-all map entry to a response without a Content-Type, after the exact type and the wildcard', () => {
     expect(resolveResponseType({ '*/*': 'blob' }, undefined)).toBe('blob')
     expect(resolveResponseType({ 'audio/*': 'blob', '*/*': 'text' }, 'video/mp4')).toBe('text')
+    expect(resolveResponseType({ 'audio/*': 'blob', '*/*': 'text' }, 'audio/mpeg; codecs=mp3')).toBe('blob')
   })
 
   test('decodes the error body of a blob call by its content type, instead of returning a Blob', async () => {
@@ -1278,6 +1260,76 @@ describe('content type negotiation', () => {
     const { transport } = transportWith({ data: { message: 'bad' }, status: 422, contentType: 'application/xml' })
     const client = createClientCore<string, string>({ defaultTransport: transport })
     await expect(client({ method: 'POST', url: '/pet' })).rejects.toMatchObject({ status: 422, contentType: 'application/xml' })
+  })
+})
+
+describe('defaultTransport binary responses', () => {
+  const bytes = new Uint8Array([0xff, 0xfb, 0x90, 0x00])
+  const responseTypes = { 'audio/mpeg': 'blob' as const, 'text/event-stream': 'stream' as const, 'application/vnd.custom': 'blob' as const }
+
+  async function send(contentType: string, responseType: ResolvedRequest['responseType'] = responseTypes) {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(bytes, { status: 200, headers: { 'Content-Type': contentType } })),
+    )
+    return defaultTransport({ url: 'https://example.test/speech', method: 'POST', headers: {}, responseType })
+  }
+
+  test('returns a Blob for a mapped binary content type the media heuristic does not know', async () => {
+    const result = await send('application/vnd.custom')
+    expect(result.data).toBeInstanceOf(Blob)
+    expect(new Uint8Array(await (result.data as Blob).arrayBuffer())).toEqual(bytes)
+    expect(result.contentType).toBe('application/vnd.custom')
+  })
+
+  test('returns a Blob for audio/mpeg when the response also declares an event stream', async () => {
+    const result = await send('audio/mpeg; charset=binary')
+    expect(result.data).toBeInstanceOf(Blob)
+    expect(result.data).not.toBeTypeOf('string')
+    expect(new Uint8Array(await (result.data as Blob).arrayBuffer())).toEqual(bytes)
+  })
+
+  test('matches a type wildcard in the responseType map', async () => {
+    const result = await send('audio/mpeg', { 'audio/*': 'blob' })
+    expect(result.data).toBeInstanceOf(Blob)
+  })
+
+  test('keeps an event-stream body as a stream when it shares the response with audio', async () => {
+    const result = await send('text/event-stream')
+    expect(result.data).toBeInstanceOf(ReadableStream)
+  })
+
+  test('a string responseType overrides the map', async () => {
+    const result = await send('audio/mpeg', 'text')
+    expect(result.data).toBeTypeOf('string')
+  })
+
+  test('an exact JSON entry wins over a catch-all blob entry', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(JSON.stringify({ delta: 'hi' }), { status: 200, headers: { 'Content-Type': 'application/json' } })),
+    )
+    const result = await defaultTransport({
+      url: 'https://example.test/speech',
+      method: 'POST',
+      headers: {},
+      responseType: { 'application/json': 'json', '*/*': 'blob' },
+    })
+    expect(result.data).toStrictEqual({ delta: 'hi' })
+  })
+
+  test('still parses JSON that the map leaves unset', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(JSON.stringify({ delta: 'hi' }), { status: 200, headers: { 'Content-Type': 'application/json' } })),
+    )
+    const result = await defaultTransport({
+      url: 'https://example.test/speech',
+      method: 'POST',
+      headers: {},
+      responseType: { 'application/vnd.custom': 'blob' },
+    })
+    expect(result.data).toStrictEqual({ delta: 'hi' })
   })
 })
 

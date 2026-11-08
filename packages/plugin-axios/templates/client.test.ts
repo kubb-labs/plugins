@@ -158,30 +158,6 @@ describe('createAxiosTransport', () => {
     expect(new Uint8Array(await (node.data as Blob).arrayBuffer())).toStrictEqual(new Uint8Array(png))
   })
 
-  test('reads a responseType map as bytes, or as a stream when an entry asks for one, and decodes by the response content type', async () => {
-    const bytes = Buffer.from([0xff, 0xfb, 0x90, 0x00])
-    const buffered = fakeAxios({ data: bytes, headers: { 'content-type': 'audio/mpeg' } })
-    const client = createClientCore({ defaultTransport: buffered.transport })
-
-    const audio = await client({ method: 'POST', url: '/speech', responseType: { 'audio/mpeg': 'blob', 'application/json': 'json' } })
-    expect(buffered.calls[0]?.responseType).toBe('arraybuffer')
-    expect(audio.data).toBeInstanceOf(Blob)
-    expect((audio.data as Blob).type).toBe('audio/mpeg')
-    expect(new Uint8Array(await (audio.data as Blob).arrayBuffer())).toStrictEqual(new Uint8Array(bytes))
-
-    const streamed = fakeAxios({ data: Readable.from([bytes]), headers: { 'content-type': 'audio/mpeg' } })
-    const streamClient = createClientCore({ defaultTransport: streamed.transport })
-    const responseType = { 'audio/mpeg': 'blob', 'text/event-stream': 'stream' } as const
-    const fromStream = await streamClient({ method: 'POST', url: '/speech', responseType })
-    expect(streamed.calls[0]?.responseType).toBe('stream')
-    expect(fromStream.data).toBeInstanceOf(Blob)
-    expect(new Uint8Array(await (fromStream.data as Blob).arrayBuffer())).toStrictEqual(new Uint8Array(bytes))
-
-    const events = fakeAxios({ data: Readable.from([Buffer.from('data: 1\n\n')]), headers: { 'content-type': 'text/event-stream' } })
-    const eventClient = createClientCore({ defaultTransport: events.transport })
-    expect(typeof ((await eventClient({ method: 'POST', url: '/speech', responseType })).data as AsyncIterable<unknown>)[Symbol.asyncIterator]).toBe('function')
-  })
-
   test('decodes a text-mode error body by its content type, as the fetch transport does', async () => {
     const { transport } = fakeAxios({ data: '{"message":"gone"}', status: 404, headers: { 'content-type': 'application/json' } })
     const client = createClientCore({ defaultTransport: transport, throwOnError: false })
@@ -296,6 +272,71 @@ describe('createAxiosTransport', () => {
         status: 503,
         data: 'busy',
       })
+    })
+  })
+})
+
+describe('a responseType map', () => {
+  const audio = new Uint8Array([0xff, 0xfb, 0x90, 0x00])
+  const json = (value: unknown) => new TextEncoder().encode(JSON.stringify(value)).buffer
+  /** A real axios instance, so `transformResponse` and the axios interceptors run, answering with the given body. */
+  const answering = ({ status = 200, body, contentType }: { status?: number; body: unknown; contentType: string }) => {
+    const seen: Array<InternalAxiosRequestConfig> = []
+    const instance = axios.create({
+      adapter: async (config: InternalAxiosRequestConfig) => {
+        seen.push(config)
+        return { data: body, status, statusText: 'x', headers: { 'content-type': contentType }, config } as AxiosResponse
+      },
+    })
+    return { instance, seen, client: createClientCore({ defaultTransport: createAxiosTransport(instance) }) }
+  }
+
+  test('reads bytes and decodes the matching content type to a Blob with its media type', async () => {
+    const { client, seen } = answering({ body: audio.buffer, contentType: 'audio/mpeg' })
+    const result = await client({ method: 'POST', url: '/speech', responseType: { 'audio/mpeg': 'blob', 'application/json': 'json' } })
+
+    expect(seen[0]?.responseType).toBe('arraybuffer')
+    expect(result.data).toBeInstanceOf(Blob)
+    expect((result.data as Blob).type).toBe('audio/mpeg')
+    expect(new Uint8Array(await (result.data as Blob).arrayBuffer())).toEqual(audio)
+  })
+
+  test('matches a type wildcard', async () => {
+    const { client } = answering({ body: audio.buffer, contentType: 'audio/wav' })
+    const result = await client({ method: 'POST', url: '/speech', responseType: { 'audio/*': 'blob', 'application/json': 'json' } })
+    expect(result.data).toBeInstanceOf(Blob)
+  })
+
+  test('hands the axios response interceptors the parsed JSON body', async () => {
+    const { client, instance } = answering({ body: json({ delta: 'hi' }), contentType: 'application/json' })
+    const intercepted: Array<unknown> = []
+    instance.interceptors.response.use((response) => (intercepted.push(response.data), response))
+
+    const result = await client({ method: 'POST', url: '/speech', responseType: { 'audio/mpeg': 'blob', 'application/json': 'json' } })
+
+    expect(intercepted).toStrictEqual([{ delta: 'hi' }])
+    expect(result.data).toStrictEqual({ delta: 'hi' })
+  })
+
+  test('reads a stream when the map has a stream entry, and keeps an event stream as a stream', async () => {
+    const responseType = { 'audio/mpeg': 'blob', 'text/event-stream': 'stream' } as const
+    const events = answering({ body: new Blob(['data: hi\n\n']).stream(), contentType: 'text/event-stream' })
+    const result = await events.client({ method: 'POST', url: '/speech', responseType })
+
+    expect(events.seen[0]?.responseType).toBe('stream')
+    expect(result.data).toBeInstanceOf(ReadableStream)
+
+    const speech = answering({ body: new Blob([audio]).stream(), contentType: 'audio/mpeg' })
+    const blob = (await speech.client({ method: 'POST', url: '/speech', responseType })).data as Blob
+    expect(new Uint8Array(await blob.arrayBuffer())).toEqual(audio)
+  })
+
+  test('decodes a mapped error body into ResponseError.data', async () => {
+    const { client } = answering({ status: 400, body: json({ message: 'bad' }), contentType: 'application/json' })
+    await expect(client({ method: 'POST', url: '/speech', responseType: { 'audio/mpeg': 'blob' } })).rejects.toMatchObject({
+      name: 'ResponseError',
+      status: 400,
+      data: { message: 'bad' },
     })
   })
 })

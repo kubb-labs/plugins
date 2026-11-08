@@ -57,7 +57,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
 
 Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, `cookies`, and `body`, and `throwOnError`. It returns a promise. A cookie operation passes `cookies` as an object, which the client joins into a `Cookie` header.
 
-A non-JSON response also passes `responseType`: a string such as `'blob'` when every content type of the response uses one parser, or a map from content type to parser when they differ, such as `{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. Pick the entry matching the response `Content-Type`, the exact type first and then `type/*`, and parse the body with it.
+A non-JSON response also passes `responseType`. It is a string such as `'blob'` when every response content type uses one parser, or a map from content type to parser when they differ, for example `{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. Read the response `Content-Type`, look it up in the map (exact type, then `type/*`, then `*/*`), and parse the body with that parser.
 
 ## A minimal client
 

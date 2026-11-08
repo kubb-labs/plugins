@@ -16,7 +16,7 @@ function buildResponseTypeLiteral(node: ast.HttpOperationNode): string | null {
   const map = getResponseTypeMap(node)
   if (!map) return null
   return `responseType: { ${Object.entries(map)
-    .map(([contentType, type]) => `'${contentType}': '${type}'`)
+    .map(([contentType, type]) => `${JSON.stringify(contentType)}: '${type}'`)
     .join(', ')} }`
 }
 

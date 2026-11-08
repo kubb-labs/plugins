@@ -68,12 +68,8 @@ function toHeaders(raw: AxiosResponse['headers']): Headers {
   return headers
 }
 
-/** The bytes of a body axios read as a buffer or left as a stream, or `undefined` for any other body. */
-async function toArrayBuffer(data: unknown): Promise<ArrayBuffer | undefined> {
+async function readStreamedBytes(data: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array | string>): Promise<ArrayBuffer> {
   if (data instanceof ReadableStream) return new Response(data).arrayBuffer()
-  if (data instanceof ArrayBuffer) return data
-  if (data instanceof Uint8Array) return new Uint8Array(data).buffer
-  if (!isStreamed(data)) return undefined
   const chunks: Array<Uint8Array> = []
   for await (const chunk of data) chunks.push(typeof chunk === 'string' ? new TextEncoder().encode(chunk) : chunk)
   const bytes = new Uint8Array(chunks.reduce((length, chunk) => length + chunk.byteLength, 0))
@@ -86,19 +82,19 @@ async function toArrayBuffer(data: unknown): Promise<ArrayBuffer | undefined> {
 }
 
 async function readStreamedText(data: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array | string>): Promise<string> {
-  return new TextDecoder().decode(await toArrayBuffer(data))
+  return new TextDecoder().decode(await readStreamedBytes(data))
 }
 
 /**
- * Decodes a body axios read as bytes with the parser the response `Content-Type` picked from a map, as the fetch transport
- * reads it. A stream stays as read.
+ * Decodes bytes with the parser a `responseType` map picked for the response content type, as the fetch transport reads
+ * them. Anything that is not bytes is returned as is.
  */
-async function decodeMappedBody(data: unknown, responseType: ResponseType | undefined, contentType: string | null): Promise<unknown> {
-  if (responseType === 'stream' || responseType === 'formdata') return data
-  const buffer = await toArrayBuffer(data)
+function decodeBytes(data: unknown, responseType: ResponseType | undefined, contentType: string | null): unknown {
+  const buffer = data instanceof ArrayBuffer ? data : data instanceof Uint8Array ? new Uint8Array(data).buffer : undefined
   if (!buffer) return data
   if (responseType === 'blob') return new Blob([buffer], { type: contentType ?? '' })
   if (responseType === 'arraybuffer') return buffer
+  if (responseType === 'stream') return new Blob([buffer]).stream()
   const text = new TextDecoder().decode(buffer)
   return responseType === 'text' || responseType === 'document' ? text : parseJsonOrText(text)
 }
@@ -138,10 +134,17 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
     }
 
     // A map is chosen from the response `Content-Type`, which arrives with the body, so the body is read as bytes, or as a
-    // stream when an entry asks for one, and decoded afterwards.
+    // stream when an entry asks for one. Bytes are decoded in `transformResponse`, before the axios interceptors run, so they
+    // see the parsed body. A stream passes through and is read below when its entry is not a stream.
     const map = typeof request.responseType === 'object' ? request.responseType : undefined
     const streamed = request.responseType === 'stream' || Boolean(map && Object.values(map).includes('stream'))
-    if (map) config.responseType = streamed ? 'stream' : 'arraybuffer'
+    if (map) {
+      config.responseType = streamed ? 'stream' : 'arraybuffer'
+      config.transformResponse = (data, responseHeaders) => {
+        const header = toHeaders(responseHeaders).get('Content-Type')
+        return decodeBytes(data, resolveResponseType(map, header), header)
+      }
+    }
 
     // In the browser the default adapters pick XHR, which buffers the whole body and cannot omit same-origin cookies, so a stream
     // or `credentials: 'omit'` switches to fetch. An adapter set on the call or the instance, and the Node http adapter with its
@@ -164,12 +167,12 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
     const response = await instance.request<unknown>(config)
     const headers = toHeaders(response.headers)
     const contentType = getResponseContentType(headers)
-    const raw =
-      blobFromBuffer && (response.data instanceof Uint8Array || response.data instanceof ArrayBuffer)
-        ? new Blob([new Uint8Array(response.data)], { type: headers.get('Content-Type') ?? '' })
-        : map && response.status < 300
-          ? await decodeMappedBody(response.data, resolveResponseType(map, contentType), headers.get('Content-Type'))
-          : response.data
+    const resolved = map ? resolveResponseType(map, contentType) : undefined
+    let raw = response.data
+    if (blobFromBuffer && (raw instanceof Uint8Array || raw instanceof ArrayBuffer))
+      raw = new Blob([new Uint8Array(raw)], { type: headers.get('Content-Type') ?? '' })
+    if (map && isStreamed(raw) && resolved !== 'stream' && response.status < 300)
+      raw = decodeBytes(await readStreamedBytes(raw), resolved, headers.get('Content-Type'))
 
     return {
       // axios reads a bodiless status as '', while the fetch transport reads it as no data. Any other empty body stays '' on both.

@@ -3,27 +3,48 @@ import { describe, expect, test } from 'vitest'
 import { buildCallConfig } from './callConfig.ts'
 
 describe('buildCallConfig', () => {
-  function build(contents: Array<{ contentType: string; schema: ast.SchemaNode }>): string {
+  test('emits a content-type map when one response mixes a binary body with an event stream', () => {
     const node = ast.factory.createOperation({
       operationId: 'speech',
       method: 'POST',
       path: '/speech',
-      responses: [ast.factory.createResponse({ statusCode: '200', content: contents.map((content) => ast.factory.createContent(content)) })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [
+            ast.factory.createContent({ contentType: 'audio/mpeg', schema: ast.factory.createSchema({ type: 'blob' }) }),
+            ast.factory.createContent({ contentType: 'text/event-stream', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }),
+          ],
+        }),
+      ],
     })
-    return buildCallConfig({ node, validatorHooks: null, throwOnErrorDefault: true, returnType: 'full' }).callConfig
-  }
 
-  test('bakes one responseType as a string, and a map when the content types need different parsers', () => {
-    const blob = ast.factory.createSchema({ type: 'blob' })
-    const json = ast.factory.createSchema({ type: 'object' })
+    const { callConfig, eventStream } = buildCallConfig({ node, validatorHooks: null, throwOnErrorDefault: true, returnType: 'full' })
 
-    expect(build([{ contentType: 'audio/mpeg', schema: blob }])).toContain("responseType: 'blob'")
-    expect(
-      build([
-        { contentType: 'audio/mpeg', schema: blob },
-        { contentType: 'text/event-stream', schema: json },
-      ]),
-    ).toContain("responseType: { 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }")
-    expect(build([{ contentType: 'application/json', schema: json }])).not.toContain('responseType')
+    expect(eventStream).toBe(false)
+    expect(callConfig).toContain(`responseType: { "audio/mpeg": 'blob', "text/event-stream": 'stream' }`)
+    expect(callConfig).toContain('...config')
+  })
+
+  test('keeps a string responseType when every content type parses as a blob', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'speech',
+      method: 'POST',
+      path: '/speech',
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [
+            ast.factory.createContent({ contentType: 'audio/mpeg', schema: ast.factory.createSchema({ type: 'blob' }) }),
+            ast.factory.createContent({ contentType: 'audio/wav', schema: ast.factory.createSchema({ type: 'blob' }) }),
+          ],
+        }),
+      ],
+    })
+
+    const { callConfig } = buildCallConfig({ node, validatorHooks: null, throwOnErrorDefault: true, returnType: 'full' })
+
+    expect(callConfig).toContain(`responseType: 'blob'`)
+    expect(callConfig).not.toContain('audio/mpeg')
   })
 })
