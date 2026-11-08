@@ -13,8 +13,9 @@ export function getCookies({ headers, cookies }: GetCookiesOptions, options: Par
       url: `/cookies`,
       headers: {
         ...headers,
-        Cookie: Object.entries(cookies)
-          .map(([name, value]) => `${name}=${value}`)
+        Cookie: Object.entries(cookies ?? {})
+          .filter(([, value]) => value != null)
+          .map(([name, value]) => `${name}=${encodeURIComponent(String(value))}`)
           .join('; '),
       },
       ...options,

@@ -125,9 +125,10 @@ export type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; 
 
 export type RequestCredentials = 'omit' | 'same-origin' | 'include'
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream' | 'formdata'
+
 /**
- * The parser per response content type, generated when one success response declares several that differ. A key is a
- * base media type such as `audio/mpeg`, a `type/*` wildcard, or a catch-all entry.
+ * Parser per response content type. Generated when one success response declares several content
+ * types that do not share a single parser. Keys are base media types, such as `audio/mpeg` or `audio/*`.
  */
 export type ResponseTypeMap = Record<string, ResponseType>
 
@@ -504,20 +505,9 @@ export function parseJsonOrText(text: string): unknown {
   }
 }
 
-/** The parser a response `Content-Type` suggests, or `undefined` for a media type the runtime does not know. */
-export function detectResponseType(contentType: string | null | undefined): ResponseType | undefined {
-  const base = baseContentType(contentType)
-  if (!base) return undefined
-  if (base === 'text/event-stream') return 'stream'
-  if (isJsonMediaType(base)) return 'json'
-  if (base.startsWith('text/')) return 'text'
-  if (base === 'application/octet-stream' || base === 'application/pdf' || /^(image|audio|video)\//.test(base)) return 'blob'
-  return undefined
-}
-
 /**
- * The parser for a response: the call's `responseType`, or for a map the entry matching the response `Content-Type`
- * (the exact base type, then `type/*`, then the catch-all), or else what the media type suggests.
+ * Picks the parser for a response. A string `responseType` wins. A map is matched against the media type: the exact
+ * type, then a wildcard such as `audio/*`, then a catch-all entry. Otherwise the parser is guessed from the media type.
  */
 export function resolveResponseType(
   responseType: ResponseType | ResponseTypeMap | undefined,
@@ -525,8 +515,14 @@ export function resolveResponseType(
 ): ResponseType | undefined {
   if (typeof responseType === 'string') return responseType
   const base = baseContentType(contentType)
-  const matched = base ? (responseType?.[base] ?? responseType?.[`${base.split('/')[0]}/*`]) : undefined
-  return matched ?? responseType?.['*/*'] ?? detectResponseType(contentType)
+  if (!base) return responseType?.['*/*']
+  const mapped = responseType?.[base] ?? responseType?.[`${base.split('/')[0]}/*`] ?? responseType?.['*/*']
+  if (mapped) return mapped
+  if (base === 'text/event-stream') return 'stream'
+  if (isJsonMediaType(base)) return 'json'
+  if (base.startsWith('text/')) return 'text'
+  if (base === 'application/octet-stream' || base === 'application/pdf' || /^(image|audio|video)\//.test(base)) return 'blob'
+  return undefined
 }
 
 /** The media type of the `Content-Type` response header, without its parameters. */

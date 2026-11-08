@@ -131,7 +131,7 @@ export async function client(config: RequestConfig): Promise<{ data: unknown; er
       ...(config.cookies
         ? {
             Cookie: Object.entries(config.cookies)
-              .map(([name, value]) => `${name}=${value}`)
+              .map(([name, value]) => `${name}=${encodeURIComponent(String(value))}`)
               .join('; '),
           }
         : {}),

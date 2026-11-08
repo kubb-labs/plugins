@@ -108,7 +108,7 @@ export async function client(config: RequestConfig) {
     method: config.method,
     headers: {
       ...(config.headers as Record<string, string>),
-      ...(config.cookies ? { Cookie: Object.entries(config.cookies).map(([name, value]) => `${name}=${value}`).join('; ') } : {}),
+      ...(config.cookies ? { Cookie: Object.entries(config.cookies).map(([name, value]) => `${name}=${encodeURIComponent(String(value))}`).join('; ') } : {}),
     },
     body: config.body === undefined ? undefined : JSON.stringify(config.body),
     signal: config.signal,

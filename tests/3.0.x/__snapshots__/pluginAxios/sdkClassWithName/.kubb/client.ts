@@ -81,13 +81,8 @@ async function readStreamedBytes(data: ReadableStream<Uint8Array> | AsyncIterabl
   return bytes.buffer
 }
 
-async function readStreamedText(data: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array | string>): Promise<string> {
-  return new TextDecoder().decode(await readStreamedBytes(data))
-}
-
 /**
- * Decodes bytes with the parser a `responseType` map picked for the response content type, as the fetch transport reads
- * them. Anything that is not bytes is returned as is.
+ * Decodes bytes with the given parser, as the fetch transport reads them. Anything that is not bytes is returned as is.
  */
 function decodeBytes(data: unknown, responseType: ResponseType | undefined, contentType: string | null): unknown {
   const buffer = data instanceof ArrayBuffer ? data : data instanceof Uint8Array ? new Uint8Array(data).buffer : undefined
@@ -111,7 +106,7 @@ async function readBody({ data, contentType, status }: { data: unknown; contentT
     if (data instanceof ArrayBuffer || data instanceof Uint8Array) return parseJsonOrText(new TextDecoder().decode(data))
   }
   if (!isStreamed(data) || !(status >= 300 || isJsonMediaType(contentType))) return data
-  return parseJsonOrText(await readStreamedText(data))
+  return parseJsonOrText(new TextDecoder().decode(await readStreamedBytes(data)))
 }
 
 /**
@@ -167,12 +162,10 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
     const response = await instance.request<unknown>(config)
     const headers = toHeaders(response.headers)
     const contentType = getResponseContentType(headers)
+    const header = headers.get('Content-Type')
     const resolved = map ? resolveResponseType(map, contentType) : undefined
-    let raw = response.data
-    if (blobFromBuffer && (raw instanceof Uint8Array || raw instanceof ArrayBuffer))
-      raw = new Blob([new Uint8Array(raw)], { type: headers.get('Content-Type') ?? '' })
-    if (map && isStreamed(raw) && resolved !== 'stream' && response.status < 300)
-      raw = decodeBytes(await readStreamedBytes(raw), resolved, headers.get('Content-Type'))
+    let raw = blobFromBuffer ? decodeBytes(response.data, 'blob', header) : response.data
+    if (map && isStreamed(raw) && resolved !== 'stream' && response.status < 300) raw = decodeBytes(await readStreamedBytes(raw), resolved, header)
 
     return {
       // axios reads a bodiless status as '', while the fetch transport reads it as no data. Any other empty body stays '' on both.

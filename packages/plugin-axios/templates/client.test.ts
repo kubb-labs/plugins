@@ -100,7 +100,6 @@ describe('createAxiosTransport', () => {
     vi.stubGlobal('XMLHttpRequest', class {})
     await client({ method: 'GET', url: '/pet', credentials: 'omit' })
     await client({ method: 'GET', url: '/pet', credentials: 'omit', options: { adapter: 'xhr' } })
-    vi.unstubAllGlobals()
 
     expect(calls.map(({ adapter, withCredentials }) => ({ adapter, withCredentials }))).toStrictEqual([
       { adapter: undefined, withCredentials: true },
@@ -150,7 +149,6 @@ describe('createAxiosTransport', () => {
     await client({ method: 'GET', url: '/image', responseType: 'blob', options: { adapter: 'fetch' } })
     vi.stubGlobal('XMLHttpRequest', class {})
     await client({ method: 'GET', url: '/image', responseType: 'blob' })
-    vi.unstubAllGlobals()
 
     expect(calls.map((call) => call.responseType)).toStrictEqual(['arraybuffer', 'blob', 'blob'])
     expect(node.data).toBeInstanceOf(Blob)

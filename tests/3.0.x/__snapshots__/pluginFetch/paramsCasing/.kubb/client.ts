@@ -1,6 +1,6 @@
 import * as core from './core'
 import type { ResponseType, ResponseTypeMap } from './core'
-import { createClientCore, detectResponseType, getResponseContentType, parseJsonOrText, resolveResponseType } from './core'
+import { createClientCore, getResponseContentType, parseJsonOrText, resolveResponseType } from './core'
 import { isJsonMediaType } from './serializers'
 export * from './core'
 
@@ -63,7 +63,7 @@ async function parseResponse(response: Response, responseType?: ResponseType | R
   const contentType = response.headers.get('Content-Type')
   const requested = resolveResponseType(responseType, contentType)
   // An error body, and a JSON answer to a streamed operation, are decoded by their content type. Any other body keeps the requested type.
-  const type = !response.ok || (requested === 'stream' && isJsonMediaType(contentType)) ? detectResponseType(contentType) : requested
+  const type = !response.ok || (requested === 'stream' && isJsonMediaType(contentType)) ? resolveResponseType(undefined, contentType) : requested
   switch (type) {
     case 'text':
     case 'document':
@@ -74,8 +74,6 @@ async function parseResponse(response: Response, responseType?: ResponseType | R
       return response.arrayBuffer()
     case 'stream':
       return response.body ?? undefined
-    case 'json':
-      return parseJsonOrText(await response.text())
   }
 
   return parseJsonOrText(await response.text())

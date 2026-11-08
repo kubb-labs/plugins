@@ -7,17 +7,20 @@ import { buildStyles } from './styles.ts'
 import { buildValidatorLiteral, type ValidatorHooks } from './validator.ts'
 
 /**
- * The `responseType` baked into a call: one parser as a string, or a map from content type to parser when the success
- * response declares several that differ, so the runtime chooses from the response `Content-Type`.
+ * `responseType` baked into a call. One parser is a string. Several parsers become a map from content
+ * type to parser so the runtime can choose from the response `Content-Type`.
  */
 function buildResponseTypeLiteral(node: ast.HttpOperationNode): string | null {
   const responseType = getResponseType(node)
   if (responseType) return `responseType: '${responseType}'`
-  const map = getResponseTypeMap(node)
-  if (!map) return null
-  return `responseType: { ${Object.entries(map)
+
+  const responseTypes = getResponseTypeMap(node)
+  if (!responseTypes) return null
+
+  const entries = Object.entries(responseTypes)
     .map(([contentType, type]) => `${JSON.stringify(contentType)}: '${type}'`)
-    .join(', ')} }`
+    .join(', ')
+  return `responseType: { ${entries} }`
 }
 
 /**
@@ -51,6 +54,7 @@ export function buildCallConfig({
     perEvent ? ['request', 'path', 'query', 'headers', 'cookies', 'error'] : ['request', 'path', 'query', 'headers', 'cookies', 'response', 'error'],
   )
   const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node })
+
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
     `url: '${node.path}'`,
