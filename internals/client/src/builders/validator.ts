@@ -7,7 +7,7 @@ import { buildZodErrorParse, resolveParamsValidator, resolveRequestValidator, re
 /**
  * The per-call validator references a generated function wires into its request config. Each hook is
  * the bare schema reference passed to the runtime's `validator.request` / `validator.path` /
- * `validator.query` / `validator.headers` / `validator.cookies` / `validator.response` / `validator.error` slot; `client.ts`
+ * `validator.query` / `validator.headers` / `validator.cookies` / `validator.response` / `validator.error` slot. `client.ts`
  * runs it through `validateStandardSchema`. The response validator only ever sees success (2xx) bodies.
  */
 export type ValidatorHooks = {

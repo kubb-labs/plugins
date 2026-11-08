@@ -1,6 +1,6 @@
 # Migrate to v6
 
-`@kubb/plugin-axios` 6 runs on the same client core as `@kubb/plugin-fetch`. The axios client keeps its generated functions, and its runtime API moves to the shared core. Code that only calls the generated functions or hooks needs no change. Most of the work is in the file that configures `client`.
+In v6 the axios client runs on the same core as `@kubb/plugin-fetch`. Code that calls the generated functions or hooks needs no change. Most edits land in the file that configures `client`, where interceptors, the transport, and the default instance change.
 
 ## Upgrade steps
 
@@ -10,7 +10,7 @@
    npm install --save-dev kubb@latest @kubb/plugin-axios@6
    ```
 
-2. Regenerate the client. This rewrites `.kubb/` and the operation files, so generated code needs no hand edits:
+2. Regenerate the client, which rewrites `.kubb/` and the operation files:
 
    ```bash
    npx kubb generate
@@ -23,11 +23,11 @@
    ```
 
 4. Fix each error with the matching section below.
-5. Check the changes that do not fail the type checker, listed under [Behavior changes](#behavior-changes), and, coming from 5.12 or earlier, [From 5.12 or earlier](#from-5-12-or-earlier).
+5. Check [Behavior changes](#behavior-changes), which compile without errors. If you come from 5.12 or earlier, also check [From 5.12 or earlier](#from-5-12-or-earlier).
 
 ## Keep your axios interceptors as they are
 
-The shortest path moves each handler from `client.interceptors` to `axiosInstance.interceptors`. Their bodies stay the same, because `axiosInstance` takes the place `defaultTransport` had in v5, and its interceptors still receive axios objects in the same order:
+The quickest fix moves each handler from `client.interceptors` to `axiosInstance.interceptors` and keeps its body. `axiosInstance` is the instance v5 called `defaultTransport`, so the handlers get the same axios objects in the same order:
 
 ```typescript
 // before
@@ -69,7 +69,7 @@ client.interceptors.request.use((request) => {
 
 For the native `InternalAxiosRequestConfig`, `AxiosResponse`, or `AxiosError`, register on `axiosInstance` instead. See [Add interceptors](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/interceptors).
 
-`client.interceptors.error` runs for a `ResponseError` only. It used to run for a network error with no response. Catch those on the instance:
+`client.interceptors.error` runs for a `ResponseError` only, not for a network error. Catch network errors on the instance:
 
 ```typescript
 import { axiosInstance } from './gen/.kubb/client'
@@ -94,17 +94,17 @@ client.setConfig({ transport: createAxiosTransport(axios.create({ timeout: 10_00
 
 Native axios interceptors for a custom transport go on the instance you pass to `createAxiosTransport`. `axiosInstance` only backs `defaultTransport`.
 
-`defaultTransport` is now that function, and the instance it sends through is `axiosInstance`. Replace `defaultTransport.defaults` and `defaultTransport.interceptors` with `axiosInstance.defaults` and `axiosInstance.interceptors`. Clients from `createClient()` inherit the `transport` of `client`, and send through `axiosInstance` when neither sets one.
+`defaultTransport` is now a function that sends through `axiosInstance`. Replace `defaultTransport.defaults` and `defaultTransport.interceptors` with `axiosInstance.defaults` and `axiosInstance.interceptors`.
 
 ## Removed exports
 
-- `validateStatus` had no effect and is removed. The client splits success from error by status.
-- `AxiosOptions` is removed. The `options` type is `NativeOptions`, which is `AxiosRequestConfig`.
+- `validateStatus` had no effect and is removed.
+- Rename `AxiosOptions` to `NativeOptions`. Both are `AxiosRequestConfig`.
 - `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are removed. `createClientCore`, `ClientInstance`, and `Interceptors` come from the shared core, and `createClientCore({ defaultTransport })` takes a transport function.
 
 ## Template subpaths
 
-`@kubb/plugin-axios/templates/axios.ts`, `templates/core.ts`, `templates/serializers.ts`, and `templates/standardSchema.ts` are gone. Import the client types from `@kubb/plugin-axios/templates/client.ts`, and the shared runtime from `@kubb/plugin-client/templates/*`. The package exports `templates/client.ts` for its types only, and the runtime is the generated `.kubb/client.ts`. Generated operations and imports from `.kubb/client.ts` need no change, except imports of the removed exports listed above.
+`@kubb/plugin-axios/templates/axios.ts`, `templates/core.ts`, `templates/serializers.ts`, and `templates/standardSchema.ts` are gone. Import the client types from `@kubb/plugin-axios/templates/client.ts`, and the shared runtime from `@kubb/plugin-client/templates/*`. The package exports `templates/client.ts` for its types only. Runtime values such as `client` still come from the generated `.kubb/client.ts`.
 
 ## Stream result types
 
@@ -128,7 +128,7 @@ These changes compile without errors, so check them by hand:
 
 ## From 5.12 or earlier
 
-5.13 already changed these, and they compile without errors, so check them by hand:
+These changed in 5.13 and compile without errors, so check them by hand:
 
 - A stream call keeps the adapter set on the call or on the instance, such as a mock adapter in tests. Only a browser call with the default adapters switches to the fetch adapter.
 - A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream.

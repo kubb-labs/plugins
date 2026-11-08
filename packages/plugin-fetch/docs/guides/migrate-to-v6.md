@@ -1,6 +1,6 @@
 # Migrate to v6
 
-`@kubb/plugin-fetch` 6 removes the compatibility layer around the client runtime that `@kubb/plugin-client` ships. The fetch client keeps its API, so most projects only regenerate. Code that only calls the generated functions or hooks needs no change.
+The fetch client keeps its API in v6, so most projects only regenerate. Code that calls the generated functions or hooks needs no change. Code that imports from the package's template files, or names a stream result type, needs the edits below.
 
 ## Upgrade steps
 
@@ -10,7 +10,7 @@
    npm install --save-dev kubb@latest @kubb/plugin-fetch@6
    ```
 
-2. Regenerate the client. This rewrites `.kubb/` and the operation files, so generated code needs no hand edits:
+2. Regenerate the client, which rewrites `.kubb/` and the operation files:
 
    ```bash
    npx kubb generate
@@ -23,7 +23,7 @@
    ```
 
 4. Fix each error with the matching section below.
-5. Coming from 5.12 or earlier, also check the changes listed under [From 5.12 or earlier](#from-5-12-or-earlier).
+5. If you come from 5.12 or earlier, also check [From 5.12 or earlier](#from-5-12-or-earlier).
 
 ## Template subpaths
 
@@ -39,11 +39,11 @@ import type { RequestConfig } from '@kubb/plugin-fetch/templates/client.ts'
 import type { ResolvedRequest } from '@kubb/plugin-client/templates/core.ts'
 ```
 
-The package exports `templates/client.ts` for its types only. The runtime is the generated `.kubb/client.ts`. Code that imports from it needs no change, except for `FetchOptions`.
+The package exports `templates/client.ts` for its types only. Runtime values such as `client` still come from the generated `.kubb/client.ts`.
 
 ## Removed exports
 
-`FetchOptions` is removed. The `options` type is `NativeOptions`, which is `RequestInit` plus Next.js's `next`:
+Rename `FetchOptions` to `NativeOptions`. It is the same type, `RequestInit` plus Next.js's `next`:
 
 ```typescript
 // before
@@ -65,11 +65,11 @@ let result: EventStreamResult<PetEvent>
 let result: EventStreamResult<ServerSentEvent<PetEvent>>
 ```
 
-A stream whose document names each event already used `TypedEvent<…>`, which stays the same.
+A stream typed with `TypedEvent<…>` stays the same.
 
 ## From 5.12 or earlier
 
-5.13 already changed these, and they compile without errors, so check them by hand:
+These changed in 5.13 and compile without errors, so check them by hand:
 
 - A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream.
 - An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.

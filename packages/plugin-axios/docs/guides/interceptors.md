@@ -1,6 +1,6 @@
 # Add interceptors
 
-Register handlers on `client.interceptors.request`, `.response`, or `.error` to apply behavior across calls. Handlers receive the resolved request and result objects.
+Register handlers on `client.interceptors.request`, `.response`, or `.error` to apply behavior across calls. They receive a `ResolvedRequest`, a `TransportResult`, or a `ResponseError`, as on the fetch client.
 
 ## Run before the send
 
@@ -20,10 +20,10 @@ The handler receives a `ResolvedRequest` (`url`, `method`, `headers`, `body`, `s
 
 ## Run after the send
 
-Response handlers run before calls resolve, and before the status split and codec deserialization.
-`data` is the body as the transport read it: a JSON body is already parsed, unless the call sets
-`responseType: 'text'`. The handler receives a `TransportResult` (`data`, `status`, `statusText`,
-`headers`, `contentType`, `request`, `response`):
+Response handlers run before the client checks the status or runs a codec. `data` is the body as
+the transport read it, so a JSON body is already parsed unless the call sets `responseType: 'text'`.
+The handler receives a `TransportResult` (`data`, `status`, `statusText`, `headers`, `contentType`,
+`request`, `response`):
 
 ```typescript
 client.interceptors.response.use((result) => {
@@ -46,9 +46,9 @@ client.interceptors.error.use((error) => {
 
 This channel only fires on the throw path. When you read with `throwOnError: false`, a documented
 non-2xx response resolves and no error interceptor runs, so inspect the returned `error` on the
-result instead. A transport failure (no response) still throws, but the error handler does not run,
-because there is no result to pass it. To react to a network error, add an error callback on
-`axiosInstance.interceptors.response`, as in [Native axios interceptors](#native-axios-interceptors).
+result instead. A network error, with no response, still throws, and the error handler does not run
+for it. To react to one, add an error callback on `axiosInstance.interceptors.response`, as in
+[Native axios interceptors](#native-axios-interceptors).
 
 ## Add, replace, and remove handlers
 
@@ -75,7 +75,7 @@ Register handlers on the shared `client` for all operations, or on a separate `c
 
 ## Native axios interceptors
 
-`client.interceptors` runs the same handlers for every transport. To work with the `InternalAxiosRequestConfig`, `AxiosResponse`, or `AxiosError` instead, register axios interceptors on `axiosInstance`, the instance `defaultTransport` sends through:
+To get the native `InternalAxiosRequestConfig`, `AxiosResponse`, or `AxiosError`, register an axios interceptor on `axiosInstance`, the instance `defaultTransport` sends through:
 
 ```typescript
 import { axiosInstance } from './gen/.kubb/client'

@@ -23,15 +23,20 @@ With a relative `importPath`, the hooks resolve it from the generated operation 
 
 ## Build on the shared runtime
 
-Instead of writing the request pipeline, copy `core.ts`, `serializers.ts`, `standardSchema.ts`, and `sse.ts` from `@kubb/plugin-client/templates` next to your `client.ts`, as `@kubb/plugin-fetch` and `@kubb/plugin-axios` do. The core cannot know your HTTP library, so it imports three types from `./client.ts`:
+To reuse the runtime of the fetch and axios clients instead of writing your own request pipeline:
 
-| Export           | Purpose                                                      | On fetch      | On axios             |
-| ---------------- | ------------------------------------------------------------ | ------------- | -------------------- |
-| `NativeRequest`  | The request object a result and a `ResponseError` carry.     | `Request`     | `AxiosRequestConfig` |
-| `NativeResponse` | The response object they carry.                              | `Response`    | `AxiosResponse`      |
-| `NativeOptions`  | The `options` a call passes through to the library as it is. | `RequestInit` | `AxiosRequestConfig` |
+1. Copy `core.ts`, `serializers.ts`, `standardSchema.ts`, and `sse.ts` from `@kubb/plugin-client/templates` next to your `client.ts`.
+2. In `client.ts`, export the three types the core imports, listed below.
+3. Write a `Transport` function that sends a `ResolvedRequest` and returns a `TransportResult`.
+4. Export `createClientCore({ defaultTransport })` as `client`, and add `export * from './core.ts'` and `export * from './sse.ts'`.
 
-Define the three, write a `Transport` function that sends a `ResolvedRequest` and returns a `TransportResult`, and export `createClientCore({ defaultTransport })` as `client`. `export * from './core.ts'` provides every other required export, and `export * from './sse.ts'` the stream exports. [`@kubb/plugin-fetch/templates/client.ts`](https://github.com/kubb-labs/plugins/blob/main/packages/plugin-fetch/templates/client.ts) does exactly this in about a hundred lines.
+| Export           | Purpose                                                 | On fetch      | On axios             |
+| ---------------- | ------------------------------------------------------- | ------------- | -------------------- |
+| `NativeRequest`  | The request object on a result and a `ResponseError`.   | `Request`     | `AxiosRequestConfig` |
+| `NativeResponse` | The response object on a result and a `ResponseError`.  | `Response`    | `AxiosResponse`      |
+| `NativeOptions`  | The `options` a call passes to your HTTP library as is. | `RequestInit` | `AxiosRequestConfig` |
+
+[`@kubb/plugin-fetch/templates/client.ts`](https://github.com/kubb-labs/plugins/blob/main/packages/plugin-fetch/templates/client.ts) is a complete example.
 
 ## What a generated function looks like
 
@@ -55,7 +60,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
 }
 ```
 
-Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, `cookies`, and `body`, and `throwOnError`. It returns a promise. A cookie operation passes `cookies` as an object, which the client joins into a `Cookie` header.
+Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, `cookies`, and `body`, and `throwOnError`. It returns a promise. `cookies` holds name and value pairs, which your client joins into a `Cookie` header, as the example below does.
 
 A non-JSON response also passes `responseType`. It is a string such as `'blob'` when every response content type uses one parser, or a map from content type to parser when they differ, for example `{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. Read the response `Content-Type`, look it up in the map (exact type, then `type/*`, then `*/*`), and parse the body with that parser.
 

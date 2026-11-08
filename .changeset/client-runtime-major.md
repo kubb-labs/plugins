@@ -4,13 +4,13 @@
 '@kubb/plugin-axios': major
 ---
 
-Remove the compatibility layer around the client runtime. The fetch and axios clients share one interceptor API and one client factory, and stream results take the full event type.
+Run the fetch and axios clients on one core with the same interceptors and client factory, and pass the full event type to stream result types.
 
-- Import client types from `templates/client.ts`, and `NativeOptions` for the `options` type of a call. `templates/fetch.ts`, `templates/axios.ts`, `FetchOptions`, and `AxiosOptions` are gone, and the shared runtime comes from `@kubb/plugin-client/templates/*`. The package exports `templates/client.ts` for its types only.
-- Pass the full event type to `EventStreamResult`, `StreamResult`, and `UnwrappedStreamResult`: `EventStreamResult<ServerSentEvent<Pet>>` where you wrote `EventStreamResult<Pet>`.
-- Receive `ResolvedRequest`, `TransportResult`, and `ResponseError` in axios `client.interceptors` handlers, as on fetch. Native axios handlers go on `axiosInstance.interceptors`, and `client.interceptors.error` no longer runs for a network error.
-- Wrap an axios instance with `createAxiosTransport(instance)` to use it as `transport`. `defaultTransport` is now a function, and `axiosInstance` is the instance behind it.
-- Removed from the axios client: `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel`. `createClientCore`, `ClientInstance`, and `Interceptors` come from the shared core.
+- Import types from `templates/client.ts`, which the package now exports for types only, and the shared runtime from `@kubb/plugin-client/templates/*`. `templates/fetch.ts` and `templates/axios.ts` are gone.
+- Use `NativeOptions` where you used `FetchOptions` or `AxiosOptions`.
+- Write `EventStreamResult<ServerSentEvent<Pet>>` where you wrote `EventStreamResult<Pet>`, and the same for `StreamResult` and `UnwrappedStreamResult`.
+- On axios, `client.interceptors` handlers get the `ResolvedRequest`, `TransportResult`, and `ResponseError`, and the error handler skips network errors. Register native axios handlers on `axiosInstance.interceptors`.
+- On axios, wrap an instance with `createAxiosTransport(instance)` to pass it as `transport`. `defaultTransport` is a function now, and `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
 
 ```diff
 - import { client, defaultTransport } from './gen/.kubb/client'
@@ -22,4 +22,4 @@ Remove the compatibility layer around the client runtime. The fetch and axios cl
 + client.setConfig({ transport: createAxiosTransport(axios.create({ baseURL })) })
 ```
 
-To upgrade, regenerate, run the type checker, and fix each error with the "Migrate to v6" guide of your plugin. The query plugins work with v5 and v6, so upgrade them separately.
+To upgrade, regenerate, run `tsc --noEmit`, and fix each error with your plugin's "Migrate to v6" guide. The query plugins work with v5 and v6.

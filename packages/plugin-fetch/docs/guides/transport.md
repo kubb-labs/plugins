@@ -33,7 +33,7 @@ type TransportResult<TData = unknown> = {
 }
 ```
 
-The core hands you a `ResolvedRequest` with the URL built, the query and body serialized, and auth headers set. Return the parsed `data` along with the native `request` and `response`, so status, headers, and the raw body stay reachable on the result. `responseType` is a string, or a map from content type to parser when the operation declares several. `resolveResponseType(request.responseType, contentType)` from the generated client picks the parser for a response.
+The core hands you a `ResolvedRequest` with the URL built, the query and body serialized, and auth headers set. Return the parsed `data` along with the native `request` and `response`, so status, headers, and the raw body stay reachable on the result. `responseType` is one parser, or a map from content type to parser when the operation returns several types. Call `resolveResponseType(request.responseType, contentType)` from the generated client to get the parser for a response.
 
 ## Mock the network in tests
 

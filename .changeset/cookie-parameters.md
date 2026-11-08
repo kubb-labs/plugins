@@ -12,7 +12,11 @@
 '@kubb/plugin-cypress': patch
 ---
 
-Add cookie parameters to the generated operation types. An operation with an `in: cookie` parameter gets a `<Name>Cookies` type and a `cookies` member on its options, so a generated call, SDK method, query hook, MCP tool, or Cypress request accepts them. The Zod schema and faker get the matching group, and `validator: 'zod'` checks cookies before the send, as it does the other groups. Operations without cookie parameters are unchanged.
+Add cookie parameters to the generated operation types.
+
+- An operation with an `in: cookie` parameter gets a `<Name>Cookies` type and a `cookies` option, so its call, SDK method, query hook, MCP tool, and Cypress request take `cookies`.
+- The Zod schema and faker get the same group, and `validator: 'zod'` checks it before the request goes out.
+- Operations without cookie parameters generate the same code as before.
 
 ```ts
 await getSession({ cookies: { session_id: 'abc' } })

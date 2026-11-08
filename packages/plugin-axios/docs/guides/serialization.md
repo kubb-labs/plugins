@@ -102,7 +102,7 @@ const { data } = await downloadInvoice({ path: { id: '123' }, responseType: 'blo
 [Server-sent events](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/server-sent-events) covers `responseType: 'stream'`.
 
 > [!NOTE]
-> With the adapter's default [`integerType: 'bigint'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype), a `format: int64` field is typed `bigint`, but `JSON.parse` returns a `number`, and nothing converts it unless a validator runs. For a JSON API, set `integerType: 'number'` on `adapterOas`, or turn on [`validator: 'zod'`](#validate-responses), whose schemas coerce an `int64` field to `bigint`. `JSON.parse` truncates a value past `Number.MAX_SAFE_INTEGER` before either step, so an exact 64-bit ID needs a string in the document.
+> With the adapter's default [`integerType: 'bigint'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype), a `format: int64` field is typed `bigint`, but `JSON.parse` returns a `number`. Set `integerType: 'number'` on `adapterOas`, or turn on [`validator: 'zod'`](#validate-responses), which converts the field to `bigint`. Either way, `JSON.parse` loses precision above `Number.MAX_SAFE_INTEGER`, so declare an exact 64-bit ID as a string in the document.
 
 For bidirectional formats, supply both `serialize` and `deserialize` in the media type codec, then set the operation's request and response `contentType`.
 
