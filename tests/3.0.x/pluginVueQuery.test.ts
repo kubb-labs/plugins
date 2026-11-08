@@ -10,7 +10,6 @@ import { parserTs } from '@kubb/parser-ts'
 import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginVueQuery } from '@kubb/plugin-vue-query'
-import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
 
 const __filename = fileURLToPath(import.meta.url)

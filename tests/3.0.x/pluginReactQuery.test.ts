@@ -10,7 +10,6 @@ import { parserTs } from '@kubb/parser-ts'
 import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginTs } from '@kubb/plugin-ts'
-import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
 
 const __filename = fileURLToPath(import.meta.url)
