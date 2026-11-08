@@ -21,6 +21,16 @@ describe('renderType', () => {
     expect(renderType(createIndexedAccessType({ target: 'GetPetPathParams', key: 'petId' }))).toBe("GetPetPathParams['petId']")
   })
 
+  it('renders a type literal with optional members', () => {
+    const type = createTypeLiteral({
+      members: [
+        { name: 'petId', type: 'string', optional: false },
+        { name: 'name', type: 'string', optional: true },
+      ],
+    })
+    expect(renderType(type)).toBe('{ petId: string; name?: string }')
+  })
+
   it('applies transformType to the rendered type', () => {
     expect(renderType('Config', (t) => `Partial<${t}>`)).toBe('Partial<Config>')
   })
