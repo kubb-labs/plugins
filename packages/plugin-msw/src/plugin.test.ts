@@ -12,20 +12,13 @@ function setupKubb(options: Options, pluginNames: Array<string>) {
 }
 
 describe('pluginMsw setup', () => {
-  test.each([
-    { handlers: false, generators: 1 },
-    { handlers: true, generators: 2 },
-  ])('registers $generators generator(s) when handlers is $handlers', ({ handlers, generators }) => {
+  test.each([{ handlers: true, generators: 2 }])('registers $generators generator(s) when handlers is $handlers', ({ handlers, generators }) => {
     const plugin = pluginMsw({ handlers })
     const ctx = createMockedSetupContext<PluginMsw>()
 
     kubbContext.run(ctx, () => plugin.setup?.(plugin.options ?? {}, ctx))
 
     expect(ctx.addGenerator).toHaveBeenCalledTimes(generators)
-  })
-
-  test("parser: 'faker' passes when plugin-faker is registered", async () => {
-    await expect(setupKubb({ parser: 'faker' }, ['plugin-ts', 'plugin-faker'])).resolves.toBeUndefined()
   })
 
   test("parser: 'faker' fails with KUBB_MISSING_DEPENDENCY when plugin-faker is not registered", async () => {

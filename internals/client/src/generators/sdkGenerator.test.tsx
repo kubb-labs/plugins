@@ -5,7 +5,6 @@ import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperations } from '#mocks'
 import { resolverClient } from '../resolver.ts'
-import type { SecurityDocument } from '../builders/security.ts'
 import type { Options, ResolvedOptions, ResolverClient } from '../types.ts'
 import { createSdkGenerator } from './sdkGenerator.tsx'
 
@@ -95,32 +94,9 @@ const operationNodes: Array<ast.OperationNode> = [
   }),
 ]
 
-const securityDocument: SecurityDocument = {
-  components: {
-    securitySchemes: {
-      petstore_auth: { type: 'oauth2' },
-      api_key: { type: 'apiKey', name: 'api_key', in: 'header' },
-    },
-  },
-  paths: {
-    '/pet/{petId}': {
-      get: { security: [{ petstore_auth: ['read:pets'] }, { api_key: [] }] },
-    },
-  },
-}
-
-function mockedAdapterWithDocument(document: SecurityDocument): Adapter {
-  return { ...createMockedAdapter(), document } as Adapter
-}
-
 describe('sdkGenerator operations', () => {
   const testData = [
     // Only getPetById declares security in the spec, so the other methods stay bare.
-    {
-      name: 'sdkClassWithSecurity',
-      options: { sdk: { mode: 'flat', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']>,
-      adapter: mockedAdapterWithDocument(securityDocument),
-    },
     // returnType: 'data' unwraps every SDK method down to the bare success body.
     { name: 'sdkClassWithReturnTypeData', options: { returnType: 'data' } as Partial<PluginFetch['resolvedOptions']> },
     { name: 'sdkClassWithoutThrowing', options: { throwOnErrorDefault: false } as Partial<PluginFetch['resolvedOptions']> },

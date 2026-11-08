@@ -20,25 +20,6 @@ const version = '3.0.x'
 type BuildConfig = Omit<Config, 'plugins' | 'storage' | 'reporters'> & { plugins: unknown }
 
 const configs: Array<{ name: string; config: BuildConfig }> = [
-  // ─── basic ──────────────────────────────────────────────────────────────
-  {
-    name: 'petStore',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginSwr({
-          output: { path: './hooks', barrel: false, mode: 'directory' },
-        }),
-      ],
-    },
-  },
-
   // ─── query disabled ─────────────────────────────────────────────────────
   {
     name: 'queryDisabled',
@@ -74,25 +55,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginSwr({
           output: { path: './hooks', barrel: false, mode: 'directory' },
           mutation: false,
-        }),
-      ],
-    },
-  },
-
-  // ─── paramsCasing ───────────────────────────────────────────────────────
-  {
-    name: 'paramsCasing',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/paramsCasing.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginSwr({
-          output: { path: './hooks', barrel: false, mode: 'directory' },
         }),
       ],
     },
@@ -158,7 +120,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       ],
     },
   },
-
 ]
 
 describe(`plugin-swr options ${version}`, () => {

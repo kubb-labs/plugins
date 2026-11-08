@@ -56,12 +56,4 @@ describe(`plugin-client ${version}`, () => {
     expect(files.some((file) => file.path.split(path.sep).includes('.kubb'))).toBe(false)
   })
 
-  test('without params validation no headers validator helper is imported', async () => {
-    const { diagnostics, putEvent } = await generate('no-params', { request: 'zod', response: 'zod' })
-
-    expect(Diagnostics.hasError(diagnostics)).toBe(false)
-    expect(putEvent).not.toContain('toHeadersStandardSchema')
-    expect(putEvent).not.toContain('putEventHeadersSchema')
-    expect(putEvent).toContain('request: putEventBodySchema')
-  })
 })

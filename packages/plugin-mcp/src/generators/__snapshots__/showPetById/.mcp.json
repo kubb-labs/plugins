@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "server": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "tsx",
+        "./test/start.ts"
+      ]
+    }
+  }
+}

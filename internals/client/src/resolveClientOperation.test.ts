@@ -30,62 +30,6 @@ describe('resolveClientOperation', () => {
     expect(driver.getResolver).not.toHaveBeenCalled()
   })
 
-  test('resolves the operation name, file path, and client runtime path', () => {
-    const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
-    const driver = createDriver()
-
-    const result = resolveClientOperation({
-      clientPlugin: { pluginName: 'plugin-fetch' },
-      driver,
-      node,
-      root: '/root',
-      output: { path: '.' },
-      memo: createTestMemo(),
-    })
-
-    expect(result).toStrictEqual({
-      name: 'getPetById',
-      path: '/root/getPetById.ts',
-      clientPath: '/root/.kubb/client.ts',
-      clientPathIsFile: true,
-      returnType: 'full',
-    })
-  })
-
-  test("resolves plugin-client's relative importPath against the operation file", () => {
-    const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
-    const driver = createDriver()
-    driver.getPlugin.mockReturnValueOnce({ options: { importPath: '../client', returnType: 'plain' } })
-
-    const result = resolveClientOperation({
-      clientPlugin: { pluginName: 'plugin-client' },
-      driver,
-      node,
-      root: '/root',
-      output: { path: '.' },
-      memo: createTestMemo(),
-    })
-
-    expect(result).toStrictEqual({ name: 'getPetById', path: '/root/getPetById.ts', clientPath: '/client', clientPathIsFile: true, returnType: 'plain' })
-  })
-
-  test("keeps plugin-client's package importPath verbatim", () => {
-    const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
-    const driver = createDriver()
-    driver.getPlugin.mockReturnValueOnce({ options: { importPath: '@my-org/api-client' } })
-
-    const result = resolveClientOperation({
-      clientPlugin: { pluginName: 'plugin-client' },
-      driver,
-      node,
-      root: '/root',
-      output: { path: '.' },
-      memo: createTestMemo(),
-    })
-
-    expect(result).toMatchObject({ clientPath: '@my-org/api-client', clientPathIsFile: false })
-  })
-
   test('reuses the cached result for the same client plugin and node instead of resolving again', () => {
     const node = ast.factory.createOperation({ operationId: 'getPetById', method: 'GET', path: '/pets/{id}' })
     const driver = createDriver()

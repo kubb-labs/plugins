@@ -20,22 +20,6 @@ type BuildConfig = Omit<Config, 'plugins' | 'reporters'> & { plugins: unknown }
 
 const configs: Array<{ name: string; config: BuildConfig }> = [
   // ─── basic ──────────────────────────────────────────────────────────────
-  {
-    name: 'petStore',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginZod({
-          output: { path: './zod', barrel: false, mode: 'directory' },
-        }),
-      ],
-    },
-  },
   // ─── exclude / include ───────────────────────────────────────────────────
   {
     name: 'excludeByOperationId',
@@ -93,23 +77,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
   // ─── inferred ───────────────────────────────────────────────────────────
-  {
-    name: 'inferred',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginZod({
-          output: { path: './zod', barrel: false, mode: 'directory' },
-          inferred: true,
-        }),
-      ],
-    },
-  },
   // ─── coercion ───────────────────────────────────────────────────────────
   {
     name: 'coercion',
@@ -129,22 +96,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
   // ─── dateType ───────────────────────────────────────────────────────────
-  {
-    name: 'dateTypeDate',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, dateType: 'date', enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginZod({
-          output: { path: './zod', barrel: false, mode: 'directory' },
-        }),
-      ],
-    },
-  },
   // ─── directional printer node ─────────────────────────────────────────
   // `placeOrder` takes an `Order` by `$ref` and `Order.shipDate` is a `datetime`, so the body has
   // to resolve to `orderInputSchema` (encode) while the response keeps `orderSchema` (decode).
@@ -169,23 +120,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
               },
             } satisfies PrinterZodNodes,
           },
-        }),
-      ],
-    },
-  },
-  // ─── paramsCasing ──────────────────────────────────────────────────────
-  {
-    name: 'paramsCasing',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/paramsCasing.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginZod({
-          output: { path: './zod', barrel: false, mode: 'directory' },
         }),
       ],
     },

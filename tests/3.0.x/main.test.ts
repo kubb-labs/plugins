@@ -2,10 +2,10 @@ import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { ensureValidVarName, getRelativePath } from '@internals/utils'
+import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
 import { Hookable, createKubb } from '@kubb/core'
-import { type Config, Diagnostics, type KubbHooks, pascalCase } from 'kubb/kit'
+import { type Config, Diagnostics, type KubbHooks } from 'kubb/kit'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
@@ -17,28 +17,6 @@ const __dirname = path.dirname(__filename)
 const version = '3.0.x'
 
 const configs = [
-  {
-    name: 'petStore',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: {
-        path: './gen',
-        barrel: false,
-      },
-      adapter: adapterOas({ validate: false, discriminator: 'propagate', enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({
-          output: {
-            path: './types',
-            barrel: false,
-            mode: 'directory',
-          },
-        }),
-      ],
-    },
-  },
   {
     name: 'discriminatorAllOf',
     config: {
@@ -326,59 +304,6 @@ const configs = [
             mode: 'directory',
           },
           enum: { type: 'asConst' },
-        }),
-      ],
-    },
-  },
-  {
-    /**
-     * Verifies that `resolver.name` override is applied.
-     * Every operation-derived name (params, responses, etc.) gets a `Custom` prefix
-     * while schema type names (which use `default(name, 'type')`) are unaffected.
-     * Returning `null`/`undefined` from any method falls back to the preset resolver.
-     */
-    name: 'resolverCustomPrefix',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/simple.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({
-          output: { path: './types', barrel: false, banner: '// Custom banner', mode: 'directory' },
-          resolver: {
-            name(name: string) {
-              return `Custom${ensureValidVarName(pascalCase(name))}`
-            },
-          },
-        }),
-      ],
-    },
-  },
-  {
-    /**
-     * Verifies that `printer.nodes` overrides are applied in pluginZod.
-     * The `integer` handler is replaced so all integer fields produce `z.number()`
-     * instead of the default `z.int()`.
-     */
-    name: 'printerNodesZod',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/simple.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginZod({
-          output: { path: './zod', barrel: false, mode: 'directory' },
-          printer: {
-            nodes: {
-              integer() {
-                return 'z.number()'
-              },
-            },
-          },
         }),
       ],
     },

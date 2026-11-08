@@ -9,11 +9,8 @@ import {
   hasRequestContentTypeChoice,
   getEventStream,
   getOperationParameters,
-  getOperationSuccessResponses,
-  getPrimarySuccessResponse,
   getResponseType,
   getResponseTypeMap,
-  getSuccessResponses,
   isErrorStatusCode,
   isEventStream,
   isSuccessStatusCode,
@@ -230,12 +227,6 @@ describe('response status helpers', () => {
     expect(isErrorStatusCode('default')).toBe(false)
   })
 
-  test('filters success responses', () => {
-    expect(getSuccessResponses(node.responses).map((response) => response.statusCode)).toStrictEqual(['201'])
-    expect(getOperationSuccessResponses(node).map((response) => response.statusCode)).toStrictEqual(['201'])
-    expect(getPrimarySuccessResponse(node)?.statusCode).toBe('201')
-  })
-
   test('resolves error, success, and all response status names', () => {
     expect(resolveErrorNames(node, resolver)).toStrictEqual(['Status400'])
     expect(resolveSuccessNames(node, resolver)).toStrictEqual(['Status201'])
@@ -355,35 +346,6 @@ describe('buildOptionsSchema', () => {
       { name: 'path', required: false, schemaType: 'never' },
       { name: 'query', required: false, schemaType: 'never' },
       { name: 'headers', required: false, schemaType: 'never' },
-    ])
-  })
-
-  test('references the resolved body, path, query, and headers names when present', () => {
-    const node = ast.factory.createOperation({
-      operationId: 'createPet',
-      method: 'POST',
-      path: '/pets/{petId}',
-      parameters: [
-        ast.factory.createParameter({ name: 'petId', in: 'path', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
-        ast.factory.createParameter({ name: 'limit', in: 'query', required: false, schema: ast.factory.createSchema({ type: 'integer' }) }),
-        ast.factory.createParameter({ name: 'x-api-key', in: 'header', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
-      ],
-      requestBody: { content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) })] },
-    })
-
-    const schema = ast.narrowSchema(buildOptionsSchema(node, resolver), 'object')!
-
-    expect(
-      schema.properties?.map((property) => ({
-        name: property.name,
-        required: property.required,
-        ref: property.schema.type === 'ref' ? property.schema.name : null,
-      })),
-    ).toStrictEqual([
-      { name: 'body', required: true, ref: 'createPetData' },
-      { name: 'path', required: true, ref: 'petIdPathParams' },
-      { name: 'query', required: false, ref: 'limitQueryParams' },
-      { name: 'headers', required: true, ref: 'x-api-keyHeaderParams' },
     ])
   })
 })

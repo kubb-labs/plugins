@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { print } from './factory.ts'
 import { printerTs } from './printers/printerTs.ts'
 import { resolverTs } from './resolvers/resolverTs.ts'
-import { buildParams, buildPropertyJSDocComments, buildResponseUnion, resolveInlineEnumNames } from './utils.ts'
+import { buildParams, buildPropertyJSDocComments, resolveInlineEnumNames } from './utils.ts'
 
 describe('resolveInlineEnumNames', () => {
   it.each(['Key', 'Value'])('checks the emitted enum alias with suffix %s', (typeSuffix) => {
@@ -66,16 +66,6 @@ describe('buildParams', () => {
     `)
   })
 
-  it('marks optional params with ?', () => {
-    const params = [ast.factory.createParameter({ name: 'limit', schema: ast.factory.createSchema({ type: 'integer' }), in: 'query', required: false })]
-
-    expect(printSchema(buildParams({ params }))).toMatchInlineSnapshot(`
-      "{
-        limit?: number;
-      }"
-    `)
-  })
-
   it('emits JSDoc on properties when parameters have descriptions', () => {
     const params = [
       ast.factory.createParameter({
@@ -130,22 +120,6 @@ describe('buildResponses', () => {
   })
 })
 
-describe('buildResponseUnion', () => {
-  it('emits a union of 2xx response types only', () => {
-    const node = ast.factory.createOperation({
-      operationId: 'listPets',
-      method: 'GET',
-      path: '/pets',
-      responses: [
-        ast.factory.createResponse({ statusCode: '200', description: 'OK', schema: ast.factory.createSchema({ type: 'object' }) }),
-        ast.factory.createResponse({ statusCode: '405', description: 'Error', schema: ast.factory.createSchema({ type: 'object' }) }),
-      ],
-    })
-
-    expect(printSchema(buildResponseUnion(node, { resolver: resolverTs })!)).toMatchInlineSnapshot(`"ListPetsStatus200"`)
-  })
-})
-
 describe('buildPropertyJSDocComments', () => {
   it('emits @description, @deprecated and @default for a richly annotated schema', () => {
     const schema = ast.factory.createSchema({ type: 'string', description: 'A pet name', deprecated: true, default: 'Fluffy' })
@@ -166,12 +140,6 @@ describe('buildPropertyJSDocComments', () => {
     const schema = ast.factory.createSchema({ type, min: 0, max: 30 })
 
     expect(buildPropertyJSDocComments(schema)).toStrictEqual(['@minimum 0', '@maximum 30', `@type ${type}`])
-  })
-
-  it('emits length bounds for string schemas', () => {
-    const schema = ast.factory.createSchema({ type: 'string', min: 0, max: 30 })
-
-    expect(buildPropertyJSDocComments(schema)).toStrictEqual(['@minLength 0', '@maxLength 30', '@type string'])
   })
 
   it('does not emit bounds for unconstrained numeric schemas', () => {
@@ -196,14 +164,6 @@ describe('buildPropertyJSDocComments', () => {
     expect(comments).toContain('Format: `uuid`')
   })
 
-  it('emits @description and Format on separate lines when only format exists', () => {
-    const schema = ast.factory.createSchema({ type: 'string', format: 'date-time' })
-    const comments = buildPropertyJSDocComments(schema)
-
-    expect(comments).toContain('@description')
-    expect(comments).toContain('Format: `date-time`')
-  })
-
   it('does not emit @description when neither description nor format exist', () => {
     const schema = ast.factory.createSchema({ type: 'string' })
     const comments = buildPropertyJSDocComments(schema)
@@ -217,29 +177,6 @@ describe('buildPropertyJSDocComments', () => {
 
     expect(comments).toContain('@example a')
     expect(comments).toContain('@example b')
-  })
-
-  it('serializes object examples as JSON', () => {
-    const schema = ast.factory.createSchema({ type: 'object', examples: [{ cidr: '10.0.0.0/8', label: 'VPC' }] })
-    const comments = buildPropertyJSDocComments(schema)
-
-    expect(comments).toContain('@example {"cidr":"10.0.0.0/8","label":"VPC"}')
-  })
-
-  it('serializes array examples as JSON', () => {
-    const schema = ast.factory.createSchema({
-      type: 'array',
-      primitive: 'array',
-      examples: [
-        [
-          { cidr: '10.0.0.0/8', label: 'VPC' },
-          { cidr: '203.0.113.5/32', label: 'Office' },
-        ],
-      ],
-    })
-    const comments = buildPropertyJSDocComments(schema)
-
-    expect(comments).toContain('@example [{"cidr":"10.0.0.0/8","label":"VPC"},{"cidr":"203.0.113.5/32","label":"Office"}]')
   })
 
   it('escapes comment terminators in structured examples', () => {

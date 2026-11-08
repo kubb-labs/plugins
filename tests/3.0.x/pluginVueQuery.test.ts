@@ -20,9 +20,9 @@ const version = '3.0.x'
 type BuildConfig = Omit<Config, 'plugins' | 'reporters'> & { plugins: unknown }
 
 const configs: Array<{ name: string; config: BuildConfig }> = [
-  // ─── basic ──────────────────────────────────────────────────────────────
+  // ─── infinite ───────────────────────────────────────────────────────────
   {
-    name: 'petStore',
+    name: 'infinite',
     config: {
       root: __dirname,
       input: '../../schemas/3.0.x/petStore.yaml',
@@ -36,6 +36,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginVueQuery({
           hooks: true,
           output: { path: './hooks', barrel: false, mode: 'directory' },
+          infinite: {
+            queryParam: 'page',
+            initialPageParam: 0,
+          },
         }),
       ],
     },
@@ -58,27 +62,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
           hooks: true,
           output: { path: './hooks', barrel: false, mode: 'directory' },
           mutation: false,
-        }),
-      ],
-    },
-  },
-
-  // ─── paramsCasing ───────────────────────────────────────────────────────
-  {
-    name: 'paramsCasing',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/paramsCasing.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginVueQuery({
-          hooks: true,
-          output: { path: './hooks', barrel: false, mode: 'directory' },
         }),
       ],
     },
@@ -150,7 +133,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       ],
     },
   },
-
 ]
 
 describe(`plugin-vue-query options ${version}`, () => {

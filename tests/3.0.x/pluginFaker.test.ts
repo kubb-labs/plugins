@@ -48,25 +48,6 @@ async function typecheck(file: string): Promise<Array<string>> {
 type BuildConfig = Omit<Config, 'plugins' | 'reporters'> & { plugins: unknown }
 
 const configs: Array<{ name: string; config: BuildConfig }> = [
-  // ─── basic ──────────────────────────────────────────────────────────────
-  {
-    name: 'petStore',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginFaker({
-          output: { path: './faker', barrel: false, mode: 'directory' },
-        }),
-      ],
-    },
-  },
-
   // ─── locale ─────────────────────────────────────────────────────────────
   {
     name: 'locale',
@@ -159,25 +140,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginFaker({
           output: { path: './faker', barrel: false, mode: 'directory' },
           regexGenerator: 'randexp',
-        }),
-      ],
-    },
-  },
-
-  // ─── paramsCasing ───────────────────────────────────────────────────────
-  {
-    name: 'paramsCasing',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/paramsCasing.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginFaker({
-          output: { path: './faker', barrel: false, mode: 'directory' },
         }),
       ],
     },

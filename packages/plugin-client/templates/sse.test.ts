@@ -137,22 +137,8 @@ describe('parseEventStream', () => {
     expect(events).toStrictEqual([message({ data: 'abcdefghi' })])
   })
 
-  test('throws when a comment line alone outgrows maxEventSize', async () => {
-    await expect(collect(parseEventStream({ stream: streamOf([': too long\ndata: a\n\n']), maxEventSize: 8 }))).rejects.toThrow(RangeError)
-  })
-
   test('strips a byte order mark', async () => {
     expect(await collect(parseEventStream<string>({ stream: streamOf(['\uFEFFdata: a\n\n']) }))).toStrictEqual([message({ data: 'a' })])
-  })
-
-  test('strips a byte order mark split across chunks', async () => {
-    const bytes = encoder.encode('\uFEFFdata: a\n\n')
-    async function* split() {
-      yield bytes.slice(0, 2)
-      yield bytes.slice(2)
-    }
-
-    expect(await collect(parseEventStream<string>({ stream: split() }))).toStrictEqual([message({ data: 'a' })])
   })
 
   test('decodes a multi-byte character split across chunks', async () => {

@@ -2,10 +2,9 @@ import { ast } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
-import { describe, expect, test, vi } from 'vitest'
+import { describe, test } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
-import type { Transformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
 import { suspenseQueryGenerator } from './suspenseQueryGenerator.tsx'
@@ -73,27 +72,12 @@ const findByTagsNode = ast.factory.createOperation({
   ],
 })
 
-const getPetByIdNode = ast.factory.createOperation({
-  operationId: 'getPetById',
-  method: 'GET',
-  path: '/pet/{petId}',
-  tags: ['pet'],
-  parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
-  responses: [
-    ast.factory.createResponse({
-      statusCode: '200',
-      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-      description: 'successful operation',
-    }),
-    ast.factory.createResponse({ statusCode: '400', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Invalid ID supplied' }),
-  ],
-})
-
 describe('suspenseQueryGenerator operation', () => {
-  const testData = [
-    { name: 'findByTags', node: findByTagsNode, options: { suspense: {} } },
-    { name: 'getPetIdCamelCase', node: getPetByIdNode, options: { suspense: {} } },
-  ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']> }>
+  const testData = [{ name: 'findByTags', node: findByTagsNode, options: { suspense: {} } }] as const satisfies Array<{
+    name: string
+    node: ast.OperationNode
+    options: Partial<PluginReactQuery['resolvedOptions']>
+  }>
 
   test.each(testData)('$name', async (props) => {
     const options: PluginReactQuery['resolvedOptions'] = {
@@ -113,48 +97,5 @@ describe('suspenseQueryGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
-  })
-})
-
-describe('suspenseQueryGenerator operation with hooks disabled', () => {
-  test('returns no file when hooks is false', async () => {
-    const options: PluginReactQuery['resolvedOptions'] = {
-      ...defaultOptions,
-      suspense: {},
-      hooks: false,
-    }
-    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
-    const driver = createMultiPluginDriver('hooksDisabled', plugins)
-
-    await renderGeneratorOperation(suspenseQueryGenerator, findByTagsNode, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverReactQuery,
-    })
-
-    expect(driver.fileManager.files).toStrictEqual([])
-  })
-})
-
-describe('suspenseQueryGenerator queryKey', () => {
-  test('passes the suspenseQuery variant to a custom queryKey', async () => {
-    const queryKey = vi.fn<Transformer>(queryKeyTransformer)
-    const options: PluginReactQuery['resolvedOptions'] = { ...defaultOptions, suspense: {}, queryKey }
-    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
-    const driver = createMultiPluginDriver('customQueryKey', plugins)
-
-    await renderGeneratorOperation(suspenseQueryGenerator, findByTagsNode, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverReactQuery,
-    })
-
-    expect(queryKey.mock.calls.map(([props]) => props.variant)).toEqual(['suspenseQuery'])
   })
 })

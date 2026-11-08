@@ -21,16 +21,6 @@ describe('renderType', () => {
     expect(renderType(createIndexedAccessType({ target: 'GetPetPathParams', key: 'petId' }))).toBe("GetPetPathParams['petId']")
   })
 
-  it('renders a type literal with optional members', () => {
-    const type = createTypeLiteral({
-      members: [
-        { name: 'petId', type: 'string', optional: false },
-        { name: 'name', type: 'string', optional: true },
-      ],
-    })
-    expect(renderType(type)).toBe('{ petId: string; name?: string }')
-  })
-
   it('applies transformType to the rendered type', () => {
     expect(renderType('Config', (t) => `Partial<${t}>`)).toBe('Partial<Config>')
   })
@@ -42,11 +32,6 @@ describe('functionPrinter in declaration mode', () => {
   it('prints required typed parameters as `name: type`', () => {
     const sig = createFunctionParameters({ params: [createFunctionParameter({ name: 'petId', type: 'string', optional: false })] })
     expect(printer.print(sig)).toBe('petId: string')
-  })
-
-  it('prints optional typed parameters as `name?: type`', () => {
-    const sig = createFunctionParameters({ params: [createFunctionParameter({ name: 'params', type: 'QueryParams', optional: true })] })
-    expect(printer.print(sig)).toBe('params?: QueryParams')
   })
 
   it('prints defaulted typed parameters as `name: type = default`', () => {

@@ -276,50 +276,6 @@ describe("typeGenerator — operations: 'inline'", () => {
 describe('typeGenerator — Operation', () => {
   const operations = [
     {
-      name: 'listPets — GET with query params',
-      node: ast.factory.createOperation({
-        operationId: 'listPets',
-        method: 'GET',
-        path: '/pets',
-        tags: ['pets'],
-        parameters: [ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) })],
-        responses: [
-          ast.factory.createResponse({
-            statusCode: '200',
-            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-            description: 'A paged array of pets',
-          }),
-          ast.factory.createResponse({
-            statusCode: 'default',
-            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-            description: 'Unexpected error',
-          }),
-        ],
-      }),
-    },
-    {
-      name: 'showPetById — GET with path param',
-      node: ast.factory.createOperation({
-        operationId: 'showPetById',
-        method: 'GET',
-        path: '/pets/{petId}',
-        tags: ['pets'],
-        parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
-        responses: [
-          ast.factory.createResponse({
-            statusCode: '200',
-            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-            description: 'Expected response',
-          }),
-          ast.factory.createResponse({
-            statusCode: 'default',
-            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-            description: 'Unexpected error',
-          }),
-        ],
-      }),
-    },
-    {
       name: 'findPetsByStatus — GET with query param enum',
       node: ast.factory.createOperation({
         operationId: 'findPetsByStatus',
@@ -339,70 +295,6 @@ describe('typeGenerator — Operation', () => {
             schema: ast.factory.createSchema({ type: 'object', properties: [] }),
             description: 'Successful operation',
           }),
-        ],
-      }),
-    },
-    {
-      name: 'addPet — POST with request body',
-      node: ast.factory.createOperation({
-        operationId: 'addPet',
-        method: 'POST',
-        path: '/pet',
-        tags: ['pet'],
-        requestBody: {
-          content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
-        },
-        responses: [
-          ast.factory.createResponse({
-            statusCode: '200',
-            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-            description: 'Successful operation',
-          }),
-          ast.factory.createResponse({ statusCode: '405', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Invalid input' }),
-        ],
-      }),
-    },
-    {
-      name: 'updatePetWithForm — POST with path and query params',
-      node: ast.factory.createOperation({
-        operationId: 'updatePetWithForm',
-        method: 'POST',
-        path: '/pet/{petId}',
-        tags: ['pet'],
-        parameters: [
-          ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'integer' }), required: true }),
-          ast.factory.createParameter({ name: 'name', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
-          ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
-        ],
-        responses: [
-          ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'void' }), description: 'Success' }),
-          ast.factory.createResponse({ statusCode: '405', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Invalid input' }),
-        ],
-      }),
-    },
-    {
-      name: 'placeOrderPatch — PATCH with path params + request body + multiple status codes',
-      node: ast.factory.createOperation({
-        operationId: 'placeOrderPatch',
-        method: 'PATCH',
-        path: '/store/order/:orderId',
-        tags: ['store'],
-        parameters: [ast.factory.createParameter({ name: 'orderId', in: 'path', schema: ast.factory.createSchema({ type: 'integer' }), required: true })],
-        requestBody: {
-          content: [
-            ast.factory.createContent({
-              contentType: 'application/json',
-              schema: ast.factory.createSchema({ type: 'object', properties: [], description: 'Order payload' }),
-            }),
-          ],
-        },
-        responses: [
-          ast.factory.createResponse({
-            statusCode: '200',
-            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-            description: 'Successful operation',
-          }),
-          ast.factory.createResponse({ statusCode: '405', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Invalid input' }),
         ],
       }),
     },

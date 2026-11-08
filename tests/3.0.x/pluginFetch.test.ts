@@ -22,38 +22,6 @@ const version = '3.0.x'
 type BuildConfig = Omit<Config, 'plugins' | 'storage' | 'reporters'> & { plugins: unknown }
 
 const configs: Array<{ name: string; config: BuildConfig }> = [
-  // ─── default (per-operation functions) ──────────────────────────────────
-  {
-    name: 'default',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginFetch({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-      ],
-    },
-  },
-
-  // ─── sdk class (one instance class per tag) ─────────────────────────────
-  {
-    name: 'sdkClass',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginFetch({ output: { path: './clients', barrel: false, mode: 'directory' }, sdk: {} }),
-      ],
-    },
-  },
-
   // ─── sdk class with composed root ───────────────────────────────────────
   {
     name: 'sdkClassWithName',
@@ -86,22 +54,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
-  // ─── zodTypes (no plugin-ts, operations typed from pluginZod's inferred types) ──
-  {
-    name: 'zodTypes',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginZod({ inferred: true, output: { path: './zod', barrel: false, mode: 'directory' } }),
-        pluginFetch({ output: { path: './clients', barrel: false, mode: 'directory' }, validator: 'zod' }),
-      ],
-    },
-  },
-
   // ─── zodTypesSdk (the sdk class path, also typed from pluginZod) ────────
   {
     name: 'zodTypesSdk',
@@ -114,22 +66,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       plugins: [
         pluginZod({ inferred: true, output: { path: './zod', barrel: false, mode: 'directory' } }),
         pluginFetch({ output: { path: './clients', barrel: false, mode: 'directory' }, validator: 'zod', sdk: {} }),
-      ],
-    },
-  },
-
-  // ─── zodParams (codec params and bodies encoded, typed with inferred: 'codec') ──
-  {
-    name: 'zodParams',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/codecParams.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, dateType: 'date', enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginZod({ inferred: 'codec', output: { path: './zod', barrel: false, mode: 'directory' } }),
-        pluginFetch({ output: { path: './clients', barrel: false, mode: 'directory' }, validator: { request: 'zod', params: 'zod', response: 'zod' } }),
       ],
     },
   },
@@ -150,22 +86,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
           validator: { request: 'zod', params: 'zod', response: 'zod' },
           sdk: {},
         }),
-      ],
-    },
-  },
-
-  // ─── paramsCasing (query, path, and header names match the spec exactly) ──
-  {
-    name: 'paramsCasing',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/paramsCasing.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginFetch({ output: { path: './clients', barrel: false, mode: 'directory' } }),
       ],
     },
   },

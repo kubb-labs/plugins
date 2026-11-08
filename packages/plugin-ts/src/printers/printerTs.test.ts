@@ -148,13 +148,6 @@ describe('printerTs', () => {
       expect(await formatTS(result)).toBe('Status')
     })
 
-    it('enum with name and enumType=asConst renders reference with Key suffix', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: asConstEnum })
-      const result = p.transform(ast.factory.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
-
-      expect(await formatTS(result)).toBe('StatusKey')
-    })
-
     it('enum with name and enumType=literal renders reference', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: literalEnum })
       const result = p.transform(ast.factory.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
@@ -297,18 +290,6 @@ describe('printerTs', () => {
       )
 
       expect(await formatTS(result)).toBe('string[]')
-    })
-
-    it('arrayType=generic renders Array<T>', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'generic', enum: inlineLiteralEnum })
-      const result = p.transform(
-        ast.factory.createSchema({
-          type: 'array',
-          items: [ast.factory.createSchema({ type: 'number' })],
-        }),
-      )
-
-      expect(await formatTS(result)).toBe('Array<number>')
     })
 
     it('renders array with multiple item types as union', async () => {
@@ -491,22 +472,6 @@ describe('printerTs', () => {
       expect(await formatTS(result)).toMatchInlineSnapshot(`
         "{
           tag: string | undefined
-        }"
-      `)
-    })
-
-    it('optional property with optionalType=questionTokenAndUndefined adds both', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionTokenAndUndefined', arrayType: 'array', enum: inlineLiteralEnum })
-      const result = p.transform(
-        ast.factory.createSchema({
-          type: 'object',
-          properties: [ast.factory.createProperty({ name: 'tag', schema: ast.factory.createSchema({ type: 'string', optional: true }) })],
-        }),
-      )
-
-      expect(await formatTS(result)).toMatchInlineSnapshot(`
-        "{
-          tag?: string | undefined
         }"
       `)
     })

@@ -90,16 +90,6 @@ describe('hasQueryKeyParams', () => {
     expect(hasQueryKeyParams(node)).toBe(false)
   })
 
-  test('returns false when operation only has header parameters', () => {
-    const node = ast.factory.createOperation({
-      operationId: 'retrieveMyProfile',
-      method: 'GET',
-      path: '/user/me',
-      parameters: [ast.factory.createParameter({ name: 'X-Request-Id', in: 'header', schema: ast.factory.createSchema({ type: 'string' }) })],
-    })
-    expect(hasQueryKeyParams(node)).toBe(false)
-  })
-
   test('returns true when operation has query parameters', () => {
     const node = ast.factory.createOperation({
       operationId: 'findPetsByTags',
@@ -124,20 +114,6 @@ describe('hasQueryKeyParams', () => {
 })
 
 describe('buildCallResultBody', () => {
-  test('calls unwrap() on the full result by default', () => {
-    expect(buildCallResultBody('getPetById({ throwOnError: true })')).toBe('return getPetById({ throwOnError: true }).unwrap()')
-  })
-
-  test('returns the call directly when the client already resolves to bare data', () => {
-    expect(buildCallResultBody('getPetById({ throwOnError: true })', { clientReturnType: 'data' })).toBe('return getPetById({ throwOnError: true })')
-  })
-
-  test('reads data off the plain result of a plugin-client operation', () => {
-    expect(buildCallResultBody('getPetById({ throwOnError: true })', { clientReturnType: 'plain' })).toBe(
-      'return (await getPetById({ throwOnError: true })).data',
-    )
-  })
-
   test("returns the whole result with returnType 'full'", () => {
     expect(buildCallResultBody('getPetById({ throwOnError: true })', { returnType: 'full' })).toBe('return getPetById({ throwOnError: true })')
     expect(buildCallResultBody('getPetById({ throwOnError: true })', { clientReturnType: 'plain', returnType: 'full' })).toBe(

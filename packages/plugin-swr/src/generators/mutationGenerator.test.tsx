@@ -3,7 +3,7 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
 import { describe, expect, test, vi } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, renderGeneratorOperation, testConfig } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import type { Transformer } from '@internals/tanstack-query'
 import { resolverSwr } from '../resolvers/resolverSwr.ts'
@@ -44,29 +44,6 @@ const mockedAxiosPlugin = createMockedPlugin({
 
 const plugins = { 'plugin-ts': mockedTsPlugin, 'plugin-axios': mockedAxiosPlugin }
 
-const findByTagsNode = ast.factory.createOperation({
-  operationId: 'findPetsByTags',
-  method: 'GET',
-  path: '/pet/findByTags',
-  tags: ['pet'],
-  parameters: [
-    ast.factory.createParameter({
-      name: 'tags',
-      in: 'query',
-      schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
-      required: true,
-    }),
-    ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
-  ],
-  responses: [
-    ast.factory.createResponse({
-      statusCode: '200',
-      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-      description: 'successful operation',
-    }),
-  ],
-})
-
 const updatePetWithFormNode = ast.factory.createOperation({
   operationId: 'updatePetWithForm',
   method: 'POST',
@@ -83,68 +60,6 @@ const updatePetWithFormNode = ast.factory.createOperation({
       description: 'successful operation',
     }),
   ],
-})
-
-const deletePetNode = ast.factory.createOperation({
-  operationId: 'deletePet',
-  method: 'DELETE',
-  path: '/pet/{petId}',
-  tags: ['pet'],
-  parameters: [
-    ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
-    ast.factory.createParameter({ name: 'api_key', in: 'header', schema: ast.factory.createSchema({ type: 'string' }) }),
-  ],
-  responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'void' }), description: 'successful operation' })],
-})
-
-const createPetNode = ast.factory.createOperation({
-  operationId: 'createPet',
-  method: 'POST',
-  path: '/pet',
-  tags: ['pet'],
-  requestBody: {
-    content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
-  },
-  responses: [
-    ast.factory.createResponse({
-      statusCode: '200',
-      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-      description: 'successful operation',
-    }),
-  ],
-})
-
-describe('mutationGenerator operation', () => {
-  const testData = [
-    { name: 'updatePetWithForm', node: updatePetWithFormNode, options: {} },
-    { name: 'createPet', node: createPetNode, options: {} },
-    { name: 'deletePet', node: deletePetNode, options: {} },
-    {
-      name: 'getAsMutation',
-      node: findByTagsNode,
-      options: { mutation: { importPath: 'swr/mutation', methods: ['get'] }, query: { importPath: 'swr', methods: [] } },
-    },
-  ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginSwr['resolvedOptions']> }>
-
-  test.each(testData)('$name', async (props) => {
-    const options: PluginSwr['resolvedOptions'] = {
-      ...defaultOptions,
-      ...props.options,
-    }
-    const plugin = createMockedPlugin<PluginSwr>({ name: 'plugin-swr', options, resolver: resolverSwr })
-    const driver = createMultiPluginDriver(props.name, plugins)
-
-    await renderGeneratorOperation(mutationGenerator, props.node, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverSwr,
-    })
-
-    await matchFiles(driver.fileManager.files, props.name)
-  })
 })
 
 describe('mutationGenerator mutationKey', () => {

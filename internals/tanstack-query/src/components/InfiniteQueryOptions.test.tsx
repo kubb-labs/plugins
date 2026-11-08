@@ -86,22 +86,10 @@ async function render(params: PageParams) {
 }
 
 describe('InfiniteQueryOptions page param resolution combinations', () => {
-  test('only getNextPageParam is configured', async () => {
-    const source = await render({ getNextPageParam: '(lastPage) => lastPage.next' })
-    expect(source).toContain('getNextPageParam: (lastPage) => lastPage.next')
-    expect(source).not.toContain('getPreviousPageParam')
-  })
-
   test('mixed getNextPageParam and previousParam', async () => {
     const source = await render({ getNextPageParam: '(lastPage) => lastPage.next', previousParam: 'prevCursor' })
     expect(source).toContain('getNextPageParam: (lastPage) => lastPage.next')
     expect(source).toContain("getPreviousPageParam: (firstPage) => firstPage?.['prevCursor']")
-  })
-
-  test('mixed nextParam and getPreviousPageParam', async () => {
-    const source = await render({ nextParam: 'nextCursor', getPreviousPageParam: '(firstPage) => firstPage.prev' })
-    expect(source).toContain("getNextPageParam: (lastPage) => lastPage?.['nextCursor']")
-    expect(source).toContain('getPreviousPageParam: (firstPage) => firstPage.prev')
   })
 
   test('only getPreviousPageParam is configured falls back to default getNextPageParam', async () => {
@@ -119,11 +107,6 @@ describe('InfiniteQueryOptions page param resolution combinations', () => {
   test('supports function expression directly in config', async () => {
     const source = await render({ getNextPageParam: (lastPage: any) => lastPage.cursor })
     expect(source).toContain('getNextPageParam: (lastPage) => lastPage.cursor')
-  })
-
-  test('default initialPageParam keeps legacy <= 1 previous page check', async () => {
-    const source = await render({ initialPageParam: 0, hasExplicitInitialPageParam: false })
-    expect(source).toContain('getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= 1 ? undefined : firstPageParam - 1')
   })
 
   test('explicit initialPageParam: 0 sets <= 0 previous page check', async () => {

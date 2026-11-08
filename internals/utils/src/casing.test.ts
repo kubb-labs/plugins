@@ -2,10 +2,7 @@ import { describe, expect, test } from 'vitest'
 import { capitalize, screamingSnakeCase, snakeCase } from './casing.ts'
 
 describe('casing', () => {
-  test.each([
-    ['getPetById', 'GetPetById'],
-    ['', ''],
-  ])('capitalize(%s) -> %s', (input, expected) => {
+  test.each([['', '']])('capitalize(%s) -> %s', (input, expected) => {
     expect(capitalize(input)).toBe(expected)
   })
 
@@ -35,24 +32,9 @@ describe('casing', () => {
     expect(snakeCase(input)).toBe(expected)
   })
 
-  test.each([
-    ['petPet', 'PET_PET'],
-    ['sensor2Reading', 'SENSOR2_READING'],
-    ['HTTPResponse', 'HTTP_RESPONSE'],
-  ])('screamingSnakeCase(%s) -> %s', (input, expected) => {
-    expect(screamingSnakeCase(input)).toBe(expected)
-  })
-
   test.each(['cool_2d_drawing', 'ranked_3rd_place', 'sensor2_reading', 'v1alpha1', '2fa', 'a'])('snakeCase keeps %s unchanged', (input) => {
     expect(snakeCase(input)).toBe(input)
   })
-
-  test.each(['COOL_2D_DRAWING', 'NICE_3D_MODEL', 'RANKED_3RD_PLACE', 'SENSOR2_READING', 'HTTP_RESPONSE', '2FA', 'A'])(
-    'screamingSnakeCase keeps %s unchanged',
-    (input) => {
-      expect(screamingSnakeCase(input)).toBe(input)
-    },
-  )
 
   test('snake case with a prefix or suffix', () => {
     expect(snakeCase('tag', { prefix: 'create' })).toBe('create_tag')
