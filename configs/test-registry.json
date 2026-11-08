@@ -1,4 +1,5 @@
 {
+  "internals/client/src/builders/callConfig.test.ts": "Regression #1332: a response that mixes a binary body with an event stream gets a content-type map, not one responseType.",
   "internals/client/src/builders/security.test.ts": "Branchy scheme resolver: basic, digest, apiKey in body, $ref, global fallback; snapshots cover only three happy paths.",
   "internals/client/src/builders/styles.test.ts": "Branchy: key quoting, allowReserved only for query, querystring flag, body encoding; pins the #1348 regression.",
   "internals/client/src/builders/validator.test.ts": "Branchy hook wiring per validator form; 3.0.x zodParams snapshots cover only zod and the full object.",
