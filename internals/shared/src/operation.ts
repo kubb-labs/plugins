@@ -308,8 +308,11 @@ export function resolveContentTypeVariants(entries: Array<ContentVariantInput>, 
 }
 
 // The request groups come from the grouped params, so `config` drops the data-shape keys to stay
-// assignable to `Options`, which omits them from `RequestConfig`.
-const requestConfigBaseType = `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`
+// assignable to `Options`, which omits them from `RequestConfig`. `cookies` is a group only on an operation that declares one.
+function requestConfigBaseType(node: ast.OperationNode): string {
+  const cookies = getOperationParameters(node).cookie.length > 0 ? ` | 'cookies'` : ''
+  return `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers'${cookies} | 'url'>>`
+}
 
 export function buildRequestConfigType(node: ast.OperationNode): string {
   const request = getContentTypeInfo(node)
@@ -322,7 +325,8 @@ export function buildRequestConfigType(node: ast.OperationNode): string {
     response.isMultipleContentTypes ? `response?: ${response.contentTypeUnion}` : null,
   ].filter(Boolean)
 
-  return members.length ? `${requestConfigBaseType} & { contentType?: { ${members.join('; ')} } }` : requestConfigBaseType
+  const base = requestConfigBaseType(node)
+  return members.length ? `${base} & { contentType?: { ${members.join('; ')} } }` : base
 }
 
 /**
@@ -331,9 +335,12 @@ export function buildRequestConfigType(node: ast.OperationNode): string {
  * `contentType?:` member: query hooks wrap GET operations, which carry no request body to select a
  * content type for.
  */
-export function buildClientOptionType(): string {
-  return requestConfigBaseType
+export function buildClientOptionType(node: ast.OperationNode): string {
+  return requestConfigBaseType(node)
 }
+
+/** The grouped request options, in the order generated signatures and calls list them. */
+export const requestGroupOrder = ['path', 'query', 'body', 'headers', 'cookies'] as const
 
 export type RequestGroups = {
   path: boolean
@@ -362,7 +369,6 @@ export type RequestGroupOptionality = {
   hasRequiredPath: boolean
   hasRequiredQuery: boolean
   hasRequiredHeader: boolean
-  hasRequiredCookie: boolean
   /**
    * Whether the grouped request parameter can default to `{}`. True only when no group carries a
    * required member, so every member is safe to omit.
@@ -377,19 +383,18 @@ export type RequestGroupOptionality = {
  */
 export function getRequestGroupOptionality(node: ast.OperationNode): RequestGroupOptionality {
   const groups = getRequestGroups(node)
-  const { path, query, header, cookie } = getOperationParameters(node)
+  const { path, query, header } = getOperationParameters(node)
   const hasRequiredPath = path.some((param) => param.required)
   const hasRequiredQuery = query.some((param) => param.required)
   const hasRequiredHeader = header.some((param) => param.required)
-  const hasRequiredCookie = cookie.some((param) => param.required)
 
   return {
     groups,
     hasRequiredPath,
     hasRequiredQuery,
     hasRequiredHeader,
-    hasRequiredCookie,
-    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !hasRequiredCookie && !groups.body,
+    // `cookies` never makes the parameter required: a browser sends its cookies itself and cannot set a `Cookie` header.
+    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !groups.body,
   }
 }
 
@@ -409,11 +414,11 @@ export function buildRequestParamsSignature(
   node: ast.OperationNode,
   resolver: RequestOptionsNameResolver,
   options: { isConfigurable?: boolean } = {},
-): { signature: string; groups: RequestGroups } {
+): { signature: string; groups: RequestGroups; names: Array<keyof RequestGroups> } {
   const { isConfigurable = true } = options
   const { groups, isOptional } = getRequestGroupOptionality(node)
 
-  const names = (['path', 'query', 'body', 'headers', 'cookies'] as const).filter((key) => groups[key])
+  const names = requestGroupOrder.filter((key) => groups[key])
 
   // These callers never carry the `contentType` that several media types require.
   const optionsType = hasRequestContentTypeChoice(node)
@@ -425,6 +430,7 @@ export function buildRequestParamsSignature(
   return {
     signature: [firstParam, configParam].filter(Boolean).join(', '),
     groups,
+    names,
   }
 }
 
@@ -512,7 +518,7 @@ export function castToClientOptions(callArg: string, clientName: string, returnT
 /**
  * Builds the combined `{ body, path, query, headers, cookies }` options object schema for an operation,
  * referencing the already-resolved body and grouped param names. `cookies` appears only when the operation
- * declares a cookie parameter, the other groups always. Shared by `@kubb/plugin-ts`'s `Options` type and
+ * declares a cookie parameter, and is always optional. The other groups appear always. Shared by `@kubb/plugin-ts`'s `Options` type and
  * `@kubb/plugin-zod`'s inferred options schema, so both printers emit the same shape from the same inputs.
  * `primitive: 'object'` is a no-op for the TS printer and tells the Zod printer to emit `z.object(…)` rather
  * than a record.
@@ -542,7 +548,8 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
         ...groups
           .filter(({ name, params }) => name !== 'cookies' || params.length > 0)
           .map(({ name, params, resolve }) => {
-            const required = params.some((param) => param.required)
+            // `cookies` stays optional, since a browser sends its cookies itself.
+            const required = name !== 'cookies' && params.some((param) => param.required)
 
             return ast.factory.createProperty({
               name,

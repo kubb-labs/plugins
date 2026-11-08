@@ -35,8 +35,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
     const hook = resolveHookFile(node, ctx, { name: mutationHookName, output, group, contractOp, returnType: ctx.options.returnType })
 
     // The contract body unwraps each request group with `toValue()`, so it needs the runtime import.
-    const groups = getRequestGroups(node)
-    const hasRequestGroups = groups.path || groups.query || groups.body || groups.headers || groups.cookies
+    const hasRequestGroups = Object.values(getRequestGroups(node)).some(Boolean)
 
     return (
       <HookFile

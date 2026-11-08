@@ -41,7 +41,7 @@ export function findPetsByTagsQueryOptions(
       'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
     }
   },
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsQueryKey({ query })
   return queryOptions<Array<Pet>, ResponseErrorConfig<unknown>, Array<Pet>, typeof queryKey>({

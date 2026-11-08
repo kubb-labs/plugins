@@ -100,6 +100,16 @@ describe('hasQueryKeyParams', () => {
     expect(hasQueryKeyParams(node)).toBe(false)
   })
 
+  test('returns true when operation has cookie parameters', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'getPrefs',
+      method: 'GET',
+      path: '/prefs',
+      parameters: [ast.factory.createParameter({ name: 'theme', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }) })],
+    })
+    expect(hasQueryKeyParams(node)).toBe(true)
+  })
+
   test('returns true when operation has query parameters', () => {
     const node = ast.factory.createOperation({
       operationId: 'findPetsByTags',

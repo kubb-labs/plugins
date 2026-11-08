@@ -53,8 +53,11 @@ describe('createAxiosTransport', () => {
     const none = createClientCore({ defaultTransport: fakeAxios({ data: '', status: 204, statusText: 'No Content' }).transport })
     const empty = createClientCore({ defaultTransport: fakeAxios({ data: '', headers: { 'content-type': 'text/plain' } }).transport })
 
+    const emptyJson = createClientCore({ defaultTransport: fakeAxios({ data: '', headers: { 'content-type': 'application/json' } }).transport })
+
     expect(await none({ method: 'DELETE', url: '/pet/1' })).toMatchObject({ status: 204, data: undefined, error: undefined })
     expect(await empty({ method: 'GET', url: '/pet/1' })).toMatchObject({ status: 200, data: '' })
+    expect(await emptyJson({ method: 'GET', url: '/pet/1' })).toMatchObject({ status: 200, data: undefined })
   })
 
   test('resolves every status so the core splits success from error', async () => {
@@ -88,6 +91,16 @@ describe('createAxiosTransport', () => {
     await client({ method: 'GET', url })
 
     expect(sent).toStrictEqual(['include', 'omit', 'same-origin', 'same-origin', 'include'])
+  })
+
+  test('passes credentials as is when an adapter list resolves to fetch', async () => {
+    const sent: Array<RequestCredentials> = []
+    const fetch = async (input: Request) => (sent.push(input.credentials), new Response('{}', { headers: { 'content-type': 'application/json' } }))
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: ['fetch', 'xhr'], env: { fetch } })) })
+
+    await client({ method: 'GET', url: 'https://petstore.dev/pet', credentials: 'same-origin' })
+
+    expect(sent).toStrictEqual(['same-origin'])
   })
 
   test('maps credentials onto withCredentials for the other adapters, and sends omit through fetch in the browser', async () => {
@@ -156,11 +169,18 @@ describe('createAxiosTransport', () => {
     expect(new Uint8Array(await (node.data as Blob).arrayBuffer())).toStrictEqual(new Uint8Array(png))
   })
 
-  test('decodes a text-mode error body by its content type, as the fetch transport does', async () => {
-    const { transport } = fakeAxios({ data: '{"message":"gone"}', status: 404, headers: { 'content-type': 'application/json' } })
+  test('keeps a text-mode error body as text, as the fetch transport does', async () => {
+    const { transport } = fakeAxios({ data: '404', status: 404, headers: { 'content-type': 'application/json' } })
     const client = createClientCore({ defaultTransport: transport, throwOnError: false })
 
-    expect((await client({ method: 'GET', url: '/pet', responseType: 'text' })).error).toStrictEqual({ message: 'gone' })
+    expect((await client({ method: 'GET', url: '/pet', responseType: 'text' })).error).toBe('404')
+  })
+
+  test('keeps the bytes of a failed blob call whose content type the runtime does not know', async () => {
+    const { transport } = fakeAxios({ data: Buffer.from([1, 2, 3]), status: 500, headers: { 'content-type': 'application/vnd.custom' } })
+    const client = createClientCore({ defaultTransport: transport, throwOnError: false })
+
+    expect((await client({ method: 'GET', url: '/image', responseType: 'blob' })).error).toBeInstanceOf(Uint8Array)
   })
 
   test('decodes the error body of a blob call on every adapter, instead of returning bytes', async () => {

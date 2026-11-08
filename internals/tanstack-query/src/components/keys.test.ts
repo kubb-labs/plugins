@@ -38,6 +38,17 @@ describe('queryKeyTransformer', () => {
     expect(keys('infiniteQuery', node)).toEqual(["{ url: '/pet/search', infinite: true }", '...(body !== undefined ? [body] : [])'])
   })
 
+  test('adds the cookies under their own name, so they cannot match a query', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'getPrefs',
+      method: 'GET',
+      path: '/prefs',
+      parameters: [ast.factory.createParameter({ name: 'theme', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }) })],
+    })
+
+    expect(keys('query', node)).toEqual(["{ url: '/prefs' }", '...(cookies ? [{ cookies }] : [])'])
+  })
+
   test('keeps a falsy body in the key of a QUERY operation', () => {
     const node = ast.factory.createOperation({
       operationId: 'searchPets',

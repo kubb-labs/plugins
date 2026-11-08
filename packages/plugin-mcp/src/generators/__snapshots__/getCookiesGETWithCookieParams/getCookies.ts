@@ -10,7 +10,7 @@ import { getCookies } from './clients/getCookies'
 /**
  * {@link /cookies}
  */
-export async function getCookiesHandler({ cookies }: GetCookiesOptions, ctx: ServerContext): Promise<CallToolResult> {
+export async function getCookiesHandler({ cookies }: GetCookiesOptions = {}, ctx: ServerContext): Promise<CallToolResult> {
   const res = await getCookies({ cookies, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {

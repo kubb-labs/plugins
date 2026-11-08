@@ -31,7 +31,7 @@ export function getPetByIdQueryOptions(
     query?: never
     headers?: never
   },
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = getPetByIdQueryKey({ path })
   return queryOptions<Omit<NonNullable<Pet>, 'name'>, ResponseErrorConfig<unknown | unknown>, Omit<NonNullable<Pet>, 'name'>, typeof queryKey>({

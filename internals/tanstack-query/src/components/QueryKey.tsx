@@ -41,7 +41,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
  */
 export const queryKeyTransformer: Transformer = ({ node, variant }) => {
   if (!node.path) return []
-  const { path, query } = getOperationParameters(node)
+  const { path, query, cookie } = getOperationParameters(node)
   // Embedding `infinite: true` inside the URL segment separates infinite queries in the cache
   // while preserving TanStack Query partial matching for base URL invalidation.
   const isInfinite = variant === 'infiniteQuery' || variant === 'suspenseInfiniteQuery'
@@ -54,6 +54,8 @@ export const queryKeyTransformer: Transformer = ({ node, variant }) => {
   if (query.length > 0) result.push('...(query ? [query] : [])')
   // A falsy body (`''`, `0`, `false`, `null`) is still an input, so only an absent one is left out.
   if (node.requestBody?.content?.[0]?.schema) result.push('...(body !== undefined ? [body] : [])')
+  // Wrapped, so a cookies-only key cannot match a query-only key.
+  if (cookie.length > 0) result.push('...(cookies ? [{ cookies }] : [])')
 
   return result
 }

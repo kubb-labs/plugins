@@ -15,7 +15,7 @@ export const findPetsByStatusQueryKey = ({ query }: { query?: MaybeRefOrGetter<O
 
 export type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
-export function findPetsByStatusQueryOptions({ query }: { query?: MaybeRefOrGetter<FindPetsByStatusOptions['query']> } = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>> = {}) {
+export function findPetsByStatusQueryOptions({ query }: { query?: MaybeRefOrGetter<FindPetsByStatusOptions['query']> } = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = findPetsByStatusQueryKey({ query })
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200>({
    queryKey,

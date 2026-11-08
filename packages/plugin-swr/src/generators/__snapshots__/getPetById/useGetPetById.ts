@@ -14,10 +14,7 @@ export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdOptions, 'headers'>)
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
-export function getPetByIdQueryOptions(
-  { path }: GetPetByIdOptions,
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>> = {},
-) {
+export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
       return getPetById({ ...config, path, throwOnError: true }).unwrap()

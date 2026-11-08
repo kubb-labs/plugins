@@ -258,10 +258,15 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
   async function* events(): AsyncGenerator<TEvent> {
     if (!isStreamBody(body)) return
     // A consumer `break` or a failed event closes this loop, which cancels the reader.
-    for await (const event of parseEventStream({ stream: body, maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })) {
-      yield (await validateEvent(options.transform ? options.transform(event) : event)) as TEvent
-      // A chunk may hold events past the one the consumer aborted on. The loop ends before the parser reads on, so `lastEventId` stays at the event the consumer saw.
-      if (options.signal?.aborted) throw options.signal.reason
+    try {
+      for await (const event of parseEventStream({ stream: body, maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })) {
+        yield (await validateEvent(options.transform ? options.transform(event) : event)) as TEvent
+        // A chunk may hold events past the one the consumer aborted on. The loop ends before the parser reads on, so `lastEventId` stays at the event the consumer saw.
+        if (options.signal?.aborted) throw options.signal.reason
+      }
+    } catch (error) {
+      // A transport reports an abort in its own error type, such as axios's `CanceledError`, so rethrow the signal's reason instead.
+      throw options.signal?.aborted ? options.signal.reason : error
     }
   }
 

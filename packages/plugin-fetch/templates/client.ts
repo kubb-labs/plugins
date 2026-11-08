@@ -62,8 +62,11 @@ async function parseResponse(response: Response, responseType?: ResponseType | R
 
   const contentType = response.headers.get('Content-Type')
   const requested = resolveResponseType(responseType, contentType)
-  // An error body, and a JSON answer to a streamed operation, are decoded by their content type. Any other body keeps the requested type.
-  const type = !response.ok || (requested === 'stream' && isJsonMediaType(contentType)) ? resolveResponseType(undefined, contentType) : requested
+  const detected = resolveResponseType(undefined, contentType)
+  // A streamed call answered with JSON or an error is decoded by its content type. A failed blob or arraybuffer call is too,
+  // when the runtime knows the type, so `error` is the error object; an unknown type, which a codec may own, keeps the bytes.
+  const binaryError = !response.ok && (requested === 'blob' || requested === 'arraybuffer')
+  const type = requested === 'stream' && (!response.ok || isJsonMediaType(contentType)) ? detected : binaryError ? (detected ?? requested) : requested
   switch (type) {
     case 'text':
     case 'document':
@@ -93,7 +96,9 @@ export const defaultTransport: Transport = async (request) => {
   if (request.credentials) init.credentials = request.credentials
 
   const nativeRequest = new Request(request.url, init)
-  const response = await globalThis.fetch(nativeRequest)
+  // `Request` drops the non-standard `next` field, so Next.js reads it from the init.
+  const nextInit: NativeOptions | undefined = request.options?.next ? { next: request.options.next } : undefined
+  const response = await globalThis.fetch(nativeRequest, nextInit)
   const data = await parseResponse(response, request.responseType)
 
   return {

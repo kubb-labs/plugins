@@ -1,7 +1,7 @@
 import * as core from './core'
 import axios from 'axios'
 import type { ResponseType } from './core'
-import type { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios'
+import type { AxiosHeaders, AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios'
 import { createClientCore, getResponseContentType, isStreamed, parseJsonOrText, resolveResponseType } from './core'
 import { isJsonMediaType } from './serializers'
 export * from './core'
@@ -70,43 +70,50 @@ function toHeaders(raw: AxiosResponse['headers']): Headers {
 
 async function readStreamedBytes(data: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array | string>): Promise<ArrayBuffer> {
   if (data instanceof ReadableStream) return new Response(data).arrayBuffer()
-  const chunks: Array<Uint8Array> = []
-  for await (const chunk of data) chunks.push(typeof chunk === 'string' ? new TextEncoder().encode(chunk) : chunk)
-  const bytes = new Uint8Array(chunks.reduce((length, chunk) => length + chunk.byteLength, 0))
-  let offset = 0
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset)
-    offset += chunk.byteLength
-  }
-  return bytes.buffer
+  const chunks: Array<BlobPart> = []
+  for await (const chunk of data) chunks.push(chunk as BlobPart)
+  return new Blob(chunks).arrayBuffer()
 }
 
 /**
  * Decodes bytes with the given parser, as the fetch transport reads them. Anything that is not bytes is returned as is.
  */
 function decodeBytes(data: unknown, responseType: ResponseType | undefined, contentType: string | null): unknown {
-  const buffer = data instanceof ArrayBuffer ? data : data instanceof Uint8Array ? new Uint8Array(data).buffer : undefined
-  if (!buffer) return data
-  if (responseType === 'blob') return new Blob([buffer], { type: contentType ?? '' })
-  if (responseType === 'arraybuffer') return buffer
-  if (responseType === 'stream') return new Blob([buffer]).stream()
-  const text = new TextDecoder().decode(buffer)
+  const bytes = data instanceof ArrayBuffer ? new Uint8Array(data) : data instanceof Uint8Array ? data : undefined
+  if (!bytes) return data
+  if (responseType === 'blob') return new Blob([bytes as Uint8Array<ArrayBuffer>], { type: contentType ?? '' })
+  if (responseType === 'arraybuffer') {
+    const whole = bytes.byteOffset === 0 && bytes.byteLength === bytes.buffer.byteLength
+    return whole ? bytes.buffer : bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+  }
+  if (responseType === 'stream') return new Blob([bytes as Uint8Array<ArrayBuffer>]).stream()
+  const text = new TextDecoder().decode(bytes)
   return responseType === 'text' || responseType === 'document' ? text : parseJsonOrText(text)
 }
 
 /**
- * Reads a streamed JSON body, or any error body the adapter read as text, bytes, or a stream, back into its value, as
- * the fetch transport decodes an error by its content type. Every adapter streams a `responseType: 'stream'` answer, and
- * a `'text'`, `'blob'`, or `'arraybuffer'` error body arrives as read. Any other success body is returned as read.
+ * Reads an error body or a streamed JSON body back into its value, as the fetch transport does. A text error stays text.
+ * A `'blob'` or `'arraybuffer'` error is decoded when its content type is JSON or text, and kept as read otherwise.
+ * Any other success body is returned as read.
  */
 async function readBody({ data, contentType, status }: { data: unknown; contentType: string | undefined; status: number }): Promise<unknown> {
-  if (status >= 300) {
-    if (typeof data === 'string' && data) return parseJsonOrText(data)
-    if (data instanceof Blob) return parseJsonOrText(await data.text())
-    if (data instanceof ArrayBuffer || data instanceof Uint8Array) return parseJsonOrText(new TextDecoder().decode(data))
+  if (status >= 300 && (data instanceof Blob || data instanceof ArrayBuffer || data instanceof Uint8Array)) {
+    const type = resolveResponseType(undefined, contentType)
+    if (type !== 'json' && type !== 'text') return data
+    const text = data instanceof Blob ? await data.text() : new TextDecoder().decode(data)
+    return type === 'json' ? parseJsonOrText(text) : text
   }
   if (!isStreamed(data) || !(status >= 300 || isJsonMediaType(contentType))) return data
   return parseJsonOrText(new TextDecoder().decode(await readStreamedBytes(data)))
+}
+
+/** Resolves an adapter setting to the function axios runs, or `undefined` when axios cannot resolve it here. */
+function resolveAdapter(adapter: AxiosRequestConfig['adapter']): unknown {
+  try {
+    return axios.getAdapter(adapter)
+  } catch {
+    return undefined
+  }
 }
 
 /**
@@ -135,22 +142,26 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
     const streamed = request.responseType === 'stream' || Boolean(map && Object.values(map).includes('stream'))
     if (map) {
       config.responseType = streamed ? 'stream' : 'arraybuffer'
-      config.transformResponse = (data, responseHeaders) => {
-        const header = toHeaders(responseHeaders).get('Content-Type')
+      // An error body is left as read, and `readBody` decodes it by its content type.
+      config.transformResponse = (data, responseHeaders, status) => {
+        if (status !== undefined && status >= 300) return data
+        const header = (responseHeaders as AxiosHeaders).get('Content-Type')?.toString() ?? null
         return decodeBytes(data, resolveResponseType(map, header), header)
       }
     }
 
     // In the browser the default adapters pick XHR, which buffers the whole body and cannot omit same-origin cookies, so a stream
     // or `credentials: 'omit'` switches to fetch. An adapter set on the call or the instance, and the Node http adapter with its
-    // proxy and agent, are kept.
-    const defaultAdapter = !instance.defaults?.adapter || String(instance.defaults.adapter) === String(axios.defaults.adapter)
+    // proxy and agent, are kept. axios's own default is the list `['xhr', 'http', 'fetch']`.
+    const instanceAdapter = instance.defaults?.adapter
+    const defaultAdapter = !instanceAdapter || String(instanceAdapter) === 'xhr,http,fetch'
     const needsFetch = streamed || request.credentials === 'omit'
     if (needsFetch && !config.adapter && defaultAdapter && typeof XMLHttpRequest !== 'undefined') config.adapter = 'fetch'
 
     // `credentials` wins over `withCredentials` in the options or the instance defaults. The fetch adapter takes the value as is,
     // while the other adapters only know a boolean, where `false` keeps cookies same-origin.
-    const fetchAdapter = (config.adapter ?? instance.defaults?.adapter) === 'fetch'
+    const adapter = resolveAdapter(config.adapter ?? instanceAdapter)
+    const fetchAdapter = adapter !== undefined && adapter === resolveAdapter('fetch')
     if (request.credentials) {
       config.withCredentials = fetchAdapter ? (request.credentials as unknown as boolean) : request.credentials === 'include'
     }
@@ -163,12 +174,17 @@ export function createAxiosTransport(instance: AxiosInstance): Transport {
     const headers = toHeaders(response.headers)
     const contentType = getResponseContentType(headers)
     const header = headers.get('Content-Type')
-    const resolved = map ? resolveResponseType(map, contentType) : undefined
-    let raw = blobFromBuffer ? decodeBytes(response.data, 'blob', header) : response.data
-    if (map && isStreamed(raw) && resolved !== 'stream' && response.status < 300) raw = decodeBytes(await readStreamedBytes(raw), resolved, header)
+    const ok = response.status < 300
+    let raw = blobFromBuffer && ok ? decodeBytes(response.data, 'blob', header) : response.data
+    if (map && ok && isStreamed(raw)) {
+      const resolved = resolveResponseType(map, contentType)
+      if (resolved !== 'stream') raw = decodeBytes(await readStreamedBytes(raw), resolved, header)
+    }
+    // axios reads an empty body as '', while the fetch transport reads it as no data unless the body is text.
+    const textBody = request.responseType === 'text' || resolveResponseType(undefined, contentType) === 'text'
+    if (raw === '' && !textBody) raw = undefined
 
     return {
-      // axios reads a bodiless status as '', while the fetch transport reads it as no data. Any other empty body stays '' on both.
       data: [204, 205, 304].includes(response.status) ? undefined : await readBody({ data: raw, contentType, status: response.status }),
       status: response.status,
       statusText: response.statusText,

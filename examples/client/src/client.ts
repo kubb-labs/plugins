@@ -121,6 +121,10 @@ export async function client(config: RequestConfig): Promise<{ data: unknown; er
   }
 
   const token = config.security?.length ? await getToken?.() : undefined
+  const cookie = Object.entries(config.cookies ?? {})
+    .filter(([, value]) => value != null)
+    .map(([name, value]) => `${name}=${encodeURIComponent(String(value))}`)
+    .join('; ')
 
   const response = await fetch(url, {
     method: config.method,
@@ -128,13 +132,7 @@ export async function client(config: RequestConfig): Promise<{ data: unknown; er
       ...(config.body === undefined ? {} : { 'Content-Type': 'application/json' }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(config.headers as Record<string, string>),
-      ...(config.cookies
-        ? {
-            Cookie: Object.entries(config.cookies)
-              .map(([name, value]) => `${name}=${encodeURIComponent(String(value))}`)
-              .join('; '),
-          }
-        : {}),
+      ...(cookie ? { Cookie: cookie } : {}),
     },
     body: config.body === undefined ? undefined : JSON.stringify(config.body, (_, value) => (typeof value === 'bigint' ? value.toString() : value)),
     signal: config.signal,

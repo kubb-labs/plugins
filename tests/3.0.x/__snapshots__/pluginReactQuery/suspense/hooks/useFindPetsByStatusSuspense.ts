@@ -13,7 +13,7 @@ export const findPetsByStatusSuspenseQueryKey = ({ query }: Omit<FindPetsByStatu
 
 type FindPetsByStatusSuspenseQueryKey = ReturnType<typeof findPetsByStatusSuspenseQueryKey>
 
-export function findPetsByStatusSuspenseQueryOptions({ query }: FindPetsByStatusOptions = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>> = {}) {
+export function findPetsByStatusSuspenseQueryOptions({ query }: FindPetsByStatusOptions = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = findPetsByStatusSuspenseQueryKey({ query })
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, typeof queryKey>({
    queryKey,

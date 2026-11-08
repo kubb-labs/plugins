@@ -14,7 +14,7 @@ type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 export function loginUserQueryOptions(
   { query }: LoginUserOptions = {},
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = loginUserQueryKey({ query })
   return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200, typeof queryKey>({

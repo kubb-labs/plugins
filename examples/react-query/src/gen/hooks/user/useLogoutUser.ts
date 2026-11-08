@@ -12,7 +12,7 @@ export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 
 type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 
-export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>> = {}) {
+export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = logoutUserQueryKey()
   return queryOptions<LogoutUserResponse, ResponseErrorConfig<Error>, LogoutUserResponse, typeof queryKey>({
     queryKey,

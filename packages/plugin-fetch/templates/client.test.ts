@@ -463,6 +463,13 @@ describe('createClientCore', () => {
     expect(calls[0]?.headers.Cookie).toBe('session=abc; ids=1,2')
   })
 
+  test('appends cookie params to a Cookie header the caller set in any casing', async () => {
+    const { client, calls } = createClient()
+    await client({ method: 'GET', url: '/pet', headers: { cookie: 'a=1' }, cookies: { session: 'abc' } })
+    expect(calls[0]?.headers).toMatchObject({ cookie: 'a=1; session=abc' })
+    expect(calls[0]?.headers.Cookie).toBeUndefined()
+  })
+
   test('serializes array and object header params with the simple style', async () => {
     const { client, calls } = createClient()
     await client({
@@ -974,7 +981,7 @@ describe('params validators', () => {
       ...Object.fromEntries(keys.filter((key) => key in (value as object)).map((key) => [key, (value as Record<string, Date>)[key]!.toISOString()])),
     }))
 
-  test('validates omitted cookies as an empty object, as it does the other groups', async () => {
+  test('skips the cookies validator when the call passes no cookies, since a browser sends them itself', async () => {
     const { client, calls } = createClient()
     const seen: Array<unknown> = []
     const cookies = toSchema((value) => {
@@ -983,8 +990,15 @@ describe('params validators', () => {
     })
 
     await client({ method: 'GET', url: '/cookies', validator: { cookies } })
+    await client({ method: 'GET', url: '/cookies', cookies: { theme: 'dark' }, validator: { cookies } })
 
-    expect(seen).toStrictEqual([{}])
+    expect(seen).toStrictEqual([{ theme: 'dark' }])
+    expect(calls[0]?.headers['Cookie']).toBeUndefined()
+  })
+
+  test('sends no Cookie header when a cookies validator replaces the value with undefined', async () => {
+    const { client, calls } = createClient()
+    await client({ method: 'GET', url: '/cookies', cookies: { theme: 'dark' }, validator: { cookies: toSchema(() => undefined) } })
     expect(calls[0]?.headers['Cookie']).toBeUndefined()
   })
 
@@ -1318,6 +1332,28 @@ describe('defaultTransport binary responses', () => {
     expect(result.data).toStrictEqual({ delta: 'hi' })
   })
 
+  test('passes the Next.js next option in the fetch init, which Request drops', async () => {
+    const fetch = vi.fn(async (_input: Request, _init?: RequestInit) => new Response('{}', { headers: { 'Content-Type': 'application/json' } }))
+    vi.stubGlobal('fetch', fetch)
+    await defaultTransport({ url: 'https://example.test/pet', method: 'GET', headers: {}, options: { next: { revalidate: 60 } } })
+    expect(fetch.mock.calls[0]?.[1]).toStrictEqual({ next: { revalidate: 60 } })
+  })
+
+  test('keeps the bytes of a failed blob call with an unknown content type, and decodes a JSON one', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(bytes, { status: 500, headers: { 'Content-Type': 'application/vnd.custom' } })),
+    )
+    const raw = await defaultTransport({ url: 'https://example.test/speech', method: 'GET', headers: {}, responseType: 'blob' })
+    expect(raw.data).toBeInstanceOf(Blob)
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('{"message":"gone"}', { status: 404, headers: { 'Content-Type': 'application/json' } })),
+    )
+    const json = await defaultTransport({ url: 'https://example.test/speech', method: 'GET', headers: {}, responseType: 'blob' })
+    expect(json.data).toStrictEqual({ message: 'gone' })
+  })
+
   test('still parses JSON that the map leaves unset', async () => {
     vi.stubGlobal(
       'fetch',
@@ -1400,6 +1436,11 @@ describe('withUnwrap', () => {
 
   test('unwrap() rejects with error for a non-throwing error result', async () => {
     await expect(withUnwrap(Promise.resolve({ data: undefined, error: { message: 'invalid' } })).unwrap()).rejects.toStrictEqual({ message: 'invalid' })
+  })
+
+  test('unwrap() rejects a failed status whose error body is empty', async () => {
+    await expect(withUnwrap(Promise.resolve({ data: undefined, error: undefined, status: 404 })).unwrap()).rejects.toBeUndefined()
+    await expect(withUnwrap(Promise.resolve({ data: undefined, error: undefined, status: 204 })).unwrap()).resolves.toBeUndefined()
   })
 
   test('a rejected call propagates the rejection unchanged', async () => {

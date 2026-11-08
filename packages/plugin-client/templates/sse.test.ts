@@ -357,6 +357,19 @@ describe('toEventStream', () => {
     expect(cancel).toHaveBeenCalledOnce()
   })
 
+  test('rejects with the abort reason when the transport fails the read with its own error', async () => {
+    const controller = new AbortController()
+    const stream = new ReadableStream({
+      pull: (c) => {
+        controller.abort(new Error('stop'))
+        c.error(new Error('CanceledError'))
+      },
+    })
+    const result = await toEventStream(Promise.resolve(call({ data: stream })), { config: { signal: controller.signal } })
+
+    await expect(collect(result.stream)).rejects.toStrictEqual(new Error('stop'))
+  })
+
   test('cancels the reader when the consumer breaks', async () => {
     const cancel = vi.fn()
 

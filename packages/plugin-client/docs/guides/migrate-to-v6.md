@@ -1,6 +1,6 @@
 # Migrate to v6
 
-`@kubb/plugin-client` 6 passes the full event type to a custom client's stream helpers. Projects without server-sent event operations need no change.
+`@kubb/plugin-client` 6 passes the full event type and a `contentType` to a custom client's stream helpers. Projects without server-sent event operations need no change.
 
 ## Stream exports of your client
 
@@ -17,3 +17,14 @@ export async function toEventStream<TEvent = ServerSentEvent>(result: Promise<{ 
 ```
 
 A generated function calls `toEventStream<ServerSentEvent<Payload>>` when the document types only the payload, and `toEventStream<TypedEvent<Event>>` when it names each event. See [Write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client).
+
+## `contentType` on the request config
+
+A stream call now passes `contentType: { response: 'text/event-stream' }`, so your client can send `Accept: text/event-stream`. Add the field to your `RequestConfig`, or the generated stream functions fail to compile:
+
+```typescript
+export type RequestConfig = {
+  // ...
+  contentType?: string | { request?: string; response?: string }
+}
+```

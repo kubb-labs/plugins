@@ -31,9 +31,12 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   // Bracket-access the path object with the raw OpenAPI param names, matching the generated `path` type's keys.
   const urlTemplate = Url.toGroupedTemplateString(node.path, { prefix: baseURL })
 
-  // `cy.request` has no cookie option, so the cookie group goes out as a `Cookie` header, encoded as the client runtime does.
-  const cookieHeader =
-    "Cookie: Object.entries(cookies ?? {}).filter(([, value]) => value != null).map(([name, value]) => `${name}=${encodeURIComponent(String(value))}`).join('; ')"
+  // `cy.request` has no cookie option, so the cookie group goes out as a `Cookie` header. An array joins with commas, a Date
+  // is ISO 8601, and an object is JSON.
+  // shortcut: ignores per-cookie `style` and `explode`, upgrade when a spec needs exploded cookie arrays in Cypress.
+  const encodeCookie =
+    "encodeURIComponent(value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value))"
+  const cookieHeader = `Cookie: Object.entries(cookies ?? {}).filter(([, value]) => value != null).map(([name, value]) => \`\${name}=\${${encodeCookie}}\`).join('; ')`
 
   const requestOptions = [
     `method: '${node.method}'`,

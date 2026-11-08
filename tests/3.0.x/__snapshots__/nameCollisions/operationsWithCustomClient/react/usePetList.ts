@@ -13,7 +13,7 @@ export const petListQueryKey = () => [{ url: '/pets/first' }] as const
 
 type PetListQueryKey = ReturnType<typeof petListQueryKey>
 
-export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>> = {}) {
+export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = petListQueryKey()
   return queryOptions<PetListStatus200, ResponseErrorConfig<Error>, PetListStatus200, typeof queryKey>({
    queryKey,

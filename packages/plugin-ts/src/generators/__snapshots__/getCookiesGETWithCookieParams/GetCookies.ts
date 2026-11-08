@@ -16,7 +16,7 @@ export type GetCookiesOptions = {
   path?: never
   query?: never
   headers?: never
-  cookies: GetCookiesCookies
+  cookies?: GetCookiesCookies
 }
 
 export type GetCookiesResponses = {

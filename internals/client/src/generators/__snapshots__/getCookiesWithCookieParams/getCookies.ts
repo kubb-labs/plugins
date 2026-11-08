@@ -8,7 +8,7 @@ import { client, withUnwrap } from './.kubb/client'
  * {@link /cookies}
  */
 export function getCookies<ThrowOnError extends boolean = true>(
-  options: Options<GetCookiesOptions, ThrowOnError>,
+  options: Options<GetCookiesOptions, ThrowOnError> = {},
 ): Unwrappable<RequestResult<GetCookiesResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

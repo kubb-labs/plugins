@@ -41,7 +41,7 @@ export function findPetsByTagsInfiniteQueryOptions(
       'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
     }
   },
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey({ query })
   return infiniteQueryOptions<

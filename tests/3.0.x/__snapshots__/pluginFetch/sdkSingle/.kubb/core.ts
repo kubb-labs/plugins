@@ -100,7 +100,9 @@ export function withUnwrap<T extends { data: unknown; error: unknown }>(promise:
   const unwrappable = promise as Unwrappable<T>
   unwrappable.unwrap = () =>
     promise.then((result) => {
-      if (result.error !== undefined) throw result.error
+      const { status } = result as { status?: number }
+      // An empty error body decodes to `undefined`, so the status decides failure when the result carries one.
+      if (result.error !== undefined || (status !== undefined && (status < 200 || status >= 300))) throw result.error
       return result.data as Extract<T, { error: undefined }>['data']
     })
   return unwrappable
@@ -479,12 +481,18 @@ export async function resolveAuth(params: {
       return
     }
     if (scheme.in === 'cookie') {
-      headers['Cookie'] = [headers['Cookie'], `${name}=${token}`].filter(Boolean).join('; ')
+      appendCookie(headers, `${name}=${token}`)
       return
     }
     if (getHeader(headers, name) === undefined) headers[name] = token
     return
   }
+}
+
+/** Adds a cookie to the `Cookie` header, under the key the caller used in any casing. */
+function appendCookie(headers: Record<string, string>, cookie: string): void {
+  const key = Object.keys(headers).find((name) => name.toLowerCase() === 'cookie') ?? 'Cookie'
+  headers[key] = [headers[key], cookie].filter(Boolean).join('; ')
 }
 
 /** A body a transport left as a stream: a web `ReadableStream` or an async iterable such as a Node readable. */
@@ -558,12 +566,12 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     path: { ...(requestConfig.path as Record<string, unknown> | undefined) },
     query: { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) },
     headers: collectHeadersCaseInsensitive(config.headers, requestConfig.headers),
-    cookies: { ...(requestConfig.cookies as Record<string, unknown> | undefined) },
+    cookies: requestConfig.cookies as Record<string, unknown> | undefined,
   }
   const [validatedPath, validatedQuery, validatedHeaders, validatedCookies] = await Promise.all(
     (['path', 'query', 'headers', 'cookies'] as const).map((source) =>
       runValidator({
-        validator: isValidationEnabled(validate, 'params') ? requestConfig.validator?.[source] : undefined,
+        validator: isValidationEnabled(validate, 'params') && paramValues[source] !== undefined ? requestConfig.validator?.[source] : undefined,
         value: paramValues[source],
         context: { ...validationContext, source },
         onValidationError,
@@ -588,8 +596,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     query,
   })
 
-  const cookie = serializeCookies(validatedCookies as Record<string, unknown>, requestConfig.styles?.cookie)
-  if (cookie) headers['Cookie'] = [headers['Cookie'], cookie].filter(Boolean).join('; ')
+  const cookie = validatedCookies ? serializeCookies(validatedCookies as Record<string, unknown>, requestConfig.styles?.cookie) : ''
+  if (cookie) appendCookie(headers, cookie)
 
   const validatedBody = await runValidator({
     validator: isValidationEnabled(validate, 'request') ? requestConfig.validator?.request : undefined,

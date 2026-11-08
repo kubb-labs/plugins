@@ -8,6 +8,8 @@ import {
   isEventStream,
   resolveErrorNames,
   resolveSuccessNames,
+  buildClientOptionType,
+  requestGroupOrder,
 } from '@internals/shared'
 import type { ast } from '@kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
@@ -19,7 +21,6 @@ import type { Infinite, Mutation, PageParamFn, Query } from './types.ts'
  * The grouped request options, ordered for both the destructured signature and the
  * call passed to the underlying client.
  */
-const requestGroupOrder = ['path', 'query', 'body', 'headers', 'cookies'] as const
 
 type RequestGroupKey = (typeof requestGroupOrder)[number]
 
@@ -63,7 +64,7 @@ export function buildGroupedRequestParam(
   },
 ): FunctionParameterNode | null {
   const { resolver, keys = requestGroupOrder, memberTypeWrapper, withContentType = false } = options
-  const { groups, hasRequiredPath, hasRequiredQuery, hasRequiredHeader, hasRequiredCookie } = getRequestGroupOptionality(node)
+  const { groups, hasRequiredPath, hasRequiredQuery, hasRequiredHeader } = getRequestGroupOptionality(node)
   const names = keys.filter((key) => groups[key])
 
   if (names.length === 0) {
@@ -75,7 +76,7 @@ export function buildGroupedRequestParam(
     query: hasRequiredQuery,
     body: groups.body,
     headers: hasRequiredHeader,
-    cookies: hasRequiredCookie,
+    cookies: false,
   }
 
   // The grouped object can default to `{}` only when none of the emitted groups is required. The
@@ -132,7 +133,7 @@ export function buildQueryOptionsParams(
 
   const configParam = createFunctionParameter({
     name: 'config',
-    type: `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>>`,
+    type: buildClientOptionType(node),
     default: '{}',
   })
 
@@ -437,9 +438,9 @@ export function resolveOperationOverrides<TOptions>(node: ast.OperationNode, ove
 /**
  * The request groups a query key is built from, matching `buildQueryKeyParams`. Headers are
  * deliberately absent: they do not identify a cache entry, so the key factory takes no parameter
- * for an operation that only carries headers.
+ * for an operation that only carries headers. Cookies can pick the answer, such as a session, so they are in.
  */
-export const queryKeyGroupOrder = ['path', 'query', 'body'] as const
+export const queryKeyGroupOrder = ['path', 'query', 'body', 'cookies'] as const
 
 /**
  * Whether the generated query key factory declares a parameter, so a call site passes an argument
@@ -451,9 +452,9 @@ export function hasQueryKeyParams(node: ast.OperationNode): boolean {
 }
 
 /**
- * Build QueryKey params as the grouped `{ path, query, body }` object (NO headers, NO config),
+ * Build QueryKey params as the grouped `{ path, query, body, cookies }` object (NO headers, NO config),
  * typed from the operation's `Options` minus `url`. The query key transformer reads the
- * grouped `path`/`query`/`body` bindings.
+ * grouped `path`/`query`/`body`/`cookies` bindings.
  */
 export function buildQueryKeyParams(
   node: ast.OperationNode,

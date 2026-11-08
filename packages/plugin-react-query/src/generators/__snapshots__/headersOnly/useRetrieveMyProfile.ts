@@ -16,7 +16,7 @@ type RetrieveMyProfileQueryKey = ReturnType<typeof retrieveMyProfileQueryKey>
 
 export function retrieveMyProfileQueryOptions(
   { headers }: RetrieveMyProfileOptions,
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = retrieveMyProfileQueryKey()
   return queryOptions<RetrieveMyProfileStatus200, ResponseErrorConfig<Error>, RetrieveMyProfileStatus200, typeof queryKey>({

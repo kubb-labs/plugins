@@ -19,7 +19,7 @@ export const logoutMutationKey = () => [{ url: '/logout' }] as const
 export function useLogout<TContext>(
   options: {
     mutation?: MutationObserverOptions<LogoutStatus204, ResponseErrorConfig<Error>, LogoutOptions, TContext> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

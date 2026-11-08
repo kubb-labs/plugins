@@ -64,6 +64,8 @@ Your `client` receives `method`, the `url` template with `{param}` placeholders,
 
 A non-JSON response also passes `responseType`. It is a string such as `'blob'` when every response content type uses one parser, or a map from content type to parser when they differ, for example `{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. Read the response `Content-Type`, look it up in the map (exact type, then `type/*`, then `*/*`), and parse the body with that parser.
 
+A call can also pass `contentType`: `request` is the body's media type, and `response` is the media type to ask for in `Accept`. A Server-Sent Events operation always passes `contentType: { response: 'text/event-stream' }`, so `RequestConfig` needs the field.
+
 ## A minimal client
 
 The client below uses `fetch`. Replace the transport with the HTTP library you use.
@@ -80,6 +82,7 @@ export type RequestConfig = {
   body?: unknown
   signal?: AbortSignal
   responseType?: string | Record<string, string>
+  contentType?: string | { request?: string; response?: string }
   throwOnError?: boolean
   security?: Array<{ type: string; name?: string; in?: string; scopes?: Array<string> }>
   client?: typeof client
@@ -103,12 +106,16 @@ export const settings = { baseURL: 'https://petstore3.swagger.io/api/v3' }
 export async function client(config: RequestConfig) {
   const path: Record<string, unknown> = { ...config.path }
   const url = new URL((config.baseURL ?? settings.baseURL) + config.url.replace(/\{(\w+)\}/g, (_, key) => encodeURIComponent(String(path[key]))))
+  const cookie = Object.entries(config.cookies ?? {})
+    .filter(([, value]) => value != null)
+    .map(([name, value]) => `${name}=${encodeURIComponent(String(value))}`)
+    .join('; ')
 
   const response = await fetch(url, {
     method: config.method,
     headers: {
       ...(config.headers as Record<string, string>),
-      ...(config.cookies ? { Cookie: Object.entries(config.cookies).map(([name, value]) => `${name}=${encodeURIComponent(String(value))}`).join('; ') } : {}),
+      ...(cookie ? { Cookie: cookie } : {}),
     },
     body: config.body === undefined ? undefined : JSON.stringify(config.body),
     signal: config.signal,

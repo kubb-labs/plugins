@@ -34,7 +34,7 @@ export function updatePetWithFormQueryOptions(
     body: MaybeRefOrGetter<UpdatePetWithFormOptions['body']>
     query?: MaybeRefOrGetter<UpdatePetWithFormOptions['query']>
   },
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = updatePetWithFormQueryKey({ path, body, query })
   return queryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormStatus200>({

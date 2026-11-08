@@ -6,7 +6,7 @@
 
 import type { GetCookiesOptions, GetCookiesResponse } from './GetCookies'
 
-export function getCookies({ headers, cookies }: GetCookiesOptions, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetCookiesResponse> {
+export function getCookies({ headers, cookies }: GetCookiesOptions = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetCookiesResponse> {
   return cy
     .request<GetCookiesResponse>({
       method: 'GET',
@@ -15,7 +15,10 @@ export function getCookies({ headers, cookies }: GetCookiesOptions, options: Par
         ...headers,
         Cookie: Object.entries(cookies ?? {})
           .filter(([, value]) => value != null)
-          .map(([name, value]) => `${name}=${encodeURIComponent(String(value))}`)
+          .map(
+            ([name, value]) =>
+              `${name}=${encodeURIComponent(value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value))}`,
+          )
           .join('; '),
       },
       ...options,
