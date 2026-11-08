@@ -17,11 +17,6 @@ import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverT
 import type { ReturnTypeOption } from '@internals/client'
 import type { Infinite, Mutation, PageParamFn, Query } from './types.ts'
 
-/**
- * The grouped request options, ordered for both the destructured signature and the
- * call passed to the underlying client.
- */
-
 type RequestGroupKey = (typeof requestGroupOrder)[number]
 
 /**
@@ -438,9 +433,10 @@ export function resolveOperationOverrides<TOptions>(node: ast.OperationNode, ove
 /**
  * The request groups a query key is built from, matching `buildQueryKeyParams`. Headers are
  * deliberately absent: they do not identify a cache entry, so the key factory takes no parameter
- * for an operation that only carries headers. Cookies can pick the answer, such as a session, so they are in.
+ * for an operation that only carries headers. Cookies are left out too: they often hold a session token, and a query key
+ * is stored in SSR payloads, persisted caches, and devtools.
  */
-export const queryKeyGroupOrder = ['path', 'query', 'body', 'cookies'] as const
+export const queryKeyGroupOrder = ['path', 'query', 'body'] as const
 
 /**
  * Whether the generated query key factory declares a parameter, so a call site passes an argument
@@ -452,9 +448,9 @@ export function hasQueryKeyParams(node: ast.OperationNode): boolean {
 }
 
 /**
- * Build QueryKey params as the grouped `{ path, query, body, cookies }` object (NO headers, NO config),
+ * Build QueryKey params as the grouped `{ path, query, body }` object (NO headers, NO cookies, NO config),
  * typed from the operation's `Options` minus `url`. The query key transformer reads the
- * grouped `path`/`query`/`body`/`cookies` bindings.
+ * grouped `path`/`query`/`body` bindings.
  */
 export function buildQueryKeyParams(
   node: ast.OperationNode,

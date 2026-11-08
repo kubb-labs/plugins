@@ -1391,16 +1391,41 @@ describe('a transport that returns a Response', () => {
     expect(await empty({ method: 'DELETE', url: '/pet/1' })).toMatchObject({ data: undefined, status: 204 })
   })
 
-  test('carries the resolved request, and response interceptors see the parsed result', async () => {
+  test('carries a Request built from the resolved request, and response interceptors see the parsed result', async () => {
     const client = createClientCore({ defaultTransport: respondWith(new Response('{"id":1}', { headers: { 'Content-Type': 'application/json' } })) })
     const seen: Array<unknown> = []
     client.interceptors.response.use((result) => (seen.push(result.data), result))
 
-    const result = await client({ method: 'GET', url: '/pet/{petId}', path: { petId: 1 } })
+    const result = await client({ method: 'GET', url: 'https://petstore.dev/pet/{petId}', path: { petId: 1 }, headers: { 'X-Trace': 'a' } })
 
     expect(seen).toStrictEqual([{ id: 1 }])
-    expect(result.request).toMatchObject({ url: '/pet/1', method: 'GET' })
+    expect(result.request).toBeInstanceOf(Request)
+    expect((result.request as unknown as Request).headers.get('x-trace')).toBe('a')
     expect(result.response).toBeInstanceOf(Response)
+  })
+
+  test('keeps the resolved request when the URL is relative, since a Request needs an absolute one', async () => {
+    const client = createClientCore({ defaultTransport: respondWith(new Response('{}', { headers: { 'Content-Type': 'application/json' } })) })
+    const result = await client({ method: 'GET', url: '/pet/1' })
+    expect(result.request).toMatchObject({ url: '/pet/1', method: 'GET' })
+  })
+
+  test('reads a Response from a polyfill such as node-fetch, which is not instanceof the global one', async () => {
+    const native = new Response('{"id":1}', { headers: { 'Content-Type': 'application/json' } })
+    const headers = { get: (name: string) => native.headers.get(name) }
+    const polyfilled = {
+      status: 200,
+      statusText: 'OK',
+      ok: true,
+      headers,
+      body: native.body,
+      text: () => native.text(),
+      arrayBuffer: () => native.arrayBuffer(),
+      blob: () => native.blob(),
+    }
+    const client = createClientCore({ defaultTransport: async () => polyfilled as unknown as Response })
+
+    expect(await client({ method: 'GET', url: '/pet/1' })).toMatchObject({ data: { id: 1 }, status: 200, contentType: 'application/json' })
   })
 
   test('readResponse keeps the request it is given and the response as is', async () => {
@@ -1500,9 +1525,13 @@ describe('withUnwrap', () => {
     await expect(withUnwrap(Promise.resolve({ data: undefined, error: { message: 'invalid' } })).unwrap()).rejects.toStrictEqual({ message: 'invalid' })
   })
 
-  test('unwrap() rejects a failed status whose error body is empty', async () => {
-    await expect(withUnwrap(Promise.resolve({ data: undefined, error: undefined, status: 404 })).unwrap()).rejects.toBeUndefined()
-    await expect(withUnwrap(Promise.resolve({ data: undefined, error: undefined, status: 204 })).unwrap()).resolves.toBeUndefined()
+  test('unwrap() rejects a failed call whose error body is empty, since the client reports the status as the error', async () => {
+    const client = createClientCore({ defaultTransport: async () => new Response(null, { status: 404, statusText: 'Not Found' }), throwOnError: false })
+
+    const result = await client({ method: 'GET', url: '/pet/1' })
+
+    expect(result.error).toStrictEqual({ status: 404, statusText: 'Not Found' })
+    await expect(withUnwrap(Promise.resolve(result)).unwrap()).rejects.toStrictEqual({ status: 404, statusText: 'Not Found' })
   })
 
   test('a rejected call propagates the rejection unchanged', async () => {

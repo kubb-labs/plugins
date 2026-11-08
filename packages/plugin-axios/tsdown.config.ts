@@ -1,4 +1,5 @@
 import { defineConfig, type UserConfig } from 'tsdown'
+import { sharedTemplates } from '../../configs/sharedTemplates.ts'
 
 const entry = {
   index: 'src/index.ts',
@@ -15,19 +16,6 @@ const shared: Partial<UserConfig> = {
   },
   outputOptions: {
     keepNames: true,
-  },
-}
-
-// The `./core.ts` stub next to the template re-exports `@kubb/plugin-client` with `export *`, which the declaration bundler
-// turns into an undeclared namespace, so the shared templates resolve to the package directly.
-const sharedTemplates = {
-  name: 'shared-templates',
-  resolveId: {
-    order: 'pre' as const,
-    handler(source: string) {
-      const match = /^\.\/(core|serializers|standardSchema)\.ts$/.exec(source)
-      return match ? { id: `@kubb/plugin-client/templates/${match[1]}.ts`, external: true } : null
-    },
   },
 }
 

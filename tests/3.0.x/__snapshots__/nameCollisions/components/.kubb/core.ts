@@ -100,9 +100,7 @@ export function withUnwrap<T extends { data: unknown; error: unknown }>(promise:
   const unwrappable = promise as Unwrappable<T>
   unwrappable.unwrap = () =>
     promise.then((result) => {
-      const { status } = result as { status?: number }
-      // An empty error body decodes to `undefined`, so the status decides failure when the result carries one.
-      if (result.error !== undefined || (status !== undefined && (status < 200 || status >= 300))) throw result.error
+      if (result.error !== undefined) throw result.error
       return result.data as Extract<T, { error: undefined }>['data']
     })
   return unwrappable
@@ -537,7 +535,11 @@ export function resolveResponseType(
 /** The media type of the `Content-Type` response header, without its parameters. */
 export function getResponseContentType(headers: Headers | Record<string, string> | undefined): string | undefined {
   if (!headers) return undefined
-  const value = headers instanceof Headers ? headers.get('Content-Type') : (headers['Content-Type'] ?? headers['content-type'])
+  // A `Headers` from another realm or a polyfill such as node-fetch is not `instanceof` the global one, so check for `get`.
+  const value =
+    typeof headers.get === 'function'
+      ? (headers as Headers).get('Content-Type')
+      : ((headers as Record<string, string>)['Content-Type'] ?? (headers as Record<string, string>)['content-type'])
   return baseContentType(value)
 }
 
@@ -581,6 +583,26 @@ export async function readResponse<TRequest, TResponse extends Response>(
     contentType: getResponseContentType(response.headers),
     request,
     response,
+  }
+}
+
+/**
+ * Whether a transport returned a web `Response` instead of a transport result. It checks the shape, so a `Response`
+ * from another realm or a polyfill such as node-fetch counts too.
+ */
+function isResponse(value: unknown): value is Response {
+  return !!value && typeof value === 'object' && !('data' in value) && typeof (value as Response).arrayBuffer === 'function' && 'status' in value
+}
+
+/**
+ * The `Request` a transport that returns a plain `Response` would have sent, for `result.request`. A relative URL or a
+ * runtime without `Request` keeps the resolved request.
+ */
+function toNativeRequest(request: ResolvedRequest): Request | ResolvedRequest {
+  try {
+    return new Request(request.url, toRequestInit(request))
+  } catch {
+    return request
   }
 }
 
@@ -736,11 +758,9 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
 
     const resolvedRequest = await interceptors.request.run(request, requestConfig)
     const sent = await transport(resolvedRequest)
-    // A transport that returns a plain `Response` carries the resolved request, since the library kept its own.
-    const transported =
-      typeof Response !== 'undefined' && sent instanceof Response
-        ? await readResponse(sent as TResponse & Response, { request: resolvedRequest as TRequest, responseType: resolvedRequest.responseType })
-        : (sent as TransportResult<unknown, TRequest, TResponse>)
+    const transported = isResponse(sent)
+      ? await readResponse(sent as TResponse & Response, { request: toNativeRequest(resolvedRequest) as TRequest, responseType: resolvedRequest.responseType })
+      : sent
     const result = await interceptors.response.run(transported, requestConfig)
 
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
@@ -776,7 +796,8 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     return {
       status: result.status,
       data: isSuccess ? data : undefined,
-      error: isSuccess ? undefined : data,
+      // An empty error body still reports the failure, so `if (error)` and `.unwrap()` see a value.
+      error: isSuccess ? undefined : (data ?? { status: result.status, statusText: result.statusText }),
       contentType,
       request: result.request,
       response: result.response,

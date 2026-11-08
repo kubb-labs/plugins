@@ -116,6 +116,9 @@ function resolveAdapter(adapter: AxiosRequestConfig['adapter']): unknown {
   }
 }
 
+/** axios's fetch adapter, resolved once, to tell whether a request goes through fetch. */
+const axiosFetchAdapter = resolveAdapter('fetch')
+
 /**
  * Turns an axios instance into a transport: each resolved request becomes one `instance.request` with the instance's
  * defaults, adapter, and axios interceptors. Every status resolves, because the core splits success from error itself.
@@ -161,7 +164,7 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
     // `credentials` wins over `withCredentials` in the options or the instance defaults. The fetch adapter takes the value as is,
     // while the other adapters only know a boolean, where `false` keeps cookies same-origin.
     const adapter = resolveAdapter(config.adapter ?? instanceAdapter)
-    const fetchAdapter = adapter !== undefined && adapter === resolveAdapter('fetch')
+    const fetchAdapter = adapter !== undefined && adapter === axiosFetchAdapter
     if (request.credentials) {
       config.withCredentials = fetchAdapter ? (request.credentials as unknown as boolean) : request.credentials === 'include'
     }
