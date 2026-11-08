@@ -9,7 +9,7 @@ The transport is a function. Use interceptors for request headers or response lo
 `@kubb/plugin-fetch` types the transport as a function that receives a fully resolved request and returns a result:
 
 ```typescript
-type Transport = (request: ResolvedRequest) => Promise<TransportResult>
+type Transport = (request: ResolvedRequest) => Promise<TransportResult | Response>
 
 type ResolvedRequest = {
   url: string
@@ -37,31 +37,19 @@ The core hands you a `ResolvedRequest` with the URL built, the query and body se
 
 ## Send with another library
 
-Any HTTP library that returns a web `Response`, such as [ky](https://github.com/sindresorhus/ky), needs only the send. Pass the `Response` to `readResponse` from the generated client, which parses the body the way `defaultTransport` does:
+A transport can also return a web `Response`. The client then parses the body the way `defaultTransport` does, so a library that returns a `Response`, such as [ky](https://github.com/sindresorhus/ky), needs only the send. `toRequestInit(request)` gives the `RequestInit` that `fetch` and ky take:
 
 ```typescript
 import ky from 'ky'
-import { client, readResponse, type Transport } from './gen/.kubb/client'
+import { client, toRequestInit } from './gen/.kubb/client'
 
-const kyTransport: Transport = async (request) => {
-  const response = await ky(request.url, {
-    ...request.options,
-    method: request.method,
-    headers: request.headers,
-    body: request.body,
-    signal: request.signal,
-    credentials: request.credentials,
-    // The client splits success from error itself, and retries belong in an interceptor or your own wrapper.
-    throwHttpErrors: false,
-    retry: 0,
-  })
-  return readResponse(response, { request, responseType: request.responseType })
-}
-
-client.setConfig({ transport: kyTransport })
+client.setConfig({
+  // The client splits success from error itself, so ky must not throw or retry on an error status.
+  transport: (request) => ky(request.url, { ...toRequestInit(request), throwHttpErrors: false, retry: 0 }),
+})
 ```
 
-The library must hand back the body unread, so `readResponse` can parse it.
+The library must hand back the body unread. `result.request` is then the resolved request, since the library keeps its own.
 
 ## Mock the network in tests
 

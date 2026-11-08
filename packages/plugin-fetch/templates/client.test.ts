@@ -9,6 +9,7 @@ import {
   createInterceptorStack,
   readResponse,
   type ResolvedRequest,
+  toRequestInit,
   ResponseError,
   resolveAuth,
   resolveResponseType,
@@ -1370,30 +1371,63 @@ describe('defaultTransport binary responses', () => {
   })
 })
 
-describe('readResponse', () => {
+describe('a transport that returns a Response', () => {
   // A ky-like library: it returns a web `Response` without throwing on an error status.
-  function libraryTransport(response: Response): Transport {
-    return async (request) => readResponse(response, { request, responseType: request.responseType })
-  }
+  const respondWith =
+    (response: Response): Transport =>
+    async () =>
+      response.clone()
 
-  test('lets a transport for another library parse bodies as defaultTransport does', async () => {
-    const ok = createClientCore({ defaultTransport: libraryTransport(new Response('{"id":1}', { headers: { 'Content-Type': 'application/json' } })) })
+  test('is read by the core as defaultTransport reads one', async () => {
+    const ok = createClientCore({ defaultTransport: respondWith(new Response('{"id":1}', { headers: { 'Content-Type': 'application/json' } })) })
     const failed = createClientCore({
-      defaultTransport: libraryTransport(new Response('{"message":"gone"}', { status: 404, headers: { 'Content-Type': 'application/json' } })),
+      defaultTransport: respondWith(new Response('{"message":"gone"}', { status: 404, headers: { 'Content-Type': 'application/json' } })),
       throwOnError: false,
     })
-    const empty = createClientCore({ defaultTransport: libraryTransport(new Response(null, { status: 204 })) })
+    const empty = createClientCore({ defaultTransport: respondWith(new Response(null, { status: 204 })) })
 
     expect(await ok({ method: 'GET', url: '/pet/1' })).toMatchObject({ data: { id: 1 }, status: 200, contentType: 'application/json' })
     expect(await failed({ method: 'GET', url: '/pet/1', responseType: 'blob' })).toMatchObject({ error: { message: 'gone' }, status: 404 })
     expect(await empty({ method: 'DELETE', url: '/pet/1' })).toMatchObject({ data: undefined, status: 204 })
   })
 
-  test('keeps the request it is given and the response as is', async () => {
+  test('carries the resolved request, and response interceptors see the parsed result', async () => {
+    const client = createClientCore({ defaultTransport: respondWith(new Response('{"id":1}', { headers: { 'Content-Type': 'application/json' } })) })
+    const seen: Array<unknown> = []
+    client.interceptors.response.use((result) => (seen.push(result.data), result))
+
+    const result = await client({ method: 'GET', url: '/pet/{petId}', path: { petId: 1 } })
+
+    expect(seen).toStrictEqual([{ id: 1 }])
+    expect(result.request).toMatchObject({ url: '/pet/1', method: 'GET' })
+    expect(result.response).toBeInstanceOf(Response)
+  })
+
+  test('readResponse keeps the request it is given and the response as is', async () => {
     const response = new Response('ok', { headers: { 'Content-Type': 'text/plain' } })
     const result = await readResponse(response, { request: 'REQ' })
     expect(result).toMatchObject({ data: 'ok', request: 'REQ' })
     expect(result.response).toBe(response)
+  })
+})
+
+describe('toRequestInit', () => {
+  test('puts the options first, so the resolved fields win', () => {
+    const signal = new AbortController().signal
+    const init = toRequestInit({
+      url: '/pet',
+      method: 'POST',
+      headers: { 'X-A': '1' },
+      body: '{}',
+      signal,
+      credentials: 'include',
+      options: { cache: 'no-store', method: 'GET' },
+    })
+    expect(init).toStrictEqual({ cache: 'no-store', method: 'POST', headers: { 'X-A': '1' }, body: '{}', signal, credentials: 'include' })
+  })
+
+  test('leaves credentials out when the call sets none', () => {
+    expect(toRequestInit({ url: '/pet', method: 'GET', headers: {} })).not.toHaveProperty('credentials')
   })
 })
 

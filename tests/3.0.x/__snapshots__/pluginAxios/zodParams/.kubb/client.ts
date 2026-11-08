@@ -120,7 +120,7 @@ function resolveAdapter(adapter: AxiosRequestConfig['adapter']): unknown {
  * Turns an axios instance into a transport: each resolved request becomes one `instance.request` with the instance's
  * defaults, adapter, and axios interceptors. Every status resolves, because the core splits success from error itself.
  */
-export function createAxiosTransport(instance: AxiosInstance): Transport {
+export function createAxiosTransport(instance: AxiosInstance): (request: core.ResolvedRequest) => Promise<TransportResult> {
   return async (request) => {
     const config: AxiosRequestConfig = {
       ...request.options,
@@ -204,7 +204,7 @@ export const axiosInstance = axios.create()
 /**
  * The default transport: `axiosInstance` wrapped by `createAxiosTransport`. Wrap another instance the same way to send through it.
  */
-export const defaultTransport: Transport = createAxiosTransport(axiosInstance)
+export const defaultTransport = createAxiosTransport(axiosInstance)
 
 export const client = createClientCore({ defaultTransport })
 

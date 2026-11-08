@@ -278,11 +278,12 @@ export type TransportResult<TData = unknown, TRequest = NativeRequest, TResponse
 }
 
 /**
- * The per-plugin send, supplied to `createClientCore` as `defaultTransport`.
+ * The per-plugin send, supplied to `createClientCore` as `defaultTransport`. It returns a transport result, or a web
+ * `Response` that the core reads with `readResponse`, so a library such as ky only has to send the request.
  */
 export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = (
   request: ResolvedRequest,
-) => Promise<TransportResult<unknown, TRequest, TResponse>>
+) => Promise<TransportResult<unknown, TRequest, TResponse> | Response>
 
 export type CallResult<TRequest = NativeRequest, TResponse = NativeResponse> = {
   status: number
@@ -548,18 +549,32 @@ export function getResponseContentType(headers: Headers | Record<string, string>
 }
 
 /**
- * Builds a transport result from a web `Response`, for any HTTP library that returns one, such as `fetch` or ky. The body
- * is parsed by `responseType` and the `Content-Type`. A 204, 205, 304, or bodiless response is no data, a streamed call
- * answered with JSON or an error is decoded by its content type, and a failed blob or arraybuffer call is too when the
- * runtime knows the type, so `error` is the error object. An unknown type, which a codec may own, keeps the bytes.
+ * The `RequestInit` of a resolved request, for `fetch` and any library that takes the same init, such as ky. The
+ * request's `options` go first, so the method, headers, body, signal, and credentials the client resolved win.
  *
  * @example
  * ```ts
- * const transport: Transport = async (request) => {
- *   const response = await ky(request.url, { ...request.options, method: request.method, headers: request.headers, body: request.body, signal: request.signal, throwHttpErrors: false })
- *   return readResponse(response, { request, responseType: request.responseType })
- * }
+ * client.setConfig({ transport: (request) => ky(request.url, { ...toRequestInit(request), throwHttpErrors: false, retry: 0 }) })
  * ```
+ */
+export function toRequestInit(request: ResolvedRequest): RequestInit {
+  const init: RequestInit = {
+    ...request.options,
+    method: request.method,
+    headers: request.headers,
+    body: request.body,
+    signal: request.signal,
+  }
+  if (request.credentials) init.credentials = request.credentials
+  return init
+}
+
+/**
+ * Builds a transport result from a web `Response`, for any HTTP library that returns one, such as `fetch` or ky.
+ * The core calls it for a transport that returns a `Response`, with the resolved request as `request`. The body
+ * is parsed by `responseType` and the `Content-Type`. A 204, 205, 304, or bodiless response is no data, a streamed call
+ * answered with JSON or an error is decoded by its content type, and a failed blob or arraybuffer call is too when the
+ * runtime knows the type, so `error` is the error object. An unknown type, which a codec may own, keeps the bytes.
  */
 export async function readResponse<TRequest, TResponse extends Response>(
   response: TResponse,
@@ -727,7 +742,13 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const { request, codecs, validate } = await resolveRequest({ config, requestConfig })
 
     const resolvedRequest = await interceptors.request.run(request, requestConfig)
-    const result = await interceptors.response.run(await transport(resolvedRequest), requestConfig)
+    const sent = await transport(resolvedRequest)
+    // A transport that returns a plain `Response` carries the resolved request, since the library kept its own.
+    const transported =
+      typeof Response !== 'undefined' && sent instanceof Response
+        ? await readResponse(sent as TResponse & Response, { request: resolvedRequest as TRequest, responseType: resolvedRequest.responseType })
+        : (sent as TransportResult<unknown, TRequest, TResponse>)
+    const result = await interceptors.response.run(transported, requestConfig)
 
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
     const validator = requestConfig.validator

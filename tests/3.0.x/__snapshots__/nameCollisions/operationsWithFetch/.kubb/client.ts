@@ -1,5 +1,5 @@
 import * as core from './core'
-import { createClientCore, readResponse } from './core'
+import { createClientCore, readResponse, toRequestInit } from './core'
 export * from './core'
 
 /** The request and response objects of this transport, carried on every result and error. */
@@ -56,17 +56,8 @@ export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse>
 /**
  * The default transport that sends the resolved request through `globalThis.fetch` and returns the parsed body with the native request and response.
  */
-export const defaultTransport: Transport = async (request) => {
-  const init: RequestInit = {
-    ...request.options,
-    method: request.method,
-    headers: request.headers,
-    body: request.body,
-    signal: request.signal,
-  }
-  if (request.credentials) init.credentials = request.credentials
-
-  const nativeRequest = new Request(request.url, init)
+export const defaultTransport = async (request: core.ResolvedRequest): Promise<TransportResult> => {
+  const nativeRequest = new Request(request.url, toRequestInit(request))
   // `Request` drops the non-standard `next` field, so Next.js reads it from the init.
   const nextInit: NativeOptions | undefined = request.options?.next ? { next: request.options.next } : undefined
   const response = await globalThis.fetch(nativeRequest, nextInit)
