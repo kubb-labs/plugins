@@ -188,6 +188,16 @@ export function isEventStream(node: ast.OperationNode): boolean {
   return getEventStream(node) !== null
 }
 
+/**
+ * Whether the primary success response offers `text/event-stream`, alone or next to other content types. The client asks
+ * for the stream by default and ships the `sse.ts` runtime, so a mixed response can be read as events too.
+ */
+export function hasEventStreamContent(node: ast.OperationNode): boolean {
+  const entries = getPrimarySuccessResponse(node)?.content ?? []
+  // Next to another type, a stream without a schema gets no typed variant, so it keeps the plain call.
+  return entries.some((entry) => baseContentType(entry.contentType) === 'text/event-stream' && (entries.length === 1 || Boolean(entry.schema)))
+}
+
 function isJsonContentType(baseType: string): boolean {
   return baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json'
 }

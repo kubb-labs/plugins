@@ -65,7 +65,7 @@
   "packages/plugin-zod/src/utils.test.ts": "isObjectSchemaNode, isClosedKeySchema, omitUnwrapChain and defaultLiteral are branchy predicates deciding record vs object.",
   "tests/3.0.x/codecParams.test.ts": "Golden path: runs the generated codec client end to end; only coverage of inferred codec encode and decode.",
   "tests/3.0.x/cypressPlugin.test.ts": "Golden path: only snapshot of plugin-cypress output for group, exclude, and include.",
-  "tests/3.0.x/eventStream.test.ts": "Golden path: only coverage of the SSE runtime, stream hook skipping, and OpenAPI 3.2 item schemas.",
+  "tests/3.0.x/eventStream.test.ts": "Golden path: only coverage of the SSE runtime, stream hook skipping, OpenAPI 3.2 item schemas, and a response that offers JSON or an event stream.",
   "tests/3.0.x/main.test.ts": "Regression pins (issues 2619, 2696, asConst) plus discriminator, case-sensitivity and duplicate-enum paths.",
   "tests/3.0.x/nameCollisions.test.ts": "Golden path for the branchy name allocator across every generator; no other file uses these specs.",
   "tests/3.0.x/operations.test.ts": "Golden path: operations inline with downstream plugins, type-checked with tsc; unique.",

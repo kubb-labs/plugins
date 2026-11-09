@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { isEventStream } from '@internals/shared'
+import { hasEventStreamContent } from '@internals/shared'
 import type { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -18,12 +18,13 @@ function buildClientFooter({ baseURL, sse }: { baseURL?: string; sse: boolean })
 
 /**
  * Writes the footer of the `.kubb/client.ts` the plugin injected, the one place it is built, and copies `sse.ts` into
- * `.kubb/` only for a document with a `text/event-stream` operation, so a document without streams ships no stream runtime.
- * `sse` is set by the plugins that ship the runtime, so a custom client from `@kubb/plugin-client` gets neither file.
+ * `.kubb/` only for a document with an operation that offers `text/event-stream`, alone or next to another content type,
+ * so a document without streams ships no stream runtime. `sse` is set by the plugins that ship the runtime, so a custom
+ * client from `@kubb/plugin-client` gets neither file.
  */
 export function StreamRuntime({ nodes, root, sse, baseURL }: { nodes: Array<ast.OperationNode>; root: string; sse?: string; baseURL?: string }): KubbReactNode {
   if (!sse) return null
-  const streams = nodes.some(isEventStream)
+  const streams = nodes.some(hasEventStreamContent)
   const footer = buildClientFooter({ baseURL, sse: streams })
   return (
     <>

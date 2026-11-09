@@ -1,0 +1,25 @@
+openapi: 3.0.3
+info:
+  title: JSON or event stream
+  version: '1'
+paths:
+  /changes:
+    get:
+      operationId: listChanges
+      responses:
+        '200':
+          description: The same changes as JSON or as an event stream, as the Wikimedia EventStreams API declares them
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Change'
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/Change'
+components:
+  schemas:
+    Change:
+      type: object
+      properties:
+        $schema:
+          type: string

@@ -19,6 +19,7 @@ export {
   getResponseType,
   getResponseTypeMap,
   getSuccessResponses,
+  hasEventStreamContent,
   isEventStream,
   isSuccessStatusCode,
   requestGroupOrder,

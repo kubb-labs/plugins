@@ -10,7 +10,7 @@ The generated functions import your module through [`importPath`](https://kubb.d
 | `Options`       | type     | The grouped options object a generated function accepts.                                     |
 | `RequestResult` | type     | What a generated function resolves to.                                                       |
 
-If your spec has server-sent event operations, also export `toEventStream` and the `EventStreamResult`, `SuccessOf`, `TypedEvent`, and `ServerSentEvent` types. A generated function calls `toEventStream<TEvent>(promise)` with the promise your `client` returns and nothing else, and returns `EventStreamResult<TEvent>`. `TEvent` is `TypedEvent<…>` when the document names each event, and `ServerSentEvent<…>` when it types only the payload. The function leaves the response validator on `config.validator.response`, so your module decides how to validate events.
+If your spec has server-sent event operations, also export `toEventStream` and the `EventStreamResult`, `SuccessOf`, `TypedEvent`, and `ServerSentEvent` types. A generated function calls `toEventStream<TEvent>(promise)` with the promise your `client` returns and nothing else, and returns `EventStreamResult<TEvent>`. `TEvent` is `TypedEvent<…>` when the document names each event, and `ServerSentEvent<…>` when it types only the payload. The function leaves the response validator on `config.validator.response`, so your module decides how to validate events. A JSON Lines operation calls `toEventStream<TItem>(promise, { shape: 'line' })` instead, so your `toEventStream` must read the body one JSON item per line when `shape` is `'line'`.
 
 The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-swr`) and `@kubb/plugin-mcp` call the generated functions with `throwOnError: true` and read `data` off the result. The query plugins also import two more types from your module:
 
@@ -64,7 +64,7 @@ Your `client` receives `method`, the `url` template with `{param}` placeholders,
 
 A non-JSON response also passes `responseType`. It is a string such as `'blob'` when every response content type uses one parser, or a map from content type to parser when they differ, for example `{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. Read the response `Content-Type`, look it up in the map (exact type, then `type/*`, then `*/*`), and parse the body with that parser.
 
-A call can also pass `contentType`: `request` is the body's media type, and `response` is the media type to ask for in `Accept`. A streamed operation always passes its media type, such as `contentType: { response: 'text/event-stream' }` or `contentType: { response: 'application/jsonl' }`, so `RequestConfig` needs the field.
+A call can also pass `contentType`: `request` is the body's media type, and `response` is the media type to ask for in `Accept`. A streamed operation always passes its media type, such as `contentType: { response: 'text/event-stream' }` or `contentType: { response: 'application/jsonl' }`. A call whose response offers `text/event-stream` next to another content type passes `text/event-stream` too, unless the caller picks another one. `RequestConfig` needs the field.
 
 ## A minimal client
 
