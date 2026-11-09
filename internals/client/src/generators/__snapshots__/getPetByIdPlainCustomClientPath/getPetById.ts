@@ -10,9 +10,7 @@ import { client } from '@acme/api-client'
 export function getPetById<ThrowOnError extends boolean = true>(
   options: Options<GetPetByIdOptions, ThrowOnError>,
 ): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({ method: 'GET', url: '/pet/{petId}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<GetPetByIdResponses, ThrowOnError>
-  >
+  return apiClient<GetPetByIdResponses, ThrowOnError>({ method: 'GET', url: '/pet/{petId}', ...config, throwOnError: config.throwOnError ?? true })
 }

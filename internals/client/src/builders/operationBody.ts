@@ -10,7 +10,7 @@ import type { ValidatorHooks } from './validator.ts'
 /**
  * The pieces of a generated operation: its generics, `options` parameter, return type, return statement, and whether the
  * body destructures `contentType` from `options`. Shared by the standalone functions and the SDK methods, so a
- * `text/event-stream` operation is wired to `toEventStream` in one place.
+ * streamed operation is wired to `apiClient.stream` in one place.
  */
 export function buildOperationBody({
   node,
@@ -29,7 +29,7 @@ export function buildOperationBody({
 }): { generics: Array<string>; paramsSignature: string; returnType: string; statement: string; mergeContentType: boolean } {
   const { callConfig, mergeContentType, eventStream } = buildCallConfig({ node, validatorHooks, security, throwOnErrorDefault, returnType })
   const signature = buildGroupedOptionsSignature({ node, types, returnType, throwOnErrorDefault, eventStream })
-  const stream = eventStream ? buildEventStreamReturn({ node, types, callConfig, returnType, validatorHooks, throwOnErrorDefault }) : null
+  const stream = eventStream ? buildEventStreamReturn({ node, types, callConfig, returnType, throwOnErrorDefault }) : null
 
   return {
     generics: signature.generics,

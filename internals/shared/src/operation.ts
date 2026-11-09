@@ -224,48 +224,6 @@ function responseTypeForContent(entry: ResponseContentEntry): ResponseType | und
 }
 
 /**
- * Derives the default `responseType` string for an operation from its primary success response.
- *
- * One content type uses {@link responseTypeForContent}. Several content types that all use the same
- * parser collapse to that string, so a call can keep `responseType: 'blob'`. Mixed parsers return
- * `undefined`; {@link getResponseTypeMap} carries the per-type choice.
- */
-export function getResponseType(node: ast.OperationNode): ResponseType | undefined {
-  const entries = getPrimarySuccessResponse(node)?.content ?? []
-  if (entries.length === 0) return undefined
-
-  const responseTypes = entries.map((entry) => responseTypeForContent(entry))
-  const first = responseTypes[0]
-  if (!first) return undefined
-  if (responseTypes.every((responseType) => responseType === first)) return first
-  return undefined
-}
-
-/**
- * Maps each base content type of a primary success response to its parser when those parsers differ.
- *
- * Keys are lowercased and stripped of parameters. JSON entries are kept as `'json'` so a catch-all
- * entry cannot claim a JSON response. Returns `undefined` when {@link getResponseType} already
- * covers the response with one string, or when no content type needs a parser other than JSON.
- * The runtime matches the response `Content-Type` against this map instead of guessing from the media type.
- */
-export function getResponseTypeMap(node: ast.OperationNode): Record<string, ResponseType> | undefined {
-  if (getResponseType(node)) return undefined
-
-  const entries = getPrimarySuccessResponse(node)?.content ?? []
-  if (entries.length <= 1) return undefined
-
-  const map: Record<string, ResponseType> = {}
-  for (const entry of entries) {
-    const baseType = baseContentType(entry.contentType)
-    const responseType = responseTypeForContent(entry) ?? (isJsonContentType(baseType) ? 'json' : undefined)
-    if (baseType && responseType) map[baseType] = responseType
-  }
-
-  return Object.values(map).some((responseType) => responseType !== 'json') ? map : undefined
-}
-
-/**
  * Maps a content type to the PascalCase suffix used to name per-content-type variants
  * (e.g. `application/json` → `Json`, `application/xml` → `Xml`, `multipart/form-data` → `FormData`).
  */

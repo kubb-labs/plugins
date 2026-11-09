@@ -83,21 +83,15 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       // The headers validator helper ships in `.kubb/standardSchema.ts`; a custom client module exports it
       // alongside its other runtime helpers.
       const standardSchemaPath = importPath ?? path.resolve(root, '.kubb/standardSchema.ts')
-      const ssePath = importPath ?? path.resolve(root, '.kubb/sse.ts')
       const stream = getEventStream(node)
 
-      const clientValueImports = (() => {
-        if (returnType === 'plain') return ['client']
-        if (returnType === 'data') return ['client', 'unwrapResult']
-        return ['client', 'withUnwrap']
-      })()
+      const clientValueImports = { plain: ['client'], data: ['client', 'unwrapResult', 'resolveThrowOnError'], full: ['client', 'withUnwrap', 'resolveThrowOnError'] }[
+        returnType
+      ]
 
-      const clientTypeImports = (() => {
-        if (stream) return { plain: ['Options', 'SuccessOf'], data: ['SuccessOf'], full: ['SuccessOf', 'Unwrappable'] }[returnType]
-        if (returnType === 'plain') return ['Options', 'RequestResult']
-        if (returnType === 'data') return ['Options', 'UnwrappedResult']
-        return ['Options', 'Unwrappable', 'RequestResult']
-      })()
+      const clientTypeImports = stream
+        ? buildEventStreamImports({ returnType, typed: stream === 'event', line: stream === 'line' })
+        : { plain: ['Options', 'RequestResult'], data: ['Options', 'UnwrappedResult'], full: ['Options', 'Unwrappable', 'RequestResult'] }[returnType]
 
       return (
         <File
@@ -109,15 +103,6 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
         >
           <File.Import name={clientValueImports} root={clientRoot} path={clientPath} />
           <File.Import name={clientTypeImports} root={clientRoot} path={clientPath} isTypeOnly />
-          {stream && <File.Import name={['toEventStream']} root={clientRoot} path={ssePath} />}
-          {stream && (
-            <File.Import
-              name={buildEventStreamImports({ returnType, typed: stream === 'event', payload: stream === 'data' })}
-              root={clientRoot}
-              path={ssePath}
-              isTypeOnly
-            />
-          )}
 
           {meta.fileTypes && importedTypeNames.length > 0 && (
             <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTypes.path} isTypeOnly />

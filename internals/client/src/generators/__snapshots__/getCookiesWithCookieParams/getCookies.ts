@@ -2,7 +2,7 @@
 
 import type { Options, Unwrappable, RequestResult } from './.kubb/client'
 import type { GetCookiesOptions, GetCookiesResponses } from './GetCookies'
-import { client, withUnwrap } from './.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from './.kubb/client'
 
 /**
  * {@link /cookies}
@@ -10,15 +10,15 @@ import { client, withUnwrap } from './.kubb/client'
 export function getCookies<ThrowOnError extends boolean = true>(
   options: Options<GetCookiesOptions, ThrowOnError> = {},
 ): Unwrappable<RequestResult<GetCookiesResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({
+    apiClient<GetCookiesResponses, ThrowOnError>({
       method: 'GET',
       url: '/cookies',
       ...config,
       styles: { ...config.styles, cookie: { theme: { explode: false }, ...config.styles?.cookie } },
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<GetCookiesResponses, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

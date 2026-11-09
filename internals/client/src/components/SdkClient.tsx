@@ -36,8 +36,8 @@ export function buildSdkMethod({
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
   const destructure = body.mergeContentType
-    ? 'const { client: request = this.client, contentType, ...config } = options'
-    : 'const { client: request = this.client, ...config } = options'
+    ? 'const { client: apiClient = this.client, contentType, ...config } = options'
+    : 'const { client: apiClient = this.client, ...config } = options'
   const methodBody = [destructure, '', body.statement].map((line) => (line ? `    ${line}` : '')).join('\n')
 
   return `${jsdoc}  public ${name}${generics}(${body.paramsSignature}): ${body.returnType} {\n${methodBody}\n  }`

@@ -60,8 +60,8 @@ export function Operation({ name, node, types, validatorHooks, returnType, throw
         JSDoc={{ comments: buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }) }}
       >
         {body.mergeContentType
-          ? 'const { client: request = client, contentType, ...config } = options'
-          : 'const { client: request = client, ...config } = options'}
+          ? 'const { client: apiClient = client, contentType, ...config } = options'
+          : 'const { client: apiClient = client, ...config } = options'}
         <br />
         {body.statement}
       </Function>

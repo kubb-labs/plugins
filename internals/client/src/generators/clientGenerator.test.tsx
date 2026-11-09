@@ -364,8 +364,38 @@ describe('clientGenerator runtime files', () => {
     const runtime = driver.fileManager.files.filter((file) => file.path.includes('.kubb/'))
     if (!expected) return expect(runtime).toStrictEqual([])
     expect(runtime.map((file) => [file.path.split('/').slice(-2).join('/'), file.copy, file.footer]).sort()).toStrictEqual([
-      ['.kubb/client.ts', undefined, [baseURL ? `client.setConfig({ baseURL: "${baseURL}" })` : null, "export * from './sse.ts'"].filter(Boolean).join('\n')],
+      [
+        '.kubb/client.ts',
+        undefined,
+        [
+          "import { streamMediaTypes } from './sse.ts'",
+          `client.setConfig({ ${baseURL ? `baseURL: "${baseURL}", ` : ''}mediaTypes: { ...streamMediaTypes } })`,
+          "export * from './sse.ts'",
+        ].join('\n'),
+      ],
       ['.kubb/sse.ts', '/templates/sse.ts', undefined],
+    ])
+  })
+
+  test('registers the form media types only when an operation sends a form body', async () => {
+    const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
+    const driver = createMockedPluginDriver({
+      name: 'runtime',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorOperations(sseGenerator, [getPetByIdNode, uploadFileNode], {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverClient,
+    })
+
+    const runtime = driver.fileManager.files.filter((file) => file.path.includes('.kubb/'))
+    expect(runtime.map((file) => [file.path.split('/').slice(-2).join('/'), file.footer])).toStrictEqual([
+      ['.kubb/client.ts', "import { formMediaTypes } from './mediaTypes.ts'\nclient.setConfig({ mediaTypes: { ...formMediaTypes } })"],
     ])
   })
 })

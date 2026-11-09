@@ -162,7 +162,6 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
       const controllers = buildControllers(nodes, ctx, types, validatorEnabled)
       const clientPath = path.resolve(root, '.kubb/client.ts')
       const standardSchemaPath = path.resolve(root, '.kubb/standardSchema.ts')
-      const ssePath = path.resolve(root, '.kubb/sse.ts')
 
       const banner = (file: ast.FileNode) => resolver.default.banner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
       const footer = (file: ast.FileNode) => resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
@@ -181,29 +180,22 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
 
         return (
           <File key={file.path} baseName={file.baseName} path={file.path} meta={file.meta} banner={banner(file)} footer={footer(file)}>
-            <File.Import name={['createClient', returnType === 'data' ? 'unwrapResult' : 'withUnwrap']} root={file.path} path={clientPath} />
+            <File.Import name={['createClient', returnType === 'data' ? 'unwrapResult' : 'withUnwrap', 'resolveThrowOnError']} root={file.path} path={clientPath} />
             <File.Import
-              name={[
-                'ClientConfig',
-                'ClientInstance',
-                'Options',
-                ...(returnType === 'data' ? [] : ['Unwrappable']),
-                ...(hasResult ? [returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'] : []),
-                ...(hasEventStream ? ['SuccessOf'] : []),
-              ]}
+              name={Array.from(
+                new Set([
+                  'ClientConfig',
+                  'ClientInstance',
+                  'Options',
+                  ...(returnType === 'data' ? [] : ['Unwrappable']),
+                  ...(hasResult ? [returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'] : []),
+                  ...(hasEventStream ? buildEventStreamImports({ returnType, typed: shapes.has('event'), line: shapes.has('line') }) : []),
+                ]),
+              )}
               root={file.path}
               path={clientPath}
               isTypeOnly
             />
-            {hasEventStream && <File.Import name={['toEventStream']} root={file.path} path={ssePath} />}
-            {hasEventStream && (
-              <File.Import
-                name={buildEventStreamImports({ returnType, typed: shapes.has('event'), payload: shapes.has('data') })}
-                root={file.path}
-                path={ssePath}
-                isTypeOnly
-              />
-            )}
 
             {validator === 'zod' && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
 

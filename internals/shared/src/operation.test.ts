@@ -10,8 +10,6 @@ import {
   getEventStream,
   getOperationParameters,
   getRequestGroupOptionality,
-  getResponseType,
-  getResponseTypeMap,
   hasEventStreamContent,
   isErrorStatusCode,
   isEventStream,
@@ -460,7 +458,7 @@ describe('toResponseContent', () => {
   })
 })
 
-describe('getResponseType / isEventStream', () => {
+describe('isEventStream', () => {
   function nodeWithResponseContentType(mediaType: string): ast.OperationNode {
     return ast.factory.createOperation({
       operationId: 'streamEvents',
@@ -470,10 +468,8 @@ describe('getResponseType / isEventStream', () => {
     })
   }
 
-  test('maps text/event-stream to a stream responseType, ignoring a charset suffix', () => {
-    expect(getResponseType(nodeWithResponseContentType('text/event-stream'))).toBe('stream')
+  test('reads text/event-stream as a stream, ignoring a charset suffix', () => {
     expect(isEventStream(nodeWithResponseContentType('text/event-stream'))).toBe(true)
-    expect(getResponseType(nodeWithResponseContentType('text/event-stream; charset=utf-8'))).toBe('stream')
     expect(isEventStream(nodeWithResponseContentType('text/event-stream; charset=utf-8'))).toBe(true)
   })
 
@@ -495,7 +491,6 @@ describe('getResponseType / isEventStream', () => {
 
     expect(isEventStream(node)).toBe(false)
     expect(hasEventStreamContent(node)).toBe(true)
-    expect(getResponseType(node)).toBeUndefined()
     expect(getEventStream(node)).toBeNull()
   })
 
@@ -568,78 +563,22 @@ describe('getResponseType / isEventStream', () => {
     })
 
     expect(getEventStream(node)).toBe(shape)
-    expect(getResponseType(node)).toBe(shape ? 'stream' : undefined)
   })
 
-  test('leaves JSON responses to the runtime auto-detection', () => {
-    expect(getResponseType(nodeWithResponseContentType('application/json'))).toBeUndefined()
+  test('keeps JSON and binary responses a normal call', () => {
     expect(isEventStream(nodeWithResponseContentType('application/json'))).toBe(false)
     expect(hasEventStreamContent(nodeWithResponseContentType('application/json'))).toBe(false)
-  })
-
-  test('maps other non-JSON content types to text or blob', () => {
-    expect(getResponseType(nodeWithResponseContentType('text/plain'))).toBe('text')
-    expect(getResponseType(nodeWithResponseContentType('application/octet-stream'))).toBe('blob')
     expect(isEventStream(nodeWithResponseContentType('application/octet-stream'))).toBe(false)
   })
 
-  test('maps a single binary schema to blob even when the media type is not a known binary type', () => {
-    const node = ast.factory.createOperation({
-      operationId: 'download',
-      method: 'GET',
-      path: '/file',
-      responses: [
-        ast.factory.createResponse({
-          statusCode: '200',
-          content: [ast.factory.createContent({ contentType: 'application/vnd.custom', schema: ast.factory.createSchema({ type: 'blob' }) })],
-        }),
-      ],
-    })
-
-    expect(getResponseType(node)).toBe('blob')
-    expect(getResponseTypeMap(node)).toBeUndefined()
-  })
-
-  test('keeps one shared parser when every content type uses it', () => {
-    const node = nodeWithResponseContents([
-      { contentType: 'audio/mpeg', schemaType: 'blob' },
-      { contentType: 'application/octet-stream', schemaType: 'blob' },
-    ])
-
-    expect(getResponseType(node)).toBe('blob')
-    expect(getResponseTypeMap(node)).toBeUndefined()
-    expect(isEventStream(node)).toBe(false)
-  })
-
-  test('maps each content type when a binary body shares the response with an event stream', () => {
+  test('keeps a binary body next to an event stream a normal call', () => {
     const node = nodeWithResponseContents([
       { contentType: 'audio/mpeg', schemaType: 'blob' },
       { contentType: 'text/event-stream; charset=utf-8', schemaType: 'object' },
     ])
 
-    expect(getResponseType(node)).toBeUndefined()
-    expect(getResponseTypeMap(node)).toStrictEqual({ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' })
     expect(isEventStream(node)).toBe(false)
-  })
-
-  test('keeps JSON in the map so a wildcard cannot claim it', () => {
-    const node = nodeWithResponseContents([
-      { contentType: 'application/json', schemaType: 'object' },
-      { contentType: '*/*', schemaType: 'blob' },
-    ])
-
-    expect(getResponseType(node)).toBeUndefined()
-    expect(getResponseTypeMap(node)).toStrictEqual({ 'application/json': 'json', '*/*': 'blob' })
-  })
-
-  test('returns no map when every content type is JSON', () => {
-    const node = nodeWithResponseContents([
-      { contentType: 'application/json', schemaType: 'object' },
-      { contentType: 'application/problem+json', schemaType: 'object' },
-    ])
-
-    expect(getResponseType(node)).toBeUndefined()
-    expect(getResponseTypeMap(node)).toBeUndefined()
+    expect(hasEventStreamContent(node)).toBe(true)
   })
 })
 
