@@ -91,15 +91,15 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "^5.16.0",
+    "@kubb/kit": "^5.16.1",
     "@kubb/plugin-faker": "workspace:^",
     "@kubb/plugin-ts": "workspace:^",
-    "@kubb/renderer-jsx": "^5.16.0"
+    "@kubb/renderer-jsx": "^5.16.1"
   },
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "msw": "^3.0.3"
+    "msw": "^3.0.4"
   },
   "peerDependencies": {
     "msw": "^3.0.0"
