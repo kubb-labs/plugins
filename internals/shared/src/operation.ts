@@ -153,11 +153,13 @@ function baseContentType(contentType: string): string {
   return contentType.split(';')[0]!.trim().toLowerCase()
 }
 
+type ResponseContentEntry = { contentType: string; schema?: ast.SchemaNode | null; stream?: ast.ContentNode['stream'] }
+
 /**
  * Whether a content entry is a sequence of JSON values the adapter marks as a stream, such as `application/jsonl`,
  * `application/x-ndjson`, `application/json-seq`, or any media type with an OpenAPI 3.2 `itemSchema`.
  */
-function isJsonLines(entry: ast.ContentNode): boolean {
+function isJsonLines(entry: ResponseContentEntry): boolean {
   const baseType = baseContentType(entry.contentType)
   // `multipart/mixed` is a stream of parts, not of JSON values.
   return Boolean(entry.stream) && baseType !== 'text/event-stream' && !baseType.startsWith('multipart/')
@@ -200,7 +202,7 @@ function isJsonContentType(baseType: string): boolean {
  * binary type. Other `text/*` is text, and `application/octet-stream`, `application/pdf`,
  * `image/*`, `audio/*`, and `video/*` are blobs.
  */
-function responseTypeForContent(entry: ast.ContentNode): ResponseType | undefined {
+function responseTypeForContent(entry: ResponseContentEntry): ResponseType | undefined {
   const baseType = baseContentType(entry.contentType)
   if (!baseType) return undefined
   if (baseType === 'text/event-stream' || isJsonLines(entry)) return 'stream'
@@ -284,15 +286,15 @@ export type ContentVariant = { name: string; suffix: string; schema: ast.SchemaN
 
 /**
  * Returns the entry with a `string` schema when the client runtime reads its body as text, such as `Pet` on `application/xml`.
- * JSON, binary, and stream entries keep their schema, and so do wildcards such as `*/*` and `application/*`, so the runtime can pick the
+ * JSON, binary, and stream entries keep their schema, and so do wildcards such as `application/*` and the any-type `*`, so the runtime can pick the
  * parser from the server's `Content-Type`. `text/*` reads as text.
  */
-export function toResponseContent<T extends ContentVariantInput & Pick<ast.ContentNode, 'stream'>>(entry: T): T {
+export function toResponseContent<T extends ContentVariantInput & ResponseContentEntry>(entry: T): T {
   const { contentType, schema } = entry
   if (!schema || entry.stream || ast.resolveRef(schema).primitive === 'string') return entry
 
   const baseType = baseContentType(contentType)
-  const responseType = responseTypeForContent(contentType, schema)
+  const responseType = responseTypeForContent(entry)
   const isText = responseType === 'text' || (!responseType && Boolean(baseType) && !isJsonContentType(baseType) && !baseType.includes('*'))
 
   return isText ? { ...entry, schema: ast.factory.createSchema({ type: 'string' }), keysToOmit: null } : entry
