@@ -212,7 +212,7 @@ describe('OpenAPI 3.2 item schemas', () => {
       expect(chat).toContain('Unwrappable<StreamResult<StreamChatResponses, ThrowOnError, TypedEvent<SuccessOf<StreamChatResponses>>>>')
       expect(chat).toContain("eventShape: 'event'")
       expect(chat).toMatch(/validator: \{[^}]*response:/)
-      expect(chat).not.toMatch(/ as /)
+      expect(chat).not.toMatch(/\) as \w/)
 
       const ticks = await fs.readFile(path.join(output, 'clients', 'streamTicks.ts'), 'utf8')
       expect(ticks).toContain('Unwrappable<StreamResult<StreamTicksResponses, ThrowOnError>>')

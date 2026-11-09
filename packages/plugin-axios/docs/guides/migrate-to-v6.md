@@ -17,7 +17,7 @@ In v6 the axios client runs on the same core as `@kubb/plugin-fetch`. Most edits
 | Calls `toEventStream`, or writes a transport that returns a parsed body                                              | Use `client.stream`, and return a web `Response`. See [Streams and transports](#streams-and-transports).                                                                                                           |
 | Relies on invalid JSON becoming a string, or on the error interceptor skipping network errors                        | Check [Behavior changes in the runtime](#behavior-changes-in-the-runtime). It compiles.                                                                                                                            |
 | Comes from 5.12 or earlier and uses streams                                                                          | Check [From 5.12 or earlier](#from-5-12-or-earlier).                                                                                                                                                               |
-| Uses SDK classes with `group: { type: 'tag' }`, such as `new pet(config)`                                            | Rename them to the PascalCase names, such as `new PetClient(config)`. See [SDK class names](#sdk-class-names).                                                                                                |
+| Uses SDK classes with `group: { type: 'tag' }`, such as `new pet(config)`                                            | Rename them to the PascalCase names, such as `new PetClient(config)`. See [SDK class names](#sdk-class-names).                                                                                                     |
 
 ## Upgrade steps
 

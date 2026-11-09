@@ -2,7 +2,7 @@
 
 import type { ClientConfig, ClientInstance, Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { GetInventoryOptions, GetInventoryResponses } from '../GetInventory'
-import { createClient, withUnwrap } from '../.kubb/client'
+import { createClient, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
 export class StoreClient {
   readonly client: ClientInstance
@@ -19,12 +19,15 @@ export class StoreClient {
   public getInventory<ThrowOnError extends boolean = true>(
     options: Options<GetInventoryOptions, ThrowOnError> = {},
   ): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'GET', url: '/store/inventory', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-        RequestResult<GetInventoryResponses, ThrowOnError>
-      >,
+      apiClient<GetInventoryResponses, ThrowOnError>({
+        method: 'GET',
+        url: '/store/inventory',
+        ...config,
+        throwOnError: resolveThrowOnError(config.throwOnError, true),
+      }),
     )
   }
 }
