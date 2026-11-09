@@ -25,10 +25,9 @@ function buildResponseTypeLiteral(node: ast.HttpOperationNode): string | null {
 
 /**
  * Builds the call config literal a generated operation forwards to the client, shared by the standalone
- * functions and the SDK methods. `baseURL` is the operation's own server and comes before the `...config` spread,
- * so a per-call `baseURL` still wins over it. The `validator` and `throwOnError` entries come after the `...config` spread, so a
- * per-call `validator` is merged per key with the generated one instead of replacing it. `styles` is merged the same
- * way, per parameter, unless `returnType` is `'plain'`.
+ * functions and the SDK methods. The operation's own `baseURL` comes before the `...config` spread, so a per-call one wins. The
+ * `validator` and `throwOnError` entries come after it, so a per-call `validator` is merged per key with the generated one instead
+ * of replacing it. `styles` is merged the same way, per parameter, unless `returnType` is `'plain'`.
  *
  * `mergeContentType` is `true` when the caller must destructure `contentType` from `options`, and
  * `eventStream` is `true` when the operation streams `text/event-stream` or JSON Lines. Unless `returnType` is `'plain'`, a

@@ -1,35 +1,16 @@
-/**
- * An OpenAPI server object, read from a path item or an operation.
- */
-type Server = {
-  url: string
-  variables?: Record<string, { default?: string } | undefined>
-}
-
+type Server = { url: string; variables?: Record<string, { default?: string } | undefined> }
 type WithServers = { servers?: Array<Server> }
 
-/**
- * The adapter's `server` option: which entry of a `servers` list to pick, and values for its `{variable}` placeholders.
- */
+/** The adapter's `server` option: the `servers` entry to pick and values for its `{variable}` placeholders. */
 export type ServerOptions = { index?: number; variables?: Record<string, string> }
 
-/**
- * The slice of an OpenAPI document the base URL derivation reads: the `servers` on each path item and on
- * each operation under it. Typed locally so this package stays independent of the OpenAPI adapter.
- */
-export type ServerDocument = {
-  paths?: Record<string, (WithServers & Record<string, unknown>) | undefined>
-}
+/** The `servers` on each path item and operation, typed locally so this package stays independent of the OpenAPI adapter. */
+export type ServerDocument = { paths?: Record<string, (WithServers & Record<string, unknown>) | undefined> }
 
 /**
- * Returns the base URL of an operation that declares its own `servers`, or of the path item it lives under.
- * The operation's list wins over the path item's. The entry is picked with the adapter's `server.index`,
- * falling back to the first one, and its `{variable}` placeholders are filled from `variables`, then from
- * the spec defaults. Returns `undefined` when neither declares `servers`, so the client's `baseURL` applies.
- *
- * @example
- * `getOperationBaseURL({ document, method: 'GET', path: '/.sse' })`
- * `// 'https://echo.websocket.org'`
+ * Returns the URL of the operation's own `servers`, else its path item's, picked with `server.index` and falling back to the
+ * first entry. `{variable}` placeholders are filled from `server.variables`, then the spec defaults. Returns `undefined` when
+ * neither declares `servers`, so the client's `baseURL` applies.
  */
 export function getOperationBaseURL({
   document,
