@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from 'vitest'
-import { type EventStreamCall, parseEventStream, parseJsonLines, type ServerSentEvent, toEventStream } from './sse.ts'
+import { type ClientConfig, createClientCore, type EventStreamOptions, type RequestConfig, type ServerSentEvent } from './core.ts'
+import { parseEventStream, parseJsonLines, streamMediaTypes } from './sse.ts'
 import { ParseError, type StandardSchemaValidator } from './standardSchema.ts'
 
 const encoder = new TextEncoder()
@@ -25,10 +26,6 @@ async function collect<T>(stream: AsyncIterable<T>): Promise<Array<T>> {
   const items: Array<T> = []
   for await (const item of stream) items.push(item)
   return items
-}
-
-function call({ data, contentType = 'text/event-stream' }: { data: unknown; contentType?: string }): EventStreamCall<Response> {
-  return { data, contentType, response: new Response() }
 }
 
 const message = <TData>({ data, ...rest }: { data: TData } & Partial<Omit<ServerSentEvent, 'data'>>): ServerSentEvent<TData> => ({
@@ -224,7 +221,7 @@ describe('parseJsonLines', () => {
   })
 })
 
-describe('toEventStream', () => {
+describe('streamMediaTypes', () => {
   const validator: StandardSchemaValidator = {
     '~standard': {
       validate: (value) =>
@@ -234,118 +231,72 @@ describe('toEventStream', () => {
     },
   }
 
-  test('passes maxEventSize to the parser and exposes the response', async () => {
-    const response = new Response()
-    const result = await toEventStream(Promise.resolve({ ...call({ data: streamOf([`data: ${'x'.repeat(44)}\n\n`]) }), response }), {
-      config: { maxEventSize: 49 },
-    })
+  function stream(
+    body: ReadableStream<Uint8Array> | null,
+    {
+      contentType = 'text/event-stream',
+      status = 200,
+      client = {},
+      ...config
+    }: Omit<RequestConfig, 'method' | 'url'> & EventStreamOptions & { contentType?: string; status?: number; client?: ClientConfig<unknown, unknown> } = {},
+  ) {
+    const response = new Response(body, { status, headers: { 'content-type': contentType } })
+    const instance = createClientCore<unknown, unknown>({ defaultTransport: async () => response, mediaTypes: streamMediaTypes, ...client })
+    return instance.stream({ method: 'GET', url: '/events', eventShape: 'data', ...config })
+  }
 
-    expect(result.response).toBe(response)
+  test('passes maxEventSize to the parser and exposes the response', async () => {
+    const result = await stream(streamOf([`data: ${'x'.repeat(44)}\n\n`]), { maxEventSize: 49 })
+
+    expect(result.response).toBeInstanceOf(Response)
     await expect(collect(result.stream)).rejects.toThrow(RangeError)
   })
 
-  test.each([undefined, null])('yields nothing for a missing body (%s)', async (data) => {
-    expect(await collect((await toEventStream(Promise.resolve({ data, status: 204, response: new Response(null, { status: 204 }) }))).stream)).toStrictEqual([])
-  })
-
-  test.each([
-    ['a stream labeled text/plain', call({ data: streamOf(['data: a\n\n']), contentType: 'text/plain' })],
-    ['a stream without a content type', { data: streamOf(['data: a\n\n']), response: new Response() }],
-  ])('parses %s as an event stream', async (_, first) => {
-    expect(await collect((await toEventStream(Promise.resolve(first))).stream)).toStrictEqual([message({ data: 'a' })])
-  })
-
-  test('throws a TypeError with the body as cause for a successful answer that is not a stream', async () => {
-    const result = toEventStream(Promise.resolve({ data: { message: 'queued' }, status: 200, contentType: 'application/json', response: new Response() }))
-
-    await expect(result).rejects.toThrow(TypeError)
-    await expect(result).rejects.toMatchObject({ cause: { message: 'queued' } })
+  test('yields nothing for a missing body', async () => {
+    expect(await collect((await stream(null, { status: 204 })).stream)).toStrictEqual([])
   })
 
   test('accepts a content type with parameters', async () => {
-    const first = call({ data: streamOf(['data: a\n\n']), contentType: 'Text/Event-Stream; charset=utf-8' })
-
-    expect(await collect((await toEventStream<ServerSentEvent<string>>(Promise.resolve(first))).stream)).toStrictEqual([message({ data: 'a' })])
-  })
-
-  test('keeps the status and error of a failed call made with throwOnError false', async () => {
-    const response = new Response(null, { status: 503 })
-    const result = await toEventStream<ServerSentEvent<string>>(
-      Promise.resolve({ data: undefined, error: { message: 'busy' }, status: 503, contentType: 'application/json', response }),
-    )
-
-    expect({ status: result.status, error: result.error, data: result.data, response: result.response }).toStrictEqual({
-      status: 503,
-      error: { message: 'busy' },
-      data: undefined,
-      response,
-    })
-    expect(await collect(result)).toStrictEqual([])
-  })
-
-  test('leaves data undefined for a failed call whose error body is empty', async () => {
-    const result = await toEventStream<ServerSentEvent<string>>(
-      Promise.resolve({ data: undefined, error: undefined, status: 503, response: new Response(null, { status: 503 }) }),
-    )
-
-    expect({ status: result.status, error: result.error, data: result.data }).toStrictEqual({ status: 503, error: undefined, data: undefined })
+    const result = await stream(streamOf(['data: a\n\n']), { contentType: 'Text/Event-Stream; charset=utf-8' })
+    expect(await collect(result.stream)).toStrictEqual([message({ data: 'a' })])
   })
 
   test('iterates the result as its stream', async () => {
-    const result = await toEventStream<ServerSentEvent<string>>(Promise.resolve(call({ data: streamOf(['data: a\n\n', 'data: b\n\n']) })))
+    const result = await stream(streamOf(['data: a\n\n', 'data: b\n\n']))
 
     expect(result.data).toBe(result.stream)
     expect(await collect(result)).toStrictEqual([message({ data: 'a' }), message({ data: 'b' })])
   })
 
   test('runs transform before the validator and validates data for the data shape', async () => {
-    const transform = vi.fn((event: ServerSentEvent) => ({ ...event, data: { n: (event.data as { count: number }).count } }))
-    const { stream } = await toEventStream(Promise.resolve(call({ data: streamOf(['id: 9\ndata: {"count":1}\n\n']) })), {
-      config: { transform },
-      shape: 'data',
-      validator,
-    })
-
-    expect(await collect(stream)).toStrictEqual([message({ data: { n: 1, checked: true }, id: '9' })])
-    expect(transform).toHaveBeenCalledOnce()
+    const transform = (event: ServerSentEvent) => ({ ...event, data: { n: event.data } })
+    const result = await stream(streamOf(['data: 1\n\n']), { transform, validator: { response: validator } })
+    expect(await collect(result)).toStrictEqual([message({ data: { n: 1, checked: true } })])
   })
 
   test('validates the whole event for the event shape and keeps id and retry', async () => {
-    const { stream } = await toEventStream(Promise.resolve(call({ data: streamOf(['event: n\nid: 1\nretry: 5\ndata: 1\n\n']) })), {
-      shape: 'event',
-      validator,
-    })
-
-    expect(await collect(stream)).toStrictEqual([{ data: 1, event: 'n', id: '1', retry: 5, checked: true }])
+    const result = await stream(streamOf(['id: 7\nretry: 10\nevent: ping\ndata: 1\n\n']), { eventShape: 'event', validator: { response: validator } })
+    expect(await collect(result)).toStrictEqual([{ data: 1, event: 'ping', id: '7', retry: 10, checked: true }])
   })
 
-  test('reads JSON Lines for the line shape, validates each line, and skips transform', async () => {
-    const transform = vi.fn((event: ServerSentEvent) => event)
-    const first = call({ data: streamOf(['{"n":1}\n{"n":', '2}\n']), contentType: 'application/x-ndjson' })
-    const result = await toEventStream(Promise.resolve(first), { config: { transform }, shape: 'line', validator })
-
-    expect(await collect(result)).toStrictEqual([
-      { n: 1, checked: true },
-      { n: 2, checked: true },
-    ])
-    expect(transform).not.toHaveBeenCalled()
-    expect(result.lastEventId).toBe('')
-  })
-
-  test('names JSON Lines in the TypeError for a successful answer that is not a stream', async () => {
-    const result = toEventStream(Promise.resolve({ data: '{"n":1}', status: 200, contentType: 'application/jsonl', response: new Response() }), {
-      shape: 'line',
-    })
-
-    await expect(result).rejects.toThrow('Expected a JSON Lines body, got application/jsonl')
-  })
+  test.each(['application/jsonl', 'application/x-ndjson', 'application/json-seq', 'application/geo+json-seq'])(
+    'reads %s as JSON Lines, validates each line, and skips transform',
+    async (contentType) => {
+      const transform = vi.fn((event: ServerSentEvent) => event)
+      const result = await stream(streamOf(['{"n":1}\n{"n":2}\n']), { contentType, eventShape: undefined, transform, validator: { response: validator } })
+      expect(await collect(result)).toStrictEqual([
+        { n: 1, checked: true },
+        { n: 2, checked: true },
+      ])
+      expect(transform).not.toHaveBeenCalled()
+    },
+  )
 
   test('a failing validation calls onValidationError and keeps streaming when it is handled', async () => {
     const onValidationError = vi.fn((_error: ParseError, context: { value: unknown }) => ({ value: { replaced: context.value } }))
-    const first = call({ data: streamOf(['data: {"n":1}\n\ndata: "bad"\n\ndata: {"n":2}\n\n']) })
-    const { stream } = await toEventStream(Promise.resolve(first), { config: { onValidationError }, validator })
+    const result = await stream(streamOf(['data: {"n":1}\n\ndata: "bad"\n\ndata: {"n":2}\n\n']), { onValidationError, validator: { response: validator } })
 
-    expect(await collect(stream)).toStrictEqual([
+    expect(await collect(result)).toStrictEqual([
       message({ data: { n: 1, checked: true } }),
       message({ data: { replaced: 'bad' } }),
       message({ data: { n: 2, checked: true } }),
@@ -356,35 +307,29 @@ describe('toEventStream', () => {
   })
 
   test('a failing validation ends the stream when no handler takes it', async () => {
-    const { stream } = await toEventStream(Promise.resolve(call({ data: streamOf(['data: "bad"\n\n']) })), {
-      config: { onValidationError: () => undefined },
-      validator,
-    })
-
-    await expect(collect(stream)).rejects.toBeInstanceOf(ParseError)
+    const result = await stream(streamOf(['data: "bad"\n\n']), { onValidationError: () => undefined, validator: { response: validator } })
+    await expect(collect(result)).rejects.toBeInstanceOf(ParseError)
   })
 
   test('reads validate and onValidationError from the client when the call does not set them', async () => {
     const onValidationError = vi.fn(() => ({ value: 'replaced' }))
-    const client = { getConfig: () => ({ onValidationError }) }
-    const { stream } = await toEventStream(Promise.resolve(call({ data: streamOf(['data: "bad"\n\n']) })), { client, validator })
-    expect(await collect(stream)).toStrictEqual([message({ data: 'replaced' })])
+    const handled = await stream(streamOf(['data: "bad"\n\n']), { client: { onValidationError }, validator: { response: validator } })
+    expect(await collect(handled)).toStrictEqual([message({ data: 'replaced' })])
 
-    const skipped = { getConfig: () => ({ validate: false }) }
-    const { stream: unvalidated } = await toEventStream(Promise.resolve(call({ data: streamOf(['data: "bad"\n\n']) })), { client: skipped, validator })
-    expect(await collect(unvalidated)).toStrictEqual([message({ data: 'bad' })])
+    const skipped = await stream(streamOf(['data: "bad"\n\n']), { client: { validate: false }, validator: { response: validator } })
+    expect(await collect(skipped)).toStrictEqual([message({ data: 'bad' })])
   })
 
   test.each([false, { response: false }])('validate %o skips the validator', async (validate) => {
-    const { stream } = await toEventStream(Promise.resolve(call({ data: streamOf(['data: "bad"\n\n']) })), { config: { validate }, validator })
-    expect(await collect(stream)).toStrictEqual([message({ data: 'bad' })])
+    const result = await stream(streamOf(['data: "bad"\n\n']), { validate, validator: { response: validator } })
+    expect(await collect(result)).toStrictEqual([message({ data: 'bad' })])
   })
 
   test('ends the loop with the abort reason once the signal is aborted, before the next event of the same chunk', async () => {
     const controller = new AbortController()
     const cancel = vi.fn()
-    const stream = new ReadableStream({ start: (c) => c.enqueue(encoder.encode('id: 1\ndata: a\n\nid: 2\ndata: b\n\n')), cancel })
-    const result = await toEventStream(Promise.resolve(call({ data: stream })), { config: { signal: controller.signal } })
+    const body = new ReadableStream({ start: (c) => c.enqueue(encoder.encode('id: 1\ndata: a\n\nid: 2\ndata: b\n\n')), cancel })
+    const result = await stream(body, { signal: controller.signal })
     const seen: Array<unknown> = []
 
     const error = await (async () => {
@@ -402,13 +347,13 @@ describe('toEventStream', () => {
 
   test('rejects with the abort reason when the transport fails the read with its own error', async () => {
     const controller = new AbortController()
-    const stream = new ReadableStream({
+    const body = new ReadableStream({
       pull: (c) => {
         controller.abort(new Error('stop'))
         c.error(new Error('CanceledError'))
       },
     })
-    const result = await toEventStream(Promise.resolve(call({ data: stream })), { config: { signal: controller.signal } })
+    const result = await stream(body, { signal: controller.signal })
 
     await expect(collect(result.stream)).rejects.toStrictEqual(new Error('stop'))
   })
@@ -416,7 +361,7 @@ describe('toEventStream', () => {
   test('cancels the reader when the consumer breaks', async () => {
     const cancel = vi.fn()
 
-    for await (const _event of (await toEventStream(Promise.resolve(call({ data: endless(cancel) })))).stream) break
+    for await (const _event of (await stream(endless(cancel))).stream) break
     expect(cancel).toHaveBeenCalledOnce()
   })
 
@@ -426,7 +371,12 @@ describe('toEventStream', () => {
       throw new Error('boom')
     }
 
-    await expect(collect((await toEventStream(Promise.resolve(call({ data: endless(cancel) })), { config: { transform } })).stream)).rejects.toThrow('boom')
+    await expect(collect((await stream(endless(cancel), { transform })).stream)).rejects.toThrow('boom')
     expect(cancel).toHaveBeenCalledOnce()
+  })
+
+  test('reads a whole body as text, as an error body is', async () => {
+    const decode = streamMediaTypes['text/event-stream']?.decode
+    expect(await decode?.(new Response('data: a\n\n'), { contentType: 'text/event-stream', config: {} })).toBe('data: a\n\n')
   })
 })

@@ -3,23 +3,31 @@ import { Readable } from 'node:stream'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { afterEach, describe, expect, test, vi } from 'vitest'
-import { axiosInstance, client, createAxiosTransport, createClient, createClientCore, ResponseError } from './client.ts'
+import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
+import { client, createAxiosTransport, createClient, createClientCore, formMediaTypes, getAxiosInstance, ResponseError } from './client.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string; headers?: Record<string, unknown> }
 
+/** The bytes axios reads with `responseType: 'arraybuffer'`: a value as JSON, a string as is. */
+function toBytes(data: unknown): unknown {
+  if (data instanceof Uint8Array || data instanceof ArrayBuffer || data instanceof Blob || data instanceof ReadableStream || data instanceof Readable) return data
+  return Buffer.from(typeof data === 'string' ? data : JSON.stringify(data))
+}
+
 /**
- * An axios instance stub that records each request config and answers with the programmed response. It never throws
- * on a status, as a real instance with `validateStatus: () => true` does not.
+ * An axios instance stub that records each request config and answers with the programmed response as bytes, as a
+ * real instance does for the transport. It never throws on a status, as a real instance with `validateStatus: () => true` does not.
  */
 function fakeAxios(result: Programmed = {}) {
   const calls: Array<AxiosRequestConfig> = []
   const request = vi.fn(async (config: AxiosRequestConfig) => {
     calls.push(config)
+    const data = result.data ?? { ok: true }
     return {
-      data: result.data ?? { ok: true },
+      data: toBytes(data),
       status: result.status ?? 200,
       statusText: result.statusText ?? 'OK',
-      headers: result.headers ?? {},
+      headers: result.headers ?? (typeof data === 'object' ? { 'content-type': 'application/json' } : {}),
       config,
     } as unknown as AxiosResponse
   })
@@ -31,7 +39,7 @@ function fakeAxios(result: Programmed = {}) {
 function realAxios() {
   return axios.create({
     adapter: async (config: InternalAxiosRequestConfig) =>
-      ({ data: { ok: true }, status: 200, statusText: 'OK', headers: { 'content-type': 'application/json' }, config }) as AxiosResponse,
+      ({ data: toBytes({ ok: true }), status: 200, statusText: 'OK', headers: { 'content-type': 'application/json' }, config }) as AxiosResponse,
   })
 }
 
@@ -50,14 +58,13 @@ describe('createAxiosTransport', () => {
     expect((result.response as AxiosResponse).headers).toMatchObject({ 'x-count': 2 })
   })
 
-  test('reads a bodiless status as no data, as the fetch transport does, and keeps an empty 200 body', async () => {
+  test('reads a bodiless status and an empty body as no data, as the fetch transport does', async () => {
     const none = createClientCore({ defaultTransport: fakeAxios({ data: '', status: 204, statusText: 'No Content' }).transport })
     const empty = createClientCore({ defaultTransport: fakeAxios({ data: '', headers: { 'content-type': 'text/plain' } }).transport })
-
     const emptyJson = createClientCore({ defaultTransport: fakeAxios({ data: '', headers: { 'content-type': 'application/json' } }).transport })
 
     expect(await none({ method: 'DELETE', url: '/pet/1' })).toMatchObject({ status: 204, data: undefined, error: undefined })
-    expect(await empty({ method: 'GET', url: '/pet/1' })).toMatchObject({ status: 200, data: '' })
+    expect(await empty({ method: 'GET', url: '/pet/1' })).toMatchObject({ status: 200, data: undefined })
     expect(await emptyJson({ method: 'GET', url: '/pet/1' })).toMatchObject({ status: 200, data: undefined })
   })
 
@@ -159,7 +166,7 @@ describe('createAxiosTransport', () => {
     ])
   })
 
-  test('decodes a body by its Content-Type when no response type is set, as the fetch transport does', async () => {
+  test('decodes a body by its Content-Type, as the fetch transport does', async () => {
     const bodies: Record<string, [string, string]> = {
       '/text': ['{"id":1}', 'text/plain'],
       '/json': ['{"id":1}', 'application/json'],
@@ -176,6 +183,26 @@ describe('createAxiosTransport', () => {
     expect((await client({ method: 'GET', url: 'https://petstore.dev/number' })).data).toBe('123')
   })
 
+  test('decodes a body the Node adapter reads, with every built-in media type', async () => {
+    const server = http.createServer((req, res) => {
+      const [type, body] = req.url === '/png' ? ['image/png', Buffer.from([1, 2])] : ['application/json', Buffer.from('{"ok":true}')]
+      res.writeHead(200, { 'content-type': type })
+      res.end(body)
+    })
+    await new Promise<void>((resolve) => server.listen(0, resolve))
+    const base = `http://localhost:${(server.address() as { port: number }).port}`
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'http' })) })
+
+    try {
+      expect((await client({ method: 'GET', url: `${base}/json` })).data).toStrictEqual({ ok: true })
+      const png = (await client({ method: 'GET', url: `${base}/png` })).data as Blob
+      expect(png.type).toBe('image/png')
+      expect(new Uint8Array(await png.arrayBuffer())).toStrictEqual(new Uint8Array([1, 2]))
+    } finally {
+      server.close()
+    }
+  })
+
   test('rejects an aborted call with the signal reason, as fetch does', async () => {
     const reason = new Error('stop')
     const fetch = async () => new Response('{}', { headers: { 'content-type': 'application/json' } })
@@ -185,7 +212,7 @@ describe('createAxiosTransport', () => {
   })
 
   test('rejects with the signal reason when the abort comes while the body is read', async () => {
-    // A map with a stream entry makes axios resolve at the headers, so the body is read after `instance.request`.
+    // A stream call makes axios resolve at the headers, so the body is read after `instance.request`.
     const server = http.createServer((_req, res) => (res.writeHead(200, { 'content-type': 'application/json' }), res.write('{"partial":')))
     await new Promise<void>((resolve) => server.listen(0, resolve))
     const url = `http://localhost:${(server.address() as { port: number }).port}/events`
@@ -194,18 +221,20 @@ describe('createAxiosTransport', () => {
     const reason = new Error('stop')
 
     try {
-      const call = client({ method: 'GET', url, signal: controller.signal, responseType: { 'application/json': 'json', 'text/event-stream': 'stream' } })
+      const call = client({ method: 'GET', url, signal: controller.signal, parseAs: 'json', options: { responseType: 'stream' } })
+      const streamed = client.stream({ method: 'GET', url, signal: controller.signal })
       setTimeout(() => controller.abort(reason), 100)
       await expect(call).rejects.toBe(reason)
+      await expect(streamed).rejects.toBe(reason)
     } finally {
       server.closeAllConnections()
       server.close()
     }
   })
 
-  test('sends the serialized body and turns URLSearchParams into a string for the Node adapter', async () => {
+  test('sends the encoded body and turns URLSearchParams into a string for the Node adapter', async () => {
     const { calls, transport } = fakeAxios()
-    const client = createClientCore({ defaultTransport: transport })
+    const client = createClientCore({ defaultTransport: transport, mediaTypes: formMediaTypes })
 
     await client({ method: 'POST', url: '/pet', body: { name: 'odie' } })
     await client({ method: 'POST', url: '/pet', body: { foo: 'a b' }, contentType: 'application/x-www-form-urlencoded' })
@@ -216,78 +245,64 @@ describe('createAxiosTransport', () => {
     expect(transform('kept')).toBe('kept')
   })
 
-  test('passes the signal and the response type, and streams through the fetch adapter in the browser unless one is set', async () => {
+  test('reads bytes, or a stream when the call streams, and streams through the fetch adapter in the browser unless one is set', async () => {
     const { calls, transport } = fakeAxios()
-    const client = createClientCore({ defaultTransport: transport })
+    const client = createClientCore({ defaultTransport: transport, mediaTypes: streamMediaTypes })
     const controller = new AbortController()
     vi.stubGlobal('XMLHttpRequest', class {})
 
-    await client({ method: 'GET', url: '/events', responseType: 'stream', signal: controller.signal })
-    await client({ method: 'GET', url: '/events', responseType: 'stream', options: { adapter: 'xhr' } })
-    await client({ method: 'GET', url: '/pet', responseType: 'blob' })
+    await client({ method: 'GET', url: '/events', parseAs: 'stream', signal: controller.signal })
+    await client({ method: 'GET', url: '/events', contentType: { response: 'text/event-stream' }, options: { adapter: 'xhr' } })
+    await client({ method: 'GET', url: '/pet', parseAs: 'blob' })
     vi.unstubAllGlobals()
 
     expect(calls[0]).toMatchObject({ responseType: 'stream', adapter: 'fetch', signal: controller.signal })
-    expect(calls[1]?.adapter).toBe('xhr')
-    expect(calls[2]).toMatchObject({ responseType: 'blob' })
+    expect(calls[1]).toMatchObject({ responseType: 'stream', adapter: 'xhr' })
+    expect(calls[2]).toMatchObject({ responseType: 'arraybuffer' })
     expect(calls[2]?.adapter).toBeUndefined()
   })
 
-  test('reads a blob as a buffer on the Node adapter and wraps it, and keeps blob on the fetch adapter and in the browser', async () => {
+  test('reads a blob from the bytes on every adapter, labeled with its media type', async () => {
     const png = Buffer.from([0x89, 0x50, 0x4e, 0x47])
-    const { calls, transport } = fakeAxios({ data: png, headers: { 'content-type': 'image/png' } })
+    const { transport } = fakeAxios({ data: png, headers: { 'content-type': 'image/png' } })
     const client = createClientCore({ defaultTransport: transport })
 
-    const node = await client({ method: 'GET', url: '/image', responseType: 'blob' })
-    await client({ method: 'GET', url: '/image', responseType: 'blob', options: { adapter: 'fetch' } })
-    vi.stubGlobal('XMLHttpRequest', class {})
-    await client({ method: 'GET', url: '/image', responseType: 'blob' })
+    const node = await client({ method: 'GET', url: '/image', parseAs: 'blob' })
+    const fetched = await createClientCore({ defaultTransport: fakeAxios({ data: new Blob([png]), headers: { 'content-type': 'image/png' } }).transport })({
+      method: 'GET',
+      url: '/image',
+    })
 
-    expect(calls.map((call) => call.responseType)).toStrictEqual(['arraybuffer', 'blob', 'blob'])
-    expect(node.data).toBeInstanceOf(Blob)
-    expect((node.data as Blob).type).toBe('image/png')
-    expect(new Uint8Array(await (node.data as Blob).arrayBuffer())).toStrictEqual(new Uint8Array(png))
+    for (const { data } of [node, fetched]) {
+      expect(data).toBeInstanceOf(Blob)
+      expect((data as Blob).type).toBe('image/png')
+      expect(new Uint8Array(await (data as Blob).arrayBuffer())).toStrictEqual(new Uint8Array(png))
+    }
   })
 
-  test('keeps a text-mode error body as text, as the fetch transport does', async () => {
-    const { transport } = fakeAxios({ data: '404', status: 404, headers: { 'content-type': 'application/json' } })
-    const client = createClientCore({ defaultTransport: transport, throwOnError: false })
-
-    expect((await client({ method: 'GET', url: '/pet', responseType: 'text' })).error).toBe('404')
-  })
-
-  test('keeps a failed blob call whose content type the runtime does not know as a Blob, as the fetch transport does', async () => {
-    const { transport } = fakeAxios({ data: Buffer.from([1, 2, 3]), status: 500, headers: { 'content-type': 'application/vnd.custom' } })
-    const client = createClientCore({ defaultTransport: transport, throwOnError: false })
-
-    const { error } = await client({ method: 'GET', url: '/image', responseType: 'blob' })
-    expect(error).toBeInstanceOf(Blob)
-    expect(new Uint8Array(await (error as Blob).arrayBuffer())).toEqual(new Uint8Array([1, 2, 3]))
-  })
-
-  test('decodes the error body of a blob call on every adapter, instead of returning bytes', async () => {
+  test('decodes an error body by its media type, whatever parseAs says', async () => {
     const body = Buffer.from('{"message":"gone"}')
     const { transport } = fakeAxios({ data: body, status: 404, headers: { 'content-type': 'application/json' } })
     const client = createClientCore({ defaultTransport: transport, throwOnError: false })
 
-    expect((await client({ method: 'GET', url: '/image', responseType: 'blob' })).error).toStrictEqual({ message: 'gone' })
+    expect((await client({ method: 'GET', url: '/image', parseAs: 'blob' })).error).toStrictEqual({ message: 'gone' })
     const { transport: fetchTransport } = fakeAxios({ data: new Blob([body]), status: 404, headers: { 'content-type': 'application/json' } })
     const fetchClient = createClientCore({ defaultTransport: fetchTransport, throwOnError: false })
-    expect((await fetchClient({ method: 'GET', url: '/image', responseType: 'blob', options: { adapter: 'fetch' } })).error).toStrictEqual({ message: 'gone' })
+    expect((await fetchClient({ method: 'GET', url: '/image', parseAs: 'text', options: { adapter: 'fetch' } })).error).toStrictEqual({ message: 'gone' })
   })
 
   test('keeps the instance adapter for a stream, and the Node adapter outside the browser', async () => {
     const seen: Array<unknown> = []
     const adapter = async (config: InternalAxiosRequestConfig) =>
-      (seen.push(config.adapter), { data: {}, status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse
+      (seen.push(config.adapter), { data: toBytes({}), status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse
     const custom = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter })) })
     const { calls, transport } = fakeAxios()
     const node = createClientCore({ defaultTransport: transport })
     vi.stubGlobal('XMLHttpRequest', class {})
 
-    await custom({ method: 'GET', url: '/events', responseType: 'stream' })
+    await custom({ method: 'GET', url: '/events', parseAs: 'stream' })
     vi.unstubAllGlobals()
-    await node({ method: 'GET', url: '/events', responseType: 'stream' })
+    await node({ method: 'GET', url: '/events', parseAs: 'stream' })
 
     expect(seen).toStrictEqual([adapter])
     expect(calls[0]?.adapter).toBeUndefined()
@@ -297,16 +312,21 @@ describe('createAxiosTransport', () => {
     const networkError = Object.assign(new Error('Network Error'), { isAxiosError: true, name: 'AxiosError' })
     const instance = { request: vi.fn(async () => Promise.reject(networkError)) } as unknown as AxiosInstance
     const client = createClientCore({ defaultTransport: createAxiosTransport(instance) })
+    const seen: Array<unknown> = []
+    client.interceptors.error.use((error) => void seen.push(error))
 
     await expect(client({ method: 'GET', url: '/pet' })).rejects.toBe(networkError)
+    expect(seen).toStrictEqual([networkError])
   })
 
-  test('runs client.interceptors next to the axios interceptors of the wrapped instance', async () => {
+  test('runs client.interceptors next to the axios interceptors of the wrapped instance, which see the raw bytes', async () => {
     const instance = realAxios()
     instance.interceptors.request.use((config) => {
       config.headers.set('X-Axios', 'yes')
       return config
     })
+    const intercepted: Array<unknown> = []
+    instance.interceptors.response.use((response) => (intercepted.push(response.data), response))
     const client = createClientCore({ defaultTransport: createAxiosTransport(instance) })
     const seen: Array<string> = []
     client.interceptors.request.use((request) => (seen.push(`request ${request.headers['X-Kubb']}`), request))
@@ -316,9 +336,11 @@ describe('createAxiosTransport', () => {
 
     expect((result.response as AxiosResponse).config.headers.get('X-Axios')).toBe('yes')
     expect(seen).toStrictEqual(['request yes', 'response 200'])
+    expect(intercepted[0]).toBeInstanceOf(Uint8Array)
+    expect(result.data).toStrictEqual({ ok: true })
   })
 
-  describe('a streamed call answered without an event stream', () => {
+  describe('a call that streams', () => {
     const encoder = new TextEncoder()
     const streamOf = (text: string) => new ReadableStream<Uint8Array>({ start: (controller) => (controller.enqueue(encoder.encode(text)), controller.close()) })
     // The adapter goes on the call, since a stream request without its own adapter switches to the fetch adapter.
@@ -329,45 +351,43 @@ describe('createAxiosTransport', () => {
     const streaming = (status: number, text: string, contentType: string) =>
       createClientCore({
         defaultTransport: createAxiosTransport(axios.create()),
+        mediaTypes: streamMediaTypes,
         options: { adapter: answering({ status, body: streamOf(text), contentType }) },
       })
+    const accepting = { method: 'GET', url: '/events', contentType: { response: 'text/event-stream' } } as const
 
-    test('reads a JSON body back into its value and keeps an event stream as a stream', async () => {
-      const json = await streaming(200, '{"ok":true}', 'application/json')({ method: 'GET', url: '/events', responseType: 'stream' })
-      expect(json.data).toStrictEqual({ ok: true })
-
-      const problem = await streaming(200, '{"ok":true}', 'application/problem+json')({ method: 'GET', url: '/events', responseType: 'stream' })
-      expect(problem.data).toStrictEqual({ ok: true })
-
-      const events = await streaming(200, 'data: a\n\n', 'text/event-stream')({ method: 'GET', url: '/events', responseType: 'stream' })
-      expect(events.data).toBeInstanceOf(ReadableStream)
-
-      const ndjson = await streaming(200, '{"a":1}\n{"a":2}\n', 'application/x-ndjson')({ method: 'GET', url: '/events', responseType: 'stream' })
-      expect(ndjson.data).toBeInstanceOf(ReadableStream)
+    test('decodes a JSON answer to a call that asks for events, and keeps an event stream a stream', async () => {
+      expect((await streaming(200, '{"ok":true}', 'application/json')(accepting)).data).toStrictEqual({ ok: true })
+      expect((await streaming(200, '{"ok":true}', 'application/problem+json')(accepting)).data).toStrictEqual({ ok: true })
+      expect((await streaming(200, 'data: a\n\n', 'text/event-stream')(accepting)).data).toBeInstanceOf(ReadableStream)
+      expect((await streaming(200, '{"a":1}\n{"a":2}\n', 'application/x-ndjson')(accepting)).data).toBeInstanceOf(ReadableStream)
     })
 
     test('reads a JSON body the Node adapter streams as a readable', async () => {
       const client = createClientCore({
         defaultTransport: createAxiosTransport(axios.create()),
+        mediaTypes: streamMediaTypes,
         options: { adapter: answering({ body: Readable.from([Buffer.from('{"ok":true}')]), contentType: 'application/json' }) },
       })
 
-      const result = await client({ method: 'GET', url: '/events', responseType: 'stream' })
-
-      expect(result.data).toStrictEqual({ ok: true })
+      expect((await client(accepting)).data).toStrictEqual({ ok: true })
     })
 
-    test('runs the response validator on a JSON body and throws a ResponseError with a parsed error body', async () => {
-      const validator = { response: { '~standard': { validate: () => ({ value: 'validated' }) } } }
-      const ok = await streaming(200, '{"ok":true}', 'application/json')({ method: 'GET', url: '/events', responseType: 'stream', validator })
-      expect(ok.data).toBe('validated')
+    test('reads events with client.stream, and throws a ResponseError with a decoded error body', async () => {
+      const events = await streaming(200, 'data: a\n\ndata: b\n\n', 'text/event-stream').stream({ method: 'GET', url: '/events' })
+      const seen: Array<unknown> = []
+      for await (const event of events) seen.push(event)
+      expect(seen).toStrictEqual([
+        { data: 'a', event: 'message' },
+        { data: 'b', event: 'message' },
+      ])
 
-      await expect(streaming(404, '{"message":"gone"}', 'application/json')({ method: 'GET', url: '/events', responseType: 'stream' })).rejects.toMatchObject({
+      await expect(streaming(404, '{"message":"gone"}', 'application/json').stream({ method: 'GET', url: '/events' })).rejects.toMatchObject({
         name: 'ResponseError',
         status: 404,
         data: { message: 'gone' },
       })
-      await expect(streaming(503, 'busy', 'text/plain')({ method: 'GET', url: '/events', responseType: 'stream' })).rejects.toMatchObject({
+      await expect(streaming(503, 'busy', 'text/plain').stream({ method: 'GET', url: '/events' })).rejects.toMatchObject({
         name: 'ResponseError',
         status: 503,
         data: 'busy',
@@ -376,84 +396,19 @@ describe('createAxiosTransport', () => {
   })
 })
 
-describe('a responseType map', () => {
-  const audio = new Uint8Array([0xff, 0xfb, 0x90, 0x00])
-  const json = (value: unknown) => new TextEncoder().encode(JSON.stringify(value)).buffer
-  /** A real axios instance, so `transformResponse` and the axios interceptors run, answering with the given body. */
-  const answering = ({ status = 200, body, contentType }: { status?: number; body: unknown; contentType: string }) => {
-    const seen: Array<InternalAxiosRequestConfig> = []
-    const instance = axios.create({
-      adapter: async (config: InternalAxiosRequestConfig) => {
-        seen.push(config)
-        return { data: body, status, statusText: 'x', headers: { 'content-type': contentType }, config } as AxiosResponse
-      },
-    })
-    return { instance, seen, client: createClientCore({ defaultTransport: createAxiosTransport(instance) }) }
-  }
-
-  test('reads bytes and decodes the matching content type to a Blob with its media type', async () => {
-    const { client, seen } = answering({ body: audio.buffer, contentType: 'audio/mpeg' })
-    const result = await client({ method: 'POST', url: '/speech', responseType: { 'audio/mpeg': 'blob', 'application/json': 'json' } })
-
-    expect(seen[0]?.responseType).toBe('arraybuffer')
-    expect(result.data).toBeInstanceOf(Blob)
-    expect((result.data as Blob).type).toBe('audio/mpeg')
-    expect(new Uint8Array(await (result.data as Blob).arrayBuffer())).toEqual(audio)
-  })
-
-  test('matches a type wildcard', async () => {
-    const { client } = answering({ body: audio.buffer, contentType: 'audio/wav' })
-    const result = await client({ method: 'POST', url: '/speech', responseType: { 'audio/*': 'blob', 'application/json': 'json' } })
-    expect(result.data).toBeInstanceOf(Blob)
-  })
-
-  test('hands the axios response interceptors the parsed JSON body', async () => {
-    const { client, instance } = answering({ body: json({ delta: 'hi' }), contentType: 'application/json' })
-    const intercepted: Array<unknown> = []
-    instance.interceptors.response.use((response) => (intercepted.push(response.data), response))
-
-    const result = await client({ method: 'POST', url: '/speech', responseType: { 'audio/mpeg': 'blob', 'application/json': 'json' } })
-
-    expect(intercepted).toStrictEqual([{ delta: 'hi' }])
-    expect(result.data).toStrictEqual({ delta: 'hi' })
-  })
-
-  test('reads a stream when the map has a stream entry, and keeps an event stream as a stream', async () => {
-    const responseType = { 'audio/mpeg': 'blob', 'text/event-stream': 'stream' } as const
-    const events = answering({ body: new Blob(['data: hi\n\n']).stream(), contentType: 'text/event-stream' })
-    const result = await events.client({ method: 'POST', url: '/speech', responseType })
-
-    expect(events.seen[0]?.responseType).toBe('stream')
-    expect(result.data).toBeInstanceOf(ReadableStream)
-
-    const speech = answering({ body: new Blob([audio]).stream(), contentType: 'audio/mpeg' })
-    const blob = (await speech.client({ method: 'POST', url: '/speech', responseType })).data as Blob
-    expect(new Uint8Array(await blob.arrayBuffer())).toEqual(audio)
-  })
-
-  test('decodes a mapped error body into ResponseError.data', async () => {
-    const { client } = answering({ status: 400, body: json({ message: 'bad' }), contentType: 'application/json' })
-    await expect(client({ method: 'POST', url: '/speech', responseType: { 'audio/mpeg': 'blob' } })).rejects.toMatchObject({
-      name: 'ResponseError',
-      status: 400,
-      data: { message: 'bad' },
-    })
-  })
-})
-
 describe('client', () => {
-  test('sends through axiosInstance, and through a transport set on the client, a call, or a child', async () => {
+  test('sends through getAxiosInstance(), and through a transport set on the client, a call, or a child', async () => {
     const seen: Array<string> = []
     const transport = (name: string) =>
       createAxiosTransport(
         axios.create({
           adapter: async (config: InternalAxiosRequestConfig) =>
-            (seen.push(name), { data: {}, status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse,
+            (seen.push(name), { data: toBytes({}), status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse,
         }),
       )
     using _request = vi
-      .spyOn(axiosInstance, 'request')
-      .mockImplementation(async (config) => (seen.push('default'), { data: {}, status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse)
+      .spyOn(getAxiosInstance(), 'request')
+      .mockImplementation(async (config) => (seen.push('default'), { data: toBytes({}), status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse)
 
     await client({ method: 'GET', url: '/pet' })
     await client({ method: 'GET', url: '/pet', transport: transport('call') })
@@ -465,14 +420,18 @@ describe('client', () => {
     expect(seen).toStrictEqual(['default', 'call', 'child', 'swapped'])
   })
 
+  test('creates the axios instance on first use, and returns the same one after', () => {
+    expect(getAxiosInstance()).toBe(getAxiosInstance())
+  })
+
   test('runs client.interceptors on the resolved request, the result, and the ResponseError', async () => {
     const own = createClient()
     const seen: Array<string> = []
     const requestId = own.interceptors.request.use((request) => (seen.push(`request ${request.headers['X-Kubb']}`), request))
     own.interceptors.response.use((result) => (seen.push(`response ${result.status}`), result))
-    own.interceptors.error.use((error) => (seen.push(`error ${error.status}`), error))
+    own.interceptors.error.use((error) => (seen.push(`error ${ResponseError.is(error) ? error.status : error.name}`), error))
     const adapter = async (config: InternalAxiosRequestConfig) =>
-      ({ data: {}, status: config.url === '/fail' ? 500 : 200, statusText: 'x', headers: {}, config }) as AxiosResponse
+      ({ data: toBytes({}), status: config.url === '/fail' ? 500 : 200, statusText: 'x', headers: {}, config }) as AxiosResponse
 
     await own({ method: 'GET', url: '/pet', headers: { 'X-Kubb': 'a' }, options: { adapter } })
     own.interceptors.request.update(requestId, (request) => (seen.push('updated'), request))

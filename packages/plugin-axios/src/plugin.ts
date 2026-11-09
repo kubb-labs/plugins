@@ -7,7 +7,7 @@ import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
-import { axiosClientTemplatePath, coreTemplatePath, serializersTemplatePath, sseTemplatePath, standardSchemaTemplatePath } from './templates.ts'
+import { axiosClientTemplatePath, coreTemplatePath, mediaTypesTemplatePath, serializersTemplatePath, sseTemplatePath, standardSchemaTemplatePath } from './templates.ts'
 import type { PluginAxios, ResolvedOptions, ResolverClient } from './types.ts'
 
 /**
@@ -87,6 +87,12 @@ export const pluginAxios = defineExtension<PluginAxios>({
       baseName: 'serializers.ts',
       path: path.resolve(root, '.kubb/serializers.ts'),
       copy: serializersTemplatePath,
+    })
+
+    injectFile({
+      baseName: 'mediaTypes.ts',
+      path: path.resolve(root, '.kubb/mediaTypes.ts'),
+      copy: mediaTypesTemplatePath,
     })
 
     injectFile({

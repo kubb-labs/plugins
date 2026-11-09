@@ -1,4 +1,4 @@
-import { createClientCore, readResponse, toRequestInit } from './core.ts'
+import { createClientCore, createLazyClient, toRequestInit } from './core.ts'
 import * as core from './core.ts'
 
 export * from './core.ts'
@@ -49,13 +49,14 @@ export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRe
   TResponse
 >
 export type ResponseErrorConfig<TError = unknown> = core.ResponseError<TError, NativeRequest, NativeResponse>
-export type TransportResult<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.TransportResult<TData, TRequest, TResponse>
+export type TransportResult<TRequest = NativeRequest, TResponse = NativeResponse> = core.TransportResult<TRequest, TResponse>
+export type DecodedResponse<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.DecodedResponse<TData, TRequest, TResponse>
 export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
 export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
 export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
 
 /**
- * The default transport that sends the resolved request through `globalThis.fetch` and returns the parsed body with the native request and response.
+ * The default transport that sends the resolved request through `globalThis.fetch` and returns the `Response` with the native `Request`.
  */
 export const defaultTransport = async (request: core.ResolvedRequest): Promise<TransportResult> => {
   const nativeRequest = new Request(request.url, toRequestInit(request))
@@ -63,9 +64,10 @@ export const defaultTransport = async (request: core.ResolvedRequest): Promise<T
   const nextInit: NativeOptions | undefined = request.options?.next ? { next: request.options.next } : undefined
   const response = await globalThis.fetch(nativeRequest, nextInit)
 
-  return readResponse(response, { request: nativeRequest, responseType: request.responseType })
+  return { webResponse: response, request: nativeRequest, response }
 }
 
-export const client = createClientCore({ defaultTransport })
+/** The client every generated operation uses unless the call passes its own. It is created on first use. */
+export const client = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
 
 export const createClient = client.createClient
