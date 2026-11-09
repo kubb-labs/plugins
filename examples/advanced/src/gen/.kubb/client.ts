@@ -82,8 +82,19 @@ function decodeBytes(data: unknown, responseType: ResponseType | undefined, cont
   return responseType === 'text' || responseType === 'document' ? text : parseJsonOrText(text)
 }
 
-function hasContentType(headers: Record<string, string>): boolean {
-  return Object.keys(headers).some((name) => name.toLowerCase() === 'content-type')
+function getContentType(headers: Record<string, string>): string | undefined {
+  const key = Object.keys(headers).find((name) => name.toLowerCase() === 'content-type')
+  return key ? headers[key] : undefined
+}
+
+/**
+ * A body the axios Node adapter sends as fetch would: it rejects a typed array, and labels a Blob with the Blob's own type
+ * over the `Content-Type` header, so the Blob takes the header's type.
+ */
+function toAxiosData(body: unknown, contentType: string | undefined): unknown {
+  if (ArrayBuffer.isView(body)) return body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength)
+  if (body instanceof Blob && contentType && body.type !== contentType) return new Blob([body], { type: contentType })
+  return body
 }
 
 /** Resolves an adapter setting to the function axios runs, or `undefined` when axios cannot resolve it here. */
@@ -115,8 +126,8 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
       url: request.url,
       method: request.method,
       // axios labels a post, put, or patch without a body as a form, so `false` leaves the header off, as fetch does.
-      headers: request.body === undefined && !hasContentType(request.headers) ? { ...request.headers, 'Content-Type': false } : request.headers,
-      data: request.body,
+      headers: request.body === undefined && getContentType(request.headers) === undefined ? { ...request.headers, 'Content-Type': false } : request.headers,
+      data: toAxiosData(request.body, getContentType(request.headers)),
       // Kubb already serialized the body; only URLSearchParams needs a string, since axios's Node adapter rejects it.
       transformRequest: (data) => (data instanceof URLSearchParams ? data.toString() : data),
       signal: request.signal,

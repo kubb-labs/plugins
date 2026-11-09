@@ -134,6 +134,31 @@ describe('createAxiosTransport', () => {
     expect(sent).toStrictEqual([null, 'application/merge-patch+json'])
   })
 
+  test('sends a typed array and a Blob through the Node adapter with the operation content type', async () => {
+    const http = await import('node:http')
+    const seen: Array<{ type: string | undefined; body: string }> = []
+    const server = http.createServer((req, res) => {
+      const chunks: Array<Buffer> = []
+      req.on('data', (chunk: Buffer) => chunks.push(chunk))
+      req.on('end', () => (seen.push({ type: req.headers['content-type'], body: Buffer.concat(chunks).toString('hex') }), res.end()))
+    })
+    await new Promise<void>((resolve) => server.listen(0, resolve))
+    const url = `http://localhost:${(server.address() as { port: number }).port}/upload`
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'http' })) })
+
+    try {
+      await client({ method: 'PUT', url, body: new Uint8Array([9, 0, 1, 2]).subarray(1), contentType: 'application/octet-stream' })
+      await client({ method: 'PUT', url, body: new Blob([new Uint8Array([3])], { type: 'image/png' }), contentType: 'application/octet-stream' })
+    } finally {
+      server.close()
+    }
+
+    expect(seen).toStrictEqual([
+      { type: 'application/octet-stream', body: '000102' },
+      { type: 'application/octet-stream', body: '03' },
+    ])
+  })
+
   test('decodes a body by its Content-Type when no response type is set, as the fetch transport does', async () => {
     const bodies: Record<string, [string, string]> = {
       '/text': ['{"id":1}', 'text/plain'],
