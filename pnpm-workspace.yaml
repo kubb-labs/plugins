@@ -14,19 +14,19 @@ allowBuilds:
 catalog:
   # Ranges, not pins: these end up in the published dependencies and peerDependencies of every
   # plugin, and a pin there conflicts with any newer Kubb release the user installs.
-  '@kubb/adapter-oas': ^5.16.0
-  '@kubb/core': ^5.16.0
-  '@kubb/kit': ^5.16.0
-  '@kubb/plugin-barrel': ^5.16.0
-  '@kubb/renderer-jsx': ^5.16.0
-  '@kubb/parser-ts': ^5.16.0
+  '@kubb/adapter-oas': ^5.16.1
+  '@kubb/core': ^5.16.1
+  '@kubb/kit': ^5.16.1
+  '@kubb/plugin-barrel': ^5.16.1
+  '@kubb/renderer-jsx': ^5.16.1
+  '@kubb/parser-ts': ^5.16.1
   '@types/node': 22.20.2
   '@types/react': ^19.3.0
   '@vitest/coverage-v8': ^5.1.0
   '@vitest/ui': ^5.1.0
-  kubb: ^5.16.0
+  kubb: ^5.16.1
   oxfmt: ^0.76.0
-  oxlint: ^1.91.0
+  oxlint: ^1.92.0
   prettier: ^3.9.10
   # pinned: 0.23.2 needs TypeScript 7.1+ for dts emit, 7.0.x fails with "does not provide the classic TypeScript API"
   tsdown: 0.23.1

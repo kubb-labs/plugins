@@ -73,8 +73,8 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "^5.16.0",
-    "@kubb/renderer-jsx": "^5.16.0",
+    "@kubb/kit": "^5.16.1",
+    "@kubb/renderer-jsx": "^5.16.1",
     "yuku-codegen": "^0.19.0"
   },
   "devDependencies": {
