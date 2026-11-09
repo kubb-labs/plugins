@@ -146,7 +146,7 @@ export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDi
     },
     ipv4: () => 'z.ipv4()',
     ipv6: () => 'z.ipv6()',
-    blob: () => 'z.instanceof(File)',
+    blob: () => 'z.instanceof(Blob)',
     enum(node) {
       const values = node.namedEnumValues?.map((v) => v.value) ?? node.enumValues ?? []
       const nonNullValues = values.filter((v): v is string | number | boolean => v !== null)

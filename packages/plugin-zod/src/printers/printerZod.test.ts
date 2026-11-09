@@ -13,6 +13,8 @@ describe('printerZod', () => {
     ['void', 'z.void()'],
     ['boolean', 'z.boolean()'],
     ['null', 'z.null()'],
+    // The TS type of a binary field is `Blob`, so a plain Blob, not only a File, must pass.
+    ['blob', 'z.instanceof(Blob)'],
   ] as const)('scalar type %s', (type, expected) => {
     expect(printer.print(ast.factory.createSchema({ type }))).toBe(expected)
   })
