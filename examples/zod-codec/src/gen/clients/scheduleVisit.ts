@@ -36,6 +36,7 @@ export function scheduleVisit<ThrowOnError extends boolean = true>(
         headers: toHeadersStandardSchema(scheduleVisitHeadersSchema, scheduleVisitHeadersSchema.shape),
         response: scheduleVisitResponseSchema,
         error: scheduleVisitErrorSchema,
+        errorStatus: [409],
       },
       contentType: { request: 'application/json' },
       ...config,
