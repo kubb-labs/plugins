@@ -13,7 +13,7 @@ import { client, withUnwrap } from '../.kubb/client'
  * {@link /pet/files}
  */
 export function addFiles<ThrowOnError extends boolean = true>(
-  options: Options<AddFilesOptions, ThrowOnError>,
+  options: Options<AddFilesOptions, ThrowOnError> = {},
 ): Unwrappable<RequestResult<AddFilesResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

@@ -32,7 +32,7 @@ export function placeOrderPatch(
         }
       },
     'body'
-  >,
+  > = {},
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<Order> {
   return cy

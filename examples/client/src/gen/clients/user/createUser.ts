@@ -13,7 +13,7 @@ import { client } from '../../../client'
  * {@link /user}
  */
 export function createUser<ThrowOnError extends boolean = true>(
-  options: Options<CreateUserOptions, ThrowOnError>,
+  options: Options<CreateUserOptions, ThrowOnError> = {},
 ): Promise<RequestResult<CreateUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

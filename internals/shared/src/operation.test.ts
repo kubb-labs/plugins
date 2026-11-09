@@ -9,6 +9,7 @@ import {
   hasRequestContentTypeChoice,
   getEventStream,
   getOperationParameters,
+  getRequestGroupOptionality,
   getResponseType,
   getResponseTypeMap,
   isErrorStatusCode,
@@ -367,6 +368,8 @@ describe('buildOptionsSchema', () => {
     const schema = ast.narrowSchema(buildOptionsSchema(node, resolver), 'object')!
 
     expect(schema.properties?.find((property) => property.name === 'body')?.required).toBe(expected)
+    // With no required parameter, the whole options argument follows the body.
+    expect(getRequestGroupOptionality(node).isOptional).toBe(!expected)
   })
 })
 

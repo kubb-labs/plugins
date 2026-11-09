@@ -383,7 +383,7 @@ export function getRequestGroupOptionality(node: ast.OperationNode): RequestGrou
     hasRequiredPath,
     hasRequiredQuery,
     hasRequiredHeader,
-    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !groups.body,
+    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !(groups.body && node.requestBody?.required === true),
   }
 }
 

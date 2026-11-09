@@ -13,7 +13,7 @@ import { client, withUnwrap } from '../../.kubb/client'
  * {@link /user/createWithList}
  */
 export function createUsersWithListInput<ThrowOnError extends boolean = true>(
-  options: Options<CreateUsersWithListInputOptions, ThrowOnError>,
+  options: Options<CreateUsersWithListInputOptions, ThrowOnError> = {},
 ): Unwrappable<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>> {
   const { client: request = client, contentType, ...config } = options
 
