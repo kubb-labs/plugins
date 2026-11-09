@@ -13,4 +13,4 @@ A call picks its base URL in this order:
 3. The path's `servers`.
 4. `createClient`, `setConfig`, or the `baseURL` option.
 
-The adapter's `server.index` picks the entry, falling back to the first, and `{variable}` placeholders take `server.variables`, then the spec defaults. A relative URL such as `/v2` is skipped.
+The adapter's `server.index` picks the entry, falling back to the first. A relative URL such as `/v2`, or one with `{variable}` placeholders, is skipped.
