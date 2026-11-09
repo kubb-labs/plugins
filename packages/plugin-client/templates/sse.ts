@@ -292,7 +292,8 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
     throw Object.assign(new TypeError(`Expected ${expected} body, got ${contentType ?? 'a body without a content type'}`), { cause: body })
   }
 
-  const validate = (value: unknown) => runValidator({ validator: validator!, value, context: { direction: 'response', source: 'body' }, onValidationError })
+  const validate = (value: unknown) =>
+    validator ? runValidator({ validator, value, context: { direction: 'response', source: 'body' }, onValidationError }) : value
   const validateEvent = async (event: ServerSentEvent): Promise<ServerSentEvent> => {
     if (!validator) return event
     const validated = await validate(meta.shape === 'event' ? event : event.data)
@@ -307,7 +308,7 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
       return
     }
     // A JSON Lines item is not an event, so it skips `transform` and is validated as a whole.
-    for await (const item of parseJsonLines({ stream, maxEventSize, terminator })) yield validator ? validate(item) : item
+    for await (const item of parseJsonLines({ stream, maxEventSize, terminator })) yield validate(item)
   }
 
   async function* events(): AsyncGenerator<TEvent> {
