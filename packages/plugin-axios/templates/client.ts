@@ -95,7 +95,7 @@ function decodeBytes(data: unknown, responseType: ResponseType | undefined, cont
  * A body the axios Node adapter sends as fetch would: it rejects a typed array, and labels a Blob with the Blob's own type
  * over the `Content-Type` header, so the Blob takes the header's type.
  */
-function toAxiosData(body: unknown, contentType: string | undefined): unknown {
+function toAxiosData({ body, contentType }: { body: unknown; contentType: string | undefined }): unknown {
   if (ArrayBuffer.isView(body)) return body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength)
   if (body instanceof Blob && contentType && body.type !== contentType) return new Blob([body], { type: contentType })
   return body
@@ -125,14 +125,14 @@ const axiosDefaultAdapters = Array.isArray(axios.defaults.adapter) ? String(axio
  */
 export function createAxiosTransport(instance: AxiosInstance): (request: core.ResolvedRequest) => Promise<TransportResult> {
   return async (request) => {
-    const contentType = getHeader(request.headers, 'content-type')
+    const contentType = getHeader({ headers: request.headers, name: 'content-type' })
     const config: AxiosRequestConfig = {
       ...request.options,
       url: request.url,
       method: request.method,
       // axios labels a post, put, or patch without a body as a form, so `false` leaves the header off, as fetch does.
       headers: request.body === undefined && contentType === undefined ? { ...request.headers, 'Content-Type': false } : request.headers,
-      data: toAxiosData(request.body, contentType),
+      data: toAxiosData({ body: request.body, contentType }),
       // Kubb already serialized the body; only URLSearchParams needs a string, since axios's Node adapter rejects it.
       transformRequest: (data) => (data instanceof URLSearchParams ? data.toString() : data),
       signal: request.signal,

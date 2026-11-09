@@ -403,14 +403,14 @@ function collectHeadersCaseInsensitive(...sources: Array<unknown>): Record<strin
 }
 
 /** The value of a header, matched by name in any letter case. */
-export function getHeader(headers: Record<string, string>, name: string): string | undefined {
+export function getHeader({ headers, name }: { headers: Record<string, string>; name: string }): string | undefined {
   const key = Object.keys(headers).find((k) => k.toLowerCase() === name.toLowerCase())
   return key ? headers[key] : undefined
 }
 
-function deleteHeader(headers: Record<string, string>, name: string): void {
+function deleteHeader({ headers, name }: { headers: Record<string, string>; name: string }): void {
   for (const key of Object.keys(headers)) {
-    if (key.toLowerCase() === name) delete headers[key]
+    if (key.toLowerCase() === name.toLowerCase()) delete headers[key]
   }
 }
 
@@ -480,7 +480,7 @@ export async function resolveAuth(params: {
     if (token === undefined) continue
 
     if (scheme.type !== 'apiKey') {
-      if (getHeader(headers, 'Authorization') === undefined) {
+      if (getHeader({ headers, name: 'Authorization' }) === undefined) {
         headers['Authorization'] = scheme.scheme === 'basic' ? `Basic ${btoa(String.fromCharCode(...new TextEncoder().encode(token)))}` : `Bearer ${token}`
       }
       return
@@ -492,16 +492,16 @@ export async function resolveAuth(params: {
       return
     }
     if (scheme.in === 'cookie') {
-      appendCookie(headers, `${name}=${token}`)
+      appendCookie({ headers, cookie: `${name}=${token}` })
       return
     }
-    if (getHeader(headers, name) === undefined) headers[name] = token
+    if (getHeader({ headers, name }) === undefined) headers[name] = token
     return
   }
 }
 
 /** Adds a cookie to the `Cookie` header, under the key the caller used in any casing. */
-function appendCookie(headers: Record<string, string>, cookie: string): void {
+function appendCookie({ headers, cookie }: { headers: Record<string, string>; cookie: string }): void {
   const key = Object.keys(headers).find((name) => name.toLowerCase() === 'cookie') ?? 'Cookie'
   headers[key] = [headers[key], cookie].filter(Boolean).join('; ')
 }
@@ -688,8 +688,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   const headers = serializeHeaders(applyHeaderStyles(validatedHeaders as HeadersInit | undefined, requestConfig.styles?.header))
   const contentType = requestConfig.contentType
   const { request: requestContentTypeOption, response: responseContentType } = typeof contentType === 'string' ? { request: contentType } : (contentType ?? {})
-  const requestContentType = requestContentTypeOption ?? getHeader(headers, 'content-type')
-  if (responseContentType && getHeader(headers, 'accept') === undefined) {
+  const requestContentType = requestContentTypeOption ?? getHeader({ headers, name: 'content-type' })
+  if (responseContentType && getHeader({ headers, name: 'accept' }) === undefined) {
     headers['Accept'] = responseContentType
   }
 
@@ -703,7 +703,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   })
 
   const cookie = validatedCookies ? serializeCookies(validatedCookies as Record<string, unknown>, requestConfig.styles?.cookie) : ''
-  if (cookie) appendCookie(headers, cookie)
+  if (cookie) appendCookie({ headers, cookie })
 
   const validatedBody = await runValidator({
     validator: isValidationEnabled(validate, 'request') ? requestConfig.validator?.request : undefined,
@@ -719,14 +719,14 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     : bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.styles?.body })
   // The operation's content type replaces a `content-type` header in any letter case, and is left off when there is no body to label.
   if (requestContentTypeOption && validatedBody !== undefined) {
-    deleteHeader(headers, 'content-type')
+    deleteHeader({ headers, name: 'content-type' })
     headers['Content-Type'] = requestContentTypeOption
   }
-  if (usesDefaultBodySerializer && isDefaultJsonBody(validatedBody) && getHeader(headers, 'content-type') === undefined) {
+  if (usesDefaultBodySerializer && isDefaultJsonBody(validatedBody) && getHeader({ headers, name: 'content-type' }) === undefined) {
     headers['Content-Type'] = 'application/json'
   }
   // The transport must set the multipart boundary, even when a content type was explicitly provided.
-  if (body instanceof FormData) deleteHeader(headers, 'content-type')
+  if (body instanceof FormData) deleteHeader({ headers, name: 'content-type' })
 
   const url = serializeUrl({
     parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
