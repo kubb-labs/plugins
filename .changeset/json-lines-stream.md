@@ -9,9 +9,9 @@
 
 Stream a JSON Lines response, such as `application/jsonl`, `application/x-ndjson`, or `application/json-seq`, one parsed item per line.
 
-- An operation whose only success content type is a JSON sequence now returns `StreamResult` typed with one item per line, as a `text/event-stream` operation returns its events. It used to wait for the whole body and return it as one string typed as a single item.
-- The call asks for the declared media type in `Accept`, and `validator: 'zod'` checks each line.
-- `.kubb/sse.ts` adds `parseJsonLines`, and `toEventStream` reads JSON Lines with `shape: 'line'`.
+- An operation whose only success content type is JSON Lines returns `StreamResult` with one item per line, like a `text/event-stream` operation. It used to return the whole body as one string.
+- The call sends the media type in `Accept`, and `validator: 'zod'` checks each line.
+- `.kubb/sse.ts` adds `parseJsonLines`, and a custom client's `toEventStream` gets `{ shape: 'line' }`. An `application/json-seq` record must fit on one line.
 - React Query, Vue Query, and SWR skip hooks for these operations, as they do for event streams.
 
 ```ts

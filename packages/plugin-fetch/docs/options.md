@@ -23,7 +23,7 @@ Pass these options to `pluginFetch()`. Shared options link to [Shared plugin opt
 
 ### baseURL
 
-Base URL prepended to every request. When omitted, each request uses the operation's relative path from the spec. A value with a `${...}` interpolation is emitted as a template literal in the generated client config, so `baseURL: '${process.env.API_URL}'` reads the environment variable at runtime.
+Base URL prepended to every request. When omitted, each request uses the operation's relative path from the spec. A path or operation that declares its own `servers` uses that URL instead. See [Set the base URL](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/base-url). A value with a `${...}` interpolation is emitted as a template literal in the generated client config, so `baseURL: '${process.env.API_URL}'` reads the environment variable at runtime.
 
 |          |          |
 | -------- | -------- |

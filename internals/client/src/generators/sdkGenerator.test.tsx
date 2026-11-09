@@ -106,6 +106,17 @@ describe('sdkGenerator operations', () => {
       name: 'sdkTagGroupWithRoot',
       options: { group: createGroupConfig({ type: 'tag' }), sdk: { mode: 'tag', name: 'petStore' } } as Partial<PluginFetch['resolvedOptions']>,
     },
+    // An operation-level `servers` entry wins over the path's and becomes that method's default `baseURL`.
+    {
+      name: 'sdkClassWithOperationServer',
+      options: {},
+      adapter: {
+        ...createMockedAdapter(),
+        document: {
+          paths: { '/store/inventory': { servers: [{ url: 'https://store.example.com' }], get: { servers: [{ url: 'https://inventory.example.com' }] } } },
+        },
+      } as Adapter,
+    },
   ] as const satisfies Array<{ name: string; options: Partial<PluginFetch['resolvedOptions']>; adapter?: Adapter }>
 
   test.each(testData)('$name', async (props) => {

@@ -6,11 +6,11 @@
 
 Run the fetch and axios clients on one core with the same interceptors and client factory.
 
-- Import types from `templates/client.ts` and the shared runtime from `@kubb/plugin-client/templates/*`. `templates/fetch.ts` and `templates/axios.ts` are gone.
-- Rename `FetchOptions` and `AxiosOptions` to `NativeOptions`.
-- Write `EventStreamResult<ServerSentEvent<Pet>>` where you wrote `EventStreamResult<Pet>`, and the same for `StreamResult` and `UnwrappedStreamResult`.
-- Return a web `Response` from a custom transport, and build its init with `toRequestInit(request)`, so a ky transport is one call.
-- On axios, `client.interceptors` handlers get the core objects. Native handlers go on `getAxiosInstance().interceptors`, and `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
+- Import types from `templates/client.ts` and the runtime from `@kubb/plugin-client/templates/*`. `templates/fetch.ts` and `templates/axios.ts` are gone.
+- `FetchOptions` and `AxiosOptions` are now `NativeOptions`.
+- Stream types take the event: `EventStreamResult<ServerSentEvent<Pet>>` instead of `EventStreamResult<Pet>`, also for `StreamResult` and `UnwrappedStreamResult`.
+- A custom transport returns a web `Response` and builds its init with `toRequestInit(request)`.
+- On axios, `client.interceptors` handlers get the core objects. Native handlers go on `getAxiosInstance().interceptors`. `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
 - Rename `codecs` to `mediaTypes`. `serialize(body, contentType)` becomes `encode(body, context)`, and `deserialize(raw, contentType)` becomes `decode(response, context)`, which reads the body itself: `await response.text()`.
 - Move a custom `serializer.body` into a `mediaTypes` entry. Serializers now cover path, query, header, and cookie only.
 - Replace `responseType` on a call with `parseAs`, such as `parseAs: 'blob'`. The media type now comes from the response `Content-Type`, matched exactly, by `+json` suffix, by `type/*`, then `*/*`.
@@ -35,4 +35,4 @@ New: generated calls pass their types to `apiClient<Responses, ThrowOnError>(con
 + client.setConfig({ transport: createAxiosTransport(axios.create({ baseURL })) })
 ```
 
-To upgrade, regenerate, run `tsc --noEmit`, and fix each error with your plugin's "Migrate to v6" guide. The query plugins work with v5 and v6.
+To upgrade, regenerate, run `tsc --noEmit`, and follow your plugin's "Migrate to v6" guide. The query plugins work with v5 and v6.

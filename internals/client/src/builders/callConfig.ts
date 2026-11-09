@@ -17,9 +17,9 @@ function buildParseAsLiteral(node: ast.HttpOperationNode): string | null {
 
 /**
  * Builds the call config literal a generated operation forwards to the client, shared by the standalone
- * functions and the SDK methods. The `validator` and `throwOnError` entries come after the `...config` spread, so a
- * per-call `validator` is merged per key with the generated one instead of replacing it. `styles` is merged the same
- * way, per parameter, unless `returnType` is `'plain'`.
+ * functions and the SDK methods. The operation's own `baseURL` comes before the `...config` spread, so a per-call one wins. The
+ * `validator` and `throwOnError` entries come after it, so a per-call `validator` is merged per key with the generated one instead
+ * of replacing it. `styles` is merged the same way, per parameter, unless `returnType` is `'plain'`.
  *
  * `mergeContentType` is `true` when the caller must destructure `contentType` from `options`, and
  * `eventStream` is `true` when the operation streams `text/event-stream` or JSON Lines. A Server-Sent Events call
@@ -29,12 +29,14 @@ export function buildCallConfig({
   node,
   validatorHooks,
   security,
+  baseURL,
   throwOnErrorDefault,
   returnType,
 }: {
   node: ast.HttpOperationNode
   validatorHooks: ValidatorHooks | null
   security?: Array<Auth>
+  baseURL?: string
   throwOnErrorDefault: boolean
   returnType: ReturnTypeOption
 }): { callConfig: string; mergeContentType: boolean; eventStream: boolean } {
@@ -55,6 +57,7 @@ export function buildCallConfig({
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
     `url: '${node.path}'`,
+    baseURL ? `baseURL: ${JSON.stringify(baseURL)}` : null,
     securityLiteral ? `security: ${securityLiteral}` : null,
     ownRuntime ? null : styles,
     contentTypeLiteral,
