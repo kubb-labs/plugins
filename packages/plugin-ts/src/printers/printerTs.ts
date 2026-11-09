@@ -3,7 +3,7 @@ import { mapSchemaItems, mapSchemaProperties } from '@internals/shared'
 import { ast, Diagnostics, isStringType, syncSchemaRef } from '@kubb/kit'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
-import { buildPropertyJSDocComments, enumTypeName, isInlineConstEnum } from '../utils.ts'
+import { buildPropertyJSDocComments, enumTypeName, isBinarySchema, isInlineConstEnum } from '../utils.ts'
 
 const { isNonNullable } = factory
 
@@ -324,7 +324,13 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
             readOnly: propMeta?.readOnly,
           })
 
-          return factory.appendJSDocToNode({ node: propertyNode, comments: buildPropertyJSDocComments(property.schema, optional) })
+          // A binary property is a file part of a form upload, where only a `File` carries a filename.
+          const binaryRemark = isBinarySchema(property.schema)
+            ? '@remarks Pass a `File` to send its filename. A plain `Blob` is sent with the filename `blob`.'
+            : undefined
+          const comments = [...buildPropertyJSDocComments(property.schema, optional), binaryRemark]
+
+          return factory.appendJSDocToNode({ node: propertyNode, comments })
         })
 
         const allElements = [...propertyNodes, ...factory.buildIndexSignatures(node, propertyNodes.length, transform)]

@@ -263,7 +263,7 @@ export const uploadFileStatus200Schema = apiResponseSchema
 
 export const uploadFileResponseSchema = uploadFileStatus200Schema
 
-export const uploadFileBodySchema = z.instanceof(File).optional()
+export const uploadFileBodySchema = z.instanceof(Blob).optional()
 
 export const uploadFilePathSchema = z.object({
   petId: z.coerce.bigint().describe('ID of pet to update'),

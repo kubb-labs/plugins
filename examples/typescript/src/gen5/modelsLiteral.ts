@@ -640,7 +640,6 @@ export type UploadFileStatus200 = ApiResponse
 /**
  * @description
  * Format: `binary`
- * @type string | undefined
  */
 export type UploadFileBody = Blob | undefined
 
