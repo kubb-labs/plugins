@@ -726,6 +726,18 @@ describe('createClientCore', () => {
     expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, contentType: undefined, request: 'REQ', response: 'RES' })
   })
 
+  test('runs the error parser only for the statuses in errorStatus when throwOnError is false', async () => {
+    const validator = { error: toFailingSchema(), errorStatus: [404, '5XX'] }
+    const unprocessable = createClient({ data: { message: 'invalid' }, status: 422 }).client
+    const result = (await unprocessable({ method: 'GET', url: '/pet/1', throwOnError: false, validator })) as CallResult<string, string>
+    expect(result).toMatchObject({ status: 422, data: undefined, error: { message: 'invalid' } })
+
+    for (const status of [404, 502]) {
+      const { client } = createClient({ data: { message: 'missing' }, status })
+      await expect(client({ method: 'GET', url: '/pet/1', throwOnError: false, validator })).rejects.toMatchObject({ name: 'ParseError' })
+    }
+  })
+
   test('skips the error parser when the call throws, so it throws the ResponseError', async () => {
     const { client } = createClient({ data: '<html>Bad Gateway</html>', status: 502 })
     const error = vi.fn(() => ({ parsed: true }))

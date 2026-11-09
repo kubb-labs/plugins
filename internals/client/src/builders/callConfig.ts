@@ -28,8 +28,8 @@ function buildResponseTypeLiteral(node: ast.HttpOperationNode): string | null {
  * functions and the SDK methods. The `throwOnError` fallback is applied after the `...config` spread.
  *
  * `mergeContentType` is `true` when the caller must destructure `contentType` from `options`, and
- * `eventStream` is `true` when the operation returns `text/event-stream`. Unless `returnType` is `'plain'`, a
- * stream's literal leaves the `response` validator to `toEventStream`, which runs it per event.
+ * `eventStream` is `true` when the operation streams `text/event-stream` or JSON Lines. Unless `returnType` is `'plain'`, a
+ * stream's literal leaves the `response` validator to `toEventStream`, which runs it per item.
  */
 export function buildCallConfig({
   node,
@@ -57,6 +57,7 @@ export function buildCallConfig({
     'cookies',
     ...(perEvent ? [] : ['response' as const]),
     'error',
+    'errorStatus',
   ])
   const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node })
 
