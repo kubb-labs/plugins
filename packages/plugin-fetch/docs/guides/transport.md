@@ -44,12 +44,13 @@ import ky from 'ky'
 import { client, toRequestInit } from './gen/.kubb/client'
 
 client.setConfig({
-  // The client splits success from error itself, so ky must not throw or retry on an error status.
-  transport: (request) => ky(request.url, { ...toRequestInit(request), throwHttpErrors: false, retry: 0 }),
+  // The client splits success from error itself, so ky must not throw or retry on an error status. ky also
+  // stops any call after 10 seconds unless `timeout` is off; pass `request.signal` to set your own limit.
+  transport: (request) => ky(request.url, { ...toRequestInit(request), throwHttpErrors: false, retry: 0, timeout: false }),
 })
 ```
 
-The library must hand back the body unread. `result.request` is then the resolved request, since the library keeps its own.
+The library must hand back the body unread. `result.request` is then a `Request` built from the resolved request, without its body, since the library keeps its own. With a relative URL, it is the resolved request itself.
 
 ## Mock the network in tests
 

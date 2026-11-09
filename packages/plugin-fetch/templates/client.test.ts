@@ -845,6 +845,17 @@ describe('createClientCore', () => {
     expect(onError).toHaveBeenCalledTimes(1)
   })
 
+  test('throws the error an error interceptor returns, and the original when it returns nothing', async () => {
+    const { client } = createClient({ status: 500 })
+    const mapped = new Error('mapped')
+    client.interceptors.error.use(() => mapped)
+    await expect(client({ method: 'GET', url: '/pet' })).rejects.toBe(mapped)
+
+    const { client: logging } = createClient({ status: 500 })
+    logging.interceptors.error.use((() => undefined) as never)
+    await expect(logging({ method: 'GET', url: '/pet' })).rejects.toBeInstanceOf(ResponseError)
+  })
+
   test('setConfig merges and getConfig reflects it', () => {
     const { client } = createClient()
     client.setConfig({ baseURL: 'https://example.com' })
@@ -968,6 +979,17 @@ describe('header merging', () => {
     const headers = await send({ 'content-type': 'application/vnd.api+json' }, { body: { name: 'odie' } })
     expect(Object.keys(headers).filter((key) => key.toLowerCase() === 'content-type')).toStrictEqual(['content-type'])
     expect(headers['content-type']).toBe('application/vnd.api+json')
+  })
+
+  test('replaces a Content-Type in another casing with the operation content type', async () => {
+    const headers = await send({ 'content-type': 'application/json' }, { body: { name: 'odie' }, contentType: 'application/merge-patch+json' })
+    expect(Object.keys(headers).filter((key) => key.toLowerCase() === 'content-type')).toStrictEqual(['Content-Type'])
+    expect(headers['Content-Type']).toBe('application/merge-patch+json')
+  })
+
+  test('sends no Content-Type when an optional body is left out', async () => {
+    const headers = await send(undefined, { body: undefined, contentType: 'application/json' })
+    expect(Object.keys(headers).some((key) => key.toLowerCase() === 'content-type')).toBe(false)
   })
 })
 
@@ -1546,6 +1568,15 @@ describe('withUnwrap', () => {
 
     expect(result.error).toStrictEqual({ status: 404, statusText: 'Not Found' })
     await expect(withUnwrap(Promise.resolve(result)).unwrap()).rejects.toStrictEqual({ status: 404, statusText: 'Not Found' })
+  })
+
+  test('reports the status as the error when an empty error body is labeled as text', async () => {
+    const response = new Response('', { status: 404, statusText: 'Not Found', headers: { 'Content-Type': 'text/html' } })
+    const client = createClientCore({ defaultTransport: async () => response, throwOnError: false })
+
+    const result = await client({ method: 'GET', url: '/status/404' })
+
+    expect(result.error).toStrictEqual({ status: 404, statusText: 'Not Found' })
   })
 
   test('a rejected call propagates the rejection unchanged', async () => {

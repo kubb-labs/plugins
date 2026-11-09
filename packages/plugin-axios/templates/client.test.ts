@@ -123,6 +123,42 @@ describe('createAxiosTransport', () => {
     ])
   })
 
+  test('sends no Content-Type on a call without a body, where axios would label a patch as a form', async () => {
+    const sent: Array<string | null> = []
+    const fetch = async (input: Request) => (sent.push(input.headers.get('content-type')), new Response(null, { status: 204 }))
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch } })) })
+
+    await client({ method: 'PATCH', url: 'https://petstore.dev/pet/1' })
+    await client({ method: 'PATCH', url: 'https://petstore.dev/pet/1', body: { name: 'odie' }, contentType: 'application/merge-patch+json' })
+
+    expect(sent).toStrictEqual([null, 'application/merge-patch+json'])
+  })
+
+  test('decodes a body by its Content-Type when no response type is set, as the fetch transport does', async () => {
+    const bodies: Record<string, [string, string]> = {
+      '/text': ['{"id":1}', 'text/plain'],
+      '/json': ['{"id":1}', 'application/json'],
+      '/number': ['123', 'text/plain'],
+    }
+    const fetch = async (input: Request) => {
+      const [body, type] = bodies[new URL(input.url).pathname]!
+      return new Response(body, { headers: { 'content-type': type } })
+    }
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch } })) })
+
+    expect((await client({ method: 'GET', url: 'https://petstore.dev/text' })).data).toBe('{"id":1}')
+    expect((await client({ method: 'GET', url: 'https://petstore.dev/json' })).data).toStrictEqual({ id: 1 })
+    expect((await client({ method: 'GET', url: 'https://petstore.dev/number' })).data).toBe('123')
+  })
+
+  test('rejects an aborted call with the signal reason, as fetch does', async () => {
+    const reason = new Error('stop')
+    const fetch = async () => new Response('{}', { headers: { 'content-type': 'application/json' } })
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch } })) })
+
+    await expect(client({ method: 'GET', url: 'https://petstore.dev/pet', signal: AbortSignal.abort(reason) })).rejects.toBe(reason)
+  })
+
   test('sends the serialized body and turns URLSearchParams into a string for the Node adapter', async () => {
     const { calls, transport } = fakeAxios()
     const client = createClientCore({ defaultTransport: transport })
