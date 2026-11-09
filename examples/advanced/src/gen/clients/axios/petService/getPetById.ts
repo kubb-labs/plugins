@@ -49,7 +49,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
         { type: 'oauth2', scopes: ['write:pets', 'read:pets'] },
       ],
       ...config,
-      validator: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema, ...config.validator },
+      validator: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema, errorStatus: [400, 404], ...config.validator },
       throwOnError: config.throwOnError ?? true,
     }) as Promise<
       RequestResult<
