@@ -14,7 +14,7 @@ client.setConfig({
 })
 ```
 
-`auth` takes a token string or a function. The function can be async and returns a token, or `undefined` to skip that scheme. When an operation accepts several schemes, the runtime tries each until one returns a token.
+`auth` takes a token string or a function. The function can be async, so it can read or refresh a token before each call, and returns a token, or `undefined` to skip that scheme. Each OpenAPI security requirement of an operation is one alternative, and the runtime sends the first one whose schemes all get a token. A requirement that needs several schemes together, such as an API key and a session cookie, sends every one of them.
 
 ## Return the right token per scheme
 

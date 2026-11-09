@@ -6,10 +6,10 @@ The transport is a function. Use interceptors for request headers or response lo
 
 ## Write a transport function
 
-`@kubb/plugin-fetch` types the transport as a function that receives a fully resolved request and returns a result:
+`@kubb/plugin-fetch` types the transport as a function that receives a fully resolved request and returns a web `Response`:
 
 ```typescript
-type Transport = (request: ResolvedRequest) => Promise<TransportResult | Response>
+type Transport = (request: ResolvedRequest) => Promise<Response | TransportResult>
 
 type ResolvedRequest = {
   url: string
@@ -19,25 +19,22 @@ type ResolvedRequest = {
   signal?: AbortSignal
   credentials?: RequestCredentials
   options?: NativeOptions
-  responseType?: ResponseType | ResponseTypeMap
+  // The call reads the response as a stream, so a transport that buffers bodies must stream it.
+  stream?: boolean
 }
 
-type TransportResult<TData = unknown> = {
-  data: TData
-  status: number
-  statusText: string
-  headers: Headers
-  contentType?: string
+type TransportResult = {
+  webResponse: Response
   request: Request
   response: Response
 }
 ```
 
-The core hands you a `ResolvedRequest` with the URL built, the query and body serialized, and auth headers set. Return the parsed `data` along with the native `request` and `response`, so status, headers, and the raw body stay reachable on the result. `responseType` is one parser, or a map from content type to parser when the operation returns several types. Call `resolveResponseType(request.responseType, contentType)` from the generated client to get the parser for a response.
+The core hands you a `ResolvedRequest` with the URL built, the query and body encoded, and auth headers set. Return the `Response` with its body unread, and the core decodes it by its media type. Return a `TransportResult` instead to set the native `request` and `response` that results and errors carry.
 
 ## Send with another library
 
-A transport can also return a web `Response`. The client then parses the body the way `defaultTransport` does, so a library that returns a `Response`, such as [ky](https://github.com/sindresorhus/ky), needs only the send. `toRequestInit(request)` gives the `RequestInit` that `fetch` and ky take:
+Since the core reads a web `Response`, a library that returns a `Response`, such as [ky](https://github.com/sindresorhus/ky), needs only the send. `toRequestInit(request)` gives the `RequestInit` that `fetch` and ky take:
 
 ```typescript
 import ky from 'ky'
@@ -61,14 +58,7 @@ import { createClient } from './gen/.kubb/client'
 import { getPetById } from './gen/clients/getPetById'
 
 const testClient = createClient({
-  transport: async (request) => ({
-    data: { id: 1, name: 'Fluffy' },
-    status: 200,
-    statusText: 'OK',
-    headers: new Headers(),
-    request: new Request(request.url),
-    response: new Response(),
-  }),
+  transport: async () => Response.json({ id: 1, name: 'Fluffy' }),
 })
 
 const { data } = await getPetById({ path: { petId: 1 }, client: testClient })

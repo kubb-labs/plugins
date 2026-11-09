@@ -4,13 +4,15 @@ The generated functions import your module through [`importPath`](https://kubb.d
 
 ## Required exports
 
-| Export          | Kind     | Purpose                                                                                      |
-| --------------- | -------- | -------------------------------------------------------------------------------------------- |
-| `client`        | function | Sends the request. Every generated function calls it, unless a call passes its own `client`. |
-| `Options`       | type     | The grouped options object a generated function accepts.                                     |
-| `RequestResult` | type     | What a generated function resolves to.                                                       |
+| Export          | Kind     | Purpose                                                                                                              |
+| --------------- | -------- | -------------------------------------------------------------------------------------------------------------------- |
+| `client`        | function | Sends the request. Every generated function calls it with two type arguments, unless a call passes its own `client`. |
+| `Options`       | type     | The grouped options object a generated function accepts.                                                             |
+| `RequestResult` | type     | What a generated function resolves to.                                                                               |
 
-If your spec has server-sent event operations, also export `toEventStream` and the `EventStreamResult`, `SuccessOf`, `TypedEvent`, and `ServerSentEvent` types. A generated function calls `toEventStream<TEvent>(promise)` with the promise your `client` returns and nothing else, and returns `EventStreamResult<TEvent>`. `TEvent` is `TypedEvent<…>` when the document names each event, and `ServerSentEvent<…>` when it types only the payload. The function leaves the response validator on `config.validator.response`, so your module decides how to validate events. A JSON Lines operation calls `toEventStream<TItem>(promise, { shape: 'line' })` instead, so your `toEventStream` must read the body one JSON item per line when `shape` is `'line'`.
+`client` is generic: a generated function calls `client<TResponses, ThrowOnError>(config)` with its responses record and its `ThrowOnError` flag, and returns what it resolves to with no cast. Type it to return `Promise<RequestResult<TResponses, ThrowOnError>>`.
+
+If your spec has server-sent event or JSON Lines operations, `client` also needs a `stream` method, and the module exports the `StreamResult`, `SuccessOf`, `TypedEvent`, and `ServerSentEvent` types. A generated function calls `client.stream<TResponses, ThrowOnError, TItem>(config)` and returns `Promise<StreamResult<TResponses, ThrowOnError, TItem>>`. `TItem` is `TypedEvent<…>` when the document names each event, the success type for JSON Lines, and left out, so it defaults to `ServerSentEvent<SuccessOf<TResponses>>`, when the document types only the payload. A Server-Sent Events call passes `eventShape: 'event'` or `'data'`, which tells your client what the response validator in `config.validator.response` checks on each event.
 
 The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-swr`) and `@kubb/plugin-mcp` call the generated functions with `throwOnError: true` and read `data` off the result. The query plugins also import two more types from your module:
 
@@ -25,10 +27,10 @@ With a relative `importPath`, the hooks resolve it from the generated operation 
 
 To reuse the runtime of the fetch and axios clients instead of writing your own request pipeline:
 
-1. Copy `core.ts`, `serializers.ts`, `standardSchema.ts`, and `sse.ts` from `@kubb/plugin-client/templates` next to your `client.ts`.
+1. Copy `core.ts`, `mediaTypes.ts`, `serializers.ts`, `standardSchema.ts`, and `sse.ts` from `@kubb/plugin-client/templates` next to your `client.ts`.
 2. In `client.ts`, export the three types the core imports, listed below.
-3. Write a `Transport` function that sends a `ResolvedRequest`. It can return a web `Response`, which the core parses for you, or a `TransportResult` when your library does not return one.
-4. Export `createClientCore({ defaultTransport })` as `client`, and add `export * from './core.ts'` and `export * from './sse.ts'`.
+3. Write a `Transport` function that sends a `ResolvedRequest` and returns a web `Response`. When your library does not return one, wrap its bytes in `new Response(bytes, { status, headers })`. The core decodes the body by its media type.
+4. Export `createLazyClient((config) => createClientCore({ defaultTransport, ...config }))` as `client`, which has the generic call and `stream`. Register the form and stream media types your spec needs with `client.setConfig({ mediaTypes: { ...formMediaTypes, ...streamMediaTypes } })`, and add `export * from './core.ts'` and `export * from './sse.ts'`.
 
 | Export           | Purpose                                                 | On fetch      | On axios             |
 | ---------------- | ------------------------------------------------------- | ------------- | -------------------- |
@@ -48,21 +50,21 @@ import { client } from '../../../client'
 export function getPetById<ThrowOnError extends boolean = true>(
   options: Options<GetPetByIdOptions, ThrowOnError>,
 ): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({
+  return apiClient<GetPetByIdResponses, ThrowOnError>({
     method: 'GET',
     url: '/pet/{petId}',
     security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }],
     ...config,
     throwOnError: config.throwOnError ?? true,
-  }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
+  })
 }
 ```
 
-Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, `cookies`, and `body`, and `throwOnError`. It returns a promise. `cookies` holds name and value pairs, which your client joins into a `Cookie` header, as the example below does.
+Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, `cookies`, and `body`, and `throwOnError`. It returns a promise. `cookies` holds name and value pairs, which your client joins into a `Cookie` header, as the example below does. Each `security` entry is one scheme, or an array of schemes that one requirement needs together.
 
-A non-JSON response also passes `responseType`. It is a string such as `'blob'` when every response content type uses one parser, or a map from content type to parser when they differ, for example `{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. Read the response `Content-Type`, look it up in the map (exact type, then `type/*`, then `*/*`), and parse the body with that parser.
+Read the body by the response `Content-Type`. An operation whose success content is all binary also passes `parseAs: 'blob'`, so a download is a `Blob` whatever its media type.
 
 A call can also pass `contentType`: `request` is the body's media type, and `response` is the media type to ask for in `Accept`. A streamed operation always passes its media type, such as `contentType: { response: 'text/event-stream' }` or `contentType: { response: 'application/jsonl' }`. A call whose response offers `text/event-stream` next to another content type passes `text/event-stream` too, unless the caller picks another one. `RequestConfig` needs the field.
 
@@ -81,7 +83,7 @@ export type RequestConfig = {
   cookies?: object
   body?: unknown
   signal?: AbortSignal
-  responseType?: string | Record<string, string>
+  parseAs?: 'json' | 'text' | 'blob' | 'arrayBuffer' | 'stream'
   contentType?: string | { request?: string; response?: string }
   throwOnError?: boolean
   security?: Array<{ type: string; name?: string; in?: string; scopes?: Array<string> }>
@@ -103,7 +105,7 @@ export type ResponseErrorConfig<TError = unknown> = Error & { body?: TError }
 // Set this to your API host. `new URL()` needs an absolute URL.
 export const settings = { baseURL: 'https://petstore3.swagger.io/api/v3' }
 
-export async function client(config: RequestConfig) {
+async function send(config: RequestConfig) {
   const path: Record<string, unknown> = { ...config.path }
   const url = new URL((config.baseURL ?? settings.baseURL) + config.url.replace(/\{(\w+)\}/g, (_, key) => encodeURIComponent(String(path[key]))))
   const cookie = Object.entries(config.cookies ?? {})
@@ -126,6 +128,10 @@ export async function client(config: RequestConfig) {
   if (config.throwOnError ?? true) throw new Error(`Request failed with status ${response.status}`)
   return { data: undefined, error: body ?? { status: response.status }, response }
 }
+
+// The generated functions pass their responses record and `ThrowOnError`, so each call is typed by its operation.
+export const client = <TResponses, ThrowOnError extends boolean = true>(config: RequestConfig) =>
+  send(config) as Promise<RequestResult<TResponses, ThrowOnError>>
 ```
 
 The [example project](https://github.com/kubb-labs/plugins/tree/main/examples/client) has a fuller version with a base URL setter, query handling, and an async auth hook. The types in this sketch are minimal. Add status-aware response types when you need them.

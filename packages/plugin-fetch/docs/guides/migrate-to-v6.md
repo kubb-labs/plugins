@@ -10,6 +10,9 @@ The fetch client keeps its API in v6, so most projects only regenerate. Find you
 | Imports from `templates/fetch.ts`, `templates/core.ts`, `templates/serializers.ts`, or `templates/standardSchema.ts` | Import from `templates/client.ts` or `@kubb/plugin-client/templates/*`. See [Template subpaths](#template-subpaths). |
 | Uses `FetchOptions`                                                                                                  | Rename it to `NativeOptions`. See [Removed exports](#removed-exports).                                               |
 | Names `EventStreamResult<Pet>`, `StreamResult`, or `UnwrappedStreamResult`                                           | Wrap the payload: `EventStreamResult<ServerSentEvent<Pet>>`. See [Stream result types](#stream-result-types).        |
+| Sets `codecs`, `serializer.body`, or `responseType`                                                                  | Use `mediaTypes` and `parseAs`. See [Media types](#media-types).                                                     |
+| Calls `toEventStream`, or writes a transport that returns a parsed body                                              | Use `client.stream`, and return a web `Response`. See [Streams and transports](#streams-and-transports).             |
+| Relies on invalid JSON becoming a string, or on the error interceptor skipping network errors                        | Check [Behavior changes in the runtime](#behavior-changes-in-the-runtime). It compiles.                              |
 | Comes from 5.12 or earlier and uses streams                                                                          | Check [From 5.12 or earlier](#from-5-12-or-earlier). It compiles, so the type checker does not catch it.             |
 
 ## Upgrade steps
@@ -75,6 +78,64 @@ let result: EventStreamResult<ServerSentEvent<PetEvent>>
 ```
 
 A stream typed with `TypedEvent<…>` stays the same.
+
+## Media types
+
+Body encoding and decoding moved into media type handlers, keyed by media type. `codecs` is renamed `mediaTypes`, and its methods are renamed and get more context:
+
+| Before                                                          | After                                        | Migration                                                                      |
+| --------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------ |
+| `codecs`                                                        | `mediaTypes`                                 | Rename the key.                                                                |
+| `codecs[type].serialize(body, contentType)`                     | `mediaTypes[type].encode(body, context)`     | Read `context.contentType`.                                                    |
+| `codecs[type].deserialize(raw, contentType)` with a parsed body | `mediaTypes[type].decode(response, context)` | Read the body yourself: `await response.text()`.                               |
+| `serializer.body`                                               | removed                                      | Move a custom body serializer into a `mediaTypes` entry.                       |
+| `responseType` on a call, a string or a map                     | removed                                      | Use `parseAs`, such as `parseAs: 'blob'`, or a media type entry for that call. |
+
+```typescript
+// before
+client.setConfig({ codecs: { 'application/xml': { deserialize: (raw) => parseXml(raw as string) } } })
+
+// after
+client.setConfig({ mediaTypes: { 'application/xml': { decode: async (response) => parseXml(await response.text()) } } })
+```
+
+A key may now be a pattern, such as `application/*+json` or `text/*`. Generated calls no longer pass `responseType`; an operation whose success content is all binary passes `parseAs: 'blob'`. See [Configure serialization](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/serialization).
+
+## Streams and transports
+
+A generated stream function returns `apiClient.stream<Responses, ThrowOnError>({ ...config, eventShape: 'data' })`, whose `data` is already the stream. `toEventStream` is gone; send the request with `client.stream` instead:
+
+```typescript
+// before
+const { stream } = await toEventStream(client({ method: 'GET', url: '/events', responseType: 'stream' }), { shape: 'data' })
+
+// after
+const { stream } = await client.stream({ method: 'GET', url: '/events', eventShape: 'data' })
+```
+
+The `ServerSentEvent`, `TypedEvent`, and `StreamResult` types moved from `.kubb/sse.ts` to `.kubb/core.ts`, and `.kubb/client.ts` still exports them.
+
+A transport returns a web `Response`, or `{ webResponse, request, response }` to set the native objects, instead of a result with a parsed body. `readResponse`, `resolveResponseType`, `parseJsonOrText`, `isStreamed`, `ResponseType`, `ResponseTypeMap`, `Codec`, `Deserializer`, `ContentBodySerializer`, `BodySerializer`, `defaultBodySerializer`, and `CallResult` are gone. Response interceptors receive a `DecodedResponse`, the shape `TransportResult` had.
+
+```typescript
+// before
+transport: async () => ({ data: { id: 1 }, status: 200, statusText: 'OK', headers: new Headers(), request, response })
+
+// after
+transport: async () => Response.json({ id: 1 })
+```
+
+## Behavior changes in the runtime
+
+These compile without errors, so check them by hand:
+
+- Invalid JSON under a JSON media type throws a `ParseError` instead of becoming a string. Catch it, or register a lenient `application/json` handler.
+- An empty body is `undefined` for every media type, text included.
+- The error interceptor sees every failure: network errors, aborts, and validation errors too, so narrow with `ResponseError.is` before reading `status`. Each handler gets the error the one before returned.
+- The error body is validated on the throwing path too, so `ResponseError.data` holds the parsed body.
+- A `2XX` response key is a success, and range keys such as `4XX` type `status` as the numbers they cover.
+- An auth requirement that needs several schemes sends all of them.
+- The default `client` is created on its first use. `client.setConfig` before that only records the config.
 
 ## From 5.12 or earlier
 

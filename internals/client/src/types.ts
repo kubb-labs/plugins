@@ -3,11 +3,11 @@ import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions
 /**
  * Validator applied to the request and response using schemas from `@kubb/plugin-zod`.
  * - `false`: no validation.
- * - `'zod'`: validates the success (2xx) response body, and the error body when a non-2xx call does
- *   not throw (`throwOnError: false`).
+ * - `'zod'`: validates the success (2xx) response body, and the error body of a non-2xx call, whether it
+ *   throws or returns the error.
  * - `{ request?: 'zod'; params?: 'zod'; response?: 'zod' }`: opt in per slot. `request` encodes the
  *   request body before the call; `params` validate the path, query, and header params;
- *   `response` validates the success response body and, on the non-throw path, the error body.
+ *   `response` validates the success response body and the error body.
  */
 export type ValidatorOptions = false | 'zod' | { request?: 'zod'; params?: 'zod'; response?: 'zod' }
 
