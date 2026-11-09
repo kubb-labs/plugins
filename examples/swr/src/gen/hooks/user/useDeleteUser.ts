@@ -4,7 +4,7 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { Options, ResponseErrorConfig } from '../../.kubb/client'
 import type { DeleteUserOptions, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/user/DeleteUser'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { deleteUser } from '../../clients/user/deleteUser'
@@ -28,7 +28,7 @@ export function useDeleteUser(
       DeleteUserMutationKey | null,
       DeleteUserMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Omit<Options<DeleteUserOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>
     shouldFetch?: boolean
   } = {},
 ) {

@@ -1,4 +1,4 @@
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { Options, ResponseErrorConfig } from '../../../.kubb/client'
 import type { AddPetRequest } from '../../../models/ts/AddPetRequest'
 import type { Pet } from '../../../models/ts/Pet'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
@@ -8,9 +8,44 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
 export function addPetMutationOptions<TContext = unknown>(
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-    contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-  } = {},
+  config: Omit<
+    Options<
+      | {
+          body: AddPetRequest
+          path?: never
+          query?: never
+          headers?: never
+          contentType?:
+            | 'application/json'
+            | {
+                request: 'application/json'
+              }
+        }
+      | {
+          body: Omit<NonNullable<Pet>, 'id'>
+          path?: never
+          query?: never
+          headers?: never
+          contentType:
+            | 'application/xml'
+            | {
+                request: 'application/xml'
+              }
+        }
+      | {
+          body: Omit<NonNullable<Pet>, 'id'>
+          path?: never
+          query?: never
+          headers?: never
+          contentType:
+            | 'application/x-www-form-urlencoded'
+            | {
+                request: 'application/x-www-form-urlencoded'
+              }
+        }
+    >,
+    'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'
+  > = {},
 ) {
   const mutationKey = addPetMutationKey()
   return mutationOptions<
@@ -60,7 +95,7 @@ export function addPetMutationOptions<TContext = unknown>(
   >({
     mutationKey,
     mutationFn: async (variables) => {
-      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0]).unwrap()
+      return addPet({ ...config, ...variables, throwOnError: true }).unwrap()
     },
   })
 }
@@ -117,9 +152,44 @@ export function useAddPet<TContext>(
         },
       TContext
     > & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-    }
+    client?: Omit<
+      Options<
+        | {
+            body: AddPetRequest
+            path?: never
+            query?: never
+            headers?: never
+            contentType?:
+              | 'application/json'
+              | {
+                  request: 'application/json'
+                }
+          }
+        | {
+            body: Omit<NonNullable<Pet>, 'id'>
+            path?: never
+            query?: never
+            headers?: never
+            contentType:
+              | 'application/xml'
+              | {
+                  request: 'application/xml'
+                }
+          }
+        | {
+            body: Omit<NonNullable<Pet>, 'id'>
+            path?: never
+            query?: never
+            headers?: never
+            contentType:
+              | 'application/x-www-form-urlencoded'
+              | {
+                  request: 'application/x-www-form-urlencoded'
+                }
+          }
+      >,
+      'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'
+    >
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

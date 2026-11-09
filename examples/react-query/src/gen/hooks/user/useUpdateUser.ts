@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { Options, ResponseErrorConfig } from '../../.kubb/client'
 import type { UpdateUserOptions, UpdateUserResponse } from '../../models/user/UpdateUser'
 import { updateUser } from '../../clients/user/updateUser'
 import { mutationOptions } from '@tanstack/react-query'
@@ -11,15 +11,13 @@ import { mutationOptions } from '@tanstack/react-query'
 export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 
 export function updateUserMutationOptions<TContext = unknown>(
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-    contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-  } = {},
+  config: Omit<Options<UpdateUserOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'> = {},
 ) {
   const mutationKey = updateUserMutationKey()
   return mutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return updateUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof updateUser<true>>[0]).unwrap()
+      return updateUser({ ...config, ...variables, throwOnError: true }).unwrap()
     },
   })
 }

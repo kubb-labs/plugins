@@ -4,7 +4,7 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { Options, ResponseErrorConfig } from '../../.kubb/client'
 import type { DeletePetOptions, DeletePetResponse, DeletePetStatus400 } from '../../models/pet/DeletePet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { deletePet } from '../../clients/pet/deletePet'
@@ -25,7 +25,7 @@ export function useDeletePet(
     mutation?: SWRMutationConfiguration<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetMutationKey | null, DeletePetMutationArg> & {
       throwOnError?: boolean
     }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Omit<Options<DeletePetOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>
     shouldFetch?: boolean
   } = {},
 ) {

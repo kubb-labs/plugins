@@ -32,7 +32,7 @@ function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: R
     withRequest: false,
     optionsType: `{
   mutation?: UseMutationOptions<${generics}> & { client?: QueryClient },
-  client?: ${buildRequestConfigType(node)},
+  client?: ${buildRequestConfigType(node, { optionsName: resolver.response.options(node) })},
 }`,
   })
 }
@@ -44,7 +44,7 @@ export function Mutation({ name, mutationOptionsName, node, tsResolver, mutation
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')
   const resultType = `UseMutationResult<${generics}>`
 
-  const mutationOptionsConfigNode = buildMutationConfigParamsNode(node)
+  const mutationOptionsConfigNode = buildMutationConfigParamsNode(node, { resolver: tsResolver })
   const mutationOptionsParamsCall = callPrinter.print(mutationOptionsConfigNode) ?? ''
 
   const paramsNode = buildMutationParamsNode(node, { resolver: tsResolver, returnType })

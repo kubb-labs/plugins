@@ -4,8 +4,8 @@
 */
 
 import useSWR from 'swr'
-import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { GetInventoryStatus200 } from '../types/GetInventory'
+import type { Options, ResponseErrorConfig } from '../.kubb/client'
+import type { GetInventoryOptions, GetInventoryStatus200 } from '../types/GetInventory'
 import type { SWRConfiguration } from 'swr'
 import { getInventory } from '../clients/getInventory'
 
@@ -13,7 +13,7 @@ export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
 type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
-export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function getInventoryQueryOptions(config: Omit<Options<GetInventoryOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {}) {
   return {
     fetcher: async () => {
       return getInventory({ ...config, throwOnError: true }).unwrap()
@@ -28,7 +28,7 @@ export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'pa
  */
 export function useGetInventory(options: {
   query?: SWRConfiguration<GetInventoryStatus200, ResponseErrorConfig<Error>>,
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Omit<Options<GetInventoryOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>,
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {

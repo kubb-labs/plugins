@@ -1,9 +1,9 @@
 import {
-  castToClientOptions,
   getOperationParameters,
   getPrimarySuccessResponse,
   getRequestGroupOptionality,
   getRequestGroups,
+  getResponseContentTypeInfo,
   hasRequestContentTypeChoice,
   isEventStream,
   resolveErrorNames,
@@ -115,8 +115,8 @@ export function buildGroupedRequestParam(
 /**
  * Builds the shared `({ path, query, body, headers, cookies }, config = {})` parameter list for a
  * TanStack query-options function. The leading parameter mirrors the client signature, and the
- * trailing `config` is a partial `RequestConfig` minus the grouped data-shape keys, which are passed
- * explicitly. Framework plugins wrap the result when needed, for example vue-query applies `MaybeRefOrGetter`.
+ * trailing `config` is the client's `Options` minus the request groups and `throwOnError`, which the
+ * hook passes itself. Framework plugins wrap the result when needed, for example vue-query applies `MaybeRefOrGetter`.
  */
 export function buildQueryOptionsParams(
   node: ast.OperationNode,
@@ -128,7 +128,7 @@ export function buildQueryOptionsParams(
 
   const configParam = createFunctionParameter({
     name: 'config',
-    type: buildClientOptionType(node),
+    type: buildClientOptionType({ optionsName: resolver.response.options(node) }),
     default: '{}',
   })
 
@@ -142,30 +142,34 @@ export function buildQueryOptionsParams(
  * can't flip the query's error semantics. Queries thread the TanStack `signal`; mutations omit it.
  *
  * When `unwrapName` is set, each request group is passed as an explicit member unwrapped through it,
- * used by vue-query to resolve refs and getters with `toValue(...)` at call time.
+ * used by vue-query to resolve refs and getters with `toValue(...)` at call time. `pageParam` names the
+ * query parameter an infinite query sets from TanStack's `pageParam`.
  *
  * @example
  * ```ts
  * buildClientCall(node, { clientName: 'getPetById', signal: true })
- * // getPetById({ path, ...config, signal: config.signal ?? signal, throwOnError: true })
+ * // getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
  * ```
  */
 export function buildClientCall(
   node: ast.OperationNode,
-  options: { clientName: string; signal?: boolean; unwrapName?: (name: string) => string; withContentType?: boolean; returnType?: ReturnTypeOption },
+  options: { clientName: string; signal?: boolean; unwrapName?: (name: string) => string; withContentType?: boolean; pageParam?: string },
 ): string {
-  const { clientName, signal = false, unwrapName, withContentType = false, returnType = 'full' } = options
+  const { clientName, signal = false, unwrapName, withContentType = false, pageParam } = options
   const { groups } = getRequestGroupOptionality(node)
   const names = requestGroupOrder.filter((key) => groups[key])
+  const member = (name: RequestGroupKey) => {
+    const value = unwrapName ? unwrapName(name) : name
+    if (name === 'query' && pageParam) return `query: { ...${value}, ${JSON.stringify(pageParam)}: pageParam }`
+    return unwrapName ? `${name}: ${value}` : name
+  }
 
   const args = [
     '...config',
-    ...(withContentType && hasRequestContentTypeChoice(node) ? ['...variables'] : names.map((name) => (unwrapName ? `${name}: ${unwrapName(name)}` : name))),
+    ...(withContentType && hasRequestContentTypeChoice(node) ? ['...variables'] : names.map(member)),
     signal ? 'signal: config.signal ?? signal' : null,
     'throwOnError: true',
   ].filter((part): part is string => part !== null)
-
-  if (withContentType && hasRequestContentTypeChoice(node)) return `${clientName}(${castToClientOptions(`{ ${args.join(', ')} }`, clientName, returnType)})`
 
   return `${clientName}({ ${args.join(', ')} })`
 }
@@ -478,9 +482,19 @@ export function buildHookParams(
 
 /**
  * The `TRequest` type argument of a mutation hook: the options type when the operation takes a request, else `undefined`.
+ * When the variables carry the request media type and the response has several, `contentType` can pick the
+ * response one too, as `{ request, response }`.
  */
 export function resolveMutationRequestType(node: ast.OperationNode, resolver: ResolverTs): string {
-  return buildGroupedRequestParam(node, { resolver }) ? resolver.response.options(node) : 'undefined'
+  if (!buildGroupedRequestParam(node, { resolver })) return 'undefined'
+
+  const optionsName = resolver.response.options(node)
+  const response = getResponseContentTypeInfo(node)
+  if (!hasRequestContentTypeChoice(node) || !response.isMultipleContentTypes) return optionsName
+
+  // An inline options type is a union, so it needs parentheses. `string` keeps its bare request media type form assignable.
+  const base = /^[\w$]+$/.test(optionsName) ? optionsName : `(${optionsName})`
+  return `${base} & { contentType?: string | { response?: ${response.contentTypeUnion} } }`
 }
 
 /**

@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { Options, ResponseErrorConfig } from '../../.kubb/client'
 import type { DeletePetOptions, DeletePetResponse, DeletePetStatus400 } from '../../types/DeletePet'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { deletePet } from '../../clients/deletePet'
@@ -19,7 +19,7 @@ export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
  */
 export function useDeletePet<TContext>(options: {
   mutation?: MutationObserverOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext> & { client?: QueryClient },
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Omit<Options<DeletePetOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

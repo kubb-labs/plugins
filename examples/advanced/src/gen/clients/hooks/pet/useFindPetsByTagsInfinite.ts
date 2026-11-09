@@ -1,5 +1,5 @@
 import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '../../../../tanstack-query-hook'
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { Options, ResponseErrorConfig } from '../../../.kubb/client'
 import type { FindPetsByTagsXEXAMPLEKey } from '../../../models/ts/FindPetsByTagsXEXAMPLE'
 import type { Pet } from '../../../models/ts/Pet'
 import { infiniteQueryOptions, useInfiniteQuery } from '../../../../tanstack-query-hook'
@@ -41,7 +41,21 @@ export function findPetsByTagsInfiniteQueryOptions(
       'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
     }
   },
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Omit<
+    Options<{
+      body?: never
+      path?: never
+      query?: {
+        tags?: Array<string>
+        page?: string
+        pageSize?: number
+      }
+      headers: {
+        'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+      }
+    }>,
+    'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
+  > = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey({ query })
   return infiniteQueryOptions<
@@ -59,19 +73,7 @@ export function findPetsByTagsInfiniteQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal, pageParam }) => {
-      query = {
-        ...(query ?? {}),
-        ['pageSize']: pageParam as unknown as {
-          tags?: Array<string>
-          page?: string
-          pageSize?: number
-        }['pageSize'],
-      } as {
-        tags?: Array<string>
-        page?: string
-        pageSize?: number
-      }
-      return findPetsByTags({ ...config, query, headers, signal: config.signal ?? signal, throwOnError: true }).unwrap()
+      return findPetsByTags({ ...config, query: { ...query, pageSize: pageParam }, headers, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => (Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1),
@@ -154,7 +156,21 @@ export function useFindPetsByTagsInfinite<
   },
   options: {
     query?: Partial<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Omit<
+      Options<{
+        body?: never
+        path?: never
+        query?: {
+          tags?: Array<string>
+          page?: string
+          pageSize?: number
+        }
+        headers: {
+          'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+        }
+      }>,
+      'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
+    >
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
