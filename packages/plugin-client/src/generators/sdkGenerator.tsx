@@ -13,7 +13,7 @@ import { buildValidatorHooks, type ValidatorHooks } from '../builders/validator.
 import { SdkClient } from '../components/SdkClient.tsx'
 import { StreamRuntime } from '../components/StreamRuntime.tsx'
 import { SdkFacade } from '../components/SdkFacade.tsx'
-import { type OperationTypeNames, type OperationTypeSource, resolveOperationTypes } from '../resolveOperationTypes.ts'
+import { type OperationTypeNames, type OperationTypeSource, resolveOperationTypes } from '@internals/client'
 import type { ContractClientFactory } from '../types.ts'
 
 type GeneratorContext = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]

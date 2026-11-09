@@ -75,6 +75,7 @@
   "devDependencies": {
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
+    "@internals/utils": "workspace:*",
     "typescript": "catalog:"
   },
   "peerDependencies": {},

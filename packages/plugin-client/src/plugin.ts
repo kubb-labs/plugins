@@ -2,8 +2,10 @@ import { createGroupConfig } from '@internals/shared'
 import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
-import { clientGenerator } from './generators/clientGenerator.tsx'
-import { clientDependencies, defaultMacros, resolverClient } from '@internals/client'
+import { createClientGenerator } from './generators/clientGenerator.tsx'
+import { defaultMacros } from './macros.ts'
+import { resolverClient } from './resolver.ts'
+import { clientDependencies } from './setup.ts'
 import type { PluginClient, ResolverClient } from './types.ts'
 
 /**
@@ -42,7 +44,7 @@ export const pluginClient = defineExtension<PluginClient>({
 
     setResolver(resolver)
     setMacros([...defaultMacros, ...(options.macros ?? [])])
-    addGenerator(clientGenerator)
+    addGenerator(createClientGenerator<PluginClient>('client'))
 
     return {
       output,

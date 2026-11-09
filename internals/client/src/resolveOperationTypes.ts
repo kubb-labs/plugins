@@ -1,9 +1,8 @@
-import { type ast, Diagnostics, type Generator, type Group, type Output } from '@kubb/kit'
+import { type ast, Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
 import { pluginTsName, type ResolverTs } from '@kubb/plugin-ts'
 import { pluginZodName, type ResolverZod } from '@kubb/plugin-zod'
-import type { ContractClientFactory } from './types.ts'
 
-type GeneratorDriver = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]['driver']
+type GeneratorDriver = GeneratorContext['driver']
 
 /**
  * The two per-operation type names a generated client references: the grouped input and the

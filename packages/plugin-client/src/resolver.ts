@@ -1,7 +1,7 @@
 import { resolveOperationName } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
 import { camelCase, createResolver, pascalCase } from '@kubb/kit'
-import type { PluginContractClient } from './types.ts'
+import type { PluginContractClient, ResolverClient } from './types.ts'
 
 /**
  * Default resolver shared by the client plugins. Functions use safe camelCase identifiers and
@@ -13,7 +13,7 @@ import type { PluginContractClient } from './types.ts'
  * resolverClient.groupName('pet')        // 'PetClient'
  * ```
  */
-export const resolverClient = createResolver<PluginContractClient>({
+export const resolverClient: ResolverClient = createResolver<PluginContractClient>({
   pluginName: 'plugin-contract-client',
   name: resolveOperationName,
   className(name) {

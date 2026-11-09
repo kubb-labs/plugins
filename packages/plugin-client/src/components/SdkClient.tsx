@@ -6,7 +6,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'
 import type { SecurityRequirement } from '../builders/security.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
-import type { OperationTypeNames } from '../resolveOperationTypes.ts'
+import type { OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
 
 /**

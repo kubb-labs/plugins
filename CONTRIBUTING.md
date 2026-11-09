@@ -54,7 +54,7 @@ plugins/
 │   ├── plugin-redoc/        # ReDoc documentation
 │   └── plugin-mcp/          # MCP integration
 ├── internals/               # Shared, non-published helpers
-│   ├── client/              # Shared generator builders for the HTTP client plugins
+│   ├── client/              # Client selection helpers for the query and MCP plugins
 │   ├── shared/              # Shared AST helpers used across packages
 │   ├── tanstack-query/      # Shared TanStack Query utilities
 │   └── utils/               # General utilities
@@ -65,7 +65,7 @@ plugins/
 └── assets/                  # Static assets
 ```
 
-Most plugins under `packages/` follow the same shape: `src/plugin.ts` defines the plugin, `src/generators/` holds the generation logic, `src/components/` holds JSX-renderer components, and `src/*.test.ts` holds the tests. A few are leaner, like the client plugins (`plugin-axios`, `plugin-fetch`) that reuse `@internals/client`, and `plugin-redoc`, which is a single `redoc.tsx` with no `generators/` or `components/`.
+Most plugins under `packages/` follow the same shape: `src/plugin.ts` defines the plugin, `src/generators/` holds the generation logic, `src/components/` holds JSX-renderer components, and `src/*.test.ts` holds the tests. A few are leaner, like the client plugins (`plugin-axios`, `plugin-fetch`) that build on `@kubb/plugin-client`, and `plugin-redoc`, which is a single `redoc.tsx` with no `generators/` or `components/`.
 
 ## Tech stack
 

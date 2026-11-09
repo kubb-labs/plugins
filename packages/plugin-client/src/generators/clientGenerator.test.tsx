@@ -7,14 +7,14 @@ import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matc
 import { resolverClient } from '../resolver.ts'
 import type { SecurityDocument } from '../builders/security.ts'
 import type { ServerDocument } from '../builders/server.ts'
-import type { Options, ResolvedOptions, ResolverClient } from '../types.ts'
+import type { ClientOptions, ClientResolvedOptions, ResolverClient } from '../types.ts'
 import { createClientGenerator } from './clientGenerator.tsx'
 
-type PluginFetch = PluginType<'plugin-fetch', Options, ResolvedOptions, ResolverClient>
+type PluginFetch = PluginType<'plugin-fetch', ClientOptions, ClientResolvedOptions, ResolverClient>
 
 const clientGenerator = createClientGenerator<PluginFetch>('fetch')
 
-type PluginClient = PluginType<'plugin-client', Options, ResolvedOptions & { importPath: string }, ResolverClient>
+type PluginClient = PluginType<'plugin-client', ClientOptions, ClientResolvedOptions & { importPath: string }, ResolverClient>
 
 // What `@kubb/plugin-client` registers: a user-owned client module, imported exactly as configured.
 const customClientGenerator = createClientGenerator<PluginClient>('client')

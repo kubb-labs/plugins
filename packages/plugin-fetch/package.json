@@ -95,8 +95,6 @@
     "@kubb/renderer-jsx": "^5.17.0"
   },
   "devDependencies": {
-    "@internals/client": "workspace:*",
-    "@internals/shared": "workspace:*",
     "typescript": "catalog:"
   },
   "peerDependencies": {},

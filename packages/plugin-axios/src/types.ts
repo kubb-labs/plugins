@@ -1,7 +1,7 @@
 import type { PluginType } from '@kubb/kit'
-import type { Options, ResolvedOptions, ResolverClient } from '@internals/client'
+import type { ClientOptions as Options, ClientResolvedOptions as ResolvedOptions, ResolverClient } from '@kubb/plugin-client'
 
-export type { Options, ResolvedOptions, ResolverClient } from '@internals/client'
+export type { ClientOptions as Options, ClientResolvedOptions as ResolvedOptions, ResolverClient } from '@kubb/plugin-client'
 
 /**
  * The plugin factory type for `@kubb/plugin-axios`. Shares the options surface, resolver, and

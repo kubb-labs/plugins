@@ -6,10 +6,10 @@ import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperations } from '#mocks'
 import { resolverClient } from '../resolver.ts'
-import type { Options, ResolvedOptions, ResolverClient } from '../types.ts'
+import type { ClientOptions, ClientResolvedOptions, ResolverClient } from '../types.ts'
 import { createSdkGenerator } from './sdkGenerator.tsx'
 
-type PluginFetch = PluginType<'plugin-fetch', Options, ResolvedOptions, ResolverClient>
+type PluginFetch = PluginType<'plugin-fetch', ClientOptions, ClientResolvedOptions, ResolverClient>
 
 const testConfig: Config = {
   root: '.',

@@ -8,24 +8,13 @@ import { createClientGenerator } from './generators/clientGenerator.tsx'
 import { createSdkGenerator } from './generators/sdkGenerator.tsx'
 import { defaultMacros } from './macros.ts'
 import { resolverClient } from './resolver.ts'
-import type { ContractClientFactory, Options, ResolvedOptions, ResolverClient } from './types.ts'
-
-/**
- * Absolute paths of the runtime files a client plugin copies into `.kubb/`. `client` is the plugin's own transport.
- */
-export type ClientTemplates = {
-  client: string
-  core: string
-  mediaTypes: string
-  serializers: string
-  standardSchema: string
-  sse: string
-}
+import { templates } from './templates.ts'
+import type { ClientOptions, ClientResolvedOptions, ContractClientFactory, ResolverClient } from './types.ts'
 
 /**
  * Applies the client option defaults and merges a user `resolver` over the built-in one.
  */
-export function resolveClientOptions(options: Options): ResolvedOptions {
+export function resolveClientOptions(options: ClientOptions): ClientResolvedOptions {
   const {
     output = { path: 'clients', barrel: { type: 'named' } },
     exclude = [],
@@ -57,9 +46,19 @@ export function resolveClientOptions(options: Options): ResolvedOptions {
 
 /**
  * Wires a client plugin inside its `setup`: the resolver, the default and user macros, the client or SDK generator,
- * and the `.kubb/` runtime files. `sse.ts` is copied by the generator, and only for a document that streams.
+ * and the `.kubb/` runtime files. `client` is the absolute path of the plugin's own `client.ts` transport template.
+ * `sse.ts` is copied by the generator, and only for a document that streams.
+ *
+ * @example
+ * ```ts
+ * setup(options) {
+ *   const resolved = resolveClientOptions(options)
+ *   setupClient({ resolved, client: fileURLToPath(new URL('../templates/client.ts', import.meta.url)) })
+ *   return resolved
+ * }
+ * ```
  */
-export function setupClient({ resolved, templates }: { resolved: ResolvedOptions; templates: ClientTemplates }): void {
+export function setupClient({ resolved, client }: { resolved: ClientResolvedOptions; client: string }): void {
   const config = useConfig()
   const options = useOptions<ContractClientFactory>()
 
@@ -75,7 +74,7 @@ export function setupClient({ resolved, templates }: { resolved: ResolvedOptions
     ['serializers.ts', templates.serializers],
     ['mediaTypes.ts', templates.mediaTypes],
     ['core.ts', templates.core],
-    ['client.ts', templates.client],
+    ['client.ts', client],
     ['standardSchema.ts', templates.standardSchema],
   ] as const
 
@@ -89,6 +88,6 @@ export function setupClient({ resolved, templates }: { resolved: ResolvedOptions
  * case `pluginZod({ inferred: true })` does. `plugin-zod` is required once `validator` enables a direction, so a missing
  * one fails setup instead of codegen.
  */
-export function clientDependencies(options: Pick<Options, 'validator'>) {
+export function clientDependencies(options: Pick<ClientOptions, 'validator'>) {
   return { [pluginTsName]: { optional: true }, [pluginZodName]: { optional: !isValidatorEnabled(options.validator) } }
 }

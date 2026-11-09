@@ -1,8 +1,8 @@
-import { clientDependencies, resolveClientOptions, setupClient } from '@internals/client'
+import { fileURLToPath } from 'node:url'
 import { defineExtension } from '@kubb/kit'
+import { clientDependencies, resolveClientOptions, setupClient } from '@kubb/plugin-client'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
-import { templates } from './templates.ts'
 import type { PluginFetch } from './types.ts'
 
 /**
@@ -39,7 +39,7 @@ export const pluginFetch = defineExtension<PluginFetch>({
   dependencies: clientDependencies,
   setup(options) {
     const resolved = resolveClientOptions(options)
-    setupClient({ resolved, templates })
+    setupClient({ resolved, client: fileURLToPath(new URL('../templates/client.ts', import.meta.url)) })
     return resolved
   },
 })

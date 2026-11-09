@@ -3,7 +3,7 @@
 import { ast } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
-import { resolverClient } from '@internals/client'
+import { resolverClient } from '@kubb/plugin-client'
 import { describe, expect, test, vi } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
 import { mutationKeyTransformer } from '@internals/tanstack-query'

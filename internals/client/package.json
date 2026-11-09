@@ -2,7 +2,7 @@
   "name": "@internals/client",
   "version": "0.0.0",
   "private": true,
-  "description": "Shared generator builders for the HTTP client plugins (plugin-fetch, plugin-axios, plugin-ky) of Kubb. Not intended for direct use.",
+  "description": "Client selection and operation helpers the query and MCP plugins of Kubb share. Not intended for direct use.",
   "keywords": [
     "axios",
     "client",
@@ -52,18 +52,15 @@
   },
   "dependencies": {
     "@internals/shared": "workspace:*",
-    "@internals/utils": "workspace:*",
     "@kubb/kit": "catalog:",
     "@kubb/plugin-ts": "workspace:*",
-    "@kubb/plugin-zod": "workspace:*",
-    "@kubb/renderer-jsx": "catalog:"
+    "@kubb/plugin-zod": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:"
   },
   "peerDependencies": {
-    "@kubb/kit": "catalog:",
-    "@kubb/renderer-jsx": "catalog:"
+    "@kubb/kit": "catalog:"
   },
   "engines": {
     "node": ">=22.22"
