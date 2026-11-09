@@ -39,7 +39,7 @@ export const pluginAxios = defineExtension<PluginAxios>({
   dependencies: clientDependencies,
   setup(options) {
     const resolved = resolveClientOptions(options)
-    setupClient({ resolved, client: fileURLToPath(new URL('../templates/client.ts', import.meta.url)) })
+    setupClient({ name: 'axios', resolved, macros: options.macros, client: fileURLToPath(new URL('../templates/client.ts', import.meta.url)) })
     return resolved
   },
 })

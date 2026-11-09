@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createGroupConfig } from '@internals/shared'
-import { addGenerator, injectFile, Resolver, setMacros, setResolver, useConfig, useOptions } from '@kubb/kit'
+import { addGenerator, injectFile, Resolver, setMacros, setResolver, useConfig } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { isValidatorEnabled } from './builders/validatorOptions.ts'
@@ -50,15 +50,24 @@ export function resolveClientOptions(options: ClientOptions): ClientResolvedOpti
 /**
  * Wires a client plugin in its `setup`: resolver, macros, client or SDK generator, and the `.kubb/` runtime with the plugin's own `client.ts`.
  */
-export function setupClient({ resolved, client }: { resolved: ClientResolvedOptions; client: string }): void {
+export function setupClient({
+  name,
+  resolved,
+  macros = [],
+  client,
+}: {
+  name: string
+  resolved: ClientResolvedOptions
+  macros?: ClientOptions['macros']
+  client: string
+}): void {
   const config = useConfig()
-  const options = useOptions<ContractClientFactory>()
 
   setResolver(resolved.resolver)
-  setMacros([...defaultMacros, ...(options.macros ?? [])])
+  setMacros([...defaultMacros, ...macros])
 
   const sse = templatePath('sse.ts')
-  addGenerator<ContractClientFactory>(resolved.sdk ? createSdkGenerator({ sse }) : createClientGenerator('client', { sse }))
+  addGenerator<ContractClientFactory>(resolved.sdk ? createSdkGenerator({ sse }) : createClientGenerator(name, { sse }))
 
   const root = path.resolve(config.root, config.output.path)
   const files = [

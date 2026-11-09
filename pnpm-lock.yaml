@@ -795,10 +795,10 @@ importers:
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
+    devDependencies:
       '@kubb/plugin-zod':
         specifier: workspace:*
         version: link:../../packages/plugin-zod
-    devDependencies:
       '@types/node':
         specifier: 'catalog:'
         version: 22.20.2

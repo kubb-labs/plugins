@@ -53,10 +53,10 @@
   "dependencies": {
     "@internals/shared": "workspace:*",
     "@kubb/kit": "catalog:",
-    "@kubb/plugin-ts": "workspace:*",
-    "@kubb/plugin-zod": "workspace:*"
+    "@kubb/plugin-ts": "workspace:*"
   },
   "devDependencies": {
+    "@kubb/plugin-zod": "workspace:*",
     "@types/node": "catalog:"
   },
   "peerDependencies": {
