@@ -112,7 +112,7 @@ export function updatePet<ThrowOnError extends boolean = true>(
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
       ...config,
-      validator: { response: updatePetResponseSchema, error: updatePetErrorSchema, ...config.validator },
+      validator: { response: updatePetResponseSchema, error: updatePetErrorSchema, errorStatus: [400, 404, 405], ...config.validator },
       throwOnError: config.throwOnError ?? true,
     }) as Promise<
       RequestResult<
