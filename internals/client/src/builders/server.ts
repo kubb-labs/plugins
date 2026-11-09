@@ -9,8 +9,8 @@ export type ServerDocument = { paths?: Record<string, (WithServers & Record<stri
 
 /**
  * Returns the URL of the operation's own `servers`, else its path item's, picked with `server.index` and falling back to the
- * first entry. `{variable}` placeholders are filled from `server.variables`, then the spec defaults. Returns `undefined` when
- * neither declares `servers`, so the client's `baseURL` applies.
+ * first entry. `{variable}` placeholders are filled from `server.variables`, then the spec defaults. Returns `undefined` for no
+ * `servers` or a relative URL such as `/v2`, which would drop the client's host, so the client's `baseURL` applies.
  */
 export function getOperationBaseURL({
   document,
@@ -28,5 +28,7 @@ export function getOperationBaseURL({
   const servers = [operation?.servers, pathItem?.servers].find((list) => list?.length)
   const entry = servers?.[index] ?? servers?.[0]
 
-  return entry?.url.replace(/\{([^{}]+)\}/g, (match, name: string) => variables?.[name] ?? entry.variables?.[name]?.default ?? match)
+  const url = entry?.url.replace(/\{([^{}]+)\}/g, (match, name: string) => variables?.[name] ?? entry.variables?.[name]?.default ?? match)
+
+  return url && /^[a-z][a-z\d+.-]*:\/\//i.test(url) ? url : undefined
 }

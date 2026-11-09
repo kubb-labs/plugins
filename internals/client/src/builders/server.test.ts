@@ -9,6 +9,7 @@ const document: ServerDocument = {
       get: {},
     },
     '/pets': { get: {} },
+    '/v2/pets': { servers: [{ url: '/v2' }], get: {} },
   },
 }
 
@@ -23,8 +24,9 @@ describe('getOperationBaseURL', () => {
     expect(getOperationBaseURL({ document, method: 'POST', path: '/upload', server: { variables: { region: 'us' } } })).toBe('https://us.files.example.com')
   })
 
-  test('returns undefined without path or operation servers', () => {
+  test('returns undefined without path or operation servers, or for a relative server URL', () => {
     expect(getOperationBaseURL({ document, method: 'GET', path: '/pets' })).toBeUndefined()
     expect(getOperationBaseURL({ document: null, method: 'GET', path: '/pets' })).toBeUndefined()
+    expect(getOperationBaseURL({ document, method: 'GET', path: '/v2/pets' })).toBeUndefined()
   })
 })

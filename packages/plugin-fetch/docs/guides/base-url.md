@@ -18,7 +18,7 @@ paths:
       operationId: streamEvents
 ```
 
-Only a `baseURL` passed on the call overrides it. The `baseURL` option, `setConfig`, and `createClient` do not.
+Only a `baseURL` passed on the call overrides it. The `baseURL` option, `setConfig`, and `createClient` do not. A relative server URL, such as `/v2`, is ignored, so the client's `baseURL` still applies.
 
 ## Use the baseURL option
 
