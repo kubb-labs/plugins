@@ -1570,8 +1570,11 @@ describe('withUnwrap', () => {
     await expect(withUnwrap(Promise.resolve(result)).unwrap()).rejects.toStrictEqual({ status: 404, statusText: 'Not Found' })
   })
 
-  test('reports the status as the error when an empty error body is labeled as text', async () => {
-    const response = new Response('', { status: 404, statusText: 'Not Found', headers: { 'Content-Type': 'text/html' } })
+  test.each([
+    ['', 'text/html'],
+    ['null', 'application/json'],
+  ])('reports the status as the error when the error body is %j labeled %s', async (body, type) => {
+    const response = new Response(body, { status: 404, statusText: 'Not Found', headers: { 'Content-Type': type } })
     const client = createClientCore({ defaultTransport: async () => response, throwOnError: false })
 
     const result = await client({ method: 'GET', url: '/status/404' })

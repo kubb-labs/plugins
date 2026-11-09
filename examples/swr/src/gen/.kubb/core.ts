@@ -821,11 +821,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       status: result.status,
       data: isSuccess ? data : undefined,
       // An empty error body still reports the failure, so `if (error)` and `.unwrap()` see a value.
-      error: isSuccess
-        ? undefined
-        : data === undefined || data === ''
-          ? ({ status: result.status, statusText: result.statusText } satisfies EmptyErrorBody)
-          : data,
+      error: isSuccess ? undefined : data == null || data === '' ? ({ status: result.status, statusText: result.statusText } satisfies EmptyErrorBody) : data,
       contentType,
       request: result.request,
       response: result.response,
