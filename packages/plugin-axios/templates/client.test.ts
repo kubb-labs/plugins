@@ -184,6 +184,25 @@ describe('createAxiosTransport', () => {
     await expect(client({ method: 'GET', url: 'https://petstore.dev/pet', signal: AbortSignal.abort(reason) })).rejects.toBe(reason)
   })
 
+  test('rejects with the signal reason when the abort comes while the body is read', async () => {
+    // A map with a stream entry makes axios resolve at the headers, so the body is read after `instance.request`.
+    const server = http.createServer((_req, res) => (res.writeHead(200, { 'content-type': 'application/json' }), res.write('{"partial":')))
+    await new Promise<void>((resolve) => server.listen(0, resolve))
+    const url = `http://localhost:${(server.address() as { port: number }).port}/events`
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'http' })) })
+    const controller = new AbortController()
+    const reason = new Error('stop')
+
+    try {
+      const call = client({ method: 'GET', url, signal: controller.signal, responseType: { 'application/json': 'json', 'text/event-stream': 'stream' } })
+      setTimeout(() => controller.abort(reason), 100)
+      await expect(call).rejects.toBe(reason)
+    } finally {
+      server.closeAllConnections()
+      server.close()
+    }
+  })
+
   test('sends the serialized body and turns URLSearchParams into a string for the Node adapter', async () => {
     const { calls, transport } = fakeAxios()
     const client = createClientCore({ defaultTransport: transport })
