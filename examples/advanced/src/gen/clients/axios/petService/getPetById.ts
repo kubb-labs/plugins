@@ -48,7 +48,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
         { type: 'apiKey', name: 'api_key', in: 'header' },
         { type: 'oauth2', scopes: ['write:pets', 'read:pets'] },
       ],
-      validator: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema },
+      validator: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema, errorStatus: [400, 404] },
       ...config,
       throwOnError: config.throwOnError ?? true,
     }) as Promise<
