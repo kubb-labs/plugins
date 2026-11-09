@@ -3,7 +3,7 @@
 Set `baseURL` on the client plugin or on the generated client.
 
 > [!NOTE]
-> Top-level OpenAPI server URLs do not configure the client automatically. The `server` option of `adapterOas` only sets document metadata. It does not set `baseURL`.
+> Top-level OpenAPI server URLs do not set the client's `baseURL`, even with the `server` option of `adapterOas`.
 
 ## Operations with their own server
 

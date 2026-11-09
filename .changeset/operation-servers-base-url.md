@@ -1,7 +1,7 @@
 ---
-'@kubb/plugin-client': minor
-'@kubb/plugin-fetch': minor
-'@kubb/plugin-axios': minor
+'@kubb/plugin-client': major
+'@kubb/plugin-fetch': major
+'@kubb/plugin-axios': major
 ---
 
 Use the `servers` entry on a path or operation as that operation's default `baseURL`, so its calls go to that host instead of the client's.

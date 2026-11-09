@@ -28,7 +28,7 @@ export function getOperationBaseURL({
   const servers = [operation?.servers, pathItem?.servers].find((list) => list?.length)
   const entry = servers?.[index] ?? servers?.[0]
 
-  const url = entry?.url.replace(/\{([^{}]+)\}/g, (match, name: string) => variables?.[name] ?? entry.variables?.[name]?.default ?? match)
+  const url = entry?.url?.replace(/\{([^{}]+)\}/g, (match, name: string) => variables?.[name] ?? entry.variables?.[name]?.default ?? match)
 
   return url && /^[a-z][a-z\d+.-]*:\/\//i.test(url) ? url : undefined
 }
