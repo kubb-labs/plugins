@@ -68,6 +68,62 @@ Read the body by the response `Content-Type`. An operation with only binary succ
 
 A call can also pass `contentType`: `request` is the body's media type, and `response` is the media type to ask for in `Accept`. A streamed operation always passes its media type, such as `contentType: { response: 'text/event-stream' }` or `contentType: { response: 'application/jsonl' }`. A call whose response offers `text/event-stream` next to another content type passes `text/event-stream` too, unless the caller picks another one. `RequestConfig` needs the field.
 
+## Serialize parameters
+
+When the spec sets `style`, `explode`, `allowReserved`, or `contentType` on a parameter, the generated call also passes `styles`, grouped by location and keyed by the parameter name:
+
+```typescript
+styles: {
+  path: { petId: { style: 'matrix', explode: true } },
+  query: { tags: { style: 'pipeDelimited', explode: false } },
+}
+```
+
+A parameter without an entry uses the default for its location. The shared runtime's `serializers.ts` applies these styles. A client you write from scratch declares `styles` on `RequestConfig` and applies the styles itself, or ignores them when the spec only uses the defaults.
+
+### Query
+
+Query parameters default to the `form` style. Arrays explode into repeated keys unless the spec
+says otherwise, and `spaceDelimited`, `pipeDelimited`, and `deepObject` change how arrays and
+objects collapse.
+
+| Style            | `explode` | Input               | Result           |
+| ---------------- | --------- | ------------------- | ---------------- |
+| `form` (default) | `true`    | `{ id: [3, 4, 5] }` | `id=3&id=4&id=5` |
+| `form`           | `false`   | `{ id: [3, 4, 5] }` | `id=3,4,5`       |
+| `spaceDelimited` | `false`   | `{ id: [3, 4, 5] }` | `id=3%204%205`   |
+| `pipeDelimited`  | `false`   | `{ id: [3, 4, 5] }` | `id=3\|4\|5`     |
+| `deepObject`     | `n/a`     | `{ a: { b: 1 } }`   | `a%5Bb%5D=1`     |
+
+With `explode: true`, `spaceDelimited` and `pipeDelimited` fall back to repeated keys like `form`,
+so the delimiter only shows with `explode: false`.
+
+### Path
+
+Path parameters default to the `simple` style, which emits the bare value. `label` prefixes a
+`.` and `matrix` prefixes a `;name=` segment. The results below are the serialized segment for a
+parameter named `id`.
+
+| Style              | `explode` | Input            | Result            |
+| ------------------ | --------- | ---------------- | ----------------- |
+| `simple` (default) | `false`   | `[3, 4, 5]`      | `3,4,5`           |
+| `label`            | `true`    | `[3, 4, 5]`      | `.3.4.5`          |
+| `matrix`           | `true`    | `[3, 4, 5]`      | `;id=3;id=4;id=5` |
+| `simple`           | `false`   | `{ x: 1, y: 2 }` | `x,1,y,2`         |
+
+### Header and cookie
+
+Header parameters use the `simple` style and cookie parameters use the `form` style. Both fix the
+style and only let `explode` vary, so the metadata for these locations carries `explode` alone.
+Header values are sent as-is, and cookie values are URL-encoded into a single `Cookie` header.
+
+| Location | `explode` | Input                             | Result                 |
+| -------- | --------- | --------------------------------- | ---------------------- |
+| header   | `false`   | `[3, 4]`                          | `X-Ids: 3,4`           |
+| header   | `true`    | `{ role: 'admin' }`               | `X-Filter: role=admin` |
+| cookie   | `false`   | `{ session: 'abc', ids: [1, 2] }` | `session=abc; ids=1,2` |
+| cookie   | `true`    | `{ ids: [1, 2] }`                 | `ids=1; ids=2`         |
+
 ## A minimal client
 
 The client below uses `fetch`. Replace the transport with the HTTP library you use.
@@ -87,6 +143,7 @@ export type RequestConfig = {
   contentType?: string | { request?: string; response?: string }
   throwOnError?: boolean
   security?: Array<{ type: string; name?: string; in?: string; scopes?: Array<string> }>
+  styles?: object
   client?: typeof client
 }
 
