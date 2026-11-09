@@ -230,6 +230,19 @@ describe('defaultBodySerializer', () => {
     expect(defaultBodySerializer({ body: { name: 'odie' } })).toBe('{"name":"odie"}')
   })
 
+  test.each(['application/xml', 'text/xml; charset=utf-8', 'application/atom+xml', 'application/yaml', 'application/x-yaml', 'text/csv'])(
+    'refuses to send an object as JSON under %s, and passes a string through',
+    (contentType) => {
+      expect(() => defaultBodySerializer({ body: { name: 'odie' }, contentType })).toThrow(TypeError)
+      expect(() => defaultBodySerializer({ body: ['odie'], contentType })).toThrow(/codecs\['[a-z+/-]+'\]\.serialize/)
+      expect(defaultBodySerializer({ body: '<pet/>', contentType })).toBe('<pet/>')
+    },
+  )
+
+  test('JSON-encodes an object for a vendor type without a +json suffix', () => {
+    expect(defaultBodySerializer({ body: { name: 'odie' }, contentType: 'application/vnd.acme.v1' })).toBe('{"name":"odie"}')
+  })
+
   test('passes FormData through untouched', () => {
     const formData = new FormData()
     expect(defaultBodySerializer({ body: formData })).toBe(formData)
