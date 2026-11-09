@@ -7,7 +7,7 @@ Set `baseURL` on the client plugin or on the generated client.
 
 ## Operations with their own server
 
-A path or operation can declare its own `servers`, such as an upload or streaming host next to the main API. Its URL becomes that operation's default `baseURL`, so the call goes to that host and not to the client's. The operation's `servers` win over the path's. The entry is picked with the `server.index` of `adapterOas`, falling back to the first one, and its `{variable}` placeholders are filled from `server.variables`, then from the spec defaults.
+A path or operation can declare its own `servers`, such as an upload or streaming host next to the main API. Its URL becomes that operation's default `baseURL`, so the call goes to that host. The operation's `servers` win over the path's. The entry is picked with the `server.index` of `adapterOas`, falling back to the first one, and its `{variable}` placeholders are filled from `server.variables`, then from the spec defaults.
 
 ```yaml [petStore.yaml]
 paths:
@@ -18,7 +18,7 @@ paths:
       operationId: streamEvents
 ```
 
-Only a `baseURL` passed on the call overrides it. The `baseURL` option, `setConfig`, and `createClient` do not. A relative server URL, such as `/v2`, is ignored, so the client's `baseURL` still applies.
+Only a `baseURL` passed on the call overrides it. A relative server URL, such as `/v2`, is ignored, so the client's `baseURL` still applies.
 
 ## Use the baseURL option
 

@@ -10,7 +10,7 @@ Run the fetch and axios clients on one core with the same interceptors and clien
 - `FetchOptions` and `AxiosOptions` are now `NativeOptions`.
 - Stream types take the event: `EventStreamResult<ServerSentEvent<Pet>>` instead of `EventStreamResult<Pet>`, also for `StreamResult` and `UnwrappedStreamResult`.
 - A custom transport returns a web `Response` and builds its init with `toRequestInit(request)`.
-- On axios, `client.interceptors` get the core objects and skip network errors. Native handlers go on `axiosInstance.interceptors`. `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
+- On axios, `client.interceptors` handlers get the core objects and skip network errors. Native handlers go on `axiosInstance.interceptors`. `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
 
 ```diff
 - import { client, defaultTransport } from './gen/.kubb/client'
