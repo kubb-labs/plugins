@@ -285,7 +285,8 @@ export type ContentVariant = { name: string; suffix: string; schema: ast.SchemaN
 
 /**
  * Returns the entry with a `string` schema when the client runtime reads its body as text, such as `Pet` on `application/xml`.
- * JSON, binary, stream, and wildcard entries keep their schema, so the runtime can pick the parser from the server's `Content-Type`.
+ * JSON, binary, and stream entries keep their schema, and so do wildcards such as `*/*` and `application/*`, so the runtime can pick the
+ * parser from the server's `Content-Type`. `text/*` reads as text.
  */
 export function toResponseContent<T extends ContentVariantInput & Pick<ast.ContentNode, 'stream'>>(entry: T): T {
   const { contentType, schema } = entry
