@@ -41,6 +41,11 @@ const putEvent = ast.factory.createOperation({
   responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'ok' })],
 })
 
+// The AST type has no range keys, but the adapter passes keys such as `5XX` through as is.
+function toResponse(statusCode: string) {
+  return ast.factory.createResponse({ statusCode: statusCode as ast.StatusCode, schema: ast.factory.createSchema({ type: 'object', properties: [] }) })
+}
+
 describe('buildValidatorHooks', () => {
   test("the 'zod' shorthand also wires the error validator when an error response is documented", () => {
     const hooks = buildValidatorHooks({ node: addPetWithError, validator: 'zod', zodResolver: resolverZod })
@@ -50,16 +55,15 @@ describe('buildValidatorHooks', () => {
     expect(hooks.importedZodNames).toStrictEqual(['addPetResponseSchema', 'addPetErrorSchema'])
   })
 
-  test('lists range keys in errorStatus and leaves it out when a default response covers every status', () => {
-    // The AST type has no range keys, but the adapter passes keys such as `5XX` through as is.
-    const toResponse = (statusCode: string) =>
-      ast.factory.createResponse({ statusCode: statusCode as ast.StatusCode, schema: ast.factory.createSchema({ type: 'object', properties: [] }) })
+  test('lists range keys and skips bodiless statuses in errorStatus', () => {
     const withRange = {
       ...addPetWithError,
       responses: [...addPetWithError.responses, toResponse('5XX'), ast.factory.createResponse({ statusCode: '409', description: 'no body' })],
     }
     expect(buildValidatorHooks({ node: withRange, validator: 'zod', zodResolver: resolverZod }).errorStatus).toBe("[422, '5XX']")
+  })
 
+  test('returns a null errorStatus when a default response covers every status', () => {
     const withDefault = { ...addPetWithError, responses: [...addPetWithError.responses, toResponse('default')] }
     const hooks = buildValidatorHooks({ node: withDefault, validator: 'zod', zodResolver: resolverZod })
     expect(hooks.error).toBe('addPetErrorSchema')

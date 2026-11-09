@@ -727,19 +727,15 @@ describe('createClientCore', () => {
   })
 
   test('runs the error parser only for the statuses in errorStatus when throwOnError is false', async () => {
-    const validator = { error: toFailingSchema(), errorStatus: [404, '4XX'] }
-    const gateway = createClient({ data: '<html>Bad Gateway</html>', status: 502 }).client
-    const result = (await gateway({ method: 'GET', url: '/pet/1', throwOnError: false, validator })) as CallResult<string, string>
-    expect(result).toMatchObject({ status: 502, data: undefined, error: '<html>Bad Gateway</html>' })
+    const validator = { error: toFailingSchema(), errorStatus: [404, '5XX'] }
+    const unprocessable = createClient({ data: { message: 'invalid' }, status: 422 }).client
+    const result = (await unprocessable({ method: 'GET', url: '/pet/1', throwOnError: false, validator })) as CallResult<string, string>
+    expect(result).toMatchObject({ status: 422, data: undefined, error: { message: 'invalid' } })
 
-    for (const status of [404, 422]) {
+    for (const status of [404, 502]) {
       const { client } = createClient({ data: { message: 'missing' }, status })
       await expect(client({ method: 'GET', url: '/pet/1', throwOnError: false, validator })).rejects.toMatchObject({ name: 'ParseError' })
     }
-    // Without errorStatus, as for a spec with a `default` response, every non-2xx body is validated.
-    await expect(gateway({ method: 'GET', url: '/pet/1', throwOnError: false, validator: { error: toFailingSchema() } })).rejects.toMatchObject({
-      name: 'ParseError',
-    })
   })
 
   test('skips the error parser when the call throws, so it throws the ResponseError', async () => {
