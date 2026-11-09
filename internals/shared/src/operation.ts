@@ -1,4 +1,4 @@
-import { ast, type Group, type Memo, type Output, type Resolver, type ResolverFileParams, Url } from '@kubb/kit'
+import { ast, type Group, type Memo, type Output, type Resolver, type ResolverFileParams } from '@kubb/kit'
 
 /**
  * Builds the `ResolverFileParams` every operation generator passes to
@@ -82,12 +82,12 @@ export type OperationTypeNameResolver = RequestConfigResolver &
     }
   }
 
-export type OperationCommentLink = 'pathTemplate' | 'urlPath' | false | ((node: ast.OperationNode) => string | undefined)
-
 export type BuildOperationCommentsOptions = {
-  link?: OperationCommentLink
-  linkPosition?: 'beforeDeprecated' | 'afterDeprecated'
   splitLines?: boolean
+  /**
+   * Extra tags, such as `@param` and `@returns`, placed after `@summary` and before `@deprecated`.
+   */
+  tags?: Array<string>
 }
 
 type ResponseLike = {
@@ -107,16 +107,11 @@ export type ResolveOperationTypeNameOptions = {
   includeParams?: boolean
 }
 
-function getOperationLink(node: ast.OperationNode, link: OperationCommentLink): string | null {
-  if (!link) {
-    return null
-  }
-
-  if (typeof link === 'function') {
-    return link(node) ?? null
-  }
-
-  return node.path ? `{@link ${Url.toPath(node.path)}}` : null
+/**
+ * The operation's method and path as plain text, such as `` `GET /pet/{petId}` ``. A path is not a valid `{@link}` target.
+ */
+function getOperationRequestLine(node: ast.OperationNode): string | null {
+  return ast.isHttpOperationNode(node) && node.path ? `\`${node.method.toUpperCase()} ${node.path}\`` : null
 }
 
 /**
@@ -457,12 +452,15 @@ export function buildRequestParamsSignature(
 }
 
 export function buildOperationComments(node: ast.OperationNode, options: BuildOperationCommentsOptions = {}): Array<string> {
-  const { link = 'pathTemplate', linkPosition = 'afterDeprecated', splitLines = false } = options
-  const linkComment = getOperationLink(node, link)
-  const comments =
-    linkPosition === 'beforeDeprecated'
-      ? [node.description && `@description ${node.description}`, node.summary && `@summary ${node.summary}`, linkComment, node.deprecated && '@deprecated']
-      : [node.description && `@description ${node.description}`, node.summary && `@summary ${node.summary}`, node.deprecated && '@deprecated', linkComment]
+  const { splitLines = false, tags = [] } = options
+  // The request line leads: free text after a block tag would belong to that tag.
+  const comments = [
+    getOperationRequestLine(node),
+    node.description && `@description ${node.description}`,
+    node.summary && `@summary ${node.summary}`,
+    ...tags,
+    node.deprecated && '@deprecated',
+  ]
 
   const filteredComments = comments.filter((comment): comment is string => Boolean(comment))
 

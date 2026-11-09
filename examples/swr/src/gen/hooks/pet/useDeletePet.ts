@@ -16,9 +16,9 @@ export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
 export type DeletePetMutationArg = DeletePetOptions
 
 /**
+ * `DELETE /pet/{petId}`
  * @description delete a pet
  * @summary Deletes a pet
- * {@link /pet/:petId}
  */
 export function useDeletePet(
   options: {

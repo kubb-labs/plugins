@@ -38,8 +38,8 @@ export function createPetsMutationOptions<TContext = unknown>(config: Partial<Om
 }
 
 /**
+ * `POST /pets/{uuid}`
  * @summary Create a pet
- * {@link /pets/:uuid}
  */
 export function useCreatePets<TContext>(
   options: {

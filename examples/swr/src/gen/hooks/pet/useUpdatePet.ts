@@ -16,9 +16,9 @@ export type UpdatePetMutationKey = ReturnType<typeof updatePetMutationKey>
 export type UpdatePetMutationArg = UpdatePetOptions
 
 /**
+ * `PUT /pet`
  * @description Update an existing pet by Id
  * @summary Update an existing pet
- * {@link /pet}
  */
 export function useUpdatePet(
   options: {

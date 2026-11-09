@@ -183,7 +183,7 @@ describe('buildRequestConfigType', () => {
 })
 
 describe('buildOperationComments', () => {
-  test('builds path-template links by default', () => {
+  test('leads with the request line as plain text', () => {
     const node = ast.factory.createOperation({
       operationId: 'showPet',
       method: 'GET',
@@ -193,10 +193,10 @@ describe('buildOperationComments', () => {
       deprecated: true,
     })
 
-    expect(buildOperationComments(node)).toStrictEqual(['@description Show pet', '@summary Show', '@deprecated', '{@link /pets/:petId}'])
+    expect(buildOperationComments(node)).toStrictEqual(['`GET /pets/{petId}`', '@description Show pet', '@summary Show', '@deprecated'])
   })
 
-  test('supports URLPath links before deprecation and multiline trimming', () => {
+  test('places extra tags before deprecation and trims multiline text', () => {
     const node = ast.factory.createOperation({
       operationId: 'showPet',
       method: 'GET',
@@ -205,10 +205,12 @@ describe('buildOperationComments', () => {
       deprecated: true,
     })
 
-    expect(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true })).toStrictEqual([
+    expect(buildOperationComments(node, { splitLines: true, tags: ['@param options - Options.', '@returns The pet.'] })).toStrictEqual([
+      '`GET /pets/{pet-id}`',
       '@description Show pet',
       'details',
-      '{@link /pets/:petId}',
+      '@param options - Options.',
+      '@returns The pet.',
       '@deprecated',
     ])
   })

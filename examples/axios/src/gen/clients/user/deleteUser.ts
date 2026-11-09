@@ -8,9 +8,11 @@ import type { DeleteUserOptions, DeleteUserResponses } from '../../models/user/D
 import { client, withUnwrap } from '../../.kubb/client'
 
 /**
+ * `DELETE /user/{username}`
  * @description This can only be done by the logged in user.
  * @summary Delete user
- * {@link /user/:username}
+ * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function deleteUser<ThrowOnError extends boolean = true>(
   options: Options<DeleteUserOptions, ThrowOnError>,

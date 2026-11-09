@@ -16,9 +16,9 @@ export type PlaceOrderPatchMutationKey = ReturnType<typeof placeOrderPatchMutati
 export type PlaceOrderPatchMutationArg = PlaceOrderPatchOptions
 
 /**
+ * `PATCH /store/order`
  * @description Place a new order in the store with patch
  * @summary Place an order for a pet with patch
- * {@link /store/order}
  */
 export function usePlaceOrderPatch(
   options: {

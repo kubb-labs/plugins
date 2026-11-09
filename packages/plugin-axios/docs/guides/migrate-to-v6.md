@@ -14,6 +14,7 @@ In v6 the axios client runs on the same core as `@kubb/plugin-fetch`. Most edits
 | Names `EventStreamResult<Pet>`, `StreamResult`, or `UnwrappedStreamResult`                                           | Wrap the payload: `EventStreamResult<ServerSentEvent<Pet>>`. See [Stream result types](#stream-result-types).                                                                                                 |
 | Relies on interceptor order, the error interceptor for network errors, or a separate instance per `createClient()`   | Check [Behavior changes](#behavior-changes). It compiles, so the type checker does not catch it.                                                                                                              |
 | Comes from 5.12 or earlier and uses streams                                                                          | Check [From 5.12 or earlier](#from-5-12-or-earlier).                                                                                                                                                          |
+| Uses SDK classes with `group: { type: 'tag' }`, such as `new pet(config)`                                            | Rename them to the PascalCase names, such as `new PetClient(config)`. See [SDK class names](#sdk-class-names).                                                                                                |
 
 ## Upgrade steps
 
@@ -145,6 +146,19 @@ These changed in 5.13 and compile without errors, so check them by hand:
 - A stream call keeps the adapter set on the call or on the instance, such as a mock adapter in tests. Only a browser call with the default adapters switches to the fetch adapter.
 - A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream.
 - An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.
+
+## SDK class names
+
+With `sdk` and `group: { type: 'tag' }`, tag classes used the group folder name, such as `export class pet`. They now use `resolver.groupName`, such as `export class PetClient`, as without `group`. The files stay where they were, and the root class keeps its `pet` and `store` fields.
+
+```diff
+- import { pet } from './gen/sdk/pet/pet'
+- const api = new pet({ baseURL })
++ import { PetClient } from './gen/sdk/pet/pet'
++ const api = new PetClient({ baseURL })
+```
+
+The root class now creates one client and shares it with every tag, so it builds one client instead of one per tag. Reach it as `api.client` to add interceptors.
 
 ## Query plugins
 

@@ -5,7 +5,9 @@ import type { GetPetByIdOptions, GetPetByIdResponses } from './GetPetById'
 import { client, withUnwrap } from './.kubb/client'
 
 /**
- * {@link /pet/:petId}
+ * `GET /pet/{petId}`
+ * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function getPetById<ThrowOnError extends boolean = true>(
   options: Options<GetPetByIdOptions, ThrowOnError>,

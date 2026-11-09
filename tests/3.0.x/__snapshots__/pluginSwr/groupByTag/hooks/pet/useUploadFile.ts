@@ -16,8 +16,8 @@ export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
 export type UploadFileMutationArg = UploadFileOptions
 
 /**
+ * `POST /pet/{petId}/uploadImage`
  * @summary uploads an image
- * {@link /pet/:petId/uploadImage}
  */
 export function useUploadFile(options: {
   mutation?: SWRMutationConfiguration<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg> & { throwOnError?: boolean },

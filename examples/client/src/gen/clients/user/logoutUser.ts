@@ -8,8 +8,10 @@ import type { LogoutUserOptions, LogoutUserResponses } from '../../models/user/L
 import { client } from '../../../client'
 
 /**
+ * `GET /user/logout`
  * @summary Logs out current logged in user session
- * {@link /user/logout}
+ * @param options - Per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function logoutUser<ThrowOnError extends boolean = true>(
   options: Options<LogoutUserOptions, ThrowOnError> = {},

@@ -3,8 +3,10 @@ import type { ApiResponse } from '../../../models/ts/ApiResponse'
 import { client, withUnwrap } from '../../../.kubb/client'
 
 /**
+ * `POST /pet/{petId}/uploadImage`
  * @summary uploads an image
- * {@link /pet/:petId/uploadImage}
+ * @param options - The request (`path`, `query`, `body`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function uploadFile<ThrowOnError extends boolean = true>(
   options: Options<

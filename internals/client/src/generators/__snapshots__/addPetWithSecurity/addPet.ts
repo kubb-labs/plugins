@@ -5,7 +5,9 @@ import type { AddPetOptions, AddPetResponses } from './AddPet'
 import { client, withUnwrap } from './.kubb/client'
 
 /**
- * {@link /pet}
+ * `POST /pet`
+ * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function addPet<ThrowOnError extends boolean = true>(
   options: Options<AddPetOptions, ThrowOnError>,

@@ -5,7 +5,9 @@ import type { ListPetsStyledOptions, ListPetsStyledResponses } from './ListPetsS
 import { client, withUnwrap } from './.kubb/client'
 
 /**
- * {@link /pets/:petId}
+ * `GET /pets/{petId}`
+ * @param options - The request (`path`, `query`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function listPetsStyled<ThrowOnError extends boolean = true>(
   options: Options<ListPetsStyledOptions, ThrowOnError>,

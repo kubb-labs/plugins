@@ -31,8 +31,8 @@ export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Om
 }
 
 /**
+ * `POST /pet/{petId}/uploadImage`
  * @summary uploads an image
- * {@link /pet/:petId/uploadImage}
  */
 export function useUploadFile<TContext>(
   options: {

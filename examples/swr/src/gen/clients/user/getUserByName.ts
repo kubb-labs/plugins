@@ -8,8 +8,10 @@ import type { GetUserByNameOptions, GetUserByNameResponses } from '../../models/
 import { client, withUnwrap } from '../../.kubb/client'
 
 /**
+ * `GET /user/{username}`
  * @summary Get user by user name
- * {@link /user/:username}
+ * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function getUserByName<ThrowOnError extends boolean = true>(
   options: Options<GetUserByNameOptions, ThrowOnError>,

@@ -1,3 +1,4 @@
+import { createGroupConfig } from '@internals/shared'
 import type { Adapter, Config, PluginType } from '@kubb/kit'
 import { ast, Diagnostics, memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
@@ -100,6 +101,11 @@ describe('sdkGenerator operations', () => {
     // returnType: 'data' unwraps every SDK method down to the bare success body.
     { name: 'sdkClassWithReturnTypeData', options: { returnType: 'data' } as Partial<PluginFetch['resolvedOptions']> },
     { name: 'sdkClassWithoutThrowing', options: { throwOnErrorDefault: false } as Partial<PluginFetch['resolvedOptions']> },
+    // `group.name` names the folders; the classes keep `resolver.groupName`, and the root shares one client.
+    {
+      name: 'sdkTagGroupWithRoot',
+      options: { group: createGroupConfig({ type: 'tag' }), sdk: { mode: 'tag', name: 'petStore' } } as Partial<PluginFetch['resolvedOptions']>,
+    },
   ] as const satisfies Array<{ name: string; options: Partial<PluginFetch['resolvedOptions']>; adapter?: Adapter }>
 
   test.each(testData)('$name', async (props) => {

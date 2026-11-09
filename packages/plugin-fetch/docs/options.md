@@ -107,7 +107,7 @@ Generates a class-based SDK. Each instance takes its own client config, so envir
 ::field-group
 
 :::field{name="'tag'"}
-Default value for `sdk.mode`. Generates one class per tag, such as `PetClient`. Set `sdk.name` to also get a root class that shares one config, used as `new PetStore(config).pet.getPetById(...)`.
+Default value for `sdk.mode`. Generates one class per tag, named by `resolver.groupName`, such as `PetClient`. Set `sdk.name` to also get a root class that creates one client and shares it with every tag, used as `new PetStore(config).pet.getPetById(...)`.
 :::
 
 :::field{name="'flat'"}
@@ -124,6 +124,16 @@ Methods take the same grouped options and return the same result as the standalo
 const pet = new PetClient({ baseURL: 'https://petstore.swagger.io/v2' })
 const { data } = await pet.getPetById({ path: { petId: 1 } })
 ```
+
+Every SDK class exposes its client as the read-only `client` field. On the root class, interceptors you add there apply to every tag:
+
+```typescript
+const api = new PetStore({ baseURL: 'https://petstore.swagger.io/v2' })
+api.client.interceptors.request.use((request) => request)
+await api.pet.getPetById({ path: { petId: 1 } })
+```
+
+A tag class also accepts an existing client, as in `new PetClient(api.client)`.
 
 ### returnType
 

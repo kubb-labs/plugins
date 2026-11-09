@@ -29,7 +29,7 @@ export function findPetsByStatusQueryOptions(
 }
 
 /**
- * {@link /pet/findByStatus}
+ * `GET /pet/findByStatus`
  */
 export function useFindPetsByStatus<
   TData = FindPetsByStatusStatus200,

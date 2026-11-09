@@ -9,7 +9,9 @@ import { client, withUnwrap } from '../.kubb/client'
 import { listEventsResponseSchema } from '../zod/listEventsSchema'
 
 /**
- * {@link /events}
+ * `GET /events`
+ * @param options - The request (`query`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function listEvents<ThrowOnError extends boolean = true>(options: Options<ListEventsOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<ListEventsResponsesSchemaType, ThrowOnError>> {
   const { client: request = client, ...config } = options

@@ -14,14 +14,16 @@ import { listEventsResponseSchema, listEventsQuerySchema } from '../zod/listEven
 import { putEventResponseSchema, putEventStatus409Schema, putEventBodySchema, putEventPathSchema, putEventQuerySchema, putEventHeadersSchema } from '../zod/putEventSchema'
 
 export class EventClient {
-  private readonly client: ClientInstance
+  readonly client: ClientInstance
 
-  constructor(config: ClientConfig = {}) {
-    this.client = createClient(config)
+  constructor(config: ClientConfig | ClientInstance = {}) {
+    this.client = typeof config === 'function' ? config : createClient(config)
   }
 
 /**
-   * {@link /events/:day}
+   * `PUT /events/{day}`
+   * @param options - The request (`path`, `query`, `body`, `headers`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public putEvent<ThrowOnError extends boolean = true>(options: Options<PutEventOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<PutEventResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
@@ -30,7 +32,9 @@ export class EventClient {
   }
 
 /**
-   * {@link /events}
+   * `GET /events`
+   * @param options - The request (`query`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public listEvents<ThrowOnError extends boolean = true>(options: Options<ListEventsOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<ListEventsResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
@@ -39,7 +43,9 @@ export class EventClient {
   }
 
 /**
-   * {@link /resources/:resource}
+   * `GET /resources/{resource}`
+   * @param options - The request (`path`, `query`, `headers`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public getResource<ThrowOnError extends boolean = true>(options: Options<GetResourceOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options

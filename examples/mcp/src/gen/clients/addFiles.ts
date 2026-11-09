@@ -8,9 +8,11 @@ import type { AddFilesOptions, AddFilesResponses } from '../models/ts/AddFiles'
 import { client, withUnwrap } from '../.kubb/client'
 
 /**
+ * `POST /pet/files`
  * @description Place a new file in the store
  * @summary Place an file for a pet
- * {@link /pet/files}
+ * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function addFiles<ThrowOnError extends boolean = true>(
   options: Options<AddFilesOptions, ThrowOnError> = {},

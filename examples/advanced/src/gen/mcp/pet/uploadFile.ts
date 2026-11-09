@@ -2,8 +2,8 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { uploadFile } from '../../clients/axios/petService/uploadFile'
 
 /**
+ * `POST /pet/{petId}/uploadImage`
  * @summary uploads an image
- * {@link /pet/:petId/uploadImage}
  */
 export async function uploadFileHandler(
   {

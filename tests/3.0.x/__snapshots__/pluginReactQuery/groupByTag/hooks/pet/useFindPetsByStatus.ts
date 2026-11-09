@@ -24,9 +24,9 @@ export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusOptions 
 }
 
 /**
+ * `GET /pet/findByStatus`
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
- * {@link /pet/findByStatus}
  */
 export function useFindPetsByStatus<TData = FindPetsByStatusStatus200, TQueryData = FindPetsByStatusStatus200, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>({ query }: { query?: FindPetsByStatusOptions['query'] | (() => FindPetsByStatusOptions['query']) } = {}, options: {
   query?: Partial<QueryObserverOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },

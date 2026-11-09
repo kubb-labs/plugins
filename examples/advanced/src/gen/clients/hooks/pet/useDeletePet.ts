@@ -30,9 +30,9 @@ export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omi
 }
 
 /**
+ * `DELETE /pet/{petId}:search`
  * @description delete a pet
  * @summary Deletes a pet
- * {@link /pet/:petId:search}
  */
 export function useDeletePet<TContext>(
   options: {

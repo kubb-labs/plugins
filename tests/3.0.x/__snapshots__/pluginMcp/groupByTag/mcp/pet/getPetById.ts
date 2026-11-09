@@ -8,9 +8,9 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { getPetById } from '../../clients/getPetById'
 
 /**
+ * `GET /pet/{petId}`
  * @description Returns a single pet
  * @summary Find pet by ID
- * {@link /pet/:petId}
  */
 export async function getPetByIdHandler({ path }: GetPetByIdOptions, ctx: ServerContext): Promise<CallToolResult> {
   const res = await getPetById({ path, signal: ctx.mcpReq.signal, throwOnError: true })

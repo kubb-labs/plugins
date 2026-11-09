@@ -28,7 +28,7 @@ export function retrieveMyProfileQueryOptions(
 }
 
 /**
- * {@link /user/me}
+ * `GET /user/me`
  */
 export function useRetrieveMyProfile<
   TData = RetrieveMyProfileStatus200,

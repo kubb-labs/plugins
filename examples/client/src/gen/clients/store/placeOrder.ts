@@ -8,9 +8,11 @@ import type { PlaceOrderOptions, PlaceOrderResponses } from '../../models/store/
 import { client } from '../../../client'
 
 /**
+ * `POST /store/order`
  * @description Place a new order in the store
  * @summary Place an order for a pet
- * {@link /store/order}
+ * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function placeOrder<ThrowOnError extends boolean = true>(
   options: Options<PlaceOrderOptions, ThrowOnError> = {},

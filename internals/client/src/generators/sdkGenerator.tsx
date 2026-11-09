@@ -87,8 +87,10 @@ function buildControllers(
   return nodes.reduce((acc, operationNode) => {
     if (!ast.isHttpOperationNode(operationNode)) return acc
     const tag = operationNode.tags[0]
-    const name = tag ? ensureValidVarName(group?.name?.({ group: camelCase(tag) }) ?? resolver.groupName(tag)) : resolver.className('ApiClient')
-    const file = resolver.file({ name, extname: '.ts', tag, root, output, group: group ?? undefined })
+    const name = tag ? ensureValidVarName(resolver.groupName(tag)) : resolver.className('ApiClient')
+    // `group.name` names the folder and file, never the class.
+    const fileName = tag && group?.name ? ensureValidVarName(group.name({ group: camelCase(tag) })) : name
+    const file = resolver.file({ name: fileName, extname: '.ts', tag, root, output, group: group ?? undefined })
     const operationData = buildOperationData(operationNode)
     const previous = acc.find((item) => item.file.path === file.path)
 
@@ -124,10 +126,10 @@ function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationDat
  * standalone per-operation functions.
  *
  * Every tag client is an instance class whose constructor takes a client config and builds its own
- * client, so each environment is a separate instance. With `sdk.mode: 'tag'` (the default) it
- * emits one class per tag and, when `sdk.name` is set, a composed root that instantiates every tag
- * client. With `sdk.mode: 'flat'` it emits one class named by `sdk.name`, with every operation as a
- * direct method.
+ * client, or takes an existing client, so each environment is a separate instance. With `sdk.mode:
+ * 'tag'` (the default) it emits one class per tag, named by `resolver.groupName`, and, when `sdk.name`
+ * is set, a composed root that creates one client and shares it with every tag client. With
+ * `sdk.mode: 'flat'` it emits one class named by `sdk.name`, with every operation as a direct method.
  *
  * `sse` is the Server-Sent Events runtime template, copied into `.kubb/sse.ts` only for a document with a
  * `text/event-stream` operation.
@@ -231,7 +233,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
 
         return (
           <File key={sdkFile.path} baseName={sdkFile.baseName} path={sdkFile.path} meta={sdkFile.meta} banner={banner(sdkFile)} footer={footer(sdkFile)}>
-            <File.Import name={['ClientConfig']} root={sdkFile.path} path={clientPath} isTypeOnly />
+            <File.Import name={['createClient']} root={sdkFile.path} path={clientPath} />
+            <File.Import name={['ClientConfig', 'ClientInstance']} root={sdkFile.path} path={clientPath} isTypeOnly />
             {controllers.map(({ name, file }) => (
               <File.Import key={name} name={[name]} root={sdkFile.path} path={file.path} />
             ))}

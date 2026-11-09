@@ -17,8 +17,10 @@ import {
 } from '../zod/scheduleVisitSchema.ts'
 
 /**
+ * `PUT /pets/{petId}/visits/{day}`
  * @summary Schedule a vet visit on a day
- * {@link /pets/:petId/visits/:day}
+ * @param options - The request (`path`, `query`, `body`, `headers`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function scheduleVisit<ThrowOnError extends boolean = true>(
   options: Options<ScheduleVisitOptionsSchemaType, ThrowOnError>,

@@ -14,16 +14,18 @@ import type { UploadFileOptions, UploadFileResponses } from '../types/UploadFile
 import { createClient, withUnwrap } from '../.kubb/client'
 
 export class PetStore {
-  private readonly client: ClientInstance
+  readonly client: ClientInstance
 
-  constructor(config: ClientConfig = {}) {
-    this.client = createClient(config)
+  constructor(config: ClientConfig | ClientInstance = {}) {
+    this.client = typeof config === 'function' ? config : createClient(config)
   }
 
 /**
+   * `POST /pet`
    * @description Add a new pet to the store
    * @summary Add a new pet to the store
-   * {@link /pet}
+   * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptions, ThrowOnError>): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
     const { client: request = this.client, contentType, ...config } = options
@@ -32,9 +34,11 @@ export class PetStore {
   }
 
 /**
+   * `GET /pet/findByStatus`
    * @description Multiple status values can be provided with comma separated strings
    * @summary Finds Pets by status
-   * {@link /pet/findByStatus}
+   * @param options - The request (`query`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptions, ThrowOnError> = {}): Unwrappable<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
@@ -43,9 +47,11 @@ export class PetStore {
   }
 
 /**
+   * `GET /pet/{petId}`
    * @description Returns a single pet
    * @summary Find pet by ID
-   * {@link /pet/:petId}
+   * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptions, ThrowOnError>): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
@@ -54,9 +60,11 @@ export class PetStore {
   }
 
 /**
+   * `DELETE /pet/{petId}`
    * @description delete a pet
    * @summary Deletes a pet
-   * {@link /pet/:petId}
+   * @param options - The request (`path`, `headers`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetOptions, ThrowOnError>): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
@@ -65,8 +73,10 @@ export class PetStore {
   }
 
 /**
+   * `POST /pet/{petId}/uploadImage`
    * @summary uploads an image
-   * {@link /pet/:petId/uploadImage}
+   * @param options - The request (`path`, `query`, `body`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileOptions, ThrowOnError>): Unwrappable<RequestResult<UploadFileResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
@@ -75,9 +85,11 @@ export class PetStore {
   }
 
 /**
+   * `GET /store/inventory`
    * @description Returns a map of status codes to quantities
    * @summary Returns pet inventories by status
-   * {@link /store/inventory}
+   * @param options - Per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptions, ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
@@ -86,9 +98,11 @@ export class PetStore {
   }
 
 /**
+   * `POST /store/order`
    * @description Place a new order in the store
    * @summary Place an order for a pet
-   * {@link /store/order}
+   * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptions, ThrowOnError> = {}): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options

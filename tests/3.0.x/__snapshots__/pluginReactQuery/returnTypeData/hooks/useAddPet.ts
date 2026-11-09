@@ -22,9 +22,9 @@ export function addPetMutationOptions<TContext = unknown>(config: Partial<Omit<R
 }
 
 /**
+ * `POST /pet`
  * @description Add a new pet to the store
  * @summary Add a new pet to the store
- * {@link /pet}
  */
 export function useAddPet<TContext>(options: {
   mutation?: UseMutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext> & { client?: QueryClient },

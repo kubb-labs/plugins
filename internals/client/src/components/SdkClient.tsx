@@ -1,8 +1,8 @@
-import { buildOperationComments } from '@internals/shared'
 import { buildJSDoc } from '@internals/utils'
 import { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
+import { buildClientComments } from '../builders/comments.ts'
 import { buildOperationBody } from '../builders/operationBody.ts'
 import type { Auth } from '../builders/security.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
@@ -33,7 +33,7 @@ export function buildSdkMethod({
 
   const body = buildOperationBody({ node, types, validatorHooks, security, returnType, throwOnErrorDefault })
   const generics = body.generics.length ? `<${body.generics.join(', ')}>` : ''
-  const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
+  const jsdoc = buildJSDoc(buildClientComments({ node, returnType }))
 
   const destructure = body.mergeContentType
     ? 'const { client: request = this.client, contentType, ...config } = options'
@@ -61,8 +61,9 @@ type Props = {
 /**
  * Renders one instance class per tag with one method per operation. The constructor takes a client
  * config object and builds its own client through `createClient`, so each environment is a separate
- * instance: `const api = new PetClient({ baseURL }); api.getPetById(...)`. A per-call `client` option
- * still overrides the instance client for a one-off call.
+ * instance: `const api = new PetClient({ baseURL }); api.getPetById(...)`. It also takes an existing
+ * client, which is how the root SDK shares one client across its tags. The client is public so callers
+ * can add interceptors, and a per-call `client` option still overrides it for a one-off call.
  */
 export function SdkClient({ name, operations, returnType, throwOnErrorDefault }: Props): KubbReactNode {
   const methods = operations.map(({ node, name: methodName, types, validatorHooks, security }) =>
@@ -78,10 +79,10 @@ export function SdkClient({ name, operations, returnType, throwOnErrorDefault }:
   )
 
   const constructor = [
-    '  private readonly client: ClientInstance',
+    '  readonly client: ClientInstance',
     '',
-    '  constructor(config: ClientConfig = {}) {',
-    '    this.client = createClient(config)',
+    '  constructor(config: ClientConfig | ClientInstance = {}) {',
+    "    this.client = typeof config === 'function' ? config : createClient(config)",
     '  }',
   ].join('\n')
 

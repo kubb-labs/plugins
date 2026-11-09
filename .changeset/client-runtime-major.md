@@ -11,6 +11,7 @@ Run the fetch and axios clients on one core with the same interceptors and clien
 - Write `EventStreamResult<ServerSentEvent<Pet>>` where you wrote `EventStreamResult<Pet>`, and the same for `StreamResult` and `UnwrappedStreamResult`.
 - Return a web `Response` from a custom transport, and build its init with `toRequestInit(request)`, so a ky transport is one call.
 - On axios, `client.interceptors` handlers get the core objects and skip network errors. Native handlers go on `axiosInstance.interceptors`, and `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
+- With `sdk` and `group: { type: 'tag' }`, SDK tag classes are PascalCase from `resolver.groupName`, such as `PetClient` instead of `pet`. Rename `new pet(config)` to `new PetClient(config)`. The root SDK class shares one client with every tag and exposes it as `client` for interceptors.
 
 ```diff
 - import { client, defaultTransport } from './gen/.kubb/client'

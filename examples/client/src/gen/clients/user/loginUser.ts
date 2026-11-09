@@ -8,8 +8,10 @@ import type { LoginUserOptions, LoginUserResponses } from '../../models/user/Log
 import { client } from '../../../client'
 
 /**
+ * `GET /user/login`
  * @summary Logs user into the system
- * {@link /user/login}
+ * @param options - The request (`query`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function loginUser<ThrowOnError extends boolean = true>(
   options: Options<LoginUserOptions, ThrowOnError> = {},

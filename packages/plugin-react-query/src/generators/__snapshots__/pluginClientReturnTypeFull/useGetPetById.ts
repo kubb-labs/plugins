@@ -30,7 +30,7 @@ export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Part
 }
 
 /**
- * {@link /pet/:petId}
+ * `GET /pet/{petId}`
  */
 export function useGetPetById<
   TData = RequestResult<GetPetByIdResponses, true>,

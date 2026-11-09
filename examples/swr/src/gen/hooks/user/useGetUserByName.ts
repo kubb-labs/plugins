@@ -25,8 +25,8 @@ export function getUserByNameQueryOptions(
 }
 
 /**
+ * `GET /user/{username}`
  * @summary Get user by user name
- * {@link /user/:username}
  */
 export function useGetUserByName(
   { path }: GetUserByNameOptions,

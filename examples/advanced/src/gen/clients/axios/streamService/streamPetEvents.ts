@@ -5,9 +5,11 @@ import { client, withUnwrap } from '../../../.kubb/client'
 import { toEventStream } from '../../../.kubb/sse'
 
 /**
+ * `GET /pet/{petId}/events`
  * @description Server-Sent Events stream of changes for a single pet
  * @summary Stream pet changes
- * {@link /pet/:petId/events}
+ * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The stream result, whose `data` yields each item as it arrives.
  */
 export function streamPetEvents<ThrowOnError extends boolean = true>(
   options: StreamOptions<

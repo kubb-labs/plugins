@@ -4,9 +4,11 @@ import { client, withUnwrap } from '../../../.kubb/client'
 import { getPetByIdResponseSchema, getPetByIdStatus400Schema, getPetByIdStatus404Schema } from '../../../zod/pet/getPetByIdSchema'
 
 /**
+ * `GET /pet/{petId}:search`
  * @description Returns a single pet
  * @summary Find pet by ID
- * {@link /pet/:petId:search}
+ * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function getPetById<ThrowOnError extends boolean = true>(
   options: Options<

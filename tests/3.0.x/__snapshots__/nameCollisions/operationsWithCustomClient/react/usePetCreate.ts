@@ -22,7 +22,7 @@ export function petCreateMutationOptions<TContext = unknown>(config: Partial<Omi
 }
 
 /**
- * {@link /pets/create-first}
+ * `POST /pets/create-first`
  */
 export function usePetCreate<TContext>(options: {
   mutation?: UseMutationOptions<PetCreateStatus200, ResponseErrorConfig<Error>, undefined, TContext> & { client?: QueryClient },

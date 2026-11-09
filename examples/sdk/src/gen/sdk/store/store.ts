@@ -11,17 +11,19 @@ import type { PlaceOrderOptions, PlaceOrderResponses } from '../../models/store/
 import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch'
 import { createClient, withUnwrap } from '../../.kubb/client'
 
-export class store {
-  private readonly client: ClientInstance
+export class StoreClient {
+  readonly client: ClientInstance
 
-  constructor(config: ClientConfig = {}) {
-    this.client = createClient(config)
+  constructor(config: ClientConfig | ClientInstance = {}) {
+    this.client = typeof config === 'function' ? config : createClient(config)
   }
 
   /**
+   * `GET /store/inventory`
    * @description Returns a map of status codes to quantities
    * @summary Returns pet inventories by status
-   * {@link /store/inventory}
+   * @param options - Per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public getInventory<ThrowOnError extends boolean = true>(
     options: Options<GetInventoryOptions, ThrowOnError> = {},
@@ -40,9 +42,11 @@ export class store {
   }
 
   /**
+   * `POST /store/order`
    * @description Place a new order in the store
    * @summary Place an order for a pet
-   * {@link /store/order}
+   * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public placeOrder<ThrowOnError extends boolean = true>(
     options: Options<PlaceOrderOptions, ThrowOnError> = {},
@@ -61,9 +65,11 @@ export class store {
   }
 
   /**
+   * `PATCH /store/order`
    * @description Place a new order in the store with patch
    * @summary Place an order for a pet with patch
-   * {@link /store/order}
+   * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public placeOrderPatch<ThrowOnError extends boolean = true>(
     options: Options<PlaceOrderPatchOptions, ThrowOnError> = {},
@@ -82,9 +88,11 @@ export class store {
   }
 
   /**
+   * `GET /store/order/{orderId}`
    * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
    * @summary Find purchase order by ID
-   * {@link /store/order/:orderId}
+   * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public getOrderById<ThrowOnError extends boolean = true>(
     options: Options<GetOrderByIdOptions, ThrowOnError>,
@@ -99,9 +107,11 @@ export class store {
   }
 
   /**
+   * `DELETE /store/order/{orderId}`
    * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
    * @summary Delete purchase order by ID
-   * {@link /store/order/:orderId}
+   * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public deleteOrder<ThrowOnError extends boolean = true>(
     options: Options<DeleteOrderOptions, ThrowOnError>,

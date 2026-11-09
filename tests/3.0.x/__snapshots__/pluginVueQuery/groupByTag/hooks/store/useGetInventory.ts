@@ -25,9 +25,9 @@ export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'pa
 }
 
 /**
+ * `GET /store/inventory`
  * @description Returns a map of status codes to quantities
  * @summary Returns pet inventories by status
- * {@link /store/inventory}
  */
 export function useGetInventory<TData = GetInventoryStatus200, TQueryData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventoryQueryKey>(options: {
   query?: Partial<UseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },

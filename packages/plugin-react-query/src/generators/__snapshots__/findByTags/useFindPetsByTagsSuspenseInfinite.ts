@@ -42,7 +42,7 @@ export function findPetsByTagsSuspenseInfiniteQueryOptions(
 }
 
 /**
- * {@link /pet/findByTags}
+ * `GET /pet/findByTags`
  */
 export function useFindPetsByTagsSuspenseInfinite<
   TQueryFnData = FindPetsByTagsStatus200,

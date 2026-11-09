@@ -61,9 +61,9 @@ export function updatePetMutationOptions<TContext = unknown>(
 }
 
 /**
+ * `PUT /pet`
  * @description Update an existing pet by Id
  * @summary Update an existing pet
- * {@link /pet}
  */
 export function useUpdatePet<TContext>(
   options: {

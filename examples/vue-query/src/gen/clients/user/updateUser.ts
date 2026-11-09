@@ -8,9 +8,11 @@ import type { UpdateUserOptions, UpdateUserResponses } from '../../models/user/U
 import { client, withUnwrap } from '../../.kubb/client'
 
 /**
+ * `PUT /user/{username}`
  * @description This can only be done by the logged in user.
  * @summary Update user
- * {@link /user/:username}
+ * @param options - The request (`path`, `body`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function updateUser<ThrowOnError extends boolean = true>(
   options: Options<UpdateUserOptions, ThrowOnError>,

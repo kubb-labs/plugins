@@ -7,9 +7,9 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { getInventory } from '../../clients/getInventory'
 
 /**
+ * `GET /store/inventory`
  * @description Returns a map of status codes to quantities
  * @summary Returns pet inventories by status
- * {@link /store/inventory}
  */
 export async function getInventoryHandler(ctx: ServerContext): Promise<CallToolResult> {
   const res = await getInventory({ signal: ctx.mcpReq.signal, throwOnError: true })

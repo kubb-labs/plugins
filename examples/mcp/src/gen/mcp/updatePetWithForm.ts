@@ -8,8 +8,8 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { updatePetWithForm } from '../clients/updatePetWithForm'
 
 /**
+ * `POST /pet/{petId}`
  * @summary Updates a pet in the store with form data
- * {@link /pet/:petId}
  */
 export async function updatePetWithFormHandler({ path, query }: UpdatePetWithFormOptions, ctx: ServerContext): Promise<CallToolResult> {
   const res = await updatePetWithForm({ path, query, signal: ctx.mcpReq.signal, throwOnError: true })

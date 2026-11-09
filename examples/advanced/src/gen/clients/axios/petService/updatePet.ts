@@ -4,9 +4,11 @@ import { client, withUnwrap } from '../../../.kubb/client'
 import { updatePetResponseSchema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema } from '../../../zod/pet/updatePetSchema'
 
 /**
+ * `PUT /pet`
  * @description Update an existing pet by Id
  * @summary Update an existing pet
- * {@link /pet}
+ * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function updatePet<ThrowOnError extends boolean = true>(
   options: Options<

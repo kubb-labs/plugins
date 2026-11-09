@@ -48,9 +48,9 @@ export function getPetByIdQueryOptions(
 }
 
 /**
+ * `GET /pet/{petId}:search`
  * @description Returns a single pet
  * @summary Find pet by ID
- * {@link /pet/:petId:search}
  */
 export function useGetPetById<
   TData = Omit<NonNullable<Pet>, 'name'> | string,
