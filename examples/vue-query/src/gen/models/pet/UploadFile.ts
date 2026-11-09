@@ -36,6 +36,9 @@ export type UploadFileBodyJson = {
 }
 
 export type UploadFileBodyFormData = {
+  /**
+   * @remarks Pass a `File` to send its filename. A plain `Blob` is sent with the filename `blob`.
+   */
   file: Blob
 }
 

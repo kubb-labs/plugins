@@ -3,7 +3,7 @@ import { mapSchemaItems, mapSchemaProperties } from '@internals/shared'
 import { ast, Diagnostics, isStringType, syncSchemaRef } from '@kubb/kit'
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
-import { buildPropertyJSDocComments, enumTypeName, isInlineConstEnum } from '../utils.ts'
+import { BINARY_PROPERTY_REMARK, buildPropertyJSDocComments, enumTypeName, isBinarySchema, isInlineConstEnum } from '../utils.ts'
 
 const { isNonNullable } = factory
 
@@ -324,7 +324,9 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
             readOnly: propMeta?.readOnly,
           })
 
-          return factory.appendJSDocToNode({ node: propertyNode, comments: buildPropertyJSDocComments(property.schema, optional) })
+          const comments = [...buildPropertyJSDocComments(property.schema, optional), isBinarySchema(property.schema) ? BINARY_PROPERTY_REMARK : undefined]
+
+          return factory.appendJSDocToNode({ node: propertyNode, comments })
         })
 
         const allElements = [...propertyNodes, ...factory.buildIndexSignatures(node, propertyNodes.length, transform)]

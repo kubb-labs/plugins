@@ -769,6 +769,28 @@ describe('printerTs', () => {
       `)
     })
 
+    it('notes on a binary object property, not on a binary alias, that a File sends its filename', async () => {
+      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: inlineLiteralEnum, name: 'Upload' })
+      const blob = ast.factory.createSchema({ type: 'blob', primitive: 'string' })
+      const form = p.print(
+        ast.factory.createSchema({ type: 'object', properties: [ast.factory.createProperty({ name: 'file', required: true, schema: blob })] }),
+      )
+
+      expect(await format(form ?? '')).toMatchInlineSnapshot(`
+        "export type Upload = {
+          /**
+           * @remarks Pass a \`File\` to send its filename. A plain \`Blob\` is sent with the filename \`blob\`.
+           */
+          file: Blob
+        }
+        "
+      `)
+      expect(await format(p.print(blob) ?? '')).toMatchInlineSnapshot(`
+        "export type Upload = Blob
+        "
+      `)
+    })
+
     it('with a multi-line description keeps each line in the JSDoc', async () => {
       const p = printerTs({
         resolver: resolverTs,
