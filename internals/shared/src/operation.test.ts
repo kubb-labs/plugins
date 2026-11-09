@@ -430,7 +430,7 @@ describe('toResponseContent', () => {
 
   test('types a body the runtime returns as text as string', () => {
     for (const contentType of ['application/xml', 'application/yaml', 'text/csv', 'text/plain; charset=utf-8', 'text/*']) {
-      expect(typeOf(contentType)).toStrictEqual({ contentType, schema: ast.factory.createSchema({ type: 'string' }), keysToOmit: undefined })
+      expect(typeOf(contentType)).toStrictEqual({ contentType, schema: ast.factory.createSchema({ type: 'string' }), keysToOmit: null })
     }
   })
 

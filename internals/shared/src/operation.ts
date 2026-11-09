@@ -284,20 +284,18 @@ export type ContentVariantInput = { contentType: string; schema?: ast.SchemaNode
 export type ContentVariant = { name: string; suffix: string; schema: ast.SchemaNode; keysToOmit?: Array<string> | null; contentType: string }
 
 /**
- * A response content entry typed as the client runtime returns it. The runtime decodes JSON and returns a binary body as a
- * `Blob` and an event stream as a stream. It returns any other body as text, so a schema such as `Pet` on `application/xml`,
- * `application/yaml`, or `text/csv` becomes `string`. A wildcard such as `application/*` keeps its schema, because the
- * runtime picks the parser from the `Content-Type` the server sends. A stream of items, such as JSON Lines, keeps its item schema.
+ * Returns the entry with a `string` schema when the client runtime reads its body as text, such as `Pet` on `application/xml`.
+ * JSON, binary, stream, and wildcard entries keep their schema, so the runtime can pick the parser from the server's `Content-Type`.
  */
 export function toResponseContent<T extends ContentVariantInput & Pick<ast.ContentNode, 'stream'>>(entry: T): T {
   const { contentType, schema } = entry
-  if (!schema || entry.stream || (schema.type === 'ref' ? schema.schema : schema)?.primitive === 'string') return entry
+  if (!schema || entry.stream || ast.resolveRef(schema).primitive === 'string') return entry
 
   const baseType = baseContentType(contentType)
   const responseType = responseTypeForContent(contentType, schema)
   const isText = responseType === 'text' || (!responseType && Boolean(baseType) && !isJsonContentType(baseType) && !baseType.includes('*'))
 
-  return isText ? { ...entry, schema: ast.factory.createSchema({ type: 'string' }), keysToOmit: undefined } : entry
+  return isText ? { ...entry, schema: ast.factory.createSchema({ type: 'string' }), keysToOmit: null } : entry
 }
 
 /**

@@ -48,7 +48,7 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
     '...options',
   ].filter(Boolean)
 
-  // Cypress types `then` per union member, so a body such as `Pet | string` would not match the return type without the cast.
+  // Cypress's catch-all `then` overload types a union body as `Chainable<Response | Pet> | Chainable<Response | string>`, so cast to the declared return type.
   const requestCall = `${groups.cookies ? cookieLine : ''}return cy.request<${responseType}>({
   ${requestOptions.join(',\n  ')}
 }).then((res) => res.body) as ${returnType}`
