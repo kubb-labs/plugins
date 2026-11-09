@@ -352,7 +352,9 @@ export type TransportResult<TRequest = NativeRequest, TResponse = NativeResponse
  * The per-plugin send, supplied to `createClientCore` as `defaultTransport`. It returns a web `Response`, or a
  * `TransportResult` that carries one, and the core decodes the body by its media type.
  */
-export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = (request: ResolvedRequest) => Promise<Response | TransportResult<TRequest, TResponse>>
+export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = (
+  request: ResolvedRequest,
+) => Promise<Response | TransportResult<TRequest, TResponse>>
 
 /**
  * What response interceptors receive: the decoded body with the status, headers, and the native request and response.
@@ -761,7 +763,12 @@ function isEmpty(response: Response, method: string): boolean {
 }
 
 function mergeConfig<T extends { headers?: HeadersInit; mediaTypes?: MediaTypes }>(config: T, next: T): T {
-  return { ...config, ...next, headers: { ...serializeHeaders(config.headers), ...serializeHeaders(next.headers) }, mediaTypes: { ...config.mediaTypes, ...next.mediaTypes } }
+  return {
+    ...config,
+    ...next,
+    headers: { ...serializeHeaders(config.headers), ...serializeHeaders(next.headers) },
+    mediaTypes: { ...config.mediaTypes, ...next.mediaTypes },
+  }
 }
 
 function resolveSerializers({ config, requestConfig }: { config: { serializer?: Serializers }; requestConfig: { serializer?: Serializers } }) {
@@ -870,8 +877,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
       credentials: requestConfig.credentials ?? config.credentials,
       options,
       stream:
-        requestConfig.parseAs === 'stream' ||
-        Boolean(accept?.split(',').some((type) => resolveMediaType({ mediaTypes, contentType: type, use: 'stream' }))),
+        requestConfig.parseAs === 'stream' || Boolean(accept?.split(',').some((type) => resolveMediaType({ mediaTypes, contentType: type, use: 'stream' }))),
     },
   }
 }
@@ -922,7 +928,8 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       own.request.run(parent ? await parent.request.run(value, context) : value, context),
     response: async (value: DecodedResponse<unknown, TRequest, TResponse>, context?: RequestConfig<unknown, TRequest, TResponse>) =>
       own.response.run(parent ? await parent.response.run(value, context) : value, context),
-    error: async (value: Error, context?: RequestConfig<unknown, TRequest, TResponse>) => own.error.run(parent ? await parent.error.run(value, context) : value, context),
+    error: async (value: Error, context?: RequestConfig<unknown, TRequest, TResponse>) =>
+      own.error.run(parent ? await parent.error.run(value, context) : value, context),
   }
 
   async function send(requestConfig: RequestConfig<unknown, TRequest, TResponse> & EventStreamOptions, streaming: boolean) {
@@ -935,9 +942,11 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
 
     const resolvedRequest = await run.request(request, requestConfig)
     const sent = await transport(resolvedRequest)
-    const { webResponse, request: nativeRequest, response: nativeResponse } = isResponse(sent)
-      ? { webResponse: sent, request: toNativeRequest(resolvedRequest) as TRequest, response: sent as TResponse & Response }
-      : sent
+    const {
+      webResponse,
+      request: nativeRequest,
+      response: nativeResponse,
+    } = isResponse(sent) ? { webResponse: sent, request: toNativeRequest(resolvedRequest) as TRequest, response: sent as TResponse & Response } : sent
 
     const status = webResponse.status
     const isSuccess = status >= 200 && status < 300
@@ -971,7 +980,11 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const resultSuccess = result.status >= 200 && result.status < 300
     const direction = resultSuccess ? 'response' : 'error'
     const validationContext = { direction, source: 'body', method: resolvedRequest.method, url: resolvedRequest.url, status: result.status } as const
-    const validatorFor = isValidationEnabled(validate, direction) ? (resultSuccess ? validator?.response : pickErrorValidator(validator?.error, result.status)) : undefined
+    const validatorFor = isValidationEnabled(validate, direction)
+      ? resultSuccess
+        ? validator?.response
+        : pickErrorValidator(validator?.error, result.status)
+      : undefined
     // A stream body is never validated as a whole: a stream call validates each item, and a regular call hands the stream over.
     const rawStream = result.data instanceof ReadableStream
     const readsItems = streaming && resultSuccess && streamType?.stream !== undefined && rawStream
@@ -1001,7 +1014,11 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
       const value = shape === 'data' ? (item as ServerSentEvent).data : item
       return runValidator({ validator: validatorFor, value, context: validationContext, onValidationError }).then((validated) =>
         // The schema may not declare `id` and `retry`, so the parsed value is merged over the event instead of replacing it.
-        shape === 'data' ? { ...(item as ServerSentEvent), data: validated } : shape === 'event' ? { ...(item as object), ...(validated as object) } : validated,
+        shape === 'data'
+          ? { ...(item as ServerSentEvent), data: validated }
+          : shape === 'event'
+            ? { ...(item as object), ...(validated as object) }
+            : validated,
       )
     }
     const items = readsItems && streamType?.stream ? streamType.stream(result.data as ReadableStream<Uint8Array>, context) : undefined
@@ -1037,10 +1054,10 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
   }
 
   const client = (<TResponses, ThrowOnError extends boolean>(requestConfig: RequestConfig<unknown, TRequest, TResponse>) =>
-    call(requestConfig, async () => (await send(requestConfig, false)).result as RequestResult<TResponses, ThrowOnError, TRequest, TResponse>)) as ClientInstance<
-    TRequest,
-    TResponse
-  >
+    call(
+      requestConfig,
+      async () => (await send(requestConfig, false)).result as RequestResult<TResponses, ThrowOnError, TRequest, TResponse>,
+    )) as ClientInstance<TRequest, TResponse>
 
   client.stream = <TResponses, ThrowOnError extends boolean, TItem>(requestConfig: RequestConfig<unknown, TRequest, TResponse> & EventStreamOptions) =>
     call(requestConfig, async () => {
@@ -1077,7 +1094,10 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
   client.interceptors = own
   client.createClient = (next = {}) => createClientCore({ defaultTransport, ...mergeConfig(config, next) })
   client.extend = (next = {}) =>
-    createClientCore({ defaultTransport, ...mergeConfig(config, next) }, { request: { ...own.request, run: run.request }, response: { ...own.response, run: run.response }, error: { ...own.error, run: run.error } })
+    createClientCore(
+      { defaultTransport, ...mergeConfig(config, next) },
+      { request: { ...own.request, run: run.request }, response: { ...own.response, run: run.response }, error: { ...own.error, run: run.error } },
+    )
 
   return client
 }

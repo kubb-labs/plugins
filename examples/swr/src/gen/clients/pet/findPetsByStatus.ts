@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../../models/pet/FindPetsByStatus'
-import { client, withUnwrap } from '../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
  * @description Multiple status values can be provided with comma separated strings
@@ -15,16 +15,16 @@ import { client, withUnwrap } from '../../.kubb/client'
 export function findPetsByStatus<ThrowOnError extends boolean = true>(
   options: Options<FindPetsByStatusOptions, ThrowOnError> = {},
 ): Unwrappable<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({
+    apiClient<FindPetsByStatusResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/findByStatus',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       ...config,
       styles: { ...config.styles, query: { status: { explode: true }, ...config.styles?.query } },
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

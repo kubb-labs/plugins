@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { AddFilesOptions, AddFilesResponses } from '../models/ts/AddFiles'
-import { client, withUnwrap } from '../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
 /**
  * @description Place a new file in the store
@@ -15,15 +15,15 @@ import { client, withUnwrap } from '../.kubb/client'
 export function addFiles<ThrowOnError extends boolean = true>(
   options: Options<AddFilesOptions, ThrowOnError> = {},
 ): Unwrappable<RequestResult<AddFilesResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request<AddFilesOptions['body']>({
+    apiClient<AddFilesResponses, ThrowOnError>({
       method: 'POST',
       url: '/pet/files',
       contentType: { request: 'application/json' },
       ...config,
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<AddFilesResponses, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

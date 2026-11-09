@@ -18,7 +18,9 @@ function hasFormBody(node: ast.OperationNode): boolean {
 function buildClientFooter({ baseURL, forms, streams }: { baseURL?: string; forms: boolean; streams: boolean }): string | undefined {
   const baseURLExpression = baseURL ? (baseURL.includes('${') ? `\`${baseURL.replaceAll('`', '\\`')}\`` : JSON.stringify(baseURL)) : undefined
   const mediaTypes = [forms ? '...formMediaTypes' : null, streams ? '...streamMediaTypes' : null].filter(Boolean)
-  const config = [baseURLExpression ? `baseURL: ${baseURLExpression}` : null, mediaTypes.length ? `mediaTypes: { ${mediaTypes.join(', ')} }` : null].filter(Boolean)
+  const config = [baseURLExpression ? `baseURL: ${baseURLExpression}` : null, mediaTypes.length ? `mediaTypes: { ${mediaTypes.join(', ')} }` : null].filter(
+    Boolean,
+  )
   return (
     [
       forms ? `import { formMediaTypes } from './mediaTypes.ts'` : null,

@@ -14,13 +14,13 @@ import { client } from '../../../client'
 export function updatePetWithForm<ThrowOnError extends boolean = true>(
   options: Options<UpdatePetWithFormOptions, ThrowOnError>,
 ): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({
+  return apiClient<UpdatePetWithFormResponses, ThrowOnError>({
     method: 'POST',
     url: '/pet/{petId}',
     security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
     ...config,
     throwOnError: config.throwOnError ?? true,
-  }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>
+  })
 }

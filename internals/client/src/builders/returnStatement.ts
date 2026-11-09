@@ -79,8 +79,10 @@ export function buildEventStreamReturn({
  * `SuccessOf` with `TypedEvent` for the item type of named events or JSON Lines.
  */
 export function buildEventStreamImports({ returnType, typed, line }: { returnType: ReturnTypeOption; typed: boolean; line: boolean }): Array<string> {
-  const result = { plain: ['Options', 'StreamResult'], full: ['StreamOptions', 'Unwrappable', 'StreamResult'], data: ['StreamOptions', 'UnwrappedStreamResult'] }[
-    returnType
-  ]
+  const result = {
+    plain: ['Options', 'StreamResult'],
+    full: ['StreamOptions', 'Unwrappable', 'StreamResult'],
+    data: ['StreamOptions', 'UnwrappedStreamResult'],
+  }[returnType]
   return [...result, ...(typed || line ? ['SuccessOf'] : []), ...(typed ? ['TypedEvent'] : [])]
 }

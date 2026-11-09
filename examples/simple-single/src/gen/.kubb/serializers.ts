@@ -77,13 +77,6 @@ export type BodyEncoding = SerializationStyle<QueryStyle> & {
 }
 
 /**
- * Serializes the request body. JSON by default; `FormData`, `URLSearchParams`, `Blob`,
- * `ArrayBuffer`, and string bodies pass through untouched. The optional `encoding` argument carries
- * the per-property OpenAPI `encoding` metadata for form bodies.
- */
-export type BodySerializer = (args: { body: unknown; contentType?: string; encoding?: Record<string, BodyEncoding> }) => RequestBody | undefined
-
-/**
  * The OpenAPI path-parameter serialization style. `simple` is the default and emits the bare value;
  * `label` prefixes a `.` and `matrix` prefixes a `;name=` segment.
  */
@@ -103,12 +96,11 @@ export type PathParamStyle = SerializationStyle<PathStyle>
 export type PathSerializer = (args: { name: string; value: unknown; options?: PathParamStyle }) => string
 
 /**
- * The per-concern serializers, grouped so they can be set in one place and overridden per client or
- * per call. Each field falls back to the matching `default*Serializer` when omitted.
+ * The parameter serializers, grouped so they can be set in one place and overridden per client or
+ * per call. Each field falls back to the matching `default*Serializer` when omitted. Bodies are encoded by `mediaTypes`.
  */
 export type Serializers = {
   query?: QuerySerializer
-  body?: BodySerializer
   path?: PathSerializer
 }
 
@@ -125,91 +117,22 @@ export type Styles = {
   body?: Record<string, BodyEncoding>
 }
 
-function isFormBody(body: unknown): body is RequestBody {
-  return (
-    body instanceof FormData ||
-    body instanceof URLSearchParams ||
-    body instanceof Blob ||
-    body instanceof ArrayBuffer ||
-    ArrayBuffer.isView(body) ||
-    typeof body === 'string'
-  )
-}
-
-export function isDefaultJsonBody(body: unknown): boolean {
-  return body !== undefined && body !== null && !isFormBody(body)
-}
-
 /**
  * Emits a `bigint` (`format: int64`) as a JSON number, which `JSON.stringify` refuses to do itself.
  * Past the safe-integer range it throws, so an id never goes out silently truncated.
  */
-function jsonReplacer(_key: string, value: unknown): unknown {
+export function jsonReplacer(_key: string, value: unknown): unknown {
   if (typeof value !== 'bigint') return value
   if (value > Number.MAX_SAFE_INTEGER || value < Number.MIN_SAFE_INTEGER)
-    throw new TypeError(`Cannot serialize ${value}n as JSON without losing precision, register a serializer.body to send it another way.`)
+    throw new TypeError(`Cannot serialize ${value}n as JSON without losing precision, register a media type to send it another way.`)
   return Number(value)
 }
 
-function appendFormDataValue({ formData, key, value, contentType }: { formData: FormData; key: string; value: unknown; contentType?: string }): void {
-  if (value === undefined || value === null) return
-  if (value instanceof Blob) {
-    formData.append(key, value)
-    return
-  }
-  if (typeof value === 'object' && !(value instanceof Date)) {
-    const json = JSON.stringify(value, jsonReplacer)
-    // A part's media type can only be set by wrapping the value in a typed Blob.
-    formData.append(key, contentType ? new Blob([json], { type: contentType }) : json)
-    return
-  }
-  formData.append(key, toValue(value))
-}
-
 /**
- * Default body serializer: passes binary/form bodies through and JSON-serializes everything else.
- * For `multipart/form-data` plain objects become `FormData` and for
- * `application/x-www-form-urlencoded` they become `URLSearchParams`. When `encoding` is supplied each
- * urlencoded property follows its OpenAPI `style` / `explode` / `allowReserved`.
- *
- * @example
- * ```ts
- * defaultBodySerializer({ body: { name: 'odie' } }) // '{"name":"odie"}'
- * defaultBodySerializer({ body: { field: 'x' }, contentType: 'multipart/form-data' }) // FormData
- * defaultBodySerializer({ body: { tags: ['a', 'b'] }, contentType: 'application/x-www-form-urlencoded', encoding: { tags: { explode: false } } }) // 'tags=a,b'
- * defaultBodySerializer({ body: { meta: { a: 1 } }, contentType: 'multipart/form-data', encoding: { meta: { contentType: 'application/json' } } }) // FormData with a typed Blob part
- * ```
+ * Serializes an `application/x-www-form-urlencoded` body. A property with `encoding` follows its OpenAPI `style`,
+ * `explode`, and `allowReserved`; one without uses the query defaults.
  */
-export const defaultBodySerializer: BodySerializer = ({ body, contentType, encoding }) => {
-  if (body === undefined || body === null) return undefined
-  if (typeof body === 'string' && isJsonMediaType(contentType)) return JSON.stringify(body)
-  if (isFormBody(body)) return body as RequestBody
-  const normalizedContentType = contentType?.toLowerCase()
-  if (normalizedContentType?.includes('multipart/form-data')) {
-    const formData = new FormData()
-    for (const [key, value] of Object.entries(body as Record<string, unknown>)) {
-      const partContentType = encoding?.[key]?.contentType
-      if (Array.isArray(value)) {
-        for (const item of value) appendFormDataValue({ formData, key, value: item, contentType: partContentType })
-        continue
-      }
-      appendFormDataValue({ formData, key, value, contentType: partContentType })
-    }
-    return formData
-  }
-  if (normalizedContentType?.includes('application/x-www-form-urlencoded')) {
-    if (encoding) return serializeUrlencodedBody(body as Record<string, unknown>, encoding)
-    return new URLSearchParams(serializeUrlencodedBody(body as Record<string, unknown>, {}))
-  }
-  // XML, YAML, and CSV are never JSON, so a value for one must not go out as JSON under its label.
-  const mediaType = baseContentType(contentType)
-  if (mediaType && /[/+](xml|yaml|x-yaml|csv)$/.test(mediaType)) {
-    throw new TypeError(`Cannot serialize the body as ${mediaType}, register codecs['${mediaType}'].serialize or pass the encoded body as a string.`)
-  }
-  return JSON.stringify(body, jsonReplacer)
-}
-
-function serializeUrlencodedBody(body: Record<string, unknown>, encoding: Record<string, BodyEncoding>): string {
+export function serializeUrlencodedBody(body: Record<string, unknown>, encoding: Record<string, BodyEncoding>): string {
   const parts: Array<string> = []
   for (const [key, value] of Object.entries(body)) {
     const propertyEncoding = encoding[key]

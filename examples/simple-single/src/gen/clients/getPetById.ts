@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { GetPetByIdOptions, GetPetByIdResponses } from '../models'
-import { client, withUnwrap } from '../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
 /**
  * @description Returns a single pet
@@ -15,10 +15,10 @@ import { client, withUnwrap } from '../.kubb/client'
 export function getPetById<ThrowOnError extends boolean = true>(
   options: Options<GetPetByIdOptions, ThrowOnError>,
 ): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({
+    apiClient<GetPetByIdResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/{petId}',
       security: [
@@ -26,7 +26,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
         { type: 'oauth2', scopes: ['write:pets', 'read:pets'] },
       ],
       ...config,
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

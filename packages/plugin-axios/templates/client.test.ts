@@ -10,7 +10,8 @@ type Programmed = { data?: unknown; status?: number; statusText?: string; header
 
 /** The bytes axios reads with `responseType: 'arraybuffer'`: a value as JSON, a string as is. */
 function toBytes(data: unknown): unknown {
-  if (data instanceof Uint8Array || data instanceof ArrayBuffer || data instanceof Blob || data instanceof ReadableStream || data instanceof Readable) return data
+  if (data instanceof Uint8Array || data instanceof ArrayBuffer || data instanceof Blob || data instanceof ReadableStream || data instanceof Readable)
+    return data
   return Buffer.from(typeof data === 'string' ? data : JSON.stringify(data))
 }
 

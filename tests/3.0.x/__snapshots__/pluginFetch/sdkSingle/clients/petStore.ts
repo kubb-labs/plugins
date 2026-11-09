@@ -11,7 +11,7 @@ import type { GetInventoryOptions, GetInventoryResponses } from '../types/GetInv
 import type { GetPetByIdOptions, GetPetByIdResponses } from '../types/GetPetById'
 import type { PlaceOrderOptions, PlaceOrderResponses } from '../types/PlaceOrder'
 import type { UploadFileOptions, UploadFileResponses } from '../types/UploadFile'
-import { createClient, withUnwrap } from '../.kubb/client'
+import { createClient, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
 export class PetStore {
   private readonly client: ClientInstance
@@ -26,9 +26,9 @@ export class PetStore {
    * {@link /pet}
    */
     public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptions, ThrowOnError>): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
-    const { client: request = this.client, contentType, ...config } = options
+    const { client: apiClient = this.client, contentType, ...config } = options
 
-    return withUnwrap(request<AddPetOptions['body']>({ method: 'POST', url: '/pet', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>)
+    return withUnwrap(apiClient<AddPetResponses, ThrowOnError>({ method: 'POST', url: '/pet', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) }, ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -37,9 +37,9 @@ export class PetStore {
    * {@link /pet/findByStatus}
    */
     public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusOptions, ThrowOnError> = {}): Unwrappable<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, styles: { ...config.styles, query: { status: { explode: true }, ...config.styles?.query } }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>)
+    return withUnwrap(apiClient<FindPetsByStatusResponses, ThrowOnError>({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, styles: { ...config.styles, query: { status: { explode: true }, ...config.styles?.query } }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -48,9 +48,9 @@ export class PetStore {
    * {@link /pet/:petId}
    */
     public getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdOptions, ThrowOnError>): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>)
+    return withUnwrap(apiClient<GetPetByIdResponses, ThrowOnError>({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -59,9 +59,9 @@ export class PetStore {
    * {@link /pet/:petId}
    */
     public deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetOptions, ThrowOnError>): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>)
+    return withUnwrap(apiClient<DeletePetResponses, ThrowOnError>({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -69,9 +69,9 @@ export class PetStore {
    * {@link /pet/:petId/uploadImage}
    */
     public uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileOptions, ThrowOnError>): Unwrappable<RequestResult<UploadFileResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], contentType: { request: 'application/octet-stream' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>)
+    return withUnwrap(apiClient<UploadFileResponses, ThrowOnError>({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }], contentType: { request: 'application/octet-stream' }, ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -80,9 +80,9 @@ export class PetStore {
    * {@link /store/inventory}
    */
     public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptions, ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>)
+    return withUnwrap(apiClient<GetInventoryResponses, ThrowOnError>({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
@@ -91,8 +91,8 @@ export class PetStore {
    * {@link /store/order}
    */
     public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptions, ThrowOnError> = {}): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(request<PlaceOrderOptions['body']>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>)
+    return withUnwrap(apiClient<PlaceOrderResponses, ThrowOnError>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 }

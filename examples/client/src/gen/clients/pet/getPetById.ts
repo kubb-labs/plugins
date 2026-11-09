@@ -15,9 +15,9 @@ import { client } from '../../../client'
 export function getPetById<ThrowOnError extends boolean = true>(
   options: Options<GetPetByIdOptions, ThrowOnError>,
 ): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({
+  return apiClient<GetPetByIdResponses, ThrowOnError>({
     method: 'GET',
     url: '/pet/{petId}',
     security: [
@@ -26,5 +26,5 @@ export function getPetById<ThrowOnError extends boolean = true>(
     ],
     ...config,
     throwOnError: config.throwOnError ?? true,
-  }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
+  })
 }

@@ -85,9 +85,11 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       const standardSchemaPath = importPath ?? path.resolve(root, '.kubb/standardSchema.ts')
       const stream = getEventStream(node)
 
-      const clientValueImports = { plain: ['client'], data: ['client', 'unwrapResult', 'resolveThrowOnError'], full: ['client', 'withUnwrap', 'resolveThrowOnError'] }[
-        returnType
-      ]
+      const clientValueImports = {
+        plain: ['client'],
+        data: ['client', 'unwrapResult', 'resolveThrowOnError'],
+        full: ['client', 'withUnwrap', 'resolveThrowOnError'],
+      }[returnType]
 
       const clientTypeImports = stream
         ? buildEventStreamImports({ returnType, typed: stream === 'event', line: stream === 'line' })

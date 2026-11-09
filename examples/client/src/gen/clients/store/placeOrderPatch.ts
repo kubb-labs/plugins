@@ -15,13 +15,13 @@ import { client } from '../../../client'
 export function placeOrderPatch<ThrowOnError extends boolean = true>(
   options: Options<PlaceOrderPatchOptions, ThrowOnError> = {},
 ): Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({
+  return apiClient<PlaceOrderPatchResponses, ThrowOnError>({
     method: 'PATCH',
     url: '/store/order',
     contentType: { request: 'application/json' },
     ...config,
     throwOnError: config.throwOnError ?? true,
-  }) as Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>>
+  })
 }

@@ -1,6 +1,6 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { ApiResponse } from '../../../models/ts/ApiResponse'
-import { client, withUnwrap } from '../../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 
 /**
  * @summary uploads an image
@@ -28,23 +28,21 @@ export function uploadFile<ThrowOnError extends boolean = true>(
     ThrowOnError
   >
 > {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({
+    apiClient<
+      {
+        '200': ApiResponse
+      },
+      ThrowOnError
+    >({
       method: 'POST',
       url: '/pet/{petId}/uploadImage',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       contentType: { request: 'application/octet-stream' },
       ...config,
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<
-      RequestResult<
-        {
-          '200': ApiResponse
-        },
-        ThrowOnError
-      >
-    >,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

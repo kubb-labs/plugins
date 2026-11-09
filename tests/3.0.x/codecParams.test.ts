@@ -80,14 +80,9 @@ async function loadClient(
     baseURL: 'https://api.test',
     transport: async (request: ResolvedRequest) => {
       requests.push(request)
-      return {
-        data: request.url.includes('/resources/') ? { resource: 'https://docs.test/guide', revision } : { startsAt: '2026-10-01T09:00:00.000Z' },
-        status: 200,
-        statusText: 'OK',
-        headers: new Headers({ 'Content-Type': 'application/json' }),
-        request: new Request('https://api.test'),
-        response: new Response(),
-      }
+      return Response.json(
+        request.url.includes('/resources/') ? { resource: 'https://docs.test/guide', revision } : { startsAt: '2026-10-01T09:00:00.000Z' },
+      )
     },
   })
   const { putEvent } = (await import(pathToFileURL(path.join(output, 'clients/putEvent.ts')).href)) as { putEvent: Operation }
@@ -404,14 +399,7 @@ describe('wire value: pluginZod({ inferred: true }) without params validation', 
   test('keeps the generated response validator when a call passes its own request validator', async () => {
     const seen: Array<unknown> = []
     const request = { '~standard': { version: 1, vendor: 'test', validate: (value: unknown) => (seen.push(value), { value }) } }
-    const transport = async () => ({
-      data: { startsAt: 'later' },
-      status: 200,
-      statusText: 'OK',
-      headers: new Headers({ 'Content-Type': 'application/json' }),
-      request: new Request('https://api.test'),
-      response: new Response(),
-    })
+    const transport = async () => Response.json({ startsAt: 'later' })
 
     await expect(client.putEvent({ path: { day: '2026-10-01' }, body, transport, validator: { request } })).rejects.toMatchObject({ name: 'ParseError' })
     expect(seen).toStrictEqual([body])

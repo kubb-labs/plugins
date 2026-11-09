@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client.ts'
 import type { ListPetsOptionsSchemaType, ListPetsResponsesSchemaType } from '../zod/listPetsSchema.ts'
-import { client, withUnwrap } from '../.kubb/client.ts'
+import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client.ts'
 import { listPetsResponseSchema, listPetsQuerySchema } from '../zod/listPetsSchema.ts'
 
 /**
@@ -15,15 +15,15 @@ import { listPetsResponseSchema, listPetsQuerySchema } from '../zod/listPetsSche
 export function listPets<ThrowOnError extends boolean = true>(
   options: Options<ListPetsOptionsSchemaType, ThrowOnError>,
 ): Unwrappable<RequestResult<ListPetsResponsesSchemaType, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({
+    apiClient<ListPetsResponsesSchemaType, ThrowOnError>({
       method: 'GET',
       url: '/pets',
       ...config,
       validator: { query: listPetsQuerySchema, response: listPetsResponseSchema, ...config.validator },
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<ListPetsResponsesSchemaType, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

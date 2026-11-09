@@ -14,9 +14,7 @@ import { client } from '../../../client'
 export function loginUser<ThrowOnError extends boolean = true>(
   options: Options<LoginUserOptions, ThrowOnError> = {},
 ): Promise<RequestResult<LoginUserResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({ method: 'GET', url: '/user/login', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<LoginUserResponses, ThrowOnError>
-  >
+  return apiClient<LoginUserResponses, ThrowOnError>({ method: 'GET', url: '/user/login', ...config, throwOnError: config.throwOnError ?? true })
 }

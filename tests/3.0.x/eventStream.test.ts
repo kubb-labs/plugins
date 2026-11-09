@@ -89,7 +89,8 @@ describe('event stream runtime', () => {
       ).safeBuild()
       expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
 
-      expect(await fs.readdir(path.join(output, '.kubb'))).toStrictEqual(['client.ts', 'core.ts', 'serializers.ts', 'standardSchema.ts'])
+      expect(await fs.readdir(path.join(output, '.kubb'))).toStrictEqual(['client.ts', 'core.ts', 'mediaTypes.ts', 'serializers.ts', 'standardSchema.ts'])
+      expect(await fs.readFile(path.join(output, '.kubb', 'client.ts'), 'utf8')).not.toContain('streamMediaTypes')
     } finally {
       await fs.rm(output, { recursive: true, force: true })
     }
@@ -201,25 +202,29 @@ describe('OpenAPI 3.2 item schemas', () => {
       expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
 
       const runtime = await fs.readFile(path.join(output, '.kubb', 'sse.ts'), 'utf8')
-      expect(runtime).toContain('export async function toEventStream')
-      expect(await fs.readFile(path.join(output, '.kubb', 'client.ts'), 'utf8')).toMatch(/export \* from '\.\/sse\.ts'\s*$/)
+      expect(runtime).toContain('export const streamMediaTypes')
+      const clientRuntime = await fs.readFile(path.join(output, '.kubb', 'client.ts'), 'utf8')
+      expect(clientRuntime).toContain('client.setConfig({ mediaTypes: { ...streamMediaTypes } })')
+      expect(clientRuntime).toMatch(/export \* from '\.\/sse\.ts'\s*$/)
 
+      // The runtime validates each item with the response validator, by the event shape the call carries.
       const chat = await fs.readFile(path.join(output, 'clients', 'streamChat.ts'), 'utf8')
-      expect(chat).toContain('Promise<StreamResult<StreamChatResponses, ThrowOnError, TypedEvent<SuccessOf<StreamChatResponses>>>>')
-      expect(chat).toContain("{ client: request, config, shape: 'event', validator: ")
-      expect(chat).not.toMatch(/validator: \{[^}]*response:/)
+      expect(chat).toContain('Unwrappable<StreamResult<StreamChatResponses, ThrowOnError, TypedEvent<SuccessOf<StreamChatResponses>>>>')
+      expect(chat).toContain("eventShape: 'event'")
+      expect(chat).toMatch(/validator: \{[^}]*response:/)
+      expect(chat).not.toMatch(/ as /)
 
       const ticks = await fs.readFile(path.join(output, 'clients', 'streamTicks.ts'), 'utf8')
-      expect(ticks).toContain('Promise<StreamResult<StreamTicksResponses, ThrowOnError>>')
-      expect(ticks).toContain("{ client: request, config, shape: 'data', validator: ")
+      expect(ticks).toContain('Unwrappable<StreamResult<StreamTicksResponses, ThrowOnError>>')
+      expect(ticks).toContain("eventShape: 'data'")
 
       // JSON Lines streams one LogEntry per line, validated per line.
       const logs = await fs.readFile(path.join(output, 'clients', 'streamLogs.ts'), 'utf8')
-      expect(logs).toContain('Promise<StreamResult<StreamLogsResponses, ThrowOnError, SuccessOf<StreamLogsResponses>>>')
-      expect(logs).toContain("{ client: request, config, shape: 'line', validator: ")
+      expect(logs).toContain('Unwrappable<StreamResult<StreamLogsResponses, ThrowOnError, SuccessOf<StreamLogsResponses>>>')
+      expect(logs).toContain('apiClient.stream<StreamLogsResponses, ThrowOnError, SuccessOf<StreamLogsResponses>>(')
       expect(logs).toContain("contentType: { response: 'application/jsonl' }")
-      expect(logs).toContain("responseType: 'stream'")
-      expect(logs).not.toMatch(/validator: \{[^}]*response:/)
+      expect(logs).not.toContain('eventShape')
+      expect(logs).not.toContain('responseType')
 
       const types = await readAll(path.join(output, 'types'))
       expect(types).toMatch(/event: ['"]message_delta['"]/)

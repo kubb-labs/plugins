@@ -1,6 +1,6 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
-import { client, withUnwrap } from '../../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 
 /**
  * @description Place a new file in the store
@@ -44,44 +44,21 @@ export function addFiles<ThrowOnError extends boolean = true>(
     ThrowOnError
   >
 > {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request<
-      (
-        | {
-            body: {
-              url: string
-            }
-            path?: never
-            query?: never
-            headers?: never
-            contentType?:
-              | 'application/json'
-              | {
-                  request: 'application/json'
-                }
-          }
-        | {
-            body: Omit<NonNullable<Pet>, 'id'>
-            path?: never
-            query?: never
-            headers?: never
-            contentType:
-              | 'multipart/form-data'
-              | {
-                  request: 'multipart/form-data'
-                }
-          }
-      )['body']
-    >({ method: 'POST', url: '/pet/files', contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-      RequestResult<
-        {
-          '200': Omit<NonNullable<Pet>, 'name'>
-          '405': unknown
-        },
-        ThrowOnError
-      >
-    >,
+    apiClient<
+      {
+        '200': Omit<NonNullable<Pet>, 'name'>
+        '405': unknown
+      },
+      ThrowOnError
+    >({
+      method: 'POST',
+      url: '/pet/files',
+      contentType: { request: 'application/json' },
+      ...config,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

@@ -1,5 +1,5 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
-import { client, withUnwrap } from '../../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 import { updatePetWithFormResponseSchema, updatePetWithFormStatus405Schema } from '../../../zod/pet/updatePetWithFormSchema'
 
 /**
@@ -29,23 +29,21 @@ export function updatePetWithForm<ThrowOnError extends boolean = true>(
     ThrowOnError
   >
 > {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({
+    apiClient<
+      {
+        '405': unknown
+      },
+      ThrowOnError
+    >({
       method: 'POST',
       url: '/pet/{petId}:search',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       ...config,
       validator: { response: updatePetWithFormResponseSchema, error: { 405: updatePetWithFormStatus405Schema }, ...config.validator },
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<
-      RequestResult<
-        {
-          '405': unknown
-        },
-        ThrowOnError
-      >
-    >,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

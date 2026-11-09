@@ -15,9 +15,7 @@ import { client } from '../../../client'
 export function deleteUser<ThrowOnError extends boolean = true>(
   options: Options<DeleteUserOptions, ThrowOnError>,
 ): Promise<RequestResult<DeleteUserResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({ method: 'DELETE', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<DeleteUserResponses, ThrowOnError>
-  >
+  return apiClient<DeleteUserResponses, ThrowOnError>({ method: 'DELETE', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true })
 }

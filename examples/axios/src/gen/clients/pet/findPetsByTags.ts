@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from '../../models/pet/FindPetsByTags'
-import { client, withUnwrap } from '../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -15,16 +15,16 @@ import { client, withUnwrap } from '../../.kubb/client'
 export function findPetsByTags<ThrowOnError extends boolean = true>(
   options: Options<FindPetsByTagsOptions, ThrowOnError> = {},
 ): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({
+    apiClient<FindPetsByTagsResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/findByTags',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       ...config,
       styles: { ...config.styles, query: { tags: { explode: true }, ...config.styles?.query } },
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

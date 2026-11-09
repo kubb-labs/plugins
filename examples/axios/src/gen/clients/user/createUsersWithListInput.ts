@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponses } from '../../models/user/CreateUsersWithListInput'
-import { client, withUnwrap } from '../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
  * @description Creates list of users with given input array
@@ -15,15 +15,15 @@ import { client, withUnwrap } from '../../.kubb/client'
 export function createUsersWithListInput<ThrowOnError extends boolean = true>(
   options: Options<CreateUsersWithListInputOptions, ThrowOnError> = {},
 ): Unwrappable<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>> {
-  const { client: request = client, contentType, ...config } = options
+  const { client: apiClient = client, contentType, ...config } = options
 
   return withUnwrap(
-    request({
+    apiClient<CreateUsersWithListInputResponses, ThrowOnError>({
       method: 'POST',
       url: '/user/createWithList',
       contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
       ...config,
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

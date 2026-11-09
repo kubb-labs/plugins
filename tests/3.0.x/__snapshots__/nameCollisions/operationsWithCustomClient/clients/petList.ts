@@ -11,7 +11,7 @@ import { client } from '@example/client'
  * {@link /pets/second}
  */
 export function petList2<ThrowOnError extends boolean = true>(options: Options<PetListOptions2, ThrowOnError> = {}): Promise<RequestResult<PetListResponses2, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({ method: 'GET', url: '/pets/second', ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<PetListResponses2, ThrowOnError>>
+  return apiClient<PetListResponses2, ThrowOnError>({ method: 'GET', url: '/pets/second', ...config, throwOnError: config.throwOnError ?? true })
 }

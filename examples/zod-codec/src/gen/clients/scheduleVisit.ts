@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client.ts'
 import type { ScheduleVisitOptionsSchemaType, ScheduleVisitResponsesSchemaType } from '../zod/scheduleVisitSchema.ts'
-import { client, withUnwrap } from '../.kubb/client.ts'
+import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client.ts'
 import { toHeadersStandardSchema } from '../.kubb/standardSchema.ts'
 import {
   scheduleVisitResponseSchema,
@@ -23,10 +23,10 @@ import {
 export function scheduleVisit<ThrowOnError extends boolean = true>(
   options: Options<ScheduleVisitOptionsSchemaType, ThrowOnError>,
 ): Unwrappable<RequestResult<ScheduleVisitResponsesSchemaType, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({
+    apiClient<ScheduleVisitResponsesSchemaType, ThrowOnError>({
       method: 'PUT',
       url: '/pets/{petId}/visits/{day}',
       contentType: { request: 'application/json' },
@@ -40,7 +40,7 @@ export function scheduleVisit<ThrowOnError extends boolean = true>(
         error: { 409: scheduleVisitStatus409Schema },
         ...config.validator,
       },
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<ScheduleVisitResponsesSchemaType, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

@@ -5,14 +5,14 @@
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { ApiProviderAuthOptions, ApiProviderAuthResponses } from '../../types/provider/Auth'
-import { client, withUnwrap } from '../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 import { providerAuthResponseSchema, providerAuthStatus400Schema } from '../../zod/provider/authSchema'
 
 /**
  * {@link /auth}
  */
 export function providerAuth<ThrowOnError extends boolean = true>(options: Options<ApiProviderAuthOptions, ThrowOnError> = {}): Unwrappable<RequestResult<ApiProviderAuthResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(request({ method: 'POST', url: '/auth', ...config, validator: { response: providerAuthResponseSchema, error: { 400: providerAuthStatus400Schema }, ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<ApiProviderAuthResponses, ThrowOnError>>)
+  return withUnwrap(apiClient<ApiProviderAuthResponses, ThrowOnError>({ method: 'POST', url: '/auth', ...config, validator: { response: providerAuthResponseSchema, error: { 400: providerAuthStatus400Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

@@ -15,9 +15,12 @@ import { client } from '../../../client'
 export function deleteOrder<ThrowOnError extends boolean = true>(
   options: Options<DeleteOrderOptions, ThrowOnError>,
 ): Promise<RequestResult<DeleteOrderResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({ method: 'DELETE', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<DeleteOrderResponses, ThrowOnError>
-  >
+  return apiClient<DeleteOrderResponses, ThrowOnError>({
+    method: 'DELETE',
+    url: '/store/order/{orderId}',
+    ...config,
+    throwOnError: config.throwOnError ?? true,
+  })
 }

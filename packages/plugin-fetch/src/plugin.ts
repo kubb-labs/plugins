@@ -7,7 +7,14 @@ import { version } from '../package.json'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
-import { fetchClientTemplatePath, coreTemplatePath, mediaTypesTemplatePath, serializersTemplatePath, sseTemplatePath, standardSchemaTemplatePath } from './templates.ts'
+import {
+  fetchClientTemplatePath,
+  coreTemplatePath,
+  mediaTypesTemplatePath,
+  serializersTemplatePath,
+  sseTemplatePath,
+  standardSchemaTemplatePath,
+} from './templates.ts'
 import type { PluginFetch, ResolvedOptions, ResolverClient } from './types.ts'
 
 /**

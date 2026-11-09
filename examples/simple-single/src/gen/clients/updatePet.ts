@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { UpdatePetOptions, UpdatePetResponses } from '../models'
-import { client, withUnwrap } from '../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
 /**
  * @description Update an existing pet by Id
@@ -15,16 +15,16 @@ import { client, withUnwrap } from '../.kubb/client'
 export function updatePet<ThrowOnError extends boolean = true>(
   options: Options<UpdatePetOptions, ThrowOnError>,
 ): Unwrappable<RequestResult<UpdatePetResponses, ThrowOnError>> {
-  const { client: request = client, contentType, ...config } = options
+  const { client: apiClient = client, contentType, ...config } = options
 
   return withUnwrap(
-    request<UpdatePetOptions['body']>({
+    apiClient<UpdatePetResponses, ThrowOnError>({
       method: 'PUT',
       url: '/pet',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
       ...config,
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { PutEventOptionsSchemaType, PutEventResponsesSchemaType } from '../zod/putEventSchema'
-import { client, withUnwrap } from '../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { toHeadersStandardSchema } from '../.kubb/standardSchema'
 import { putEventResponseSchema, putEventStatus409Schema, putEventBodySchema, putEventPathSchema, putEventQuerySchema, putEventHeadersSchema } from '../zod/putEventSchema'
 
@@ -13,7 +13,7 @@ import { putEventResponseSchema, putEventStatus409Schema, putEventBodySchema, pu
  * {@link /events/:day}
  */
 export function putEvent<ThrowOnError extends boolean = true>(options: Options<PutEventOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<PutEventResponsesSchemaType, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(request({ method: 'PUT', url: '/events/{day}', contentType: { request: 'application/json' }, ...config, validator: { request: putEventBodySchema, path: putEventPathSchema, query: putEventQuerySchema, headers: toHeadersStandardSchema(putEventHeadersSchema, putEventHeadersSchema.shape), response: putEventResponseSchema, error: { 409: putEventStatus409Schema }, ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<PutEventResponsesSchemaType, ThrowOnError>>)
+  return withUnwrap(apiClient<PutEventResponsesSchemaType, ThrowOnError>({ method: 'PUT', url: '/events/{day}', contentType: { request: 'application/json' }, ...config, validator: { request: putEventBodySchema, path: putEventPathSchema, query: putEventQuerySchema, headers: toHeadersStandardSchema(putEventHeadersSchema, putEventHeadersSchema.shape), response: putEventResponseSchema, error: { 409: putEventStatus409Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

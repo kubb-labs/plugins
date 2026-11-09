@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { CreateUserOptions, CreateUserResponses } from '../../models/user/CreateUser'
-import { client, withUnwrap } from '../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
  * @description This can only be done by the logged in user.
@@ -15,15 +15,15 @@ import { client, withUnwrap } from '../../.kubb/client'
 export function createUser<ThrowOnError extends boolean = true>(
   options: Options<CreateUserOptions, ThrowOnError> = {},
 ): Unwrappable<RequestResult<CreateUserResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request<CreateUserOptions['body']>({
+    apiClient<CreateUserResponses, ThrowOnError>({
       method: 'POST',
       url: '/user',
       contentType: { request: 'application/json' },
       ...config,
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<CreateUserResponses, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

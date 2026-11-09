@@ -15,13 +15,13 @@ import { client } from '../../../client'
 export function createUser<ThrowOnError extends boolean = true>(
   options: Options<CreateUserOptions, ThrowOnError> = {},
 ): Promise<RequestResult<CreateUserResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({
+  return apiClient<CreateUserResponses, ThrowOnError>({
     method: 'POST',
     url: '/user',
     contentType: { request: 'application/json' },
     ...config,
     throwOnError: config.throwOnError ?? true,
-  }) as Promise<RequestResult<CreateUserResponses, ThrowOnError>>
+  })
 }

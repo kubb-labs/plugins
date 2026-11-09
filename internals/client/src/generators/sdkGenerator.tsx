@@ -180,7 +180,11 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
 
         return (
           <File key={file.path} baseName={file.baseName} path={file.path} meta={file.meta} banner={banner(file)} footer={footer(file)}>
-            <File.Import name={['createClient', returnType === 'data' ? 'unwrapResult' : 'withUnwrap', 'resolveThrowOnError']} root={file.path} path={clientPath} />
+            <File.Import
+              name={['createClient', returnType === 'data' ? 'unwrapResult' : 'withUnwrap', 'resolveThrowOnError']}
+              root={file.path}
+              path={clientPath}
+            />
             <File.Import
               name={Array.from(
                 new Set([

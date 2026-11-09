@@ -15,9 +15,7 @@ import { client } from '../../../client'
 export function getOrderById<ThrowOnError extends boolean = true>(
   options: Options<GetOrderByIdOptions, ThrowOnError>,
 ): Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({ method: 'GET', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<GetOrderByIdResponses, ThrowOnError>
-  >
+  return apiClient<GetOrderByIdResponses, ThrowOnError>({ method: 'GET', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true })
 }

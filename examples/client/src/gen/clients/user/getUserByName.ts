@@ -14,9 +14,7 @@ import { client } from '../../../client'
 export function getUserByName<ThrowOnError extends boolean = true>(
   options: Options<GetUserByNameOptions, ThrowOnError>,
 ): Promise<RequestResult<GetUserByNameResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({ method: 'GET', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<GetUserByNameResponses, ThrowOnError>
-  >
+  return apiClient<GetUserByNameResponses, ThrowOnError>({ method: 'GET', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true })
 }

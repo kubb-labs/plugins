@@ -5,14 +5,14 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { ApiCreateContainerOptions, ApiCreateContainerResponses } from '../types/CreateContainer'
-import { client, withUnwrap } from '../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { createContainerResponseSchema } from '../zod/createContainerSchema'
 
 /**
  * {@link /containers}
  */
 export function createContainer<ThrowOnError extends boolean = true>(options: Options<ApiCreateContainerOptions, ThrowOnError> = {}): Unwrappable<RequestResult<ApiCreateContainerResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(request({ method: 'POST', url: '/containers', contentType: { request: 'application/json' }, ...config, validator: { response: createContainerResponseSchema, ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<ApiCreateContainerResponses, ThrowOnError>>)
+  return withUnwrap(apiClient<ApiCreateContainerResponses, ThrowOnError>({ method: 'POST', url: '/containers', contentType: { request: 'application/json' }, ...config, validator: { response: createContainerResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

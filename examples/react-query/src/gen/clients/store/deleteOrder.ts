@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { DeleteOrderOptions, DeleteOrderResponses } from '../../models/store/DeleteOrder'
-import { client, withUnwrap } from '../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
@@ -15,11 +15,14 @@ import { client, withUnwrap } from '../../.kubb/client'
 export function deleteOrder<ThrowOnError extends boolean = true>(
   options: Options<DeleteOrderOptions, ThrowOnError>,
 ): Unwrappable<RequestResult<DeleteOrderResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'DELETE', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-      RequestResult<DeleteOrderResponses, ThrowOnError>
-    >,
+    apiClient<DeleteOrderResponses, ThrowOnError>({
+      method: 'DELETE',
+      url: '/store/order/{orderId}',
+      ...config,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

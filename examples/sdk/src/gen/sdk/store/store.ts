@@ -9,7 +9,7 @@ import type { GetInventoryOptions, GetInventoryResponses } from '../../models/st
 import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../../models/store/GetOrderById'
 import type { PlaceOrderOptions, PlaceOrderResponses } from '../../models/store/PlaceOrder'
 import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch'
-import { createClient, withUnwrap } from '../../.kubb/client'
+import { createClient, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 export class store {
   private readonly client: ClientInstance
@@ -26,16 +26,16 @@ export class store {
   public getInventory<ThrowOnError extends boolean = true>(
     options: Options<GetInventoryOptions, ThrowOnError> = {},
   ): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      request({
+      apiClient<GetInventoryResponses, ThrowOnError>({
         method: 'GET',
         url: '/store/inventory',
         security: [{ type: 'apiKey', name: 'api_key', in: 'header' }],
         ...config,
-        throwOnError: config.throwOnError ?? true,
-      }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>,
+        throwOnError: resolveThrowOnError(config.throwOnError, true),
+      }),
     )
   }
 
@@ -47,16 +47,16 @@ export class store {
   public placeOrder<ThrowOnError extends boolean = true>(
     options: Options<PlaceOrderOptions, ThrowOnError> = {},
   ): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      request<PlaceOrderOptions['body']>({
+      apiClient<PlaceOrderResponses, ThrowOnError>({
         method: 'POST',
         url: '/store/order',
         contentType: { request: 'application/json' },
         ...config,
-        throwOnError: config.throwOnError ?? true,
-      }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>,
+        throwOnError: resolveThrowOnError(config.throwOnError, true),
+      }),
     )
   }
 
@@ -68,16 +68,16 @@ export class store {
   public placeOrderPatch<ThrowOnError extends boolean = true>(
     options: Options<PlaceOrderPatchOptions, ThrowOnError> = {},
   ): Unwrappable<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      request<PlaceOrderPatchOptions['body']>({
+      apiClient<PlaceOrderPatchResponses, ThrowOnError>({
         method: 'PATCH',
         url: '/store/order',
         contentType: { request: 'application/json' },
         ...config,
-        throwOnError: config.throwOnError ?? true,
-      }) as Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>>,
+        throwOnError: resolveThrowOnError(config.throwOnError, true),
+      }),
     )
   }
 
@@ -89,12 +89,15 @@ export class store {
   public getOrderById<ThrowOnError extends boolean = true>(
     options: Options<GetOrderByIdOptions, ThrowOnError>,
   ): Unwrappable<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'GET', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-        RequestResult<GetOrderByIdResponses, ThrowOnError>
-      >,
+      apiClient<GetOrderByIdResponses, ThrowOnError>({
+        method: 'GET',
+        url: '/store/order/{orderId}',
+        ...config,
+        throwOnError: resolveThrowOnError(config.throwOnError, true),
+      }),
     )
   }
 
@@ -106,12 +109,15 @@ export class store {
   public deleteOrder<ThrowOnError extends boolean = true>(
     options: Options<DeleteOrderOptions, ThrowOnError>,
   ): Unwrappable<RequestResult<DeleteOrderResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'DELETE', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-        RequestResult<DeleteOrderResponses, ThrowOnError>
-      >,
+      apiClient<DeleteOrderResponses, ThrowOnError>({
+        method: 'DELETE',
+        url: '/store/order/{orderId}',
+        ...config,
+        throwOnError: resolveThrowOnError(config.throwOnError, true),
+      }),
     )
   }
 }

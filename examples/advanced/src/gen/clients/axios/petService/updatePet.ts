@@ -1,6 +1,6 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
-import { client, withUnwrap } from '../../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 import { updatePetResponseSchema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema } from '../../../zod/pet/updatePetSchema'
 
 /**
@@ -67,45 +67,28 @@ export function updatePet<ThrowOnError extends boolean = true>(
     ThrowOnError
   >
 > {
-  const { client: request = client, contentType, ...config } = options
+  const { client: apiClient = client, contentType, ...config } = options
 
   return withUnwrap(
-    request<
-      (
-        | {
-            body: Omit<NonNullable<Pet>, 'id'>
-            path?: never
-            query?: never
-            headers?: never
-            contentType?:
-              | 'application/json'
-              | {
-                  request: 'application/json'
-                }
-          }
-        | {
-            body: Omit<NonNullable<Pet>, 'id'>
-            path?: never
-            query?: never
-            headers?: never
-            contentType:
-              | 'application/xml'
-              | {
-                  request: 'application/xml'
-                }
-          }
-        | {
-            body: Omit<NonNullable<Pet>, 'id'>
-            path?: never
-            query?: never
-            headers?: never
-            contentType:
-              | 'application/x-www-form-urlencoded'
-              | {
-                  request: 'application/x-www-form-urlencoded'
-                }
-          }
-      )['body']
+    apiClient<
+      {
+        '200':
+          | {
+              contentType: 'application/json'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+          | {
+              contentType: 'application/xml'
+              data: string
+            }
+        '202': {
+          id?: number
+        }
+        '400': unknown
+        '404': unknown
+        '405': unknown
+      },
+      ThrowOnError
     >({
       method: 'PUT',
       url: '/pet',
@@ -117,28 +100,7 @@ export function updatePet<ThrowOnError extends boolean = true>(
         error: { 400: updatePetStatus400Schema, 404: updatePetStatus404Schema, 405: updatePetStatus405Schema },
         ...config.validator,
       },
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<
-      RequestResult<
-        {
-          '200':
-            | {
-                contentType: 'application/json'
-                data: Omit<NonNullable<Pet>, 'name'>
-              }
-            | {
-                contentType: 'application/xml'
-                data: string
-              }
-          '202': {
-            id?: number
-          }
-          '400': unknown
-          '404': unknown
-          '405': unknown
-        },
-        ThrowOnError
-      >
-    >,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

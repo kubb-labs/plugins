@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { DeleteUserOptions, DeleteUserResponses } from '../../models/user/DeleteUser'
-import { client, withUnwrap } from '../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
  * @description This can only be done by the logged in user.
@@ -15,11 +15,14 @@ import { client, withUnwrap } from '../../.kubb/client'
 export function deleteUser<ThrowOnError extends boolean = true>(
   options: Options<DeleteUserOptions, ThrowOnError>,
 ): Unwrappable<RequestResult<DeleteUserResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'DELETE', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-      RequestResult<DeleteUserResponses, ThrowOnError>
-    >,
+    apiClient<DeleteUserResponses, ThrowOnError>({
+      method: 'DELETE',
+      url: '/user/{username}',
+      ...config,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }
