@@ -87,16 +87,16 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "^5.16.0",
+    "@kubb/kit": "^5.16.1",
     "@kubb/plugin-ts": "workspace:^",
-    "@kubb/renderer-jsx": "^5.16.0"
+    "@kubb/renderer-jsx": "^5.16.1"
   },
   "devDependencies": {
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*",
-    "@tanstack/react-query": "^5.105.3"
+    "@tanstack/react-query": "^5.106.1"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.82.0"
