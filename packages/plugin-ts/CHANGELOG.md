@@ -1,5 +1,13 @@
 # @kubb/plugin-ts
 
+## 5.4.2
+
+### Patch Changes
+
+- [#1367](https://github.com/kubb-labs/plugins/pull/1367) [`6fadb07`](https://github.com/kubb-labs/plugins/commit/6fadb07c0e99de2732115486c2139060bd82d5e5) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - A binary property, such as a file field in a `multipart/form-data` body, now has a JSDoc note: pass a `File` to send its filename, since a plain `Blob` is sent with the filename `blob`. A binary schema also no longer gets `@type string` in its JSDoc, which contradicted its `Blob` type.
+
+- [#1368](https://github.com/kubb-labs/plugins/pull/1368) [`821265a`](https://github.com/kubb-labs/plugins/commit/821265a374d1431288b745f863c28d2dc5d9ac63) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - An operation whose `requestBody` is not `required: true` now types `body` as optional in its options, as OpenAPI defines. A call such as petstore's `updateUser({ path: { username } })` typechecks without a body. When the operation has no required parameter either, the generated client takes no argument at all, such as `createUser()`. A body marked `required: true` stays required.
+
 ## 5.4.1
 
 ### Patch Changes
