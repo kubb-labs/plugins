@@ -2,10 +2,8 @@ import { createGroupConfig } from '@internals/shared'
 import { addGenerator, defineExtension, Resolver, setMacros, setResolver } from '@kubb/kit'
 import { compatibility } from '../kubb-extension.json'
 import { version } from '../package.json'
-import { pluginTsName } from '@kubb/plugin-ts'
-import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
-import { defaultMacros, isValidatorEnabled, resolverClient } from '@internals/client'
+import { clientDependencies, defaultMacros, resolverClient } from '@internals/client'
 import type { PluginClient, ResolverClient } from './types.ts'
 
 /**
@@ -26,7 +24,7 @@ export const pluginClientName = 'plugin-client' satisfies PluginClient['name']
 export const pluginClient = defineExtension<PluginClient>({
   kind: 'plugin',
   meta: { name: pluginClientName, version, compatibility },
-  dependencies: (options) => ({ [pluginTsName]: { optional: true }, [pluginZodName]: { optional: !isValidatorEnabled(options.validator) } }),
+  dependencies: clientDependencies,
   setup(options) {
     const {
       output = { path: 'clients', barrel: { type: 'named' } },
