@@ -3,7 +3,22 @@
 Set `baseURL` on the client plugin or on the generated client.
 
 > [!NOTE]
-> OpenAPI server URLs do not configure the client automatically. The `server` option of `adapterOas` only sets document metadata. It does not set `baseURL`.
+> Top-level OpenAPI server URLs do not set the client's `baseURL`, even with the `server` option of `adapterOas`.
+
+## Operations with their own server
+
+A path or operation can declare its own `servers`, such as an upload or streaming host next to the main API. Its URL becomes that operation's default `baseURL`, so the call goes to that host. The `server.index` of `adapterOas` picks the entry, falling back to the first one.
+
+```yaml [petStore.yaml]
+paths:
+  /.sse:
+    servers:
+      - url: https://echo.websocket.org
+    get:
+      operationId: streamEvents
+```
+
+A relative server URL, such as `/v2`, or one with `{variable}` placeholders is skipped, so the client's `baseURL` applies.
 
 ## Use the baseURL option
 
@@ -55,4 +70,13 @@ import { getPetById } from './gen/clients/getPetById'
 const { data } = await getPetById({ path: { petId: 1 }, baseURL: 'https://localhost:3000' })
 ```
 
-A `baseURL` set on the call wins over `createClient`, which wins over `setConfig`, which wins over the build-time value.
+## Which base URL a call uses
+
+A call uses the first base URL it finds, in this order:
+
+1. `baseURL` passed on the call.
+2. The operation's own `servers`.
+3. The path's `servers`.
+4. The client passed as `client`, made with `createClient({ baseURL })`.
+5. `client.setConfig({ baseURL })`.
+6. The `baseURL` option of `pluginFetch`.

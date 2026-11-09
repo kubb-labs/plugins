@@ -72,10 +72,10 @@ export type Options = OutputOptions & {
    */
   override?: Array<Override<Omit<ResolvedOptions, 'throwOnErrorDefault'>>>
   /**
-   * Base URL prepended to every request. When omitted, the generated client sets no base URL, so
-   * set one at runtime with `client.setConfig({ baseURL })`. The adapter's server URL is not used.
-   * Values containing a `${...}` interpolation are emitted as template literals in the generated
-   * client config, which keeps runtime environment reads dynamic.
+   * Base URL prepended to every request. When omitted, the generated client sets no base URL, so set one at runtime with
+   * `client.setConfig({ baseURL })`. The top-level server URL is not used, but an operation with path-level or operation-level `servers` calls it.
+   * Values containing a `${...}` interpolation are emitted as template literals in the generated client config, which keeps
+   * runtime environment reads dynamic.
    */
   baseURL?: string
   /**

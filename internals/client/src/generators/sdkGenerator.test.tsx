@@ -100,6 +100,17 @@ describe('sdkGenerator operations', () => {
     // returnType: 'data' unwraps every SDK method down to the bare success body.
     { name: 'sdkClassWithReturnTypeData', options: { returnType: 'data' } as Partial<PluginFetch['resolvedOptions']> },
     { name: 'sdkClassWithoutThrowing', options: { throwOnErrorDefault: false } as Partial<PluginFetch['resolvedOptions']> },
+    // An operation-level `servers` entry wins over the path's and becomes that method's default `baseURL`.
+    {
+      name: 'sdkClassWithOperationServer',
+      options: {},
+      adapter: {
+        ...createMockedAdapter(),
+        document: {
+          paths: { '/store/inventory': { servers: [{ url: 'https://store.example.com' }], get: { servers: [{ url: 'https://inventory.example.com' }] } } },
+        },
+      } as Adapter,
+    },
   ] as const satisfies Array<{ name: string; options: Partial<PluginFetch['resolvedOptions']>; adapter?: Adapter }>
 
   test.each(testData)('$name', async (props) => {

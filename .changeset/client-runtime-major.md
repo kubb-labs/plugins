@@ -6,11 +6,11 @@
 
 Run the fetch and axios clients on one core with the same interceptors and client factory.
 
-- Import types from `templates/client.ts` and the shared runtime from `@kubb/plugin-client/templates/*`. `templates/fetch.ts` and `templates/axios.ts` are gone.
-- Rename `FetchOptions` and `AxiosOptions` to `NativeOptions`.
-- Write `EventStreamResult<ServerSentEvent<Pet>>` where you wrote `EventStreamResult<Pet>`, and the same for `StreamResult` and `UnwrappedStreamResult`.
-- Return a web `Response` from a custom transport, and build its init with `toRequestInit(request)`, so a ky transport is one call.
-- On axios, `client.interceptors` handlers get the core objects and skip network errors. Native handlers go on `axiosInstance.interceptors`, and `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
+- Import types from `templates/client.ts` and the runtime from `@kubb/plugin-client/templates/*`. `templates/fetch.ts` and `templates/axios.ts` are gone.
+- `FetchOptions` and `AxiosOptions` are now `NativeOptions`.
+- Stream types take the event: `EventStreamResult<ServerSentEvent<Pet>>` instead of `EventStreamResult<Pet>`, also for `StreamResult` and `UnwrappedStreamResult`.
+- A custom transport returns a web `Response` and builds its init with `toRequestInit(request)`.
+- On axios, `client.interceptors` handlers get the core objects and skip network errors. Native handlers go on `axiosInstance.interceptors`. `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
 
 ```diff
 - import { client, defaultTransport } from './gen/.kubb/client'
@@ -22,4 +22,4 @@ Run the fetch and axios clients on one core with the same interceptors and clien
 + client.setConfig({ transport: createAxiosTransport(axios.create({ baseURL })) })
 ```
 
-To upgrade, regenerate, run `tsc --noEmit`, and fix each error with your plugin's "Migrate to v6" guide. The query plugins work with v5 and v6.
+To upgrade, regenerate, run `tsc --noEmit`, and follow your plugin's "Migrate to v6" guide. The query plugins work with v5 and v6.

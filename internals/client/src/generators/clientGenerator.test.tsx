@@ -6,6 +6,7 @@ import { describe, expect, test } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation, renderGeneratorOperations } from '#mocks'
 import { resolverClient } from '../resolver.ts'
 import type { SecurityDocument } from '../builders/security.ts'
+import type { ServerDocument } from '../builders/server.ts'
 import type { Options, ResolvedOptions, ResolverClient } from '../types.ts'
 import { createClientGenerator } from './clientGenerator.tsx'
 
@@ -240,7 +241,7 @@ const securityDocument: SecurityDocument = {
   },
 }
 
-function mockedAdapterWithDocument(document: SecurityDocument): Adapter {
+function mockedAdapterWithDocument(document: SecurityDocument | ServerDocument): Adapter {
   return { ...createMockedAdapter(), document } as Adapter
 }
 
@@ -264,6 +265,13 @@ describe('clientGenerator operation', () => {
     { name: 'findPetsByTagsWithGlobalSecurity', node: findPetsByTagsNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
     // Two requirements referencing two different schemes (oauth2 bearer + apiKey header).
     { name: 'getPetByIdWithMultipleSchemes', node: getPetByIdNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
+    // A path-level `servers` entry becomes the call's default `baseURL`, before `...config` so a per-call one still wins.
+    {
+      name: 'streamEventsWithPathServer',
+      node: streamEventsNode,
+      options: {},
+      adapter: mockedAdapterWithDocument({ paths: { '/events': { servers: [{ url: 'https://echo.websocket.org' }] } } }),
+    },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginFetch['resolvedOptions']>; adapter?: Adapter }>
 
   test.each(testData)('$name', async (props) => {

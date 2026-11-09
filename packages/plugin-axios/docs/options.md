@@ -23,7 +23,7 @@ Pass these options to `pluginAxios()`. Shared options link to [Shared plugin opt
 
 ### baseURL
 
-Base URL prepended to every request. When omitted, each request uses the operation's relative path from the spec, with no server-URL fallback. A value with a `${...}` interpolation is emitted as a template literal, so `baseURL: '${process.env.API_URL}'` reads the environment variable at runtime.
+Base URL prepended to every request. When omitted, each request uses the operation's relative path from the spec, with no fallback to the top-level server URL. A path or operation that declares its own `servers` uses that URL instead. See [Set the base URL](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/base-url). A value with a `${...}` interpolation is emitted as a template literal, so `baseURL: '${process.env.API_URL}'` reads the environment variable at runtime.
 
 |          |          |
 | -------- | -------- |
