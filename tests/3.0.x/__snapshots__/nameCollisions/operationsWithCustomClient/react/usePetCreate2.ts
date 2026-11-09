@@ -11,7 +11,7 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const petCreateMutationKey2 = () => [{ url: '/pets/create-second' }] as const
 
-export function petCreateMutationOptions2<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function petCreateMutationOptions2<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const mutationKey = petCreateMutationKey2()
   return mutationOptions<PetCreateStatus2002, ResponseErrorConfig<Error>, undefined, TContext>({
     mutationKey,
@@ -22,11 +22,11 @@ export function petCreateMutationOptions2<TContext = unknown>(config: Partial<Om
 }
 
 /**
- * {@link /pets/create-second}
+ * `POST /pets/create-second`
  */
 export function usePetCreate2<TContext>(options: {
   mutation?: UseMutationOptions<PetCreateStatus2002, ResponseErrorConfig<Error>, undefined, TContext> & { client?: QueryClient },
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

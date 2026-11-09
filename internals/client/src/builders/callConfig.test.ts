@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest'
 import { buildCallConfig } from './callConfig.ts'
 
 describe('buildCallConfig', () => {
-  test('emits a content-type map when one response mixes a binary body with an event stream', () => {
+  test('leaves a response that mixes a binary body with an event stream to the runtime media types', () => {
     const node = ast.factory.createOperation({
       operationId: 'speech',
       method: 'POST',
@@ -22,11 +22,12 @@ describe('buildCallConfig', () => {
     const { callConfig, eventStream } = buildCallConfig({ node, validatorHooks: null, throwOnErrorDefault: true, returnType: 'full' })
 
     expect(eventStream).toBe(false)
-    expect(callConfig).toContain(`responseType: { "audio/mpeg": 'blob', "text/event-stream": 'stream' }`)
+    expect(callConfig).not.toContain('responseType')
+    expect(callConfig).not.toContain('parseAs')
     expect(callConfig).toContain('...config')
   })
 
-  test('keeps a string responseType when every content type parses as a blob', () => {
+  test('reads the body as a blob when every content type is binary', () => {
     const node = ast.factory.createOperation({
       operationId: 'speech',
       method: 'POST',
@@ -44,7 +45,7 @@ describe('buildCallConfig', () => {
 
     const { callConfig } = buildCallConfig({ node, validatorHooks: null, throwOnErrorDefault: true, returnType: 'full' })
 
-    expect(callConfig).toContain(`responseType: 'blob'`)
+    expect(callConfig).toContain(`parseAs: 'blob', ...config`)
     expect(callConfig).not.toContain('audio/mpeg')
   })
 
@@ -70,12 +71,14 @@ describe('buildCallConfig', () => {
   }
   const evaluate = (config: object) => {
     const { callConfig } = buildCallConfig({ node: listPets, validatorHooks, throwOnErrorDefault: true, returnType: 'full' })
-    return new Function('config', 'responseSchema', `return ${callConfig}`)(config, 'responseSchema')
+    const resolveThrowOnError = (value: boolean | undefined, fallback: boolean) => value ?? fallback
+    return new Function('config', 'responseSchema', 'resolveThrowOnError', `return ${callConfig}`)(config, 'responseSchema', resolveThrowOnError)
   }
 
   test('merges a per-call validator with the generated one per key', () => {
     expect(evaluate({ validator: { request: 'bodySchema' } })).toMatchObject({ validator: { request: 'bodySchema', response: 'responseSchema' } })
-    expect(evaluate({})).toMatchObject({ validator: { response: 'responseSchema' } })
+    expect(evaluate({})).toMatchObject({ validator: { response: 'responseSchema' }, throwOnError: true })
+    expect(evaluate({ throwOnError: false })).toMatchObject({ throwOnError: false })
   })
 
   test('merges per-call styles with the generated ones per parameter', () => {

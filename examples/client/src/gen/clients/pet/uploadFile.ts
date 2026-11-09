@@ -8,20 +8,20 @@ import type { UploadFileOptions, UploadFileResponses } from '../../models/pet/Up
 import { client } from '../../../client'
 
 /**
+ * `POST /pet/{petId}/uploadImage`
  * @summary uploads an image
- * {@link /pet/:petId/uploadImage}
  */
 export function uploadFile<ThrowOnError extends boolean = true>(
   options: Options<UploadFileOptions, ThrowOnError>,
 ): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({
+  return apiClient<UploadFileResponses, ThrowOnError>({
     method: 'POST',
     url: '/pet/{petId}/uploadImage',
     security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
     contentType: { request: 'application/json' },
     ...config,
     throwOnError: config.throwOnError ?? true,
-  }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
+  })
 }

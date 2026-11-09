@@ -8,20 +8,20 @@ import type { PlaceOrderOptions, PlaceOrderResponses } from '../../models/store/
 import { client } from '../../../client'
 
 /**
+ * `POST /store/order`
  * @description Place a new order in the store
  * @summary Place an order for a pet
- * {@link /store/order}
  */
 export function placeOrder<ThrowOnError extends boolean = true>(
   options: Options<PlaceOrderOptions, ThrowOnError> = {},
 ): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({
+  return apiClient<PlaceOrderResponses, ThrowOnError>({
     method: 'POST',
     url: '/store/order',
     contentType: { request: 'application/json' },
     ...config,
     throwOnError: config.throwOnError ?? true,
-  }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>
+  })
 }

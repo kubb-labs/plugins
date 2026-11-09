@@ -16,18 +16,16 @@ export type CreateUserMutationKey = ReturnType<typeof createUserMutationKey>
 export type CreateUserMutationArg = CreateUserOptions
 
 /**
+ * `POST /user`
  * @description This can only be done by the logged in user.
  * @summary Create user
- * {@link /user}
  */
 export function useCreateUser(
   options: {
     mutation?: SWRMutationConfiguration<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg> & {
       throwOnError?: boolean
     }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-    }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
 ) {
@@ -37,7 +35,7 @@ export function useCreateUser(
   return useSWRMutation<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return createUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof createUser<true>>[0]).unwrap()
+      return createUser({ ...config, ...variables, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

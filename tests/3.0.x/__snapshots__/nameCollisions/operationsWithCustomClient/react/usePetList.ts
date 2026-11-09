@@ -13,7 +13,7 @@ export const petListQueryKey = () => [{ url: '/pets/first' }] as const
 
 type PetListQueryKey = ReturnType<typeof petListQueryKey>
 
-export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const queryKey = petListQueryKey()
   return queryOptions<PetListStatus200, ResponseErrorConfig<Error>, PetListStatus200, typeof queryKey>({
    queryKey,
@@ -24,11 +24,11 @@ export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' |
 }
 
 /**
- * {@link /pets/first}
+ * `GET /pets/first`
  */
 export function usePetList<TData = PetListStatus200, TQueryData = PetListStatus200, TQueryKey extends QueryKey = PetListQueryKey>(options: {
   query?: Partial<QueryObserverOptions<PetListStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig

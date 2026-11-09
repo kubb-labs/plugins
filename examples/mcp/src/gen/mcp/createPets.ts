@@ -8,8 +8,8 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { createPets } from '../clients/createPets'
 
 /**
+ * `POST /pets/{uuid}`
  * @summary Create a pet
- * {@link /pets/:uuid}
  */
 export async function createPetsHandler({ path, query, body, headers }: CreatePetsOptions, ctx: ServerContext): Promise<CallToolResult> {
   const res = await createPets({ path, query, body, headers, signal: ctx.mcpReq.signal, throwOnError: true })

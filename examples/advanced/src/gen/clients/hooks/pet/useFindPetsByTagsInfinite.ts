@@ -41,7 +41,7 @@ export function findPetsByTagsInfiniteQueryOptions(
       'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
     }
   },
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey({ query })
   return infiniteQueryOptions<
@@ -59,19 +59,7 @@ export function findPetsByTagsInfiniteQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal, pageParam }) => {
-      query = {
-        ...(query ?? {}),
-        ['pageSize']: pageParam as unknown as {
-          tags?: Array<string>
-          page?: string
-          pageSize?: number
-        }['pageSize'],
-      } as {
-        tags?: Array<string>
-        page?: string
-        pageSize?: number
-      }
-      return findPetsByTags({ ...config, query, headers, signal: config.signal ?? signal, throwOnError: true }).unwrap()
+      return findPetsByTags({ ...config, query: { ...query, pageSize: pageParam }, headers, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => (Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1),
@@ -80,9 +68,9 @@ export function findPetsByTagsInfiniteQueryOptions(
 }
 
 /**
+ * `GET /pet/findByTags`
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
  * @summary Finds Pets by tags
- * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsInfinite<
   TQueryFnData = Array<Pet> | string,
@@ -154,7 +142,7 @@ export function useFindPetsByTagsInfinite<
   },
   options: {
     query?: Partial<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

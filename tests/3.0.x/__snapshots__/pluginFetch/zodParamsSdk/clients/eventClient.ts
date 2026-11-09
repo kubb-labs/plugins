@@ -7,43 +7,43 @@ import type { ClientConfig, ClientInstance, Options, Unwrappable, RequestResult 
 import type { GetResourceOptionsSchemaType, GetResourceResponsesSchemaType } from '../zod/getResourceSchema'
 import type { ListEventsOptionsSchemaType, ListEventsResponsesSchemaType } from '../zod/listEventsSchema'
 import type { PutEventOptionsSchemaType, PutEventResponsesSchemaType } from '../zod/putEventSchema'
-import { createClient, withUnwrap } from '../.kubb/client'
+import { createClient, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { toHeadersStandardSchema } from '../.kubb/standardSchema'
 import { getResourceResponseSchema, getResourcePathSchema, getResourceQuerySchema, getResourceHeadersSchema } from '../zod/getResourceSchema'
 import { listEventsResponseSchema, listEventsQuerySchema } from '../zod/listEventsSchema'
 import { putEventResponseSchema, putEventStatus409Schema, putEventBodySchema, putEventPathSchema, putEventQuerySchema, putEventHeadersSchema } from '../zod/putEventSchema'
 
 export class EventClient {
-  private readonly client: ClientInstance
+  readonly client: ClientInstance
 
-  constructor(config: ClientConfig = {}) {
-    this.client = createClient(config)
+  constructor(config: ClientConfig | ClientInstance = {}) {
+    this.client = typeof config === 'function' ? config : createClient(config)
   }
 
 /**
-   * {@link /events/:day}
+   * `PUT /events/{day}`
    */
     public putEvent<ThrowOnError extends boolean = true>(options: Options<PutEventOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<PutEventResponsesSchemaType, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'PUT', url: '/events/{day}', contentType: { request: 'application/json' }, ...config, validator: { request: putEventBodySchema, path: putEventPathSchema, query: putEventQuerySchema, headers: toHeadersStandardSchema(putEventHeadersSchema, putEventHeadersSchema.shape), response: putEventResponseSchema, error: { 409: putEventStatus409Schema }, ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<PutEventResponsesSchemaType, ThrowOnError>>)
+    return withUnwrap(apiClient<PutEventResponsesSchemaType, ThrowOnError>({ method: 'PUT', url: '/events/{day}', contentType: { request: 'application/json' }, ...config, validator: { request: putEventBodySchema, path: putEventPathSchema, query: putEventQuerySchema, headers: toHeadersStandardSchema(putEventHeadersSchema, putEventHeadersSchema.shape), response: putEventResponseSchema, error: { 409: putEventStatus409Schema }, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
-   * {@link /events}
+   * `GET /events`
    */
     public listEvents<ThrowOnError extends boolean = true>(options: Options<ListEventsOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<ListEventsResponsesSchemaType, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/events', ...config, validator: { query: listEventsQuerySchema, response: listEventsResponseSchema, ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<ListEventsResponsesSchemaType, ThrowOnError>>)
+    return withUnwrap(apiClient<ListEventsResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/events', ...config, validator: { query: listEventsQuerySchema, response: listEventsResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 
 /**
-   * {@link /resources/:resource}
+   * `GET /resources/{resource}`
    */
     public getResource<ThrowOnError extends boolean = true>(options: Options<GetResourceOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/resources/{resource}', ...config, validator: { path: getResourcePathSchema, query: getResourceQuerySchema, headers: toHeadersStandardSchema(getResourceHeadersSchema, getResourceHeadersSchema.shape), response: getResourceResponseSchema, ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>>)
+    return withUnwrap(apiClient<GetResourceResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/resources/{resource}', ...config, validator: { path: getResourcePathSchema, query: getResourceQuerySchema, headers: toHeadersStandardSchema(getResourceHeadersSchema, getResourceHeadersSchema.shape), response: getResourceResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
   }
 }

@@ -4,8 +4,8 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { createPets } from '../../clients/axios/petsService/createPets'
 
 /**
+ * `POST /pets/{uuid}`
  * @summary Create a pet
- * {@link /pets/:uuid}
  */
 export async function createPetsHandler(
   {

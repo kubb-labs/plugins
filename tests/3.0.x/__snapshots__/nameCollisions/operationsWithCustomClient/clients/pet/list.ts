@@ -8,10 +8,10 @@ import type { Options, RequestResult } from '@example/client'
 import { client } from '@example/client'
 
 /**
- * {@link /pets/first}
+ * `GET /pets/first`
  */
 export function petList<ThrowOnError extends boolean = true>(options: Options<PetListOptions, ThrowOnError> = {}): Promise<RequestResult<PetListResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({ method: 'GET', url: '/pets/first', ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<PetListResponses, ThrowOnError>>
+  return apiClient<PetListResponses, ThrowOnError>({ method: 'GET', url: '/pets/first', ...config, throwOnError: config.throwOnError ?? true })
 }

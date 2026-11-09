@@ -1,46 +1,60 @@
 import { describe, expect, test, vi } from 'vitest'
 import {
   type Auth,
-  type CallResult,
   type ClientConfig,
   createClient as createFetchClient,
   createClientCore,
+  createLazyClient,
+  defaultMediaTypes,
   defaultTransport,
   createInterceptorStack,
-  readResponse,
+  formMediaTypes,
+  isResponseError,
+  type MediaTypeContext,
+  type MediaTypes,
+  type RequestConfig,
   type ResolvedRequest,
   toRequestInit,
   ResponseError,
   resolveAuth,
-  resolveResponseType,
+  resolveMediaType,
+  resolveThrowOnError,
   type Transport,
-  type TransportResult,
   unwrapResult,
   withUnwrap,
 } from './client.ts'
-import { applyHeaderStyles, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
+import type { BodyEncoding } from './serializers.ts'
+import { applyHeaderStyles, defaultPathSerializer, defaultQuerySerializer, serializeCookies } from './serializers.ts'
+import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
 
-type FakeResult = Partial<Pick<TransportResult, 'data' | 'status' | 'statusText'>>
+type FakeResult = { data?: unknown; status?: number; statusText?: string; contentType?: string }
 
+/** A transport that answers every call with `data` as JSON, or as text when it is a string. */
 function fakeTransport(result: FakeResult = {}) {
   const calls: Array<ResolvedRequest> = []
   const transport: Transport<string, string> = async (request) => {
     calls.push(request)
-    return {
-      data: result.data ?? { ok: true },
+    const data = result.data ?? { ok: true }
+    const contentType = result.contentType ?? (typeof data === 'string' ? 'text/plain' : 'application/json')
+    const webResponse = new Response(typeof data === 'string' ? data : JSON.stringify(data), {
       status: result.status ?? 200,
       statusText: result.statusText ?? 'OK',
-      headers: new Headers(),
-      request: 'REQ',
-      response: 'RES',
-    }
+      headers: { 'content-type': contentType },
+    })
+    return { webResponse, request: 'REQ', response: 'RES' }
   }
   return { transport, calls }
 }
 
+/** Encodes a body as the client would for `contentType`, with the form media types registered. */
+function encodeBody({ body, contentType, encoding }: { body: unknown; contentType?: string; encoding?: Record<string, BodyEncoding> }) {
+  const mediaType = resolveMediaType({ mediaTypes: { ...defaultMediaTypes, ...formMediaTypes }, contentType: contentType ?? '*/*', use: 'encode' })
+  return mediaType?.encode?.(body, { contentType: contentType ?? '', config: { styles: { body: encoding } } })
+}
+
 function createClient(result?: FakeResult) {
   const { transport, calls } = fakeTransport(result)
-  const client = createClientCore<string, string>({ defaultTransport: transport })
+  const client = createClientCore<string, string>({ defaultTransport: transport, mediaTypes: formMediaTypes })
   return { client, calls }
 }
 
@@ -76,19 +90,17 @@ describe('createInterceptorStack', () => {
     expect(await stack.run([])).toStrictEqual(['A', 'b'])
   })
 
-  test('keeps the value when a handler returns nothing, and stops at a result the guard rejects', async () => {
-    const isList = (value: unknown): value is Array<string> => Array.isArray(value)
-    const stack = createInterceptorStack<Array<string>, never, Array<string> | Error | void>(isList)
-    const later = vi.fn((value: Array<string>) => [...value, 'c'])
+  test('keeps the value when a handler returns nothing, and hands the next handler what the one before returned', async () => {
+    const stack = createInterceptorStack<Error, never, Error | void>()
+    const later = vi.fn((value: Error) => value)
     stack.use(() => undefined)
-    stack.use((value) => [...value, 'b'])
-    expect(await stack.run(['a'])).toStrictEqual(['a', 'b'])
+    expect(await stack.run(new Error('a'))).toMatchObject({ message: 'a' })
 
     const mapped = new Error('mapped')
     stack.use(() => mapped)
     stack.use(later)
-    expect(await stack.run(['a'])).toBe(mapped)
-    expect(later).not.toHaveBeenCalled()
+    expect(await stack.run(new Error('a'))).toBe(mapped)
+    expect(later).toHaveBeenCalledWith(mapped, undefined)
   })
 })
 
@@ -211,41 +223,41 @@ describe('defaultPathSerializer', () => {
   })
 })
 
-describe('defaultBodySerializer', () => {
+describe('built-in media types encode', () => {
   test.each(['application/json', 'application/json; charset=utf-8', 'application/vnd.api+json'])('JSON-encodes strings for %s', (contentType) => {
-    expect(defaultBodySerializer({ body: 'a"b\nc', contentType })).toBe('"a\\"b\\nc"')
-    expect(defaultBodySerializer({ body: '', contentType })).toBe('""')
+    expect(encodeBody({ body: 'a"b\nc', contentType })).toBe('"a\\"b\\nc"')
+    expect(encodeBody({ body: '', contentType })).toBe('""')
   })
 
   test.each([undefined, 'text/plain', 'application/jsonl'])('passes strings through for %s', (contentType) => {
-    expect(defaultBodySerializer({ body: 'abc', contentType })).toBe('abc')
+    expect(encodeBody({ body: 'abc', contentType })).toBe('abc')
   })
 
   test('ignores a JSON part contentType for urlencoded bodies', () => {
     const encoding = { meta: { contentType: 'application/json' } }
-    expect(defaultBodySerializer({ body: { meta: { a: 1 } }, contentType: 'application/x-www-form-urlencoded', encoding })).toBe('a=1')
+    expect(encodeBody({ body: { meta: { a: 1 } }, contentType: 'application/x-www-form-urlencoded', encoding })).toBe('a=1')
   })
 
   test('JSON-serializes plain objects', () => {
-    expect(defaultBodySerializer({ body: { name: 'odie' } })).toBe('{"name":"odie"}')
+    expect(encodeBody({ body: { name: 'odie' } })).toBe('{"name":"odie"}')
   })
 
   test.each(['application/xml', 'text/xml; charset=utf-8', 'application/atom+xml', 'application/yaml', 'application/x-yaml', 'text/csv'])(
     'refuses to send an object as JSON under %s, and passes a string through',
     (contentType) => {
-      expect(() => defaultBodySerializer({ body: { name: 'odie' }, contentType })).toThrow(TypeError)
-      expect(() => defaultBodySerializer({ body: ['odie'], contentType })).toThrow(/codecs\['[a-z+/-]+'\]\.serialize/)
-      expect(defaultBodySerializer({ body: '<pet/>', contentType })).toBe('<pet/>')
+      expect(() => encodeBody({ body: { name: 'odie' }, contentType })).toThrow(TypeError)
+      expect(() => encodeBody({ body: ['odie'], contentType })).toThrow(/mediaTypes\['[a-z+/-]+'\]\.encode/)
+      expect(encodeBody({ body: '<pet/>', contentType })).toBe('<pet/>')
     },
   )
 
   test('JSON-encodes an object for a vendor type without a +json suffix', () => {
-    expect(defaultBodySerializer({ body: { name: 'odie' }, contentType: 'application/vnd.acme.v1' })).toBe('{"name":"odie"}')
+    expect(encodeBody({ body: { name: 'odie' }, contentType: 'application/vnd.acme.v1' })).toBe('{"name":"odie"}')
   })
 
   test('passes FormData through untouched', () => {
     const formData = new FormData()
-    expect(defaultBodySerializer({ body: formData })).toBe(formData)
+    expect(encodeBody({ body: formData })).toBe(formData)
   })
 
   test.each([
@@ -254,7 +266,7 @@ describe('defaultBodySerializer', () => {
     'APPLICATION/X-WWW-FORM-URLENCODED',
     'Application/X-WWW-Form-Urlencoded; charset=UTF-8',
   ])('encodes objects as URLSearchParams for %s', (contentType) => {
-    const body = defaultBodySerializer({ body: { a: '1' }, contentType })
+    const body = encodeBody({ body: { a: '1' }, contentType })
     expect(body).toBeInstanceOf(URLSearchParams)
     expect(body?.toString()).toBe('a=1')
   })
@@ -262,7 +274,7 @@ describe('defaultBodySerializer', () => {
   test.each(['multipart/form-data', 'Multipart/Form-Data', 'MULTIPART/FORM-DATA', 'Multipart/Form-Data; boundary=example'])(
     'builds FormData from a plain object for %s',
     (contentType) => {
-      const body = defaultBodySerializer({ body: { field: 'x' }, contentType })
+      const body = encodeBody({ body: { field: 'x' }, contentType })
       expect(body).toBeInstanceOf(FormData)
       expect((body as FormData).get('field')).toBe('x')
     },
@@ -270,7 +282,7 @@ describe('defaultBodySerializer', () => {
 
   test('passes Blob members through and serializes dates, objects, and arrays in multipart', () => {
     const file = new Blob(['hi'], { type: 'text/plain' })
-    const body = defaultBodySerializer({
+    const body = encodeBody({
       body: { file, when: new Date('2020-01-01T00:00:00.000Z'), meta: { a: 1 }, tags: ['a', 'b'] },
       contentType: 'multipart/form-data',
     }) as FormData
@@ -282,11 +294,11 @@ describe('defaultBodySerializer', () => {
 
   test('passes a pre-built FormData through untouched for multipart', () => {
     const formData = new FormData()
-    expect(defaultBodySerializer({ body: formData, contentType: 'multipart/form-data' })).toBe(formData)
+    expect(encodeBody({ body: formData, contentType: 'multipart/form-data' })).toBe(formData)
   })
 
   test('honors per-property encoding for urlencoded bodies', () => {
-    const body = defaultBodySerializer({
+    const body = encodeBody({
       body: { tags: ['a', 'b'], filter: { x: 1 } },
       contentType: 'application/x-www-form-urlencoded',
       encoding: { tags: { style: 'form', explode: false }, filter: { style: 'deepObject' } },
@@ -295,21 +307,21 @@ describe('defaultBodySerializer', () => {
   })
 
   test('emits a bigint as a JSON number', () => {
-    expect(defaultBodySerializer({ body: { id: 42n } })).toBe('{"id":42}')
+    expect(encodeBody({ body: { id: 42n } })).toBe('{"id":42}')
   })
 
   test('emits a bigint nested in a multipart part', () => {
-    const body = defaultBodySerializer({ body: { meta: { id: 42n } }, contentType: 'multipart/form-data' }) as FormData
+    const body = encodeBody({ body: { meta: { id: 42n } }, contentType: 'multipart/form-data' }) as FormData
     expect(body.get('meta')).toBe('{"id":42}')
   })
 
   test('throws on a bigint outside the safe-integer range', () => {
-    expect(() => defaultBodySerializer({ body: { id: 9007199254740993n } })).toThrow(/without losing precision/)
-    expect(() => defaultBodySerializer({ body: { id: -9007199254740993n } })).toThrow(/without losing precision/)
+    expect(() => encodeBody({ body: { id: 9007199254740993n } })).toThrow(/without losing precision/)
+    expect(() => encodeBody({ body: { id: -9007199254740993n } })).toThrow(/without losing precision/)
   })
 
   test('applies a per-part content type from multipart encoding via a typed Blob', async () => {
-    const body = defaultBodySerializer({
+    const body = encodeBody({
       body: { meta: { a: 1 } },
       contentType: 'multipart/form-data',
       encoding: { meta: { contentType: 'application/json' } },
@@ -463,12 +475,17 @@ describe('createClientCore', () => {
     expect(calls[0]?.headers['Content-Type']).toBeUndefined()
   })
 
-  test('does not auto-inject Content-Type when a custom bodySerializer is used', async () => {
+  test('encodes the body with a media type the client registers, merged per key over the built-ins', async () => {
     const { transport, calls } = fakeTransport()
-    const client = createClientCore<string, string>({ defaultTransport: transport, serializer: { body: ({ body }) => `custom:${JSON.stringify(body)}` } })
+    const client = createClientCore<string, string>({
+      defaultTransport: transport,
+      mediaTypes: { 'application/json': { encode: (body) => `custom:${JSON.stringify(body)}` } },
+    })
     await client({ method: 'POST', url: '/pet', body: { name: 'odie' } })
     expect(calls[0]?.body).toBe('custom:{"name":"odie"}')
-    expect(calls[0]?.headers['Content-Type']).toBeUndefined()
+    expect(calls[0]?.headers['Content-Type']).toBe('application/json')
+    await client({ method: 'POST', url: '/pet', body: 'a', contentType: 'text/plain' })
+    expect(calls[1]?.body).toBe('a')
   })
 
   test('serializes cookie params into the Cookie header', async () => {
@@ -527,7 +544,7 @@ describe('createClientCore', () => {
     expect(calls[0]?.headers['Content-Type']).toBeUndefined()
   })
 
-  test('removes every content-type spelling when a custom serializer returns FormData', async () => {
+  test('removes every content-type spelling when a media type encodes FormData', async () => {
     const { transport, calls } = fakeTransport()
     const client = createClientCore<string, string>({ defaultTransport: transport, headers: { 'cOnTeNt-TyPe': 'application/xml' } })
     const formData = new FormData()
@@ -537,7 +554,7 @@ describe('createClientCore', () => {
       url: '/pet',
       body: { field: 'x' },
       contentType: 'application/json',
-      serializer: { body: () => formData },
+      mediaTypes: { 'application/json': { encode: () => formData } },
     })
     expect(calls[0]?.body).toBe(formData)
     expect(calls[0]?.headers).toStrictEqual({})
@@ -561,12 +578,12 @@ describe('createClientCore', () => {
 
   test('returns the success shape with data and an undefined error', async () => {
     const { client } = createClient({ data: { id: 1 }, status: 200 })
-    const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<string, string>
+    const result = await client({ method: 'GET', url: '/pet/1' })
     expect(result).toStrictEqual({
       status: 200,
       data: { id: 1 },
       error: undefined,
-      contentType: undefined,
+      contentType: 'application/json',
       request: 'REQ',
       response: 'RES',
     })
@@ -691,7 +708,7 @@ describe('createClientCore', () => {
   test('resolves the per-call transport over the default', async () => {
     const { client } = createClient()
     const override = fakeTransport({ data: { from: 'override' } })
-    const result = (await client({ method: 'GET', url: '/pet', transport: override.transport })) as CallResult<string, string>
+    const result = await client({ method: 'GET', url: '/pet', transport: override.transport })
     expect(override.calls).toHaveLength(1)
     expect(result.data).toStrictEqual({ from: 'override' })
   })
@@ -700,12 +717,12 @@ describe('createClientCore', () => {
     const { client, calls } = createClient({ data: { raw: true }, status: 200 })
     const request = vi.fn((body: unknown) => ({ ...(body as object), validated: true }))
     const response = vi.fn(() => ({ parsed: true }))
-    const result = (await client({
+    const result = await client({
       method: 'POST',
       url: '/pet',
       body: { name: 'odie' },
       validator: { request: toSchema(request), response: toSchema(response) },
-    })) as CallResult<string, string>
+    })
     expect(request).toHaveBeenCalledTimes(1)
     expect(calls[0]?.body).toBe('{"name":"odie","validated":true}')
     expect(result.data).toStrictEqual({ parsed: true })
@@ -721,9 +738,9 @@ describe('createClientCore', () => {
   test('runs the error parser on a non-2xx body when throwOnError is false', async () => {
     const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
     const error = vi.fn(() => ({ parsed: true }))
-    const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { error: toSchema(error) } })) as CallResult<string, string>
+    const result = await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { error: toSchema(error) } })
     expect(error).toHaveBeenCalledTimes(1)
-    expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, contentType: undefined, request: 'REQ', response: 'RES' })
+    expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, contentType: 'application/json', request: 'REQ', response: 'RES' })
   })
 
   test('picks the error validator by status, then range, then default, and skips undeclared statuses', async () => {
@@ -735,7 +752,7 @@ describe('createClientCore', () => {
       },
     })
     const call = (status: number, data: unknown, error: Record<string, ReturnType<typeof toCodeSchema>>) =>
-      createClient({ data, status }).client({ method: 'GET', url: '/pet/1', throwOnError: false, validator: { error } }) as Promise<CallResult<string, unknown>>
+      createClient({ data, status }).client({ method: 'GET', url: '/pet/1', throwOnError: false, validator: { error } })
     const byStatus = { 404: toCodeSchema('not-found'), '5XX': toCodeSchema('upstream') }
 
     expect(await call(404, { code: 'not-found' }, byStatus)).toMatchObject({ status: 404, error: { checkedBy: 'not-found' } })
@@ -748,15 +765,16 @@ describe('createClientCore', () => {
     await expect(call(502, '<html>Bad Gateway</html>', withDefault)).rejects.toMatchObject({ name: 'ParseError' })
   })
 
-  test('skips the error parser when the call throws, so it throws the ResponseError', async () => {
+  test('validates the error body of a call that throws, so the ResponseError carries the parsed body', async () => {
     const { client } = createClient({ data: '<html>Bad Gateway</html>', status: 502 })
     const error = vi.fn(() => ({ parsed: true }))
-    await expect(client({ method: 'GET', url: '/pet/1', validator: { error: toFailingSchema() } })).rejects.toMatchObject({
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { error: toFailingSchema() } })).rejects.toMatchObject({ name: 'ParseError' })
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { error: toSchema(error) } })).rejects.toMatchObject({
       name: 'ResponseError',
       status: 502,
+      data: { parsed: true },
     })
-    await expect(client({ method: 'GET', url: '/pet/1', validator: { error: toSchema(error) } })).rejects.toMatchObject({ data: '<html>Bad Gateway</html>' })
-    expect(error).not.toHaveBeenCalled()
+    expect(error).toHaveBeenCalledTimes(1)
   })
 
   test('throws the ParseError when no onValidationError is set', async () => {
@@ -771,7 +789,7 @@ describe('createClientCore', () => {
     const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
     const onValidationError = vi.fn((_error: unknown, context: { value: unknown }) => ({ value: context.value }))
     const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError })
-    const result = (await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })) as CallResult<string, string>
+    const result = await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })
     expect(result.data).toStrictEqual({ id: 1 })
     expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'response', source: 'body', method: 'GET', status: 200, value: { id: 1 } })
   })
@@ -787,20 +805,20 @@ describe('createClientCore', () => {
   test('skips every validator when the client sets validate to false', async () => {
     const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
     const client = createClientCore<string, string>({ defaultTransport: transport, validate: false })
-    const result = (await client({
+    const result = await client({
       method: 'POST',
       url: '/pet',
       body: { name: 1 },
       query: { limit: 1 },
       validator: { request: toFailingSchema(), query: toFailingSchema(), response: toFailingSchema() },
-    })) as CallResult<string, string>
+    })
     expect(result.data).toStrictEqual({ id: 1 })
   })
 
   test('skips only the directions the client turns off', async () => {
     const { transport } = fakeTransport({ data: { id: 1 }, status: 200 })
     const client = createClientCore<string, string>({ defaultTransport: transport, validate: { response: false } })
-    const result = (await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })) as CallResult<string, string>
+    const result = await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })
     expect(result.data).toStrictEqual({ id: 1 })
     await expect(client({ method: 'POST', url: '/pet', body: { name: 1 }, validator: { request: toFailingSchema() } })).rejects.toMatchObject({
       name: 'ParseError',
@@ -839,12 +857,12 @@ describe('createClientCore', () => {
     const clientLevel = vi.fn(() => ({ value: 'client' }))
     const perCall = vi.fn(() => ({ value: 'call' }))
     const client = createClientCore<string, string>({ defaultTransport: transport, onValidationError: clientLevel })
-    const result = (await client({
+    const result = await client({
       method: 'GET',
       url: '/pet/1',
       validator: { response: toFailingSchema() },
       onValidationError: perCall,
-    })) as CallResult<string, string>
+    })
     expect(result.data).toBe('call')
     expect(clientLevel).not.toHaveBeenCalled()
   })
@@ -888,15 +906,36 @@ describe('createClientCore', () => {
     await expect(logging({ method: 'GET', url: '/pet' })).rejects.toBeInstanceOf(ResponseError)
   })
 
-  test('passes the ResponseError to every handler until one returns another error', async () => {
+  test('hands each error handler the error the one before returned', async () => {
     class NotFound extends Error {}
     const { client } = createClient({ status: 404 })
-    const seen: Array<number> = []
-    client.interceptors.error.use((error) => void seen.push(error.status))
-    client.interceptors.error.use((error) => (error.status === 404 ? new NotFound() : error))
-    client.interceptors.error.use((error) => void seen.push(error.status))
+    const seen: Array<string> = []
+    client.interceptors.error.use((error) => void seen.push(error.name))
+    client.interceptors.error.use((error) => (ResponseError.is(error) && error.status === 404 ? new NotFound() : error))
+    client.interceptors.error.use((error) => void seen.push(error.constructor.name))
     await expect(client({ method: 'GET', url: '/pet' })).rejects.toBeInstanceOf(NotFound)
-    expect(seen).toStrictEqual([404])
+    expect(seen).toStrictEqual(['ResponseError', 'NotFound'])
+  })
+
+  test('runs the error interceptor for a network error, an abort, and a failed validation', async () => {
+    const network = new TypeError('fetch failed')
+    const client = createClientCore<string, string>({
+      defaultTransport: async () => {
+        throw network
+      },
+    })
+    const seen: Array<unknown> = []
+    client.interceptors.error.use((error) => void seen.push(error))
+    await expect(client({ method: 'GET', url: '/pet' })).rejects.toBe(network)
+
+    const controller = new AbortController()
+    controller.abort(new DOMException('stop', 'AbortError'))
+    await expect(client({ method: 'GET', url: '/pet', signal: controller.signal })).rejects.toBe(controller.signal.reason)
+
+    const { client: validating } = createClient({ data: { id: 1 } })
+    validating.interceptors.error.use((error) => void seen.push(error.name))
+    await expect(validating({ method: 'GET', url: '/pet', validator: { response: toFailingSchema() } })).rejects.toMatchObject({ name: 'ParseError' })
+    expect(seen).toStrictEqual([network, controller.signal.reason, 'ParseError'])
   })
 
   test('setConfig merges and getConfig reflects it', () => {
@@ -911,74 +950,298 @@ describe('createClientCore', () => {
     expect(client.getConfig().headers).toStrictEqual({ authorization: 'Bearer t' })
   })
 
-  test('createClient produces an instance with isolated interceptors', () => {
-    const { client } = createClient()
+  test('createClient produces an instance with isolated interceptors', async () => {
+    const { client, calls } = createClient()
+    client.interceptors.request.use((request) => ({ ...request, headers: { ...request.headers, 'X-Parent': '1' } }))
     const child = client.createClient()
     child.interceptors.request.use((request) => request)
     expect(child).not.toBe(client)
+    await child({ method: 'GET', url: '/pet' })
+    expect(calls[0]?.headers['X-Parent']).toBeUndefined()
+  })
+
+  test('extend keeps the config and runs the parent interceptors before its own, including ones added later', async () => {
+    const { client, calls } = createClient()
+    client.setConfig({ baseURL: 'https://api.test', headers: { 'X-Client': 'parent' } })
+    const order: Array<string> = []
+    client.interceptors.request.use(() => void order.push('parent'))
+    const child = client.extend({ headers: { 'X-Child': '1' } })
+    child.interceptors.request.use(() => void order.push('child'))
+    client.interceptors.response.use(() => void order.push('parent response'))
+
+    await child({ method: 'GET', url: '/pet' })
+    expect(calls[0]).toMatchObject({ url: 'https://api.test/pet', headers: { 'X-Client': 'parent', 'X-Child': '1' } })
+    expect(order).toStrictEqual(['parent', 'child', 'parent response'])
+
+    // The parent does not run the child's interceptors.
+    order.length = 0
+    await client({ method: 'GET', url: '/pet' })
+    expect(order).toStrictEqual(['parent', 'parent response'])
   })
 })
 
-describe('a streamed call answered without an event stream', () => {
-  const answer = (body: string, contentType: string) => async () => new Response(body, { status: 200, headers: { 'content-type': contentType } })
+describe('media types', () => {
+  const answer =
+    (body: BodyInit | null, headers: Record<string, string> = {}, status = 200): Transport<string, string> =>
+    async () =>
+      new Response(body, { status, headers })
+  const call = (
+    transport: Transport<string, string>,
+    config: Omit<RequestConfig<unknown, string, string>, 'method' | 'url'> & { method?: 'GET' | 'HEAD' } = {},
+  ) => createClientCore<string, string>({ defaultTransport: transport, throwOnError: false })({ method: 'GET', url: '/pet', ...config })
 
-  test.each(['application/json', 'application/problem+json'])('parses a %s body', async (contentType) => {
-    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('{"ok":true}', contentType))
-    const client = createClientCore({ defaultTransport })
-
-    expect((await client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream' })).data).toStrictEqual({ ok: true })
+  test('matches the exact type, then the structured suffix, then the type wildcard, then the catch-all', () => {
+    const mediaTypes: MediaTypes = { 'application/xml': {}, 'application/*+xml': {}, 'text/*': {}, '*/*': {} }
+    const pick = (contentType: string | undefined) => resolveMediaType({ mediaTypes, contentType })
+    expect(pick('Application/XML; charset=utf-8')).toBe(mediaTypes['application/xml'])
+    expect(pick('application/atom+xml')).toBe(mediaTypes['application/*+xml'])
+    expect(pick(' text/csv ')).toBe(mediaTypes['text/*'])
+    expect(pick('video/mp4')).toBe(mediaTypes['*/*'])
+    expect(pick(undefined)).toBe(mediaTypes['*/*'])
   })
 
-  test('keeps a JSON-labeled body that is not JSON as text, and reads an empty one as no data', async () => {
-    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('Pet deleted', 'application/json'))
-    const client = createClientCore({ defaultTransport })
-
-    expect((await client({ method: 'DELETE', url: 'https://api.test/pet/1' })).data).toBe('Pet deleted')
-    _fetch.mockImplementation(answer('', 'application/json'))
-    expect((await client({ method: 'DELETE', url: 'https://api.test/pet/1' })).data).toBeUndefined()
+  test('skips a handler without the method asked for', () => {
+    const xml = { decode: async () => 'xml' }
+    const mediaTypes: MediaTypes = { ...defaultMediaTypes, 'application/xml': xml }
+    expect(resolveMediaType({ mediaTypes, contentType: 'application/xml', use: 'decode' })).toBe(xml)
+    expect(resolveMediaType({ mediaTypes, contentType: 'application/xml', use: 'encode' })).toBe(defaultMediaTypes['*/*'])
   })
 
-  test('applies a catch-all map entry to a response without a Content-Type, after the exact type and the wildcard', () => {
-    expect(resolveResponseType({ '*/*': 'blob' }, undefined)).toBe('blob')
-    expect(resolveResponseType({ 'audio/*': 'blob', '*/*': 'text' }, 'video/mp4')).toBe('text')
-    expect(resolveResponseType({ 'audio/*': 'blob', '*/*': 'text' }, 'audio/mpeg; codecs=mp3')).toBe('blob')
-  })
+  test.each(['application/json', 'application/problem+json', 'text/json', 'application/vnd.api+json; charset=utf-8'])(
+    'decodes a %s body as JSON',
+    async (contentType) => {
+      expect((await call(answer('{"ok":true}', { 'content-type': contentType }))).data).toStrictEqual({ ok: true })
+    },
+  )
 
-  test('decodes the error body of a blob call by its content type, instead of returning a Blob', async () => {
-    using _fetch = vi
-      .spyOn(globalThis, 'fetch')
-      .mockImplementation(async () => new Response('{"message":"gone"}', { status: 404, headers: { 'content-type': 'application/json' } }))
-    const client = createClientCore({ defaultTransport, throwOnError: false })
-
-    expect((await client({ method: 'GET', url: 'https://api.test/image', responseType: 'blob' })).error).toStrictEqual({ message: 'gone' })
-  })
-
-  test('runs the response validator on a JSON body', async () => {
-    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('{"ok":true}', 'application/json'))
-    const client = createClientCore({ defaultTransport })
-
-    const result = await client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream', validator: { response: toSchema(() => 'validated') } })
-    expect(result.data).toBe('validated')
-  })
-
-  test('keeps an application/x-ndjson body a stream', async () => {
-    using _fetch = vi.spyOn(globalThis, 'fetch').mockImplementation(answer('{"a":1}\n{"a":2}\n', 'application/x-ndjson'))
-    const client = createClientCore({ defaultTransport })
-
-    expect((await client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream' })).data).toBeInstanceOf(ReadableStream)
-  })
-
-  test('decodes a text error body instead of handing the stream to the error path', async () => {
-    using _fetch = vi
-      .spyOn(globalThis, 'fetch')
-      .mockImplementation(async () => new Response('busy', { status: 503, headers: { 'content-type': 'text/plain' } }))
-    const client = createClientCore({ defaultTransport })
-
-    await expect(client({ method: 'GET', url: 'https://api.test/events', responseType: 'stream' })).rejects.toMatchObject({
-      name: 'ResponseError',
-      status: 503,
-      data: 'busy',
+  test('throws a ParseError for invalid JSON under a JSON media type, and keeps a non-JSON body as text under */*', async () => {
+    await expect(call(answer('Pet deleted', { 'content-type': 'application/json' }))).rejects.toMatchObject({
+      name: 'ParseError',
+      message: 'Invalid JSON in a application/json body',
     })
+    expect((await call(answer('Pet deleted', { 'content-type': 'application/x-unknown' }))).data).toBe('Pet deleted')
+    expect((await call(answer('{"a":1}', { 'content-type': 'application/x-unknown' }))).data).toStrictEqual({ a: 1 })
+  })
+
+  test('decodes text and binary types, and a form body', async () => {
+    expect((await call(answer('<pet/>', { 'content-type': 'application/xml' }))).data).toBe('<pet/>')
+    expect((await call(answer('hi', { 'content-type': 'text/plain' }))).data).toBe('hi')
+    const blob = (await call(answer('bytes', { 'content-type': 'image/png' }))).data
+    expect(blob).toBeInstanceOf(Blob)
+    expect((blob as Blob).type).toBe('image/png')
+    const form = await call(answer('a=1', { 'content-type': 'application/x-www-form-urlencoded' }), { mediaTypes: formMediaTypes })
+    expect((form.data as FormData).get('a')).toBe('1')
+  })
+
+  test('gives no data for 204, 205, 304, a HEAD request, and an empty body', async () => {
+    for (const status of [204, 205, 304]) expect((await call(answer(null, { 'content-type': 'application/json' }, status))).data).toBeUndefined()
+    expect((await call(answer('{"a":1}', { 'content-type': 'application/json' }), { method: 'HEAD' })).data).toBeUndefined()
+    expect((await call(answer('', { 'content-type': 'application/json' }))).data).toBeUndefined()
+    expect((await call(answer(null))).data).toBeUndefined()
+  })
+
+  test('decodes a 2xx answer without a Content-Type as the media type the call asked for, then as */*', async () => {
+    // A `Response` with a string body labels it `text/plain` itself, so these bodies are bytes.
+    const bytes = (text: string) => new TextEncoder().encode(text)
+    expect((await call(answer(bytes('{"a":1}')))).data).toStrictEqual({ a: 1 })
+    expect((await call(answer(bytes('plain')))).data).toBe('plain')
+    expect((await call(answer(bytes('a')), { contentType: { response: 'image/png' } })).data).toBeInstanceOf(Blob)
+    expect((await call(answer(bytes('data: 1\n\n')), { contentType: { response: 'text/event-stream' }, mediaTypes: streamMediaTypes })).data).toBeInstanceOf(
+      ReadableStream,
+    )
+    // An error answer without a Content-Type is not read as the success type.
+    expect((await call(answer(bytes('{"code":1}'), {}, 500), { contentType: { response: 'image/png' } })).error).toStrictEqual({ code: 1 })
+  })
+
+  test('reads a 2xx body as parseAs says, and still decodes an error body by its media type', async () => {
+    const json = () => answer('{"a":1}', { 'content-type': 'application/json' })
+    expect((await call(json(), { parseAs: 'text' })).data).toBe('{"a":1}')
+    expect((await call(json(), { parseAs: 'blob' })).data).toBeInstanceOf(Blob)
+    expect((await call(json(), { parseAs: 'arrayBuffer' })).data).toBeInstanceOf(ArrayBuffer)
+    expect((await call(json(), { parseAs: 'stream' })).data).toBeInstanceOf(ReadableStream)
+    expect((await call(answer('{"a":1}', { 'content-type': 'text/plain' }), { parseAs: 'json' })).data).toStrictEqual({ a: 1 })
+    expect((await call(answer('{"message":"gone"}', { 'content-type': 'application/json' }, 404), { parseAs: 'blob' })).error).toStrictEqual({
+      message: 'gone',
+    })
+  })
+
+  test('reads a parseAs json body with the registered application/json handler', async () => {
+    const lenient: MediaTypes = { 'application/json': { decode: async (response) => ({ lenient: await response.text() }) } }
+    const result = await call(answer('not json', { 'content-type': 'text/plain' }), { parseAs: 'json', mediaTypes: lenient })
+    expect(result.data).toStrictEqual({ lenient: 'not json' })
+  })
+
+  test('marks the request as streamed for parseAs stream and for an Accept a stream media type reads', async () => {
+    const { client, calls } = createClient()
+    client.setConfig({ mediaTypes: streamMediaTypes })
+    await client({ method: 'GET', url: '/a' })
+    await client({ method: 'GET', url: '/b', parseAs: 'stream' })
+    await client({ method: 'GET', url: '/c', contentType: { response: 'text/event-stream' } })
+    expect(calls.map((request) => request.stream)).toStrictEqual([false, true, true])
+  })
+
+  test('merges a per-call media type over the client-level one', async () => {
+    const transport = answer('<pet/>', { 'content-type': 'application/xml' })
+    const client = createClientCore<string, string>({ defaultTransport: transport, mediaTypes: { 'application/xml': { decode: async () => 'client' } } })
+    expect((await client({ method: 'GET', url: '/pet' })).data).toBe('client')
+    const perCall = await client({
+      method: 'GET',
+      url: '/pet',
+      mediaTypes: { 'application/xml': { decode: async (response) => `call:${await response.text()}` } },
+    })
+    expect(perCall.data).toBe('call:<pet/>')
+  })
+
+  test('hands decode the full Content-Type and the status', async () => {
+    const decode = vi.fn(async (_response: Response, _context: MediaTypeContext) => 'decoded')
+    await call(answer('x', { 'content-type': 'application/xml; charset=utf-8' }, 201), { mediaTypes: { 'application/xml': { decode } } })
+    expect(decode.mock.calls[0]?.[1]).toMatchObject({ contentType: 'application/xml; charset=utf-8', status: 201 })
+  })
+
+  test('keeps a stream body a raw stream on a regular call, without validating it', async () => {
+    const response = vi.fn(() => 'validated')
+    const result = await call(answer('{"a":1}\n', { 'content-type': 'application/x-ndjson' }), {
+      mediaTypes: streamMediaTypes,
+      validator: { response: toSchema(response) },
+    })
+    expect(result.data).toBeInstanceOf(ReadableStream)
+    expect(response).not.toHaveBeenCalled()
+  })
+
+  test('decodes a text error body of a stream media type whole', async () => {
+    const client = createClientCore<string, string>({
+      defaultTransport: answer('busy', { 'content-type': 'text/event-stream' }, 503),
+      mediaTypes: streamMediaTypes,
+    })
+    await expect(client.stream({ method: 'GET', url: '/events' })).rejects.toMatchObject({ name: 'ResponseError', status: 503, data: 'busy' })
+  })
+})
+
+describe('client.stream', () => {
+  const sse =
+    (body: string, status = 200): Transport<string, string> =>
+    async () =>
+      new Response(body, { status, headers: { 'content-type': 'text/event-stream' } })
+  const streamClient = (transport: Transport<string, string>) => createClientCore<string, string>({ defaultTransport: transport, mediaTypes: streamMediaTypes })
+  async function collect(items: AsyncIterable<unknown>) {
+    const values: Array<unknown> = []
+    for await (const item of items) values.push(item)
+    return values
+  }
+
+  test('reads Server-Sent Events, validates each payload with eventShape data, and keeps the last event ID', async () => {
+    const response = vi.fn((value: unknown) => ({ checked: value }))
+    const stream = await streamClient(sse('id: 1\ndata: {"a":1}\n\nid: 2\ndata: {"a":2}\n\n')).stream({
+      method: 'GET',
+      url: '/events',
+      eventShape: 'data',
+      validator: { response: toSchema(response) },
+    })
+    expect(await collect(stream)).toStrictEqual([
+      { data: { checked: { a: 1 } }, event: 'message', id: '1' },
+      { data: { checked: { a: 2 } }, event: 'message', id: '2' },
+    ])
+    expect(stream.lastEventId).toBe('2')
+    expect(stream.data).toBe(stream.stream)
+  })
+
+  test('validates the whole event with eventShape event, after transform', async () => {
+    const stream = await streamClient(sse('event: ping\ndata: 1\n\n')).stream({
+      method: 'GET',
+      url: '/events',
+      eventShape: 'event',
+      transform: (event) => ({ ...event, event: event.event.toUpperCase() }),
+      validator: { response: toSchema((value) => ({ ...(value as object), seen: true })) },
+    })
+    expect(await collect(stream)).toStrictEqual([{ data: 1, event: 'PING', seen: true }])
+  })
+
+  test('stops at the terminator and applies maxEventSize', async () => {
+    const stream = await streamClient(sse('data: 1\n\ndata: [DONE]\n\ndata: 2\n\n')).stream({ method: 'GET', url: '/events', terminator: '[DONE]' })
+    expect(await collect(stream)).toStrictEqual([{ data: 1, event: 'message' }])
+    const large = await streamClient(sse('data: 123456\n\n')).stream({ method: 'GET', url: '/events', maxEventSize: 4 })
+    await expect(collect(large)).rejects.toBeInstanceOf(RangeError)
+  })
+
+  test('reads JSON Lines and validates each line whole', async () => {
+    const transport = async () => new Response('{"a":1}\n{"a":2}\n', { headers: { 'content-type': 'application/jsonl' } })
+    const stream = await streamClient(transport).stream({ method: 'GET', url: '/logs', validator: { response: toSchema((value) => ({ line: value })) } })
+    expect(await collect(stream)).toStrictEqual([{ line: { a: 1 } }, { line: { a: 2 } }])
+  })
+
+  test('throws a TypeError with the body as cause for a 2xx answer whose media type cannot stream, and streams nothing for an empty one', async () => {
+    const json = async () => new Response('{"ok":true}', { headers: { 'content-type': 'application/json' } })
+    await expect(streamClient(json).stream({ method: 'GET', url: '/events' })).rejects.toMatchObject({
+      name: 'TypeError',
+      message: 'Expected a streamed body, got application/json',
+      cause: { ok: true },
+    })
+    const empty = await streamClient(async () => new Response(null, { status: 204 })).stream({ method: 'GET', url: '/events' })
+    expect(await collect(empty)).toStrictEqual([])
+  })
+
+  test('returns the error of a failed call made with throwOnError false and streams nothing', async () => {
+    const failed = async () => new Response('{"code":"busy"}', { status: 503, headers: { 'content-type': 'application/json' } })
+    const result = await streamClient(failed).stream({ method: 'GET', url: '/events', throwOnError: false })
+    expect(result).toMatchObject({ status: 503, error: { code: 'busy' }, data: undefined })
+    expect(await collect(result)).toStrictEqual([])
+  })
+
+  test('ends the loop with the abort reason once the signal is aborted, and cancels the reader on break', async () => {
+    const controller = new AbortController()
+    const stream = await streamClient(sse('data: 1\n\ndata: 2\n\n')).stream({ method: 'GET', url: '/events', signal: controller.signal })
+    const seen: Array<unknown> = []
+    const reason = new Error('stop')
+    await expect(
+      (async () => {
+        for await (const event of stream) {
+          seen.push(event)
+          controller.abort(reason)
+        }
+      })(),
+    ).rejects.toBe(reason)
+    expect(seen).toHaveLength(1)
+
+    const cancel = vi.fn()
+    const body = new ReadableStream<Uint8Array>({
+      start: (source) => source.enqueue(new TextEncoder().encode('data: 1\n\ndata: 2\n\n')),
+      cancel,
+    })
+    const broken = await streamClient(async () => new Response(body, { headers: { 'content-type': 'text/event-stream' } })).stream({
+      method: 'GET',
+      url: '/events',
+    })
+    for await (const _event of broken) break
+    expect(cancel).toHaveBeenCalled()
+  })
+
+  test('passes the stream through response interceptors as the raw body', async () => {
+    const client = streamClient(sse('data: 1\n\n'))
+    const seen: Array<unknown> = []
+    client.interceptors.response.use((response) => void seen.push(response.data))
+    const stream = await client.stream({ method: 'GET', url: '/events' })
+    expect(seen[0]).toBeInstanceOf(ReadableStream)
+    expect(await collect(stream)).toHaveLength(1)
+  })
+})
+
+describe('isResponseError', () => {
+  type Responses = { '200': { id: number }; '404': { message: string }; '4XX': { code: string }; default: { fault: true } }
+
+  test('narrows data by status, a range key, and default', async () => {
+    const { client } = createClient({ data: { message: 'gone' }, status: 404 })
+    const error = await client({ method: 'GET', url: '/pet' }).catch((caught: unknown) => caught)
+    expect(isResponseError<Responses>(error)).toBe(true)
+    if (!isResponseError<Responses>(error)) return
+    if (error.status === 404) {
+      const message: string = error.data.message
+      expect(message).toBe('gone')
+    }
+    if (error.status === 418) {
+      const code: string = error.data.code
+      expect(code).toBeUndefined()
+    }
+    expect(isResponseError<Responses>(new Error('network'))).toBe(false)
   })
 })
 
@@ -1180,22 +1443,7 @@ describe('params validators', () => {
 })
 
 describe('content type negotiation', () => {
-  function transportWith(result: FakeResult & { contentType?: string }) {
-    const calls: Array<ResolvedRequest> = []
-    const headers = new Headers(result.contentType ? { 'Content-Type': result.contentType } : {})
-    const transport: Transport<string, string> = async (request) => {
-      calls.push(request)
-      return {
-        data: result.data ?? { ok: true },
-        status: result.status ?? 200,
-        statusText: result.statusText ?? 'OK',
-        headers,
-        request: 'REQ',
-        response: 'RES',
-      }
-    }
-    return { transport, calls }
-  }
+  const transportWith = (result: FakeResult) => fakeTransport(result)
 
   test('object-form contentType sets the request Content-Type and the Accept header', async () => {
     const { transport, calls } = transportWith({})
@@ -1228,14 +1476,14 @@ describe('content type negotiation', () => {
   })
 
   test('carries the negotiated content type onto result.contentType, charset stripped', async () => {
-    const { transport } = transportWith({ data: { id: 1 }, contentType: 'application/xml; charset=utf-8' })
+    const { transport } = transportWith({ data: { id: 1 }, contentType: 'application/json; charset=utf-8' })
     const client = createClientCore<string, string>({ defaultTransport: transport })
-    const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<string, string>
-    expect(result.contentType).toBe('application/xml')
+    const result = await client({ method: 'GET', url: '/pet/1' })
+    expect(result.contentType).toBe('application/json')
     expect(result.data).toStrictEqual({ id: 1 })
   })
 
-  test.each([200, 422])('validates a codec-produced undefined value for status %s', async (status) => {
+  test.each([200, 422])('validates a decoded undefined value for status %s', async (status) => {
     const { transport } = transportWith({ data: 'raw', status, contentType: 'application/xml' })
     const client = createClientCore<string, string>({ defaultTransport: transport })
     const response = vi.fn(() => 'success')
@@ -1243,7 +1491,7 @@ describe('content type negotiation', () => {
     const result = await client({
       url: '/pet',
       throwOnError: false,
-      codecs: { 'application/xml': { deserialize: async () => undefined } },
+      mediaTypes: { 'application/xml': { decode: async () => undefined } },
       validator: { response: toSchema(response), error: toSchema(error) },
     })
     const selected = status === 200 ? response : error
@@ -1256,7 +1504,7 @@ describe('content type negotiation', () => {
     })
   })
 
-  test.each([false, true])('keeps the selected validation recovery when a codec changes config (per-call: %s)', async (perCall) => {
+  test.each([false, true])('keeps the selected validation recovery when a media type changes config (per-call: %s)', async (perCall) => {
     const { transport } = transportWith({ contentType: 'application/xml' })
     const initial = vi.fn(() => ({ value: 'initial' }))
     const override = vi.fn(() => ({ value: 'override' }))
@@ -1266,12 +1514,12 @@ describe('content type negotiation', () => {
       url: '/pet',
       onValidationError: perCall ? override : undefined,
       validator: { response: toFailingSchema() },
-      codecs: {
+      mediaTypes: {
         'application/xml': {
-          async deserialize(value) {
+          async decode(response) {
             client.setConfig({ onValidationError: replacement })
             await Promise.resolve()
-            return value
+            return response.text()
           },
         },
       },
@@ -1283,14 +1531,14 @@ describe('content type negotiation', () => {
     expect(replacement).not.toHaveBeenCalled()
   })
 
-  test.each([false, true])('keeps throwOnError=%s when a codec changes the client default', async (throwOnError) => {
+  test.each([false, true])('keeps throwOnError=%s when a media type changes the client default', async (throwOnError) => {
     const { transport } = transportWith({ status: 422, contentType: 'application/xml' })
     const client = createClientCore<string, string>({ defaultTransport: transport, throwOnError })
     const result = client({
       url: '/pet',
-      codecs: {
+      mediaTypes: {
         'application/xml': {
-          async deserialize() {
+          async decode() {
             client.setConfig({ throwOnError: !throwOnError })
             await Promise.resolve()
             return 'decoded error'
@@ -1306,97 +1554,56 @@ describe('content type negotiation', () => {
     await expect(result).resolves.toMatchObject({ data: undefined, error: 'decoded error', status: 422 })
   })
 
-  test('runs the matching deserializer before validation and feeds result.data', async () => {
+  test('runs the matching decode before validation and feeds result.data', async () => {
     const { transport } = transportWith({ data: '<pet><id>1</id></pet>', contentType: 'application/xml' })
-    const parseXml = vi.fn(() => ({ id: 1 }))
-    const client = createClientCore<string, string>({ defaultTransport: transport, codecs: { 'application/xml': { deserialize: parseXml } } })
-    const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<string, string>
-    expect(parseXml).toHaveBeenCalledWith('<pet><id>1</id></pet>', 'application/xml')
-    expect(result.data).toStrictEqual({ id: 1 })
+    const parseXml = vi.fn(async (response: Response) => ({ id: (await response.text()).length }))
+    const client = createClientCore<string, string>({ defaultTransport: transport, mediaTypes: { 'application/xml': { decode: parseXml } } })
+    const result = await client({ method: 'GET', url: '/pet/1' })
+    expect(result.data).toStrictEqual({ id: 21 })
     expect(result.contentType).toBe('application/xml')
   })
 
-  test('matches a per-call deserializer over the client-level one, charset stripped', async () => {
-    const { transport } = transportWith({ data: 'raw', contentType: 'application/xml; charset=utf-8' })
-    const clientLevel = vi.fn(() => ({ from: 'client' }))
-    const perCall = vi.fn(() => ({ from: 'call' }))
-    const client = createClientCore<string, string>({ defaultTransport: transport, codecs: { 'application/xml': { deserialize: clientLevel } } })
-    const result = (await client({ method: 'GET', url: '/pet/1', codecs: { 'application/xml': { deserialize: perCall } } })) as CallResult<string, string>
-    expect(clientLevel).not.toHaveBeenCalled()
-    expect(perCall).toHaveBeenCalledTimes(1)
-    expect(result.data).toStrictEqual({ from: 'call' })
-  })
-
-  test('uses a per-content-type bodySerializer for the request body', async () => {
+  test('encodes the request body with the media type of its content type', async () => {
     const { transport, calls } = transportWith({})
-    const toXml = vi.fn(() => '<pet/>')
-    const client = createClientCore<string, string>({ defaultTransport: transport, codecs: { 'application/xml': { serialize: toXml } } })
-    await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, contentType: 'application/xml' })
-    expect(toXml).toHaveBeenCalledWith({ name: 'odie' }, 'application/xml')
+    const toXml = vi.fn((_body: unknown, _context: MediaTypeContext) => '<pet/>')
+    const client = createClientCore<string, string>({ defaultTransport: transport, mediaTypes: { 'application/xml': { encode: toXml } } })
+    await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, contentType: 'application/xml; charset=utf-8' })
+    expect(toXml.mock.calls[0]?.[0]).toStrictEqual({ name: 'odie' })
+    expect(toXml.mock.calls[0]?.[1]).toMatchObject({ contentType: 'application/xml; charset=utf-8' })
     expect(calls[0]?.body).toBe('<pet/>')
-    expect(calls[0]?.headers['Content-Type']).toBe('application/xml')
+    expect(calls[0]?.headers['Content-Type']).toBe('application/xml; charset=utf-8')
   })
 
   test('carries the negotiated content type onto a thrown ResponseError', async () => {
-    const { transport } = transportWith({ data: { message: 'bad' }, status: 422, contentType: 'application/xml' })
+    const { transport } = transportWith({ data: '<error/>', status: 422, contentType: 'application/xml' })
     const client = createClientCore<string, string>({ defaultTransport: transport })
-    await expect(client({ method: 'POST', url: '/pet' })).rejects.toMatchObject({ status: 422, contentType: 'application/xml' })
+    await expect(client({ method: 'POST', url: '/pet' })).rejects.toMatchObject({ status: 422, contentType: 'application/xml', data: '<error/>' })
   })
 })
 
-describe('defaultTransport binary responses', () => {
+describe('defaultTransport', () => {
   const bytes = new Uint8Array([0xff, 0xfb, 0x90, 0x00])
-  const responseTypes = { 'audio/mpeg': 'blob' as const, 'text/event-stream': 'stream' as const, 'application/vnd.custom': 'blob' as const }
 
-  async function send(contentType: string, responseType: ResolvedRequest['responseType'] = responseTypes) {
+  test('returns the Response with the Request it sent', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => new Response(bytes, { status: 200, headers: { 'Content-Type': contentType } })),
+      vi.fn(async () => new Response(bytes, { status: 200, headers: { 'Content-Type': 'audio/mpeg' } })),
     )
-    return defaultTransport({ url: 'https://example.test/speech', method: 'POST', headers: {}, responseType })
-  }
-
-  test('returns a Blob for a mapped binary content type the media heuristic does not know', async () => {
-    const result = await send('application/vnd.custom')
-    expect(result.data).toBeInstanceOf(Blob)
-    expect(new Uint8Array(await (result.data as Blob).arrayBuffer())).toEqual(bytes)
-    expect(result.contentType).toBe('application/vnd.custom')
+    const result = await defaultTransport({ url: 'https://example.test/speech', method: 'POST', headers: {}, body: 'hi' })
+    expect(result.webResponse).toBe(result.response)
+    expect(result.request).toBeInstanceOf(Request)
+    expect(new Uint8Array(await result.webResponse.arrayBuffer())).toEqual(bytes)
   })
 
-  test('returns a Blob for audio/mpeg when the response also declares an event stream', async () => {
-    const result = await send('audio/mpeg; charset=binary')
-    expect(result.data).toBeInstanceOf(Blob)
-    expect(result.data).not.toBeTypeOf('string')
-    expect(new Uint8Array(await (result.data as Blob).arrayBuffer())).toEqual(bytes)
-  })
-
-  test('matches a type wildcard in the responseType map', async () => {
-    const result = await send('audio/mpeg', { 'audio/*': 'blob' })
-    expect(result.data).toBeInstanceOf(Blob)
-  })
-
-  test('keeps an event-stream body as a stream when it shares the response with audio', async () => {
-    const result = await send('text/event-stream')
-    expect(result.data).toBeInstanceOf(ReadableStream)
-  })
-
-  test('a string responseType overrides the map', async () => {
-    const result = await send('audio/mpeg', 'text')
-    expect(result.data).toBeTypeOf('string')
-  })
-
-  test('an exact JSON entry wins over a catch-all blob entry', async () => {
+  test('decodes a binary body to a Blob through the client, and an unknown binary type with parseAs blob', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () => new Response(JSON.stringify({ delta: 'hi' }), { status: 200, headers: { 'Content-Type': 'application/json' } })),
+      vi.fn(async () => new Response(bytes, { status: 200, headers: { 'Content-Type': 'application/vnd.custom' } })),
     )
-    const result = await defaultTransport({
-      url: 'https://example.test/speech',
-      method: 'POST',
-      headers: {},
-      responseType: { 'application/json': 'json', '*/*': 'blob' },
-    })
-    expect(result.data).toStrictEqual({ delta: 'hi' })
+    const client = createClientCore({ defaultTransport })
+    const blob = (await client({ method: 'GET', url: 'https://example.test/file', parseAs: 'blob' })).data
+    expect(blob).toBeInstanceOf(Blob)
+    expect(new Uint8Array(await (blob as Blob).arrayBuffer())).toEqual(bytes)
   })
 
   test('passes the Next.js next option in the fetch init, which Request drops', async () => {
@@ -1404,35 +1611,6 @@ describe('defaultTransport binary responses', () => {
     vi.stubGlobal('fetch', fetch)
     await defaultTransport({ url: 'https://example.test/pet', method: 'GET', headers: {}, options: { next: { revalidate: 60 } } })
     expect(fetch.mock.calls[0]?.[1]).toStrictEqual({ next: { revalidate: 60 } })
-  })
-
-  test('keeps the bytes of a failed blob call with an unknown content type, and decodes a JSON one', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => new Response(bytes, { status: 500, headers: { 'Content-Type': 'application/vnd.custom' } })),
-    )
-    const raw = await defaultTransport({ url: 'https://example.test/speech', method: 'GET', headers: {}, responseType: 'blob' })
-    expect(raw.data).toBeInstanceOf(Blob)
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => new Response('{"message":"gone"}', { status: 404, headers: { 'Content-Type': 'application/json' } })),
-    )
-    const json = await defaultTransport({ url: 'https://example.test/speech', method: 'GET', headers: {}, responseType: 'blob' })
-    expect(json.data).toStrictEqual({ message: 'gone' })
-  })
-
-  test('still parses JSON that the map leaves unset', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => new Response(JSON.stringify({ delta: 'hi' }), { status: 200, headers: { 'Content-Type': 'application/json' } })),
-    )
-    const result = await defaultTransport({
-      url: 'https://example.test/speech',
-      method: 'POST',
-      headers: {},
-      responseType: { 'application/vnd.custom': 'blob' },
-    })
-    expect(result.data).toStrictEqual({ delta: 'hi' })
   })
 })
 
@@ -1452,11 +1630,11 @@ describe('a transport that returns a Response', () => {
     const empty = createClientCore({ defaultTransport: respondWith(new Response(null, { status: 204 })) })
 
     expect(await ok({ method: 'GET', url: '/pet/1' })).toMatchObject({ data: { id: 1 }, status: 200, contentType: 'application/json' })
-    expect(await failed({ method: 'GET', url: '/pet/1', responseType: 'blob' })).toMatchObject({ error: { message: 'gone' }, status: 404 })
+    expect(await failed({ method: 'GET', url: '/pet/1', parseAs: 'blob' })).toMatchObject({ error: { message: 'gone' }, status: 404 })
     expect(await empty({ method: 'DELETE', url: '/pet/1' })).toMatchObject({ data: undefined, status: 204 })
   })
 
-  test('carries a Request built from the resolved request, and response interceptors see the parsed result', async () => {
+  test('carries a Request built from the resolved request, and response interceptors see the decoded result', async () => {
     const client = createClientCore({ defaultTransport: respondWith(new Response('{"id":1}', { headers: { 'Content-Type': 'application/json' } })) })
     const seen: Array<unknown> = []
     client.interceptors.response.use((result) => (seen.push(result.data), result))
@@ -1499,12 +1677,35 @@ describe('a transport that returns a Response', () => {
 
     expect(await client({ method: 'GET', url: '/pet/1' })).toMatchObject({ data: { id: 1 }, status: 200, contentType: 'application/json' })
   })
+})
 
-  test('readResponse keeps the request it is given and the response as is', async () => {
-    const response = new Response('ok', { headers: { 'Content-Type': 'text/plain' } })
-    const result = await readResponse(response, { request: 'REQ' })
-    expect(result).toMatchObject({ data: 'ok', request: 'REQ' })
-    expect(result.response).toBe(response)
+describe('createLazyClient', () => {
+  test('creates the client on first use, with the config set before it', async () => {
+    const { transport, calls } = fakeTransport()
+    const create = vi.fn((config: ClientConfig<string, string>) => createClientCore<string, string>({ defaultTransport: transport, ...config }))
+    const client = createLazyClient(create)
+
+    client.setConfig({ baseURL: 'https://api.test' })
+    client.setConfig({ headers: { 'X-A': '1' } })
+    expect(client.getConfig()).toMatchObject({ baseURL: 'https://api.test', headers: { 'X-A': '1' } })
+    expect(create).not.toHaveBeenCalled()
+
+    await client({ method: 'GET', url: '/pet' })
+    expect(create).toHaveBeenCalledOnce()
+    expect(calls[0]).toMatchObject({ url: 'https://api.test/pet', headers: { 'X-A': '1' } })
+
+    client.interceptors.request.use((request) => ({ ...request, url: `${request.url}?traced` }))
+    await client({ method: 'GET', url: '/pet' })
+    expect(calls[1]?.url).toBe('https://api.test/pet?traced')
+    expect(create).toHaveBeenCalledOnce()
+  })
+
+  test('creates nothing when the module that holds it is imported', async () => {
+    const fetch = vi.fn()
+    vi.stubGlobal('fetch', fetch)
+    const module = await import('./client.ts')
+    expect(typeof module.client).toBe('function')
+    expect(fetch).not.toHaveBeenCalled()
   })
 })
 
@@ -1583,8 +1784,15 @@ describe('getUrl', () => {
 
 describe('unwrapResult', () => {
   test('narrows a success result to its data', async () => {
-    const result = await unwrapResult(Promise.resolve({ data: { id: 1 }, error: undefined }), undefined)
+    const result = await unwrapResult(Promise.resolve({ data: { id: 1 }, error: undefined }), true)
     expect(result).toStrictEqual({ id: 1 })
+    expect(await unwrapResult(Promise.resolve({ data: { id: 1 }, error: undefined }), false)).toStrictEqual({ data: { id: 1 }, error: undefined })
+  })
+
+  test('resolveThrowOnError keeps the call value and falls back to the generated default', () => {
+    expect(resolveThrowOnError(undefined, true)).toBe(true)
+    expect(resolveThrowOnError(undefined, false)).toBe(false)
+    expect(resolveThrowOnError(false, true)).toBe(false)
   })
 })
 
@@ -1704,6 +1912,41 @@ describe('resolveAuth', () => {
       query: {},
     })
     expect(headers).toStrictEqual({ 'X-API-Key': 'secret' })
+  })
+
+  test('sends every scheme of a requirement that needs several, and skips one with a scheme that has no token', async () => {
+    const headers: Record<string, string> = {}
+    const query: Record<string, unknown> = {}
+    const tokens: Record<string, string> = { 'X-API-Key': 'key', session: 'sid' }
+    await resolveAuth({
+      security: [
+        [
+          { type: 'apiKey', name: 'X-API-Key', in: 'header' },
+          { type: 'http', scheme: 'bearer' },
+        ],
+        [
+          { type: 'apiKey', name: 'X-API-Key', in: 'header' },
+          { type: 'apiKey', name: 'session', in: 'query' },
+        ],
+      ],
+      // An async resolver, as an app that refreshes its token would pass.
+      auth: async (auth) => (auth.name ? tokens[auth.name] : undefined),
+      headers,
+      query,
+    })
+    expect(headers).toStrictEqual({ 'X-API-Key': 'key' })
+    expect(query).toStrictEqual({ session: 'sid' })
+  })
+
+  test('reads an async auth callback from the client for each call', async () => {
+    const { transport, calls } = fakeTransport()
+    let token = 'first'
+    const client = createClientCore<string, string>({ defaultTransport: transport, auth: async () => token })
+    const security: Array<Auth> = [{ type: 'http', scheme: 'bearer' }]
+    await client({ method: 'GET', url: '/pet', security })
+    token = 'refreshed'
+    await client({ method: 'GET', url: '/pet', security })
+    expect(calls.map((request) => request.headers.Authorization)).toStrictEqual(['Bearer first', 'Bearer refreshed'])
   })
 
   test('does nothing without an auth resolver', async () => {

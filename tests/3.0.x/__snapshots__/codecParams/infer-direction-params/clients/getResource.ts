@@ -5,15 +5,15 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { GetResourceOptionsSchemaType, GetResourceResponsesSchemaType } from '../zod/getResourceSchema'
-import { client, withUnwrap } from '../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { toHeadersStandardSchema } from '../.kubb/standardSchema'
 import { getResourceResponseSchema, getResourcePathSchema, getResourceQuerySchema, getResourceHeadersSchema } from '../zod/getResourceSchema'
 
 /**
- * {@link /resources/:resource}
+ * `GET /resources/{resource}`
  */
 export function getResource<ThrowOnError extends boolean = true>(options: Options<GetResourceOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(request({ method: 'GET', url: '/resources/{resource}', ...config, validator: { path: getResourcePathSchema, query: getResourceQuerySchema, headers: toHeadersStandardSchema(getResourceHeadersSchema, getResourceHeadersSchema.shape), response: getResourceResponseSchema, ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>>)
+  return withUnwrap(apiClient<GetResourceResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/resources/{resource}', ...config, validator: { path: getResourcePathSchema, query: getResourceQuerySchema, headers: toHeadersStandardSchema(getResourceHeadersSchema, getResourceHeadersSchema.shape), response: getResourceResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

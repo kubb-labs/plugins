@@ -8,21 +8,21 @@ import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from '../../model
 import { client } from '../../../client'
 
 /**
+ * `GET /pet/findByTags`
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
  * @summary Finds Pets by tags
- * {@link /pet/findByTags}
  */
 export function findPetsByTags<ThrowOnError extends boolean = true>(
   options: Options<FindPetsByTagsOptions, ThrowOnError> = {},
 ): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({
+  return apiClient<FindPetsByTagsResponses, ThrowOnError>({
     method: 'GET',
     url: '/pet/findByTags',
     security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
     styles: { query: { tags: { explode: true } } },
     ...config,
     throwOnError: config.throwOnError ?? true,
-  }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
+  })
 }

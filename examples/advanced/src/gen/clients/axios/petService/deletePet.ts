@@ -1,11 +1,11 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
-import { client, withUnwrap } from '../../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 import { deletePetResponseSchema, deletePetStatus400Schema } from '../../../zod/pet/deletePetSchema'
 
 /**
+ * `DELETE /pet/{petId}:search`
  * @description delete a pet
  * @summary Deletes a pet
- * {@link /pet/:petId:search}
  */
 export function deletePet<ThrowOnError extends boolean = true>(
   options: Options<
@@ -29,23 +29,21 @@ export function deletePet<ThrowOnError extends boolean = true>(
     ThrowOnError
   >
 > {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({
+    apiClient<
+      {
+        '400': unknown
+      },
+      ThrowOnError
+    >({
       method: 'DELETE',
       url: '/pet/{petId}:search',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       ...config,
       validator: { response: deletePetResponseSchema, error: { 400: deletePetStatus400Schema }, ...config.validator },
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<
-      RequestResult<
-        {
-          '400': unknown
-        },
-        ThrowOnError
-      >
-    >,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

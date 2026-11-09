@@ -16,7 +16,7 @@ type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
 export function findPetsByStatusQueryOptions(
   { query }: FindPetsByStatusOptions = {},
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   return {
     fetcher: async () => {
@@ -26,15 +26,15 @@ export function findPetsByStatusQueryOptions(
 }
 
 /**
+ * `GET /pet/findByStatus`
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
- * {@link /pet/findByStatus}
  */
 export function useFindPetsByStatus(
   { query }: FindPetsByStatusOptions = {},
   options: {
     query?: SWRConfiguration<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>>
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
   } = {},

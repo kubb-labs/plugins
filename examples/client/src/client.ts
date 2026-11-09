@@ -40,6 +40,14 @@ export type RequestConfig = {
    * Serialization hints for query and header values, generated for reference. This skeleton ignores them.
    */
   styles?: unknown
+  /**
+   * How to read a success body, set for binary downloads (`'blob'`). This skeleton reads JSON.
+   */
+  parseAs?: 'json' | 'text' | 'blob' | 'arrayBuffer' | 'stream'
+  /**
+   * What a Server-Sent Events call's validator checks per event. Generated for reference on stream calls.
+   */
+  eventShape?: 'event' | 'data'
   signal?: AbortSignal
   throwOnError?: boolean
   /**
@@ -68,9 +76,17 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true> = Thr
 export type ServerSentEvent<TData = unknown> = { data: TData; event: string; id?: string; retry?: number }
 
 /**
- * What a server-sent event operation resolves to: the parsed events and the native response. `TEvent` is the full event type.
+ * An event typed by name, for a stream whose document types each event with its own `event` and `data`.
  */
-export type EventStreamResult<TEvent = ServerSentEvent> = { stream: AsyncGenerator<TEvent>; response: Response }
+export type TypedEvent<TEvent> = TEvent & { id?: string; retry?: number }
+
+/**
+ * What `client.stream` resolves to: the parsed events and the native response. `TEvent` is the full event type.
+ */
+export type StreamResult<TResponses, _ThrowOnError extends boolean = true, TEvent = ServerSentEvent<SuccessOf<TResponses>>> = {
+  stream: AsyncGenerator<TEvent>
+  response: Response
+}
 
 /**
  * What a failed query hook rejects with. Only the query plugins import it.
@@ -113,7 +129,7 @@ export function setAuth(resolve: GetToken) {
 /**
  * The default transport: a plain `fetch` call. Replace this function to change how requests are sent.
  */
-export async function client(config: RequestConfig): Promise<{ data: unknown; error: unknown; response: Response }> {
+async function send(config: RequestConfig): Promise<{ data: unknown; error: unknown; response: Response }> {
   const path: Record<string, unknown> = { ...config.path }
   const url = new URL((config.baseURL ?? baseURL) + config.url.replace(/\{(\w+)\}/g, (_, key) => encodeURIComponent(String(path[key]))))
   for (const [key, value] of Object.entries(config.query ?? {})) {
@@ -147,8 +163,19 @@ export async function client(config: RequestConfig): Promise<{ data: unknown; er
 }
 
 /**
- * Backs server-sent event operations. This skeleton does not parse streams, so it throws. Implement it if you use SSE.
+ * What every generated operation calls. Each operation passes its responses record and `ThrowOnError` as type
+ * arguments, so the result is typed per operation. `stream` backs server-sent event operations; this skeleton does
+ * not parse streams, so it throws. Implement it if you use SSE.
  */
-export async function toEventStream<TEvent = ServerSentEvent>(_result: Promise<{ data: unknown; response: Response }>): Promise<EventStreamResult<TEvent>> {
-  throw new Error('toEventStream is not implemented in this client')
-}
+export const client = Object.assign(
+  <TResponses, ThrowOnError extends boolean = true>(config: RequestConfig): Promise<RequestResult<TResponses, ThrowOnError>> =>
+    // The skeleton trusts the server to answer with the documented body; validate here if you need to.
+    send(config) as Promise<RequestResult<TResponses, ThrowOnError>>,
+  {
+    stream: async <TResponses, ThrowOnError extends boolean = true, TEvent = ServerSentEvent<SuccessOf<TResponses>>>(
+      _config: RequestConfig,
+    ): Promise<StreamResult<TResponses, ThrowOnError, TEvent>> => {
+      throw new Error('client.stream is not implemented in this client')
+    },
+  },
+)

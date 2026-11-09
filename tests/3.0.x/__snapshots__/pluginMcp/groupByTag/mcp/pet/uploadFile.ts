@@ -8,8 +8,8 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { uploadFile } from '../../clients/uploadFile'
 
 /**
+ * `POST /pet/{petId}/uploadImage`
  * @summary uploads an image
- * {@link /pet/:petId/uploadImage}
  */
 export async function uploadFileHandler({ path, query, body }: UploadFileOptions, ctx: ServerContext): Promise<CallToolResult> {
   const res = await uploadFile({ path, query, body, signal: ctx.mcpReq.signal, throwOnError: true })

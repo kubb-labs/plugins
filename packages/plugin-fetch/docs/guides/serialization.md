@@ -1,6 +1,6 @@
 # Configure serialization
 
-The generated client encodes parameters using OpenAPI `style` and `explode`, serializes request bodies by content type, and decodes responses by media type. Each generated operation carries its parameter styles and content types, so most requests need no extra setup.
+The generated client encodes parameters by their OpenAPI `style` and `explode`, and encodes and decodes bodies by their media type. Each generated operation carries its parameter styles and content types, so most requests need no extra setup.
 
 ## Parameter styles
 
@@ -51,7 +51,7 @@ Header values are sent as-is, and cookie values are URL-encoded into a single `C
 
 ## Override parameter serialization
 
-To replace these defaults, override `serializer.query`, `.body`, or `.path` on the client. Omitted functions retain their defaults:
+To replace these defaults, override `serializer.query` or `serializer.path` on the client. Omitted functions keep their defaults:
 
 ```typescript
 import { client } from './gen/.kubb/client'
@@ -64,101 +64,91 @@ client.setConfig({
 })
 ```
 
-A serializer set this way runs for every call, but you can pass `serializer` on a single call to
-override only that request.
+A serializer set this way runs for every call. Pass `serializer` on a single call to override only that request.
+
+## Built-in media types
+
+| Keys                                                                                     | Encodes                                           | Decodes                                    |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------ |
+| `application/json`, `application/*+json`, `text/json`                                    | JSON                                              | JSON                                       |
+| `text/*`                                                                                 | a string                                          | text                                       |
+| `multipart/form-data`, `application/x-www-form-urlencoded`                               | `FormData` or `URLSearchParams` from an object    | `FormData`                                 |
+| `application/octet-stream`, `application/pdf`, `image/*`, `audio/*`, `video/*`           | a `Blob` as is                                    | `Blob`                                     |
+| `text/event-stream`, `application/jsonl`, `application/x-ndjson`, `application/json-seq` |                                                   | text, or item by item with `client.stream` |
+| `*/*`                                                                                    | JSON for objects, strings and binary bodies as is | JSON, or text when the body is not JSON    |
+
+`.kubb/client.ts` registers the form media types only when the document has a form body, and the stream media types only when it streams. They are exported as `formMediaTypes` from `.kubb/mediaTypes.ts` and `streamMediaTypes` from `.kubb/sse.ts`.
+
+A key can be a pattern. The runtime lower-cases the type, drops its parameters, and tries the exact type, then a suffix such as `application/*+json`, then a wildcard such as `text/*`, then `*/*`. Write your own keys in lower case.
 
 ## Encode request bodies
 
-The request content type decides how the body is encoded. The default serializer handles the
-common types: a plain object becomes JSON, `multipart/form-data` becomes `FormData`, and
-`application/x-www-form-urlencoded` becomes `URLSearchParams`. Binary and already-encoded bodies
-(`FormData`, `URLSearchParams`, `Blob`, `ArrayBuffer`, typed arrays, and strings) pass through
-untouched.
+When an operation declares one request content type, Kubb sets it on the generated function, so you pass only the body. For an operation that accepts more than one, set `contentType` on the call. A body without a content type is sent as `application/json`, unless it is already encoded.
 
-When an operation declares a single request content type, Kubb sets it on the generated function,
-so you pass only the body. For an operation that accepts more than one, set `contentType` on the
-call.
+Bodies that are already encoded (`FormData`, `URLSearchParams`, `Blob`, `ArrayBuffer`, typed arrays, streams, and strings) pass through every built-in media type as they are. A string under a JSON media type is JSON-encoded.
 
 > [!NOTE]
-> When the body is `FormData`, the runtime removes any `Content-Type` header so the transport sets
-> it with the multipart boundary. You do not need to set `multipart/form-data` yourself, and a
-> value you set is dropped for that request.
+> When the body is `FormData`, the runtime removes any `Content-Type` header so the transport sets it with the multipart boundary.
 
-The default serializer sends any other object as JSON, except for XML, YAML, and CSV types. For
-those, an object throws a `TypeError`, so pass the encoded body as a string or register a codec.
+An XML, YAML, or CSV media type has no built-in handler, so an object sent under one throws a `TypeError`. Pass the encoded body as a string, or register a media type.
 
-To encode a content type the default serializer does not handle, register a codec for that media
-type. `codecs` is keyed by content type. Each entry takes a `serialize` for the request body, a
-`deserialize` for the response, or both:
+## Add a media type
+
+Register a handler under its media type with `mediaTypes`. `encode` gets the body and a context with the full `contentType`, and returns what `fetch` can send. `decode` gets the `Response`, so a binary format can read bytes:
 
 ```typescript
 import { client } from './gen/.kubb/client'
-import { stringify } from 'yaml'
+import { XMLBuilder, XMLParser } from 'fast-xml-parser'
 
 client.setConfig({
-  codecs: {
-    'application/yaml': { serialize: (body) => stringify(body) },
+  mediaTypes: {
+    'application/xml': {
+      encode: (body) => new XMLBuilder().build(body),
+      decode: async (response) => new XMLParser().parse(await response.text()),
+    },
+  },
+})
+```
+
+Handlers merge per key over the built-ins, over earlier `setConfig` calls, and, when passed on a single call, over the client ones. An entry with only `decode` still encodes through the next match, such as `*/*`.
+
+A streaming format adds `stream`, which reads the 2xx body item by item. The runtime validates each item:
+
+```typescript
+client.setConfig({
+  mediaTypes: {
+    'multipart/mixed': { stream: (body, { contentType }) => readParts(body, boundaryOf(contentType)) },
   },
 })
 ```
 
 ## Decode responses
 
-The runtime reads the response `Content-Type` and decodes the body by it: JSON is parsed, text
-stays a string, and a binary type becomes a `Blob`. The negotiated media type is on the result as
-`contentType`, so a `switch (result.contentType)` narrows `data` for an operation that returns
-more than one.
+The runtime decodes each body by the response `Content-Type`. The media type is on the result as `contentType`, so a `switch (result.contentType)` narrows `data` for an operation that returns more than one.
 
-When that success response declares several content types that do not share one parser, the
-generated call sets `responseType` to a map from content type to parser, for example
-`{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. The runtime matches the response
-`Content-Type` against the map, including a `type/*` wildcard, before the media-type heuristic.
-A schema with `format: binary` is a blob even when the media type is not a well-known binary type.
+- A 2xx response without a `Content-Type` is decoded as the media type the call asked for in `contentType.response`, then as `*/*`.
+- A 204, 205, or 304 response, a `HEAD` request, and an empty body give `data: undefined`.
+- Invalid JSON under a JSON media type throws a `ParseError`. Catch it, or register a lenient `application/json` handler.
 
-To decode a media type the runtime does not handle, register a codec's `deserialize` for it.
-`deserialize` receives the raw body and the content type and returns the parsed value. It runs
-before validation, so the schema checks the parsed value:
+To skip the lookup for one call, set `parseAs` to `'json'`, `'text'`, `'blob'`, `'arrayBuffer'`, or `'stream'`. It applies to a 2xx body only. Kubb sets `parseAs: 'blob'` on an operation with only binary success content:
 
 ```typescript
-import { client } from './gen/.kubb/client'
-
-client.setConfig({
-  codecs: {
-    'application/xml': { deserialize: (raw) => new DOMParser().parseFromString(raw as string, 'application/xml') },
-  },
-})
+const { data } = await getReport({ path: { id: '123' }, parseAs: 'text' })
 ```
 
-Like the other config, `codecs` can also be passed on a single call, and a per-call entry merges
-over the client one for that content type.
-
-The generated types follow what the runtime returns without a codec. A response the runtime reads
-as text, such as `application/xml`, `application/yaml`, or `text/csv`, is typed `string`, even
-when the document gives it an object schema. A `deserialize` changes the value but not that type,
-so cast or narrow `data` to what your codec returns:
+The generated types follow what the built-in media types return. A response read as text, such as `application/xml`, `application/yaml`, or `text/csv`, is typed `string`, even when the document gives it an object schema. A media type you register changes the value but not that type, so narrow or cast `data` to what it returns:
 
 ```typescript
 const result = await getPetById({ path: { petId: 1 }, contentType: { response: 'application/xml' } })
 if (result.contentType === 'application/xml') {
-  const pet = result.data as unknown as Document
+  const pet = result.data as unknown as Pet
 }
 ```
 
-When the runtime picks the wrong parse mode because a response omits its `Content-Type` or sets a
-misleading one, force the mode with `responseType` on the call. It accepts `'json'`, `'text'`,
-`'blob'`, `'arraybuffer'`, and `'document'`:
-
-```typescript
-const { data } = await downloadInvoice({ path: { id: '123' }, responseType: 'blob' })
-// data is a Blob even when the server leaves Content-Type unset
-```
-
-[Server-sent events](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/server-sent-events) covers `responseType: 'stream'`.
+[Server-sent events](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/server-sent-events) covers stream media types and `client.stream`.
 
 > [!NOTE]
 > With the adapter's default [`integerType: 'bigint'`](https://kubb.dev/extensions/kubb-labs/adapter-oas/options#integertype), a `format: int64` field is typed `bigint`, but `JSON.parse` returns a `number`. Set `integerType: 'number'` on `adapterOas`, or turn on [`validator: 'zod'`](#validate-responses), which converts the field to `bigint`. Either way, `JSON.parse` loses precision above `Number.MAX_SAFE_INTEGER`, so declare an exact 64-bit ID as a string in the document.
-
-For bidirectional formats, supply both `serialize` and `deserialize` in the media type codec, then set the operation's request and response `contentType`.
 
 ## Validate responses
 
@@ -170,14 +160,10 @@ import { pluginFetch } from '@kubb/plugin-fetch'
 pluginFetch({ validator: 'zod' })
 ```
 
-`'zod'` validates the success response body, and the error body when a non-2xx call does not
-throw. Use the object form to opt in per direction, where `request` validates the request
-body before the call goes out:
+`'zod'` validates the success response body and the error body. Use the object form to opt in per direction, where `request` validates the request body before the call goes out:
 
 ```typescript
 pluginFetch({ validator: { request: 'zod', response: 'zod' } })
 ```
 
-With a validator set, Kubb passes the matching schema to each generated call, and the runtime
-parses the body through it. A body that does not match throws a `ParseError` with the schema's
-`issues`.
+With a validator set, Kubb passes the matching schema to each generated call, and the runtime parses the decoded body through it. A body that does not match throws a `ParseError` with the schema's `issues`.

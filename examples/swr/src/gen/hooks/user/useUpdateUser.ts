@@ -16,18 +16,16 @@ export type UpdateUserMutationKey = ReturnType<typeof updateUserMutationKey>
 export type UpdateUserMutationArg = UpdateUserOptions
 
 /**
+ * `PUT /user/{username}`
  * @description This can only be done by the logged in user.
  * @summary Update user
- * {@link /user/:username}
  */
 export function useUpdateUser(
   options: {
     mutation?: SWRMutationConfiguration<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserMutationKey | null, UpdateUserMutationArg> & {
       throwOnError?: boolean
     }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-    }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
 ) {
@@ -37,7 +35,7 @@ export function useUpdateUser(
   return useSWRMutation<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserMutationKey | null, UpdateUserMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return updateUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof updateUser<true>>[0]).unwrap()
+      return updateUser({ ...config, ...variables, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

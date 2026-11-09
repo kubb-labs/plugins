@@ -3,7 +3,7 @@ import { ast } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'
-import type { Auth } from '../builders/security.ts'
+import type { SecurityRequirement } from '../builders/security.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption } from '../types.ts'
@@ -32,10 +32,10 @@ type Props = {
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
   /**
-   * Per-operation security, resolved from the spec into inline `Auth` objects and serialized onto the
+   * Per-operation security, resolved from the spec into inline security requirements and serialized onto the
    * call config's `security` field for the runtime `auth` resolver to consume.
    */
-  security?: Array<Auth>
+  security?: Array<SecurityRequirement>
   /** The operation's own server URL from a path-level or operation-level `servers` entry, emitted as the call's default `baseURL`. */
   baseURL?: string
 }
@@ -59,11 +59,11 @@ export function Operation({ name, node, types, validatorHooks, returnType, throw
         generics={body.generics}
         params={body.paramsSignature}
         returnType={body.returnType}
-        JSDoc={{ comments: buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }) }}
+        JSDoc={{ comments: buildOperationComments(node, { splitLines: true }) }}
       >
         {body.mergeContentType
-          ? 'const { client: request = client, contentType, ...config } = options'
-          : 'const { client: request = client, ...config } = options'}
+          ? 'const { client: apiClient = client, contentType, ...config } = options'
+          : 'const { client: apiClient = client, ...config } = options'}
         <br />
         {body.statement}
       </Function>

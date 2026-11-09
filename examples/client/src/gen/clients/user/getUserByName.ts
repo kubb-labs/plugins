@@ -8,15 +8,13 @@ import type { GetUserByNameOptions, GetUserByNameResponses } from '../../models/
 import { client } from '../../../client'
 
 /**
+ * `GET /user/{username}`
  * @summary Get user by user name
- * {@link /user/:username}
  */
 export function getUserByName<ThrowOnError extends boolean = true>(
   options: Options<GetUserByNameOptions, ThrowOnError>,
 ): Promise<RequestResult<GetUserByNameResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({ method: 'GET', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<GetUserByNameResponses, ThrowOnError>
-  >
+  return apiClient<GetUserByNameResponses, ThrowOnError>({ method: 'GET', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true })
 }

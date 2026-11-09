@@ -5,14 +5,14 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { ListEventsOptionsSchemaType, ListEventsResponsesSchemaType } from '../zod/listEventsSchema'
-import { client, withUnwrap } from '../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { listEventsResponseSchema, listEventsQuerySchema } from '../zod/listEventsSchema'
 
 /**
- * {@link /events}
+ * `GET /events`
  */
 export function listEvents<ThrowOnError extends boolean = true>(options: Options<ListEventsOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<ListEventsResponsesSchemaType, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(request({ method: 'GET', url: '/events', ...config, validator: { query: listEventsQuerySchema, response: listEventsResponseSchema, ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<ListEventsResponsesSchemaType, ThrowOnError>>)
+  return withUnwrap(apiClient<ListEventsResponsesSchemaType, ThrowOnError>({ method: 'GET', url: '/events', ...config, validator: { query: listEventsQuerySchema, response: listEventsResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }

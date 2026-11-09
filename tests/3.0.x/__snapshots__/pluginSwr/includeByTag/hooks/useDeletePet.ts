@@ -16,13 +16,13 @@ export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
 export type DeletePetMutationArg = DeletePetOptions
 
 /**
+ * `DELETE /pet/{petId}`
  * @description delete a pet
  * @summary Deletes a pet
- * {@link /pet/:petId}
  */
 export function useDeletePet(options: {
   mutation?: SWRMutationConfiguration<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetMutationKey | null, DeletePetMutationArg> & { throwOnError?: boolean },
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}

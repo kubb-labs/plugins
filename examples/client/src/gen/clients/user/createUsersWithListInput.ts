@@ -8,20 +8,20 @@ import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponses
 import { client } from '../../../client'
 
 /**
+ * `POST /user/createWithList`
  * @description Creates list of users with given input array
  * @summary Creates list of users with given input array
- * {@link /user/createWithList}
  */
 export function createUsersWithListInput<ThrowOnError extends boolean = true>(
   options: Options<CreateUsersWithListInputOptions, ThrowOnError> = {},
 ): Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>> {
-  const { client: request = client, contentType, ...config } = options
+  const { client: apiClient = client, contentType, ...config } = options
 
-  return request({
+  return apiClient<CreateUsersWithListInputResponses, ThrowOnError>({
     method: 'POST',
     url: '/user/createWithList',
     contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
     ...config,
     throwOnError: config.throwOnError ?? true,
-  }) as Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>>
+  })
 }

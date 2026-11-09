@@ -4,16 +4,20 @@ In v6 the axios client runs on the same core as `@kubb/plugin-fetch`. Most edits
 
 ## What to change
 
-| Your code                                                                                                            | What to do                                                                                                                                                                                                    |
-| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Calls generated functions, SDK methods, or hooks                                                                     | Regenerate. Nothing else.                                                                                                                                                                                     |
-| Registers handlers on `client.interceptors`                                                                          | Move them to `axiosInstance.interceptors`, or rewrite them for the core objects. See [Keep your axios interceptors as they are](#keep-your-axios-interceptors-as-they-are) and [Interceptors](#interceptors). |
-| Passes an axios instance as `transport`, or sets `defaultTransport.defaults`                                         | Wrap it with `createAxiosTransport(instance)`, and set defaults on `axiosInstance`. See [Transport and default instance](#transport-and-default-instance).                                                    |
-| Uses `AxiosOptions`, `validateStatus`, `AxiosTransport`, `InterceptorFn`, or `InterceptorChannel`                    | Rename `AxiosOptions` to `NativeOptions`, and drop the rest. See [Removed exports](#removed-exports).                                                                                                         |
-| Imports from `templates/axios.ts`, `templates/core.ts`, `templates/serializers.ts`, or `templates/standardSchema.ts` | Import from `templates/client.ts` or `@kubb/plugin-client/templates/*`. See [Template subpaths](#template-subpaths).                                                                                          |
-| Names `EventStreamResult<Pet>`, `StreamResult`, or `UnwrappedStreamResult`                                           | Wrap the payload: `EventStreamResult<ServerSentEvent<Pet>>`. See [Stream result types](#stream-result-types).                                                                                                 |
-| Relies on interceptor order, the error interceptor for network errors, or a separate instance per `createClient()`   | Check [Behavior changes](#behavior-changes). It compiles, so the type checker does not catch it.                                                                                                              |
-| Comes from 5.12 or earlier and uses streams                                                                          | Check [From 5.12 or earlier](#from-5-12-or-earlier).                                                                                                                                                          |
+| Your code                                                                                                            | What to do                                                                                                                                                                                                         |
+| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Calls generated functions, SDK methods, or hooks                                                                     | Regenerate. Nothing else.                                                                                                                                                                                          |
+| Registers handlers on `client.interceptors`                                                                          | Move them to `getAxiosInstance().interceptors`, or rewrite them for the core objects. See [Keep your axios interceptors as they are](#keep-your-axios-interceptors-as-they-are) and [Interceptors](#interceptors). |
+| Passes an axios instance as `transport`, or sets `defaultTransport.defaults`                                         | Wrap it with `createAxiosTransport(instance)`, and set defaults on `getAxiosInstance()`. See [Transport and default instance](#transport-and-default-instance).                                                    |
+| Uses `AxiosOptions`, `validateStatus`, `AxiosTransport`, `InterceptorFn`, or `InterceptorChannel`                    | Rename `AxiosOptions` to `NativeOptions`, and drop the rest. See [Removed exports](#removed-exports).                                                                                                              |
+| Imports from `templates/axios.ts`, `templates/core.ts`, `templates/serializers.ts`, or `templates/standardSchema.ts` | Import from `templates/client.ts` or `@kubb/plugin-client/templates/*`. See [Template subpaths](#template-subpaths).                                                                                               |
+| Names `EventStreamResult<Pet>`, `StreamResult`, or `UnwrappedStreamResult`                                           | Use `StreamResult` and wrap the payload in `ServerSentEvent`. See [Stream result types](#stream-result-types).                                                                                                     |
+| Relies on interceptor order, or a separate instance per `createClient()`                                             | Check [Behavior changes](#behavior-changes). It compiles, so the type checker does not catch it.                                                                                                                   |
+| Sets `codecs`, `serializer.body`, or `responseType`                                                                  | Use `mediaTypes` and `parseAs`. See [Media types](#media-types).                                                                                                                                                   |
+| Calls `toEventStream`, or writes a transport that returns a parsed body                                              | Use `client.stream`, and return a web `Response`. See [Streams and transports](#streams-and-transports).                                                                                                           |
+| Relies on invalid JSON becoming a string, or on the error interceptor skipping network errors                        | Check [Behavior changes in the runtime](#behavior-changes-in-the-runtime). It compiles.                                                                                                                            |
+| Comes from 5.12 or earlier and uses streams                                                                          | Check [From 5.12 or earlier](#from-5-12-or-earlier).                                                                                                                                                               |
+| Uses SDK classes with `group: { type: 'tag' }`, such as `new pet(config)`                                            | Use the new names, such as `new PetClient(config)`. See [SDK class names](#sdk-class-names).                                                                                                                       |
 
 ## Upgrade steps
 
@@ -39,7 +43,7 @@ In v6 the axios client runs on the same core as `@kubb/plugin-fetch`. Most edits
 
 ## Keep your axios interceptors as they are
 
-The quickest fix moves each handler from `client.interceptors` to `axiosInstance.interceptors` and keeps its body. `axiosInstance` is the instance v5 called `defaultTransport`, so the handlers get the same axios objects in the same order:
+The quickest fix moves each handler from `client.interceptors` to `getAxiosInstance().interceptors` and keeps its body. `getAxiosInstance()` is the instance v5 called `defaultTransport`, so the handlers get the same axios objects in the same order:
 
 ```typescript
 // before
@@ -51,9 +55,9 @@ client.interceptors.request.use((config) => {
 })
 
 // after
-import { axiosInstance } from './gen/.kubb/client'
+import { getAxiosInstance } from './gen/.kubb/client'
 
-axiosInstance.interceptors.request.use((config) => {
+getAxiosInstance().interceptors.request.use((config) => {
   config.headers.set('X-Request-ID', crypto.randomUUID())
   return config
 })
@@ -63,7 +67,7 @@ To share interceptor code with `@kubb/plugin-fetch` instead, rewrite the handler
 
 ## Interceptors
 
-`client.interceptors` handlers receive the core's `ResolvedRequest`, `TransportResult`, and `ResponseError`, as on the fetch client:
+`client.interceptors` handlers receive the core's `ResolvedRequest`, `DecodedResponse`, and the error a call ends with, as on the fetch client:
 
 ```typescript
 // before: native axios objects
@@ -79,14 +83,14 @@ client.interceptors.request.use((request) => {
 })
 ```
 
-For the native `InternalAxiosRequestConfig`, `AxiosResponse`, or `AxiosError`, register on `axiosInstance` instead. See [Add interceptors](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/interceptors).
+For the native `InternalAxiosRequestConfig`, `AxiosResponse`, or `AxiosError`, register on `getAxiosInstance()` instead. See [Add interceptors](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/interceptors).
 
-`client.interceptors.error` runs for a `ResponseError` only, not for a network error. Catch network errors on the instance:
+`client.interceptors.error` now runs for every failure and gets a network error as the native `AxiosError`. You can also catch it on the instance:
 
 ```typescript
-import { axiosInstance } from './gen/.kubb/client'
+import { getAxiosInstance } from './gen/.kubb/client'
 
-axiosInstance.interceptors.response.use(undefined, (error) => {
+getAxiosInstance().interceptors.response.use(undefined, (error) => {
   reportNetworkError(error)
   return Promise.reject(error)
 })
@@ -104,9 +108,9 @@ client.setConfig({ transport: axios.create({ timeout: 10_000 }) })
 client.setConfig({ transport: createAxiosTransport(axios.create({ timeout: 10_000 })) })
 ```
 
-Native axios interceptors for a custom transport go on the instance you pass to `createAxiosTransport`. `axiosInstance` only backs `defaultTransport`.
+Native axios interceptors for a custom transport go on the instance you pass to `createAxiosTransport`. `getAxiosInstance()` only backs `defaultTransport`.
 
-`defaultTransport` is now a function that sends through `axiosInstance`. Replace `defaultTransport.defaults` and `defaultTransport.interceptors` with `axiosInstance.defaults` and `axiosInstance.interceptors`.
+`defaultTransport` is now a function that sends through `getAxiosInstance()`. Replace `defaultTransport.defaults` and `defaultTransport.interceptors` with `getAxiosInstance().defaults` and `getAxiosInstance().interceptors`.
 
 ## Removed exports
 
@@ -120,14 +124,14 @@ Native axios interceptors for a custom transport go on the instance you pass to 
 
 ## Stream result types
 
-`EventStreamResult`, `StreamResult`, and `UnwrappedStreamResult` take the full event type, not the payload:
+`EventStreamResult` is gone, since no call returns it. Name a stream call's result `StreamResult`. `StreamResult` and `UnwrappedStreamResult` take the full event type, not the payload. Wrap a payload in `ServerSentEvent`:
 
 ```typescript
 // before
 let result: EventStreamResult<PetEvent>
 
 // after
-let result: EventStreamResult<ServerSentEvent<PetEvent>>
+let result: StreamResult<StreamPetsResponses, true, ServerSentEvent<PetEvent>>
 ```
 
 ## Behavior changes
@@ -135,8 +139,65 @@ let result: EventStreamResult<ServerSentEvent<PetEvent>>
 These changes compile without errors, so check them by hand:
 
 - `client.interceptors.request` handlers run in the order you register them. axios ran its request handlers in reverse.
-- `client.interceptors.error` no longer runs for a network error. See [Interceptors](#interceptors).
 - A child from `createClient()` inherits the `transport` of `client`. It used to get its own `axios.create()`.
+
+## Media types
+
+`codecs` is now `mediaTypes`, and its methods are renamed:
+
+| Before                                                          | After                                        | Migration                                                                      |
+| --------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------ |
+| `codecs`                                                        | `mediaTypes`                                 | Rename the key.                                                                |
+| `codecs[type].serialize(body, contentType)`                     | `mediaTypes[type].encode(body, context)`     | Read `context.contentType`.                                                    |
+| `codecs[type].deserialize(raw, contentType)` with a parsed body | `mediaTypes[type].decode(response, context)` | Read the body yourself: `await response.text()`.                               |
+| `serializer.body`                                               | removed                                      | Move a custom body serializer into a `mediaTypes` entry.                       |
+| `responseType` on a call, a string or a map                     | removed                                      | Use `parseAs`, such as `parseAs: 'blob'`, or a media type entry for that call. |
+
+```typescript
+// before
+client.setConfig({ codecs: { 'application/xml': { deserialize: (raw) => parseXml(raw as string) } } })
+
+// after
+client.setConfig({ mediaTypes: { 'application/xml': { decode: async (response) => parseXml(await response.text()) } } })
+```
+
+A key can now be a pattern, such as `application/*+json` or `text/*`. See [Configure serialization](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/serialization).
+
+## Streams and transports
+
+`toEventStream` is gone. Send the request with `client.stream`, whose result is already the stream:
+
+```typescript
+// before
+const { stream } = await toEventStream(client({ method: 'GET', url: '/events', responseType: 'stream' }), { shape: 'data' })
+
+// after
+const { stream } = await client.stream({ method: 'GET', url: '/events', eventShape: 'data' })
+```
+
+Import `ServerSentEvent`, `TypedEvent`, and `StreamResult` from `.kubb/client.ts`, not `.kubb/sse.ts`.
+
+A transport returns a web `Response`, or `{ webResponse, request, response }` to set the native objects. `readResponse`, `resolveResponseType`, `parseJsonOrText`, `isStreamed`, `ResponseType`, `ResponseTypeMap`, `Codec`, `Deserializer`, `ContentBodySerializer`, `BodySerializer`, `defaultBodySerializer`, and `CallResult` are gone. Response interceptors receive a `DecodedResponse`, the shape `TransportResult` had.
+
+```typescript
+// before
+transport: async () => ({ data: { id: 1 }, status: 200, statusText: 'OK', headers: new Headers(), request, response })
+
+// after
+transport: async () => Response.json({ id: 1 })
+```
+
+## Behavior changes in the runtime
+
+These compile without errors, so check them by hand:
+
+- Native axios response interceptors see the raw bytes, not the decoded body.
+- Invalid JSON under a JSON media type throws a `ParseError` instead of becoming a string. Catch it, or register a lenient `application/json` handler.
+- An empty body is `undefined` for every media type, text included.
+- Error interceptors also get network errors, aborts, and validation errors, so narrow with `ResponseError.is` before reading `status`. Each handler gets the error the previous one returned.
+- `ResponseError.data` holds the validated body.
+- A `2XX` response key is a success, and range keys such as `4XX` type `status` as the numbers they cover.
+- An auth requirement that needs several schemes sends all of them.
 
 ## From 5.12 or earlier
 
@@ -145,6 +206,19 @@ These changed in 5.13 and compile without errors, so check them by hand:
 - A stream call keeps the adapter set on the call or on the instance, such as a mock adapter in tests. Only a browser call with the default adapters switches to the fetch adapter.
 - A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream.
 - An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.
+
+## SDK class names
+
+With `sdk` and `group: { type: 'tag' }`, tag classes are now named like `PetClient` instead of `pet`. The files and the root class's `pet` and `store` fields stay the same:
+
+```diff
+- import { pet } from './gen/sdk/pet/pet'
+- const api = new pet({ baseURL })
++ import { PetClient } from './gen/sdk/pet/pet'
++ const api = new PetClient({ baseURL })
+```
+
+The root class shares one client with every tag. Add interceptors on `api.client`.
 
 ## Query plugins
 

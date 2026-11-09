@@ -8,16 +8,14 @@ import type { DeleteUserOptions, DeleteUserResponses } from '../../models/user/D
 import { client } from '../../../client'
 
 /**
+ * `DELETE /user/{username}`
  * @description This can only be done by the logged in user.
  * @summary Delete user
- * {@link /user/:username}
  */
 export function deleteUser<ThrowOnError extends boolean = true>(
   options: Options<DeleteUserOptions, ThrowOnError>,
 ): Promise<RequestResult<DeleteUserResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({ method: 'DELETE', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<DeleteUserResponses, ThrowOnError>
-  >
+  return apiClient<DeleteUserResponses, ThrowOnError>({ method: 'DELETE', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true })
 }

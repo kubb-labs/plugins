@@ -3,9 +3,9 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { updatePet } from '../../clients/axios/petService/updatePet'
 
 /**
+ * `PUT /pet`
  * @description Update an existing pet by Id
  * @summary Update an existing pet
- * {@link /pet}
  */
 export async function updatePetHandler(
   {

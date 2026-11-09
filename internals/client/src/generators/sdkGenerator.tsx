@@ -7,7 +7,7 @@ import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
-import { type Auth, getOperationSecurity, type SecurityDocument } from '../builders/security.ts'
+import { getOperationSecurity, type SecurityDocument, type SecurityRequirement } from '../builders/security.ts'
 import { getOperationBaseURL, type ServerDocument, type ServerOptions } from '../builders/server.ts'
 import { buildValidatorHooks, type ValidatorHooks } from '../builders/validator.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
@@ -29,7 +29,7 @@ type OperationData = {
    * `null` without a zod resolver.
    */
   validatorHooks: ValidatorHooks | null
-  security?: Array<Auth>
+  security?: Array<SecurityRequirement>
   baseURL?: string
 }
 
@@ -91,8 +91,10 @@ function buildControllers(
   return nodes.reduce((acc, operationNode) => {
     if (!ast.isHttpOperationNode(operationNode)) return acc
     const tag = operationNode.tags[0]
-    const name = tag ? ensureValidVarName(group?.name?.({ group: camelCase(tag) }) ?? resolver.groupName(tag)) : resolver.className('ApiClient')
-    const file = resolver.file({ name, extname: '.ts', tag, root, output, group: group ?? undefined })
+    const name = tag ? ensureValidVarName(resolver.groupName(tag)) : resolver.className('ApiClient')
+    // `group.name` names the folder and file, never the class.
+    const fileName = tag && group?.name ? ensureValidVarName(group.name({ group: camelCase(tag) })) : name
+    const file = resolver.file({ name: fileName, extname: '.ts', tag, root, output, group: group ?? undefined })
     const operationData = buildOperationData(operationNode)
     const previous = acc.find((item) => item.file.path === file.path)
 
@@ -128,10 +130,10 @@ function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationDat
  * standalone per-operation functions.
  *
  * Every tag client is an instance class whose constructor takes a client config and builds its own
- * client, so each environment is a separate instance. With `sdk.mode: 'tag'` (the default) it
- * emits one class per tag and, when `sdk.name` is set, a composed root that instantiates every tag
- * client. With `sdk.mode: 'flat'` it emits one class named by `sdk.name`, with every operation as a
- * direct method.
+ * client, or takes an existing client, so each environment is a separate instance. With `sdk.mode:
+ * 'tag'` (the default) it emits one class per tag, named by `resolver.groupName`, and, when `sdk.name`
+ * is set, a composed root that creates one client and shares it with every tag client. With
+ * `sdk.mode: 'flat'` it emits one class named by `sdk.name`, with every operation as a direct method.
  *
  * `sse` is the Server-Sent Events runtime template, copied into `.kubb/sse.ts` only for a document with a
  * `text/event-stream` operation.
@@ -166,7 +168,6 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
       const controllers = buildControllers(nodes, ctx, types, validatorEnabled)
       const clientPath = path.resolve(root, '.kubb/client.ts')
       const standardSchemaPath = path.resolve(root, '.kubb/standardSchema.ts')
-      const ssePath = path.resolve(root, '.kubb/sse.ts')
 
       const banner = (file: ast.FileNode) => resolver.default.banner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
       const footer = (file: ast.FileNode) => resolver.default.footer(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
@@ -185,29 +186,26 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
 
         return (
           <File key={file.path} baseName={file.baseName} path={file.path} meta={file.meta} banner={banner(file)} footer={footer(file)}>
-            <File.Import name={['createClient', returnType === 'data' ? 'unwrapResult' : 'withUnwrap']} root={file.path} path={clientPath} />
             <File.Import
-              name={[
-                'ClientConfig',
-                'ClientInstance',
-                'Options',
-                ...(returnType === 'data' ? [] : ['Unwrappable']),
-                ...(hasResult ? [returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'] : []),
-                ...(hasEventStream ? ['SuccessOf'] : []),
-              ]}
+              name={['createClient', returnType === 'data' ? 'unwrapResult' : 'withUnwrap', 'resolveThrowOnError']}
+              root={file.path}
+              path={clientPath}
+            />
+            <File.Import
+              name={Array.from(
+                new Set([
+                  'ClientConfig',
+                  'ClientInstance',
+                  'Options',
+                  ...(returnType === 'data' ? [] : ['Unwrappable']),
+                  ...(hasResult ? [returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'] : []),
+                  ...(hasEventStream ? buildEventStreamImports({ returnType, typed: shapes.has('event'), line: shapes.has('line') }) : []),
+                ]),
+              )}
               root={file.path}
               path={clientPath}
               isTypeOnly
             />
-            {hasEventStream && <File.Import name={['toEventStream']} root={file.path} path={ssePath} />}
-            {hasEventStream && (
-              <File.Import
-                name={buildEventStreamImports({ returnType, typed: shapes.has('event'), payload: shapes.has('data') })}
-                root={file.path}
-                path={ssePath}
-                isTypeOnly
-              />
-            )}
 
             {validator === 'zod' && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
 
@@ -235,7 +233,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
 
         return (
           <File key={sdkFile.path} baseName={sdkFile.baseName} path={sdkFile.path} meta={sdkFile.meta} banner={banner(sdkFile)} footer={footer(sdkFile)}>
-            <File.Import name={['ClientConfig']} root={sdkFile.path} path={clientPath} isTypeOnly />
+            <File.Import name={['createClient']} root={sdkFile.path} path={clientPath} />
+            <File.Import name={['ClientConfig', 'ClientInstance']} root={sdkFile.path} path={clientPath} isTypeOnly />
             {controllers.map(({ name, file }) => (
               <File.Import key={name} name={[name]} root={sdkFile.path} path={file.path} />
             ))}

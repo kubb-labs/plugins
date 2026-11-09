@@ -16,7 +16,7 @@ type RetrieveMyProfileQueryKey = ReturnType<typeof retrieveMyProfileQueryKey>
 
 export function retrieveMyProfileQueryOptions(
   { headers }: RetrieveMyProfileOptions,
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = retrieveMyProfileQueryKey()
   return queryOptions<RetrieveMyProfileStatus200, ResponseErrorConfig<Error>, RetrieveMyProfileStatus200, typeof queryKey>({
@@ -28,7 +28,7 @@ export function retrieveMyProfileQueryOptions(
 }
 
 /**
- * {@link /user/me}
+ * `GET /user/me`
  */
 export function useRetrieveMyProfile<
   TData = RetrieveMyProfileStatus200,
@@ -38,7 +38,7 @@ export function useRetrieveMyProfile<
   { headers }: { headers: RetrieveMyProfileOptions['headers'] | (() => RetrieveMyProfileOptions['headers']) },
   options: {
     query?: Partial<QueryObserverOptions<RetrieveMyProfileStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

@@ -5,25 +5,25 @@
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { UpdateUserOptions, UpdateUserResponses } from '../../models/user/UpdateUser'
-import { client, withUnwrap } from '../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
+ * `PUT /user/{username}`
  * @description This can only be done by the logged in user.
  * @summary Update user
- * {@link /user/:username}
  */
 export function updateUser<ThrowOnError extends boolean = true>(
   options: Options<UpdateUserOptions, ThrowOnError>,
 ): Unwrappable<RequestResult<UpdateUserResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request<UpdateUserOptions['body']>({
+    apiClient<UpdateUserResponses, ThrowOnError>({
       method: 'PUT',
       url: '/user/{username}',
       contentType: { request: 'application/json' },
       ...config,
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<UpdateUserResponses, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

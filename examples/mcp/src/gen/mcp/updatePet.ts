@@ -8,9 +8,9 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { updatePet } from '../clients/updatePet'
 
 /**
+ * `PUT /pet`
  * @description Update an existing pet by Id
  * @summary Update an existing pet
- * {@link /pet}
  */
 export async function updatePetHandler({ body }: Pick<UpdatePetOptions, 'body'>, ctx: ServerContext): Promise<CallToolResult> {
   const res = await updatePet({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof updatePet<true>>[0])

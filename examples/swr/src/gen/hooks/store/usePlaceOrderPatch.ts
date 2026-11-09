@@ -16,9 +16,9 @@ export type PlaceOrderPatchMutationKey = ReturnType<typeof placeOrderPatchMutati
 export type PlaceOrderPatchMutationArg = PlaceOrderPatchOptions
 
 /**
+ * `PATCH /store/order`
  * @description Place a new order in the store with patch
  * @summary Place an order for a pet with patch
- * {@link /store/order}
  */
 export function usePlaceOrderPatch(
   options: {
@@ -28,9 +28,7 @@ export function usePlaceOrderPatch(
       PlaceOrderPatchMutationKey | null,
       PlaceOrderPatchMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-    }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
 ) {
@@ -40,7 +38,7 @@ export function usePlaceOrderPatch(
   return useSWRMutation<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchMutationKey | null, PlaceOrderPatchMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return placeOrderPatch({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrderPatch<true>>[0]).unwrap()
+      return placeOrderPatch({ ...config, ...variables, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

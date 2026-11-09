@@ -1,30 +1,51 @@
 # Migrate to v6
 
-`@kubb/plugin-client` 6 passes the full event type and a `contentType` to a custom client's stream helpers. Projects without server-sent event operations need no change.
+`@kubb/plugin-client` 6 calls your client with type arguments and streams through `client.stream`. Update the `client` export of your module, then regenerate.
 
-## Stream exports of your client
+## A generic client call
 
-Export `ServerSentEvent` next to `TypedEvent`, and make `toEventStream` and `EventStreamResult` take the full event type instead of the payload:
+A generated function now calls `client<TResponses, ThrowOnError>(config)`. Make `client` generic:
 
 ```typescript
-export type ServerSentEvent<TData = unknown> = { data: TData; event: string; id?: string; retry?: number }
-
-export type EventStreamResult<TEvent = ServerSentEvent> = { stream: AsyncGenerator<TEvent>; response: Response }
-
-export async function toEventStream<TEvent = ServerSentEvent>(result: Promise<{ data: unknown; response: Response }>): Promise<EventStreamResult<TEvent>> {
-  // parse the stream into TEvent values
-}
+export const client = <TResponses, ThrowOnError extends boolean = true>(config: RequestConfig) =>
+  send(config) as Promise<RequestResult<TResponses, ThrowOnError>>
 ```
 
-A generated function calls `toEventStream<ServerSentEvent<Payload>>` when the document types only the payload, and `toEventStream<TypedEvent<Event>>` when it names each event. See [Write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client).
+## A stream method instead of toEventStream
 
-## `contentType` on the request config
+A Server-Sent Events or JSON Lines operation calls `client.stream<TResponses, ThrowOnError, TItem>(config)`. Remove `toEventStream` and `EventStreamResult`, add `stream` to `client`, and export `StreamResult`, `SuccessOf`, `TypedEvent`, and `ServerSentEvent`:
 
-A stream call now passes `contentType: { response: 'text/event-stream' }`, so your client can send `Accept: text/event-stream`. Add the field to your `RequestConfig`, or the generated stream functions fail to compile:
+```typescript
+export type StreamResult<TResponses, ThrowOnError extends boolean = true, TEvent = ServerSentEvent<SuccessOf<TResponses>>> = {
+  stream: AsyncGenerator<TEvent>
+  response: Response
+}
+
+export const client = Object.assign(<TResponses, ThrowOnError extends boolean = true>(config: RequestConfig) => send<TResponses, ThrowOnError>(config), {
+  stream: async <TResponses, ThrowOnError extends boolean = true, TEvent = ServerSentEvent<SuccessOf<TResponses>>>(
+    config: RequestConfig,
+  ): Promise<StreamResult<TResponses, ThrowOnError, TEvent>> => {
+    // send the request and parse the body into TEvent values
+  },
+})
+```
+
+A Server-Sent Events call also passes `eventShape: 'event'` or `'data'`. See [Write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client).
+
+## New fields on the request config
+
+Add these fields to your `RequestConfig`, or the generated functions fail to compile:
 
 ```typescript
 export type RequestConfig = {
   // ...
   contentType?: string | { request?: string; response?: string }
+  // Replaces `responseType`. Binary downloads pass 'blob'.
+  parseAs?: 'json' | 'text' | 'blob' | 'arrayBuffer' | 'stream'
+  eventShape?: 'event' | 'data'
 }
 ```
+
+## Security requirements with several schemes
+
+A `security` entry is an array when one requirement needs several schemes together, such as an API key and a session cookie. Send all of them, or skip the entry.

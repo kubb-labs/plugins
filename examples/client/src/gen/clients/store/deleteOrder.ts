@@ -8,16 +8,19 @@ import type { DeleteOrderOptions, DeleteOrderResponses } from '../../models/stor
 import { client } from '../../../client'
 
 /**
+ * `DELETE /store/order/{orderId}`
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
  * @summary Delete purchase order by ID
- * {@link /store/order/:orderId}
  */
 export function deleteOrder<ThrowOnError extends boolean = true>(
   options: Options<DeleteOrderOptions, ThrowOnError>,
 ): Promise<RequestResult<DeleteOrderResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({ method: 'DELETE', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<DeleteOrderResponses, ThrowOnError>
-  >
+  return apiClient<DeleteOrderResponses, ThrowOnError>({
+    method: 'DELETE',
+    url: '/store/order/{orderId}',
+    ...config,
+    throwOnError: config.throwOnError ?? true,
+  })
 }

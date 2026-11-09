@@ -32,17 +32,17 @@ describe('buildSdkMethod', () => {
     const method = buildSdkMethod({ node, name: 'streamEvents', types: resolverTs, validatorHooks, returnType: 'full', throwOnErrorDefault: true })
 
     expect(method).toContain('): Unwrappable<StreamResult<StreamEventsResponses, ThrowOnError>>')
-    expect(method).toContain('return withUnwrap(toEventStream<ServerSentEvent<SuccessOf<')
-    // The response validator runs per event, so it moves from the call config into the stream meta.
+    // The runtime validates each event with the response validator, by the event shape the call carries.
     expect(method).toContain(
-      `request({ method: 'GET', url: '/events', contentType: { response: 'text/event-stream' }, responseType: 'stream', ...config, throwOnError: config.throwOnError ?? true }), { client: request, config, shape: 'data', validator: streamEventsResponseSchema })`,
+      `return withUnwrap(apiClient.stream<StreamEventsResponses, ThrowOnError>({ method: 'GET', url: '/events', contentType: { response: 'text/event-stream' }, eventShape: 'data', ...config, validator: { response: streamEventsResponseSchema, ...config.validator }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))`,
     )
+    expect(method).not.toMatch(/\) as \w/)
 
-    // A plain custom client gets no stream meta, so its response validator stays in the call config.
+    // A plain custom client gets the same call, with a boolean throwOnError.
     const plain = buildSdkMethod({ node, name: 'streamEvents', types: resolverTs, validatorHooks, returnType: 'plain', throwOnErrorDefault: true })
-    expect(plain).toContain('return toEventStream<ServerSentEvent<SuccessOf<')
-    expect(plain).toContain('validator: { response: streamEventsResponseSchema, ...config.validator }')
-    expect(plain).not.toContain(', config')
+    expect(plain).toContain('): Promise<StreamResult<StreamEventsResponses, ThrowOnError>>')
+    expect(plain).toContain('return apiClient.stream<StreamEventsResponses, ThrowOnError>({')
+    expect(plain).toContain('throwOnError: config.throwOnError ?? true })')
   })
 
   test('returns only the events of a text/event-stream response with returnType data', () => {
@@ -62,7 +62,8 @@ describe('buildSdkMethod', () => {
     const method = buildSdkMethod({ node, name: 'streamEvents', types: resolverTs, validatorHooks: null, returnType: 'data', throwOnErrorDefault: true })
 
     expect(method).toContain('): Promise<UnwrappedStreamResult<StreamEventsResponses, ThrowOnError>>')
-    expect(method).toContain('return unwrapResult(toEventStream<ServerSentEvent<SuccessOf<')
-    expect(method).toContain('config.throwOnError ?? true) as Promise<UnwrappedStreamResult<StreamEventsResponses, ThrowOnError>>')
+    expect(method).toContain('return unwrapResult(apiClient.stream<StreamEventsResponses, ThrowOnError>({')
+    expect(method).toContain('}), resolveThrowOnError(config.throwOnError, true))')
+    expect(method).not.toMatch(/\) as \w/)
   })
 })

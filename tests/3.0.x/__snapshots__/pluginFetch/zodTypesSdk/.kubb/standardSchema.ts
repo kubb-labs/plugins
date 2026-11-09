@@ -1,6 +1,5 @@
 /**
- * A Standard Schema-compatible validator: a minimal duck-type covering Zod v3/v4, valibot, and
- * arktype schemas. Only the `~standard.validate` method is required at runtime.
+ * A Standard Schema validator, such as a Zod, Valibot, or ArkType schema.
  */
 export type StandardSchemaValidator<TOutput = unknown> = {
   readonly '~standard': {
@@ -8,24 +7,15 @@ export type StandardSchemaValidator<TOutput = unknown> = {
   }
 }
 
-/**
- * The two possible outcomes of a Standard Schema `validate` call. A successful result carries
- * `value`; a failed result carries `issues`.
- */
 export type StandardSchemaResult<TOutput> = { readonly value: TOutput; readonly issues?: undefined } | { readonly issues: ReadonlyArray<StandardSchemaIssue> }
 
-/**
- * One validation issue from a Standard Schema `validate` call.
- */
 export type StandardSchemaIssue = {
   readonly message?: string
   readonly path?: ReadonlyArray<PropertyKey | { readonly key: PropertyKey }>
 }
 
 /**
- * Thrown by `validateStandardSchema` when validation fails. Carries the raw `issues` array from
- * the schema's `validate` result so callers receive a uniform error shape regardless of which
- * schema library is in use.
+ * Thrown when validation fails, with the schema's `issues`.
  */
 export class ParseError extends Error {
   readonly issues: ReadonlyArray<StandardSchemaIssue>
@@ -38,12 +28,7 @@ export class ParseError extends Error {
 }
 
 /**
- * Validates `value` against a Standard Schema-compatible `schema`. Returns the parsed output on
- * success; throws `ParseError` with the schema's `issues` on failure. Handles both sync and async
- * `validate` implementations transparently.
- *
- * @example
- * const pet = await validateStandardSchema(PetSchema, rawData)
+ * Returns the parsed value, or throws a `ParseError` with the schema's `issues`.
  */
 export async function validateStandardSchema<TOutput>(schema: StandardSchemaValidator<TOutput>, value: unknown): Promise<TOutput> {
   const result = await schema['~standard'].validate(value)
@@ -54,13 +39,8 @@ export async function validateStandardSchema<TOutput>(schema: StandardSchemaVali
 }
 
 /**
- * Wraps an object schema so its keys match case-insensitively.
- * Keys the schema does not declare pass through untouched.
- * The declared keys are validated with `schema` under their declared names.
- * Every key, and every issue path, keeps the casing the caller used.
+ * Wraps an object schema so its keys match in any letter case. `entries` are the keys the schema declares.
  *
- * @param schema Standard Schema-compatible object schema.
- * @param entries The record of keys the passed object schema validates.
  * @example
  * ```ts
  * validator: { headers: toHeadersStandardSchema(putEventHeadersSchema, putEventHeadersSchema.shape) }
@@ -109,7 +89,7 @@ export function toHeadersStandardSchema(schema: StandardSchemaValidator, entries
 }
 
 /**
- * Identifies the value and request that failed validation in `onValidationError`.
+ * Which value and request failed validation.
  */
 export type ValidationErrorContext = {
   value: unknown
@@ -121,13 +101,12 @@ export type ValidationErrorContext = {
 }
 
 /**
- * Return `{ value }` to substitute a failed value, including `undefined`. Returning nothing rethrows the `ParseError`.
+ * Return `{ value }` to use instead of a failed value. Return nothing to rethrow the `ParseError`.
  */
 export type ValidationErrorHandler = (error: ParseError, context: ValidationErrorContext) => { value: unknown } | void | Promise<{ value: unknown } | void>
 
 /**
- * Turns generated validation on or off. `false` skips every validator, an object skips only the directions set to `false`:
- * `request` is the body, `params` are path, query, and header params, `response` and `error` are the response bodies.
+ * Turns generated validation on or off, for every direction or per direction.
  * @default true
  */
 export type ValidateOption = boolean | { request?: boolean; params?: boolean; response?: boolean; error?: boolean }
@@ -136,9 +115,6 @@ export function isValidationEnabled(validate: ValidateOption | undefined, direct
   return typeof validate === 'object' ? validate[direction] !== false : validate !== false
 }
 
-/**
- * Runs a validator when there is one, handing a `ParseError` to `onValidationError` first, which may substitute the value.
- */
 export async function runValidator<T>({
   validator,
   value,

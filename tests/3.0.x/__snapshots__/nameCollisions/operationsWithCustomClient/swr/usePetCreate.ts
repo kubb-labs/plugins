@@ -16,11 +16,11 @@ export type PetCreateMutationKey = ReturnType<typeof petCreateMutationKey>
 export type PetCreateMutationArg = never
 
 /**
- * {@link /pets/create-first}
+ * `POST /pets/create-first`
  */
 export function usePetCreate(options: {
   mutation?: SWRMutationConfiguration<PetCreateStatus200, ResponseErrorConfig<Error>, PetCreateMutationKey | null, PetCreateMutationArg> & { throwOnError?: boolean },
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}

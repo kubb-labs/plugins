@@ -4,7 +4,7 @@ import { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 import { buildOperationBody } from '../builders/operationBody.ts'
-import type { Auth } from '../builders/security.ts'
+import type { SecurityRequirement } from '../builders/security.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption } from '../types.ts'
@@ -26,7 +26,7 @@ export function buildSdkMethod({
   name: string
   types: OperationTypeNames
   validatorHooks: ValidatorHooks | null
-  security?: Array<Auth>
+  security?: Array<SecurityRequirement>
   baseURL?: string
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
@@ -35,11 +35,11 @@ export function buildSdkMethod({
 
   const body = buildOperationBody({ node, types, validatorHooks, security, baseURL, returnType, throwOnErrorDefault })
   const generics = body.generics.length ? `<${body.generics.join(', ')}>` : ''
-  const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
+  const jsdoc = buildJSDoc(buildOperationComments(node, { splitLines: true }))
 
   const destructure = body.mergeContentType
-    ? 'const { client: request = this.client, contentType, ...config } = options'
-    : 'const { client: request = this.client, ...config } = options'
+    ? 'const { client: apiClient = this.client, contentType, ...config } = options'
+    : 'const { client: apiClient = this.client, ...config } = options'
   const methodBody = [destructure, '', body.statement].map((line) => (line ? `    ${line}` : '')).join('\n')
 
   return `${jsdoc}  public ${name}${generics}(${body.paramsSignature}): ${body.returnType} {\n${methodBody}\n  }`
@@ -50,7 +50,7 @@ type OperationData = {
   name: string
   types: OperationTypeNames
   validatorHooks: ValidatorHooks | null
-  security?: Array<Auth>
+  security?: Array<SecurityRequirement>
   baseURL?: string
 }
 
@@ -64,8 +64,9 @@ type Props = {
 /**
  * Renders one instance class per tag with one method per operation. The constructor takes a client
  * config object and builds its own client through `createClient`, so each environment is a separate
- * instance: `const api = new PetClient({ baseURL }); api.getPetById(...)`. A per-call `client` option
- * still overrides the instance client for a one-off call.
+ * instance: `const api = new PetClient({ baseURL }); api.getPetById(...)`. It also takes an existing
+ * client, which is how the root SDK shares one client across its tags. The client is public so callers
+ * can add interceptors, and a per-call `client` option still overrides it for a one-off call.
  */
 export function SdkClient({ name, operations, returnType, throwOnErrorDefault }: Props): KubbReactNode {
   const methods = operations.map(({ node, name: methodName, types, validatorHooks, security, baseURL }) =>
@@ -82,10 +83,10 @@ export function SdkClient({ name, operations, returnType, throwOnErrorDefault }:
   )
 
   const constructor = [
-    '  private readonly client: ClientInstance',
+    '  readonly client: ClientInstance',
     '',
-    '  constructor(config: ClientConfig = {}) {',
-    '    this.client = createClient(config)',
+    '  constructor(config: ClientConfig | ClientInstance = {}) {',
+    "    this.client = typeof config === 'function' ? config : createClient(config)",
     '  }',
   ].join('\n')
 

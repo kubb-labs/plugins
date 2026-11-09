@@ -11,15 +11,18 @@ import { mutationOptions } from '@tanstack/react-query'
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
 export function addPetMutationOptions<TContext = unknown>(
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-    contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'; response?: 'application/json' | 'application/xml' }
-  } = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>> = {},
 ) {
   const mutationKey = addPetMutationKey()
-  return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
+  return mutationOptions<
+    AddPetStatus200,
+    ResponseErrorConfig<AddPetStatus405>,
+    AddPetOptions & { contentType?: string | { response?: 'application/json' | 'application/xml' } },
+    TContext
+  >({
     mutationKey,
     mutationFn: async (variables) => {
-      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0]).unwrap()
+      return addPet({ ...config, ...variables, throwOnError: true }).unwrap()
     },
   })
 }

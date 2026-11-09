@@ -48,7 +48,7 @@ export function buildGroupedOptionsSignature({
   throwOnErrorDefault: boolean
   /**
    * Adds the per-call stream options to the `options` type of a `text/event-stream` operation, except for a plain custom
-   * client, whose `toEventStream(promise)` does not read them.
+   * client, whose own `client.stream` returns a `StreamResult` and types its config itself.
    */
   eventStream?: boolean
 }): GroupedOptionsSignature {

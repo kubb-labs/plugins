@@ -60,4 +60,29 @@ describe('getOperationSecurity', () => {
     }
     expect(getOperationSecurity({ document: bodyDocument, method: 'GET', path: '/pet' })).toBeUndefined()
   })
+
+  test('groups the schemes one requirement needs together, and drops a requirement with a scheme the runtime cannot place', () => {
+    const both: SecurityDocument = {
+      security: [{ api_key: [], session: [] }, { weird: [], api_key: [] }, { petstore_auth: ['read:pets'] }],
+      components: {
+        securitySchemes: {
+          api_key: { type: 'apiKey', name: 'api_key', in: 'header' },
+          session: { type: 'apiKey', name: 'sid', in: 'cookie' },
+          weird: { type: 'apiKey', name: 'sid', in: 'body' },
+          petstore_auth: { type: 'oauth2' },
+        },
+      },
+    }
+    const security = getOperationSecurity({ document: both, method: 'GET', path: '/pet' })
+    expect(security).toStrictEqual([
+      [
+        { type: 'apiKey', name: 'api_key', in: 'header' },
+        { type: 'apiKey', name: 'sid', in: 'cookie' },
+      ],
+      { type: 'oauth2', scopes: ['read:pets'] },
+    ])
+    expect(buildSecurityMetadata({ security })).toBe(
+      "[[{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'apiKey', name: 'sid', in: 'cookie' }], { type: 'oauth2', scopes: ['read:pets'] }]",
+    )
+  })
 })

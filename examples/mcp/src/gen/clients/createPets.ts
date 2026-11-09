@@ -5,24 +5,24 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { CreatePetsOptions, CreatePetsResponses } from '../models/ts/CreatePets'
-import { client, withUnwrap } from '../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
 /**
+ * `POST /pets/{uuid}`
  * @summary Create a pet
- * {@link /pets/:uuid}
  */
 export function createPets<ThrowOnError extends boolean = true>(
   options: Options<CreatePetsOptions, ThrowOnError>,
 ): Unwrappable<RequestResult<CreatePetsResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({
+    apiClient<CreatePetsResponses, ThrowOnError>({
       method: 'POST',
       url: '/pets/{uuid}',
       contentType: { request: 'application/json' },
       ...config,
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<CreatePetsResponses, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

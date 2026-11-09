@@ -1,19 +1,19 @@
 import * as core from './core'
-import { createClientCore, readResponse, toRequestInit } from './core'
+import { createClientCore, createLazyClient, toRequestInit } from './core'
 export * from './core'
 
-/** The request and response objects of this transport, carried on every result and error. */
+/**
+ * The native request and response that every result and error carries.
+ */
 export type NativeRequest = Request
 export type NativeResponse = Response
 
 /**
- * The `options` of every request, client config, and resolved request: extra `fetch` init the transport spreads onto
- * the `Request`, for fields the runtime does not set itself such as `cache`, `redirect`, and Next.js's `next`.
+ * Extra `fetch` init for a call or client, such as `cache`, `redirect`, or Next.js's `next`.
  */
 export type NativeOptions = RequestInit & { next?: Record<string, unknown> }
 
 export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>
-/** The core's `ResponseError` class, typed with this transport's request and response. `instanceof` and `ResponseError.is` both match what the client throws. */
 export const ResponseError = core.ResponseError as {
   new <TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse>(
     config: ConstructorParameters<typeof core.ResponseError<TError, TRequest, TResponse>>[0],
@@ -23,7 +23,6 @@ export const ResponseError = core.ResponseError as {
   prototype: core.ResponseError<unknown, NativeRequest, NativeResponse>
 }
 
-/** The core's request, result, and client types, bound to this transport's request, response, and options. */
 export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestConfig<TBody, TRequest, TResponse> & {
   options?: NativeOptions
 }
@@ -48,23 +47,24 @@ export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRe
   TResponse
 >
 export type ResponseErrorConfig<TError = unknown> = core.ResponseError<TError, NativeRequest, NativeResponse>
-export type TransportResult<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.TransportResult<TData, TRequest, TResponse>
+export type TransportResult<TRequest = NativeRequest, TResponse = NativeResponse> = core.TransportResult<TRequest, TResponse>
+export type DecodedResponse<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.DecodedResponse<TData, TRequest, TResponse>
 export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
 export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
 export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
 
-/**
- * The default transport that sends the resolved request through `globalThis.fetch` and returns the parsed body with the native request and response.
- */
 export const defaultTransport = async (request: core.ResolvedRequest): Promise<TransportResult> => {
   const nativeRequest = new Request(request.url, toRequestInit(request))
   // `Request` drops the non-standard `next` field, so Next.js reads it from the init.
   const nextInit: NativeOptions | undefined = request.options?.next ? { next: request.options.next } : undefined
   const response = await globalThis.fetch(nativeRequest, nextInit)
 
-  return readResponse(response, { request: nativeRequest, responseType: request.responseType })
+  return { webResponse: response, request: nativeRequest, response }
 }
 
-export const client = createClientCore({ defaultTransport })
+/**
+ * The client every generated operation uses unless a call passes its own. It is created on first use.
+ */
+export const client = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
 
 export const createClient = client.createClient

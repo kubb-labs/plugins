@@ -1,13 +1,13 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { AddPetRequest } from '../../../models/ts/AddPetRequest'
 import type { Pet } from '../../../models/ts/Pet'
-import { client, withUnwrap } from '../../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 import { addPetResponseSchema, addPetStatus405Schema, addPetStatusDefaultSchema } from '../../../zod/pet/addPetSchema'
 
 /**
+ * `POST /pet`
  * @description Add a new pet to the store
  * @summary Add a new pet to the store
- * {@link /pet}
  */
 export function addPet<ThrowOnError extends boolean = true>(
   options: Options<
@@ -66,45 +66,26 @@ export function addPet<ThrowOnError extends boolean = true>(
     ThrowOnError
   >
 > {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request<
-      (
-        | {
-            body: AddPetRequest
-            path?: never
-            query?: never
-            headers?: never
-            contentType?:
-              | 'application/json'
-              | {
-                  request: 'application/json'
-                }
-          }
-        | {
-            body: Omit<NonNullable<Pet>, 'id'>
-            path?: never
-            query?: never
-            headers?: never
-            contentType:
-              | 'application/xml'
-              | {
-                  request: 'application/xml'
-                }
-          }
-        | {
-            body: Omit<NonNullable<Pet>, 'id'>
-            path?: never
-            query?: never
-            headers?: never
-            contentType:
-              | 'application/x-www-form-urlencoded'
-              | {
-                  request: 'application/x-www-form-urlencoded'
-                }
-          }
-      )['body']
+    apiClient<
+      {
+        '405': {
+          code?: number
+          message?: string
+        }
+        default:
+          | {
+              contentType: 'application/json'
+              data: Omit<NonNullable<Pet>, 'name'>
+            }
+          | {
+              contentType: 'application/xml'
+              data: string
+            }
+      },
+      ThrowOnError
     >({
       method: 'POST',
       url: '/pet',
@@ -112,26 +93,7 @@ export function addPet<ThrowOnError extends boolean = true>(
       contentType: { request: 'application/json' },
       ...config,
       validator: { response: addPetResponseSchema, error: { 405: addPetStatus405Schema, default: addPetStatusDefaultSchema }, ...config.validator },
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<
-      RequestResult<
-        {
-          '405': {
-            code?: number
-            message?: string
-          }
-          default:
-            | {
-                contentType: 'application/json'
-                data: Omit<NonNullable<Pet>, 'name'>
-              }
-            | {
-                contentType: 'application/xml'
-                data: string
-              }
-        },
-        ThrowOnError
-      >
-    >,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

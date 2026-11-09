@@ -5,7 +5,9 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId:search' }] as const
 
-export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function deletePetMutationOptions<TContext = unknown>(
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
+) {
   const mutationKey = deletePetMutationKey()
   return mutationOptions<
     unknown,
@@ -30,9 +32,9 @@ export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omi
 }
 
 /**
+ * `DELETE /pet/{petId}:search`
  * @description delete a pet
  * @summary Deletes a pet
- * {@link /pet/:petId:search}
  */
 export function useDeletePet<TContext>(
   options: {
@@ -51,7 +53,7 @@ export function useDeletePet<TContext>(
       },
       TContext
     > & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

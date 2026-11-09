@@ -8,9 +8,7 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
 export function addPetMutationOptions<TContext = unknown>(
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-    contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-  } = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>> = {},
 ) {
   const mutationKey = addPetMutationKey()
   return mutationOptions<
@@ -60,15 +58,15 @@ export function addPetMutationOptions<TContext = unknown>(
   >({
     mutationKey,
     mutationFn: async (variables) => {
-      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0]).unwrap()
+      return addPet({ ...config, ...variables, throwOnError: true }).unwrap()
     },
   })
 }
 
 /**
+ * `POST /pet`
  * @description Add a new pet to the store
  * @summary Add a new pet to the store
- * {@link /pet}
  */
 export function useAddPet<TContext>(
   options: {
@@ -117,9 +115,7 @@ export function useAddPet<TContext>(
         },
       TContext
     > & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-    }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

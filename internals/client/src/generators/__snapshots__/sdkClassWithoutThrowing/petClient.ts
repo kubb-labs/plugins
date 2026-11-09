@@ -3,42 +3,48 @@
 import type { ClientConfig, ClientInstance, Options, Unwrappable, RequestResult } from './.kubb/client'
 import type { DeletePetOptions, DeletePetResponses } from './DeletePet'
 import type { GetPetByIdOptions, GetPetByIdResponses } from './GetPetById'
-import { createClient, withUnwrap } from './.kubb/client'
+import { createClient, withUnwrap, resolveThrowOnError } from './.kubb/client'
 
 export class PetClient {
-  private readonly client: ClientInstance
+  readonly client: ClientInstance
 
-  constructor(config: ClientConfig = {}) {
-    this.client = createClient(config)
+  constructor(config: ClientConfig | ClientInstance = {}) {
+    this.client = typeof config === 'function' ? config : createClient(config)
   }
 
   /**
-   * {@link /pet/:petId}
+   * `GET /pet/{petId}`
    */
   public getPetById<ThrowOnError extends boolean = false>(
     options: Options<GetPetByIdOptions, ThrowOnError>,
   ): Unwrappable<RequestResult<GetPetByIdResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'GET', url: '/pet/{petId}', ...config, throwOnError: config.throwOnError ?? false }) as Promise<
-        RequestResult<GetPetByIdResponses, ThrowOnError>
-      >,
+      apiClient<GetPetByIdResponses, ThrowOnError>({
+        method: 'GET',
+        url: '/pet/{petId}',
+        ...config,
+        throwOnError: resolveThrowOnError(config.throwOnError, false),
+      }),
     )
   }
 
   /**
-   * {@link /pet/:petId}
+   * `DELETE /pet/{petId}`
    */
   public deletePet<ThrowOnError extends boolean = false>(
     options: Options<DeletePetOptions, ThrowOnError>,
   ): Unwrappable<RequestResult<DeletePetResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'DELETE', url: '/pet/{petId}', ...config, throwOnError: config.throwOnError ?? false }) as Promise<
-        RequestResult<DeletePetResponses, ThrowOnError>
-      >,
+      apiClient<DeletePetResponses, ThrowOnError>({
+        method: 'DELETE',
+        url: '/pet/{petId}',
+        ...config,
+        throwOnError: resolveThrowOnError(config.throwOnError, false),
+      }),
     )
   }
 }

@@ -3,16 +3,19 @@
  * Do not edit manually.
  */
 
-import type { ClientConfig } from '../.kubb/client'
-import { pet } from './pet/pet'
-import { store } from './store/store'
+import type { ClientConfig, ClientInstance } from '../.kubb/client'
+import { createClient } from '../.kubb/client'
+import { PetClient } from './pet/pet'
+import { StoreClient } from './store/store'
 
 export class PetStoreSDK {
-  readonly pet: pet
-  readonly store: store
+  readonly client: ClientInstance
+  readonly pet: PetClient
+  readonly store: StoreClient
 
   constructor(config: ClientConfig = {}) {
-    this.pet = new pet(config)
-    this.store = new store(config)
+    this.client = createClient(config)
+    this.pet = new PetClient(this.client)
+    this.store = new StoreClient(this.client)
   }
 }

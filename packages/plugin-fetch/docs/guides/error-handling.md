@@ -37,6 +37,25 @@ class ResponseError extends Error {
 
 Each generated package bundles its own `ResponseError` class, so narrow with `ResponseError.is(error)` instead of `instanceof`. `is()` checks the error name.
 
+## Narrow a thrown error by status
+
+`isResponseError<Responses>(error)` narrows a caught error to the `ResponseError` of one operation. Checking `status` then narrows `data` to the body declared for that status. A range key such as `4XX` covers its statuses that have no entry of their own, and `default` covers the rest:
+
+```typescript
+import { isResponseError } from './gen/.kubb/client'
+import type { GetPetByIdResponses } from './gen/models/GetPetById'
+
+try {
+  await getPetById({ path: { petId: 7 } })
+} catch (error) {
+  if (isResponseError<GetPetByIdResponses>(error) && error.status === 404) {
+    console.error(error.data) // GetPetById404
+  }
+}
+```
+
+The type argument is not checked at runtime, so keep the `try` around one operation.
+
 ## Return the error instead
 
 Pass `throwOnError: false` and the call resolves for every documented status. The result is a
@@ -81,8 +100,8 @@ operation passes its own value. Set it on the plugin.
 > [!IMPORTANT]
 > `throwOnError` only applies when the server answers. A dropped connection, a DNS failure, or an
 > aborted `AbortSignal` always rejects. A `ResponseError` means the server answered with a non-2xx
-> status, and a `ParseError` means a body failed validation. Any other error usually means the
-> request never completed.
+> status, and a `ParseError` means a body failed validation or is not valid JSON. Any other error
+> usually means the request never completed. All of them reach `client.interceptors.error`.
 
 ```typescript
 try {

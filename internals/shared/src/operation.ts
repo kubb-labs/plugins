@@ -1,4 +1,4 @@
-import { ast, type Group, type Memo, type Output, type Resolver, type ResolverFileParams, Url } from '@kubb/kit'
+import { ast, type Group, type Memo, type Output, type Resolver, type ResolverFileParams } from '@kubb/kit'
 
 /**
  * Builds the `ResolverFileParams` every operation generator passes to
@@ -82,11 +82,7 @@ export type OperationTypeNameResolver = RequestConfigResolver &
     }
   }
 
-export type OperationCommentLink = 'pathTemplate' | 'urlPath' | false | ((node: ast.OperationNode) => string | undefined)
-
 export type BuildOperationCommentsOptions = {
-  link?: OperationCommentLink
-  linkPosition?: 'beforeDeprecated' | 'afterDeprecated'
   splitLines?: boolean
 }
 
@@ -107,16 +103,11 @@ export type ResolveOperationTypeNameOptions = {
   includeParams?: boolean
 }
 
-function getOperationLink(node: ast.OperationNode, link: OperationCommentLink): string | null {
-  if (!link) {
-    return null
-  }
-
-  if (typeof link === 'function') {
-    return link(node) ?? null
-  }
-
-  return node.path ? `{@link ${Url.toPath(node.path)}}` : null
+/**
+ * The operation's method and path as plain text, such as `` `GET /pet/{petId}` ``. A path is not a valid `{@link}` target.
+ */
+function getOperationRequestLine(node: ast.OperationNode): string | null {
+  return ast.isHttpOperationNode(node) && node.path ? `\`${node.method.toUpperCase()} ${node.path}\`` : null
 }
 
 /**
@@ -147,7 +138,7 @@ export function getResponseContentTypeInfo(node: ast.OperationNode): ContentType
   return buildContentTypeInfo(getPrimarySuccessResponse(node)?.content?.map((e) => e.contentType) ?? [])
 }
 
-export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
+type ResponseType = 'blob' | 'text' | 'stream'
 
 function baseContentType(contentType: string): string {
   return contentType.split(';')[0]!.trim().toLowerCase()
@@ -200,6 +191,16 @@ export function hasEventStreamContent(node: ast.OperationNode): boolean {
   return entries.some((entry) => baseContentType(entry.contentType) === 'text/event-stream' && (entries.length === 1 || Boolean(entry.schema)))
 }
 
+const formContentTypes = new Set(['multipart/form-data', 'application/x-www-form-urlencoded'])
+
+/**
+ * Whether the request body offers `multipart/form-data` or `application/x-www-form-urlencoded`, so the client registers the
+ * form media types.
+ */
+export function hasFormBody(node: ast.OperationNode): boolean {
+  return (node.requestBody?.content ?? []).some((entry) => formContentTypes.has(baseContentType(entry.contentType)))
+}
+
 function isJsonContentType(baseType: string): boolean {
   return baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json'
 }
@@ -221,48 +222,6 @@ function responseTypeForContent(entry: ResponseContentEntry): ResponseType | und
   if (baseType.startsWith('text/')) return 'text'
   if (baseType === 'application/octet-stream' || baseType === 'application/pdf' || /^(image|audio|video)\//.test(baseType)) return 'blob'
   return undefined
-}
-
-/**
- * Derives the default `responseType` string for an operation from its primary success response.
- *
- * One content type uses {@link responseTypeForContent}. Several content types that all use the same
- * parser collapse to that string, so a call can keep `responseType: 'blob'`. Mixed parsers return
- * `undefined`; {@link getResponseTypeMap} carries the per-type choice.
- */
-export function getResponseType(node: ast.OperationNode): ResponseType | undefined {
-  const entries = getPrimarySuccessResponse(node)?.content ?? []
-  if (entries.length === 0) return undefined
-
-  const responseTypes = entries.map((entry) => responseTypeForContent(entry))
-  const first = responseTypes[0]
-  if (!first) return undefined
-  if (responseTypes.every((responseType) => responseType === first)) return first
-  return undefined
-}
-
-/**
- * Maps each base content type of a primary success response to its parser when those parsers differ.
- *
- * Keys are lowercased and stripped of parameters. JSON entries are kept as `'json'` so a catch-all
- * entry cannot claim a JSON response. Returns `undefined` when {@link getResponseType} already
- * covers the response with one string, or when no content type needs a parser other than JSON.
- * The runtime matches the response `Content-Type` against this map instead of guessing from the media type.
- */
-export function getResponseTypeMap(node: ast.OperationNode): Record<string, ResponseType> | undefined {
-  if (getResponseType(node)) return undefined
-
-  const entries = getPrimarySuccessResponse(node)?.content ?? []
-  if (entries.length <= 1) return undefined
-
-  const map: Record<string, ResponseType> = {}
-  for (const entry of entries) {
-    const baseType = baseContentType(entry.contentType)
-    const responseType = responseTypeForContent(entry) ?? (isJsonContentType(baseType) ? 'json' : undefined)
-    if (baseType && responseType) map[baseType] = responseType
-  }
-
-  return Object.values(map).some((responseType) => responseType !== 'json') ? map : undefined
 }
 
 /**
@@ -336,28 +295,35 @@ export function resolveContentTypeVariants(entries: Array<ContentVariantInput>, 
 
 /**
  * Builds the `client?:` option type shared by the generated query hooks (`useQuery`,
- * `useInfiniteQuery`, `useSWR`, ...). Unlike {@link buildRequestConfigType}, it never adds a
- * `contentType?:` member: query hooks wrap GET operations, which carry no request body to select a
- * content type for. It drops the data-shape keys to stay assignable to `Options`, which omits them
- * from `RequestConfig`. `cookies` is a group only on an operation that declares one.
+ * `useInfiniteQuery`, `useSWR`, ...): `RequestConfig` minus what the
+ * hook fills in, which is every request group and `throwOnError`. Unlike {@link buildRequestConfigType},
+ * it never narrows `contentType`: query hooks wrap GET operations, which carry no request body to select
+ * a content type for.
  */
-export function buildClientOptionType(node: ast.OperationNode): string {
-  const cookies = getOperationParameters(node).cookie.length > 0 ? ` | 'cookies'` : ''
-  return `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers'${cookies} | 'url'>>`
+export function buildClientOptionType(options: { omit?: Array<string> } = {}): string {
+  const keys = [...requestGroupOrder, 'url', ...(options.omit ?? []), 'throwOnError']
+  return `Partial<Omit<RequestConfig, ${keys.map((key) => `'${key}'`).join(' | ')}>>`
 }
 
+/**
+ * The `client?:` option type of a mutation hook. When the operation has a request content type choice,
+ * the mutation variables carry `contentType`, so the config leaves it out. Otherwise the ambiguous side is
+ * narrowed to the operation's media types; a single-type side has nothing to pick, so it stays baked in the
+ * generated call.
+ */
 export function buildRequestConfigType(node: ast.OperationNode): string {
+  if (hasRequestContentTypeChoice(node)) {
+    return buildClientOptionType({ omit: ['contentType'] })
+  }
+
   const request = getContentTypeInfo(node)
   const response = getResponseContentTypeInfo(node)
-
-  // Only the ambiguous side is offered: a single-type side has nothing to pick, so it stays baked in
-  // the generated call.
   const members = [
     request.isMultipleContentTypes ? `request?: ${request.contentTypeUnion}` : null,
     response.isMultipleContentTypes ? `response?: ${response.contentTypeUnion}` : null,
   ].filter(Boolean)
 
-  const base = buildClientOptionType(node)
+  const base = buildClientOptionType()
   return members.length ? `${base} & { contentType?: { ${members.join('; ')} } }` : base
 }
 
@@ -457,12 +423,14 @@ export function buildRequestParamsSignature(
 }
 
 export function buildOperationComments(node: ast.OperationNode, options: BuildOperationCommentsOptions = {}): Array<string> {
-  const { link = 'pathTemplate', linkPosition = 'afterDeprecated', splitLines = false } = options
-  const linkComment = getOperationLink(node, link)
-  const comments =
-    linkPosition === 'beforeDeprecated'
-      ? [node.description && `@description ${node.description}`, node.summary && `@summary ${node.summary}`, linkComment, node.deprecated && '@deprecated']
-      : [node.description && `@description ${node.description}`, node.summary && `@summary ${node.summary}`, node.deprecated && '@deprecated', linkComment]
+  const { splitLines = false } = options
+  // The request line leads: free text after a block tag would belong to that tag.
+  const comments = [
+    getOperationRequestLine(node),
+    node.description && `@description ${node.description}`,
+    node.summary && `@summary ${node.summary}`,
+    node.deprecated && '@deprecated',
+  ]
 
   const filteredComments = comments.filter((comment): comment is string => Boolean(comment))
 

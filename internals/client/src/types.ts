@@ -3,11 +3,11 @@ import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions
 /**
  * Validator applied to the request and response using schemas from `@kubb/plugin-zod`.
  * - `false`: no validation.
- * - `'zod'`: validates the success (2xx) response body, and the error body when a non-2xx call does
- *   not throw (`throwOnError: false`).
+ * - `'zod'`: validates the success (2xx) response body, and the error body of a non-2xx call, whether it
+ *   throws or returns the error.
  * - `{ request?: 'zod'; params?: 'zod'; response?: 'zod' }`: opt in per slot. `request` encodes the
  *   request body before the call; `params` validate the path, query, and header params;
- *   `response` validates the success response body and, on the non-throw path, the error body.
+ *   `response` validates the success response body and the error body.
  */
 export type ValidatorOptions = false | 'zod' | { request?: 'zod'; params?: 'zod'; response?: 'zod' }
 
@@ -117,15 +117,17 @@ export type Options = OutputOptions & {
    * // const api = new PetClient({ baseURL: 'https://api.example.com' })
    * // await api.getPetById({ path: { petId: 1 } })
    * ```
-   * @example Composed root that instantiates every tag client from one config
+   * @example Composed root that shares one client with every tag client
    * ```ts
    * pluginFetch({ sdk: { name: 'petStore' } })
    * // class PetStore {
+   * //   readonly client: ClientInstance
    * //   readonly pet: PetClient
    * //   readonly store: StoreClient
    * //   constructor(config = {}) { ... }
    * // }
    * // const api = new PetStore({ baseURL })
+   * // api.client.interceptors.request.use(...) // applies to every tag
    * // await api.pet.getPetById({ path: { petId: 1 } })
    * ```
    * @example Flat class with every operation as a direct method
@@ -138,7 +140,7 @@ export type Options = OutputOptions & {
   sdk?: {
     /**
      * How the SDK groups operations.
-     * - `'tag'`: one class per tag. With `name`, a composed root instantiates every tag client.
+     * - `'tag'`: one class per tag, such as `PetClient`. With `name`, a composed root shares one client with every tag client.
      * - `'flat'`: one class named by `name`, with every operation as a direct method.
      *
      * @default 'tag'
@@ -146,7 +148,7 @@ export type Options = OutputOptions & {
     mode?: Mode
     /**
      * Name of the generated entry point, also the file name. With `mode: 'tag'` it emits a
-     * composed root class that instantiates every tag client from one shared config. With
+     * composed root class that creates one client and shares it with every tag client. With
      * `mode: 'flat'` it names the single class.
      */
     name?: string

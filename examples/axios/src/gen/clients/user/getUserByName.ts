@@ -5,20 +5,23 @@
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { GetUserByNameOptions, GetUserByNameResponses } from '../../models/user/GetUserByName'
-import { client, withUnwrap } from '../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
+ * `GET /user/{username}`
  * @summary Get user by user name
- * {@link /user/:username}
  */
 export function getUserByName<ThrowOnError extends boolean = true>(
   options: Options<GetUserByNameOptions, ThrowOnError>,
 ): Unwrappable<RequestResult<GetUserByNameResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'GET', url: '/user/{username}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-      RequestResult<GetUserByNameResponses, ThrowOnError>
-    >,
+    apiClient<GetUserByNameResponses, ThrowOnError>({
+      method: 'GET',
+      url: '/user/{username}',
+      ...config,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

@@ -8,21 +8,21 @@ import type { FindPetsByStatusOptions, FindPetsByStatusResponses } from '../../m
 import { client } from '../../../client'
 
 /**
+ * `GET /pet/findByStatus`
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
- * {@link /pet/findByStatus}
  */
 export function findPetsByStatus<ThrowOnError extends boolean = true>(
   options: Options<FindPetsByStatusOptions, ThrowOnError> = {},
 ): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({
+  return apiClient<FindPetsByStatusResponses, ThrowOnError>({
     method: 'GET',
     url: '/pet/findByStatus',
     security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
     styles: { query: { status: { explode: true } } },
     ...config,
     throwOnError: config.throwOnError ?? true,
-  }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
+  })
 }

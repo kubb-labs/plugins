@@ -8,9 +8,9 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { placeOrderPatch } from '../clients/placeOrderPatch'
 
 /**
+ * `PATCH /store/order`
  * @description Place a new order in the store with patch
  * @summary Place an order for a pet with patch
- * {@link /store/order}
  */
 export async function placeOrderPatchHandler({ body }: Pick<PlaceOrderPatchOptions, 'body'> = {}, ctx: ServerContext): Promise<CallToolResult> {
   const res = await placeOrderPatch({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof placeOrderPatch<true>>[0])

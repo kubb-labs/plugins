@@ -11,7 +11,7 @@ import { mutationOptions } from '@tanstack/react-query'
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
 
 export function createUsersWithListInputMutationOptions<TContext = unknown>(
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> & {
     contentType?: { response?: 'application/json' | 'application/xml' }
   } = {},
 ) {

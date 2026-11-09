@@ -14,7 +14,7 @@ client.setConfig({
 })
 ```
 
-`auth` takes a token string or a function. The function can be async and returns a token, or `undefined` to skip that scheme. When an operation accepts several schemes, the runtime tries each until one returns a token.
+`auth` takes a token string or a function. The function can be async and returns a token, or `undefined` to skip that scheme. The runtime sends the first security requirement whose schemes all get a token. A requirement that needs an API key and a session cookie together sends both.
 
 ## Return the right token per scheme
 

@@ -12,11 +12,11 @@ import { useMutation } from '@tanstack/vue-query'
 export const petCreateMutationKey = () => [{ url: '/pets/create-first' }] as const
 
 /**
- * {@link /pets/create-first}
+ * `POST /pets/create-first`
  */
 export function usePetCreate<TContext>(options: {
   mutation?: MutationObserverOptions<PetCreateStatus200, ResponseErrorConfig<Error>, undefined, TContext> & { client?: QueryClient },
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

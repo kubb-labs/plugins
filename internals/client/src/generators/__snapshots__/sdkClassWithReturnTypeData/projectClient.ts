@@ -2,26 +2,31 @@
 
 import type { ClientConfig, ClientInstance, Options, UnwrappedResult } from './.kubb/client'
 import type { GetProjectOptions, GetProjectResponses } from './GetProject'
-import { createClient, unwrapResult } from './.kubb/client'
+import { createClient, unwrapResult, resolveThrowOnError } from './.kubb/client'
 
 export class ProjectClient {
-  private readonly client: ClientInstance
+  readonly client: ClientInstance
 
-  constructor(config: ClientConfig = {}) {
-    this.client = createClient(config)
+  constructor(config: ClientConfig | ClientInstance = {}) {
+    this.client = typeof config === 'function' ? config : createClient(config)
   }
 
   /**
-   * {@link /projects/:project_id}
+   * `GET /projects/{project_id}`
    */
   public getProject<ThrowOnError extends boolean = true>(
     options: Options<GetProjectOptions, ThrowOnError>,
   ): Promise<UnwrappedResult<GetProjectResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
     return unwrapResult(
-      request({ method: 'GET', url: '/projects/{project_id}', ...config, throwOnError: config.throwOnError ?? true }),
-      config.throwOnError ?? true,
-    ) as Promise<UnwrappedResult<GetProjectResponses, ThrowOnError>>
+      apiClient<GetProjectResponses, ThrowOnError>({
+        method: 'GET',
+        url: '/projects/{project_id}',
+        ...config,
+        throwOnError: resolveThrowOnError(config.throwOnError, true),
+      }),
+      resolveThrowOnError(config.throwOnError, true),
+    )
   }
 }

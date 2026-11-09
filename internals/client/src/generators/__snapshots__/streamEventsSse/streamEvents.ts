@@ -1,30 +1,25 @@
 /* eslint-disable no-alert, no-console */
 
-import type { SuccessOf, Unwrappable } from './.kubb/client'
-import type { StreamResult, StreamOptions, ServerSentEvent } from './.kubb/sse'
+import type { StreamOptions, Unwrappable, StreamResult } from './.kubb/client'
 import type { StreamEventsOptions, StreamEventsResponses } from './StreamEvents'
-import { client, withUnwrap } from './.kubb/client'
-import { toEventStream } from './.kubb/sse'
+import { client, withUnwrap, resolveThrowOnError } from './.kubb/client'
 
 /**
- * {@link /events}
+ * `GET /events`
  */
 export function streamEvents<ThrowOnError extends boolean = true>(
   options: StreamOptions<StreamEventsOptions, ThrowOnError> = {},
 ): Unwrappable<StreamResult<StreamEventsResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    toEventStream<ServerSentEvent<SuccessOf<StreamEventsResponses>>>(
-      request({
-        method: 'GET',
-        url: '/events',
-        contentType: { response: 'text/event-stream' },
-        responseType: 'stream',
-        ...config,
-        throwOnError: config.throwOnError ?? true,
-      }),
-      { client: request, config, shape: 'data' },
-    ) as Promise<StreamResult<StreamEventsResponses, ThrowOnError>>,
+    apiClient.stream<StreamEventsResponses, ThrowOnError>({
+      method: 'GET',
+      url: '/events',
+      contentType: { response: 'text/event-stream' },
+      eventShape: 'data',
+      ...config,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

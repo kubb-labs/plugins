@@ -16,8 +16,8 @@ export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMu
 export type UpdatePetWithFormMutationArg = UpdatePetWithFormOptions
 
 /**
+ * `POST /pet/{petId}`
  * @summary Updates a pet in the store with form data
- * {@link /pet/:petId}
  */
 export function useUpdatePetWithForm(
   options: {
@@ -27,7 +27,7 @@ export function useUpdatePetWithForm(
       UpdatePetWithFormMutationKey | null,
       UpdatePetWithFormMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
 ) {

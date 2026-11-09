@@ -11,15 +11,13 @@ import { mutationOptions } from '@tanstack/react-query'
 export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as const
 
 export function placeOrderPatchMutationOptions<TContext = unknown>(
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-    contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-  } = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>> = {},
 ) {
   const mutationKey = placeOrderPatchMutationKey()
   return mutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return placeOrderPatch({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrderPatch<true>>[0]).unwrap()
+      return placeOrderPatch({ ...config, ...variables, throwOnError: true }).unwrap()
     },
   })
 }

@@ -5,20 +5,18 @@
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { LoginUserOptions, LoginUserResponses } from '../../models/user/LoginUser'
-import { client, withUnwrap } from '../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
+ * `GET /user/login`
  * @summary Logs user into the system
- * {@link /user/login}
  */
 export function loginUser<ThrowOnError extends boolean = true>(
   options: Options<LoginUserOptions, ThrowOnError> = {},
 ): Unwrappable<RequestResult<LoginUserResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({ method: 'GET', url: '/user/login', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-      RequestResult<LoginUserResponses, ThrowOnError>
-    >,
+    apiClient<LoginUserResponses, ThrowOnError>({ method: 'GET', url: '/user/login', ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
   )
 }

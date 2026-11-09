@@ -3,9 +3,9 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { findPetsByTags } from '../../clients/axios/petService/findPetsByTags'
 
 /**
+ * `GET /pet/findByTags`
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
  * @summary Finds Pets by tags
- * {@link /pet/findByTags}
  */
 export async function findPetsByTagsHandler(
   {

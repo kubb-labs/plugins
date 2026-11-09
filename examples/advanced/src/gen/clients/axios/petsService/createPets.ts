@@ -1,12 +1,12 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { CreatePetsBoolParamKey } from '../../../models/ts/CreatePetsBoolParam'
 import type { CreatePetsXEXAMPLEKey } from '../../../models/ts/CreatePetsXEXAMPLE'
-import { client, withUnwrap } from '../../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 import { createPetsResponseSchema, createPetsStatusDefaultSchema } from '../../../zod/pets/createPetsSchema'
 
 /**
+ * `POST /pets/{uuid}`
  * @summary Create a pet
- * {@link /pets/:uuid}
  */
 export function createPets<ThrowOnError extends boolean = true>(
   options: Options<
@@ -37,24 +37,22 @@ export function createPets<ThrowOnError extends boolean = true>(
     ThrowOnError
   >
 > {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({
+    apiClient<
+      {
+        '201': unknown
+        default: unknown
+      },
+      ThrowOnError
+    >({
       method: 'POST',
       url: '/pets/{uuid}',
       contentType: { request: 'application/json' },
       ...config,
       validator: { response: createPetsResponseSchema, error: { default: createPetsStatusDefaultSchema }, ...config.validator },
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<
-      RequestResult<
-        {
-          '201': unknown
-          default: unknown
-        },
-        ThrowOnError
-      >
-    >,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

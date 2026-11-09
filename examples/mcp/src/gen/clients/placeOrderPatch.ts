@@ -5,25 +5,25 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../models/ts/PlaceOrderPatch'
-import { client, withUnwrap } from '../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
 /**
+ * `PATCH /store/order`
  * @description Place a new order in the store with patch
  * @summary Place an order for a pet with patch
- * {@link /store/order}
  */
 export function placeOrderPatch<ThrowOnError extends boolean = true>(
   options: Options<PlaceOrderPatchOptions, ThrowOnError> = {},
 ): Unwrappable<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request<PlaceOrderPatchOptions['body']>({
+    apiClient<PlaceOrderPatchResponses, ThrowOnError>({
       method: 'PATCH',
       url: '/store/order',
       contentType: { request: 'application/json' },
       ...config,
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

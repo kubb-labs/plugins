@@ -31,7 +31,7 @@ export function findPetsByStatusQueryOptions(
     query?: never
     headers?: never
   },
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = findPetsByStatusQueryKey({ path })
   return queryOptions<Array<Pet> | string, ResponseErrorConfig<unknown>, Array<Pet> | string, typeof queryKey>({
@@ -43,9 +43,9 @@ export function findPetsByStatusQueryOptions(
 }
 
 /**
+ * `GET /pet/findByStatus/{step_id}`
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
- * {@link /pet/findByStatus/:step_id}
  */
 export function useFindPetsByStatus<TData = Array<Pet> | string, TQueryData = Array<Pet> | string, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>(
   {
@@ -71,7 +71,7 @@ export function useFindPetsByStatus<TData = Array<Pet> | string, TQueryData = Ar
   },
   options: {
     query?: Partial<QueryObserverOptions<Array<Pet> | string, ResponseErrorConfig<unknown>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

@@ -1,6 +1,6 @@
-import { client, createClient } from './gen/.kubb/client.ts'
+import { client, createClient, isResponseError } from './gen/.kubb/client.ts'
 import { addPet, getPetById } from './gen/clients/index.ts'
-import type { Pet } from './gen/models/index.ts'
+import type { GetPetByIdResponses, Pet } from './gen/models/index.ts'
 
 // Configure the bundled runtime. There is no runtime dependency on @kubb/plugin-fetch.
 client.setConfig({ baseURL: 'https://petstore3.swagger.io/api/v3' })
@@ -34,7 +34,23 @@ export async function demo() {
       break
   }
 
+  // a thrown error narrows by status to the body the document declares for it
+  try {
+    await getPetById({ path: { petId: 3n } })
+  } catch (error) {
+    if (isResponseError<GetPetByIdResponses>(error) && error.status === 404) console.log('missing', error.data)
+  }
+
   // an isolated instance for a different base URL, passed per call
   const tenant = createClient({ baseURL: 'https://tenant.example.com' })
   await getPetById({ path: { petId: 2n }, client: tenant })
+}
+
+type DemoResponses = { '200': Pet; '404': { message: string }; '5XX': { retryAfter: number } }
+
+// Checking `status` narrows `data`: the `5XX` range covers every status from 500 to 599.
+export function describeError(error: unknown): string {
+  if (!isResponseError<DemoResponses>(error)) return 'network'
+  if (error.status === 404) return error.data.message
+  return `retry in ${error.data.retryAfter}s`
 }

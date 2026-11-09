@@ -23,14 +23,7 @@ function createServer() {
     const data = request.url.includes('/visits/')
       ? { petId: '9007199254740993', day: '2026-10-01', startsAt: '2026-10-01T09:00:00.000Z', notes: 'Yearly check-up' }
       : [{ id: '9007199254740993', name: 'Odie', homepage: 'https://odie.example.com', birthDate: '2020-04-01', createdAt: '2020-04-02T10:30:00.000Z' }]
-    return {
-      data,
-      status: 200,
-      statusText: 'OK',
-      headers: new Headers({ 'Content-Type': 'application/json' }),
-      request: new Request(request.url),
-      response: new Response(),
-    }
+    return Response.json(data)
   }
   return { requests, transport }
 }

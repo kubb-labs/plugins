@@ -10,7 +10,9 @@ import { mutationOptions } from '@tanstack/react-query'
 
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
 
-export function deleteOrderMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function deleteOrderMutationOptions<TContext = unknown>(
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
+) {
   const mutationKey = deleteOrderMutationKey()
   return mutationOptions<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderOptions, TContext>({
     mutationKey,

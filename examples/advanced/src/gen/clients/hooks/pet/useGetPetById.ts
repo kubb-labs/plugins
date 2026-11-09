@@ -31,7 +31,7 @@ export function getPetByIdQueryOptions(
     query?: never
     headers?: never
   },
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getPetByIdQueryKey({ path })
   return queryOptions<
@@ -48,9 +48,9 @@ export function getPetByIdQueryOptions(
 }
 
 /**
+ * `GET /pet/{petId}:search`
  * @description Returns a single pet
  * @summary Find pet by ID
- * {@link /pet/:petId:search}
  */
 export function useGetPetById<
   TData = Omit<NonNullable<Pet>, 'name'> | string,
@@ -82,7 +82,7 @@ export function useGetPetById<
     query?: Partial<QueryObserverOptions<Omit<NonNullable<Pet>, 'name'> | string, ResponseErrorConfig<unknown | unknown>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
     }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

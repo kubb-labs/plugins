@@ -8,9 +8,9 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { getOrderById } from '../clients/getOrderById'
 
 /**
+ * `GET /store/order/{orderId}`
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
  * @summary Find purchase order by ID
- * {@link /store/order/:orderId}
  */
 export async function getOrderByIdHandler({ path }: GetOrderByIdOptions, ctx: ServerContext): Promise<CallToolResult> {
   const res = await getOrderById({ path, signal: ctx.mcpReq.signal, throwOnError: true })

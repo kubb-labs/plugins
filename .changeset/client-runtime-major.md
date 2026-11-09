@@ -8,17 +8,22 @@ Run the fetch and axios clients on one core with the same interceptors and clien
 
 - Import types from `templates/client.ts` and the runtime from `@kubb/plugin-client/templates/*`. `templates/fetch.ts` and `templates/axios.ts` are gone.
 - `FetchOptions` and `AxiosOptions` are now `NativeOptions`.
-- Stream types take the event: `EventStreamResult<ServerSentEvent<Pet>>` instead of `EventStreamResult<Pet>`, also for `StreamResult` and `UnwrappedStreamResult`.
-- A custom transport returns a web `Response` and builds its init with `toRequestInit(request)`.
-- On axios, `client.interceptors` handlers get the core objects and skip network errors. Native handlers go on `axiosInstance.interceptors`. `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
+- Rename `codecs` to `mediaTypes`, `serialize` to `encode`, and `deserialize` to `decode`, and move a custom `serializer.body` into a `mediaTypes` entry.
+- Replace `responseType` with `parseAs`, and catch the `ParseError` that invalid JSON now throws.
+- Replace `toEventStream(call, { shape })` with `client.stream({ ...config, eventShape })`, and name its result `StreamResult` with the event type, such as `StreamResult<Responses, true, ServerSentEvent<Pet>>`. `EventStreamResult` is gone.
+- Return a web `Response` from a custom transport, built with `toRequestInit(request)`.
+- Narrow `client.interceptors.error` handlers with `ResponseError.is`, since they now also get network and validation errors.
+- On axios, `client.interceptors` handlers get the core objects. Put native handlers on `getAxiosInstance().interceptors`. `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
+- Make a custom client (`importPath`) generic and add a `stream` method.
+- With `sdk` tag classes, rename `new pet(config)` to `new PetClient(config)`.
 
 ```diff
 - import { client, defaultTransport } from './gen/.kubb/client'
-+ import { axiosInstance, client, createAxiosTransport } from './gen/.kubb/client'
++ import { client, createAxiosTransport, getAxiosInstance } from './gen/.kubb/client'
 
 - defaultTransport.defaults.timeout = 10_000
 - client.setConfig({ transport: axios.create({ baseURL }) })
-+ axiosInstance.defaults.timeout = 10_000
++ getAxiosInstance().defaults.timeout = 10_000
 + client.setConfig({ transport: createAxiosTransport(axios.create({ baseURL })) })
 ```
 

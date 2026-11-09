@@ -5,25 +5,25 @@
 
 import type { Options, Unwrappable, RequestResult } from '../.kubb/client'
 import type { UploadFileOptions, UploadFileResponses } from '../models'
-import { client, withUnwrap } from '../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
 /**
+ * `POST /pet/{petId}/uploadImage`
  * @summary uploads an image
- * {@link /pet/:petId/uploadImage}
  */
 export function uploadFile<ThrowOnError extends boolean = true>(
   options: Options<UploadFileOptions, ThrowOnError>,
 ): Unwrappable<RequestResult<UploadFileResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({
+    apiClient<UploadFileResponses, ThrowOnError>({
       method: 'POST',
       url: '/pet/{petId}/uploadImage',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       contentType: { request: 'application/octet-stream' },
       ...config,
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

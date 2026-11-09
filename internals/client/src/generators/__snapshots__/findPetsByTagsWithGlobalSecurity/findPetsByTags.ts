@@ -2,23 +2,23 @@
 
 import type { Options, Unwrappable, RequestResult } from './.kubb/client'
 import type { FindPetsByTagsOptions, FindPetsByTagsResponses } from './FindPetsByTags'
-import { client, withUnwrap } from './.kubb/client'
+import { client, withUnwrap, resolveThrowOnError } from './.kubb/client'
 
 /**
- * {@link /pet/findByTags}
+ * `GET /pet/findByTags`
  */
 export function findPetsByTags<ThrowOnError extends boolean = true>(
   options: Options<FindPetsByTagsOptions, ThrowOnError>,
 ): Unwrappable<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    request({
+    apiClient<FindPetsByTagsResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/findByTags',
       security: [{ type: 'http', scheme: 'bearer' }],
       ...config,
-      throwOnError: config.throwOnError ?? true,
-    }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

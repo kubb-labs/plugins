@@ -5,7 +5,9 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId:search' }] as const
 
-export function updatePetWithFormMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function updatePetWithFormMutationOptions<TContext = unknown>(
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
+) {
   const mutationKey = updatePetWithFormMutationKey()
   return mutationOptions<
     unknown,
@@ -31,8 +33,8 @@ export function updatePetWithFormMutationOptions<TContext = unknown>(config: Par
 }
 
 /**
+ * `POST /pet/{petId}:search`
  * @summary Updates a pet in the store with form data
- * {@link /pet/:petId:search}
  */
 export function useUpdatePetWithForm<TContext>(
   options: {
@@ -52,7 +54,7 @@ export function useUpdatePetWithForm<TContext>(
       },
       TContext
     > & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

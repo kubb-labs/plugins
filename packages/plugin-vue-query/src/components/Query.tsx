@@ -49,7 +49,7 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
     memberTypeWrapper: maybeRefOrGetter,
     optionsType: `{
   query?: Partial<${optionsName}<${optionsGenerics.join(', ')}>> & { client?: QueryClient },
-  client?: ${buildClientOptionType(node)}
+  client?: ${buildClientOptionType()}
 }`,
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''

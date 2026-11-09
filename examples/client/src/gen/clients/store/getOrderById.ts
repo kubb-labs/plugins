@@ -8,16 +8,14 @@ import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../../models/st
 import { client } from '../../../client'
 
 /**
+ * `GET /store/order/{orderId}`
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
  * @summary Find purchase order by ID
- * {@link /store/order/:orderId}
  */
 export function getOrderById<ThrowOnError extends boolean = true>(
   options: Options<GetOrderByIdOptions, ThrowOnError>,
 ): Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({ method: 'GET', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<GetOrderByIdResponses, ThrowOnError>
-  >
+  return apiClient<GetOrderByIdResponses, ThrowOnError>({ method: 'GET', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true })
 }

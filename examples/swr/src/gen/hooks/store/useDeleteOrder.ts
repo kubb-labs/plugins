@@ -16,9 +16,9 @@ export type DeleteOrderMutationKey = ReturnType<typeof deleteOrderMutationKey>
 export type DeleteOrderMutationArg = DeleteOrderOptions
 
 /**
+ * `DELETE /store/order/{orderId}`
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
  * @summary Delete purchase order by ID
- * {@link /store/order/:orderId}
  */
 export function useDeleteOrder(
   options: {
@@ -28,7 +28,7 @@ export function useDeleteOrder(
       DeleteOrderMutationKey | null,
       DeleteOrderMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
 ) {

@@ -8,20 +8,20 @@ import type { DeletePetOptions, DeletePetResponses } from '../../models/pet/Dele
 import { client } from '../../../client'
 
 /**
+ * `DELETE /pet/{petId}`
  * @description delete a pet
  * @summary Deletes a pet
- * {@link /pet/:petId}
  */
 export function deletePet<ThrowOnError extends boolean = true>(
   options: Options<DeletePetOptions, ThrowOnError>,
 ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({
+  return apiClient<DeletePetResponses, ThrowOnError>({
     method: 'DELETE',
     url: '/pet/{petId}',
     security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
     ...config,
     throwOnError: config.throwOnError ?? true,
-  }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
+  })
 }

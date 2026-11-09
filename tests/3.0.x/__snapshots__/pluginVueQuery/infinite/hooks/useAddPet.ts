@@ -12,21 +12,21 @@ import { useMutation } from '@tanstack/vue-query'
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
 /**
+ * `POST /pet`
  * @description Add a new pet to the store
  * @summary Add a new pet to the store
- * {@link /pet}
  */
 export function useAddPet<TContext>(options: {
-  mutation?: MutationObserverOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext> & { client?: QueryClient },
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: { request?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"; response?: "application/json" | "application/xml" } },
+  mutation?: MutationObserverOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions & { contentType?: string | { response?: "application/json" | "application/xml" } }, TContext> & { client?: QueryClient },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions?.mutationKey ?? addPetMutationKey()
 
-  return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext>({
+  return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions & { contentType?: string | { response?: "application/json" | "application/xml" } }, TContext>({
     mutationFn: async(variables) => {
-      return addPet({ ...config, ...variables, throwOnError: true } as Parameters<typeof addPet<true>>[0]).unwrap()
+      return addPet({ ...config, ...variables, throwOnError: true }).unwrap()
     },
     mutationKey,
     ...mutationOptions

@@ -11,15 +11,13 @@ import { mutationOptions } from '@tanstack/react-query'
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
 export function uploadFileMutationOptions<TContext = unknown>(
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-    contentType?: { request?: 'application/json' | 'multipart/form-data' }
-  } = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>> = {},
 ) {
   const mutationKey = uploadFileMutationKey()
   return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return uploadFile({ ...config, ...variables, throwOnError: true } as Parameters<typeof uploadFile<true>>[0]).unwrap()
+      return uploadFile({ ...config, ...variables, throwOnError: true }).unwrap()
     },
   })
 }

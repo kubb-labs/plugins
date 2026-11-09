@@ -16,7 +16,7 @@ type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 export function findPetsByTagsQueryOptions(
   { query }: FindPetsByTagsOptions = {},
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   return {
     fetcher: async () => {
@@ -26,15 +26,15 @@ export function findPetsByTagsQueryOptions(
 }
 
 /**
+ * `GET /pet/findByTags`
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
  * @summary Finds Pets by tags
- * {@link /pet/findByTags}
  */
 export function useFindPetsByTags(
   { query }: FindPetsByTagsOptions = {},
   options: {
     query?: SWRConfiguration<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>>
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
   } = {},

@@ -11,15 +11,13 @@ import { mutationOptions } from '@tanstack/react-query'
 export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 
 export function updateUserMutationOptions<TContext = unknown>(
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-    contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-  } = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>> = {},
 ) {
   const mutationKey = updateUserMutationKey()
   return mutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return updateUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof updateUser<true>>[0]).unwrap()
+      return updateUser({ ...config, ...variables, throwOnError: true }).unwrap()
     },
   })
 }

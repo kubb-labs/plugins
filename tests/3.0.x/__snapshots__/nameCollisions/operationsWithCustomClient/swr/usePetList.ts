@@ -13,7 +13,7 @@ export const petListQueryKey = () => [{ url: '/pets/first' }] as const
 
 type PetListQueryKey = ReturnType<typeof petListQueryKey>
 
-export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   return {
     fetcher: async () => {
       return (await petList({ ...config, throwOnError: true })).data
@@ -22,11 +22,11 @@ export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' |
 }
 
 /**
- * {@link /pets/first}
+ * `GET /pets/first`
  */
 export function usePetList(options: {
   query?: SWRConfiguration<PetListStatus200, ResponseErrorConfig<Error>>,
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {

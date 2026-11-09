@@ -7,13 +7,15 @@ Auth lives in your `client`. The plugin does not send credentials itself. It tel
 Each generated function passes the operation's security schemes from the spec as `security`:
 
 ```typescript
-request({
+apiClient<GetPetByIdResponses, ThrowOnError>({
   method: 'GET',
   url: '/pet/{petId}',
   security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }],
   ...config,
 })
 ```
+
+Each entry is one security requirement, and meeting one is enough. A requirement that needs several schemes together, such as an API key and a session cookie, is an array, and your client sends all of them: `security: [[{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'apiKey', name: 'sid', in: 'cookie' }]]`.
 
 An operation without security requirements passes no `security` field. Use that to skip auth on public endpoints.
 

@@ -1,6 +1,6 @@
 # Add interceptors
 
-Register handlers on `client.interceptors.request`, `.response`, or `.error` to apply behavior across calls. They receive a `ResolvedRequest`, a `TransportResult`, or a `ResponseError`, as on the fetch client.
+Register handlers on `client.interceptors.request`, `.response`, or `.error` to apply behavior across calls. Handlers receive the resolved request, the decoded result, or the error a call ends with.
 
 ## Run before the send
 
@@ -16,49 +16,47 @@ client.interceptors.request.use((request) => {
 ```
 
 The handler receives a `ResolvedRequest` (`url`, `method`, `headers`, `body`, `signal`,
-`credentials`, `options`, `responseType`).
+`credentials`, `options`, `stream`).
 
 ## Run after the send
 
-Response handlers run before the client checks the status or runs a codec. `data` is the body as
-the transport read it, so a JSON body is already parsed unless the call sets `responseType: 'text'`.
-The handler receives a `TransportResult` (`data`, `status`, `statusText`, `headers`, `contentType`,
-`request`, `response`):
+Response handlers run after the body is decoded and before the status check and the validator, so a JSON body is
+already parsed. On a `client.stream` call, `data` is the raw body stream. The handler receives a `DecodedResponse`
+(`data`, `status`, `statusText`, `headers`, `contentType`, `request`, `response`):
 
 ```typescript
 client.interceptors.response.use((result) => {
-  console.info(`${result.status} ${result.request.url}`)
+  console.info(`${result.status} ${result.contentType}`)
   return result
 })
 ```
 
 ## React to an error
 
-Use an error handler to react to HTTP errors on the throwing path. The handler receives the
-`ResponseError`:
+Error handlers get every failure: a `ResponseError` for a non-2xx status, a network error, an abort, or a
+`ParseError`. Narrow with `ResponseError.is`:
 
 ```typescript
+import { client, ResponseError } from './gen/.kubb/client'
+
 client.interceptors.error.use((error) => {
-  if (error.status === 401) scheduleTokenRefresh()
+  if (ResponseError.is(error) && error.status === 401) scheduleTokenRefresh()
+  if (error.name === 'AbortError') console.info('canceled')
   return error
 })
 ```
 
-Return another error, such as a domain error, and the call throws it instead. The handlers after it
-do not run, so each handler still receives a `ResponseError`. A handler that returns nothing keeps
-the error:
+Return another error, such as a domain error, and the call throws it instead. Each handler receives the error the one
+before it returned. A handler that returns nothing keeps the error:
 
 ```typescript
 class NotFoundError extends Error {}
 
-client.interceptors.error.use((error) => (error.status === 404 ? new NotFoundError(error.message) : error))
+client.interceptors.error.use((error) => (ResponseError.is(error) && error.status === 404 ? new NotFoundError(error.message) : error))
 ```
 
-This channel only fires on the throw path. When you read with `throwOnError: false`, a documented
-non-2xx response resolves and no error interceptor runs, so inspect the returned `error` on the
-result instead. A network error, with no response, still throws, and the error handler does not run
-for it. To react to one, add an error callback on `axiosInstance.interceptors.response`, as in
-[Native axios interceptors](#native-axios-interceptors).
+With `throwOnError: false`, a documented non-2xx response resolves and no error handler runs for it, so inspect the
+returned `error` on the result. An error inside a stream loop throws from the loop and skips the error handlers.
 
 ## Add, replace, and remove handlers
 
@@ -81,19 +79,29 @@ client.interceptors.request.eject(id)
 
 ## Where to set them
 
-Register handlers on the shared `client` for all operations, or on a separate `createClient` instance for isolated calls. Interceptors are instance-level settings.
+Register handlers on the shared `client` for all operations. `client.createClient(config)` returns an instance with the
+same config and no handlers. `client.extend(config)` returns one that runs the parent's handlers, even those added
+later, before its own:
+
+```typescript
+import { client } from './gen/.kubb/client'
+
+const admin = client.extend({ headers: { 'X-Role': 'admin' } })
+admin.interceptors.request.use((request) => request) // runs after the handlers on client
+await getPetById({ path: { petId: 1 }, client: admin })
+```
 
 ## Native axios interceptors
 
-To get the native `InternalAxiosRequestConfig`, `AxiosResponse`, or `AxiosError`, register an axios interceptor on `axiosInstance`, the instance `defaultTransport` sends through:
+To get the native `InternalAxiosRequestConfig`, `AxiosResponse`, or `AxiosError`, register an axios interceptor on `getAxiosInstance()`:
 
 ```typescript
-import { axiosInstance } from './gen/.kubb/client'
+import { getAxiosInstance } from './gen/.kubb/client'
 
-axiosInstance.interceptors.request.use((config) => {
+getAxiosInstance().interceptors.request.use((config) => {
   config.headers.set('traceparent', currentTraceparent())
   return config
 })
 ```
 
-Axios runs these after the `client.interceptors` request handlers, and in reverse order of registration. An instance you wrap with `createAxiosTransport` keeps its own axios interceptors. See [Use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/transport).
+They run after the `client.interceptors` request handlers, in reverse order of registration, and response interceptors see the raw bytes. An instance you wrap with `createAxiosTransport` keeps its own interceptors. See [Use a custom transport](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/transport).

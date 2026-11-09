@@ -8,15 +8,13 @@ import type { LoginUserOptions, LoginUserResponses } from '../../models/user/Log
 import { client } from '../../../client'
 
 /**
+ * `GET /user/login`
  * @summary Logs user into the system
- * {@link /user/login}
  */
 export function loginUser<ThrowOnError extends boolean = true>(
   options: Options<LoginUserOptions, ThrowOnError> = {},
 ): Promise<RequestResult<LoginUserResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({ method: 'GET', url: '/user/login', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-    RequestResult<LoginUserResponses, ThrowOnError>
-  >
+  return apiClient<LoginUserResponses, ThrowOnError>({ method: 'GET', url: '/user/login', ...config, throwOnError: config.throwOnError ?? true })
 }

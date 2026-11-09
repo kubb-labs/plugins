@@ -8,19 +8,19 @@ import type { UpdatePetWithFormOptions, UpdatePetWithFormResponses } from '../..
 import { client } from '../../../client'
 
 /**
+ * `POST /pet/{petId}`
  * @summary Updates a pet in the store with form data
- * {@link /pet/:petId}
  */
 export function updatePetWithForm<ThrowOnError extends boolean = true>(
   options: Options<UpdatePetWithFormOptions, ThrowOnError>,
 ): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
-  return request({
+  return apiClient<UpdatePetWithFormResponses, ThrowOnError>({
     method: 'POST',
     url: '/pet/{petId}',
     security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
     ...config,
     throwOnError: config.throwOnError ?? true,
-  }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>
+  })
 }

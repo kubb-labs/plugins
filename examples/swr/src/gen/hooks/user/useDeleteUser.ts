@@ -16,9 +16,9 @@ export type DeleteUserMutationKey = ReturnType<typeof deleteUserMutationKey>
 export type DeleteUserMutationArg = DeleteUserOptions
 
 /**
+ * `DELETE /user/{username}`
  * @description This can only be done by the logged in user.
  * @summary Delete user
- * {@link /user/:username}
  */
 export function useDeleteUser(
   options: {
@@ -28,7 +28,7 @@ export function useDeleteUser(
       DeleteUserMutationKey | null,
       DeleteUserMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
 ) {

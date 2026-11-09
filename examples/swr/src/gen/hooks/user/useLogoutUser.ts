@@ -13,7 +13,7 @@ export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 
 type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 
-export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   return {
     fetcher: async () => {
       return logoutUser({ ...config, throwOnError: true }).unwrap()
@@ -22,13 +22,13 @@ export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path
 }
 
 /**
+ * `GET /user/logout`
  * @summary Logs out current logged in user session
- * {@link /user/logout}
  */
 export function useLogoutUser(
   options: {
     query?: SWRConfiguration<LogoutUserResponse, ResponseErrorConfig<Error>>
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
   } = {},

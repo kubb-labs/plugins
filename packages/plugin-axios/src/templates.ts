@@ -8,9 +8,10 @@ export const axiosClientTemplatePath = fileURLToPath(new URL('../templates/clien
 
 /**
  * Absolute paths to the runtime templates `@kubb/plugin-client` ships for every client plugin, copied into `.kubb/core.ts`,
- * `.kubb/serializers.ts`, `.kubb/standardSchema.ts`, and `.kubb/sse.ts`.
+ * `.kubb/mediaTypes.ts`, `.kubb/serializers.ts`, `.kubb/standardSchema.ts`, and `.kubb/sse.ts`.
  */
 export const coreTemplatePath = require.resolve('@kubb/plugin-client/templates/core.ts')
+export const mediaTypesTemplatePath = require.resolve('@kubb/plugin-client/templates/mediaTypes.ts')
 export const serializersTemplatePath = require.resolve('@kubb/plugin-client/templates/serializers.ts')
 export const standardSchemaTemplatePath = require.resolve('@kubb/plugin-client/templates/standardSchema.ts')
 export const sseTemplatePath = require.resolve('@kubb/plugin-client/templates/sse.ts')

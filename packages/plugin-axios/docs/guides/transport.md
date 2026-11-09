@@ -2,7 +2,7 @@
 
 Set a transport at runtime to replace the network send. The client still builds URLs, serializes parameters, resolves authentication, and handles results.
 
-The transport is a function that takes the resolved request and returns the parsed body with the native request and response, as in `@kubb/plugin-fetch`. The default is `defaultTransport`, which sends through `axiosInstance`, an `axios.create()` instance exported from the generated client. `createAxiosTransport(instance)` turns any axios instance into a transport.
+The transport is a function that takes the resolved request and returns a web `Response` with the native axios config and response, as in `@kubb/plugin-fetch`. The default is `defaultTransport`, which sends through `getAxiosInstance()`. `createAxiosTransport(instance)` turns any axios instance into a transport.
 
 ```typescript
 type ClientConfig = {
@@ -39,19 +39,19 @@ Every generated function now sends through your instance, so its timeout, header
 
 ## Configure the default instance
 
-The generated client exports `axiosInstance`, the instance `defaultTransport` sends through. Configure it directly to add tracing or headers without replacing the transport:
+The generated client exports `getAxiosInstance()`, which returns the instance `defaultTransport` sends through. Configure it directly to add tracing or headers without replacing the transport:
 
 ```typescript
-import { axiosInstance } from './gen/.kubb/client'
+import { getAxiosInstance } from './gen/.kubb/client'
 
-axiosInstance.defaults.timeout = 10_000
-axiosInstance.interceptors.request.use((config) => {
+getAxiosInstance().defaults.timeout = 10_000
+getAxiosInstance().interceptors.request.use((config) => {
   config.headers.set('traceparent', currentTraceparent())
   return config
 })
 ```
 
-An instance from `createClient()` copies the `transport` of `client` when you create it, unless you pass its own. A later `client.setConfig({ transport })` does not reach it. Without a `transport` on either, it sends through `axiosInstance`.
+An instance from `createClient()` copies the `transport` of `client` when you create it, unless you pass its own. A later `client.setConfig({ transport })` does not reach it. Without a `transport` on either, it sends through `getAxiosInstance()`.
 
 ## Where to set it
 

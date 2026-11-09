@@ -7,7 +7,7 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { petCreate2 } from '../clients/petCreate'
 
 /**
- * {@link /pets/create-second}
+ * `POST /pets/create-second`
  */
 export async function petCreateHandler2(ctx: ServerContext): Promise<CallToolResult> {
   const res = await petCreate2({ signal: ctx.mcpReq.signal, throwOnError: true })

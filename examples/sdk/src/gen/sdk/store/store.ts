@@ -9,109 +9,115 @@ import type { GetInventoryOptions, GetInventoryResponses } from '../../models/st
 import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../../models/store/GetOrderById'
 import type { PlaceOrderOptions, PlaceOrderResponses } from '../../models/store/PlaceOrder'
 import type { PlaceOrderPatchOptions, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch'
-import { createClient, withUnwrap } from '../../.kubb/client'
+import { createClient, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
-export class store {
-  private readonly client: ClientInstance
+export class StoreClient {
+  readonly client: ClientInstance
 
-  constructor(config: ClientConfig = {}) {
-    this.client = createClient(config)
+  constructor(config: ClientConfig | ClientInstance = {}) {
+    this.client = typeof config === 'function' ? config : createClient(config)
   }
 
   /**
+   * `GET /store/inventory`
    * @description Returns a map of status codes to quantities
    * @summary Returns pet inventories by status
-   * {@link /store/inventory}
    */
   public getInventory<ThrowOnError extends boolean = true>(
     options: Options<GetInventoryOptions, ThrowOnError> = {},
   ): Unwrappable<RequestResult<GetInventoryResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      request({
+      apiClient<GetInventoryResponses, ThrowOnError>({
         method: 'GET',
         url: '/store/inventory',
         security: [{ type: 'apiKey', name: 'api_key', in: 'header' }],
         ...config,
-        throwOnError: config.throwOnError ?? true,
-      }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>,
+        throwOnError: resolveThrowOnError(config.throwOnError, true),
+      }),
     )
   }
 
   /**
+   * `POST /store/order`
    * @description Place a new order in the store
    * @summary Place an order for a pet
-   * {@link /store/order}
    */
   public placeOrder<ThrowOnError extends boolean = true>(
     options: Options<PlaceOrderOptions, ThrowOnError> = {},
   ): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      request<PlaceOrderOptions['body']>({
+      apiClient<PlaceOrderResponses, ThrowOnError>({
         method: 'POST',
         url: '/store/order',
         contentType: { request: 'application/json' },
         ...config,
-        throwOnError: config.throwOnError ?? true,
-      }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>,
+        throwOnError: resolveThrowOnError(config.throwOnError, true),
+      }),
     )
   }
 
   /**
+   * `PATCH /store/order`
    * @description Place a new order in the store with patch
    * @summary Place an order for a pet with patch
-   * {@link /store/order}
    */
   public placeOrderPatch<ThrowOnError extends boolean = true>(
     options: Options<PlaceOrderPatchOptions, ThrowOnError> = {},
   ): Unwrappable<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      request<PlaceOrderPatchOptions['body']>({
+      apiClient<PlaceOrderPatchResponses, ThrowOnError>({
         method: 'PATCH',
         url: '/store/order',
         contentType: { request: 'application/json' },
         ...config,
-        throwOnError: config.throwOnError ?? true,
-      }) as Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>>,
+        throwOnError: resolveThrowOnError(config.throwOnError, true),
+      }),
     )
   }
 
   /**
+   * `GET /store/order/{orderId}`
    * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
    * @summary Find purchase order by ID
-   * {@link /store/order/:orderId}
    */
   public getOrderById<ThrowOnError extends boolean = true>(
     options: Options<GetOrderByIdOptions, ThrowOnError>,
   ): Unwrappable<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'GET', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-        RequestResult<GetOrderByIdResponses, ThrowOnError>
-      >,
+      apiClient<GetOrderByIdResponses, ThrowOnError>({
+        method: 'GET',
+        url: '/store/order/{orderId}',
+        ...config,
+        throwOnError: resolveThrowOnError(config.throwOnError, true),
+      }),
     )
   }
 
   /**
+   * `DELETE /store/order/{orderId}`
    * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
    * @summary Delete purchase order by ID
-   * {@link /store/order/:orderId}
    */
   public deleteOrder<ThrowOnError extends boolean = true>(
     options: Options<DeleteOrderOptions, ThrowOnError>,
   ): Unwrappable<RequestResult<DeleteOrderResponses, ThrowOnError>> {
-    const { client: request = this.client, ...config } = options
+    const { client: apiClient = this.client, ...config } = options
 
     return withUnwrap(
-      request({ method: 'DELETE', url: '/store/order/{orderId}', ...config, throwOnError: config.throwOnError ?? true }) as Promise<
-        RequestResult<DeleteOrderResponses, ThrowOnError>
-      >,
+      apiClient<DeleteOrderResponses, ThrowOnError>({
+        method: 'DELETE',
+        url: '/store/order/{orderId}',
+        ...config,
+        throwOnError: resolveThrowOnError(config.throwOnError, true),
+      }),
     )
   }
 }

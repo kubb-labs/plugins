@@ -13,12 +13,12 @@ export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 
 export type UpdatePetMutationKey = ReturnType<typeof updatePetMutationKey>
 
-export type UpdatePetMutationArg = UpdatePetOptions
+export type UpdatePetMutationArg = UpdatePetOptions & { contentType?: string | { response?: 'application/json' | 'application/xml' } }
 
 /**
+ * `PUT /pet`
  * @description Update an existing pet by Id
  * @summary Update an existing pet
- * {@link /pet}
  */
 export function useUpdatePet(
   options: {
@@ -28,12 +28,7 @@ export function useUpdatePet(
       UpdatePetMutationKey | null,
       UpdatePetMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: {
-        request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-        response?: 'application/json' | 'application/xml'
-      }
-    }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
 ) {
@@ -48,7 +43,7 @@ export function useUpdatePet(
   >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return updatePet({ ...config, ...variables, throwOnError: true } as Parameters<typeof updatePet<true>>[0]).unwrap()
+      return updatePet({ ...config, ...variables, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

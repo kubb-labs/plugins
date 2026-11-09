@@ -1,13 +1,11 @@
-import type { SuccessOf, Unwrappable } from '../../../.kubb/client'
-import type { StreamResult, StreamOptions, TypedEvent } from '../../../.kubb/sse'
+import type { StreamOptions, Unwrappable, StreamResult, SuccessOf, TypedEvent } from '../../../.kubb/client'
 import type { OrderEvent } from '../../../models/ts/OrderEvent'
-import { client, withUnwrap } from '../../../.kubb/client'
-import { toEventStream } from '../../../.kubb/sse'
+import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 
 /**
+ * `GET /store/order/{orderId}/events`
  * @description Server-Sent Events stream of an order, one event per step. Each event names itself with `event` and carries the order in `data`.
  * @summary Stream order updates
- * {@link /store/order/:orderId/events}
  */
 export function streamOrderEvents<ThrowOnError extends boolean = true>(
   options: StreamOptions<
@@ -34,37 +32,26 @@ export function streamOrderEvents<ThrowOnError extends boolean = true>(
     >
   >
 > {
-  const { client: request = client, ...config } = options
+  const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    toEventStream<
+    apiClient.stream<
+      {
+        '200': OrderEvent
+      },
+      ThrowOnError,
       TypedEvent<
         SuccessOf<{
           '200': OrderEvent
         }>
       >
-    >(
-      request({
-        method: 'GET',
-        url: '/store/order/{orderId}/events',
-        contentType: { response: 'text/event-stream' },
-        responseType: 'stream',
-        ...config,
-        throwOnError: config.throwOnError ?? true,
-      }),
-      { client: request, config, shape: 'event' },
-    ) as Promise<
-      StreamResult<
-        {
-          '200': OrderEvent
-        },
-        ThrowOnError,
-        TypedEvent<
-          SuccessOf<{
-            '200': OrderEvent
-          }>
-        >
-      >
-    >,
+    >({
+      method: 'GET',
+      url: '/store/order/{orderId}/events',
+      contentType: { response: 'text/event-stream' },
+      eventShape: 'event',
+      ...config,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

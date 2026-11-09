@@ -19,7 +19,7 @@ export type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInf
 
 export function findPetsByTagsInfiniteQueryOptions(
   { query }: { query: MaybeRefOrGetter<FindPetsByTagsOptions['query']> },
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey({ query })
   return infiniteQueryOptions<
@@ -31,11 +31,7 @@ export function findPetsByTagsInfiniteQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal, pageParam }) => {
-      query = {
-        ...(query ?? {}),
-        ['pageSize']: pageParam as unknown as FindPetsByTagsQuery['pageSize'],
-      } as FindPetsByTagsQuery
-      return findPetsByTags({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true }).unwrap()
+      return findPetsByTags({ ...config, query: { ...toValue(query), pageSize: pageParam }, signal: config.signal ?? signal, throwOnError: true }).unwrap()
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.hasNext ? lastPage.number + 1 : undefined),
@@ -44,7 +40,7 @@ export function findPetsByTagsInfiniteQueryOptions(
 }
 
 /**
- * {@link /pet/findByTags}
+ * `GET /pet/findByTags`
  */
 export function useFindPetsByTagsInfinite<
   TData = InfiniteData<FindPetsByTagsStatus200>,
@@ -54,7 +50,7 @@ export function useFindPetsByTagsInfinite<
   { query }: { query: MaybeRefOrGetter<FindPetsByTagsOptions['query']> },
   options: {
     query?: Partial<UseInfiniteQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TQueryData, TQueryKey, TQueryData>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

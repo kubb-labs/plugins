@@ -15,7 +15,7 @@ type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 export function loginUserQueryOptions(
   { query }: LoginUserOptions = {},
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   return {
     fetcher: async () => {
@@ -25,14 +25,14 @@ export function loginUserQueryOptions(
 }
 
 /**
+ * `GET /user/login`
  * @summary Logs user into the system
- * {@link /user/login}
  */
 export function useLoginUser(
   { query }: LoginUserOptions = {},
   options: {
     query?: SWRConfiguration<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>>
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
   } = {},

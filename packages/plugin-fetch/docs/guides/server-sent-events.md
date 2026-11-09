@@ -232,6 +232,7 @@ Pass these on the call, next to its request params:
 | `transform`    | Maps each event before validation, for example to camelCase its keys.                                                           |
 | `maxEventSize` | Largest event in characters. A larger one throws a `RangeError`. Defaults to `16 * 1024 * 1024`. Set `Infinity` to turn it off. |
 | `signal`       | An `AbortSignal` that ends the request and the loop.                                                                            |
+| `eventShape`   | What the validator checks: `data` for the payload, `event` for the whole event. Generated calls set it.                         |
 
 To stop reading, `break` out of the loop. The runtime then cancels the reader and releases the connection.
 
@@ -325,14 +326,27 @@ if (result.contentType === 'text/event-stream') {
 }
 ```
 
-To get an event stream result with `lastEventId`, pass the call to `toEventStream`. It throws a `TypeError` when the server answers with JSON:
+To get a stream result with `lastEventId`, send the same request with `client.stream`. It throws a `TypeError` when the server answers with JSON:
 
 ```typescript
-import { toEventStream } from './gen/.kubb/client'
+import { client } from './gen/.kubb/client'
 
-const { stream } = await toEventStream(getV2StreamRecentchange({ signal }))
-for await (const event of stream) render(event.data)
+const result = await client.stream({ method: 'GET', url: '/v2/stream/recentchange', eventShape: 'data', signal })
+for await (const event of result) render(event.data)
 ```
+
+## Stream with the client
+
+`client.stream(config)` runs the same interceptors and transport as `client(config)`. On a 2xx answer, it reads the body item by item and validates each item with `validator.response`. A non-2xx body is decoded whole, so `error` stays a value. Type it with the responses record, `ThrowOnError`, and the item type, which defaults to `ServerSentEvent` around the success body:
+
+```typescript
+import { client, type SuccessOf } from './gen/.kubb/client'
+import type { StreamLogsResponses } from './gen/models/StreamLogs'
+
+const result = await client.stream<StreamLogsResponses, true, SuccessOf<StreamLogsResponses>>({ method: 'GET', url: '/logs' })
+```
+
+To stream another format, register a `stream` handler, as [Configure serialization](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/serialization#add-a-media-type) shows.
 
 ## Return only the events
 
@@ -400,7 +414,7 @@ The events alone carry no `response` or `lastEventId`. To resume a dropped strea
 
 ## The runtime files
 
-`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `EventStreamResult` types. A stream operation takes `StreamOptions` and returns `StreamResult`, the stream versions of `Options` and `RequestResult`. Kubb writes it only when the document has a JSON Lines operation or an operation that offers `text/event-stream`, alone or next to another content type, and `.kubb/client.ts` then re-exports it, so the types import from either file. Kubb regenerates both on each run, so do not edit them:
+`.kubb/sse.ts` holds `parseEventStream`, `parseJsonLines`, and the `eventStream`, `jsonLines`, and `streamMediaTypes` media types. The `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, `StreamOptions`, and `StreamResult` types live in `.kubb/core.ts`. A stream operation takes `StreamOptions` and returns `StreamResult`, the stream versions of `Options` and `RequestResult`. Kubb writes `sse.ts` only when the document has a JSON Lines operation or an operation that offers `text/event-stream`, and `.kubb/client.ts` re-exports it, so everything imports from the client. Kubb regenerates these files on each run, so do not edit them:
 
 ```typescript
 import type { ServerSentEvent } from './gen/.kubb/client'

@@ -16,9 +16,9 @@ export type CreateUsersWithListInputMutationKey = ReturnType<typeof createUsersW
 export type CreateUsersWithListInputMutationArg = CreateUsersWithListInputOptions
 
 /**
+ * `POST /user/createWithList`
  * @description Creates list of users with given input array
  * @summary Creates list of users with given input array
- * {@link /user/createWithList}
  */
 export function useCreateUsersWithListInput(
   options: {
@@ -28,7 +28,7 @@ export function useCreateUsersWithListInput(
       CreateUsersWithListInputMutationKey | null,
       CreateUsersWithListInputMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> & {
       contentType?: { response?: 'application/json' | 'application/xml' }
     }
     shouldFetch?: boolean
