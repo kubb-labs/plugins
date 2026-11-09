@@ -39,6 +39,9 @@ call.
 > it with the multipart boundary. You do not need to set `multipart/form-data` yourself, and a
 > value you set is dropped for that request.
 
+The default serializer sends any other object as JSON, except for XML, YAML, and CSV types. For
+those, an object throws a `TypeError`, so pass the encoded body as a string or register a codec.
+
 To encode a content type the default serializer does not handle, register a codec for that media
 type. `codecs` is keyed by content type. Each entry takes a `serialize` for the request body, a
 `deserialize` for the response, or both:
