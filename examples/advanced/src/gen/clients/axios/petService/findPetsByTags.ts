@@ -49,9 +49,9 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
       method: 'GET',
       url: '/pet/findByTags',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
-      styles: { query: { tags: { explode: true } } },
-      validator: { response: findPetsByTagsResponseSchema, error: findPetsByTagsErrorSchema },
       ...config,
+      styles: { ...config.styles, query: { tags: { explode: true }, ...config.styles?.query } },
+      validator: { response: findPetsByTagsResponseSchema, error: findPetsByTagsErrorSchema, ...config.validator },
       throwOnError: config.throwOnError ?? true,
     }) as Promise<
       RequestResult<

@@ -36,8 +36,8 @@ export function deletePet<ThrowOnError extends boolean = true>(
       method: 'DELETE',
       url: '/pet/{petId}:search',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
-      validator: { response: deletePetResponseSchema, error: deletePetErrorSchema },
       ...config,
+      validator: { response: deletePetResponseSchema, error: deletePetErrorSchema, ...config.validator },
       throwOnError: config.throwOnError ?? true,
     }) as Promise<
       RequestResult<

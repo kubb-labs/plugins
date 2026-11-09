@@ -79,8 +79,9 @@ export function buildValidatorHooks({
 
 /**
  * Prints the `validator: { … }` entry of a call config from the hooks named in `keys`, or `null` when none is set.
+ * The entry spreads `config.validator` last, so a per-call hook overrides the generated one for its key only.
  */
 export function buildValidatorLiteral(hooks: ValidatorHooks | null, keys: ReadonlyArray<keyof Omit<ValidatorHooks, 'importedZodNames'>>): string | null {
   const entries = keys.flatMap((key) => (hooks?.[key] ? [`${key}: ${hooks[key]}`] : []))
-  return entries.length ? `validator: { ${entries.join(', ')} }` : null
+  return entries.length ? `validator: { ${entries.join(', ')}, ...config.validator }` : null
 }

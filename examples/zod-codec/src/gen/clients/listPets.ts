@@ -21,8 +21,8 @@ export function listPets<ThrowOnError extends boolean = true>(
     request({
       method: 'GET',
       url: '/pets',
-      validator: { query: listPetsQuerySchema, response: listPetsResponseSchema },
       ...config,
+      validator: { query: listPetsQuerySchema, response: listPetsResponseSchema, ...config.validator },
       throwOnError: config.throwOnError ?? true,
     }) as Promise<RequestResult<ListPetsResponsesSchemaType, ThrowOnError>>,
   )

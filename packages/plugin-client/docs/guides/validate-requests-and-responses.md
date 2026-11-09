@@ -29,10 +29,12 @@ Each generated call now includes the schemas:
 request({
   method: 'POST',
   url: '/pet',
-  validator: { response: addPetResponseSchema, error: addPetErrorSchema },
   ...config,
+  validator: { response: addPetResponseSchema, error: addPetErrorSchema, ...config.validator },
 })
 ```
+
+A `validator` passed on one call is merged per key, so `validator: { request }` adds a request schema and keeps the generated response schema.
 
 Add a `validator` field to your `RequestConfig`, then run the schemas in `client`. Zod schemas follow [Standard Schema](https://standardschema.dev), so `~standard.validate` works with any compatible library:
 
@@ -63,12 +65,13 @@ With `validator: { params: 'zod' }`, each call also passes the schemas for its p
 request({
   method: 'PUT',
   url: '/events/{day}',
+  ...config,
   validator: {
     path: putEventPathSchema,
     query: putEventQuerySchema,
     headers: toHeadersStandardSchema(putEventHeadersSchema, putEventHeadersSchema.shape),
+    ...config.validator,
   },
-  ...config,
 })
 ```
 

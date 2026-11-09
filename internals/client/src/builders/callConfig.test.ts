@@ -47,4 +47,37 @@ describe('buildCallConfig', () => {
     expect(callConfig).toContain(`responseType: 'blob'`)
     expect(callConfig).not.toContain('audio/mpeg')
   })
+
+  test('merges a per-call validator and styles with the generated ones per key', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'listPets',
+      method: 'GET',
+      path: '/pets',
+      parameters: [
+        ast.factory.createParameter({ name: 'tags', in: 'query', schema: ast.factory.createSchema({ type: 'string' }), explode: false }),
+        ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: 'string' }), explode: true }),
+      ],
+      responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+    })
+    const validatorHooks = {
+      request: null,
+      path: null,
+      query: null,
+      headers: null,
+      cookies: null,
+      response: 'responseSchema',
+      error: null,
+      importedZodNames: [],
+    }
+
+    const { callConfig } = buildCallConfig({ node, validatorHooks, throwOnErrorDefault: true, returnType: 'full' })
+    const evaluate = new Function('config', 'responseSchema', `return ${callConfig}`)
+    const config = { validator: { request: 'bodySchema' }, styles: { query: { tags: { explode: true } }, header: { 'X-Id': { explode: true } } } }
+
+    expect(evaluate(config, 'responseSchema')).toMatchObject({
+      validator: { request: 'bodySchema', response: 'responseSchema' },
+      styles: { query: { tags: { explode: true }, limit: { explode: true } }, header: { 'X-Id': { explode: true } } },
+    })
+    expect(evaluate({}, 'responseSchema')).toMatchObject({ validator: { response: 'responseSchema' }, styles: { query: { tags: { explode: false } } } })
+  })
 })

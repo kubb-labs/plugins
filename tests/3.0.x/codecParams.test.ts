@@ -401,6 +401,22 @@ describe('wire value: pluginZod({ inferred: true }) without params validation', 
     expect(client.requests[0]?.headers['X-Since']).toBe('2026-08-01T00:00:00.000Z')
   })
 
+  test('keeps the generated response validator when a call passes its own request validator', async () => {
+    const seen: Array<unknown> = []
+    const request = { '~standard': { version: 1, vendor: 'test', validate: (value: unknown) => (seen.push(value), { value }) } }
+    const transport = async () => ({
+      data: { startsAt: 'later' },
+      status: 200,
+      statusText: 'OK',
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+      request: new Request('https://api.test'),
+      response: new Response(),
+    })
+
+    await expect(client.putEvent({ path: { day: '2026-10-01' }, body, transport, validator: { request } })).rejects.toMatchObject({ name: 'ParseError' })
+    expect(seen).toStrictEqual([body])
+  })
+
   test('does not validate or encode params', async () => {
     await client.putEvent({ path: { day: 'not-a-date' }, query: { after: 'whenever' }, headers: { 'X-Since': 'yesterday' }, body })
     expect(client.requests[0]?.url).toBe('https://api.test/events/not-a-date?after=whenever')

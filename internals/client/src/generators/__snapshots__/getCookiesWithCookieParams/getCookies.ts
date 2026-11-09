@@ -16,8 +16,8 @@ export function getCookies<ThrowOnError extends boolean = true>(
     request({
       method: 'GET',
       url: '/cookies',
-      styles: { cookie: { theme: { explode: false } } },
       ...config,
+      styles: { ...config.styles, cookie: { theme: { explode: false }, ...config.styles?.cookie } },
       throwOnError: config.throwOnError ?? true,
     }) as Promise<RequestResult<GetCookiesResponses, ThrowOnError>>,
   )

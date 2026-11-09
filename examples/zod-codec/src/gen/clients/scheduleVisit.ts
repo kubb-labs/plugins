@@ -29,6 +29,8 @@ export function scheduleVisit<ThrowOnError extends boolean = true>(
     request({
       method: 'PUT',
       url: '/pets/{petId}/visits/{day}',
+      contentType: { request: 'application/json' },
+      ...config,
       validator: {
         request: scheduleVisitBodySchema,
         path: scheduleVisitPathSchema,
@@ -36,9 +38,8 @@ export function scheduleVisit<ThrowOnError extends boolean = true>(
         headers: toHeadersStandardSchema(scheduleVisitHeadersSchema, scheduleVisitHeadersSchema.shape),
         response: scheduleVisitResponseSchema,
         error: scheduleVisitErrorSchema,
+        ...config.validator,
       },
-      contentType: { request: 'application/json' },
-      ...config,
       throwOnError: config.throwOnError ?? true,
     }) as Promise<RequestResult<ScheduleVisitResponsesSchemaType, ThrowOnError>>,
   )

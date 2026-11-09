@@ -78,8 +78,8 @@ export class pet {
         method: 'GET',
         url: '/pet/findByStatus',
         security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
-        styles: { query: { status: { explode: true } } },
         ...config,
+        styles: { ...config.styles, query: { status: { explode: true }, ...config.styles?.query } },
         throwOnError: config.throwOnError ?? true,
       }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>,
     )
@@ -100,8 +100,8 @@ export class pet {
         method: 'GET',
         url: '/pet/findByTags',
         security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
-        styles: { query: { tags: { explode: true } } },
         ...config,
+        styles: { ...config.styles, query: { tags: { explode: true }, ...config.styles?.query } },
         throwOnError: config.throwOnError ?? true,
       }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>,
     )

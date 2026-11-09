@@ -14,5 +14,5 @@ import { createPetResponseSchema } from '../zod/createPetSchema'
 export function createPet<ThrowOnError extends boolean = true>(options: Options<ApiCreatePetOptions, ThrowOnError> = {}): Unwrappable<RequestResult<ApiCreatePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'POST', url: '/pets', validator: { response: createPetResponseSchema }, contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<ApiCreatePetResponses, ThrowOnError>>)
+  return withUnwrap(request({ method: 'POST', url: '/pets', contentType: { request: 'application/json' }, ...config, validator: { response: createPetResponseSchema, ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<ApiCreatePetResponses, ThrowOnError>>)
 }

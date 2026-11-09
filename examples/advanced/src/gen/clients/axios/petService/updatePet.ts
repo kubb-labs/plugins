@@ -110,9 +110,9 @@ export function updatePet<ThrowOnError extends boolean = true>(
       method: 'PUT',
       url: '/pet',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
-      validator: { response: updatePetResponseSchema, error: updatePetErrorSchema },
       contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
       ...config,
+      validator: { response: updatePetResponseSchema, error: updatePetErrorSchema, ...config.validator },
       throwOnError: config.throwOnError ?? true,
     }) as Promise<
       RequestResult<
