@@ -713,6 +713,17 @@ describe('createClientCore', () => {
     const result = (await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })) as CallResult<string, string>
     expect(result.data).toStrictEqual({ id: 1 })
     expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'response', source: 'body', method: 'GET', status: 200, value: { id: 1 } })
+  test('skips the error parser when the call throws, so it throws the ResponseError', async () => {
+    const { client } = createClient({ data: '<html>Bad Gateway</html>', status: 502 })
+    const error = vi.fn(() => ({ parsed: true }))
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { error: toFailingSchema() } })).rejects.toMatchObject({
+      name: 'ResponseError',
+      status: 502,
+    })
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { error: toSchema(error) } })).rejects.toMatchObject({ data: '<html>Bad Gateway</html>' })
+    expect(error).not.toHaveBeenCalled()
+  })
+
   })
 
   test('rethrows when onValidationError returns nothing', async () => {

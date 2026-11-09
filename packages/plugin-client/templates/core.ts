@@ -800,13 +800,15 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     // A streamed success body is validated event by event in `toEventStream`, not as a whole. A JSON answer to a streamed call is a whole body.
     const streaming = isSuccess && resolveResponseType(resolvedRequest.responseType, contentType) === 'stream' && isStreamed(decoded)
     const data = await runValidator({
-      validator: isValidationEnabled(validate, direction) && !streaming ? validator?.[direction] : undefined,
+      validator: validatesBody ? validator?.[direction] : undefined,
       value: decoded,
       context: { direction, source: 'body', method: resolvedRequest.method, url: resolvedRequest.url, status: result.status },
       onValidationError,
     })
     if (!isSuccess && throwOnError) {
       const responseError = new ResponseError({
+    // An error body is validated only when the call returns it. A call that throws keeps its `ResponseError`.
+    const validatesBody = isValidationEnabled(validate, direction) && !streaming && (isSuccess || !throwOnError)
         data,
         status: result.status,
         statusText: result.statusText,
