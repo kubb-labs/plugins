@@ -25,8 +25,8 @@ export function loginUserQueryOptions(
 }
 
 /**
+ * `GET /user/login`
  * @summary Logs user into the system
- * {@link /user/login}
  */
 export function useLoginUser(
   { query }: LoginUserOptions = {},

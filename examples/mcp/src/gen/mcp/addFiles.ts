@@ -8,9 +8,9 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { addFiles } from '../clients/addFiles'
 
 /**
+ * `POST /pet/files`
  * @description Place a new file in the store
  * @summary Place an file for a pet
- * {@link /pet/files}
  */
 export async function addFilesHandler({ body }: Pick<AddFilesOptions, 'body'> = {}, ctx: ServerContext): Promise<CallToolResult> {
   const res = await addFiles({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof addFiles<true>>[0])

@@ -16,9 +16,9 @@ export type UpdateUserMutationKey = ReturnType<typeof updateUserMutationKey>
 export type UpdateUserMutationArg = UpdateUserOptions
 
 /**
+ * `PUT /user/{username}`
  * @description This can only be done by the logged in user.
  * @summary Update user
- * {@link /user/:username}
  */
 export function useUpdateUser(
   options: {

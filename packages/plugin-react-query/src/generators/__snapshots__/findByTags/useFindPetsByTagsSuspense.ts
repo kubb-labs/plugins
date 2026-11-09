@@ -29,7 +29,7 @@ export function findPetsByTagsSuspenseQueryOptions(
 }
 
 /**
- * {@link /pet/findByTags}
+ * `GET /pet/findByTags`
  */
 export function useFindPetsByTagsSuspense<TData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey>(
   { query }: { query: FindPetsByTagsOptions['query'] | (() => FindPetsByTagsOptions['query']) },

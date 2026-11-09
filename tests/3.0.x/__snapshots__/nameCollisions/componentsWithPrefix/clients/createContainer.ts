@@ -9,7 +9,9 @@ import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 import { createContainerResponseSchema } from '../zod/createContainerSchema'
 
 /**
- * {@link /containers}
+ * `POST /containers`
+ * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function createContainer<ThrowOnError extends boolean = true>(options: Options<ApiCreateContainerOptions, ThrowOnError> = {}): Unwrappable<RequestResult<ApiCreateContainerResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options

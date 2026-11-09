@@ -8,9 +8,9 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { deletePet } from '../clients/deletePet'
 
 /**
+ * `DELETE /pet/{petId}`
  * @description delete a pet
  * @summary Deletes a pet
- * {@link /pet/:petId}
  */
 export async function deletePetHandler({ path, headers }: DeletePetOptions, ctx: ServerContext): Promise<CallToolResult> {
   const res = await deletePet({ path, headers, signal: ctx.mcpReq.signal, throwOnError: true })

@@ -31,8 +31,8 @@ export function updatePetWithFormMutationOptions<TContext = unknown>(config: Par
 }
 
 /**
+ * `POST /pet/{petId}:search`
  * @summary Updates a pet in the store with form data
- * {@link /pet/:petId:search}
  */
 export function useUpdatePetWithForm<TContext>(
   options: {

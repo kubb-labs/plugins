@@ -66,9 +66,9 @@ export function addPetMutationOptions<TContext = unknown>(
 }
 
 /**
+ * `POST /pet`
  * @description Add a new pet to the store
  * @summary Add a new pet to the store
- * {@link /pet}
  */
 export function useAddPet<TContext>(
   options: {

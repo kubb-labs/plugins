@@ -24,7 +24,7 @@ export function petListQueryOptions2(config: Partial<Omit<RequestConfig, 'path' 
 }
 
 /**
- * {@link /pets/second}
+ * `GET /pets/second`
  */
 export function usePetList2<TData = PetListStatus2002, TQueryData = PetListStatus2002, TQueryKey extends QueryKey = PetListQueryKey2>(options: {
   query?: Partial<QueryObserverOptions<PetListStatus2002, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },

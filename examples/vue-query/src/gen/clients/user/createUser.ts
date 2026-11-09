@@ -8,9 +8,11 @@ import type { CreateUserOptions, CreateUserResponses } from '../../models/user/C
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
+ * `POST /user`
  * @description This can only be done by the logged in user.
  * @summary Create user
- * {@link /user}
+ * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function createUser<ThrowOnError extends boolean = true>(
   options: Options<CreateUserOptions, ThrowOnError> = {},

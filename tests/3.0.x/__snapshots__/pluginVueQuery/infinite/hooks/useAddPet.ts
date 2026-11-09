@@ -12,9 +12,9 @@ import { useMutation } from '@tanstack/vue-query'
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
 /**
+ * `POST /pet`
  * @description Add a new pet to the store
  * @summary Add a new pet to the store
- * {@link /pet}
  */
 export function useAddPet<TContext>(options: {
   mutation?: MutationObserverOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions, TContext> & { client?: QueryClient },

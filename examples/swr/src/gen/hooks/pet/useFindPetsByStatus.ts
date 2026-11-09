@@ -26,9 +26,9 @@ export function findPetsByStatusQueryOptions(
 }
 
 /**
+ * `GET /pet/findByStatus`
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
- * {@link /pet/findByStatus}
  */
 export function useFindPetsByStatus(
   { query }: FindPetsByStatusOptions = {},

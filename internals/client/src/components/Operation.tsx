@@ -1,7 +1,7 @@
-import { buildOperationComments } from '@internals/shared'
 import { ast } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
+import { buildClientComments } from '../builders/comments.ts'
 import { buildOperationBody } from '../builders/operationBody.ts'
 import type { Auth } from '../builders/security.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
@@ -57,7 +57,7 @@ export function Operation({ name, node, types, validatorHooks, returnType, throw
         generics={body.generics}
         params={body.paramsSignature}
         returnType={body.returnType}
-        JSDoc={{ comments: buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }) }}
+        JSDoc={{ comments: buildClientComments({ node, returnType }) }}
       >
         {body.mergeContentType
           ? 'const { client: apiClient = client, contentType, ...config } = options'

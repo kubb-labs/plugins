@@ -3,16 +3,19 @@
 * Do not edit manually.
 */
 
-import type { ClientConfig } from '../.kubb/client'
+import type { ClientConfig, ClientInstance } from '../.kubb/client'
+import { createClient } from '../.kubb/client'
 import { PetClient } from './petClient'
 import { StoreClient } from './storeClient'
 
 export class PetStore {
+  readonly client: ClientInstance
   readonly pet: PetClient
   readonly store: StoreClient
 
   constructor(config: ClientConfig = {}) {
-    this.pet = new PetClient(config)
-    this.store = new StoreClient(config)
+    this.client = createClient(config)
+    this.pet = new PetClient(this.client)
+    this.store = new StoreClient(this.client)
   }
 }

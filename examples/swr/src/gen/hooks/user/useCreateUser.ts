@@ -16,9 +16,9 @@ export type CreateUserMutationKey = ReturnType<typeof createUserMutationKey>
 export type CreateUserMutationArg = CreateUserOptions
 
 /**
+ * `POST /user`
  * @description This can only be done by the logged in user.
  * @summary Create user
- * {@link /user}
  */
 export function useCreateUser(
   options: {

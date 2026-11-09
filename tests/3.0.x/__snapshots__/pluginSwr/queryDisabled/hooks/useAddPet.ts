@@ -16,9 +16,9 @@ export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
 export type AddPetMutationArg = AddPetOptions
 
 /**
+ * `POST /pet`
  * @description Add a new pet to the store
  * @summary Add a new pet to the store
- * {@link /pet}
  */
 export function useAddPet(options: {
   mutation?: SWRMutationConfiguration<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg> & { throwOnError?: boolean },

@@ -22,9 +22,9 @@ export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusOptions 
 }
 
 /**
+ * `GET /pet/findByStatus`
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
- * {@link /pet/findByStatus}
  */
 export function useFindPetsByStatus({ query }: FindPetsByStatusOptions = {}, options: {
   query?: SWRConfiguration<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>>,

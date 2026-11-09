@@ -26,9 +26,9 @@ export function getPetByIdQueryOptions({ path }: { path: MaybeRefOrGetter<GetPet
 }
 
 /**
+ * `GET /pet/{petId}`
  * @description Returns a single pet
  * @summary Find pet by ID
- * {@link /pet/:petId}
  */
 export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdQueryKey>({ path }: { path: MaybeRefOrGetter<GetPetByIdOptions['path']> }, options: {
   query?: Partial<UseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },

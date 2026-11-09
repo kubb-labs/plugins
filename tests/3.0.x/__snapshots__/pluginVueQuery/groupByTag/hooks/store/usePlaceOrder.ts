@@ -12,9 +12,9 @@ import { useMutation } from '@tanstack/vue-query'
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
 /**
+ * `POST /store/order`
  * @description Place a new order in the store
  * @summary Place an order for a pet
- * {@link /store/order}
  */
 export function usePlaceOrder<TContext>(options: {
   mutation?: MutationObserverOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext> & { client?: QueryClient },

@@ -22,8 +22,8 @@ export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path
 }
 
 /**
+ * `GET /user/logout`
  * @summary Logs out current logged in user session
- * {@link /user/logout}
  */
 export function useLogoutUser(
   options: {

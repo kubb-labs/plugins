@@ -49,9 +49,9 @@ export function addFilesMutationOptions<TContext = unknown>(
 }
 
 /**
+ * `POST /pet/files`
  * @description Place a new file in the store
  * @summary Place an file for a pet
- * {@link /pet/files}
  */
 export function useAddFiles<TContext>(
   options: {

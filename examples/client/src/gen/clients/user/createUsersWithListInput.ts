@@ -8,9 +8,11 @@ import type { CreateUsersWithListInputOptions, CreateUsersWithListInputResponses
 import { client } from '../../../client'
 
 /**
+ * `POST /user/createWithList`
  * @description Creates list of users with given input array
  * @summary Creates list of users with given input array
- * {@link /user/createWithList}
+ * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function createUsersWithListInput<ThrowOnError extends boolean = true>(
   options: Options<CreateUsersWithListInputOptions, ThrowOnError> = {},

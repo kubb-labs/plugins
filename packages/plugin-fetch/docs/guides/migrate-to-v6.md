@@ -14,6 +14,7 @@ The fetch client keeps its API in v6, so most projects only regenerate. Find you
 | Calls `toEventStream`, or writes a transport that returns a parsed body                                              | Use `client.stream`, and return a web `Response`. See [Streams and transports](#streams-and-transports).             |
 | Relies on invalid JSON becoming a string, or on the error interceptor skipping network errors                        | Check [Behavior changes in the runtime](#behavior-changes-in-the-runtime). It compiles.                              |
 | Comes from 5.12 or earlier and uses streams                                                                          | Check [From 5.12 or earlier](#from-5-12-or-earlier). It compiles, so the type checker does not catch it.             |
+| Uses SDK classes with `group: { type: 'tag' }`, such as `new pet(config)`                                            | Rename them to the PascalCase names, such as `new PetClient(config)`. See [SDK class names](#sdk-class-names).       |
 
 ## Upgrade steps
 
@@ -143,6 +144,19 @@ These changed in 5.13 and compile without errors, so check them by hand:
 
 - A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream.
 - An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.
+
+## SDK class names
+
+With `sdk` and `group: { type: 'tag' }`, tag classes used the group folder name, such as `export class pet`. They now use `resolver.groupName`, such as `export class PetClient`, as without `group`. The files stay where they were, and the root class keeps its `pet` and `store` fields.
+
+```diff
+- import { pet } from './gen/sdk/pet/pet'
+- const api = new pet({ baseURL })
++ import { PetClient } from './gen/sdk/pet/pet'
++ const api = new PetClient({ baseURL })
+```
+
+The root class now creates one client and shares it with every tag, so it builds one client instead of one per tag. Reach it as `api.client` to add interceptors.
 
 ## Query plugins
 

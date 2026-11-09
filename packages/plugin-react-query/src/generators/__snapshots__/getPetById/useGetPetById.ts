@@ -25,7 +25,7 @@ export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Part
 }
 
 /**
- * {@link /pet/:petId}
+ * `GET /pet/{petId}`
  */
 export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdQueryKey>(
   { path }: { path: GetPetByIdOptions['path'] | (() => GetPetByIdOptions['path']) },

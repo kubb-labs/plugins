@@ -21,6 +21,7 @@ Run the fetch and axios clients on one core with the same interceptors and clien
 - Narrow `client.interceptors.error` handlers with `ResponseError.is`: they now see network errors, aborts, and validation errors too, and each one gets the error the previous handler returned.
 - Expect the error body to be validated on the throwing path too, and a `2XX` key to count as success.
 - A custom client (`importPath`) must make `client` generic, `client<TResponses, ThrowOnError>(config)`, and add a `stream` method for stream operations. Copy the `ClientInstance` type from `core.ts`, or build on `createClientCore`.
+- With `sdk` and `group: { type: 'tag' }`, SDK tag classes are PascalCase from `resolver.groupName`, such as `PetClient` instead of `pet`. Rename `new pet(config)` to `new PetClient(config)`. The root SDK class shares one client with every tag and exposes it as `client` for interceptors.
 
 New: generated calls pass their types to `apiClient<Responses, ThrowOnError>(config)` with no cast, `isResponseError<Responses>(error)` narrows a thrown error by status, `client.extend(config)` keeps the parent's interceptors, `auth` sends every scheme a security requirement needs, and the default client is created on first use.
 

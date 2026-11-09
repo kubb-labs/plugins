@@ -22,9 +22,9 @@ export function getPetByIdQueryOptions({ path }: GetPetByIdOptions, config: Part
 }
 
 /**
+ * `GET /pet/{petId}`
  * @description Returns a single pet
  * @summary Find pet by ID
- * {@link /pet/:petId}
  */
 export function useGetPetById(
   { path }: GetPetByIdOptions,

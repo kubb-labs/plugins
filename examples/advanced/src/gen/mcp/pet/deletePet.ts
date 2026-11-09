@@ -2,9 +2,9 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { deletePet } from '../../clients/axios/petService/deletePet'
 
 /**
+ * `DELETE /pet/{petId}:search`
  * @description delete a pet
  * @summary Deletes a pet
- * {@link /pet/:petId:search}
  */
 export async function deletePetHandler(
   {

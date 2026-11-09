@@ -8,7 +8,7 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { getCookies } from './clients/getCookies'
 
 /**
- * {@link /cookies}
+ * `GET /cookies`
  */
 export async function getCookiesHandler({ cookies }: GetCookiesOptions = {}, ctx: ServerContext): Promise<CallToolResult> {
   const res = await getCookies({ cookies, signal: ctx.mcpReq.signal, throwOnError: true })

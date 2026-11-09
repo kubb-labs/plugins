@@ -6,14 +6,16 @@ import type { GetPetByIdOptions, GetPetByIdResponses } from './GetPetById'
 import { createClient, unwrapResult, resolveThrowOnError } from './.kubb/client'
 
 export class PetClient {
-  private readonly client: ClientInstance
+  readonly client: ClientInstance
 
-  constructor(config: ClientConfig = {}) {
-    this.client = createClient(config)
+  constructor(config: ClientConfig | ClientInstance = {}) {
+    this.client = typeof config === 'function' ? config : createClient(config)
   }
 
   /**
-   * {@link /pet/:petId}
+   * `GET /pet/{petId}`
+   * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The response body, or the full result when `throwOnError` is `false`.
    */
   public getPetById<ThrowOnError extends boolean = true>(
     options: Options<GetPetByIdOptions, ThrowOnError>,
@@ -32,7 +34,9 @@ export class PetClient {
   }
 
   /**
-   * {@link /pet/:petId}
+   * `DELETE /pet/{petId}`
+   * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The response body, or the full result when `throwOnError` is `false`.
    */
   public deletePet<ThrowOnError extends boolean = true>(
     options: Options<DeletePetOptions, ThrowOnError>,

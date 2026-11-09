@@ -5,14 +5,16 @@ import type { GetProjectOptions, GetProjectResponses } from './GetProject'
 import { createClient, unwrapResult, resolveThrowOnError } from './.kubb/client'
 
 export class ProjectClient {
-  private readonly client: ClientInstance
+  readonly client: ClientInstance
 
-  constructor(config: ClientConfig = {}) {
-    this.client = createClient(config)
+  constructor(config: ClientConfig | ClientInstance = {}) {
+    this.client = typeof config === 'function' ? config : createClient(config)
   }
 
   /**
-   * {@link /projects/:project_id}
+   * `GET /projects/{project_id}`
+   * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
+   * @returns The response body, or the full result when `throwOnError` is `false`.
    */
   public getProject<ThrowOnError extends boolean = true>(
     options: Options<GetProjectOptions, ThrowOnError>,

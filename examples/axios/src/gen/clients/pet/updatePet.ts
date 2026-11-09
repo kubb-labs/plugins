@@ -8,9 +8,11 @@ import type { UpdatePetOptions, UpdatePetResponses } from '../../models/pet/Upda
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
+ * `PUT /pet`
  * @description Update an existing pet by Id
  * @summary Update an existing pet
- * {@link /pet}
+ * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function updatePet<ThrowOnError extends boolean = true>(
   options: Options<UpdatePetOptions, ThrowOnError>,

@@ -5,7 +5,9 @@ import type { StreamEventsOptions, StreamEventsResponses } from './StreamEvents'
 import { client, withUnwrap, resolveThrowOnError } from './.kubb/client'
 
 /**
- * {@link /events}
+ * `GET /events`
+ * @param options - Per-call settings, such as `client` and `throwOnError`.
+ * @returns The stream result, whose `data` yields each item as it arrives.
  */
 export function streamEvents<ThrowOnError extends boolean = true>(
   options: StreamOptions<StreamEventsOptions, ThrowOnError> = {},

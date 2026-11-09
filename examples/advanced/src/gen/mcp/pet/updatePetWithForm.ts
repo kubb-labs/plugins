@@ -2,8 +2,8 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { updatePetWithForm } from '../../clients/axios/petService/updatePetWithForm'
 
 /**
+ * `POST /pet/{petId}:search`
  * @summary Updates a pet in the store with form data
- * {@link /pet/:petId:search}
  */
 export async function updatePetWithFormHandler(
   {

@@ -8,8 +8,10 @@ import type { UploadFileOptions, UploadFileResponses } from '../models'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
 /**
+ * `POST /pet/{petId}/uploadImage`
  * @summary uploads an image
- * {@link /pet/:petId/uploadImage}
+ * @param options - The request (`path`, `query`, `body`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function uploadFile<ThrowOnError extends boolean = true>(
   options: Options<UploadFileOptions, ThrowOnError>,

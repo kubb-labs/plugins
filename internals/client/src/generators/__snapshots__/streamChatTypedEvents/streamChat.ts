@@ -5,7 +5,9 @@ import type { StreamChatOptions, StreamChatResponses } from './StreamChat'
 import { client, withUnwrap, resolveThrowOnError } from './.kubb/client'
 
 /**
- * {@link /chat}
+ * `POST /chat`
+ * @param options - Per-call settings, such as `client` and `throwOnError`.
+ * @returns The stream result, whose `data` yields each item as it arrives.
  */
 export function streamChat<ThrowOnError extends boolean = true>(
   options: StreamOptions<StreamChatOptions, ThrowOnError> = {},

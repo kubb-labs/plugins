@@ -28,7 +28,7 @@ export function findPetsByTagsQueryOptions(
 }
 
 /**
- * {@link /pet/findByTags}
+ * `GET /pet/findByTags`
  */
 export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
   { query }: { query: FindPetsByTagsOptions['query'] | (() => FindPetsByTagsOptions['query']) },

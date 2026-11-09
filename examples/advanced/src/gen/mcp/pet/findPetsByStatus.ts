@@ -2,9 +2,9 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { findPetsByStatus } from '../../clients/axios/petService/findPetsByStatus'
 
 /**
+ * `GET /pet/findByStatus/{step_id}`
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
- * {@link /pet/findByStatus/:step_id}
  */
 export async function findPetsByStatusHandler(
   {

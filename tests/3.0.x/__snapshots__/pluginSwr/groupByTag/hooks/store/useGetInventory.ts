@@ -22,9 +22,9 @@ export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'pa
 }
 
 /**
+ * `GET /store/inventory`
  * @description Returns a map of status codes to quantities
  * @summary Returns pet inventories by status
- * {@link /store/inventory}
  */
 export function useGetInventory(options: {
   query?: SWRConfiguration<GetInventoryStatus200, ResponseErrorConfig<Error>>,

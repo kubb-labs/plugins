@@ -8,9 +8,9 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { findPetsByStatus } from '../../clients/findPetsByStatus'
 
 /**
+ * `GET /pet/findByStatus`
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
- * {@link /pet/findByStatus}
  */
 export async function findPetsByStatusHandler({ query }: FindPetsByStatusOptions = {}, ctx: ServerContext): Promise<CallToolResult> {
   const res = await findPetsByStatus({ query, signal: ctx.mcpReq.signal, throwOnError: true })

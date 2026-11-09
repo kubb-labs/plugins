@@ -5,9 +5,11 @@ import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 import { addPetResponseSchema, addPetStatus405Schema, addPetStatusDefaultSchema } from '../../../zod/pet/addPetSchema'
 
 /**
+ * `POST /pet`
  * @description Add a new pet to the store
  * @summary Add a new pet to the store
- * {@link /pet}
+ * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function addPet<ThrowOnError extends boolean = true>(
   options: Options<

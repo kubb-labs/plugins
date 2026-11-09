@@ -5,14 +5,16 @@ import type { GetInventoryOptions, GetInventoryResponses } from './GetInventory'
 import { createClient, withUnwrap, resolveThrowOnError } from './.kubb/client'
 
 export class StoreClient {
-  private readonly client: ClientInstance
+  readonly client: ClientInstance
 
-  constructor(config: ClientConfig = {}) {
-    this.client = createClient(config)
+  constructor(config: ClientConfig | ClientInstance = {}) {
+    this.client = typeof config === 'function' ? config : createClient(config)
   }
 
   /**
-   * {@link /store/inventory}
+   * `GET /store/inventory`
+   * @param options - Per-call settings, such as `client` and `throwOnError`.
+   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public getInventory<ThrowOnError extends boolean = false>(
     options: Options<GetInventoryOptions, ThrowOnError> = {},

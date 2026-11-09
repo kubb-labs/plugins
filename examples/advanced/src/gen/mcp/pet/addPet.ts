@@ -4,9 +4,9 @@ import type { CallToolResult, ServerContext } from '@modelcontextprotocol/server
 import { addPet } from '../../clients/axios/petService/addPet'
 
 /**
+ * `POST /pet`
  * @description Add a new pet to the store
  * @summary Add a new pet to the store
- * {@link /pet}
  */
 export async function addPetHandler(
   {

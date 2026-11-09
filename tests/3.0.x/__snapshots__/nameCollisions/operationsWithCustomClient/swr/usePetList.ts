@@ -22,7 +22,7 @@ export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' |
 }
 
 /**
- * {@link /pets/first}
+ * `GET /pets/first`
  */
 export function usePetList(options: {
   query?: SWRConfiguration<PetListStatus200, ResponseErrorConfig<Error>>,

@@ -29,7 +29,7 @@ export function createUsersWithListInputQueryOptions(
 }
 
 /**
- * {@link /user/createWithList}
+ * `POST /user/createWithList`
  */
 export function useCreateUsersWithListInput<
   TData = CreateUsersWithListInputStatus200,

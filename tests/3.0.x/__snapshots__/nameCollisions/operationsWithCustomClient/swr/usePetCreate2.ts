@@ -16,7 +16,7 @@ export type PetCreateMutationKey2 = ReturnType<typeof petCreateMutationKey2>
 export type PetCreateMutationArg2 = never
 
 /**
- * {@link /pets/create-second}
+ * `POST /pets/create-second`
  */
 export function usePetCreate2(options: {
   mutation?: SWRMutationConfiguration<PetCreateStatus2002, ResponseErrorConfig<Error>, PetCreateMutationKey2 | null, PetCreateMutationArg2> & { throwOnError?: boolean },

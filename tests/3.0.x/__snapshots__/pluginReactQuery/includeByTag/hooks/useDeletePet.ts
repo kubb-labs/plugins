@@ -22,9 +22,9 @@ export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omi
 }
 
 /**
+ * `DELETE /pet/{petId}`
  * @description delete a pet
  * @summary Deletes a pet
- * {@link /pet/:petId}
  */
 export function useDeletePet<TContext>(options: {
   mutation?: UseMutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext> & { client?: QueryClient },

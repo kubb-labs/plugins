@@ -43,9 +43,9 @@ export function findPetsByStatusQueryOptions(
 }
 
 /**
+ * `GET /pet/findByStatus/{step_id}`
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
- * {@link /pet/findByStatus/:step_id}
  */
 export function useFindPetsByStatus<TData = Array<Pet> | string, TQueryData = Array<Pet> | string, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>(
   {

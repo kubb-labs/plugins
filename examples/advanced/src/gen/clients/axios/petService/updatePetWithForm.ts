@@ -3,8 +3,10 @@ import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
 import { updatePetWithFormResponseSchema, updatePetWithFormStatus405Schema } from '../../../zod/pet/updatePetWithFormSchema'
 
 /**
+ * `POST /pet/{petId}:search`
  * @summary Updates a pet in the store with form data
- * {@link /pet/:petId:search}
+ * @param options - The request (`path`, `query`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function updatePetWithForm<ThrowOnError extends boolean = true>(
   options: Options<

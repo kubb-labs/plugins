@@ -22,9 +22,9 @@ export function placeOrderMutationOptions<TContext = unknown>(config: Partial<Om
 }
 
 /**
+ * `POST /store/order`
  * @description Place a new order in the store
  * @summary Place an order for a pet
- * {@link /store/order}
  */
 export function usePlaceOrder<TContext>(options: {
   mutation?: UseMutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext> & { client?: QueryClient },

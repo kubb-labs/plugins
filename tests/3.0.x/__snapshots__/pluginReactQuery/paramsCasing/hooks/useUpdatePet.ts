@@ -22,7 +22,7 @@ export function updatePetMutationOptions<TContext = unknown>(config: Partial<Omi
 }
 
 /**
- * {@link /pets/:pet_id}
+ * `POST /pets/{pet_id}`
  */
 export function useUpdatePet<TContext>(options: {
   mutation?: UseMutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetOptions, TContext> & { client?: QueryClient },

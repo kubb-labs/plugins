@@ -8,9 +8,11 @@ import type { GetOrderByIdOptions, GetOrderByIdResponses } from '../../models/st
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
+ * `GET /store/order/{orderId}`
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
  * @summary Find purchase order by ID
- * {@link /store/order/:orderId}
+ * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function getOrderById<ThrowOnError extends boolean = true>(
   options: Options<GetOrderByIdOptions, ThrowOnError>,

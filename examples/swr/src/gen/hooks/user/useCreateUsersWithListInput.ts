@@ -16,9 +16,9 @@ export type CreateUsersWithListInputMutationKey = ReturnType<typeof createUsersW
 export type CreateUsersWithListInputMutationArg = CreateUsersWithListInputOptions
 
 /**
+ * `POST /user/createWithList`
  * @description Creates list of users with given input array
  * @summary Creates list of users with given input array
- * {@link /user/createWithList}
  */
 export function useCreateUsersWithListInput(
   options: {

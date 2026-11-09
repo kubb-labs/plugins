@@ -8,8 +8,10 @@ import type { CreatePetsOptions, CreatePetsResponses } from '../models/ts/Create
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
 /**
+ * `POST /pets/{uuid}`
  * @summary Create a pet
- * {@link /pets/:uuid}
+ * @param options - The request (`path`, `query`, `body`, `headers`) and per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function createPets<ThrowOnError extends boolean = true>(
   options: Options<CreatePetsOptions, ThrowOnError>,

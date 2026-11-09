@@ -8,7 +8,9 @@ import type { Options, RequestResult } from '@example/client'
 import { client } from '@example/client'
 
 /**
- * {@link /pets/create-second}
+ * `POST /pets/create-second`
+ * @param options - Per-call settings, such as `client` and `throwOnError`.
+ * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function petCreate2<ThrowOnError extends boolean = true>(options: Options<PetCreateOptions2, ThrowOnError> = {}): Promise<RequestResult<PetCreateResponses2, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
