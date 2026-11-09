@@ -86,11 +86,6 @@ function formatExample(value: unknown): string {
 }
 
 /**
- * The note on a binary object property, which is a file part of a form upload: only a `File` carries a filename there.
- */
-export const BINARY_PROPERTY_REMARK = '@remarks Pass a `File` to send its filename. A plain `Blob` is sent with the filename `blob`.'
-
-/**
  * Whether a schema is binary, or an array of binary items, so its TypeScript type is `Blob` or `Blob[]`.
  */
 export function isBinarySchema(schema: ast.SchemaNode): boolean {
@@ -118,8 +113,6 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   // OAS 3.1 carries schema examples as an `examples` array, one `@example` line each.
   const exampleValues = meta?.examples ?? []
 
-  const isBinary = isBinarySchema(schema)
-
   const comments = [
     hasDescription ? `@description ${jsDocEscape(meta.description)}` : null,
     ...formatComment,
@@ -139,7 +132,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   // add bytes with no information a reader can't already see in the signature.
   const typeTag =
     // A binary schema's primitive is `string`, which would contradict its `Blob` type.
-    comments.length && !isBinary && meta && 'primitive' in meta && meta.primitive
+    comments.length && !isBinarySchema(schema) && meta && 'primitive' in meta && meta.primitive
       ? [`@type ${meta.primitive}`, (optional ?? isSchemaOptional(schema)) ? ' | undefined' : null].filter(Boolean).join('')
       : null
 
