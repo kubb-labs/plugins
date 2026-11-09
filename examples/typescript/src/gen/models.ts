@@ -298,7 +298,7 @@ export interface PetNotFound {
 
 export type UpdatePetStatus200Json = Pet
 
-export type UpdatePetStatus200Xml = Pet
+export type UpdatePetStatus200Xml = string
 
 export type UpdatePetStatus200 = UpdatePetStatus200Json | UpdatePetStatus200Xml
 
@@ -382,7 +382,7 @@ export type UpdatePetResponse = UpdatePetStatus200
 
 export type AddPetStatus200Json = Pet
 
-export type AddPetStatus200Xml = Pet
+export type AddPetStatus200Xml = string
 
 export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
@@ -477,7 +477,7 @@ export interface FindPetsByStatusQuery {
 
 export type FindPetsByStatusStatus200Json = Array<Pet>
 
-export type FindPetsByStatusStatus200Xml = Array<Pet>
+export type FindPetsByStatusStatus200Xml = string
 
 export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
 
@@ -528,7 +528,7 @@ export interface FindPetsByTagsQuery {
 
 export type FindPetsByTagsStatus200Json = Array<Pet>
 
-export type FindPetsByTagsStatus200Xml = Array<Pet>
+export type FindPetsByTagsStatus200Xml = string
 
 export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
 
@@ -571,7 +571,7 @@ export interface GetPetByIdPath {
 
 export type GetPetByIdStatus200Json = Pet
 
-export type GetPetByIdStatus200Xml = Pet
+export type GetPetByIdStatus200Xml = string
 
 export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml
 
@@ -873,7 +873,7 @@ export interface GetOrderByIdPath {
 
 export type GetOrderByIdStatus200Json = Order
 
-export type GetOrderByIdStatus200Xml = Order
+export type GetOrderByIdStatus200Xml = string
 
 export type GetOrderByIdStatus200 = GetOrderByIdStatus200Json | GetOrderByIdStatus200Xml
 

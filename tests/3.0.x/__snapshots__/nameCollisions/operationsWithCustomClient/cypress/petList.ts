@@ -10,5 +10,5 @@ export function petList2(options: Partial<Cypress.RequestOptions> = {}): Cypress
     method: 'GET',
     url: `/pets/second`,
     ...options
-  }).then((res) => res.body)
+  }).then((res) => res.body) as Cypress.Chainable<PetListResponse2>
 }

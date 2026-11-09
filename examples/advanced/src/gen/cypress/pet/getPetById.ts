@@ -12,12 +12,12 @@ export function getPetById(
     headers?: never
   },
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<Omit<NonNullable<Pet>, 'name'>> {
+): Cypress.Chainable<Omit<NonNullable<Pet>, 'name'> | string> {
   return cy
-    .request<Omit<NonNullable<Pet>, 'name'>>({
+    .request<Omit<NonNullable<Pet>, 'name'> | string>({
       method: 'GET',
       url: `/pet/${path.petId}:search`,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<Omit<NonNullable<Pet>, 'name'> | string>
 }

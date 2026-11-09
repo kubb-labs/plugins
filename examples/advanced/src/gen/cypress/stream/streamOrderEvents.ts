@@ -19,5 +19,5 @@ export function streamOrderEvents(
       url: `/store/order/${path.orderId}/events`,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<OrderEvent>
 }

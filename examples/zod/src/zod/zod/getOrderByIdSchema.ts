@@ -14,7 +14,7 @@ export const getOrderByIdStatus200SchemaJson = orderSchema
 
 export type GetOrderByIdStatus200SchemaJsonType = z.infer<typeof getOrderByIdStatus200SchemaJson>
 
-export const getOrderByIdStatus200SchemaXml = orderSchema
+export const getOrderByIdStatus200SchemaXml = z.string()
 
 export type GetOrderByIdStatus200SchemaXmlType = z.infer<typeof getOrderByIdStatus200SchemaXml>
 

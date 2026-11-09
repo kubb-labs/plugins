@@ -18,7 +18,7 @@ export function addPetMutationOptions<TContext = unknown>(
         code?: number
         message?: string
       }
-    | Omit<NonNullable<Pet>, 'name'>,
+    | (Omit<NonNullable<Pet>, 'name'> | string),
     ResponseErrorConfig<{
       code?: number
       message?: string
@@ -77,7 +77,7 @@ export function useAddPet<TContext>(
           code?: number
           message?: string
         }
-      | Omit<NonNullable<Pet>, 'name'>,
+      | (Omit<NonNullable<Pet>, 'name'> | string),
       ResponseErrorConfig<{
         code?: number
         message?: string
@@ -131,7 +131,7 @@ export function useAddPet<TContext>(
         code?: number
         message?: string
       }
-    | Omit<NonNullable<Pet>, 'name'>,
+    | (Omit<NonNullable<Pet>, 'name'> | string),
     ResponseErrorConfig<{
       code?: number
       message?: string
@@ -177,7 +177,7 @@ export function useAddPet<TContext>(
         code?: number
         message?: string
       }
-    | Omit<NonNullable<Pet>, 'name'>,
+    | (Omit<NonNullable<Pet>, 'name'> | string),
     ResponseErrorConfig<{
       code?: number
       message?: string
@@ -228,7 +228,7 @@ export function useAddPet<TContext>(
         code?: number
         message?: string
       }
-    | Omit<NonNullable<Pet>, 'name'>,
+    | (Omit<NonNullable<Pet>, 'name'> | string),
     ResponseErrorConfig<{
       code?: number
       message?: string

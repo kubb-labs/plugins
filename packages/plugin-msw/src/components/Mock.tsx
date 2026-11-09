@@ -3,7 +3,7 @@ import type { ast } from '@kubb/kit'
 import { Url } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import { getContentType, getMswMethod, hasResponseSchema, resolveDefaultBaseURL, responseLiteral } from '../utils.ts'
+import { getMswMethod, hasResponseSchema, resolveDefaultBaseURL, responseReturn } from '../utils.ts'
 
 type Props = {
   name: string
@@ -20,7 +20,6 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
   const methodGuard = node.method === 'QUERY' ? `if (info.request.method !== 'QUERY') return\n\n    ` : ''
   const successResponse = getPrimarySuccessResponse(node)
   const statusCode = successResponse ? Number(successResponse.statusCode) : 200
-  const contentType = getContentType(successResponse)
   const url = Url.toPath(node.path)
 
   const responseHasSchema = hasResponseSchema(successResponse)
@@ -38,7 +37,7 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
 
   // Escape colons that do not start a param, such as the second one in `/pet/:petId:search`.
   const urlLiteral = `\`\${options?.baseURL ?? ${resolveDefaultBaseURL(baseURL)}}${url.replace(/([^/]):/g, '$1\\\\:')}\``
-  const responseBody = fakerName ? `JSON.stringify(data ?? ${fakerName}(data))` : 'JSON.stringify(data)'
+  const responseBody = fakerName ? `data ?? ${fakerName}(data)` : 'data'
 
   return (
     <File.Source name={name} isIndexable isExportable>
@@ -46,7 +45,7 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
         {`return ${httpCall}(${urlLiteral}, function handler(info) {
     ${methodGuard}if(typeof data === 'function') return data(info)
 
-    return ${responseLiteral(responseBody, statusCode, contentType)}
+    ${responseReturn(responseBody, statusCode, successResponse)}
   })`}
       </Function>
     </File.Source>

@@ -8,7 +8,7 @@ import { petSchema } from './petSchema'
 
 export const updatePetStatus200SchemaJson = z.lazy(() => petSchema)
 
-export const updatePetStatus200SchemaXml = z.lazy(() => petSchema)
+export const updatePetStatus200SchemaXml = z.string()
 
 export const updatePetStatus200Schema = z.union([updatePetStatus200SchemaJson, updatePetStatus200SchemaXml])
 

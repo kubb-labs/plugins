@@ -13,5 +13,5 @@ export function updatePet({ body }: Pick<UpdatePetOptions, 'body'>, options: Par
       body,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<UpdatePetResponse>
 }

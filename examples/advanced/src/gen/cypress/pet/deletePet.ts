@@ -21,5 +21,5 @@ export function deletePet(
       headers,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<unknown>
 }

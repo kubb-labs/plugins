@@ -262,9 +262,9 @@ describe("typeGenerator — operations: 'inline'", () => {
         '409': ApiCreatePetStatus409;
         '410': ApiCreatePetStatus410;
       }",
-        "ApiCreatePetStatus201": "ApiCreatePetStatus201Json",
+        "ApiCreatePetStatus201": "ApiCreatePetStatus201Json | ApiCreatePetStatus201Xml",
         "ApiCreatePetStatus201Json": "ApiPet",
-        "ApiCreatePetStatus201Xml": "ApiPet",
+        "ApiCreatePetStatus201Xml": "string",
         "ApiCreatePetStatus404": "unknown",
         "ApiCreatePetStatus409": "ApiPetStatus",
         "ApiCreatePetStatus410": "ApiPet | null",

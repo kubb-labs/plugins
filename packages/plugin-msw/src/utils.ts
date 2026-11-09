@@ -1,4 +1,5 @@
-import type { ast } from '@kubb/kit'
+import { toResponseContent } from '@internals/shared'
+import { ast } from '@kubb/kit'
 
 /**
  * Returns the base URL as source code. A `${...}` value stays a template literal.
@@ -38,12 +39,40 @@ export function hasResponseSchema(response: ast.ResponseNode | null | undefined)
  */
 function getResponseContentType(response: ast.ResponseNode | null | undefined): string | null {
   const contents = response?.content ?? []
-  const jsonEntry = contents.find((entry) => {
-    const baseType = entry.contentType?.split(';')[0]?.trim().toLowerCase()
-    return baseType === 'application/json' || baseType?.endsWith('+json')
-  })
-  const value = (jsonEntry ?? contents[0])?.contentType
+  const value = (contents.find((entry) => isJson(entry.contentType)) ?? contents[0])?.contentType
   return typeof value === 'string' && value.length > 0 ? value : null
+}
+
+function isJson(contentType: string | undefined): boolean {
+  const baseType = contentType?.split(';')[0]?.trim().toLowerCase()
+  return baseType === 'application/json' || Boolean(baseType?.endsWith('+json'))
+}
+
+/**
+ * The first content type of a response that the client reads as text, such as `application/xml`, or `null` when none is.
+ */
+function getTextContentType(response: ast.ResponseNode | null | undefined): string | null {
+  const entry = (response?.content ?? []).find((entry) => {
+    const schema = toResponseContent(entry).schema
+    return !isJson(entry.contentType) && schema && ast.resolveRef(schema).primitive === 'string'
+  })
+  return entry?.contentType ?? null
+}
+
+/**
+ * The statements that return a mocked `Response` for `body`. A string body for a response the client reads as text goes
+ * out as raw text with that content type, so an XML mock is not sent as a quoted JSON string. Any other body is JSON.
+ */
+export function responseReturn(body: string, status: number, response: ast.ResponseNode | null | undefined): string {
+  const contentType = getContentType(response)
+  const textContentType = hasResponseSchema(response) ? getTextContentType(response) : null
+  if (!textContentType) return `return ${responseLiteral(`JSON.stringify(${body})`, status, contentType)}`
+
+  // A plain variable such as `data` is checked as it is, an expression such as `data ?? createPet(data)` is read once.
+  const name = /^\w+$/.test(body) ? body : 'body'
+  return `${name === body ? '' : `const body = ${body}\n    `}if (typeof ${name} === 'string') return ${responseLiteral(name, status, textContentType)}
+
+    return ${responseLiteral(`JSON.stringify(${name})`, status, contentType)}`
 }
 
 /**

@@ -22,6 +22,7 @@ import {
   resolveResponseTypes,
   resolveStatusCodeNames,
   resolveSuccessNames,
+  toResponseContent,
   type OperationTypeNameResolver,
   type RequestConfigResolver,
   type ResponseNameResolver,
@@ -421,6 +422,41 @@ describe('resolveOperationTypeNames', () => {
     })
 
     expect(resolveOperationTypeNames(node, resolver, { responseStatusNames: 'error' })).toStrictEqual(['showPetResponse', 'Status404'])
+  })
+})
+
+describe('toResponseContent', () => {
+  const pet = ast.factory.createSchema({ type: 'ref', name: 'Pet', schema: ast.factory.createSchema({ type: 'object' }) })
+  const typeOf = (contentType: string, schema: ast.SchemaNode = pet) => toResponseContent({ contentType, schema, keysToOmit: ['id'] })
+
+  test('types a body the runtime returns as text as string', () => {
+    for (const contentType of ['application/xml', 'application/yaml', 'text/csv', 'text/plain; charset=utf-8', 'text/*']) {
+      expect(typeOf(contentType)).toStrictEqual({ contentType, schema: ast.factory.createSchema({ type: 'string' }), keysToOmit: null })
+    }
+  })
+
+  test('keeps the schema of a JSON, binary, stream, or wildcard body', () => {
+    const blob = ast.factory.createSchema({ type: 'blob' })
+    for (const [contentType, schema] of [
+      ['application/json', pet],
+      ['application/problem+json', pet],
+      ['text/event-stream', pet],
+      ['image/png', blob],
+      ['text/csv', blob],
+      ['*/*', pet],
+      ['application/*', pet],
+    ] as const) {
+      expect(typeOf(contentType, schema).schema).toBe(schema)
+    }
+  })
+
+  test('keeps the item schema of a stream of items', () => {
+    expect(toResponseContent({ contentType: 'application/jsonl', schema: pet, stream: { schema: pet } }).schema).toBe(pet)
+  })
+
+  test('keeps a string schema on a text body', () => {
+    const token = ast.factory.createSchema({ type: 'ref', name: 'Token', schema: ast.factory.createSchema({ type: 'string' }) })
+    expect(typeOf('text/plain', token).schema).toBe(token)
   })
 })
 

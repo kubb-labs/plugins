@@ -45,9 +45,9 @@ export function findPetsByTagsInfiniteQueryOptions(
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey({ query })
   return infiniteQueryOptions<
-    Array<Pet>,
+    Array<Pet> | string,
     ResponseErrorConfig<unknown>,
-    InfiniteData<Array<Pet>>,
+    InfiniteData<Array<Pet> | string>,
     typeof queryKey,
     NonNullable<
       {
@@ -85,7 +85,7 @@ export function findPetsByTagsInfiniteQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsInfinite<
-  TQueryFnData = Array<Pet>,
+  TQueryFnData = Array<Pet> | string,
   TError = ResponseErrorConfig<unknown>,
   TData = InfiniteData<TQueryFnData>,
   TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,

@@ -21,5 +21,5 @@ export function getCookies({ headers, cookies }: GetCookiesOptions = {}, options
       headers: { ...headers, ...(cookie ? { Cookie: cookie } : {}) },
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<GetCookiesResponse>
 }

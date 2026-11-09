@@ -4,7 +4,7 @@
  * Source: text content
  */
 
-import type { GetPetResponse, GetPetStatus200, GetPetStatus200Json, GetPetStatus200Xml, GetPetStatus401 } from './types/GetPet'
+import type { GetPetResponse, GetPetStatus200, GetPetStatus200Json, GetPetStatus401 } from './types/GetPet'
 import { faker } from '@faker-js/faker'
 
 /**
@@ -23,14 +23,8 @@ export function createGetPetStatus200Json<TData extends Partial<GetPetStatus200J
 /**
  * @description A pet
  */
-export function createGetPetStatus200Xml<TData extends Partial<GetPetStatus200Xml> = object>(data?: TData) {
-  const defaultFakeData = {
-    id: faker.string.alpha(),
-  }
-  return {
-    ...defaultFakeData,
-    ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+export function createGetPetStatus200Xml(data?: string): string {
+  return data ?? faker.string.alpha()
 }
 
 /**

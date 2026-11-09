@@ -17,5 +17,5 @@ export function deleteOrder(
       url: `/store/order/${path.orderId}`,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<unknown | unknown>
 }

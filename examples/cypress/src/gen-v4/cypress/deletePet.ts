@@ -13,5 +13,5 @@ export function deletePet({ path, headers }: DeletePetOptions, options: Partial<
       headers,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<DeletePetResponse>
 }

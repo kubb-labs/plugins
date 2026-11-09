@@ -12,12 +12,12 @@ export function findPetsByStatus(
     headers?: never
   },
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<Array<Pet>> {
+): Cypress.Chainable<Array<Pet> | string> {
   return cy
-    .request<Array<Pet>>({
+    .request<Array<Pet> | string>({
       method: 'GET',
       url: `/pet/findByStatus/${path.step_id}`,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<Array<Pet> | string>
 }

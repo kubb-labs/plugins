@@ -323,3 +323,43 @@ describe('mswGenerator faker fallback', () => {
     expect(await getResponseBody(data)).toEqual(fakerData)
   })
 })
+
+describe('mswGenerator text response', () => {
+  const getPetNode = ast.factory.createOperation({
+    operationId: 'getPet',
+    method: 'GET',
+    path: '/pet',
+    tags: ['pets'],
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '200',
+        description: 'A pet',
+        content: ['application/json', 'application/xml'].map((contentType) =>
+          ast.factory.createContent({ contentType, schema: ast.factory.createSchema({ type: 'object', properties: [] }) }),
+        ),
+      }),
+    ],
+  })
+
+  async function getResponse(data: unknown) {
+    const files = await renderOperation({ name: 'getPet', node: getPetNode, options: {} })
+    const [source] = rawSources(files)
+    const handlers = await importGenerated(source!)
+
+    return msw.getResponse([handlers.getPetHandler(data)], new Request('http://localhost/pet'), { baseUrl: 'http://localhost' })
+  }
+
+  test('sends a string body as raw XML', async () => {
+    const response = await getResponse('<pet/>')
+
+    expect(response?.headers.get('Content-Type')).toBe('application/xml')
+    expect(await response?.text()).toBe('<pet/>')
+  })
+
+  test('sends an object body as JSON', async () => {
+    const response = await getResponse({ id: 1 })
+
+    expect(response?.headers.get('Content-Type')).toBe('application/json')
+    expect(await response?.json()).toEqual({ id: 1 })
+  })
+})

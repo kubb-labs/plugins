@@ -1,7 +1,7 @@
 import type { ast } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import { getContentType, hasResponseSchema, responseLiteral } from '../utils.ts'
+import { hasResponseSchema, responseReturn } from '../utils.ts'
 
 type Props = {
   typeName: string
@@ -11,7 +11,6 @@ type Props = {
 
 export function Response({ name, typeName, response }: Props): KubbReactNode {
   const statusCode = Number(response.statusCode)
-  const contentType = getContentType(response)
 
   const params = `data${hasResponseSchema(response) ? '' : '?'}: ${typeName}`
 
@@ -21,7 +20,7 @@ export function Response({ name, typeName, response }: Props): KubbReactNode {
     <File.Source name={responseName} isIndexable isExportable>
       <Function name={responseName} export params={params}>
         {`
-    return ${responseLiteral('JSON.stringify(data)', statusCode, contentType)}`}
+    ${responseReturn('data', statusCode, response)}`}
       </Function>
     </File.Source>
   )

@@ -9,7 +9,7 @@ import { petSchema } from './petSchema'
 
 export const addPetStatus200SchemaJson = petSchema
 
-export const addPetStatus200SchemaXml = petSchema
+export const addPetStatus200SchemaXml = z.string()
 
 export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])
 

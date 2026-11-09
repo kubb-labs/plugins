@@ -3,13 +3,7 @@
  * Do not edit manually.
  */
 
-import type {
-  FindPetsByTagsQuery,
-  FindPetsByTagsResponse,
-  FindPetsByTagsStatus200,
-  FindPetsByTagsStatus200Json,
-  FindPetsByTagsStatus200Xml,
-} from '../../models/FindPetsByTags'
+import type { FindPetsByTagsQuery, FindPetsByTagsResponse, FindPetsByTagsStatus200, FindPetsByTagsStatus200Json } from '../../models/FindPetsByTags'
 import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
 
@@ -37,8 +31,8 @@ export function createFindPetsByTagsStatus200Json(data?: Partial<FindPetsByTagsS
 /**
  * @description successful operation
  */
-export function createFindPetsByTagsStatus200Xml(data?: Partial<FindPetsByTagsStatus200Xml>): FindPetsByTagsStatus200Xml {
-  return [...faker.helpers.multiple(() => createPet()), ...(data || []).filter((item) => item !== undefined)] as FindPetsByTagsStatus200Xml
+export function createFindPetsByTagsStatus200Xml(data?: string): string {
+  return data ?? faker.string.alpha()
 }
 
 /**

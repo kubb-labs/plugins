@@ -11,7 +11,7 @@ export type FindPetsByStatusPath = {
 
 export type FindPetsByStatusStatus200Json = Pet[]
 
-export type FindPetsByStatusStatus200Xml = Pet[]
+export type FindPetsByStatusStatus200Xml = string
 
 export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
 

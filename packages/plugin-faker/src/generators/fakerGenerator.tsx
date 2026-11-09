@@ -1,4 +1,11 @@
-import { getCircularNames, getOperationParameters, getPerContentTypeName, resolveContentTypeVariants, resolveDependencyOperationFile } from '@internals/shared'
+import {
+  getCircularNames,
+  getOperationParameters,
+  getPerContentTypeName,
+  resolveContentTypeVariants,
+  resolveDependencyOperationFile,
+  toResponseContent,
+} from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
 import { ast, defineGenerator } from '@kubb/kit'
 import { buildParams, enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -168,7 +175,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const responseUnits = node.responses.flatMap((response) =>
       expandContentUnits(
-        response.content ?? [],
+        (response.content ?? []).map(toResponseContent),
         resolver.response.status(node, response.statusCode),
         tsResolver.response.status(node, response.statusCode),
         response.description,

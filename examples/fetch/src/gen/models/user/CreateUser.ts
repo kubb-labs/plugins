@@ -7,7 +7,7 @@ import type { User } from '../User'
 
 export type CreateUserStatusDefaultJson = User
 
-export type CreateUserStatusDefaultXml = User
+export type CreateUserStatusDefaultXml = string
 
 export type CreateUserStatusDefault = CreateUserStatusDefaultJson | CreateUserStatusDefaultXml
 

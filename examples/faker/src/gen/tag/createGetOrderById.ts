@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { GetOrderByIdPath, GetOrderByIdResponse, GetOrderByIdStatus200, GetOrderByIdStatus200Json, GetOrderByIdStatus200Xml } from '../models/GetOrderById'
+import type { GetOrderByIdPath, GetOrderByIdResponse, GetOrderByIdStatus200, GetOrderByIdStatus200Json } from '../models/GetOrderById'
 import { createOrder } from './createOrder'
 import { fakerEN as faker } from '@faker-js/faker'
 
@@ -27,8 +27,8 @@ export function createGetOrderByIdStatus200Json(data?: Partial<GetOrderByIdStatu
 /**
  * @description successful operation
  */
-export function createGetOrderByIdStatus200Xml(data?: Partial<GetOrderByIdStatus200Xml>): GetOrderByIdStatus200Xml {
-  return createOrder(data) as GetOrderByIdStatus200Xml
+export function createGetOrderByIdStatus200Xml(data?: string): string {
+  return data ?? faker.string.alpha()
 }
 
 /**

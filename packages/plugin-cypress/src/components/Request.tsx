@@ -48,9 +48,10 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
     '...options',
   ].filter(Boolean)
 
+  // Cypress's catch-all `then` overload types a union body as `Chainable<Response | Pet> | Chainable<Response | string>`, so cast to the declared return type.
   const requestCall = `${groups.cookies ? cookieLine : ''}return cy.request<${responseType}>({
   ${requestOptions.join(',\n  ')}
-}).then((res) => res.body)`
+}).then((res) => res.body) as ${returnType}`
 
   return (
     <File.Source name={name} isIndexable isExportable>

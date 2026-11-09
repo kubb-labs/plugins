@@ -7,6 +7,7 @@ import {
   getSuccessResponses,
   isSuccessStatusCode,
   resolveContentTypeVariants,
+  toResponseContent,
 } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -262,11 +263,12 @@ export const zodGenerator = defineGenerator<PluginZod>({
     )
 
     const responseSchemas = node.responses.map((res) => {
-      const variants = (res.content ?? []).filter((entry) => entry.schema)
+      const content = (res.content ?? []).map(toResponseContent)
+      const variants = content.filter((entry) => entry.schema)
       if (variants.length > 1) {
-        return buildContentTypeVariants(res.content!, resolver.response.status(node, res.statusCode))
+        return buildContentTypeVariants(content, resolver.response.status(node, res.statusCode))
       }
-      const primary = variants[0] ?? res.content?.[0]
+      const primary = variants[0] ?? content[0]
       return renderSchemaEntry({
         schema: primary?.schema ?? null,
         name: resolver.response.status(node, res.statusCode),

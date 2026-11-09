@@ -10,5 +10,5 @@ export function getPetById({ path }: GetPetByIdOptions, options: Partial<Cypress
     method: 'GET',
     url: `/pet/${path.petId}`,
     ...options
-  }).then((res) => res.body)
+  }).then((res) => res.body) as Cypress.Chainable<GetPetByIdResponse>
 }

@@ -12,5 +12,5 @@ export function deleteOrder({ path }: DeleteOrderOptions, options: Partial<Cypre
       url: `http://localhost:3000/store/order/${path.orderId}`,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<DeleteOrderResponse>
 }

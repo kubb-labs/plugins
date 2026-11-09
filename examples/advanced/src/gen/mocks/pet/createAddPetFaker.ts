@@ -37,19 +37,17 @@ export function createAddPetStatusDefaultFakerJson<TData extends Partial<Omit<No
 /**
  * @description Successful operation
  */
-export function createAddPetStatusDefaultFakerXml<TData extends Partial<Omit<NonNullable<Pet>, 'name'>> = object>(data?: TData) {
-  const { name: _omit0, ...defaultFakeData } = createPetFaker()
-  return {
-    ...defaultFakeData,
-    ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
+export function createAddPetStatusDefaultFakerXml(data?: string): string {
+  return data ?? faker.string.alpha()
 }
 
 /**
  * @description Successful operation
  */
-export function createAddPetStatusDefaultFaker(data?: Partial<Omit<NonNullable<Pet>, 'name'>>): Omit<NonNullable<Pet>, 'name'> {
-  return (data ?? faker.helpers.arrayElement([createAddPetStatusDefaultFakerJson(), createAddPetStatusDefaultFakerXml()])) as Omit<NonNullable<Pet>, 'name'>
+export function createAddPetStatusDefaultFaker(data?: Partial<Omit<NonNullable<Pet>, 'name'> | string>): Omit<NonNullable<Pet>, 'name'> | string {
+  return (data ?? faker.helpers.arrayElement([createAddPetStatusDefaultFakerJson(), createAddPetStatusDefaultFakerXml()])) as
+    | Omit<NonNullable<Pet>, 'name'>
+    | string
 }
 
 /**
@@ -96,18 +94,18 @@ export function createAddPetResponseFaker(
         code?: number
         message?: string
       }
-    | Omit<NonNullable<Pet>, 'name'>
+    | (Omit<NonNullable<Pet>, 'name'> | string)
   >,
 ):
   | {
       code?: number
       message?: string
     }
-  | Omit<NonNullable<Pet>, 'name'> {
+  | (Omit<NonNullable<Pet>, 'name'> | string) {
   return (data ?? faker.helpers.arrayElement([createAddPetStatus405Faker(), createAddPetStatusDefaultFaker()])) as
     | {
         code?: number
         message?: string
       }
-    | Omit<NonNullable<Pet>, 'name'>
+    | (Omit<NonNullable<Pet>, 'name'> | string)
 }

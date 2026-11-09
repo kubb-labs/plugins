@@ -17,7 +17,7 @@ export type GetPetByIdPath = {
 
 export type GetPetByIdStatus200Json = Pet;
 
-export type GetPetByIdStatus200Xml = Pet;
+export type GetPetByIdStatus200Xml = string;
 
 export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml;
 

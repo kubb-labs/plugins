@@ -10,5 +10,5 @@ export function getConfigIdV20250({ path }: GetConfigIdV20250Options, options: P
     method: 'GET',
     url: `/config/${path.config_id}`,
     ...options
-  }).then((res) => res.body)
+  }).then((res) => res.body) as Cypress.Chainable<GetConfigIdV20250Response>
 }

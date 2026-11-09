@@ -87,6 +87,18 @@ client.setConfig({
 Like the other config, `codecs` can also be passed on a single call, and a per-call entry merges
 over the client one for that content type.
 
+The generated types follow what the runtime returns without a codec. A response the runtime reads
+as text, such as `application/xml`, `application/yaml`, or `text/csv`, is typed `string`, even
+when the document gives it an object schema. A `deserialize` changes the value but not that type,
+so cast or narrow `data` to what your codec returns:
+
+```typescript
+const result = await getPetById({ path: { petId: 1 }, contentType: { response: 'application/xml' } })
+if (result.contentType === 'application/xml') {
+  const pet = result.data as unknown as Document
+}
+```
+
 When the runtime picks the wrong parse mode because a response omits its `Content-Type` or sets a
 misleading one, force the mode with `responseType` on the call. It accepts `'json'`, `'text'`,
 `'blob'`, `'arraybuffer'`, and `'document'`:
