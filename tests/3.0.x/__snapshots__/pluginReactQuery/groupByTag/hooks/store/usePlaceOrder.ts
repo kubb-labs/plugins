@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { PlaceOrderOptions, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../types/PlaceOrder'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { placeOrder } from '../../clients/placeOrder'
@@ -11,7 +11,7 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
-export function placeOrderMutationOptions<TContext = unknown>(config: Omit<Options<PlaceOrderOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'> = {}) {
+export function placeOrderMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>> = {}) {
   const mutationKey = placeOrderMutationKey()
   return mutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext>({
     mutationKey,
@@ -28,7 +28,7 @@ export function placeOrderMutationOptions<TContext = unknown>(config: Omit<Optio
  */
 export function usePlaceOrder<TContext>(options: {
   mutation?: UseMutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext> & { client?: QueryClient },
-  client?: Omit<Options<PlaceOrderOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

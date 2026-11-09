@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { UploadFileOptions, UploadFileStatus200 } from '../../types/UploadFile'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { uploadFile } from '../../clients/uploadFile'
@@ -11,7 +11,7 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
-export function uploadFileMutationOptions<TContext = unknown>(config: Omit<Options<UploadFileOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {}) {
+export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const mutationKey = uploadFileMutationKey()
   return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileOptions, TContext>({
     mutationKey,
@@ -27,7 +27,7 @@ export function uploadFileMutationOptions<TContext = unknown>(config: Omit<Optio
  */
 export function useUploadFile<TContext>(options: {
   mutation?: UseMutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileOptions, TContext> & { client?: QueryClient },
-  client?: Omit<Options<UploadFileOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

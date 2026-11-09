@@ -35,7 +35,7 @@ function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: R
     withRequest: false,
     optionsType: `{
   mutation?: MutationObserverOptions<${[TData, TError, resolveMutationRequestType(node, resolver), 'TContext'].join(', ')}> & { client?: QueryClient },
-  client?: ${buildRequestConfigType(node, { optionsName: resolver.response.options(node) })},
+  client?: ${buildRequestConfigType(node)},
 }`,
   })
 }

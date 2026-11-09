@@ -4,7 +4,7 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { AddPetOptions, AddPetStatus200, AddPetStatus405 } from '../../models/pet/AddPet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { addPet } from '../../clients/pet/addPet'
@@ -25,7 +25,7 @@ export function useAddPet(
     mutation?: SWRMutationConfiguration<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg> & {
       throwOnError?: boolean
     }
-    client?: Omit<Options<AddPetOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
 ) {

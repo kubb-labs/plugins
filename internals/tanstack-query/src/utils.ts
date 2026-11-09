@@ -128,7 +128,7 @@ export function buildQueryOptionsParams(
 
   const configParam = createFunctionParameter({
     name: 'config',
-    type: buildClientOptionType({ optionsName: resolver.response.options(node) }),
+    type: buildClientOptionType(),
     default: '{}',
   })
 

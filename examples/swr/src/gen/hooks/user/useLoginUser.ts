@@ -4,7 +4,7 @@
  */
 
 import useSWR from 'swr'
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { LoginUserOptions, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser'
 import type { SWRConfiguration } from 'swr'
 import { loginUser } from '../../clients/user/loginUser'
@@ -15,7 +15,7 @@ type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 export function loginUserQueryOptions(
   { query }: LoginUserOptions = {},
-  config: Omit<Options<LoginUserOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   return {
     fetcher: async () => {
@@ -32,7 +32,7 @@ export function useLoginUser(
   { query }: LoginUserOptions = {},
   options: {
     query?: SWRConfiguration<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>>
-    client?: Omit<Options<LoginUserOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
   } = {},

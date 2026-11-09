@@ -4,7 +4,7 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { UpdateUserOptions, UpdateUserResponse } from '../../models/user/UpdateUser'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { updateUser } from '../../clients/user/updateUser'
@@ -25,7 +25,7 @@ export function useUpdateUser(
     mutation?: SWRMutationConfiguration<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserMutationKey | null, UpdateUserMutationArg> & {
       throwOnError?: boolean
     }
-    client?: Omit<Options<UpdateUserOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
 ) {

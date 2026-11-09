@@ -4,7 +4,7 @@
  */
 
 import useSWR from 'swr'
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { GetUserByNameOptions, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/user/GetUserByName'
 import type { SWRConfiguration } from 'swr'
 import { getUserByName } from '../../clients/user/getUserByName'
@@ -15,7 +15,7 @@ type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 
 export function getUserByNameQueryOptions(
   { path }: GetUserByNameOptions,
-  config: Omit<Options<GetUserByNameOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   return {
     fetcher: async () => {
@@ -32,7 +32,7 @@ export function useGetUserByName(
   { path }: GetUserByNameOptions,
   options: {
     query?: SWRConfiguration<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>>
-    client?: Omit<Options<GetUserByNameOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
     shouldFetch?: boolean
     immutable?: boolean
   } = {},

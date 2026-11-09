@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { CreateUserOptions, CreateUserResponse } from '../../models/user/CreateUser'
 import { createUser } from '../../clients/user/createUser'
 import { mutationOptions } from '@tanstack/react-query'
@@ -11,7 +11,7 @@ import { mutationOptions } from '@tanstack/react-query'
 export const createUserMutationKey = () => [{ url: '/user' }] as const
 
 export function createUserMutationOptions<TContext = unknown>(
-  config: Omit<Options<CreateUserOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>> = {},
 ) {
   const mutationKey = createUserMutationKey()
   return mutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserOptions, TContext>({

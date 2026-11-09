@@ -1,4 +1,4 @@
-import type { Options, ResponseErrorConfig } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { updatePetWithForm } from '../../axios/petService/updatePetWithForm'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -6,20 +6,7 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId:search' }] as const
 
 export function updatePetWithFormMutationOptions<TContext = unknown>(
-  config: Omit<
-    Options<{
-      body?: never
-      path: {
-        petId: number
-      }
-      query?: {
-        name?: string
-        status?: string
-      }
-      headers?: never
-    }>,
-    'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
-  > = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const mutationKey = updatePetWithFormMutationKey()
   return mutationOptions<
@@ -67,20 +54,7 @@ export function useUpdatePetWithForm<TContext>(
       },
       TContext
     > & { client?: QueryClient }
-    client?: Omit<
-      Options<{
-        body?: never
-        path: {
-          petId: number
-        }
-        query?: {
-          name?: string
-          status?: string
-        }
-        headers?: never
-      }>,
-      'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
-    >
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

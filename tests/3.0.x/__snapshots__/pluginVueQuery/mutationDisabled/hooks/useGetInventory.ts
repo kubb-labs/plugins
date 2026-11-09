@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { Options, ResponseErrorConfig } from '../.kubb/client'
-import type { GetInventoryOptions, GetInventoryStatus200 } from '../types/GetInventory'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { GetInventoryStatus200 } from '../types/GetInventory'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import { getInventory } from '../clients/getInventory'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
@@ -14,7 +14,7 @@ export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
 export type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
-export function getInventoryQueryOptions(config: Omit<Options<GetInventoryOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {}) {
+export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const queryKey = getInventoryQueryKey()
   return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200>({
    queryKey,
@@ -31,7 +31,7 @@ export function getInventoryQueryOptions(config: Omit<Options<GetInventoryOption
  */
 export function useGetInventory<TData = GetInventoryStatus200, TQueryData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventoryQueryKey>(options: {
   query?: Partial<UseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
-  client?: Omit<Options<GetInventoryOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig

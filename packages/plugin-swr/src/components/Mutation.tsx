@@ -39,7 +39,7 @@ function buildMutationParamsNode(
         name: 'options',
         type: `{
   mutation?: SWRMutationConfiguration<${TData}, ${TError}, ${mutationKeyTypeName} | null, ${mutationArgTypeName}> & { throwOnError?: boolean },
-  client?: ${buildRequestConfigType(node, { optionsName: resolver.response.options(node) })},
+  client?: ${buildRequestConfigType(node)},
   shouldFetch?: boolean,
 }`,
         default: '{}',

@@ -119,7 +119,7 @@ export function Query({
     memberTypeWrapper: maybeValueOrGetter,
     optionsType: `{
   query?: Partial<${observerOptionsType}> & { client?: QueryClient },
-  client?: ${buildClientOptionType({ optionsName: tsResolver.response.options(node) })}
+  client?: ${buildClientOptionType()}
 }`,
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''

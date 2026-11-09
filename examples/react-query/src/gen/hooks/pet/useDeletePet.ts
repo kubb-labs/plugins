@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { DeletePetOptions, DeletePetResponse, DeletePetStatus400 } from '../../models/pet/DeletePet'
 import { deletePet } from '../../clients/pet/deletePet'
 import { mutationOptions } from '@tanstack/react-query'
@@ -11,7 +11,7 @@ import { mutationOptions } from '@tanstack/react-query'
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
 export function deletePetMutationOptions<TContext = unknown>(
-  config: Omit<Options<DeletePetOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const mutationKey = deletePetMutationKey()
   return mutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetOptions, TContext>({

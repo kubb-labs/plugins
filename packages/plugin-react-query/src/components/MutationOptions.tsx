@@ -19,12 +19,12 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function buildMutationConfigParamsNode(node: ast.OperationNode, options: { resolver: ResolverTs }): FunctionParametersNode {
+export function buildMutationConfigParamsNode(node: ast.OperationNode): FunctionParametersNode {
   return createFunctionParameters({
     params: [
       createFunctionParameter({
         name: 'config',
-        type: buildRequestConfigType(node, { optionsName: options.resolver.response.options(node) }),
+        type: buildRequestConfigType(node),
         default: '{}',
       }),
     ],
@@ -34,7 +34,7 @@ export function buildMutationConfigParamsNode(node: ast.OperationNode, options: 
 export function MutationOptions({ name, clientName, node, tsResolver, mutationKeyName, clientReturnType, returnType }: Props): KubbReactNode {
   const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
 
-  const configParamsNode = buildMutationConfigParamsNode(node, { resolver: tsResolver })
+  const configParamsNode = buildMutationConfigParamsNode(node)
   const paramsSignature = declarationPrinter.print(configParamsNode) ?? ''
 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver, withContentType: true })

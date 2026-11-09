@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { LoginUserOptions, LoginUserStatus200, LoginUserStatus400 } from '../../models/user/LoginUser'
 import type { MaybeRefOrGetter } from 'vue'
 import { loginUser } from '../../clients/user/loginUser'
@@ -17,7 +17,7 @@ export type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 export function loginUserQueryOptions(
   { query }: { query?: MaybeRefOrGetter<LoginUserOptions['query']> } = {},
-  config: Omit<Options<LoginUserOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = loginUserQueryKey({ query })
   return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200>({

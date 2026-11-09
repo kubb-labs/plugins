@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
-import type { GetInventoryOptions, GetInventoryStatus200 } from '../../models/store/GetInventory'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { GetInventoryStatus200 } from '../../models/store/GetInventory'
 import { getInventory } from '../../clients/store/getInventory'
 import { queryOptions } from '@tanstack/vue-query'
 
@@ -12,7 +12,9 @@ export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
 export type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
-export function getInventoryQueryOptions(config: Omit<Options<GetInventoryOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {}) {
+export function getInventoryQueryOptions(
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
+) {
   const queryKey = getInventoryQueryKey()
   return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200>({
     queryKey,

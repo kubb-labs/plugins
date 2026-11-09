@@ -1,5 +1,5 @@
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
-import type { Options, ResponseErrorConfig } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { getPetById } from '../../axios/petService/getPetById'
@@ -31,17 +31,7 @@ export function getPetByIdQueryOptions(
     query?: never
     headers?: never
   },
-  config: Omit<
-    Options<{
-      body?: never
-      path: {
-        petId: number
-      }
-      query?: never
-      headers?: never
-    }>,
-    'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
-  > = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = getPetByIdQueryKey({ path })
   return queryOptions<
@@ -92,17 +82,7 @@ export function useGetPetById<
     query?: Partial<QueryObserverOptions<Omit<NonNullable<Pet>, 'name'> | string, ResponseErrorConfig<unknown | unknown>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
     }
-    client?: Omit<
-      Options<{
-        body?: never
-        path: {
-          petId: number
-        }
-        query?: never
-        headers?: never
-      }>,
-      'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
-    >
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

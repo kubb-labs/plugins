@@ -4,7 +4,7 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { UpdatePetOptions, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/pet/UpdatePet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { updatePet } from '../../clients/pet/updatePet'
@@ -28,7 +28,7 @@ export function useUpdatePet(
       UpdatePetMutationKey | null,
       UpdatePetMutationArg
     > & { throwOnError?: boolean }
-    client?: Omit<Options<UpdatePetOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
 ) {

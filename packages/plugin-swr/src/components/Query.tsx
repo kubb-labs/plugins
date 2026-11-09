@@ -33,7 +33,7 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
     resolver: tsResolver,
     optionsType: `{
   query?: SWRConfiguration<${[TData, TError].join(', ')}>,
-  client?: ${buildClientOptionType({ optionsName: tsResolver.response.options(node) })},
+  client?: ${buildClientOptionType()},
   shouldFetch?: boolean,
   immutable?: boolean
 }`,

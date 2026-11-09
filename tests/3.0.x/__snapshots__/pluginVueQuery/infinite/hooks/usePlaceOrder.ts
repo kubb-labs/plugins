@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options, ResponseErrorConfig } from '../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
 import type { PlaceOrderOptions, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { placeOrder } from '../clients/placeOrder'
@@ -18,7 +18,7 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  */
 export function usePlaceOrder<TContext>(options: {
   mutation?: MutationObserverOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderOptions, TContext> & { client?: QueryClient },
-  client?: Omit<Options<PlaceOrderOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

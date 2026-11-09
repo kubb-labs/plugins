@@ -4,7 +4,7 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { PlaceOrderOptions, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../types/PlaceOrder'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { placeOrder } from '../../clients/placeOrder'
@@ -22,7 +22,7 @@ export type PlaceOrderMutationArg = PlaceOrderOptions
  */
 export function usePlaceOrder(options: {
   mutation?: SWRMutationConfiguration<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg> & { throwOnError?: boolean },
-  client?: Omit<Options<PlaceOrderOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>,
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}

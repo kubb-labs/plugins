@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { DeleteOrderOptions, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/store/DeleteOrder'
 import { deleteOrder } from '../../clients/store/deleteOrder'
 import { mutationOptions } from '@tanstack/react-query'
@@ -11,7 +11,7 @@ import { mutationOptions } from '@tanstack/react-query'
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
 
 export function deleteOrderMutationOptions<TContext = unknown>(
-  config: Omit<Options<DeleteOrderOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const mutationKey = deleteOrderMutationKey()
   return mutationOptions<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderOptions, TContext>({

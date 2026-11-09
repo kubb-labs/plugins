@@ -289,15 +289,14 @@ export function resolveContentTypeVariants(entries: Array<ContentVariantInput>, 
 
 /**
  * Builds the `client?:` option type shared by the generated query hooks (`useQuery`,
- * `useInfiniteQuery`, `useSWR`, ...): the client function's own `Options<optionsName>` minus what the
+ * `useInfiniteQuery`, `useSWR`, ...): `RequestConfig` minus what the
  * hook fills in, which is every request group and `throwOnError`. Unlike {@link buildRequestConfigType},
  * it never narrows `contentType`: query hooks wrap GET operations, which carry no request body to select
  * a content type for.
  */
-export function buildClientOptionType(options: { optionsName: string; omit?: Array<string> }): string {
-  const { optionsName, omit = [] } = options
-  const keys = [...requestGroupOrder, ...omit, 'throwOnError']
-  return `Omit<Options<${optionsName}>, ${keys.map((key) => `'${key}'`).join(' | ')}>`
+export function buildClientOptionType(options: { omit?: Array<string> } = {}): string {
+  const keys = [...requestGroupOrder, 'url', ...(options.omit ?? []), 'throwOnError']
+  return `Partial<Omit<RequestConfig, ${keys.map((key) => `'${key}'`).join(' | ')}>>`
 }
 
 /**
@@ -306,9 +305,9 @@ export function buildClientOptionType(options: { optionsName: string; omit?: Arr
  * narrowed to the operation's media types; a single-type side has nothing to pick, so it stays baked in the
  * generated call.
  */
-export function buildRequestConfigType(node: ast.OperationNode, options: { optionsName: string }): string {
+export function buildRequestConfigType(node: ast.OperationNode): string {
   if (hasRequestContentTypeChoice(node)) {
-    return buildClientOptionType({ optionsName: options.optionsName, omit: ['contentType'] })
+    return buildClientOptionType({ omit: ['contentType'] })
   }
 
   const request = getContentTypeInfo(node)
@@ -318,7 +317,7 @@ export function buildRequestConfigType(node: ast.OperationNode, options: { optio
     response.isMultipleContentTypes ? `response?: ${response.contentTypeUnion}` : null,
   ].filter(Boolean)
 
-  const base = buildClientOptionType(options)
+  const base = buildClientOptionType()
   return members.length ? `${base} & { contentType?: { ${members.join('; ')} } }` : base
 }
 
@@ -408,7 +407,7 @@ export function buildRequestParamsSignature(
     ? `Pick<${resolver.response.options(node)}, ${names.map((name) => `'${name}'`).join(' | ')}>`
     : resolver.response.options(node)
   const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: ${optionsType}${isOptional ? ' = {}' : ''}` : null
-  const configParam = isConfigurable ? `config: ${buildRequestConfigType(node, { optionsName: resolver.response.options(node) })} = {}` : null
+  const configParam = isConfigurable ? `config: ${buildRequestConfigType(node)} = {}` : null
 
   return {
     signature: [firstParam, configParam].filter(Boolean).join(', '),

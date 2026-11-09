@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
-import type { LogoutUserOptions, LogoutUserResponse } from '../../models/user/LogoutUser'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { LogoutUserResponse } from '../../models/user/LogoutUser'
 import { logoutUser } from '../../clients/user/logoutUser'
 import { queryOptions } from '@tanstack/react-query'
 
@@ -12,7 +12,7 @@ export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 
 type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 
-export function logoutUserQueryOptions(config: Omit<Options<LogoutUserOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {}) {
+export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   const queryKey = logoutUserQueryKey()
   return queryOptions<LogoutUserResponse, ResponseErrorConfig<Error>, LogoutUserResponse, typeof queryKey>({
     queryKey,

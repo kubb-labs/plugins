@@ -147,8 +147,8 @@ describe('buildRequestConfigType', () => {
       },
     })
 
-    expect(buildRequestConfigType(node, { optionsName: 'CreatePetOptions' })).toBe(
-      `Omit<Options<CreatePetOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'>`,
+    expect(buildRequestConfigType(node)).toBe(
+      `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>`,
     )
   })
 
@@ -168,17 +168,15 @@ describe('buildRequestConfigType', () => {
       ],
     })
 
-    expect(buildRequestConfigType(node, { optionsName: 'GetPetOptions' })).toBe(
-      `Omit<Options<GetPetOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> & { contentType?: { response?: "application/json" | "application/xml" } }`,
+    expect(buildRequestConfigType(node)).toBe(
+      `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> & { contentType?: { response?: "application/json" | "application/xml" } }`,
     )
   })
 
-  test('uses the operation options when no request schema exists', () => {
+  test('omits every request group when no request schema exists', () => {
     const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
-    expect(buildRequestConfigType(node, { optionsName: 'ListPetsOptions' })).toBe(
-      `Omit<Options<ListPetsOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>`,
-    )
+    expect(buildRequestConfigType(node)).toBe(`Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>`)
   })
 })
 

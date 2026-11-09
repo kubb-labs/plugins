@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { UploadFileOptions, UploadFileStatus200 } from '../../types/UploadFile'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { uploadFile } from '../../clients/uploadFile'
@@ -18,7 +18,7 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
  */
 export function useUploadFile<TContext>(options: {
   mutation?: MutationObserverOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileOptions, TContext> & { client?: QueryClient },
-  client?: Omit<Options<UploadFileOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

@@ -1,4 +1,4 @@
-import type { Options, ResponseErrorConfig } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { updatePet } from '../../axios/petService/updatePet'
@@ -7,44 +7,7 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 
 export function updatePetMutationOptions<TContext = unknown>(
-  config: Omit<
-    Options<
-      | {
-          body: Omit<NonNullable<Pet>, 'id'>
-          path?: never
-          query?: never
-          headers?: never
-          contentType?:
-            | 'application/json'
-            | {
-                request: 'application/json'
-              }
-        }
-      | {
-          body: Omit<NonNullable<Pet>, 'id'>
-          path?: never
-          query?: never
-          headers?: never
-          contentType:
-            | 'application/xml'
-            | {
-                request: 'application/xml'
-              }
-        }
-      | {
-          body: Omit<NonNullable<Pet>, 'id'>
-          path?: never
-          query?: never
-          headers?: never
-          contentType:
-            | 'application/x-www-form-urlencoded'
-            | {
-                request: 'application/x-www-form-urlencoded'
-              }
-        }
-    >,
-    'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'
-  > = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>> = {},
 ) {
   const mutationKey = updatePetMutationKey()
   return mutationOptions<
@@ -147,44 +110,7 @@ export function useUpdatePet<TContext>(
       ) & { contentType?: string | { response?: 'application/json' | 'application/xml' } },
       TContext
     > & { client?: QueryClient }
-    client?: Omit<
-      Options<
-        | {
-            body: Omit<NonNullable<Pet>, 'id'>
-            path?: never
-            query?: never
-            headers?: never
-            contentType?:
-              | 'application/json'
-              | {
-                  request: 'application/json'
-                }
-          }
-        | {
-            body: Omit<NonNullable<Pet>, 'id'>
-            path?: never
-            query?: never
-            headers?: never
-            contentType:
-              | 'application/xml'
-              | {
-                  request: 'application/xml'
-                }
-          }
-        | {
-            body: Omit<NonNullable<Pet>, 'id'>
-            path?: never
-            query?: never
-            headers?: never
-            contentType:
-              | 'application/x-www-form-urlencoded'
-              | {
-                  request: 'application/x-www-form-urlencoded'
-                }
-          }
-      >,
-      'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'
-    >
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

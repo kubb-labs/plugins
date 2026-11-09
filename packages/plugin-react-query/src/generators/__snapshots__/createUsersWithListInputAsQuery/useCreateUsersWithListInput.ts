@@ -4,7 +4,7 @@
  * Source: text content
  */
 
-import type { Options, ResponseErrorConfig } from './.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { CreateUsersWithListInputOptions, CreateUsersWithListInputStatus200 } from './CreateUsersWithListInput'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { createUsersWithListInput } from './clients/createUsersWithListInput'
@@ -17,7 +17,7 @@ type CreateUsersWithListInputQueryKey = ReturnType<typeof createUsersWithListInp
 
 export function createUsersWithListInputQueryOptions(
   { body }: CreateUsersWithListInputOptions,
-  config: Omit<Options<CreateUsersWithListInputOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = createUsersWithListInputQueryKey({ body })
   return queryOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputStatus200, typeof queryKey>({
@@ -41,7 +41,7 @@ export function useCreateUsersWithListInput<
     query?: Partial<QueryObserverOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
     }
-    client?: Omit<Options<CreateUsersWithListInputOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

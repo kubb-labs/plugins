@@ -1,4 +1,4 @@
-import type { Options, ResponseErrorConfig } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { deletePet } from '../../axios/petService/deletePet'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -6,19 +6,7 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 export const deletePetMutationKey = () => [{ url: '/pet/:petId:search' }] as const
 
 export function deletePetMutationOptions<TContext = unknown>(
-  config: Omit<
-    Options<{
-      body?: never
-      path: {
-        petId: number
-      }
-      query?: never
-      headers?: {
-        api_key?: string
-      }
-    }>,
-    'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
-  > = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const mutationKey = deletePetMutationKey()
   return mutationOptions<
@@ -65,19 +53,7 @@ export function useDeletePet<TContext>(
       },
       TContext
     > & { client?: QueryClient }
-    client?: Omit<
-      Options<{
-        body?: never
-        path: {
-          petId: number
-        }
-        query?: never
-        headers?: {
-          api_key?: string
-        }
-      }>,
-      'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
-    >
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options, ResponseErrorConfig } from '../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
 import type { AddPetOptions, AddPetStatus200, AddPetStatus405 } from '../types/AddPet'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { addPet } from '../clients/addPet'
@@ -18,7 +18,7 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  */
 export function useAddPet<TContext>(options: {
   mutation?: MutationObserverOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetOptions & { contentType?: string | { response?: "application/json" | "application/xml" } }, TContext> & { client?: QueryClient },
-  client?: Omit<Options<AddPetOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

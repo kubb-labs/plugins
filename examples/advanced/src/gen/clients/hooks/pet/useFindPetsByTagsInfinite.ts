@@ -1,5 +1,5 @@
 import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '../../../../tanstack-query-hook'
-import type { Options, ResponseErrorConfig } from '../../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
 import type { FindPetsByTagsXEXAMPLEKey } from '../../../models/ts/FindPetsByTagsXEXAMPLE'
 import type { Pet } from '../../../models/ts/Pet'
 import { infiniteQueryOptions, useInfiniteQuery } from '../../../../tanstack-query-hook'
@@ -41,21 +41,7 @@ export function findPetsByTagsInfiniteQueryOptions(
       'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
     }
   },
-  config: Omit<
-    Options<{
-      body?: never
-      path?: never
-      query?: {
-        tags?: Array<string>
-        page?: string
-        pageSize?: number
-      }
-      headers: {
-        'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
-      }
-    }>,
-    'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
-  > = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey({ query })
   return infiniteQueryOptions<
@@ -156,21 +142,7 @@ export function useFindPetsByTagsInfinite<
   },
   options: {
     query?: Partial<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
-    client?: Omit<
-      Options<{
-        body?: never
-        path?: never
-        query?: {
-          tags?: Array<string>
-          page?: string
-          pageSize?: number
-        }
-        headers: {
-          'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
-        }
-      }>,
-      'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
-    >
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

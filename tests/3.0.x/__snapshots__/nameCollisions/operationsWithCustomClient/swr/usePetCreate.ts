@@ -4,8 +4,8 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { PetCreateOptions, PetCreateStatus200 } from '../types/pet/Create'
-import type { Options, ResponseErrorConfig } from '@example/client'
+import type { PetCreateStatus200 } from '../types/pet/Create'
+import type { RequestConfig, ResponseErrorConfig } from '@example/client'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { petCreate } from '../clients/pet/create'
 
@@ -20,7 +20,7 @@ export type PetCreateMutationArg = never
  */
 export function usePetCreate(options: {
   mutation?: SWRMutationConfiguration<PetCreateStatus200, ResponseErrorConfig<Error>, PetCreateMutationKey | null, PetCreateMutationArg> & { throwOnError?: boolean },
-  client?: Omit<Options<PetCreateOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}

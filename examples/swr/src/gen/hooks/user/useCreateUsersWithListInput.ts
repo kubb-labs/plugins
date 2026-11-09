@@ -4,7 +4,7 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { CreateUsersWithListInputOptions, CreateUsersWithListInputStatus200 } from '../../models/user/CreateUsersWithListInput'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { createUsersWithListInput } from '../../clients/user/createUsersWithListInput'
@@ -28,7 +28,7 @@ export function useCreateUsersWithListInput(
       CreateUsersWithListInputMutationKey | null,
       CreateUsersWithListInputMutationArg
     > & { throwOnError?: boolean }
-    client?: Omit<Options<CreateUsersWithListInputOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> & {
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> & {
       contentType?: { response?: 'application/json' | 'application/xml' }
     }
     shouldFetch?: boolean

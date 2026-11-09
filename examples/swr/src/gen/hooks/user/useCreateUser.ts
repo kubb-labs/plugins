@@ -4,7 +4,7 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
 import type { CreateUserOptions, CreateUserResponse } from '../../models/user/CreateUser'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { createUser } from '../../clients/user/createUser'
@@ -25,7 +25,7 @@ export function useCreateUser(
     mutation?: SWRMutationConfiguration<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg> & {
       throwOnError?: boolean
     }
-    client?: Omit<Options<CreateUserOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'contentType' | 'throwOnError'>>
     shouldFetch?: boolean
   } = {},
 ) {

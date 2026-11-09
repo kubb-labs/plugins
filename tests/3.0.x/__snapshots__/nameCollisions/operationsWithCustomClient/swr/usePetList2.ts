@@ -4,8 +4,8 @@
 */
 
 import useSWR from 'swr'
-import type { PetListOptions2, PetListStatus2002 } from '../types/PetList'
-import type { Options, ResponseErrorConfig } from '@example/client'
+import type { PetListStatus2002 } from '../types/PetList'
+import type { RequestConfig, ResponseErrorConfig } from '@example/client'
 import type { SWRConfiguration } from 'swr'
 import { petList2 } from '../clients/petList'
 
@@ -13,7 +13,7 @@ export const petListQueryKey2 = () => [{ url: '/pets/second' }] as const
 
 type PetListQueryKey2 = ReturnType<typeof petListQueryKey2>
 
-export function petListQueryOptions2(config: Omit<Options<PetListOptions2>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {}) {
+export function petListQueryOptions2(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>> = {}) {
   return {
     fetcher: async () => {
       return (await petList2({ ...config, throwOnError: true })).data
@@ -26,7 +26,7 @@ export function petListQueryOptions2(config: Omit<Options<PetListOptions2>, 'pat
  */
 export function usePetList2(options: {
   query?: SWRConfiguration<PetListStatus2002, ResponseErrorConfig<Error>>,
-  client?: Omit<Options<PetListOptions2>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'url' | 'throwOnError'>>,
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {
