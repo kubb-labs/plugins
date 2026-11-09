@@ -167,10 +167,12 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
     // The Node http adapter has no 'blob' and would decode the bytes as text, so it reads a buffer instead.
     if (request.responseType === 'blob' && typeof XMLHttpRequest === 'undefined' && !fetchAdapter) config.responseType = 'arraybuffer'
 
-    // axios rejects an abort with its own `CanceledError`, while fetch rejects with the signal's reason.
-    const response = await instance.request<unknown>(config).catch((error: unknown) => {
+    // axios rejects an abort with its own `CanceledError`, while fetch rejects with the signal's reason. A body read after
+    // the headers, such as a stream, can be aborted too.
+    const toAbortReason = (error: unknown): never => {
       throw request.signal?.aborted && axios.isCancel(error) ? request.signal.reason : error
-    })
+    }
+    const response = await instance.request<unknown>(config).catch(toAbortReason)
     const { data, status, statusText } = response
     const headers = toHeaders(response.headers)
     const result = { status, statusText, headers, contentType: getResponseContentType(headers), request: response.config, response }
@@ -183,7 +185,7 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
       const read = await readResponse(new Response(data as BodyInit, { status, statusText, headers }), {
         request: response.config,
         responseType: request.responseType,
-      })
+      }).catch(toAbortReason)
       return { ...result, data: read.data }
     }
 
