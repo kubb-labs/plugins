@@ -7,7 +7,7 @@ import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
-import { type Auth, getOperationSecurity, type SecurityDocument } from '../builders/security.ts'
+import { getOperationSecurity, type SecurityDocument, type SecurityRequirement } from '../builders/security.ts'
 import { getOperationBaseURL, type ServerDocument, type ServerOptions } from '../builders/server.ts'
 import { buildValidatorHooks, type ValidatorHooks } from '../builders/validator.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
@@ -29,7 +29,7 @@ type OperationData = {
    * `null` without a zod resolver.
    */
   validatorHooks: ValidatorHooks | null
-  security?: Array<Auth>
+  security?: Array<SecurityRequirement>
   baseURL?: string
 }
 

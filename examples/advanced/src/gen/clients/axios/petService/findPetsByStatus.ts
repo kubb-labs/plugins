@@ -7,8 +7,6 @@ import { findPetsByStatusResponseSchema, findPetsByStatusStatus400Schema } from 
  * `GET /pet/findByStatus/{step_id}`
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
- * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function findPetsByStatus<ThrowOnError extends boolean = true>(
   options: Options<

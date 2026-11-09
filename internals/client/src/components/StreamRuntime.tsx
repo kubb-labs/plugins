@@ -1,14 +1,8 @@
 import path from 'node:path'
-import { hasEventStreamContent, isEventStream } from '@internals/shared'
+import { hasEventStreamContent, hasFormBody, isEventStream } from '@internals/shared'
 import type { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-
-const formTypes = new Set(['multipart/form-data', 'application/x-www-form-urlencoded'])
-
-function hasFormBody(node: ast.OperationNode): boolean {
-  return (node.requestBody?.content ?? []).some((entry) => formTypes.has(entry.contentType.split(';')[0]!.trim().toLowerCase()))
-}
 
 /**
  * The `footer` of `.kubb/client.ts`: the `baseURL` set at generation time, the form and stream media types the document

@@ -10,7 +10,7 @@ Run the fetch and axios clients on one core with the same interceptors and clien
 - `FetchOptions` and `AxiosOptions` are now `NativeOptions`.
 - Rename `codecs` to `mediaTypes`, `serialize` to `encode`, and `deserialize` to `decode`, and move a custom `serializer.body` into a `mediaTypes` entry.
 - Replace `responseType` with `parseAs`, and catch the `ParseError` that invalid JSON now throws.
-- Replace `toEventStream(call, { shape })` with `client.stream({ ...config, eventShape })`, and pass the event to stream types: `EventStreamResult<ServerSentEvent<Pet>>`.
+- Replace `toEventStream(call, { shape })` with `client.stream({ ...config, eventShape })`, and name its result `StreamResult` with the event type, such as `StreamResult<Responses, true, ServerSentEvent<Pet>>`. `EventStreamResult` is gone.
 - Return a web `Response` from a custom transport, built with `toRequestInit(request)`.
 - Narrow `client.interceptors.error` handlers with `ResponseError.is`, since they now also get network and validation errors.
 - On axios, `client.interceptors` handlers get the core objects. Put native handlers on `getAxiosInstance().interceptors`. `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.

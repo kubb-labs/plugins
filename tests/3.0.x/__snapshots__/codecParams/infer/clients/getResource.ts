@@ -10,8 +10,6 @@ import { getResourceResponseSchema } from '../zod/getResourceSchema'
 
 /**
  * `GET /resources/{resource}`
- * @param options - The request (`path`, `query`, `headers`) and per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function getResource<ThrowOnError extends boolean = true>(options: Options<GetResourceOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options

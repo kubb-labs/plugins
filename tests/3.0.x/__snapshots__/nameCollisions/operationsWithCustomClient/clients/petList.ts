@@ -9,8 +9,6 @@ import { client } from '@example/client'
 
 /**
  * `GET /pets/second`
- * @param options - Per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function petList2<ThrowOnError extends boolean = true>(options: Options<PetListOptions2, ThrowOnError> = {}): Promise<RequestResult<PetListResponses2, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options

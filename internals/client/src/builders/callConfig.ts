@@ -2,7 +2,7 @@ import { getEventStream, getPrimarySuccessResponse } from '@internals/shared'
 import type { ast } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildContentType } from './contentType.ts'
-import { type Auth, buildSecurityMetadata } from './security.ts'
+import { buildSecurityMetadata, type SecurityRequirement } from './security.ts'
 import { buildStyles } from './styles.ts'
 import { buildValidatorLiteral, type ValidatorHooks } from './validator.ts'
 
@@ -35,7 +35,7 @@ export function buildCallConfig({
 }: {
   node: ast.HttpOperationNode
   validatorHooks: ValidatorHooks | null
-  security?: Array<Auth>
+  security?: Array<SecurityRequirement>
   baseURL?: string
   throwOnErrorDefault: boolean
   returnType: ReturnTypeOption

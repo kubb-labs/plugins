@@ -18,6 +18,7 @@ export {
   getResponseContentTypeInfo,
   getSuccessResponses,
   hasEventStreamContent,
+  hasFormBody,
   isEventStream,
   isSuccessStatusCode,
   requestGroupOrder,

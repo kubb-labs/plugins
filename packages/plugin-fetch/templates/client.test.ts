@@ -1065,6 +1065,12 @@ describe('media types', () => {
     })
   })
 
+  test('reads a parseAs json body with the registered application/json handler', async () => {
+    const lenient: MediaTypes = { 'application/json': { decode: async (response) => ({ lenient: await response.text() }) } }
+    const result = await call(answer('not json', { 'content-type': 'text/plain' }), { parseAs: 'json', mediaTypes: lenient })
+    expect(result.data).toStrictEqual({ lenient: 'not json' })
+  })
+
   test('marks the request as streamed for parseAs stream and for an Accept a stream media type reads', async () => {
     const { client, calls } = createClient()
     client.setConfig({ mediaTypes: streamMediaTypes })

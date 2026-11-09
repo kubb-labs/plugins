@@ -84,10 +84,6 @@ export type OperationTypeNameResolver = RequestConfigResolver &
 
 export type BuildOperationCommentsOptions = {
   splitLines?: boolean
-  /**
-   * Extra tags, such as `@param` and `@returns`, placed after `@summary` and before `@deprecated`.
-   */
-  tags?: Array<string>
 }
 
 type ResponseLike = {
@@ -142,7 +138,7 @@ export function getResponseContentTypeInfo(node: ast.OperationNode): ContentType
   return buildContentTypeInfo(getPrimarySuccessResponse(node)?.content?.map((e) => e.contentType) ?? [])
 }
 
-export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
+type ResponseType = 'blob' | 'text' | 'stream'
 
 function baseContentType(contentType: string): string {
   return contentType.split(';')[0]!.trim().toLowerCase()
@@ -193,6 +189,16 @@ export function hasEventStreamContent(node: ast.OperationNode): boolean {
   const entries = getPrimarySuccessResponse(node)?.content ?? []
   // Next to another type, a stream without a schema gets no typed variant, so it keeps the plain call.
   return entries.some((entry) => baseContentType(entry.contentType) === 'text/event-stream' && (entries.length === 1 || Boolean(entry.schema)))
+}
+
+const formContentTypes = new Set(['multipart/form-data', 'application/x-www-form-urlencoded'])
+
+/**
+ * Whether the request body offers `multipart/form-data` or `application/x-www-form-urlencoded`, so the client registers the
+ * form media types.
+ */
+export function hasFormBody(node: ast.OperationNode): boolean {
+  return (node.requestBody?.content ?? []).some((entry) => formContentTypes.has(baseContentType(entry.contentType)))
 }
 
 function isJsonContentType(baseType: string): boolean {
@@ -417,13 +423,12 @@ export function buildRequestParamsSignature(
 }
 
 export function buildOperationComments(node: ast.OperationNode, options: BuildOperationCommentsOptions = {}): Array<string> {
-  const { splitLines = false, tags = [] } = options
+  const { splitLines = false } = options
   // The request line leads: free text after a block tag would belong to that tag.
   const comments = [
     getOperationRequestLine(node),
     node.description && `@description ${node.description}`,
     node.summary && `@summary ${node.summary}`,
-    ...tags,
     node.deprecated && '@deprecated',
   ]
 

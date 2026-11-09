@@ -6,8 +6,6 @@ import { client, withUnwrap, resolveThrowOnError } from './.kubb/client'
 
 /**
  * `GET /pet/findByTags`
- * @param options - The request (`query`) and per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function findPetsByTags<ThrowOnError extends boolean = true>(
   options: Options<FindPetsByTagsOptions, ThrowOnError>,

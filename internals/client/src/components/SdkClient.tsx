@@ -1,10 +1,10 @@
+import { buildOperationComments } from '@internals/shared'
 import { buildJSDoc } from '@internals/utils'
 import { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import { buildClientComments } from '../builders/comments.ts'
 import { buildOperationBody } from '../builders/operationBody.ts'
-import type { Auth } from '../builders/security.ts'
+import type { SecurityRequirement } from '../builders/security.ts'
 import type { ValidatorHooks } from '../builders/validator.ts'
 import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption } from '../types.ts'
@@ -26,7 +26,7 @@ export function buildSdkMethod({
   name: string
   types: OperationTypeNames
   validatorHooks: ValidatorHooks | null
-  security?: Array<Auth>
+  security?: Array<SecurityRequirement>
   baseURL?: string
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
@@ -35,7 +35,7 @@ export function buildSdkMethod({
 
   const body = buildOperationBody({ node, types, validatorHooks, security, baseURL, returnType, throwOnErrorDefault })
   const generics = body.generics.length ? `<${body.generics.join(', ')}>` : ''
-  const jsdoc = buildJSDoc(buildClientComments({ node, returnType }))
+  const jsdoc = buildJSDoc(buildOperationComments(node, { splitLines: true }))
 
   const destructure = body.mergeContentType
     ? 'const { client: apiClient = this.client, contentType, ...config } = options'
@@ -50,7 +50,7 @@ type OperationData = {
   name: string
   types: OperationTypeNames
   validatorHooks: ValidatorHooks | null
-  security?: Array<Auth>
+  security?: Array<SecurityRequirement>
   baseURL?: string
 }
 

@@ -3,7 +3,7 @@
  * returned token: `http` bearer/basic on `Authorization`, `apiKey` under `name` in the header/query/cookie, and
  * `oauth2`/`openIdConnect` as a bearer token.
  */
-export type AuthScheme = {
+export type Auth = {
   type: 'http' | 'apiKey' | 'oauth2' | 'openIdConnect'
   scheme?: 'bearer' | 'basic'
   name?: string
@@ -15,7 +15,7 @@ export type AuthScheme = {
  * One entry of a generated call's `security` array: an OpenAPI security requirement, as one scheme or as the schemes it
  * needs together. The runtime sends the first requirement whose schemes all resolve a token.
  */
-export type Auth = AuthScheme | Array<AuthScheme>
+export type SecurityRequirement = Auth | Array<Auth>
 
 /**
  * A single OpenAPI security requirement read from the spec: scheme name to the scopes it needs.
@@ -37,7 +37,7 @@ export type SecurityDocument = {
 
 type OasSecurityScheme = { type: 'http'; scheme?: string } | { type: 'apiKey'; name?: string; in?: string } | { type: 'oauth2' } | { type: 'openIdConnect' }
 
-function serializeScheme(auth: AuthScheme): string {
+function serializeScheme(auth: Auth): string {
   const parts = [`type: '${auth.type}'`]
   if (auth.scheme) parts.push(`scheme: '${auth.scheme}'`)
   if (auth.name) parts.push(`name: '${auth.name}'`)
@@ -46,8 +46,8 @@ function serializeScheme(auth: AuthScheme): string {
   return `{ ${parts.join(', ')} }`
 }
 
-function serializeAuth(auth: Auth): string {
-  return Array.isArray(auth) ? `[${auth.map(serializeScheme).join(', ')}]` : serializeScheme(auth)
+function serializeRequirement(requirement: SecurityRequirement): string {
+  return Array.isArray(requirement) ? `[${requirement.map(serializeScheme).join(', ')}]` : serializeScheme(requirement)
 }
 
 /**
@@ -55,7 +55,7 @@ function serializeAuth(auth: Auth): string {
  * place it (an unresolved `$ref`, or an `apiKey` without a name or outside `header` / `query` /
  * `cookie`). `http` schemes other than `basic` are treated as bearer.
  */
-export function resolveSecurityScheme(scheme: OasSecurityScheme | { $ref: string } | undefined): AuthScheme | null {
+export function resolveSecurityScheme(scheme: OasSecurityScheme | { $ref: string } | undefined): Auth | null {
   if (!scheme || '$ref' in scheme) return null
   if (scheme.type === 'apiKey') {
     if (!scheme.name || (scheme.in !== 'header' && scheme.in !== 'query' && scheme.in !== 'cookie')) return null
@@ -87,7 +87,7 @@ export function getOperationSecurity({
   document: SecurityDocument | null | undefined
   method: string
   path: string
-}): Array<Auth> | undefined {
+}): Array<SecurityRequirement> | undefined {
   if (!document) return undefined
 
   const operation = document.paths?.[path]?.[method.toLowerCase()]
@@ -95,7 +95,7 @@ export function getOperationSecurity({
   if (!requirements?.length) return undefined
 
   const definitions = document.components?.securitySchemes ?? {}
-  const security: Array<Auth> = []
+  const security: Array<SecurityRequirement> = []
   const seen = new Set<string>()
   for (const requirement of requirements) {
     const entries = Object.entries(requirement)
@@ -106,8 +106,8 @@ export function getOperationSecurity({
       const auth = resolveSecurityScheme(definitions[schemeName])
       return auth && scopes.length ? { ...auth, scopes } : auth
     })
-    if (schemes.some((scheme) => scheme === null)) continue
-    const resolved = schemes.filter((scheme): scheme is AuthScheme => scheme !== null)
+    const resolved = schemes.filter((scheme): scheme is Auth => scheme !== null)
+    if (resolved.length !== schemes.length) continue
     security.push(resolved.length === 1 ? resolved[0]! : resolved)
   }
 
@@ -121,7 +121,7 @@ export function getOperationSecurity({
  * @example
  * `buildSecurityMetadata({ security: [{ type: 'http', scheme: 'bearer' }] }) // "[{ type: 'http', scheme: 'bearer' }]"`
  */
-export function buildSecurityMetadata({ security }: { security?: Array<Auth> }): string | null {
+export function buildSecurityMetadata({ security }: { security?: Array<SecurityRequirement> }): string | null {
   if (!security?.length) return null
-  return `[${security.map(serializeAuth).join(', ')}]`
+  return `[${security.map(serializeRequirement).join(', ')}]`
 }

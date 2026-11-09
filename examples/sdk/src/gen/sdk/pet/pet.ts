@@ -25,8 +25,6 @@ export class PetClient {
    * `PUT /pet`
    * @description Update an existing pet by Id
    * @summary Update an existing pet
-   * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public updatePet<ThrowOnError extends boolean = true>(
     options: Options<UpdatePetOptions, ThrowOnError>,
@@ -49,8 +47,6 @@ export class PetClient {
    * `POST /pet`
    * @description Add a new pet to the store
    * @summary Add a new pet to the store
-   * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetOptions, ThrowOnError>): Unwrappable<RequestResult<AddPetResponses, ThrowOnError>> {
     const { client: apiClient = this.client, contentType, ...config } = options
@@ -71,8 +67,6 @@ export class PetClient {
    * `GET /pet/findByStatus`
    * @description Multiple status values can be provided with comma separated strings
    * @summary Finds Pets by status
-   * @param options - The request (`query`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public findPetsByStatus<ThrowOnError extends boolean = true>(
     options: Options<FindPetsByStatusOptions, ThrowOnError> = {},
@@ -95,8 +89,6 @@ export class PetClient {
    * `GET /pet/findByTags`
    * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
    * @summary Finds Pets by tags
-   * @param options - The request (`query`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public findPetsByTags<ThrowOnError extends boolean = true>(
     options: Options<FindPetsByTagsOptions, ThrowOnError> = {},
@@ -119,8 +111,6 @@ export class PetClient {
    * `GET /pet/{petId}`
    * @description Returns a single pet
    * @summary Find pet by ID
-   * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public getPetById<ThrowOnError extends boolean = true>(
     options: Options<GetPetByIdOptions, ThrowOnError>,
@@ -144,8 +134,6 @@ export class PetClient {
   /**
    * `POST /pet/{petId}`
    * @summary Updates a pet in the store with form data
-   * @param options - The request (`path`, `query`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public updatePetWithForm<ThrowOnError extends boolean = true>(
     options: Options<UpdatePetWithFormOptions, ThrowOnError>,
@@ -167,8 +155,6 @@ export class PetClient {
    * `DELETE /pet/{petId}`
    * @description delete a pet
    * @summary Deletes a pet
-   * @param options - The request (`path`, `headers`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public deletePet<ThrowOnError extends boolean = true>(
     options: Options<DeletePetOptions, ThrowOnError>,
@@ -189,8 +175,6 @@ export class PetClient {
   /**
    * `POST /pet/{petId}/uploadImage`
    * @summary uploads an image
-   * @param options - The request (`path`, `query`, `body`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public uploadFile<ThrowOnError extends boolean = true>(
     options: Options<UploadFileOptions, ThrowOnError>,

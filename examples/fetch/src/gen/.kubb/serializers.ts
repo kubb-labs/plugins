@@ -2,102 +2,69 @@ export type HeaderValue = string | number | boolean | null | undefined | object
 export type HeadersInit = Array<[string, HeaderValue]> | Record<string, HeaderValue>
 
 /**
- * The request body type `fetch` accepts, derived from `RequestInit` instead of the global `BodyInit`
- * name, which a Node-only project (`@types/node` without the `dom` lib) does not declare.
+ * A body `fetch` accepts, read from `RequestInit` so a project without the `dom` lib still has it.
  */
 export type RequestBody = NonNullable<RequestInit['body']>
 
 export type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'QUERY'
 
 /**
- * The OpenAPI query-parameter serialization style. `form` is the default; `spaceDelimited` and
- * `pipeDelimited` join arrays with a space or pipe, and `deepObject` renders objects as
- * `key[prop]=value`.
+ * The OpenAPI query style. `form` is the default.
  */
 export type QueryStyle = 'form' | 'spaceDelimited' | 'pipeDelimited' | 'deepObject'
 
-/**
- * The serialization metadata shared by the styled parameter locations: the OpenAPI `style` (typed per
- * location through `TStyle`), `explode`, and `allowReserved` (keeps RFC 3986 reserved characters
- * unencoded, used by query and request bodies).
- */
 export type SerializationStyle<TStyle = string> = {
   style?: TStyle
   explode?: boolean
   allowReserved?: boolean
 }
 
-/** The media type of a parameter described with `content`; JSON sends one JSON-encoded value. */
+/**
+ * The media type of a parameter described with `content`. JSON sends one JSON-encoded value.
+ */
 export type ParamContentType = {
   contentType?: string
 }
 
 /**
- * The per-parameter query serialization metadata carried by the generated request. `querystring` marks an OpenAPI 3.2
- * `in: querystring` parameter, whose JSON value is the whole query string, sent without its name.
+ * `querystring` marks an OpenAPI 3.2 `in: querystring` parameter, sent as the whole query string.
  */
 export type QueryParamStyle = SerializationStyle<QueryStyle> & ParamContentType & { querystring?: boolean }
 
 /**
- * Serializes the query object into a search string. The optional second argument carries the
- * per-parameter OpenAPI `style` / `explode` / `allowReserved` metadata; without it arrays explode
- * into repeated keys and nested objects use the `deepObject` style.
+ * Turns the query object into a search string, following each parameter's OpenAPI style when given.
  */
 export type QuerySerializer = (params: Record<string, unknown>, options?: Record<string, QueryParamStyle>) => string
 
-/**
- * The per-parameter cookie serialization metadata carried by the generated request. Cookies use the
- * OpenAPI `form` style, so only `explode` is configurable.
- */
 export type CookieParamStyle = ParamContentType & {
   explode?: boolean
 }
 
-/**
- * The per-parameter header serialization metadata carried by the generated request. Headers use the
- * OpenAPI `simple` style, so only `explode` is configurable.
- *
- * @example
- * ```ts
- * // styles.header: { 'X-Ids': { explode: false } }, header [3, 4] -> 'X-Ids: 3,4'
- * // styles.header: { 'X-Filter': { explode: true } }, header { role: 'admin' } -> 'X-Filter: role=admin'
- * ```
- */
 export type HeaderParamStyle = ParamContentType & {
   explode?: boolean
 }
 
 /**
- * The per-property `encoding` metadata for an `application/x-www-form-urlencoded` or
- * `multipart/form-data` request body. `contentType` overrides the part's media type; `style` /
- * `explode` / `allowReserved` follow the OpenAPI query rules for urlencoded bodies.
+ * The OpenAPI `encoding` of one form body property. `contentType` sets a multipart part's media type.
  */
 export type BodyEncoding = SerializationStyle<QueryStyle> & {
   contentType?: string
 }
 
 /**
- * The OpenAPI path-parameter serialization style. `simple` is the default and emits the bare value;
- * `label` prefixes a `.` and `matrix` prefixes a `;name=` segment.
+ * The OpenAPI path style. `simple` is the default.
  */
 export type PathStyle = 'simple' | 'label' | 'matrix'
 
-/**
- * The per-parameter serialization metadata carried by the generated request. `style` selects the
- * OpenAPI style and `explode` controls how arrays and objects expand.
- */
 export type PathParamStyle = SerializationStyle<PathStyle>
 
 /**
- * Serializes a single path parameter for interpolation into the URL, honoring the OpenAPI `style` /
- * `explode` passed as `options`. Defaults to `simple` style with `explode: false`: primitives are
- * URL-encoded, arrays join their members with commas, and objects flatten to `key,value` pairs.
+ * Turns one path parameter into its URL segment.
  */
 export type PathSerializer = (args: { name: string; value: unknown; options?: PathParamStyle }) => string
 
 /**
- * The parameter serializers, grouped so they can be set in one place and overridden per client or
- * per call. Each field falls back to the matching `default*Serializer` when omitted. Bodies are encoded by `mediaTypes`.
+ * Parameter serializers, set per client or per call. Bodies are encoded by `mediaTypes`.
  */
 export type Serializers = {
   query?: QuerySerializer
@@ -105,9 +72,7 @@ export type Serializers = {
 }
 
 /**
- * The per-parameter OpenAPI `style` / `explode` metadata a generated request carries, grouped by
- * location and keyed by parameter name. Mirrors the `serializer` grouping and feeds the default
- * serializers; `body` carries the form `encoding` for a urlencoded or multipart body.
+ * The OpenAPI styles of a generated call's parameters, by location and name. `body` holds the form `encoding`.
  */
 export type Styles = {
   path?: Record<string, PathParamStyle>
@@ -118,8 +83,7 @@ export type Styles = {
 }
 
 /**
- * Emits a `bigint` (`format: int64`) as a JSON number, which `JSON.stringify` refuses to do itself.
- * Past the safe-integer range it throws, so an id never goes out silently truncated.
+ * Sends a `bigint` as a JSON number, and throws past the safe-integer range instead of losing precision.
  */
 export function jsonReplacer(_key: string, value: unknown): unknown {
   if (typeof value !== 'bigint') return value
@@ -128,10 +92,6 @@ export function jsonReplacer(_key: string, value: unknown): unknown {
   return Number(value)
 }
 
-/**
- * Serializes an `application/x-www-form-urlencoded` body. A property with `encoding` follows its OpenAPI `style`,
- * `explode`, and `allowReserved`; one without uses the query defaults.
- */
 export function serializeUrlencodedBody(body: Record<string, unknown>, encoding: Record<string, BodyEncoding>): string {
   const parts: Array<string> = []
   for (const [key, value] of Object.entries(body)) {
@@ -142,15 +102,14 @@ export function serializeUrlencodedBody(body: Record<string, unknown>, encoding:
 }
 
 /**
- * The media type of a `Content-Type` value without its parameters, in lower case: `application/json; charset=utf-8` gives `application/json`.
+ * A `Content-Type` without its parameters, in lower case.
  */
 export function baseContentType(value: string | null | undefined): string | undefined {
   if (!value) return undefined
   return value.split(';')[0]!.trim().toLowerCase() || undefined
 }
 
-/** Whether a content type carries JSON: `application/json`, `text/json`, or a `+json` suffix. */
-export function isJsonMediaType(contentType: string | null | undefined): boolean {
+function isJsonMediaType(contentType: string | null | undefined): boolean {
   return /[/+]json$/.test(baseContentType(contentType) ?? '')
 }
 
@@ -171,14 +130,7 @@ function serializeCookie({ name, value, explode }: { name: string; value: unknow
 }
 
 /**
- * Serializes cookie parameters into a `Cookie` header value using the OpenAPI `form` style, joined
- * with `; `. Values are URL-encoded and `explode` is honored per parameter.
- *
- * @example
- * ```ts
- * serializeCookies({ session: 'abc', ids: [1, 2] }) // 'session=abc; ids=1,2'
- * serializeCookies({ ids: [1, 2] }, { ids: { explode: true } }) // 'ids=1; ids=2'
- * ```
+ * Joins cookie parameters into a `Cookie` header value with the OpenAPI `form` style.
  */
 export function serializeCookies(cookies: Record<string, unknown>, styles?: Record<string, CookieParamStyle>): string {
   const parts: Array<string> = []
@@ -216,39 +168,25 @@ function notNullish(value: unknown): boolean {
 }
 
 /**
- * Renders a primitive parameter value as a string, serializing `Date` to ISO-8601 so dates are
- * stable across path, query, cookie, and header locations rather than locale-dependent.
+ * Renders a parameter value as a string. A `Date` becomes ISO-8601, so it does not depend on the locale.
  */
-function toValue(value: unknown): string {
+export function toValue(value: unknown): string {
   return value instanceof Date ? value.toISOString() : String(value)
 }
 
-/**
- * Percent-encodes a value, keeping RFC 3986 reserved characters intact (used when `allowReserved` is set).
- */
 function encodeReserved(value: unknown): string {
   return encodeURI(toValue(value))
 }
 
-/**
- * Percent-encodes a value, escaping reserved characters (the default query/path encoder).
- */
 function encodeComponent(value: unknown): string {
   return encodeURIComponent(toValue(value))
 }
 
-/**
- * Whether a value should expand into bracketed/keyed parts. Arrays and `Date` are excluded so they
- * are serialized as a unit (a `Date` becomes an ISO string, not its enumerable own properties).
- */
+// A `Date` is a unit, not an object to expand.
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Date)
 }
 
-/**
- * Expands an object or array into `deepObject` query parts, recursing into nested values so
- * `{ a: { b: { c: 1 } } }` becomes `a[b][c]=1`. Primitives terminate the recursion.
- */
 function serializeDeepObject({ key, value, encode }: { key: string; value: unknown; encode: (value: unknown) => string }): Array<string> {
   if (value === undefined || value === null) return []
   if (Array.isArray(value)) return value.flatMap((item, index) => serializeDeepObject({ key: `${key}[${index}]`, value: item, encode }))
@@ -314,19 +252,7 @@ function serializeDefaultQueryParam(key: string, value: unknown): Array<string> 
 }
 
 /**
- * Default query serializer. Members with `options` metadata follow their OpenAPI `style` / `explode`
- * / `allowReserved`. Members without it keep the defaults: arrays explode into repeated keys and
- * nested objects use the `deepObject` style (`key[prop]=value`).
- *
- * @example
- * ```ts
- * defaultQuerySerializer({ id: [3, 4, 5] }) // 'id=3&id=4&id=5'
- * defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'form', explode: false } }) // 'id=3,4,5'
- * defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'spaceDelimited', explode: false } }) // 'id=3%204%205'
- * defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'pipeDelimited', explode: false } }) // 'id=3|4|5'
- * defaultQuerySerializer({ a: { b: 1 } }, { a: { style: 'deepObject' } }) // 'a%5Bb%5D=1'
- * defaultQuerySerializer({ a: { b: { c: 1 } } }, { a: { style: 'deepObject' } }) // 'a%5Bb%5D%5Bc%5D=1'
- * ```
+ * The default query serializer. Without a style, arrays repeat their key and objects use `deepObject`.
  */
 export const defaultQuerySerializer: QuerySerializer = (params, options) => {
   const parts: Array<string> = []
@@ -366,17 +292,7 @@ function serializePathObject({ name, value, style, explode }: { name: string; va
 }
 
 /**
- * Default path serializer honoring the OpenAPI `style` / `explode` metadata. Without metadata it
- * falls back to `simple` style with `explode: false`. Replaces the previous `String(value)`
- * interpolation, which emitted `[object Object]` for object path params.
- *
- * @example
- * ```ts
- * defaultPathSerializer({ name: 'id', value: [3, 4, 5] }) // '3,4,5'
- * defaultPathSerializer({ name: 'id', value: [3, 4, 5], options: { style: 'label', explode: true } }) // '.3.4.5'
- * defaultPathSerializer({ name: 'id', value: [3, 4, 5], options: { style: 'matrix', explode: true } }) // ';id=3;id=4;id=5'
- * defaultPathSerializer({ name: 'pt', value: { x: 1, y: 2 } }) // 'x,1,y,2'
- * ```
+ * The default path serializer. Without a style, it uses `simple` without `explode`.
  */
 export const defaultPathSerializer: PathSerializer = ({ name, value, options }) => {
   if (value === undefined || value === null) return ''
@@ -398,15 +314,13 @@ function serializeHeaderValue(value: unknown, explode: boolean): string {
     .join(',')
 }
 
-/** Header values must be Latin-1, so non-ASCII characters become JSON `\uXXXX` escapes. */
+// Header values must be Latin-1, so non-ASCII characters become JSON escapes.
 function toAsciiJson(value: unknown): string {
   return JSON.stringify(value, jsonReplacer).replace(/[\u007f-\uffff]/g, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`)
 }
 
 /**
- * Serializes array and object header parameters with the OpenAPI `simple` style before they are
- * merged. Header values are not URL-encoded. Primitive values and headers without metadata pass
- * through untouched.
+ * Serializes array and object headers with the OpenAPI `simple` style.
  */
 export function applyHeaderStyles(headers: HeadersInit | undefined, styles: Record<string, HeaderParamStyle> | undefined): HeadersInit | undefined {
   if (!headers || !styles) return headers

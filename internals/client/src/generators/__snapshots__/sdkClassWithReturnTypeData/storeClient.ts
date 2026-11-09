@@ -13,8 +13,6 @@ export class StoreClient {
 
   /**
    * `GET /store/inventory`
-   * @param options - Per-call settings, such as `client` and `throwOnError`.
-   * @returns The response body, or the full result when `throwOnError` is `false`.
    */
   public getInventory<ThrowOnError extends boolean = true>(
     options: Options<GetInventoryOptions, ThrowOnError> = {},

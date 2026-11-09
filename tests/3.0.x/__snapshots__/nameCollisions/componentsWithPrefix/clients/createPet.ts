@@ -10,8 +10,6 @@ import { createPetResponseSchema } from '../zod/createPetSchema'
 
 /**
  * `POST /pets`
- * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function createPet<ThrowOnError extends boolean = true>(options: Options<ApiCreatePetOptions, ThrowOnError> = {}): Unwrappable<RequestResult<ApiCreatePetResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options

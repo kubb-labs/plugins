@@ -11,8 +11,6 @@ import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
  * `GET /store/inventory`
  * @description Returns a map of status codes to quantities
  * @summary Returns pet inventories by status
- * @param options - Per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function getInventory<ThrowOnError extends boolean = true>(
   options: Options<GetInventoryOptions, ThrowOnError> = {},

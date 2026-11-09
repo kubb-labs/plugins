@@ -11,8 +11,6 @@ import { client } from '../../../client'
  * `PUT /user/{username}`
  * @description This can only be done by the logged in user.
  * @summary Update user
- * @param options - The request (`path`, `body`) and per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function updateUser<ThrowOnError extends boolean = true>(
   options: Options<UpdateUserOptions, ThrowOnError>,

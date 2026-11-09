@@ -194,7 +194,7 @@ describe('buildOperationComments', () => {
     expect(buildOperationComments(node)).toStrictEqual(['`GET /pets/{petId}`', '@description Show pet', '@summary Show', '@deprecated'])
   })
 
-  test('places extra tags before deprecation and trims multiline text', () => {
+  test('splits multiline text into trimmed lines', () => {
     const node = ast.factory.createOperation({
       operationId: 'showPet',
       method: 'GET',
@@ -203,14 +203,7 @@ describe('buildOperationComments', () => {
       deprecated: true,
     })
 
-    expect(buildOperationComments(node, { splitLines: true, tags: ['@param options - Options.', '@returns The pet.'] })).toStrictEqual([
-      '`GET /pets/{pet-id}`',
-      '@description Show pet',
-      'details',
-      '@param options - Options.',
-      '@returns The pet.',
-      '@deprecated',
-    ])
+    expect(buildOperationComments(node, { splitLines: true })).toStrictEqual(['`GET /pets/{pet-id}`', '@description Show pet', 'details', '@deprecated'])
   })
 })
 

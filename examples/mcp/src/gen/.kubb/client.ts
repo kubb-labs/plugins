@@ -4,18 +4,18 @@ import type { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios'
 import { createClientCore, createLazyClient, getHeader } from './core'
 export * from './core'
 
-/** The request and response objects of this transport, carried on every result and error. */
+/**
+ * The native request and response that every result and error carries.
+ */
 export type NativeRequest = AxiosRequestConfig
 export type NativeResponse = AxiosResponse
 
 /**
- * The `options` of every request, client config, and resolved request: extra axios config the transport spreads onto
- * the request, for per-call fields the runtime does not set itself such as `timeout`, `proxy`, and the progress callbacks.
+ * Extra axios config for a call or client, such as `timeout`, `proxy`, or the progress callbacks.
  */
 export type NativeOptions = AxiosRequestConfig
 
 export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>
-/** The core's `ResponseError` class, typed with this transport's request and response. `instanceof` and `ResponseError.is` both match what the client throws. */
 export const ResponseError = core.ResponseError as {
   new <TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse>(
     config: ConstructorParameters<typeof core.ResponseError<TError, TRequest, TResponse>>[0],
@@ -24,7 +24,6 @@ export const ResponseError = core.ResponseError as {
   prototype: core.ResponseError<unknown, NativeRequest, NativeResponse>
 }
 
-/** The core's request, result, and client types, bound to this transport's request, response, and options. */
 export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestConfig<TBody, TRequest, TResponse> & {
   options?: NativeOptions
 }
@@ -55,9 +54,6 @@ export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = co
 export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
 export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
 
-/**
- * Collects the headers axios read into a `Headers`, so the core and the interceptors see one shape for every transport.
- */
 function toHeaders(raw: AxiosResponse['headers']): Headers {
   const headers = new Headers()
   for (const [name, value] of Object.entries(raw ?? {})) {
@@ -67,17 +63,13 @@ function toHeaders(raw: AxiosResponse['headers']): Headers {
   return headers
 }
 
-/**
- * A body the axios Node adapter sends as fetch would: it rejects a typed array, and labels a Blob with the Blob's own type
- * over the `Content-Type` header, so the Blob takes the header's type.
- */
+// The Node adapter rejects a typed array, and labels a Blob with its own type over the `Content-Type` header.
 function toAxiosData(body: unknown, contentType: string | undefined): unknown {
   if (ArrayBuffer.isView(body)) return body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength)
   if (body instanceof Blob && contentType && body.type !== contentType) return new Blob([body], { type: contentType })
   return body
 }
 
-/** Resolves an adapter setting to the function axios runs, or `undefined` when axios cannot resolve it here. */
 function resolveAdapter(adapter: AxiosRequestConfig['adapter']): unknown {
   try {
     return axios.getAdapter(adapter)
@@ -86,20 +78,13 @@ function resolveAdapter(adapter: AxiosRequestConfig['adapter']): unknown {
   }
 }
 
-/** axios's fetch adapter, resolved once, to tell whether a request goes through fetch. */
 let axiosFetchAdapter: unknown
 
-/**
- * axios's own default adapter list, read on the first request. A mock such as `axios-mock-adapter` replaces it with a
- * function, so the axios 1.x list is the fallback when the mock came first.
- */
+// A mock such as `axios-mock-adapter` replaces the default adapter list, so the axios 1.x list is the fallback.
 let axiosDefaultAdapters: string | undefined
 
 /**
- * Turns an axios instance into a transport: each resolved request becomes one `instance.request` with the instance's
- * defaults, adapter, and axios interceptors. Every status resolves, because the core splits success from error itself.
- * The body is read as bytes, or as a stream when the call streams, and handed to the core as a web `Response`, so the
- * media types decode it as they do for fetch.
+ * Turns an axios instance into a transport that keeps its defaults, adapter, and interceptors.
  */
 export function createAxiosTransport(instance: AxiosInstance): (request: core.ResolvedRequest) => Promise<TransportResult> {
   return async (request) => {
@@ -113,33 +98,28 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
       // axios labels a post, put, or patch without a body as a form, so `false` leaves the header off, as fetch does.
       headers: request.body === undefined && contentType === undefined ? { ...request.headers, 'Content-Type': false } : request.headers,
       data: toAxiosData(request.body, contentType),
-      // Kubb already serialized the body; only URLSearchParams needs a string, since axios's Node adapter rejects it.
+      // The body is already encoded. Only `URLSearchParams` needs a string, since the Node adapter rejects it.
       transformRequest: (data) => (data instanceof URLSearchParams ? data.toString() : data),
-      // The core decodes the body by its media type, so axios hands over the bytes or the stream untouched.
       responseType: request.stream ? 'stream' : 'arraybuffer',
       transformResponse: (data) => data,
       signal: request.signal,
       validateStatus: () => true,
     }
 
-    // In the browser the default adapters pick XHR, which buffers the whole body and cannot omit same-origin cookies, so a stream
-    // or `credentials: 'omit'` switches to fetch. An adapter set on the call or the instance, and the Node http adapter with its
-    // proxy and agent, are kept.
+    // XHR buffers the body and cannot omit same-origin cookies, so a stream or `credentials: 'omit'` uses fetch in the browser.
     const instanceAdapter = instance.defaults?.adapter
     const defaultAdapter = !instanceAdapter || String(instanceAdapter) === axiosDefaultAdapters
     const needsFetch = request.stream || request.credentials === 'omit'
     if (needsFetch && !config.adapter && defaultAdapter && typeof XMLHttpRequest !== 'undefined') config.adapter = 'fetch'
 
-    // `credentials` wins over `withCredentials` in the options or the instance defaults. The fetch adapter takes the value as is,
-    // while the other adapters only know a boolean, where `false` keeps cookies same-origin.
+    // The fetch adapter takes `credentials` as is. The other adapters only know a boolean.
     const adapter = resolveAdapter(config.adapter ?? instanceAdapter)
     const fetchAdapter = adapter !== undefined && adapter === axiosFetchAdapter
     if (request.credentials) {
       config.withCredentials = fetchAdapter ? (request.credentials as unknown as boolean) : request.credentials === 'include'
     }
 
-    // axios rejects an abort with its own `CanceledError`, while fetch rejects with the signal's reason. The core rethrows
-    // the reason for an abort while a stream is read.
+    // Rethrow the signal's reason, as fetch does, instead of axios's `CanceledError`.
     const response = await instance.request<unknown>(config).catch((error: unknown) => {
       throw request.signal?.aborted && axios.isCancel(error) ? request.signal.reason : error
     })
@@ -153,19 +133,17 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
 let instance: AxiosInstance | undefined
 
 /**
- * The axios instance `defaultTransport` sends through, created on first use. Set its defaults, or register native axios
- * interceptors on it.
+ * The axios instance `defaultTransport` sends through, created on first use.
  */
 export function getAxiosInstance(): AxiosInstance {
   return (instance ??= axios.create())
 }
 
-/**
- * The default transport: `getAxiosInstance()` wrapped by `createAxiosTransport`. Wrap another instance the same way to send through it.
- */
 export const defaultTransport: Transport = (request) => createAxiosTransport(getAxiosInstance())(request)
 
-/** The client every generated operation uses unless the call passes its own. It is created on first use. */
+/**
+ * The client every generated operation uses unless a call passes its own. It is created on first use.
+ */
 export const client = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
 
 export const createClient = client.createClient

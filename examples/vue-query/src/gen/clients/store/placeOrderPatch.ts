@@ -11,8 +11,6 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * `PATCH /store/order`
  * @description Place a new order in the store with patch
  * @summary Place an order for a pet with patch
- * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function placeOrderPatch<ThrowOnError extends boolean = true>(
   options: Options<PlaceOrderPatchOptions, ThrowOnError> = {},

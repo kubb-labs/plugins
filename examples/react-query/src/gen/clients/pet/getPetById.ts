@@ -11,8 +11,6 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  * `GET /pet/{petId}`
  * @description Returns a single pet
  * @summary Find pet by ID
- * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function getPetById<ThrowOnError extends boolean = true>(
   options: Options<GetPetByIdOptions, ThrowOnError>,

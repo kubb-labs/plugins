@@ -11,7 +11,7 @@ In v6 the axios client runs on the same core as `@kubb/plugin-fetch`. Most edits
 | Passes an axios instance as `transport`, or sets `defaultTransport.defaults`                                         | Wrap it with `createAxiosTransport(instance)`, and set defaults on `getAxiosInstance()`. See [Transport and default instance](#transport-and-default-instance).                                                    |
 | Uses `AxiosOptions`, `validateStatus`, `AxiosTransport`, `InterceptorFn`, or `InterceptorChannel`                    | Rename `AxiosOptions` to `NativeOptions`, and drop the rest. See [Removed exports](#removed-exports).                                                                                                              |
 | Imports from `templates/axios.ts`, `templates/core.ts`, `templates/serializers.ts`, or `templates/standardSchema.ts` | Import from `templates/client.ts` or `@kubb/plugin-client/templates/*`. See [Template subpaths](#template-subpaths).                                                                                               |
-| Names `EventStreamResult<Pet>`, `StreamResult`, or `UnwrappedStreamResult`                                           | Wrap the payload: `EventStreamResult<ServerSentEvent<Pet>>`. See [Stream result types](#stream-result-types).                                                                                                      |
+| Names `EventStreamResult<Pet>`, `StreamResult`, or `UnwrappedStreamResult`                                           | Use `StreamResult` and wrap the payload in `ServerSentEvent`. See [Stream result types](#stream-result-types).                                                                                                     |
 | Relies on interceptor order, or a separate instance per `createClient()`                                             | Check [Behavior changes](#behavior-changes). It compiles, so the type checker does not catch it.                                                                                                                   |
 | Sets `codecs`, `serializer.body`, or `responseType`                                                                  | Use `mediaTypes` and `parseAs`. See [Media types](#media-types).                                                                                                                                                   |
 | Calls `toEventStream`, or writes a transport that returns a parsed body                                              | Use `client.stream`, and return a web `Response`. See [Streams and transports](#streams-and-transports).                                                                                                           |
@@ -124,14 +124,14 @@ Native axios interceptors for a custom transport go on the instance you pass to 
 
 ## Stream result types
 
-`EventStreamResult`, `StreamResult`, and `UnwrappedStreamResult` take the full event type, not the payload:
+`EventStreamResult` is gone, since no call returns it. Name a stream call's result `StreamResult`. `StreamResult` and `UnwrappedStreamResult` take the full event type, not the payload. Wrap a payload in `ServerSentEvent`:
 
 ```typescript
 // before
 let result: EventStreamResult<PetEvent>
 
 // after
-let result: EventStreamResult<ServerSentEvent<PetEvent>>
+let result: StreamResult<StreamPetsResponses, true, ServerSentEvent<PetEvent>>
 ```
 
 ## Behavior changes

@@ -1,6 +1,5 @@
 import type { EventStreamOptions, MediaType, MediaTypes, ServerSentEvent } from './client.ts'
 
-/** The last event ID, shared with the result so it can be read after the loop. */
 type Cursor = { lastEventId: string }
 
 async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>): AsyncGenerator<Uint8Array> {
@@ -21,10 +20,6 @@ async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uin
   }
 }
 
-/**
- * Decodes a byte stream and splits it on CRLF, CR, or LF, a CRLF split across chunks included. Yields each chunk's finished
- * lines and the unfinished `rest`, which the next chunk continues.
- */
 async function* readLines(stream: EventStreamInput): AsyncGenerator<{ lines: Array<string>; rest: string }> {
   const decoder = new TextDecoder()
   let rest = ''
@@ -51,18 +46,14 @@ function parseData<TData>(raw: string): TData {
   }
 }
 
-/**
- * Parses a `text/event-stream` body as the WHATWG event stream specification does: an event is dispatched at its blank line
- * when it holds `data`, `event` defaults to `message`, `id` carries across events until an empty `id` resets it, `retry` needs
- * all digits, and an unfinished event at the end is dropped. `data` is parsed as JSON when it is valid and kept as text
- * otherwise. Consume with `for await`, and break the loop to cancel the stream.
- */
 type EventStreamInput = ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>
 
+/**
+ * Parses a `text/event-stream` body into events, as the WHATWG spec does. Break the loop to cancel the stream.
+ */
 export async function* parseEventStream<TData = unknown>(
   input: EventStreamInput | (Pick<EventStreamOptions, 'maxEventSize' | 'terminator'> & { stream: EventStreamInput; cursor?: Cursor }),
 ): AsyncGenerator<ServerSentEvent<TData>> {
-  // The stream alone is the form earlier releases took.
   const { stream, maxEventSize = 16 * 1024 * 1024, terminator, cursor = { lastEventId: '' } } = isStreamBody(input) ? { stream: input } : input
   const tooLarge = `Server-sent event exceeds maxEventSize of ${maxEventSize} characters`
   let type = ''
@@ -93,7 +84,7 @@ export async function* parseEventStream<TData = unknown>(
   for await (const { lines, rest: line } of readLines(stream)) {
     for (const part of lines) {
       if (!part) {
-        // The ID is committed at the blank line, so a drop inside an event does not report an ID past the last full event.
+        // Committed at the blank line, so a dropped stream never reports an ID past the last full event.
         cursor.lastEventId = pendingId
         if (data.length) {
           const raw = data.join('\n')
@@ -111,12 +102,10 @@ export async function* parseEventStream<TData = unknown>(
         size = 0
         continue
       }
-      // A comment line is dropped and does not count toward the event, but must fit the limit on its own.
       if (part.startsWith(':')) {
         if (part.length + 1 > maxEventSize) throw new RangeError(tooLarge)
         continue
       }
-      // A finished line counts one more character for its line break.
       if (size + part.length + 1 > maxEventSize) throw new RangeError(tooLarge)
       size += part.length + 1
       readField(part)
@@ -126,10 +115,7 @@ export async function* parseEventStream<TData = unknown>(
 }
 
 /**
- * Parses a JSON Lines body, such as `application/jsonl` or `application/x-ndjson`, into one value per line. Lines end on
- * CRLF, CR, or LF, a blank line is skipped, and a last line without a line break still counts. The record separator that
- * starts each `application/json-seq` record is dropped. A line that is not valid JSON throws a `SyntaxError`. Consume
- * with `for await`, and break the loop to cancel the stream.
+ * Parses a JSON Lines body into one value per line. Break the loop to cancel the stream.
  */
 export async function* parseJsonLines<TData = unknown>({
   stream,
@@ -166,8 +152,7 @@ async function* mapEvents(events: AsyncIterable<ServerSentEvent>, transform: (ev
 }
 
 /**
- * `text/event-stream`: a stream call reads it event by event with `parseEventStream`, honoring `maxEventSize`,
- * `terminator`, and `transform`, and records the last event ID. A whole body, such as an error, is read as text.
+ * The `text/event-stream` handler. A whole body, such as an error, is read as text.
  */
 export const eventStream: MediaType = {
   decode: (response) => response.text(),
@@ -178,8 +163,7 @@ export const eventStream: MediaType = {
 }
 
 /**
- * JSON Lines: a stream call reads one JSON value per line with `parseJsonLines`, honoring `maxEventSize` and
- * `terminator`. A whole body, such as an error, is read as text.
+ * The JSON Lines handler. A whole body, such as an error, is read as text.
  */
 export const jsonLines: MediaType = {
   decode: (response) => response.text(),
@@ -187,8 +171,7 @@ export const jsonLines: MediaType = {
 }
 
 /**
- * The stream media types the generated client registers when the document streams: Server-Sent Events and the JSON
- * Lines family, `application/jsonl`, `application/x-ndjson`, and `application/json-seq` with its `+json-seq` suffixes.
+ * The Server-Sent Events and JSON Lines handlers, registered when the document streams.
  */
 export const streamMediaTypes: MediaTypes = {
   'text/event-stream': eventStream,

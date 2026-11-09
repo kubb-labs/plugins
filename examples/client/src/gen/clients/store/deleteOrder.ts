@@ -11,8 +11,6 @@ import { client } from '../../../client'
  * `DELETE /store/order/{orderId}`
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
  * @summary Delete purchase order by ID
- * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function deleteOrder<ThrowOnError extends boolean = true>(
   options: Options<DeleteOrderOptions, ThrowOnError>,

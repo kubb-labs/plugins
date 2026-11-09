@@ -14,8 +14,6 @@ export class PetClient {
 
   /**
    * `GET /pet/{petId}`
-   * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public getPetById<ThrowOnError extends boolean = false>(
     options: Options<GetPetByIdOptions, ThrowOnError>,
@@ -34,8 +32,6 @@ export class PetClient {
 
   /**
    * `DELETE /pet/{petId}`
-   * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public deletePet<ThrowOnError extends boolean = false>(
     options: Options<DeletePetOptions, ThrowOnError>,

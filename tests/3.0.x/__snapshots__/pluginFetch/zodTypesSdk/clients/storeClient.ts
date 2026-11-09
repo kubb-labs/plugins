@@ -21,8 +21,6 @@ export class StoreClient {
    * `GET /store/inventory`
    * @description Returns a map of status codes to quantities
    * @summary Returns pet inventories by status
-   * @param options - Per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
@@ -34,8 +32,6 @@ export class StoreClient {
    * `POST /store/order`
    * @description Place a new order in the store
    * @summary Place an order for a pet
-   * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options

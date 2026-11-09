@@ -9,7 +9,7 @@ The fetch client keeps its API in v6, so most projects only regenerate. Find you
 | Calls generated functions, SDK methods, or hooks                                                                     | Regenerate. Nothing else.                                                                                            |
 | Imports from `templates/fetch.ts`, `templates/core.ts`, `templates/serializers.ts`, or `templates/standardSchema.ts` | Import from `templates/client.ts` or `@kubb/plugin-client/templates/*`. See [Template subpaths](#template-subpaths). |
 | Uses `FetchOptions`                                                                                                  | Rename it to `NativeOptions`. See [Removed exports](#removed-exports).                                               |
-| Names `EventStreamResult<Pet>`, `StreamResult`, or `UnwrappedStreamResult`                                           | Wrap the payload: `EventStreamResult<ServerSentEvent<Pet>>`. See [Stream result types](#stream-result-types).        |
+| Names `EventStreamResult<Pet>`, `StreamResult`, or `UnwrappedStreamResult`                                           | Use `StreamResult` and wrap the payload in `ServerSentEvent`. See [Stream result types](#stream-result-types).       |
 | Sets `codecs`, `serializer.body`, or `responseType`                                                                  | Use `mediaTypes` and `parseAs`. See [Media types](#media-types).                                                     |
 | Calls `toEventStream`, or writes a transport that returns a parsed body                                              | Use `client.stream`, and return a web `Response`. See [Streams and transports](#streams-and-transports).             |
 | Relies on invalid JSON becoming a string, or on the error interceptor skipping network errors                        | Check [Behavior changes in the runtime](#behavior-changes-in-the-runtime). It compiles.                              |
@@ -68,14 +68,14 @@ import type { NativeOptions } from './gen/.kubb/client'
 
 ## Stream result types
 
-`EventStreamResult`, `StreamResult`, and `UnwrappedStreamResult` take the full event type, not the payload. Wrap a payload in `ServerSentEvent`:
+`EventStreamResult` is gone, since no call returns it. Name a stream call's result `StreamResult`. `StreamResult` and `UnwrappedStreamResult` take the full event type, not the payload. Wrap a payload in `ServerSentEvent`:
 
 ```typescript
 // before
 let result: EventStreamResult<PetEvent>
 
 // after
-let result: EventStreamResult<ServerSentEvent<PetEvent>>
+let result: StreamResult<StreamPetsResponses, true, ServerSentEvent<PetEvent>>
 ```
 
 A stream typed with `TypedEvent<…>` stays the same.

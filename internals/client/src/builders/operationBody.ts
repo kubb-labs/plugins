@@ -3,7 +3,7 @@ import type { OperationTypeNames } from '../resolveOperationTypes.ts'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildCallConfig } from './callConfig.ts'
 import { buildEventStreamReturn, buildReturnStatement } from './returnStatement.ts'
-import type { Auth } from './security.ts'
+import type { SecurityRequirement } from './security.ts'
 import { buildGroupedOptionsSignature } from './signature.ts'
 import type { ValidatorHooks } from './validator.ts'
 
@@ -24,7 +24,7 @@ export function buildOperationBody({
   node: ast.HttpOperationNode
   types: OperationTypeNames
   validatorHooks: ValidatorHooks | null
-  security?: Array<Auth>
+  security?: Array<SecurityRequirement>
   baseURL?: string
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean

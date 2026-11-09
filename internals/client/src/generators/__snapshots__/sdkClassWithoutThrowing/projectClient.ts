@@ -13,8 +13,6 @@ export class ProjectClient {
 
   /**
    * `GET /projects/{project_id}`
-   * @param options - The request (`path`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
   public getProject<ThrowOnError extends boolean = false>(
     options: Options<GetProjectOptions, ThrowOnError>,

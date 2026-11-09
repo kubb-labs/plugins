@@ -10,8 +10,6 @@ import { putEventResponseSchema, putEventStatus409Schema } from '../zod/putEvent
 
 /**
  * `PUT /events/{day}`
- * @param options - The request (`path`, `query`, `body`, `headers`) and per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function putEvent<ThrowOnError extends boolean = true>(options: Options<PutEventOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<PutEventResponsesSchemaType, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options

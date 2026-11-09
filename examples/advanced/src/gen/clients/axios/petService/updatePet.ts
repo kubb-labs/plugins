@@ -7,8 +7,6 @@ import { updatePetResponseSchema, updatePetStatus400Schema, updatePetStatus404Sc
  * `PUT /pet`
  * @description Update an existing pet by Id
  * @summary Update an existing pet
- * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function updatePet<ThrowOnError extends boolean = true>(
   options: Options<

@@ -11,8 +11,6 @@ import { listPetsResponseSchema, listPetsQuerySchema } from '../zod/listPetsSche
 /**
  * `GET /pets`
  * @summary List pets born after a date
- * @param options - The request (`query`) and per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function listPets<ThrowOnError extends boolean = true>(
   options: Options<ListPetsOptionsSchemaType, ThrowOnError>,

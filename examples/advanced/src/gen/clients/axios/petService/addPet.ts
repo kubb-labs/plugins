@@ -8,8 +8,6 @@ import { addPetResponseSchema, addPetStatus405Schema, addPetStatusDefaultSchema 
  * `POST /pet`
  * @description Add a new pet to the store
  * @summary Add a new pet to the store
- * @param options - The request (`body`) and per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function addPet<ThrowOnError extends boolean = true>(
   options: Options<

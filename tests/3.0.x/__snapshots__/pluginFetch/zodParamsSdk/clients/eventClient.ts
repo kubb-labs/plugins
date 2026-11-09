@@ -22,8 +22,6 @@ export class EventClient {
 
 /**
    * `PUT /events/{day}`
-   * @param options - The request (`path`, `query`, `body`, `headers`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public putEvent<ThrowOnError extends boolean = true>(options: Options<PutEventOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<PutEventResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
@@ -33,8 +31,6 @@ export class EventClient {
 
 /**
    * `GET /events`
-   * @param options - The request (`query`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public listEvents<ThrowOnError extends boolean = true>(options: Options<ListEventsOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<ListEventsResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options
@@ -44,8 +40,6 @@ export class EventClient {
 
 /**
    * `GET /resources/{resource}`
-   * @param options - The request (`path`, `query`, `headers`) and per-call settings, such as `client` and `throwOnError`.
-   * @returns The result with `data` or `error`, `status`, `request`, and `response`.
    */
     public getResource<ThrowOnError extends boolean = true>(options: Options<GetResourceOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>> {
     const { client: apiClient = this.client, ...config } = options

@@ -6,8 +6,6 @@ import { client, withUnwrap, resolveThrowOnError } from './.kubb/client'
 
 /**
  * `GET /cookies`
- * @param options - The request (`cookies`) and per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function getCookies<ThrowOnError extends boolean = true>(
   options: Options<GetCookiesOptions, ThrowOnError> = {},

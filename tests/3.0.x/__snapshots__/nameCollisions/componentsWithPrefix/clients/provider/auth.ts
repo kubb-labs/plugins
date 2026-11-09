@@ -10,8 +10,6 @@ import { providerAuthResponseSchema, providerAuthStatus400Schema } from '../../z
 
 /**
  * `POST /auth`
- * @param options - Per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function providerAuth<ThrowOnError extends boolean = true>(options: Options<ApiProviderAuthOptions, ThrowOnError> = {}): Unwrappable<RequestResult<ApiProviderAuthResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options

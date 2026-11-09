@@ -11,8 +11,6 @@ import { client } from '../../../client'
  * `DELETE /pet/{petId}`
  * @description delete a pet
  * @summary Deletes a pet
- * @param options - The request (`path`, `headers`) and per-call settings, such as `client` and `throwOnError`.
- * @returns The result with `data` or `error`, `status`, `request`, and `response`.
  */
 export function deletePet<ThrowOnError extends boolean = true>(
   options: Options<DeletePetOptions, ThrowOnError>,
