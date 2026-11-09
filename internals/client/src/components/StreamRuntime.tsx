@@ -18,9 +18,9 @@ function buildClientFooter({ baseURL, sse }: { baseURL?: string; sse: boolean })
 
 /**
  * Writes the footer of the `.kubb/client.ts` the plugin injected, the one place it is built, and copies `sse.ts` into
- * `.kubb/` only for a document with an operation that offers `text/event-stream`, also next to another content type, so a
- * document without streams ships no stream runtime. `sse` is set by the plugins that ship the runtime, so a custom client
- * from `@kubb/plugin-client` gets neither file.
+ * `.kubb/` only for a document with an operation that offers `text/event-stream`, alone or next to another content type,
+ * so a document without streams ships no stream runtime. `sse` is set by the plugins that ship the runtime, so a custom
+ * client from `@kubb/plugin-client` gets neither file.
  */
 export function StreamRuntime({ nodes, root, sse, baseURL }: { nodes: Array<ast.OperationNode>; root: string; sse?: string; baseURL?: string }): KubbReactNode {
   if (!sse) return null

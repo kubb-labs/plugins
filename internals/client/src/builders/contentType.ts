@@ -13,7 +13,7 @@ export function buildContentType({ node }: { node: ast.HttpOperationNode }): { l
   const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
   // The first declared type is the default; the caller overrides it on `contentType`.
   const requestContentType = hasRequestBody ? defaultContentType : null
-  // A response that offers a stream asks for `text/event-stream`, also next to JSON, so a client whose default `Accept` prefers
+  // A response that offers a stream asks for `text/event-stream`, even next to JSON, so a client whose default `Accept` prefers
   // JSON, such as axios, gets events. The caller picks another type with `contentType.response`.
   const response = hasEventStreamContent(node) ? `response: 'text/event-stream'` : null
 

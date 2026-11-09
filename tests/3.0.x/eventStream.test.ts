@@ -97,7 +97,7 @@ describe('event stream runtime', () => {
 })
 
 describe('a response that offers JSON or an event stream', () => {
-  async function generate(output: string, clientPlugin: typeof pluginFetch | typeof pluginAxios) {
+  async function generate({ output, clientPlugin }: { output: string; clientPlugin: typeof pluginFetch | typeof pluginAxios }) {
     const { diagnostics } = await createKubb(
       {
         root: dirname,
@@ -120,7 +120,7 @@ describe('a response that offers JSON or an event stream', () => {
   ])('asks $name for the event stream and ships the runtime to parse it', async ({ clientPlugin }) => {
     const output = await fs.mkdtemp(path.join(dirname, '.event-stream-mixed-'))
     try {
-      await generate(output, clientPlugin)
+      await generate({ output, clientPlugin })
 
       expect(await fs.readFile(path.join(output, '.kubb', 'sse.ts'), 'utf8')).toContain('export async function* parseEventStream')
       expect(await fs.readFile(path.join(output, '.kubb', 'client.ts'), 'utf8')).toMatch(/export \* from '\.\/sse\.ts'\s*$/)
@@ -136,7 +136,7 @@ describe('a response that offers JSON or an event stream', () => {
   test('returns the event stream as a stream to parse, and JSON when the caller picks it', async () => {
     const output = await fs.mkdtemp(path.join(dirname, '.event-stream-mixed-run-'))
     try {
-      await generate(output, pluginFetch)
+      await generate({ output, clientPlugin: pluginFetch })
 
       const accepts: Array<string | undefined> = []
       const { client, parseEventStream } = await import(pathToFileURL(path.join(output, '.kubb/client.ts')).href)
