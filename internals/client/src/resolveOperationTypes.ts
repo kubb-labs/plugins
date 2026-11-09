@@ -1,7 +1,10 @@
 import { type ast, Diagnostics, type Generator, type Group, type Output } from '@kubb/kit'
 import { pluginTsName, type ResolverTs } from '@kubb/plugin-ts'
-import { pluginZodName, type ResolverZod } from '@kubb/plugin-zod'
+import type { PluginZod, ResolverZod } from '@kubb/plugin-zod'
 import type { ContractClientFactory } from './types.ts'
+
+// A type-only import: the query plugins bundle this file but do not depend on @kubb/plugin-zod.
+const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
 
 type GeneratorDriver = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]['driver']
 
