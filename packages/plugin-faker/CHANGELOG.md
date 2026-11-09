@@ -1,5 +1,13 @@
 # @kubb/plugin-faker
 
+## 5.3.2
+
+### Patch Changes
+
+- [#1363](https://github.com/kubb-labs/plugins/pull/1363) [`7793918`](https://github.com/kubb-labs/plugins/commit/77939187c9b22c7c2d5e0e8b114d77494ed3977a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Format `date-time` fields with `dateParser`, as the option already promises. With `dateParser: 'dayjs'`, a `format: date-time` field now prints `dayjs(faker.date.anytime()).format("YYYY-MM-DDTHH:mm:ss[Z]")` and keeps the `dayjs` import, instead of ignoring the option. The format follows the adapter `dateType`: `stringOffset` adds a numeric offset and `stringLocal` drops the zone. The default `dateParser: 'faker'` output does not change.
+- Updated dependencies [[`6fadb07`](https://github.com/kubb-labs/plugins/commit/6fadb07c0e99de2732115486c2139060bd82d5e5), [`821265a`](https://github.com/kubb-labs/plugins/commit/821265a374d1431288b745f863c28d2dc5d9ac63)]:
+  - @kubb/plugin-ts@5.4.2
+
 ## 5.3.1
 
 ### Patch Changes

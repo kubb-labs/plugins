@@ -1,5 +1,15 @@
 # @kubb/plugin-axios
 
+## 5.13.2
+
+### Patch Changes
+
+- [#1368](https://github.com/kubb-labs/plugins/pull/1368) [`821265a`](https://github.com/kubb-labs/plugins/commit/821265a374d1431288b745f863c28d2dc5d9ac63) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - An operation whose `requestBody` is not `required: true` now types `body` as optional in its options, as OpenAPI defines. A call such as petstore's `updateUser({ path: { username } })` typechecks without a body. When the operation has no required parameter either, the generated client takes no argument at all, such as `createUser()`. A body marked `required: true` stays required.
+- Updated dependencies [[`6fadb07`](https://github.com/kubb-labs/plugins/commit/6fadb07c0e99de2732115486c2139060bd82d5e5), [`821265a`](https://github.com/kubb-labs/plugins/commit/821265a374d1431288b745f863c28d2dc5d9ac63), [`6fadb07`](https://github.com/kubb-labs/plugins/commit/6fadb07c0e99de2732115486c2139060bd82d5e5)]:
+  - @kubb/plugin-ts@5.4.2
+  - @kubb/plugin-zod@5.8.3
+  - @kubb/plugin-client@5.11.1
+
 ## 5.13.1
 
 ### Patch Changes
