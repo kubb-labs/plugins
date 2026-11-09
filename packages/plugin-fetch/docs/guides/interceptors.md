@@ -1,6 +1,6 @@
 # Add interceptors
 
-Register handlers on `client.interceptors.request`, `.response`, or `.error` to apply behavior across calls. Handlers receive the resolved request, the decoded result, and every error a call ends with.
+Register handlers on `client.interceptors.request`, `.response`, or `.error` to apply behavior across calls. Handlers receive the resolved request, the decoded result, or the error a call ends with.
 
 ## Run before the send
 
@@ -20,9 +20,9 @@ The handler receives a `ResolvedRequest` (`url`, `method`, `headers`, `body`, `s
 
 ## Run after the send
 
-Response handlers run after the body is decoded by its media type and before the client checks the status or runs
-the validator, so a JSON body is already parsed. On a `client.stream` call, `data` is still the raw body stream. The
-handler receives a `DecodedResponse` (`data`, `status`, `statusText`, `headers`, `contentType`, `request`, `response`):
+Response handlers run after the body is decoded and before the status check and the validator, so a JSON body is
+already parsed. On a `client.stream` call, `data` is the raw body stream. The handler receives a `DecodedResponse`
+(`data`, `status`, `statusText`, `headers`, `contentType`, `request`, `response`):
 
 ```typescript
 client.interceptors.response.use((result) => {
@@ -33,8 +33,8 @@ client.interceptors.response.use((result) => {
 
 ## React to an error
 
-The error handlers see every failure of a call: a `ResponseError` for a non-2xx status, a network error, an abort, a
-`ParseError` from a validator or from invalid JSON, and a `TypeError` from the runtime. Narrow with `ResponseError.is`:
+Error handlers get every failure: a `ResponseError` for a non-2xx status, a network error, an abort, or a
+`ParseError`. Narrow with `ResponseError.is`:
 
 ```typescript
 import { client, ResponseError } from './gen/.kubb/client'
@@ -56,8 +56,7 @@ client.interceptors.error.use((error) => (ResponseError.is(error) && error.statu
 ```
 
 With `throwOnError: false`, a documented non-2xx response resolves and no error handler runs for it, so inspect the
-returned `error` on the result. A failure inside a stream loop, after the call resolved, throws from the loop and does
-not reach the error handlers.
+returned `error` on the result. An error inside a stream loop throws from the loop and skips the error handlers.
 
 ## Add, replace, and remove handlers
 
@@ -81,8 +80,8 @@ client.interceptors.request.eject(id)
 ## Where to set them
 
 Register handlers on the shared `client` for all operations. `client.createClient(config)` returns an instance with the
-same config and no handlers. `client.extend(config)` returns one that runs this client's handlers before its own,
-including handlers added to the parent later:
+same config and no handlers. `client.extend(config)` returns one that runs the parent's handlers, even those added
+later, before its own:
 
 ```typescript
 import { client } from './gen/.kubb/client'

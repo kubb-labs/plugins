@@ -19,7 +19,7 @@ type ResolvedRequest = {
   signal?: AbortSignal
   credentials?: RequestCredentials
   options?: NativeOptions
-  // The call reads the response as a stream, so a transport that buffers bodies must stream it.
+  // Set when the call streams the response. Do not buffer the body.
   stream?: boolean
 }
 
@@ -30,11 +30,11 @@ type TransportResult = {
 }
 ```
 
-The core hands you a `ResolvedRequest` with the URL built, the query and body encoded, and auth headers set. Return the `Response` with its body unread, and the core decodes it by its media type. Return a `TransportResult` instead to set the native `request` and `response` that results and errors carry.
+The `ResolvedRequest` has the URL built, the query and body encoded, and auth headers set. Return the `Response` with its body unread. Return a `TransportResult` to set the native `request` and `response` on results and errors.
 
 ## Send with another library
 
-Since the core reads a web `Response`, a library that returns a `Response`, such as [ky](https://github.com/sindresorhus/ky), needs only the send. `toRequestInit(request)` gives the `RequestInit` that `fetch` and ky take:
+A library that returns a `Response`, such as [ky](https://github.com/sindresorhus/ky), needs only the send. `toRequestInit(request)` gives the `RequestInit` that `fetch` and ky take:
 
 ```typescript
 import ky from 'ky'

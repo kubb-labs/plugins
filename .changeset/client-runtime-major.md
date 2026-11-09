@@ -8,22 +8,14 @@ Run the fetch and axios clients on one core with the same interceptors and clien
 
 - Import types from `templates/client.ts` and the runtime from `@kubb/plugin-client/templates/*`. `templates/fetch.ts` and `templates/axios.ts` are gone.
 - `FetchOptions` and `AxiosOptions` are now `NativeOptions`.
-- Stream types take the event: `EventStreamResult<ServerSentEvent<Pet>>` instead of `EventStreamResult<Pet>`, also for `StreamResult` and `UnwrappedStreamResult`.
-- A custom transport returns a web `Response` and builds its init with `toRequestInit(request)`.
-- On axios, `client.interceptors` handlers get the core objects. Native handlers go on `getAxiosInstance().interceptors`. `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
-- Rename `codecs` to `mediaTypes`. `serialize(body, contentType)` becomes `encode(body, context)`, and `deserialize(raw, contentType)` becomes `decode(response, context)`, which reads the body itself: `await response.text()`.
-- Move a custom `serializer.body` into a `mediaTypes` entry. Serializers now cover path, query, header, and cookie only.
-- Replace `responseType` on a call with `parseAs`, such as `parseAs: 'blob'`. The media type now comes from the response `Content-Type`, matched exactly, by `+json` suffix, by `type/*`, then `*/*`.
-- Catch the `ParseError` that invalid JSON under a JSON media type now throws, or register a lenient `application/json` handler. An empty body is `undefined` for every media type.
-- Replace `toEventStream(call, { shape })` with `client.stream({ ...config, eventShape })`, whose `data` is already the stream. Import `ServerSentEvent`, `TypedEvent`, and `StreamResult` from `.kubb/client`.
-- Return a web `Response`, or `{ webResponse, request, response }`, from a transport, not a result with a parsed body. `readResponse`, `resolveResponseType`, `parseJsonOrText`, `isStreamed`, `CallResult`, `ResponseType`, `ResponseTypeMap`, `Codec`, and `defaultBodySerializer` are gone. Response interceptors receive a `DecodedResponse`.
-- On axios, replace `axiosInstance` with `getAxiosInstance()`, which creates the instance on first use. Native axios response interceptors now see the raw bytes.
-- Narrow `client.interceptors.error` handlers with `ResponseError.is`: they now see network errors, aborts, and validation errors too, and each one gets the error the previous handler returned.
-- Expect the error body to be validated on the throwing path too, and a `2XX` key to count as success.
-- A custom client (`importPath`) must make `client` generic, `client<TResponses, ThrowOnError>(config)`, and add a `stream` method for stream operations. Copy the `ClientInstance` type from `core.ts`, or build on `createClientCore`.
-- With `sdk` and `group: { type: 'tag' }`, SDK tag classes are PascalCase from `resolver.groupName`, such as `PetClient` instead of `pet`. Rename `new pet(config)` to `new PetClient(config)`. The root SDK class shares one client with every tag and exposes it as `client` for interceptors.
-
-New: generated calls pass their types to `apiClient<Responses, ThrowOnError>(config)` with no cast, `isResponseError<Responses>(error)` narrows a thrown error by status, `client.extend(config)` keeps the parent's interceptors, `auth` sends every scheme a security requirement needs, and the default client is created on first use.
+- Rename `codecs` to `mediaTypes`, `serialize` to `encode`, and `deserialize` to `decode`, and move a custom `serializer.body` into a `mediaTypes` entry.
+- Replace `responseType` with `parseAs`, and catch the `ParseError` that invalid JSON now throws.
+- Replace `toEventStream(call, { shape })` with `client.stream({ ...config, eventShape })`, and pass the event to stream types: `EventStreamResult<ServerSentEvent<Pet>>`.
+- Return a web `Response` from a custom transport, built with `toRequestInit(request)`.
+- Narrow `client.interceptors.error` handlers with `ResponseError.is`, since they now also get network and validation errors.
+- On axios, `client.interceptors` handlers get the core objects. Put native handlers on `getAxiosInstance().interceptors`. `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
+- Make a custom client (`importPath`) generic and add a `stream` method.
+- With `sdk` tag classes, rename `new pet(config)` to `new PetClient(config)`.
 
 ```diff
 - import { client, defaultTransport } from './gen/.kubb/client'

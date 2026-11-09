@@ -4,15 +4,15 @@ The generated functions import your module through [`importPath`](https://kubb.d
 
 ## Required exports
 
-| Export          | Kind     | Purpose                                                                                                              |
-| --------------- | -------- | -------------------------------------------------------------------------------------------------------------------- |
-| `client`        | function | Sends the request. Every generated function calls it with two type arguments, unless a call passes its own `client`. |
-| `Options`       | type     | The grouped options object a generated function accepts.                                                             |
-| `RequestResult` | type     | What a generated function resolves to.                                                                               |
+| Export          | Kind     | Purpose                                                                                      |
+| --------------- | -------- | -------------------------------------------------------------------------------------------- |
+| `client`        | function | Sends the request. Every generated function calls it, unless a call passes its own `client`. |
+| `Options`       | type     | The grouped options object a generated function accepts.                                     |
+| `RequestResult` | type     | What a generated function resolves to.                                                       |
 
-`client` is generic: a generated function calls `client<TResponses, ThrowOnError>(config)` with its responses record and its `ThrowOnError` flag, and returns what it resolves to with no cast. Type it to return `Promise<RequestResult<TResponses, ThrowOnError>>`.
+A generated function calls `client<TResponses, ThrowOnError>(config)`, so type `client` to return `Promise<RequestResult<TResponses, ThrowOnError>>`.
 
-If your spec has server-sent event or JSON Lines operations, `client` also needs a `stream` method, and the module exports the `StreamResult`, `SuccessOf`, `TypedEvent`, and `ServerSentEvent` types. A generated function calls `client.stream<TResponses, ThrowOnError, TItem>(config)` and returns `Promise<StreamResult<TResponses, ThrowOnError, TItem>>`. `TItem` is `TypedEvent<…>` when the document names each event, the success type for JSON Lines, and left out, so it defaults to `ServerSentEvent<SuccessOf<TResponses>>`, when the document types only the payload. A Server-Sent Events call passes `eventShape: 'event'` or `'data'`, which tells your client what the response validator in `config.validator.response` checks on each event.
+If your spec has server-sent event or JSON Lines operations, `client` also needs a `stream` method, and the module exports the `StreamResult`, `SuccessOf`, `TypedEvent`, and `ServerSentEvent` types. A generated function calls `client.stream<TResponses, ThrowOnError, TItem>(config)` and returns `Promise<StreamResult<TResponses, ThrowOnError, TItem>>`. `TItem` is `TypedEvent<…>` when the document names each event and the success type for JSON Lines. When the document types only the payload, `TItem` is left out and defaults to `ServerSentEvent<SuccessOf<TResponses>>`. A Server-Sent Events call passes `eventShape: 'event'` or `'data'` to say whether `config.validator.response` checks the whole event or its `data`.
 
 The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-swr`) and `@kubb/plugin-mcp` call the generated functions with `throwOnError: true` and read `data` off the result. The query plugins also import two more types from your module:
 
@@ -29,8 +29,8 @@ To reuse the runtime of the fetch and axios clients instead of writing your own 
 
 1. Copy `core.ts`, `mediaTypes.ts`, `serializers.ts`, `standardSchema.ts`, and `sse.ts` from `@kubb/plugin-client/templates` next to your `client.ts`.
 2. In `client.ts`, export the three types the core imports, listed below.
-3. Write a `Transport` function that sends a `ResolvedRequest` and returns a web `Response`. When your library does not return one, wrap its bytes in `new Response(bytes, { status, headers })`. The core decodes the body by its media type.
-4. Export `createLazyClient((config) => createClientCore({ defaultTransport, ...config }))` as `client`, which has the generic call and `stream`. Register the form and stream media types your spec needs with `client.setConfig({ mediaTypes: { ...formMediaTypes, ...streamMediaTypes } })`, and add `export * from './core.ts'` and `export * from './sse.ts'`.
+3. Write a `Transport` function that sends a `ResolvedRequest` and returns a web `Response`. If your library does not return one, wrap its bytes in `new Response(bytes, { status, headers })`.
+4. Export `createLazyClient((config) => createClientCore({ defaultTransport, ...config }))` as `client`. Register the form and stream media types your spec needs with `client.setConfig({ mediaTypes: { ...formMediaTypes, ...streamMediaTypes } })`, and add `export * from './core.ts'` and `export * from './sse.ts'`.
 
 | Export           | Purpose                                                 | On fetch      | On axios             |
 | ---------------- | ------------------------------------------------------- | ------------- | -------------------- |
@@ -62,9 +62,9 @@ export function getPetById<ThrowOnError extends boolean = true>(
 }
 ```
 
-Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, `cookies`, and `body`, and `throwOnError`. It returns a promise. `cookies` holds name and value pairs, which your client joins into a `Cookie` header, as the example below does. Each `security` entry is one scheme, or an array of schemes that one requirement needs together.
+Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, `cookies`, and `body`, and `throwOnError`. It returns a promise. `cookies` holds name and value pairs, which your client joins into a `Cookie` header, as the example below does. A `security` entry is one scheme, or an array of schemes to send together.
 
-Read the body by the response `Content-Type`. An operation whose success content is all binary also passes `parseAs: 'blob'`, so a download is a `Blob` whatever its media type.
+Read the body by the response `Content-Type`. An operation with only binary success content also passes `parseAs: 'blob'`.
 
 A call can also pass `contentType`: `request` is the body's media type, and `response` is the media type to ask for in `Accept`. A streamed operation always passes its media type, such as `contentType: { response: 'text/event-stream' }` or `contentType: { response: 'application/jsonl' }`. A call whose response offers `text/event-stream` next to another content type passes `text/event-stream` too, unless the caller picks another one. `RequestConfig` needs the field.
 
@@ -129,7 +129,7 @@ async function send(config: RequestConfig) {
   return { data: undefined, error: body ?? { status: response.status }, response }
 }
 
-// The generated functions pass their responses record and `ThrowOnError`, so each call is typed by its operation.
+// Generated functions pass their responses type and `ThrowOnError`.
 export const client = <TResponses, ThrowOnError extends boolean = true>(config: RequestConfig) =>
   send(config) as Promise<RequestResult<TResponses, ThrowOnError>>
 ```

@@ -1,6 +1,6 @@
 # Server-sent events
 
-An operation that returns `text/event-stream` gives you a typed stream of events instead of a `RequestResult`. In the browser, stream calls use the axios fetch adapter, because the default XHR adapter buffers the whole body. An `adapter` set on the call or on `getAxiosInstance()` is kept, and in Node the http adapter streams with its proxy and agent settings. Kubb takes the event types from the OpenAPI document. The generated function calls `client.stream`, which reads the body with the `text/event-stream` media type in `.kubb/sse.ts`. It parses the stream the way the WHATWG event stream specification does.
+An operation that returns `text/event-stream` gives you a typed stream of events instead of a `RequestResult`. In the browser, stream calls use the axios fetch adapter, because the default XHR adapter buffers the whole body. An `adapter` set on the call or on `getAxiosInstance()` is kept, and in Node the http adapter streams with its proxy and agent settings. Kubb takes the event types from the OpenAPI document. The runtime in `.kubb/sse.ts` parses the stream the way the WHATWG event stream specification does.
 
 Each event on the wire has up to four fields, and a blank line ends it:
 
@@ -232,7 +232,7 @@ Pass these on the call, next to its request params:
 | `transform`    | Maps each event before validation, for example to camelCase its keys.                                                           |
 | `maxEventSize` | Largest event in characters. A larger one throws a `RangeError`. Defaults to `16 * 1024 * 1024`. Set `Infinity` to turn it off. |
 | `signal`       | An `AbortSignal` that ends the request and the loop.                                                                            |
-| `eventShape`   | What the validator checks on each event: `data` for a payload, `event` for the whole event. Generated calls set it.             |
+| `eventShape`   | What the validator checks: `data` for the payload, `event` for the whole event. Generated calls set it.                         |
 
 To stop reading, `break` out of the loop. The runtime then cancels the reader and releases the connection.
 
@@ -337,7 +337,7 @@ for await (const event of result) render(event.data)
 
 ## Stream with the client
 
-`client.stream(config)` runs the same pipeline as `client(config)`: request interceptors, the transport, and response interceptors, which see the raw body stream. On a 2xx answer whose media type can stream, it reads the body item by item and validates each item with `validator.response`. A non-2xx body is decoded whole, so `error` stays a value. Type it with the responses record, `ThrowOnError`, and the item type, which defaults to `ServerSentEvent` around the success body:
+`client.stream(config)` runs the same interceptors and transport as `client(config)`. On a 2xx answer, it reads the body item by item and validates each item with `validator.response`. A non-2xx body is decoded whole, so `error` stays a value. Type it with the responses record, `ThrowOnError`, and the item type, which defaults to `ServerSentEvent` around the success body:
 
 ```typescript
 import { client, type SuccessOf } from './gen/.kubb/client'
@@ -346,7 +346,7 @@ import type { StreamLogsResponses } from './gen/models/StreamLogs'
 const result = await client.stream<StreamLogsResponses, true, SuccessOf<StreamLogsResponses>>({ method: 'GET', url: '/logs' })
 ```
 
-The stream media types are `eventStream` and `jsonLines`, exported from `.kubb/sse.ts` with `streamMediaTypes`. Register a `stream` handler for another format, as [Configure serialization](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/serialization#add-a-media-type) shows.
+To stream another format, register a `stream` handler, as [Configure serialization](https://kubb.dev/extensions/kubb-labs/plugin-axios/guides/serialization#add-a-media-type) shows.
 
 ## Return only the events
 
@@ -414,7 +414,7 @@ The events alone carry no `response` or `lastEventId`. To resume a dropped strea
 
 ## The runtime files
 
-`.kubb/sse.ts` holds `parseEventStream`, `parseJsonLines`, and the `eventStream`, `jsonLines`, and `streamMediaTypes` media types. The `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, `StreamOptions`, and `StreamResult` types live in `.kubb/core.ts`. A stream operation takes `StreamOptions` and returns `StreamResult`, the stream versions of `Options` and `RequestResult`. Kubb writes `sse.ts` only when the document has a JSON Lines operation or an operation that offers `text/event-stream`, alone or next to another content type. `.kubb/client.ts` then registers `streamMediaTypes` and re-exports `sse.ts`, so everything imports from the client. Kubb regenerates these files on each run, so do not edit them:
+`.kubb/sse.ts` holds `parseEventStream`, `parseJsonLines`, and the `eventStream`, `jsonLines`, and `streamMediaTypes` media types. The `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, `StreamOptions`, and `StreamResult` types live in `.kubb/core.ts`. A stream operation takes `StreamOptions` and returns `StreamResult`, the stream versions of `Options` and `RequestResult`. Kubb writes `sse.ts` only when the document has a JSON Lines operation or an operation that offers `text/event-stream`, and `.kubb/client.ts` re-exports it, so everything imports from the client. Kubb regenerates these files on each run, so do not edit them:
 
 ```typescript
 import type { ServerSentEvent } from './gen/.kubb/client'

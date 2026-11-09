@@ -1,16 +1,6 @@
 # Configure serialization
 
-The generated client encodes parameters with serializers, using OpenAPI `style` and `explode`, and encodes and decodes bodies with media types, picked by the request and response `Content-Type`. Each generated operation carries its parameter styles and content types, so most requests need no extra setup.
-
-## Serializers and media types
-
-A serializer turns a request parameter into text in the URL or a header. A media type handler turns a body into bytes and back for one media type: it encodes the request body, decodes the response body, and can read a response item by item.
-
-|           | Serializers                                | Media types                                  |
-| --------- | ------------------------------------------ | -------------------------------------------- |
-| Input     | Path, query, header, and cookie parameters | The request body and the response body       |
-| Chosen by | The OpenAPI style of each parameter        | The request or response `Content-Type`       |
-| Override  | `serializer: { path, query }`              | `mediaTypes: { 'application/xml': { ... } }` |
+The generated client encodes parameters by their OpenAPI `style` and `explode`, and encodes and decodes bodies by their media type. Each generated operation carries its parameter styles and content types, so most requests need no extra setup.
 
 ## Override parameter serialization
 
@@ -35,20 +25,20 @@ A serializer set this way runs for every call. Pass `serializer` on a single cal
 
 | Keys                                                                                     | Encodes                                           | Decodes                                    |
 | ---------------------------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------ |
-| `application/json`, `application/*+json`, `text/json`                                    | JSON                                              | JSON. Invalid JSON throws a `ParseError`   |
+| `application/json`, `application/*+json`, `text/json`                                    | JSON                                              | JSON                                       |
 | `text/*`                                                                                 | a string                                          | text                                       |
 | `multipart/form-data`, `application/x-www-form-urlencoded`                               | `FormData` or `URLSearchParams` from an object    | `FormData`                                 |
 | `application/octet-stream`, `application/pdf`, `image/*`, `audio/*`, `video/*`           | a `Blob` as is                                    | `Blob`                                     |
 | `text/event-stream`, `application/jsonl`, `application/x-ndjson`, `application/json-seq` |                                                   | text, or item by item with `client.stream` |
 | `*/*`                                                                                    | JSON for objects, strings and binary bodies as is | JSON, or text when the body is not JSON    |
 
-The generated `.kubb/client.ts` registers the form media types only when the document has a form body, and the stream media types only when it streams, so a client ships only the code it uses. Both are exported, as `formMediaTypes` from `.kubb/mediaTypes.ts` and `streamMediaTypes` from `.kubb/sse.ts`.
+`.kubb/client.ts` registers the form media types only when the document has a form body, and the stream media types only when it streams. They are exported as `formMediaTypes` from `.kubb/mediaTypes.ts` and `streamMediaTypes` from `.kubb/sse.ts`.
 
-A key may be a pattern. Before matching, the runtime drops the header's parameters, trims it, and lower-cases it. It then tries the exact type, the structured suffix such as `application/*+json`, the type wildcard such as `text/*`, and last `*/*`. Write your own keys in lower case.
+A key can be a pattern. The runtime lower-cases the type, drops its parameters, and tries the exact type, then a suffix such as `application/*+json`, then a wildcard such as `text/*`, then `*/*`. Write your own keys in lower case.
 
 ## Encode request bodies
 
-When an operation declares one request content type, Kubb sets it on the generated function, so you pass only the body. For an operation that accepts more than one, set `contentType` on the call. A body sent without a content type goes out as JSON, labeled `application/json`, unless it is already encoded.
+When an operation declares one request content type, Kubb sets it on the generated function, so you pass only the body. For an operation that accepts more than one, set `contentType` on the call. A body without a content type is sent as `application/json`, unless it is already encoded.
 
 Bodies that are already encoded (`FormData`, `URLSearchParams`, `Blob`, `ArrayBuffer`, typed arrays, streams, and strings) pass through every built-in media type as they are. A string under a JSON media type is JSON-encoded.
 
@@ -75,7 +65,7 @@ client.setConfig({
 })
 ```
 
-Handlers you pass merge over the built-ins per key. `setConfig` merges them over the ones set before, and `mediaTypes` on a single call merges over the client ones for that call. A handler may leave out a method: an entry with only `decode` still encodes through the next match, such as `*/*`.
+Handlers merge per key over the built-ins, over earlier `setConfig` calls, and, when passed on a single call, over the client ones. An entry with only `decode` still encodes through the next match, such as `*/*`.
 
 A streaming format adds `stream`, which reads the 2xx body item by item. The runtime validates each item:
 
@@ -89,13 +79,13 @@ client.setConfig({
 
 ## Decode responses
 
-The runtime decodes every body once, after the transport, by the response `Content-Type`. The media type is on the result as `contentType`, so a `switch (result.contentType)` narrows `data` for an operation that returns more than one.
+The runtime decodes each body by the response `Content-Type`. The media type is on the result as `contentType`, so a `switch (result.contentType)` narrows `data` for an operation that returns more than one.
 
 - A 2xx response without a `Content-Type` is decoded as the media type the call asked for in `contentType.response`, then as `*/*`.
 - A 204, 205, or 304 response, a `HEAD` request, and an empty body give `data: undefined`.
 - Invalid JSON under a JSON media type throws a `ParseError`. Catch it, or register a lenient `application/json` handler.
 
-To skip the lookup for one call, set `parseAs` to `'json'`, `'text'`, `'blob'`, `'arrayBuffer'`, or `'stream'`. It applies to a 2xx body; an error body is still decoded by its media type. Kubb sets `parseAs: 'blob'` on an operation whose success content is all binary, so a download is a `Blob` even when the server sends another media type:
+To skip the lookup for one call, set `parseAs` to `'json'`, `'text'`, `'blob'`, `'arrayBuffer'`, or `'stream'`. It applies to a 2xx body only. Kubb sets `parseAs: 'blob'` on an operation with only binary success content:
 
 ```typescript
 const { data } = await getReport({ path: { id: '123' }, parseAs: 'text' })
@@ -125,7 +115,7 @@ import { pluginFetch } from '@kubb/plugin-fetch'
 pluginFetch({ validator: 'zod' })
 ```
 
-`'zod'` validates the success response body and the error body, whether the call throws or returns the error. Use the object form to opt in per direction, where `request` validates the request body before the call goes out:
+`'zod'` validates the success response body and the error body. Use the object form to opt in per direction, where `request` validates the request body before the call goes out:
 
 ```typescript
 pluginFetch({ validator: { request: 'zod', response: 'zod' } })

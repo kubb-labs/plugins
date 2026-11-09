@@ -63,7 +63,7 @@ Default value. Skips validation and casts the response to the generated type.
 :::
 
 :::field{name="'zod'"}
-Validates the success response body, and the error body against the schema of its status, whether the call throws or returns the error.
+Validates the success response body, and the error body against the schema of its status.
 :::
 
 :::field{name="{ request?: 'zod', params?: 'zod', response?: 'zod' }"}
@@ -107,7 +107,7 @@ Generates a class-based SDK. Each instance takes its own client config, so envir
 ::field-group
 
 :::field{name="'tag'"}
-Default value for `sdk.mode`. Generates one class per tag, named by `resolver.groupName`, such as `PetClient`. Set `sdk.name` to also get a root class that creates one client and shares it with every tag, used as `new PetStore(config).pet.getPetById(...)`.
+Default value for `sdk.mode`. Generates one class per tag, such as `PetClient`. Set `sdk.name` to also get a root class that shares one client with every tag, used as `new PetStore(config).pet.getPetById(...)`.
 :::
 
 :::field{name="'flat'"}
@@ -125,7 +125,7 @@ const pet = new PetClient({ baseURL: 'https://petstore.swagger.io/v2' })
 const { data } = await pet.getPetById({ path: { petId: 1 } })
 ```
 
-Every SDK class exposes its client as the read-only `client` field. On the root class, interceptors you add there apply to every tag:
+Each SDK class exposes its client as the read-only `client` field. Interceptors on the root class's `client` apply to every tag:
 
 ```typescript
 const api = new PetStore({ baseURL: 'https://petstore.swagger.io/v2' })

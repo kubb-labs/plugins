@@ -14,7 +14,7 @@ The fetch client keeps its API in v6, so most projects only regenerate. Find you
 | Calls `toEventStream`, or writes a transport that returns a parsed body                                              | Use `client.stream`, and return a web `Response`. See [Streams and transports](#streams-and-transports).             |
 | Relies on invalid JSON becoming a string, or on the error interceptor skipping network errors                        | Check [Behavior changes in the runtime](#behavior-changes-in-the-runtime). It compiles.                              |
 | Comes from 5.12 or earlier and uses streams                                                                          | Check [From 5.12 or earlier](#from-5-12-or-earlier). It compiles, so the type checker does not catch it.             |
-| Uses SDK classes with `group: { type: 'tag' }`, such as `new pet(config)`                                            | Rename them to the PascalCase names, such as `new PetClient(config)`. See [SDK class names](#sdk-class-names).       |
+| Uses SDK classes with `group: { type: 'tag' }`, such as `new pet(config)`                                            | Use the new names, such as `new PetClient(config)`. See [SDK class names](#sdk-class-names).                         |
 
 ## Upgrade steps
 
@@ -82,7 +82,7 @@ A stream typed with `TypedEvent<…>` stays the same.
 
 ## Media types
 
-Body encoding and decoding moved into media type handlers, keyed by media type. `codecs` is renamed `mediaTypes`, and its methods are renamed and get more context:
+`codecs` is now `mediaTypes`, and its methods are renamed:
 
 | Before                                                          | After                                        | Migration                                                                      |
 | --------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------ |
@@ -100,11 +100,11 @@ client.setConfig({ codecs: { 'application/xml': { deserialize: (raw) => parseXml
 client.setConfig({ mediaTypes: { 'application/xml': { decode: async (response) => parseXml(await response.text()) } } })
 ```
 
-A key may now be a pattern, such as `application/*+json` or `text/*`. Generated calls no longer pass `responseType`; an operation whose success content is all binary passes `parseAs: 'blob'`. See [Configure serialization](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/serialization).
+A key can now be a pattern, such as `application/*+json` or `text/*`. See [Configure serialization](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/serialization).
 
 ## Streams and transports
 
-A generated stream function returns `apiClient.stream<Responses, ThrowOnError>({ ...config, eventShape: 'data' })`, whose `data` is already the stream. `toEventStream` is gone; send the request with `client.stream` instead:
+`toEventStream` is gone. Send the request with `client.stream`, whose result is already the stream:
 
 ```typescript
 // before
@@ -114,9 +114,9 @@ const { stream } = await toEventStream(client({ method: 'GET', url: '/events', r
 const { stream } = await client.stream({ method: 'GET', url: '/events', eventShape: 'data' })
 ```
 
-The `ServerSentEvent`, `TypedEvent`, and `StreamResult` types moved from `.kubb/sse.ts` to `.kubb/core.ts`, and `.kubb/client.ts` still exports them.
+Import `ServerSentEvent`, `TypedEvent`, and `StreamResult` from `.kubb/client.ts`, not `.kubb/sse.ts`.
 
-A transport returns a web `Response`, or `{ webResponse, request, response }` to set the native objects, instead of a result with a parsed body. `readResponse`, `resolveResponseType`, `parseJsonOrText`, `isStreamed`, `ResponseType`, `ResponseTypeMap`, `Codec`, `Deserializer`, `ContentBodySerializer`, `BodySerializer`, `defaultBodySerializer`, and `CallResult` are gone. Response interceptors receive a `DecodedResponse`, the shape `TransportResult` had.
+A transport returns a web `Response`, or `{ webResponse, request, response }` to set the native objects. `readResponse`, `resolveResponseType`, `parseJsonOrText`, `isStreamed`, `ResponseType`, `ResponseTypeMap`, `Codec`, `Deserializer`, `ContentBodySerializer`, `BodySerializer`, `defaultBodySerializer`, and `CallResult` are gone. Response interceptors receive a `DecodedResponse`, the shape `TransportResult` had.
 
 ```typescript
 // before
@@ -132,11 +132,10 @@ These compile without errors, so check them by hand:
 
 - Invalid JSON under a JSON media type throws a `ParseError` instead of becoming a string. Catch it, or register a lenient `application/json` handler.
 - An empty body is `undefined` for every media type, text included.
-- The error interceptor sees every failure: network errors, aborts, and validation errors too, so narrow with `ResponseError.is` before reading `status`. Each handler gets the error the one before returned.
-- The error body is validated on the throwing path too, so `ResponseError.data` holds the parsed body.
+- Error interceptors also get network errors, aborts, and validation errors, so narrow with `ResponseError.is` before reading `status`. Each handler gets the error the previous one returned.
+- `ResponseError.data` holds the validated body.
 - A `2XX` response key is a success, and range keys such as `4XX` type `status` as the numbers they cover.
 - An auth requirement that needs several schemes sends all of them.
-- The default `client` is created on its first use. `client.setConfig` before that only records the config.
 
 ## From 5.12 or earlier
 
@@ -147,7 +146,7 @@ These changed in 5.13 and compile without errors, so check them by hand:
 
 ## SDK class names
 
-With `sdk` and `group: { type: 'tag' }`, tag classes used the group folder name, such as `export class pet`. They now use `resolver.groupName`, such as `export class PetClient`, as without `group`. The files stay where they were, and the root class keeps its `pet` and `store` fields.
+With `sdk` and `group: { type: 'tag' }`, tag classes are now named like `PetClient` instead of `pet`. The files and the root class's `pet` and `store` fields stay the same:
 
 ```diff
 - import { pet } from './gen/sdk/pet/pet'
@@ -156,7 +155,7 @@ With `sdk` and `group: { type: 'tag' }`, tag classes used the group folder name,
 + const api = new PetClient({ baseURL })
 ```
 
-The root class now creates one client and shares it with every tag, so it builds one client instead of one per tag. Reach it as `api.client` to add interceptors.
+The root class shares one client with every tag. Add interceptors on `api.client`.
 
 ## Query plugins
 

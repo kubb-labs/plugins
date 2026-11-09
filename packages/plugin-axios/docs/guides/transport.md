@@ -2,7 +2,7 @@
 
 Set a transport at runtime to replace the network send. The client still builds URLs, serializes parameters, resolves authentication, and handles results.
 
-The transport is a function that takes the resolved request and returns a web `Response` with the native axios config and response, as in `@kubb/plugin-fetch`. The core then decodes the body by its media type. The default is `defaultTransport`, which sends through `getAxiosInstance()`, an `axios.create()` instance created on the first call. `createAxiosTransport(instance)` turns any axios instance into a transport: it reads the body as bytes, or as a stream when the call streams, and wraps it in a `Response`.
+The transport is a function that takes the resolved request and returns a web `Response` with the native axios config and response, as in `@kubb/plugin-fetch`. The default is `defaultTransport`, which sends through `getAxiosInstance()`. `createAxiosTransport(instance)` turns any axios instance into a transport.
 
 ```typescript
 type ClientConfig = {
@@ -39,7 +39,7 @@ Every generated function now sends through your instance, so its timeout, header
 
 ## Configure the default instance
 
-The generated client exports `getAxiosInstance()`, which returns the instance `defaultTransport` sends through and creates it on its first call, so importing a generated function runs no `axios.create()`. Configure it directly to add tracing or headers without replacing the transport:
+The generated client exports `getAxiosInstance()`, which returns the instance `defaultTransport` sends through. Configure it directly to add tracing or headers without replacing the transport:
 
 ```typescript
 import { getAxiosInstance } from './gen/.kubb/client'
