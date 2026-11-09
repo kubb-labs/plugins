@@ -19,17 +19,18 @@ export type TypedEvent<TEvent> = TEvent & Pick<ServerSentEvent, 'id' | 'retry'>
 /** Per-call options of a streamed operation, passed next to its request params. */
 export type EventStreamOptions = {
   /**
-   * The largest number of characters, line breaks included, one event may hold before the blank line that ends it.
+   * The largest number of characters, line breaks included, one event may hold before the blank line that ends it, or one
+   * line of JSON Lines may hold.
    * A larger event throws a `RangeError` and cancels the stream. Set `Infinity` to turn the limit off.
    * @default 16777216
    */
   maxEventSize?: number
   /**
-   * Ends the stream when an event's raw `data` equals this value, such as `[DONE]`.
+   * Ends the stream when an event's raw `data`, or a JSON Lines line, equals this value, such as `[DONE]`.
    */
   terminator?: string
   /**
-   * Maps each event before validation.
+   * Maps each Server-Sent Event before validation. JSON Lines items are not passed through it.
    */
   transform?: (event: ServerSentEvent) => ServerSentEvent
 }
@@ -107,6 +108,28 @@ async function* readBytes(stream: ReadableStream<Uint8Array> | AsyncIterable<Uin
   }
 }
 
+/**
+ * Decodes a byte stream and splits it on CRLF, CR, or LF, a CRLF split across chunks included. Yields each chunk's finished
+ * lines and the unfinished `rest`, which the next chunk continues.
+ */
+async function* readLines(stream: EventStreamInput): AsyncGenerator<{ lines: Array<string>; rest: string }> {
+  const decoder = new TextDecoder()
+  let rest = ''
+  let endsWithCR = false
+  for await (const chunk of readBytes(stream)) {
+    const decoded = decoder.decode(chunk, { stream: true })
+    if (!decoded) continue
+    // A CRLF split across chunks already ended its line on the `\r`.
+    const text: string = endsWithCR && decoded.startsWith('\n') ? decoded.slice(1) : decoded
+    endsWithCR = text.endsWith('\r')
+
+    const lines = text.split(/\r\n|\r|\n/)
+    lines[0] = rest + lines[0]
+    rest = lines.pop() ?? ''
+    yield { lines, rest }
+  }
+}
+
 function parseData<TData>(raw: string): TData {
   try {
     return JSON.parse(raw) as TData
@@ -128,14 +151,11 @@ export async function* parseEventStream<TData = unknown>(
 ): AsyncGenerator<ServerSentEvent<TData>> {
   // The stream alone is the form earlier releases took.
   const { stream, maxEventSize = 16 * 1024 * 1024, terminator, cursor = { lastEventId: '' } } = isStreamBody(input) ? { stream: input } : input
-  const decoder = new TextDecoder()
   const tooLarge = `Server-sent event exceeds maxEventSize of ${maxEventSize} characters`
   let type = ''
   let data: Array<string> = []
   let retry: number | undefined
   let size = 0
-  let line = ''
-  let endsWithCR = false
   let pendingId = cursor.lastEventId
 
   const readField = (part: string) => {
@@ -157,17 +177,8 @@ export async function* parseEventStream<TData = unknown>(
     }
   }
 
-  for await (const chunk of readBytes(stream)) {
-    const decoded = decoder.decode(chunk, { stream: true })
-    if (!decoded) continue
-    // A CRLF split across chunks already ended its line on the `\r`.
-    const text: string = endsWithCR && decoded.startsWith('\n') ? decoded.slice(1) : decoded
-    endsWithCR = text.endsWith('\r')
-
-    const parts = text.split(/\r\n|\r|\n/)
-    parts[0] = line + parts[0]
-    line = parts.pop() ?? ''
-    for (const part of parts) {
+  for await (const { lines, rest: line } of readLines(stream)) {
+    for (const part of lines) {
       if (!part) {
         // The ID is committed at the blank line, so a drop inside an event does not report an ID past the last full event.
         cursor.lastEventId = pendingId
@@ -201,16 +212,48 @@ export async function* parseEventStream<TData = unknown>(
   }
 }
 
+/**
+ * Parses a JSON Lines body, such as `application/jsonl` or `application/x-ndjson`, into one value per line. Lines end on
+ * CRLF, CR, or LF, a blank line is skipped, and a last line without a line break still counts. The record separator that
+ * starts each `application/json-seq` record is dropped. A line that is not valid JSON throws a `SyntaxError`. Consume
+ * with `for await`, and break the loop to cancel the stream.
+ */
+export async function* parseJsonLines<TData = unknown>({
+  stream,
+  maxEventSize = 16 * 1024 * 1024,
+  terminator,
+}: Pick<EventStreamOptions, 'maxEventSize' | 'terminator'> & { stream: EventStreamInput }): AsyncGenerator<TData> {
+  const tooLarge = `JSON line exceeds maxEventSize of ${maxEventSize} characters`
+  async function* lines(): AsyncGenerator<string> {
+    let last = ''
+    for await (const chunk of readLines(stream)) {
+      yield* chunk.lines
+      last = chunk.rest
+      if (last.length > maxEventSize) throw new RangeError(tooLarge)
+    }
+    yield last
+  }
+
+  for await (const raw of lines()) {
+    if (raw.length + 1 > maxEventSize) throw new RangeError(tooLarge)
+    // shortcut: a json-seq record must fit on one line, so a pretty-printed record fails to parse; split on the separator to read one.
+    const line = raw.split('\u001e').join('').trim()
+    if (!line) continue
+    if (line === terminator) return
+    yield JSON.parse(line) as TData
+  }
+}
+
 function isStreamBody(data: unknown): data is ReadableStream<Uint8Array> | AsyncIterable<Uint8Array> {
   return !!data && typeof data === 'object' && (Symbol.asyncIterator in data || 'getReader' in data)
 }
 
 /**
- * Reads a call as typed Server-Sent Events, transformed and validated one by one, until the terminator or the end of the
- * stream. A successful call whose body is not a stream, such as a decoded JSON answer, throws a `TypeError` with the body
- * as its `cause`. A dropped connection ends the loop with the transport's error, and `lastEventId` on the result is the
- * ID to resume from. An aborted `config.signal` ends the loop with its `reason` right after the event the consumer saw,
- * so `lastEventId` stays at that event.
+ * Reads a call as typed Server-Sent Events, or as JSON Lines with `shape: 'line'`, transformed and validated one by one,
+ * until the terminator or the end of the stream. A successful call whose body is not a stream, such as a decoded JSON
+ * answer, throws a `TypeError` with the body as its `cause`. A dropped connection ends the loop with the transport's
+ * error, and `lastEventId` on the result is the ID to resume from. An aborted `config.signal` ends the loop with its
+ * `reason` right after the event the consumer saw, so `lastEventId` stays at that event.
  */
 export async function toEventStream<TEvent = ServerSentEvent, TResponse = NativeResponse>(
   call: Promise<EventStreamCall<TResponse>>,
@@ -225,12 +268,13 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
     client?: { getConfig: () => ValidationSettings }
     config?: EventStreamOptions & ValidationSettings & { signal?: AbortSignal }
     /**
-     * `event` when the document types each event with its own `event` and `data`, or `data` when it types only the payload.
+     * `event` when the document types each event with its own `event` and `data`, `data` when it types only the payload, or
+     * `line` when the body is JSON Lines and each line is one item.
      * @default 'data'
      */
-    shape?: 'event' | 'data'
+    shape?: 'event' | 'data' | 'line'
     /**
-     * Validates each event (`shape: 'event'`) or its `data` (`shape: 'data'`), after `transform`.
+     * Validates each event (`shape: 'event'`), its `data` (`shape: 'data'`), or each line (`shape: 'line'`), after `transform`.
      */
     validator?: StandardSchemaValidator
   } = {},
@@ -245,23 +289,34 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
   // A 204 or empty answer has no body, `undefined` or `null`, and still ends as an empty stream.
   if (ok && body != null && !isStreamBody(body)) {
     // `cause` is assigned, since the constructor option needs the ES2022 library a generated client cannot assume.
-    throw Object.assign(new TypeError(`Expected a text/event-stream body, got ${contentType ?? 'a body without a content type'}`), { cause: body })
+    const expected = meta.shape === 'line' ? 'a JSON Lines' : 'a text/event-stream'
+    throw Object.assign(new TypeError(`Expected ${expected} body, got ${contentType ?? 'a body without a content type'}`), { cause: body })
   }
 
+  const validate = (value: unknown) => runValidator({ validator: validator!, value, context: { direction: 'response', source: 'body' }, onValidationError })
   const validateEvent = async (event: ServerSentEvent): Promise<ServerSentEvent> => {
     if (!validator) return event
-    const value = meta.shape === 'event' ? event : event.data
-    const validated = await runValidator({ validator, value, context: { direction: 'response', source: 'body' }, onValidationError })
+    const validated = await validate(meta.shape === 'event' ? event : event.data)
     // The schema may not declare `id` and `retry`, so the parsed value is merged over the event instead of replacing it.
     return meta.shape === 'event' ? { ...event, ...(validated as object) } : { ...event, data: validated }
+  }
+
+  async function* items(stream: EventStreamInput): AsyncGenerator<unknown> {
+    const { maxEventSize, terminator, transform } = options
+    if (meta.shape !== 'line') {
+      for await (const event of parseEventStream({ stream, maxEventSize, terminator, cursor })) yield validateEvent(transform ? transform(event) : event)
+      return
+    }
+    // A JSON Lines item is not an event, so it skips `transform` and is validated as a whole.
+    for await (const item of parseJsonLines({ stream, maxEventSize, terminator })) yield validator ? validate(item) : item
   }
 
   async function* events(): AsyncGenerator<TEvent> {
     if (!isStreamBody(body)) return
     // A consumer `break` or a failed event closes this loop, which cancels the reader.
     try {
-      for await (const event of parseEventStream({ stream: body, maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })) {
-        yield (await validateEvent(options.transform ? options.transform(event) : event)) as TEvent
+      for await (const item of items(body)) {
+        yield item as TEvent
         // A chunk may hold more events, so stop before the parser reads on.
         if (options.signal?.aborted) throw options.signal.reason
       }

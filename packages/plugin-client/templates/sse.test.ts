@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest'
-import { type EventStreamCall, parseEventStream, type ServerSentEvent, toEventStream } from './sse.ts'
+import { type EventStreamCall, parseEventStream, parseJsonLines, type ServerSentEvent, toEventStream } from './sse.ts'
 import { ParseError, type StandardSchemaValidator } from './standardSchema.ts'
 
 const encoder = new TextEncoder()
@@ -188,6 +188,42 @@ describe('parseEventStream', () => {
   })
 })
 
+describe('parseJsonLines', () => {
+  test('yields one value per line across CRLF, CR, LF, blank lines, and a last line without a line break', async () => {
+    const stream = streamOf(['{"n":1}\r\n\r\n[2]\r', '\n"three"\n', '\n4'])
+
+    expect(await collect(parseJsonLines({ stream }))).toStrictEqual([{ n: 1 }, [2], 'three', 4])
+  })
+
+  test('joins a line split across chunks, a multibyte character included', async () => {
+    const bytes = encoder.encode('{"name":"é"}\n')
+    async function* split() {
+      yield bytes.slice(0, 4)
+      yield bytes.slice(4, 10)
+      yield bytes.slice(10)
+    }
+
+    expect(await collect(parseJsonLines({ stream: split() }))).toStrictEqual([{ name: 'é' }])
+  })
+
+  test('drops the json-seq record separator and stops at the terminator', async () => {
+    const stream = streamOf(['\u001e{"n":1}\n\u001e{"n":2}\n[DONE]\n{"n":3}\n'])
+
+    expect(await collect(parseJsonLines({ stream, terminator: '[DONE]' }))).toStrictEqual([{ n: 1 }, { n: 2 }])
+  })
+
+  test('throws a SyntaxError for a line that is not JSON', async () => {
+    await expect(collect(parseJsonLines({ stream: streamOf(['{"n":1}\nnot json\n']) }))).rejects.toThrow(SyntaxError)
+  })
+
+  test.each([
+    ['a finished line', ['[1]\n', `"${'x'.repeat(20)}"\n`]],
+    ['an unfinished line', ['[1]\n', `"${'x'.repeat(30)}`]],
+  ])('throws a RangeError for %s past maxEventSize', async (_, chunks) => {
+    await expect(collect(parseJsonLines({ stream: streamOf(chunks), maxEventSize: 20 }))).rejects.toThrow(RangeError)
+  })
+})
+
 describe('toEventStream', () => {
   const validator: StandardSchemaValidator = {
     '~standard': {
@@ -281,6 +317,27 @@ describe('toEventStream', () => {
     })
 
     expect(await collect(stream)).toStrictEqual([{ data: 1, event: 'n', id: '1', retry: 5, checked: true }])
+  })
+
+  test('reads JSON Lines for the line shape, validates each line, and skips transform', async () => {
+    const transform = vi.fn((event: ServerSentEvent) => event)
+    const first = call({ data: streamOf(['{"n":1}\n{"n":', '2}\n']), contentType: 'application/x-ndjson' })
+    const result = await toEventStream(Promise.resolve(first), { config: { transform }, shape: 'line', validator })
+
+    expect(await collect(result)).toStrictEqual([
+      { n: 1, checked: true },
+      { n: 2, checked: true },
+    ])
+    expect(transform).not.toHaveBeenCalled()
+    expect(result.lastEventId).toBe('')
+  })
+
+  test('names JSON Lines in the TypeError for a successful answer that is not a stream', async () => {
+    const result = toEventStream(Promise.resolve({ data: '{"n":1}', status: 200, contentType: 'application/jsonl', response: new Response() }), {
+      shape: 'line',
+    })
+
+    await expect(result).rejects.toThrow('Expected a JSON Lines body, got application/jsonl')
   })
 
   test('a failing validation calls onValidationError and keeps streaming when it is handled', async () => {

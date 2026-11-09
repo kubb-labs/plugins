@@ -496,6 +496,24 @@ describe('getResponseType / isEventStream', () => {
     expect(getEventStream(typedEvents)).toBe('event')
   })
 
+  test.each([
+    ['application/jsonl', 'line'],
+    ['application/x-ndjson', 'line'],
+    ['application/json-seq', 'line'],
+    ['multipart/mixed', null],
+  ])('reads %s the adapter marks as a stream as %s', (contentType, shape) => {
+    const schema = ast.factory.createSchema({ type: 'object' })
+    const node = ast.factory.createOperation({
+      operationId: 'streamLogs',
+      method: 'GET',
+      path: '/logs',
+      responses: [ast.factory.createResponse({ statusCode: '200', content: [ast.factory.createContent({ contentType, schema, stream: { schema } })] })],
+    })
+
+    expect(getEventStream(node)).toBe(shape)
+    expect(getResponseType(node)).toBe(shape ? 'stream' : undefined)
+  })
+
   test('leaves JSON responses to the runtime auto-detection', () => {
     expect(getResponseType(nodeWithResponseContentType('application/json'))).toBeUndefined()
     expect(isEventStream(nodeWithResponseContentType('application/json'))).toBe(false)
