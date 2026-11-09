@@ -39,7 +39,7 @@ export type AddPetOptions = {
   path?: never;
   query?: never;
   headers?: never;
-  contentType?: {
+  contentType?: 'application/json' | {
     request: 'application/json';
   };
 } | {
@@ -47,7 +47,7 @@ export type AddPetOptions = {
   path?: never;
   query?: never;
   headers?: never;
-  contentType: {
+  contentType: 'application/xml' | {
     request: 'application/xml';
   };
 } | {
@@ -55,7 +55,7 @@ export type AddPetOptions = {
   path?: never;
   query?: never;
   headers?: never;
-  contentType: {
+  contentType: 'application/x-www-form-urlencoded' | {
     request: 'application/x-www-form-urlencoded';
   };
 };

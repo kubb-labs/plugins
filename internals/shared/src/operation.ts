@@ -570,28 +570,31 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
     return createOptions(hasBody ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) }) : createNever())
   }
 
-  // The first media type is the runtime default, so only the others must pass `contentType`.
+  // The first media type is the runtime default, so only the others must pass `contentType`. A bare string sets the
+  // request content type at runtime, so it is accepted next to the `{ request }` form.
   return ast.factory.createSchema({
     type: 'union',
-    members: variants.map((variant, index) =>
-      createOptions(ast.factory.createSchema({ type: 'ref', name: variant.name }), [
+    members: variants.map((variant, index) => {
+      const contentType = ast.factory.createSchema({ type: 'enum', enumValues: [variant.contentType] })
+
+      return createOptions(ast.factory.createSchema({ type: 'ref', name: variant.name }), [
         ast.factory.createProperty({
           name: 'contentType',
           required: index > 0,
           schema: ast.factory.createSchema({
-            type: 'object',
-            primitive: 'object',
-            properties: [
-              ast.factory.createProperty({
-                name: 'request',
-                required: true,
-                schema: ast.factory.createSchema({ type: 'enum', enumValues: [variant.contentType] }),
+            type: 'union',
+            members: [
+              contentType,
+              ast.factory.createSchema({
+                type: 'object',
+                primitive: 'object',
+                properties: [ast.factory.createProperty({ name: 'request', required: true, schema: contentType })],
               }),
             ],
           }),
         }),
-      ]),
-    ),
+      ])
+    }),
   })
 }
 

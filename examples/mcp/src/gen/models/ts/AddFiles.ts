@@ -31,18 +31,22 @@ export type AddFilesOptions =
       path?: never
       query?: never
       headers?: never
-      contentType?: {
-        request: 'application/json'
-      }
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
     }
   | {
       body: AddFilesBodyFormData
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'multipart/form-data'
-      }
+      contentType:
+        | 'multipart/form-data'
+        | {
+            request: 'multipart/form-data'
+          }
     }
 
 export type AddFilesResponses = {

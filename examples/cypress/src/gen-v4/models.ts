@@ -208,27 +208,33 @@ export type UpdatePetOptions =
       path?: never
       query?: never
       headers?: never
-      contentType?: {
-        request: 'application/json'
-      }
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
     }
   | {
       body: UpdatePetBodyXml
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/xml'
-      }
+      contentType:
+        | 'application/xml'
+        | {
+            request: 'application/xml'
+          }
     }
   | {
       body: UpdatePetBodyFormUrlEncoded
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/x-www-form-urlencoded'
-      }
+      contentType:
+        | 'application/x-www-form-urlencoded'
+        | {
+            request: 'application/x-www-form-urlencoded'
+          }
     }
 
 export type UpdatePetResponses = {
@@ -293,27 +299,33 @@ export type AddPetOptions =
       path?: never
       query?: never
       headers?: never
-      contentType?: {
-        request: 'application/json'
-      }
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
     }
   | {
       body: AddPetBodyXml
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/xml'
-      }
+      contentType:
+        | 'application/xml'
+        | {
+            request: 'application/xml'
+          }
     }
   | {
       body: AddPetBodyFormUrlEncoded
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/x-www-form-urlencoded'
-      }
+      contentType:
+        | 'application/x-www-form-urlencoded'
+        | {
+            request: 'application/x-www-form-urlencoded'
+          }
     }
 
 export type AddPetResponses = {
@@ -648,27 +660,33 @@ export type PlaceOrderOptions =
       path?: never
       query?: never
       headers?: never
-      contentType?: {
-        request: 'application/json'
-      }
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
     }
   | {
       body: PlaceOrderBodyXml
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/xml'
-      }
+      contentType:
+        | 'application/xml'
+        | {
+            request: 'application/xml'
+          }
     }
   | {
       body: PlaceOrderBodyFormUrlEncoded
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/x-www-form-urlencoded'
-      }
+      contentType:
+        | 'application/x-www-form-urlencoded'
+        | {
+            request: 'application/x-www-form-urlencoded'
+          }
     }
 
 export type PlaceOrderResponses = {
@@ -699,27 +717,33 @@ export type PlaceOrderPatchOptions =
       path?: never
       query?: never
       headers?: never
-      contentType?: {
-        request: 'application/json'
-      }
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
     }
   | {
       body: PlaceOrderPatchBodyXml
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/xml'
-      }
+      contentType:
+        | 'application/xml'
+        | {
+            request: 'application/xml'
+          }
     }
   | {
       body: PlaceOrderPatchBodyFormUrlEncoded
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/x-www-form-urlencoded'
-      }
+      contentType:
+        | 'application/x-www-form-urlencoded'
+        | {
+            request: 'application/x-www-form-urlencoded'
+          }
     }
 
 export type PlaceOrderPatchResponses = {
