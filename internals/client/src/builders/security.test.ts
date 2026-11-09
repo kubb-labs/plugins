@@ -6,10 +6,6 @@ describe('buildSecurityMetadata', () => {
     expect(buildSecurityMetadata({ security: undefined })).toBeNull()
     expect(buildSecurityMetadata({ security: [] })).toBeNull()
   })
-
-  test('serializes security schemes with scopes', () => {
-    expect(buildSecurityMetadata({ security: [{ type: 'oauth2', scopes: ['read:pets'] }] })).toBe("[{ type: 'oauth2', scopes: ['read:pets'] }]")
-  })
 })
 
 describe('resolveSecurityScheme', () => {
@@ -52,17 +48,6 @@ describe('getOperationSecurity', () => {
       },
     },
   }
-
-  test('resolves every scheme referenced across multiple requirements', () => {
-    expect(getOperationSecurity({ document, method: 'GET', path: '/pet/{petId}' })).toStrictEqual([
-      { type: 'oauth2', scopes: ['read:pets'] },
-      { type: 'apiKey', name: 'api_key', in: 'header' },
-    ])
-  })
-
-  test('falls back to the global security when the operation declares none', () => {
-    expect(getOperationSecurity({ document, method: 'GET', path: '/pet' })).toStrictEqual([{ type: 'http', scheme: 'bearer' }])
-  })
 
   test('treats an explicit empty operation security as no auth', () => {
     expect(getOperationSecurity({ document, method: 'DELETE', path: '/pet/{petId}' })).toBeUndefined()

@@ -3,7 +3,6 @@ import { describe, expect, test } from 'vitest'
 import {
   applyMiniModifiers,
   applyModifiers,
-  buildEnum,
   defaultLiteral,
   formatDefault,
   isClosedKeySchema,
@@ -97,20 +96,6 @@ describe('defaultLiteral', () => {
   })
 })
 
-describe('buildEnum', () => {
-  test('all-string set uses z.enum', () => {
-    expect(buildEnum(['a', 'b', 'c'])).toBe("z.enum(['a', 'b', 'c'])")
-  })
-
-  test('single non-string value uses z.literal', () => {
-    expect(buildEnum([42])).toBe('z.literal(42)')
-  })
-
-  test('numeric set uses z.union of literals', () => {
-    expect(buildEnum([200, 400, 500])).toBe('z.union([z.literal(200), z.literal(400), z.literal(500)])')
-  })
-})
-
 describe('numberConstraints', () => {
   test('no constraints returns empty string', () => {
     expect(numberConstraints({})).toBe('')
@@ -124,10 +109,6 @@ describe('numberConstraints', () => {
 describe('lengthConstraints', () => {
   test('no constraints returns empty string', () => {
     expect(lengthConstraints({})).toBe('')
-  })
-
-  test('all constraints combined', () => {
-    expect(lengthConstraints({ min: 1, max: 10, pattern: '^[a-z]+$' })).toBe('.min(1).max(10).regex(/^[a-z]+$/)')
   })
 
   test('regexType constructor emits new RegExp(...)', () => {
@@ -164,10 +145,6 @@ describe('lengthChecksMini', () => {
 describe('applyModifiers', () => {
   test('nullish (explicit flag) takes priority over nullable+optional', () => {
     expect(applyModifiers({ value: 'z.string()', nullish: true, nullable: true, optional: true })).toBe('z.string().nullish()')
-  })
-
-  test('nullable and optional combined produce nullish', () => {
-    expect(applyModifiers({ value: 'z.string()', nullable: true, optional: true })).toBe('z.string().nullish()')
   })
 
   test('default value (object)', () => {

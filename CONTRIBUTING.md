@@ -89,6 +89,7 @@ pnpm generate            # Regenerate every example against local plugins
 pnpm test                # Run all tests once
 pnpm test:watch          # Run tests in watch mode
 pnpm test:bench          # Performance benchmarks
+pnpm test:registry       # Check every test file has a registry entry
 pnpm typecheck           # Type-check the plugins
 pnpm typecheck:examples  # Type-check the examples
 pnpm lint                # Lint with oxlint
@@ -103,6 +104,14 @@ To run a single plugin's tests:
 pnpm vitest run --config ./configs/vitest.config.ts packages/plugin-ts
 pnpm vitest run --config ./configs/vitest.config.ts -u packages/plugin-ts   # update snapshots
 ```
+
+### Test registry
+
+Every committed test file is listed in `configs/test-registry.json` with one sentence that says why it earns its CI time.
+A test stays when it covers a golden path a user reaches, pins a shipped bug, or checks branchy logic a golden-path test
+would miss. Tests that assert mock call counts, cover a trivial helper, or repeat another file's coverage are deleted
+instead of registered. `pnpm test:registry` fails CI when a test file has no entry or an entry points at a deleted file.
+When you add a test, add its line to the registry in the same PR.
 
 ## Development workflow
 

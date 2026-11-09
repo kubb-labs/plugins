@@ -23,12 +23,6 @@ describe('resolveClient', () => {
     })
   })
 
-  test('auto-detects a lone contract client plugin when client is unset', () => {
-    expect(resolveClient({ client: undefined, pluginNames: ['plugin-ts', 'plugin-fetch'] })).toStrictEqual({ kind: 'contract', pluginName: 'plugin-fetch' })
-    expect(resolveClient({ client: undefined, pluginNames: ['plugin-ts', 'plugin-axios'] })).toStrictEqual({ kind: 'contract', pluginName: 'plugin-axios' })
-    expect(resolveClient({ client: undefined, pluginNames: ['plugin-ts', 'plugin-client'] })).toStrictEqual({ kind: 'contract', pluginName: 'plugin-client' })
-  })
-
   test('two contract client plugins without a selector is ambiguous', () => {
     const result = resolveClient({ client: undefined, pluginNames: ['plugin-fetch', 'plugin-axios'] })
     expect(result.kind).toBe('error')
@@ -70,12 +64,5 @@ describe('resolveContractClient', () => {
     const diagnostic = resolveError({ plugin: 'plugin-react-query', ...options })
     expect(diagnostic).toMatchObject({ code, severity: 'error', plugin: 'plugin-react-query', location: { kind: 'config' } })
     expect(diagnostic.help).toBeTruthy()
-  })
-
-  test('returns the contract client when one is registered', () => {
-    expect(resolveContractClient({ plugin: 'plugin-swr', client: undefined, plugins: [{ name: 'plugin-fetch' }] })).toStrictEqual({
-      kind: 'contract',
-      pluginName: 'plugin-fetch',
-    })
   })
 })

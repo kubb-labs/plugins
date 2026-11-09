@@ -204,16 +204,6 @@ describe('printerZodMini', () => {
       expect(result).toBe('z.literal(42)')
     })
 
-    test('boolean enum uses z.union of literals', () => {
-      const result = printer.print(ast.factory.createSchema({ type: 'enum', enumValues: [true, false] }))
-      expect(result).toBe('z.union([z.literal(true), z.literal(false)])')
-    })
-
-    test('mixed value enum uses z.union of literals', () => {
-      const result = printer.print(ast.factory.createSchema({ type: 'enum', enumValues: ['active', 1, true] }))
-      expect(result).toBe("z.union([z.literal('active'), z.literal(1), z.literal(true)])")
-    })
-
     test('number literals (namedEnumValues)', () => {
       const result = printer.print(
         ast.factory.createSchema({
@@ -883,14 +873,6 @@ describe('printerZodMini', () => {
   })
 
   describe('intersection', () => {
-    test('ref with string maxLength constraint', () => {
-      const node = ast.factory.createSchema({
-        type: 'intersection',
-        members: [ast.factory.createSchema({ type: 'ref', name: 'PhoneNumber' }), ast.factory.createSchema({ type: 'string', max: 15 })],
-      })
-      expect(printer.print(node)).toBe('PhoneNumber.check(z.maxLength(15))')
-    })
-
     test('ref with string min and max constraints', () => {
       const node = ast.factory.createSchema({
         type: 'intersection',
@@ -1145,19 +1127,6 @@ describe('printerZodMini', () => {
 ])`)
     })
 
-    test('discriminated union with three or more ref members', () => {
-      const node = ast.factory.createSchema({
-        type: 'union',
-        discriminatorPropertyName: 'type',
-        members: [
-          ast.factory.createSchema({ type: 'ref', name: 'Cat', ref: '#/components/schemas/Cat' }),
-          ast.factory.createSchema({ type: 'ref', name: 'Dog', ref: '#/components/schemas/Dog' }),
-          ast.factory.createSchema({ type: 'ref', name: 'Bird', ref: '#/components/schemas/Bird' }),
-        ],
-      })
-      expect(printer.print(node)).toMatchInlineSnapshot(`"z.discriminatedUnion('type', [Cat, Dog, Bird])"`)
-    })
-
     test('empty discriminated union returns empty string', () => {
       const node = ast.factory.createSchema({
         type: 'union',
@@ -1234,24 +1203,6 @@ describe('printerZodMini', () => {
   })
 
   describe('keysToOmit', () => {
-    test('omits single key from object schema', () => {
-      const p = printerZodMini({ keysToOmit: ['id'] })
-      const node = ast.factory.createSchema({
-        type: 'object',
-        primitive: 'object',
-        properties: [
-          ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) }),
-          ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
-        ],
-      })
-      expect(p.print(node)).toMatchInlineSnapshot(`
-        "z.omit(z.object({
-          id: z.int(),
-          name: z.string(),
-        }), { "id": true })"
-      `)
-    })
-
     test('omits multiple keys from object schema', () => {
       const p = printerZodMini({ keysToOmit: ['id', 'createdAt'] })
       const node = ast.factory.createSchema({

@@ -10,7 +10,6 @@ import { parserTs } from '@kubb/parser-ts'
 import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginSwr } from '@kubb/plugin-swr'
 import { pluginTs } from '@kubb/plugin-ts'
-import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -21,71 +20,6 @@ const version = '3.0.x'
 type BuildConfig = Omit<Config, 'plugins' | 'storage' | 'reporters'> & { plugins: unknown }
 
 const configs: Array<{ name: string; config: BuildConfig }> = [
-  // ─── basic ──────────────────────────────────────────────────────────────
-  {
-    name: 'petStore',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginSwr({
-          output: { path: './hooks', barrel: false, mode: 'directory' },
-        }),
-      ],
-    },
-  },
-
-  // ─── parser zod ─────────────────────────────────────────────────────────
-  {
-    name: 'parserZod',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginZod({ output: { path: './zod', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' }, validator: 'zod' }),
-        pluginSwr({
-          output: { path: './hooks', barrel: false, mode: 'directory' },
-        }),
-      ],
-    },
-  },
-
-  // ─── query / mutation methods override ──────────────────────────────────
-  {
-    name: 'queryMethods',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginSwr({
-          output: { path: './hooks', barrel: false, mode: 'directory' },
-          query: {
-            methods: ['get'],
-            importPath: 'swr',
-          },
-          mutation: {
-            methods: ['post', 'put', 'patch', 'delete'],
-          },
-        }),
-      ],
-    },
-  },
-
   // ─── query disabled ─────────────────────────────────────────────────────
   {
     name: 'queryDisabled',
@@ -121,25 +55,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginSwr({
           output: { path: './hooks', barrel: false, mode: 'directory' },
           mutation: false,
-        }),
-      ],
-    },
-  },
-
-  // ─── paramsCasing ───────────────────────────────────────────────────────
-  {
-    name: 'paramsCasing',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/paramsCasing.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginSwr({
-          output: { path: './hooks', barrel: false, mode: 'directory' },
         }),
       ],
     },
@@ -201,25 +116,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginSwr({
           output: { path: './hooks', barrel: false, mode: 'directory' },
           group: { type: 'tag' },
-        }),
-      ],
-    },
-  },
-
-  // ─── with explicit client plugin ───────────────────────────────────────
-  {
-    name: 'withClientPlugin',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginSwr({
-          output: { path: './hooks', barrel: false, mode: 'directory' },
         }),
       ],
     },

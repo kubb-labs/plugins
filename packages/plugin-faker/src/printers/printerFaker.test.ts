@@ -4,6 +4,17 @@ import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import { printerFaker } from './printerFaker.ts'
 
 describe('printerFaker', () => {
+  test.each([
+    [{}, 'faker', 'faker.date.anytime().toISOString()'],
+    [{}, 'dayjs', 'dayjs(faker.date.anytime()).format("YYYY-MM-DDTHH:mm:ss[Z]")'],
+    [{ offset: true }, 'dayjs', 'dayjs(faker.date.anytime()).format("YYYY-MM-DDTHH:mm:ssZ")'],
+    [{ local: true }, 'moment', 'moment(faker.date.anytime()).format("YYYY-MM-DDTHH:mm:ss")'],
+  ] as const)('prints datetime %o with dateParser %s', (flags, dateParser, expected) => {
+    const node = ast.factory.createSchema({ type: 'datetime', ...flags })
+
+    expect(printerFaker({ resolver: resolverFaker, dateParser }).print(node)).toBe(expected)
+  })
+
   test.each([false, true])('populates propertyNames enum records (referenced: %s)', (referenced) => {
     const keys = ast.factory.createSchema({ type: 'enum', enumValues: ['x', 'y'] })
     const node = ast.factory.createSchema({

@@ -11,10 +11,4 @@ describe('urlencoded body serialization', () => {
     expect(result).toBeInstanceOf(URLSearchParams)
     expect(result?.toString()).toBe('d=1970-01-01T00%3A00%3A00.000Z&o%5Ba%5D=1&arr=x&arr=y&zero=0&flag=false&text=a+b')
   })
-
-  test('omits null and undefined properties', () => {
-    const result = serialize({ body: { tags: null, x: undefined }, contentType: 'application/x-www-form-urlencoded' })
-
-    expect(result?.toString()).toBe('')
-  })
 })

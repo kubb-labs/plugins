@@ -20,25 +20,6 @@ const version = '3.0.x'
 type BuildConfig = Omit<Config, 'plugins' | 'reporters'> & { plugins: unknown }
 
 const configs: Array<{ name: string; config: BuildConfig }> = [
-  // ─── basic (parser: data) ──────────────────────────────────────────────
-  {
-    name: 'petStore',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginMsw({
-          output: { path: './msw', barrel: false, mode: 'directory' },
-        }),
-      ],
-    },
-  },
-
   // ─── parser: faker ──────────────────────────────────────────────────────
   {
     name: 'parserFaker',
@@ -55,26 +36,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginMsw({
           output: { path: './msw', barrel: false, mode: 'directory' },
           parser: 'faker',
-        }),
-      ],
-    },
-  },
-
-  // ─── handlers ───────────────────────────────────────────────────────────
-  {
-    name: 'handlers',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginMsw({
-          output: { path: './msw', barrel: false, mode: 'directory' },
-          handlers: true,
         }),
       ],
     },

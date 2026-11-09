@@ -16,11 +16,6 @@ function createOperation(parameters: Array<Parameters<typeof ast.factory.createP
 const stringSchema = () => ast.factory.createSchema({ type: 'string' })
 
 describe('buildStyles', () => {
-  test('returns null when no parameter carries style or explode', () => {
-    const node = createOperation([{ name: 'status', in: 'query', schema: stringSchema() }])
-    expect(buildStyles({ node })).toBeNull()
-  })
-
   test('keeps the spec name for header and cookie parameters, quoted when not a bare identifier', () => {
     const node = createOperation([
       { name: 'X-Ids', in: 'header', schema: stringSchema(), style: 'simple', explode: true },

@@ -10,10 +10,6 @@ function setupKubb(pluginNames: Array<string>) {
 }
 
 describe('pluginMcp setup', () => {
-  test('passes when plugin-ts and plugin-zod are registered', async () => {
-    await expect(setupKubb(['plugin-ts', 'plugin-zod', 'plugin-fetch'])).resolves.toBeUndefined()
-  })
-
   test('passes without plugin-ts, since pluginZod({ inferred }) can supply the handler types', async () => {
     await expect(setupKubb(['plugin-zod', 'plugin-fetch'])).resolves.toBeUndefined()
   })

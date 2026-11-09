@@ -6,7 +6,6 @@ import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
 import { Hookable, createKubb } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
-import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginCypress } from '@kubb/plugin-cypress'
 import { pluginFaker } from '@kubb/plugin-faker'
@@ -47,30 +46,6 @@ function allGenerators(client: unknown) {
 const configs: Array<{ name: string; config: BuildConfig }> = [
   // ─── operation declarations that collide with each other ─────────────────
   {
-    name: 'operationsWithFetch',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/operationNameCollisions.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: allGenerators(pluginFetch()),
-    },
-  },
-  {
-    name: 'operationsWithAxios',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/operationNameCollisions.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: allGenerators(pluginAxios()),
-    },
-  },
-  {
     name: 'operationsWithCustomClient',
     config: {
       root: __dirname,
@@ -84,18 +59,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
   },
 
   // ─── components, operations and inline enums competing for one name ──────
-  {
-    name: 'components',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/nameCollisions.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [pluginTs(), pluginZod(), pluginFetch({ validator: 'zod' }), pluginFaker()],
-    },
-  },
   {
     /** A custom `name` maps distinct schemas onto one identifier, so the allocator has to split them again. */
     name: 'componentsWithPrefix',

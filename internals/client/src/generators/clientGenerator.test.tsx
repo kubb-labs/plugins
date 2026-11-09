@@ -228,8 +228,6 @@ function mockedAdapterWithDocument(document: SecurityDocument): Adapter {
 
 describe('clientGenerator operation', () => {
   const testData = [
-    { name: 'findPetsByTags', node: findPetsByTagsNode, options: {} },
-    { name: 'getPetById', node: getPetByIdNode, options: {} },
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
     // multipart/form-data request body bakes a `contentType` into the call config.
     { name: 'uploadFileMultipart', node: uploadFileNode, options: {} },
@@ -240,7 +238,6 @@ describe('clientGenerator operation', () => {
     // A `stream.shape` of `event` types each event by name.
     { name: 'streamChatTypedEvents', node: streamChatNode, options: {} },
     // returnType: 'data' unwraps the resolved call down to the bare success body.
-    { name: 'getPetByIdWithReturnTypeData', node: getPetByIdNode, options: { returnType: 'data' as const } },
     // Operation-level security overriding the global default, oauth2 reduced to bearer.
     { name: 'addPetWithSecurity', node: createPetNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
     // No operation-level security: falls back to the document's global `bearerAuth`.

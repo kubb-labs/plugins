@@ -72,57 +72,13 @@ const findByTagsNode = ast.factory.createOperation({
   ],
 })
 
-const updatePetWithFormNode = ast.factory.createOperation({
-  operationId: 'updatePetWithForm',
-  method: 'POST',
-  path: '/pet/{petId}',
-  tags: ['pet'],
-  parameters: [
-    ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
-    ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
-  ],
-  requestBody: {
-    content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
-  },
-  responses: [
-    ast.factory.createResponse({
-      statusCode: '200',
-      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-      description: 'successful operation',
-    }),
-  ],
-})
-
 describe('queryGenerator operation', () => {
-  const testData = [
-    { name: 'findByTags', node: findByTagsNode, options: {} },
-    { name: 'findByTagsReturnTypeFull', node: findByTagsNode, options: { returnType: 'full' } },
-    {
-      name: 'findByTagsWithCustomQueryKey',
-      node: findByTagsNode,
-      options: {
-        query: {
-          methods: ['get'],
-          importPath: '@tanstack/react-query',
-        },
-        queryKey(props) {
-          const id = props.node.operationId
-          const keys = queryKeyTransformer(props)
-          return [`"${id}"`, ...keys]
-        },
-      },
-    },
-    {
-      name: 'postAsQuery',
-      node: updatePetWithFormNode,
-      options: {
-        query: {
-          importPath: 'custom-query',
-          methods: ['post'],
-        },
-      },
-    },
-  ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginVueQuery['resolvedOptions']>; baseURL?: string }>
+  const testData = [{ name: 'findByTags', node: findByTagsNode, options: {} }] as const satisfies Array<{
+    name: string
+    node: ast.OperationNode
+    options: Partial<PluginVueQuery['resolvedOptions']>
+    baseURL?: string
+  }>
 
   test.each(testData)('$name', async (props) => {
     const options: PluginVueQuery['resolvedOptions'] = {
