@@ -7,7 +7,7 @@ Set `baseURL` on the client plugin or on the generated client.
 
 ## Operations with their own server
 
-A path or operation can declare its own `servers`, such as an upload or streaming host next to the main API. Its URL becomes that operation's default `baseURL`, so the call goes to that host. The operation's `servers` win over the path's. The entry is picked with the `server.index` of `adapterOas`, falling back to the first one, and its `{variable}` placeholders are filled from `server.variables`, then from the spec defaults.
+A path or operation can declare its own `servers`, such as an upload or streaming host next to the main API. Its URL becomes that operation's default `baseURL`, so the call goes to that host. The `server.index` of `adapterOas` picks the entry, falling back to the first one, and its `{variable}` placeholders are filled from `server.variables`, then from the spec defaults.
 
 ```yaml [petStore.yaml]
 paths:
@@ -18,7 +18,7 @@ paths:
       operationId: streamEvents
 ```
 
-Only a `baseURL` passed on the call overrides it. A relative server URL, such as `/v2`, is ignored, so the client's `baseURL` still applies.
+A relative server URL, such as `/v2`, is skipped, so the client's `baseURL` applies.
 
 ## Use the baseURL option
 
@@ -70,4 +70,13 @@ import { getPetById } from './gen/clients/getPetById'
 const { data } = await getPetById({ path: { petId: 1 }, baseURL: 'https://localhost:3000' })
 ```
 
-A `baseURL` set on the call wins over the operation's own server, which wins over `createClient`, which wins over `setConfig`, which wins over the build-time value.
+## Which base URL a call uses
+
+A call uses the first base URL it finds, in this order:
+
+1. `baseURL` passed on the call.
+2. The operation's own `servers`.
+3. The path's `servers`.
+4. The client passed as `client`, made with `createClient({ baseURL })`.
+5. `client.setConfig({ baseURL })`.
+6. The `baseURL` option of `pluginFetch`.
