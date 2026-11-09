@@ -78,6 +78,7 @@ export type OperationTypeNameResolver = RequestConfigResolver &
       path(node: ast.OperationNode, param: ast.ParameterNode): string
       query(node: ast.OperationNode, param: ast.ParameterNode): string
       headers(node: ast.OperationNode, param: ast.ParameterNode): string
+      cookies(node: ast.OperationNode, param: ast.ParameterNode): string
     }
   }
 
@@ -306,9 +307,17 @@ export function resolveContentTypeVariants(entries: Array<ContentVariantInput>, 
     })
 }
 
-// The request groups come from the grouped params, so `config` drops the data-shape keys to stay
-// assignable to `Options`, which omits them from `RequestConfig`.
-const requestConfigBaseType = `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`
+/**
+ * Builds the `client?:` option type shared by the generated query hooks (`useQuery`,
+ * `useInfiniteQuery`, `useSWR`, ...). Unlike {@link buildRequestConfigType}, it never adds a
+ * `contentType?:` member: query hooks wrap GET operations, which carry no request body to select a
+ * content type for. It drops the data-shape keys to stay assignable to `Options`, which omits them
+ * from `RequestConfig`. `cookies` is a group only on an operation that declares one.
+ */
+export function buildClientOptionType(node: ast.OperationNode): string {
+  const cookies = getOperationParameters(node).cookie.length > 0 ? ` | 'cookies'` : ''
+  return `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers'${cookies} | 'url'>>`
+}
 
 export function buildRequestConfigType(node: ast.OperationNode): string {
   const request = getContentTypeInfo(node)
@@ -321,36 +330,32 @@ export function buildRequestConfigType(node: ast.OperationNode): string {
     response.isMultipleContentTypes ? `response?: ${response.contentTypeUnion}` : null,
   ].filter(Boolean)
 
-  return members.length ? `${requestConfigBaseType} & { contentType?: { ${members.join('; ')} } }` : requestConfigBaseType
+  const base = buildClientOptionType(node)
+  return members.length ? `${base} & { contentType?: { ${members.join('; ')} } }` : base
 }
 
-/**
- * Builds the `client?:` option type shared by the generated query hooks (`useQuery`,
- * `useInfiniteQuery`, `useSWR`, ...). Unlike {@link buildRequestConfigType}, it never adds a
- * `contentType?:` member: query hooks wrap GET operations, which carry no request body to select a
- * content type for.
- */
-export function buildClientOptionType(): string {
-  return requestConfigBaseType
-}
+/** The grouped request options, in the order generated signatures and calls list them. */
+export const requestGroupOrder = ['path', 'query', 'body', 'headers', 'cookies'] as const
 
 export type RequestGroups = {
   path: boolean
   query: boolean
   body: boolean
   headers: boolean
+  cookies: boolean
 }
 
 /**
  * Which of the grouped request options an operation carries.
  */
 export function getRequestGroups(node: ast.OperationNode): RequestGroups {
-  const { path, query, header } = getOperationParameters(node)
+  const { path, query, header, cookie } = getOperationParameters(node)
   return {
     path: path.length > 0,
     query: query.length > 0,
     body: Boolean(node.requestBody?.content?.[0]?.schema),
     headers: header.length > 0,
+    cookies: cookie.length > 0,
   }
 }
 
@@ -383,6 +388,7 @@ export function getRequestGroupOptionality(node: ast.OperationNode): RequestGrou
     hasRequiredPath,
     hasRequiredQuery,
     hasRequiredHeader,
+    // `cookies` never makes the parameter required: a browser sends its cookies itself and cannot set a `Cookie` header.
     isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !(groups.body && node.requestBody?.required === true),
   }
 }
@@ -394,7 +400,7 @@ export type RequestOptionsNameResolver = RequestConfigResolver & {
 }
 
 /**
- * Builds the grouped `{ path, query, body, headers }` parameter for a generated client
+ * Builds the grouped `{ path, query, body, headers, cookies }` parameter for a generated client
  * function, typed from the operation's `Options` (minus `url`). Only the groups the
  * operation actually has are destructured. The trailing `config` parameter carries the
  * runtime `RequestConfig` overrides plus `client`.
@@ -403,11 +409,11 @@ export function buildRequestParamsSignature(
   node: ast.OperationNode,
   resolver: RequestOptionsNameResolver,
   options: { isConfigurable?: boolean } = {},
-): { signature: string; groups: RequestGroups } {
+): { signature: string; groups: RequestGroups; names: Array<keyof RequestGroups> } {
   const { isConfigurable = true } = options
   const { groups, isOptional } = getRequestGroupOptionality(node)
 
-  const names = (['path', 'query', 'body', 'headers'] as const).filter((key) => groups[key])
+  const names = requestGroupOrder.filter((key) => groups[key])
 
   // These callers never carry the `contentType` that several media types require.
   const optionsType = hasRequestContentTypeChoice(node)
@@ -419,6 +425,7 @@ export function buildRequestParamsSignature(
   return {
     signature: [firstParam, configParam].filter(Boolean).join(', '),
     groups,
+    names,
   }
 }
 
@@ -490,11 +497,7 @@ export function getOperationParameters(node: ast.OperationNode): OperationParame
 }
 
 /**
- * Builds the combined `{ body, path, query, headers }` options object schema for an operation,
- * referencing the already-resolved body and grouped param names. Shared by `@kubb/plugin-ts`'s
- * `Options` type and `@kubb/plugin-zod`'s inferred options schema, so both printers emit the same
- * shape from the same inputs. `primitive: 'object'` is a no-op for the TS printer and tells the Zod
- * printer to emit `z.object(…)` rather than a record.
+ * Whether the operation declares more than one request media type with a schema, so a caller must pick one on `contentType`.
  */
 export function hasRequestContentTypeChoice(node: ast.OperationNode): boolean {
   return (node.requestBody?.content ?? []).filter((entry) => entry.schema).length > 1
@@ -507,14 +510,23 @@ export function castToClientOptions(callArg: string, clientName: string, returnT
   return `${callArg} as Parameters<typeof ${clientName}${returnType === 'plain' ? '' : '<true>'}>[0]`
 }
 
+/**
+ * Builds the combined `{ body, path, query, headers, cookies }` options object schema for an operation,
+ * referencing the already-resolved body and grouped param names. `cookies` appears only on an operation
+ * with a cookie parameter, and stays optional because a browser sends its cookies itself. Shared by `@kubb/plugin-ts`'s
+ * `Options` type and `@kubb/plugin-zod`'s inferred options schema, so both printers emit the same shape from the same inputs.
+ * `primitive: 'object'` is a no-op for the TS printer and tells the Zod printer to emit `z.object(…)` rather
+ * than a record.
+ */
 export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationTypeNameResolver, { pairContentTypes = false } = {}): ast.SchemaNode {
-  const { path, query, header } = getOperationParameters(node)
+  const { path, query, header, cookie } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const createNever = () => ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true })
   const groups = [
     { name: 'path', params: path, resolve: resolver.param.path },
     { name: 'query', params: query, resolve: resolver.param.query },
     { name: 'headers', params: header, resolve: resolver.param.headers },
+    { name: 'cookies', params: cookie, resolve: resolver.param.cookies },
   ] as const
 
   const createOptions = (body: ast.SchemaNode, extra: Array<ast.PropertyNode> = []) =>
@@ -527,18 +539,20 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
       deprecated: node.deprecated,
       properties: [
         ast.factory.createProperty({ name: 'body', required: hasBody && node.requestBody?.required === true, schema: body }),
-        ...groups.map(({ name, params, resolve }) => {
-          const required = params.some((param) => param.required)
+        ...groups
+          .filter(({ name, params }) => name !== 'cookies' || params.length > 0)
+          .map(({ name, params, resolve }) => {
+            const required = name !== 'cookies' && params.some((param) => param.required)
 
-          return ast.factory.createProperty({
-            name,
-            required,
-            schema:
-              params.length > 0
-                ? ast.factory.createSchema({ type: 'ref', name: resolve.call(resolver.param, node, params[0]!), optional: !required })
-                : createNever(),
-          })
-        }),
+            return ast.factory.createProperty({
+              name,
+              required,
+              schema:
+                params.length > 0
+                  ? ast.factory.createSchema({ type: 'ref', name: resolve.call(resolver.param, node, params[0]!), optional: !required })
+                  : createNever(),
+            })
+          }),
         ...extra,
       ],
     })
@@ -549,28 +563,31 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
     return createOptions(hasBody ? ast.factory.createSchema({ type: 'ref', name: resolver.response.body(node) }) : createNever())
   }
 
-  // The first media type is the runtime default, so only the others must pass `contentType`.
+  // The first media type is the runtime default, so only the others must pass `contentType`. A bare string sets the
+  // request content type at runtime, so it is accepted next to the `{ request }` form.
   return ast.factory.createSchema({
     type: 'union',
-    members: variants.map((variant, index) =>
-      createOptions(ast.factory.createSchema({ type: 'ref', name: variant.name }), [
+    members: variants.map((variant, index) => {
+      const contentType = ast.factory.createSchema({ type: 'enum', enumValues: [variant.contentType] })
+
+      return createOptions(ast.factory.createSchema({ type: 'ref', name: variant.name }), [
         ast.factory.createProperty({
           name: 'contentType',
           required: index > 0,
           schema: ast.factory.createSchema({
-            type: 'object',
-            primitive: 'object',
-            properties: [
-              ast.factory.createProperty({
-                name: 'request',
-                required: true,
-                schema: ast.factory.createSchema({ type: 'enum', enumValues: [variant.contentType] }),
+            type: 'union',
+            members: [
+              contentType,
+              ast.factory.createSchema({
+                type: 'object',
+                primitive: 'object',
+                properties: [ast.factory.createProperty({ name: 'request', required: true, schema: contentType })],
               }),
             ],
           }),
         }),
-      ]),
-    ),
+      ])
+    }),
   })
 }
 
@@ -686,7 +703,7 @@ export function resolveOperationTypeNames(
 ): string[] {
   const key = `${node.operationId}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
   return resolver.memo(`operationTypeNames:${key}`, () => {
-    const { path, query, header } = getOperationParameters(node)
+    const { path, query, header, cookie } = getOperationParameters(node)
     const responseStatusNames =
       options.responseStatusNames === 'error'
         ? resolveErrorNames(node, resolver)
@@ -701,6 +718,7 @@ export function resolveOperationTypeNames(
             ...path.map((param) => resolver.param.path(node, param)),
             ...query.map((param) => resolver.param.query(node, param)),
             ...header.map((param) => resolver.param.headers(node, param)),
+            ...cookie.map((param) => resolver.param.cookies(node, param)),
           ]
     const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.response.body(node) : null, resolver.response.response(node)]
     const names =

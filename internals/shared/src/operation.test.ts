@@ -46,6 +46,9 @@ const resolver = createResolver<TestPlugin>({
     headers(_node, param) {
       return `${param.name}HeaderParams`
     },
+    cookies(_node, param) {
+      return `${param.name}CookieParams`
+    },
   },
   response: {
     body(node) {
@@ -383,6 +386,7 @@ describe('resolveOperationTypeNames', () => {
         ast.factory.createParameter({ name: 'pet-id', in: 'path', schema: ast.factory.createSchema({ type: 'string' }) }),
         ast.factory.createParameter({ name: 'page-size', in: 'query', schema: ast.factory.createSchema({ type: 'number' }) }),
         ast.factory.createParameter({ name: 'x-api-key', in: 'header', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({ name: 'session', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }) }),
       ],
       requestBody: {
         content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) })],
@@ -397,6 +401,7 @@ describe('resolveOperationTypeNames', () => {
       'pet-idPathParams',
       'page-sizeQueryParams',
       'x-api-keyHeaderParams',
+      'sessionCookieParams',
       'showPetData',
       'showPetResponse',
       'Status400',

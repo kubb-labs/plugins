@@ -201,6 +201,11 @@ export const defaultBodySerializer: BodySerializer = ({ body, contentType, encod
     if (encoding) return serializeUrlencodedBody(body as Record<string, unknown>, encoding)
     return new URLSearchParams(serializeUrlencodedBody(body as Record<string, unknown>, {}))
   }
+  // XML, YAML, and CSV are never JSON, so a value for one must not go out as JSON under its label.
+  const mediaType = baseContentType(contentType)
+  if (mediaType && /[/+](xml|yaml|x-yaml|csv)$/.test(mediaType)) {
+    throw new TypeError(`Cannot serialize the body as ${mediaType}, register codecs['${mediaType}'].serialize or pass the encoded body as a string.`)
+  }
   return JSON.stringify(body, jsonReplacer)
 }
 

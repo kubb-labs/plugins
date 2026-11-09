@@ -157,6 +157,24 @@ const listPetsStyledNode = ast.factory.createOperation({
   ],
 })
 
+const getCookiesNode = ast.factory.createOperation({
+  operationId: 'getCookies',
+  method: 'GET',
+  path: '/cookies',
+  tags: ['cookie'],
+  parameters: [
+    ast.factory.createParameter({ name: 'session', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+    ast.factory.createParameter({ name: 'theme', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }), explode: false }),
+  ],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
+})
+
 const streamEventsNode = ast.factory.createOperation({
   operationId: 'streamEvents',
   method: 'GET',
@@ -233,6 +251,8 @@ describe('clientGenerator operation', () => {
     { name: 'uploadFileMultipart', node: uploadFileNode, options: {} },
     // Parameter style/explode flows from the ParameterNode into a `styles` call-config entry.
     { name: 'listPetsWithStyles', node: listPetsStyledNode, options: {} },
+    // Cookie parameters reach the call through the `cookies` group, with their explode in `styles`.
+    { name: 'getCookiesWithCookieParams', node: getCookiesNode, options: {} },
     // text/event-stream response returns a typed event stream instead of a one-shot result.
     { name: 'streamEventsSse', node: streamEventsNode, options: {} },
     // A `stream.shape` of `event` types each event by name.

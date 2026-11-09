@@ -37,27 +37,33 @@ export type CreateUserOptions =
       path?: never
       query?: never
       headers?: never
-      contentType?: {
-        request: 'application/json'
-      }
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
     }
   | {
       body?: CreateUserBodyXml
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/xml'
-      }
+      contentType:
+        | 'application/xml'
+        | {
+            request: 'application/xml'
+          }
     }
   | {
       body?: CreateUserBodyFormUrlEncoded
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/x-www-form-urlencoded'
-      }
+      contentType:
+        | 'application/x-www-form-urlencoded'
+        | {
+            request: 'application/x-www-form-urlencoded'
+          }
     }
 
 export type CreateUserResponses = {

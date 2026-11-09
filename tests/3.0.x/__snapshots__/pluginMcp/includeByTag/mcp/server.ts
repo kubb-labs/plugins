@@ -32,7 +32,6 @@ export function getServer() {
     return addPetHandler({ body }, ctx)
   })
 
-
   server.registerTool("findPetsByStatus", {
     title: "Finds Pets by status",
     description: "Multiple status values can be provided with comma separated strings",
@@ -41,7 +40,6 @@ export function getServer() {
   }, async ({ query }, ctx) => {
     return findPetsByStatusHandler({ query }, ctx)
   })
-
 
   server.registerTool("getPetById", {
     title: "Find pet by ID",
@@ -52,7 +50,6 @@ export function getServer() {
     return getPetByIdHandler({ path }, ctx)
   })
 
-
   server.registerTool("deletePet", {
     title: "Deletes a pet",
     description: "delete a pet",
@@ -60,7 +57,6 @@ export function getServer() {
   }, async ({ path, headers }, ctx) => {
     return deletePetHandler({ path, headers }, ctx)
   })
-
 
   server.registerTool("uploadFile", {
     title: "uploads an image",

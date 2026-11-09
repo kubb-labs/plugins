@@ -41,27 +41,33 @@ export type UpdateUserOptions =
       path: UpdateUserPath
       query?: never
       headers?: never
-      contentType?: {
-        request: 'application/json'
-      }
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
     }
   | {
       body?: UpdateUserBodyXml
       path: UpdateUserPath
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/xml'
-      }
+      contentType:
+        | 'application/xml'
+        | {
+            request: 'application/xml'
+          }
     }
   | {
       body?: UpdateUserBodyFormUrlEncoded
       path: UpdateUserPath
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/x-www-form-urlencoded'
-      }
+      contentType:
+        | 'application/x-www-form-urlencoded'
+        | {
+            request: 'application/x-www-form-urlencoded'
+          }
     }
 
 export type UpdateUserResponses = {

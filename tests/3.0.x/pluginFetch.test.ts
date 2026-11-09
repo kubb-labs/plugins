@@ -143,7 +143,8 @@ describe(`plugin-fetch options ${version}`, () => {
     expect(Diagnostics.hasError(diagnostics)).toBe(false)
 
     const clientPath = path.join(output, '.kubb/client.ts')
-    expect(await fs.readFile(clientPath, 'utf-8')).toContain("from './serializers.ts'")
+    expect(await fs.readFile(clientPath, 'utf-8')).toContain("from './core.ts'")
+    expect(await fs.readFile(path.join(output, '.kubb/core.ts'), 'utf-8')).toContain("from './serializers.ts'")
 
     const result = spawnSync(
       process.execPath,

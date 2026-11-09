@@ -21,6 +21,7 @@ export {
   getSuccessResponses,
   isEventStream,
   isSuccessStatusCode,
+  requestGroupOrder,
   operationFileEntry,
   resolveContentTypeVariants,
   resolveDependencyOperationFile,

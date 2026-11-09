@@ -49,10 +49,15 @@ export function buildCallConfig({
   const stylesLiteral = buildStyles({ node })
   // Unless `returnType` is `'plain'`, `toEventStream` validates per event, so `response` stays out of the call config.
   const perEvent = eventStream && returnType !== 'plain'
-  const validatorLiteral = buildValidatorLiteral(
-    validatorHooks,
-    perEvent ? ['request', 'path', 'query', 'headers', 'error'] : ['request', 'path', 'query', 'headers', 'response', 'error'],
-  )
+  const validatorLiteral = buildValidatorLiteral(validatorHooks, [
+    'request',
+    'path',
+    'query',
+    'headers',
+    'cookies',
+    ...(perEvent ? [] : ['response' as const]),
+    'error',
+  ])
   const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node })
 
   const callConfig = `{ ${[

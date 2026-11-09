@@ -10,7 +10,7 @@ The generated functions import your module through [`importPath`](https://kubb.d
 | `Options`       | type     | The grouped options object a generated function accepts.                                     |
 | `RequestResult` | type     | What a generated function resolves to.                                                       |
 
-If your spec has server-sent event operations, also export `toEventStream` and the `EventStreamResult`, `SuccessOf`, and `TypedEvent` types. A generated function calls `toEventStream<TData>(promise)` with the promise your `client` returns and nothing else, and leaves the response validator on `config.validator.response`, so your module decides how to validate events.
+If your spec has server-sent event operations, also export `toEventStream` and the `EventStreamResult`, `SuccessOf`, `TypedEvent`, and `ServerSentEvent` types. A generated function calls `toEventStream<TEvent>(promise)` with the promise your `client` returns and nothing else, and returns `EventStreamResult<TEvent>`. `TEvent` is `TypedEvent<…>` when the document names each event, and `ServerSentEvent<…>` when it types only the payload. The function leaves the response validator on `config.validator.response`, so your module decides how to validate events.
 
 The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-swr`) and `@kubb/plugin-mcp` call the generated functions with `throwOnError: true` and read `data` off the result. The query plugins also import two more types from your module:
 
@@ -20,6 +20,23 @@ The query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/
 | `ResponseErrorConfig` | type | The error type of a failed hook, given the spec's error type.           |
 
 With a relative `importPath`, the hooks resolve it from the generated operation file, so one path serves both.
+
+## Build on the shared runtime
+
+To reuse the runtime of the fetch and axios clients instead of writing your own request pipeline:
+
+1. Copy `core.ts`, `serializers.ts`, `standardSchema.ts`, and `sse.ts` from `@kubb/plugin-client/templates` next to your `client.ts`.
+2. In `client.ts`, export the three types the core imports, listed below.
+3. Write a `Transport` function that sends a `ResolvedRequest`. It can return a web `Response`, which the core parses for you, or a `TransportResult` when your library does not return one.
+4. Export `createClientCore({ defaultTransport })` as `client`, and add `export * from './core.ts'` and `export * from './sse.ts'`.
+
+| Export           | Purpose                                                 | On fetch      | On axios             |
+| ---------------- | ------------------------------------------------------- | ------------- | -------------------- |
+| `NativeRequest`  | The request object on a result and a `ResponseError`.   | `Request`     | `AxiosRequestConfig` |
+| `NativeResponse` | The response object on a result and a `ResponseError`.  | `Response`    | `AxiosResponse`      |
+| `NativeOptions`  | The `options` a call passes to your HTTP library as is. | `RequestInit` | `AxiosRequestConfig` |
+
+[`@kubb/plugin-fetch/templates/client.ts`](https://github.com/kubb-labs/plugins/blob/main/packages/plugin-fetch/templates/client.ts) is a complete example.
 
 ## What a generated function looks like
 
@@ -43,9 +60,11 @@ export function getPetById<ThrowOnError extends boolean = true>(
 }
 ```
 
-Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, and `body`, and `throwOnError`. It returns a promise.
+Your `client` receives `method`, the `url` template with `{param}` placeholders, `security`, the grouped `path`, `query`, `headers`, `cookies`, and `body`, and `throwOnError`. It returns a promise. `cookies` holds name and value pairs, which your client joins into a `Cookie` header, as the example below does.
 
 A non-JSON response also passes `responseType`. It is a string such as `'blob'` when every response content type uses one parser, or a map from content type to parser when they differ, for example `{ 'audio/mpeg': 'blob', 'text/event-stream': 'stream' }`. Read the response `Content-Type`, look it up in the map (exact type, then `type/*`, then `*/*`), and parse the body with that parser.
+
+A call can also pass `contentType`: `request` is the body's media type, and `response` is the media type to ask for in `Accept`. A Server-Sent Events operation always passes `contentType: { response: 'text/event-stream' }`, so `RequestConfig` needs the field.
 
 ## A minimal client
 
@@ -59,15 +78,17 @@ export type RequestConfig = {
   headers?: object
   path?: object
   query?: object
+  cookies?: object
   body?: unknown
   signal?: AbortSignal
   responseType?: string | Record<string, string>
+  contentType?: string | { request?: string; response?: string }
   throwOnError?: boolean
   security?: Array<{ type: string; name?: string; in?: string; scopes?: Array<string> }>
   client?: typeof client
 }
 
-type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown }
+type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; path?: unknown; query?: unknown }
 
 export type Options<TData extends DataShape, ThrowOnError extends boolean = true> = Omit<RequestConfig, keyof DataShape | 'url' | 'method'> &
   TData & { throwOnError?: ThrowOnError }
@@ -85,10 +106,17 @@ export const settings = { baseURL: 'https://petstore3.swagger.io/api/v3' }
 export async function client(config: RequestConfig) {
   const path: Record<string, unknown> = { ...config.path }
   const url = new URL((config.baseURL ?? settings.baseURL) + config.url.replace(/\{(\w+)\}/g, (_, key) => encodeURIComponent(String(path[key]))))
+  const cookie = Object.entries(config.cookies ?? {})
+    .filter(([, value]) => value != null)
+    .map(([name, value]) => `${name}=${encodeURIComponent(String(value))}`)
+    .join('; ')
 
   const response = await fetch(url, {
     method: config.method,
-    headers: config.headers as Record<string, string>,
+    headers: {
+      ...(config.headers as Record<string, string>),
+      ...(cookie ? { Cookie: cookie } : {}),
+    },
     body: config.body === undefined ? undefined : JSON.stringify(config.body),
     signal: config.signal,
   })

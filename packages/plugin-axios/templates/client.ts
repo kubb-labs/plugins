@@ -1,7 +1,15 @@
 import axios from 'axios'
-import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
-import { getResponseContentType, isStreamed, resolveResponseType, type CallResult, type ResponseType, type ResponseTypeMap, type Transport } from './core.ts'
-import { isJsonMediaType } from './serializers.ts'
+import type { AxiosHeaders, AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios'
+import {
+  createClientCore,
+  getHeader,
+  getResponseContentType,
+  isStreamed,
+  parseJsonOrText,
+  readResponse,
+  resolveResponseType,
+  type ResponseType,
+} from './core.ts'
 import * as core from './core.ts'
 
 export * from './core.ts'
@@ -11,34 +19,11 @@ export type NativeRequest = AxiosRequestConfig
 export type NativeResponse = AxiosResponse
 
 /**
- * Extra axios config the transport spreads onto every request, an escape hatch for per-call fields the runtime does not set itself such as `timeout`, `proxy`, and the progress callbacks.
+ * The `options` of every request, client config, and resolved request: extra axios config the transport spreads onto
+ * the request, for per-call fields the runtime does not set itself such as `timeout`, `proxy`, and the progress callbacks.
  */
-export type AxiosOptions = AxiosRequestConfig
+export type NativeOptions = AxiosRequestConfig
 
-/** A transport as this client accepts it: an axios instance, which `createAxiosTransport` wraps, or a transport function. */
-export type AxiosTransport = AxiosInstance | Transport
-
-type AxiosOverrides = {
-  options?: AxiosOptions
-  transport?: AxiosTransport
-  /**
-   * @deprecated Has no effect. The client splits success from error by status, so axios never throws on a status.
-   */
-  validateStatus?: (status: number) => boolean
-}
-
-export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = Omit<
-  core.RequestConfig<TBody, TRequest, TResponse>,
-  'transport' | 'client'
-> &
-  AxiosOverrides & { client?: ClientInstance<TRequest, TResponse> }
-export type Options<TData extends core.DataShape, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = Omit<
-  core.Options<TData, ThrowOnError, TRequest, TResponse>,
-  'transport' | 'client'
-> &
-  AxiosOverrides & { client?: ClientInstance<TRequest, TResponse> }
-export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = Omit<core.ClientConfig<TRequest, TResponse>, 'transport'> & AxiosOverrides
-export type ResolvedRequest = core.ResolvedRequest & { options?: AxiosOptions }
 export type ResponseError<TError = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.ResponseError<TError, TRequest, TResponse>
 /** The core's `ResponseError` class, typed with this transport's request and response. `instanceof` and `ResponseError.is` both match what the client throws. */
 export const ResponseError = core.ResponseError as {
@@ -49,31 +34,35 @@ export const ResponseError = core.ResponseError as {
   prototype: core.ResponseError<unknown, NativeRequest, NativeResponse>
 }
 
-/** An interceptor handler. It receives the native axios object; the second argument is kept for handlers written against earlier versions and is always `undefined`. */
-export type InterceptorFn<T> = (value: T, requestConfig?: RequestConfig) => T | Promise<T>
-
-/** Registers, removes, or replaces handlers on axios's own interceptor managers. */
-export type InterceptorChannel<T> = {
-  use: (fn: InterceptorFn<T>) => number
-  eject: (id: number) => void
-  update: (id: number, fn: InterceptorFn<T>) => void
+/** The core's request, result, and client types, bound to this transport's request, response, and options. */
+export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestConfig<TBody, TRequest, TResponse> & {
+  options?: NativeOptions
 }
-
-/** The interceptors of `defaultTransport`: request handlers see the `InternalAxiosRequestConfig`, response handlers the `AxiosResponse`, error handlers the `AxiosError`. */
-export type Interceptors = {
-  request: InterceptorChannel<InternalAxiosRequestConfig>
-  response: InterceptorChannel<AxiosResponse>
-  error: InterceptorChannel<AxiosError>
-}
-
-export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = {
-  <TBody = unknown>(config: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>>
-  getConfig: () => ClientConfig<TRequest, TResponse>
-  setConfig: (config: ClientConfig<TRequest, TResponse>) => ClientConfig<TRequest, TResponse>
-  getUrl: core.ClientInstance<TRequest, TResponse>['getUrl']
-  interceptors: Interceptors
-  createClient: (config?: ClientConfig<TRequest, TResponse>) => ClientInstance<TRequest, TResponse>
-}
+export type Options<TData extends core.DataShape, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.Options<
+  TData,
+  ThrowOnError,
+  TRequest,
+  TResponse
+> & { options?: NativeOptions }
+export type ClientConfig<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientConfig<TRequest, TResponse> & { options?: NativeOptions }
+export type ResolvedRequest = core.ResolvedRequest & { options?: NativeOptions }
+export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.RequestResult<
+  TResponses,
+  ThrowOnError,
+  TRequest,
+  TResponse
+>
+export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = core.UnwrappedResult<
+  TResponses,
+  ThrowOnError,
+  TRequest,
+  TResponse
+>
+export type ResponseErrorConfig<TError = unknown> = core.ResponseError<TError, NativeRequest, NativeResponse>
+export type TransportResult<TData = unknown, TRequest = NativeRequest, TResponse = NativeResponse> = core.TransportResult<TData, TRequest, TResponse>
+export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
+export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
+export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
 
 /**
  * Collects the headers axios read into a `Headers`, so the core and the interceptors see one shape for every transport.
@@ -87,225 +76,144 @@ function toHeaders(raw: AxiosResponse['headers']): Headers {
   return headers
 }
 
-async function readStreamedText(data: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array | string>): Promise<string> {
-  if (data instanceof ReadableStream) return new Response(data).text()
-  const decoder = new TextDecoder()
-  let text = ''
-  for await (const chunk of data) text += typeof chunk === 'string' ? chunk : decoder.decode(chunk, { stream: true })
-  return text + decoder.decode()
-}
-
 /**
- * Reads a streamed JSON body, or any streamed error body, back into its value, because every adapter streams a
- * `responseType: 'stream'` answer: the fetch adapter as a `ReadableStream`, the Node adapter as a readable. Any other
- * streamed success body stays a stream.
+ * Decodes bytes with the given parser, as the fetch transport reads them. Anything that is not bytes is returned as is.
  */
-async function readStreamedBody({ data, contentType, status }: { data: unknown; contentType: string | undefined; status: number }): Promise<unknown> {
-  if (!isStreamed(data) || !(status >= 300 || isJsonMediaType(contentType))) return data
-  const text = await readStreamedText(data)
-  if (!text) return undefined
-  try {
-    return JSON.parse(text)
-  } catch {
-    return text
-  }
-}
-
-async function readStreamedBytes(data: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array | string>): Promise<Uint8Array> {
-  if (data instanceof ReadableStream) return new Uint8Array(await new Response(data).arrayBuffer())
-  const chunks: Array<Uint8Array> = []
-  for await (const chunk of data) chunks.push(typeof chunk === 'string' ? new TextEncoder().encode(chunk) : chunk)
-  return new Uint8Array(await new Blob(chunks as Array<BlobPart>).arrayBuffer())
-}
-
-function toBytes(data: unknown): Uint8Array | undefined {
-  if (data instanceof ArrayBuffer) return new Uint8Array(data)
-  if (ArrayBuffer.isView(data)) return new Uint8Array(data.buffer, data.byteOffset, data.byteLength)
-  return undefined
-}
-
-/** Decodes raw bytes with the parser a `responseType` map picked for the response content type. */
-function decodeBytes(bytes: Uint8Array, responseType: ResponseType | undefined, contentType: string | undefined): unknown {
-  switch (responseType) {
-    case 'blob':
-      return new Blob([bytes as BlobPart], { type: contentType ?? '' })
-    case 'arraybuffer':
-      return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
-    case 'stream':
-      return new Blob([bytes as BlobPart]).stream()
-    case 'text':
-    case 'document':
-      return new TextDecoder().decode(bytes)
+function decodeBytes(data: unknown, responseType: ResponseType | undefined, contentType: string | null): unknown {
+  const bytes = data instanceof ArrayBuffer ? new Uint8Array(data) : data instanceof Uint8Array ? data : undefined
+  if (!bytes) return data
+  if (responseType === 'blob') return new Blob([bytes as Uint8Array<ArrayBuffer>], { type: contentType ?? '' })
+  if (responseType === 'arraybuffer') {
+    const whole = bytes.byteOffset === 0 && bytes.byteLength === bytes.buffer.byteLength
+    return whole ? bytes.buffer : bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
   }
   const text = new TextDecoder().decode(bytes)
-  if (!text) return undefined
-  try {
-    return JSON.parse(text)
-  } catch {
-    return text
-  }
+  return responseType === 'text' || responseType === 'document' ? text : parseJsonOrText(text)
 }
 
 /**
- * Decodes a body read for a `responseType` map. Bytes are decoded by the mapped parser. A streamed body stays a stream
- * when the map picks `'stream'` for a success, and is read and decoded otherwise. Anything else was already decoded.
+ * A body the axios Node adapter sends as fetch would: it rejects a typed array, and labels a Blob with the Blob's own type
+ * over the `Content-Type` header, so the Blob takes the header's type.
  */
-async function decodeMappedBody({
-  data,
-  responseTypeMap,
-  contentType,
-  status,
-}: {
-  data: unknown
-  responseTypeMap: ResponseTypeMap
-  contentType: string | undefined
-  status: number
-}): Promise<unknown> {
-  const responseType = resolveResponseType(responseTypeMap, contentType)
-  if (isStreamed(data)) {
-    if (responseType === 'stream' && status < 300) return data
-    return decodeBytes(await readStreamedBytes(data), responseType, contentType)
-  }
-  const bytes = toBytes(data)
-  return bytes ? decodeBytes(bytes, responseType, contentType) : data
+function toAxiosData(body: unknown, contentType: string | undefined): unknown {
+  if (ArrayBuffer.isView(body)) return body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength)
+  if (body instanceof Blob && contentType && body.type !== contentType) return new Blob([body], { type: contentType })
+  return body
 }
+
+/** Resolves an adapter setting to the function axios runs, or `undefined` when axios cannot resolve it here. */
+function resolveAdapter(adapter: AxiosRequestConfig['adapter']): unknown {
+  try {
+    return axios.getAdapter(adapter)
+  } catch {
+    return undefined
+  }
+}
+
+/** axios's fetch adapter, resolved once, to tell whether a request goes through fetch. */
+const axiosFetchAdapter = resolveAdapter('fetch')
+
+/**
+ * axios's own default adapter list, read once. A mock such as `axios-mock-adapter` replaces it with a function, so the
+ * axios 1.x list is the fallback when the module loads after one.
+ */
+const axiosDefaultAdapters = Array.isArray(axios.defaults.adapter) ? String(axios.defaults.adapter) : 'xhr,http,fetch'
 
 /**
  * Turns an axios instance into a transport: each resolved request becomes one `instance.request` with the instance's
  * defaults, adapter, and axios interceptors. Every status resolves, because the core splits success from error itself.
  */
-export function createAxiosTransport(instance: AxiosInstance): Transport {
+export function createAxiosTransport(instance: AxiosInstance): (request: core.ResolvedRequest) => Promise<TransportResult> {
   return async (request) => {
+    const contentType = getHeader(request.headers, 'content-type')
     const config: AxiosRequestConfig = {
       ...request.options,
       url: request.url,
       method: request.method,
-      headers: request.headers,
-      data: request.body,
+      // axios labels a post, put, or patch without a body as a form, so `false` leaves the header off, as fetch does.
+      headers: request.body === undefined && contentType === undefined ? { ...request.headers, 'Content-Type': false } : request.headers,
+      data: toAxiosData(request.body, contentType),
       // Kubb already serialized the body; only URLSearchParams needs a string, since axios's Node adapter rejects it.
       transformRequest: (data) => (data instanceof URLSearchParams ? data.toString() : data),
       signal: request.signal,
-      responseType: typeof request.responseType === 'object' ? undefined : request.responseType,
+      responseType: typeof request.responseType === 'string' ? request.responseType : undefined,
       validateStatus: () => true,
     }
 
-    // Axios picks how to read the body before the Content-Type is known, so a map reads raw bytes and decodes them once it
-    // is. A map with a stream entry reads a stream, so an event stream still arrives incrementally. Bytes are decoded in
-    // `transformResponse`, before the axios interceptors run, so they see the parsed body.
-    const responseTypeMap = typeof request.responseType === 'object' ? request.responseType : undefined
-    if (responseTypeMap) {
-      config.responseType = Object.values(responseTypeMap).includes('stream') ? 'stream' : 'arraybuffer'
-      config.transformResponse = (data, headers) => {
-        const bytes = toBytes(data)
-        if (!bytes) return data
-        const contentType = getResponseContentType(toHeaders(headers))
-        return decodeBytes(bytes, resolveResponseType(responseTypeMap, contentType), contentType)
+    // A map is chosen from the response `Content-Type`, which arrives with the body, so the body is read as bytes, or as a
+    // stream when an entry asks for one. Bytes are decoded in `transformResponse`, before the axios interceptors run, so they
+    // see the parsed body. A stream passes through and is read below when its entry is not a stream.
+    const map = typeof request.responseType === 'object' ? request.responseType : undefined
+    // Without a parser, the body is decoded by its `Content-Type` as on fetch, since axios would parse any text as JSON.
+    const byContentType = Boolean(map) || request.responseType === undefined
+    const streamed = request.responseType === 'stream' || Boolean(map && Object.values(map).includes('stream'))
+    if (byContentType) {
+      config.responseType = streamed ? 'stream' : 'arraybuffer'
+      // An error body is left as read, and `readResponse` below decodes it as the fetch transport does.
+      config.transformResponse = (data, responseHeaders, status) => {
+        if (status !== undefined && status >= 300) return data
+        const header = (responseHeaders as AxiosHeaders).get('Content-Type')?.toString() ?? null
+        return decodeBytes(data, resolveResponseType(map, header), header)
       }
     }
 
-    // In the browser the default adapters pick XHR, which buffers the whole body, so a stream switches to fetch. An adapter set
-    // on the call or the instance, and the Node http adapter with its proxy and agent, are kept.
-    const defaultAdapter = !instance.defaults?.adapter || String(instance.defaults.adapter) === String(axios.defaults.adapter)
-    if (config.responseType === 'stream' && !config.adapter && defaultAdapter && typeof XMLHttpRequest !== 'undefined') config.adapter = 'fetch'
+    // In the browser the default adapters pick XHR, which buffers the whole body and cannot omit same-origin cookies, so a stream
+    // or `credentials: 'omit'` switches to fetch. An adapter set on the call or the instance, and the Node http adapter with its
+    // proxy and agent, are kept.
+    const instanceAdapter = instance.defaults?.adapter
+    const defaultAdapter = !instanceAdapter || String(instanceAdapter) === axiosDefaultAdapters
+    const needsFetch = streamed || request.credentials === 'omit'
+    if (needsFetch && !config.adapter && defaultAdapter && typeof XMLHttpRequest !== 'undefined') config.adapter = 'fetch'
 
-    const response = await instance.request<unknown>(config)
+    // `credentials` wins over `withCredentials` in the options or the instance defaults. The fetch adapter takes the value as is,
+    // while the other adapters only know a boolean, where `false` keeps cookies same-origin.
+    const adapter = resolveAdapter(config.adapter ?? instanceAdapter)
+    const fetchAdapter = adapter !== undefined && adapter === axiosFetchAdapter
+    if (request.credentials) {
+      config.withCredentials = fetchAdapter ? (request.credentials as unknown as boolean) : request.credentials === 'include'
+    }
+
+    // The Node http adapter has no 'blob' and would decode the bytes as text, so it reads a buffer instead.
+    if (request.responseType === 'blob' && typeof XMLHttpRequest === 'undefined' && !fetchAdapter) config.responseType = 'arraybuffer'
+
+    // axios rejects an abort with its own `CanceledError`, while fetch rejects with the signal's reason. A body read after
+    // the headers, such as a stream, can be aborted too.
+    const toAbortReason = (error: unknown): never => {
+      throw request.signal?.aborted && axios.isCancel(error) ? request.signal.reason : error
+    }
+    const response = await instance.request<unknown>(config).catch(toAbortReason)
+    const { data, status, statusText } = response
     const headers = toHeaders(response.headers)
-    const contentType = getResponseContentType(headers)
+    const result = { status, statusText, headers, contentType: getResponseContentType(headers), request: response.config, response }
+    if ([204, 205, 304].includes(status)) return { ...result, data: undefined }
 
-    return {
-      data: responseTypeMap
-        ? await decodeMappedBody({ data: response.data, responseTypeMap, contentType, status: response.status })
-        : await readStreamedBody({ data: response.data, contentType, status: response.status }),
-      status: response.status,
-      statusText: response.statusText,
-      headers,
-      contentType,
-      request: response.config,
-      response,
+    // Bytes and streams are read as the fetch transport reads a body, so both clients decode alike. A map's success body
+    // was already decoded in `transformResponse`.
+    const bytes = data instanceof Blob || data instanceof ArrayBuffer || data instanceof Uint8Array
+    if (isStreamed(data) || (bytes && !(byContentType && status < 300))) {
+      const read = await readResponse(new Response(data as BodyInit, { status, statusText, headers }), {
+        request: response.config,
+        responseType: request.responseType,
+      }).catch(toAbortReason)
+      return { ...result, data: read.data }
     }
-  }
-}
 
-function isAxiosInstance(value: unknown): value is AxiosInstance {
-  return typeof value === 'function' && 'request' in value && 'interceptors' in value
-}
-
-function toTransport<T extends { transport?: AxiosTransport }>(config: T): Omit<T, 'transport'> & { transport?: Transport } {
-  return { ...config, transport: isAxiosInstance(config.transport) ? createAxiosTransport(config.transport) : config.transport }
-}
-
-/**
- * Maps the kubb interceptor API onto the native managers of `instance`, keeping one id per handler so `eject` and `update`
- * keep working after an `update`.
- */
-function nativeInterceptors(instance: AxiosInstance): Interceptors {
-  const channel = <T>(eject: (nativeId: number) => void, register: (fn: InterceptorFn<T>) => number): InterceptorChannel<T> => {
-    const nativeIds = new Map<number, number>()
-    let counter = 0
-    return {
-      use(fn) {
-        const id = ++counter
-        nativeIds.set(id, register(fn))
-        return id
-      },
-      eject(id) {
-        const nativeId = nativeIds.get(id)
-        if (nativeId !== undefined) eject(nativeId)
-        nativeIds.delete(id)
-      },
-      update(id, fn) {
-        const nativeId = nativeIds.get(id)
-        if (nativeId === undefined) return
-        eject(nativeId)
-        nativeIds.set(id, register(fn))
-      },
-    }
-  }
-  const ejectRequest = (id: number) => instance.interceptors.request.eject(id)
-  const ejectResponse = (id: number) => instance.interceptors.response.eject(id)
-  return {
-    request: channel(ejectRequest, (fn) => instance.interceptors.request.use((config) => fn(config))),
-    response: channel(ejectResponse, (fn) => instance.interceptors.response.use((response) => fn(response))),
-    error: channel(ejectResponse, (fn) =>
-      instance.interceptors.response.use(undefined, async (error: AxiosError) => {
-        throw (await fn(error)) ?? error
-      }),
-    ),
+    // axios reads an empty body as '', while the fetch transport reads it as no data unless the body is text.
+    const textBody = request.responseType === 'text' || resolveResponseType(undefined, result.contentType) === 'text'
+    return { ...result, data: data === '' && !textBody ? undefined : data }
   }
 }
 
 /**
- * Wraps a core client for axios callers: an `AxiosInstance` passed as `transport` is wrapped by `createAxiosTransport`,
- * `client.interceptors` registers on `instance`, and `createClient` gives the child its own instance.
+ * The axios instance `defaultTransport` sends through. Set its defaults, or register native axios interceptors on it.
  */
-function createAxiosClient(instance: AxiosInstance, config: ClientConfig = {}, defaultTransport: Transport = createAxiosTransport(instance)): ClientInstance {
-  const inner = core.createClientCore<NativeRequest, NativeResponse>({ defaultTransport, ...toTransport(config) })
-  // `client` never reaches the core: the generated operation destructures it before the call.
-  const client = ((requestConfig) => inner(toTransport(requestConfig) as core.RequestConfig<unknown, NativeRequest, NativeResponse>)) as ClientInstance
-  client.getConfig = inner.getConfig
-  client.setConfig = (next) => inner.setConfig(toTransport(next))
-  client.getUrl = inner.getUrl
-  client.interceptors = nativeInterceptors(instance)
-  client.createClient = (next = {}) => createAxiosClient(axios.create(), { ...inner.getConfig(), ...next })
-  return client
-}
+export const axiosInstance = axios.create()
 
 /**
- * The axios instance the generated `client` sends through when no transport is set. Set its defaults or register axios
- * interceptors on it. Instances from `createClient()` get their own.
+ * The default transport: `axiosInstance` wrapped by `createAxiosTransport`. Wrap another instance the same way to send through it.
  */
-export const defaultTransport = axios.create()
+export const defaultTransport = createAxiosTransport(axiosInstance)
 
-/**
- * Creates an isolated client. `defaultTransport` is the axios instance to send through, a transport function, or left out
- * for a new `axios.create()`.
- */
-export function createClientCore(options: { defaultTransport?: AxiosTransport } & ClientConfig = {}): ClientInstance {
-  const { defaultTransport: transport, ...config } = options
-  const instance = isAxiosInstance(transport) ? transport : axios.create()
-  return createAxiosClient(instance, config, transport && !isAxiosInstance(transport) ? transport : createAxiosTransport(instance))
-}
+export const client = createClientCore({ defaultTransport })
 
-export const client = createAxiosClient(defaultTransport)
-
-export const createClient = (config?: ClientConfig) => client.createClient(config)
+export const createClient = client.createClient

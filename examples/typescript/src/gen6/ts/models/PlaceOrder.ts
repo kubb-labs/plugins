@@ -27,27 +27,33 @@ export type PlaceOrderOptions =
       path?: never
       query?: never
       headers?: never
-      contentType?: {
-        request: 'application/json'
-      }
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
     }
   | {
       body?: PlaceOrderBodyXml
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/xml'
-      }
+      contentType:
+        | 'application/xml'
+        | {
+            request: 'application/xml'
+          }
     }
   | {
       body?: PlaceOrderBodyFormUrlEncoded
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/x-www-form-urlencoded'
-      }
+      contentType:
+        | 'application/x-www-form-urlencoded'
+        | {
+            request: 'application/x-www-form-urlencoded'
+          }
     }
 
 export type PlaceOrderResponses = {

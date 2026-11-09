@@ -46,27 +46,33 @@ export type AddPetOptions =
       path?: never
       query?: never
       headers?: never
-      contentType?: {
-        request: 'application/json'
-      }
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
     }
   | {
       body: AddPetBodyXml
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/xml'
-      }
+      contentType:
+        | 'application/xml'
+        | {
+            request: 'application/xml'
+          }
     }
   | {
       body: AddPetBodyFormUrlEncoded
       path?: never
       query?: never
       headers?: never
-      contentType: {
-        request: 'application/x-www-form-urlencoded'
-      }
+      contentType:
+        | 'application/x-www-form-urlencoded'
+        | {
+            request: 'application/x-www-form-urlencoded'
+          }
     }
 
 export type AddPetResponses = {

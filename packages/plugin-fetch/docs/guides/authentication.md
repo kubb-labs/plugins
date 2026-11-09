@@ -67,6 +67,6 @@ const tenant = createClient({
 const { data } = await getPetById({ path: { petId: 1 }, client: tenant })
 ```
 
-To override the client for one request, pass `auth` on that single call, which suits a one-off token refresh. An explicit `headers` value you set on a call always wins over the resolved token.
+To override the client for one request, pass `auth` on that single call, which suits a one-off token refresh. A header you set yourself always wins over the resolved token: client-level `headers`, or `headers` on a call to an operation that declares header parameters.
 
 For authentication outside OpenAPI security schemes, use an async request interceptor to sign requests or supply custom headers.

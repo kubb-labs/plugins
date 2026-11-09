@@ -20,6 +20,17 @@ describe('queryKeyTransformer', () => {
   test('returns no entries for an operation without a path', () => {
     expect(keys('query', ast.factory.createOperation({ operationId: 'event' }))).toEqual([])
   })
+
+  test('leaves cookies out of the key, since they often hold a session token', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'getPrefs',
+      method: 'GET',
+      path: '/prefs',
+      parameters: [ast.factory.createParameter({ name: 'theme', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }) })],
+    })
+
+    expect(keys('query', node)).toEqual(["{ url: '/prefs' }"])
+  })
 })
 
 describe('mutationKeyTransformer', () => {

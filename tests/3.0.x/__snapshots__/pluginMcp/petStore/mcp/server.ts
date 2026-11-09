@@ -36,7 +36,6 @@ export function getServer() {
     return addPetHandler({ body }, ctx)
   })
 
-
   server.registerTool("findPetsByStatus", {
     title: "Finds Pets by status",
     description: "Multiple status values can be provided with comma separated strings",
@@ -45,7 +44,6 @@ export function getServer() {
   }, async ({ query }, ctx) => {
     return findPetsByStatusHandler({ query }, ctx)
   })
-
 
   server.registerTool("getPetById", {
     title: "Find pet by ID",
@@ -56,7 +54,6 @@ export function getServer() {
     return getPetByIdHandler({ path }, ctx)
   })
 
-
   server.registerTool("deletePet", {
     title: "Deletes a pet",
     description: "delete a pet",
@@ -64,7 +61,6 @@ export function getServer() {
   }, async ({ path, headers }, ctx) => {
     return deletePetHandler({ path, headers }, ctx)
   })
-
 
   server.registerTool("uploadFile", {
     title: "uploads an image",
@@ -75,7 +71,6 @@ export function getServer() {
     return uploadFileHandler({ path, query, body }, ctx)
   })
 
-
   server.registerTool("getInventory", {
     title: "Returns pet inventories by status",
     description: "Returns a map of status codes to quantities",
@@ -83,7 +78,6 @@ export function getServer() {
   }, async (ctx) => {
     return getInventoryHandler(ctx)
   })
-
 
   server.registerTool("placeOrder", {
     title: "Place an order for a pet",

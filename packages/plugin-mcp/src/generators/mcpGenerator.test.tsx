@@ -6,7 +6,15 @@ import { resolverClient } from '@internals/client'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, rawSources, renderGeneratorOperation, testConfig as baseConfig } from '#mocks'
+import {
+  createMockedAdapter,
+  createMockedPlugin,
+  createMultiPluginDriver,
+  matchFiles,
+  rawSources,
+  renderGeneratorOperation,
+  testConfig as baseConfig,
+} from '#mocks'
 import { resolverMcp } from '../resolvers/resolverMcp.ts'
 import type { PluginMcp } from '../types.ts'
 import { mcpGenerator } from './mcpGenerator.tsx'
@@ -75,5 +83,42 @@ describe("mcpGenerator — the client plugin's returnType", () => {
     expect(source).toContain('text: JSON.stringify(res)')
     expect(source).toContain('structuredContent: { data: res }')
     expect(source).not.toContain('res.data')
+  })
+})
+
+describe('mcpGenerator — cookie parameters', () => {
+  // The tool takes the cookies as an optional input and passes them to the client call.
+  test('getCookies — GET with cookie params', async () => {
+    const name = 'getCookies — GET with cookie params'
+    const node = ast.factory.createOperation({
+      operationId: 'getCookies',
+      method: 'GET',
+      path: '/cookies',
+      tags: ['cookies'],
+      parameters: [
+        ast.factory.createParameter({ name: 'session', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+        ast.factory.createParameter({ name: 'theme', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }) }),
+      ],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+          description: 'The cookies the request sent',
+        }),
+      ],
+    })
+    const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options: defaultOptions, resolver: resolverMcp })
+    const driver = driverFor(name)
+
+    await renderGeneratorOperation(mcpGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverMcp,
+    })
+
+    await matchFiles(driver.fileManager.files, name)
   })
 })

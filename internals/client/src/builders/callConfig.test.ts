@@ -19,7 +19,7 @@ describe('buildCallConfig', () => {
       ],
     })
 
-    const { callConfig, eventStream } = buildCallConfig({ node, validatorHooks: null, throwOnErrorDefault: true })
+    const { callConfig, eventStream } = buildCallConfig({ node, validatorHooks: null, throwOnErrorDefault: true, returnType: 'full' })
 
     expect(eventStream).toBe(false)
     expect(callConfig).toContain(`responseType: { "audio/mpeg": 'blob', "text/event-stream": 'stream' }`)
@@ -42,7 +42,7 @@ describe('buildCallConfig', () => {
       ],
     })
 
-    const { callConfig } = buildCallConfig({ node, validatorHooks: null, throwOnErrorDefault: true })
+    const { callConfig } = buildCallConfig({ node, validatorHooks: null, throwOnErrorDefault: true, returnType: 'full' })
 
     expect(callConfig).toContain(`responseType: 'blob'`)
     expect(callConfig).not.toContain('audio/mpeg')

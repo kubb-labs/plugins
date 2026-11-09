@@ -7,7 +7,7 @@ Each event on the wire has up to four fields, and a blank line ends it:
 | Field   | Meaning                                                                          |
 | ------- | -------------------------------------------------------------------------------- |
 | `event` | The event name. `message` when the server sends none.                            |
-| `data`  | The payload. Parsed as JSON unless the document types it as a string.            |
+| `data`  | The payload. Parsed as JSON when it is valid JSON, and kept as text otherwise.   |
 | `id`    | The last event ID. It carries over to later events and resumes a dropped stream. |
 | `retry` | The reconnect delay in milliseconds.                                             |
 
@@ -33,7 +33,7 @@ For one payload on every event, such as a feed of pet changes. The item declares
 
 ### Describe it
 
-In OpenAPI 3.2, put one `oneOf` member per event name on `itemSchema`, with a `const` on `event`. Describe JSON inside `data` with `contentMediaType` and `contentSchema`:
+In OpenAPI 3.2, put one `oneOf` member per event name on `itemSchema`, with a `const` on `event`. Point `data` at the payload schema with `$ref`. Kubb does not read `contentMediaType` or `contentSchema`, so `data` described with them stays a string:
 
 ```yaml
 /chat:
@@ -53,13 +53,16 @@ In OpenAPI 3.2, put one `oneOf` member per event name on `itemSchema`, with a `c
                 id: { type: string }
                 retry: { type: integer, minimum: 0 }
               oneOf:
-                - properties:
-                    event: { const: message_delta }
-                    data:
-                      contentMediaType: application/json
-                      contentSchema: { $ref: '#/components/schemas/MessageDelta' }
-                - properties:
-                    event: { const: ping }
+                - type: object
+                  required: [event, data]
+                  properties:
+                    event: { type: string, const: message_delta }
+                    data: { $ref: '#/components/schemas/MessageDelta' }
+                - type: object
+                  required: [event]
+                  properties:
+                    event: { type: string, const: ping }
+                    data: { type: string }
 ```
 
 In OpenAPI 3.0 and 3.1, put the same `oneOf` on `schema`, with a `discriminator` on `event`. Kubb reads `schema` as one event.
@@ -239,7 +242,7 @@ try {
 }
 ```
 
-With `throwOnError: false`, the call resolves instead of throwing, as a regular call does. The result then carries the `status` and the `error` body, its `data` is `undefined`, and its stream yields nothing. Check `data` rather than `error`, because an empty error body leaves `error` undefined. Checking `status` narrows `error` to the body the document declares for that status:
+With `throwOnError: false`, the call resolves instead of throwing, as a regular call does. The result then carries the `status` and the `error` body, its `data` is `undefined`, and its stream yields nothing. Check `data` to tell the two apart. An empty error body sets `error` to `{ status, statusText }`. Checking `status` narrows `error` to the body the document declares for that status:
 
 ```typescript
 const result = await streamChat({ body, throwOnError: false })
@@ -253,7 +256,7 @@ As on a regular call, `.unwrap()` resolves to the events. A failed call rejects 
 for await (const event of await streamChat({ body }).unwrap()) render(event)
 ```
 
-A stream call that gets a JSON response, such as an error body, parses it like any other call, so a 2xx JSON body yields an empty stream. An operation that declares another content type next to `text/event-stream` is generated as a normal call.
+A stream call that gets a JSON error body parses it like any other call. A 2xx answer that is not an event stream, such as a JSON body, throws a `TypeError` with the body as its `cause`, and an empty 2xx answer ends as an empty stream. An operation that declares another content type next to `text/event-stream` is generated as a normal call.
 
 Declare heartbeat and `error` events in the document, so each has a `case` in your `switch`.
 

@@ -9,7 +9,7 @@ The transport is a function. Use interceptors for request headers or response lo
 `@kubb/plugin-fetch` types the transport as a function that receives a fully resolved request and returns a result:
 
 ```typescript
-type Transport = (request: ResolvedRequest) => Promise<TransportResult>
+type Transport = (request: ResolvedRequest) => Promise<TransportResult | Response>
 
 type ResolvedRequest = {
   url: string
@@ -18,8 +18,8 @@ type ResolvedRequest = {
   body?: RequestBody
   signal?: AbortSignal
   credentials?: RequestCredentials
-  options?: FetchOptions
-  responseType?: ResponseType
+  options?: NativeOptions
+  responseType?: ResponseType | ResponseTypeMap
 }
 
 type TransportResult<TData = unknown> = {
@@ -33,7 +33,24 @@ type TransportResult<TData = unknown> = {
 }
 ```
 
-The core hands you a `ResolvedRequest` with the URL built, the query and body serialized, and auth headers set. Return the parsed `data` along with the native `request` and `response`, so status, headers, and the raw body stay reachable on the result.
+The core hands you a `ResolvedRequest` with the URL built, the query and body serialized, and auth headers set. Return the parsed `data` along with the native `request` and `response`, so status, headers, and the raw body stay reachable on the result. `responseType` is one parser, or a map from content type to parser when the operation returns several types. Call `resolveResponseType(request.responseType, contentType)` from the generated client to get the parser for a response.
+
+## Send with another library
+
+A transport can also return a web `Response`. The client then parses the body the way `defaultTransport` does, so a library that returns a `Response`, such as [ky](https://github.com/sindresorhus/ky), needs only the send. `toRequestInit(request)` gives the `RequestInit` that `fetch` and ky take:
+
+```typescript
+import ky from 'ky'
+import { client, toRequestInit } from './gen/.kubb/client'
+
+client.setConfig({
+  // The client splits success from error itself, so ky must not throw or retry on an error status. ky also
+  // stops every call after 10 seconds unless `timeout` is off. Set a limit per call with `signal: AbortSignal.timeout(ms)`.
+  transport: (request) => ky(request.url, { ...toRequestInit(request), throwHttpErrors: false, retry: 0, timeout: false }),
+})
+```
+
+The library must hand back the body unread. `result.request` is then a `Request` built from the resolved request, without its body, since the library keeps its own. With a relative URL, it is the resolved request itself.
 
 ## Mock the network in tests
 

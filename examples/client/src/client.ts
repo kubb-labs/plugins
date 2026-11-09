@@ -16,7 +16,7 @@ export type SuccessOf<TResponses> = TResponses[Extract<keyof TResponses, '200' |
  */
 type DataOf<T> = T extends { contentType: string; data: infer TData } ? TData : T
 
-type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown }
+type DataShape = { body?: unknown; cookies?: unknown; headers?: unknown; path?: unknown; query?: unknown }
 
 type ErrorBody = NonNullable<unknown>
 
@@ -30,6 +30,7 @@ export type RequestConfig = {
   headers?: object
   path?: object
   query?: object
+  cookies?: object
   body?: unknown
   /**
    * Media type hints from the operation. This skeleton assumes JSON.
@@ -62,9 +63,14 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true> = Thr
   : { data: DataOf<SuccessOf<TResponses>>; error: undefined; response: Response } | { data: undefined; error: ErrorBody; response: Response }
 
 /**
- * What a server-sent event operation resolves to: the parsed event stream and the native response.
+ * One event of a payload-only stream: the payload as `data`, under the event name the server sent.
  */
-export type EventStreamResult<TData = unknown> = { stream: AsyncGenerator<TData>; response: Response }
+export type ServerSentEvent<TData = unknown> = { data: TData; event: string; id?: string; retry?: number }
+
+/**
+ * What a server-sent event operation resolves to: the parsed events and the native response. `TEvent` is the full event type.
+ */
+export type EventStreamResult<TEvent = ServerSentEvent> = { stream: AsyncGenerator<TEvent>; response: Response }
 
 /**
  * What a failed query hook rejects with. Only the query plugins import it.
@@ -115,6 +121,10 @@ export async function client(config: RequestConfig): Promise<{ data: unknown; er
   }
 
   const token = config.security?.length ? await getToken?.() : undefined
+  const cookie = Object.entries(config.cookies ?? {})
+    .filter(([, value]) => value != null)
+    .map(([name, value]) => `${name}=${encodeURIComponent(String(value))}`)
+    .join('; ')
 
   const response = await fetch(url, {
     method: config.method,
@@ -122,6 +132,7 @@ export async function client(config: RequestConfig): Promise<{ data: unknown; er
       ...(config.body === undefined ? {} : { 'Content-Type': 'application/json' }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(config.headers as Record<string, string>),
+      ...(cookie ? { Cookie: cookie } : {}),
     },
     body: config.body === undefined ? undefined : JSON.stringify(config.body, (_, value) => (typeof value === 'bigint' ? value.toString() : value)),
     signal: config.signal,
@@ -138,6 +149,6 @@ export async function client(config: RequestConfig): Promise<{ data: unknown; er
 /**
  * Backs server-sent event operations. This skeleton does not parse streams, so it throws. Implement it if you use SSE.
  */
-export async function toEventStream<TData = unknown>(_result: Promise<{ data: unknown; response: Response }>): Promise<EventStreamResult<TData>> {
+export async function toEventStream<TEvent = ServerSentEvent>(_result: Promise<{ data: unknown; response: Response }>): Promise<EventStreamResult<TEvent>> {
   throw new Error('toEventStream is not implemented in this client')
 }

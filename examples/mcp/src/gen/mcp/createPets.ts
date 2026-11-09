@@ -12,7 +12,7 @@ import { createPets } from '../clients/createPets'
  * {@link /pets/:uuid}
  */
 export async function createPetsHandler({ path, query, body, headers }: CreatePetsOptions, ctx: ServerContext): Promise<CallToolResult> {
-  const res = await createPets({ path, query, headers, body, signal: ctx.mcpReq.signal, throwOnError: true })
+  const res = await createPets({ path, query, body, headers, signal: ctx.mcpReq.signal, throwOnError: true })
 
   return {
     content: [

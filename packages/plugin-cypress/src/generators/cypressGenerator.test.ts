@@ -59,3 +59,42 @@ describe('cypressGenerator — baseURL', () => {
     await matchFiles(driver.fileManager.files, 'baseURL template')
   })
 })
+
+describe('cypressGenerator — cookie parameters', () => {
+  // The request takes the cookies as an optional group and sends `Cookie` only when the call passes cookies.
+  test('getCookies', async () => {
+    const node = ast.factory.createOperation({
+      operationId: 'getCookies',
+      method: 'GET',
+      path: '/cookies',
+      tags: ['cookies'],
+      parameters: [
+        ast.factory.createParameter({ name: 'session', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+        ast.factory.createParameter({ name: 'x-trace', in: 'header', schema: ast.factory.createSchema({ type: 'string' }) }),
+      ],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+          description: 'The cookies the request sent',
+        }),
+      ],
+    })
+    const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options: defaultOptions, resolver: resolverCypress })
+    const driver = createMockedPluginDriver({
+      name: 'getCookies',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorOperation(cypressGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverCypress,
+    })
+
+    await matchFiles(driver.fileManager.files, 'getCookies')
+  })
+})

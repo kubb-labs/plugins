@@ -20,9 +20,10 @@ The handler receives a `ResolvedRequest` (`url`, `method`, `headers`, `body`, `s
 
 ## Run after the send
 
-Response handlers run before calls resolve, and before the status split and deserialization, so
-`data` is the raw body. The handler receives a `TransportResult` (`data`, `status`, `statusText`,
-`headers`, `contentType`, `request`, `response`):
+Response handlers run before the client checks the status or runs a codec. `data` is the body as
+the transport read it, so a JSON body is already parsed unless the call sets `responseType: 'text'`.
+The handler receives a `TransportResult` (`data`, `status`, `statusText`, `headers`, `contentType`,
+`request`, `response`):
 
 ```typescript
 client.interceptors.response.use((result) => {
@@ -41,6 +42,16 @@ client.interceptors.error.use((error) => {
   if (error.status === 401) scheduleTokenRefresh()
   return error
 })
+```
+
+Return another error, such as a domain error, and the call throws it instead. The handlers after it
+do not run, so each handler still receives a `ResponseError`. A handler that returns nothing keeps
+the error:
+
+```typescript
+class NotFoundError extends Error {}
+
+client.interceptors.error.use((error) => (error.status === 404 ? new NotFoundError(error.message) : error))
 ```
 
 This channel only fires on the throw path. When you read with `throwOnError: false`, a documented

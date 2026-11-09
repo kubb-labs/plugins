@@ -7,7 +7,7 @@ import { buildZodErrorParse, resolveParamsValidator, resolveRequestValidator, re
 /**
  * The per-call validator references a generated function wires into its request config. Each hook is
  * the bare schema reference passed to the runtime's `validator.request` / `validator.path` /
- * `validator.query` / `validator.headers` / `validator.response` / `validator.error` slot; `client.ts`
+ * `validator.query` / `validator.headers` / `validator.cookies` / `validator.response` / `validator.error` slot. `client.ts`
  * runs it through `validateStandardSchema`. The response validator only ever sees success (2xx) bodies.
  */
 export type ValidatorHooks = {
@@ -16,12 +16,13 @@ export type ValidatorHooks = {
    */
   request: string | null
   /**
-   * Schema references for the `validator.path` / `query` / `headers` hooks (`headers` wrapped in
+   * Schema references for the `validator.path` / `query` / `headers` / `cookies` hooks (`headers` wrapped in
    * `toHeadersStandardSchema`), or `null` when params validation is off or the group is empty.
    */
   path: string | null
   query: string | null
   headers: string | null
+  cookies: string | null
   /**
    * Schema reference for the `validator.response` hook, or `null` when response validation is off.
    */
@@ -61,18 +62,19 @@ export function buildValidatorHooks({
   const request = zodResolver && resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.response.body(node) || null : null
 
   const paramGroups = getOperationParameters(node)
-  const resolveParamsName = (kind: 'path' | 'query' | 'headers', params: Array<ast.ParameterNode>): string | null =>
+  const resolveParamsName = (kind: 'path' | 'query' | 'headers' | 'cookies', params: Array<ast.ParameterNode>): string | null =>
     zodResolver && resolveParamsValidator(validator) === 'zod' && params.length > 0 ? zodResolver.param[kind](node, params[0]!) : null
   const path = resolveParamsName('path', paramGroups.path)
   const query = resolveParamsName('query', paramGroups.query)
   const headers = resolveParamsName('headers', paramGroups.header)
+  const cookies = resolveParamsName('cookies', paramGroups.cookie)
 
   // Order is output: the generated file imports the response schema, then the error schema, then the request body and params schemas.
-  const importedZodNames = [response, error, request, path, query, headers].filter((name): name is string => Boolean(name))
+  const importedZodNames = [response, error, request, path, query, headers, cookies].filter((name): name is string => Boolean(name))
 
   const headersValidator = headers ? `toHeadersStandardSchema(${headers}, ${headers}.shape)` : null
 
-  return { request, path, query, headers: headersValidator, response, error, importedZodNames }
+  return { request, path, query, headers: headersValidator, cookies, response, error, importedZodNames }
 }
 
 /**

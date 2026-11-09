@@ -27,15 +27,12 @@ type Props = {
   returnType?: 'full' | 'data' | 'plain'
 }
 
-const requestGroupOrder = ['path', 'query', 'headers', 'body'] as const
-
 export function McpHandler({ name, clientName, node, resolver, returnType = 'full' }: Props): KubbReactNode {
-  const { signature, groups } = buildRequestParamsSignature(node, resolver, { isConfigurable: false })
+  const { signature, names: callArgs } = buildRequestParamsSignature(node, resolver, { isConfigurable: false })
   const paramsSignature = [signature, 'ctx: ServerContext'].filter(Boolean).join(', ')
 
   // Forward the grouped config and MCP cancellation signal through the contract client. `throwOnError: true`
   // pins the result shape, since `throwOnErrorDefault: false` would otherwise resolve to the full result.
-  const callArgs = requestGroupOrder.filter((key) => groups[key])
   const callConfig = `{ ${[...callArgs, 'signal: ctx.mcpReq.signal', 'throwOnError: true'].join(', ')} }`
   // Tool arguments carry no media type, so the call takes the client's default one.
   const callArg = hasRequestContentTypeChoice(node) ? castToClientOptions(callConfig, clientName, returnType) : callConfig

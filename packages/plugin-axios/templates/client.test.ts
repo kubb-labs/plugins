@@ -1,8 +1,9 @@
+import http from 'node:http'
 import { Readable } from 'node:stream'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
-import { describe, expect, test, vi } from 'vitest'
-import { client, createAxiosTransport, createClient, createClientCore, defaultTransport, ResponseError } from './client.ts'
+import { afterEach, describe, expect, test, vi } from 'vitest'
+import { axiosInstance, client, createAxiosTransport, createClient, createClientCore, ResponseError } from './client.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string; headers?: Record<string, unknown> }
 
@@ -34,6 +35,8 @@ function realAxios() {
   })
 }
 
+afterEach(() => vi.unstubAllGlobals())
+
 describe('createAxiosTransport', () => {
   test('sends the resolved request as one axios request and returns its response', async () => {
     const { calls, transport } = fakeAxios({ data: { id: 1 }, headers: { 'content-type': 'application/json; charset=utf-8', 'x-count': 2 } })
@@ -45,6 +48,17 @@ describe('createAxiosTransport', () => {
     expect(result).toMatchObject({ status: 200, data: { id: 1 }, error: undefined, contentType: 'application/json' })
     expect(result.request).toBe(calls[0])
     expect((result.response as AxiosResponse).headers).toMatchObject({ 'x-count': 2 })
+  })
+
+  test('reads a bodiless status as no data, as the fetch transport does, and keeps an empty 200 body', async () => {
+    const none = createClientCore({ defaultTransport: fakeAxios({ data: '', status: 204, statusText: 'No Content' }).transport })
+    const empty = createClientCore({ defaultTransport: fakeAxios({ data: '', headers: { 'content-type': 'text/plain' } }).transport })
+
+    const emptyJson = createClientCore({ defaultTransport: fakeAxios({ data: '', headers: { 'content-type': 'application/json' } }).transport })
+
+    expect(await none({ method: 'DELETE', url: '/pet/1' })).toMatchObject({ status: 204, data: undefined, error: undefined })
+    expect(await empty({ method: 'GET', url: '/pet/1' })).toMatchObject({ status: 200, data: '' })
+    expect(await emptyJson({ method: 'GET', url: '/pet/1' })).toMatchObject({ status: 200, data: undefined })
   })
 
   test('resolves every status so the core splits success from error', async () => {
@@ -65,6 +79,128 @@ describe('createAxiosTransport', () => {
 
     expect(calls[0]).toMatchObject({ timeout: 5, url: '/pet' })
     expect(calls[0]?.validateStatus?.(500)).toBe(true)
+  })
+
+  test('maps credentials onto the request the fetch adapter sends, over withCredentials in the defaults or the options', async () => {
+    const sent: Array<RequestCredentials> = []
+    const fetch = async (input: Request) => (sent.push(input.credentials), new Response('{}', { headers: { 'content-type': 'application/json' } }))
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch }, withCredentials: true })) })
+    const url = 'https://petstore.dev/pet'
+
+    for (const credentials of ['include', 'omit', 'same-origin'] as const) await client({ method: 'GET', url, credentials })
+    await client({ method: 'GET', url, credentials: 'same-origin', options: { withCredentials: true } })
+    await client({ method: 'GET', url })
+
+    expect(sent).toStrictEqual(['include', 'omit', 'same-origin', 'same-origin', 'include'])
+  })
+
+  test('passes credentials as is when an adapter list resolves to fetch', async () => {
+    const sent: Array<RequestCredentials> = []
+    const fetch = async (input: Request) => (sent.push(input.credentials), new Response('{}', { headers: { 'content-type': 'application/json' } }))
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: ['fetch', 'xhr'], env: { fetch } })) })
+
+    await client({ method: 'GET', url: 'https://petstore.dev/pet', credentials: 'same-origin' })
+
+    expect(sent).toStrictEqual(['same-origin'])
+  })
+
+  test('maps credentials onto withCredentials for the other adapters, and sends omit through fetch in the browser', async () => {
+    const { calls, transport } = fakeAxios()
+    const client = createClientCore({ defaultTransport: transport })
+
+    await client({ method: 'GET', url: '/pet', credentials: 'include' })
+    await client({ method: 'GET', url: '/pet', credentials: 'same-origin', options: { withCredentials: true } })
+    await client({ method: 'GET', url: '/pet', credentials: 'omit' })
+    vi.stubGlobal('XMLHttpRequest', class {})
+    await client({ method: 'GET', url: '/pet', credentials: 'omit' })
+    await client({ method: 'GET', url: '/pet', credentials: 'omit', options: { adapter: 'xhr' } })
+
+    expect(calls.map(({ adapter, withCredentials }) => ({ adapter, withCredentials }))).toStrictEqual([
+      { adapter: undefined, withCredentials: true },
+      { adapter: undefined, withCredentials: false },
+      { adapter: undefined, withCredentials: false },
+      { adapter: 'fetch', withCredentials: 'omit' },
+      { adapter: 'xhr', withCredentials: false },
+    ])
+  })
+
+  test('sends no Content-Type on a call without a body, where axios would label a patch as a form', async () => {
+    const sent: Array<string | null> = []
+    const fetch = async (input: Request) => (sent.push(input.headers.get('content-type')), new Response(null, { status: 204 }))
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch } })) })
+
+    await client({ method: 'PATCH', url: 'https://petstore.dev/pet/1' })
+    await client({ method: 'PATCH', url: 'https://petstore.dev/pet/1', body: { name: 'odie' }, contentType: 'application/merge-patch+json' })
+
+    expect(sent).toStrictEqual([null, 'application/merge-patch+json'])
+  })
+
+  test('sends a typed array and a Blob through the Node adapter with the operation content type', async () => {
+    const seen: Array<{ type: string | undefined; body: string }> = []
+    const server = http.createServer((req, res) => {
+      const chunks: Array<Buffer> = []
+      req.on('data', (chunk: Buffer) => chunks.push(chunk))
+      req.on('end', () => (seen.push({ type: req.headers['content-type'], body: Buffer.concat(chunks).toString('hex') }), res.end()))
+    })
+    await new Promise<void>((resolve) => server.listen(0, resolve))
+    const url = `http://localhost:${(server.address() as { port: number }).port}/upload`
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'http' })) })
+
+    try {
+      await client({ method: 'PUT', url, body: new Uint8Array([9, 0, 1, 2]).subarray(1), contentType: 'application/octet-stream' })
+      await client({ method: 'PUT', url, body: new Blob([new Uint8Array([3])], { type: 'image/png' }), contentType: 'application/octet-stream' })
+    } finally {
+      server.close()
+    }
+
+    expect(seen).toStrictEqual([
+      { type: 'application/octet-stream', body: '000102' },
+      { type: 'application/octet-stream', body: '03' },
+    ])
+  })
+
+  test('decodes a body by its Content-Type when no response type is set, as the fetch transport does', async () => {
+    const bodies: Record<string, [string, string]> = {
+      '/text': ['{"id":1}', 'text/plain'],
+      '/json': ['{"id":1}', 'application/json'],
+      '/number': ['123', 'text/plain'],
+    }
+    const fetch = async (input: Request) => {
+      const [body, type] = bodies[new URL(input.url).pathname]!
+      return new Response(body, { headers: { 'content-type': type } })
+    }
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch } })) })
+
+    expect((await client({ method: 'GET', url: 'https://petstore.dev/text' })).data).toBe('{"id":1}')
+    expect((await client({ method: 'GET', url: 'https://petstore.dev/json' })).data).toStrictEqual({ id: 1 })
+    expect((await client({ method: 'GET', url: 'https://petstore.dev/number' })).data).toBe('123')
+  })
+
+  test('rejects an aborted call with the signal reason, as fetch does', async () => {
+    const reason = new Error('stop')
+    const fetch = async () => new Response('{}', { headers: { 'content-type': 'application/json' } })
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch } })) })
+
+    await expect(client({ method: 'GET', url: 'https://petstore.dev/pet', signal: AbortSignal.abort(reason) })).rejects.toBe(reason)
+  })
+
+  test('rejects with the signal reason when the abort comes while the body is read', async () => {
+    // A map with a stream entry makes axios resolve at the headers, so the body is read after `instance.request`.
+    const server = http.createServer((_req, res) => (res.writeHead(200, { 'content-type': 'application/json' }), res.write('{"partial":')))
+    await new Promise<void>((resolve) => server.listen(0, resolve))
+    const url = `http://localhost:${(server.address() as { port: number }).port}/events`
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'http' })) })
+    const controller = new AbortController()
+    const reason = new Error('stop')
+
+    try {
+      const call = client({ method: 'GET', url, signal: controller.signal, responseType: { 'application/json': 'json', 'text/event-stream': 'stream' } })
+      setTimeout(() => controller.abort(reason), 100)
+      await expect(call).rejects.toBe(reason)
+    } finally {
+      server.closeAllConnections()
+      server.close()
+    }
   })
 
   test('sends the serialized body and turns URLSearchParams into a string for the Node adapter', async () => {
@@ -97,6 +233,49 @@ describe('createAxiosTransport', () => {
     expect(calls[2]?.adapter).toBeUndefined()
   })
 
+  test('reads a blob as a buffer on the Node adapter and wraps it, and keeps blob on the fetch adapter and in the browser', async () => {
+    const png = Buffer.from([0x89, 0x50, 0x4e, 0x47])
+    const { calls, transport } = fakeAxios({ data: png, headers: { 'content-type': 'image/png' } })
+    const client = createClientCore({ defaultTransport: transport })
+
+    const node = await client({ method: 'GET', url: '/image', responseType: 'blob' })
+    await client({ method: 'GET', url: '/image', responseType: 'blob', options: { adapter: 'fetch' } })
+    vi.stubGlobal('XMLHttpRequest', class {})
+    await client({ method: 'GET', url: '/image', responseType: 'blob' })
+
+    expect(calls.map((call) => call.responseType)).toStrictEqual(['arraybuffer', 'blob', 'blob'])
+    expect(node.data).toBeInstanceOf(Blob)
+    expect((node.data as Blob).type).toBe('image/png')
+    expect(new Uint8Array(await (node.data as Blob).arrayBuffer())).toStrictEqual(new Uint8Array(png))
+  })
+
+  test('keeps a text-mode error body as text, as the fetch transport does', async () => {
+    const { transport } = fakeAxios({ data: '404', status: 404, headers: { 'content-type': 'application/json' } })
+    const client = createClientCore({ defaultTransport: transport, throwOnError: false })
+
+    expect((await client({ method: 'GET', url: '/pet', responseType: 'text' })).error).toBe('404')
+  })
+
+  test('keeps a failed blob call whose content type the runtime does not know as a Blob, as the fetch transport does', async () => {
+    const { transport } = fakeAxios({ data: Buffer.from([1, 2, 3]), status: 500, headers: { 'content-type': 'application/vnd.custom' } })
+    const client = createClientCore({ defaultTransport: transport, throwOnError: false })
+
+    const { error } = await client({ method: 'GET', url: '/image', responseType: 'blob' })
+    expect(error).toBeInstanceOf(Blob)
+    expect(new Uint8Array(await (error as Blob).arrayBuffer())).toEqual(new Uint8Array([1, 2, 3]))
+  })
+
+  test('decodes the error body of a blob call on every adapter, instead of returning bytes', async () => {
+    const body = Buffer.from('{"message":"gone"}')
+    const { transport } = fakeAxios({ data: body, status: 404, headers: { 'content-type': 'application/json' } })
+    const client = createClientCore({ defaultTransport: transport, throwOnError: false })
+
+    expect((await client({ method: 'GET', url: '/image', responseType: 'blob' })).error).toStrictEqual({ message: 'gone' })
+    const { transport: fetchTransport } = fakeAxios({ data: new Blob([body]), status: 404, headers: { 'content-type': 'application/json' } })
+    const fetchClient = createClientCore({ defaultTransport: fetchTransport, throwOnError: false })
+    expect((await fetchClient({ method: 'GET', url: '/image', responseType: 'blob', options: { adapter: 'fetch' } })).error).toStrictEqual({ message: 'gone' })
+  })
+
   test('keeps the instance adapter for a stream, and the Node adapter outside the browser', async () => {
     const seen: Array<unknown> = []
     const adapter = async (config: InternalAxiosRequestConfig) =>
@@ -122,15 +301,15 @@ describe('createAxiosTransport', () => {
     await expect(client({ method: 'GET', url: '/pet' })).rejects.toBe(networkError)
   })
 
-  test('registers client.interceptors on the instance given as defaultTransport, next to its own', async () => {
+  test('runs client.interceptors next to the axios interceptors of the wrapped instance', async () => {
     const instance = realAxios()
     instance.interceptors.request.use((config) => {
       config.headers.set('X-Axios', 'yes')
       return config
     })
-    const client = createClientCore({ defaultTransport: instance })
+    const client = createClientCore({ defaultTransport: createAxiosTransport(instance) })
     const seen: Array<string> = []
-    client.interceptors.request.use((request) => (seen.push(`request ${request.headers.get('X-Kubb')}`), request))
+    client.interceptors.request.use((request) => (seen.push(`request ${request.headers['X-Kubb']}`), request))
     client.interceptors.response.use((result) => (seen.push(`response ${result.status}`), result))
 
     const result = await client({ method: 'GET', url: '/pet', headers: { 'X-Kubb': 'yes' } })
@@ -209,7 +388,7 @@ describe('a responseType map', () => {
         return { data: body, status, statusText: 'x', headers: { 'content-type': contentType }, config } as AxiosResponse
       },
     })
-    return { instance, seen, client: createClientCore({ defaultTransport: instance }) }
+    return { instance, seen, client: createClientCore({ defaultTransport: createAxiosTransport(instance) }) }
   }
 
   test('reads bytes and decodes the matching content type to a Blob with its media type', async () => {
@@ -263,72 +442,44 @@ describe('a responseType map', () => {
 })
 
 describe('client', () => {
-  test('sends through defaultTransport, an axios instance, and accepts an instance as transport on the client, a call, and a child', async () => {
+  test('sends through axiosInstance, and through a transport set on the client, a call, or a child', async () => {
     const seen: Array<string> = []
-    const instance = (name: string) =>
-      axios.create({
-        adapter: async (config: InternalAxiosRequestConfig) =>
-          (seen.push(name), { data: {}, status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse,
-      })
+    const transport = (name: string) =>
+      createAxiosTransport(
+        axios.create({
+          adapter: async (config: InternalAxiosRequestConfig) =>
+            (seen.push(name), { data: {}, status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse,
+        }),
+      )
     using _request = vi
-      .spyOn(defaultTransport, 'request')
+      .spyOn(axiosInstance, 'request')
       .mockImplementation(async (config) => (seen.push('default'), { data: {}, status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse)
 
     await client({ method: 'GET', url: '/pet' })
-    await client({ method: 'GET', url: '/pet', transport: instance('call') })
-    const child = createClient({ transport: instance('child') })
+    await client({ method: 'GET', url: '/pet', transport: transport('call') })
+    const child = createClient({ transport: transport('child') })
     await child({ method: 'GET', url: '/pet' })
-    child.setConfig({ transport: instance('swapped') })
+    child.setConfig({ transport: transport('swapped') })
     await child({ method: 'GET', url: '/pet' })
 
     expect(seen).toStrictEqual(['default', 'call', 'child', 'swapped'])
-    expect(typeof child.getConfig().transport).toBe('function')
   })
 
-  test('registers client.interceptors on the default instance as native axios handlers and keeps ids across update', async () => {
+  test('runs client.interceptors on the resolved request, the result, and the ResponseError', async () => {
     const own = createClient()
     const seen: Array<string> = []
-    const requestId = own.interceptors.request.use((config) => (seen.push(`request ${config.headers.get('X-Kubb')}`), config))
-    own.interceptors.response.use((response) => (seen.push(`response ${response.status}`), response))
-    own.interceptors.error.use((error) => (seen.push(`error ${error.response?.status}`), error))
-    const adapter = async (config: InternalAxiosRequestConfig) => {
-      if (config.url === '/fail')
-        throw new axios.AxiosError('fail', 'ERR_BAD_REQUEST', config, undefined, {
-          data: {},
-          status: 500,
-          statusText: 'x',
-          headers: {},
-          config,
-        } as AxiosResponse)
-      return { data: {}, status: 200, statusText: 'OK', headers: {}, config } as AxiosResponse
-    }
+    const requestId = own.interceptors.request.use((request) => (seen.push(`request ${request.headers['X-Kubb']}`), request))
+    own.interceptors.response.use((result) => (seen.push(`response ${result.status}`), result))
+    own.interceptors.error.use((error) => (seen.push(`error ${error.status}`), error))
+    const adapter = async (config: InternalAxiosRequestConfig) =>
+      ({ data: {}, status: config.url === '/fail' ? 500 : 200, statusText: 'x', headers: {}, config }) as AxiosResponse
 
     await own({ method: 'GET', url: '/pet', headers: { 'X-Kubb': 'a' }, options: { adapter } })
-    own.interceptors.request.update(requestId, (config) => (seen.push('updated'), config))
+    own.interceptors.request.update(requestId, (request) => (seen.push('updated'), request))
     await own({ method: 'GET', url: '/pet', options: { adapter } })
     own.interceptors.request.eject(requestId)
-    await expect(own({ method: 'GET', url: '/fail', options: { adapter } })).rejects.toThrow('fail')
+    await expect(own({ method: 'GET', url: '/fail', options: { adapter } })).rejects.toBeInstanceOf(ResponseError)
 
-    expect(seen).toStrictEqual(['request a', 'response 200', 'updated', 'response 200', 'error 500'])
-  })
-
-  test('a child client has its own instance, so its interceptors do not reach the parent', async () => {
-    const parent = createClient()
-    const child = parent.createClient()
-    const seen: Array<string> = []
-    child.interceptors.request.use((config) => (seen.push('child'), config))
-    const adapter = async (config: InternalAxiosRequestConfig) => ({ data: {}, status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse
-
-    await parent({ method: 'GET', url: '/pet', options: { adapter } })
-    await child({ method: 'GET', url: '/pet', options: { adapter } })
-
-    expect(seen).toStrictEqual(['child'])
-  })
-
-  test('accepts the deprecated validateStatus without changing the status split', async () => {
-    const own = createClient({ validateStatus: () => false })
-    const adapter = async (config: InternalAxiosRequestConfig) => ({ data: { ok: true }, status: 200, statusText: 'OK', headers: {}, config }) as AxiosResponse
-
-    expect((await own({ method: 'GET', url: '/pet', options: { adapter } })).data).toStrictEqual({ ok: true })
+    expect(seen).toStrictEqual(['request a', 'response 200', 'updated', 'response 200', 'response 500', 'error 500'])
   })
 })

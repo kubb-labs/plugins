@@ -1,4 +1,5 @@
 import { defineConfig, type UserConfig } from 'tsdown'
+import { sharedTemplates } from '../../configs/sharedTemplates.ts'
 
 const entry = {
   index: 'src/index.ts',
@@ -37,13 +38,10 @@ export default defineConfig([
     // Declarations for the raw templates so consumers can import their types without `allowImportingTsExtensions`.
     entry: {
       'templates/client': 'templates/client.ts',
-      'templates/core': 'templates/core.ts',
-      'templates/fetch': 'templates/fetch.ts',
-      'templates/serializers': 'templates/serializers.ts',
-      'templates/standardSchema': 'templates/standardSchema.ts',
     },
     format: 'esm',
     fixedExtension: false,
+    plugins: [sharedTemplates],
     dts: { emitDtsOnly: true, tsconfig: '../../tsconfig.dts.json' },
   },
 ])

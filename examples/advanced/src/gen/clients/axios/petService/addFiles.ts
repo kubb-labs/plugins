@@ -16,18 +16,22 @@ export function addFiles<ThrowOnError extends boolean = true>(
         path?: never
         query?: never
         headers?: never
-        contentType?: {
-          request: 'application/json'
-        }
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
       }
     | {
         body: Omit<NonNullable<Pet>, 'id'>
         path?: never
         query?: never
         headers?: never
-        contentType: {
-          request: 'multipart/form-data'
-        }
+        contentType:
+          | 'multipart/form-data'
+          | {
+              request: 'multipart/form-data'
+            }
       },
     ThrowOnError
   >,
@@ -52,18 +56,22 @@ export function addFiles<ThrowOnError extends boolean = true>(
             path?: never
             query?: never
             headers?: never
-            contentType?: {
-              request: 'application/json'
-            }
+            contentType?:
+              | 'application/json'
+              | {
+                  request: 'application/json'
+                }
           }
         | {
             body: Omit<NonNullable<Pet>, 'id'>
             path?: never
             query?: never
             headers?: never
-            contentType: {
-              request: 'multipart/form-data'
-            }
+            contentType:
+              | 'multipart/form-data'
+              | {
+                  request: 'multipart/form-data'
+                }
           }
       )['body']
     >({ method: 'POST', url: '/pet/files', contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<
