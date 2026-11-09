@@ -51,11 +51,7 @@ export function buildZodErrorParse(node: ast.OperationNode, zodResolver: Resolve
   return zodResolver.response.error?.(node) || null
 }
 
-/**
- * Prints the statuses the `<operation>ErrorSchema` covers, such as `[404, '5XX']`, for the runtime's
- * `validator.errorStatus`. Returns `null` when a `default` response covers every status, so the runtime
- * validates every non-2xx body, or when there is no error schema.
- */
+/** Prints the statuses `<operation>ErrorSchema` covers, such as `[404, '5XX']`, or `null` when a `default` response covers them all. */
 export function buildErrorStatusLiteral(node: ast.OperationNode): string | null {
   const statusCodes = getErrorStatusCodes(node)
   if (!statusCodes.length || statusCodes.includes('default')) return null

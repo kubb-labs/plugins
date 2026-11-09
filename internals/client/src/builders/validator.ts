@@ -33,10 +33,7 @@ export type ValidatorHooks = {
    * call does not throw.
    */
   error: string | null
-  /**
-   * Array literal of the statuses `error` covers, printed as `validator.errorStatus`, or `null` when `error`
-   * is off or a `default` response covers every status.
-   */
+  /** Array literal of the statuses `error` covers, or `null` when `error` is off or a `default` response covers every status. */
   errorStatus: string | null
   /**
    * Zod schema names the generated file imports from the zod plugin output.
