@@ -40,16 +40,18 @@ Each generated package bundles its own `ResponseError` class, so narrow with `Re
 ## Return the error instead
 
 Pass `throwOnError: false` and the call resolves for every documented status. The result is a
-discriminated union: `data` is set on success and `error` on failure. Branch on `status`,
-because an empty error body can leave `error` empty or undefined.
+discriminated union: `data` is set on success and `error` on failure. A failed call with an empty
+body sets `error` to `{ status, statusText }`.
+
+Check `data` before you read it. A check on `status` narrows `data` too, unless the operation
+declares a `default` response, whose status can be any number:
 
 ```typescript
 const result = await getPetById({ path: { petId: 1 }, throwOnError: false })
 
-if (result.status === 200) {
+if (result.data !== undefined) {
   console.info(result.data.name)
-}
-if (result.status !== 200) {
+} else {
   console.error(result.status, result.error)
 }
 ```
