@@ -7,6 +7,13 @@ import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } fro
 import { http, HttpResponse } from 'msw/http'
 
 export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
+  if (typeof data === 'string') return new HttpResponse<string>(data, {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/xml'
+    },
+  })
+
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -30,6 +37,13 @@ export function getPetByIdHandlerResponse404(data?: GetPetByIdStatus404) {
 export function getPetByIdHandler(data?: GetPetByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>), options?: { baseURL?: string }) {
   return http.get(`${options?.baseURL ?? ''}/pet/:petId`, function handler(info) {
       if(typeof data === 'function') return data(info)
+
+      if (typeof data === 'string') return new HttpResponse<string>(data, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/xml'
+        },
+      })
 
       return new HttpResponse<string>(JSON.stringify(data), {
         status: 200,

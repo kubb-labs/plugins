@@ -2,6 +2,14 @@ import type { Pet } from '../../models/ts/Pet'
 import { http, HttpResponse } from 'msw/http'
 
 export function findPetsByTagsHandlerResponse200(data: Array<Pet> | string) {
+  if (typeof data === 'string')
+    return new HttpResponse<string>(data, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/xml',
+      },
+    })
+
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -22,6 +30,14 @@ export function findPetsByTagsHandler(
 ) {
   return http.get(`${options?.baseURL ?? ''}/pet/findByTags`, function handler(info) {
     if (typeof data === 'function') return data(info)
+
+    if (typeof data === 'string')
+      return new HttpResponse<string>(data, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/xml',
+        },
+      })
 
     return new HttpResponse<string>(JSON.stringify(data), {
       status: 200,

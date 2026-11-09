@@ -9,6 +9,14 @@ import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function addPetHandlerResponse200(data: AddPetResponse) {
+  if (typeof data === 'string')
+    return new HttpResponse<string>(data, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/xml',
+      },
+    })
+
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -34,6 +42,14 @@ export function addPetHandler(
     `${options?.baseURL ?? 'http://localhost:3000'}/pet`,
     function handler(info) {
       if (typeof data === 'function') return data(info)
+
+      if (typeof data === 'string')
+        return new HttpResponse<string>(data, {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/xml',
+          },
+        })
 
       return new HttpResponse<string>(JSON.stringify(data), {
         status: 200,
