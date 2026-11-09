@@ -177,6 +177,14 @@ export function isEventStream(node: ast.OperationNode): boolean {
 }
 
 /**
+ * Whether the primary success response offers `text/event-stream`, alone or next to other content types. The client asks
+ * for the stream by default and ships the `sse.ts` runtime, so a mixed response can be read as events too.
+ */
+export function hasEventStreamContent(node: ast.OperationNode): boolean {
+  return (getPrimarySuccessResponse(node)?.content ?? []).some((entry) => baseContentType(entry.contentType) === 'text/event-stream')
+}
+
+/**
  * How the document types a `text/event-stream` response, as the adapter read it from `itemSchema`: `event` when each item is
  * the parsed event with its own `event` and `data`, `data` when it is only the payload. Returns `null` without an event stream.
  */

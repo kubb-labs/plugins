@@ -12,6 +12,7 @@ import {
   getRequestGroupOptionality,
   getResponseType,
   getResponseTypeMap,
+  hasEventStreamContent,
   isErrorStatusCode,
   isEventStream,
   isSuccessStatusCode,
@@ -457,6 +458,7 @@ describe('getResponseType / isEventStream', () => {
     })
 
     expect(isEventStream(node)).toBe(false)
+    expect(hasEventStreamContent(node)).toBe(true)
     expect(getResponseType(node)).toBeUndefined()
     expect(getEventStream(node)).toBeNull()
   })
@@ -499,6 +501,7 @@ describe('getResponseType / isEventStream', () => {
   test('leaves JSON responses to the runtime auto-detection', () => {
     expect(getResponseType(nodeWithResponseContentType('application/json'))).toBeUndefined()
     expect(isEventStream(nodeWithResponseContentType('application/json'))).toBe(false)
+    expect(hasEventStreamContent(nodeWithResponseContentType('application/json'))).toBe(false)
   })
 
   test('maps other non-JSON content types to text or blob', () => {

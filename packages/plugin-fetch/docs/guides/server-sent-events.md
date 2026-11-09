@@ -256,9 +256,37 @@ As on a regular call, `.unwrap()` resolves to the events. A failed call rejects 
 for await (const event of await streamChat({ body }).unwrap()) render(event)
 ```
 
-A stream call that gets a JSON error body parses it like any other call. A 2xx answer that is not an event stream, such as a JSON body, throws a `TypeError` with the body as its `cause`, and an empty 2xx answer ends as an empty stream. An operation that declares another content type next to `text/event-stream` is generated as a normal call.
+A stream call that gets a JSON error body parses it like any other call. A 2xx answer that is not an event stream, such as a JSON body, throws a `TypeError` with the body as its `cause`, and an empty 2xx answer ends as an empty stream. An operation that declares another content type next to `text/event-stream` is a normal call. See [JSON or an event stream](#json-or-an-event-stream).
 
 Declare heartbeat and `error` events in the document, so each has a `case` in your `switch`.
+
+## JSON or an event stream
+
+Some APIs, such as Wikimedia EventStreams, declare the same response as `application/json` and as `text/event-stream`. Kubb generates a normal call for it, which returns a `RequestResult`. The call sends `Accept: text/event-stream`, so the server streams events. To ask for JSON, pass `contentType: { response: 'application/json' }`.
+
+Check `contentType` on the result. For `text/event-stream`, `data` is the raw `ReadableStream<Uint8Array>`. Pass it to `parseEventStream` from `.kubb/client` to read the events:
+
+```typescript
+import { parseEventStream } from './gen/.kubb/client'
+import { getV2StreamRecentchange } from './gen/clients/getV2StreamRecentchange'
+
+const result = await getV2StreamRecentchange({ signal })
+
+if (result.contentType === 'text/event-stream') {
+  for await (const { data } of parseEventStream(result.data)) render(data)
+} else {
+  render(result.data) // the JSON body
+}
+```
+
+To get an event stream result with `lastEventId`, pass the call to `toEventStream`. It throws a `TypeError` when the server answers with JSON:
+
+```typescript
+import { toEventStream } from './gen/.kubb/client'
+
+const { stream } = await toEventStream(getV2StreamRecentchange({ signal }))
+for await (const event of stream) render(event.data)
+```
 
 ## Return only the events
 
@@ -326,7 +354,7 @@ The events alone carry no `response` or `lastEventId`. To resume a dropped strea
 
 ## The runtime files
 
-`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `EventStreamResult` types. A stream operation takes `StreamOptions` and returns `StreamResult`, the stream versions of `Options` and `RequestResult`. Kubb writes it only when the document has a `text/event-stream` operation, and `.kubb/client.ts` then re-exports it, so the types import from either file. Kubb regenerates both on each run, so do not edit them:
+`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `EventStreamResult` types. A stream operation takes `StreamOptions` and returns `StreamResult`, the stream versions of `Options` and `RequestResult`. Kubb writes it only when an operation in the document offers `text/event-stream`, alone or next to another content type, and `.kubb/client.ts` then re-exports it, so the types import from either file. Kubb regenerates both on each run, so do not edit them:
 
 ```typescript
 import type { ServerSentEvent } from './gen/.kubb/client'

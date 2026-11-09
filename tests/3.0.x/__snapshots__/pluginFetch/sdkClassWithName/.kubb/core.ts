@@ -30,11 +30,19 @@ export type EmptyErrorBody = { status: number; statusText: string }
 export type DataOf<T> = T extends { contentType: string; data: infer TData } ? TData : T
 
 /**
- * Keeps `contentType` beside `data` so switching on it narrows the body.
+ * Keeps `contentType` beside `data` so switching on it narrows the body. A `text/event-stream` body next to other
+ * content types is the raw stream the transport returns: pass it to `parseEventStream`, or the call to `toEventStream`.
  */
 export type SuccessVariant<TStatus, TEntry, TRequest, TResponse> = TEntry extends { contentType: string; data: unknown }
   ? TEntry extends { contentType: infer TContentType; data: infer TData }
-    ? { status: ToStatusNumber<TStatus>; data: TData; error: undefined; contentType: TContentType; request: TRequest; response: TResponse }
+    ? {
+        status: ToStatusNumber<TStatus>
+        data: TContentType extends `text/event-stream${string}` ? ReadableStream<Uint8Array> : TData
+        error: undefined
+        contentType: TContentType
+        request: TRequest
+        response: TResponse
+      }
     : never
   : { status: ToStatusNumber<TStatus>; data: TEntry; error: undefined; contentType: string | undefined; request: TRequest; response: TResponse }
 
