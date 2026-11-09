@@ -42,23 +42,14 @@ export function resolveResponseValidator(validator: ValidatorOptions | undefined
 }
 
 /**
- * Resolves the zod schema name a generated client validates an error body with on the non-throw path.
- * Uses the error-only `<operation>ErrorSchema` (the union of non-2xx statuses); returns `null` when the
- * operation documents no error responses with a schema.
+ * Builds the `validator.error` map of a call, one plugin-zod `<operation>StatusNNNSchema` per non-2xx response with a
+ * schema, such as `{ 404: getPetStatus404Schema, '5XX': getPetStatus5XXSchema }`. Returns `null` without one.
  */
-export function buildZodErrorParse(node: ast.OperationNode, zodResolver: ResolverZod): string | null {
-  if (!getErrorStatusCodes(node).length) return null
-  return zodResolver.response.error?.(node) || null
-}
-
-/** Prints the statuses `<operation>ErrorSchema` covers, such as `[404, '5XX']`, or `null` when a `default` response covers them all. */
-export function buildErrorStatusLiteral(node: ast.OperationNode): string | null {
-  const statusCodes = getErrorStatusCodes(node)
-  if (!statusCodes.length || statusCodes.includes('default')) return null
-  return `[${statusCodes.map((statusCode) => (/^\d+$/.test(statusCode) ? statusCode : stringify(statusCode))).join(', ')}]`
-}
-
-// The same selection plugin-zod uses for `<operation>ErrorSchema`: every non-2xx response with a schema.
-function getErrorStatusCodes(node: ast.OperationNode): Array<string> {
-  return node.responses.filter((res) => !isSuccessStatusCode(res.statusCode) && res.content?.some((entry) => entry.schema)).map((res) => String(res.statusCode))
+export function buildZodErrorParse(node: ast.OperationNode, zodResolver: ResolverZod): { literal: string; names: Array<string> } | null {
+  const entries = node.responses
+    .filter((res) => !isSuccessStatusCode(res.statusCode) && res.content?.some((entry) => entry.schema))
+    .map((res) => ({ key: String(res.statusCode), name: zodResolver.response.status(node, res.statusCode) }))
+  if (!entries.length) return null
+  const literal = entries.map(({ key, name }) => `${/^\d+$/.test(key) ? key : stringify(key)}: ${name}`).join(', ')
+  return { literal: `{ ${literal} }`, names: entries.map(({ name }) => name) }
 }

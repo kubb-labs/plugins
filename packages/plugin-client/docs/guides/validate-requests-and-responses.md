@@ -30,11 +30,11 @@ request({
   method: 'POST',
   url: '/pet',
   ...config,
-  validator: { response: addPetResponseSchema, error: addPetErrorSchema, errorStatus: [405], ...config.validator },
+  validator: { response: addPetResponseSchema, error: { 405: addPetStatus405Schema }, ...config.validator },
 })
 ```
 
-A `validator` passed on one call is merged per key, so `validator: { request }` adds a request schema and keeps the generated response schema.
+A `validator` passed on one call is merged per key, so `validator: { request }` adds a request schema and keeps the generated response schema. A per-call `error` replaces the generated error map as a whole.
 
 Add a `validator` field to your `RequestConfig`, then run the schemas in `client`. Zod schemas follow [Standard Schema](https://standardschema.dev), so `~standard.validate` works with any compatible library:
 
@@ -44,7 +44,7 @@ type Schema = { '~standard': { validate: (value: unknown) => Result | Promise<Re
 
 export type RequestConfig = {
   // ...
-  validator?: { request?: Schema; response?: Schema; error?: Schema; errorStatus?: Array<number | string> }
+  validator?: { request?: Schema; response?: Schema; error?: Schema | Record<string, Schema> }
 }
 
 // inside client(), after reading the body
@@ -55,7 +55,7 @@ const validatedBody = result && 'value' in result ? result.value : body
 
 Return `validatedBody` as `data`, so a schema that transforms the value takes effect. Without a response schema, `validatedBody` is the original `body`.
 
-`errorStatus` lists the statuses `error` covers. Skip `error` for any other status.
+`error` is keyed by status, such as `{ 404: schema, '5XX': schema, default: schema }`. Pick the exact status, then its range, then `default`, and skip validation when none matches.
 
 Set `validator: { request: 'zod' }` or `{ response: 'zod' }` to pass one direction only. Without `pluginZod()` in the plugins list, generation stops with an error.
 

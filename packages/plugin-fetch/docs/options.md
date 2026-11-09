@@ -63,7 +63,7 @@ Default value. Does no validation and returns the response cast to the generated
 :::
 
 :::field{name="'zod'"}
-Validates the success response body, and the error body when a non-2xx call does not throw and the document declares its status.
+Validates the success response body, and the error body against the schema of its status when a non-2xx call does not throw.
 :::
 
 :::field{name="{ request?: 'zod', params?: 'zod', response?: 'zod' }"}

@@ -1,7 +1,7 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
 import { client, withUnwrap } from '../../../.kubb/client'
-import { findPetsByStatusResponseSchema, findPetsByStatusErrorSchema } from '../../../zod/pet/findPetsByStatusSchema'
+import { findPetsByStatusResponseSchema, findPetsByStatusStatus400Schema } from '../../../zod/pet/findPetsByStatusSchema'
 
 /**
  * @description Multiple status values can be provided with comma separated strings
@@ -45,7 +45,7 @@ export function findPetsByStatus<ThrowOnError extends boolean = true>(
       url: '/pet/findByStatus/{step_id}',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       ...config,
-      validator: { response: findPetsByStatusResponseSchema, error: findPetsByStatusErrorSchema, errorStatus: [400], ...config.validator },
+      validator: { response: findPetsByStatusResponseSchema, error: { 400: findPetsByStatusStatus400Schema }, ...config.validator },
       throwOnError: config.throwOnError ?? true,
     }) as Promise<
       RequestResult<

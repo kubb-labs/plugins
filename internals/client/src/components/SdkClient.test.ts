@@ -27,7 +27,6 @@ describe('buildSdkMethod', () => {
       cookies: null,
       response: 'streamEventsResponseSchema',
       error: null,
-      errorStatus: null,
       importedZodNames: [],
     }
     const method = buildSdkMethod({ node, name: 'streamEvents', types: resolverTs, validatorHooks, returnType: 'full', throwOnErrorDefault: true })

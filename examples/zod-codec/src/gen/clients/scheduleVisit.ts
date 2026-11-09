@@ -9,7 +9,7 @@ import { client, withUnwrap } from '../.kubb/client.ts'
 import { toHeadersStandardSchema } from '../.kubb/standardSchema.ts'
 import {
   scheduleVisitResponseSchema,
-  scheduleVisitErrorSchema,
+  scheduleVisitStatus409Schema,
   scheduleVisitBodySchema,
   scheduleVisitPathSchema,
   scheduleVisitQuerySchema,
@@ -37,8 +37,7 @@ export function scheduleVisit<ThrowOnError extends boolean = true>(
         query: scheduleVisitQuerySchema,
         headers: toHeadersStandardSchema(scheduleVisitHeadersSchema, scheduleVisitHeadersSchema.shape),
         response: scheduleVisitResponseSchema,
-        error: scheduleVisitErrorSchema,
-        errorStatus: [409],
+        error: { 409: scheduleVisitStatus409Schema },
         ...config.validator,
       },
       throwOnError: config.throwOnError ?? true,

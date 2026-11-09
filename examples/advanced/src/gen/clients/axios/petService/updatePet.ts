@@ -1,7 +1,7 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
 import { client, withUnwrap } from '../../../.kubb/client'
-import { updatePetResponseSchema, updatePetErrorSchema } from '../../../zod/pet/updatePetSchema'
+import { updatePetResponseSchema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema } from '../../../zod/pet/updatePetSchema'
 
 /**
  * @description Update an existing pet by Id
@@ -112,7 +112,11 @@ export function updatePet<ThrowOnError extends boolean = true>(
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
       ...config,
-      validator: { response: updatePetResponseSchema, error: updatePetErrorSchema, errorStatus: [400, 404, 405], ...config.validator },
+      validator: {
+        response: updatePetResponseSchema,
+        error: { 400: updatePetStatus400Schema, 404: updatePetStatus404Schema, 405: updatePetStatus405Schema },
+        ...config.validator,
+      },
       throwOnError: config.throwOnError ?? true,
     }) as Promise<
       RequestResult<

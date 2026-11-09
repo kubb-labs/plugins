@@ -62,7 +62,6 @@ export function buildCallConfig({
     'cookies',
     ...(perEvent ? [] : ['response' as const]),
     'error',
-    'errorStatus',
   ])
   const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node })
 

@@ -114,7 +114,7 @@ try {
 }
 ```
 
-A `ParseError` reports schema validation issues. A `ResponseError` reports a non-2xx status. With `throwOnError: false`, the error body is checked against the error schema when the document declares its status. A status the document leaves out, such as a `502` from a gateway, resolves with the body unchecked. A `default` response declares every status.
+A `ParseError` reports schema validation issues. A `ResponseError` reports a non-2xx status. With `throwOnError: false`, the error body is checked against the schema of its status, then of its range such as `5XX`, then of `default`. A status the document leaves out, such as a `502` from a gateway, resolves with the body unchecked.
 
 Calling `.unwrap()` on a `throwOnError: false` call turns that same `error` into a rejection, so a
 `try`/`catch` works there too.

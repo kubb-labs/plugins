@@ -1,6 +1,6 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import { client, withUnwrap } from '../../../.kubb/client'
-import { deletePetResponseSchema, deletePetErrorSchema } from '../../../zod/pet/deletePetSchema'
+import { deletePetResponseSchema, deletePetStatus400Schema } from '../../../zod/pet/deletePetSchema'
 
 /**
  * @description delete a pet
@@ -37,7 +37,7 @@ export function deletePet<ThrowOnError extends boolean = true>(
       url: '/pet/{petId}:search',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
       ...config,
-      validator: { response: deletePetResponseSchema, error: deletePetErrorSchema, errorStatus: [400], ...config.validator },
+      validator: { response: deletePetResponseSchema, error: { 400: deletePetStatus400Schema }, ...config.validator },
       throwOnError: config.throwOnError ?? true,
     }) as Promise<
       RequestResult<

@@ -726,16 +726,26 @@ describe('createClientCore', () => {
     expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, contentType: undefined, request: 'REQ', response: 'RES' })
   })
 
-  test('runs the error parser only for the statuses in errorStatus when throwOnError is false', async () => {
-    const validator = { error: toFailingSchema(), errorStatus: [404, '5XX'] }
-    const unprocessable = createClient({ data: { message: 'invalid' }, status: 422 }).client
-    const result = (await unprocessable({ method: 'GET', url: '/pet/1', throwOnError: false, validator })) as CallResult<string, string>
-    expect(result).toMatchObject({ status: 422, data: undefined, error: { message: 'invalid' } })
+  test('picks the error validator by status, then range, then default, and skips undeclared statuses', async () => {
+    // Accepts only a body whose `code` matches, and tags it with the schema that ran.
+    const toCodeSchema = (code: string) => ({
+      '~standard': {
+        validate: (value: unknown) =>
+          (value as { code?: string }).code === code ? { value: { code, checkedBy: code } } : { issues: [{ message: `not ${code}`, path: ['code'] }] },
+      },
+    })
+    const call = (status: number, data: unknown, error: Record<string, ReturnType<typeof toCodeSchema>>) =>
+      createClient({ data, status }).client({ method: 'GET', url: '/pet/1', throwOnError: false, validator: { error } }) as Promise<CallResult<string, unknown>>
+    const byStatus = { 404: toCodeSchema('not-found'), '5XX': toCodeSchema('upstream') }
 
-    for (const status of [404, 502]) {
-      const { client } = createClient({ data: { message: 'missing' }, status })
-      await expect(client({ method: 'GET', url: '/pet/1', throwOnError: false, validator })).rejects.toMatchObject({ name: 'ParseError' })
-    }
+    expect(await call(404, { code: 'not-found' }, byStatus)).toMatchObject({ status: 404, error: { checkedBy: 'not-found' } })
+    await expect(call(404, { code: 'upstream' }, byStatus)).rejects.toMatchObject({ name: 'ParseError' })
+    expect(await call(503, { code: 'upstream' }, byStatus)).toMatchObject({ status: 503, error: { checkedBy: 'upstream' } })
+    expect(await call(422, '<html>Unprocessable</html>', byStatus)).toMatchObject({ status: 422, error: '<html>Unprocessable</html>' })
+
+    const withDefault = { 404: toCodeSchema('not-found'), default: toCodeSchema('other') }
+    expect(await call(502, { code: 'other' }, withDefault)).toMatchObject({ status: 502, error: { checkedBy: 'other' } })
+    await expect(call(502, '<html>Bad Gateway</html>', withDefault)).rejects.toMatchObject({ name: 'ParseError' })
   })
 
   test('skips the error parser when the call throws, so it throws the ResponseError', async () => {

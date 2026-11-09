@@ -226,7 +226,7 @@ export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse =
   transport?: Transport<TRequest, TResponse>
   serializer?: Serializers
   codecs?: Record<string, Codec>
-  /** `errorStatus` lists the statuses `error` covers, such as `[404, '5XX']`. Without it, `error` checks every non-2xx body. */
+  /** `error` takes one validator for every non-2xx body, or a map by status such as `{ 404: schema, '5XX': schema, default: schema }`. */
   validator?: {
     request?: Validator
     path?: Validator
@@ -234,8 +234,7 @@ export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse =
     headers?: Validator
     cookies?: Validator
     response?: Validator
-    error?: Validator
-    errorStatus?: Array<number | string>
+    error?: Validator | Record<string, Validator>
   }
   onValidationError?: ValidationErrorHandler
   validate?: ValidateOption
@@ -627,9 +626,11 @@ export async function readResponse<TRequest, TResponse extends Response>(
   }
 }
 
-/** Returns `true` when `statuses` is unset or lists `status`, directly or by a range key such as `'5XX'`. */
-function coversStatus(statuses: ReadonlyArray<number | string> | undefined, status: number): boolean {
-  return !statuses || statuses.some((code) => [String(status), `${String(status)[0]}XX`].includes(String(code).toUpperCase()))
+/** Picks the error validator for `status`: the exact status, then its range such as `5XX`, then `default`. */
+function pickErrorValidator(error: Validator | Record<string, Validator> | undefined, status: number): Validator | undefined {
+  if (!error || '~standard' in error) return error as Validator | undefined
+  const range = Object.keys(error).find((key) => key.toUpperCase() === `${String(status)[0]}XX`)
+  return error[String(status)] ?? (range ? error[range] : undefined) ?? error.default
 }
 
 /**
@@ -828,10 +829,9 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     // A streamed success body is validated event by event in `toEventStream`, not as a whole. A JSON answer to a streamed call is a whole body.
     const streaming = isSuccess && resolveResponseType(resolvedRequest.responseType, contentType) === 'stream' && isStreamed(decoded)
     // An error body is validated only when the call returns it. A call that throws keeps its `ResponseError`.
-    const declared = isSuccess || coversStatus(validator?.errorStatus, result.status)
-    const validatesBody = isValidationEnabled(validate, direction) && !streaming && declared && (isSuccess || !throwOnError)
+    const validatesBody = isValidationEnabled(validate, direction) && !streaming && (isSuccess || !throwOnError)
     const data = await runValidator({
-      validator: validatesBody ? validator?.[direction] : undefined,
+      validator: validatesBody ? (isSuccess ? validator?.response : pickErrorValidator(validator?.error, result.status)) : undefined,
       value: decoded,
       context: { direction, source: 'body', method: resolvedRequest.method, url: resolvedRequest.url, status: result.status },
       onValidationError,

@@ -2,7 +2,7 @@ import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { CreatePetsBoolParamKey } from '../../../models/ts/CreatePetsBoolParam'
 import type { CreatePetsXEXAMPLEKey } from '../../../models/ts/CreatePetsXEXAMPLE'
 import { client, withUnwrap } from '../../../.kubb/client'
-import { createPetsResponseSchema, createPetsErrorSchema } from '../../../zod/pets/createPetsSchema'
+import { createPetsResponseSchema, createPetsStatusDefaultSchema } from '../../../zod/pets/createPetsSchema'
 
 /**
  * @summary Create a pet
@@ -45,7 +45,7 @@ export function createPets<ThrowOnError extends boolean = true>(
       url: '/pets/{uuid}',
       contentType: { request: 'application/json' },
       ...config,
-      validator: { response: createPetsResponseSchema, error: createPetsErrorSchema, ...config.validator },
+      validator: { response: createPetsResponseSchema, error: { default: createPetsStatusDefaultSchema }, ...config.validator },
       throwOnError: config.throwOnError ?? true,
     }) as Promise<
       RequestResult<
