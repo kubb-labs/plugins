@@ -1,3 +1,4 @@
+import http from 'node:http'
 import { Readable } from 'node:stream'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
@@ -135,7 +136,6 @@ describe('createAxiosTransport', () => {
   })
 
   test('sends a typed array and a Blob through the Node adapter with the operation content type', async () => {
-    const http = await import('node:http')
     const seen: Array<{ type: string | undefined; body: string }> = []
     const server = http.createServer((req, res) => {
       const chunks: Array<Buffer> = []

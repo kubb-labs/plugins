@@ -1,6 +1,15 @@
 import axios from 'axios'
 import type { AxiosHeaders, AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios'
-import { createClientCore, getResponseContentType, isStreamed, parseJsonOrText, readResponse, resolveResponseType, type ResponseType } from './core.ts'
+import {
+  createClientCore,
+  getHeader,
+  getResponseContentType,
+  isStreamed,
+  parseJsonOrText,
+  readResponse,
+  resolveResponseType,
+  type ResponseType,
+} from './core.ts'
 import * as core from './core.ts'
 
 export * from './core.ts'
@@ -82,11 +91,6 @@ function decodeBytes(data: unknown, responseType: ResponseType | undefined, cont
   return responseType === 'text' || responseType === 'document' ? text : parseJsonOrText(text)
 }
 
-function getContentType(headers: Record<string, string>): string | undefined {
-  const key = Object.keys(headers).find((name) => name.toLowerCase() === 'content-type')
-  return key ? headers[key] : undefined
-}
-
 /**
  * A body the axios Node adapter sends as fetch would: it rejects a typed array, and labels a Blob with the Blob's own type
  * over the `Content-Type` header, so the Blob takes the header's type.
@@ -121,13 +125,14 @@ const axiosDefaultAdapters = Array.isArray(axios.defaults.adapter) ? String(axio
  */
 export function createAxiosTransport(instance: AxiosInstance): (request: core.ResolvedRequest) => Promise<TransportResult> {
   return async (request) => {
+    const contentType = getHeader(request.headers, 'content-type')
     const config: AxiosRequestConfig = {
       ...request.options,
       url: request.url,
       method: request.method,
       // axios labels a post, put, or patch without a body as a form, so `false` leaves the header off, as fetch does.
-      headers: request.body === undefined && getContentType(request.headers) === undefined ? { ...request.headers, 'Content-Type': false } : request.headers,
-      data: toAxiosData(request.body, getContentType(request.headers)),
+      headers: request.body === undefined && contentType === undefined ? { ...request.headers, 'Content-Type': false } : request.headers,
+      data: toAxiosData(request.body, contentType),
       // Kubb already serialized the body; only URLSearchParams needs a string, since axios's Node adapter rejects it.
       transformRequest: (data) => (data instanceof URLSearchParams ? data.toString() : data),
       signal: request.signal,

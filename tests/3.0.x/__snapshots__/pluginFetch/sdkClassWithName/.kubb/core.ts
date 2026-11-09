@@ -402,7 +402,8 @@ function collectHeadersCaseInsensitive(...sources: Array<unknown>): Record<strin
   return result
 }
 
-function getHeader(headers: Record<string, string>, name: string): string | undefined {
+/** The value of a header, matched by name in any letter case. */
+export function getHeader(headers: Record<string, string>, name: string): string | undefined {
   const key = Object.keys(headers).find((k) => k.toLowerCase() === name.toLowerCase())
   return key ? headers[key] : undefined
 }
@@ -716,7 +717,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   const body = contentCodec?.serialize
     ? contentCodec.serialize(validatedBody, requestContentType)
     : bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.styles?.body })
-  // The operation's content type replaces a header in any case, and is left off when there is no body to label.
+  // The operation's content type replaces a `content-type` header in any letter case, and is left off when there is no body to label.
   if (requestContentTypeOption && validatedBody !== undefined) {
     deleteHeader(headers, 'content-type')
     headers['Content-Type'] = requestContentTypeOption
