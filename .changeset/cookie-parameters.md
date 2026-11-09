@@ -12,10 +12,10 @@
 '@kubb/plugin-cypress': patch
 ---
 
-Add an optional `cookies` option for `in: cookie` parameters to the generated types, Zod schema, faker, client call, query hooks, MCP tool, and Cypress request.
+Add an optional `cookies` option for `in: cookie` parameters to the types, Zod schemas, Faker mocks, clients, query hooks, MCP tools, and Cypress requests.
 
-- Leave `cookies` out of query keys, as headers are, since a key ends up in SSR payloads and caches.
-- Check `cookies` with `validator: 'zod'` when the call passes them.
+- Query keys leave `cookies` out, as they do headers, since keys end up in SSR payloads and caches.
+- `validator: 'zod'` checks `cookies` when the call passes them.
 
 ```ts
 await getSession({ cookies: { session_id: 'abc' } })

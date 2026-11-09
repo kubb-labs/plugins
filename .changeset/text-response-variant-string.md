@@ -8,10 +8,8 @@
 '@kubb/plugin-axios': patch
 ---
 
-Type a response body the client returns as text, such as `application/xml`, `application/yaml`, or `text/csv`, as `string` instead of its schema.
+Type a text response, such as `application/xml`, `application/yaml`, or `text/csv`, as `string`, since the client returns it as text.
 
-The client parses JSON, returns a `Blob` for a binary type and a stream for `text/event-stream`, and returns any other body as text. The types, Zod schemas, and Faker mocks now match that. For an operation that returns JSON and XML, such as `getPetById`, `data` is `Pet | string`, so narrow on `result.contentType` to get the `Pet`. JSON, binary, stream, and wildcard (`*/*`) responses keep their schema, and so does a text response whose schema is already a string. With a `codecs[...].deserialize`, cast `data` to what the codec returns.
-
-Cypress requests now cast their result to the declared return type, so a body type such as `Pet | string` compiles.
-
-MSW handlers send a string body for such a response as raw text with its content type, so an XML mock is no longer a quoted JSON string. Other bodies are still sent as JSON.
+- An operation that returns JSON and XML, such as `getPetById`, has `data: Pet | string`. Narrow on `result.contentType` to get the `Pet`.
+- JSON, binary, stream, and `*/*` responses keep their schema, as does a text response whose schema is a string. With a `codecs[...].deserialize`, cast `data` to what the codec returns.
+- Zod schemas and Faker mocks match the new types. Cypress casts its result to the declared type, and MSW sends a string body as raw text with its content type.

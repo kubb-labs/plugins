@@ -18,10 +18,6 @@ paths:
       operationId: streamEvents
 ```
 
-```typescript
-request({ method: 'GET', url: '/.sse', baseURL: 'https://echo.websocket.org', ...config })
-```
-
 Only a `baseURL` passed on the call overrides it. The `baseURL` option, `setConfig`, and `createClient` do not.
 
 ## Use the baseURL option

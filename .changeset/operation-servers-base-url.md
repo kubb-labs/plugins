@@ -4,11 +4,7 @@
 '@kubb/plugin-axios': minor
 ---
 
-Use a path-level or operation-level `servers` entry as that operation's default `baseURL`, so a call to an upload or streaming host no longer goes to the client's main host.
+Use a path's or operation's own `servers` entry as that operation's default `baseURL`, so a call to an upload or streaming host reaches it.
 
-- The operation's `servers` win over the path's. The entry is picked with the adapter's `server.index`, falling back to the first one, and its `{variable}` placeholders are filled from `server.variables`, then from the spec defaults.
-- A `baseURL` passed on the call still wins. The `baseURL` option, `setConfig`, and `createClient` do not override it.
-
-```ts
-request({ method: 'GET', url: '/.sse', baseURL: 'https://echo.websocket.org', ...config })
-```
+- The operation's `servers` win over the path's. The adapter's `server.index` picks the entry, falling back to the first, and `{variable}` placeholders take `server.variables`, then the spec defaults.
+- Only a per-call `baseURL` overrides it. The `baseURL` option, `setConfig`, and `createClient` do not.
