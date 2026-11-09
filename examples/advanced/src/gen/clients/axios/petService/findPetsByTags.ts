@@ -35,7 +35,7 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
           }
         | {
             contentType: 'application/xml'
-            data: Array<Pet>
+            data: string
           }
       '400': unknown
     },
@@ -63,7 +63,7 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
               }
             | {
                 contentType: 'application/xml'
-                data: Array<Pet>
+                data: string
               }
           '400': unknown
         },

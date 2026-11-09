@@ -34,7 +34,12 @@ export function getPetByIdQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = getPetByIdQueryKey({ path })
-  return queryOptions<Omit<NonNullable<Pet>, 'name'>, ResponseErrorConfig<unknown | unknown>, Omit<NonNullable<Pet>, 'name'>, typeof queryKey>({
+  return queryOptions<
+    Omit<NonNullable<Pet>, 'name'> | string,
+    ResponseErrorConfig<unknown | unknown>,
+    Omit<NonNullable<Pet>, 'name'> | string,
+    typeof queryKey
+  >({
     queryKey,
     queryFn: async ({ signal }) => {
       return getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true }).unwrap()
@@ -48,8 +53,8 @@ export function getPetByIdQueryOptions(
  * {@link /pet/:petId:search}
  */
 export function useGetPetById<
-  TData = Omit<NonNullable<Pet>, 'name'>,
-  TQueryData = Omit<NonNullable<Pet>, 'name'>,
+  TData = Omit<NonNullable<Pet>, 'name'> | string,
+  TQueryData = Omit<NonNullable<Pet>, 'name'> | string,
   TQueryKey extends QueryKey = GetPetByIdQueryKey,
 >(
   {
@@ -74,7 +79,7 @@ export function useGetPetById<
         }['path'])
   },
   options: {
-    query?: Partial<QueryObserverOptions<Omit<NonNullable<Pet>, 'name'>, ResponseErrorConfig<unknown | unknown>, TData, TQueryData, TQueryKey>> & {
+    query?: Partial<QueryObserverOptions<Omit<NonNullable<Pet>, 'name'> | string, ResponseErrorConfig<unknown | unknown>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
     }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>

@@ -11,5 +11,5 @@ export function findPetsByStatus({ query }: FindPetsByStatusOptions = {}, option
     url: `/pet/findByStatus`,
     qs: query,
     ...options
-  }).then((res) => res.body)
+  }).then((res) => res.body) as Cypress.Chainable<FindPetsByStatusResponse>
 }

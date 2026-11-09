@@ -11,5 +11,5 @@ export function placeOrder({ body }: Pick<PlaceOrderOptions, 'body'> = {}, optio
     url: `/store/order`,
     body,
     ...options
-  }).then((res) => res.body)
+  }).then((res) => res.body) as Cypress.Chainable<PlaceOrderResponse>
 }

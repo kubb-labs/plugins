@@ -10,7 +10,7 @@ export const getOrderByIdPathOrderIdSchema = z.coerce.bigint()
 
 export const getOrderByIdStatus200SchemaJson = orderSchema
 
-export const getOrderByIdStatus200SchemaXml = orderSchema
+export const getOrderByIdStatus200SchemaXml = z.string()
 
 export const getOrderByIdStatus200Schema = z.union([getOrderByIdStatus200SchemaJson, getOrderByIdStatus200SchemaXml])
 

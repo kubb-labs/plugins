@@ -106,7 +106,7 @@ export const petNotFoundSchema = z.object({
 
 export const updatePetStatus200SchemaJson = petSchema
 
-export const updatePetStatus200SchemaXml = petSchema
+export const updatePetStatus200SchemaXml = z.string()
 
 export const updatePetStatus200Schema = z.union([updatePetStatus200SchemaJson, updatePetStatus200SchemaXml])
 
@@ -130,7 +130,7 @@ export const updatePetBodySchema = z.union([updatePetBodySchemaJson, updatePetBo
 
 export const addPetStatus200SchemaJson = petSchema
 
-export const addPetStatus200SchemaXml = petSchema
+export const addPetStatus200SchemaXml = z.string()
 
 export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])
 
@@ -158,7 +158,7 @@ export const findPetsByStatusQueryStatusSchema = findPetsByStatusStatusSchema
 
 export const findPetsByStatusStatus200SchemaJson = z.array(petSchema)
 
-export const findPetsByStatusStatus200SchemaXml = z.array(petSchema)
+export const findPetsByStatusStatus200SchemaXml = z.string()
 
 export const findPetsByStatusStatus200Schema = z.union([findPetsByStatusStatus200SchemaJson, findPetsByStatusStatus200SchemaXml])
 
@@ -180,7 +180,7 @@ export const findPetsByTagsQueryPageSizeSchema = z.string().optional().describe(
 
 export const findPetsByTagsStatus200SchemaJson = z.array(petSchema)
 
-export const findPetsByTagsStatus200SchemaXml = z.array(petSchema)
+export const findPetsByTagsStatus200SchemaXml = z.string()
 
 export const findPetsByTagsStatus200Schema = z.union([findPetsByTagsStatus200SchemaJson, findPetsByTagsStatus200SchemaXml])
 
@@ -200,7 +200,7 @@ export const getPetByIdPathPetIdSchema = z.coerce.bigint().describe('ID of pet t
 
 export const getPetByIdStatus200SchemaJson = petSchema
 
-export const getPetByIdStatus200SchemaXml = petSchema
+export const getPetByIdStatus200SchemaXml = z.string()
 
 export const getPetByIdStatus200Schema = z.union([getPetByIdStatus200SchemaJson, getPetByIdStatus200SchemaXml])
 
@@ -313,7 +313,7 @@ export const getOrderByIdPathOrderIdSchema = z.coerce.bigint().describe('ID of o
 
 export const getOrderByIdStatus200SchemaJson = orderSchema
 
-export const getOrderByIdStatus200SchemaXml = orderSchema
+export const getOrderByIdStatus200SchemaXml = z.string()
 
 export const getOrderByIdStatus200Schema = z.union([getOrderByIdStatus200SchemaJson, getOrderByIdStatus200SchemaXml])
 

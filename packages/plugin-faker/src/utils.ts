@@ -1,4 +1,5 @@
 import { posix } from 'node:path'
+import { toResponseContent } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { ast } from '@kubb/kit'
 import type { ResolverFaker } from './types.ts'
@@ -72,7 +73,9 @@ function shouldInlineSingleResponseSchema(schema: ast.SchemaNode): boolean {
  * Returns null if no responses are provided, or embeds single simple responses inline.
  */
 export function buildResponseUnionSchema(node: ast.OperationNode, resolver: ResolverFaker): ast.SchemaNode | null {
-  const responses = node.responses.filter((response) => response.content?.[0]?.schema)
+  const responses = node.responses
+    .map((response) => ({ ...response, content: response.content?.map(toResponseContent) }))
+    .filter((response) => response.content?.[0]?.schema)
 
   if (!responses.length) {
     return null

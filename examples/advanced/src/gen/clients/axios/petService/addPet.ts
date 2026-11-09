@@ -60,7 +60,7 @@ export function addPet<ThrowOnError extends boolean = true>(
           }
         | {
             contentType: 'application/xml'
-            data: Omit<NonNullable<Pet>, 'name'>
+            data: string
           }
     },
     ThrowOnError
@@ -127,7 +127,7 @@ export function addPet<ThrowOnError extends boolean = true>(
               }
             | {
                 contentType: 'application/xml'
-                data: Omit<NonNullable<Pet>, 'name'>
+                data: string
               }
         },
         ThrowOnError

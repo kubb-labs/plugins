@@ -10,7 +10,7 @@ export const findPetsByStatusQueryStatusSchema = z._default(z.optional(z.enum(['
 
 export const findPetsByStatusStatus200SchemaJson = z.array(z.lazy(() => petSchema))
 
-export const findPetsByStatusStatus200SchemaXml = z.array(z.lazy(() => petSchema))
+export const findPetsByStatusStatus200SchemaXml = z.string()
 
 export const findPetsByStatusStatus200Schema = z.union([findPetsByStatusStatus200SchemaJson, findPetsByStatusStatus200SchemaXml])
 

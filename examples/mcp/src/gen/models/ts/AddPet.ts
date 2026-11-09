@@ -8,7 +8,7 @@ import type { Pet } from './Pet'
 
 export type AddPetStatus200Json = Omit<NonNullable<Pet>, 'name'>
 
-export type AddPetStatus200Xml = Omit<NonNullable<Pet>, 'name'>
+export type AddPetStatus200Xml = string
 
 export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 

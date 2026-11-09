@@ -39,5 +39,5 @@ export function addFiles(
       body,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<Omit<NonNullable<Pet>, 'name'>>
 }

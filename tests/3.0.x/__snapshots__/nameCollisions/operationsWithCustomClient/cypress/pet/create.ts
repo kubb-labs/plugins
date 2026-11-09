@@ -10,5 +10,5 @@ export function petCreate(options: Partial<Cypress.RequestOptions> = {}): Cypres
     method: 'POST',
     url: `/pets/create-first`,
     ...options
-  }).then((res) => res.body)
+  }).then((res) => res.body) as Cypress.Chainable<PetCreateResponse>
 }

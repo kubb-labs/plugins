@@ -781,6 +781,33 @@ describe('zodGenerator — Operation', () => {
       }),
       options: { printer: { nodes: temporalNodes } },
     },
+    {
+      name: 'multiContentType — GET with json and xml response body',
+      node: ast.factory.createOperation({
+        operationId: 'getPetById',
+        method: 'GET',
+        path: '/pet/{petId}',
+        tags: ['pet'],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            description: 'Successful operation',
+            content: ['application/json', 'application/xml'].map((contentType) =>
+              ast.factory.createContent({
+                contentType,
+                schema: ast.factory.createSchema({
+                  type: ast.schemaTypes.object,
+                  primitive: ast.schemaTypes.object,
+                  properties: [
+                    ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: ast.schemaTypes.string }) }),
+                  ],
+                }),
+              }),
+            ),
+          }),
+        ],
+      }),
+    },
   ]
 
   test.each(operations)('$name', async (props) => {

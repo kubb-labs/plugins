@@ -26,15 +26,15 @@ export function createFindPetsByStatusStatus200FakerJson(data?: Partial<Array<Pe
 /**
  * @description successful operation
  */
-export function createFindPetsByStatusStatus200FakerXml(data?: Partial<Array<Pet>>): Array<Pet> {
-  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || []).filter((item) => item !== undefined)] as Array<Pet>
+export function createFindPetsByStatusStatus200FakerXml(data?: string): string {
+  return data ?? faker.string.alpha()
 }
 
 /**
  * @description successful operation
  */
-export function createFindPetsByStatusStatus200Faker(data?: Partial<Array<Pet>>): Array<Pet> {
-  return (data ?? faker.helpers.arrayElement([createFindPetsByStatusStatus200FakerJson(), createFindPetsByStatusStatus200FakerXml()])) as Array<Pet>
+export function createFindPetsByStatusStatus200Faker(data?: Partial<Array<Pet> | string>): Array<Pet> | string {
+  return (data ?? faker.helpers.arrayElement([createFindPetsByStatusStatus200FakerJson(), createFindPetsByStatusStatus200FakerXml()])) as Array<Pet> | string
 }
 
 /**
@@ -44,6 +44,6 @@ export function createFindPetsByStatusStatus400Faker() {
   return undefined
 }
 
-export function createFindPetsByStatusResponseFaker(data?: Partial<Array<Pet>>): Array<Pet> {
-  return (data ?? faker.helpers.arrayElement([createFindPetsByStatusStatus200Faker(), createFindPetsByStatusStatus400Faker()])) as Array<Pet>
+export function createFindPetsByStatusResponseFaker(data?: Partial<Array<Pet> | string>): Array<Pet> | string {
+  return (data ?? faker.helpers.arrayElement([createFindPetsByStatusStatus200Faker(), createFindPetsByStatusStatus400Faker()])) as Array<Pet> | string
 }

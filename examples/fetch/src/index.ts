@@ -21,8 +21,11 @@ export async function demo() {
   // switch on the top-level `status` to narrow `data`/`error` to one status' payload
   switch (result.status) {
     case 200: {
-      const pet: Pet = result.data
-      console.log('found', pet.name)
+      // The XML variant arrives as a string, so narrow on the content type for the parsed JSON.
+      if (result.contentType === 'application/json') {
+        const pet: Pet = result.data
+        console.log('found', pet.name)
+      }
       break
     }
     case 400:

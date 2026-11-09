@@ -25,5 +25,5 @@ export function uploadFile(
       body,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<ApiResponse>
 }

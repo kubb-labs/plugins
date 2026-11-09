@@ -10,7 +10,7 @@ export const getPetByIdPathPetIdSchema = z.coerce.bigint().describe('ID of pet t
 
 export const getPetByIdStatus200SchemaJson = petSchema
 
-export const getPetByIdStatus200SchemaXml = petSchema
+export const getPetByIdStatus200SchemaXml = z.string()
 
 export const getPetByIdStatus200Schema = z.union([getPetByIdStatus200SchemaJson, getPetByIdStatus200SchemaXml])
 

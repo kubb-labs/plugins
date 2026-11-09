@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { AddPetBody, AddPetBodyFormUrlEncoded, AddPetBodyJson, AddPetBodyXml, AddPetResponse, AddPetStatus200, AddPetStatus200Json, AddPetStatus200Xml } from '../../types/AddPet'
+import type { AddPetBody, AddPetBodyFormUrlEncoded, AddPetBodyJson, AddPetBodyXml, AddPetResponse, AddPetStatus200, AddPetStatus200Json } from '../../types/AddPet'
 import { createAddPetRequest } from '../createAddPetRequest'
 import { createPet } from '../createPet'
 import { fakerEN as faker } from '@faker-js/faker'
@@ -18,8 +18,8 @@ export function createAddPetStatus200Json(data?: Partial<AddPetStatus200Json>): 
 /**
  * @description Successful operation
  */
-export function createAddPetStatus200Xml(data?: Partial<AddPetStatus200Xml>): AddPetStatus200Xml {
-  return createPet(data) as AddPetStatus200Xml
+export function createAddPetStatus200Xml(data?: string): string {
+  return data ?? faker.string.alpha()
 }
 
 /**

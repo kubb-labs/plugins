@@ -41,14 +41,14 @@ export function updatePet(
   >,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<
-  | Omit<NonNullable<Pet>, 'name'>
+  | (Omit<NonNullable<Pet>, 'name'> | string)
   | {
       id?: number
     }
 > {
   return cy
     .request<
-      | Omit<NonNullable<Pet>, 'name'>
+      | (Omit<NonNullable<Pet>, 'name'> | string)
       | {
           id?: number
         }
@@ -58,5 +58,10 @@ export function updatePet(
       body,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<
+    | (Omit<NonNullable<Pet>, 'name'> | string)
+    | {
+        id?: number
+      }
+  >
 }

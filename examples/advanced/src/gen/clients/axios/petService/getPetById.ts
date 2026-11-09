@@ -30,7 +30,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
           }
         | {
             contentType: 'application/xml'
-            data: Omit<NonNullable<Pet>, 'name'>
+            data: string
           }
       '400': unknown
       '404': unknown
@@ -61,7 +61,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
               }
             | {
                 contentType: 'application/xml'
-                data: Omit<NonNullable<Pet>, 'name'>
+                data: string
               }
           '400': unknown
           '404': unknown

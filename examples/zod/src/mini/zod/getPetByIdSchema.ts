@@ -10,7 +10,7 @@ export const getPetByIdPathPetIdSchema = z.coerce.bigint()
 
 export const getPetByIdStatus200SchemaJson = z.lazy(() => petSchema)
 
-export const getPetByIdStatus200SchemaXml = z.lazy(() => petSchema)
+export const getPetByIdStatus200SchemaXml = z.string()
 
 export const getPetByIdStatus200Schema = z.union([getPetByIdStatus200SchemaJson, getPetByIdStatus200SchemaXml])
 

@@ -48,5 +48,5 @@ export function placeOrder(
       body,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<Order>
 }

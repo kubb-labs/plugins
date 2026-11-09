@@ -1,7 +1,15 @@
 import type { Pet } from '../../models/ts/Pet'
 import { http, HttpResponse } from 'msw/http'
 
-export function getPetByIdHandlerResponse200(data: Omit<NonNullable<Pet>, 'name'>) {
+export function getPetByIdHandlerResponse200(data: Omit<NonNullable<Pet>, 'name'> | string) {
+  if (typeof data === 'string')
+    return new HttpResponse<string>(data, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/xml',
+      },
+    })
+
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -23,11 +31,19 @@ export function getPetByIdHandlerResponse404(data?: unknown) {
 }
 
 export function getPetByIdHandler(
-  data?: Omit<NonNullable<Pet>, 'name'> | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  data?: (Omit<NonNullable<Pet>, 'name'> | string) | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
   options?: { baseURL?: string },
 ) {
   return http.get(`${options?.baseURL ?? ''}/pet/:petId\\:search`, function handler(info) {
     if (typeof data === 'function') return data(info)
+
+    if (typeof data === 'string')
+      return new HttpResponse<string>(data, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/xml',
+        },
+      })
 
     return new HttpResponse<string>(JSON.stringify(data), {
       status: 200,

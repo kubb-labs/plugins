@@ -13,7 +13,7 @@ export function updatePetMutationOptions<TContext = unknown>(
 ) {
   const mutationKey = updatePetMutationKey()
   return mutationOptions<
-    | Omit<NonNullable<Pet>, 'name'>
+    | (Omit<NonNullable<Pet>, 'name'> | string)
     | {
         id?: number
       },
@@ -68,7 +68,7 @@ export function updatePetMutationOptions<TContext = unknown>(
 export function useUpdatePet<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      | Omit<NonNullable<Pet>, 'name'>
+      | (Omit<NonNullable<Pet>, 'name'> | string)
       | {
           id?: number
         },
@@ -121,7 +121,7 @@ export function useUpdatePet<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? updatePetMutationKey()
 
   const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<
-    | Omit<NonNullable<Pet>, 'name'>
+    | (Omit<NonNullable<Pet>, 'name'> | string)
     | {
         id?: number
       },
@@ -163,7 +163,7 @@ export function useUpdatePet<TContext>(
   >
 
   return useMutation<
-    | Omit<NonNullable<Pet>, 'name'>
+    | (Omit<NonNullable<Pet>, 'name'> | string)
     | {
         id?: number
       },
@@ -210,7 +210,7 @@ export function useUpdatePet<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    | Omit<NonNullable<Pet>, 'name'>
+    | (Omit<NonNullable<Pet>, 'name'> | string)
     | {
         id?: number
       },

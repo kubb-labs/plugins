@@ -7,7 +7,7 @@ import type { Pet } from './Pet'
 
 export type AddPetStatus200Json = Pet
 
-export type AddPetStatus200Xml = Pet
+export type AddPetStatus200Xml = string
 
 export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 

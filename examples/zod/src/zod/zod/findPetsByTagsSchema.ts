@@ -30,7 +30,7 @@ export const findPetsByTagsStatus200SchemaJson = z.array(z.lazy(() => petSchema)
 
 export type FindPetsByTagsStatus200SchemaJsonType = z.infer<typeof findPetsByTagsStatus200SchemaJson>
 
-export const findPetsByTagsStatus200SchemaXml = z.array(z.lazy(() => petSchema))
+export const findPetsByTagsStatus200SchemaXml = z.string()
 
 export type FindPetsByTagsStatus200SchemaXmlType = z.infer<typeof findPetsByTagsStatus200SchemaXml>
 

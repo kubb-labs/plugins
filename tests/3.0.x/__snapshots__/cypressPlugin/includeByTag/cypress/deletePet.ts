@@ -11,5 +11,5 @@ export function deletePet({ path, headers }: DeletePetOptions, options: Partial<
     url: `/pet/${path.petId}`,
     headers,
     ...options
-  }).then((res) => res.body)
+  }).then((res) => res.body) as Cypress.Chainable<DeletePetResponse>
 }

@@ -15,7 +15,7 @@ export type GetUserByNamePath = {
 
 export type GetUserByNameStatus200Json = User
 
-export type GetUserByNameStatus200Xml = User
+export type GetUserByNameStatus200Xml = string
 
 export type GetUserByNameStatus200 = GetUserByNameStatus200Json | GetUserByNameStatus200Xml
 

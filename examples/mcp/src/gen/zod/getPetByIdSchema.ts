@@ -10,7 +10,7 @@ export const getPetByIdPathPetIdSchema = z.int().describe('ID of pet to return')
 
 export const getPetByIdStatus200SchemaJson = petSchema.omit({ name: true })
 
-export const getPetByIdStatus200SchemaXml = petSchema.omit({ name: true })
+export const getPetByIdStatus200SchemaXml = z.string()
 
 export const getPetByIdStatus200Schema = z.union([getPetByIdStatus200SchemaJson, getPetByIdStatus200SchemaXml])
 

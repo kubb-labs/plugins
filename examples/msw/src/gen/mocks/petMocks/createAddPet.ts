@@ -11,7 +11,6 @@ import type {
   AddPetResponse,
   AddPetStatus200,
   AddPetStatus200Json,
-  AddPetStatus200Xml,
   AddPetStatus405,
 } from '../../models/AddPet'
 import { createAddPetRequest } from '../createAddPetRequest'
@@ -30,8 +29,8 @@ export function createAddPetStatus200Json(data?: Partial<AddPetStatus200Json>): 
 /**
  * @description Successful operation
  */
-export function createAddPetStatus200Xml(data?: Partial<AddPetStatus200Xml>): AddPetStatus200Xml {
-  return createPet(data) as AddPetStatus200Xml
+export function createAddPetStatus200Xml(data?: string): string {
+  return data ?? faker.string.alpha()
 }
 
 /**

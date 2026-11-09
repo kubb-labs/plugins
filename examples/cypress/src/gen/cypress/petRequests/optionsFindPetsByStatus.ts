@@ -12,5 +12,5 @@ export function optionsFindPetsByStatus(options: Partial<Cypress.RequestOptions>
       url: `http://localhost:3000/pet/findByStatus`,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<OptionsFindPetsByStatusResponse>
 }
