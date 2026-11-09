@@ -18,7 +18,7 @@ export type PlaceOrderBodyFormUrlEncoded = Order | undefined;
 export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrderBodyFormUrlEncoded;
 
 export type PlaceOrderOptions = {
-  body: PlaceOrderBodyJson;
+  body?: PlaceOrderBodyJson;
   path?: never;
   query?: never;
   headers?: never;
@@ -26,7 +26,7 @@ export type PlaceOrderOptions = {
     request: 'application/json';
   };
 } | {
-  body: PlaceOrderBodyXml;
+  body?: PlaceOrderBodyXml;
   path?: never;
   query?: never;
   headers?: never;
@@ -34,7 +34,7 @@ export type PlaceOrderOptions = {
     request: 'application/xml';
   };
 } | {
-  body: PlaceOrderBodyFormUrlEncoded;
+  body?: PlaceOrderBodyFormUrlEncoded;
   path?: never;
   query?: never;
   headers?: never;

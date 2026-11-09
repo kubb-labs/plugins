@@ -13,7 +13,7 @@ import { client, withUnwrap } from '../../.kubb/client'
  * {@link /user}
  */
 export function createUser<ThrowOnError extends boolean = true>(
-  options: Options<CreateUserOptions, ThrowOnError>,
+  options: Options<CreateUserOptions, ThrowOnError> = {},
 ): Unwrappable<RequestResult<CreateUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

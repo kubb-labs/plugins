@@ -383,7 +383,7 @@ export function getRequestGroupOptionality(node: ast.OperationNode): RequestGrou
     hasRequiredPath,
     hasRequiredQuery,
     hasRequiredHeader,
-    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !groups.body,
+    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !(groups.body && node.requestBody?.required === true),
   }
 }
 
@@ -526,7 +526,7 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
       primitive: 'object',
       deprecated: node.deprecated,
       properties: [
-        ast.factory.createProperty({ name: 'body', required: hasBody, schema: body }),
+        ast.factory.createProperty({ name: 'body', required: hasBody && node.requestBody?.required === true, schema: body }),
         ...groups.map(({ name, params, resolve }) => {
           const required = params.some((param) => param.required)
 

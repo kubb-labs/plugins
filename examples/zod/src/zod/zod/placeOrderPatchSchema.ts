@@ -39,7 +39,7 @@ export const placeOrderPatchBodySchema = z.union([placeOrderPatchBodySchemaJson,
 export type PlaceOrderPatchBodySchemaType = z.infer<typeof placeOrderPatchBodySchema>
 
 export const placeOrderPatchOptionsSchema = z.object({
-  body: placeOrderPatchBodySchema,
+  body: placeOrderPatchBodySchema.optional(),
   path: z.never().optional(),
   query: z.never().optional(),
   headers: z.never().optional(),

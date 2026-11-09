@@ -11,7 +11,7 @@ import { createContainerResponseSchema } from '../zod/createContainerSchema'
 /**
  * {@link /containers}
  */
-export function createContainer<ThrowOnError extends boolean = true>(options: Options<ApiCreateContainerOptions, ThrowOnError>): Unwrappable<RequestResult<ApiCreateContainerResponses, ThrowOnError>> {
+export function createContainer<ThrowOnError extends boolean = true>(options: Options<ApiCreateContainerOptions, ThrowOnError> = {}): Unwrappable<RequestResult<ApiCreateContainerResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
   return withUnwrap(request({ method: 'POST', url: '/containers', validator: { response: createContainerResponseSchema }, contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<ApiCreateContainerResponses, ThrowOnError>>)

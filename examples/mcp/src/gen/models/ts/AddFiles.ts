@@ -27,7 +27,7 @@ export type AddFilesBody = AddFilesBodyJson | AddFilesBodyFormData
 
 export type AddFilesOptions =
   | {
-      body: AddFilesBodyJson
+      body?: AddFilesBodyJson
       path?: never
       query?: never
       headers?: never
@@ -36,7 +36,7 @@ export type AddFilesOptions =
       }
     }
   | {
-      body: AddFilesBodyFormData
+      body?: AddFilesBodyFormData
       path?: never
       query?: never
       headers?: never

@@ -33,7 +33,7 @@ export class StoreClient {
    * @summary Place an order for a pet
    * {@link /store/order}
    */
-    public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>> {
+    public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
     return withUnwrap(request<PlaceOrderOptionsSchemaType['body']>({ method: 'POST', url: '/store/order', validator: { response: placeOrderResponseSchema, error: placeOrderErrorSchema }, contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>>)

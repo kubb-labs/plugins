@@ -10,7 +10,7 @@ export type ApiCreatePetBody2 = {
 } | undefined;
 
 export type ApiCreatePetOptions = {
-  body: ApiCreatePetBody2;
+  body?: ApiCreatePetBody2;
   path?: never;
   query?: never;
   headers?: never;

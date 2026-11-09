@@ -13,7 +13,7 @@ import { client } from '../../../client'
  * {@link /store/order}
  */
 export function placeOrder<ThrowOnError extends boolean = true>(
-  options: Options<PlaceOrderOptions, ThrowOnError>,
+  options: Options<PlaceOrderOptions, ThrowOnError> = {},
 ): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
