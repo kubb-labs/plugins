@@ -26,18 +26,22 @@ export type UploadFileOptions =
       path: UploadFilePath
       query?: never
       headers?: never
-      contentType?: {
-        request: 'application/json'
-      }
+      contentType?:
+        | 'application/json'
+        | {
+            request: 'application/json'
+          }
     }
   | {
       body: UploadFileBodyFormData
       path: UploadFilePath
       query?: never
       headers?: never
-      contentType: {
-        request: 'multipart/form-data'
-      }
+      contentType:
+        | 'multipart/form-data'
+        | {
+            request: 'multipart/form-data'
+          }
     }
 
 export type UploadFileResponses = {

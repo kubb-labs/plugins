@@ -231,7 +231,7 @@ describe("typeGenerator — operations: 'inline'", () => {
         path: ApiCreatePetPath;
         query?: ApiCreatePetQuery;
         headers?: never;
-        contentType?: {
+        contentType?: 'application/json' | {
           request: 'application/json';
         };
       } | {
@@ -239,7 +239,7 @@ describe("typeGenerator — operations: 'inline'", () => {
         path: ApiCreatePetPath;
         query?: ApiCreatePetQuery;
         headers?: never;
-        contentType: {
+        contentType: 'application/xml' | {
           request: 'application/xml';
         };
       }",

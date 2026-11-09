@@ -1,3 +1,4 @@
+import http from 'node:http'
 import { Readable } from 'node:stream'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
@@ -121,6 +122,66 @@ describe('createAxiosTransport', () => {
       { adapter: 'fetch', withCredentials: 'omit' },
       { adapter: 'xhr', withCredentials: false },
     ])
+  })
+
+  test('sends no Content-Type on a call without a body, where axios would label a patch as a form', async () => {
+    const sent: Array<string | null> = []
+    const fetch = async (input: Request) => (sent.push(input.headers.get('content-type')), new Response(null, { status: 204 }))
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch } })) })
+
+    await client({ method: 'PATCH', url: 'https://petstore.dev/pet/1' })
+    await client({ method: 'PATCH', url: 'https://petstore.dev/pet/1', body: { name: 'odie' }, contentType: 'application/merge-patch+json' })
+
+    expect(sent).toStrictEqual([null, 'application/merge-patch+json'])
+  })
+
+  test('sends a typed array and a Blob through the Node adapter with the operation content type', async () => {
+    const seen: Array<{ type: string | undefined; body: string }> = []
+    const server = http.createServer((req, res) => {
+      const chunks: Array<Buffer> = []
+      req.on('data', (chunk: Buffer) => chunks.push(chunk))
+      req.on('end', () => (seen.push({ type: req.headers['content-type'], body: Buffer.concat(chunks).toString('hex') }), res.end()))
+    })
+    await new Promise<void>((resolve) => server.listen(0, resolve))
+    const url = `http://localhost:${(server.address() as { port: number }).port}/upload`
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'http' })) })
+
+    try {
+      await client({ method: 'PUT', url, body: new Uint8Array([9, 0, 1, 2]).subarray(1), contentType: 'application/octet-stream' })
+      await client({ method: 'PUT', url, body: new Blob([new Uint8Array([3])], { type: 'image/png' }), contentType: 'application/octet-stream' })
+    } finally {
+      server.close()
+    }
+
+    expect(seen).toStrictEqual([
+      { type: 'application/octet-stream', body: '000102' },
+      { type: 'application/octet-stream', body: '03' },
+    ])
+  })
+
+  test('decodes a body by its Content-Type when no response type is set, as the fetch transport does', async () => {
+    const bodies: Record<string, [string, string]> = {
+      '/text': ['{"id":1}', 'text/plain'],
+      '/json': ['{"id":1}', 'application/json'],
+      '/number': ['123', 'text/plain'],
+    }
+    const fetch = async (input: Request) => {
+      const [body, type] = bodies[new URL(input.url).pathname]!
+      return new Response(body, { headers: { 'content-type': type } })
+    }
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch } })) })
+
+    expect((await client({ method: 'GET', url: 'https://petstore.dev/text' })).data).toBe('{"id":1}')
+    expect((await client({ method: 'GET', url: 'https://petstore.dev/json' })).data).toStrictEqual({ id: 1 })
+    expect((await client({ method: 'GET', url: 'https://petstore.dev/number' })).data).toBe('123')
+  })
+
+  test('rejects an aborted call with the signal reason, as fetch does', async () => {
+    const reason = new Error('stop')
+    const fetch = async () => new Response('{}', { headers: { 'content-type': 'application/json' } })
+    const client = createClientCore({ defaultTransport: createAxiosTransport(axios.create({ adapter: 'fetch', env: { fetch } })) })
+
+    await expect(client({ method: 'GET', url: 'https://petstore.dev/pet', signal: AbortSignal.abort(reason) })).rejects.toBe(reason)
   })
 
   test('sends the serialized body and turns URLSearchParams into a string for the Node adapter', async () => {

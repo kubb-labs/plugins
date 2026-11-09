@@ -22,7 +22,7 @@ export type PlaceOrderOptions = {
   path?: never;
   query?: never;
   headers?: never;
-  contentType?: {
+  contentType?: 'application/json' | {
     request: 'application/json';
   };
 } | {
@@ -30,7 +30,7 @@ export type PlaceOrderOptions = {
   path?: never;
   query?: never;
   headers?: never;
-  contentType: {
+  contentType: 'application/xml' | {
     request: 'application/xml';
   };
 } | {
@@ -38,7 +38,7 @@ export type PlaceOrderOptions = {
   path?: never;
   query?: never;
   headers?: never;
-  contentType: {
+  contentType: 'application/x-www-form-urlencoded' | {
     request: 'application/x-www-form-urlencoded';
   };
 };

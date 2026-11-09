@@ -1,6 +1,15 @@
 import axios from 'axios'
 import type { AxiosHeaders, AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios'
-import { createClientCore, getResponseContentType, isStreamed, parseJsonOrText, readResponse, resolveResponseType, type ResponseType } from './core.ts'
+import {
+  createClientCore,
+  getHeader,
+  getResponseContentType,
+  isStreamed,
+  parseJsonOrText,
+  readResponse,
+  resolveResponseType,
+  type ResponseType,
+} from './core.ts'
 import * as core from './core.ts'
 
 export * from './core.ts'
@@ -82,6 +91,16 @@ function decodeBytes(data: unknown, responseType: ResponseType | undefined, cont
   return responseType === 'text' || responseType === 'document' ? text : parseJsonOrText(text)
 }
 
+/**
+ * A body the axios Node adapter sends as fetch would: it rejects a typed array, and labels a Blob with the Blob's own type
+ * over the `Content-Type` header, so the Blob takes the header's type.
+ */
+function toAxiosData(body: unknown, contentType: string | undefined): unknown {
+  if (ArrayBuffer.isView(body)) return body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength)
+  if (body instanceof Blob && contentType && body.type !== contentType) return new Blob([body], { type: contentType })
+  return body
+}
+
 /** Resolves an adapter setting to the function axios runs, or `undefined` when axios cannot resolve it here. */
 function resolveAdapter(adapter: AxiosRequestConfig['adapter']): unknown {
   try {
@@ -106,12 +125,14 @@ const axiosDefaultAdapters = Array.isArray(axios.defaults.adapter) ? String(axio
  */
 export function createAxiosTransport(instance: AxiosInstance): (request: core.ResolvedRequest) => Promise<TransportResult> {
   return async (request) => {
+    const contentType = getHeader(request.headers, 'content-type')
     const config: AxiosRequestConfig = {
       ...request.options,
       url: request.url,
       method: request.method,
-      headers: request.headers,
-      data: request.body,
+      // axios labels a post, put, or patch without a body as a form, so `false` leaves the header off, as fetch does.
+      headers: request.body === undefined && contentType === undefined ? { ...request.headers, 'Content-Type': false } : request.headers,
+      data: toAxiosData(request.body, contentType),
       // Kubb already serialized the body; only URLSearchParams needs a string, since axios's Node adapter rejects it.
       transformRequest: (data) => (data instanceof URLSearchParams ? data.toString() : data),
       signal: request.signal,
@@ -123,8 +144,10 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
     // stream when an entry asks for one. Bytes are decoded in `transformResponse`, before the axios interceptors run, so they
     // see the parsed body. A stream passes through and is read below when its entry is not a stream.
     const map = typeof request.responseType === 'object' ? request.responseType : undefined
+    // Without a parser, the body is decoded by its `Content-Type` as on fetch, since axios would parse any text as JSON.
+    const byContentType = Boolean(map) || request.responseType === undefined
     const streamed = request.responseType === 'stream' || Boolean(map && Object.values(map).includes('stream'))
-    if (map) {
+    if (byContentType) {
       config.responseType = streamed ? 'stream' : 'arraybuffer'
       // An error body is left as read, and `readResponse` below decodes it as the fetch transport does.
       config.transformResponse = (data, responseHeaders, status) => {
@@ -153,7 +176,10 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
     // The Node http adapter has no 'blob' and would decode the bytes as text, so it reads a buffer instead.
     if (request.responseType === 'blob' && typeof XMLHttpRequest === 'undefined' && !fetchAdapter) config.responseType = 'arraybuffer'
 
-    const response = await instance.request<unknown>(config)
+    // axios rejects an abort with its own `CanceledError`, while fetch rejects with the signal's reason.
+    const response = await instance.request<unknown>(config).catch((error: unknown) => {
+      throw request.signal?.aborted && axios.isCancel(error) ? request.signal.reason : error
+    })
     const { data, status, statusText } = response
     const headers = toHeaders(response.headers)
     const result = { status, statusText, headers, contentType: getResponseContentType(headers), request: response.config, response }
@@ -162,7 +188,7 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
     // Bytes and streams are read as the fetch transport reads a body, so both clients decode alike. A map's success body
     // was already decoded in `transformResponse`.
     const bytes = data instanceof Blob || data instanceof ArrayBuffer || data instanceof Uint8Array
-    if (isStreamed(data) || (bytes && !(map && status < 300))) {
+    if (isStreamed(data) || (bytes && !(byContentType && status < 300))) {
       const read = await readResponse(new Response(data as BodyInit, { status, statusText, headers }), {
         request: response.config,
         responseType: request.responseType,

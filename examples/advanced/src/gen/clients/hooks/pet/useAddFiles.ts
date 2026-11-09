@@ -22,18 +22,22 @@ export function addFilesMutationOptions<TContext = unknown>(
         path?: never
         query?: never
         headers?: never
-        contentType?: {
-          request: 'application/json'
-        }
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
       }
     | {
         body: Omit<NonNullable<Pet>, 'id'>
         path?: never
         query?: never
         headers?: never
-        contentType: {
-          request: 'multipart/form-data'
-        }
+        contentType:
+          | 'multipart/form-data'
+          | {
+              request: 'multipart/form-data'
+            }
       },
     TContext
   >({
@@ -61,18 +65,22 @@ export function useAddFiles<TContext>(
           path?: never
           query?: never
           headers?: never
-          contentType?: {
-            request: 'application/json'
-          }
+          contentType?:
+            | 'application/json'
+            | {
+                request: 'application/json'
+              }
         }
       | {
           body: Omit<NonNullable<Pet>, 'id'>
           path?: never
           query?: never
           headers?: never
-          contentType: {
-            request: 'multipart/form-data'
-          }
+          contentType:
+            | 'multipart/form-data'
+            | {
+                request: 'multipart/form-data'
+              }
         },
       TContext
     > & { client?: QueryClient }
@@ -95,18 +103,22 @@ export function useAddFiles<TContext>(
         path?: never
         query?: never
         headers?: never
-        contentType?: {
-          request: 'application/json'
-        }
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
       }
     | {
         body: Omit<NonNullable<Pet>, 'id'>
         path?: never
         query?: never
         headers?: never
-        contentType: {
-          request: 'multipart/form-data'
-        }
+        contentType:
+          | 'multipart/form-data'
+          | {
+              request: 'multipart/form-data'
+            }
       },
     TContext
   >
@@ -121,18 +133,22 @@ export function useAddFiles<TContext>(
         path?: never
         query?: never
         headers?: never
-        contentType?: {
-          request: 'application/json'
-        }
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
       }
     | {
         body: Omit<NonNullable<Pet>, 'id'>
         path?: never
         query?: never
         headers?: never
-        contentType: {
-          request: 'multipart/form-data'
-        }
+        contentType:
+          | 'multipart/form-data'
+          | {
+              request: 'multipart/form-data'
+            }
       },
     TContext
   >(
@@ -152,18 +168,22 @@ export function useAddFiles<TContext>(
         path?: never
         query?: never
         headers?: never
-        contentType?: {
-          request: 'application/json'
-        }
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
       }
     | {
         body: Omit<NonNullable<Pet>, 'id'>
         path?: never
         query?: never
         headers?: never
-        contentType: {
-          request: 'multipart/form-data'
-        }
+        contentType:
+          | 'multipart/form-data'
+          | {
+              request: 'multipart/form-data'
+            }
       },
     TContext
   >

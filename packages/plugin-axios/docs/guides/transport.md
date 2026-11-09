@@ -35,7 +35,7 @@ client.setConfig({ transport: createAxiosTransport(instance) })
 Every generated function now sends through your instance, so its timeout, headers, and axios interceptors apply to each call. Handlers registered through `client.interceptors` keep running, whatever the transport.
 
 > [!NOTE]
-> Kubb sets `url`, `method`, `headers`, `data`, `transformRequest`, `responseType`, and `validateStatus` on each request for its own serialization and status handling, so leave those fields alone. Set timeouts, retries, and interceptors on the instance. For one call, pass `options`, such as `{ timeout }` or `{ onUploadProgress }`, instead of building a new instance.
+> Kubb sets `url`, `method`, `headers`, `data`, `transformRequest`, `transformResponse`, `responseType`, and `validateStatus` for its own serialization and status handling, so leave those fields alone. Set timeouts, retries, and interceptors on the instance. For one call, pass `options`, such as `{ timeout }` or `{ onUploadProgress }`, instead of building a new instance.
 
 ## Configure the default instance
 

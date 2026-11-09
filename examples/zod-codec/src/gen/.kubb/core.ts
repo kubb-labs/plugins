@@ -409,9 +409,16 @@ function collectHeadersCaseInsensitive(...sources: Array<unknown>): Record<strin
   return result
 }
 
-function getHeader(headers: Record<string, string>, name: string): string | undefined {
+/** The value of a header, matched by name in any letter case. */
+export function getHeader(headers: Record<string, string>, name: string): string | undefined {
   const key = Object.keys(headers).find((k) => k.toLowerCase() === name.toLowerCase())
   return key ? headers[key] : undefined
+}
+
+function deleteHeader(headers: Record<string, string>, name: string): void {
+  for (const key of Object.keys(headers)) {
+    if (key.toLowerCase() === name.toLowerCase()) delete headers[key]
+  }
 }
 
 function serializeUrl({
@@ -561,7 +568,7 @@ export function getResponseContentType(headers: Headers | Record<string, string>
  *
  * @example
  * ```ts
- * client.setConfig({ transport: (request) => ky(request.url, { ...toRequestInit(request), throwHttpErrors: false, retry: 0 }) })
+ * client.setConfig({ transport: (request) => ky(request.url, { ...toRequestInit(request), throwHttpErrors: false, retry: 0, timeout: false }) })
  * ```
  */
 export function toRequestInit(request: ResolvedRequest): RequestInit {
@@ -717,16 +724,16 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   const body = contentCodec?.serialize
     ? contentCodec.serialize(validatedBody, requestContentType)
     : bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.styles?.body })
-  if (requestContentTypeOption) headers['Content-Type'] = requestContentTypeOption
+  // The operation's content type replaces a `content-type` header in any letter case, and is left off when there is no body to label.
+  if (requestContentTypeOption && validatedBody !== undefined) {
+    deleteHeader(headers, 'content-type')
+    headers['Content-Type'] = requestContentTypeOption
+  }
   if (usesDefaultBodySerializer && isDefaultJsonBody(validatedBody) && getHeader(headers, 'content-type') === undefined) {
     headers['Content-Type'] = 'application/json'
   }
   // The transport must set the multipart boundary, even when a content type was explicitly provided.
-  if (body instanceof FormData) {
-    for (const key of Object.keys(headers)) {
-      if (key.toLowerCase() === 'content-type') delete headers[key]
-    }
-  }
+  if (body instanceof FormData) deleteHeader(headers, 'content-type')
 
   const url = serializeUrl({
     parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
@@ -808,14 +815,14 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         method: resolvedRequest.method,
         url: resolvedRequest.url,
       })
-      await interceptors.error.run(responseError, requestConfig)
-      throw responseError
+      // An error handler may return a different error, such as a domain error, which is thrown instead.
+      throw (await interceptors.error.run(responseError, requestConfig)) ?? responseError
     }
     return {
       status: result.status,
       data: isSuccess ? data : undefined,
       // An empty error body still reports the failure, so `if (error)` and `.unwrap()` see a value.
-      error: isSuccess ? undefined : (data ?? ({ status: result.status, statusText: result.statusText } satisfies EmptyErrorBody)),
+      error: isSuccess ? undefined : data == null || data === '' ? ({ status: result.status, statusText: result.statusText } satisfies EmptyErrorBody) : data,
       contentType,
       request: result.request,
       response: result.response,

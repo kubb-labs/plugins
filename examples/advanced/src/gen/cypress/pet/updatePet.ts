@@ -9,27 +9,33 @@ export function updatePet(
         path?: never
         query?: never
         headers?: never
-        contentType?: {
-          request: 'application/json'
-        }
+        contentType?:
+          | 'application/json'
+          | {
+              request: 'application/json'
+            }
       }
     | {
         body: Omit<NonNullable<Pet>, 'id'>
         path?: never
         query?: never
         headers?: never
-        contentType: {
-          request: 'application/xml'
-        }
+        contentType:
+          | 'application/xml'
+          | {
+              request: 'application/xml'
+            }
       }
     | {
         body: Omit<NonNullable<Pet>, 'id'>
         path?: never
         query?: never
         headers?: never
-        contentType: {
-          request: 'application/x-www-form-urlencoded'
-        }
+        contentType:
+          | 'application/x-www-form-urlencoded'
+          | {
+              request: 'application/x-www-form-urlencoded'
+            }
       },
     'body'
   >,
