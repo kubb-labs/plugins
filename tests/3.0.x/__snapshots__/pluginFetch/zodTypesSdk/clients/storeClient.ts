@@ -36,6 +36,6 @@ export class StoreClient {
     public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request<PlaceOrderOptionsSchemaType['body']>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, validator: { response: placeOrderResponseSchema, error: placeOrderErrorSchema, ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>>)
+    return withUnwrap(request<PlaceOrderOptionsSchemaType['body']>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, validator: { response: placeOrderResponseSchema, error: placeOrderErrorSchema, errorStatus: [405], ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>>)
   }
 }

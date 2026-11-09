@@ -19,7 +19,17 @@ describe('buildSdkMethod', () => {
         }),
       ],
     })
-    const validatorHooks = { request: null, path: null, query: null, headers: null, response: 'streamEventsResponseSchema', error: null, importedZodNames: [] }
+    const validatorHooks = {
+      request: null,
+      path: null,
+      query: null,
+      headers: null,
+      cookies: null,
+      response: 'streamEventsResponseSchema',
+      error: null,
+      errorStatus: null,
+      importedZodNames: [],
+    }
     const method = buildSdkMethod({ node, name: 'streamEvents', types: resolverTs, validatorHooks, returnType: 'full', throwOnErrorDefault: true })
 
     expect(method).toContain('): Unwrappable<StreamResult<StreamEventsResponses, ThrowOnError>>')

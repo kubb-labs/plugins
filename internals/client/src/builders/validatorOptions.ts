@@ -1,4 +1,5 @@
 import { isSuccessStatusCode } from '@internals/shared'
+import { stringify } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import type { ValidatorOptions } from '../types.ts'
@@ -46,7 +47,18 @@ export function resolveResponseValidator(validator: ValidatorOptions | undefined
  * operation documents no error responses with a schema.
  */
 export function buildZodErrorParse(node: ast.OperationNode, zodResolver: ResolverZod): string | null {
-  const hasErrorResponse = node.responses.some((res) => !isSuccessStatusCode(res.statusCode) && res.content?.some((entry) => entry.schema))
-  if (!hasErrorResponse) return null
+  if (!getErrorStatusCodes(node).length) return null
   return zodResolver.response.error?.(node) || null
+}
+
+/** Prints the statuses `<operation>ErrorSchema` covers, such as `[404, '5XX']`, or `null` when a `default` response covers them all. */
+export function buildErrorStatusLiteral(node: ast.OperationNode): string | null {
+  const statusCodes = getErrorStatusCodes(node)
+  if (!statusCodes.length || statusCodes.includes('default')) return null
+  return `[${statusCodes.map((statusCode) => (/^\d+$/.test(statusCode) ? statusCode : stringify(statusCode))).join(', ')}]`
+}
+
+// The same selection plugin-zod uses for `<operation>ErrorSchema`: every non-2xx response with a schema.
+function getErrorStatusCodes(node: ast.OperationNode): Array<string> {
+  return node.responses.filter((res) => !isSuccessStatusCode(res.statusCode) && res.content?.some((entry) => entry.schema)).map((res) => String(res.statusCode))
 }

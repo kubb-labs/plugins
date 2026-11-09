@@ -106,7 +106,7 @@ describe('OpenAPI 3.2 item schemas', () => {
   test.each([
     { name: 'axios', clientPlugin: pluginAxios },
     { name: 'fetch', clientPlugin: pluginFetch },
-  ])('types each $name event by name, validates per event, and keeps a payload-only item', async ({ clientPlugin }) => {
+  ])('types each $name event by name, validates per event, keeps a payload-only item, and streams JSON Lines', async ({ clientPlugin }) => {
     const output = await fs.mkdtemp(path.join(dirname, '.event-stream-3-2-'))
     try {
       const { diagnostics } = await createKubb(
@@ -141,10 +141,13 @@ describe('OpenAPI 3.2 item schemas', () => {
       expect(ticks).toContain('Promise<StreamResult<StreamTicksResponses, ThrowOnError>>')
       expect(ticks).toContain("{ client: request, config, shape: 'data', validator: ")
 
-      // JSON Lines is a stream of items too, but not an event stream, so it keeps the one-shot result typed with one item.
+      // JSON Lines streams one LogEntry per line, validated per line.
       const logs = await fs.readFile(path.join(output, 'clients', 'streamLogs.ts'), 'utf8')
-      expect(logs).toContain('RequestResult<')
-      expect(logs).not.toContain('toEventStream')
+      expect(logs).toContain('Promise<StreamResult<StreamLogsResponses, ThrowOnError, SuccessOf<StreamLogsResponses>>>')
+      expect(logs).toContain("{ client: request, config, shape: 'line', validator: ")
+      expect(logs).toContain("contentType: { response: 'application/jsonl' }")
+      expect(logs).toContain("responseType: 'stream'")
+      expect(logs).not.toMatch(/validator: \{[^}]*response:/)
 
       const types = await readAll(path.join(output, 'types'))
       expect(types).toMatch(/event: ['"]message_delta['"]/)

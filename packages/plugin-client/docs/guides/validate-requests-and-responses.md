@@ -30,7 +30,7 @@ request({
   method: 'POST',
   url: '/pet',
   ...config,
-  validator: { response: addPetResponseSchema, error: addPetErrorSchema, ...config.validator },
+  validator: { response: addPetResponseSchema, error: addPetErrorSchema, errorStatus: [405], ...config.validator },
 })
 ```
 
@@ -44,7 +44,7 @@ type Schema = { '~standard': { validate: (value: unknown) => Result | Promise<Re
 
 export type RequestConfig = {
   // ...
-  validator?: { request?: Schema; response?: Schema; error?: Schema }
+  validator?: { request?: Schema; response?: Schema; error?: Schema; errorStatus?: Array<number | string> }
 }
 
 // inside client(), after reading the body
@@ -54,6 +54,8 @@ const validatedBody = result && 'value' in result ? result.value : body
 ```
 
 Return `validatedBody` as `data`, so a schema that transforms the value takes effect. Without a response schema, `validatedBody` is the original `body`.
+
+`errorStatus` lists the statuses `error` covers. Skip `error` for any other status.
 
 Set `validator: { request: 'zod' }` or `{ response: 'zod' }` to pass one direction only. Without `pluginZod()` in the plugins list, generation stops with an error.
 

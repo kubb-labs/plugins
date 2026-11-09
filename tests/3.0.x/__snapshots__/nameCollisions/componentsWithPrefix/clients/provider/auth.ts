@@ -14,5 +14,5 @@ import { providerAuthResponseSchema, providerAuthErrorSchema2 } from '../../zod/
 export function providerAuth<ThrowOnError extends boolean = true>(options: Options<ApiProviderAuthOptions, ThrowOnError> = {}): Unwrappable<RequestResult<ApiProviderAuthResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'POST', url: '/auth', ...config, validator: { response: providerAuthResponseSchema, error: providerAuthErrorSchema2, ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<ApiProviderAuthResponses, ThrowOnError>>)
+  return withUnwrap(request({ method: 'POST', url: '/auth', ...config, validator: { response: providerAuthResponseSchema, error: providerAuthErrorSchema2, errorStatus: [400], ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<ApiProviderAuthResponses, ThrowOnError>>)
 }

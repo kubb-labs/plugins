@@ -2,7 +2,7 @@ import { getOperationParameters } from '@internals/shared'
 import type { ast } from '@kubb/kit'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import type { ValidatorOptions } from '../types.ts'
-import { buildZodErrorParse, resolveParamsValidator, resolveRequestValidator, resolveResponseValidator } from './validatorOptions.ts'
+import { buildErrorStatusLiteral, buildZodErrorParse, resolveParamsValidator, resolveRequestValidator, resolveResponseValidator } from './validatorOptions.ts'
 
 /**
  * The per-call validator references a generated function wires into its request config. Each hook is
@@ -33,6 +33,8 @@ export type ValidatorHooks = {
    * call does not throw.
    */
   error: string | null
+  /** Array literal of the statuses `error` covers, or `null` when `error` is off or a `default` response covers every status. */
+  errorStatus: string | null
   /**
    * Zod schema names the generated file imports from the zod plugin output.
    */
@@ -59,6 +61,7 @@ export function buildValidatorHooks({
   // Success responses validate with the success-only `<operation>ResponseSchema`; error bodies are never zod-parsed on the throw path.
   const response = parsesResponse ? zodResolver.response.response(node) || null : null
   const error = parsesResponse ? buildZodErrorParse(node, zodResolver) : null
+  const errorStatus = error ? buildErrorStatusLiteral(node) : null
   const request = zodResolver && resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.response.body(node) || null : null
 
   const paramGroups = getOperationParameters(node)
@@ -74,7 +77,7 @@ export function buildValidatorHooks({
 
   const headersValidator = headers ? `toHeadersStandardSchema(${headers}, ${headers}.shape)` : null
 
-  return { request, path, query, headers: headersValidator, cookies, response, error, importedZodNames }
+  return { request, path, query, headers: headersValidator, cookies, response, error, errorStatus, importedZodNames }
 }
 
 /**

@@ -54,11 +54,11 @@ export function buildReturnStatement({
 }
 
 /**
- * Builds the return type and statement of a `text/event-stream` operation. The item type is `TypedEvent<...>` when each item
- * declares its own `event` and `data`, and otherwise the payload type, which `EventStreamResult` wraps in `ServerSentEvent`. The call's
- * promise goes through `toEventStream` with the `client` for its defaults, the call's `config`, the shape and the per-event
- * validator. A `returnType: 'plain'` client receives only the promise,
- * `toEventStream(request(config))`, and keeps its response validator in the call config.
+ * Builds the return type and statement of a streamed operation. The item type is `TypedEvent<...>` when each event declares
+ * its own `event` and `data`, the success type itself for JSON Lines, and otherwise the payload type, which `EventStreamResult`
+ * wraps in `ServerSentEvent`. The call's promise goes through `toEventStream` with the `client` for its defaults, the call's
+ * `config`, the shape and the per-item validator. A `returnType: 'plain'` client receives only the promise,
+ * `toEventStream(request(config))`, plus the shape for JSON Lines, and keeps its response validator in the call config.
  */
 export function buildEventStreamReturn({
   node,
@@ -81,12 +81,13 @@ export function buildEventStreamReturn({
   const shape = getEventStream(node) ?? 'data'
   const responses = types.response.responses(node)
   const success = `SuccessOf<${responses}>`
-  const eventType = shape === 'event' ? `TypedEvent<${success}>` : `ServerSentEvent<${success}>`
+  const eventType = { event: `TypedEvent<${success}>`, data: `ServerSentEvent<${success}>`, line: success }[shape]
   if (returnType === 'plain') {
-    return { returnType: `Promise<EventStreamResult<${eventType}>>`, statement: `return toEventStream<${eventType}>(request(${callConfig}))` }
+    const options = shape === 'line' ? `, { shape: 'line' }` : ''
+    return { returnType: `Promise<EventStreamResult<${eventType}>>`, statement: `return toEventStream<${eventType}>(request(${callConfig})${options})` }
   }
 
-  const generics = `${responses}, ThrowOnError${shape === 'event' ? `, ${eventType}` : ''}`
+  const generics = `${responses}, ThrowOnError${shape === 'data' ? '' : `, ${eventType}`}`
   const meta = [`shape: '${shape}'`, validatorHooks?.response ? `validator: ${validatorHooks.response}` : null].filter(Boolean).join(', ')
   const call = `toEventStream<${eventType}>(request(${callConfig}), { client: request, config, ${meta} })`
   if (returnType === 'data') {
