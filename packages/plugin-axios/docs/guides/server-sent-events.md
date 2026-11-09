@@ -178,7 +178,7 @@ for await (const { data } of stream) {
 
 ## JSON Lines
 
-An operation whose only success content type is a JSON sequence, such as `application/jsonl`, `application/x-ndjson`, or `application/json-seq`, streams one item per line. Each line is parsed as JSON, so the loop gets each item as soon as its line arrives instead of waiting for the whole body.
+An operation whose only success content type is a JSON sequence, such as `application/jsonl`, `application/x-ndjson`, or `application/json-seq`, streams one item per line. Each line is parsed as JSON, so the loop gets each item as soon as its line arrives instead of waiting for the whole body. An `application/json-seq` record must fit on one line; a record that spans several lines fails to parse.
 
 ### Describe it
 
