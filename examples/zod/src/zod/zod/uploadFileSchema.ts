@@ -39,7 +39,7 @@ export const uploadFileQuerySchema = z.object({
 export type UploadFileQuerySchemaType = z.infer<typeof uploadFileQuerySchema>
 
 export const uploadFileOptionsSchema = z.object({
-  body: uploadFileBodySchema,
+  body: uploadFileBodySchema.optional(),
   path: uploadFilePathSchema,
   query: uploadFileQuerySchema.optional(),
   headers: z.never().optional(),

@@ -39,7 +39,7 @@ export const placeOrderBodySchema = z.union([placeOrderBodySchemaJson, placeOrde
 export type PlaceOrderBodySchemaType = z.infer<typeof placeOrderBodySchema>
 
 export const placeOrderOptionsSchema = z.object({
-  body: placeOrderBodySchema,
+  body: placeOrderBodySchema.optional(),
   path: z.never().optional(),
   query: z.never().optional(),
   headers: z.never().optional(),

@@ -673,7 +673,7 @@ export type UploadFileStatus200 = ApiResponse
 export type UploadFileBody = Blob | undefined
 
 export type UploadFileOptions = {
-  body: UploadFileBody
+  body?: UploadFileBody
   path: UploadFilePath
   query?: UploadFileQuery
   headers?: never
@@ -726,7 +726,7 @@ export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrder
 
 export type PlaceOrderOptions =
   | {
-      body: PlaceOrderBodyJson
+      body?: PlaceOrderBodyJson
       path?: never
       query?: never
       headers?: never
@@ -735,7 +735,7 @@ export type PlaceOrderOptions =
       }
     }
   | {
-      body: PlaceOrderBodyXml
+      body?: PlaceOrderBodyXml
       path?: never
       query?: never
       headers?: never
@@ -744,7 +744,7 @@ export type PlaceOrderOptions =
       }
     }
   | {
-      body: PlaceOrderBodyFormUrlEncoded
+      body?: PlaceOrderBodyFormUrlEncoded
       path?: never
       query?: never
       headers?: never
@@ -777,7 +777,7 @@ export type PlaceOrderPatchBody = PlaceOrderPatchBodyJson | PlaceOrderPatchBodyX
 
 export type PlaceOrderPatchOptions =
   | {
-      body: PlaceOrderPatchBodyJson
+      body?: PlaceOrderPatchBodyJson
       path?: never
       query?: never
       headers?: never
@@ -786,7 +786,7 @@ export type PlaceOrderPatchOptions =
       }
     }
   | {
-      body: PlaceOrderPatchBodyXml
+      body?: PlaceOrderPatchBodyXml
       path?: never
       query?: never
       headers?: never
@@ -795,7 +795,7 @@ export type PlaceOrderPatchOptions =
       }
     }
   | {
-      body: PlaceOrderPatchBodyFormUrlEncoded
+      body?: PlaceOrderPatchBodyFormUrlEncoded
       path?: never
       query?: never
       headers?: never

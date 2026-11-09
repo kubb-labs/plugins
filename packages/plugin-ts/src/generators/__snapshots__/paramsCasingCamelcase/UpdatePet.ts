@@ -20,7 +20,7 @@ export type UpdatePetBody = {
 }
 
 export type UpdatePetOptions = {
-  body: UpdatePetBody
+  body?: UpdatePetBody
   path: UpdatePetPath
   query?: UpdatePetQuery
   headers?: never

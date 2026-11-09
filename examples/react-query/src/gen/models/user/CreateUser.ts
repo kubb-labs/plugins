@@ -33,7 +33,7 @@ export type CreateUserBody = CreateUserBodyJson | CreateUserBodyXml | CreateUser
 
 export type CreateUserOptions =
   | {
-      body: CreateUserBodyJson
+      body?: CreateUserBodyJson
       path?: never
       query?: never
       headers?: never
@@ -42,7 +42,7 @@ export type CreateUserOptions =
       }
     }
   | {
-      body: CreateUserBodyXml
+      body?: CreateUserBodyXml
       path?: never
       query?: never
       headers?: never
@@ -51,7 +51,7 @@ export type CreateUserOptions =
       }
     }
   | {
-      body: CreateUserBodyFormUrlEncoded
+      body?: CreateUserBodyFormUrlEncoded
       path?: never
       query?: never
       headers?: never

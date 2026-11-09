@@ -5,7 +5,7 @@ export function placeOrder(
     body,
   }: Pick<
     | {
-        body: Order
+        body?: Order
         path?: never
         query?: never
         headers?: never
@@ -14,7 +14,7 @@ export function placeOrder(
         }
       }
     | {
-        body: Order
+        body?: Order
         path?: never
         query?: never
         headers?: never
@@ -23,7 +23,7 @@ export function placeOrder(
         }
       }
     | {
-        body: Order
+        body?: Order
         path?: never
         query?: never
         headers?: never

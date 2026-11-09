@@ -16,7 +16,7 @@ export type CreateUsersWithListInputStatusDefault = unknown
 export type CreateUsersWithListInputBody = User[] | undefined
 
 export type CreateUsersWithListInputOptions = {
-  body: CreateUsersWithListInputBody
+  body?: CreateUsersWithListInputBody
   path?: never
   query?: never
   headers?: never

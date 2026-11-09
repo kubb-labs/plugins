@@ -348,6 +348,26 @@ describe('buildOptionsSchema', () => {
       { name: 'headers', required: false, schemaType: 'never' },
     ])
   })
+
+  test.each([
+    [true, true],
+    [false, false],
+    [undefined, false],
+  ])('makes body required only when requestBody.required is true (%s)', (required, expected) => {
+    const node = ast.factory.createOperation({
+      operationId: 'updateUser',
+      method: 'PUT',
+      path: '/user',
+      requestBody: {
+        required,
+        content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) })],
+      },
+    })
+
+    const schema = ast.narrowSchema(buildOptionsSchema(node, resolver), 'object')!
+
+    expect(schema.properties?.find((property) => property.name === 'body')?.required).toBe(expected)
+  })
 })
 
 describe('resolveOperationTypeNames', () => {

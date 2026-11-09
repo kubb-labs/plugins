@@ -227,7 +227,7 @@ describe("typeGenerator — operations: 'inline'", () => {
         "ApiCreatePetBodyJson": "ApiNewPet",
         "ApiCreatePetBodyXml": "ApiNewPet",
         "ApiCreatePetOptions": "{
-        body: ApiCreatePetBodyJson;
+        body?: ApiCreatePetBodyJson;
         path: ApiCreatePetPath;
         query?: ApiCreatePetQuery;
         headers?: never;
@@ -235,7 +235,7 @@ describe("typeGenerator — operations: 'inline'", () => {
           request: 'application/json';
         };
       } | {
-        body: ApiCreatePetBodyXml;
+        body?: ApiCreatePetBodyXml;
         path: ApiCreatePetPath;
         query?: ApiCreatePetQuery;
         headers?: never;
