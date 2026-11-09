@@ -183,9 +183,9 @@ export type ClientResolvedOptions = {
 }
 
 /**
- * The plugin factory type shared by the client plugins. Each concrete plugin (plugin-fetch,
- * plugin-axios, plugin-ky) declares its own name and registers itself; this base ties the shared
- * builders, resolver, and components to one option/resolver shape.
+ * The plugin type behind the shared resolver. Each concrete plugin (plugin-fetch, plugin-axios)
+ * declares its own name and registers itself; this base ties the shared builders, resolver, and
+ * components to one option/resolver shape.
  */
 export type PluginContractClient = PluginType<'plugin-contract-client', ClientOptions, ClientResolvedOptions, ResolverClient>
 

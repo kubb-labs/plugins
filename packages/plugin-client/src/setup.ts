@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { createGroupConfig } from '@internals/shared'
 import { addGenerator, injectFile, Resolver, setMacros, setResolver, useConfig, useOptions } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -8,8 +9,10 @@ import { createClientGenerator } from './generators/clientGenerator.tsx'
 import { createSdkGenerator } from './generators/sdkGenerator.tsx'
 import { defaultMacros } from './macros.ts'
 import { resolverClient } from './resolver.ts'
-import { templates } from './templates.ts'
 import type { ClientOptions, ClientResolvedOptions, ContractClientFactory, ResolverClient } from './types.ts'
+
+// Resolved from a file directly in `src/`, so the same `../templates/` path works from `dist/`.
+const templatePath = (name: string) => fileURLToPath(new URL(`../templates/${name}`, import.meta.url))
 
 /**
  * Applies the client option defaults and merges a user `resolver` over the built-in one.
@@ -65,17 +68,18 @@ export function setupClient({ resolved, client }: { resolved: ClientResolvedOpti
   setResolver(resolved.resolver)
   setMacros([...defaultMacros, ...(options.macros ?? [])])
 
+  const sse = templatePath('sse.ts')
   // `sdk` swaps the per-operation functions for the class-based SDK; left unset, the standalone
   // functions (which query plugins consume) stay.
-  addGenerator<ContractClientFactory>(resolved.sdk ? createSdkGenerator({ sse: templates.sse }) : createClientGenerator('client', { sse: templates.sse }))
+  addGenerator<ContractClientFactory>(resolved.sdk ? createSdkGenerator({ sse }) : createClientGenerator('client', { sse }))
 
   const root = path.resolve(config.root, config.output.path)
   const files = [
-    ['serializers.ts', templates.serializers],
-    ['mediaTypes.ts', templates.mediaTypes],
-    ['core.ts', templates.core],
+    ['serializers.ts', templatePath('serializers.ts')],
+    ['mediaTypes.ts', templatePath('mediaTypes.ts')],
+    ['core.ts', templatePath('core.ts')],
     ['client.ts', client],
-    ['standardSchema.ts', templates.standardSchema],
+    ['standardSchema.ts', templatePath('standardSchema.ts')],
   ] as const
 
   for (const [baseName, copy] of files) {

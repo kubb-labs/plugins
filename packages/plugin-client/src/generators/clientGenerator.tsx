@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { resolveOperationTypes } from '@internals/client'
 import { getEventStream, operationFileEntry, operationKey, resolveDependencyOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
@@ -11,7 +12,6 @@ import { getOperationBaseURL, type ServerDocument, type ServerOptions } from '..
 import { buildValidatorHooks } from '../builders/validator.ts'
 import { Operation } from '../components/Operation.tsx'
 import { StreamRuntime } from '../components/StreamRuntime.tsx'
-import { resolveOperationTypes } from '@internals/client'
 import type { ContractClientFactory } from '../types.ts'
 
 /**
