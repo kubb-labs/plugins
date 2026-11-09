@@ -50,10 +50,10 @@ export function buildCallConfig({
   const securityLiteral = buildSecurityMetadata({ security })
   // A `'plain'` client is the user's own, which may type `styles` as `unknown`, so it keeps the generated styles as a default.
   const ownRuntime = returnType !== 'plain'
-  const stylesLiteral = buildStyles({ node, merge: ownRuntime ? 'config.styles' : undefined })
+  const stylesLiteral = buildStyles({ node, merge: ownRuntime })
   const styles = stylesLiteral ? `styles: ${stylesLiteral}` : null
   // Unless `returnType` is `'plain'`, `toEventStream` validates per event, so `response` stays out of the call config.
-  const perEvent = eventStream && returnType !== 'plain'
+  const perEvent = eventStream && ownRuntime
   const validatorLiteral = buildValidatorLiteral(validatorHooks, [
     'request',
     'path',

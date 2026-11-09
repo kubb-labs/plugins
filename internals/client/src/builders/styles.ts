@@ -56,8 +56,8 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
  * is unchanged. A form request body adds a `body` group keyed by property name from its `encoding`.
  * Returns `null` when nothing carries metadata.
  *
- * With `merge`, the literal spreads that expression's styles in per parameter, so a per-call entry overrides the
- * generated one for that parameter and leaves the others in place.
+ * With `merge`, the literal spreads `config.styles` per parameter, so a per-call entry overrides the generated one for
+ * that parameter and leaves the others in place.
  *
  * @example
  * ```ts
@@ -65,7 +65,7 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
  * buildStyles({ node }) // "{ path: { id: { style: 'matrix', explode: true } }, query: { tags: { explode: false } } }"
  * ```
  */
-export function buildStyles({ node, merge }: { node: ast.OperationNode; merge?: string }): string | null {
+export function buildStyles({ node, merge }: { node: ast.OperationNode; merge?: boolean }): string | null {
   if (!ast.isHttpOperationNode(node)) return null
 
   const groups: Record<StyledLocation | 'body', Array<string>> = { path: [], query: [], header: [], cookie: [], body: serializeBodyEncoding(node) }
@@ -79,8 +79,8 @@ export function buildStyles({ node, merge }: { node: ast.OperationNode; merge?: 
 
   const entries = Object.entries(groups)
     .filter(([, items]) => items.length > 0)
-    .map(([location, items]) => `${location}: { ${[...items, ...(merge ? [`...${merge}?.${location}`] : [])].join(', ')} }`)
+    .map(([location, items]) => `${location}: { ${(merge ? [...items, `...config.styles?.${location}`] : items).join(', ')} }`)
 
   if (entries.length === 0) return null
-  return `{ ${[...(merge ? [`...${merge}`] : []), ...entries].join(', ')} }`
+  return `{ ${(merge ? ['...config.styles', ...entries] : entries).join(', ')} }`
 }
