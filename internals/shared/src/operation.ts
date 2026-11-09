@@ -181,7 +181,9 @@ export function isEventStream(node: ast.OperationNode): boolean {
  * for the stream by default and ships the `sse.ts` runtime, so a mixed response can be read as events too.
  */
 export function hasEventStreamContent(node: ast.OperationNode): boolean {
-  return (getPrimarySuccessResponse(node)?.content ?? []).some((entry) => baseContentType(entry.contentType) === 'text/event-stream')
+  const entries = getPrimarySuccessResponse(node)?.content ?? []
+  // Next to another type, a stream without a schema gets no typed variant, so it keeps the plain call.
+  return entries.some((entry) => baseContentType(entry.contentType) === 'text/event-stream' && (entries.length === 1 || Boolean(entry.schema)))
 }
 
 /**
