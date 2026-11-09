@@ -31,25 +31,21 @@ function serializeParameter(parameter: ast.ParameterNode): string | null {
 }
 
 /**
- * Serializes the `encoding` of the request body's default content type into a `{ property: { ... } }`
- * literal, or `null` when it carries none. Only an operation with a single request content type
+ * Serializes the `encoding` of the request body's default content type into `property: { ... }`
+ * entries, empty when it carries none. Only an operation with a single request content type
  * emits it, because the runtime applies `styles.body` to whichever type the caller selects.
  */
-function serializeBodyEncoding(node: ast.HttpOperationNode): string | null {
+function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
   const content = node.requestBody?.content
-  const entries = Object.entries(content?.length === 1 ? (content[0]?.encoding ?? {}) : {}).map(
-    ([property, { contentType, style, explode, allowReserved }]) => {
-      const parts = [
-        style && `style: ${JSON.stringify(style)}`,
-        explode !== undefined && `explode: ${explode}`,
-        allowReserved !== undefined && `allowReserved: ${allowReserved}`,
-        contentType && `contentType: ${JSON.stringify(contentType)}`,
-      ].filter(Boolean)
-      return `${isValidVarName(property) ? property : JSON.stringify(property)}: { ${parts.join(', ')} }`
-    },
-  )
-
-  return entries.length > 0 ? `body: { ${entries.join(', ')} }` : null
+  return Object.entries(content?.length === 1 ? (content[0]?.encoding ?? {}) : {}).map(([property, { contentType, style, explode, allowReserved }]) => {
+    const parts = [
+      style && `style: ${JSON.stringify(style)}`,
+      explode !== undefined && `explode: ${explode}`,
+      allowReserved !== undefined && `allowReserved: ${allowReserved}`,
+      contentType && `contentType: ${JSON.stringify(contentType)}`,
+    ].filter(Boolean)
+    return `${isValidVarName(property) ? property : JSON.stringify(property)}: { ${parts.join(', ')} }`
+  })
 }
 
 /**
@@ -60,16 +56,19 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): string | null {
  * is unchanged. A form request body adds a `body` group keyed by property name from its `encoding`.
  * Returns `null` when nothing carries metadata.
  *
+ * With `merge`, the literal spreads `config.styles` per parameter, so a per-call entry overrides the generated one for
+ * that parameter and leaves the others in place.
+ *
  * @example
  * ```ts
  * // a path param with { style: 'matrix', explode: true } and a query param with { explode: false }
  * buildStyles({ node }) // "{ path: { id: { style: 'matrix', explode: true } }, query: { tags: { explode: false } } }"
  * ```
  */
-export function buildStyles({ node }: { node: ast.OperationNode }): string | null {
+export function buildStyles({ node, merge }: { node: ast.OperationNode; merge?: boolean }): string | null {
   if (!ast.isHttpOperationNode(node)) return null
 
-  const groups: Record<StyledLocation, Array<string>> = { path: [], query: [], header: [], cookie: [] }
+  const groups: Record<StyledLocation | 'body', Array<string>> = { path: [], query: [], header: [], cookie: [], body: serializeBodyEncoding(node) }
 
   for (const [location, parameters] of Object.entries(getOperationParameters(node)) as Array<[StyledLocation, Array<ast.ParameterNode>]>) {
     for (const parameter of parameters) {
@@ -78,12 +77,10 @@ export function buildStyles({ node }: { node: ast.OperationNode }): string | nul
     }
   }
 
-  const entries = [
-    ...(Object.keys(groups) as Array<StyledLocation>)
-      .filter((location) => groups[location].length > 0)
-      .map((location) => `${location}: { ${groups[location].join(', ')} }`),
-    serializeBodyEncoding(node),
-  ].filter(Boolean)
+  const entries = Object.entries(groups)
+    .filter(([, items]) => items.length > 0)
+    .map(([location, items]) => `${location}: { ${(merge ? [...items, `...config.styles?.${location}`] : items).join(', ')} }`)
 
-  return entries.length > 0 ? `{ ${entries.join(', ')} }` : null
+  if (entries.length === 0) return null
+  return `{ ${(merge ? ['...config.styles', ...entries] : entries).join(', ')} }`
 }

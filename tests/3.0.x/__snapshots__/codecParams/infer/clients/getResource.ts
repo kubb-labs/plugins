@@ -14,5 +14,5 @@ import { getResourceResponseSchema } from '../zod/getResourceSchema'
 export function getResource<ThrowOnError extends boolean = true>(options: Options<GetResourceOptionsSchemaType, ThrowOnError>): Unwrappable<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return withUnwrap(request({ method: 'GET', url: '/resources/{resource}', validator: { response: getResourceResponseSchema }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>>)
+  return withUnwrap(request({ method: 'GET', url: '/resources/{resource}', ...config, validator: { response: getResourceResponseSchema, ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<GetResourceResponsesSchemaType, ThrowOnError>>)
 }

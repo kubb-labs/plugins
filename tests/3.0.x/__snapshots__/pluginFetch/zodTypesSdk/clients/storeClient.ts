@@ -8,7 +8,7 @@ import type { GetInventoryOptionsSchemaType, GetInventoryResponsesSchemaType } f
 import type { PlaceOrderOptionsSchemaType, PlaceOrderResponsesSchemaType } from '../zod/placeOrderSchema'
 import { createClient, withUnwrap } from '../.kubb/client'
 import { getInventoryResponseSchema } from '../zod/getInventorySchema'
-import { placeOrderResponseSchema, placeOrderErrorSchema } from '../zod/placeOrderSchema'
+import { placeOrderResponseSchema, placeOrderStatus405Schema } from '../zod/placeOrderSchema'
 
 export class StoreClient {
   private readonly client: ClientInstance
@@ -25,7 +25,7 @@ export class StoreClient {
     public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], validator: { response: getInventoryResponseSchema }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>>)
+    return withUnwrap(request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config, validator: { response: getInventoryResponseSchema, ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<GetInventoryResponsesSchemaType, ThrowOnError>>)
   }
 
 /**
@@ -36,6 +36,6 @@ export class StoreClient {
     public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderOptionsSchemaType, ThrowOnError> = {}): Unwrappable<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return withUnwrap(request<PlaceOrderOptionsSchemaType['body']>({ method: 'POST', url: '/store/order', validator: { response: placeOrderResponseSchema, error: placeOrderErrorSchema, errorStatus: [405] }, contentType: { request: 'application/json' }, ...config, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>>)
+    return withUnwrap(request<PlaceOrderOptionsSchemaType['body']>({ method: 'POST', url: '/store/order', contentType: { request: 'application/json' }, ...config, validator: { response: placeOrderResponseSchema, error: { 405: placeOrderStatus405Schema }, ...config.validator }, throwOnError: config.throwOnError ?? true }) as Promise<RequestResult<PlaceOrderResponsesSchemaType, ThrowOnError>>)
   }
 }

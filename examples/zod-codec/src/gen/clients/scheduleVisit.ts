@@ -9,7 +9,7 @@ import { client, withUnwrap } from '../.kubb/client.ts'
 import { toHeadersStandardSchema } from '../.kubb/standardSchema.ts'
 import {
   scheduleVisitResponseSchema,
-  scheduleVisitErrorSchema,
+  scheduleVisitStatus409Schema,
   scheduleVisitBodySchema,
   scheduleVisitPathSchema,
   scheduleVisitQuerySchema,
@@ -29,17 +29,17 @@ export function scheduleVisit<ThrowOnError extends boolean = true>(
     request({
       method: 'PUT',
       url: '/pets/{petId}/visits/{day}',
+      contentType: { request: 'application/json' },
+      ...config,
       validator: {
         request: scheduleVisitBodySchema,
         path: scheduleVisitPathSchema,
         query: scheduleVisitQuerySchema,
         headers: toHeadersStandardSchema(scheduleVisitHeadersSchema, scheduleVisitHeadersSchema.shape),
         response: scheduleVisitResponseSchema,
-        error: scheduleVisitErrorSchema,
-        errorStatus: [409],
+        error: { 409: scheduleVisitStatus409Schema },
+        ...config.validator,
       },
-      contentType: { request: 'application/json' },
-      ...config,
       throwOnError: config.throwOnError ?? true,
     }) as Promise<RequestResult<ScheduleVisitResponsesSchemaType, ThrowOnError>>,
   )

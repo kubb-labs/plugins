@@ -1,7 +1,7 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { Pet } from '../../../models/ts/Pet'
 import { client, withUnwrap } from '../../../.kubb/client'
-import { getPetByIdResponseSchema, getPetByIdErrorSchema } from '../../../zod/pet/getPetByIdSchema'
+import { getPetByIdResponseSchema, getPetByIdStatus400Schema, getPetByIdStatus404Schema } from '../../../zod/pet/getPetByIdSchema'
 
 /**
  * @description Returns a single pet
@@ -48,8 +48,8 @@ export function getPetById<ThrowOnError extends boolean = true>(
         { type: 'apiKey', name: 'api_key', in: 'header' },
         { type: 'oauth2', scopes: ['write:pets', 'read:pets'] },
       ],
-      validator: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema, errorStatus: [400, 404] },
       ...config,
+      validator: { response: getPetByIdResponseSchema, error: { 400: getPetByIdStatus400Schema, 404: getPetByIdStatus404Schema }, ...config.validator },
       throwOnError: config.throwOnError ?? true,
     }) as Promise<
       RequestResult<

@@ -1,6 +1,6 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import { client, withUnwrap } from '../../../.kubb/client'
-import { updatePetWithFormResponseSchema, updatePetWithFormErrorSchema } from '../../../zod/pet/updatePetWithFormSchema'
+import { updatePetWithFormResponseSchema, updatePetWithFormStatus405Schema } from '../../../zod/pet/updatePetWithFormSchema'
 
 /**
  * @summary Updates a pet in the store with form data
@@ -36,8 +36,8 @@ export function updatePetWithForm<ThrowOnError extends boolean = true>(
       method: 'POST',
       url: '/pet/{petId}:search',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
-      validator: { response: updatePetWithFormResponseSchema, error: updatePetWithFormErrorSchema, errorStatus: [405] },
       ...config,
+      validator: { response: updatePetWithFormResponseSchema, error: { 405: updatePetWithFormStatus405Schema }, ...config.validator },
       throwOnError: config.throwOnError ?? true,
     }) as Promise<
       RequestResult<

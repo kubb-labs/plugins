@@ -25,7 +25,9 @@ function buildResponseTypeLiteral(node: ast.HttpOperationNode): string | null {
 
 /**
  * Builds the call config literal a generated operation forwards to the client, shared by the standalone
- * functions and the SDK methods. The `throwOnError` fallback is applied after the `...config` spread.
+ * functions and the SDK methods. The `validator` and `throwOnError` entries come after the `...config` spread, so a
+ * per-call `validator` is merged per key with the generated one instead of replacing it. `styles` is merged the same
+ * way, per parameter, unless `returnType` is `'plain'`.
  *
  * `mergeContentType` is `true` when the caller must destructure `contentType` from `options`, and
  * `eventStream` is `true` when the operation streams `text/event-stream` or JSON Lines. Unless `returnType` is `'plain'`, a
@@ -46,9 +48,12 @@ export function buildCallConfig({
 }): { callConfig: string; mergeContentType: boolean; eventStream: boolean } {
   const eventStream = isEventStream(node)
   const securityLiteral = buildSecurityMetadata({ security })
-  const stylesLiteral = buildStyles({ node })
+  // A `'plain'` client is the user's own, which may type `styles` as `unknown`, so it keeps the generated styles as a default.
+  const ownRuntime = returnType !== 'plain'
+  const stylesLiteral = buildStyles({ node, merge: ownRuntime })
+  const styles = stylesLiteral ? `styles: ${stylesLiteral}` : null
   // Unless `returnType` is `'plain'`, `toEventStream` validates per event, so `response` stays out of the call config.
-  const perEvent = eventStream && returnType !== 'plain'
+  const perEvent = eventStream && ownRuntime
   const validatorLiteral = buildValidatorLiteral(validatorHooks, [
     'request',
     'path',
@@ -57,7 +62,6 @@ export function buildCallConfig({
     'cookies',
     ...(perEvent ? [] : ['response' as const]),
     'error',
-    'errorStatus',
   ])
   const { literal: contentTypeLiteral, merge: mergeContentType } = buildContentType({ node })
 
@@ -65,11 +69,12 @@ export function buildCallConfig({
     `method: '${node.method.toUpperCase()}'`,
     `url: '${node.path}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
-    stylesLiteral ? `styles: ${stylesLiteral}` : null,
-    validatorLiteral,
+    ownRuntime ? null : styles,
     contentTypeLiteral,
     buildResponseTypeLiteral(node),
     '...config',
+    ownRuntime ? styles : null,
+    validatorLiteral,
     `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`,
   ]
     .filter(Boolean)

@@ -2,7 +2,7 @@ import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { AddPetRequest } from '../../../models/ts/AddPetRequest'
 import type { Pet } from '../../../models/ts/Pet'
 import { client, withUnwrap } from '../../../.kubb/client'
-import { addPetResponseSchema, addPetErrorSchema } from '../../../zod/pet/addPetSchema'
+import { addPetResponseSchema, addPetStatus405Schema, addPetStatusDefaultSchema } from '../../../zod/pet/addPetSchema'
 
 /**
  * @description Add a new pet to the store
@@ -109,9 +109,9 @@ export function addPet<ThrowOnError extends boolean = true>(
       method: 'POST',
       url: '/pet',
       security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
-      validator: { response: addPetResponseSchema, error: addPetErrorSchema },
       contentType: { request: 'application/json' },
       ...config,
+      validator: { response: addPetResponseSchema, error: { 405: addPetStatus405Schema, default: addPetStatusDefaultSchema }, ...config.validator },
       throwOnError: config.throwOnError ?? true,
     }) as Promise<
       RequestResult<
