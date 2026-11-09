@@ -290,22 +290,23 @@ export type CallResult<TRequest = NativeRequest, TResponse = NativeResponse> = {
   response: TResponse
 }
 
-export type InterceptorFn<T, TContext = never> = (value: T, context?: TContext) => T | Promise<T>
+export type InterceptorFn<T, TContext = never, TResult = T> = (value: T, context?: TContext) => TResult | Promise<TResult>
 
 /**
  * A single interceptor channel with a transport-agnostic `use` / `eject` / `update` API.
  */
-export type InterceptorStack<T, TContext = never> = {
-  use: (fn: InterceptorFn<T, TContext>) => number
+export type InterceptorStack<T, TContext = never, TResult = T> = {
+  use: (fn: InterceptorFn<T, TContext, TResult>) => number
   eject: (id: number) => void
-  update: (id: number, fn: InterceptorFn<T, TContext>) => void
-  run: (value: T, context?: TContext) => Promise<T>
+  update: (id: number, fn: InterceptorFn<T, TContext, TResult>) => void
+  run: (value: T, context?: TContext) => Promise<T | TResult>
 }
 
 export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = {
   request: InterceptorStack<ResolvedRequest, RequestConfig<unknown, TRequest, TResponse>>
   response: InterceptorStack<TransportResult<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
-  error: InterceptorStack<ResponseError<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>
+  /** A handler returns the error, another error that the call throws instead, or nothing to keep the error. */
+  error: InterceptorStack<ResponseError<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>, Error | void>
 }
 
 export type UrlConfig = Pick<RequestConfig, 'baseURL' | 'url' | 'path' | 'query' | 'params' | 'serializer' | 'styles'>
@@ -435,10 +436,12 @@ function serializeUrl({
 }
 
 /**
- * Creates a transport-agnostic interceptor channel that runs interceptors in registration order.
+ * Creates a transport-agnostic interceptor channel that runs interceptors in registration order. A handler that returns
+ * nothing keeps the value. With `isValue`, a handler that returns anything else ends the run with what it returned, so
+ * the next handler still receives a `T`.
  */
-export function createInterceptorStack<T, TContext = never>(): InterceptorStack<T, TContext> {
-  let entries: Array<{ id: number; fn: InterceptorFn<T, TContext> }> = []
+export function createInterceptorStack<T, TContext = never, TResult = T>(isValue?: (value: unknown) => value is T): InterceptorStack<T, TContext, TResult> {
+  let entries: Array<{ id: number; fn: InterceptorFn<T, TContext, TResult> }> = []
   let counter = 0
   return {
     use(fn) {
@@ -456,7 +459,10 @@ export function createInterceptorStack<T, TContext = never>(): InterceptorStack<
     async run(value, context) {
       let result = value
       for (const entry of entries) {
-        result = await entry.fn(result, context)
+        const next = await entry.fn(result, context)
+        if (next === undefined) continue
+        if (isValue && !isValue(next)) return next
+        result = next as unknown as T
       }
       return result
     },
@@ -767,7 +773,9 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
   const interceptors: Interceptors<TRequest, TResponse> = {
     request: createInterceptorStack<ResolvedRequest, RequestConfig<unknown, TRequest, TResponse>>(),
     response: createInterceptorStack<TransportResult<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>(),
-    error: createInterceptorStack<ResponseError<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>>(),
+    error: createInterceptorStack<ResponseError<unknown, TRequest, TResponse>, RequestConfig<unknown, TRequest, TResponse>, Error | void>(
+      (value): value is ResponseError<unknown, TRequest, TResponse> => ResponseError.is(value),
+    ),
   }
 
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
@@ -791,6 +799,8 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const decoded = contentType && codec?.deserialize ? await codec.deserialize(result.data, contentType) : result.data
     // A streamed success body is validated event by event in `toEventStream`, not as a whole. A JSON answer to a streamed call is a whole body.
     const streaming = isSuccess && resolveResponseType(resolvedRequest.responseType, contentType) === 'stream' && isStreamed(decoded)
+    // An error body is validated only when the call returns it. A call that throws keeps its `ResponseError`.
+    const validatesBody = isValidationEnabled(validate, direction) && !streaming && (isSuccess || !throwOnError)
     const data = await runValidator({
       validator: validatesBody ? validator?.[direction] : undefined,
       value: decoded,
@@ -799,8 +809,6 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     })
     if (!isSuccess && throwOnError) {
       const responseError = new ResponseError({
-    // An error body is validated only when the call returns it. A call that throws keeps its `ResponseError`.
-    const validatesBody = isValidationEnabled(validate, direction) && !streaming && (isSuccess || !throwOnError)
         data,
         status: result.status,
         statusText: result.statusText,

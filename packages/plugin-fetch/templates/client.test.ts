@@ -75,6 +75,21 @@ describe('createInterceptorStack', () => {
     stack.update(id, (value) => [...value, 'A'])
     expect(await stack.run([])).toStrictEqual(['A', 'b'])
   })
+
+  test('keeps the value when a handler returns nothing, and stops at a result the guard rejects', async () => {
+    const isList = (value: unknown): value is Array<string> => Array.isArray(value)
+    const stack = createInterceptorStack<Array<string>, never, Array<string> | Error | void>(isList)
+    const later = vi.fn((value: Array<string>) => [...value, 'c'])
+    stack.use(() => undefined)
+    stack.use((value) => [...value, 'b'])
+    expect(await stack.run(['a'])).toStrictEqual(['a', 'b'])
+
+    const mapped = new Error('mapped')
+    stack.use(() => mapped)
+    stack.use(later)
+    expect(await stack.run(['a'])).toBe(mapped)
+    expect(later).not.toHaveBeenCalled()
+  })
 })
 
 describe('defaultQuerySerializer', () => {
@@ -698,6 +713,17 @@ describe('createClientCore', () => {
     expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, contentType: undefined, request: 'REQ', response: 'RES' })
   })
 
+  test('skips the error parser when the call throws, so it throws the ResponseError', async () => {
+    const { client } = createClient({ data: '<html>Bad Gateway</html>', status: 502 })
+    const error = vi.fn(() => ({ parsed: true }))
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { error: toFailingSchema() } })).rejects.toMatchObject({
+      name: 'ResponseError',
+      status: 502,
+    })
+    await expect(client({ method: 'GET', url: '/pet/1', validator: { error: toSchema(error) } })).rejects.toMatchObject({ data: '<html>Bad Gateway</html>' })
+    expect(error).not.toHaveBeenCalled()
+  })
+
   test('throws the ParseError when no onValidationError is set', async () => {
     const { client } = createClient({ data: { id: 1 }, status: 200 })
     await expect(client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })).rejects.toMatchObject({
@@ -713,17 +739,6 @@ describe('createClientCore', () => {
     const result = (await client({ method: 'GET', url: '/pet/1', validator: { response: toFailingSchema() } })) as CallResult<string, string>
     expect(result.data).toStrictEqual({ id: 1 })
     expect(onValidationError.mock.calls[0]?.[1]).toMatchObject({ direction: 'response', source: 'body', method: 'GET', status: 200, value: { id: 1 } })
-  test('skips the error parser when the call throws, so it throws the ResponseError', async () => {
-    const { client } = createClient({ data: '<html>Bad Gateway</html>', status: 502 })
-    const error = vi.fn(() => ({ parsed: true }))
-    await expect(client({ method: 'GET', url: '/pet/1', validator: { error: toFailingSchema() } })).rejects.toMatchObject({
-      name: 'ResponseError',
-      status: 502,
-    })
-    await expect(client({ method: 'GET', url: '/pet/1', validator: { error: toSchema(error) } })).rejects.toMatchObject({ data: '<html>Bad Gateway</html>' })
-    expect(error).not.toHaveBeenCalled()
-  })
-
   })
 
   test('rethrows when onValidationError returns nothing', async () => {
@@ -834,8 +849,19 @@ describe('createClientCore', () => {
     await expect(client({ method: 'GET', url: '/pet' })).rejects.toBe(mapped)
 
     const { client: logging } = createClient({ status: 500 })
-    logging.interceptors.error.use((() => undefined) as never)
+    logging.interceptors.error.use(() => undefined)
     await expect(logging({ method: 'GET', url: '/pet' })).rejects.toBeInstanceOf(ResponseError)
+  })
+
+  test('passes the ResponseError to every handler until one returns another error', async () => {
+    class NotFound extends Error {}
+    const { client } = createClient({ status: 404 })
+    const seen: Array<number> = []
+    client.interceptors.error.use((error) => void seen.push(error.status))
+    client.interceptors.error.use((error) => (error.status === 404 ? new NotFound() : error))
+    client.interceptors.error.use((error) => void seen.push(error.status))
+    await expect(client({ method: 'GET', url: '/pet' })).rejects.toBeInstanceOf(NotFound)
+    expect(seen).toStrictEqual([404])
   })
 
   test('setConfig merges and getConfig reflects it', () => {

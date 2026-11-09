@@ -44,6 +44,16 @@ client.interceptors.error.use((error) => {
 })
 ```
 
+Return another error, such as a domain error, and the call throws it instead. The handlers after it
+do not run, so each handler still receives a `ResponseError`. A handler that returns nothing keeps
+the error:
+
+```typescript
+class NotFoundError extends Error {}
+
+client.interceptors.error.use((error) => (error.status === 404 ? new NotFoundError(error.message) : error))
+```
+
 This channel only fires on the throw path. When you read with `throwOnError: false`, a documented
 non-2xx response resolves and no error interceptor runs, so inspect the returned `error` on the
 result instead. A transport failure (no response) still throws. The error handler does not run,
