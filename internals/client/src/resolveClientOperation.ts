@@ -1,7 +1,16 @@
 import path from 'node:path'
 import { operationFileEntry, operationKey } from '@internals/shared'
 import type { ast, Exclude, Group, Include, Memo, Output, Override, Resolver } from '@kubb/kit'
-import type { ReturnTypeOption } from './types.ts'
+
+/**
+ * Shape of the value a generated operation function resolves to.
+ * - `'full'`: the complete `{ status, data, error, contentType, request, response }` result.
+ * - `'data'`: the bare success body when `throwOnError` is true, or the full result when it is false
+ *   so callers can inspect `error`.
+ * - `'plain'`: the client's own promise typed as `RequestResult`, with no `withUnwrap` / `unwrapResult`
+ *   helper. Backs `@kubb/plugin-client`.
+ */
+export type ReturnTypeOption = 'full' | 'data' | 'plain'
 
 /**
  * The resolved contract `<op>` for one operation: the generated function name, the file it lives in,

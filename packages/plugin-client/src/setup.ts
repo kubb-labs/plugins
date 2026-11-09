@@ -48,18 +48,7 @@ export function resolveClientOptions(options: ClientOptions): ClientResolvedOpti
 }
 
 /**
- * Wires a client plugin inside its `setup`: the resolver, the default and user macros, the client or SDK generator,
- * and the `.kubb/` runtime files. `client` is the absolute path of the plugin's own `client.ts` transport template.
- * `sse.ts` is copied by the generator, and only for a document that streams.
- *
- * @example
- * ```ts
- * setup(options) {
- *   const resolved = resolveClientOptions(options)
- *   setupClient({ resolved, client: fileURLToPath(new URL('../templates/client.ts', import.meta.url)) })
- *   return resolved
- * }
- * ```
+ * Wires a client plugin in its `setup`: resolver, macros, client or SDK generator, and the `.kubb/` runtime with the plugin's own `client.ts`.
  */
 export function setupClient({ resolved, client }: { resolved: ClientResolvedOptions; client: string }): void {
   const config = useConfig()
@@ -69,8 +58,6 @@ export function setupClient({ resolved, client }: { resolved: ClientResolvedOpti
   setMacros([...defaultMacros, ...(options.macros ?? [])])
 
   const sse = templatePath('sse.ts')
-  // `sdk` swaps the per-operation functions for the class-based SDK; left unset, the standalone
-  // functions (which query plugins consume) stay.
   addGenerator<ContractClientFactory>(resolved.sdk ? createSdkGenerator({ sse }) : createClientGenerator('client', { sse }))
 
   const root = path.resolve(config.root, config.output.path)
@@ -88,9 +75,7 @@ export function setupClient({ resolved, client }: { resolved: ClientResolvedOpti
 }
 
 /**
- * Declares the plugins a client plugin builds on. `plugin-ts` supplies the operation types unless it is absent, in which
- * case `pluginZod({ inferred: true })` does. `plugin-zod` is required once `validator` enables a direction, so a missing
- * one fails setup instead of codegen.
+ * Declares `plugin-ts` as optional and `plugin-zod` as required once `validator` enables a direction.
  */
 export function clientDependencies(options: Pick<ClientOptions, 'validator'>) {
   return { [pluginTsName]: { optional: true }, [pluginZodName]: { optional: !isValidatorEnabled(options.validator) } }

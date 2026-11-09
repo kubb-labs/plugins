@@ -15,15 +15,7 @@ import { StreamRuntime } from '../components/StreamRuntime.tsx'
 import type { ContractClientFactory } from '../types.ts'
 
 /**
- * Builds the built-in per-operation generator shared by the client plugins (`@kubb/plugin-fetch`,
- * `@kubb/plugin-axios`). Emits one async function per OpenAPI operation using the shared
- * `Operation` component: a grouped `<Name>Request` type and a function that forwards a single
- * `options` object to the bundled `client` and returns the `Unwrappable<RequestResult>`. Only the
- * generator `name` and the runtime templates differ between plugins. Every other resolution, import,
- * and rendering step is identical.
- *
- * `sse` is the Server-Sent Events runtime template, copied into `.kubb/sse.ts` only for a document with a
- * `text/event-stream` operation.
+ * Builds the per-operation client generator shared by the client plugins. `sse` is the template copied into `.kubb/sse.ts` for a streaming document.
  */
 export function createClientGenerator<TFactory extends ContractClientFactory>(name: string, { sse }: { sse?: string } = {}): Generator<TFactory> {
   return defineGenerator<TFactory>({
