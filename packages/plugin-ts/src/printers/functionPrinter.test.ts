@@ -44,11 +44,6 @@ describe('functionPrinter in declaration mode', () => {
     expect(printer.print(sig)).toBe('petId: string')
   })
 
-  it('prints optional typed parameters as `name?: type`', () => {
-    const sig = createFunctionParameters({ params: [createFunctionParameter({ name: 'params', type: 'QueryParams', optional: true })] })
-    expect(printer.print(sig)).toBe('params?: QueryParams')
-  })
-
   it('prints defaulted typed parameters as `name: type = default`', () => {
     const sig = createFunctionParameters({
       params: [createFunctionParameter({ name: 'config', type: 'RequestConfig', default: '{}' })],

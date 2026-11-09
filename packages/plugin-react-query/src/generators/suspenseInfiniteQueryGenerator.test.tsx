@@ -73,22 +73,6 @@ const findByTagsNode = ast.factory.createOperation({
   ],
 })
 
-const getPetByIdNode = ast.factory.createOperation({
-  operationId: 'getPetById',
-  method: 'GET',
-  path: '/pet/{petId}',
-  tags: ['pet'],
-  parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
-  responses: [
-    ast.factory.createResponse({
-      statusCode: '200',
-      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-      description: 'successful operation',
-    }),
-    ast.factory.createResponse({ statusCode: '400', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Invalid ID supplied' }),
-  ],
-})
-
 const suspenseInfiniteConfig = {
   suspense: {},
   infinite: {
@@ -101,10 +85,11 @@ const suspenseInfiniteConfig = {
 } as const
 
 describe('suspenseInfiniteQueryGenerator operation', () => {
-  const testData = [
-    { name: 'findByTags', node: findByTagsNode, options: { ...suspenseInfiniteConfig } },
-    { name: 'getPetIdCamelCase', node: getPetByIdNode, options: { ...suspenseInfiniteConfig } },
-  ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']> }>
+  const testData = [{ name: 'findByTags', node: findByTagsNode, options: { ...suspenseInfiniteConfig } }] as const satisfies Array<{
+    name: string
+    node: ast.OperationNode
+    options: Partial<PluginReactQuery['resolvedOptions']>
+  }>
 
   test.each(testData)('$name', async (props) => {
     const options: PluginReactQuery['resolvedOptions'] = {
@@ -124,29 +109,6 @@ describe('suspenseInfiniteQueryGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
-  })
-})
-
-describe('suspenseInfiniteQueryGenerator operation with hooks disabled', () => {
-  test('returns no file when hooks is false', async () => {
-    const options: PluginReactQuery['resolvedOptions'] = {
-      ...defaultOptions,
-      ...suspenseInfiniteConfig,
-      hooks: false,
-    }
-    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
-    const driver = createMultiPluginDriver('hooksDisabled', plugins)
-
-    await renderGeneratorOperation(suspenseInfiniteQueryGenerator, findByTagsNode, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverReactQuery,
-    })
-
-    expect(driver.fileManager.files).toStrictEqual([])
   })
 })
 

@@ -206,7 +206,14 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       integer: (node) => numberCall('int', node.min, node.max),
       bigint: () => 'faker.number.bigInt()',
       blob: () => 'faker.image.url() as unknown as Blob',
-      datetime: () => 'faker.date.anytime().toISOString()',
+      datetime(node) {
+        const parser = this.options.dateParser ?? 'faker'
+        if (parser === 'faker') return 'faker.date.anytime().toISOString()'
+        // ISO 8601 that matches the node: no zone when local, a numeric offset, or UTC `Z`.
+        const format = node.local ? 'YYYY-MM-DDTHH:mm:ss' : node.offset ? 'YYYY-MM-DDTHH:mm:ssZ' : 'YYYY-MM-DDTHH:mm:ss[Z]'
+
+        return `${parser}(faker.date.anytime()).format("${format}")`
+      },
       date(node) {
         return dateTimeCall(node.representation ?? 'string', { format: 'YYYY-MM-DD', substring: '0, 10' }, this.options.dateParser, this.options.schemaName)
       },

@@ -13,7 +13,7 @@ import { client } from '../../../client'
  * {@link /store/order}
  */
 export function placeOrderPatch<ThrowOnError extends boolean = true>(
-  options: Options<PlaceOrderPatchOptions, ThrowOnError>,
+  options: Options<PlaceOrderPatchOptions, ThrowOnError> = {},
 ): Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

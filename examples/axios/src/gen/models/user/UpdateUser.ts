@@ -37,7 +37,7 @@ export type UpdateUserBody = UpdateUserBodyJson | UpdateUserBodyXml | UpdateUser
 
 export type UpdateUserOptions =
   | {
-      body: UpdateUserBodyJson
+      body?: UpdateUserBodyJson
       path: UpdateUserPath
       query?: never
       headers?: never
@@ -48,7 +48,7 @@ export type UpdateUserOptions =
           }
     }
   | {
-      body: UpdateUserBodyXml
+      body?: UpdateUserBodyXml
       path: UpdateUserPath
       query?: never
       headers?: never
@@ -59,7 +59,7 @@ export type UpdateUserOptions =
           }
     }
   | {
-      body: UpdateUserBodyFormUrlEncoded
+      body?: UpdateUserBodyFormUrlEncoded
       path: UpdateUserPath
       query?: never
       headers?: never

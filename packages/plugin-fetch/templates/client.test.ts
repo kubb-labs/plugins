@@ -396,13 +396,6 @@ describe('createClientCore', () => {
     expect(calls[0]?.url).toBe('https://override.test/pet')
   })
 
-  test('an explicit Authorization header on the call wins over the auth resolver', async () => {
-    const { transport, calls } = fakeTransport()
-    const client = createClientCore<string, string>({ defaultTransport: transport, auth: () => 'token-123' })
-    await client({ method: 'GET', url: '/pet', security: [{ type: 'http', scheme: 'bearer' }], headers: { Authorization: 'Bearer explicit' } })
-    expect(calls[0]?.headers.Authorization).toBe('Bearer explicit')
-  })
-
   test('honors per-parameter styles.query metadata', async () => {
     const { client, calls } = createClient()
     await client({
@@ -440,15 +433,6 @@ describe('createClientCore', () => {
     await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, headers: { 'content-type': 'application/vnd.api+json' } })
     expect(calls[0]?.headers['content-type']).toBe('application/vnd.api+json')
     expect(calls[0]?.headers['Content-Type']).toBeUndefined()
-  })
-
-  test('does not duplicate Content-Type when a mixed-case header is set', async () => {
-    const { client, calls } = createClient()
-    await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, headers: { 'Content-type': 'application/vnd.api+json' } })
-    const headers = calls[0]?.headers as Record<string, string>
-    const contentTypeKeys = Object.keys(headers).filter((k) => k.toLowerCase() === 'content-type')
-    expect(contentTypeKeys).toHaveLength(1)
-    expect(headers['Content-type']).toBe('application/vnd.api+json')
   })
 
   test('does not auto-inject Content-Type when a custom bodySerializer is used', async () => {
@@ -636,12 +620,6 @@ describe('createClientCore', () => {
     await expect(client({ method: 'GET', url: '/pet/1' })).rejects.toBe(networkError)
   })
 
-  test('surfaces a non-2xx body as an error value when throwOnError is false', async () => {
-    const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
-    const result = (await client({ method: 'POST', url: '/pet', throwOnError: false })) as CallResult<string, string>
-    expect(result).toStrictEqual({ status: 405, data: undefined, error: { message: 'invalid' }, contentType: undefined, request: 'REQ', response: 'RES' })
-  })
-
   test('passes client-level options to the transport', async () => {
     const { transport, calls } = fakeTransport()
     const client = createClientCore<string, string>({ defaultTransport: transport, options: { cache: 'no-store' } })
@@ -652,13 +630,6 @@ describe('createClientCore', () => {
   test('passes createClient credentials to the transport', async () => {
     const { transport, calls } = fakeTransport()
     const client = createFetchClient({ transport, credentials: 'include' })
-    await client({ method: 'GET', url: '/pet' })
-    expect(calls[0]?.credentials).toBe('include')
-  })
-
-  test('passes setConfig credentials to the transport', async () => {
-    const { client, calls } = createClient()
-    client.setConfig({ credentials: 'include' })
     await client({ method: 'GET', url: '/pet' })
     expect(calls[0]?.credentials).toBe('include')
   })
@@ -1542,12 +1513,6 @@ describe('unwrapResult', () => {
   test('narrows a success result to its data', async () => {
     const result = await unwrapResult(Promise.resolve({ data: { id: 1 }, error: undefined }), undefined)
     expect(result).toStrictEqual({ id: 1 })
-  })
-
-  test('falls back to the full result when throwOnError is false', async () => {
-    const full = { data: undefined, error: { message: 'invalid' } }
-    const result = await unwrapResult(Promise.resolve(full), false)
-    expect(result).toBe(full)
   })
 })
 

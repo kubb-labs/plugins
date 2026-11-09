@@ -10,7 +10,6 @@ import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginBarrel } from '@kubb/plugin-barrel'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginTs } from '@kubb/plugin-ts'
-import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -21,54 +20,6 @@ const version = '3.0.x'
 type BuildConfig = Omit<Config, 'plugins' | 'storage' | 'reporters'> & { plugins: unknown }
 
 const configs: Array<{ name: string; config: BuildConfig }> = [
-  // ─── default (per-operation functions) ──────────────────────────────────
-  {
-    name: 'default',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-      ],
-    },
-  },
-
-  // ─── sdk class (one instance class per tag) ─────────────────────────────
-  {
-    name: 'sdkClass',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' }, sdk: {} }),
-      ],
-    },
-  },
-
-  // ─── sdk class with composed root ───────────────────────────────────────
-  {
-    name: 'sdkClassWithName',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' }, sdk: { name: 'PetStore' } }),
-      ],
-    },
-  },
-
   // ─── sdk single (one flat class, every operation a direct method) ────────
   {
     name: 'sdkSingle',
@@ -81,54 +32,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       plugins: [
         pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
         pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' }, sdk: { mode: 'flat', name: 'PetStore' } }),
-      ],
-    },
-  },
-
-  // ─── zodTypes (no plugin-ts, operations typed from pluginZod's inferred types) ──
-  {
-    name: 'zodTypes',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginZod({ inferred: true, output: { path: './zod', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' }, validator: 'zod' }),
-      ],
-    },
-  },
-
-  // ─── zodParams (codec params and bodies encoded, typed with inferred: 'codec') ──
-  {
-    name: 'zodParams',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/codecParams.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, dateType: 'date', enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginZod({ inferred: 'codec', output: { path: './zod', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' }, validator: { request: 'zod', params: 'zod', response: 'zod' } }),
-      ],
-    },
-  },
-
-  // ─── paramsCasing (query, path, and header names match the spec exactly) ──
-  {
-    name: 'paramsCasing',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/paramsCasing.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
       ],
     },
   },

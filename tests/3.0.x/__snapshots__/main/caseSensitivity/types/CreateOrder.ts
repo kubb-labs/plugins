@@ -17,7 +17,7 @@ export type CreateOrderBody = {
 } | undefined;
 
 export type CreateOrderOptions = {
-  body: CreateOrderBody;
+  body?: CreateOrderBody;
   path?: never;
   query?: never;
   headers?: never;

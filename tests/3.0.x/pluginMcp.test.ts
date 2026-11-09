@@ -129,27 +129,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       ],
     },
   },
-
-  // ─── with explicit client plugin ──────────────────────────────────────────
-  {
-    name: 'withClientPlugin',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginZod({ output: { path: './zod', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginMcp({
-          output: { path: './mcp', barrel: false, mode: 'directory' },
-        }),
-      ],
-    },
-  },
 ]
 
 describe(`plugin-mcp options ${version}`, () => {

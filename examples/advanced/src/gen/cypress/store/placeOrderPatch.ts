@@ -5,7 +5,7 @@ export function placeOrderPatch(
     body,
   }: Pick<
     | {
-        body: Order
+        body?: Order
         path?: never
         query?: never
         headers?: never
@@ -16,7 +16,7 @@ export function placeOrderPatch(
             }
       }
     | {
-        body: Order
+        body?: Order
         path?: never
         query?: never
         headers?: never
@@ -27,7 +27,7 @@ export function placeOrderPatch(
             }
       }
     | {
-        body: Order
+        body?: Order
         path?: never
         query?: never
         headers?: never
@@ -38,7 +38,7 @@ export function placeOrderPatch(
             }
       },
     'body'
-  >,
+  > = {},
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<Order> {
   return cy

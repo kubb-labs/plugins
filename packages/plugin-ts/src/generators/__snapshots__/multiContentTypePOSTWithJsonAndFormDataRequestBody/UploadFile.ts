@@ -22,7 +22,7 @@ export type UploadFileBody = UploadFileBodyJson | UploadFileBodyFormData
 
 export type UploadFileOptions =
   | {
-      body: UploadFileBodyJson
+      body?: UploadFileBodyJson
       path: UploadFilePath
       query?: never
       headers?: never
@@ -33,7 +33,7 @@ export type UploadFileOptions =
           }
     }
   | {
-      body: UploadFileBodyFormData
+      body?: UploadFileBodyFormData
       path: UploadFilePath
       query?: never
       headers?: never

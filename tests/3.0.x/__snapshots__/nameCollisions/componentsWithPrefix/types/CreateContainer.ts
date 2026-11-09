@@ -10,7 +10,7 @@ export type ApiCreateContainerStatus200 = unknown;
 export type ApiCreateContainerBody3 = ApiCreateContainerBody | undefined;
 
 export type ApiCreateContainerOptions = {
-  body: ApiCreateContainerBody3;
+  body?: ApiCreateContainerBody3;
   path?: never;
   query?: never;
   headers?: never;

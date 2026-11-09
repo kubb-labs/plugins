@@ -85,6 +85,15 @@ function formatExample(value: unknown): string {
   return rendered.replaceAll('*/', '*\\/')
 }
 
+/**
+ * Whether a schema is binary, or an array of binary items, so its TypeScript type is `Blob` or `Blob[]`.
+ */
+export function isBinarySchema(schema: ast.SchemaNode): boolean {
+  const meta = syncSchemaRef(schema)
+  const isBlob = (node: ast.SchemaNode) => syncSchemaRef(node)?.type === 'blob'
+  return !!meta && (isBlob(meta) || (meta.type === 'array' && 'items' in meta && (meta.items ?? []).some(isBlob)))
+}
+
 export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: boolean): Array<string | undefined> {
   const meta = syncSchemaRef(schema)
 
@@ -122,7 +131,8 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   // earns its place inside a comment block that exists for another reason. Bare, it would just
   // add bytes with no information a reader can't already see in the signature.
   const typeTag =
-    comments.length && meta && 'primitive' in meta && meta.primitive
+    // A binary schema's primitive is `string`, which would contradict its `Blob` type.
+    comments.length && !isBinarySchema(schema) && meta && 'primitive' in meta && meta.primitive
       ? [`@type ${meta.primitive}`, (optional ?? isSchemaOptional(schema)) ? ' | undefined' : null].filter(Boolean).join('')
       : null
 

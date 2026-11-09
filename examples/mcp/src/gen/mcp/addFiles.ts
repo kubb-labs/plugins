@@ -12,7 +12,7 @@ import { addFiles } from '../clients/addFiles'
  * @summary Place an file for a pet
  * {@link /pet/files}
  */
-export async function addFilesHandler({ body }: Pick<AddFilesOptions, 'body'>, ctx: ServerContext): Promise<CallToolResult> {
+export async function addFilesHandler({ body }: Pick<AddFilesOptions, 'body'> = {}, ctx: ServerContext): Promise<CallToolResult> {
   const res = await addFiles({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof addFiles<true>>[0])
 
   return {

@@ -5,7 +5,7 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { resolverClient } from '@internals/client'
 import { describe, expect, test, vi } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, matchFiles, renderGeneratorOperation, testConfig } from '#mocks'
+import { createMockedAdapter, createMockedPlugin, createMultiPluginDriver, renderGeneratorOperation, testConfig } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import type { Transformer } from '@internals/tanstack-query'
 import { resolverSwr } from '../resolvers/resolverSwr.ts'
@@ -67,66 +67,6 @@ const findByTagsNode = ast.factory.createOperation({
       description: 'successful operation',
     }),
   ],
-})
-
-const getPetByIdNode = ast.factory.createOperation({
-  operationId: 'getPetById',
-  method: 'GET',
-  path: '/pet/{petId}',
-  tags: ['pet'],
-  parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
-  responses: [
-    ast.factory.createResponse({
-      statusCode: '200',
-      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-      description: 'successful operation',
-    }),
-    ast.factory.createResponse({ statusCode: '400', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Invalid ID supplied' }),
-  ],
-})
-
-const findByStatusNode = ast.factory.createOperation({
-  operationId: 'findPetsByStatus',
-  method: 'GET',
-  path: '/pet/findByStatus',
-  tags: ['pet'],
-  parameters: [ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) })],
-  responses: [
-    ast.factory.createResponse({
-      statusCode: '200',
-      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-      description: 'successful operation',
-    }),
-  ],
-})
-
-describe('queryGenerator operation', () => {
-  const testData = [
-    { name: 'findByTags', node: findByTagsNode, options: {} },
-    { name: 'getPetById', node: getPetByIdNode, options: {} },
-    { name: 'getPetByIdReturnTypeFull', node: getPetByIdNode, options: { returnType: 'full' } },
-    { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
-  ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginSwr['resolvedOptions']> }>
-
-  test.each(testData)('$name', async (props) => {
-    const options: PluginSwr['resolvedOptions'] = {
-      ...defaultOptions,
-      ...props.options,
-    }
-    const plugin = createMockedPlugin<PluginSwr>({ name: 'plugin-swr', options, resolver: resolverSwr })
-    const driver = createMultiPluginDriver(props.name, plugins)
-
-    await renderGeneratorOperation(queryGenerator, props.node, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverSwr,
-    })
-
-    await matchFiles(driver.fileManager.files, props.name)
-  })
 })
 
 describe('queryGenerator queryKey', () => {

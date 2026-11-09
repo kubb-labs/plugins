@@ -914,6 +914,36 @@ body.id
 })
 
 describe('fakerGenerator — custom imports', () => {
+  test('a dateParser other than faker imports it in schema and operation files', async () => {
+    const options: PluginFaker['resolvedOptions'] = { ...defaultOptions, dateParser: 'dayjs' }
+    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options, resolver: resolverFaker })
+    const driver = createMockedPluginDriver({
+      name: 'dateParser',
+      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+    const context = { config: testConfig, adapter: createMockedAdapter(), driver, plugin, options, resolver: resolverFaker }
+
+    await renderGeneratorSchema(fakerGenerator, ast.factory.createSchema({ type: 'date', representation: 'string', name: 'CreatedAt' }), context)
+    await renderGeneratorOperation(
+      fakerGenerator,
+      ast.factory.createOperation({
+        operationId: 'getClock',
+        method: 'GET',
+        path: '/clock',
+        tags: [],
+        responses: [
+          ast.factory.createResponse({ statusCode: '200', description: 'OK', schema: ast.factory.createSchema({ type: 'date', representation: 'string' }) }),
+        ],
+      }),
+      context,
+    )
+
+    expect(driver.fileManager.files).toHaveLength(2)
+    for (const file of driver.fileManager.files) {
+      expect(file.imports.map((imp) => imp.path)).toContain('dayjs')
+    }
+  })
+
   test('`this.import` in a printer.nodes handler adds the import to the file', async () => {
     const options: PluginFaker['resolvedOptions'] = {
       ...defaultOptions,

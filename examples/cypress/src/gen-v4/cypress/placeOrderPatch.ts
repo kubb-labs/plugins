@@ -6,7 +6,7 @@
 import type { PlaceOrderPatchOptions, PlaceOrderPatchResponse } from '../models'
 
 export function placeOrderPatch(
-  { body }: Pick<PlaceOrderPatchOptions, 'body'>,
+  { body }: Pick<PlaceOrderPatchOptions, 'body'> = {},
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<PlaceOrderPatchResponse> {
   return cy

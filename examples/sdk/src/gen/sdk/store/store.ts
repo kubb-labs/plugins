@@ -45,7 +45,7 @@ export class store {
    * {@link /store/order}
    */
   public placeOrder<ThrowOnError extends boolean = true>(
-    options: Options<PlaceOrderOptions, ThrowOnError>,
+    options: Options<PlaceOrderOptions, ThrowOnError> = {},
   ): Unwrappable<RequestResult<PlaceOrderResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
@@ -66,7 +66,7 @@ export class store {
    * {@link /store/order}
    */
   public placeOrderPatch<ThrowOnError extends boolean = true>(
-    options: Options<PlaceOrderPatchOptions, ThrowOnError>,
+    options: Options<PlaceOrderPatchOptions, ThrowOnError> = {},
   ): Unwrappable<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 

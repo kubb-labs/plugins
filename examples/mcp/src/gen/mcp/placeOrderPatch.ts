@@ -12,7 +12,7 @@ import { placeOrderPatch } from '../clients/placeOrderPatch'
  * @summary Place an order for a pet with patch
  * {@link /store/order}
  */
-export async function placeOrderPatchHandler({ body }: Pick<PlaceOrderPatchOptions, 'body'>, ctx: ServerContext): Promise<CallToolResult> {
+export async function placeOrderPatchHandler({ body }: Pick<PlaceOrderPatchOptions, 'body'> = {}, ctx: ServerContext): Promise<CallToolResult> {
   const res = await placeOrderPatch({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof placeOrderPatch<true>>[0])
 
   return {

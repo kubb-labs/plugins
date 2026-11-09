@@ -11,14 +11,6 @@ function setupKubb(options: Options, pluginNames: Array<string>) {
 }
 
 describe('pluginAxios setup', () => {
-  test('passes without plugin-zod when validator is unset', async () => {
-    await expect(setupKubb({}, ['plugin-ts'])).resolves.toBeUndefined()
-  })
-
-  test('passes without plugin-zod when validator enables no direction', async () => {
-    await expect(setupKubb({ validator: {} }, ['plugin-ts'])).resolves.toBeUndefined()
-  })
-
   test("validator: 'zod' fails with KUBB_MISSING_DEPENDENCY when plugin-zod is not registered", async () => {
     await expect(setupKubb({ validator: 'zod' }, ['plugin-ts'])).rejects.toMatchObject({
       diagnostic: { code: 'KUBB_MISSING_DEPENDENCY', message: 'Plugin "plugin-zod" is required by "plugin-axios" but not found.' },

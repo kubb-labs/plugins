@@ -19,7 +19,7 @@ export type PlaceOrderPatchBody = PlaceOrderPatchBodyJson | PlaceOrderPatchBodyX
 
 export type PlaceOrderPatchOptions =
   | {
-      body: PlaceOrderPatchBodyJson
+      body?: PlaceOrderPatchBodyJson
       path?: never
       query?: never
       headers?: never
@@ -30,7 +30,7 @@ export type PlaceOrderPatchOptions =
           }
     }
   | {
-      body: PlaceOrderPatchBodyXml
+      body?: PlaceOrderPatchBodyXml
       path?: never
       query?: never
       headers?: never
@@ -41,7 +41,7 @@ export type PlaceOrderPatchOptions =
           }
     }
   | {
-      body: PlaceOrderPatchBodyFormUrlEncoded
+      body?: PlaceOrderPatchBodyFormUrlEncoded
       path?: never
       query?: never
       headers?: never

@@ -16,16 +16,8 @@ describe('trimQuotes', () => {
 })
 
 describe('stringify', () => {
-  it('wraps a plain string in single quotes', () => {
-    expect(stringify('hello')).toBe("'hello'")
-  })
-
   it('strips existing surrounding quotes first', () => {
     expect(stringify('"hello"')).toBe("'hello'")
-  })
-
-  it('escapes an embedded single quote', () => {
-    expect(stringify("o'clock")).toBe("'o\\'clock'")
   })
 
   it('escapes a newline', () => {

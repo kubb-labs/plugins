@@ -23,7 +23,7 @@ export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrder
 
 export type PlaceOrderOptions =
   | {
-      body: PlaceOrderBodyJson
+      body?: PlaceOrderBodyJson
       path?: never
       query?: never
       headers?: never
@@ -34,7 +34,7 @@ export type PlaceOrderOptions =
           }
     }
   | {
-      body: PlaceOrderBodyXml
+      body?: PlaceOrderBodyXml
       path?: never
       query?: never
       headers?: never
@@ -45,7 +45,7 @@ export type PlaceOrderOptions =
           }
     }
   | {
-      body: PlaceOrderBodyFormUrlEncoded
+      body?: PlaceOrderBodyFormUrlEncoded
       path?: never
       query?: never
       headers?: never

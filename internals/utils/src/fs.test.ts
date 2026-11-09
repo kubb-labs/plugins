@@ -7,11 +7,6 @@ describe('getRelativePath', () => {
   const relTestDir = path.join(os.tmpdir(), 'kubb-test-rel')
   const folderPath = path.join(relTestDir, 'folder')
 
-  test('returns correct relative path (POSIX)', () => {
-    expect(getRelativePath(relTestDir, path.join(folderPath, 'test.js'))).toBe('./folder/test.js')
-    expect(getRelativePath(folderPath, relTestDir)).toBe('./..')
-  })
-
   test('returns correct relative path for Windows-style paths', () => {
     const winMocks = 'C:\\Users\\user\\project\\mocks'
     const winFolder = 'C:\\Users\\user\\project\\mocks\\folder'

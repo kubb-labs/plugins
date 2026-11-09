@@ -13,7 +13,7 @@ import { client } from '../../../client'
  * {@link /user/createWithList}
  */
 export function createUsersWithListInput<ThrowOnError extends boolean = true>(
-  options: Options<CreateUsersWithListInputOptions, ThrowOnError>,
+  options: Options<CreateUsersWithListInputOptions, ThrowOnError> = {},
 ): Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>> {
   const { client: request = client, contentType, ...config } = options
 

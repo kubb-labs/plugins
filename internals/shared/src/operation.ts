@@ -394,7 +394,7 @@ export function getRequestGroupOptionality(node: ast.OperationNode): RequestGrou
     hasRequiredQuery,
     hasRequiredHeader,
     // `cookies` never makes the parameter required: a browser sends its cookies itself and cannot set a `Cookie` header.
-    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !groups.body,
+    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !(groups.body && node.requestBody?.required === true),
   }
 }
 
@@ -543,7 +543,7 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
       primitive: 'object',
       deprecated: node.deprecated,
       properties: [
-        ast.factory.createProperty({ name: 'body', required: hasBody, schema: body }),
+        ast.factory.createProperty({ name: 'body', required: hasBody && node.requestBody?.required === true, schema: body }),
         // `cookies` is rare, so it appears only on an operation that declares one.
         ...groups
           .filter(({ name, params }) => name !== 'cookies' || params.length > 0)

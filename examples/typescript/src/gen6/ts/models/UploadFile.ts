@@ -28,12 +28,11 @@ export type UploadFileStatus200 = ApiResponse
 /**
  * @description
  * Format: `binary`
- * @type string | undefined
  */
 export type UploadFileBody = Blob | undefined
 
 export type UploadFileOptions = {
-  body: UploadFileBody
+  body?: UploadFileBody
   path: UploadFilePath
   query?: UploadFileQuery
   headers?: never

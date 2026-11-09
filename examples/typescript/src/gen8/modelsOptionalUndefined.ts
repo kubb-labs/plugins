@@ -690,12 +690,11 @@ export type UploadFileStatus200 = ApiResponse
 /**
  * @description
  * Format: `binary`
- * @type string | undefined
  */
 export type UploadFileBody = Blob | undefined
 
 export type UploadFileOptions = {
-  body: UploadFileBody
+  body: UploadFileBody | undefined
   path: UploadFilePath
   query: UploadFileQuery | undefined
   headers: never | undefined
@@ -748,7 +747,7 @@ export type PlaceOrderBody = PlaceOrderBodyJson | PlaceOrderBodyXml | PlaceOrder
 
 export type PlaceOrderOptions =
   | {
-      body: PlaceOrderBodyJson
+      body: PlaceOrderBodyJson | undefined
       path: never | undefined
       query: never | undefined
       headers: never | undefined
@@ -762,7 +761,7 @@ export type PlaceOrderOptions =
         | undefined
     }
   | {
-      body: PlaceOrderBodyXml
+      body: PlaceOrderBodyXml | undefined
       path: never | undefined
       query: never | undefined
       headers: never | undefined
@@ -773,7 +772,7 @@ export type PlaceOrderOptions =
           }
     }
   | {
-      body: PlaceOrderBodyFormUrlEncoded
+      body: PlaceOrderBodyFormUrlEncoded | undefined
       path: never | undefined
       query: never | undefined
       headers: never | undefined
@@ -808,7 +807,7 @@ export type PlaceOrderPatchBody = PlaceOrderPatchBodyJson | PlaceOrderPatchBodyX
 
 export type PlaceOrderPatchOptions =
   | {
-      body: PlaceOrderPatchBodyJson
+      body: PlaceOrderPatchBodyJson | undefined
       path: never | undefined
       query: never | undefined
       headers: never | undefined
@@ -822,7 +821,7 @@ export type PlaceOrderPatchOptions =
         | undefined
     }
   | {
-      body: PlaceOrderPatchBodyXml
+      body: PlaceOrderPatchBodyXml | undefined
       path: never | undefined
       query: never | undefined
       headers: never | undefined
@@ -833,7 +832,7 @@ export type PlaceOrderPatchOptions =
           }
     }
   | {
-      body: PlaceOrderPatchBodyFormUrlEncoded
+      body: PlaceOrderPatchBodyFormUrlEncoded | undefined
       path: never | undefined
       query: never | undefined
       headers: never | undefined

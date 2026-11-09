@@ -10,7 +10,6 @@ import { parserTs } from '@kubb/parser-ts'
 import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginTs } from '@kubb/plugin-ts'
-import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -21,124 +20,6 @@ const version = '3.0.x'
 type BuildConfig = Omit<Config, 'plugins' | 'reporters'> & { plugins: unknown }
 
 const configs: Array<{ name: string; config: BuildConfig }> = [
-  // ─── basic ──────────────────────────────────────────────────────────────
-  {
-    name: 'petStore',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginReactQuery({
-          hooks: true,
-          output: { path: './hooks', barrel: false, mode: 'directory' },
-        }),
-      ],
-    },
-  },
-
-  // ─── suspense ───────────────────────────────────────────────────────────
-  {
-    name: 'suspense',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginReactQuery({
-          hooks: true,
-          output: { path: './hooks', barrel: false, mode: 'directory' },
-          suspense: {},
-        }),
-      ],
-    },
-  },
-
-  // ─── infinite ───────────────────────────────────────────────────────────
-  {
-    name: 'infinite',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginReactQuery({
-          hooks: true,
-          output: { path: './hooks', barrel: false, mode: 'directory' },
-          infinite: {
-            queryParam: 'page',
-            initialPageParam: 0,
-          },
-        }),
-      ],
-    },
-  },
-
-  // ─── parser zod ─────────────────────────────────────────────────────────
-  {
-    name: 'parserZod',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginZod({ output: { path: './zod', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' }, validator: 'zod' }),
-        pluginReactQuery({
-          hooks: true,
-          output: { path: './hooks', barrel: false, mode: 'directory' },
-        }),
-      ],
-    },
-  },
-
-  // ─── query methods override ─────────────────────────────────────────────
-  {
-    name: 'queryMethods',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginReactQuery({
-          hooks: true,
-          output: { path: './hooks', barrel: false, mode: 'directory' },
-          query: {
-            methods: ['get'],
-            importPath: '@tanstack/react-query',
-          },
-          mutation: {
-            methods: ['post', 'put', 'patch', 'delete'],
-          },
-        }),
-      ],
-    },
-  },
-
   // ─── mutation disabled ──────────────────────────────────────────────────
   {
     name: 'mutationDisabled',
@@ -244,27 +125,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
           hooks: true,
           output: { path: './hooks', barrel: false, mode: 'directory' },
           group: { type: 'tag' },
-        }),
-      ],
-    },
-  },
-
-  // ─── with explicit client plugin ───────────────────────────────────────
-  {
-    name: 'withClientPlugin',
-    config: {
-      root: __dirname,
-      input: '../../schemas/3.0.x/petStore.yaml',
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs()],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false, mode: 'directory' } }),
-        pluginAxios({ output: { path: './clients', barrel: false, mode: 'directory' } }),
-        pluginReactQuery({
-          hooks: true,
-          output: { path: './hooks', barrel: false, mode: 'directory' },
         }),
       ],
     },

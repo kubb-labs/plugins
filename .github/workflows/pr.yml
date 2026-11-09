@@ -118,6 +118,9 @@ jobs:
           NODE_OPTIONS: '--max_old_space_size=4096'
         run: pnpm run lint
 
+      - name: Test registry
+        run: pnpm run test:registry
+
   benchmarks:
     name: Performance benchmarks (Vitest)
     timeout-minutes: 15
