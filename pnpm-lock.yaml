@@ -789,22 +789,16 @@ importers:
       '@internals/shared':
         specifier: workspace:*
         version: link:../shared
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:../utils
       '@kubb/kit':
         specifier: 'catalog:'
         version: 5.17.0
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
+    devDependencies:
       '@kubb/plugin-zod':
         specifier: workspace:*
         version: link:../../packages/plugin-zod
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.17.0
-    devDependencies:
       '@types/node':
         specifier: 'catalog:'
         version: 22.20.2
@@ -868,22 +862,7 @@ importers:
       '@kubb/plugin-client':
         specifier: workspace:^
         version: link:../plugin-client
-      '@kubb/plugin-ts':
-        specifier: workspace:^
-        version: link:../plugin-ts
-      '@kubb/plugin-zod':
-        specifier: workspace:^
-        version: link:../plugin-zod
-      '@kubb/renderer-jsx':
-        specifier: ^5.17.0
-        version: 5.17.0
     devDependencies:
-      '@internals/client':
-        specifier: workspace:*
-        version: link:../../internals/client
-      '@internals/shared':
-        specifier: workspace:*
-        version: link:../../internals/shared
       axios:
         specifier: ^1.21.0
         version: 1.21.0(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
@@ -912,6 +891,9 @@ importers:
       '@internals/shared':
         specifier: workspace:*
         version: link:../../internals/shared
+      '@internals/utils':
+        specifier: workspace:*
+        version: link:../../internals/utils
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -968,22 +950,7 @@ importers:
       '@kubb/plugin-client':
         specifier: workspace:^
         version: link:../plugin-client
-      '@kubb/plugin-ts':
-        specifier: workspace:^
-        version: link:../plugin-ts
-      '@kubb/plugin-zod':
-        specifier: workspace:^
-        version: link:../plugin-zod
-      '@kubb/renderer-jsx':
-        specifier: ^5.17.0
-        version: 5.17.0
     devDependencies:
-      '@internals/client':
-        specifier: workspace:*
-        version: link:../../internals/client
-      '@internals/shared':
-        specifier: workspace:*
-        version: link:../../internals/shared
       typescript:
         specifier: 'catalog:'
         version: 7.0.2
@@ -1012,6 +979,9 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
+      '@kubb/plugin-client':
+        specifier: workspace:*
+        version: link:../plugin-client
       '@modelcontextprotocol/server':
         specifier: ^2.4.0
         version: 2.4.0
@@ -1068,6 +1038,9 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
+      '@kubb/plugin-client':
+        specifier: workspace:*
+        version: link:../plugin-client
       '@tanstack/react-query':
         specifier: ^5.106.1
         version: 5.107.1(@types/react@19.3.0)(react@19.3.1)
@@ -1106,6 +1079,9 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
+      '@kubb/plugin-client':
+        specifier: workspace:*
+        version: link:../plugin-client
       swr:
         specifier: ^2.5.1
         version: 2.5.1(react@19.3.1)
@@ -1162,6 +1138,9 @@ importers:
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
+      '@kubb/plugin-client':
+        specifier: workspace:*
+        version: link:../plugin-client
       '@tanstack/vue-query':
         specifier: ^5.106.1
         version: 5.107.1(vue@3.5.45(typescript@7.0.2))

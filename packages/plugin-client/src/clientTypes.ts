@@ -1,3 +1,4 @@
+import type { ReturnTypeOption } from '@internals/client'
 import type { ast, ResolverPatch, Exclude, Group, Include, Output, OutputOptions, Override, PluginType, Resolver } from '@kubb/kit'
 
 /**
@@ -17,16 +18,6 @@ export type ValidatorOptions = false | 'zod' | { request?: 'zod'; params?: 'zod'
  * - `'flat'`: one class with every operation as a direct method.
  */
 export type Mode = 'tag' | 'flat'
-
-/**
- * Shape of the value a generated operation function resolves to.
- * - `'full'`: the complete `{ status, data, error, contentType, request, response }` result.
- * - `'data'`: the bare success body when `throwOnError` is true, or the full result when it is false
- *   so callers can inspect `error`.
- * - `'plain'`: the client's own promise typed as `RequestResult`, with no `withUnwrap` / `unwrapResult`
- *   helper. Backs `@kubb/plugin-client`.
- */
-export type ReturnTypeOption = 'full' | 'data' | 'plain'
 
 /**
  * The resolver shared by the client plugins. Inherits the built-in camelCase `name` and `file`;
@@ -58,7 +49,7 @@ export type ResolverClient = Resolver & {
  * response contract and one grouped options object. Each plugin extends this with its own
  * `transport` field.
  */
-export type Options = OutputOptions & {
+export type ClientOptions = OutputOptions & {
   /**
    * Skip operations matching at least one entry in the list.
    */
@@ -70,7 +61,7 @@ export type Options = OutputOptions & {
   /**
    * Apply a different options object to operations matching a pattern.
    */
-  override?: Array<Override<Omit<ResolvedOptions, 'throwOnErrorDefault'>>>
+  override?: Array<Override<Omit<ClientResolvedOptions, 'throwOnErrorDefault'>>>
   /**
    * Base URL prepended to every request. When omitted, the generated client sets no base URL, so set one at runtime with
    * `client.setConfig({ baseURL })`. The top-level server URL is not used, but an operation with path-level or operation-level `servers` calls it.
@@ -166,19 +157,19 @@ export type Options = OutputOptions & {
 /**
  * The resolved options after defaults are applied.
  */
-export type ResolvedOptions = {
+export type ClientResolvedOptions = {
   output: Output
   exclude: Array<Exclude>
   include: Array<Include> | undefined
-  override: Array<Override<Omit<ResolvedOptions, 'throwOnErrorDefault'>>>
+  override: Array<Override<Omit<ClientResolvedOptions, 'throwOnErrorDefault'>>>
   group: Group | null
-  baseURL: Options['baseURL']
+  baseURL: ClientOptions['baseURL']
   /**
    * Module the generated operations import the client runtime from, used verbatim. Unset, they import the bundled `.kubb/client.ts`.
    */
   importPath?: string
   throwOnErrorDefault: boolean
-  validator: NonNullable<Options['validator']>
+  validator: NonNullable<ClientOptions['validator']>
   returnType: ReturnTypeOption
   sdk:
     | {
@@ -190,15 +181,15 @@ export type ResolvedOptions = {
 }
 
 /**
- * The plugin factory type shared by the client plugins. Each concrete plugin (plugin-fetch,
- * plugin-axios, plugin-ky) declares its own name and registers itself; this base ties the shared
- * builders, resolver, and components to one option/resolver shape.
+ * The plugin type behind the shared resolver. Each concrete plugin (plugin-fetch, plugin-axios)
+ * declares its own name and registers itself; this base ties the shared builders, resolver, and
+ * components to one option/resolver shape.
  */
-export type PluginContractClient = PluginType<'plugin-contract-client', Options, ResolvedOptions, ResolverClient>
+export type PluginContractClient = PluginType<'plugin-contract-client', ClientOptions, ClientResolvedOptions, ResolverClient>
 
 /**
  * The shape any client plugin (plugin-fetch, plugin-axios) must satisfy to reuse the shared
  * client and SDK generators. Pins the option, resolved-option, and resolver shapes while leaving
  * the plugin name free.
  */
-export type ContractClientFactory = PluginType<string, Options, ResolvedOptions, ResolverClient>
+export type ContractClientFactory = PluginType<string, ClientOptions, ClientResolvedOptions, ResolverClient>

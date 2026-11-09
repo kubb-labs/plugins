@@ -1,7 +1,8 @@
 import type { Override, PluginType } from '@kubb/kit'
-import type { Options as ClientOptions, ResolvedOptions as ClientResolvedOptions, ResolverClient } from '@internals/client'
+import type { ClientOptions, ClientResolvedOptions, ResolverClient } from './clientTypes.ts'
 
-export type { ResolverClient } from '@internals/client'
+export type * from './clientTypes.ts'
+export type { ReturnTypeOption } from '@internals/client'
 
 /**
  * Omits keys from every member of a union, where the built-in `Omit` would collapse the union into one shape.

@@ -89,14 +89,9 @@
   },
   "dependencies": {
     "@kubb/kit": "^5.17.0",
-    "@kubb/plugin-client": "workspace:^",
-    "@kubb/plugin-ts": "workspace:^",
-    "@kubb/plugin-zod": "workspace:^",
-    "@kubb/renderer-jsx": "^5.17.0"
+    "@kubb/plugin-client": "workspace:^"
   },
   "devDependencies": {
-    "@internals/client": "workspace:*",
-    "@internals/shared": "workspace:*",
     "axios": "^1.21.0",
     "typescript": "catalog:"
   },

@@ -1,6 +1,6 @@
 import { getEventStream } from '@internals/shared'
 import type { ast } from '@kubb/kit'
-import type { OperationTypeNames } from '../resolveOperationTypes.ts'
+import type { OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildRequestResultGenerics } from './generics.ts'
 

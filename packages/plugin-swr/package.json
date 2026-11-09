@@ -94,6 +94,7 @@
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*",
+    "@kubb/plugin-client": "workspace:*",
     "swr": "^2.5.1"
   },
   "peerDependencies": {

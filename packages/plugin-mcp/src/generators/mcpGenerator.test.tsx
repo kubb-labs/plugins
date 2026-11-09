@@ -2,7 +2,7 @@
 
 import type { Config } from '@kubb/kit'
 import { ast } from '@kubb/kit'
-import { resolverClient } from '@internals/client'
+import { resolverClient } from '@kubb/plugin-client'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'

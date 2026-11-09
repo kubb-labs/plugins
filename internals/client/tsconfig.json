@@ -1,9 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "kubb/jsx",
     "types": ["bun-types", "../../globals.d.ts"]
   },
-  "include": ["src/**/*", "templates/**/*", "./package.json", "./tsdown.config.ts", "./vitest.config.ts"]
+  "include": ["src/**/*", "./package.json", "./tsdown.config.ts", "./vitest.config.ts"]
 }
