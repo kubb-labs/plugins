@@ -4,7 +4,7 @@
  * Source: text content
  */
 
-import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { Options, ResponseErrorConfig } from './.kubb/client'
 import type { RetrieveMyProfileOptions, RetrieveMyProfileStatus200 } from './RetrieveMyProfile'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { retrieveMyProfile } from './clients/retrieveMyProfile'
@@ -16,7 +16,7 @@ type RetrieveMyProfileQueryKey = ReturnType<typeof retrieveMyProfileQueryKey>
 
 export function retrieveMyProfileQueryOptions(
   { headers }: RetrieveMyProfileOptions,
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Omit<Options<RetrieveMyProfileOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {},
 ) {
   const queryKey = retrieveMyProfileQueryKey()
   return queryOptions<RetrieveMyProfileStatus200, ResponseErrorConfig<Error>, RetrieveMyProfileStatus200, typeof queryKey>({
@@ -38,7 +38,7 @@ export function useRetrieveMyProfile<
   { headers }: { headers: RetrieveMyProfileOptions['headers'] | (() => RetrieveMyProfileOptions['headers']) },
   options: {
     query?: Partial<QueryObserverOptions<RetrieveMyProfileStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Omit<Options<RetrieveMyProfileOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

@@ -4,8 +4,8 @@
  */
 
 import useSWR from 'swr'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
-import type { LogoutUserResponse } from '../../models/user/LogoutUser'
+import type { Options, ResponseErrorConfig } from '../../.kubb/client'
+import type { LogoutUserOptions, LogoutUserResponse } from '../../models/user/LogoutUser'
 import type { SWRConfiguration } from 'swr'
 import { logoutUser } from '../../clients/user/logoutUser'
 
@@ -13,7 +13,7 @@ export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 
 type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 
-export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function logoutUserQueryOptions(config: Omit<Options<LogoutUserOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {}) {
   return {
     fetcher: async () => {
       return logoutUser({ ...config, throwOnError: true }).unwrap()
@@ -28,7 +28,7 @@ export function logoutUserQueryOptions(config: Partial<Omit<RequestConfig, 'path
 export function useLogoutUser(
   options: {
     query?: SWRConfiguration<LogoutUserResponse, ResponseErrorConfig<Error>>
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Omit<Options<LogoutUserOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>
     shouldFetch?: boolean
     immutable?: boolean
   } = {},

@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { PetListStatus200 } from '../types/pet/List'
-import type { RequestConfig, ResponseErrorConfig } from '@example/client'
+import type { PetListOptions, PetListStatus200 } from '../types/pet/List'
+import type { Options, ResponseErrorConfig } from '@example/client'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { petList } from '../clients/pet/list'
 import { queryOptions, useQuery } from '@tanstack/react-query'
@@ -13,7 +13,7 @@ export const petListQueryKey = () => [{ url: '/pets/first' }] as const
 
 type PetListQueryKey = ReturnType<typeof petListQueryKey>
 
-export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function petListQueryOptions(config: Omit<Options<PetListOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {}) {
   const queryKey = petListQueryKey()
   return queryOptions<PetListStatus200, ResponseErrorConfig<Error>, PetListStatus200, typeof queryKey>({
    queryKey,
@@ -28,7 +28,7 @@ export function petListQueryOptions(config: Partial<Omit<RequestConfig, 'path' |
  */
 export function usePetList<TData = PetListStatus200, TQueryData = PetListStatus200, TQueryKey extends QueryKey = PetListQueryKey>(options: {
   query?: Partial<QueryObserverOptions<PetListStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+  client?: Omit<Options<PetListOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig

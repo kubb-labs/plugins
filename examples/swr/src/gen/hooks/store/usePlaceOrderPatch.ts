@@ -4,7 +4,7 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { Options, ResponseErrorConfig } from '../../.kubb/client'
 import type { PlaceOrderPatchOptions, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/store/PlaceOrderPatch'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { placeOrderPatch } from '../../clients/store/placeOrderPatch'
@@ -28,9 +28,7 @@ export function usePlaceOrderPatch(
       PlaceOrderPatchMutationKey | null,
       PlaceOrderPatchMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-    }
+    client?: Omit<Options<PlaceOrderPatchOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'>
     shouldFetch?: boolean
   } = {},
 ) {
@@ -40,7 +38,7 @@ export function usePlaceOrderPatch(
   return useSWRMutation<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchMutationKey | null, PlaceOrderPatchMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return placeOrderPatch({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrderPatch<true>>[0]).unwrap()
+      return placeOrderPatch({ ...config, ...variables, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { Options, ResponseErrorConfig } from '../.kubb/client'
 import type { UpdatePetOptions, UpdatePetStatus200 } from '../types/UpdatePet'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { updatePet } from '../clients/updatePet'
@@ -11,7 +11,7 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
 
-export function updatePetMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function updatePetMutationOptions<TContext = unknown>(config: Omit<Options<UpdatePetOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> = {}) {
   const mutationKey = updatePetMutationKey()
   return mutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetOptions, TContext>({
     mutationKey,
@@ -26,7 +26,7 @@ export function updatePetMutationOptions<TContext = unknown>(config: Partial<Omi
  */
 export function useUpdatePet<TContext>(options: {
   mutation?: UseMutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetOptions, TContext> & { client?: QueryClient },
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Omit<Options<UpdatePetOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

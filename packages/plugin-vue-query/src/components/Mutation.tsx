@@ -35,7 +35,7 @@ function buildMutationParamsNode(node: ast.OperationNode, options: { resolver: R
     withRequest: false,
     optionsType: `{
   mutation?: MutationObserverOptions<${[TData, TError, resolveMutationRequestType(node, resolver), 'TContext'].join(', ')}> & { client?: QueryClient },
-  client?: ${buildRequestConfigType(node)},
+  client?: ${buildRequestConfigType(node, { optionsName: resolver.response.options(node) })},
 }`,
   })
 }
@@ -53,7 +53,6 @@ export function Mutation({ name, clientName, node, tsResolver, mutationKeyName, 
       clientName,
       signal: false,
       withContentType: true,
-      returnType: clientReturnType,
       // Pin the payload type: an optional `value` property can otherwise drive Vue's ref inference.
       unwrapName: (name) => `toValue<${TRequest}['${name}']>(${name})`,
     }),

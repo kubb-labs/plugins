@@ -1,4 +1,4 @@
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { Options, ResponseErrorConfig } from '../../../.kubb/client'
 import type { ApiResponse } from '../../../models/ts/ApiResponse'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { uploadFile } from '../../axios/petService/uploadFile'
@@ -6,7 +6,21 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
-export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function uploadFileMutationOptions<TContext = unknown>(
+  config: Omit<
+    Options<{
+      body: Blob
+      path: {
+        petId: number
+      }
+      query?: {
+        additionalMetadata?: string
+      }
+      headers?: never
+    }>,
+    'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
+  > = {},
+) {
   const mutationKey = uploadFileMutationKey()
   return mutationOptions<
     ApiResponse,
@@ -51,7 +65,19 @@ export function useUploadFile<TContext>(
       },
       TContext
     > & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Omit<
+      Options<{
+        body: Blob
+        path: {
+          petId: number
+        }
+        query?: {
+          additionalMetadata?: string
+        }
+        headers?: never
+      }>,
+      'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
+    >
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

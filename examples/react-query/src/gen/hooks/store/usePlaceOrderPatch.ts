@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { Options, ResponseErrorConfig } from '../../.kubb/client'
 import type { PlaceOrderPatchOptions, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/store/PlaceOrderPatch'
 import { placeOrderPatch } from '../../clients/store/placeOrderPatch'
 import { mutationOptions } from '@tanstack/react-query'
@@ -11,15 +11,13 @@ import { mutationOptions } from '@tanstack/react-query'
 export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as const
 
 export function placeOrderPatchMutationOptions<TContext = unknown>(
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-    contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-  } = {},
+  config: Omit<Options<PlaceOrderPatchOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'> = {},
 ) {
   const mutationKey = placeOrderPatchMutationKey()
   return mutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchOptions, TContext>({
     mutationKey,
     mutationFn: async (variables) => {
-      return placeOrderPatch({ ...config, ...variables, throwOnError: true } as Parameters<typeof placeOrderPatch<true>>[0]).unwrap()
+      return placeOrderPatch({ ...config, ...variables, throwOnError: true }).unwrap()
     },
   })
 }

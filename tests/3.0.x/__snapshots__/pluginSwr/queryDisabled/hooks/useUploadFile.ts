@@ -4,7 +4,7 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client'
+import type { Options, ResponseErrorConfig } from '../.kubb/client'
 import type { UploadFileOptions, UploadFileStatus200 } from '../types/UploadFile'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { uploadFile } from '../clients/uploadFile'
@@ -21,7 +21,7 @@ export type UploadFileMutationArg = UploadFileOptions
  */
 export function useUploadFile(options: {
   mutation?: SWRMutationConfiguration<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg> & { throwOnError?: boolean },
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Omit<Options<UploadFileOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>,
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}

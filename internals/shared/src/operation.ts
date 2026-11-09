@@ -336,28 +336,36 @@ export function resolveContentTypeVariants(entries: Array<ContentVariantInput>, 
 
 /**
  * Builds the `client?:` option type shared by the generated query hooks (`useQuery`,
- * `useInfiniteQuery`, `useSWR`, ...). Unlike {@link buildRequestConfigType}, it never adds a
- * `contentType?:` member: query hooks wrap GET operations, which carry no request body to select a
- * content type for. It drops the data-shape keys to stay assignable to `Options`, which omits them
- * from `RequestConfig`. `cookies` is a group only on an operation that declares one.
+ * `useInfiniteQuery`, `useSWR`, ...): the client function's own `Options<optionsName>` minus what the
+ * hook fills in, which is every request group and `throwOnError`. Unlike {@link buildRequestConfigType},
+ * it never narrows `contentType`: query hooks wrap GET operations, which carry no request body to select
+ * a content type for.
  */
-export function buildClientOptionType(node: ast.OperationNode): string {
-  const cookies = getOperationParameters(node).cookie.length > 0 ? ` | 'cookies'` : ''
-  return `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers'${cookies} | 'url'>>`
+export function buildClientOptionType(options: { optionsName: string; omit?: Array<string> }): string {
+  const { optionsName, omit = [] } = options
+  const keys = [...requestGroupOrder, ...omit, 'throwOnError']
+  return `Omit<Options<${optionsName}>, ${keys.map((key) => `'${key}'`).join(' | ')}>`
 }
 
-export function buildRequestConfigType(node: ast.OperationNode): string {
+/**
+ * The `client?:` option type of a mutation hook. When the operation has a request content type choice,
+ * the mutation variables carry `contentType`, so the config leaves it out. Otherwise the ambiguous side is
+ * narrowed to the operation's media types; a single-type side has nothing to pick, so it stays baked in the
+ * generated call.
+ */
+export function buildRequestConfigType(node: ast.OperationNode, options: { optionsName: string }): string {
+  if (hasRequestContentTypeChoice(node)) {
+    return buildClientOptionType({ optionsName: options.optionsName, omit: ['contentType'] })
+  }
+
   const request = getContentTypeInfo(node)
   const response = getResponseContentTypeInfo(node)
-
-  // Only the ambiguous side is offered: a single-type side has nothing to pick, so it stays baked in
-  // the generated call.
   const members = [
     request.isMultipleContentTypes ? `request?: ${request.contentTypeUnion}` : null,
     response.isMultipleContentTypes ? `response?: ${response.contentTypeUnion}` : null,
   ].filter(Boolean)
 
-  const base = buildClientOptionType(node)
+  const base = buildClientOptionType(options)
   return members.length ? `${base} & { contentType?: { ${members.join('; ')} } }` : base
 }
 
@@ -447,7 +455,7 @@ export function buildRequestParamsSignature(
     ? `Pick<${resolver.response.options(node)}, ${names.map((name) => `'${name}'`).join(' | ')}>`
     : resolver.response.options(node)
   const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: ${optionsType}${isOptional ? ' = {}' : ''}` : null
-  const configParam = isConfigurable ? `config: ${buildRequestConfigType(node)} = {}` : null
+  const configParam = isConfigurable ? `config: ${buildRequestConfigType(node, { optionsName: resolver.response.options(node) })} = {}` : null
 
   return {
     signature: [firstParam, configParam].filter(Boolean).join(', '),

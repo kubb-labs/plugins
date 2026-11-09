@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { PetCreateStatus200 } from '../types/pet/Create'
-import type { RequestConfig, ResponseErrorConfig } from '@example/client'
+import type { PetCreateOptions, PetCreateStatus200 } from '../types/pet/Create'
+import type { Options, ResponseErrorConfig } from '@example/client'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { petCreate } from '../clients/pet/create'
 import { useMutation } from '@tanstack/vue-query'
@@ -16,7 +16,7 @@ export const petCreateMutationKey = () => [{ url: '/pets/create-first' }] as con
  */
 export function usePetCreate<TContext>(options: {
   mutation?: MutationObserverOptions<PetCreateStatus200, ResponseErrorConfig<Error>, undefined, TContext> & { client?: QueryClient },
-  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
+  client?: Omit<Options<PetCreateOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

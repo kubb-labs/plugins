@@ -1,4 +1,4 @@
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { Options, ResponseErrorConfig } from '../../../.kubb/client'
 import type { CreatePetsBoolParamKey } from '../../../models/ts/CreatePetsBoolParam'
 import type { CreatePetsXEXAMPLEKey } from '../../../models/ts/CreatePetsXEXAMPLE'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
@@ -7,7 +7,27 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const createPetsMutationKey = () => [{ url: '/pets/:uuid' }] as const
 
-export function createPetsMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
+export function createPetsMutationOptions<TContext = unknown>(
+  config: Omit<
+    Options<{
+      body: {
+        name: string
+        tag: string
+      }
+      path: {
+        uuid: string
+      }
+      query?: {
+        bool_param?: CreatePetsBoolParamKey
+        offset?: number
+      }
+      headers: {
+        'X-EXAMPLE': CreatePetsXEXAMPLEKey
+      }
+    }>,
+    'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
+  > = {},
+) {
   const mutationKey = createPetsMutationKey()
   return mutationOptions<
     unknown,
@@ -64,7 +84,25 @@ export function useCreatePets<TContext>(
       },
       TContext
     > & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Omit<
+      Options<{
+        body: {
+          name: string
+          tag: string
+        }
+        path: {
+          uuid: string
+        }
+        query?: {
+          bool_param?: CreatePetsBoolParamKey
+          offset?: number
+        }
+        headers: {
+          'X-EXAMPLE': CreatePetsXEXAMPLEKey
+        }
+      }>,
+      'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
+    >
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

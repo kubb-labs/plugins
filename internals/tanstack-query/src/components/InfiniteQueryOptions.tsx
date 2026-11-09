@@ -80,7 +80,9 @@ export function InfiniteQueryOptions({
 
   const paramsNode = buildQueryOptionsParams(node, { resolver: tsResolver, memberTypeWrapper })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName }), { clientReturnType, returnType })
+  // The page param replaces the configured query parameter of the request, typed as that parameter.
+  const pageParam = queryParam && queryParamsTypeName ? queryParam : undefined
+  const queryFnBody = buildCallResultBody(buildClientCall(node, { clientName, signal: true, unwrapName, pageParam }), { clientReturnType, returnType })
 
   const initialPageParamLiteral =
     typeof initialPageParam === 'string' || (typeof initialPageParam === 'object' && initialPageParam !== null)
@@ -114,16 +116,7 @@ export function InfiniteQueryOptions({
 
   const queryOptionsArr = [`initialPageParam: ${initialPageParamLiteral}`, getNextPageParamExpr, getPreviousPageParamExpr].filter(Boolean)
 
-  const infiniteOverrideParams =
-    queryParam && queryParamsTypeName
-      ? `query = {
-      ...(query ?? {}),
-      ['${queryParam}']: pageParam as unknown as ${queryParamsTypeName}['${queryParam}'],
-    } as ${queryParamsTypeName}`
-      : ''
-
-  const queryFnArgs = infiniteOverrideParams ? '{ signal, pageParam }' : '{ signal }'
-  const queryFnStatements = infiniteOverrideParams ? `${infiniteOverrideParams}\n    ${queryFnBody}` : queryFnBody
+  const queryFnArgs = pageParam ? '{ signal, pageParam }' : '{ signal }'
 
   return (
     <File.Source name={name} isExportable isIndexable>
@@ -133,7 +126,7 @@ const queryKey = ${queryKeyName}(${queryKeyParamsCall})
 return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, ${queryKeyType}, ${pageParamType}>({
   queryKey,
   queryFn: async (${queryFnArgs}) => {
-    ${queryFnStatements}
+    ${queryFnBody}
   },
   ${queryOptionsArr.join(',\n  ')}
 })

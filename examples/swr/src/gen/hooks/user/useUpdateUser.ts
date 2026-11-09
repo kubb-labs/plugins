@@ -4,7 +4,7 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client'
+import type { Options, ResponseErrorConfig } from '../../.kubb/client'
 import type { UpdateUserOptions, UpdateUserResponse } from '../../models/user/UpdateUser'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { updateUser } from '../../clients/user/updateUser'
@@ -25,9 +25,7 @@ export function useUpdateUser(
     mutation?: SWRMutationConfiguration<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserMutationKey | null, UpdateUserMutationArg> & {
       throwOnError?: boolean
     }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
-      contentType?: { request?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' }
-    }
+    client?: Omit<Options<UpdateUserOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'>
     shouldFetch?: boolean
   } = {},
 ) {
@@ -37,7 +35,7 @@ export function useUpdateUser(
   return useSWRMutation<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserMutationKey | null, UpdateUserMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: variables }) => {
-      return updateUser({ ...config, ...variables, throwOnError: true } as Parameters<typeof updateUser<true>>[0]).unwrap()
+      return updateUser({ ...config, ...variables, throwOnError: true }).unwrap()
     },
     mutationOptions,
   )

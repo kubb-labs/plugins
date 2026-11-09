@@ -1,5 +1,5 @@
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
-import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client'
+import type { Options, ResponseErrorConfig } from '../../../.kubb/client'
 import type { FindPetsByTagsXEXAMPLEKey } from '../../../models/ts/FindPetsByTagsXEXAMPLE'
 import type { Pet } from '../../../models/ts/Pet'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
@@ -41,7 +41,21 @@ export function findPetsByTagsQueryOptions(
       'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
     }
   },
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Omit<
+    Options<{
+      body?: never
+      path?: never
+      query?: {
+        tags?: Array<string>
+        page?: string
+        pageSize?: number
+      }
+      headers: {
+        'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+      }
+    }>,
+    'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
+  > = {},
 ) {
   const queryKey = findPetsByTagsQueryKey({ query })
   return queryOptions<Array<Pet> | string, ResponseErrorConfig<unknown>, Array<Pet> | string, typeof queryKey>({
@@ -115,7 +129,21 @@ export function useFindPetsByTags<TData = Array<Pet> | string, TQueryData = Arra
   },
   options: {
     query?: Partial<QueryObserverOptions<Array<Pet> | string, ResponseErrorConfig<unknown>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Omit<
+      Options<{
+        body?: never
+        path?: never
+        query?: {
+          tags?: Array<string>
+          page?: string
+          pageSize?: number
+        }
+        headers: {
+          'X-EXAMPLE': FindPetsByTagsXEXAMPLEKey
+        }
+      }>,
+      'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'
+    >
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

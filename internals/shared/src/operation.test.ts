@@ -136,7 +136,7 @@ describe('buildOptionsSchema with several request content types', () => {
 })
 
 describe('buildRequestConfigType', () => {
-  test('offers a request content type when the request body has multiple', () => {
+  test('leaves contentType to the mutation variables when the request body has multiple', () => {
     const node = ast.factory.createOperation({
       operationId: 'createPet',
       method: 'POST',
@@ -149,8 +149,8 @@ describe('buildRequestConfigType', () => {
       },
     })
 
-    expect(buildRequestConfigType(node)).toBe(
-      `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: { request?: "application/json" | "application/xml" } }`,
+    expect(buildRequestConfigType(node, { optionsName: 'CreatePetOptions' })).toBe(
+      `Omit<Options<CreatePetOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'contentType' | 'throwOnError'>`,
     )
   })
 
@@ -170,15 +170,17 @@ describe('buildRequestConfigType', () => {
       ],
     })
 
-    expect(buildRequestConfigType(node)).toBe(
-      `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: { response?: "application/json" | "application/xml" } }`,
+    expect(buildRequestConfigType(node, { optionsName: 'GetPetOptions' })).toBe(
+      `Omit<Options<GetPetOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'> & { contentType?: { response?: "application/json" | "application/xml" } }`,
     )
   })
 
-  test('uses the untyped request config when no request schema exists', () => {
+  test('uses the operation options when no request schema exists', () => {
     const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
-    expect(buildRequestConfigType(node)).toBe(`Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`)
+    expect(buildRequestConfigType(node, { optionsName: 'ListPetsOptions' })).toBe(
+      `Omit<Options<ListPetsOptions>, 'path' | 'query' | 'body' | 'headers' | 'cookies' | 'throwOnError'>`,
+    )
   })
 })
 
