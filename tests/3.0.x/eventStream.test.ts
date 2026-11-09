@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { adapterOas } from '@kubb/adapter-oas'
 import { Hookable, createKubb } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
@@ -90,6 +90,78 @@ describe('event stream runtime', () => {
       expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
 
       expect(await fs.readdir(path.join(output, '.kubb'))).toStrictEqual(['client.ts', 'core.ts', 'serializers.ts', 'standardSchema.ts'])
+    } finally {
+      await fs.rm(output, { recursive: true, force: true })
+    }
+  })
+})
+
+describe('a response that offers JSON or an event stream', () => {
+  async function generate({ output, clientPlugin }: { output: string; clientPlugin: typeof pluginFetch | typeof pluginAxios }) {
+    const { diagnostics } = await createKubb(
+      {
+        root: dirname,
+        input: '../../schemas/3.0.x/eventStreamMixed.yaml',
+        output: { path: output, barrel: false },
+        adapter: adapterOas({ validate: false }),
+        parsers: [parserTs()],
+        reporters: [],
+        storage: fsStorage(),
+        plugins: [pluginTs({ output: { path: './types', barrel: false } }), clientPlugin({ output: { path: './clients', barrel: false } })],
+      } as Config,
+      { hooks: new Hookable<KubbHooks>() },
+    ).safeBuild()
+    expect(Diagnostics.hasError(diagnostics), JSON.stringify(diagnostics)).toBe(false)
+  }
+
+  test.each([
+    { name: 'axios', clientPlugin: pluginAxios },
+    { name: 'fetch', clientPlugin: pluginFetch },
+  ])('asks $name for the event stream and ships the runtime to parse it', async ({ clientPlugin }) => {
+    const output = await fs.mkdtemp(path.join(dirname, '.event-stream-mixed-'))
+    try {
+      await generate({ output, clientPlugin })
+
+      expect(await fs.readFile(path.join(output, '.kubb', 'sse.ts'), 'utf8')).toContain('export async function* parseEventStream')
+      expect(await fs.readFile(path.join(output, '.kubb', 'client.ts'), 'utf8')).toMatch(/export \* from '\.\/sse\.ts'\s*$/)
+
+      const client = await fs.readFile(path.join(output, 'clients', 'listChanges.ts'), 'utf8')
+      expect(client).toContain('RequestResult<ListChangesResponses')
+      expect(client).toContain("contentType: { response: 'text/event-stream' }")
+    } finally {
+      await fs.rm(output, { recursive: true, force: true })
+    }
+  })
+
+  test('returns the event stream as a stream to parse, and JSON when the caller picks it', async () => {
+    const output = await fs.mkdtemp(path.join(dirname, '.event-stream-mixed-run-'))
+    try {
+      await generate({ output, clientPlugin: pluginFetch })
+
+      const accepts: Array<string | undefined> = []
+      const { client, parseEventStream } = await import(pathToFileURL(path.join(output, '.kubb/client.ts')).href)
+      client.setConfig({
+        baseURL: 'https://api.test',
+        transport: async (request: { headers: Record<string, string> }) => {
+          const accept = request.headers['Accept']
+          accepts.push(accept)
+          return accept === 'text/event-stream'
+            ? new Response('data: {"$schema":"change"}\n\n', { headers: { 'Content-Type': 'text/event-stream' } })
+            : Response.json({ $schema: 'change' })
+        },
+      })
+      const { listChanges } = await import(pathToFileURL(path.join(output, 'clients/listChanges.ts')).href)
+
+      const stream = await listChanges()
+      expect(stream.contentType).toBe('text/event-stream')
+      expect(stream.data).toBeInstanceOf(ReadableStream)
+      const events = []
+      for await (const event of parseEventStream(stream.data)) events.push(event)
+      expect(events).toStrictEqual([{ event: 'message', data: { $schema: 'change' } }])
+
+      const json = await listChanges({ contentType: { response: 'application/json' } })
+      expect(json).toMatchObject({ contentType: 'application/json', data: { $schema: 'change' } })
+      expect(accepts).toStrictEqual(['text/event-stream', 'application/json'])
     } finally {
       await fs.rm(output, { recursive: true, force: true })
     }

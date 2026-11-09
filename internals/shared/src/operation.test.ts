@@ -12,6 +12,7 @@ import {
   getRequestGroupOptionality,
   getResponseType,
   getResponseTypeMap,
+  hasEventStreamContent,
   isErrorStatusCode,
   isEventStream,
   isSuccessStatusCode,
@@ -457,8 +458,28 @@ describe('getResponseType / isEventStream', () => {
     })
 
     expect(isEventStream(node)).toBe(false)
+    expect(hasEventStreamContent(node)).toBe(true)
     expect(getResponseType(node)).toBeUndefined()
     expect(getEventStream(node)).toBeNull()
+  })
+
+  test('ignores a schema-less text/event-stream next to another content type', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'streamEvents',
+      method: 'GET',
+      path: '/events',
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [
+            ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) }),
+            ast.factory.createContent({ contentType: 'text/event-stream' }),
+          ],
+        }),
+      ],
+    })
+
+    expect(hasEventStreamContent(node)).toBe(false)
   })
 
   test('reads the item shape of the stream', () => {
@@ -517,6 +538,7 @@ describe('getResponseType / isEventStream', () => {
   test('leaves JSON responses to the runtime auto-detection', () => {
     expect(getResponseType(nodeWithResponseContentType('application/json'))).toBeUndefined()
     expect(isEventStream(nodeWithResponseContentType('application/json'))).toBe(false)
+    expect(hasEventStreamContent(nodeWithResponseContentType('application/json'))).toBe(false)
   })
 
   test('maps other non-JSON content types to text or blob', () => {
