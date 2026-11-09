@@ -584,10 +584,7 @@ export function toRequestInit(request: ResolvedRequest): RequestInit {
 
 /**
  * Builds a transport result from a web `Response`, for any HTTP library that returns one, such as `fetch` or ky.
- * The core calls it for a transport that returns a `Response`, with the resolved request as `request`. The body
- * is parsed by `responseType` and the `Content-Type`. A 204, 205, 304, or bodiless response is no data, a streamed call
- * answered with JSON or an error is decoded by its content type, and a failed blob or arraybuffer call is too when the
- * runtime knows the type, so `error` is the error object. An unknown type, which a codec may own, keeps the bytes.
+ * The core calls it for a transport that returns a `Response`, with the resolved request as `request`.
  */
 export async function readResponse<TRequest, TResponse extends Response>(
   response: TResponse,

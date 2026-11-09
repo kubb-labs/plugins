@@ -4,14 +4,13 @@
 '@kubb/plugin-axios': major
 ---
 
-Run the fetch and axios clients on one core with the same interceptors and client factory, and pass the full event type to stream result types.
+Run the fetch and axios clients on one core with the same interceptors and client factory.
 
-- Import types from `templates/client.ts`, which the package now exports for types only, and the shared runtime from `@kubb/plugin-client/templates/*`. `templates/fetch.ts` and `templates/axios.ts` are gone.
-- Use `NativeOptions` where you used `FetchOptions` or `AxiosOptions`.
-- A transport can return a web `Response`, which the client parses as the fetch client does, so a ky transport is one call: `(request) => ky(request.url, { ...toRequestInit(request), throwHttpErrors: false, retry: 0 })`.
+- Import types from `templates/client.ts` and the shared runtime from `@kubb/plugin-client/templates/*`. `templates/fetch.ts` and `templates/axios.ts` are gone.
+- Rename `FetchOptions` and `AxiosOptions` to `NativeOptions`.
 - Write `EventStreamResult<ServerSentEvent<Pet>>` where you wrote `EventStreamResult<Pet>`, and the same for `StreamResult` and `UnwrappedStreamResult`.
-- On axios, `client.interceptors` handlers get the `ResolvedRequest`, `TransportResult`, and `ResponseError`, and the error handler skips network errors. Register native axios handlers on `axiosInstance.interceptors`.
-- On axios, wrap an instance with `createAxiosTransport(instance)` to pass it as `transport`. `defaultTransport` is a function now, and `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
+- Return a web `Response` from a custom transport, and build its init with `toRequestInit(request)`, so a ky transport is one call.
+- On axios, `client.interceptors` handlers get the core objects and skip network errors. Native handlers go on `axiosInstance.interceptors`, and `validateStatus`, `AxiosTransport`, `InterceptorFn`, and `InterceptorChannel` are gone.
 
 ```diff
 - import { client, defaultTransport } from './gen/.kubb/client'

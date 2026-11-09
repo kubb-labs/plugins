@@ -307,9 +307,14 @@ export function resolveContentTypeVariants(entries: Array<ContentVariantInput>, 
     })
 }
 
-// The request groups come from the grouped params, so `config` drops the data-shape keys to stay
-// assignable to `Options`, which omits them from `RequestConfig`. `cookies` is a group only on an operation that declares one.
-function requestConfigBaseType(node: ast.OperationNode): string {
+/**
+ * Builds the `client?:` option type shared by the generated query hooks (`useQuery`,
+ * `useInfiniteQuery`, `useSWR`, ...). Unlike {@link buildRequestConfigType}, it never adds a
+ * `contentType?:` member: query hooks wrap GET operations, which carry no request body to select a
+ * content type for. It drops the data-shape keys to stay assignable to `Options`, which omits them
+ * from `RequestConfig`. `cookies` is a group only on an operation that declares one.
+ */
+export function buildClientOptionType(node: ast.OperationNode): string {
   const cookies = getOperationParameters(node).cookie.length > 0 ? ` | 'cookies'` : ''
   return `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers'${cookies} | 'url'>>`
 }
@@ -325,18 +330,8 @@ export function buildRequestConfigType(node: ast.OperationNode): string {
     response.isMultipleContentTypes ? `response?: ${response.contentTypeUnion}` : null,
   ].filter(Boolean)
 
-  const base = requestConfigBaseType(node)
+  const base = buildClientOptionType(node)
   return members.length ? `${base} & { contentType?: { ${members.join('; ')} } }` : base
-}
-
-/**
- * Builds the `client?:` option type shared by the generated query hooks (`useQuery`,
- * `useInfiniteQuery`, `useSWR`, ...). Unlike {@link buildRequestConfigType}, it never adds a
- * `contentType?:` member: query hooks wrap GET operations, which carry no request body to select a
- * content type for.
- */
-export function buildClientOptionType(node: ast.OperationNode): string {
-  return requestConfigBaseType(node)
 }
 
 /** The grouped request options, in the order generated signatures and calls list them. */
@@ -517,9 +512,9 @@ export function castToClientOptions(callArg: string, clientName: string, returnT
 
 /**
  * Builds the combined `{ body, path, query, headers, cookies }` options object schema for an operation,
- * referencing the already-resolved body and grouped param names. `cookies` appears only when the operation
- * declares a cookie parameter, and is always optional. The other groups appear always. Shared by `@kubb/plugin-ts`'s `Options` type and
- * `@kubb/plugin-zod`'s inferred options schema, so both printers emit the same shape from the same inputs.
+ * referencing the already-resolved body and grouped param names. `cookies` appears only on an operation
+ * with a cookie parameter, and stays optional because a browser sends its cookies itself. Shared by `@kubb/plugin-ts`'s
+ * `Options` type and `@kubb/plugin-zod`'s inferred options schema, so both printers emit the same shape from the same inputs.
  * `primitive: 'object'` is a no-op for the TS printer and tells the Zod printer to emit `z.object(…)` rather
  * than a record.
  */
@@ -544,11 +539,9 @@ export function buildOptionsSchema(node: ast.OperationNode, resolver: OperationT
       deprecated: node.deprecated,
       properties: [
         ast.factory.createProperty({ name: 'body', required: hasBody && node.requestBody?.required === true, schema: body }),
-        // `cookies` is rare, so it appears only on an operation that declares one.
         ...groups
           .filter(({ name, params }) => name !== 'cookies' || params.length > 0)
           .map(({ name, params, resolve }) => {
-            // `cookies` stays optional, since a browser sends its cookies itself.
             const required = name !== 'cookies' && params.some((param) => param.required)
 
             return ast.factory.createProperty({

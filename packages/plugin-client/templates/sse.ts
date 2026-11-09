@@ -261,7 +261,7 @@ export async function toEventStream<TEvent = ServerSentEvent, TResponse = Native
     try {
       for await (const event of parseEventStream({ stream: body, maxEventSize: options.maxEventSize, terminator: options.terminator, cursor })) {
         yield (await validateEvent(options.transform ? options.transform(event) : event)) as TEvent
-        // A chunk may hold events past the one the consumer aborted on. The loop ends before the parser reads on, so `lastEventId` stays at the event the consumer saw.
+        // A chunk may hold more events, so stop before the parser reads on.
         if (options.signal?.aborted) throw options.signal.reason
       }
     } catch (error) {
