@@ -625,6 +625,9 @@ async function parseResponseBody(response: Response, responseType: ResponseType 
   const contentType = response.headers.get('Content-Type')
   const requested = resolveResponseType(responseType, contentType)
   const detected = resolveResponseType(undefined, contentType)
+  // A server may answer a streamed operation with JSON, or with an error body: both are decoded by their content type.
+  // A failed blob or arraybuffer call is too, when the runtime knows the type, so `error` is the error object. An unknown
+  // type, which a codec may own, keeps the bytes. Any other body keeps the requested parser.
   const binaryError = !response.ok && (requested === 'blob' || requested === 'arraybuffer')
   const type = requested === 'stream' && (!response.ok || isJsonMediaType(contentType)) ? detected : binaryError ? (detected ?? requested) : requested
   switch (type) {
@@ -639,6 +642,7 @@ async function parseResponseBody(response: Response, responseType: ResponseType 
       return response.body ?? undefined
   }
 
+  // An empty body labeled JSON would make `response.json()` throw, and a server may label plain text as JSON, so read text first.
   return parseJsonOrText(await response.text())
 }
 
