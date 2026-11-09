@@ -18,6 +18,7 @@ export function buildSdkMethod({
   types,
   validatorHooks,
   security,
+  baseURL,
   returnType,
   throwOnErrorDefault,
 }: {
@@ -26,12 +27,13 @@ export function buildSdkMethod({
   types: OperationTypeNames
   validatorHooks: ValidatorHooks | null
   security?: Array<Auth>
+  baseURL?: string
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
 }): string {
   if (!ast.isHttpOperationNode(node)) return ''
 
-  const body = buildOperationBody({ node, types, validatorHooks, security, returnType, throwOnErrorDefault })
+  const body = buildOperationBody({ node, types, validatorHooks, security, baseURL, returnType, throwOnErrorDefault })
   const generics = body.generics.length ? `<${body.generics.join(', ')}>` : ''
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
@@ -49,6 +51,7 @@ type OperationData = {
   types: OperationTypeNames
   validatorHooks: ValidatorHooks | null
   security?: Array<Auth>
+  baseURL?: string
 }
 
 type Props = {
@@ -65,13 +68,14 @@ type Props = {
  * still overrides the instance client for a one-off call.
  */
 export function SdkClient({ name, operations, returnType, throwOnErrorDefault }: Props): KubbReactNode {
-  const methods = operations.map(({ node, name: methodName, types, validatorHooks, security }) =>
+  const methods = operations.map(({ node, name: methodName, types, validatorHooks, security, baseURL }) =>
     buildSdkMethod({
       node,
       name: methodName,
       types,
       validatorHooks,
       security,
+      baseURL,
       returnType,
       throwOnErrorDefault,
     }),

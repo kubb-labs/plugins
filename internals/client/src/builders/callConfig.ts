@@ -25,7 +25,8 @@ function buildResponseTypeLiteral(node: ast.HttpOperationNode): string | null {
 
 /**
  * Builds the call config literal a generated operation forwards to the client, shared by the standalone
- * functions and the SDK methods. The `validator` and `throwOnError` entries come after the `...config` spread, so a
+ * functions and the SDK methods. `baseURL` is the operation's own server and comes before the `...config` spread,
+ * so a per-call `baseURL` still wins over it. The `validator` and `throwOnError` entries come after the `...config` spread, so a
  * per-call `validator` is merged per key with the generated one instead of replacing it. `styles` is merged the same
  * way, per parameter, unless `returnType` is `'plain'`.
  *
@@ -37,12 +38,14 @@ export function buildCallConfig({
   node,
   validatorHooks,
   security,
+  baseURL,
   throwOnErrorDefault,
   returnType,
 }: {
   node: ast.HttpOperationNode
   validatorHooks: ValidatorHooks | null
   security?: Array<Auth>
+  baseURL?: string
   throwOnErrorDefault: boolean
   returnType: ReturnTypeOption
 }): { callConfig: string; mergeContentType: boolean; eventStream: boolean } {
@@ -68,6 +71,7 @@ export function buildCallConfig({
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
     `url: '${node.path}'`,
+    baseURL ? `baseURL: ${JSON.stringify(baseURL)}` : null,
     securityLiteral ? `security: ${securityLiteral}` : null,
     ownRuntime ? null : styles,
     contentTypeLiteral,

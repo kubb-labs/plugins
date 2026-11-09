@@ -8,6 +8,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { type Auth, getOperationSecurity, type SecurityDocument } from '../builders/security.ts'
+import { getOperationBaseURL, type ServerDocument, type ServerOptions } from '../builders/server.ts'
 import { buildValidatorHooks, type ValidatorHooks } from '../builders/validator.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
 import { StreamRuntime } from '../components/StreamRuntime.tsx'
@@ -29,6 +30,7 @@ type OperationData = {
    */
   validatorHooks: ValidatorHooks | null
   security?: Array<Auth>
+  baseURL?: string
 }
 
 type Controller = {
@@ -57,7 +59,8 @@ function buildControllers(
 
   const pluginZod = validatorEnabled ? driver.getPlugin(pluginZodName) : null
   const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
-  const document = ctx.adapter.document as SecurityDocument | null | undefined
+  const document = ctx.adapter.document as (SecurityDocument & ServerDocument) | null | undefined
+  const server = (ctx.adapter.options as { server?: ServerOptions } | undefined)?.server
 
   function buildOperationData(node: ast.OperationNode): OperationData {
     const typeFile = types.resolver.file({
@@ -77,11 +80,12 @@ function buildControllers(
         : null
 
     const security = ast.isHttpOperationNode(node) ? getOperationSecurity({ document, method: node.method, path: node.path }) : undefined
+    const baseURL = ast.isHttpOperationNode(node) ? getOperationBaseURL({ document, method: node.method, path: node.path, server }) : undefined
 
     const validatorHooks = zodResolver ? buildValidatorHooks({ node, validator, zodResolver }) : null
 
     const name = resolver.name(node.operationId)
-    return { node, name: resolver.resolveName({ key: operationKey(node), name }), types, typeFile, zodFile, validatorHooks, security }
+    return { node, name: resolver.resolveName({ key: operationKey(node), name }), types, typeFile, zodFile, validatorHooks, security, baseURL }
   }
 
   return nodes.reduce((acc, operationNode) => {

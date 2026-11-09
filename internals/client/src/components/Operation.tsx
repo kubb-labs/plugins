@@ -36,6 +36,10 @@ type Props = {
    * call config's `security` field for the runtime `auth` resolver to consume.
    */
   security?: Array<Auth>
+  /**
+   * The operation's own server URL from a path-level or operation-level `servers` entry, emitted as the call's default `baseURL`.
+   */
+  baseURL?: string
 }
 
 /**
@@ -44,10 +48,10 @@ type Props = {
  * type, signature, and call config are built with the AST factory, and only the jsx-renderer emits
  * the source.
  */
-export function Operation({ name, node, types, validatorHooks, returnType, throwOnErrorDefault, security }: Props): KubbReactNode {
+export function Operation({ name, node, types, validatorHooks, returnType, throwOnErrorDefault, security, baseURL }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
 
-  const body = buildOperationBody({ node, types, validatorHooks, security, returnType, throwOnErrorDefault })
+  const body = buildOperationBody({ node, types, validatorHooks, security, baseURL, returnType, throwOnErrorDefault })
 
   return (
     <File.Source name={name} isExportable isIndexable>
