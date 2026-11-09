@@ -24,7 +24,7 @@
   "packages/plugin-axios/src/plugin.test.ts": "Golden path: setup fails with KUBB_MISSING_DEPENDENCY when the validator needs plugin-zod; no snapshot suite pins the failure.",
   "packages/plugin-axios/templates/client.test.ts": "Runtime axios transport shipped to users: status split, adapters, interceptors, stream fallbacks; nothing else tests it.",
   "packages/plugin-client/templates/serializers.test.ts": "Pins Date, zero and false defaults for urlencoded bodies without encoding metadata; the fetch client test only covers the metadata branch.",
-  "packages/plugin-client/templates/sse.test.ts": "Branchy runtime SSE parser (CRLF splits, BOM, ids, maxEventSize) shipped to users; only test of sse.ts.",
+  "packages/plugin-client/templates/sse.test.ts": "Branchy runtime SSE and JSON Lines parsers (CRLF splits, BOM, ids, maxEventSize) shipped to users; only test of sse.ts.",
   "packages/plugin-client/templates/standardSchema.test.ts": "Branchy case-insensitive header validator shipped to users; tests/3.0.x/pluginClient.test.ts only checks the import.",
   "packages/plugin-cypress/src/generators/cypressGenerator.test.ts": "Pins the baseURL template literal and the cookie group in rendered Cypress requests; tests/3.0.x/cypressPlugin.test.ts covers neither.",
   "packages/plugin-faker/src/generators/fakerGenerator.test.tsx": "Pins regressions #928, #873 and #3172 and typechecks cyclic factories; option matrix beyond the e2e configs.",

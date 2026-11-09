@@ -149,31 +149,43 @@ export function getResponseContentTypeInfo(node: ast.OperationNode): ContentType
 
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
 
-/**
- * Reads the single base content type of an operation's primary success response, lowercased and
- * stripped of any `; charset=...` suffix. Returns `undefined` when the response declares zero or
- * more than one content type, since neither case has a single type to act on.
- */
-function getPrimarySuccessContentType(node: ast.OperationNode): string | undefined {
-  const contentTypes = getPrimarySuccessResponse(node)?.content?.map((entry) => entry.contentType) ?? []
-  if (contentTypes.length !== 1) return undefined
-  return contentTypes[0]!.split(';')[0]!.trim().toLowerCase()
+function baseContentType(contentType: string): string {
+  return contentType.split(';')[0]!.trim().toLowerCase()
 }
 
 /**
- * The `text/event-stream` content of the primary success response, when it is the only content type. A response that also
- * declares another type stays a normal call with its query hooks.
+ * Whether a content entry is a sequence of JSON values the adapter marks as a stream, such as `application/jsonl`,
+ * `application/x-ndjson`, `application/json-seq`, or any media type with an OpenAPI 3.2 `itemSchema`.
  */
-function getEventStreamContent(node: ast.OperationNode): ast.ContentNode | undefined {
-  return getPrimarySuccessContentType(node) === 'text/event-stream' ? getPrimarySuccessResponse(node)?.content?.[0] : undefined
+function isJsonLines(entry: ast.ContentNode): boolean {
+  const baseType = baseContentType(entry.contentType)
+  // `multipart/mixed` is a stream of parts, not of JSON values.
+  return Boolean(entry.stream) && baseType !== 'text/event-stream' && !baseType.startsWith('multipart/')
 }
 
 /**
- * Whether an operation streams its primary success response as Server-Sent Events (`text/event-stream`). The client
- * generator uses this to return a typed event stream instead of a one-shot `RequestResult`.
+ * How an operation streams its primary success response item by item, when that response declares one content type:
+ * - `'event'` for `text/event-stream` whose `itemSchema` types the whole event with its own `event` and `data`
+ * - `'data'` for `text/event-stream` typed by its payload only
+ * - `'line'` for JSON Lines, one parsed JSON value per line
+ *
+ * Returns `null` for any other response, and for a response that also declares another content type, which stays a normal
+ * call with its query hooks.
+ */
+export function getEventStream(node: ast.OperationNode): 'event' | 'data' | 'line' | null {
+  const content = getPrimarySuccessResponse(node)?.content ?? []
+  if (content.length !== 1) return null
+  const entry = content[0]!
+  if (baseContentType(entry.contentType) === 'text/event-stream') return entry.stream?.shape ?? 'data'
+  return isJsonLines(entry) ? 'line' : null
+}
+
+/**
+ * Whether an operation streams its primary success response, as Server-Sent Events or JSON Lines. The client generator uses
+ * this to return a typed stream of items instead of a one-shot `RequestResult`.
  */
 export function isEventStream(node: ast.OperationNode): boolean {
-  return getEventStreamContent(node) !== undefined
+  return getEventStream(node) !== null
 }
 
 /**
@@ -186,19 +198,6 @@ export function hasEventStreamContent(node: ast.OperationNode): boolean {
   return entries.some((entry) => baseContentType(entry.contentType) === 'text/event-stream' && (entries.length === 1 || Boolean(entry.schema)))
 }
 
-/**
- * How the document types a `text/event-stream` response, as the adapter read it from `itemSchema`: `event` when each item is
- * the parsed event with its own `event` and `data`, `data` when it is only the payload. Returns `null` without an event stream.
- */
-export function getEventStream(node: ast.OperationNode): 'event' | 'data' | null {
-  const content = getEventStreamContent(node)
-  return content ? (content.stream?.shape ?? 'data') : null
-}
-
-function baseContentType(contentType: string): string {
-  return contentType.split(';')[0]!.trim().toLowerCase()
-}
-
 function isJsonContentType(baseType: string): boolean {
   return baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json'
 }
@@ -206,17 +205,17 @@ function isJsonContentType(baseType: string): boolean {
 /**
  * Parser for one response content entry.
  *
- * JSON stays unset so the runtime detects it. `text/event-stream` is a stream. A binary schema
+ * JSON stays unset so the runtime detects it. `text/event-stream` and JSON Lines are streams. A binary schema
  * (`format: binary` / `contentMediaType`) is a blob even when the media type is not a well-known
  * binary type. Other `text/*` is text, and `application/octet-stream`, `application/pdf`,
  * `image/*`, `audio/*`, and `video/*` are blobs.
  */
-function responseTypeForContent(contentType: string, schema?: ast.SchemaNode | null): ResponseType | undefined {
-  const baseType = baseContentType(contentType)
+function responseTypeForContent(entry: ast.ContentNode): ResponseType | undefined {
+  const baseType = baseContentType(entry.contentType)
   if (!baseType) return undefined
+  if (baseType === 'text/event-stream' || isJsonLines(entry)) return 'stream'
   if (isJsonContentType(baseType)) return undefined
-  if (baseType === 'text/event-stream') return 'stream'
-  if (schema?.type === 'blob') return 'blob'
+  if (entry.schema?.type === 'blob') return 'blob'
   if (baseType.startsWith('text/')) return 'text'
   if (baseType === 'application/octet-stream' || baseType === 'application/pdf' || /^(image|audio|video)\//.test(baseType)) return 'blob'
   return undefined
@@ -233,7 +232,7 @@ export function getResponseType(node: ast.OperationNode): ResponseType | undefin
   const entries = getPrimarySuccessResponse(node)?.content ?? []
   if (entries.length === 0) return undefined
 
-  const responseTypes = entries.map((entry) => responseTypeForContent(entry.contentType, entry.schema))
+  const responseTypes = entries.map((entry) => responseTypeForContent(entry))
   const first = responseTypes[0]
   if (!first) return undefined
   if (responseTypes.every((responseType) => responseType === first)) return first
@@ -257,7 +256,7 @@ export function getResponseTypeMap(node: ast.OperationNode): Record<string, Resp
   const map: Record<string, ResponseType> = {}
   for (const entry of entries) {
     const baseType = baseContentType(entry.contentType)
-    const responseType = responseTypeForContent(entry.contentType, entry.schema) ?? (isJsonContentType(baseType) ? 'json' : undefined)
+    const responseType = responseTypeForContent(entry) ?? (isJsonContentType(baseType) ? 'json' : undefined)
     if (baseType && responseType) map[baseType] = responseType
   }
 

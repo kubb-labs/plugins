@@ -176,6 +176,52 @@ for await (const { data } of stream) {
 }
 ```
 
+## JSON Lines
+
+An operation whose only success content type is a JSON sequence, such as `application/jsonl`, `application/x-ndjson`, or `application/json-seq`, streams one item per line. Each line is parsed as JSON, so the loop gets each item as soon as its line arrives instead of waiting for the whole body.
+
+### Describe it
+
+Point `itemSchema` at the schema of one line:
+
+```yaml
+/logs:
+  get:
+    operationId: streamLogs
+    responses:
+      '200':
+        description: One LogEntry per line
+        content:
+          application/jsonl:
+            itemSchema:
+              $ref: '#/components/schemas/LogEntry'
+```
+
+In OpenAPI 3.0 and 3.1, `schema` on one of these media types describes one line.
+
+### The stream
+
+```text
+{"level": "info", "message": "started"}
+{"level": "warn", "message": "slow"}
+```
+
+The call asks for the declared media type in `Accept`. A line may end with CRLF, CR, or LF, blank lines are skipped, and a last line without a line break still counts. A line that is not valid JSON throws a `SyntaxError` from the loop.
+
+### Use it
+
+Each item is a `LogEntry`, with no event wrapper:
+
+```typescript
+import { streamLogs } from './gen/clients/streamLogs'
+
+for await (const entry of await streamLogs()) {
+  console.info(entry.level, entry.message) // LogEntry
+}
+```
+
+`terminator`, `maxEventSize`, and `signal` work per line. `transform` only applies to Server-Sent Events. With `validator: 'zod'`, the validator runs on each line. `lastEventId` stays empty, since JSON Lines has no event IDs.
+
 ## Stream options
 
 Pass these on the call, next to its request params:
@@ -256,7 +302,7 @@ As on a regular call, `.unwrap()` resolves to the events. A failed call rejects 
 for await (const event of await streamChat({ body }).unwrap()) render(event)
 ```
 
-A stream call that gets a JSON error body parses it like any other call. A 2xx answer that is not an event stream, such as a JSON body, throws a `TypeError` with the body as its `cause`, and an empty 2xx answer ends as an empty stream. An operation that declares another content type next to `text/event-stream` is a normal call. See [JSON or an event stream](#json-or-an-event-stream).
+A stream call that gets a JSON error body parses it like any other call. A 2xx answer that is not an event stream, such as a JSON body, throws a `TypeError` with the body as its `cause`, and an empty 2xx answer ends as an empty stream. An operation that declares another content type next to `text/event-stream` or a JSON Lines type is a normal call. See [JSON or an event stream](#json-or-an-event-stream).
 
 Declare heartbeat and `error` events in the document, so each has a `case` in your `switch`.
 
@@ -354,7 +400,7 @@ The events alone carry no `response` or `lastEventId`. To resume a dropped strea
 
 ## The runtime files
 
-`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `EventStreamResult` types. A stream operation takes `StreamOptions` and returns `StreamResult`, the stream versions of `Options` and `RequestResult`. Kubb writes it only when an operation in the document offers `text/event-stream`, alone or next to another content type, and `.kubb/client.ts` then re-exports it, so the types import from either file. Kubb regenerates both on each run, so do not edit them:
+`.kubb/sse.ts` holds the parser, `toEventStream`, and the `ServerSentEvent`, `TypedEvent`, `EventStreamOptions`, and `EventStreamResult` types. A stream operation takes `StreamOptions` and returns `StreamResult`, the stream versions of `Options` and `RequestResult`. Kubb writes it only when the document has a JSON Lines operation or an operation that offers `text/event-stream`, alone or next to another content type, and `.kubb/client.ts` then re-exports it, so the types import from either file. Kubb regenerates both on each run, so do not edit them:
 
 ```typescript
 import type { ServerSentEvent } from './gen/.kubb/client'
