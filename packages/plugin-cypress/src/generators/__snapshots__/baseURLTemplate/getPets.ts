@@ -14,5 +14,5 @@ export function getPets({ query }: GetPetsOptions = {}, options: Partial<Cypress
       qs: query,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<GetPetsResponse>
 }

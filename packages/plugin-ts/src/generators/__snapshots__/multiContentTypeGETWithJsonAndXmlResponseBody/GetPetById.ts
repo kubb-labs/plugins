@@ -12,9 +12,7 @@ export type GetPetByIdStatus200Json = {
   name: string
 }
 
-export type GetPetByIdStatus200Xml = {
-  id: number
-}
+export type GetPetByIdStatus200Xml = string
 
 export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml
 

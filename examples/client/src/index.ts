@@ -17,7 +17,8 @@ export async function demo() {
   const result = await getPetById({ path: { petId: 1n }, throwOnError: false })
   if (result.error !== undefined) {
     console.log('failed', result.response.status)
-  } else {
+  } else if (typeof result.data !== 'string') {
+    // The XML variant arrives as a string, so narrow to the parsed JSON.
     const pet: Pet = result.data
     console.log('pet', pet.name)
   }

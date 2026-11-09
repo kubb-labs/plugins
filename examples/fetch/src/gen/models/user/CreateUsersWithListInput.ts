@@ -7,7 +7,7 @@ import type { User } from '../User'
 
 export type CreateUsersWithListInputStatus200Json = User
 
-export type CreateUsersWithListInputStatus200Xml = User
+export type CreateUsersWithListInputStatus200Xml = string
 
 export type CreateUsersWithListInputStatus200 = CreateUsersWithListInputStatus200Json | CreateUsersWithListInputStatus200Xml
 

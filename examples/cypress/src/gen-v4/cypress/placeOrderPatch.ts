@@ -16,5 +16,5 @@ export function placeOrderPatch(
       body,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<PlaceOrderPatchResponse>
 }

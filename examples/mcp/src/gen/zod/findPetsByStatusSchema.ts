@@ -14,7 +14,7 @@ export const findPetsByStatusStatus200SchemaJson = z
   .max(3)
   .refine((items) => new Set(items).size === items.length, { message: 'Array entries must be unique' })
 
-export const findPetsByStatusStatus200SchemaXml = z.array(petSchema)
+export const findPetsByStatusStatus200SchemaXml = z.string()
 
 export const findPetsByStatusStatus200Schema = z.union([findPetsByStatusStatus200SchemaJson, findPetsByStatusStatus200SchemaXml])
 

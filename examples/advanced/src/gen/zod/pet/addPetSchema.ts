@@ -13,7 +13,7 @@ export const addPetStatusDefaultSchemaJson = z.lazy(() => petSchema.omit({ name:
 
 export type AddPetStatusDefaultSchemaJsonType = z.infer<typeof addPetStatusDefaultSchemaJson>
 
-export const addPetStatusDefaultSchemaXml = z.lazy(() => petSchema.omit({ name: true }))
+export const addPetStatusDefaultSchemaXml = z.string()
 
 export type AddPetStatusDefaultSchemaXmlType = z.infer<typeof addPetStatusDefaultSchemaXml>
 

@@ -17,7 +17,7 @@ export const findPetsByTagsHeaderXEXAMPLESchema = findPetsByTagsXEXAMPLESchema.d
 
 export const findPetsByTagsStatus200SchemaJson = z.array(petSchema)
 
-export const findPetsByTagsStatus200SchemaXml = z.array(petSchema)
+export const findPetsByTagsStatus200SchemaXml = z.string()
 
 export const findPetsByTagsStatus200Schema = z.union([findPetsByTagsStatus200SchemaJson, findPetsByTagsStatus200SchemaXml])
 

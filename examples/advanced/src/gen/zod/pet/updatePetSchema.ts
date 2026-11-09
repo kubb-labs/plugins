@@ -5,7 +5,7 @@ export const updatePetStatus200SchemaJson = z.lazy(() => petSchema.omit({ name: 
 
 export type UpdatePetStatus200SchemaJsonType = z.infer<typeof updatePetStatus200SchemaJson>
 
-export const updatePetStatus200SchemaXml = z.lazy(() => petSchema.omit({ name: true }))
+export const updatePetStatus200SchemaXml = z.string()
 
 export type UpdatePetStatus200SchemaXmlType = z.infer<typeof updatePetStatus200SchemaXml>
 

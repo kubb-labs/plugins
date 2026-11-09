@@ -17,7 +17,7 @@ export type GetOrderByIdPath = {
 
 export type GetOrderByIdStatus200Json = Order
 
-export type GetOrderByIdStatus200Xml = Order
+export type GetOrderByIdStatus200Xml = string
 
 export type GetOrderByIdStatus200 = GetOrderByIdStatus200Json | GetOrderByIdStatus200Xml
 

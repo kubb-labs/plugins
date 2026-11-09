@@ -16,5 +16,5 @@ export function findPetsByTags(
       qs: query,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<FindPetsByTagsResponse>
 }

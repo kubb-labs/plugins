@@ -46,7 +46,7 @@ export function addPet(
       code?: number
       message?: string
     }
-  | Omit<NonNullable<Pet>, 'name'>
+  | (Omit<NonNullable<Pet>, 'name'> | string)
 > {
   return cy
     .request<
@@ -54,12 +54,18 @@ export function addPet(
           code?: number
           message?: string
         }
-      | Omit<NonNullable<Pet>, 'name'>
+      | (Omit<NonNullable<Pet>, 'name'> | string)
     >({
       method: 'POST',
       url: `/pet`,
       body,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<
+    | {
+        code?: number
+        message?: string
+      }
+    | (Omit<NonNullable<Pet>, 'name'> | string)
+  >
 }

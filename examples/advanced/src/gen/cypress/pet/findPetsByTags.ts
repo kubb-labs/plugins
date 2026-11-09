@@ -18,14 +18,14 @@ export function findPetsByTags(
     }
   },
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<Array<Pet>> {
+): Cypress.Chainable<Array<Pet> | string> {
   return cy
-    .request<Array<Pet>>({
+    .request<Array<Pet> | string>({
       method: 'GET',
       url: `/pet/findByTags`,
       qs: query,
       headers,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<Array<Pet> | string>
 }

@@ -13,5 +13,5 @@ export function addPet({ body }: Pick<AddPetOptions, 'body'>, options: Partial<C
       body,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<AddPetResponse>
 }

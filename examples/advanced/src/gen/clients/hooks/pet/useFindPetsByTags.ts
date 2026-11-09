@@ -44,7 +44,7 @@ export function findPetsByTagsQueryOptions(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsQueryKey({ query })
-  return queryOptions<Array<Pet>, ResponseErrorConfig<unknown>, Array<Pet>, typeof queryKey>({
+  return queryOptions<Array<Pet> | string, ResponseErrorConfig<unknown>, Array<Pet> | string, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByTags({ ...config, query, headers, signal: config.signal ?? signal, throwOnError: true }).unwrap()
@@ -57,7 +57,7 @@ export function findPetsByTagsQueryOptions(
  * @summary Finds Pets by tags
  * {@link /pet/findByTags}
  */
-export function useFindPetsByTags<TData = Array<Pet>, TQueryData = Array<Pet>, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
+export function useFindPetsByTags<TData = Array<Pet> | string, TQueryData = Array<Pet> | string, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
   {
     headers,
     query,
@@ -114,7 +114,7 @@ export function useFindPetsByTags<TData = Array<Pet>, TQueryData = Array<Pet>, T
         }['query'])
   },
   options: {
-    query?: Partial<QueryObserverOptions<Array<Pet>, ResponseErrorConfig<unknown>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<QueryObserverOptions<Array<Pet> | string, ResponseErrorConfig<unknown>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {

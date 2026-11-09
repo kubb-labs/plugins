@@ -12,5 +12,5 @@ export function uploadFile({ path, query, body }: UploadFileOptions, options: Pa
     qs: query,
     body,
     ...options
-  }).then((res) => res.body)
+  }).then((res) => res.body) as Cypress.Chainable<UploadFileResponse>
 }

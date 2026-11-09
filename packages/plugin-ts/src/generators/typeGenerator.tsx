@@ -1,4 +1,4 @@
-import { buildOptionsSchema, buildResponses, getEnumNames, getOperationParameters, resolveContentTypeVariants } from '@internals/shared'
+import { buildOptionsSchema, buildResponses, getEnumNames, getOperationParameters, resolveContentTypeVariants, toResponseContent } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
@@ -189,13 +189,14 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const requestType = buildRequestType()
 
     const responseTypes = node.responses.map((res) => {
-      const variants = (res.content ?? []).filter((entry) => entry.schema)
+      const content = (res.content ?? []).map(toResponseContent)
+      const variants = content.filter((entry) => entry.schema)
       // Multiple content types for a single status code — generate per-variant types + a plain union.
       // The `<Name>Responses` record discriminates them by content type (see buildResponses).
       if (variants.length > 1) {
         return buildContentTypeVariants(variants, resolver.response.status(node, res.statusCode), res.pointer)
       }
-      const primary = variants[0] ?? res.content?.[0]
+      const primary = variants[0] ?? content[0]
       return renderSchemaType({
         schema: primary?.schema ? { ...primary.schema, pointer: res.pointer ?? primary.schema.pointer } : ast.factory.createSchema({ type: 'unknown' }),
         name: resolver.response.status(node, res.statusCode),

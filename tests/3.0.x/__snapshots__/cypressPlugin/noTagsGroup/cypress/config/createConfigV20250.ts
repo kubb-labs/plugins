@@ -11,5 +11,5 @@ export function createConfigV20250({ body }: CreateConfigV20250Options, options:
     url: `/config`,
     body,
     ...options
-  }).then((res) => res.body)
+  }).then((res) => res.body) as Cypress.Chainable<CreateConfigV20250Response>
 }

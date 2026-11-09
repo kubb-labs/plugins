@@ -46,15 +46,15 @@ export function createFindPetsByTagsStatus200FakerJson(data?: Partial<Array<Pet>
 /**
  * @description successful operation
  */
-export function createFindPetsByTagsStatus200FakerXml(data?: Partial<Array<Pet>>): Array<Pet> {
-  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || []).filter((item) => item !== undefined)] as Array<Pet>
+export function createFindPetsByTagsStatus200FakerXml(data?: string): string {
+  return data ?? faker.string.alpha()
 }
 
 /**
  * @description successful operation
  */
-export function createFindPetsByTagsStatus200Faker(data?: Partial<Array<Pet>>): Array<Pet> {
-  return (data ?? faker.helpers.arrayElement([createFindPetsByTagsStatus200FakerJson(), createFindPetsByTagsStatus200FakerXml()])) as Array<Pet>
+export function createFindPetsByTagsStatus200Faker(data?: Partial<Array<Pet> | string>): Array<Pet> | string {
+  return (data ?? faker.helpers.arrayElement([createFindPetsByTagsStatus200FakerJson(), createFindPetsByTagsStatus200FakerXml()])) as Array<Pet> | string
 }
 
 /**
@@ -64,6 +64,6 @@ export function createFindPetsByTagsStatus400Faker() {
   return undefined
 }
 
-export function createFindPetsByTagsResponseFaker(data?: Partial<Array<Pet>>): Array<Pet> {
-  return (data ?? faker.helpers.arrayElement([createFindPetsByTagsStatus200Faker(), createFindPetsByTagsStatus400Faker()])) as Array<Pet>
+export function createFindPetsByTagsResponseFaker(data?: Partial<Array<Pet> | string>): Array<Pet> | string {
+  return (data ?? faker.helpers.arrayElement([createFindPetsByTagsStatus200Faker(), createFindPetsByTagsStatus400Faker()])) as Array<Pet> | string
 }

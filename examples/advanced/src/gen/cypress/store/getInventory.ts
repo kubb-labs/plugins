@@ -9,5 +9,7 @@ export function getInventory(options: Partial<Cypress.RequestOptions> = {}): Cyp
       url: `/store/inventory`,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<{
+    [key: string]: number
+  }>
 }

@@ -17,7 +17,7 @@ export type GetPetByIdPath = {
 
 export type GetPetByIdStatus200Json = Omit<NonNullable<Pet>, 'name'>
 
-export type GetPetByIdStatus200Xml = Omit<NonNullable<Pet>, 'name'>
+export type GetPetByIdStatus200Xml = string
 
 export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml
 

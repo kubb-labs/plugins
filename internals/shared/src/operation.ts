@@ -284,6 +284,23 @@ export type ContentVariantInput = { contentType: string; schema?: ast.SchemaNode
 export type ContentVariant = { name: string; suffix: string; schema: ast.SchemaNode; keysToOmit?: Array<string> | null; contentType: string }
 
 /**
+ * A response content entry typed as the client runtime returns it. The runtime decodes JSON and returns a binary body as a
+ * `Blob` and an event stream as a stream. It returns any other body as text, so a schema such as `Pet` on `application/xml`,
+ * `application/yaml`, or `text/csv` becomes `string`. A wildcard such as `application/*` keeps its schema, because the
+ * runtime picks the parser from the `Content-Type` the server sends. A stream of items, such as JSON Lines, keeps its item schema.
+ */
+export function toResponseContent<T extends ContentVariantInput & Pick<ast.ContentNode, 'stream'>>(entry: T): T {
+  const { contentType, schema } = entry
+  if (!schema || entry.stream || (schema.type === 'ref' ? schema.schema : schema)?.primitive === 'string') return entry
+
+  const baseType = baseContentType(contentType)
+  const responseType = responseTypeForContent(contentType, schema)
+  const isText = responseType === 'text' || (!responseType && Boolean(baseType) && !isJsonContentType(baseType) && !baseType.includes('*'))
+
+  return isText ? { ...entry, schema: ast.factory.createSchema({ type: 'string' }), keysToOmit: undefined } : entry
+}
+
+/**
  * Resolves per-content-type variant names for a set of content entries, deduplicating suffix
  * collisions with a numeric counter. Entries without a schema are skipped. The returned `suffix` is
  * the final (possibly counter-augmented) value, so callers can derive parallel names in another

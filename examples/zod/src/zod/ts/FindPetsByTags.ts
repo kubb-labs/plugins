@@ -41,7 +41,7 @@ export type FindPetsByTagsHeaders = {
 
 export type FindPetsByTagsStatus200Json = Array<Pet>
 
-export type FindPetsByTagsStatus200Xml = Array<Pet>
+export type FindPetsByTagsStatus200Xml = string
 
 export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
 

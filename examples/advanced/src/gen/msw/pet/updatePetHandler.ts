@@ -5,7 +5,7 @@ import { http, HttpResponse } from 'msw/http'
 
 export function updatePetHandlerResponse200(
   data:
-    | Omit<NonNullable<Pet>, 'name'>
+    | (Omit<NonNullable<Pet>, 'name'> | string)
     | {
         id?: number
       },
@@ -20,7 +20,7 @@ export function updatePetHandlerResponse200(
 
 export function updatePetHandlerResponse202(
   data:
-    | Omit<NonNullable<Pet>, 'name'>
+    | (Omit<NonNullable<Pet>, 'name'> | string)
     | {
         id?: number
       },
@@ -54,7 +54,7 @@ export function updatePetHandlerResponse405(data?: unknown) {
 export function updatePetHandler(
   data?:
     | (
-        | Omit<NonNullable<Pet>, 'name'>
+        | (Omit<NonNullable<Pet>, 'name'> | string)
         | {
             id?: number
           }

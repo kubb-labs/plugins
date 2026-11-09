@@ -12,5 +12,5 @@ export function getInventory(options: Partial<Cypress.RequestOptions> = {}): Cyp
       url: `http://localhost:3000/store/inventory`,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<GetInventoryResponse>
 }

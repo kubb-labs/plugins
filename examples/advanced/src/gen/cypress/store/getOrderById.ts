@@ -12,12 +12,12 @@ export function getOrderById(
     headers?: never
   },
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<Order> {
+): Cypress.Chainable<Order | string> {
   return cy
-    .request<Order>({
+    .request<Order | string>({
       method: 'GET',
       url: `/store/order/${path.orderId}`,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<Order | string>
 }

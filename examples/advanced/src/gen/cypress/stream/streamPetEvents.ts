@@ -19,5 +19,5 @@ export function streamPetEvents(
       url: `/pet/${path.petId}/events`,
       ...options,
     })
-    .then((res) => res.body)
+    .then((res) => res.body) as Cypress.Chainable<PetEvent>
 }

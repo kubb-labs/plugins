@@ -48,9 +48,10 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
     '...options',
   ].filter(Boolean)
 
+  // Cypress types `then` per union member, so a body such as `Pet | string` would not match the return type without the cast.
   const requestCall = `${groups.cookies ? cookieLine : ''}return cy.request<${responseType}>({
   ${requestOptions.join(',\n  ')}
-}).then((res) => res.body)`
+}).then((res) => res.body) as ${returnType}`
 
   return (
     <File.Source name={name} isIndexable isExportable>

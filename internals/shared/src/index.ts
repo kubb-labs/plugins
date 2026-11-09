@@ -29,6 +29,7 @@ export {
   resolveOperationTypeNames,
   resolveResponseTypes,
   resolveSuccessNames,
+  toResponseContent,
 } from './operation.ts'
 export { getOasAdapter } from './adapter.ts'
 export {

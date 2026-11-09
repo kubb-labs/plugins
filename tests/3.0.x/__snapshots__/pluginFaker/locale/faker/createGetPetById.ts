@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { GetPetByIdPath, GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus200Json, GetPetByIdStatus200Xml } from '../types/GetPetById'
+import type { GetPetByIdPath, GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus200Json } from '../types/GetPetById'
 import { createPet } from './createPet'
 import { fakerDE as faker } from '@faker-js/faker'
 
@@ -27,8 +27,8 @@ export function createGetPetByIdStatus200Json(data?: Partial<GetPetByIdStatus200
 /**
  * @description successful operation
  */
-export function createGetPetByIdStatus200Xml(data?: Partial<GetPetByIdStatus200Xml>): GetPetByIdStatus200Xml {
-  return createPet(data) as GetPetByIdStatus200Xml
+export function createGetPetByIdStatus200Xml(data?: string): string {
+  return data ?? faker.string.alpha()
 }
 
 /**

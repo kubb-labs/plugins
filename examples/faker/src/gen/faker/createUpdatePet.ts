@@ -11,7 +11,6 @@ import type {
   UpdatePetResponse,
   UpdatePetStatus200,
   UpdatePetStatus200Json,
-  UpdatePetStatus200Xml,
 } from '../models/UpdatePet'
 import { createPet } from './createPet'
 import { fakerEN as faker } from '@faker-js/faker'
@@ -26,8 +25,8 @@ export function createUpdatePetStatus200Json(data?: Partial<UpdatePetStatus200Js
 /**
  * @description Successful operation
  */
-export function createUpdatePetStatus200Xml(data?: Partial<UpdatePetStatus200Xml>): UpdatePetStatus200Xml {
-  return createPet(data) as UpdatePetStatus200Xml
+export function createUpdatePetStatus200Xml(data?: string): string {
+  return data ?? faker.string.alpha()
 }
 
 /**

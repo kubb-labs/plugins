@@ -16,7 +16,7 @@ export type FindPetsByStatusQuery = {
 
 export type FindPetsByStatusStatus200Json = Array<Pet>
 
-export type FindPetsByStatusStatus200Xml = Array<Pet>
+export type FindPetsByStatusStatus200Xml = string
 
 export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
 
