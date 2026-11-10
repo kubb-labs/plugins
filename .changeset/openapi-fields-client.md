@@ -14,6 +14,6 @@ Use the OpenAPI 3.2 fields in the clients:
 - `.kubb/client.ts` exports the servers that have a 3.2 `name` as `servers`, for `client.setConfig({ baseURL: servers.staging })`.
 - A `multipart/mixed` body is sent as one part per array item, each with its media type from `prefixEncoding` and `itemEncoding`.
 
-The operation's `servers` now come from the AST instead of the raw document, with the same result.
+The operation's `servers` now come from the AST instead of the raw document. `server.index` counts the servers the adapter keeps, which leaves out a server without a `url`.
 
-A custom client from `@kubb/plugin-client` keeps its two-argument `RequestResult`, so its results get no typed headers. Its `security` entries can now carry `flows`, `metadataUrl` and `url`, so widen a strict entry type the way the "Write your client" guide shows.
+A custom client from `@kubb/plugin-client` keeps its two-argument `RequestResult`, so its results get no typed headers. Generated calls can now pass `flows`, `metadataUrl` and `url` in a `security` entry and `style: 'cookie'` in `styles`, so a client that types these fields strictly stops compiling after it regenerates. Widen them the way the "Write your client" guide shows.
