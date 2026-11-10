@@ -136,14 +136,15 @@ function isJsonMediaType(contentType: string | null | undefined): boolean {
 // RFC 6265 cookie-octets, which the `cookie` style sends unescaped.
 const cookieOctets = /^[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*$/
 
-function rawCookieValue(item: unknown): string {
+function rawCookieValue(name: string, item: unknown): string {
   const value = toValue(item)
-  if (!cookieOctets.test(value)) throw new TypeError(`Cookie value ${JSON.stringify(value)} has characters the cookie style cannot send, escape it first.`)
+  // The message leaves the value out, since cookies often carry session tokens.
+  if (!cookieOctets.test(value)) throw new TypeError(`Cookie ${name} has characters the cookie style cannot send, escape it first.`)
   return value
 }
 
 function serializeCookie({ name, value, explode, raw }: { name: string; value: unknown; explode: boolean; raw: boolean }): string {
-  const encode = (item: unknown) => (raw ? rawCookieValue(item) : encodeURIComponent(toValue(item)))
+  const encode = (item: unknown) => (raw ? rawCookieValue(name, item) : encodeURIComponent(toValue(item)))
   if (Array.isArray(value)) {
     const items = value.filter(notNullish).map(encode)
     return explode ? items.map((item) => `${name}=${item}`).join('; ') : `${name}=${items.join(',')}`
