@@ -197,7 +197,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const requestType = buildRequestType()
 
     const responseTypes = node.responses.map((res) => {
-      const content = (res.content ?? []).map(toResponseContent)
+      const content = (res.content ?? []).map((entry, _, content) => toResponseContent(entry, content))
       const variants = content.filter((entry) => entry.schema)
       // Multiple content types for a single status code — generate per-variant types + a plain union.
       // The `<Name>Responses` record discriminates them by content type (see buildResponses).

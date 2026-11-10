@@ -264,7 +264,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     )
 
     const responseSchemas = node.responses.map((res) => {
-      const content = (res.content ?? []).map(toResponseContent)
+      const content = (res.content ?? []).map((entry, _, content) => toResponseContent(entry, content))
       const variants = content.filter((entry) => entry.schema)
       if (variants.length > 1) {
         return buildContentTypeVariants(content, resolver.response.status(node, res.statusCode))
