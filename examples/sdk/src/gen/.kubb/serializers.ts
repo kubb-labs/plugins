@@ -274,7 +274,12 @@ export const defaultQuerySerializer: QuerySerializer = (params, options) => {
       continue
     }
     const styled = paramOptions ?? (isRecord(value) ? {} : undefined)
-    parts.push(...(styled ? serializeStyledQueryParam({ key, value, options: styled }) : serializeDefaultQueryParam(key, value)))
+    // `URLSearchParams` writes a space as `+`, form encoding for bodies. A query follows RFC 6570, as a styled one does: `%20`.
+    parts.push(
+      ...(styled
+        ? serializeStyledQueryParam({ key, value, options: styled })
+        : serializeDefaultQueryParam(key, value).map((part) => part.replaceAll('+', '%20'))),
+    )
   }
   return parts.join('&')
 }

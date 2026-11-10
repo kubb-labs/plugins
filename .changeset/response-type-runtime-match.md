@@ -14,3 +14,4 @@ Make generated response types match what the client returns at runtime:
 - A response under `image/*`, `audio/*`, `video/*`, `application/pdf`, or `application/octet-stream` is typed `Blob`, even when its schema says `type: string`. The client always reads these as a `Blob`, so an SVG typed `string` failed at runtime.
 - A binary schema on a media type such as `application/vnd.noaa.dwml+xml`, next to a JSON variant, is typed `string`. Without `parseAs: 'blob'` the client reads it as text, and `validator: 'zod'` rejected every such response.
 - A response without a body, such as a Swagger 2.0 `405`, keeps its `unknown` type instead of becoming `string`.
+- A vendor media type such as `application/vnd.github.object` keeps its schema type instead of becoming `string`. The client parses its JSON body into an object. XML, YAML, and CSV vendor types stay `string`.

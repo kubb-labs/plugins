@@ -179,6 +179,10 @@ describe('defaultQuerySerializer', () => {
     expect(defaultQuerySerializer({ expand: ['a', 'b'] }, { expand: { style: 'deepObject' } })).toBe('expand=a&expand=b')
   })
 
+  test('encodes a space as %20 with or without a style', () => {
+    expect(defaultQuerySerializer({ q: 'a b', styled: 'a b', plus: 'a+b' }, { styled: { style: 'form' } })).toBe('q=a%20b&styled=a%20b&plus=a%2Bb')
+  })
+
   test('serializes Date values as ISO-8601', () => {
     expect(defaultQuerySerializer({ since: new Date('2020-01-02T03:04:05.000Z') })).toBe('since=2020-01-02T03%3A04%3A05.000Z')
   })

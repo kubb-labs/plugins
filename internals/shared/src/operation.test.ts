@@ -423,7 +423,7 @@ describe('toResponseContent', () => {
   const typeOf = (contentType: string, schema: ast.SchemaNode = pet) => toResponseContent({ contentType, schema, keysToOmit: ['id'] })
 
   test('types a body the runtime returns as text as string', () => {
-    for (const contentType of ['application/xml', 'application/yaml', 'text/csv', 'text/plain; charset=utf-8', 'text/*']) {
+    for (const contentType of ['application/xml', 'application/vnd.noaa.dwml+xml', 'application/yaml', 'text/csv', 'text/plain; charset=utf-8', 'text/*']) {
       expect(typeOf(contentType)).toStrictEqual({ contentType, schema: ast.factory.createSchema({ type: 'string' }), keysToOmit: null })
     }
   })
@@ -438,6 +438,7 @@ describe('toResponseContent', () => {
       ['text/csv', blob],
       ['*/*', pet],
       ['application/*', pet],
+      ['application/vnd.github.object', pet],
     ] as const) {
       expect(typeOf(contentType, schema).schema).toBe(schema)
     }

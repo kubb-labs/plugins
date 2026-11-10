@@ -265,7 +265,7 @@ export type ContentVariant = { name: string; suffix: string; schema: ast.SchemaN
  *   `blob` schema even when the spec says `type: string`.
  * - A binary schema on another media type is only a `Blob` through `parseAs: 'blob'`, which a call gets when every entry in
  *   `entries` is binary. Next to a JSON entry it reads as text, so it gets a `string` schema.
- * - JSON, stream, and schemaless (`unknown`) entries keep their schema, and so do wildcards such as `application/*` and `*`, so
+ * - JSON, vendor types such as `application/vnd.github.object`, stream, and schemaless (`unknown`) entries keep their schema, and so do wildcards such as `application/*` and `*`, so
  *   the runtime can pick the parser from the server's `Content-Type`.
  *
  * Pass it to `content.map` as is, so `entries` holds the response's other content types.
@@ -294,7 +294,9 @@ export function toResponseContent<T extends ContentVariantInput & ResponseConten
   const responseType = responseTypeForContent(entry)
   // A response without a body, such as a 405, has no schema to read. Only `text/*` is always text.
   if (responseType !== 'text' && (resolved.type === 'unknown' || resolved.type === 'any' || resolved.type === 'void')) return entry
-  const isText = responseType === 'text' || (!responseType && isPlainMediaType)
+  // The `*/*` decoder parses JSON, so a vendor type such as `application/vnd.github.object` keeps its schema. XML, YAML, and CSV read as text.
+  const isVendorJson = /^[^/]+\/vnd\./.test(baseType) && !/(xml|yaml|yml|csv)$/.test(baseType)
+  const isText = responseType === 'text' || (!responseType && isPlainMediaType && !isVendorJson)
 
   return isText ? { ...entry, schema: ast.factory.createSchema({ type: 'string' }), keysToOmit: null } : entry
 }
