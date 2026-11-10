@@ -22,6 +22,8 @@ export type ListOrdersCookies = {
 };
 
 /**
+ * @summary The orders
+ * @see getOrder: getOrder({ orderId: $response.body#/0/id })
  * @example [{"id":1,"paymentMethod":"card","creditCard":"4111","billingAddress":"Main St 1"}]
  * @type array
  */

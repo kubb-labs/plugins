@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { print } from './factory.ts'
 import { printerTs } from './printers/printerTs.ts'
 import { resolverTs } from './resolvers/resolverTs.ts'
-import { buildParams, buildPropertyJSDocComments, isBinarySchema, resolveInlineEnumNames } from './utils.ts'
+import { buildParams, buildPropertyJSDocComments, buildResponseComments, getExampleValues, isBinarySchema, resolveInlineEnumNames } from './utils.ts'
 
 describe('resolveInlineEnumNames', () => {
   it.each(['Key', 'Value'])('checks the emitted enum alias with suffix %s', (typeSuffix) => {
@@ -208,5 +208,31 @@ describe('buildPropertyJSDocComments', () => {
     const comments = buildPropertyJSDocComments(schema)
 
     expect(comments).toContain('@type string')
+  })
+})
+
+describe('buildResponseComments', () => {
+  it('prints the summary and one @see per link with the values it fills in', () => {
+    const response = ast.factory.createResponse({
+      statusCode: '201',
+      summary: 'Created',
+      links: { getPet: { operationId: 'getPet', parameters: { petId: '$response.body#/id' } }, list: { operationRef: '#/paths/~1pets/get' } },
+    })
+    expect(buildResponseComments(response)).toStrictEqual([
+      '@summary Created',
+      '@see getPet: getPet({ petId: $response.body#/id })',
+      '@see list: #/paths/~1pets/get()',
+    ])
+  })
+})
+
+describe('getExampleValues', () => {
+  it('keeps the value and adds the serialized form under a caption', () => {
+    expect(getExampleValues([{ value: { name: 'Rex' }, serializedValue: 'name=Rex' }, { serializedValue: 'a=*/' }])).toStrictEqual([
+      { name: 'Rex' },
+      '<caption>Serialized</caption> name=Rex',
+      '<caption>Serialized</caption> a=*\\/',
+    ])
+    expect(getExampleValues([{ summary: 'empty' }])).toBeUndefined()
   })
 })

@@ -12,7 +12,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import { printerTs } from '../printers/printerTs.ts'
 import type { PluginTs } from '../types'
-import { buildParams, buildResponseUnion, enumTypeName, getExampleValues, isInlineConstEnum, resolveInlineEnumNames } from '../utils.ts'
+import { buildParams, buildResponseComments, buildResponseUnion, enumTypeName, getExampleValues, isInlineConstEnum, resolveInlineEnumNames } from '../utils.ts'
 
 /**
  * Built-in generator for `@kubb/plugin-ts`. Emits one TypeScript file per
@@ -97,11 +97,13 @@ export const typeGenerator = defineGenerator<PluginTs>({
       name,
       keysToOmit,
       examples,
+      comments,
     }: {
       schema: ast.SchemaNode | null
       name: string
       keysToOmit?: Array<string> | null
       examples?: Array<ast.ExampleNode>
+      comments?: Array<string>
     }) {
       if (!schema) return null
       if (!inline && enumOptions.type !== 'inlineLiteral') schema = resolveInlineEnumNames({ node: schema, owner: node.operationId, resolver, enumOptions })
@@ -116,6 +118,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         syntaxType,
         description: schema.description,
         examples: getExampleValues(examples),
+        comments,
         keysToOmit,
         resolver,
         enumSchemaNames,
@@ -143,6 +146,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       baseName: string,
       pointer: string | undefined,
       decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
+      comments?: Array<string>,
     ) {
       const variants = resolveContentTypeVariants(entries, baseName)
       // Inline, content types that print the same type would repeat it in the union (`Order | Order`).
@@ -163,7 +167,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
               examples: entries.find((entry) => entry.contentType === variant.contentType)?.examples,
             }),
           )}
-          {renderSchemaType({ schema: unionSchema, name: baseName })}
+          {renderSchemaType({ schema: unionSchema, name: baseName, comments })}
         </>
       )
     }
@@ -215,7 +219,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       // Multiple content types for a single status code — generate per-variant types + a plain union.
       // The `<Name>Responses` record discriminates them by content type (see buildResponses).
       if (variants.length > 1) {
-        return buildContentTypeVariants(variants, resolver.response.status(node, res.statusCode), res.pointer)
+        return buildContentTypeVariants(variants, resolver.response.status(node, res.statusCode), res.pointer, undefined, buildResponseComments(res))
       }
       const primary = variants[0] ?? content[0]
       return renderSchemaType({
@@ -223,6 +227,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         name: resolver.response.status(node, res.statusCode),
         keysToOmit: primary?.keysToOmit,
         examples: primary?.examples,
+        comments: buildResponseComments(res),
       })
     })
 

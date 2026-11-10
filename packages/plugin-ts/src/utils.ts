@@ -156,6 +156,19 @@ export function getExampleValues(examples: Array<ast.ExampleNode> | undefined): 
   return values.length > 0 ? values : undefined
 }
 
+/**
+ * JSDoc for a response type: its `summary`, and one `@see` per link with the operation it leads to and the parameters
+ * it fills in from this response.
+ */
+export function buildResponseComments(response: ast.ResponseNode): Array<string> {
+  const links = Object.entries(response.links ?? {}).map(([name, link]) => {
+    const values = { ...link.parameters, ...(link.requestBody !== undefined ? { body: link.requestBody } : {}) }
+    const args = Object.entries(values).map(([key, value]) => `${key}: ${typeof value === 'string' ? value : JSON.stringify(value)}`)
+    return `@see ${jsDocEscape(`${name}: ${link.operationId ?? link.operationRef ?? ''}(${args.length ? `{ ${args.join(', ')} }` : ''})`)}`
+  })
+  return [...(response.summary ? [`@summary ${jsDocEscape(response.summary)}`] : []), ...links]
+}
+
 type BuildParamsSchemaOptions = {
   params: Array<ast.ParameterNode>
 }

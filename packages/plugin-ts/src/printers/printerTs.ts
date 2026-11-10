@@ -100,6 +100,10 @@ export type PrinterTsOptions = {
    */
   examples?: Array<unknown>
   /**
+   * JSDoc lines put before the schema's own, such as a response's `@summary`.
+   */
+  comments?: Array<string>
+  /**
    * Properties to exclude using `Omit<Type, Keys>`.
    * Forces type alias syntax regardless of `syntaxType` setting.
    */
@@ -348,7 +352,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       ...toNodeHandlers(options.nodes),
     },
     print(node) {
-      const { name, syntaxType = 'type', description, examples, keysToOmit } = this.options
+      const { name, syntaxType = 'type', description, examples, comments = [], keysToOmit } = this.options
 
       const transformed = this.transform(node)
       if (!transformed) return null
@@ -378,11 +382,14 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         isExportable: true,
         type: inner,
         syntax: useTypeGeneration ? 'type' : 'interface',
-        comments: buildPropertyJSDocComments({
-          ...meta,
-          description,
-          examples: examples?.length ? examples : meta.examples,
-        }),
+        comments: [
+          ...comments,
+          ...buildPropertyJSDocComments({
+            ...meta,
+            description,
+            examples: examples?.length ? examples : meta.examples,
+          }),
+        ],
       })
     },
   }
