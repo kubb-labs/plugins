@@ -86,6 +86,44 @@ describe('printerFaker', () => {
     expect(printerFaker({ resolver: resolverFaker }).print(node)).toMatchInlineSnapshot(`"faker.number.bigInt().toString()"`)
   })
 
+  test('keeps integers and floats inside exclusive bounds', () => {
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
+
+    expect(print(ast.factory.createSchema({ type: 'integer', exclusive: { min: 0, max: 10 } }))).toBe('faker.number.int({ min: 1, max: 9 })')
+    expect(print(ast.factory.createSchema({ type: 'number', exclusive: { min: 0, max: 1 } }))).toBe('faker.number.float({ min: 0, max: 1 })')
+  })
+
+  test("fills the other bound when faker's default would contradict a lone one", () => {
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
+
+    expect(print(ast.factory.createSchema({ type: 'number', exclusive: { min: 5 } }))).toBe('faker.number.float({ min: 5, max: 105 })')
+    expect(print(ast.factory.createSchema({ type: 'number', exclusive: { max: 0 } }))).toBe('faker.number.float({ min: -100, max: 0 })')
+    expect(print(ast.factory.createSchema({ type: 'integer', exclusive: { max: 0 } }))).toBe('faker.number.int({ min: -101, max: -1 })')
+    expect(print(ast.factory.createSchema({ type: 'number', max: 50 }))).toBe('faker.number.float({ max: 50 })')
+  })
+
+  test('puts the items that match contains first', () => {
+    const node = ast.factory.createSchema({
+      type: 'array',
+      items: [ast.factory.createSchema({ type: 'string' })],
+      max: 3,
+      contains: { schema: ast.factory.createSchema({ type: 'enum', enumValues: ['priority'] }), min: 2 },
+    })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe(
+      "[...faker.helpers.multiple(() => (faker.helpers.arrayElement(['priority'])), { count: 2 }), ...faker.helpers.multiple(() => (faker.string.alpha()), { count: { min: 0, max: 3 }})].slice(0, 3)",
+    )
+  })
+
+  test('mocks a string that holds JSON from its content schema', () => {
+    const node = ast.factory.createSchema({
+      type: 'string',
+      content: { mediaType: 'application/json', schema: ast.factory.createSchema({ type: 'ref', name: 'Metadata', ref: '#/components/schemas/Metadata' }) },
+    })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('JSON.stringify(createMetadata())')
+  })
+
   test('mocks a string int32 within the 32-bit range', () => {
     const node = ast.factory.createSchema({ type: 'string', format: 'int32' })
 

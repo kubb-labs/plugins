@@ -5,6 +5,7 @@ import {
   resolveContentTypeVariants,
   resolveOperationFile,
   toResponseContent,
+  withUnwalkedSchemas,
 } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
 import { ast, defineGenerator } from '@kubb/kit'
@@ -80,7 +81,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       typeFilePath: meta.typeFile.path,
     })
 
-    const imports = resolver.imports({ node, root, output, group: group ?? undefined })
+    // The printer prints `contains` and a string's JSON `content`, which the import visitor skips.
+    const imports = resolver.imports({ node: withUnwalkedSchemas(node), root, output, group: group ?? undefined })
     const usedImports = filterUsedImports(imports, fakerText)
 
     return (
@@ -216,7 +218,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     } as const
 
     function resolveMockImports(schema: ast.SchemaNode) {
-      return resolver.imports({ node: schema, root, output, group: group ?? undefined }).filter((entry) => entry.path !== meta.file.path)
+      return resolver.imports({ node: withUnwalkedSchemas(schema), root, output, group: group ?? undefined }).filter((entry) => entry.path !== meta.file.path)
     }
 
     function renderEntry({ schema, name, typeName, description, keysToOmit, skipImportNames = [] }: RenderUnit) {

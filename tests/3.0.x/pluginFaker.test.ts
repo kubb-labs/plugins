@@ -48,6 +48,19 @@ async function typecheck(file: string): Promise<Array<string>> {
 type BuildConfig = Omit<Config, 'plugins' | 'reporters'> & { plugins: unknown }
 
 const configs: Array<{ name: string; config: BuildConfig }> = [
+  {
+    // OpenAPI 3.1 and 3.2 fields: contains items and JSON string content.
+    name: 'openapiFields3_2',
+    config: {
+      root: __dirname,
+      input: '../../schemas/3.0.x/openapiFields3_2.yaml',
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false }),
+      parsers: [parserTs()],
+      storage: fsStorage(),
+      plugins: [pluginTs({ output: { path: './types', barrel: false } }), pluginFaker({ output: { path: './faker', barrel: false } })],
+    },
+  },
   // ─── locale ─────────────────────────────────────────────────────────────
   {
     name: 'locale',

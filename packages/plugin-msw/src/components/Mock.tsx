@@ -3,7 +3,7 @@ import type { ast } from '@kubb/kit'
 import { Url } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import { getMswMethod, hasResponseSchema, resolveDefaultBaseURL, responseReturn } from '../utils.ts'
+import { getMockStatus, getMswMethod, hasResponseSchema, resolveDefaultBaseURL, responseReturn } from '../utils.ts'
 
 type Props = {
   name: string
@@ -19,7 +19,7 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
   // `http.all` matches every method on the path, so the QUERY handler lets the others pass through.
   const methodGuard = node.method === 'QUERY' ? `if (info.request.method !== 'QUERY') return\n\n    ` : ''
   const successResponse = getPrimarySuccessResponse(node)
-  const statusCode = successResponse ? Number(successResponse.statusCode) : 200
+  const statusCode = successResponse ? getMockStatus(successResponse.statusCode) : 200
   const url = Url.toPath(node.path)
 
   const responseHasSchema = hasResponseSchema(successResponse)

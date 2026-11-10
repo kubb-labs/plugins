@@ -1,5 +1,25 @@
 import { toResponseContent } from '@internals/shared'
+import { stringify } from '@internals/utils'
 import { ast } from '@kubb/kit'
+
+/**
+ * The status a mock sends: the code itself, or the first code of a range, so `2XX` sends `200`.
+ */
+export function getMockStatus(statusCode: ast.StatusCode): number {
+  return /^[1-5]XX$/i.test(statusCode) ? Number(statusCode[0]) * 100 : Number(statusCode)
+}
+
+/**
+ * The response headers a mock sends: each declared header with an example or a default, as a string.
+ */
+export function getMockHeaders(response: ast.ResponseNode | null | undefined): Array<[name: string, value: string]> {
+  return (response?.headers ?? []).flatMap((header): Array<[string, string]> => {
+    const value = header.examples?.find((example) => example.value !== undefined)?.value ?? header.schema.default ?? header.schema.examples?.[0]
+    if (value === undefined || value === null) return []
+    // Headers use the `simple` style, so an array is sent comma-separated.
+    return [[header.name, Array.isArray(value) ? value.join(',') : typeof value === 'string' ? value : JSON.stringify(value)]]
+  })
+}
 
 /**
  * Returns the base URL as source code. A `${...}` value stays a template literal.
@@ -65,14 +85,15 @@ function getTextContentType(response: ast.ResponseNode | null | undefined): stri
  */
 export function responseReturn(body: string, status: number, response: ast.ResponseNode | null | undefined): string {
   const contentType = getContentType(response)
+  const headers = getMockHeaders(response)
   const textContentType = hasResponseSchema(response) ? getTextContentType(response) : null
-  if (!textContentType) return `return ${responseLiteral(`JSON.stringify(${body})`, status, contentType)}`
+  if (!textContentType) return `return ${responseLiteral(`JSON.stringify(${body})`, status, contentType, headers)}`
 
   // A plain variable such as `data` is checked as it is, an expression such as `data ?? createPet(data)` is read once.
   const name = /^\w+$/.test(body) ? body : 'body'
-  return `${name === body ? '' : `const body = ${body}\n    `}if (typeof ${name} === 'string') return ${responseLiteral(name, status, textContentType)}
+  return `${name === body ? '' : `const body = ${body}\n    `}if (typeof ${name} === 'string') return ${responseLiteral(name, status, textContentType, headers)}
 
-    return ${responseLiteral(`JSON.stringify(${name})`, status, contentType)}`
+    return ${responseLiteral(`JSON.stringify(${name})`, status, contentType, headers)}`
 }
 
 /**
@@ -84,17 +105,18 @@ export function getMswMethod(node: ast.HttpOperationNode): string {
 }
 
 /**
- * The `headers` entry of a mocked `Response` init, or an empty string when there is no content type.
+ * The `headers` entry of a mocked `Response` init, or an empty string when there is no header to send.
  */
-function headersBlock(contentType: string | null): string {
-  return contentType ? `\n      headers: {\n        'Content-Type': '${contentType}'\n      },` : ''
+function headersBlock(contentType: string | null, headers: Array<[string, string]>): string {
+  const entries = [...(contentType ? [`'Content-Type': '${contentType}'`] : []), ...headers.map(([name, value]) => `${stringify(name)}: ${stringify(value)}`)]
+  return entries.length ? `\n      headers: {\n        ${entries.join(',\n        ')}\n      },` : ''
 }
 
 /**
  * The `new HttpResponse<string>(...)` expression a mocked handler returns.
  */
-export function responseLiteral(body: string, status: number, contentType: string | null): string {
+export function responseLiteral(body: string, status: number, contentType: string | null, headers: Array<[string, string]> = []): string {
   return `new HttpResponse<string>(${body}, {
-      status: ${status},${headersBlock(contentType)}
+      status: ${status},${headersBlock(contentType, headers)}
     })`
 }
