@@ -5,7 +5,7 @@ import { getExampleBody, getMockHeaders, getMockStatus, responseLiteral } from '
 describe('getMockStatus', () => {
   test('mocks a range with the first code of its class', () => {
     expect(getMockStatus('201')).toBe(201)
-    expect(getMockStatus('2XX')).toBe(200)
+    expect(getMockStatus('2xx')).toBe(200)
   })
 })
 
@@ -35,6 +35,16 @@ describe('getExampleBody', () => {
     })
     expect(getExampleBody(response)).toBeNull()
   })
+
+  test('sends a serialized example as is for a text response, and skips it for a binary one', () => {
+    const response = (contentType: string) =>
+      ast.factory.createResponse({
+        statusCode: '200',
+        content: [ast.factory.createContent({ contentType, schema: ast.factory.createSchema({ type: 'object' }), examples: [{ serializedValue: '<pet/>' }] })],
+      })
+    expect(getExampleBody(response('application/xml'))).toBe("'<pet/>'")
+    expect(getExampleBody(response('application/octet-stream'))).toBeNull()
+  })
 })
 
 describe('getMockHeaders', () => {
@@ -52,10 +62,26 @@ describe('getMockHeaders', () => {
       ['X-Count', '3'],
     ])
   })
+
+  test('leaves out an example a header cannot carry', () => {
+    const header = (name: string, value: string) =>
+      ast.factory.createParameter({ name, in: 'header', required: false, schema: ast.factory.createSchema({ type: 'string' }), examples: [{ value }] })
+    const response = ast.factory.createResponse({
+      statusCode: '200',
+      headers: [header('X-Multi', 'line1\nline2'), header('X-Name', 'Zoë ✓'), header('X-Latin', 'Zoë')],
+    })
+
+    expect(getMockHeaders(response)).toStrictEqual([['X-Latin', 'Zoë']])
+    expect(() => new Headers(getMockHeaders(response))).not.toThrow()
+  })
 })
 
 describe('responseLiteral', () => {
   test('keeps the quotes of a header value', () => {
     expect(responseLiteral('body', 200, null, [['ETag', '"33a64df5"']])).toContain(`'ETag': '"33a64df5"'`)
+  })
+
+  test('escapes a line break in a header value', () => {
+    expect(responseLiteral('body', 200, null, [['Link', 'a\nb']])).toContain(`'Link': 'a\\nb'`)
   })
 })

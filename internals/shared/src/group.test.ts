@@ -9,10 +9,13 @@ describe('createGroupConfig', () => {
     expect(name({ group: '/pet/findByStatus' })).toBe('pet')
   })
 
-  it('names tag groups with the plain camelCased group', () => {
-    const config = createGroupConfig({ type: 'tag' })
-    const name = config?.name as (ctx: { group: string }) => string
+  it('leaves tag groups unnamed, so Kubb nests a tag in the folders of its parent tags', () => {
+    expect(createGroupConfig({ type: 'tag' })).toStrictEqual({ type: 'tag' })
+  })
 
-    expect(name({ group: 'pet store' })).toBe('petStore')
+  it('keeps a custom name', () => {
+    const name = () => 'custom'
+
+    expect(createGroupConfig({ type: 'tag', name })?.name).toBe(name)
   })
 })

@@ -7,7 +7,7 @@ import type { PointResponse } from '../types/PointOperation'
 import { http, HttpResponse } from 'msw/http'
 
 export function pointHandlerResponse200(data: PointResponse) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -19,7 +19,7 @@ export function pointHandler(data?: PointResponse | ((info: Parameters<Parameter
   return http.get(`${options?.baseURL ?? ''}/points/:id`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data), {
+      return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'

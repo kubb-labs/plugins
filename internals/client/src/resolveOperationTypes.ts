@@ -8,8 +8,8 @@ const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
 type GeneratorDriver = GeneratorContext['driver']
 
 /**
- * The two per-operation type names a generated client references: the grouped input and the
- * per-status responses record its `RequestResult` is keyed on.
+ * The per-operation type names a generated client references: the grouped input, the per-status
+ * responses record its `RequestResult` is keyed on, and the headers each response declares.
  */
 export type OperationTypeNames = {
   response: {
@@ -26,6 +26,25 @@ export type OperationTypeNames = {
      */
     headers?(node: ast.OperationNode, statusCode: ast.StatusCode): string
   }
+}
+
+function getResponseHeaderTypes({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<[ast.StatusCode, string]> {
+  const resolve = types.response.headers
+  if (!resolve) return []
+  return node.responses
+    .filter((response) => response.headers?.length)
+    .map((response) => [response.statusCode, resolve.call(types.response, node, response.statusCode)])
+}
+
+/** The headers type argument of `RequestResult`, such as `{ '200': LoginUserStatus200Headers }`, or `null` when no response declares headers. */
+export function buildResponseHeadersType({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
+  const entries = getResponseHeaderTypes({ node, types }).map(([statusCode, name]) => `'${statusCode}': ${name}`)
+  return entries.length ? `{ ${entries.join('; ')} }` : null
+}
+
+/** The names of the headers types `buildResponseHeadersType` references, for the file's imports. */
+export function getResponseHeadersTypeNames({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<string> {
+  return getResponseHeaderTypes({ node, types }).map(([, name]) => name)
 }
 
 /**

@@ -100,6 +100,16 @@ const createPetNode = ast.factory.createOperation({
   ],
 })
 
+const header = (name: string) => ast.factory.createParameter({ name, in: 'header', required: true, schema: ast.factory.createSchema({ type: 'string' }) })
+
+const createPetWithHeadersNode: ast.OperationNode = {
+  ...createPetNode,
+  responses: [
+    { ...createPetNode.responses[0]!, headers: [header('Location')] },
+    { ...createPetNode.responses[1]!, headers: [header('Retry-After')] },
+  ],
+}
+
 const uploadFileNode = ast.factory.createOperation({
   operationId: 'uploadFile',
   method: 'POST',
@@ -257,6 +267,9 @@ describe('clientGenerator operation', () => {
       options: {},
       meta: securityMeta,
     },
+    // Declared response headers type `headers` on the result, also on the full result `returnType: 'data'` resolves to without throwing.
+    { name: 'addPetWithResponseHeaders', node: createPetWithHeadersNode, options: {} },
+    { name: 'addPetWithResponseHeadersData', node: createPetWithHeadersNode, options: { returnType: 'data' } },
     // A path-level `servers` entry becomes the call's default `baseURL`, before `...config` so a per-call one still wins.
     {
       name: 'streamEventsWithPathServer',
@@ -380,6 +393,34 @@ describe('clientGenerator runtime files', () => {
       ],
       ['.kubb/sse.ts', '/templates/sse.ts', undefined],
     ])
+  })
+
+  test('exports the named servers, the first one for a name used twice', async () => {
+    const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
+    const driver = createMockedPluginDriver({
+      name: 'runtime',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorOperations(sseGenerator, [getPetByIdNode], {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      meta: {
+        servers: [
+          { url: 'https://api.test', name: 'production' },
+          { url: 'https://eu.api.test', name: 'eu-west' },
+          { url: 'https://old.api.test', name: 'production' },
+          { url: 'https://unnamed.api.test' },
+        ],
+      },
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverClient,
+    })
+
+    const runtime = driver.fileManager.files.filter((file) => file.path.includes('.kubb/'))
+    expect(runtime[0]?.footer).toContain("export const servers = { production: 'https://api.test', 'eu-west': 'https://eu.api.test' } as const")
   })
 
   test('registers the form media types only when an operation sends a form body', async () => {

@@ -216,6 +216,20 @@ export function hasEventStreamContent(node: ast.OperationNode): boolean {
   return entries.some((entry) => baseContentType(entry.contentType) === 'text/event-stream' && (entries.length === 1 || Boolean(entry.schema)))
 }
 
+// The media types the client runtime reads as a stream. Keep in sync with `streamMediaTypes` in the client's `sse.ts`.
+const streamContentType = /^(text\/event-stream|application\/(jsonl|x-ndjson|json-seq|.+\+json-seq))$/
+
+/**
+ * Whether a success response offers a stream media type next to other content types. The client returns that variant's
+ * body as a `ReadableStream`, so the stream runtime is registered and a hook's data type includes the stream.
+ */
+export function hasStreamVariant(node: ast.OperationNode): boolean {
+  return getSuccessResponses(node.responses).some((response) => {
+    const variants = (response.content ?? []).filter((entry) => entry.schema)
+    return variants.length > 1 && variants.some((entry) => streamContentType.test(baseContentType(entry.contentType)))
+  })
+}
+
 const formContentTypes = new Set(['multipart/form-data', 'multipart/mixed', 'application/x-www-form-urlencoded'])
 
 /**
@@ -684,7 +698,7 @@ export function buildResponses(node: ast.OperationNode, resolver: ResponseStatus
     primitive: 'object',
     properties: node.responses.map((res) =>
       ast.factory.createProperty({
-        name: toStatusKey(res.statusCode),
+        name: String(res.statusCode),
         required: true,
         schema: buildResponseRecordEntry(node, res, resolver),
       }),
@@ -699,21 +713,14 @@ export function getStatusCodeNumber(statusCode: ast.StatusCode | number | string
 }
 
 /**
- * The class digit of a status code or range, such as `2` for `201` and `2XX`, or `null` for `default`.
+ * The class digit of a status code or range, such as `2` for `201` and `2xx`, or `null` for `default`.
  */
 export function getStatusClass(statusCode: ast.StatusCode | number | string): number | null {
-  const range = /^([1-5])XX$/i.exec(String(statusCode))
+  const range = /^([1-5])xx$/.exec(String(statusCode))
   if (range) return Number(range[1])
   const code = getStatusCodeNumber(statusCode)
 
   return code === null ? null : Math.floor(code / 100)
-}
-
-/**
- * A status as generated code writes it, with a range in lower case: `2XX` becomes `2xx`.
- */
-export function toStatusKey(statusCode: ast.StatusCode | number | string): string {
-  return String(statusCode).toLowerCase()
 }
 
 export function isSuccessStatusCode(statusCode: ast.StatusCode | number | string): boolean {

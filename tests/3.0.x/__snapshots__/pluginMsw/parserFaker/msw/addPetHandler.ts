@@ -17,7 +17,7 @@ export function addPetHandlerResponse200(data: AddPetResponse) {
     },
   })
 
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -26,7 +26,7 @@ export function addPetHandlerResponse200(data: AddPetResponse) {
 }
 
 export function addPetHandlerResponse405(data?: AddPetStatus405) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 405,
   })
 }
@@ -35,7 +35,7 @@ export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Recor
   return http.post<Record<string, string>, AddPetBody extends DefaultBodyType ? AddPetBody : DefaultBodyType>(`${options?.baseURL ?? ''}/pet`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      const body = data ?? createAddPetResponse(data)
+      const body = data ?? createAddPetResponse()
       if (typeof body === 'string') return new HttpResponse<string>(body, {
         status: 200,
         headers: {
@@ -43,7 +43,7 @@ export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Recor
         },
       })
 
-      return new HttpResponse<string>(JSON.stringify(body), {
+      return new HttpResponse<string>(JSON.stringify(body, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'

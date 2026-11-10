@@ -26,7 +26,7 @@ type ToNumber<T> = T extends `${infer TNumber extends number}` ? TNumber : never
  */
 export type ToStatusNumber<TStatus, TKeys = never> = TStatus extends `${infer TNumber extends number}`
   ? TNumber
-  : Uppercase<TStatus & string> extends `${infer TFirst extends '1' | '2' | '3' | '4' | '5'}XX`
+  : TStatus extends `${infer TFirst extends '1' | '2' | '3' | '4' | '5'}xx`
     ? Exclude<ToNumber<`${TFirst}${Digit}${Digit}`>, ToNumber<TKeys>>
     : number
 
@@ -44,13 +44,21 @@ export type ResponseHeaders<THeaders = unknown> = Omit<Headers, 'get'> & {
   get: (name: Extract<keyof THeaders, string> | (string & {})) => string | null
 }
 
+// The media types `streamMediaTypes` reads as a stream: a response with one of them resolves to its raw body.
+type StreamContentType =
+  | `text/event-stream${string}`
+  | `application/jsonl${string}`
+  | `application/x-ndjson${string}`
+  | `application/json-seq${string}`
+  | `application/${string}+json-seq${string}`
+
 type HeadersFor<THeaders, TStatus> = ResponseHeaders<TStatus extends keyof THeaders ? THeaders[TStatus] : unknown>
 
 export type SuccessVariant<TStatus, TEntry, TRequest, TResponse, TKeys = never, THeaders = unknown> = TEntry extends { contentType: string; data: unknown }
   ? TEntry extends { contentType: infer TContentType; data: infer TData }
     ? {
         status: ToStatusNumber<TStatus, TKeys>
-        data: TContentType extends `text/event-stream${string}` ? ReadableStream<Uint8Array> : TData
+        data: TContentType extends StreamContentType ? ReadableStream<Uint8Array> : TData
         error: undefined
         contentType: TContentType
         headers: HeadersFor<THeaders, TStatus>
@@ -150,9 +158,21 @@ export type Unwrapped<T, ThrowOnError extends boolean> = ThrowOnError extends tr
 /**
  * What an operation returns with `returnType: 'data'`: the success body, or the full result when `throwOnError` is false.
  */
-export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = Unwrapped<
-  RequestResult<TResponses, ThrowOnError, TRequest, TResponse>,
-  ThrowOnError
+export type UnwrappedResult<
+  TResponses,
+  ThrowOnError extends boolean = true,
+  TRequest = NativeRequest,
+  TResponse = NativeResponse,
+  THeaders = unknown,
+> = Unwrapped<RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>, ThrowOnError>
+
+/** `UnwrappedResult` with the declared response headers by status, for the full result a `throwOnError: false` call resolves to. */
+export type UnwrappedResultWithHeaders<TResponses, THeaders, ThrowOnError extends boolean = true> = UnwrappedResult<
+  TResponses,
+  ThrowOnError,
+  NativeRequest,
+  NativeResponse,
+  THeaders
 >
 
 /**
@@ -467,6 +487,8 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
   status: number
   statusText: string
   contentType: string | undefined
+  /** The response's `Headers`, the same on every transport. */
+  headers: ResponseHeaders
   request: TRequest
   response: TResponse
 
@@ -475,6 +497,7 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
     status: number
     statusText: string
     contentType?: string
+    headers?: Headers
     request: TRequest
     response: TResponse
     method?: string
@@ -490,6 +513,7 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
     this.status = config.status
     this.statusText = config.statusText
     this.contentType = config.contentType
+    this.headers = config.headers ?? new Headers()
     this.request = config.request
     this.response = config.response
   }
@@ -507,13 +531,15 @@ export type ResponseErrorConfig<TError = unknown> = ResponseError<TError>
 type ErrorStatus<TResponses> = Exclude<keyof TResponses, SuccessStatusCode>
 
 /**
- * The `ResponseError` an operation throws. Checking `status` narrows `data` to that status's body.
+ * The `ResponseError` an operation throws. Checking `status` narrows `data` to that status's body, and `headers.get` to
+ * the header names in `THeaders`, the same record `RequestResult` takes.
  */
-export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = NativeResponse> = [ErrorStatus<TResponses>] extends [never]
+export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = NativeResponse, THeaders = unknown> = [ErrorStatus<TResponses>] extends [never]
   ? ResponseError<unknown, TRequest, TResponse>
   : {
       [TStatus in ErrorStatus<TResponses>]: ResponseError<DataOf<TResponses[TStatus]>, TRequest, TResponse> & {
         status: ToStatusNumber<TStatus, keyof TResponses>
+        headers: HeadersFor<THeaders, TStatus>
       }
     }[ErrorStatus<TResponses>]
 
@@ -529,9 +555,9 @@ export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = Na
  * }
  * ```
  */
-export function isResponseError<TResponses = unknown, TRequest = NativeRequest, TResponse = NativeResponse>(
+export function isResponseError<TResponses = unknown, TRequest = NativeRequest, TResponse = NativeResponse, THeaders = unknown>(
   error: unknown,
-): error is ResponseErrorOf<TResponses, TRequest, TResponse> {
+): error is ResponseErrorOf<TResponses, TRequest, TResponse, THeaders> {
   return ResponseError.is(error)
 }
 
@@ -700,8 +726,7 @@ export function toRequestInit(request: ResolvedRequest): RequestInit {
 
 function pickErrorValidator(error: Validator | Record<string, Validator> | undefined, status: number): Validator | undefined {
   if (!error || '~standard' in error) return error as Validator | undefined
-  const range = Object.keys(error).find((key) => key.toUpperCase() === `${String(status)[0]}XX`)
-  return error[String(status)] ?? (range ? error[range] : undefined) ?? error.default
+  return error[String(status)] ?? error[`${String(status)[0]}xx`] ?? error.default
 }
 
 // Checks the shape, so a `Response` from another realm or a polyfill counts too.
@@ -986,6 +1011,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         status: result.status,
         statusText: result.statusText,
         contentType: result.contentType,
+        headers: result.headers,
         request: result.request,
         response: result.response,
         method: resolvedRequest.method,

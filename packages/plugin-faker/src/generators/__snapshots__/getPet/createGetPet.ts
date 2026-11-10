@@ -32,5 +32,5 @@ export function createGetPetStatus404(data?: Partial<GetPetStatus404>): GetPetSt
 }
 
 export function createGetPetResponse(data?: Partial<GetPetResponse>): GetPetResponse {
-  return (data ?? faker.helpers.arrayElement([createGetPetStatus200(), createGetPetStatus202(), createGetPetStatus404()])) as GetPetResponse
+  return (data ?? faker.helpers.arrayElement([createGetPetStatus200(), createGetPetStatus202()])) as GetPetResponse
 }

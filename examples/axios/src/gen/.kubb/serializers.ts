@@ -6,7 +6,7 @@ export type HeadersInit = Array<[string, HeaderValue]> | Record<string, HeaderVa
  */
 export type RequestBody = NonNullable<RequestInit['body']>
 
-export type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'QUERY' | 'TRACE'
+export type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'QUERY' | 'TRACE' | (string & {})
 
 /**
  * The OpenAPI query style. `form` is the default.
@@ -151,7 +151,8 @@ function serializeCookie({ name, value, explode, raw }: { name: string; value: u
   }
   if (isRecord(value)) {
     const entries = Object.entries(value).filter(([, item]) => notNullish(item))
-    if (explode) return entries.map(([key, item]) => `${key}=${encode(item)}`).join('; ')
+    // An exploded key becomes a cookie name, so the cookie style checks it like a value.
+    if (explode) return entries.map(([key, item]) => `${raw ? rawCookieValue(name, key) : key}=${encode(item)}`).join('; ')
     return `${name}=${entries
       .flatMap(([key, item]) => [key, item])
       .map(encode)

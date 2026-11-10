@@ -142,6 +142,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   return [...comments, typeTag].filter(Boolean)
 }
 
+/** The example values. With `serialized`, each `serializedValue` follows as a `<caption>Serialized</caption>` line, a captioned `@example`. */
 export function getExampleValues(examples: Array<ast.ExampleNode> | undefined, serialized = false): Array<unknown> | undefined {
   const values = (examples ?? []).flatMap((example) => [
     ...(example.value !== undefined ? [example.value] : []),
@@ -150,6 +151,7 @@ export function getExampleValues(examples: Array<ast.ExampleNode> | undefined, s
   return values.length > 0 ? values : undefined
 }
 
+/** The JSDoc lines of a response type: `@summary`, and one `@see` per link, such as `@see getPet: getPet({ petId: $response.body#/id })`. */
 export function buildResponseComments(response: ast.ResponseNode): Array<string> {
   const links = Object.entries(response.links ?? {}).map(([name, link]) => {
     const values = { ...link.parameters, ...(link.requestBody !== undefined ? { body: link.requestBody } : {}) }
@@ -164,7 +166,6 @@ type BuildParamsSchemaOptions = {
   /**
    * Adds each serialized example to `examples` as a `<caption>Serialized</caption>` JSDoc line.
    * Leave it off when `examples` must hold values, such as for mocks.
-   * @default false
    */
   serializedExamples?: boolean
 }

@@ -48,5 +48,11 @@ export function createGetPetStatus401<TData extends Partial<GetPetStatus401> = o
 }
 
 export function createGetPetResponse(data?: Partial<GetPetResponse>): GetPetResponse {
-  return (data ?? faker.helpers.arrayElement([createGetPetStatus200(), createGetPetStatus401()])) as GetPetResponse
+  return (data ??
+    faker.helpers.arrayElement([
+      {
+        id: faker.string.alpha(),
+      },
+      faker.string.alpha(),
+    ])) as GetPetResponse
 }

@@ -7,7 +7,7 @@ import type { GetInventoryResponse } from '../types/GetInventory'
 import { http, HttpResponse } from 'msw/http'
 
 export function getInventoryHandlerResponse200(data: GetInventoryResponse) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -19,7 +19,7 @@ export function getInventoryHandler(data?: GetInventoryResponse | ((info: Parame
   return http.get(`${options?.baseURL ?? "http://localhost:3000"}/store/inventory`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data), {
+      return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'

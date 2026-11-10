@@ -30,7 +30,7 @@ type Props = {
   /**
    * Set when the schema references itself. A self-referential initializer (e.g. a `z.lazy(() => …)`
    * back to the same const) is implicitly `any` under `strict`, so the const is annotated with an
-   * explicit `z.ZodType` to break the inference cycle.
+   * explicit `z.ZodType` to break the inference cycle, or `z.ZodMiniType` for `zod/mini`, which has no `ZodType`.
    */
   cyclic?: boolean
   /**
@@ -77,7 +77,7 @@ export function Zod({ name, node, printer, inferTypeName, inferKind = 'infer', t
         />
       ))}
       <File.Source name={name} isExportable isIndexable>
-        <Const export name={name} type={needsAnnotation ? 'z.ZodType' : undefined}>
+        <Const export name={name} type={needsAnnotation ? (mini ? 'z.ZodMiniType' : 'z.ZodType') : undefined}>
           {value}
         </Const>
       </File.Source>

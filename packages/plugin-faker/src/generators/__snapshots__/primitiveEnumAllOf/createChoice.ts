@@ -8,5 +8,5 @@ import type { Choice } from './types/Choice'
 import { faker } from '@faker-js/faker'
 
 export function createChoice(data?: Partial<Choice>): Choice {
-  return data ?? faker.helpers.arrayElement([faker.helpers.arrayElement<Choice>(['a']), faker.helpers.arrayElement<Choice>(['b'])])
+  return data ?? faker.helpers.arrayElement([faker.helpers.arrayElement(['a'] as Array<Choice>), faker.helpers.arrayElement(['b'] as Array<Choice>)])
 }

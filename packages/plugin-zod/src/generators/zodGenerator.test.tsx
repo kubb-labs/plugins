@@ -363,9 +363,13 @@ describe('zodGenerator — Schema', () => {
     ],
   })
 
-  test('selfRefCycle — directly self-referential schema is annotated z.ZodType', async () => {
+  test.each([
+    [false, 'z.ZodType'],
+    [true, 'z.ZodMiniType'],
+  ])('selfRefCycle — directly self-referential schema with mini: %s is annotated %s', async (mini, annotation) => {
+    const options = { ...defaultOptions, mini }
     const resolver = Resolver.merge(resolverZod)
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver })
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver })
     const driver = createMockedPluginDriver({ name: 'selfRefCycle' })
     driver.inputNode = ast.factory.createInput({ schemas: [errorDetailsSchema] })
 
@@ -374,12 +378,12 @@ describe('zodGenerator — Schema', () => {
       adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
       driver,
       plugin,
-      options: defaultOptions,
+      options,
       resolver,
     })
 
     const source = rawSources(driver.fileManager.files).join('\n')
-    expect(source).toContain('export const errorDetailsSchema: z.ZodType')
+    expect(source).toContain(`export const errorDetailsSchema: ${annotation} =`)
   })
 
   test.each(
@@ -893,6 +897,10 @@ describe('zodGenerator — transformers', () => {
 })
 
 describe('zodGenerator — inferred aliases', () => {
+  test('an inferred type name keeps a status range in lower case', () => {
+    expect(resolverZod.schema.type('listPetsStatus2xxSchema')).toBe('ListPetsStatus2xxSchemaType')
+  })
+
   const slotSchema = ast.factory.createSchema({
     type: ast.schemaTypes.object,
     primitive: ast.schemaTypes.object,

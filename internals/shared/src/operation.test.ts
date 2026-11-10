@@ -11,6 +11,7 @@ import {
   getOperationParameters,
   getRequestGroupOptionality,
   hasEventStreamContent,
+  hasStreamVariant,
   isErrorStatusCode,
   isEventStream,
   isSuccessStatusCode,
@@ -238,12 +239,12 @@ describe('response status helpers', () => {
     expect(isErrorStatusCode('default')).toBe(false)
   })
 
-  test('reads status ranges such as 2XX', () => {
-    expect(isSuccessStatusCode('2XX')).toBe(true)
-    expect(isSuccessStatusCode('4XX')).toBe(false)
-    expect(isErrorStatusCode('4XX')).toBe(true)
-    expect(isErrorStatusCode('5XX')).toBe(true)
-    expect(isErrorStatusCode('3XX')).toBe(false)
+  test('reads status ranges such as 2xx', () => {
+    expect(isSuccessStatusCode('2xx')).toBe(true)
+    expect(isSuccessStatusCode('4xx')).toBe(false)
+    expect(isErrorStatusCode('4xx')).toBe(true)
+    expect(isErrorStatusCode('5xx')).toBe(true)
+    expect(isErrorStatusCode('3xx')).toBe(false)
   })
 
   test('resolves error, success, and all response status names', () => {
@@ -548,6 +549,27 @@ describe('isEventStream', () => {
     })
 
     expect(hasEventStreamContent(node)).toBe(false)
+  })
+
+  test('finds a stream media type next to another content type on any success response', () => {
+    const operation = (contentTypes: Array<string>, schema: ast.SchemaNode | null = ast.factory.createSchema({ type: 'object' })) =>
+      ast.factory.createOperation({
+        operationId: 'getUpdates',
+        method: 'GET',
+        path: '/updates',
+        responses: [
+          ast.factory.createResponse({ statusCode: '200', description: 'no body' }),
+          ast.factory.createResponse({ statusCode: '202', content: contentTypes.map((contentType) => ast.factory.createContent({ contentType, schema })) }),
+        ],
+      })
+
+    expect(hasStreamVariant(operation(['application/json', 'application/jsonl']))).toBe(true)
+    expect(hasStreamVariant(operation(['application/json', 'text/event-stream; charset=utf-8']))).toBe(true)
+    expect(hasStreamVariant(operation(['application/json', 'application/geo+json-seq']))).toBe(true)
+    expect(hasStreamVariant(operation(['application/json', 'application/xml']))).toBe(false)
+    // A lone stream is a stream operation, and a variant without a schema is not typed.
+    expect(hasStreamVariant(operation(['application/jsonl']))).toBe(false)
+    expect(hasStreamVariant(operation(['application/json', 'application/jsonl'], null))).toBe(false)
   })
 
   test('reads the item shape of the stream', () => {

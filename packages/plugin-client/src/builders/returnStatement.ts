@@ -31,7 +31,7 @@ export function buildReturnStatement({
   returnType: ReturnTypeOption
   throwOnErrorDefault: boolean
 }): string {
-  const call = `apiClient<${buildRequestResultGenerics({ node, types, returnType })}>(${callConfig})`
+  const call = `apiClient<${buildRequestResultGenerics({ node, types })}>(${callConfig})`
   if (returnType === 'data') return `return unwrapResult(${call}, resolveThrowOnError(config.throwOnError, ${throwOnErrorDefault}))`
   if (returnType === 'plain') return `return ${call}`
   return `return withUnwrap(${call})`

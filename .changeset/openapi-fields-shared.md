@@ -19,4 +19,4 @@ Read the OpenAPI 3.1 and 3.2 fields that Kubb 5.18 adds, which needs Kubb 5.18.0
 - Write a range in lower case: `ListPetsStatus2XX` becomes `ListPetsStatus2xx`, and the `'2XX'` key becomes `'2xx'`.
 - Add `@see` from an operation's `externalDocs` to its JSDoc.
 
-After you regenerate, rename imports of the `…Status2XX` names and any hand-written `'2XX'` key.
+After you regenerate, rename imports of the `…Status2XX` names. An upper-case range key such as `'2XX'` or `'5XX'` in a hand-written responses record or `validator.error` map is no longer read, so write it in lower case.

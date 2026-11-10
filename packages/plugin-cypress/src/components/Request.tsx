@@ -1,6 +1,5 @@
 import { buildRequestParamsSignature } from '@internals/shared'
-import { Url } from '@kubb/kit'
-import type { ast } from '@kubb/kit'
+import { ast, Url } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -33,18 +32,34 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
 
   // `cy.request` has no cookie option, so the cookie group goes out as a `Cookie` header. An array joins with commas, a Date
   // is ISO 8601, and an object is JSON.
-  // shortcut: ignores per-cookie `style` and `explode`, upgrade when a spec needs exploded cookie arrays in Cypress.
-  const encodeCookie =
-    "encodeURIComponent(value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value))"
+  // shortcut: ignores per-cookie `explode`, upgrade when a spec needs exploded cookie arrays in Cypress.
+  const cookieText =
+    "value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value)"
+  // The OpenAPI 3.2 `cookie` style sends a value as it is, and throws on one it cannot send, like the generated clients do.
+  const rawCookies = node.parameters.filter((parameter) => parameter.in === 'cookie' && parameter.style === 'cookie').map((parameter) => `'${parameter.name}'`)
+  const rawCookieLine = rawCookies.length
+    ? `const rawCookie = (value: string) => {
+  if (!/^[\\x21\\x23-\\x2B\\x2D-\\x3A\\x3C-\\x5B\\x5D-\\x7E]*$/.test(value)) throw new TypeError('A cookie has characters the cookie style cannot send, escape it first.')
+  return value
+}\n`
+    : ''
+  const encodeCookie = rawCookies.length
+    ? `([${rawCookies.join(', ')}].includes(name) ? rawCookie : encodeURIComponent)(${cookieText})`
+    : `encodeURIComponent(${cookieText})`
   // Built first and sent only when non-empty, so a call without cookies keeps the cookies Cypress attaches itself.
-  const cookieLine = `const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null).map(([name, value]) => \`\${name}=\${${encodeCookie}}\`).join('; ')\n`
+  const cookieLine = `${rawCookieLine}const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null).map(([name, value]) => \`\${name}=\${${encodeCookie}}\`).join('; ')\n`
+
+  // Cypress types a body as a string or an object, so a body that is one number or has no schema type is cast, and an
+  // `int64` is sent as a number.
+  const bodySchema = node.requestBody?.content?.[0]?.schema && ast.resolveRef(node.requestBody.content[0].schema)
+  const castBody = bodySchema && (['number', 'integer', 'bigint'].includes(bodySchema.primitive ?? '') || ['unknown', 'any'].includes(bodySchema.type))
 
   const requestOptions = [
     `method: '${node.method}'`,
     `url: ${urlTemplate}`,
     groups.query && 'qs: query',
     groups.cookies ? `headers: { ${groups.headers ? '...headers, ' : ''}...(cookie ? { Cookie: cookie } : {}) }` : groups.headers && 'headers',
-    groups.body && 'body',
+    groups.body && (castBody ? "body: (typeof body === 'bigint' ? Number(body) : body) as unknown as Cypress.RequestBody" : 'body'),
     '...options',
   ].filter(Boolean)
 

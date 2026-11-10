@@ -655,6 +655,13 @@ describe('createClientCore', () => {
     await expect(client({ method: 'POST', url: '/pet' })).rejects.toMatchObject({ status: 405, data: { message: 'invalid' } })
   })
 
+  test('a ResponseError carries the response headers', async () => {
+    const { client } = createClient({ data: { message: 'slow down' }, status: 429, statusText: 'Too Many Requests' })
+    const error = await client({ method: 'GET', url: '/pet' }).catch((thrown: unknown) => thrown)
+    expect(ResponseError.is(error) && error.headers.get('content-type')).toBe('application/json')
+    expect(new ResponseError({ data: undefined, status: 500, statusText: '', request: 'REQ', response: 'RES' }).headers.get('x')).toBeNull()
+  })
+
   test('names the method and URL in the ResponseError message, without the query', async () => {
     const { client } = createClient({ status: 404, statusText: 'Not Found' })
     await expect(client({ method: 'GET', baseURL: 'https://api.test', url: '/pet/1', query: { api_key: 'secret' } })).rejects.toThrow(
@@ -821,7 +828,7 @@ describe('createClientCore', () => {
     })
     const call = (status: number, data: unknown, error: Record<string, ReturnType<typeof toCodeSchema>>) =>
       createClient({ data, status }).client({ method: 'GET', url: '/pet/1', throwOnError: false, validator: { error } })
-    const byStatus = { 404: toCodeSchema('not-found'), '5XX': toCodeSchema('upstream') }
+    const byStatus = { 404: toCodeSchema('not-found'), '5xx': toCodeSchema('upstream') }
 
     expect(await call(404, { code: 'not-found' }, byStatus)).toMatchObject({ status: 404, error: { checkedBy: 'not-found' } })
     await expect(call(404, { code: 'upstream' }, byStatus)).rejects.toMatchObject({ name: 'ParseError' })
@@ -1101,6 +1108,21 @@ describe('media types', () => {
     expect((form.data as FormData).get('a')).toBe('1')
   })
 
+  test('types and returns a JSON Lines variant next to JSON as the raw stream', async () => {
+    type Responses = { '200': { contentType: 'application/json'; data: { id: number } } | { contentType: 'application/jsonl'; data: { id: number } } }
+    const client = createClientCore<string, string>({
+      defaultTransport: answer('{"id":1}\n', { 'content-type': 'application/jsonl' }),
+      mediaTypes: streamMediaTypes,
+    })
+    const result = await client<Responses>({ method: 'GET', url: '/updates' })
+
+    expect(result.contentType).toBe('application/jsonl')
+    if (result.contentType === 'application/jsonl') {
+      const stream: ReadableStream<Uint8Array> = result.data
+      expect(stream).toBeInstanceOf(ReadableStream)
+    }
+  })
+
   test('gives no data for 204, 205, 304, a HEAD request, and an empty body', async () => {
     for (const status of [204, 205, 304]) expect((await call(answer(null, { 'content-type': 'application/json' }, status))).data).toBeUndefined()
     expect((await call(answer('{"a":1}', { 'content-type': 'application/json' }), { method: 'HEAD' })).data).toBeUndefined()
@@ -1313,7 +1335,7 @@ describe('client.stream', () => {
 })
 
 describe('isResponseError', () => {
-  type Responses = { '200': { id: number }; '404': { message: string }; '4XX': { code: string }; default: { fault: true } }
+  type Responses = { '200': { id: number }; '404': { message: string }; '4xx': { code: string }; default: { fault: true } }
 
   test('narrows data by status, a range key, and default', async () => {
     const { client } = createClient({ data: { message: 'gone' }, status: 404 })

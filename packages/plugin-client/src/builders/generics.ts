@@ -1,25 +1,15 @@
 import type { ast } from '@kubb/kit'
-import type { OperationTypeNames } from '@internals/client'
-import { toStatusKey } from '@internals/shared'
+import { buildResponseHeadersType, type OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
 
 /**
- * Builds the `RequestResult` type arguments of one operation: responses, `ThrowOnError` and, unless `returnType` is `'data'`, the response headers.
+ * Builds the `RequestResult` type arguments of one operation: responses, `ThrowOnError` and the response headers, when a response declares any.
  *
  * @example
- * `buildRequestResultGenerics({ node, types, returnType }) // "LoginUserResponses, ThrowOnError, { '200': LoginUserStatus200Headers }"`
+ * `buildRequestResultGenerics({ node, types }) // "LoginUserResponses, ThrowOnError, { '200': LoginUserStatus200Headers }"`
  */
-export function buildRequestResultGenerics({
-  node,
-  types,
-  returnType,
-}: {
-  node: ast.OperationNode
-  types: OperationTypeNames
-  returnType: ReturnTypeOption
-}): string {
-  const headers = returnType === 'data' ? null : buildResponseHeadersType({ node, types })
-  return [types.response.responses(node), 'ThrowOnError', headers].filter(Boolean).join(', ')
+export function buildRequestResultGenerics({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string {
+  return [types.response.responses(node), 'ThrowOnError', buildResponseHeadersType({ node, types })].filter(Boolean).join(', ')
 }
 
 /**
@@ -34,32 +24,8 @@ export function buildRequestResultGenerics({
  */
 export function buildResultType({ node, types, returnType }: { node: ast.OperationNode; types: OperationTypeNames; returnType: ReturnTypeOption }): string {
   const responses = types.response.responses(node)
-  if (returnType === 'data') return `Promise<UnwrappedResult<${responses}, ThrowOnError>>`
   const headers = buildResponseHeadersType({ node, types })
-  const result = headers ? `RequestResultWithHeaders<${responses}, ${headers}, ThrowOnError>` : `RequestResult<${responses}, ThrowOnError>`
-  if (returnType === 'plain') return `Promise<${result}>`
-  return `Unwrappable<${result}>`
-}
-
-/**
- * The status and type name of each response that declares headers.
- */
-function getResponseHeaderTypes({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<[ast.StatusCode, string]> {
-  const resolve = types.response.headers
-  if (!resolve) return []
-  return node.responses
-    .filter((response) => response.headers?.length)
-    .map((response) => [response.statusCode, resolve.call(types.response, node, response.statusCode)])
-}
-
-/**
- * The `{ status: headers }` record for the last `RequestResult` type argument, or `null` when no response declares headers.
- */
-function buildResponseHeadersType({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
-  const entries = getResponseHeaderTypes({ node, types }).map(([statusCode, name]) => `'${toStatusKey(statusCode)}': ${name}`)
-  return entries.length ? `{ ${entries.join('; ')} }` : null
-}
-
-export function getResponseHeadersTypeNames({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<string> {
-  return getResponseHeaderTypes({ node, types }).map(([, name]) => name)
+  const name = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'
+  const result = headers ? `${name}WithHeaders<${responses}, ${headers}, ThrowOnError>` : `${name}<${responses}, ThrowOnError>`
+  return returnType === 'full' ? `Unwrappable<${result}>` : `Promise<${result}>`
 }

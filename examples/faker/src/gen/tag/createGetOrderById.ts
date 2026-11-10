@@ -53,6 +53,5 @@ export function createGetOrderByIdStatus404() {
 }
 
 export function createGetOrderByIdResponse(data?: Partial<GetOrderByIdResponse>): GetOrderByIdResponse {
-  return (data ??
-    faker.helpers.arrayElement([createGetOrderByIdStatus200(), createGetOrderByIdStatus400(), createGetOrderByIdStatus404()])) as GetOrderByIdResponse
+  return (data ?? faker.helpers.arrayElement([createOrder(), faker.string.alpha()])) as GetOrderByIdResponse
 }

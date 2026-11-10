@@ -15,7 +15,7 @@ export function findPetsByStatusHandlerResponse200(data: FindPetsByStatusRespons
     },
   })
 
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -24,7 +24,7 @@ export function findPetsByStatusHandlerResponse200(data: FindPetsByStatusRespons
 }
 
 export function findPetsByStatusHandlerResponse400(data?: FindPetsByStatusStatus400) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 400,
   })
 }
@@ -33,7 +33,7 @@ export function findPetsByStatusHandler(data?: FindPetsByStatusResponse | ((info
   return http.get(`${options?.baseURL ?? ''}/pet/findByStatus`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      const body = data ?? createFindPetsByStatusResponse(data)
+      const body = data ?? createFindPetsByStatusResponse()
       if (typeof body === 'string') return new HttpResponse<string>(body, {
         status: 200,
         headers: {
@@ -41,7 +41,7 @@ export function findPetsByStatusHandler(data?: FindPetsByStatusResponse | ((info
         },
       })
 
-      return new HttpResponse<string>(JSON.stringify(body), {
+      return new HttpResponse<string>(JSON.stringify(body, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'

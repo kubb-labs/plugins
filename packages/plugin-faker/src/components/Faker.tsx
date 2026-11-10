@@ -89,6 +89,9 @@ export function Faker({ node, description, name, typeName, printer, canOverride,
     !!cyclicSchemas &&
     (node.properties ?? []).some((p) => containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
 
+  // An `allOf` with a `oneOf` member makes `defaultFakeData` a union, which TypeScript does not relate to the `Omit` of it.
+  const castThroughUnknown = node.type !== 'object' && typeMode !== 'schema'
+
   const defaults = keysToOmit?.length
     ? `{ ${keysToOmit.map((key, index) => `${objectKey(key)}: _omit${index}`).join(', ')}, ...defaultFakeData }`
     : 'defaultFakeData'
@@ -105,7 +108,7 @@ return defaultFakeData as ${returnType}`
 return {
   ...defaultFakeData,
   ...(data || {}),
-} as ${returnType}`
+} as ${castThroughUnknown ? 'unknown as ' : ''}${returnType}`
 
   return (
     <>

@@ -15,24 +15,33 @@ export function getOrderByIdHandlerResponse200(data: GetOrderByIdResponse) {
       },
     })
 
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     },
-  })
+  )
 }
 
 export function getOrderByIdHandlerResponse400(data?: GetOrderByIdStatus400) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 400,
-  })
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 400,
+    },
+  )
 }
 
 export function getOrderByIdHandlerResponse404(data?: GetOrderByIdStatus404) {
-  return new HttpResponse<string>(JSON.stringify(data), {
-    status: 404,
-  })
+  return new HttpResponse<string>(
+    JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+    {
+      status: 404,
+    },
+  )
 }
 
 export function getOrderByIdHandler(
@@ -50,11 +59,14 @@ export function getOrderByIdHandler(
         },
       })
 
-    return new HttpResponse<string>(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
+    return new HttpResponse<string>(
+      JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    })
+    )
   })
 }

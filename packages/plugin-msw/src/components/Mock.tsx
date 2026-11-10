@@ -1,4 +1,5 @@
 import { getPrimarySuccessResponse } from '@internals/shared'
+import { singleQuote } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 import { Url } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
@@ -16,8 +17,8 @@ type Props = {
 
 export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName, node }: Props): KubbReactNode {
   const method = getMswMethod(node)
-  // `http.all` matches every method on the path, so the QUERY handler lets the others pass through.
-  const methodGuard = node.method === 'QUERY' ? `if (info.request.method !== 'QUERY') return\n\n    ` : ''
+  // `http.all` matches every method on the path, so a handler for a method MSW has no helper for lets the others pass through.
+  const methodGuard = method === 'all' ? `if (info.request.method !== ${singleQuote(node.method)}) return\n\n    ` : ''
   const successResponse = getPrimarySuccessResponse(node)
   const statusCode = successResponse ? getMockStatus(successResponse.statusCode) : 200
   const url = Url.toPath(node.path)
@@ -37,9 +38,9 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
 
   // Escape colons that do not start a param, such as the second one in `/pet/:petId:search`.
   const urlLiteral = `\`\${options?.baseURL ?? ${resolveDefaultBaseURL(baseURL)}}${url.replace(/([^/]):/g, '$1\\\\:')}\``
-  // Without Faker, the spec's own response example is the default body.
+  // Without Faker, the spec's own response example is the default body. An explicit `null` stays a `null` body.
   const example = fakerName ? null : getExampleBody(successResponse)
-  const responseBody = fakerName ? `data ?? ${fakerName}(data)` : example ? `data ?? ${example}` : 'data'
+  const responseBody = fakerName ? `data ?? ${fakerName}()` : example ? `data === undefined ? ${example} : data` : 'data'
 
   return (
     <File.Source name={name} isIndexable isExportable>

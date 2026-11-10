@@ -8,7 +8,7 @@ import type { PetCreateResponse } from '../types/pet/Create'
 import { http, HttpResponse } from 'msw/http'
 
 export function petCreateHandlerResponse200(data: PetCreateResponse) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -20,7 +20,7 @@ export function petCreateHandler(data?: PetCreateResponse | ((info: Parameters<P
   return http.post(`${options?.baseURL ?? ''}/pets/create-first`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data), {
+      return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'
@@ -30,7 +30,7 @@ export function petCreateHandler(data?: PetCreateResponse | ((info: Parameters<P
 }
 
 export function petCreateHandler2Response200(data: PetCreateResponse2) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -42,7 +42,7 @@ export function petCreateHandler2(data?: PetCreateResponse2 | ((info: Parameters
   return http.post(`${options?.baseURL ?? ''}/pets/create-second`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data), {
+      return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'

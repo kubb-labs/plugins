@@ -12,5 +12,5 @@ faker.seed([42])
  * @description Status values that need to be considered for filter
  */
 export function createFindPetsByStatusStatus(data?: FindPetsByStatusStatusKey): FindPetsByStatusStatusKey {
-  return data ?? faker.helpers.arrayElement<FindPetsByStatusStatusKey>(['available', 'pending', 'sold'])
+  return data ?? faker.helpers.arrayElement(['available', 'pending', 'sold'] as Array<FindPetsByStatusStatusKey>)
 }

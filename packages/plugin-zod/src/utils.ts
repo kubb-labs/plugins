@@ -166,6 +166,8 @@ export function defaultLiteral(node: ast.SchemaNode | undefined, value: unknown)
   // it produces a bare `.default()` (no argument). Drop it.
   if (value === null) return null
   const resolved = node ? syncSchemaRef(node) : undefined
+  // A binary schema parses to a `Blob`, which a spec default, a string, cannot be.
+  if (resolved?.type === 'blob') return null
   if (resolved && ast.narrowSchema(resolved, 'bigint')) {
     if (typeof value === 'bigint') return `BigInt(${value})`
     if (typeof value === 'number' && Number.isInteger(value)) return `BigInt(${value})`

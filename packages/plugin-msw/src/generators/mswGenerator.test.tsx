@@ -278,20 +278,24 @@ createPetsHandler(async ({ request }) => {
   })
 })
 
-describe('mswGenerator QUERY handler', () => {
-  // MSW has no `http.query`, so the handler is registered with `http.all` and answers QUERY only.
+describe.each([
+  ['QUERY', searchPetsNode],
+  ['SUBSCRIBE', { ...searchPetsNode, operationId: 'subscribePets', method: 'SUBSCRIBE' }],
+] as const)('mswGenerator %s handler', (operationMethod, node) => {
+  // MSW has no `http.query` and no helper for a custom `additionalOperations` method, so the handler is registered with
+  // `http.all` and answers its own method only.
   async function getResponse(method: string) {
-    const files = await renderOperation({ name: 'searchPets', node: searchPetsNode, options: {} })
+    const files = await renderOperation({ name: node.operationId, node, options: {} })
     const [source] = rawSources(files)
     const handlers = await importGenerated(source!)
 
-    return msw.getResponse([handlers.searchPetsHandler([{ id: 1 }])], new Request('http://localhost/pets/search', { method, body: '{}' }), {
+    return msw.getResponse([handlers[`${node.operationId}Handler`]([{ id: 1 }])], new Request('http://localhost/pets/search', { method, body: '{}' }), {
       baseUrl: 'http://localhost',
     })
   }
 
-  test('answers a QUERY request', async () => {
-    const response = await getResponse('QUERY')
+  test('answers a request with its method', async () => {
+    const response = await getResponse(operationMethod)
 
     expect(await response?.json()).toEqual([{ id: 1 }])
   })
@@ -321,6 +325,43 @@ describe('mswGenerator faker fallback', () => {
 
   test.each([null])('falls back to Faker data when data is %s', async (data) => {
     expect(await getResponseBody(data)).toEqual(fakerData)
+  })
+})
+
+describe('mswGenerator body encoding', () => {
+  const operation = (operationId: string, contentType: string) =>
+    ast.factory.createOperation({
+      operationId,
+      method: 'GET',
+      // A path of its own: the resolver names a handler by its method and path.
+      path: `/${operationId}`,
+      tags: ['pets'],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          description: 'A pet',
+          content: [ast.factory.createContent({ contentType, schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+        }),
+      ],
+    })
+
+  async function getBody(node: ast.OperationNode, data: unknown) {
+    const files = await renderOperation({ name: node.operationId, node, options: {} })
+    const handlers = await importGenerated(rawSources(files)[0]!)
+    const response = await msw.getResponse([handlers[`${node.operationId}Handler`](data)], new Request(`http://localhost/${node.operationId}`), {
+      baseUrl: 'http://localhost',
+    })
+
+    return response?.text()
+  }
+
+  test('sends an int64 mock, a bigint, as a JSON number', async () => {
+    expect(await getBody(operation('getBigPet', 'application/json'), { id: 9n })).toBe('{"id":9}')
+  })
+
+  test('frames an event-stream mock as one data event, and sends nothing without data', async () => {
+    expect(await getBody(operation('streamPet', 'text/event-stream'), { id: 1 })).toBe('data: {"id":1}\n\n')
+    expect(await getBody(operation('streamNoPet', 'text/event-stream'), undefined)).toBe('')
   })
 })
 

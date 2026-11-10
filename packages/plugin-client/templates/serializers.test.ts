@@ -23,6 +23,7 @@ describe('cookie serialization', () => {
     expect(() => serializeCookies({ sid: 'x; admin=1' }, { sid: { style: 'cookie' } })).toThrow(
       new TypeError('Cookie sid has characters the cookie style cannot send, escape it first.'),
     )
+    expect(() => serializeCookies({ prefs: { 'a; admin': '1' } }, { prefs: { style: 'cookie' } })).toThrow(TypeError)
   })
 })
 
