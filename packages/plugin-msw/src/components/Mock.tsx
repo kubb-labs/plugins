@@ -37,9 +37,9 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
 
   // Escape colons that do not start a param, such as the second one in `/pet/:petId:search`.
   const urlLiteral = `\`\${options?.baseURL ?? ${resolveDefaultBaseURL(baseURL)}}${url.replace(/([^/]):/g, '$1\\\\:')}\``
-  // Without Faker, the spec's own response example is the default body.
+  // Without Faker, the spec's own response example is the default body. An explicit `null` stays a `null` body.
   const example = fakerName ? null : getExampleBody(successResponse)
-  const responseBody = fakerName ? `data ?? ${fakerName}(data)` : example ? `data ?? ${example}` : 'data'
+  const responseBody = fakerName ? `data ?? ${fakerName}(data)` : example ? `data === undefined ? ${example} : data` : 'data'
 
   return (
     <File.Source name={name} isIndexable isExportable>

@@ -2,11 +2,17 @@ import { getStatusClass, toResponseContent } from '@internals/shared'
 import { jsStringEscape, objectKey, singleQuote } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
+/**
+ * The status a mock responds with. A range such as `2XX` mocks the first code of its class, `200`.
+ */
 export function getMockStatus(statusCode: ast.StatusCode): number {
-  // A range such as `2XX` mocks the first code of its class.
   return /XX$/i.test(statusCode) ? (getStatusClass(statusCode) ?? 2) * 100 : Number(statusCode)
 }
 
+/**
+ * The declared response headers a mock sends, each with the first value found in its example's `serializedValue`, its
+ * example's `value`, its schema `default`, and its schema's first example. A header without one is left out.
+ */
 export function getMockHeaders(response: ast.ResponseNode | null | undefined): Array<[name: string, value: string]> {
   return (response?.headers ?? []).flatMap((header): Array<[string, string]> => {
     const example = header.examples?.find((entry) => entry.serializedValue !== undefined || entry.value !== undefined)
@@ -104,7 +110,8 @@ export function getExampleBody(response: ast.ResponseNode | null | undefined): s
   const example = entry?.examples?.find((item) => item.value !== undefined || item.serializedValue !== undefined)
   if (!entry || !example) return null
   if (example.value !== undefined) return toLiteral(example.value)
-  if (!isJson(entry.contentType)) return toLiteral(example.serializedValue)
+  // `responseReturn` sends raw text only for a text response. For a binary one the example would go out JSON-encoded.
+  if (!isJson(entry.contentType)) return getTextContentType(response) === entry.contentType ? toLiteral(example.serializedValue) : null
   // `responseReturn` encodes a JSON body itself, so a serialized JSON example is parsed first.
   try {
     return toLiteral(JSON.parse(example.serializedValue!))

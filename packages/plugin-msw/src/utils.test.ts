@@ -35,6 +35,16 @@ describe('getExampleBody', () => {
     })
     expect(getExampleBody(response)).toBeNull()
   })
+
+  test('sends a serialized example as is for a text response, and skips it for a binary one', () => {
+    const response = (contentType: string) =>
+      ast.factory.createResponse({
+        statusCode: '200',
+        content: [ast.factory.createContent({ contentType, schema: ast.factory.createSchema({ type: 'object' }), examples: [{ serializedValue: '<pet/>' }] })],
+      })
+    expect(getExampleBody(response('application/xml'))).toBe("'<pet/>'")
+    expect(getExampleBody(response('application/octet-stream'))).toBeNull()
+  })
 })
 
 describe('getMockHeaders', () => {
@@ -57,5 +67,9 @@ describe('getMockHeaders', () => {
 describe('responseLiteral', () => {
   test('keeps the quotes of a header value', () => {
     expect(responseLiteral('body', 200, null, [['ETag', '"33a64df5"']])).toContain(`'ETag': '"33a64df5"'`)
+  })
+
+  test('escapes a line break in a header value', () => {
+    expect(responseLiteral('body', 200, null, [['Link', 'a\nb']])).toContain(`'Link': 'a\\nb'`)
   })
 })
