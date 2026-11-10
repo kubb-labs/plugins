@@ -39,7 +39,9 @@ export function uploadFile<ThrowOnError extends boolean = true>(
     >({
       method: 'POST',
       url: '/pet/{petId}/uploadImage',
-      security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+      security: [
+        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+      ],
       contentType: { request: 'application/octet-stream' },
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),

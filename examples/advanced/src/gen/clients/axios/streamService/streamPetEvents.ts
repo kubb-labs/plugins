@@ -40,7 +40,7 @@ export function streamPetEvents<ThrowOnError extends boolean = true>(
       url: '/pet/{petId}/events',
       security: [
         { type: 'apiKey', name: 'api_key', in: 'header' },
-        { type: 'oauth2', scopes: ['read:pets'] },
+        { type: 'oauth2', scopes: ['read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
       ],
       contentType: { response: 'text/event-stream' },
       eventShape: 'data',

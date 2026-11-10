@@ -37,55 +37,96 @@ export type EmptyErrorBody = { status: number; statusText: string }
 
 export type DataOf<T> = T extends { contentType: string; data: infer TData } ? TData : T
 
-export type SuccessVariant<TStatus, TEntry, TRequest, TResponse, TKeys = never> = TEntry extends { contentType: string; data: unknown }
+/**
+ * A response's `Headers`, whose `get` suggests the header names the spec declares. Values stay strings, as sent.
+ */
+export type ResponseHeaders<THeaders = unknown> = Omit<Headers, 'get'> & {
+  get: (name: Extract<keyof THeaders, string> | (string & {})) => string | null
+}
+
+/**
+ * The `headers` of the result for one status key, typed by what `THeaders` declares for that key.
+ */
+type HeadersFor<THeaders, TStatus> = ResponseHeaders<TStatus extends keyof THeaders ? THeaders[TStatus] : unknown>
+
+export type SuccessVariant<TStatus, TEntry, TRequest, TResponse, TKeys = never, THeaders = unknown> = TEntry extends { contentType: string; data: unknown }
   ? TEntry extends { contentType: infer TContentType; data: infer TData }
     ? {
         status: ToStatusNumber<TStatus, TKeys>
         data: TContentType extends `text/event-stream${string}` ? ReadableStream<Uint8Array> : TData
         error: undefined
         contentType: TContentType
+        headers: HeadersFor<THeaders, TStatus>
         request: TRequest
         response: TResponse
       }
     : never
-  : { status: ToStatusNumber<TStatus, TKeys>; data: TEntry; error: undefined; contentType: string | undefined; request: TRequest; response: TResponse }
+  : {
+      status: ToStatusNumber<TStatus, TKeys>
+      data: TEntry
+      error: undefined
+      contentType: string | undefined
+      headers: HeadersFor<THeaders, TStatus>
+      request: TRequest
+      response: TResponse
+    }
 
-export type ResultByStatus<TResponses, TStatus extends keyof TResponses, TRequest, TResponse> = TStatus extends SuccessStatusCode
-  ? SuccessVariant<TStatus, TResponses[TStatus], TRequest, TResponse, keyof TResponses>
+export type ResultByStatus<TResponses, TStatus extends keyof TResponses, TRequest, TResponse, THeaders = unknown> = TStatus extends SuccessStatusCode
+  ? SuccessVariant<TStatus, TResponses[TStatus], TRequest, TResponse, keyof TResponses, THeaders>
   : {
       status: ToStatusNumber<TStatus, keyof TResponses>
       data: undefined
       error: DataOf<TResponses[TStatus]> | EmptyErrorBody
       contentType: string | undefined
+      headers: HeadersFor<THeaders, TStatus>
       request: TRequest
       response: TResponse
     }
 
-export type ResultUnion<TResponses, TRequest, TResponse> = {
-  [TStatus in keyof TResponses]: ResultByStatus<TResponses, TStatus, TRequest, TResponse>
+export type ResultUnion<TResponses, TRequest, TResponse, THeaders = unknown> = {
+  [TStatus in keyof TResponses]: ResultByStatus<TResponses, TStatus, TRequest, TResponse, THeaders>
 }[keyof TResponses]
 
-export type SuccessResultUnion<TResponses, TRequest, TResponse> = {
-  [TStatus in Extract<keyof TResponses, SuccessStatusCode>]: ResultByStatus<TResponses, TStatus, TRequest, TResponse>
+export type SuccessResultUnion<TResponses, TRequest, TResponse, THeaders = unknown> = {
+  [TStatus in Extract<keyof TResponses, SuccessStatusCode>]: ResultByStatus<TResponses, TStatus, TRequest, TResponse, THeaders>
 }[Extract<keyof TResponses, SuccessStatusCode>]
 
 /**
- * The result of a call, narrowed by `status`. With `throwOnError`, it holds only the success variants.
+ * The result of a call, narrowed by `status`. With `throwOnError`, it holds only the success variants. `THeaders` keys the
+ * declared response headers by status like the responses record, so `headers.get` suggests them for the narrowed status.
  */
-export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = ThrowOnError extends true
-  ? [SuccessResultUnion<TResponses, TRequest, TResponse>] extends [never]
+export type RequestResult<
+  TResponses,
+  ThrowOnError extends boolean = true,
+  TRequest = NativeRequest,
+  TResponse = NativeResponse,
+  THeaders = unknown,
+> = ThrowOnError extends true
+  ? [SuccessResultUnion<TResponses, TRequest, TResponse, THeaders>] extends [never]
     ? {
         status: number
         data: SuccessOf<TResponses>
         error: undefined
         contentType: string | undefined
+        headers: ResponseHeaders
         request: TRequest
         response: TResponse
       }
-    : SuccessResultUnion<TResponses, TRequest, TResponse>
-  : [ResultUnion<TResponses, TRequest, TResponse>] extends [never]
-    ? { status: number; data: undefined; error: undefined; contentType: string | undefined; request: TRequest; response: TResponse }
-    : ResultUnion<TResponses, TRequest, TResponse>
+    : SuccessResultUnion<TResponses, TRequest, TResponse, THeaders>
+  : [ResultUnion<TResponses, TRequest, TResponse, THeaders>] extends [never]
+    ? { status: number; data: undefined; error: undefined; contentType: string | undefined; headers: ResponseHeaders; request: TRequest; response: TResponse }
+    : ResultUnion<TResponses, TRequest, TResponse, THeaders>
+
+/**
+ * `RequestResult` with the declared response headers by status: `RequestResultWithHeaders<ListPetsResponses, { '200': ListPetsStatus200Headers }>`.
+ */
+export type RequestResultWithHeaders<TResponses, THeaders, ThrowOnError extends boolean = true> = RequestResult<
+  TResponses,
+  ThrowOnError,
+  NativeRequest,
+  NativeResponse,
+  THeaders
+>
 
 /**
  * A result promise whose `unwrap()` resolves to the success body.
@@ -159,6 +200,18 @@ export type Auth = {
   name?: string
   in?: 'header' | 'query' | 'cookie'
   scopes?: Array<string>
+  /**
+   * The OAuth2 flows by name with their URLs, such as `deviceAuthorization` with `deviceAuthorizationUrl` and `tokenUrl`.
+   */
+  flows?: Record<string, { authorizationUrl?: string; deviceAuthorizationUrl?: string; tokenUrl?: string; refreshUrl?: string }>
+  /**
+   * The OAuth2 authorization server metadata URL (RFC 8414).
+   */
+  metadataUrl?: string
+  /**
+   * The OpenID Connect discovery URL.
+   */
+  url?: string
 }
 
 /**
@@ -392,9 +445,9 @@ export type UnwrappedStreamResult<TResponses, ThrowOnError extends boolean = tru
  * A client. Call it to send a request.
  */
 export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = {
-  <TResponses = unknown, ThrowOnError extends boolean = true>(
+  <TResponses = unknown, ThrowOnError extends boolean = true, THeaders = unknown>(
     config: RequestConfig<unknown, TRequest, TResponse> & { throwOnError?: ThrowOnError },
-  ): Promise<RequestResult<TResponses, ThrowOnError, TRequest, TResponse>>
+  ): Promise<RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>>
   /**
    * Sends the request and reads a 2xx body item by item. A body whose media type cannot stream throws a `TypeError`.
    */
@@ -778,6 +831,11 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   }
   // The transport sets the multipart boundary.
   if (body instanceof FormData) deleteHeader(headers, 'content-type')
+  // A multipart body built as a Blob, such as `multipart/mixed`, carries its boundary in its type.
+  if (body instanceof Blob && /^multipart\//i.test(body.type)) {
+    deleteHeader(headers, 'content-type')
+    headers['Content-Type'] = body.type
+  }
 
   const url = serializeUrl({
     parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
@@ -968,6 +1026,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
             ? ({ status: result.status, statusText: result.statusText } satisfies EmptyErrorBody)
             : data,
         contentType: result.contentType,
+        headers: result.headers,
         request: result.request,
         response: result.response,
       },
@@ -984,10 +1043,10 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     }
   }
 
-  const client = (<TResponses, ThrowOnError extends boolean>(requestConfig: RequestConfig<unknown, TRequest, TResponse>) =>
+  const client = (<TResponses, ThrowOnError extends boolean, THeaders>(requestConfig: RequestConfig<unknown, TRequest, TResponse>) =>
     call(
       requestConfig,
-      async () => (await send(requestConfig, false)).result as RequestResult<TResponses, ThrowOnError, TRequest, TResponse>,
+      async () => (await send(requestConfig, false)).result as unknown as RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>,
     )) as ClientInstance<TRequest, TResponse>
 
   client.stream = <TResponses, ThrowOnError extends boolean, TItem>(requestConfig: RequestConfig<unknown, TRequest, TResponse> & EventStreamOptions) =>

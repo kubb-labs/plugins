@@ -40,7 +40,9 @@ export function deletePet<ThrowOnError extends boolean = true>(
     >({
       method: 'DELETE',
       url: '/pet/{petId}:search',
-      security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+      security: [
+        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+      ],
       ...config,
       validator: { response: deletePetResponseSchema, error: { 400: deletePetStatus400Schema }, ...config.validator },
       throwOnError: resolveThrowOnError(config.throwOnError, true),

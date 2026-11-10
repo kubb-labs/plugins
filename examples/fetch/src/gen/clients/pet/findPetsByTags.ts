@@ -21,7 +21,9 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
     apiClient<FindPetsByTagsResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/findByTags',
-      security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+      security: [
+        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+      ],
       ...config,
       styles: { ...config.styles, query: { tags: { explode: true, allowReserved: true }, ...config.styles?.query } },
       throwOnError: resolveThrowOnError(config.throwOnError, true),

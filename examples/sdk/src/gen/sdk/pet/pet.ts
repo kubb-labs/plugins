@@ -35,7 +35,9 @@ export class PetClient {
       apiClient<UpdatePetResponses, ThrowOnError>({
         method: 'PUT',
         url: '/pet',
-        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        security: [
+          { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+        ],
         contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
         ...config,
         throwOnError: resolveThrowOnError(config.throwOnError, true),
@@ -55,7 +57,9 @@ export class PetClient {
       apiClient<AddPetResponses, ThrowOnError>({
         method: 'POST',
         url: '/pet',
-        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        security: [
+          { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+        ],
         contentType: { request: 'application/json', ...(typeof contentType === 'string' ? { request: contentType } : contentType) },
         ...config,
         throwOnError: resolveThrowOnError(config.throwOnError, true),
@@ -77,7 +81,9 @@ export class PetClient {
       apiClient<FindPetsByStatusResponses, ThrowOnError>({
         method: 'GET',
         url: '/pet/findByStatus',
-        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        security: [
+          { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+        ],
         ...config,
         styles: { ...config.styles, query: { status: { explode: true }, ...config.styles?.query } },
         throwOnError: resolveThrowOnError(config.throwOnError, true),
@@ -99,7 +105,9 @@ export class PetClient {
       apiClient<FindPetsByTagsResponses, ThrowOnError>({
         method: 'GET',
         url: '/pet/findByTags',
-        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        security: [
+          { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+        ],
         ...config,
         styles: { ...config.styles, query: { tags: { explode: true }, ...config.styles?.query } },
         throwOnError: resolveThrowOnError(config.throwOnError, true),
@@ -123,7 +131,7 @@ export class PetClient {
         url: '/pet/{petId}',
         security: [
           { type: 'apiKey', name: 'api_key', in: 'header' },
-          { type: 'oauth2', scopes: ['write:pets', 'read:pets'] },
+          { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
         ],
         ...config,
         throwOnError: resolveThrowOnError(config.throwOnError, true),
@@ -144,7 +152,9 @@ export class PetClient {
       apiClient<UpdatePetWithFormResponses, ThrowOnError>({
         method: 'POST',
         url: '/pet/{petId}',
-        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        security: [
+          { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+        ],
         ...config,
         throwOnError: resolveThrowOnError(config.throwOnError, true),
       }),
@@ -165,7 +175,9 @@ export class PetClient {
       apiClient<DeletePetResponses, ThrowOnError>({
         method: 'DELETE',
         url: '/pet/{petId}',
-        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        security: [
+          { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+        ],
         ...config,
         throwOnError: resolveThrowOnError(config.throwOnError, true),
       }),
@@ -185,7 +197,9 @@ export class PetClient {
       apiClient<UploadFileResponses, ThrowOnError>({
         method: 'POST',
         url: '/pet/{petId}/uploadImage',
-        security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+        security: [
+          { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+        ],
         contentType: { request: 'application/json' },
         ...config,
         throwOnError: resolveThrowOnError(config.throwOnError, true),

@@ -21,7 +21,9 @@ export function findPetsByStatus<ThrowOnError extends boolean = true>(
     apiClient<FindPetsByStatusResponses, ThrowOnError>({
       method: 'GET',
       url: '/pet/findByStatus',
-      security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+      security: [
+        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+      ],
       ...config,
       styles: { ...config.styles, query: { status: { explode: true }, ...config.styles?.query } },
       throwOnError: resolveThrowOnError(config.throwOnError, true),

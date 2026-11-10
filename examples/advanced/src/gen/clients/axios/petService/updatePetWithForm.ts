@@ -40,7 +40,9 @@ export function updatePetWithForm<ThrowOnError extends boolean = true>(
     >({
       method: 'POST',
       url: '/pet/{petId}:search',
-      security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+      security: [
+        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+      ],
       ...config,
       validator: { response: updatePetWithFormResponseSchema, error: { 405: updatePetWithFormStatus405Schema }, ...config.validator },
       throwOnError: resolveThrowOnError(config.throwOnError, true),

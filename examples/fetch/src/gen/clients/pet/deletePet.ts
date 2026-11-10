@@ -21,7 +21,9 @@ export function deletePet<ThrowOnError extends boolean = true>(
     apiClient<DeletePetResponses, ThrowOnError>({
       method: 'DELETE',
       url: '/pet/{petId}',
-      security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+      security: [
+        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+      ],
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),
     }),

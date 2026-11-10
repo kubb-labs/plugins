@@ -76,7 +76,17 @@ export type Serializers = {
 }
 
 /**
- * The OpenAPI styles of a generated call's parameters, by location and name. `body` holds the form `encoding`.
+ * The OpenAPI 3.2 `prefixEncoding` and `itemEncoding` of a `multipart/mixed` body: each part's media type by position,
+ * then for every part after those.
+ */
+export type PartsEncoding = {
+  prefix?: Array<{ contentType?: string }>
+  item?: { contentType?: string }
+}
+
+/**
+ * The OpenAPI styles of a generated call's parameters, by location and name. `body` holds the form `encoding`, and
+ * `parts` the encoding of a `multipart/mixed` body's parts.
  */
 export type Styles = {
   path?: Record<string, PathParamStyle>
@@ -84,6 +94,7 @@ export type Styles = {
   header?: Record<string, HeaderParamStyle>
   cookie?: Record<string, CookieParamStyle>
   body?: Record<string, BodyEncoding>
+  parts?: PartsEncoding
 }
 
 /**

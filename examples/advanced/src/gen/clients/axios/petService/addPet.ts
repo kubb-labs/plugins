@@ -89,7 +89,9 @@ export function addPet<ThrowOnError extends boolean = true>(
     >({
       method: 'POST',
       url: '/pet',
-      security: [{ type: 'oauth2', scopes: ['write:pets', 'read:pets'] }],
+      security: [
+        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
+      ],
       contentType: { request: 'application/json' },
       ...config,
       validator: { response: addPetResponseSchema, error: { 405: addPetStatus405Schema, default: addPetStatusDefaultSchema }, ...config.validator },

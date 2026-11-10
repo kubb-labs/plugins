@@ -61,7 +61,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
       url: '/pet/{petId}:search',
       security: [
         { type: 'apiKey', name: 'api_key', in: 'header' },
-        { type: 'oauth2', scopes: ['write:pets', 'read:pets'] },
+        { type: 'oauth2', scopes: ['write:pets', 'read:pets'], flows: { implicit: { authorizationUrl: 'https://petstore3.swagger.io/oauth/authorize' } } },
       ],
       ...config,
       validator: { response: getPetByIdResponseSchema, error: { 400: getPetByIdStatus400Schema, 404: getPetByIdStatus404Schema }, ...config.validator },
