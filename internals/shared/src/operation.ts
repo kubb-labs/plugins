@@ -258,17 +258,10 @@ export type ContentVariantInput = { contentType: string; schema?: ast.SchemaNode
 export type ContentVariant = { name: string; suffix: string; schema: ast.SchemaNode; keysToOmit?: Array<string> | null; contentType: string }
 
 /**
- * Returns the entry with the schema of the value the client runtime returns for it.
- *
- * - `text/*` and other non-JSON media types read as text get a `string` schema, such as `Pet` on `application/xml`.
- * - `application/octet-stream`, `application/pdf`, `image/*`, `audio/*`, and `video/*` always read as a `Blob`, so they get a
- *   `blob` schema even when the spec says `type: string`.
- * - A binary schema on another media type is only a `Blob` through `parseAs: 'blob'`, which a call gets when every entry in
- *   `entries` is binary. Next to a JSON entry it reads as text, so it gets a `string` schema.
- * - JSON, vendor types such as `application/vnd.github.object`, stream, and schemaless (`unknown`) entries keep their schema, and so do wildcards such as `application/*` and `*`, so
- *   the runtime can pick the parser from the server's `Content-Type`.
- *
- * Pass it to `content.map` as is, so `entries` holds the response's other content types.
+ * Returns the entry with the schema of the value the client returns: `string` for a body read as text, such as `Pet` on
+ * `application/xml`, and `blob` for `image/*`, `audio/*`, `video/*`, PDF, and octet-stream. A binary schema elsewhere is a `Blob`
+ * only through `parseAs: 'blob'`, which needs every entry in `entries` binary. JSON, vendor (`application/vnd.*`), stream,
+ * schemaless, and wildcard entries keep their schema. Pass it to `content.map` as is, so `entries` holds the other content types.
  */
 export function toResponseContent<T extends ContentVariantInput & ResponseContentEntry>(
   entry: T,
@@ -294,7 +287,6 @@ export function toResponseContent<T extends ContentVariantInput & ResponseConten
   const responseType = responseTypeForContent(entry)
   // A response without a body, such as a 405, has no schema to read. Only `text/*` is always text.
   if (responseType !== 'text' && (resolved.type === 'unknown' || resolved.type === 'any' || resolved.type === 'void')) return entry
-  // The `*/*` decoder parses JSON, so a vendor type such as `application/vnd.github.object` keeps its schema. XML, YAML, and CSV read as text.
   const isVendorJson = /^[^/]+\/vnd\./.test(baseType) && !/(xml|yaml|yml|csv)$/.test(baseType)
   const isText = responseType === 'text' || (!responseType && isPlainMediaType && !isVendorJson)
 
