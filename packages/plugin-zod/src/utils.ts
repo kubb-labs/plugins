@@ -461,8 +461,6 @@ export function getMemberConstraint({
   lengths: (constraints: LengthConstraints) => string
   numbers: (constraints: NumericConstraints) => string
 }): string | undefined {
-  // Checks a suffix cannot carry stay on the member's own schema.
-  if (hasPropertyCounts(member)) return undefined
   if (member.primitive === 'string') return lengths({ ...(ast.narrowSchema(member, 'string') ?? {}), regexType }) || undefined
   if (member.primitive === 'number' || member.primitive === 'integer')
     return numbers(ast.narrowSchema(member, 'number') ?? ast.narrowSchema(member, 'integer') ?? {}) || undefined

@@ -992,6 +992,28 @@ describe('printerZod', () => {
       expect(printer.print(node)).toBe('z.union([TypeA.strict(), TypeB.strict()])')
     })
 
+    test('oneOf union keeps a ref with property counts strict inside its pipe', () => {
+      const node = ast.factory.createSchema({
+        type: 'union',
+        strategy: 'one',
+        members: [
+          ast.factory.createSchema({
+            type: 'ref',
+            name: 'TypeA',
+            ref: '#/components/schemas/TypeA',
+            schema: ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], min: 1 }),
+          }),
+          ast.factory.createSchema({
+            type: 'ref',
+            name: 'TypeB',
+            ref: '#/components/schemas/TypeB',
+            schema: ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [] }),
+          }),
+        ],
+      })
+      expect(printer.print(node)).toBe('z.union([z.pipe(TypeA.in, TypeA.out.strict()), TypeB.strict()])')
+    })
+
     test('single member union', () => {
       const node = ast.factory.createSchema({
         type: 'union',

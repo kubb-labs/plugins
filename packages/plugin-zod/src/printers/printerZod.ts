@@ -136,13 +136,9 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
       return member
     }
 
-    // Property counts print a `z.pipe(…)`, which has no `.strict()`.
-    if (
-      schema.type === ast.schemaTypes.object &&
-      !hasPropertyCounts(schema) &&
-      (schema.additionalProperties === undefined || schema.additionalProperties === false)
-    ) {
-      return `${member}.strict()`
+    if (schema.type === ast.schemaTypes.object && (schema.additionalProperties === undefined || schema.additionalProperties === false)) {
+      // Property counts print a `z.pipe(…)`, which has no `.strict()`, so its object output is made strict.
+      return hasPropertyCounts(schema) ? `z.pipe(${member}.in, ${member}.out.strict())` : `${member}.strict()`
     }
   }
 
