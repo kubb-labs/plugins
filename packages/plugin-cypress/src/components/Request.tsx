@@ -36,13 +36,19 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   // shortcut: ignores per-cookie `explode`, upgrade when a spec needs exploded cookie arrays in Cypress.
   const cookieText =
     "value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value)"
-  // The OpenAPI 3.2 `cookie` style sends a value as it is, like the generated clients do.
+  // The OpenAPI 3.2 `cookie` style sends a value as it is, and throws on one it cannot send, like the generated clients do.
   const rawCookies = node.parameters.filter((parameter) => parameter.in === 'cookie' && parameter.style === 'cookie').map((parameter) => `'${parameter.name}'`)
+  const rawCookieLine = rawCookies.length
+    ? `const rawCookie = (value: string) => {
+  if (!/^[\\x21\\x23-\\x2B\\x2D-\\x3A\\x3C-\\x5B\\x5D-\\x7E]*$/.test(value)) throw new TypeError('A cookie has characters the cookie style cannot send, escape it first.')
+  return value
+}\n`
+    : ''
   const encodeCookie = rawCookies.length
-    ? `([${rawCookies.join(', ')}].includes(name) ? String : encodeURIComponent)(${cookieText})`
+    ? `([${rawCookies.join(', ')}].includes(name) ? rawCookie : encodeURIComponent)(${cookieText})`
     : `encodeURIComponent(${cookieText})`
   // Built first and sent only when non-empty, so a call without cookies keeps the cookies Cypress attaches itself.
-  const cookieLine = `const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null).map(([name, value]) => \`\${name}=\${${encodeCookie}}\`).join('; ')\n`
+  const cookieLine = `${rawCookieLine}const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null).map(([name, value]) => \`\${name}=\${${encodeCookie}}\`).join('; ')\n`
 
   const requestOptions = [
     `method: '${node.method}'`,
