@@ -1,5 +1,5 @@
 import { getStatusClass, toResponseContent } from '@internals/shared'
-import { singleQuote } from '@internals/utils'
+import { jsStringEscape, objectKey, singleQuote } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
 export function getMockStatus(statusCode: ast.StatusCode): number {
@@ -13,7 +13,7 @@ export function getMockHeaders(response: ast.ResponseNode | null | undefined): A
     const value = example?.serializedValue ?? example?.value ?? header.schema.default ?? header.schema.examples?.[0]
     if (value === undefined || value === null) return []
     // Headers use the `simple` style, so an array is sent comma-separated.
-    return [[header.name, Array.isArray(value) ? value.join(',') : typeof value === 'string' ? value : JSON.stringify(value)]]
+    return [[header.name, Array.isArray(value) ? value.join(',') : typeof value === 'object' ? Object.entries(value).flat().join(',') : String(value)]]
   })
 }
 
@@ -103,14 +103,27 @@ export function getExampleBody(response: ast.ResponseNode | null | undefined): s
   const entry = getResponseEntry(response)
   const example = entry?.examples?.find((item) => item.value !== undefined || item.serializedValue !== undefined)
   if (!entry || !example) return null
-  if (example.value !== undefined) return JSON.stringify(example.value)
-  if (!isJson(entry.contentType)) return JSON.stringify(example.serializedValue)
+  if (example.value !== undefined) return toLiteral(example.value)
+  if (!isJson(entry.contentType)) return toLiteral(example.serializedValue)
   // `responseReturn` encodes a JSON body itself, so a serialized JSON example is parsed first.
   try {
-    return JSON.stringify(JSON.parse(example.serializedValue!))
+    return toLiteral(JSON.parse(example.serializedValue!))
   } catch {
     return null
   }
+}
+
+/**
+ * A JSON value as a JavaScript literal, with single-quoted strings.
+ */
+function toLiteral(value: unknown): string {
+  if (typeof value === 'string') return `'${jsStringEscape(value)}'`
+  if (Array.isArray(value)) return `[${value.map(toLiteral).join(', ')}]`
+  if (value && typeof value === 'object')
+    return `{ ${Object.entries(value)
+      .map(([key, item]) => `${objectKey(key)}: ${toLiteral(item)}`)
+      .join(', ')} }`
+  return String(value)
 }
 
 /**

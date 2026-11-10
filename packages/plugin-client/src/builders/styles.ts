@@ -1,5 +1,5 @@
 import { getOperationParameters } from '@internals/shared'
-import { isValidVarName } from '@internals/utils'
+import { isValidVarName, singleQuote } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
 type StyledLocation = 'path' | 'query' | 'header' | 'cookie'
@@ -52,7 +52,7 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
 function serializePartsEncoding(node: ast.HttpOperationNode): Array<string> {
   const content = node.requestBody?.content
   const entry = content?.length === 1 ? content[0] : undefined
-  const part = (encoding: ast.EncodingNode) => (encoding.contentType ? `{ contentType: ${JSON.stringify(encoding.contentType)} }` : '{}')
+  const part = (encoding: ast.EncodingNode) => (encoding.contentType ? `{ contentType: ${singleQuote(encoding.contentType)} }` : '{}')
   return [
     ...(entry?.prefixEncoding?.length ? [`prefix: [${entry.prefixEncoding.map(part).join(', ')}]`] : []),
     ...(entry?.itemEncoding?.contentType ? [`item: ${part(entry.itemEncoding)}`] : []),

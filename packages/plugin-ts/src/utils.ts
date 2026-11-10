@@ -153,7 +153,7 @@ export function getExampleValues(examples: Array<ast.ExampleNode> | undefined, s
 export function buildResponseComments(response: ast.ResponseNode): Array<string> {
   const links = Object.entries(response.links ?? {}).map(([name, link]) => {
     const values = { ...link.parameters, ...(link.requestBody !== undefined ? { body: link.requestBody } : {}) }
-    const args = Object.entries(values).map(([key, value]) => `${key}: ${typeof value === 'string' ? value : JSON.stringify(value)}`)
+    const args = Object.entries(values).map(([key, value]) => `${key}: ${formatExample(value)}`)
     return `@see ${jsDocEscape(`${name}: ${link.operationId ?? link.operationRef ?? ''}(${args.length ? `{ ${args.join(', ')} }` : ''})`)}`
   })
   return [...(response.summary ? [`@summary ${jsDocEscape(response.summary)}`] : []), ...links]

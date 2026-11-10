@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { hasEventStreamContent, hasFormBody, isEventStream } from '@internals/shared'
-import { objectKey } from '@internals/utils'
+import { objectKey, singleQuote } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -9,7 +9,7 @@ function buildServers(servers: Array<ast.InputServer> | undefined): string | nul
   const named = new Map<string, string>()
   for (const server of servers ?? []) if (server.name && !named.has(server.name)) named.set(server.name, server.url)
   if (!named.size) return null
-  const entries = [...named].map(([name, url]) => `${objectKey(name)}: ${JSON.stringify(url)}`)
+  const entries = [...named].map(([name, url]) => `${objectKey(name)}: ${singleQuote(url)}`)
   return `/**\n * The servers from the spec by name, for \`baseURL\`.\n */\nexport const servers = { ${entries.join(', ')} } as const`
 }
 

@@ -1,6 +1,6 @@
 import { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { getExampleBody, getMockStatus, responseLiteral } from './utils.ts'
+import { getExampleBody, getMockHeaders, getMockStatus, responseLiteral } from './utils.ts'
 
 describe('getMockStatus', () => {
   test('mocks a range with the first code of its class', () => {
@@ -17,7 +17,7 @@ describe('getExampleBody', () => {
     })
 
   test('parses a serialized JSON example, so the mock does not encode it twice', () => {
-    expect(getExampleBody(json([{ serializedValue: '{"id":1}' }]))).toBe('{"id":1}')
+    expect(getExampleBody(json([{ serializedValue: '{"id":1,"tags":["a\\nb"]}' }]))).toBe("{ id: 1, tags: ['a\\nb'] }")
     expect(getExampleBody(json([{ serializedValue: 'not json' }]))).toBeNull()
   })
 
@@ -34,6 +34,23 @@ describe('getExampleBody', () => {
       ],
     })
     expect(getExampleBody(response)).toBeNull()
+  })
+})
+
+describe('getMockHeaders', () => {
+  test('sends arrays and objects in the simple style', () => {
+    const header = (name: string, value: unknown) =>
+      ast.factory.createParameter({ name, in: 'header', required: false, schema: ast.factory.createSchema({ type: 'string' }), examples: [{ value }] })
+    const response = ast.factory.createResponse({
+      statusCode: '200',
+      headers: [header('X-Ids', [1, 2]), header('X-Range', { from: 1, to: 2 }), header('X-Count', 3)],
+    })
+
+    expect(getMockHeaders(response)).toStrictEqual([
+      ['X-Ids', '1,2'],
+      ['X-Range', 'from,1,to,2'],
+      ['X-Count', '3'],
+    ])
   })
 })
 
