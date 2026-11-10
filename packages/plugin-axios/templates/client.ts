@@ -155,9 +155,7 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
     // A null-body status cannot carry a body, and an adapter may read a missing body as ''.
     const raw = [204, 205, 304].includes(status) || data === '' || data == null ? null : (data as BodyInit)
     const body =
-      request.stream && request.signal && raw !== null && Symbol.asyncIterator in Object(raw)
-        ? rethrowAbort(raw as unknown as AsyncIterable<Uint8Array>, request.signal)
-        : raw
+      request.stream && request.signal && Symbol.asyncIterator in Object(raw) ? rethrowAbort(raw as unknown as AsyncIterable<Uint8Array>, request.signal) : raw
     return { webResponse: new Response(body, { status, statusText, headers: toHeaders(response.headers) }), request: response.config, response }
   }
 }
