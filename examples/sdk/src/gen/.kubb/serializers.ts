@@ -138,7 +138,6 @@ const cookieOctets = /^[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*$/
 
 function rawCookieValue(item: unknown): string {
   const value = toValue(item)
-  // An unescaped `;` would add a cookie of its own.
   if (!cookieOctets.test(value)) throw new TypeError(`Cookie value ${JSON.stringify(value)} has characters the cookie style cannot send, escape it first.`)
   return value
 }

@@ -86,7 +86,6 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
         full: ['client', 'withUnwrap', 'resolveThrowOnError'],
       }[returnType]
 
-      // The result type narrows `headers` to the declared response headers, except for streams and unwrapped data.
       const headerTypeNames = stream || returnType === 'data' ? [] : getResponseHeadersTypeNames({ node, types })
       importedTypeNames.push(...headerTypeNames)
 
