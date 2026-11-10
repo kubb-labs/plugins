@@ -1,3 +1,4 @@
+import { stringify } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 
 /**
@@ -11,6 +12,18 @@ export type Auth = {
   name?: string
   in?: 'header' | 'query' | 'cookie'
   scopes?: Array<string>
+  /**
+   * The OAuth2 flows by name with their URLs, such as `deviceAuthorization` with `deviceAuthorizationUrl` and `tokenUrl`.
+   */
+  flows?: Record<string, Omit<ast.OAuthFlow, 'scopes'>>
+  /**
+   * The OAuth2 authorization server metadata URL (RFC 8414).
+   */
+  metadataUrl?: string
+  /**
+   * The OpenID Connect discovery URL.
+   */
+  url?: string
 }
 
 /**
@@ -25,6 +38,17 @@ function serializeScheme(auth: Auth): string {
   if (auth.name) parts.push(`name: '${auth.name}'`)
   if (auth.in) parts.push(`in: '${auth.in}'`)
   if (auth.scopes?.length) parts.push(`scopes: [${auth.scopes.map((scope) => `'${scope}'`).join(', ')}]`)
+  if (auth.flows && Object.keys(auth.flows).length) {
+    const flows = Object.entries(auth.flows).map(
+      ([name, flow]) =>
+        `${name}: { ${Object.entries(flow)
+          .map(([key, value]) => `${key}: ${stringify(value)}`)
+          .join(', ')} }`,
+    )
+    parts.push(`flows: { ${flows.join(', ')} }`)
+  }
+  if (auth.metadataUrl) parts.push(`metadataUrl: ${stringify(auth.metadataUrl)}`)
+  if (auth.url) parts.push(`url: ${stringify(auth.url)}`)
   return `{ ${parts.join(', ')} }`
 }
 
@@ -34,12 +58,22 @@ function serializeRequirement(requirement: SecurityRequirement): string {
 
 /**
  * Maps an AST credential to the inline `Auth` object, or `null` for `mutualTLS`, which the runtime cannot send.
- * `http` schemes other than `basic` are treated as bearer.
+ * `http` schemes other than `basic` are treated as bearer. OAuth2 keeps its flow URLs and metadata URL, and OpenID
+ * Connect its discovery URL, so an `auth` resolver can run the flow. The flows leave out their scope descriptions,
+ * since the requirement lists the scopes a call needs.
  */
 export function resolveCredential(credential: ast.AuthCredential): Auth | null {
   if (credential.type === 'apiKey') return { type: 'apiKey', name: credential.name, in: credential.in }
   if (credential.type === 'http') return { type: 'http', scheme: credential.scheme === 'basic' ? 'basic' : 'bearer' }
-  if (credential.type === 'oauth2' || credential.type === 'openIdConnect') return { type: credential.type }
+  if (credential.type === 'oauth2') {
+    const flows = Object.fromEntries(Object.entries(credential.flows).map(([name, { scopes: _scopes, ...urls }]) => [name, urls]))
+    return {
+      type: 'oauth2',
+      ...(Object.keys(flows).length ? { flows } : {}),
+      ...(credential.metadataUrl ? { metadataUrl: credential.metadataUrl } : {}),
+    }
+  }
+  if (credential.type === 'openIdConnect') return { type: 'openIdConnect', ...(credential.url ? { url: credential.url } : {}) }
   return null
 }
 

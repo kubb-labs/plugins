@@ -95,6 +95,8 @@ paths:
     post:
       operationId: createOrder
       tags: [orders]
+      security:
+        - device: [write]
       requestBody:
         required: true
         content:
@@ -134,6 +136,15 @@ components:
       type: apiKey
       in: header
       name: X-API-Key
+    device:
+      type: oauth2
+      oauth2MetadataUrl: https://auth.example.com/.well-known/oauth-authorization-server
+      flows:
+        deviceAuthorization:
+          deviceAuthorizationUrl: https://auth.example.com/device
+          tokenUrl: https://auth.example.com/token
+          scopes:
+            write: Create orders
   schemas:
     Order:
       type: object

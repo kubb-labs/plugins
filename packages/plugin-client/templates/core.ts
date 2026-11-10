@@ -161,6 +161,18 @@ export type Auth = {
   name?: string
   in?: 'header' | 'query' | 'cookie'
   scopes?: Array<string>
+  /**
+   * The OAuth2 flows by name with their URLs, such as `deviceAuthorization` with `deviceAuthorizationUrl` and `tokenUrl`.
+   */
+  flows?: Record<string, { authorizationUrl?: string; deviceAuthorizationUrl?: string; tokenUrl?: string; refreshUrl?: string }>
+  /**
+   * The OAuth2 authorization server metadata URL (RFC 8414).
+   */
+  metadataUrl?: string
+  /**
+   * The OpenID Connect discovery URL.
+   */
+  url?: string
 }
 
 /**

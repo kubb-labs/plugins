@@ -13,5 +13,5 @@ import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 export function createOrder<ThrowOnError extends boolean = true>(options: Options<CreateOrderOptions, ThrowOnError>): Unwrappable<RequestResult<CreateOrderResponses, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<CreateOrderResponses, ThrowOnError>({ method: 'POST', url: '/orders', security: [{ type: 'apiKey', name: 'X-API-Key', in: 'header' }], contentType: { request: 'application/json' }, ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap(apiClient<CreateOrderResponses, ThrowOnError>({ method: 'POST', url: '/orders', security: [{ type: 'oauth2', scopes: ['write'], flows: { deviceAuthorization: { deviceAuthorizationUrl: 'https://auth.example.com/device', tokenUrl: 'https://auth.example.com/token' } }, metadataUrl: 'https://auth.example.com/.well-known/oauth-authorization-server' }], contentType: { request: 'application/json' }, ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }
