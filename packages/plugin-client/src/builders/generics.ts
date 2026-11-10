@@ -27,6 +27,26 @@ export function buildRequestResultGenerics({ node, types }: { node: ast.Operatio
 export function buildResultType({ node, types, returnType }: { node: ast.OperationNode; types: OperationTypeNames; returnType: ReturnTypeOption }): string {
   const generics = buildRequestResultGenerics({ node, types })
   if (returnType === 'data') return `Promise<UnwrappedResult<${generics}>>`
-  if (returnType === 'plain') return `Promise<RequestResult<${generics}>>`
-  return `Unwrappable<RequestResult<${generics}>>`
+  const headers = buildResponseHeadersType({ node, types })
+  const result = headers ? `WithHeaders<RequestResult<${generics}>, ${headers}>` : `RequestResult<${generics}>`
+  if (returnType === 'plain') return `Promise<${result}>`
+  return `Unwrappable<${result}>`
+}
+
+/**
+ * The `{ status: headers }` record of the responses that declare `headers`, for `WithHeaders`, or `null` when none does.
+ *
+ * @example
+ * `buildResponseHeadersType({ node, types }) // "{ '200': ListPetsStatus200Headers }"`
+ */
+export function buildResponseHeadersType({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
+  const entries = node.responses.filter((response) => response.headers?.length).map((response) => `'${response.statusCode}': ${types.response.headers(node, response.statusCode)}`)
+  return entries.length ? `{ ${entries.join('; ')} }` : null
+}
+
+/**
+ * The type names of the headers an operation's responses declare, which its file imports for `WithHeaders`.
+ */
+export function getResponseHeadersTypeNames({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<string> {
+  return node.responses.filter((response) => response.headers?.length).map((response) => types.response.headers(node, response.statusCode))
 }

@@ -6,6 +6,7 @@ import { ast, camelCase, defineGenerator, Diagnostics } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { getResponseHeadersTypeNames } from '../builders/generics.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { getOperationSecurity, type SecurityRequirement } from '../builders/security.ts'
@@ -14,7 +15,7 @@ import { buildValidatorHooks, type ValidatorHooks } from '../builders/validator.
 import { SdkClient } from '../components/SdkClient.tsx'
 import { StreamRuntime } from '../components/StreamRuntime.tsx'
 import { SdkFacade } from '../components/SdkFacade.tsx'
-import type { ContractClientFactory } from '../types.ts'
+import type { ContractClientFactory, ReturnTypeOption } from '../types.ts'
 
 type GeneratorContext = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]
 
@@ -40,8 +41,15 @@ type Controller = {
   operations: Array<OperationData>
 }
 
-function resolveTypeImportNames(node: ast.OperationNode, types: OperationTypeNames): Array<string> {
-  return [types.response.options(node), types.response.responses(node)]
+function resolveTypeImportNames(node: ast.OperationNode, types: OperationTypeNames, returnType: ReturnTypeOption): Array<string> {
+  return [types.response.options(node), types.response.responses(node), ...getHeaderTypeNames(node, types, returnType)]
+}
+
+/**
+ * The response header types a method's `WithHeaders` result names: none for a stream or for unwrapped data.
+ */
+function getHeaderTypeNames(node: ast.OperationNode, types: OperationTypeNames, returnType: ReturnTypeOption): Array<string> {
+  return isEventStream(node) || returnType === 'data' ? [] : getResponseHeadersTypeNames({ node, types })
 }
 
 /**
@@ -178,7 +186,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
       const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
         const { namesByPath: typeNamesByPath, filesByPath: typeFilesByPath } = collectImportsByFile(ops, (op) => ({
           file: op.typeFile,
-          names: resolveTypeImportNames(op.node, op.types),
+          names: resolveTypeImportNames(op.node, op.types, returnType),
         }))
         const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = validatorEnabled
           ? collectImportsByFile(ops, (op) => ({ file: op.zodFile, names: op.validatorHooks?.importedZodNames ?? [] }))
@@ -202,6 +210,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
                   'Options',
                   ...(returnType === 'data' ? [] : ['Unwrappable']),
                   ...(hasResult ? [returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'] : []),
+                  ...(ops.some((op) => getHeaderTypeNames(op.node, op.types, returnType).length) ? ['WithHeaders'] : []),
                   ...(hasEventStream ? buildEventStreamImports({ returnType, typed: shapes.has('event'), line: shapes.has('line') }) : []),
                 ]),
               )}

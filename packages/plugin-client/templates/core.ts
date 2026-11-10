@@ -44,11 +44,20 @@ export type SuccessVariant<TStatus, TEntry, TRequest, TResponse, TKeys = never> 
         data: TContentType extends `text/event-stream${string}` ? ReadableStream<Uint8Array> : TData
         error: undefined
         contentType: TContentType
+        headers: Headers
         request: TRequest
         response: TResponse
       }
     : never
-  : { status: ToStatusNumber<TStatus, TKeys>; data: TEntry; error: undefined; contentType: string | undefined; request: TRequest; response: TResponse }
+  : {
+      status: ToStatusNumber<TStatus, TKeys>
+      data: TEntry
+      error: undefined
+      contentType: string | undefined
+      headers: Headers
+      request: TRequest
+      response: TResponse
+    }
 
 export type ResultByStatus<TResponses, TStatus extends keyof TResponses, TRequest, TResponse> = TStatus extends SuccessStatusCode
   ? SuccessVariant<TStatus, TResponses[TStatus], TRequest, TResponse, keyof TResponses>
@@ -57,6 +66,7 @@ export type ResultByStatus<TResponses, TStatus extends keyof TResponses, TReques
       data: undefined
       error: DataOf<TResponses[TStatus]> | EmptyErrorBody
       contentType: string | undefined
+      headers: Headers
       request: TRequest
       response: TResponse
     }
@@ -79,13 +89,33 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequ
         data: SuccessOf<TResponses>
         error: undefined
         contentType: string | undefined
+        headers: Headers
         request: TRequest
         response: TResponse
       }
     : SuccessResultUnion<TResponses, TRequest, TResponse>
   : [ResultUnion<TResponses, TRequest, TResponse>] extends [never]
-    ? { status: number; data: undefined; error: undefined; contentType: string | undefined; request: TRequest; response: TResponse }
+    ? { status: number; data: undefined; error: undefined; contentType: string | undefined; headers: Headers; request: TRequest; response: TResponse }
     : ResultUnion<TResponses, TRequest, TResponse>
+
+/**
+ * A response's `Headers`, whose `get` suggests the header names the spec declares. Values stay strings, as sent.
+ */
+export type ResponseHeaders<THeaders = unknown> = Omit<Headers, 'get'> & {
+  get: (name: Extract<keyof THeaders, string> | (string & {})) => string | null
+}
+
+type HeadersOfStatus<THeaders, TStatus> = {
+  [TKey in keyof THeaders]: TStatus extends ToStatusNumber<TKey> ? THeaders[TKey] : never
+}[keyof THeaders]
+
+/**
+ * Narrows `headers` on each variant of a result to the response headers its status declares, keyed by status like the
+ * responses record: `WithHeaders<RequestResult<ListPetsResponses>, { '200': ListPetsStatus200Headers }>`.
+ */
+export type WithHeaders<TResult, THeaders> = TResult extends { status: infer TStatus }
+  ? Omit<TResult, 'headers'> & { headers: ResponseHeaders<HeadersOfStatus<THeaders, TStatus>> }
+  : TResult
 
 /**
  * A result promise whose `unwrap()` resolves to the success body.
@@ -987,6 +1017,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
             ? ({ status: result.status, statusText: result.statusText } satisfies EmptyErrorBody)
             : data,
         contentType: result.contentType,
+        headers: result.headers,
         request: result.request,
         response: result.response,
       },

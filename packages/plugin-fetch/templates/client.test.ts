@@ -642,9 +642,11 @@ describe('createClientCore', () => {
       data: { id: 1 },
       error: undefined,
       contentType: 'application/json',
+      headers: expect.any(Headers),
       request: 'REQ',
       response: 'RES',
     })
+    expect(result.headers.get('content-type')).toBe('application/json')
   })
 
   test('throws a ResponseError for a non-2xx status by default', async () => {
@@ -798,7 +800,15 @@ describe('createClientCore', () => {
     const error = vi.fn(() => ({ parsed: true }))
     const result = await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { error: toSchema(error) } })
     expect(error).toHaveBeenCalledTimes(1)
-    expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, contentType: 'application/json', request: 'REQ', response: 'RES' })
+    expect(result).toStrictEqual({
+      status: 405,
+      data: undefined,
+      error: { parsed: true },
+      contentType: 'application/json',
+      headers: expect.any(Headers),
+      request: 'REQ',
+      response: 'RES',
+    })
   })
 
   test('picks the error validator by status, then range, then default, and skips undeclared statuses', async () => {

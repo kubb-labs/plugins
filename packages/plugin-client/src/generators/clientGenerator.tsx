@@ -5,6 +5,7 @@ import { ast, defineGenerator } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { getResponseHeadersTypeNames } from '../builders/generics.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { getOperationSecurity } from '../builders/security.ts'
@@ -83,9 +84,16 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
         full: ['client', 'withUnwrap', 'resolveThrowOnError'],
       }[returnType]
 
+      // The result type narrows `headers` to the declared response headers, except for streams and unwrapped data.
+      const headerTypeNames = stream || returnType === 'data' ? [] : getResponseHeadersTypeNames({ node, types })
+      importedTypeNames.push(...headerTypeNames)
+
       const clientTypeImports = stream
         ? buildEventStreamImports({ returnType, typed: stream === 'event', line: stream === 'line' })
-        : { plain: ['Options', 'RequestResult'], data: ['Options', 'UnwrappedResult'], full: ['Options', 'Unwrappable', 'RequestResult'] }[returnType]
+        : [
+            ...{ plain: ['Options', 'RequestResult'], data: ['Options', 'UnwrappedResult'], full: ['Options', 'Unwrappable', 'RequestResult'] }[returnType],
+            ...(headerTypeNames.length ? ['WithHeaders'] : []),
+          ]
 
       return (
         <File

@@ -21,6 +21,10 @@ export type OperationTypeNames = {
      * Resolves the name of the operation's per-status responses record type.
      */
     responses(node: ast.OperationNode): string
+    /**
+     * Resolves the name of the type of the headers one response declares.
+     */
+    headers(node: ast.OperationNode, statusCode: ast.StatusCode): string
   }
 }
 
@@ -68,6 +72,7 @@ function toZodTypeResolver(resolver: ResolverZod): ResolverTs {
       status: (node: ast.OperationNode, statusCode: ast.StatusCode) => type(resolver.response.status(node, statusCode)),
       response: (node: ast.OperationNode) => type(resolver.response.response(node)),
       responses: (node: ast.OperationNode) => type(resolver.response.responses(node)),
+      headers: (node: ast.OperationNode, statusCode: ast.StatusCode) => type(resolver.response.headers(node, statusCode)),
       options: (node: ast.OperationNode) => resolver.response.options(node),
     },
   } as unknown as ResolverTs
