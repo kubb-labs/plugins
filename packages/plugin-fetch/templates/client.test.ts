@@ -180,6 +180,12 @@ describe('defaultQuerySerializer', () => {
     expect(defaultQuerySerializer({ path: '/a/b' }, { path: { allowReserved: true } })).toBe('path=/a/b')
     expect(defaultQuerySerializer({ path: '/a/b' })).toBe('path=%2Fa%2Fb')
   })
+
+  test('allowReserved still encodes characters that end the query or change a form value', () => {
+    expect(defaultQuerySerializer({ r: 'a/b?c#d', q: 'x' }, { r: { allowReserved: true } })).toBe('r=a/b?c%23d&q=x')
+    expect(defaultQuerySerializer({ r: 'a&b=c+d' }, { r: { allowReserved: true } })).toBe('r=a%26b=c%2Bd')
+    expect(defaultQuerySerializer({ r: ['a#', 'b&'] }, { r: { allowReserved: true, explode: false } })).toBe('r=a%23,b%26')
+  })
 })
 
 describe('defaultPathSerializer', () => {
@@ -233,8 +239,13 @@ describe('built-in media types encode', () => {
     expect(encodeBody({ body: 'abc', contentType })).toBe('abc')
   })
 
-  test('ignores a JSON part contentType for urlencoded bodies', () => {
+  test('JSON-encodes a urlencoded property with a JSON contentType', () => {
     const encoding = { meta: { contentType: 'application/json' } }
+    expect(encodeBody({ body: { meta: { a: 1 } }, contentType: 'application/x-www-form-urlencoded', encoding })).toBe('meta=%7B%22a%22%3A1%7D')
+  })
+
+  test('ignores a urlencoded contentType when the property sets a style', () => {
+    const encoding = { meta: { contentType: 'application/json', explode: true } }
     expect(encodeBody({ body: { meta: { a: 1 } }, contentType: 'application/x-www-form-urlencoded', encoding })).toBe('a=1')
   })
 
