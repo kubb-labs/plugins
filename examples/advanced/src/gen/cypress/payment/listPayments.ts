@@ -18,7 +18,7 @@ export function listPayments(
   } = {},
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<Array<Payment>> {
-  const cookie = Object.entries<unknown>(cookies ?? {})
+  const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>)
     .filter(([, value]) => value != null)
     .map(
       ([name, value]) =>
