@@ -893,6 +893,10 @@ describe('zodGenerator — transformers', () => {
 })
 
 describe('zodGenerator — inferred aliases', () => {
+  test('an inferred type name keeps a status range in lower case', () => {
+    expect(resolverZod.schema.type('listPetsStatus2xxSchema')).toBe('ListPetsStatus2xxSchemaType')
+  })
+
   const slotSchema = ast.factory.createSchema({
     type: ast.schemaTypes.object,
     primitive: ast.schemaTypes.object,

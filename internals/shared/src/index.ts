@@ -38,6 +38,7 @@ export {
   createCasedFile,
   createOperationParamResolver,
   createOperationResponseResolver,
+  lowerRange,
   getCircularNames,
   getEnumNames,
   operationKey,

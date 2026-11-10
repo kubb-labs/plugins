@@ -87,6 +87,13 @@ export function createOperationParamResolver(): OperationParamResolver {
 }
 
 /**
+ * Lowercases the status range in a resolved name, `ListPetsStatus2XX` to `ListPetsStatus2xx`. Casing `2xx` itself gives `2Xx`.
+ */
+export function lowerRange(name: string): string {
+  return name.replace(/Status([1-5])XX/i, 'Status$1xx')
+}
+
+/**
  * Builds the shared `response` namespace. Spread the result into
  * `createResolver` and add plugin-specific methods (`options`, `error`) next
  * to it.
@@ -96,13 +103,6 @@ export function createOperationParamResolver(): OperationParamResolver {
  * createResolver<PluginTs>({ response: { ...createOperationResponseResolver(), options(node) {...} }, ... })
  * ```
  */
-/**
- * Lowercases the status range in a resolved name, `ListPetsStatus2XX` to `ListPetsStatus2xx`. Casing `2xx` itself gives `2Xx`.
- */
-function lowerRange(name: string): string {
-  return name.replace(/Status([1-5])XX/i, 'Status$1xx')
-}
-
 export function createOperationResponseResolver(): OperationResponseResolver {
   return {
     status(node, statusCode) {

@@ -1,4 +1,4 @@
-import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, operationKey } from '@internals/shared'
+import { createCasedFile, createOperationParamResolver, createOperationResponseResolver, lowerRange, operationKey } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
 import { camelCase, createResolver, pascalCase } from '@kubb/kit'
 import type { PluginZod } from '../types.ts'
@@ -26,10 +26,10 @@ export const resolverZod = createResolver<PluginZod>({
   file: createCasedFile((part) => camelCase(part, { suffix: 'schema' })),
   schema: {
     typeName(name) {
-      return this.memo(`typeName:${name}`, () => ensureValidVarName(pascalCase(name, { suffix: 'schema type' })))
+      return this.memo(`typeName:${name}`, () => lowerRange(ensureValidVarName(pascalCase(name, { suffix: 'schema type' }))))
     },
     type(name) {
-      return this.memo(`type:${name}`, () => ensureValidVarName(pascalCase(name, { suffix: 'type' })))
+      return this.memo(`type:${name}`, () => lowerRange(ensureValidVarName(pascalCase(name, { suffix: 'type' }))))
     },
     inputName(name) {
       return this.name(`${name} input`)
