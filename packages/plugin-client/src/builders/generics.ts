@@ -1,5 +1,6 @@
 import type { ast } from '@kubb/kit'
 import type { OperationTypeNames } from '@internals/client'
+import { toStatusKey } from '@internals/shared'
 import type { ReturnTypeOption } from '../types.ts'
 
 /**
@@ -55,7 +56,7 @@ function getResponseHeaderTypes({ node, types }: { node: ast.OperationNode; type
  * The `{ status: headers }` record for the last `RequestResult` type argument, or `null` when no response declares headers.
  */
 function buildResponseHeadersType({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
-  const entries = getResponseHeaderTypes({ node, types }).map(([statusCode, name]) => `'${statusCode}': ${name}`)
+  const entries = getResponseHeaderTypes({ node, types }).map(([statusCode, name]) => `'${toStatusKey(statusCode)}': ${name}`)
   return entries.length ? `{ ${entries.join('; ')} }` : null
 }
 

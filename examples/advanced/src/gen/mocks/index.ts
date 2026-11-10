@@ -42,8 +42,8 @@ export {
   createListPaymentsCookiesFaker,
   createListPaymentsQueryFaker,
   createListPaymentsResponseFaker,
-  createListPaymentsStatus2XXFaker,
-  createListPaymentsStatus4XXFaker,
+  createListPaymentsStatus2xxFaker,
+  createListPaymentsStatus4xxFaker,
 } from './payment/createListPaymentsFaker'
 export {
   createAddFilesBodyFaker,

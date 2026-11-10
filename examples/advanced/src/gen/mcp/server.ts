@@ -19,7 +19,7 @@ import {
   listPaymentsCookieSessionSchema,
   listPaymentsQueryFilterSchema,
   listPaymentsQueryStatusSchema,
-  listPaymentsStatus2XXSchema,
+  listPaymentsStatus2xxSchema,
 } from '../zod/payment/listPaymentsSchema'
 import { addFilesBodySchema, addFilesStatus200Schema } from '../zod/pet/addFilesSchema'
 import { addPetBodySchema } from '../zod/pet/addPetSchema'
@@ -206,7 +206,7 @@ export function getServer() {
     {
       title: 'List payments',
       description: 'Make a GET request to /store/payments',
-      outputSchema: z.object({ data: listPaymentsStatus2XXSchema }),
+      outputSchema: z.object({ data: listPaymentsStatus2xxSchema }),
       inputSchema: z.object({
         query: z.object({ status: listPaymentsQueryStatusSchema, filter: listPaymentsQueryFilterSchema }),
         cookies: z.object({ session: listPaymentsCookieSessionSchema }),

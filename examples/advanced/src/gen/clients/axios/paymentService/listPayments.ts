@@ -2,7 +2,7 @@ import type { Options, Unwrappable, RequestResultWithHeaders } from '../../../.k
 import type { Payment } from '../../../models/ts/Payment'
 import type { PaymentError } from '../../../models/ts/PaymentError'
 import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
-import { listPaymentsResponseSchema, listPaymentsStatus4XXSchema } from '../../../zod/payment/listPaymentsSchema'
+import { listPaymentsResponseSchema, listPaymentsStatus4xxSchema } from '../../../zod/payment/listPaymentsSchema'
 
 /**
  * `GET /store/payments`
@@ -28,11 +28,11 @@ export function listPayments<ThrowOnError extends boolean = true>(
 ): Unwrappable<
   RequestResultWithHeaders<
     {
-      '2XX': Array<Payment>
-      '4XX': PaymentError
+      '2xx': Array<Payment>
+      '4xx': PaymentError
     },
     {
-      '2XX': {
+      '2xx': {
         'X-Rate-Limit': number
         'X-Next-Page'?: string
       }
@@ -45,12 +45,12 @@ export function listPayments<ThrowOnError extends boolean = true>(
   return withUnwrap(
     apiClient<
       {
-        '2XX': Array<Payment>
-        '4XX': PaymentError
+        '2xx': Array<Payment>
+        '4xx': PaymentError
       },
       ThrowOnError,
       {
-        '2XX': {
+        '2xx': {
           'X-Rate-Limit': number
           'X-Next-Page'?: string
         }
@@ -60,7 +60,7 @@ export function listPayments<ThrowOnError extends boolean = true>(
       url: '/store/payments',
       ...config,
       styles: { ...config.styles, cookie: { session: { style: 'cookie' }, ...config.styles?.cookie } },
-      validator: { response: listPaymentsResponseSchema, error: { '4XX': listPaymentsStatus4XXSchema }, ...config.validator },
+      validator: { response: listPaymentsResponseSchema, error: { '4xx': listPaymentsStatus4xxSchema }, ...config.validator },
       throwOnError: resolveThrowOnError(config.throwOnError, true),
     }),
   )

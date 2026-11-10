@@ -30,9 +30,9 @@ export type {
   ListPaymentsQueryStatusSchemaType,
   ListPaymentsResponseSchemaType,
   ListPaymentsResponsesSchemaType,
-  ListPaymentsStatus2XXHeadersSchemaType,
-  ListPaymentsStatus2XXSchemaType,
-  ListPaymentsStatus4XXSchemaType,
+  ListPaymentsStatus2XxHeadersSchemaType,
+  ListPaymentsStatus2XxSchemaType,
+  ListPaymentsStatus4XxSchemaType,
 } from './listPaymentsSchema'
 export {
   createPaymentBatchBodySchema,
@@ -66,7 +66,7 @@ export {
   listPaymentsQueryStatusSchema,
   listPaymentsResponseSchema,
   listPaymentsResponsesSchema,
-  listPaymentsStatus2XXHeadersSchema,
-  listPaymentsStatus2XXSchema,
-  listPaymentsStatus4XXSchema,
+  listPaymentsStatus2xxHeadersSchema,
+  listPaymentsStatus2xxSchema,
+  listPaymentsStatus4xxSchema,
 } from './listPaymentsSchema'

@@ -1,4 +1,4 @@
-import { isSuccessStatusCode } from '@internals/shared'
+import { isSuccessStatusCode, toStatusKey } from '@internals/shared'
 import { stringify } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -43,12 +43,12 @@ export function resolveResponseValidator(validator: ValidatorOptions | undefined
 
 /**
  * Builds the `validator.error` map of a call, one plugin-zod `<operation>StatusNNNSchema` per non-2xx response with a
- * schema, such as `{ 404: getPetStatus404Schema, '5XX': getPetStatus5XXSchema }`. Returns `null` without one.
+ * schema, such as `{ 404: getPetStatus404Schema, '5xx': getPetStatus5xxSchema }`. Returns `null` without one.
  */
 export function buildZodErrorParse(node: ast.OperationNode, zodResolver: ResolverZod): { literal: string; names: Array<string> } | null {
   const entries = node.responses
     .filter((res) => !isSuccessStatusCode(res.statusCode) && res.content?.some((entry) => entry.schema))
-    .map((res) => ({ key: String(res.statusCode), name: zodResolver.response.status(node, res.statusCode) }))
+    .map((res) => ({ key: toStatusKey(res.statusCode), name: zodResolver.response.status(node, res.statusCode) }))
   if (!entries.length) return null
   const literal = entries.map(({ key, name }) => `${/^\d+$/.test(key) ? key : stringify(key)}: ${name}`).join(', ')
   return { literal: `{ ${literal} }`, names: entries.map(({ name }) => name) }

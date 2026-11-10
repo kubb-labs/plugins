@@ -684,7 +684,7 @@ export function buildResponses(node: ast.OperationNode, resolver: ResponseStatus
     primitive: 'object',
     properties: node.responses.map((res) =>
       ast.factory.createProperty({
-        name: String(res.statusCode),
+        name: toStatusKey(res.statusCode),
         required: true,
         schema: buildResponseRecordEntry(node, res, resolver),
       }),
@@ -707,6 +707,13 @@ export function getStatusClass(statusCode: ast.StatusCode | number | string): nu
   const code = getStatusCodeNumber(statusCode)
 
   return code === null ? null : Math.floor(code / 100)
+}
+
+/**
+ * A status as generated code writes it, with a range in lower case: `2XX` becomes `2xx`.
+ */
+export function toStatusKey(statusCode: ast.StatusCode | number | string): string {
+  return String(statusCode).toLowerCase()
 }
 
 export function isSuccessStatusCode(statusCode: ast.StatusCode | number | string): boolean {

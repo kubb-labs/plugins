@@ -9,9 +9,9 @@ export * from './mediaTypes.ts'
 export type { ValidateOption, ValidationErrorContext, ValidationErrorHandler } from './standardSchema.ts'
 
 /**
- * The status keys that count as success. `2XX` covers every 2xx status.
+ * The status keys that count as success. `2xx` covers every 2xx status.
  */
-export type SuccessStatusCode = '200' | '201' | '202' | '203' | '204' | '205' | '206' | '207' | '208' | '226' | '2XX'
+export type SuccessStatusCode = '200' | '201' | '202' | '203' | '204' | '205' | '206' | '207' | '208' | '226' | '2xx'
 
 export type SuccessOf<TResponses> = TResponses[Extract<keyof TResponses, SuccessStatusCode>]
 
@@ -22,7 +22,7 @@ type Digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
 type ToNumber<T> = T extends `${infer TNumber extends number}` ? TNumber : never
 
 /**
- * Maps a status key such as `404` or `4XX` to its numeric statuses. `default` becomes `number`.
+ * Maps a status key such as `404` or `4xx` to its numeric statuses. `default` becomes `number`.
  */
 export type ToStatusNumber<TStatus, TKeys = never> = TStatus extends `${infer TNumber extends number}`
   ? TNumber
@@ -284,7 +284,7 @@ export type RequestConfig<TBody = unknown, TRequest = NativeRequest, TResponse =
    */
   mediaTypes?: MediaTypes
   /**
-   * `error` takes one validator, or a map by status such as `{ 404: schema, '5XX': schema, default: schema }`.
+   * `error` takes one validator, or a map by status such as `{ 404: schema, '5xx': schema, default: schema }`.
    */
   validator?: {
     request?: Validator

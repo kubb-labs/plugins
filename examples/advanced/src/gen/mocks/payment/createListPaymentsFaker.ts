@@ -37,17 +37,17 @@ export function createListPaymentsCookiesFaker<
 /**
  * @description The payments
  */
-export function createListPaymentsStatus2XXFaker(data?: Partial<Array<Payment>>): Array<Payment> {
+export function createListPaymentsStatus2xxFaker(data?: Partial<Array<Payment>>): Array<Payment> {
   return [...faker.helpers.multiple(() => createPaymentFaker()), ...(data || []).filter((item) => item !== undefined)] as Array<Payment>
 }
 
 /**
  * @description Client error
  */
-export function createListPaymentsStatus4XXFaker(data?: Partial<PaymentError>): PaymentError {
+export function createListPaymentsStatus4xxFaker(data?: Partial<PaymentError>): PaymentError {
   return createPaymentErrorFaker(data) as PaymentError
 }
 
 export function createListPaymentsResponseFaker(data?: Partial<Array<Payment>>): Array<Payment> {
-  return (data ?? faker.helpers.arrayElement([createListPaymentsStatus2XXFaker(), createListPaymentsStatus4XXFaker()])) as Array<Payment>
+  return (data ?? faker.helpers.arrayElement([createListPaymentsStatus2xxFaker(), createListPaymentsStatus4xxFaker()])) as Array<Payment>
 }

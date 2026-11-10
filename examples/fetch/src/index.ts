@@ -46,9 +46,9 @@ export async function demo() {
   await getPetById({ path: { petId: 2n }, client: tenant })
 }
 
-type DemoResponses = { '200': Pet; '404': { message: string }; '5XX': { retryAfter: number } }
+type DemoResponses = { '200': Pet; '404': { message: string }; '5xx': { retryAfter: number } }
 
-// Checking `status` narrows `data`: the `5XX` range covers every status from 500 to 599.
+// Checking `status` narrows `data`: the `5xx` range covers every status from 500 to 599.
 export function describeError(error: unknown): string {
   if (!isResponseError<DemoResponses>(error)) return 'network'
   if (error.status === 404) return error.data.message

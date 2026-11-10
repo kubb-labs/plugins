@@ -65,8 +65,8 @@ describe('buildValidatorHooks', () => {
       ],
     }
     const hooks = buildValidatorHooks({ node, validator: 'zod', zodResolver: resolverZod })
-    expect(hooks.error).toBe("{ 422: addPetStatus422Schema, '5XX': addPetStatus5XXSchema, 'default': addPetStatusDefaultSchema }")
-    expect(hooks.importedZodNames).toStrictEqual(['addPetResponseSchema', 'addPetStatus422Schema', 'addPetStatus5XXSchema', 'addPetStatusDefaultSchema'])
+    expect(hooks.error).toBe("{ 422: addPetStatus422Schema, '5xx': addPetStatus5xxSchema, 'default': addPetStatusDefaultSchema }")
+    expect(hooks.importedZodNames).toStrictEqual(['addPetResponseSchema', 'addPetStatus422Schema', 'addPetStatus5xxSchema', 'addPetStatusDefaultSchema'])
   })
 
   test('the object form wires the request validator from the body schema', () => {

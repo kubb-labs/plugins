@@ -91,9 +91,9 @@ export type {
   ListPaymentsQueryStatusSchemaType,
   ListPaymentsResponseSchemaType,
   ListPaymentsResponsesSchemaType,
-  ListPaymentsStatus2XXHeadersSchemaType,
-  ListPaymentsStatus2XXSchemaType,
-  ListPaymentsStatus4XXSchemaType,
+  ListPaymentsStatus2XxHeadersSchemaType,
+  ListPaymentsStatus2XxSchemaType,
+  ListPaymentsStatus4XxSchemaType,
 } from './zod/payment/listPaymentsSchema'
 export type { PaymentErrorSchemaType } from './zod/paymentErrorSchema'
 export type { PaymentMethodEnumSchemaType } from './zod/paymentMethodEnumSchema'
@@ -330,8 +330,8 @@ export {
   createListPaymentsCookiesFaker,
   createListPaymentsQueryFaker,
   createListPaymentsResponseFaker,
-  createListPaymentsStatus2XXFaker,
-  createListPaymentsStatus4XXFaker,
+  createListPaymentsStatus2xxFaker,
+  createListPaymentsStatus4xxFaker,
 } from './mocks/payment/createListPaymentsFaker'
 export {
   createAddFilesBodyFaker,
@@ -523,9 +523,9 @@ export {
   listPaymentsQueryStatusSchema,
   listPaymentsResponseSchema,
   listPaymentsResponsesSchema,
-  listPaymentsStatus2XXHeadersSchema,
-  listPaymentsStatus2XXSchema,
-  listPaymentsStatus4XXSchema,
+  listPaymentsStatus2xxHeadersSchema,
+  listPaymentsStatus2xxSchema,
+  listPaymentsStatus4xxSchema,
 } from './zod/payment/listPaymentsSchema'
 export { paymentErrorSchema } from './zod/paymentErrorSchema'
 export { paymentMethodEnumSchema } from './zod/paymentMethodEnumSchema'

@@ -52,9 +52,9 @@ export type {
   ListPaymentsQueryStatusSchemaType,
   ListPaymentsResponseSchemaType,
   ListPaymentsResponsesSchemaType,
-  ListPaymentsStatus2XXHeadersSchemaType,
-  ListPaymentsStatus2XXSchemaType,
-  ListPaymentsStatus4XXSchemaType,
+  ListPaymentsStatus2XxHeadersSchemaType,
+  ListPaymentsStatus2XxSchemaType,
+  ListPaymentsStatus4XxSchemaType,
 } from './payment/listPaymentsSchema'
 export type { PaymentErrorSchemaType } from './paymentErrorSchema'
 export type { PaymentMethodEnumSchemaType } from './paymentMethodEnumSchema'
@@ -270,9 +270,9 @@ export {
   listPaymentsQueryStatusSchema,
   listPaymentsResponseSchema,
   listPaymentsResponsesSchema,
-  listPaymentsStatus2XXHeadersSchema,
-  listPaymentsStatus2XXSchema,
-  listPaymentsStatus4XXSchema,
+  listPaymentsStatus2xxHeadersSchema,
+  listPaymentsStatus2xxSchema,
+  listPaymentsStatus4xxSchema,
 } from './payment/listPaymentsSchema'
 export { paymentErrorSchema } from './paymentErrorSchema'
 export { paymentMethodEnumSchema } from './paymentMethodEnumSchema'

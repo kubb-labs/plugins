@@ -27,11 +27,11 @@ export type ListPaymentsCookies = {
  * @example [{"id":1,"method":"card","creditCard":"4111","billingAddress":"Main St 1"}]
  * @type array
  */
-export type ListPaymentsStatus2XX = Array<Payment>
+export type ListPaymentsStatus2xx = Array<Payment>
 
-export type ListPaymentsStatus4XX = PaymentError
+export type ListPaymentsStatus4xx = PaymentError
 
-export type ListPaymentsStatus2XXHeaders = {
+export type ListPaymentsStatus2xxHeaders = {
   /**
    * @description Calls left this hour
    * @example 100
@@ -55,11 +55,11 @@ export type ListPaymentsOptions = {
 }
 
 export type ListPaymentsResponses = {
-  '2XX': ListPaymentsStatus2XX
-  '4XX': ListPaymentsStatus4XX
+  '2xx': ListPaymentsStatus2xx
+  '4xx': ListPaymentsStatus4xx
 }
 
 /**
  * @description Union of all possible responses
  */
-export type ListPaymentsResponse = ListPaymentsStatus2XX
+export type ListPaymentsResponse = ListPaymentsStatus2xx

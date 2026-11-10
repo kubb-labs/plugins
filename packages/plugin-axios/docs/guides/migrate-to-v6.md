@@ -196,7 +196,7 @@ These compile without errors, so check them by hand:
 - An empty body is `undefined` for every media type, text included.
 - Error interceptors also get network errors, aborts, and validation errors, so narrow with `ResponseError.is` before reading `status`. Each handler gets the error the previous one returned.
 - `ResponseError.data` holds the validated body.
-- A `2XX` response key is a success, and range keys such as `4XX` type `status` as the numbers they cover.
+- A `2xx` response key is a success, and range keys such as `4xx` type `status` as the numbers they cover.
 - An auth requirement that needs several schemes sends all of them.
 
 ## From 5.12 or earlier

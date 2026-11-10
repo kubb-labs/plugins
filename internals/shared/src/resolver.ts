@@ -96,14 +96,21 @@ export function createOperationParamResolver(): OperationParamResolver {
  * createResolver<PluginTs>({ response: { ...createOperationResponseResolver(), options(node) {...} }, ... })
  * ```
  */
+/**
+ * Lowercases the status range in a resolved name, `ListPetsStatus2XX` to `ListPetsStatus2xx`. Casing `2xx` itself gives `2Xx`.
+ */
+function lowerRange(name: string): string {
+  return name.replace(/Status([1-5])XX/, 'Status$1xx')
+}
+
 export function createOperationResponseResolver(): OperationResponseResolver {
   return {
     status(node, statusCode) {
-      const name = this.name(`${node.operationId} Status ${statusCode}`)
+      const name = lowerRange(this.name(`${node.operationId} Status ${statusCode}`))
       return this.resolveName({ key: operationKey(node, 'response', 'status', statusCode), name })
     },
     headers(node, statusCode) {
-      const name = this.name(`${node.operationId} Status ${statusCode} Headers`)
+      const name = lowerRange(this.name(`${node.operationId} Status ${statusCode} Headers`))
       return this.resolveName({ key: operationKey(node, 'response', 'headers', statusCode), name })
     },
     body(node) {

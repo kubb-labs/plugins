@@ -14,26 +14,26 @@ export const listPaymentsCookieSessionSchema = z.string().optional()
 
 export type ListPaymentsCookieSessionSchemaType = z.infer<typeof listPaymentsCookieSessionSchema>
 
-export const listPaymentsStatus2XXSchema = z.array(paymentSchema)
+export const listPaymentsStatus2xxSchema = z.array(paymentSchema)
 
-export type ListPaymentsStatus2XXSchemaType = z.infer<typeof listPaymentsStatus2XXSchema>
+export type ListPaymentsStatus2XxSchemaType = z.infer<typeof listPaymentsStatus2xxSchema>
 
-export const listPaymentsStatus4XXSchema = paymentErrorSchema
+export const listPaymentsStatus4xxSchema = paymentErrorSchema
 
-export type ListPaymentsStatus4XXSchemaType = z.infer<typeof listPaymentsStatus4XXSchema>
+export type ListPaymentsStatus4XxSchemaType = z.infer<typeof listPaymentsStatus4xxSchema>
 
-export const listPaymentsStatus2XXHeadersSchema = z.object({
+export const listPaymentsStatus2xxHeadersSchema = z.object({
   'X-Rate-Limit': z.int().describe('Calls left this hour'),
   'X-Next-Page': z.string().optional(),
 })
 
-export type ListPaymentsStatus2XXHeadersSchemaType = z.infer<typeof listPaymentsStatus2XXHeadersSchema>
+export type ListPaymentsStatus2XxHeadersSchemaType = z.infer<typeof listPaymentsStatus2xxHeadersSchema>
 
-export const listPaymentsResponseSchema = listPaymentsStatus2XXSchema
+export const listPaymentsResponseSchema = listPaymentsStatus2xxSchema
 
 export type ListPaymentsResponseSchemaType = z.infer<typeof listPaymentsResponseSchema>
 
-export const listPaymentsErrorSchema = listPaymentsStatus4XXSchema
+export const listPaymentsErrorSchema = listPaymentsStatus4xxSchema
 
 export type ListPaymentsErrorSchemaType = z.infer<typeof listPaymentsErrorSchema>
 
@@ -61,8 +61,8 @@ export const listPaymentsOptionsSchema = z.object({
 export type ListPaymentsOptionsSchemaType = z.infer<typeof listPaymentsOptionsSchema>
 
 export const listPaymentsResponsesSchema = z.object({
-  '2XX': listPaymentsStatus2XXSchema,
-  '4XX': listPaymentsStatus4XXSchema,
+  '2xx': listPaymentsStatus2xxSchema,
+  '4xx': listPaymentsStatus4xxSchema,
 })
 
 export type ListPaymentsResponsesSchemaType = z.infer<typeof listPaymentsResponsesSchema>
