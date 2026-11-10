@@ -1,5 +1,6 @@
+import type { ast } from '@kubb/kit'
 import { describe, expect, test } from 'vitest'
-import { buildSecurityMetadata, getOperationSecurity, resolveSecurityScheme, type SecurityDocument } from './security.ts'
+import { buildSecurityMetadata, getOperationSecurity, resolveCredential } from './security.ts'
 
 describe('buildSecurityMetadata', () => {
   test('returns null when there is no security', () => {
@@ -8,72 +9,52 @@ describe('buildSecurityMetadata', () => {
   })
 })
 
-describe('resolveSecurityScheme', () => {
-  test('maps http basic to basic, case-insensitively', () => {
-    expect(resolveSecurityScheme({ type: 'http', scheme: 'Basic' })).toStrictEqual({ type: 'http', scheme: 'basic' })
+describe('resolveCredential', () => {
+  test('keeps http basic as basic', () => {
+    expect(resolveCredential({ type: 'http', scheme: 'basic' })).toStrictEqual({ type: 'http', scheme: 'basic' })
   })
 
   test('treats an unknown http scheme as bearer', () => {
-    expect(resolveSecurityScheme({ type: 'http', scheme: 'digest' })).toStrictEqual({ type: 'http', scheme: 'bearer' })
+    expect(resolveCredential({ type: 'http', scheme: 'digest' })).toStrictEqual({ type: 'http', scheme: 'bearer' })
   })
 
-  test('returns null for an apiKey the runtime cannot place', () => {
-    expect(resolveSecurityScheme({ type: 'apiKey', name: 'sid', in: 'body' })).toBeNull()
-    expect(resolveSecurityScheme({ type: 'apiKey', in: 'header' })).toBeNull()
+  test('keeps only the fields the runtime reads', () => {
+    expect(resolveCredential({ type: 'oauth2', flows: { clientCredentials: { tokenUrl: 'https://auth.example.com' } } })).toStrictEqual({ type: 'oauth2' })
+    expect(resolveCredential({ type: 'openIdConnect', url: 'https://auth.example.com' })).toStrictEqual({ type: 'openIdConnect' })
   })
 
-  test('returns null for an unresolved $ref or a missing scheme', () => {
-    expect(resolveSecurityScheme({ $ref: '#/components/securitySchemes/bearerAuth' })).toBeNull()
-    expect(resolveSecurityScheme(undefined)).toBeNull()
+  test('returns null for mutualTLS, which the runtime cannot send', () => {
+    expect(resolveCredential({ type: 'mutualTLS' })).toBeNull()
   })
 })
 
 describe('getOperationSecurity', () => {
-  const document: SecurityDocument = {
-    security: [{ globalAuth: [] }],
-    components: {
-      securitySchemes: {
-        globalAuth: { type: 'http', scheme: 'bearer' },
-        petstore_auth: { type: 'oauth2' },
-        api_key: { type: 'apiKey', name: 'api_key', in: 'header' },
-      },
-    },
-    paths: {
-      '/pet': {
-        post: { security: [{ petstore_auth: ['write:pets', 'read:pets'] }] },
-      },
-      '/pet/{petId}': {
-        get: { security: [{ petstore_auth: ['read:pets'] }, { api_key: [] }] },
-        delete: { security: [] },
-      },
-    },
-  }
+  const schemes: Array<ast.AuthScheme> = [
+    { name: 'api_key', credential: { type: 'apiKey', name: 'api_key', in: 'header' } },
+    { name: 'session', credential: { type: 'apiKey', name: 'sid', in: 'cookie' } },
+    { name: 'mtls', credential: { type: 'mutualTLS' } },
+    { name: 'petstore_auth', credential: { type: 'oauth2', flows: {} } },
+  ]
 
-  test('treats an explicit empty operation security as no auth', () => {
-    expect(getOperationSecurity({ document, method: 'DELETE', path: '/pet/{petId}' })).toBeUndefined()
+  test('treats a missing or empty auth list as no auth', () => {
+    expect(getOperationSecurity({ auth: undefined, schemes })).toBeUndefined()
+    expect(getOperationSecurity({ auth: [], schemes })).toBeUndefined()
   })
 
-  test('omits a referenced scheme the runtime cannot place', () => {
-    const bodyDocument: SecurityDocument = {
-      security: [{ weird: [] }],
-      components: { securitySchemes: { weird: { type: 'apiKey', name: 'sid', in: 'body' } } },
-    }
-    expect(getOperationSecurity({ document: bodyDocument, method: 'GET', path: '/pet' })).toBeUndefined()
+  test('omits a requirement with a scheme the runtime cannot place or that is not declared', () => {
+    expect(getOperationSecurity({ auth: [[{ scheme: 'mtls' }], [{ scheme: 'missing' }]], schemes })).toBeUndefined()
   })
 
-  test('groups the schemes one requirement needs together, and drops a requirement with a scheme the runtime cannot place', () => {
-    const both: SecurityDocument = {
-      security: [{ api_key: [], session: [] }, { weird: [], api_key: [] }, { petstore_auth: ['read:pets'] }],
-      components: {
-        securitySchemes: {
-          api_key: { type: 'apiKey', name: 'api_key', in: 'header' },
-          session: { type: 'apiKey', name: 'sid', in: 'cookie' },
-          weird: { type: 'apiKey', name: 'sid', in: 'body' },
-          petstore_auth: { type: 'oauth2' },
-        },
-      },
-    }
-    const security = getOperationSecurity({ document: both, method: 'GET', path: '/pet' })
+  test('groups the schemes one requirement needs together, and drops repeated and unmet requirements', () => {
+    const security = getOperationSecurity({
+      auth: [
+        [{ scheme: 'api_key' }, { scheme: 'session' }],
+        [{ scheme: 'mtls' }, { scheme: 'api_key' }],
+        [{ scheme: 'api_key' }, { scheme: 'session' }],
+        [{ scheme: 'petstore_auth', scopes: ['read:pets'] }],
+      ],
+      schemes,
+    })
     expect(security).toStrictEqual([
       [
         { type: 'apiKey', name: 'api_key', in: 'header' },

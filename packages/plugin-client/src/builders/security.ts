@@ -1,3 +1,5 @@
+import type { ast } from '@kubb/kit'
+
 /**
  * A resolved security scheme. The runtime calls the configured `auth` resolver with this object and places the
  * returned token: `http` bearer/basic on `Authorization`, `apiKey` under `name` in the header/query/cookie, and
@@ -17,26 +19,6 @@ export type Auth = {
  */
 export type SecurityRequirement = Auth | Array<Auth>
 
-/**
- * A single OpenAPI security requirement read from the spec: scheme name to the scopes it needs.
- */
-type OasSecurityRequirement = Record<string, Array<string>>
-
-/**
- * The slice of an OpenAPI document the security derivation reads: the global `security`, the
- * per-operation `security` under `paths`, and the `securitySchemes` map under `components`. Typed
- * locally so this package stays independent of the OpenAPI adapter.
- */
-export type SecurityDocument = {
-  security?: Array<OasSecurityRequirement>
-  components?: {
-    securitySchemes?: Record<string, OasSecurityScheme | { $ref: string } | undefined>
-  }
-  paths?: Record<string, Record<string, { security?: Array<OasSecurityRequirement> } | undefined> | undefined>
-}
-
-type OasSecurityScheme = { type: 'http'; scheme?: string } | { type: 'apiKey'; name?: string; in?: string } | { type: 'oauth2' } | { type: 'openIdConnect' }
-
 function serializeScheme(auth: Auth): string {
   const parts = [`type: '${auth.type}'`]
   if (auth.scheme) parts.push(`scheme: '${auth.scheme}'`)
@@ -51,63 +33,50 @@ function serializeRequirement(requirement: SecurityRequirement): string {
 }
 
 /**
- * Maps an OpenAPI security scheme to the inline `Auth` object, or `null` when the runtime cannot
- * place it (an unresolved `$ref`, or an `apiKey` without a name or outside `header` / `query` /
- * `cookie`). `http` schemes other than `basic` are treated as bearer.
+ * Maps an AST credential to the inline `Auth` object, or `null` for `mutualTLS`, which the runtime cannot send.
+ * `http` schemes other than `basic` are treated as bearer.
  */
-export function resolveSecurityScheme(scheme: OasSecurityScheme | { $ref: string } | undefined): Auth | null {
-  if (!scheme || '$ref' in scheme) return null
-  if (scheme.type === 'apiKey') {
-    if (!scheme.name || (scheme.in !== 'header' && scheme.in !== 'query' && scheme.in !== 'cookie')) return null
-    return { type: 'apiKey', name: scheme.name, in: scheme.in }
-  }
-  if (scheme.type === 'http') return { type: 'http', scheme: scheme.scheme?.toLowerCase() === 'basic' ? 'basic' : 'bearer' }
-  if (scheme.type === 'oauth2') return { type: 'oauth2' }
-  if (scheme.type === 'openIdConnect') return { type: 'openIdConnect' }
+export function resolveCredential(credential: ast.AuthCredential): Auth | null {
+  if (credential.type === 'apiKey') return { type: 'apiKey', name: credential.name, in: credential.in }
+  if (credential.type === 'http') return { type: 'http', scheme: credential.scheme === 'basic' ? 'basic' : 'bearer' }
+  if (credential.type === 'oauth2' || credential.type === 'openIdConnect') return { type: credential.type }
   return null
 }
 
 /**
- * Derives the per-operation security metadata from the OpenAPI document. The operation's own
- * `security` overrides the global `security` (an explicit empty array disables auth). Each requirement becomes one
- * entry: its scheme, or an array of its schemes when it needs several together. A requirement with a scheme the runtime
- * cannot place is left out, since it can never be met, and so is a repeated one.
+ * Derives the per-operation security metadata from `OperationNode.auth` and the document's `meta.auth` schemes. Each
+ * requirement becomes one entry: its scheme, or an array of its schemes when it needs several together. A requirement
+ * with a scheme the runtime cannot place or that is not declared is left out, since it can never be met, and so is a
+ * repeated one.
  *
  * @example
- * `getOperationSecurity({ document, method: 'POST', path: '/pet' })`
+ * `getOperationSecurity({ auth: [[{ scheme: 'bearerAuth' }]], schemes: meta.auth })`
  * `// [{ type: 'http', scheme: 'bearer' }]`
  * @example
- * `// security: [{ api_key: [], session: [] }] gives [[{ type: 'apiKey', ... }, { type: 'apiKey', ... }]]`
+ * `// auth: [[{ scheme: 'api_key' }, { scheme: 'session' }]] gives [[{ type: 'apiKey', ... }, { type: 'apiKey', ... }]]`
  */
 export function getOperationSecurity({
-  document,
-  method,
-  path,
+  auth,
+  schemes,
 }: {
-  document: SecurityDocument | null | undefined
-  method: string
-  path: string
+  auth: Array<ast.AuthRequirement> | undefined
+  schemes: Array<ast.AuthScheme> | undefined
 }): Array<SecurityRequirement> | undefined {
-  if (!document) return undefined
+  if (!auth?.length) return undefined
 
-  const operation = document.paths?.[path]?.[method.toLowerCase()]
-  const requirements = operation?.security ?? document.security
-  if (!requirements?.length) return undefined
-
-  const definitions = document.components?.securitySchemes ?? {}
+  const credentials = new Map(schemes?.map((scheme) => [scheme.name, scheme.credential]))
   const security: Array<SecurityRequirement> = []
   const seen = new Set<string>()
-  for (const requirement of requirements) {
-    const entries = Object.entries(requirement)
-    const key = entries.map(([schemeName]) => schemeName).join('\0')
-    if (!entries.length || seen.has(key)) continue
+  for (const requirement of auth) {
+    const key = requirement.map(({ scheme }) => scheme).join('\0')
+    if (!requirement.length || seen.has(key)) continue
     seen.add(key)
-    const schemes = entries.map(([schemeName, scopes]) => {
-      const auth = resolveSecurityScheme(definitions[schemeName])
-      return auth && scopes.length ? { ...auth, scopes } : auth
+    const resolved = requirement.map(({ scheme, scopes }) => {
+      const credential = credentials.get(scheme)
+      const entry = credential ? resolveCredential(credential) : null
+      return entry && scopes?.length ? { ...entry, scopes } : entry
     })
-    const resolved = schemes.filter((scheme): scheme is Auth => scheme !== null)
-    if (resolved.length !== schemes.length) continue
+    if (!resolved.every((entry): entry is Auth => entry !== null)) continue
     security.push(resolved.length === 1 ? resolved[0]! : resolved)
   }
 
