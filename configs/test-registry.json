@@ -15,7 +15,7 @@
   "packages/plugin-axios/templates/client.test.ts": "Runtime axios transport shipped to users: status split, adapters, interceptors, stream fallbacks; nothing else tests it.",
   "packages/plugin-client/src/builders/callConfig.test.ts": "Regression #1332: a response that mixes a binary body with an event stream gets a content-type map, not one responseType.",
   "packages/plugin-client/src/builders/contentType.test.ts": "Pins the Accept: text/event-stream contentType literal a stream call sends, with and without a request type choice; no snapshot asserts the merge.",
-  "packages/plugin-client/src/builders/security.test.ts": "Branchy scheme resolver: basic, digest, apiKey in body, $ref, global fallback; snapshots cover only three happy paths.",
+  "packages/plugin-client/src/builders/security.test.ts": "Branchy credential resolver: basic, digest, mutualTLS, undeclared and repeated requirements; snapshots cover only three happy paths.",
   "packages/plugin-client/src/builders/server.test.ts": "Branchy server pick: operation over path item, index fallback, relative and templated URLs skipped; snapshots cover one path and one operation server.",
   "packages/plugin-client/src/builders/styles.test.ts": "Branchy: key quoting, allowReserved only for query, querystring flag, body encoding; pins the #1348 regression.",
   "packages/plugin-client/src/builders/validator.test.ts": "Branchy hook wiring per validator form; 3.0.x zodParams snapshots cover only zod and the full object.",

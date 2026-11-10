@@ -7,7 +7,7 @@ import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
-import { getOperationSecurity, type SecurityDocument } from '../builders/security.ts'
+import { getOperationSecurity } from '../builders/security.ts'
 import { getOperationBaseURL, type ServerDocument, type ServerOptions } from '../builders/server.ts'
 import { buildValidatorHooks } from '../builders/validator.ts'
 import { Operation } from '../components/Operation.tsx'
@@ -65,11 +65,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
             : null,
       } as const
 
-      const security = getOperationSecurity({
-        document: ctx.adapter.document as SecurityDocument | null | undefined,
-        method: node.method,
-        path: node.path,
-      })
+      const security = getOperationSecurity({ auth: node.auth, schemes: ctx.meta.auth })
       const baseURL = getOperationBaseURL({
         document: ctx.adapter.document as ServerDocument | null | undefined,
         method: node.method,

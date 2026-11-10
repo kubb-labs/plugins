@@ -5,7 +5,6 @@ import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation, renderGeneratorOperations } from '#mocks'
 import { resolverClient } from '../resolver.ts'
-import type { SecurityDocument } from '../builders/security.ts'
 import type { ServerDocument } from '../builders/server.ts'
 import type { ClientOptions, ClientResolvedOptions, ResolverClient } from '../types.ts'
 import { createClientGenerator } from './clientGenerator.tsx'
@@ -222,26 +221,15 @@ const streamChatNode = ast.factory.createOperation({
   ],
 })
 
-const securityDocument: SecurityDocument = {
-  security: [{ bearerAuth: [] }],
-  components: {
-    securitySchemes: {
-      bearerAuth: { type: 'http', scheme: 'bearer' },
-      petstore_auth: { type: 'oauth2' },
-      api_key: { type: 'apiKey', name: 'api_key', in: 'header' },
-    },
-  },
-  paths: {
-    '/pet': {
-      post: { security: [{ petstore_auth: ['write:pets', 'read:pets'] }] },
-    },
-    '/pet/{petId}': {
-      get: { security: [{ petstore_auth: ['read:pets'] }, { api_key: [] }] },
-    },
-  },
+const securityMeta: ast.InputMeta = {
+  auth: [
+    { name: 'bearerAuth', credential: { type: 'http', scheme: 'bearer' } },
+    { name: 'petstore_auth', credential: { type: 'oauth2', flows: {} } },
+    { name: 'api_key', credential: { type: 'apiKey', name: 'api_key', in: 'header' } },
+  ],
 }
 
-function mockedAdapterWithDocument(document: SecurityDocument | ServerDocument): Adapter {
+function mockedAdapterWithDocument(document: ServerDocument): Adapter {
   return { ...createMockedAdapter(), document } as Adapter
 }
 
@@ -260,11 +248,21 @@ describe('clientGenerator operation', () => {
     { name: 'streamChatTypedEvents', node: streamChatNode, options: {} },
     // returnType: 'data' unwraps the resolved call down to the bare success body.
     // Operation-level security overriding the global default, oauth2 reduced to bearer.
-    { name: 'addPetWithSecurity', node: createPetNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
-    // No operation-level security: falls back to the document's global `bearerAuth`.
-    { name: 'findPetsByTagsWithGlobalSecurity', node: findPetsByTagsNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
+    {
+      name: 'addPetWithSecurity',
+      node: { ...createPetNode, auth: [[{ scheme: 'petstore_auth', scopes: ['write:pets', 'read:pets'] }]] },
+      options: {},
+      meta: securityMeta,
+    },
+    // The document's global `bearerAuth`, which the adapter copies onto an operation without its own `security`.
+    { name: 'findPetsByTagsWithGlobalSecurity', node: { ...findPetsByTagsNode, auth: [[{ scheme: 'bearerAuth' }]] }, options: {}, meta: securityMeta },
     // Two requirements referencing two different schemes (oauth2 bearer + apiKey header).
-    { name: 'getPetByIdWithMultipleSchemes', node: getPetByIdNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
+    {
+      name: 'getPetByIdWithMultipleSchemes',
+      node: { ...getPetByIdNode, auth: [[{ scheme: 'petstore_auth', scopes: ['read:pets'] }], [{ scheme: 'api_key' }]] },
+      options: {},
+      meta: securityMeta,
+    },
     // A path-level `servers` entry becomes the call's default `baseURL`, before `...config` so a per-call one still wins.
     {
       name: 'streamEventsWithPathServer',
@@ -272,7 +270,13 @@ describe('clientGenerator operation', () => {
       options: {},
       adapter: mockedAdapterWithDocument({ paths: { '/events': { servers: [{ url: 'https://echo.websocket.org' }] } } }),
     },
-  ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginFetch['resolvedOptions']>; adapter?: Adapter }>
+  ] as const satisfies Array<{
+    name: string
+    node: ast.OperationNode
+    options: Partial<PluginFetch['resolvedOptions']>
+    adapter?: Adapter
+    meta?: ast.InputMeta
+  }>
 
   test.each(testData)('$name', async (props) => {
     const options: PluginFetch['resolvedOptions'] = { ...defaultOptions, ...props.options }
@@ -285,6 +289,7 @@ describe('clientGenerator operation', () => {
     await renderGeneratorOperation(clientGenerator, props.node, {
       config: testConfig,
       adapter: 'adapter' in props ? props.adapter : createMockedAdapter(),
+      meta: 'meta' in props ? props.meta : undefined,
       driver,
       plugin,
       options,
