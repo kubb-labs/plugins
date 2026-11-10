@@ -4,7 +4,7 @@
  * Source: text content
  */
 
-import type { GetThingStatus200 } from './GetThing'
+import type { GetThingStatus200 } from './GetThingOperation'
 import { http, HttpResponse } from 'msw/http'
 
 export function getThingHandlerResponse200(data: GetThingStatus200) {

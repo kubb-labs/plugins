@@ -1,5 +1,5 @@
 import { resolveClientOperation, resolveOperationTypes } from '@internals/client'
-import { operationFileEntry, resolveDependencyOperationFile } from '@internals/shared'
+import { operationFileEntry, resolveOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
@@ -34,8 +34,9 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     const meta = {
       name: resolver.handler.name(node),
       file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
-      fileTs: resolveDependencyOperationFile({
+      fileTs: resolveOperationFile({
         memo: ctx.memo,
+        schemas: ctx.driver.inputNode?.schemas,
         node,
         resolver: tsResolver,
         root,

@@ -1,0 +1,37 @@
+openapi: 3.0.3
+info: { title: File name collisions, version: '1' }
+paths:
+  /points/{id}:
+    get:
+      operationId: point
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PointGeoJson' }
+  /stories:
+    get:
+      operationId: office_weatherstory
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OfficeWeatherStory' }
+components:
+  schemas:
+    Point:
+      type: object
+      properties:
+        gridId: { type: string }
+    PointGeoJson:
+      type: object
+      properties:
+        properties: { $ref: '#/components/schemas/Point' }
+    OfficeWeatherStory:
+      type: object
+      properties:
+        title: { type: string }

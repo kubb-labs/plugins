@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { resolveOperationTypes } from '@internals/client'
-import { getEventStream, operationFileEntry, operationKey, resolveDependencyOperationFile } from '@internals/shared'
+import { getEventStream, operationFileEntry, operationKey, resolveOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -44,8 +44,9 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       const meta = {
         name: resolver.resolveName({ key: operationKey(node), name: operationName }),
         file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
-        fileTypes: resolveDependencyOperationFile({
+        fileTypes: resolveOperationFile({
           memo: ctx.memo,
+          schemas: ctx.driver.inputNode?.schemas,
           node,
           resolver: types.resolver,
           root,
@@ -54,8 +55,11 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
         }),
         fileZod:
           zodResolver && pluginZod?.options
-            ? zodResolver.file({
-                ...operationFileEntry(node, node.operationId),
+            ? resolveOperationFile({
+                memo: ctx.memo,
+                schemas: ctx.driver.inputNode?.schemas,
+                node,
+                resolver: zodResolver,
                 root,
                 output: pluginZod.options.output ?? output,
                 group: pluginZod.options?.group ?? undefined,

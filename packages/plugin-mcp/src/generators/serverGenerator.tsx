@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { getOperationParameters, getPrimarySuccessResponse, operationFileEntry } from '@internals/shared'
+import { getOperationParameters, getPrimarySuccessResponse, operationFileEntry, resolveOperationFile } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -49,10 +49,12 @@ export const serverGenerator = defineGenerator<PluginMcp>({
     const operationsMapped = nodes.filter(ast.isHttpOperationNode).map((node) => {
       const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = getOperationParameters(node)
 
-      const fileEntry = operationFileEntry(node, node.operationId)
-      const mcpFile = resolver.file({ ...fileEntry, root, output, group: group ?? undefined })
-      const zodFile = zodResolver.file({
-        ...fileEntry,
+      const mcpFile = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
+      const zodFile = resolveOperationFile({
+        memo: ctx.memo,
+        schemas: driver.inputNode?.schemas,
+        node,
+        resolver: zodResolver,
         root,
         output: pluginZod.options?.output ?? output,
         group: pluginZod.options?.group ?? undefined,

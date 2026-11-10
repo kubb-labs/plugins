@@ -58,6 +58,21 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
+  // ─── operation files that collide with schema files ──────────────────────
+  {
+    /** Operation `point` and schema `Point` share a file name, `office_weatherstory` and `OfficeWeatherStory` differ only in case. */
+    name: 'operationAndSchemaFiles',
+    config: {
+      root: __dirname,
+      input: '../../schemas/3.0.x/fileNameCollisions.yaml',
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false }),
+      parsers: [parserTs()],
+      storage: fsStorage(),
+      plugins: allGenerators(pluginFetch({ validator: 'zod' })),
+    },
+  },
+
   // ─── components, operations and inline enums competing for one name ──────
   {
     /** A custom `name` maps distinct schemas onto one identifier, so the allocator has to split them again. */
@@ -97,6 +112,8 @@ describe(`name collisions ${version}`, () => {
 
     expect(files.length).toBeGreaterThan(0)
     expect(Diagnostics.hasError(diagnostics)).toBe(false)
+    // Paths that differ only in case overwrite each other on macOS and Windows.
+    expect(new Set(files.map((file) => file.path.toLowerCase())).size).toBe(files.length)
 
     for (const file of files) {
       const fileContent = await fs.readFile(file.path, 'utf-8')

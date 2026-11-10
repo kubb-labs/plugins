@@ -1,4 +1,4 @@
-import { getEnumNames, getOperationSuccessResponses, resolveDependencyOperationFile, resolveResponseTypes } from '@internals/shared'
+import { getEnumNames, getOperationSuccessResponses, resolveOperationFile, resolveResponseTypes } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -34,11 +34,11 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       fakerPlugin && fakerResolver
         ? {
             name: fakerResolver.response.response(node),
-            file: fakerResolver.file({
-              name: node.operationId,
-              extname: '.ts',
-              tag: node.tags[0] ?? 'default',
-              path: node.path,
+            file: resolveOperationFile({
+              memo: ctx.memo,
+              schemas: driver.inputNode?.schemas,
+              node,
+              resolver: fakerResolver,
               root,
               output: fakerPlugin.options?.output ?? output,
               group: fakerPlugin.options?.group ?? undefined,
@@ -50,8 +50,9 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const tsResolver = driver.getResolver(pluginTsName)
 
     const type = {
-      file: resolveDependencyOperationFile({
+      file: resolveOperationFile({
         memo: ctx.memo,
+        schemas: ctx.driver.inputNode?.schemas,
         node,
         resolver: tsResolver,
         root,

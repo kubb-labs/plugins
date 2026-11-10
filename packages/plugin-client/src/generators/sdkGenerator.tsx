@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { type OperationTypeNames, type OperationTypeSource, resolveOperationTypes } from '@internals/client'
-import { getEventStream, isEventStream, operationFileEntry, operationKey } from '@internals/shared'
+import { getEventStream, isEventStream, operationKey, resolveOperationFile } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
 import { ast, camelCase, defineGenerator, Diagnostics } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
@@ -63,16 +63,23 @@ function buildControllers(
   const server = (ctx.adapter.options as { server?: ServerOptions } | undefined)?.server
 
   function buildOperationData(node: ast.OperationNode): OperationData {
-    const typeFile = types.resolver.file({
-      ...operationFileEntry(node, node.operationId),
+    const schemas = driver.inputNode?.schemas
+    const typeFile = resolveOperationFile({
+      memo: ctx.memo,
+      schemas,
+      node,
+      resolver: types.resolver,
       root,
       output: types.output ?? output,
       group: types.group,
     })
     const zodFile =
       zodResolver && pluginZod?.options
-        ? zodResolver.file({
-            ...operationFileEntry(node, node.operationId),
+        ? resolveOperationFile({
+            memo: ctx.memo,
+            schemas,
+            node,
+            resolver: zodResolver,
             root,
             output: pluginZod.options?.output ?? output,
             group: pluginZod.options?.group ?? undefined,

@@ -1,4 +1,12 @@
-import { buildOptionsSchema, buildResponses, getEnumNames, getOperationParameters, resolveContentTypeVariants, toResponseContent } from '@internals/shared'
+import {
+  buildOptionsSchema,
+  buildResponses,
+  getEnumNames,
+  getOperationParameters,
+  resolveContentTypeVariants,
+  resolveOperationFile,
+  toResponseContent,
+} from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
@@ -73,7 +81,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const inline = operations === 'inline'
 
     const meta = {
-      file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
+      file: resolveOperationFile({ memo: ctx.memo, schemas: ctx.driver.inputNode?.schemas, node, resolver, root, output, group }),
     } as const
 
     // Enum schema names, so the ref handler and the imports

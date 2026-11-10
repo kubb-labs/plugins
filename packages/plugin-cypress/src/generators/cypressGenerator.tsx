@@ -1,4 +1,4 @@
-import { operationKey, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
+import { operationKey, resolveOperationFile, resolveOperationTypeNames } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -28,8 +28,9 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     const meta = {
       name: resolver.resolveName({ key: operationKey(node), name }),
       file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
-      fileTs: resolveDependencyOperationFile({
+      fileTs: resolveOperationFile({
         memo: ctx.memo,
+        schemas: ctx.driver.inputNode?.schemas,
         node,
         resolver: tsResolver,
         root,

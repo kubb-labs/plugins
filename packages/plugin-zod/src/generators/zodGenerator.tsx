@@ -7,6 +7,7 @@ import {
   getSuccessResponses,
   isSuccessStatusCode,
   resolveContentTypeVariants,
+  resolveOperationFile,
   toResponseContent,
 } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
@@ -148,7 +149,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
 
     const meta = {
-      file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
+      file: resolveOperationFile({ memo: ctx.memo, schemas: ctx.driver.inputNode?.schemas, node, resolver, root, output, group }),
     } as const
 
     const cyclicSchemas = getCircularNames(ctx)
