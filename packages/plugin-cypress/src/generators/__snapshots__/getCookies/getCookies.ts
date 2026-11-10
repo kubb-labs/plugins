@@ -7,7 +7,7 @@
 import type { GetCookiesOptions, GetCookiesResponse } from './GetCookies'
 
 export function getCookies({ headers, cookies }: GetCookiesOptions = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetCookiesResponse> {
-  const cookie = Object.entries(cookies ?? {})
+  const cookie = Object.entries<unknown>(cookies ?? {})
     .filter(([, value]) => value != null)
     .map(
       ([name, value]) =>

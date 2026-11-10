@@ -37,7 +37,7 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   const encodeCookie =
     "encodeURIComponent(value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value))"
   // Built first and sent only when non-empty, so a call without cookies keeps the cookies Cypress attaches itself.
-  const cookieLine = `const cookie = Object.entries(cookies ?? {}).filter(([, value]) => value != null).map(([name, value]) => \`\${name}=\${${encodeCookie}}\`).join('; ')\n`
+  const cookieLine = `const cookie = Object.entries<unknown>(cookies ?? {}).filter(([, value]) => value != null).map(([name, value]) => \`\${name}=\${${encodeCookie}}\`).join('; ')\n`
 
   const requestOptions = [
     `method: '${node.method}'`,
