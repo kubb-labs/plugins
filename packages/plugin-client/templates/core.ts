@@ -9,9 +9,9 @@ import type { ValidateOption, ValidationErrorHandler } from './standardSchema.ts
 export * from './mediaTypes.ts'
 
 /**
- * The status keys that count as success. `2xx` covers every 2xx status. Generated code writes it in lower case, and `2XX` is read too.
+ * The status keys that count as success. `2xx` covers every 2xx status.
  */
-export type SuccessStatusCode = '200' | '201' | '202' | '203' | '204' | '205' | '206' | '207' | '208' | '226' | '2xx' | '2XX'
+export type SuccessStatusCode = '200' | '201' | '202' | '203' | '204' | '205' | '206' | '207' | '208' | '226' | '2xx'
 
 export type SuccessOf<TResponses> = TResponses[Extract<keyof TResponses, SuccessStatusCode>]
 
