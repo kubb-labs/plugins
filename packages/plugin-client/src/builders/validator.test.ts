@@ -41,9 +41,8 @@ const putEvent = ast.factory.createOperation({
   responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'ok' })],
 })
 
-// The AST type has no lower-case range such as `4xx`, but the adapter passes one a spec writes through as is.
-function toResponse(statusCode: string) {
-  return ast.factory.createResponse({ statusCode: statusCode as ast.StatusCode, schema: ast.factory.createSchema({ type: 'object', properties: [] }) })
+function toResponse(statusCode: ast.StatusCode) {
+  return ast.factory.createResponse({ statusCode, schema: ast.factory.createSchema({ type: 'object', properties: [] }) })
 }
 
 describe('buildValidatorHooks', () => {
@@ -59,7 +58,7 @@ describe('buildValidatorHooks', () => {
       ...addPetWithError,
       responses: [
         ...addPetWithError.responses,
-        toResponse('5XX'),
+        toResponse('5xx'),
         toResponse('4xx'),
         toResponse('default'),
         ast.factory.createResponse({ statusCode: '409', description: 'no body' }),

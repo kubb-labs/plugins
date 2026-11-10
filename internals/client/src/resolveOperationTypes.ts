@@ -1,4 +1,3 @@
-import { toStatusKey } from '@internals/shared'
 import { type ast, Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
 import { pluginTsName, type ResolverTs } from '@kubb/plugin-ts'
 import type { PluginZod, ResolverZod } from '@kubb/plugin-zod'
@@ -39,7 +38,7 @@ function getResponseHeaderTypes({ node, types }: { node: ast.OperationNode; type
 
 /** The headers type argument of `RequestResult`, such as `{ '200': LoginUserStatus200Headers }`, or `null` when no response declares headers. */
 export function buildResponseHeadersType({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
-  const entries = getResponseHeaderTypes({ node, types }).map(([statusCode, name]) => `'${toStatusKey(statusCode)}': ${name}`)
+  const entries = getResponseHeaderTypes({ node, types }).map(([statusCode, name]) => `'${statusCode}': ${name}`)
   return entries.length ? `{ ${entries.join('; ')} }` : null
 }
 

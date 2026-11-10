@@ -2,9 +2,9 @@ import { getStatusClass, toResponseContent } from '@internals/shared'
 import { jsStringEscape, objectKey, singleQuote } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
-/** The status a mock responds with. A range such as `2XX` mocks the first code of its class, `200`. */
+/** The status a mock responds with. A range such as `2xx` mocks the first code of its class, `200`. */
 export function getMockStatus(statusCode: ast.StatusCode): number {
-  return /XX$/i.test(statusCode) ? (getStatusClass(statusCode) ?? 2) * 100 : Number(statusCode)
+  return /xx$/.test(statusCode) ? (getStatusClass(statusCode) ?? 2) * 100 : Number(statusCode)
 }
 
 /** The declared headers a mock sends, each with its example's `serializedValue` or `value`, else its schema's `default` or first example. */

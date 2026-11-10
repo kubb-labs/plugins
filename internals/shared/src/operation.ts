@@ -684,7 +684,7 @@ export function buildResponses(node: ast.OperationNode, resolver: ResponseStatus
     primitive: 'object',
     properties: node.responses.map((res) =>
       ast.factory.createProperty({
-        name: toStatusKey(res.statusCode),
+        name: String(res.statusCode),
         required: true,
         schema: buildResponseRecordEntry(node, res, resolver),
       }),
@@ -699,21 +699,14 @@ export function getStatusCodeNumber(statusCode: ast.StatusCode | number | string
 }
 
 /**
- * The class digit of a status code or range, such as `2` for `201` and `2XX`, or `null` for `default`.
+ * The class digit of a status code or range, such as `2` for `201` and `2xx`, or `null` for `default`.
  */
 export function getStatusClass(statusCode: ast.StatusCode | number | string): number | null {
-  const range = /^([1-5])XX$/i.exec(String(statusCode))
+  const range = /^([1-5])xx$/.exec(String(statusCode))
   if (range) return Number(range[1])
   const code = getStatusCodeNumber(statusCode)
 
   return code === null ? null : Math.floor(code / 100)
-}
-
-/**
- * A status as generated code writes it, with a range in lower case: `2XX` becomes `2xx`.
- */
-export function toStatusKey(statusCode: ast.StatusCode | number | string): string {
-  return String(statusCode).toLowerCase()
 }
 
 export function isSuccessStatusCode(statusCode: ast.StatusCode | number | string): boolean {

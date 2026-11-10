@@ -5,7 +5,7 @@ import { getExampleBody, getMockHeaders, getMockStatus, responseLiteral } from '
 describe('getMockStatus', () => {
   test('mocks a range with the first code of its class', () => {
     expect(getMockStatus('201')).toBe(201)
-    expect(getMockStatus('2XX')).toBe(200)
+    expect(getMockStatus('2xx')).toBe(200)
   })
 })
 
