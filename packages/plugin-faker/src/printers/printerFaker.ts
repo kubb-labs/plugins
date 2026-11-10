@@ -68,6 +68,19 @@ export type PrinterFakerFactory = ast.PrinterFactoryOptions<'faker', PrinterFake
 const integerFormats: ReadonlySet<string> = new Set(['int32', 'int64', 'uint64'])
 
 const maxInt32 = 2_147_483_647
+// The largest value of a 32-bit format, which faker's default `max` exceeds.
+const formatMax: Record<string, number> = { int32: maxInt32, uint32: 4_294_967_295 }
+
+/**
+ * Whether a ref points back into its own cycle: at the schema being printed, or from one cyclic schema at another. Such a
+ * ref is left empty, so a mock of a recursive schema is finite and can be serialized.
+ */
+function isCyclicRef(node: ast.SchemaNode, { schemaName, cyclicSchemas }: PrinterFakerOptions): boolean {
+  if (node.type !== 'ref' || !schemaName) return false
+  const refName = ast.resolveRefName(node)
+
+  return refName === schemaName || Boolean(refName && cyclicSchemas?.has(schemaName) && cyclicSchemas.has(refName))
+}
 
 /**
  * `faker.number.float()` or `faker.number.int()`, with `min` and `max` passed only when set, moved inside an exclusive
@@ -201,8 +214,9 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         }
 
         const { min, max } = node
-        if (min !== undefined && max !== undefined) return `faker.string.alpha({ length: { min: ${min}, max: ${max} } })`
-        if (max !== undefined || min !== undefined) return `faker.string.alpha({ length: ${max ?? min} })`
+        // A string as long as a large `maxLength` makes a mock of megabytes, so the length stays within 100 of the minimum.
+        if (max !== undefined) return `faker.string.alpha({ length: { min: ${min ?? Math.min(1, max)}, max: ${Math.min(max, (min ?? 0) + 100)} } })`
+        if (min !== undefined) return `faker.string.alpha({ length: ${min} })`
 
         return 'faker.string.alpha()'
       },
@@ -210,9 +224,14 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       url: () => 'faker.internet.url()',
       uuid: () => 'faker.string.uuid()',
       number: (node) => numberCall('float', node),
-      integer: (node) => numberCall('int', node),
-      bigint: () => 'faker.number.bigInt()',
-      blob: () => 'faker.image.url() as unknown as Blob',
+      integer: (node) =>
+        numberCall('int', node.format && node.format in formatMax ? { ...node, max: Math.min(node.max ?? Infinity, formatMax[node.format]!) } : node),
+      bigint({ min, max }) {
+        const args = [min !== undefined && `min: ${min}n`, max !== undefined && `max: ${max}n`].filter(Boolean).join(', ')
+
+        return `faker.number.bigInt(${args ? `{ ${args} }` : ''})`
+      },
+      blob: () => 'new Blob([faker.string.alpha()])',
       datetime(node) {
         const parser = this.options.dateParser ?? 'faker'
         if (parser === 'faker') return 'faker.date.anytime().toISOString()'
@@ -243,7 +262,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           })
         }
 
-        if (this.options.schemaName && refName === this.options.schemaName) {
+        if (isCyclicRef(node, this.options)) {
           return this.options.typeName ? `undefined as unknown as ${this.options.typeName}` : 'undefined as unknown'
         }
 
@@ -313,6 +332,9 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return !objectMembers.length || items.length === 1 ? items.at(-1)! : `{...${items.join(', ...')}}`
       },
       array(node): string {
+        // An array of items that would recurse stays empty, which is valid where a list of `undefined` is not.
+        if (node.items?.length === 1 && isCyclicRef(node.items[0]!, this.options)) return this.options.typeName ? `[] as ${this.options.typeName}` : '[]'
+
         const items: Array<string> = mapSchemaItems(node, (member) =>
           printNested(member, {
             typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[number]` : undefined,
@@ -328,9 +350,9 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
         const { min, max } = node
         const item = items[0]
-        if (min !== undefined && max !== undefined) return `faker.helpers.multiple(() => (${item}), { count: { min: ${min}, max: ${max} }})`
+        // Like a string, a list stays within 100 items of its minimum, however large `maxItems` is.
+        if (max !== undefined) return `faker.helpers.multiple(() => (${item}), { count: { min: ${min ?? 0}, max: ${Math.min(max, (min ?? 0) + 100)} }})`
         if (min !== undefined) return `faker.helpers.multiple(() => (${item}), { count: ${min} })`
-        if (max !== undefined) return `faker.helpers.multiple(() => (${item}), { count: { min: 0, max: ${max} }})`
 
         return `faker.helpers.multiple(() => (${item}))`
       },

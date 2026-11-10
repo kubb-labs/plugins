@@ -119,7 +119,7 @@ Library used to generate strings that satisfy a regex `pattern` in the spec.
 ::field-group
 
 :::field{name="'faker'"}
-Default value. Generates `faker.helpers.fromRegExp(/pattern/)` without an extra dependency. Faker does not support shorthand classes such as `\d`, `\w`, or `\s`, so use `'randexp'` for patterns that contain them.
+Default value. Generates `faker.helpers.fromRegExp(/pattern/)` without an extra dependency. Faker does not support groups, alternation (`a|b`), anchors, or shorthand classes such as `\d`, `\w`, or `\s`, so use `'randexp'` for patterns that contain them.
 :::
 
 :::field{name="'randexp'"}

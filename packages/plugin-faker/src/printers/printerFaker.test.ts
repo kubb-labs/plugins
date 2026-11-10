@@ -86,6 +86,40 @@ describe('printerFaker', () => {
     expect(printerFaker({ resolver: resolverFaker }).print(node)).toMatchInlineSnapshot(`"faker.number.bigInt().toString()"`)
   })
 
+  test('keeps 32-bit and 64-bit integers inside their format and bounds', () => {
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
+
+    expect(print(ast.factory.createSchema({ type: 'integer', format: 'int32' }))).toBe('faker.number.int({ max: 2147483647 })')
+    expect(print(ast.factory.createSchema({ type: 'integer', format: 'int32', max: 10 }))).toBe('faker.number.int({ max: 10 })')
+    expect(print(ast.factory.createSchema({ type: 'integer', format: 'uint32' }))).toBe('faker.number.int({ max: 4294967295 })')
+    expect(print(ast.factory.createSchema({ type: 'bigint', min: 1, max: 10 }))).toBe('faker.number.bigInt({ min: 1n, max: 10n })')
+    expect(print(ast.factory.createSchema({ type: 'bigint' }))).toBe('faker.number.bigInt()')
+  })
+
+  test('keeps a string and a list near their minimum length, however large the maximum is', () => {
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
+    const item = ast.factory.createSchema({ type: 'string' })
+
+    expect(print(ast.factory.createSchema({ type: 'string', max: 10_485_760 }))).toBe('faker.string.alpha({ length: { min: 1, max: 100 } })')
+    expect(print(ast.factory.createSchema({ type: 'string', min: 5, max: 8 }))).toBe('faker.string.alpha({ length: { min: 5, max: 8 } })')
+    expect(print(ast.factory.createSchema({ type: 'string', max: 0 }))).toBe('faker.string.alpha({ length: { min: 0, max: 0 } })')
+    expect(print(ast.factory.createSchema({ type: 'string', min: 3 }))).toBe('faker.string.alpha({ length: 3 })')
+    expect(print(ast.factory.createSchema({ type: 'array', items: [item], max: 100_000 }))).toBe(
+      'faker.helpers.multiple(() => (faker.string.alpha()), { count: { min: 0, max: 100 }})',
+    )
+  })
+
+  test('mocks a binary value as a Blob, and leaves a ref back into its own cycle empty', () => {
+    const self = ast.factory.createSchema({ type: 'ref', name: 'Tree', ref: '#/components/schemas/Tree' })
+    const other = ast.factory.createSchema({ type: 'ref', name: 'Leaf', ref: '#/components/schemas/Leaf' })
+    const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker, schemaName: 'Tree', cyclicSchemas: new Set(['Tree', 'Leaf']) }).print(node)
+
+    expect(printerFaker({ resolver: resolverFaker }).print(ast.factory.createSchema({ type: 'blob' }))).toBe('new Blob([faker.string.alpha()])')
+    expect(print(ast.factory.createSchema({ type: 'array', items: [self] }))).toBe('[]')
+    expect(print(ast.factory.createSchema({ type: 'array', items: [other] }))).toBe('[]')
+    expect(print(other)).toBe('undefined as unknown')
+  })
+
   test('keeps integers and floats inside exclusive bounds', () => {
     const print = (node: ast.SchemaNode) => printerFaker({ resolver: resolverFaker }).print(node)
 
