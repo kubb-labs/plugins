@@ -37,6 +37,7 @@
   "packages/plugin-mcp/src/plugin.test.ts": "Plugin lifecycle: KUBB_MISSING_DEPENDENCY when plugin-zod is absent; snapshot suites never hit error paths.",
   "packages/plugin-msw/src/generators/mswGenerator.test.tsx": "Runs generated handlers in real MSW (QUERY method, faker fallback) and typechecks request body types.",
   "packages/plugin-msw/src/plugin.test.ts": "Pins the missing plugin-faker diagnostic for parser faker.",
+  "packages/plugin-msw/src/utils.test.ts": "Pins the spec example body (serialized JSON parsed once, the sent content type's entry), simple-style headers and quoted header values.",
   "packages/plugin-react-query/src/generators/customHookOptionsFileGenerator.test.tsx": "Rendered starter file placement and skip rules (hooks false, importPath outside output) not pinned by snapshots.",
   "packages/plugin-react-query/src/generators/hookOptionsGenerator.test.tsx": "Rendered hook options map and override query false skip; snapshots never set customOptions with an override.",
   "packages/plugin-react-query/src/generators/infiniteQueryGenerator.test.tsx": "Rendered infinite hooks with nextParam, initialPageParam, pageParamCode, hooks false; the snapshot suite pins one infinite config.",
