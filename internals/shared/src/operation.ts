@@ -21,29 +21,54 @@ export function operationFileEntry(node: ast.OperationNode, name: string, extnam
 }
 
 /**
- * Resolves a dependency plugin's generated file for `node.operationId`, cached in `memo` (the
- * build's `ctx.memo`) under the resolver's own plugin name and the operation. Several dependents reading the
- * same dependency for the same operation in one pass (a query plugin's several hook generators, the
- * MCP handler, ...) share one computed name and path instead of each calling `resolver.file` again.
+ * Resolves the file a schema-emitting plugin (`plugin-ts`, `plugin-zod`, `plugin-faker`) writes
+ * `node` to, cached in `ctx.memo` under the resolver's plugin name and the
+ * operation. The plugin itself and every plugin that imports from it call this, so they all get
+ * the same path.
  *
- * @example Cache `plugin-ts`'s file for the current operation
+ * When that path matches the file of a component schema in `ctx.driver.inputNode`, ignoring case, the file name
+ * gets an `Operation` suffix: operation `point` goes to `PointOperation.ts` next to schema `Point.ts`.
+ * Otherwise the two merge into one file, or overwrite each other on a case-insensitive file system.
+ * Only the file name changes. The declarations keep their names.
+ *
+ * @example Resolve `plugin-ts`'s file for the current operation
  * ```ts
- * const fileTs = resolveDependencyOperationFile({ memo: ctx.memo, node, resolver: tsResolver, root, output })
+ * const fileTs = resolveOperationFile({ ctx, node, resolver: tsResolver, root, output })
  * ```
  */
-export function resolveDependencyOperationFile(options: {
-  memo: Memo
+export function resolveOperationFile(options: {
+  ctx: { memo: Memo; driver: { inputNode?: { schemas: ReadonlyArray<ast.SchemaNode> } | null } }
   node: ast.OperationNode
   resolver: Pick<Resolver, 'file' | 'pluginName'>
   root: string
   output: Output
   group?: Group | null
 }): ast.FileNode {
-  const { memo, node, resolver, root, output, group } = options
+  const { ctx, node, resolver, root, output } = options
+  const { memo } = ctx
+  const location = { root, output, group: options.group ?? undefined }
 
-  return memo(`${resolver.pluginName}:operationFile:${node.operationId}`, () =>
-    resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
-  )
+  return memo(`${resolver.pluginName}:operationFile:${node.operationId}`, () => {
+    const schemaPaths = memo(
+      `${resolver.pluginName}:schemaFilePaths`,
+      () =>
+        new Set(
+          (ctx.driver.inputNode?.schemas ?? []).flatMap((schema) =>
+            schema.name ? [resolver.file({ name: schema.name, extname: '.ts', ...location }).path.toLowerCase()] : [],
+          ),
+        ),
+    )
+    let file = resolver.file({ ...operationFileEntry(node, node.operationId), ...location })
+
+    for (let name = `${node.operationId}Operation`; schemaPaths.has(file.path.toLowerCase()); name += 'Operation') {
+      const next = resolver.file({ ...operationFileEntry(node, name), ...location })
+      // A single-file output holds every declaration on purpose, so a new name changes nothing.
+      if (next.path === file.path) break
+      file = next
+    }
+
+    return file
+  })
 }
 
 export type ContentTypeInfo = {

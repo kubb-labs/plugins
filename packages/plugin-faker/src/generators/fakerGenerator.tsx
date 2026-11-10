@@ -3,7 +3,7 @@ import {
   getOperationParameters,
   getPerContentTypeName,
   resolveContentTypeVariants,
-  resolveDependencyOperationFile,
+  resolveOperationFile,
   toResponseContent,
 } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '../utils/imports.ts'
@@ -204,9 +204,9 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const cyclicSchemas = getCircularNames(ctx)
 
     const meta = {
-      file: resolver.file({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path, root, output, group: group ?? undefined }),
-      typeFile: resolveDependencyOperationFile({
-        memo: ctx.memo,
+      file: resolveOperationFile({ ctx, node, resolver, root, output, group }),
+      typeFile: resolveOperationFile({
+        ctx,
         node,
         resolver: tsResolver,
         root,

@@ -247,7 +247,7 @@ Whether each operation gets its own types file (`AddPetOptions`, `AddPetResponse
 ::field-group
 
 :::field{name="'export'"}
-Emits one file per operation with its aliases and aggregates, for example `export type AddPetStatus200 = Pet`.
+Emits one file per operation with its aliases and aggregates, for example `export type AddPetStatus200 = Pet`. When an operation file would have the same name as a schema file, ignoring case, it gets an `Operation` suffix: operation `point` goes to `PointOperation.ts` next to schema `Point.ts`. `plugin-zod` and `plugin-faker` name their operation files the same way.
 :::
 
 :::field{name="'inline'"}

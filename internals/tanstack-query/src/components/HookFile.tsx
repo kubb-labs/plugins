@@ -1,5 +1,5 @@
 import { resolveOperationTypes } from '@internals/client'
-import { operationFileEntry, resolveDependencyOperationFile, resolveOperationTypeNames } from '@internals/shared'
+import { operationFileEntry, resolveOperationFile, resolveOperationTypeNames } from '@internals/shared'
 import { type ast, Diagnostics, type GeneratorContext, type Group, type Output } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File } from '@kubb/renderer-jsx'
@@ -56,8 +56,8 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
   const tsResolver = types.resolver
 
   const file = resolver.file({ ...operationFileEntry(node, name), root, output, group: group ?? undefined })
-  const fileTs = resolveDependencyOperationFile({
-    memo: ctx.memo,
+  const fileTs = resolveOperationFile({
+    ctx,
     node,
     resolver: tsResolver,
     root,
