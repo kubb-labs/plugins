@@ -75,6 +75,10 @@ export type PrinterZodOptions = {
    */
   oneOfType?: PluginZod['resolvedOptions']['oneOfType']
   /**
+   * Check a string's encoded content against its `contentSchema`.
+   */
+  contentSchema?: PluginZod['resolvedOptions']['contentSchema']
+  /**
    * Date format in the OpenAPI spec (`'date'` or `'date-time'`).
    */
   dateType?: ast.ParserOptions['dateType']

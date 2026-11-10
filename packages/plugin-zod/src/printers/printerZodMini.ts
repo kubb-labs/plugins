@@ -53,6 +53,10 @@ export type PrinterZodMiniOptions = {
    */
   oneOfType?: PluginZod['resolvedOptions']['oneOfType']
   /**
+   * Check a string's encoded content against its `contentSchema`.
+   */
+  contentSchema?: PluginZod['resolvedOptions']['contentSchema']
+  /**
    * Transforms raw schema names into valid JavaScript identifiers.
    */
   resolver?: ResolverZod

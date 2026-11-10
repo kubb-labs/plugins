@@ -14,6 +14,7 @@ Pass these options to `pluginZod()`. Shared options link to [Shared plugin optio
 | [`guidType`](#guidtype)                                                   | Validator for `format: uuid` properties.                               | `'uuid'`                                     |
 | [`regexType`](#regextype)                                                 | How an OpenAPI `pattern` is written.                                   | `'literal'`                                  |
 | [`oneOfType`](#oneoftype)                                                 | How a `oneOf` is validated.                                            | `'union'`                                    |
+| [`contentSchema`](#contentschema)                                         | Check the encoded content a string holds.                              | `false`                                      |
 | [`compile`](#compile)                                                     | Wrap schemas in `z.compile` for fast-path validation.                  | `false`                                      |
 | [`mini`](#mini)                                                           | Generate Zod Mini schemas.                                             | `false`                                      |
 | [`typeGuards`](#typeguards)                                               | Generate `is*` type guards and `assert*` assertions.                   | `false`                                      |
@@ -176,6 +177,23 @@ Emits `z.xor([...])`, which passes only when exactly one member matches, as `one
 ::
 
 A `oneOf` with a discriminator, where every member is an object, prints `z.discriminatedUnion(...)` with either value. An `anyOf` always prints `z.union(...)`.
+
+### contentSchema
+
+Checks a string that holds encoded content, described with `contentMediaType`, `contentEncoding`, and `contentSchema`. A JSON string is parsed, after base64 decoding when `contentEncoding` is `base64` or `base64url`, and checked against its `contentSchema`. A base64 string without one prints `z.base64()` or `z.base64url()`. The inferred type stays `string`.
+
+|          |           |
+| -------- | --------- |
+| Type     | `boolean` |
+| Required | `false`   |
+| Default  | `false`   |
+
+JSON Schema treats these keywords as annotations, so the check is off unless you turn it on.
+
+```typescript
+// metadata: { type: string, contentMediaType: application/json, contentSchema: { $ref: Metadata } }
+metadata: z.string().refine((value) => { try { return metadataSchema.safeParse(JSON.parse(value)).success } catch { return false } }, { message: '…' })
+```
 
 ### compile
 

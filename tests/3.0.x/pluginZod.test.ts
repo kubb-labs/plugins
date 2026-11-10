@@ -32,6 +32,19 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       plugins: [pluginZod({ output: { path: './zod', barrel: false }, mini, importPath: mini ? 'zod/mini' : 'zod' })],
     },
   })),
+  {
+    // `contentSchema: true` checks the JSON a string holds and imports the schema it refers to.
+    name: 'openapiFields3_2Content',
+    config: {
+      root: __dirname,
+      input: '../../schemas/3.0.x/openapiFields3_2.yaml',
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false }),
+      parsers: [parserTs()],
+      storage: fsStorage(),
+      plugins: [pluginZod({ output: { path: './zod', barrel: false }, contentSchema: true })],
+    },
+  },
   // ─── basic ──────────────────────────────────────────────────────────────
   // ─── exclude / include ───────────────────────────────────────────────────
   {

@@ -30,6 +30,7 @@ export type ZodNodeOptions = {
   guidType?: PluginZod['resolvedOptions']['guidType']
   regexType?: PluginZod['resolvedOptions']['regexType']
   oneOfType?: PluginZod['resolvedOptions']['oneOfType']
+  contentSchema?: PluginZod['resolvedOptions']['contentSchema']
   resolver?: ResolverZod
   cyclicSchemas?: ReadonlySet<string>
   direction?: 'encode' | 'decode'
@@ -118,13 +119,16 @@ export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDi
     null: () => 'z.null()',
     string(node) {
       const coerce = shouldCoerce(this.options.coercion, 'strings')
-      const call = coerce ? undefined : STRING_FORMAT_CALLS.get(node.format)
-      if (call) return `${call}${dialect.lengths({ ...node, regexType: this.options.regexType })}`
-
+      const content = this.options.contentSchema ? node.content : undefined
+      const call = coerce ? undefined : (STRING_FORMAT_CALLS.get(node.format) ?? STRING_FORMAT_CALLS.get(content?.encoding))
       const base = coerce ? 'z.coerce.string()' : 'z.string()'
       const pattern = node.pattern ?? integerFormatPattern(node.format)
+      const value = call
+        ? `${call}${dialect.lengths({ ...node, regexType: this.options.regexType })}`
+        : `${base}${dialect.lengths({ ...node, pattern, regexType: this.options.regexType })}`
+      const check = content && contentCheck(this, content)
 
-      return `${base}${dialect.lengths({ ...node, pattern, regexType: this.options.regexType })}`
+      return check ? dialect.refine(value, check) : value
     },
     number(node) {
       const base = shouldCoerce(this.options.coercion, 'numbers') ? 'z.coerce.number()' : 'z.number()'
@@ -348,6 +352,19 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
 }
 
 type PrinterContext = { transform: (node: ast.SchemaNode) => string | null }
+
+/**
+ * The `z.refine(…)` arguments that parse a JSON string, base64-decoded first when its encoding says so, and check the
+ * result against `content.schema`. `null` for content that is not JSON or has no schema.
+ */
+function contentCheck(ctx: PrinterContext, content: NonNullable<ast.StringSchemaNode['content']>): string | null {
+  if (!content.schema || !content.mediaType || !/[/+]json\b/i.test(content.mediaType)) return null
+  const decoded =
+    content.encoding === 'base64' ? 'atob(value)' : content.encoding === 'base64url' ? "atob(value.replace(/-/g, '+').replace(/_/g, '/'))" : 'value'
+  const schema = ctx.transform(content.schema) ?? 'z.unknown()'
+
+  return `(value) => { try { return ${schema}.safeParse(JSON.parse(${decoded})).success } catch { return false } }, { message: ${stringify(`Value is not ${content.mediaType} that matches its content schema`)} }`
+}
 
 /**
  * The `z.refine(…)` arguments that count the items matching `contains.schema`, or `null` when any count is allowed.

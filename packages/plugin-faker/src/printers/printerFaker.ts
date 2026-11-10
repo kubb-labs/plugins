@@ -86,6 +86,15 @@ function numberCall(kind: 'float' | 'int', { min, max, exclusive }: Pick<ast.Num
 }
 
 /**
+ * Encodes a string expression as `encoding` says: `base64` with `btoa`, and `base64url` with its URL-safe alphabet and no padding.
+ */
+function encodeContent(value: string, encoding: string | undefined): string {
+  if (encoding === 'base64') return `btoa(${value})`
+  if (encoding === 'base64url') return `btoa(${value}).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '')`
+  return value
+}
+
+/**
  * A `date` or `time` value: an ISO substring, a `dateParser` call, or a `Date` when `representation` is `'date'`.
  */
 function dateTimeCall(
@@ -192,9 +201,12 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       boolean: () => 'faker.datatype.boolean()',
       null: () => 'null',
       string(node) {
-        // A string that holds JSON, such as `contentMediaType: application/json` with a `contentSchema`.
-        if (node.content?.schema && !node.content.encoding && node.content.mediaType && /json/i.test(node.content.mediaType)) {
-          return `JSON.stringify(${printNested(node.content.schema, { typeName: undefined, nestedInObject: true })})`
+        // A string that holds JSON, such as `contentMediaType: application/json` with a `contentSchema`, encoded as `contentEncoding` says.
+        if (node.content?.schema && node.content.mediaType && /json/i.test(node.content.mediaType)) {
+          return encodeContent(`JSON.stringify(${printNested(node.content.schema, { typeName: undefined, nestedInObject: true })})`, node.content.encoding)
+        }
+        if (node.content?.encoding === 'base64' || node.content?.encoding === 'base64url') {
+          return encodeContent('faker.string.alpha()', node.content.encoding)
         }
 
         if (node.pattern) {

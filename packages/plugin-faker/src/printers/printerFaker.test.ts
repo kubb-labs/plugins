@@ -124,6 +124,15 @@ describe('printerFaker', () => {
     expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('JSON.stringify(createMetadata())')
   })
 
+  test('encodes string content as its contentEncoding says', () => {
+    const json = ast.factory.createSchema({ type: 'unknown' })
+    const print = (content: ast.StringSchemaNode['content']) =>
+      printerFaker({ resolver: resolverFaker }).print(ast.factory.createSchema({ type: 'string', content }))
+
+    expect(print({ mediaType: 'application/json', encoding: 'base64', schema: json })).toBe('btoa(JSON.stringify(undefined))')
+    expect(print({ encoding: 'base64url' })).toBe("btoa(faker.string.alpha()).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '')")
+  })
+
   test('mocks a string int32 within the 32-bit range', () => {
     const node = ast.factory.createSchema({ type: 'string', format: 'int32' })
 
