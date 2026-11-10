@@ -12,7 +12,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import { printerTs } from '../printers/printerTs.ts'
 import type { PluginTs } from '../types'
-import { buildParams, buildResponseUnion, enumTypeName, isInlineConstEnum, resolveInlineEnumNames } from '../utils.ts'
+import { buildParams, buildResponseUnion, enumTypeName, getExampleValues, isInlineConstEnum, resolveInlineEnumNames } from '../utils.ts'
 
 /**
  * Built-in generator for `@kubb/plugin-ts`. Emits one TypeScript file per
@@ -92,7 +92,17 @@ export const typeGenerator = defineGenerator<PluginTs>({
       ? printerTs({ optionalType, arrayType, enum: enumOptions, syntaxType, resolver, enumSchemaNames, nodes: printer?.nodes })
       : null
 
-    function renderSchemaType({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
+    function renderSchemaType({
+      schema,
+      name,
+      keysToOmit,
+      examples,
+    }: {
+      schema: ast.SchemaNode | null
+      name: string
+      keysToOmit?: Array<string> | null
+      examples?: Array<ast.ExampleNode>
+    }) {
       if (!schema) return null
       if (!inline && enumOptions.type !== 'inlineLiteral') schema = resolveInlineEnumNames({ node: schema, owner: node.operationId, resolver, enumOptions })
 
@@ -105,6 +115,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         name,
         syntaxType,
         description: schema.description,
+        examples: getExampleValues(examples),
         keysToOmit,
         resolver,
         enumSchemaNames,
@@ -128,7 +139,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
      * query hooks and `result.data` keep the bare body.
      */
     function buildContentTypeVariants(
-      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
+      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null; examples?: Array<ast.ExampleNode> }>,
       baseName: string,
       pointer: string | undefined,
       decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
@@ -149,6 +160,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
               schema: decorate ? decorate(variant.schema) : variant.schema,
               name: variant.name,
               keysToOmit: variant.keysToOmit,
+              examples: entries.find((entry) => entry.contentType === variant.contentType)?.examples,
             }),
           )}
           {renderSchemaType({ schema: unionSchema, name: baseName })}
@@ -185,6 +197,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
           },
           name: resolver.response.body(node),
           keysToOmit: entry.keysToOmit,
+          examples: entry.examples,
         })
       }
       // Multiple content types — generate individual types + union alias
@@ -209,8 +222,13 @@ export const typeGenerator = defineGenerator<PluginTs>({
         schema: primary?.schema ? { ...primary.schema, pointer: res.pointer ?? primary.schema.pointer } : ast.factory.createSchema({ type: 'unknown' }),
         name: resolver.response.status(node, res.statusCode),
         keysToOmit: primary?.keysToOmit,
+        examples: primary?.examples,
       })
     })
+
+    const responseHeaderTypes = node.responses.map((res) =>
+      res.headers?.length ? renderSchemaType({ schema: buildParams({ params: res.headers }), name: resolver.response.headers(node, res.statusCode) }) : null,
+    )
 
     const optionsType = renderSchemaType({
       schema: buildOptionsSchema(node, resolver, { pairContentTypes: true }),
@@ -258,6 +276,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       >
         {paramGroupTypes}
         {responseTypes}
+        {responseHeaderTypes}
         {requestType}
         {optionsType}
         {responsesType}

@@ -96,6 +96,10 @@ export type PrinterTsOptions = {
    */
   description?: string
   /**
+   * `@example` values for the generated type, such as a media type's `examples`. Replaces the schema's own.
+   */
+  examples?: Array<unknown>
+  /**
    * Properties to exclude using `Omit<Type, Keys>`.
    * Forces type alias syntax regardless of `syntaxType` setting.
    */
@@ -344,7 +348,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       ...toNodeHandlers(options.nodes),
     },
     print(node) {
-      const { name, syntaxType = 'type', description, keysToOmit } = this.options
+      const { name, syntaxType = 'type', description, examples, keysToOmit } = this.options
 
       const transformed = this.transform(node)
       if (!transformed) return null
@@ -377,6 +381,7 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
         comments: buildPropertyJSDocComments({
           ...meta,
           description,
+          examples: examples?.length ? examples : meta.examples,
         }),
       })
     },

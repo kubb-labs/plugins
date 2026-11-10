@@ -99,6 +99,8 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
 
   const isArray = meta?.primitive === 'array'
   const isNumeric = meta?.primitive === 'number' || meta?.primitive === 'integer' || meta?.primitive === 'bigint'
+  // `@minimum`, `@minProperties` or `@minLength`, and their `max` pairs.
+  const boundSuffix = isNumeric ? 'imum' : meta?.type === 'object' ? 'Properties' : 'Length'
 
   const hasDescription = meta && 'description' in meta && meta.description
 
@@ -118,13 +120,16 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
     ...formatComment,
     meta && 'deprecated' in meta && meta.deprecated ? '@deprecated' : null,
     // minItems/maxItems on arrays should not be emitted as @minLength/@maxLength
-    !isArray && meta && 'min' in meta && meta.min !== undefined ? `@${isNumeric ? 'minimum' : 'minLength'} ${meta.min}` : null,
-    !isArray && meta && 'max' in meta && meta.max !== undefined ? `@${isNumeric ? 'maximum' : 'maxLength'} ${meta.max}` : null,
+    !isArray && meta && 'min' in meta && meta.min !== undefined ? `@min${boundSuffix} ${meta.min}` : null,
+    !isArray && meta && 'max' in meta && meta.max !== undefined ? `@max${boundSuffix} ${meta.max}` : null,
     meta && 'pattern' in meta && meta.pattern ? `@pattern ${meta.pattern}` : null,
+    meta && 'content' in meta && meta.content?.mediaType ? `@contentMediaType ${meta.content.mediaType}` : null,
+    meta && 'content' in meta && meta.content?.encoding ? `@contentEncoding ${meta.content.encoding}` : null,
     meta && 'default' in meta && meta.default !== undefined
       ? `@default ${'primitive' in meta && meta.primitive === 'string' && typeof meta.default === 'string' ? stringify(meta.default) : formatExample(meta.default)}`
       : null,
     ...exampleValues.map((example) => `@example ${formatExample(example)}`),
+    meta?.externalDocs ? `@see ${[meta.externalDocs.url, meta.externalDocs.description].filter(Boolean).join(' ')}` : null,
   ].filter(Boolean)
 
   // `@type` merely repeats the TypeScript type already sitting next to the property, so it only
@@ -137,6 +142,14 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
       : null
 
   return [...comments, typeTag].filter(Boolean)
+}
+
+/**
+ * The values of a parameter's or media type's `examples`, or `undefined` when none has a value.
+ */
+export function getExampleValues(examples: Array<ast.ExampleNode> | undefined): Array<unknown> | undefined {
+  const values = (examples ?? []).filter((example) => example.value !== undefined).map((example) => example.value)
+  return values.length > 0 ? values : undefined
 }
 
 type BuildParamsSchemaOptions = {
@@ -155,13 +168,18 @@ type BuildOperationSchemaOptions = {
 export function buildParams({ params }: BuildParamsSchemaOptions): ast.SchemaNode {
   return ast.factory.createSchema({
     type: 'object',
-    // The group points at the `parameters` list that declares its first parameter.
-    pointer: params[0]?.pointer?.replace(/\/\d+$/, ''),
+    // The group points at the `parameters` list or `headers` map that declares its first parameter.
+    pointer: params[0]?.pointer?.replace(/\/[^/]+$/, ''),
     properties: params.map((param) =>
       ast.factory.createProperty({
         name: param.name,
         required: param.required,
-        schema: ast.factory.createSchema({ ...param.schema, optional: !param.required }),
+        schema: ast.factory.createSchema({
+          ...param.schema,
+          optional: !param.required,
+          deprecated: param.deprecated || param.schema.deprecated,
+          examples: getExampleValues(param.examples) ?? param.schema.examples,
+        }),
       }),
     ),
   })

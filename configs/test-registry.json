@@ -3,6 +3,7 @@
   "internals/client/src/resolveClientOperation.test.ts": "Golden path for client include, exclude and override scoping and importPath resolution in the query plugins.",
   "internals/shared/src/group.test.ts": "Pins path and tag group naming; the path case runs code no other test reaches.",
   "internals/shared/src/operation.test.ts": "Branchy parameter grouping, querystring spreading, dedupe (#1349), content types, stream shape detection.",
+  "internals/shared/src/resolver.test.ts": "A cycle through conditionals is invisible to the AST visitors, and missing it makes a generated module throw at load.",
   "internals/tanstack-query/src/components/InfiniteQueryOptions.test.tsx": "Branchy page-param combinations (previousParam mixes, null initialPageParam) the package generator tests do not render.",
   "internals/tanstack-query/src/components/keys.test.ts": "Pins the empty query and mutation keys for an operation without a path, and that cookies stay out of a query key; no generator snapshot reaches either.",
   "internals/tanstack-query/src/utils.test.ts": "Branchy classification and page-param warning: ref chains, allOf, json priority, QUERY method, and cookie-only operations without key params.",

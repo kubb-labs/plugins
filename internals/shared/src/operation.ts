@@ -475,6 +475,7 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
     node.description && `@description ${node.description}`,
     node.summary && `@summary ${node.summary}`,
     node.deprecated && '@deprecated',
+    node.externalDocs && `@see ${[node.externalDocs.url, node.externalDocs.description].filter(Boolean).join(' ')}`,
   ]
 
   const filteredComments = comments.filter((comment): comment is string => Boolean(comment))
@@ -697,16 +698,25 @@ export function getStatusCodeNumber(statusCode: ast.StatusCode | number | string
   return Number.isNaN(code) ? null : code
 }
 
-export function isSuccessStatusCode(statusCode: ast.StatusCode | number | string): boolean {
+/**
+ * The first digit of a status such as `404` or a range such as `4XX`, or `null` for `default`.
+ */
+function getStatusClass(statusCode: ast.StatusCode | number | string): number | null {
+  const range = /^([1-5])XX$/i.exec(String(statusCode))
+  if (range) return Number(range[1])
   const code = getStatusCodeNumber(statusCode)
 
-  return code !== null && code >= 200 && code < 300
+  return code === null ? null : Math.floor(code / 100)
+}
+
+export function isSuccessStatusCode(statusCode: ast.StatusCode | number | string): boolean {
+  return getStatusClass(statusCode) === 2
 }
 
 export function isErrorStatusCode(statusCode: ast.StatusCode | number | string): boolean {
-  const code = getStatusCodeNumber(statusCode)
+  const statusClass = getStatusClass(statusCode)
 
-  return code !== null && code >= 400
+  return statusClass !== null && statusClass >= 4
 }
 
 export function getSuccessResponses<TResponse extends ResponseLike>(responses: ReadonlyArray<TResponse>): Array<TResponse> {

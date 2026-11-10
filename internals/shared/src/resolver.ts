@@ -1,6 +1,7 @@
 import { ensureValidVarName, toFilePath } from '@internals/utils'
 import { ast, camelCase } from '@kubb/kit'
 import type { GeneratorContext, Resolver, ResolverFile } from '@kubb/kit'
+import { withUnwalkedSchemas } from './schemaTraversal.ts'
 
 /**
  * The shared top-level `name` of the operation plugins, computed once per operation name and build.
@@ -43,6 +44,10 @@ export type OperationParamResolver = {
  */
 export type OperationResponseResolver = {
   status(this: Resolver, node: ast.OperationNode, statusCode: ast.StatusCode): string
+  /**
+   * Name of the headers a response declares, such as `ListPetsStatus200Headers`.
+   */
+  headers(this: Resolver, node: ast.OperationNode, statusCode: ast.StatusCode): string
   body(this: Resolver, node: ast.OperationNode): string
   responses(this: Resolver, node: ast.OperationNode): string
   response(this: Resolver, node: ast.OperationNode): string
@@ -98,6 +103,10 @@ export function createOperationResponseResolver(): OperationResponseResolver {
       const name = this.name(`${node.operationId} Status ${statusCode}`)
       return this.resolveName({ key: operationKey(node, 'response', 'status', statusCode), name })
     },
+    headers(node, statusCode) {
+      const name = this.name(`${node.operationId} Status ${statusCode} Headers`)
+      return this.resolveName({ key: operationKey(node, 'response', 'headers', statusCode), name })
+    },
     body(node) {
       const name = this.name(`${node.operationId} Body`)
       return this.resolveName({ key: operationKey(node, 'response', 'body'), name })
@@ -133,10 +142,13 @@ export function createCasedFile(caseLast: (part: string) => string): ResolverFil
 type SchemaIndexContext = Pick<GeneratorContext, 'memo' | 'driver'>
 
 /**
- * Names of the schemas in a circular reference chain, computed once per build.
+ * Names of the schemas in a circular reference chain, computed once per build. A chain can run through `conditionals`,
+ * `contains` or a string's `content`, which the visitors skip but the printers import.
  */
 export function getCircularNames(ctx: SchemaIndexContext): ReadonlySet<string> {
-  return ctx.memo('circularNames:set', () => ast.findCircularSchemas(ctx.driver.inputNode?.schemas ?? []))
+  return ctx.memo('circularNames:set', () =>
+    ast.findCircularSchemas((ctx.driver.inputNode?.schemas ?? []).map((schema) => ({ ...withUnwalkedSchemas(schema), name: schema.name }))),
+  )
 }
 
 /**

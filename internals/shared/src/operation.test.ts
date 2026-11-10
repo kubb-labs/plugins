@@ -195,6 +195,17 @@ describe('buildOperationComments', () => {
     expect(buildOperationComments(node)).toStrictEqual(['`GET /pets/{petId}`', '@description Show pet', '@summary Show', '@deprecated'])
   })
 
+  test('links the external docs with @see', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'showPet',
+      method: 'GET',
+      path: '/pets',
+      externalDocs: { url: 'https://example.com/pets', description: 'Pet guide' },
+    })
+
+    expect(buildOperationComments(node)).toStrictEqual(['`GET /pets`', '@see https://example.com/pets Pet guide'])
+  })
+
   test('splits multiline text into trimmed lines', () => {
     const node = ast.factory.createOperation({
       operationId: 'showPet',
@@ -225,6 +236,14 @@ describe('response status helpers', () => {
     expect(isSuccessStatusCode('400')).toBe(false)
     expect(isErrorStatusCode('400')).toBe(true)
     expect(isErrorStatusCode('default')).toBe(false)
+  })
+
+  test('reads status ranges such as 2XX', () => {
+    expect(isSuccessStatusCode('2XX')).toBe(true)
+    expect(isSuccessStatusCode('4XX')).toBe(false)
+    expect(isErrorStatusCode('4XX')).toBe(true)
+    expect(isErrorStatusCode('5XX')).toBe(true)
+    expect(isErrorStatusCode('3XX')).toBe(false)
   })
 
   test('resolves error, success, and all response status names', () => {

@@ -195,6 +195,7 @@ export type {
   LoginUserResponse,
   LoginUserResponses,
   LoginUserStatus200,
+  LoginUserStatus200Headers,
   LoginUserStatus200Json,
   LoginUserStatus200Xml,
   LoginUserStatus400,
