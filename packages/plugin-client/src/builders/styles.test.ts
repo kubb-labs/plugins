@@ -125,7 +125,13 @@ describe('buildStyles', () => {
     const content = (contentType: string) =>
       ast.factory.createContent({ contentType, schema: ast.factory.createSchema({ type: 'array', items: [] }), itemEncoding: { contentType: 'text/csv' } })
     const operation = (contentTypes: Array<string>) =>
-      ast.factory.createOperation({ operationId: 'upload', method: 'POST', path: '/upload', requestBody: { content: contentTypes.map(content) }, responses: [] })
+      ast.factory.createOperation({
+        operationId: 'upload',
+        method: 'POST',
+        path: '/upload',
+        requestBody: { content: contentTypes.map(content) },
+        responses: [],
+      })
 
     expect(buildStyles({ node: operation(['application/json', 'multipart/mixed']) })).toBe("{ parts: { item: { contentType: 'text/csv' } } }")
     expect(buildStyles({ node: operation(['multipart/related']) })).toBeNull()
