@@ -1,9 +1,10 @@
-import { toResponseContent } from '@internals/shared'
-import { stringify } from '@internals/utils'
+import { getStatusClass, toResponseContent } from '@internals/shared'
+import { singleQuote } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
 export function getMockStatus(statusCode: ast.StatusCode): number {
-  return /^[1-5]XX$/i.test(statusCode) ? Number(statusCode[0]) * 100 : Number(statusCode)
+  // A range such as `2XX` mocks the first code of its class.
+  return /XX$/i.test(statusCode) ? (getStatusClass(statusCode) ?? 2) * 100 : Number(statusCode)
 }
 
 export function getMockHeaders(response: ast.ResponseNode | null | undefined): Array<[name: string, value: string]> {
@@ -53,9 +54,13 @@ export function hasResponseSchema(response: ast.ResponseNode | null | undefined)
  * content types, JSON is preferred (the faker mock body is JSON), otherwise the first declared type.
  */
 function getResponseContentType(response: ast.ResponseNode | null | undefined): string | null {
-  const contents = response?.content ?? []
-  const value = (contents.find((entry) => isJson(entry.contentType)) ?? contents[0])?.contentType
+  const value = getResponseEntry(response)?.contentType
   return typeof value === 'string' && value.length > 0 ? value : null
+}
+
+function getResponseEntry(response: ast.ResponseNode | null | undefined): ast.ContentNode | undefined {
+  const contents = response?.content ?? []
+  return contents.find((entry) => isJson(entry.contentType)) ?? contents[0]
 }
 
 function isJson(contentType: string | undefined): boolean {
@@ -91,12 +96,21 @@ export function responseReturn(body: string, status: number, response: ast.Respo
     return ${responseLiteral(`JSON.stringify(${name})`, status, contentType, headers)}`
 }
 
+/**
+ * The spec example of the response entry the mock sends, as source code, or `null` when that entry has none.
+ */
 export function getExampleBody(response: ast.ResponseNode | null | undefined): string | null {
-  for (const entry of response?.content ?? []) {
-    const example = entry.examples?.find((item) => item.value !== undefined || item.serializedValue !== undefined)
-    if (example) return example.value !== undefined ? JSON.stringify(example.value) : stringify(example.serializedValue!)
+  const entry = getResponseEntry(response)
+  const example = entry?.examples?.find((item) => item.value !== undefined || item.serializedValue !== undefined)
+  if (!entry || !example) return null
+  if (example.value !== undefined) return JSON.stringify(example.value)
+  if (!isJson(entry.contentType)) return JSON.stringify(example.serializedValue)
+  // `responseReturn` encodes a JSON body itself, so a serialized JSON example is parsed first.
+  try {
+    return JSON.stringify(JSON.parse(example.serializedValue!))
+  } catch {
+    return null
   }
-  return null
 }
 
 /**
@@ -111,7 +125,10 @@ export function getMswMethod(node: ast.HttpOperationNode): string {
  * The `headers` entry of a mocked `Response` init, or an empty string when there is no header to send.
  */
 function headersBlock(contentType: string | null, headers: Array<[string, string]>): string {
-  const entries = [...(contentType ? [`'Content-Type': '${contentType}'`] : []), ...headers.map(([name, value]) => `${stringify(name)}: ${stringify(value)}`)]
+  const entries = [
+    ...(contentType ? [`'Content-Type': '${contentType}'`] : []),
+    ...headers.map(([name, value]) => `${singleQuote(name)}: ${singleQuote(value)}`),
+  ]
   return entries.length ? `\n      headers: {\n        ${entries.join(',\n        ')}\n      },` : ''
 }
 

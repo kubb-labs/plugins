@@ -16,6 +16,7 @@ export {
   getRequestGroups,
   hasRequestContentTypeChoice,
   getResponseContentTypeInfo,
+  getStatusClass,
   getSuccessResponses,
   hasEventStreamContent,
   hasFormBody,

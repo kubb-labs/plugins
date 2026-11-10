@@ -698,7 +698,10 @@ export function getStatusCodeNumber(statusCode: ast.StatusCode | number | string
   return Number.isNaN(code) ? null : code
 }
 
-function getStatusClass(statusCode: ast.StatusCode | number | string): number | null {
+/**
+ * The class digit of a status code or range, such as `2` for `201` and `2XX`, or `null` for `default`.
+ */
+export function getStatusClass(statusCode: ast.StatusCode | number | string): number | null {
   const range = /^([1-5])XX$/i.exec(String(statusCode))
   if (range) return Number(range[1])
   const code = getStatusCodeNumber(statusCode)
