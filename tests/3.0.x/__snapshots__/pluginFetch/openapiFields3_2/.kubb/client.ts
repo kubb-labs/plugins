@@ -68,3 +68,8 @@ export const defaultTransport = async (request: core.ResolvedRequest): Promise<T
 export const client = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
 
 export const createClient = client.createClient
+
+/**
+ * The servers from the spec by name, for `baseURL`.
+ */
+export const servers = { production: "https://api.example.com", staging: "https://staging.example.com" } as const

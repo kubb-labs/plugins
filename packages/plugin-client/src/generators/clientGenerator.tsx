@@ -22,7 +22,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
     name,
     renderer: jsxRenderer,
     operations(nodes, ctx) {
-      return <StreamRuntime nodes={nodes} root={ctx.root} sse={sse} baseURL={ctx.options.baseURL} />
+      return <StreamRuntime nodes={nodes} root={ctx.root} sse={sse} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} />
     },
     operation(node, ctx) {
       if (!ast.isHttpOperationNode(node)) return null

@@ -257,7 +257,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
 
       return (
         <>
-          <StreamRuntime nodes={nodes} root={root} sse={sse} baseURL={ctx.options.baseURL} />
+          <StreamRuntime nodes={nodes} root={root} sse={sse} baseURL={ctx.options.baseURL} servers={ctx.meta.servers} />
           {files}
         </>
       )
