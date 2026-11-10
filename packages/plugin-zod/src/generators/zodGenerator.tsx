@@ -149,7 +149,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
 
     const meta = {
-      file: resolveOperationFile({ memo: ctx.memo, schemas: ctx.driver.inputNode?.schemas, node, resolver, root, output, group }),
+      file: resolveOperationFile({ ctx, node, resolver, root, output, group }),
     } as const
 
     const cyclicSchemas = getCircularNames(ctx)

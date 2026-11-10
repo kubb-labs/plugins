@@ -35,8 +35,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
         ? {
             name: fakerResolver.response.response(node),
             file: resolveOperationFile({
-              memo: ctx.memo,
-              schemas: driver.inputNode?.schemas,
+              ctx,
               node,
               resolver: fakerResolver,
               root,
@@ -51,8 +50,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     const type = {
       file: resolveOperationFile({
-        memo: ctx.memo,
-        schemas: ctx.driver.inputNode?.schemas,
+        ctx,
         node,
         resolver: tsResolver,
         root,

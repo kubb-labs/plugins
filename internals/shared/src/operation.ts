@@ -22,36 +22,41 @@ export function operationFileEntry(node: ast.OperationNode, name: string, extnam
 
 /**
  * Resolves the file a schema-emitting plugin (`plugin-ts`, `plugin-zod`, `plugin-faker`) writes
- * `node` to, cached in `memo` (the build's `ctx.memo`) under the resolver's plugin name and the
+ * `node` to, cached in `ctx.memo` under the resolver's plugin name and the
  * operation. The plugin itself and every plugin that imports from it call this, so they all get
  * the same path.
  *
- * When that path matches the file of a component schema in `schemas`, ignoring case, the file name
+ * When that path matches the file of a component schema in `ctx.driver.inputNode`, ignoring case, the file name
  * gets an `Operation` suffix: operation `point` goes to `PointOperation.ts` next to schema `Point.ts`.
  * Otherwise the two merge into one file, or overwrite each other on a case-insensitive file system.
  * Only the file name changes. The declarations keep their names.
  *
  * @example Resolve `plugin-ts`'s file for the current operation
  * ```ts
- * const fileTs = resolveOperationFile({ memo: ctx.memo, schemas: ctx.driver.inputNode?.schemas, node, resolver: tsResolver, root, output })
+ * const fileTs = resolveOperationFile({ ctx, node, resolver: tsResolver, root, output })
  * ```
  */
 export function resolveOperationFile(options: {
-  memo: Memo
-  schemas: ReadonlyArray<ast.SchemaNode> | undefined
+  ctx: { memo: Memo; driver: { inputNode?: { schemas: ReadonlyArray<ast.SchemaNode> } | null } }
   node: ast.OperationNode
   resolver: Pick<Resolver, 'file' | 'pluginName'>
   root: string
   output: Output
   group?: Group | null
 }): ast.FileNode {
-  const { memo, schemas = [], node, resolver, root, output } = options
+  const { ctx, node, resolver, root, output } = options
+  const { memo } = ctx
   const location = { root, output, group: options.group ?? undefined }
 
   return memo(`${resolver.pluginName}:operationFile:${node.operationId}`, () => {
     const schemaPaths = memo(
       `${resolver.pluginName}:schemaFilePaths`,
-      () => new Set(schemas.flatMap((schema) => (schema.name ? [resolver.file({ name: schema.name, extname: '.ts', ...location }).path.toLowerCase()] : []))),
+      () =>
+        new Set(
+          (ctx.driver.inputNode?.schemas ?? []).flatMap((schema) =>
+            schema.name ? [resolver.file({ name: schema.name, extname: '.ts', ...location }).path.toLowerCase()] : [],
+          ),
+        ),
     )
     let file = resolver.file({ ...operationFileEntry(node, node.operationId), ...location })
 

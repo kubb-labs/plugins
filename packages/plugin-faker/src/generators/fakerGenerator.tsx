@@ -204,10 +204,9 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const cyclicSchemas = getCircularNames(ctx)
 
     const meta = {
-      file: resolveOperationFile({ memo: ctx.memo, schemas: ctx.driver.inputNode?.schemas, node, resolver, root, output, group }),
+      file: resolveOperationFile({ ctx, node, resolver, root, output, group }),
       typeFile: resolveOperationFile({
-        memo: ctx.memo,
-        schemas: ctx.driver.inputNode?.schemas,
+        ctx,
         node,
         resolver: tsResolver,
         root,

@@ -35,8 +35,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
       name: resolver.handler.name(node),
       file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
       fileTs: resolveOperationFile({
-        memo: ctx.memo,
-        schemas: ctx.driver.inputNode?.schemas,
+        ctx,
         node,
         resolver: tsResolver,
         root,

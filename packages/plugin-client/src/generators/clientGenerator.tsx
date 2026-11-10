@@ -45,8 +45,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
         name: resolver.resolveName({ key: operationKey(node), name: operationName }),
         file: resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined }),
         fileTypes: resolveOperationFile({
-          memo: ctx.memo,
-          schemas: ctx.driver.inputNode?.schemas,
+          ctx,
           node,
           resolver: types.resolver,
           root,
@@ -56,8 +55,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
         fileZod:
           zodResolver && pluginZod?.options
             ? resolveOperationFile({
-                memo: ctx.memo,
-                schemas: ctx.driver.inputNode?.schemas,
+                ctx,
                 node,
                 resolver: zodResolver,
                 root,

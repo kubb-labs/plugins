@@ -57,8 +57,7 @@ export function resolveHookFile(node: ast.OperationNode, ctx: HookFileContext, o
 
   const file = resolver.file({ ...operationFileEntry(node, name), root, output, group: group ?? undefined })
   const fileTs = resolveOperationFile({
-    memo: ctx.memo,
-    schemas: ctx.driver.inputNode?.schemas,
+    ctx,
     node,
     resolver: tsResolver,
     root,

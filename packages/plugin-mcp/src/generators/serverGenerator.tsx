@@ -51,8 +51,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
 
       const mcpFile = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
       const zodFile = resolveOperationFile({
-        memo: ctx.memo,
-        schemas: driver.inputNode?.schemas,
+        ctx,
         node,
         resolver: zodResolver,
         root,

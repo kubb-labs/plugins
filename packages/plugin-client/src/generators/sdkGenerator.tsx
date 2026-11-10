@@ -63,10 +63,8 @@ function buildControllers(
   const server = (ctx.adapter.options as { server?: ServerOptions } | undefined)?.server
 
   function buildOperationData(node: ast.OperationNode): OperationData {
-    const schemas = driver.inputNode?.schemas
     const typeFile = resolveOperationFile({
-      memo: ctx.memo,
-      schemas,
+      ctx,
       node,
       resolver: types.resolver,
       root,
@@ -76,8 +74,7 @@ function buildControllers(
     const zodFile =
       zodResolver && pluginZod?.options
         ? resolveOperationFile({
-            memo: ctx.memo,
-            schemas,
+            ctx,
             node,
             resolver: zodResolver,
             root,

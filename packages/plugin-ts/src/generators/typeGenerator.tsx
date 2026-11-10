@@ -81,7 +81,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const inline = operations === 'inline'
 
     const meta = {
-      file: resolveOperationFile({ memo: ctx.memo, schemas: ctx.driver.inputNode?.schemas, node, resolver, root, output, group }),
+      file: resolveOperationFile({ ctx, node, resolver, root, output, group }),
     } as const
 
     // Enum schema names, so the ref handler and the imports

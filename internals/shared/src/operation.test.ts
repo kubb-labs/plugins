@@ -603,6 +603,8 @@ describe('resolveOperationFile', () => {
     }) as Memo
   }
 
+  const ctxOf = (memo: Memo, schemas: Array<ast.SchemaNode> = []) => ({ memo, driver: { inputNode: { schemas } } })
+
   function createFileResolver(pluginName: string) {
     return { pluginName, file: vi.fn(() => ast.factory.createFile({ path: '/root/getPetById.ts', baseName: 'getPetById.ts' as const })) }
   }
@@ -613,8 +615,8 @@ describe('resolveOperationFile', () => {
     const dependencyResolver = createFileResolver('plugin-ts')
     const memo = createTestMemo()
 
-    const first = resolveOperationFile({ memo, schemas: [], node, resolver: dependencyResolver, root: '/root', output: { path: '.' } })
-    const second = resolveOperationFile({ memo, schemas: [], node, resolver: dependencyResolver, root: '/root', output: { path: '.' } })
+    const first = resolveOperationFile({ ctx: ctxOf(memo), node, resolver: dependencyResolver, root: '/root', output: { path: '.' } })
+    const second = resolveOperationFile({ ctx: ctxOf(memo), node, resolver: dependencyResolver, root: '/root', output: { path: '.' } })
 
     expect(second).toBe(first)
     expect(dependencyResolver.file).toHaveBeenCalledOnce()
@@ -625,8 +627,8 @@ describe('resolveOperationFile', () => {
     const zodResolver = createFileResolver('plugin-zod')
     const memo = createTestMemo()
 
-    resolveOperationFile({ memo, schemas: [], node, resolver: tsResolver, root: '/root', output: { path: '.' } })
-    resolveOperationFile({ memo, schemas: [], node, resolver: zodResolver, root: '/root', output: { path: '.' } })
+    resolveOperationFile({ ctx: ctxOf(memo), node, resolver: tsResolver, root: '/root', output: { path: '.' } })
+    resolveOperationFile({ ctx: ctxOf(memo), node, resolver: zodResolver, root: '/root', output: { path: '.' } })
 
     expect(tsResolver.file).toHaveBeenCalledOnce()
     expect(zodResolver.file).toHaveBeenCalledOnce()
@@ -637,16 +639,14 @@ describe('resolveOperationFile', () => {
     const memo = createTestMemo()
 
     resolveOperationFile({
-      memo,
-      schemas: [],
+      ctx: ctxOf(memo),
       node: ast.factory.createOperation({ operationId: 'publishPet' }),
       resolver: tsResolver,
       root: '/root',
       output: { path: '.' },
     })
     resolveOperationFile({
-      memo,
-      schemas: [],
+      ctx: ctxOf(memo),
       node: ast.factory.createOperation({ operationId: 'publishOrder' }),
       resolver: tsResolver,
       root: '/root',
@@ -662,12 +662,12 @@ describe('resolveOperationFile', () => {
     const schemas = (...names: Array<string>) => names.map((name) => ast.factory.createSchema({ type: 'object', name }))
     const resolve = (operationId: string, options: { schemas: ReturnType<typeof schemas>; output?: Output; group?: Group }) =>
       resolveOperationFile({
-        memo: createTestMemo(),
+        ctx: ctxOf(createTestMemo(), options.schemas),
         node: ast.factory.createOperation({ operationId, method: 'GET', path: '/points', tags: ['geo'] }),
         resolver: pascalResolver,
         root: '/root',
-        output,
-        ...options,
+        output: options.output ?? output,
+        group: options.group,
       }).path
 
     test('adds an `Operation` suffix when the names match', () => {
