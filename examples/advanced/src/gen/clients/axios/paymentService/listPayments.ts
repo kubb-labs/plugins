@@ -2,7 +2,7 @@ import type { Options, Unwrappable, RequestResultWithHeaders } from '../../../.k
 import type { Payment } from '../../../models/ts/Payment'
 import type { PaymentError } from '../../../models/ts/PaymentError'
 import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
-import { listPaymentsResponseSchema, listPaymentsStatus4xxSchema } from '../../../zod/payment/listPaymentsSchema'
+import { listPaymentsResponseSchema, listPaymentsStatus4xxSchema } from '../../../zod/store/payment/listPaymentsSchema'
 
 /**
  * `GET /store/payments`

@@ -15,7 +15,7 @@ export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
     },
   })
 
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 200,
     headers: {
       'Content-Type': 'application/json'
@@ -24,13 +24,13 @@ export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
 }
 
 export function getPetByIdHandlerResponse400(data?: GetPetByIdStatus400) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 400,
   })
 }
 
 export function getPetByIdHandlerResponse404(data?: GetPetByIdStatus404) {
-  return new HttpResponse<string>(JSON.stringify(data), {
+  return new HttpResponse<string>(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
     status: 404,
   })
 }
@@ -39,7 +39,7 @@ export function getPetByIdHandler(data?: GetPetByIdResponse | ((info: Parameters
   return http.get(`${options?.baseURL ?? ''}/pet/:petId`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      const body = data ?? createGetPetByIdResponse(data)
+      const body = data ?? createGetPetByIdResponse()
       if (typeof body === 'string') return new HttpResponse<string>(body, {
         status: 200,
         headers: {
@@ -47,7 +47,7 @@ export function getPetByIdHandler(data?: GetPetByIdResponse | ((info: Parameters
         },
       })
 
-      return new HttpResponse<string>(JSON.stringify(body), {
+      return new HttpResponse<string>(JSON.stringify(body, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)), {
         status: 200,
         headers: {
           'Content-Type': 'application/json'

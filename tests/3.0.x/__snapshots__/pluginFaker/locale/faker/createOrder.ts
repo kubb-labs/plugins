@@ -11,7 +11,7 @@ export function createOrder<TData extends Partial<Order> = object>(data?: TData)
   const defaultFakeData = {
     id: faker.number.bigInt(),
     petId: faker.number.bigInt(),
-    quantity: faker.number.int(),
+    quantity: faker.number.int({ max: 2147483647 }),
     shipDate: faker.date.anytime().toISOString(),
     status: createOrderStatusEnum(),
     complete: faker.datatype.boolean(),

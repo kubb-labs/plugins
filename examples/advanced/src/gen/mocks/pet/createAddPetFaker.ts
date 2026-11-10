@@ -14,7 +14,7 @@ export function createAddPetStatus405Faker<
   }> = object,
 >(data?: TData) {
   const defaultFakeData = {
-    code: faker.number.int(),
+    code: faker.number.int({ max: 2147483647 }),
     message: faker.string.alpha(),
   }
   return {

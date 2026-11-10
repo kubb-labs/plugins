@@ -37,7 +37,7 @@ export function createUploadFileStatus200(data?: Partial<UploadFileStatus200>): 
 }
 
 export function createUploadFileBody(data?: Blob): Blob {
-  return data ?? faker.image.url() as unknown as Blob
+  return data ?? new Blob([faker.string.alpha()])
 }
 
 export function createUploadFileResponse(data?: Partial<UploadFileResponse>): UploadFileResponse {

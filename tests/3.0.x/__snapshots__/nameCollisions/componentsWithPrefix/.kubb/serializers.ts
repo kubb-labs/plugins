@@ -6,7 +6,7 @@ export type HeadersInit = Array<[string, HeaderValue]> | Record<string, HeaderVa
  */
 export type RequestBody = NonNullable<RequestInit['body']>
 
-export type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'QUERY' | 'TRACE'
+export type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'QUERY' | 'TRACE' | (string & {})
 
 /**
  * The OpenAPI query style. `form` is the default.

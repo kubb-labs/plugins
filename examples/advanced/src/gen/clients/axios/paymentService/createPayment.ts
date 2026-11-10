@@ -1,7 +1,7 @@
 import type { Options, Unwrappable, RequestResult } from '../../../.kubb/client'
 import type { Payment } from '../../../models/ts/Payment'
 import { client, withUnwrap, resolveThrowOnError } from '../../../.kubb/client'
-import { createPaymentResponseSchema } from '../../../zod/payment/createPaymentSchema'
+import { createPaymentResponseSchema } from '../../../zod/store/payment/createPaymentSchema'
 
 /**
  * `POST /store/payments`

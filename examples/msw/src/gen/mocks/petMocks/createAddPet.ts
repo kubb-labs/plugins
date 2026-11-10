@@ -45,7 +45,7 @@ export function createAddPetStatus200(data?: Partial<AddPetStatus200>): AddPetSt
  */
 export function createAddPetStatus405<TData extends Partial<AddPetStatus405> = object>(data?: TData) {
   const defaultFakeData = {
-    code: faker.number.int(),
+    code: faker.number.int({ max: 2147483647 }),
     message: faker.string.alpha(),
   }
   return {

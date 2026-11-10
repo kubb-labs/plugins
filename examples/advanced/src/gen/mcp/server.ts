@@ -1,7 +1,3 @@
-import { createPaymentHandler } from './payment/createPayment'
-import { createPaymentBatchHandler } from './payment/createPaymentBatch'
-import { getPaymentByIdHandler } from './payment/getPaymentById'
-import { listPaymentsHandler } from './payment/listPayments'
 import { addFilesHandler } from './pet/addFiles'
 import { addPetHandler } from './pet/addPet'
 import { deletePetHandler } from './pet/deletePet'
@@ -12,15 +8,10 @@ import { updatePetHandler } from './pet/updatePet'
 import { updatePetWithFormHandler } from './pet/updatePetWithForm'
 import { uploadFileHandler } from './pet/uploadFile'
 import { createPetsHandler } from './pets/createPets'
-import { createPaymentBatchBodySchema, createPaymentBatchStatus204Schema } from '../zod/payment/createPaymentBatchSchema'
-import { createPaymentBodySchema, createPaymentStatus201Schema } from '../zod/payment/createPaymentSchema'
-import { getPaymentByIdPathPaymentIdSchema, getPaymentByIdStatus200Schema } from '../zod/payment/getPaymentByIdSchema'
-import {
-  listPaymentsCookieSessionSchema,
-  listPaymentsQueryFilterSchema,
-  listPaymentsQueryStatusSchema,
-  listPaymentsStatus2xxSchema,
-} from '../zod/payment/listPaymentsSchema'
+import { createPaymentHandler } from './store/payment/createPayment'
+import { createPaymentBatchHandler } from './store/payment/createPaymentBatch'
+import { getPaymentByIdHandler } from './store/payment/getPaymentById'
+import { listPaymentsHandler } from './store/payment/listPayments'
 import { addFilesBodySchema, addFilesStatus200Schema } from '../zod/pet/addFilesSchema'
 import { addPetBodySchema } from '../zod/pet/addPetSchema'
 import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/pet/deletePetSchema'
@@ -49,6 +40,15 @@ import {
   createPetsQueryOffsetSchema,
   createPetsStatus201Schema,
 } from '../zod/pets/createPetsSchema'
+import { createPaymentBatchBodySchema, createPaymentBatchStatus204Schema } from '../zod/store/payment/createPaymentBatchSchema'
+import { createPaymentBodySchema, createPaymentStatus201Schema } from '../zod/store/payment/createPaymentSchema'
+import { getPaymentByIdPathPaymentIdSchema, getPaymentByIdStatus200Schema } from '../zod/store/payment/getPaymentByIdSchema'
+import {
+  listPaymentsCookieSessionSchema,
+  listPaymentsQueryFilterSchema,
+  listPaymentsQueryStatusSchema,
+  listPaymentsStatus2xxSchema,
+} from '../zod/store/payment/listPaymentsSchema'
 import { serveStdio } from '@modelcontextprotocol/server/stdio'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'

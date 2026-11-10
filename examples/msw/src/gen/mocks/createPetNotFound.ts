@@ -10,7 +10,7 @@ faker.seed([220])
 
 export function createPetNotFound<TData extends Partial<PetNotFound> = object>(data?: TData) {
   const defaultFakeData = {
-    code: faker.number.int(),
+    code: faker.number.int({ max: 2147483647 }),
     message: faker.string.alpha(),
   }
   return {
