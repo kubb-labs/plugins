@@ -1046,7 +1046,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
   const client = (<TResponses, ThrowOnError extends boolean, THeaders>(requestConfig: RequestConfig<unknown, TRequest, TResponse>) =>
     call(
       requestConfig,
-      async () => (await send(requestConfig, false)).result as unknown as RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>,
+      async () => (await send(requestConfig, false)).result as RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>,
     )) as ClientInstance<TRequest, TResponse>
 
   client.stream = <TResponses, ThrowOnError extends boolean, TItem>(requestConfig: RequestConfig<unknown, TRequest, TResponse> & EventStreamOptions) =>

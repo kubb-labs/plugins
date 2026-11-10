@@ -202,7 +202,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       null: () => 'null',
       string(node) {
         // A string that holds JSON, such as `contentMediaType: application/json` with a `contentSchema`, encoded as `contentEncoding` says.
-        if (node.content?.schema && node.content.mediaType && /json/i.test(node.content.mediaType)) {
+        if (node.content?.schema && node.content.mediaType && /[/+]json\b/i.test(node.content.mediaType)) {
           return encodeContent(`JSON.stringify(${printNested(node.content.schema, { typeName: undefined, nestedInObject: true })})`, node.content.encoding)
         }
         if (node.content?.encoding === 'base64' || node.content?.encoding === 'base64url') {

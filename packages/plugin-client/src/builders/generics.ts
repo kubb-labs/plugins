@@ -8,9 +8,9 @@ import type { ReturnTypeOption } from '../types.ts'
  * headers by status. `SuccessOf` / `ErrorOf` split the record inside the runtime.
  *
  * @example
- * `buildRequestResultGenerics({ node, types }) // 'AddPetResponses, ThrowOnError'`
+ * `buildRequestResultGenerics({ node, types, returnType }) // 'AddPetResponses, ThrowOnError'`
  * @example
- * `buildRequestResultGenerics({ node, types }) // "LoginUserResponses, ThrowOnError, { '200': LoginUserStatus200Headers }"`
+ * `buildRequestResultGenerics({ node, types, returnType }) // "LoginUserResponses, ThrowOnError, { '200': LoginUserStatus200Headers }"`
  */
 export function buildRequestResultGenerics({
   node,
@@ -19,7 +19,7 @@ export function buildRequestResultGenerics({
 }: {
   node: ast.OperationNode
   types: OperationTypeNames
-  returnType?: ReturnTypeOption
+  returnType: ReturnTypeOption
 }): string {
   const headers = returnType === 'data' ? null : buildResponseHeadersType({ node, types })
   return [types.response.responses(node), 'ThrowOnError', headers].filter(Boolean).join(', ')
@@ -36,10 +36,10 @@ export function buildRequestResultGenerics({
  * `buildResultType({ node, types, returnType: 'data' }) // 'Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>'`
  */
 export function buildResultType({ node, types, returnType }: { node: ast.OperationNode; types: OperationTypeNames; returnType: ReturnTypeOption }): string {
-  const generics = buildRequestResultGenerics({ node, types, returnType })
-  if (returnType === 'data') return `Promise<UnwrappedResult<${generics}>>`
+  const responses = types.response.responses(node)
+  if (returnType === 'data') return `Promise<UnwrappedResult<${responses}, ThrowOnError>>`
   const headers = buildResponseHeadersType({ node, types })
-  const result = headers ? `RequestResultWithHeaders<${types.response.responses(node)}, ${headers}, ThrowOnError>` : `RequestResult<${generics}>`
+  const result = headers ? `RequestResultWithHeaders<${responses}, ${headers}, ThrowOnError>` : `RequestResult<${responses}, ThrowOnError>`
   if (returnType === 'plain') return `Promise<${result}>`
   return `Unwrappable<${result}>`
 }

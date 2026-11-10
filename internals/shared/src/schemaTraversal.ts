@@ -76,7 +76,7 @@ export function mapSchemaItems<TOutput>(node: ast.ArraySchemaNode, transform: Sc
  * Schemas the AST visitors skip: each `conditionals` entry, an array's `contains.schema` and, unless `content` is
  * `false`, a string's `content.schema`, found anywhere in `node`, including inside each other.
  */
-export function collectUnwalkedSchemas(node: ast.SchemaNode, { content = true }: { content?: boolean } = {}): Array<ast.SchemaNode> {
+function collectUnwalkedSchemas(node: ast.SchemaNode, { content = true }: { content?: boolean } = {}): Array<ast.SchemaNode> {
   const found = new Set<ast.SchemaNode>()
   const queue = [node]
   while (queue.length > 0) {
