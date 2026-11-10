@@ -1,6 +1,6 @@
 import type { AdapterOas } from '@kubb/adapter-oas'
 import { describe, expect, test } from 'vitest'
-import { getPageHTML, withRedocTags } from './redoc.ts'
+import { getPageHTML } from './redoc.ts'
 
 const payload = '</script><script>alert(1)</script>'
 
@@ -46,34 +46,5 @@ describe('getPageHTML', () => {
     expect(html).toMatch(
       /<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/redoc@\d+\.\d+\.\d+\/bundles\/redoc\.standalone\.js" integrity="sha384-[A-Za-z0-9+/=]+" crossorigin="anonymous"><\/script>/,
     )
-  })
-})
-
-describe('withRedocTags', () => {
-  test('groups tags by their OpenAPI 3.2 parent and shows the summary as the display name', () => {
-    const document = {
-      openapi: '3.2.0',
-      info: { title: 'Shop', version: '1.0.0' },
-      tags: [{ name: 'shop', summary: 'Shop' }, { name: 'orders', parent: 'shop' }, { name: 'users' }],
-      paths: {
-        '/orders': { get: { tags: ['orders'], responses: {} } },
-        '/misc': { get: { tags: ['misc'], responses: {} }, additionalOperations: { COPY: { tags: ['copy'], responses: {} } } },
-      },
-    } as unknown as AdapterOas['document']
-
-    expect(withRedocTags(document)).toMatchObject({
-      tags: [{ name: 'shop', 'x-displayName': 'Shop' }, { name: 'orders' }, { name: 'users' }],
-      'x-tagGroups': [
-        { name: 'Shop', tags: ['shop', 'orders'] },
-        { name: 'users', tags: ['users'] },
-        { name: 'misc', tags: ['misc'] },
-        { name: 'copy', tags: ['copy'] },
-      ],
-    })
-  })
-
-  test('keeps a document without 3.2 tag fields as it is', () => {
-    const document = createDocument()
-    expect(withRedocTags(document)).toBe(document)
   })
 })
