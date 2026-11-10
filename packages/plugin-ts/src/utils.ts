@@ -142,9 +142,6 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   return [...comments, typeTag].filter(Boolean)
 }
 
-/**
- * Each example's `value`, then its `serializedValue` under a `Serialized` caption, or `undefined` when there are none.
- */
 export function getExampleValues(examples: Array<ast.ExampleNode> | undefined): Array<unknown> | undefined {
   const values = (examples ?? []).flatMap((example) => [
     ...(example.value !== undefined ? [example.value] : []),

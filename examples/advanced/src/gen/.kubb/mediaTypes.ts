@@ -170,10 +170,6 @@ const multipart: MediaType = {
   decode: (response) => response.formData(),
 }
 
-/**
- * Encodes an array as `multipart/mixed` parts (RFC 2046), each typed by `encoding` (`prefix`, then `item`) or by the part.
- * The boundary goes on the `Blob`'s type, which the client sends as `Content-Type`.
- */
 function toMultipartMixed(parts: Array<unknown>, encoding: PartsEncoding | undefined): Blob {
   const boundary = `kubb-${crypto.randomUUID()}`
   const chunks: Array<BlobPart> = []

@@ -42,9 +42,6 @@ export function buildResultType({ node, types, returnType }: { node: ast.Operati
 
 /**
  * The `{ status: headers }` record for the last `RequestResult` type argument, or `null` when no response declares headers.
- *
- * @example
- * `buildResponseHeadersType({ node, types }) // "{ '200': ListPetsStatus200Headers }"`
  */
 export function buildResponseHeadersType({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
   const resolve = types.response.headers

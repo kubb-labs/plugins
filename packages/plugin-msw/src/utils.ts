@@ -6,9 +6,6 @@ export function getMockStatus(statusCode: ast.StatusCode): number {
   return /^[1-5]XX$/i.test(statusCode) ? Number(statusCode[0]) * 100 : Number(statusCode)
 }
 
-/**
- * The declared response headers a mock sends as strings, from an example (its `serializedValue` first) or a default.
- */
 export function getMockHeaders(response: ast.ResponseNode | null | undefined): Array<[name: string, value: string]> {
   return (response?.headers ?? []).flatMap((header): Array<[string, string]> => {
     const example = header.examples?.find((entry) => entry.serializedValue !== undefined || entry.value !== undefined)
