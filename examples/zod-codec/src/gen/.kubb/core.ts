@@ -764,7 +764,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   })
   const requestContentType = requestContentTypeOption ?? getHeader(headers, 'content-type') ?? (isEncodedBody(validatedBody) ? undefined : 'application/json')
   const body =
-    validatedBody === undefined || validatedBody === null
+    // `null` is a valid JSON body, such as a merge patch that clears a resource.
+    validatedBody === undefined
       ? undefined
       : resolveMediaType({ mediaTypes, contentType: requestContentType, use: 'encode' })?.encode?.(validatedBody, {
           contentType: requestContentType ?? '',

@@ -137,8 +137,8 @@ describe('defaultQuerySerializer', () => {
     expect(defaultQuerySerializer({ value }, { value: { contentType: 'application/jsonl' } })).toBe('a=1')
   })
 
-  test('serializes nested objects with the deepObject style', () => {
-    expect(defaultQuerySerializer({ filter: { name: 'odie' } })).toBe('filter%5Bname%5D=odie')
+  test('serializes an object without a style as form with explode', () => {
+    expect(defaultQuerySerializer({ filter: { name: 'odie', age: 3 } })).toBe('name=odie&age=3')
   })
 
   test('skips undefined and null members', () => {
@@ -389,6 +389,17 @@ describe('applyHeaderStyles', () => {
 })
 
 describe('createClientCore', () => {
+  test('sends a null body as the JSON document null, and leaves an undefined body out', async () => {
+    const { transport, calls } = fakeTransport()
+    const client = createClientCore<string, string>({ defaultTransport: transport })
+    await client({ method: 'PATCH', url: '/pet/1', body: null, contentType: 'application/merge-patch+json' })
+    await client({ method: 'PATCH', url: '/pet/1', body: undefined })
+    expect(calls.map((call) => [call.body, call.headers['Content-Type']])).toStrictEqual([
+      ['null', 'application/merge-patch+json'],
+      [undefined, undefined],
+    ])
+  })
+
   test('returns errors for a non-throwing call and honors a per-call override', async () => {
     const { transport } = fakeTransport({ data: { message: 'invalid' }, status: 405 })
     const client = createClientCore<string, string>({ defaultTransport: transport })

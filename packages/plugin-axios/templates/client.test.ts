@@ -253,6 +253,15 @@ describe('createAxiosTransport', () => {
     }
   })
 
+  test('sends a web ReadableStream body through the fetch adapter, which the Node adapter cannot send', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ defaultTransport: createAxiosTransport(instance) })
+    const body = new ReadableStream({ start: (controller) => (controller.enqueue(new TextEncoder().encode('chunk')), controller.close()) })
+    await client({ method: 'POST', url: 'https://petstore.dev/upload', body, contentType: 'application/octet-stream' })
+    await client({ method: 'POST', url: 'https://petstore.dev/upload', body: 'text', contentType: 'text/plain' })
+    expect(calls.map((call) => call.adapter)).toStrictEqual(['fetch', undefined])
+  })
+
   test('keeps the Content-Type of a pre-encoded body sent without a content type through the Node adapter', async () => {
     const sent: Array<string | undefined> = []
     const server = http.createServer((req, res) => (sent.push(req.headers['content-type']), req.resume(), res.writeHead(204).end()))

@@ -90,7 +90,7 @@ Bodies that are already encoded (`FormData`, `URLSearchParams`, `Blob`, `ArrayBu
 > [!NOTE]
 > When the body is `FormData`, the runtime removes any `Content-Type` header so the transport sets it with the multipart boundary.
 
-An XML, YAML, or CSV media type has no built-in handler, so an object sent under one throws a `TypeError`. Pass the encoded body as a string, or register a media type.
+An XML, YAML, or CSV media type has no built-in handler, so an object sent under one throws a `TypeError`. Pass the encoded body as a string, or register a media type. The generated body type is the schema, such as `Pet`, so a string body needs a cast: `body: xml as unknown as AddPetBodyXml`.
 
 ## Add a media type
 

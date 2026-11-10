@@ -12,3 +12,6 @@ Fix client behavior found by calling real APIs with the fetch, axios, and ky cli
 - `HttpMethod` includes `TRACE`, so a generated `trace` operation typechecks. `fetch` and ky still reject `TRACE`. Use `@kubb/plugin-axios` or a custom transport for it.
 - On axios, aborting a call while its raw streamed body is read rejects with the signal's reason instead of axios's `CanceledError`, as on fetch.
 - On axios, a string or untyped body sent without a content type no longer goes out labeled `application/x-www-form-urlencoded`. `FormData`, `URLSearchParams`, and a typed `Blob` keep their own type.
+- An object query parameter without a `style` in the document goes out as `form` with explode (`name=odie&age=3`), the OpenAPI default the serialization guide documents. Before, it went out as `deepObject` (`filter[name]=odie`). Set `style: deepObject` on the parameter to keep brackets.
+- `body: null` sends the JSON document `null`, so a merge patch can clear a resource. Before, the body was dropped. An `undefined` body is still left out.
+- On axios, a web `ReadableStream` request body goes through the axios fetch adapter, since the Node and XHR adapters cannot send one.

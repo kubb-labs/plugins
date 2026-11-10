@@ -137,6 +137,8 @@ export function createAxiosTransport(instance: AxiosInstance): (request: core.Re
     const defaultAdapter = !instanceAdapter || String(instanceAdapter) === axiosDefaultAdapters
     const needsFetch = request.stream || request.credentials === 'omit'
     if (needsFetch && !config.adapter && defaultAdapter && typeof XMLHttpRequest !== 'undefined') config.adapter = 'fetch'
+    // The Node and XHR adapters cannot send a web `ReadableStream`, so it goes through fetch everywhere.
+    if (request.body instanceof ReadableStream && !config.adapter && defaultAdapter) config.adapter = 'fetch'
 
     // The fetch adapter takes `credentials` as is. The other adapters only know a boolean.
     const adapter = resolveAdapter(config.adapter ?? instanceAdapter)

@@ -252,7 +252,8 @@ function serializeDefaultQueryParam(key: string, value: unknown): Array<string> 
 }
 
 /**
- * The default query serializer. Without a style, arrays repeat their key and objects use `deepObject`.
+ * The default query serializer. Without a style, arrays repeat their key and objects use the OpenAPI default, `form` with
+ * explode, so `{ a: 1, b: 2 }` becomes `a=1&b=2`.
  */
 export const defaultQuerySerializer: QuerySerializer = (params, options) => {
   const parts: Array<string> = []
@@ -263,7 +264,8 @@ export const defaultQuerySerializer: QuerySerializer = (params, options) => {
       parts.push(paramOptions?.querystring ? json : `${encodeComponent(key)}=${json}`)
       continue
     }
-    parts.push(...(paramOptions ? serializeStyledQueryParam({ key, value, options: paramOptions }) : serializeDefaultQueryParam(key, value)))
+    const styled = paramOptions ?? (isRecord(value) ? {} : undefined)
+    parts.push(...(styled ? serializeStyledQueryParam({ key, value, options: styled }) : serializeDefaultQueryParam(key, value)))
   }
   return parts.join('&')
 }
