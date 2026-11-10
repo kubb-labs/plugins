@@ -148,8 +148,8 @@ function toFormData(body: Record<string, unknown>, encoding: Record<string, Body
   const formData = new FormData()
   for (const [key, value] of Object.entries(body)) {
     const { contentType, style, explode } = encoding?.[key] ?? {}
-    // `explode: false` sends an array as one part, its items joined by the style's delimiter.
-    if (Array.isArray(value) && explode === false) {
+    // `explode: false` sends an array of scalars as one part, its items joined by the style's delimiter.
+    if (Array.isArray(value) && explode === false && value.every((item) => typeof item !== 'object' || item === null || item instanceof Date)) {
       const delimiter = formDelimiters[style ?? 'form'] ?? ','
       formData.append(
         key,

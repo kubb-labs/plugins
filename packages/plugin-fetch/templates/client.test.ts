@@ -339,6 +339,15 @@ describe('built-in media types encode', () => {
     expect(body.getAll('tags')).toStrictEqual(['c', 'd'])
   })
 
+  test('keeps one JSON part per object in a multipart array with explode false', () => {
+    const body = encodeBody({
+      body: { items: [{ a: 1 }, { a: 2 }] },
+      contentType: 'multipart/form-data',
+      encoding: { items: { style: 'form', explode: false } },
+    }) as FormData
+    expect(body.getAll('items')).toStrictEqual(['{"a":1}', '{"a":2}'])
+  })
+
   test('emits a bigint as a JSON number', () => {
     expect(encodeBody({ body: { id: 42n } })).toBe('{"id":42}')
   })
