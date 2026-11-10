@@ -44,13 +44,21 @@ export type ResponseHeaders<THeaders = unknown> = Omit<Headers, 'get'> & {
   get: (name: Extract<keyof THeaders, string> | (string & {})) => string | null
 }
 
+// The media types `streamMediaTypes` reads as a stream: a response with one of them resolves to its raw body.
+type StreamContentType =
+  | `text/event-stream${string}`
+  | `application/jsonl${string}`
+  | `application/x-ndjson${string}`
+  | `application/json-seq${string}`
+  | `application/${string}+json-seq${string}`
+
 type HeadersFor<THeaders, TStatus> = ResponseHeaders<TStatus extends keyof THeaders ? THeaders[TStatus] : unknown>
 
 export type SuccessVariant<TStatus, TEntry, TRequest, TResponse, TKeys = never, THeaders = unknown> = TEntry extends { contentType: string; data: unknown }
   ? TEntry extends { contentType: infer TContentType; data: infer TData }
     ? {
         status: ToStatusNumber<TStatus, TKeys>
-        data: TContentType extends `text/event-stream${string}` ? ReadableStream<Uint8Array> : TData
+        data: TContentType extends StreamContentType ? ReadableStream<Uint8Array> : TData
         error: undefined
         contentType: TContentType
         headers: HeadersFor<THeaders, TStatus>

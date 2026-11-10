@@ -216,6 +216,20 @@ export function hasEventStreamContent(node: ast.OperationNode): boolean {
   return entries.some((entry) => baseContentType(entry.contentType) === 'text/event-stream' && (entries.length === 1 || Boolean(entry.schema)))
 }
 
+// The media types the client runtime reads as a stream. Keep in sync with `streamMediaTypes` in the client's `sse.ts`.
+const streamContentType = /^(text\/event-stream|application\/(jsonl|x-ndjson|json-seq|.+\+json-seq))$/
+
+/**
+ * Whether a success response offers a stream media type next to other content types. The client returns that variant's
+ * body as a `ReadableStream`, so the stream runtime is registered and a hook's data type includes the stream.
+ */
+export function hasStreamVariant(node: ast.OperationNode): boolean {
+  return getSuccessResponses(node.responses).some((response) => {
+    const variants = (response.content ?? []).filter((entry) => entry.schema)
+    return variants.length > 1 && variants.some((entry) => streamContentType.test(baseContentType(entry.contentType)))
+  })
+}
+
 const formContentTypes = new Set(['multipart/form-data', 'multipart/mixed', 'application/x-www-form-urlencoded'])
 
 /**

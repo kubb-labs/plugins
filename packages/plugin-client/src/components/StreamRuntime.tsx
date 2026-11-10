@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { hasEventStreamContent, hasFormBody, isEventStream } from '@internals/shared'
+import { hasEventStreamContent, hasFormBody, hasStreamVariant, isEventStream } from '@internals/shared'
 import { objectKey, singleQuote } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
@@ -67,7 +67,7 @@ export function StreamRuntime({
   servers?: Array<ast.InputServer>
 }): KubbReactNode {
   if (!sse) return null
-  const streams = nodes.some((node) => hasEventStreamContent(node) || isEventStream(node))
+  const streams = nodes.some((node) => hasEventStreamContent(node) || isEventStream(node) || hasStreamVariant(node))
   const footer = buildClientFooter({ baseURL, forms: nodes.some(hasFormBody), streams, servers })
   return (
     <>

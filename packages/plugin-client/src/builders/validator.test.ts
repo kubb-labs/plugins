@@ -75,6 +75,15 @@ describe('buildValidatorHooks', () => {
     ])
   })
 
+  test('wires no response validator for an operation without a response body schema, since plugin-zod emits none', () => {
+    const bodiless = [ast.factory.createResponse({ statusCode: '204', description: 'no body' })]
+    for (const responses of [[], bodiless]) {
+      const hooks = buildValidatorHooks({ node: { ...addPet, responses }, validator: 'zod', zodResolver: resolverZod })
+      expect(hooks.response).toBeNull()
+      expect(hooks.importedZodNames).toStrictEqual([])
+    }
+  })
+
   test('the object form wires the request validator from the body schema', () => {
     const hooks = buildValidatorHooks({ node: addPet, validator: { request: 'zod' }, zodResolver: resolverZod })
     expect(hooks.request).toBe('addPetBodySchema')

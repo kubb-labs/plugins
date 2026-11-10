@@ -19,6 +19,7 @@ export {
   getStatusClass,
   getSuccessResponses,
   hasEventStreamContent,
+  hasStreamVariant,
   hasFormBody,
   isEventStream,
   isSuccessStatusCode,

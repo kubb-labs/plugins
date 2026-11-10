@@ -5,6 +5,7 @@ import {
   getRequestGroups,
   getResponseContentTypeInfo,
   hasRequestContentTypeChoice,
+  hasStreamVariant,
   isEventStream,
   resolveErrorNames,
   resolveSuccessNames,
@@ -234,7 +235,9 @@ export function buildResponseTypes(node: ast.OperationNode, resolver: ResolverTs
   // The same operation gets typed headers from one client and not from another, so both results are kept.
   return resolver.memo(`responseTypes:${returnType}:${Boolean(resolver.response.headers)}:${node.method}\0${node.path}`, () => {
     const successNames = resolveSuccessNames(node, resolver)
-    const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
+    const bodyName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
+    // The client resolves a stream variant of a mixed response to its raw body.
+    const responseName = hasStreamVariant(node) ? `${bodyName} | ReadableStream<Uint8Array>` : bodyName
     const errorNames = resolveErrorNames(node, resolver)
 
     return {

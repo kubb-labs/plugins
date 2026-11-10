@@ -1108,6 +1108,21 @@ describe('media types', () => {
     expect((form.data as FormData).get('a')).toBe('1')
   })
 
+  test('types and returns a JSON Lines variant next to JSON as the raw stream', async () => {
+    type Responses = { '200': { contentType: 'application/json'; data: { id: number } } | { contentType: 'application/jsonl'; data: { id: number } } }
+    const client = createClientCore<string, string>({
+      defaultTransport: answer('{"id":1}\n', { 'content-type': 'application/jsonl' }),
+      mediaTypes: streamMediaTypes,
+    })
+    const result = await client<Responses>({ method: 'GET', url: '/updates' })
+
+    expect(result.contentType).toBe('application/jsonl')
+    if (result.contentType === 'application/jsonl') {
+      const stream: ReadableStream<Uint8Array> = result.data
+      expect(stream).toBeInstanceOf(ReadableStream)
+    }
+  })
+
   test('gives no data for 204, 205, 304, a HEAD request, and an empty body', async () => {
     for (const status of [204, 205, 304]) expect((await call(answer(null, { 'content-type': 'application/json' }, status))).data).toBeUndefined()
     expect((await call(answer('{"a":1}', { 'content-type': 'application/json' }), { method: 'HEAD' })).data).toBeUndefined()
