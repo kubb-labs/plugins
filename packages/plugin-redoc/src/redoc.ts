@@ -43,6 +43,58 @@ const redocBundle = {
   integrity: 'sha384-w447zOpYfw/1Tv/5AK9NfHTlQIqE3RVR6KY62jCyy9zNDgO64cMwGGP1Fj0zJVf5',
 }
 
+type Tag = { name: string; summary?: string; parent?: string; 'x-displayName'?: string }
+
+/**
+ * Maps OpenAPI 3.2 tag fields onto the Redoc extensions Redoc 2 reads instead: a tag's `summary` becomes its
+ * `x-displayName`, and when tags nest through `parent`, `x-tagGroups` holds one group per top-level tag with every tag
+ * under it. Operation tags the document does not declare get a group of their own, so Redoc still lists them. A document
+ * that sets its own `x-tagGroups` keeps it.
+ */
+export function withRedocTags(api: AdapterOas['document']): object {
+  const tags = (api.tags ?? []) as Array<Tag>
+  if (!tags.some((tag) => tag.summary || tag.parent)) return api
+
+  const displayTags = tags.map((tag) => (tag.summary && !tag['x-displayName'] ? { ...tag, 'x-displayName': tag.summary } : tag))
+  if ('x-tagGroups' in api || !tags.some((tag) => tag.parent)) return { ...api, tags: displayTags }
+
+  const byName = new Map(tags.map((tag) => [tag.name, tag]))
+  const rootOf = (tag: Tag) => {
+    const seen = new Set<string>()
+    let current = tag
+    // A `parent` loop stops at the first tag seen twice.
+    while (current.parent && byName.has(current.parent) && !seen.has(current.name)) {
+      seen.add(current.name)
+      current = byName.get(current.parent)!
+    }
+    return current
+  }
+  const groups = new Map<Tag, Array<string>>()
+  for (const tag of tags) {
+    const root = rootOf(tag)
+    groups.set(root, [...(groups.get(root) ?? []), tag.name])
+  }
+  // 3.2 nests custom methods under `additionalOperations`, and webhooks list operations the same way.
+  const pathItems = [...Object.values(api.paths ?? {}), ...Object.values((api as { webhooks?: object }).webhooks ?? {})] as Array<
+    Record<string, unknown> | undefined
+  >
+  const operationTags = pathItems.flatMap((pathItem) =>
+    [...Object.values(pathItem ?? {}), ...Object.values(pathItem?.additionalOperations ?? {})].flatMap(
+      (operation) => (operation as { tags?: Array<string> } | undefined)?.tags ?? [],
+    ),
+  )
+  const undeclared = [...new Set(operationTags)].filter((name) => !byName.has(name))
+
+  return {
+    ...api,
+    tags: displayTags,
+    'x-tagGroups': [
+      ...[...groups].map(([root, names]) => ({ name: root['x-displayName'] ?? root.summary ?? root.name, tags: names })),
+      ...undeclared.map((name) => ({ name, tags: [name] })),
+    ],
+  }
+}
+
 /**
  * Renders a self-contained Redoc HTML page for an OpenAPI document. The page
  * embeds the spec inline and pulls Redoc's bundle from a CDN at runtime, so
@@ -55,7 +107,7 @@ export function getPageHTML(api: AdapterOas['document']) {
      <script src="${redocBundle.src}" integrity="${redocBundle.integrity}" crossorigin="anonymous"></script>
  <div id="redoc-container"></div>
  <script>
-   const data = ${toScriptJSON(api)};
+   const data = ${toScriptJSON(withRedocTags(api))};
    Redoc.init(data, {
      "expandResponses": "200,400"
    }, document.getElementById('redoc-container'))

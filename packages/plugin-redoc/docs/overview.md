@@ -4,6 +4,8 @@ The Redoc plugin generates a single HTML page that documents your OpenAPI spec w
 
 The whole spec is embedded in the page, so you can publish the page to any static host without a build step. Viewing the page needs network access, because it loads a pinned Redoc bundle from jsDelivr, checked with a Subresource Integrity hash, and its fonts from Google Fonts.
 
+Redoc 2 does not read the OpenAPI 3.2 tag fields, so the plugin maps them for it: a tag's `summary` becomes its `x-displayName`, and tags that nest through `parent` become `x-tagGroups`, one group per top-level tag.
+
 ## Setup
 
 No other plugins or packages are needed. The plugin reads the spec through the default OpenAPI adapter, `adapterOas`, and fails with any other adapter.
