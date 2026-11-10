@@ -33,9 +33,14 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
 
   // `cy.request` has no cookie option, so the cookie group goes out as a `Cookie` header. An array joins with commas, a Date
   // is ISO 8601, and an object is JSON.
-  // shortcut: ignores per-cookie `style` and `explode`, upgrade when a spec needs exploded cookie arrays in Cypress.
-  const encodeCookie =
-    "encodeURIComponent(value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value))"
+  // shortcut: ignores per-cookie `explode`, upgrade when a spec needs exploded cookie arrays in Cypress.
+  const cookieText =
+    "value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value)"
+  // The OpenAPI 3.2 `cookie` style sends a value as it is, like the generated clients do.
+  const rawCookies = node.parameters.filter((parameter) => parameter.in === 'cookie' && parameter.style === 'cookie').map((parameter) => `'${parameter.name}'`)
+  const encodeCookie = rawCookies.length
+    ? `([${rawCookies.join(', ')}].includes(name) ? String : encodeURIComponent)(${cookieText})`
+    : `encodeURIComponent(${cookieText})`
   // Built first and sent only when non-empty, so a call without cookies keeps the cookies Cypress attaches itself.
   const cookieLine = `const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null).map(([name, value]) => \`\${name}=\${${encodeCookie}}\`).join('; ')\n`
 
