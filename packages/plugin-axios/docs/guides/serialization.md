@@ -136,7 +136,7 @@ To skip the lookup for one call, set `parseAs` to `'json'`, `'text'`, `'blob'`, 
 const { data } = await getReport({ path: { id: '123' }, parseAs: 'text' })
 ```
 
-The generated types follow what the built-in media types return. A response read as text, such as `application/xml`, `application/yaml`, or `text/csv`, is typed `string`, even when the document gives it an object schema. A vendor type such as `application/vnd.github.object` goes through `*/*`, which parses JSON, so it keeps its schema type. A media type you register changes the value but not that type, so narrow or cast `data` to what it returns:
+The generated types follow what the built-in media types return. A response read as text, such as `application/xml`, `application/yaml`, or `text/csv`, is typed `string`, even when the document gives it an object schema. A vendor type such as `application/vnd.github.object` keeps its schema type, because the client parses its JSON body. A media type you register changes the value but not that type, so narrow or cast `data` to what it returns:
 
 ```typescript
 const result = await getPetById({ path: { petId: 1 }, contentType: { response: 'application/xml' } })
