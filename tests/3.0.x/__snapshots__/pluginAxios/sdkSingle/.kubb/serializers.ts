@@ -96,6 +96,12 @@ export function serializeUrlencodedBody(body: Record<string, unknown>, encoding:
   const parts: Array<string> = []
   for (const [key, value] of Object.entries(body)) {
     const propertyEncoding = encoding[key]
+    // OpenAPI ignores `contentType` once a style field is set.
+    const styled = propertyEncoding?.style !== undefined || propertyEncoding?.explode !== undefined || propertyEncoding?.allowReserved !== undefined
+    if (notNullish(value) && !styled && isJsonMediaType(propertyEncoding?.contentType)) {
+      parts.push(`${encodeComponent(key)}=${encodeComponent(JSON.stringify(value, jsonReplacer))}`)
+      continue
+    }
     parts.push(...(propertyEncoding ? serializeStyledQueryParam({ key, value, options: propertyEncoding }) : serializeDefaultQueryParam(key, value)))
   }
   return parts.join('&')
@@ -174,8 +180,9 @@ export function toValue(value: unknown): string {
   return value instanceof Date ? value.toISOString() : String(value)
 }
 
+// `allowReserved` keeps reserved characters, but `#`, `&`, and `+` would end the query or change a form value.
 function encodeReserved(value: unknown): string {
-  return encodeURI(toValue(value))
+  return encodeURI(toValue(value)).replace(/[#&+]/g, encodeURIComponent)
 }
 
 function encodeComponent(value: unknown): string {
