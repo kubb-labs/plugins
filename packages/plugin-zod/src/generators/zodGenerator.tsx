@@ -9,6 +9,7 @@ import {
   resolveContentTypeVariants,
   resolveOperationFile,
   toResponseContent,
+  withUnwalkedSchemas,
 } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -69,11 +70,14 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const cyclicSchemas = getCircularNames(ctx)
     const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
 
-    // Rendered twice: the canonical schema decodes, the `${name}InputSchema` variant encodes.
-    const hasDirectionalNode = !mini && containsDirectionalNode({ node, printerOptions })
+    // The Zod printer prints `conditionals` and `contains`, which the visitors skip, and ignores a string's `content`.
+    const printedNode = withUnwalkedSchemas(node, { content: false })
 
-    const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node, printerOptions }) : [])
-    const importEntries = resolver.imports({ node, root, output, group: group ?? undefined })
+    // Rendered twice: the canonical schema decodes, the `${name}InputSchema` variant encodes.
+    const hasDirectionalNode = !mini && containsDirectionalNode({ node: printedNode, printerOptions })
+
+    const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node: printedNode, printerOptions }) : [])
+    const importEntries = resolver.imports({ node: printedNode, root, output, group: group ?? undefined })
     const inputImportEntries = hasDirectionalNode
       ? [...directionalRefNames].map((schemaName) => ({
           name: [resolver.schema.inputName(schemaName)],
@@ -168,9 +172,10 @@ export const zodGenerator = defineGenerator<PluginZod>({
     }) {
       if (!schema) return null
 
-      const directionalRefNames = direction === 'encode' && !mini ? new Set(collectDirectionalRefNames({ node: schema, printerOptions })) : null
+      const printedSchema = withUnwalkedSchemas(schema, { content: false })
+      const directionalRefNames = direction === 'encode' && !mini ? new Set(collectDirectionalRefNames({ node: printedSchema, printerOptions })) : null
       const imports = resolver.imports({
-        node: schema,
+        node: printedSchema,
         root,
         output,
         group: group ?? undefined,
@@ -277,6 +282,18 @@ export const zodGenerator = defineGenerator<PluginZod>({
       })
     })
 
+    const toParamsSchema = (params: Array<ast.ParameterNode>) =>
+      ast.factory.createSchema({
+        type: 'object',
+        // `primitive: 'object'` makes the printer emit `z.object(…)` rather than a record.
+        primitive: 'object',
+        properties: params.map((param) => ast.factory.createProperty({ name: param.name, required: param.required, schema: param.schema })),
+      })
+
+    const responseHeaderSchemas = node.responses.map((res) =>
+      res.headers?.length ? renderSchemaEntry({ schema: toParamsSchema(res.headers), name: resolver.response.headers(node, res.statusCode) }) : null,
+    )
+
     const responsesWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
     // Validate success (2xx) bodies only. Error bodies are surfaced unparsed, typed by plugin-ts (#369).
     const successResponsesWithSchema = getSuccessResponses(responsesWithSchema)
@@ -332,12 +349,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       .filter(({ params }) => params.length > 0)
       .map(({ kind, params }) =>
         renderSchemaEntry({
-          schema: ast.factory.createSchema({
-            type: 'object',
-            // `primitive: 'object'` makes the printer emit `z.object(…)` rather than a record.
-            primitive: 'object',
-            properties: params.map((param) => ast.factory.createProperty({ name: param.name, required: param.required, schema: param.schema })),
-          }),
+          schema: toParamsSchema(params),
           name: resolver.param[kind](node, params[0]!),
           direction: 'encode',
         }),
@@ -365,6 +377,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
         <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
         {paramSchemas}
         {responseSchemas}
+        {responseHeaderSchemas}
         {responseUnionSchema}
         {errorUnionSchema}
         {requestSchema}

@@ -19,6 +19,19 @@ const version = '3.0.x'
 type BuildConfig = Omit<Config, 'plugins' | 'reporters'> & { plugins: unknown }
 
 const configs: Array<{ name: string; config: BuildConfig }> = [
+  ...[false, true].map((mini): { name: string; config: BuildConfig } => ({
+    // OpenAPI 3.1 and 3.2 fields: conditionals, contains, property counts, exclusive bounds and response headers.
+    name: mini ? 'openapiFields3_2Mini' : 'openapiFields3_2',
+    config: {
+      root: __dirname,
+      input: '../../schemas/3.0.x/openapiFields3_2.yaml',
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false }),
+      parsers: [parserTs()],
+      storage: fsStorage(),
+      plugins: [pluginZod({ output: { path: './zod', barrel: false }, mini, importPath: mini ? 'zod/mini' : 'zod' })],
+    },
+  })),
   // ─── basic ──────────────────────────────────────────────────────────────
   // ─── exclude / include ───────────────────────────────────────────────────
   {

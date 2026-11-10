@@ -102,7 +102,7 @@ describe('numberConstraints', () => {
   })
 
   test('all constraints combined', () => {
-    expect(numberConstraints({ min: 1, max: 99, exclusiveMinimum: 0, exclusiveMaximum: 100 })).toBe('.min(1).max(99).gt(0).lt(100)')
+    expect(numberConstraints({ min: 1, max: 99, exclusive: { min: 0, max: 100 } })).toBe('.min(1).max(99).gt(0).lt(100)')
   })
 })
 
@@ -122,7 +122,7 @@ describe('numberChecksMini', () => {
   })
 
   test('all constraints combined', () => {
-    expect(numberChecksMini({ min: 1, max: 99, exclusiveMinimum: 0, exclusiveMaximum: 100 })).toBe(
+    expect(numberChecksMini({ min: 1, max: 99, exclusive: { min: 0, max: 100 } })).toBe(
       '.check(z.minimum(1), z.maximum(99), z.minimum(0, { exclusive: true }), z.maximum(100, { exclusive: true }))',
     )
   })
@@ -239,6 +239,12 @@ describe('omitUnwrapChain', () => {
 })
 
 describe('isObjectSchemaNode', () => {
+  test('an allOf with conditionals prints a pipe, so it returns false', () => {
+    const member = ast.factory.createSchema({ type: 'object', properties: [] })
+    const node = ast.factory.createSchema({ type: 'intersection', members: [member, member], conditionals: [{ if: member, then: member }] })
+    expect(isObjectSchemaNode(node)).toBe(false)
+  })
+
   test('plain object with properties returns true', () => {
     const node = ast.factory.createSchema({
       type: 'object',
