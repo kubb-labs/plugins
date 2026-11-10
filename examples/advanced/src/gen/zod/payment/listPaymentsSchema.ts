@@ -16,18 +16,18 @@ export type ListPaymentsCookieSessionSchemaType = z.infer<typeof listPaymentsCoo
 
 export const listPaymentsStatus2xxSchema = z.array(paymentSchema)
 
-export type ListPaymentsStatus2XxSchemaType = z.infer<typeof listPaymentsStatus2xxSchema>
+export type ListPaymentsStatus2xxSchemaType = z.infer<typeof listPaymentsStatus2xxSchema>
 
 export const listPaymentsStatus4xxSchema = paymentErrorSchema
 
-export type ListPaymentsStatus4XxSchemaType = z.infer<typeof listPaymentsStatus4xxSchema>
+export type ListPaymentsStatus4xxSchemaType = z.infer<typeof listPaymentsStatus4xxSchema>
 
 export const listPaymentsStatus2xxHeadersSchema = z.object({
   'X-Rate-Limit': z.int().describe('Calls left this hour'),
   'X-Next-Page': z.string().optional(),
 })
 
-export type ListPaymentsStatus2XxHeadersSchemaType = z.infer<typeof listPaymentsStatus2xxHeadersSchema>
+export type ListPaymentsStatus2xxHeadersSchemaType = z.infer<typeof listPaymentsStatus2xxHeadersSchema>
 
 export const listPaymentsResponseSchema = listPaymentsStatus2xxSchema
 

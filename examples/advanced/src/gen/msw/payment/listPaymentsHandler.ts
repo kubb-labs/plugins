@@ -8,7 +8,7 @@ export function listPaymentsHandler(
   return http.get(`${options?.baseURL ?? ''}/store/payments`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse<string>(JSON.stringify(data ?? [{ id: 1, method: 'card', creditCard: '4111', billingAddress: 'Main St 1' }]), {
+    return new HttpResponse<string>(JSON.stringify(data === undefined ? [{ id: 1, method: 'card', creditCard: '4111', billingAddress: 'Main St 1' }] : data), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

@@ -22,7 +22,7 @@ export function listPayments(
     .filter(([, value]) => value != null)
     .map(
       ([name, value]) =>
-        `${name}=${encodeURIComponent(value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value))}`,
+        `${name}=${(['session'].includes(name) ? String : encodeURIComponent)(value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value))}`,
     )
     .join('; ')
   return cy

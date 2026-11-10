@@ -91,9 +91,9 @@ export type {
   ListPaymentsQueryStatusSchemaType,
   ListPaymentsResponseSchemaType,
   ListPaymentsResponsesSchemaType,
-  ListPaymentsStatus2XxHeadersSchemaType,
-  ListPaymentsStatus2XxSchemaType,
-  ListPaymentsStatus4XxSchemaType,
+  ListPaymentsStatus2xxHeadersSchemaType,
+  ListPaymentsStatus2xxSchemaType,
+  ListPaymentsStatus4xxSchemaType,
 } from './zod/payment/listPaymentsSchema'
 export type { PaymentErrorSchemaType } from './zod/paymentErrorSchema'
 export type { PaymentMethodEnumSchemaType } from './zod/paymentMethodEnumSchema'
