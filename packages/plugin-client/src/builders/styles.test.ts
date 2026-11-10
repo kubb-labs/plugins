@@ -121,6 +121,16 @@ describe('buildStyles', () => {
     expect(buildStyles({ node })).toBe("{ parts: { prefix: [{ contentType: 'application/json' }, {}], item: { contentType: 'text/plain' } } }")
   })
 
+  test('emits the parts group when multipart/mixed is one of several request content types, and for no other media type', () => {
+    const content = (contentType: string) =>
+      ast.factory.createContent({ contentType, schema: ast.factory.createSchema({ type: 'array', items: [] }), itemEncoding: { contentType: 'text/csv' } })
+    const operation = (contentTypes: Array<string>) =>
+      ast.factory.createOperation({ operationId: 'upload', method: 'POST', path: '/upload', requestBody: { content: contentTypes.map(content) }, responses: [] })
+
+    expect(buildStyles({ node: operation(['application/json', 'multipart/mixed']) })).toBe("{ parts: { item: { contentType: 'text/csv' } } }")
+    expect(buildStyles({ node: operation(['multipart/related']) })).toBeNull()
+  })
+
   test('omits the body group when the request has several content types', () => {
     const content = (contentType: string) =>
       ast.factory.createContent({
