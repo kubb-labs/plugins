@@ -44,9 +44,6 @@ export type ResponseHeaders<THeaders = unknown> = Omit<Headers, 'get'> & {
   get: (name: Extract<keyof THeaders, string> | (string & {})) => string | null
 }
 
-/**
- * The `headers` of the result for one status key, typed by what `THeaders` declares for that key.
- */
 type HeadersFor<THeaders, TStatus> = ResponseHeaders<TStatus extends keyof THeaders ? THeaders[TStatus] : unknown>
 
 export type SuccessVariant<TStatus, TEntry, TRequest, TResponse, TKeys = never, THeaders = unknown> = TEntry extends { contentType: string; data: unknown }
@@ -194,7 +191,8 @@ export type Validator<T = unknown> = StandardSchemaValidator<T>
 export type { ValidateOption, ValidationErrorContext, ValidationErrorHandler } from './standardSchema.ts'
 
 /**
- * A security scheme of a generated call, passed to the `auth` resolver.
+ * A security scheme of a generated call, passed to the `auth` resolver. OAuth2 `flows` and `metadataUrl` (RFC 8414) and
+ * the OpenID Connect `url` tell the resolver where to get a token.
  */
 export type Auth = {
   type: 'http' | 'apiKey' | 'oauth2' | 'openIdConnect'
@@ -202,17 +200,8 @@ export type Auth = {
   name?: string
   in?: 'header' | 'query' | 'cookie'
   scopes?: Array<string>
-  /**
-   * The OAuth2 flows by name with their URLs, such as `deviceAuthorization` with `deviceAuthorizationUrl` and `tokenUrl`.
-   */
   flows?: Record<string, { authorizationUrl?: string; deviceAuthorizationUrl?: string; tokenUrl?: string; refreshUrl?: string }>
-  /**
-   * The OAuth2 authorization server metadata URL (RFC 8414).
-   */
   metadataUrl?: string
-  /**
-   * The OpenID Connect discovery URL.
-   */
   url?: string
 }
 

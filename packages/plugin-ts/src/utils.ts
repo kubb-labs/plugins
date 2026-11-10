@@ -143,8 +143,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
 }
 
 /**
- * The `@example` values of a parameter's or media type's `examples`: each `value`, then its `serializedValue`, the form
- * sent on the wire, under a `Serialized` caption. `undefined` when there are none.
+ * Each example's `value`, then its `serializedValue` under a `Serialized` caption, or `undefined` when there are none.
  */
 export function getExampleValues(examples: Array<ast.ExampleNode> | undefined): Array<unknown> | undefined {
   const values = (examples ?? []).flatMap((example) => [
@@ -155,8 +154,7 @@ export function getExampleValues(examples: Array<ast.ExampleNode> | undefined): 
 }
 
 /**
- * JSDoc for a response type: its `summary`, and one `@see` per link with the operation it leads to and the parameters
- * it fills in from this response.
+ * JSDoc for a response type: its `summary`, and one `@see` per link.
  */
 export function buildResponseComments(response: ast.ResponseNode): Array<string> {
   const links = Object.entries(response.links ?? {}).map(([name, link]) => {

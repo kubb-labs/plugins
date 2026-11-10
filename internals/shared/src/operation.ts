@@ -698,9 +698,6 @@ export function getStatusCodeNumber(statusCode: ast.StatusCode | number | string
   return Number.isNaN(code) ? null : code
 }
 
-/**
- * The first digit of a status such as `404` or a range such as `4XX`, or `null` for `default`.
- */
 function getStatusClass(statusCode: ast.StatusCode | number | string): number | null {
   const range = /^([1-5])XX$/i.exec(String(statusCode))
   if (range) return Number(range[1])

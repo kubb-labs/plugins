@@ -3,12 +3,8 @@ import type { OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
 
 /**
- * Builds the `RequestResult` generic arguments for one operation: the per-status responses record,
- * the per-call `ThrowOnError` flag, and, unless `returnType` is `'data'`, the declared response
- * headers by status. `SuccessOf` / `ErrorOf` split the record inside the runtime.
+ * Builds the `RequestResult` type arguments of one operation: responses, `ThrowOnError` and, unless `returnType` is `'data'`, the response headers.
  *
- * @example
- * `buildRequestResultGenerics({ node, types, returnType }) // 'AddPetResponses, ThrowOnError'`
  * @example
  * `buildRequestResultGenerics({ node, types, returnType }) // "LoginUserResponses, ThrowOnError, { '200': LoginUserStatus200Headers }"`
  */
@@ -45,8 +41,7 @@ export function buildResultType({ node, types, returnType }: { node: ast.Operati
 }
 
 /**
- * The `{ status: headers }` record of the responses that declare `headers`, the last `RequestResult` type argument, or
- * `null` when none does.
+ * The `{ status: headers }` record for the last `RequestResult` type argument, or `null` when no response declares headers.
  *
  * @example
  * `buildResponseHeadersType({ node, types }) // "{ '200': ListPetsStatus200Headers }"`

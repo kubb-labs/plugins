@@ -358,8 +358,7 @@ export function hasInputChecks(node: ast.SchemaNode): boolean {
 }
 
 /**
- * Checks the raw input before parsing strips unknown keys or inserts defaults: an object's property counts, then
- * the node's `conditionals`, already printed as `z.refine(…)` calls.
+ * Checks the raw input, before parsing strips keys or inserts defaults: property counts, then the printed `conditionals`.
  */
 export function inputChecks({ value, node, conditionals = [] }: { value: string; node: ast.SchemaNode; conditionals?: Array<string> }): string {
   const checks: Array<string> = []

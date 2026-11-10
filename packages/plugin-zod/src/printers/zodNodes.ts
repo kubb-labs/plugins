@@ -56,9 +56,6 @@ export type ZodDialect<TOptions extends ZodNodeOptions = ZodNodeOptions> = {
   catchall: (object: string, value: string) => string
   nullable: (value: string) => string
   unique: (array: string) => string
-  /**
-   * Adds a `z.refine(…)` check, given as its arguments, to a schema.
-   */
   refine: (schema: string, check: string) => string
   extend: (base: string, shape: string) => string
   intersection: (left: string, right: string) => string
@@ -354,8 +351,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
 type PrinterContext = { transform: (node: ast.SchemaNode) => string | null }
 
 /**
- * The `z.refine(…)` arguments that parse a JSON string, base64-decoded first when its encoding says so, and check the
- * result against `content.schema`. `null` for content that is not JSON or has no schema.
+ * The `z.refine(…)` arguments that check a JSON string, base64-decoded when its encoding says so, against `content.schema`.
  */
 function contentCheck(ctx: PrinterContext, content: NonNullable<ast.StringSchemaNode['content']>): string | null {
   if (!content.schema || !content.mediaType || !/[/+]json\b/i.test(content.mediaType)) return null
@@ -366,9 +362,6 @@ function contentCheck(ctx: PrinterContext, content: NonNullable<ast.StringSchema
   return `(value) => { try { return ${schema}.safeParse(JSON.parse(${decoded})).success } catch { return false } }, { message: ${stringify(`Value is not ${content.mediaType} that matches its content schema`)} }`
 }
 
-/**
- * The `z.refine(…)` arguments that count the items matching `contains.schema`, or `null` when any count is allowed.
- */
 function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | null {
   if (min === 0 && max === undefined) return null
   const bounds = [`count >= ${min}`, max !== undefined ? `count <= ${max}` : null].filter(Boolean).join(' && ')
@@ -404,16 +397,12 @@ function matchesCondition(ctx: PrinterContext, schema: ast.SchemaNode | undefine
   return conditions.join(' && ')
 }
 
-/**
- * Prints one `conditionals` entry (`if`/`then`/`else`, `dependentRequired` or `dependentSchemas`) as a `z.refine(…)` check.
- */
 function conditionalCheck(ctx: PrinterContext, entry: NonNullable<ast.SchemaNode['conditionals']>[number]): string {
   return `z.refine((value) => (${matchesCondition(ctx, entry.if)} ? ${matchesCondition(ctx, entry.then)} : ${matchesCondition(ctx, entry.else)}), { message: "Value does not meet a conditional schema" })`
 }
 
 /**
- * Wraps each handler so its output first checks the raw input: an object's property counts and the node's
- * `conditionals`. See {@link inputChecks}.
+ * Wraps each handler so its output first checks the raw input, see {@link inputChecks}.
  */
 export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.PrinterPartial<string, TOptions>): ast.PrinterPartial<string, TOptions> {
   const wrapped: Record<string, unknown> = {}

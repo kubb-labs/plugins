@@ -45,9 +45,6 @@ function resolveTypeImportNames(node: ast.OperationNode, types: OperationTypeNam
   return [types.response.options(node), types.response.responses(node), ...getHeaderTypeNames(node, types, returnType)]
 }
 
-/**
- * The response header types a method's `RequestResultWithHeaders` names: none for a stream or for unwrapped data.
- */
 function getHeaderTypeNames(node: ast.OperationNode, types: OperationTypeNames, returnType: ReturnTypeOption): Array<string> {
   return isEventStream(node) || returnType === 'data' ? [] : getResponseHeadersTypeNames({ node, types })
 }

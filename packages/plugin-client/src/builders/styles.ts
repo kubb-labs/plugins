@@ -50,8 +50,7 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
 }
 
 /**
- * Serializes the OpenAPI 3.2 `prefixEncoding` and `itemEncoding` of the request body's default content type into
- * `prefix: [...]` and `item: { ... }` entries for a `multipart/mixed` body. Only the part media types are kept.
+ * The `prefix` and `item` part media types of a `multipart/mixed` body, from its `prefixEncoding` and `itemEncoding`.
  */
 function serializePartsEncoding(node: ast.HttpOperationNode): Array<string> {
   const content = node.requestBody?.content

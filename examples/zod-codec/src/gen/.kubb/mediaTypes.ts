@@ -171,8 +171,7 @@ const multipart: MediaType = {
 }
 
 /**
- * Encodes an array as `multipart/mixed` parts (RFC 2046). A part's media type comes from `encoding`, by position in
- * `prefix` and then `item`, else from the part: a `Blob`'s own type, `text/plain` for a string, JSON for anything else.
+ * Encodes an array as `multipart/mixed` parts (RFC 2046), each typed by `encoding` (`prefix`, then `item`) or by the part.
  * The boundary goes on the `Blob`'s type, which the client sends as `Content-Type`.
  */
 function toMultipartMixed(parts: Array<unknown>, encoding: PartsEncoding | undefined): Blob {

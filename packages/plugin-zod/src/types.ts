@@ -250,9 +250,8 @@ export type Options = OutputOptions & {
    */
   oneOfType?: 'union' | 'xor'
   /**
-   * Check a string that holds encoded content (`contentMediaType`, `contentEncoding`, `contentSchema`). A JSON string is
-   * parsed, after base64 decoding when `contentEncoding` says so, and checked against its `contentSchema`, and a base64
-   * string without one prints `z.base64()`. Off by default, since JSON Schema treats these keywords as annotations.
+   * Check a string's `contentSchema`: parse its JSON, base64-decoded first when `contentEncoding` says so. A base64 string
+   * without one prints `z.base64()`. Off by default, since JSON Schema treats these keywords as annotations.
    *
    * @default false
    */

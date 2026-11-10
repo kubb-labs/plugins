@@ -46,10 +46,8 @@ const redocBundle = {
 type Tag = { name: string; summary?: string; parent?: string; 'x-displayName'?: string }
 
 /**
- * Maps OpenAPI 3.2 tag fields onto the Redoc extensions Redoc 2 reads instead: a tag's `summary` becomes its
- * `x-displayName`, and when tags nest through `parent`, `x-tagGroups` holds one group per top-level tag with every tag
- * under it. Operation tags the document does not declare get a group of their own, so Redoc still lists them. A document
- * that sets its own `x-tagGroups` keeps it.
+ * Maps OpenAPI 3.2 tag fields onto Redoc 2 extensions: `summary` becomes `x-displayName`, and `parent` nesting becomes
+ * `x-tagGroups`, with a group for each undeclared operation tag. A document's own `x-tagGroups` wins.
  */
 export function withRedocTags(api: AdapterOas['document']): object {
   const tags = (api.tags ?? []) as Array<Tag>

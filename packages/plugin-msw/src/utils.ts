@@ -2,16 +2,12 @@ import { toResponseContent } from '@internals/shared'
 import { stringify } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
-/**
- * The status a mock sends: the code itself, or the first code of a range, so `2XX` sends `200`.
- */
 export function getMockStatus(statusCode: ast.StatusCode): number {
   return /^[1-5]XX$/i.test(statusCode) ? Number(statusCode[0]) * 100 : Number(statusCode)
 }
 
 /**
- * The response headers a mock sends: each declared header with an example or a default, as a string. An example's
- * `serializedValue` is the header as sent, so it wins over its `value`.
+ * The declared response headers a mock sends as strings, from an example (its `serializedValue` first) or a default.
  */
 export function getMockHeaders(response: ast.ResponseNode | null | undefined): Array<[name: string, value: string]> {
   return (response?.headers ?? []).flatMap((header): Array<[string, string]> => {
@@ -99,8 +95,7 @@ export function responseReturn(body: string, status: number, response: ast.Respo
 }
 
 /**
- * The first example of a response body as source code: its `value` as a literal, else its `serializedValue` as a string.
- * `null` when the response has no example.
+ * A response's first body example as source code, or `null` when it has none.
  */
 export function getExampleBody(response: ast.ResponseNode | null | undefined): string | null {
   for (const entry of response?.content ?? []) {

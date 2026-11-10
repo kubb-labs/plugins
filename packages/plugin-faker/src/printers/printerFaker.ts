@@ -73,8 +73,7 @@ const maxInt32 = 2_147_483_647
  * `faker.number.float()` or `faker.number.int()`, with `min` and `max` passed only when set.
  */
 function numberCall(kind: 'float' | 'int', { min, max, exclusive }: Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive'>): string {
-  // An integer next to an exclusive bound starts at the next integer. A float uses the bound: faker never returns its `max`,
-  // and returns its `min` only by chance.
+  // An integer bound moves to the next integer. Faker never returns a float's `max`, and its `min` only by chance.
   if (exclusive?.min !== undefined) min = Math.max(min ?? -Infinity, kind === 'int' ? Math.floor(exclusive.min) + 1 : exclusive.min)
   if (exclusive?.max !== undefined) max = Math.min(max ?? Infinity, kind === 'int' ? Math.ceil(exclusive.max) - 1 : exclusive.max)
   // Faker fills a missing bound with `0` (and `1` for a float's `max`), which a lone bound on the other side of it contradicts.
@@ -85,9 +84,6 @@ function numberCall(kind: 'float' | 'int', { min, max, exclusive }: Pick<ast.Num
   return `faker.number.${kind}(${args ? `{ ${args} }` : ''})`
 }
 
-/**
- * Encodes a string expression as `encoding` says: `base64` with `btoa`, and `base64url` with its URL-safe alphabet and no padding.
- */
 function encodeContent(value: string, encoding: string | undefined): string {
   if (encoding === 'base64') return `btoa(${value})`
   if (encoding === 'base64url') return `btoa(${value}).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '')`
@@ -201,7 +197,6 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       boolean: () => 'faker.datatype.boolean()',
       null: () => 'null',
       string(node) {
-        // A string that holds JSON, such as `contentMediaType: application/json` with a `contentSchema`, encoded as `contentEncoding` says.
         if (node.content?.schema && node.content.mediaType && /[/+]json\b/i.test(node.content.mediaType)) {
           return encodeContent(`JSON.stringify(${printNested(node.content.schema, { typeName: undefined, nestedInObject: true })})`, node.content.encoding)
         }

@@ -6,8 +6,7 @@ import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
 /**
- * `export const servers = { production: '…' }`: the document's servers that have a `name`, the first one per name, so
- * `client.setConfig({ baseURL: servers.staging })` picks one by name. `null` when no server has a name.
+ * `export const servers = { production: '…' }` from the named servers, for `client.setConfig({ baseURL: servers.staging })`.
  */
 function buildServers(servers: Array<ast.InputServer> | undefined): string | null {
   const named = new Map<string, string>()

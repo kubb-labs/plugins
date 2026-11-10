@@ -12,17 +12,8 @@ export type Auth = {
   name?: string
   in?: 'header' | 'query' | 'cookie'
   scopes?: Array<string>
-  /**
-   * The OAuth2 flows by name with their URLs, such as `deviceAuthorization` with `deviceAuthorizationUrl` and `tokenUrl`.
-   */
   flows?: Record<string, Omit<ast.OAuthFlow, 'scopes'>>
-  /**
-   * The OAuth2 authorization server metadata URL (RFC 8414).
-   */
   metadataUrl?: string
-  /**
-   * The OpenID Connect discovery URL.
-   */
   url?: string
 }
 
@@ -58,9 +49,7 @@ function serializeRequirement(requirement: SecurityRequirement): string {
 
 /**
  * Maps an AST credential to the inline `Auth` object, or `null` for `mutualTLS`, which the runtime cannot send.
- * `http` schemes other than `basic` are treated as bearer. OAuth2 keeps its flow URLs and metadata URL, and OpenID
- * Connect its discovery URL, so an `auth` resolver can run the flow. The flows leave out their scope descriptions,
- * since the requirement lists the scopes a call needs.
+ * `http` schemes other than `basic` are treated as bearer. OAuth2 and OpenID Connect keep their URLs for the `auth` resolver.
  */
 export function resolveCredential(credential: ast.AuthCredential): Auth | null {
   if (credential.type === 'apiKey') return { type: 'apiKey', name: credential.name, in: credential.in }

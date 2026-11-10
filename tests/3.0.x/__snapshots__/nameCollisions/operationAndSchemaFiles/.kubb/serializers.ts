@@ -76,8 +76,7 @@ export type Serializers = {
 }
 
 /**
- * The OpenAPI 3.2 `prefixEncoding` and `itemEncoding` of a `multipart/mixed` body: each part's media type by position,
- * then for every part after those.
+ * The OpenAPI 3.2 `prefixEncoding` (by position) and `itemEncoding` (the rest) of a `multipart/mixed` body's parts.
  */
 export type PartsEncoding = {
   prefix?: Array<{ contentType?: string }>
@@ -134,9 +133,7 @@ function isJsonMediaType(contentType: string | null | undefined): boolean {
   return /[/+]json$/.test(baseContentType(contentType) ?? '')
 }
 
-/**
- * An RFC 6265 cookie value, which the `cookie` style sends without escaping.
- */
+// RFC 6265 cookie-octets, which the `cookie` style sends unescaped.
 const cookieOctets = /^[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*$/
 
 function rawCookieValue(item: unknown): string {
