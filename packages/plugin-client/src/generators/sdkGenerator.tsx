@@ -9,7 +9,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { getOperationSecurity, type SecurityRequirement } from '../builders/security.ts'
-import { getOperationBaseURL, type ServerDocument, type ServerOptions } from '../builders/server.ts'
+import { getOperationBaseURL, type ServerOptions } from '../builders/server.ts'
 import { buildValidatorHooks, type ValidatorHooks } from '../builders/validator.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
 import { StreamRuntime } from '../components/StreamRuntime.tsx'
@@ -59,7 +59,6 @@ function buildControllers(
 
   const pluginZod = validatorEnabled ? driver.getPlugin(pluginZodName) : null
   const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
-  const document = ctx.adapter.document as ServerDocument | null | undefined
   const server = (ctx.adapter.options as { server?: ServerOptions } | undefined)?.server
 
   function buildOperationData(node: ast.OperationNode): OperationData {
@@ -84,7 +83,7 @@ function buildControllers(
         : null
 
     const security = getOperationSecurity({ auth: node.auth, schemes: ctx.meta.auth })
-    const baseURL = ast.isHttpOperationNode(node) ? getOperationBaseURL({ document, method: node.method, path: node.path, server }) : undefined
+    const baseURL = getOperationBaseURL({ servers: node.servers, server })
 
     const validatorHooks = zodResolver ? buildValidatorHooks({ node, validator, zodResolver }) : null
 

@@ -36,7 +36,11 @@ export type QueryParamStyle = SerializationStyle<QueryStyle> & ParamContentType 
  */
 export type QuerySerializer = (params: Record<string, unknown>, options?: Record<string, QueryParamStyle>) => string
 
+/**
+ * `cookie` is the OpenAPI 3.2 style that sends values as they are, without percent-encoding (RFC 6265). `form` is the default.
+ */
 export type CookieParamStyle = ParamContentType & {
+  style?: 'form' | 'cookie'
   explode?: boolean
 }
 
@@ -119,24 +123,37 @@ function isJsonMediaType(contentType: string | null | undefined): boolean {
   return /[/+]json$/.test(baseContentType(contentType) ?? '')
 }
 
-function serializeCookie({ name, value, explode }: { name: string; value: unknown; explode: boolean }): string {
+/**
+ * An RFC 6265 cookie value, which the `cookie` style sends without escaping.
+ */
+const cookieOctets = /^[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*$/
+
+function rawCookieValue(item: unknown): string {
+  const value = toValue(item)
+  // An unescaped `;` would add a cookie of its own.
+  if (!cookieOctets.test(value)) throw new TypeError(`Cookie value ${JSON.stringify(value)} has characters the cookie style cannot send, escape it first.`)
+  return value
+}
+
+function serializeCookie({ name, value, explode, raw }: { name: string; value: unknown; explode: boolean; raw: boolean }): string {
+  const encode = (item: unknown) => (raw ? rawCookieValue(item) : encodeURIComponent(toValue(item)))
   if (Array.isArray(value)) {
-    const items = value.filter(notNullish).map((item) => encodeURIComponent(toValue(item)))
+    const items = value.filter(notNullish).map(encode)
     return explode ? items.map((item) => `${name}=${item}`).join('; ') : `${name}=${items.join(',')}`
   }
   if (isRecord(value)) {
     const entries = Object.entries(value).filter(([, item]) => notNullish(item))
-    if (explode) return entries.map(([key, item]) => `${key}=${encodeURIComponent(toValue(item))}`).join('; ')
+    if (explode) return entries.map(([key, item]) => `${key}=${encode(item)}`).join('; ')
     return `${name}=${entries
       .flatMap(([key, item]) => [key, item])
-      .map((item) => encodeURIComponent(toValue(item)))
+      .map(encode)
       .join(',')}`
   }
-  return `${name}=${encodeURIComponent(toValue(value))}`
+  return `${name}=${encode(value)}`
 }
 
 /**
- * Joins cookie parameters into a `Cookie` header value with the OpenAPI `form` style.
+ * Joins cookie parameters into a `Cookie` header value with the OpenAPI `form` style, or the `cookie` style when a parameter sets it.
  */
 export function serializeCookies(cookies: Record<string, unknown>, styles?: Record<string, CookieParamStyle>): string {
   const parts: Array<string> = []
@@ -147,7 +164,9 @@ export function serializeCookies(cookies: Record<string, unknown>, styles?: Reco
       parts.push(`${name}=${encodeURIComponent(JSON.stringify(value, jsonReplacer))}`)
       continue
     }
-    parts.push(serializeCookie({ name, value, explode: style?.explode ?? false }))
+    // OpenAPI 3.2 defaults `explode` to true for the `cookie` style.
+    const raw = style?.style === 'cookie'
+    parts.push(serializeCookie({ name, value, explode: style?.explode ?? raw, raw }))
   }
   return parts.join('; ')
 }

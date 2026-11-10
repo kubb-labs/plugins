@@ -113,16 +113,19 @@ parameter named `id`.
 
 ### Header and cookie
 
-Header parameters use the `simple` style and cookie parameters use the `form` style. Both fix the
-style and only let `explode` vary, so the metadata for these locations carries `explode` alone.
-Header values are sent as-is, and cookie values are URL-encoded into a single `Cookie` header.
+Header parameters use the `simple` style and cookie parameters use the `form` style, so the metadata
+for these locations carries only `explode`, plus `style: 'cookie'` for a cookie parameter with the
+OpenAPI 3.2 `cookie` style. Header values are sent as-is. Cookie values are URL-encoded into a single
+`Cookie` header. The `cookie` style sends them unencoded, as RFC 6265 describes, defaults `explode` to
+`true`, and throws on a value with a character such as `;` or a space.
 
-| Location | `explode` | Input                             | Result                 |
-| -------- | --------- | --------------------------------- | ---------------------- |
-| header   | `false`   | `[3, 4]`                          | `X-Ids: 3,4`           |
-| header   | `true`    | `{ role: 'admin' }`               | `X-Filter: role=admin` |
-| cookie   | `false`   | `{ session: 'abc', ids: [1, 2] }` | `session=abc; ids=1,2` |
-| cookie   | `true`    | `{ ids: [1, 2] }`                 | `ids=1; ids=2`         |
+| Location               | `explode` | Input                             | Result                    |
+| ---------------------- | --------- | --------------------------------- | ------------------------- |
+| header                 | `false`   | `[3, 4]`                          | `X-Ids: 3,4`              |
+| header                 | `true`    | `{ role: 'admin' }`               | `X-Filter: role=admin`    |
+| cookie                 | `false`   | `{ session: 'abc', ids: [1, 2] }` | `session=abc; ids=1,2`    |
+| cookie                 | `true`    | `{ ids: [1, 2] }`                 | `ids=1; ids=2`            |
+| cookie, `cookie` style | default   | `{ sid: 'a%20b', ids: [1, 2] }`   | `sid=a%20b; ids=1; ids=2` |
 
 ## A minimal client
 

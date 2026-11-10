@@ -8,7 +8,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { getOperationSecurity } from '../builders/security.ts'
-import { getOperationBaseURL, type ServerDocument, type ServerOptions } from '../builders/server.ts'
+import { getOperationBaseURL, type ServerOptions } from '../builders/server.ts'
 import { buildValidatorHooks } from '../builders/validator.ts'
 import { Operation } from '../components/Operation.tsx'
 import { StreamRuntime } from '../components/StreamRuntime.tsx'
@@ -66,12 +66,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       } as const
 
       const security = getOperationSecurity({ auth: node.auth, schemes: ctx.meta.auth })
-      const baseURL = getOperationBaseURL({
-        document: ctx.adapter.document as ServerDocument | null | undefined,
-        method: node.method,
-        path: node.path,
-        server: (ctx.adapter.options as { server?: ServerOptions } | undefined)?.server,
-      })
+      const baseURL = getOperationBaseURL({ servers: node.servers, server: (ctx.adapter.options as { server?: ServerOptions } | undefined)?.server })
 
       // A custom client module is emitted verbatim, so `importPath` is used exactly as configured.
       // The default `.kubb/client.ts` is a file path and is made relative to the operation file.

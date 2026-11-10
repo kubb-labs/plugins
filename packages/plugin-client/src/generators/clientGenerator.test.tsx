@@ -1,11 +1,10 @@
-import type { Adapter, Config, PluginType } from '@kubb/kit'
+import type { Config, PluginType } from '@kubb/kit'
 import { ast, memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation, renderGeneratorOperations } from '#mocks'
 import { resolverClient } from '../resolver.ts'
-import type { ServerDocument } from '../builders/server.ts'
 import type { ClientOptions, ClientResolvedOptions, ResolverClient } from '../types.ts'
 import { createClientGenerator } from './clientGenerator.tsx'
 
@@ -229,10 +228,6 @@ const securityMeta: ast.InputMeta = {
   ],
 }
 
-function mockedAdapterWithDocument(document: ServerDocument): Adapter {
-  return { ...createMockedAdapter(), document } as Adapter
-}
-
 describe('clientGenerator operation', () => {
   const testData = [
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
@@ -265,15 +260,13 @@ describe('clientGenerator operation', () => {
     // A path-level `servers` entry becomes the call's default `baseURL`, before `...config` so a per-call one still wins.
     {
       name: 'streamEventsWithPathServer',
-      node: streamEventsNode,
+      node: { ...streamEventsNode, servers: [{ url: 'https://echo.websocket.org' }] },
       options: {},
-      adapter: mockedAdapterWithDocument({ paths: { '/events': { servers: [{ url: 'https://echo.websocket.org' }] } } }),
     },
   ] as const satisfies Array<{
     name: string
     node: ast.OperationNode
     options: Partial<PluginFetch['resolvedOptions']>
-    adapter?: Adapter
     meta?: ast.InputMeta
   }>
 
@@ -287,7 +280,7 @@ describe('clientGenerator operation', () => {
 
     await renderGeneratorOperation(clientGenerator, props.node, {
       config: testConfig,
-      adapter: 'adapter' in props ? props.adapter : createMockedAdapter(),
+      adapter: createMockedAdapter(),
       meta: 'meta' in props ? props.meta : undefined,
       driver,
       plugin,
