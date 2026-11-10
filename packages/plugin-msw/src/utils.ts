@@ -94,9 +94,6 @@ export function responseReturn(body: string, status: number, response: ast.Respo
     return ${responseLiteral(`JSON.stringify(${name})`, status, contentType, headers)}`
 }
 
-/**
- * A response's first body example as source code, or `null` when it has none.
- */
 export function getExampleBody(response: ast.ResponseNode | null | undefined): string | null {
   for (const entry of response?.content ?? []) {
     const example = entry.examples?.find((item) => item.value !== undefined || item.serializedValue !== undefined)

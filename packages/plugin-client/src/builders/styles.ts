@@ -49,9 +49,6 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
   })
 }
 
-/**
- * The `prefix` and `item` part media types of a `multipart/mixed` body, from its `prefixEncoding` and `itemEncoding`.
- */
 function serializePartsEncoding(node: ast.HttpOperationNode): Array<string> {
   const content = node.requestBody?.content
   const entry = content?.length === 1 ? content[0] : undefined

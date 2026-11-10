@@ -5,9 +5,6 @@ import type { ast } from '@kubb/kit'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
 
-/**
- * `export const servers = { production: '…' }` from the named servers, for `client.setConfig({ baseURL: servers.staging })`.
- */
 function buildServers(servers: Array<ast.InputServer> | undefined): string | null {
   const named = new Map<string, string>()
   for (const server of servers ?? []) if (server.name && !named.has(server.name)) named.set(server.name, server.url)

@@ -153,9 +153,6 @@ export function getExampleValues(examples: Array<ast.ExampleNode> | undefined): 
   return values.length > 0 ? values : undefined
 }
 
-/**
- * JSDoc for a response type: its `summary`, and one `@see` per link.
- */
 export function buildResponseComments(response: ast.ResponseNode): Array<string> {
   const links = Object.entries(response.links ?? {}).map(([name, link]) => {
     const values = { ...link.parameters, ...(link.requestBody !== undefined ? { body: link.requestBody } : {}) }

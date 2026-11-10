@@ -56,9 +56,6 @@ function getHeaderStatuses(node: ast.OperationNode): Array<ast.StatusCode> {
   return node.responses.filter((response) => response.headers?.length).map((response) => response.statusCode)
 }
 
-/**
- * The type names of the headers an operation's responses declare, which its file imports for `RequestResultWithHeaders`.
- */
 export function getResponseHeadersTypeNames({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<string> {
   const resolve = types.response.headers
   return resolve ? getHeaderStatuses(node).map((statusCode) => resolve.call(types.response, node, statusCode)) : []
