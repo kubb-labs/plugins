@@ -64,6 +64,10 @@ paths:
             X-Next-Page:
               schema:
                 type: string
+              examples:
+                next:
+                  dataValue: abc
+                  serializedValue: cursor=abc
           content:
             application/json:
               schema:

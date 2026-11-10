@@ -37,6 +37,19 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       ],
     },
   },
+  {
+    // Without Faker, a handler sends the response example from the spec.
+    name: 'openapiFields3_2Data',
+    config: {
+      root: __dirname,
+      input: '../../schemas/3.0.x/openapiFields3_2.yaml',
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false }),
+      parsers: [parserTs()],
+      storage: fsStorage(),
+      plugins: [pluginTs({ output: { path: './types', barrel: false } }), pluginMsw({ output: { path: './msw', barrel: false } })],
+    },
+  },
   // ─── parser: faker ──────────────────────────────────────────────────────
   {
     name: 'parserFaker',

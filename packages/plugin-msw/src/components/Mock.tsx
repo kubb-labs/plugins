@@ -3,7 +3,7 @@ import type { ast } from '@kubb/kit'
 import { Url } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import { getMockStatus, getMswMethod, hasResponseSchema, resolveDefaultBaseURL, responseReturn } from '../utils.ts'
+import { getExampleBody, getMockStatus, getMswMethod, hasResponseSchema, resolveDefaultBaseURL, responseReturn } from '../utils.ts'
 
 type Props = {
   name: string
@@ -37,7 +37,9 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
 
   // Escape colons that do not start a param, such as the second one in `/pet/:petId:search`.
   const urlLiteral = `\`\${options?.baseURL ?? ${resolveDefaultBaseURL(baseURL)}}${url.replace(/([^/]):/g, '$1\\\\:')}\``
-  const responseBody = fakerName ? `data ?? ${fakerName}(data)` : 'data'
+  // Without Faker, the spec's own response example is the default body.
+  const example = fakerName ? null : getExampleBody(successResponse)
+  const responseBody = fakerName ? `data ?? ${fakerName}(data)` : example ? `data ?? ${example}` : 'data'
 
   return (
     <File.Source name={name} isIndexable isExportable>

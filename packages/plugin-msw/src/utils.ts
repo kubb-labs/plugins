@@ -10,11 +10,13 @@ export function getMockStatus(statusCode: ast.StatusCode): number {
 }
 
 /**
- * The response headers a mock sends: each declared header with an example or a default, as a string.
+ * The response headers a mock sends: each declared header with an example or a default, as a string. An example's
+ * `serializedValue` is the header as sent, so it wins over its `value`.
  */
 export function getMockHeaders(response: ast.ResponseNode | null | undefined): Array<[name: string, value: string]> {
   return (response?.headers ?? []).flatMap((header): Array<[string, string]> => {
-    const value = header.examples?.find((example) => example.value !== undefined)?.value ?? header.schema.default ?? header.schema.examples?.[0]
+    const example = header.examples?.find((entry) => entry.serializedValue !== undefined || entry.value !== undefined)
+    const value = example?.serializedValue ?? example?.value ?? header.schema.default ?? header.schema.examples?.[0]
     if (value === undefined || value === null) return []
     // Headers use the `simple` style, so an array is sent comma-separated.
     return [[header.name, Array.isArray(value) ? value.join(',') : typeof value === 'string' ? value : JSON.stringify(value)]]
@@ -94,6 +96,18 @@ export function responseReturn(body: string, status: number, response: ast.Respo
   return `${name === body ? '' : `const body = ${body}\n    `}if (typeof ${name} === 'string') return ${responseLiteral(name, status, textContentType, headers)}
 
     return ${responseLiteral(`JSON.stringify(${name})`, status, contentType, headers)}`
+}
+
+/**
+ * The first example of a response body as source code: its `value` as a literal, else its `serializedValue` as a string.
+ * `null` when the response has no example.
+ */
+export function getExampleBody(response: ast.ResponseNode | null | undefined): string | null {
+  for (const entry of response?.content ?? []) {
+    const example = entry.examples?.find((item) => item.value !== undefined || item.serializedValue !== undefined)
+    if (example) return example.value !== undefined ? JSON.stringify(example.value) : stringify(example.serializedValue!)
+  }
+  return null
 }
 
 /**

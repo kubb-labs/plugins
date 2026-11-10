@@ -15,7 +15,8 @@ export function listOrdersHandler(data?: ListOrdersResponse | ((info: Parameters
         status: 200,
         headers: {
           'Content-Type': 'application/json',
-          'X-Rate-Limit': '100'
+          'X-Rate-Limit': '100',
+          'X-Next-Page': 'cursor=abc'
         },
       })
     })

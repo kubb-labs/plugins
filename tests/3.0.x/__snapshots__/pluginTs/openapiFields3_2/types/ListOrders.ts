@@ -10,6 +10,7 @@ export type ListOrdersQuery = {
   /**
    * @deprecated
    * @example open
+   * @example <caption>Serialized</caption> status=open
    * @type string | undefined
    */
   status?: string;
@@ -35,6 +36,11 @@ export type ListOrdersStatus2XXHeaders = {
    * @type integer
    */
   'X-Rate-Limit': number;
+  /**
+   * @example abc
+   * @example <caption>Serialized</caption> cursor=abc
+   * @type string | undefined
+   */
   'X-Next-Page'?: string;
 };
 

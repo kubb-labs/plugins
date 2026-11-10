@@ -145,10 +145,14 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
 }
 
 /**
- * The values of a parameter's or media type's `examples`, or `undefined` when none has a value.
+ * The `@example` values of a parameter's or media type's `examples`: each `value`, then its `serializedValue`, the form
+ * sent on the wire, under a `Serialized` caption. `undefined` when there are none.
  */
 export function getExampleValues(examples: Array<ast.ExampleNode> | undefined): Array<unknown> | undefined {
-  const values = (examples ?? []).filter((example) => example.value !== undefined).map((example) => example.value)
+  const values = (examples ?? []).flatMap((example) => [
+    ...(example.value !== undefined ? [example.value] : []),
+    ...(example.serializedValue !== undefined ? [`<caption>Serialized</caption> ${example.serializedValue.replaceAll('*/', '*\\/')}`] : []),
+  ])
   return values.length > 0 ? values : undefined
 }
 
