@@ -60,6 +60,36 @@ describe('cypressGenerator — baseURL', () => {
   })
 })
 
+describe('cypressGenerator — numeric body', () => {
+  // Cypress types a request body as a string or an object, so a body that is one int64 is sent as a number and cast.
+  test('patchCounter', async () => {
+    const node = ast.factory.createOperation({
+      operationId: 'patchCounter',
+      method: 'PATCH',
+      path: '/counter',
+      tags: ['counter'],
+      requestBody: { content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'bigint' }) })] },
+      responses: [ast.factory.createResponse({ statusCode: '204', description: 'Updated' })],
+    })
+    const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options: defaultOptions, resolver: resolverCypress })
+    const driver = createMockedPluginDriver({
+      name: 'patchCounter',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorOperation(cypressGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverCypress,
+    })
+
+    await matchFiles(driver.fileManager.files, 'patchCounter')
+  })
+})
+
 describe('cypressGenerator — cookie parameters', () => {
   // The request takes the cookies as an optional group and sends `Cookie` only when the call passes cookies. A `style: cookie`
   // value goes out as it is.

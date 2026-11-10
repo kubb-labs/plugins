@@ -1,6 +1,5 @@
 import { buildRequestParamsSignature } from '@internals/shared'
-import { Url } from '@kubb/kit'
-import type { ast } from '@kubb/kit'
+import { ast, Url } from '@kubb/kit'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -50,12 +49,17 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   // Built first and sent only when non-empty, so a call without cookies keeps the cookies Cypress attaches itself.
   const cookieLine = `${rawCookieLine}const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null).map(([name, value]) => \`\${name}=\${${encodeCookie}}\`).join('; ')\n`
 
+  // Cypress types a body as a string or an object, so a body that is one number or has no schema type is cast, and an
+  // `int64` is sent as a number.
+  const bodySchema = node.requestBody?.content?.[0]?.schema && ast.resolveRef(node.requestBody.content[0].schema)
+  const castBody = bodySchema && (['number', 'integer', 'bigint'].includes(bodySchema.primitive ?? '') || ['unknown', 'any'].includes(bodySchema.type))
+
   const requestOptions = [
     `method: '${node.method}'`,
     `url: ${urlTemplate}`,
     groups.query && 'qs: query',
     groups.cookies ? `headers: { ${groups.headers ? '...headers, ' : ''}...(cookie ? { Cookie: cookie } : {}) }` : groups.headers && 'headers',
-    groups.body && 'body',
+    groups.body && (castBody ? "body: (typeof body === 'bigint' ? Number(body) : body) as unknown as Cypress.RequestBody" : 'body'),
     '...options',
   ].filter(Boolean)
 
