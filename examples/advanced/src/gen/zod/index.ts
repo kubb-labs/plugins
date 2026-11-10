@@ -21,6 +21,47 @@ export type { OrderShippedEventEventEnumSchemaType } from './orderShippedEventEv
 export type { OrderShippedEventSchemaType } from './orderShippedEventSchema'
 export type { OrderStatusEnumSchemaType } from './orderStatusEnumSchema'
 export type {
+  CreatePaymentBatchBodySchemaType,
+  CreatePaymentBatchOptionsSchemaType,
+  CreatePaymentBatchResponseSchemaType,
+  CreatePaymentBatchResponsesSchemaType,
+  CreatePaymentBatchStatus204SchemaType,
+} from './payment/createPaymentBatchSchema'
+export type {
+  CreatePaymentBodySchemaType,
+  CreatePaymentOptionsSchemaType,
+  CreatePaymentResponseSchemaType,
+  CreatePaymentResponsesSchemaType,
+  CreatePaymentStatus201SchemaType,
+} from './payment/createPaymentSchema'
+export type {
+  GetPaymentByIdOptionsSchemaType,
+  GetPaymentByIdPathPaymentIdSchemaType,
+  GetPaymentByIdPathSchemaType,
+  GetPaymentByIdResponseSchemaType,
+  GetPaymentByIdResponsesSchemaType,
+  GetPaymentByIdStatus200SchemaType,
+} from './payment/getPaymentByIdSchema'
+export type {
+  ListPaymentsCookieSessionSchemaType,
+  ListPaymentsCookiesSchemaType,
+  ListPaymentsErrorSchemaType,
+  ListPaymentsOptionsSchemaType,
+  ListPaymentsQueryFilterSchemaType,
+  ListPaymentsQuerySchemaType,
+  ListPaymentsQueryStatusSchemaType,
+  ListPaymentsResponseSchemaType,
+  ListPaymentsResponsesSchemaType,
+  ListPaymentsStatus2XXHeadersSchemaType,
+  ListPaymentsStatus2XXSchemaType,
+  ListPaymentsStatus4XXSchemaType,
+} from './payment/listPaymentsSchema'
+export type { PaymentErrorSchemaType } from './paymentErrorSchema'
+export type { PaymentLabelSchemaType } from './paymentLabelSchema'
+export type { PaymentMetadataSchemaType } from './paymentMetadataSchema'
+export type { PaymentMethodEnumSchemaType } from './paymentMethodEnumSchema'
+export type { PaymentSchemaType } from './paymentSchema'
+export type {
   AddFilesBodySchemaFormDataType,
   AddFilesBodySchemaJsonType,
   AddFilesBodySchemaType,
@@ -199,6 +240,47 @@ export { orderSchema } from './orderSchema'
 export { orderShippedEventEventEnumSchema } from './orderShippedEventEventEnumSchema'
 export { orderShippedEventSchema } from './orderShippedEventSchema'
 export { orderStatusEnumSchema } from './orderStatusEnumSchema'
+export {
+  createPaymentBatchBodySchema,
+  createPaymentBatchOptionsSchema,
+  createPaymentBatchResponseSchema,
+  createPaymentBatchResponsesSchema,
+  createPaymentBatchStatus204Schema,
+} from './payment/createPaymentBatchSchema'
+export {
+  createPaymentBodySchema,
+  createPaymentOptionsSchema,
+  createPaymentResponseSchema,
+  createPaymentResponsesSchema,
+  createPaymentStatus201Schema,
+} from './payment/createPaymentSchema'
+export {
+  getPaymentByIdOptionsSchema,
+  getPaymentByIdPathPaymentIdSchema,
+  getPaymentByIdPathSchema,
+  getPaymentByIdResponseSchema,
+  getPaymentByIdResponsesSchema,
+  getPaymentByIdStatus200Schema,
+} from './payment/getPaymentByIdSchema'
+export {
+  listPaymentsCookieSessionSchema,
+  listPaymentsCookiesSchema,
+  listPaymentsErrorSchema,
+  listPaymentsOptionsSchema,
+  listPaymentsQueryFilterSchema,
+  listPaymentsQuerySchema,
+  listPaymentsQueryStatusSchema,
+  listPaymentsResponseSchema,
+  listPaymentsResponsesSchema,
+  listPaymentsStatus2XXHeadersSchema,
+  listPaymentsStatus2XXSchema,
+  listPaymentsStatus4XXSchema,
+} from './payment/listPaymentsSchema'
+export { paymentErrorSchema } from './paymentErrorSchema'
+export { paymentLabelSchema } from './paymentLabelSchema'
+export { paymentMetadataSchema } from './paymentMetadataSchema'
+export { paymentMethodEnumSchema } from './paymentMethodEnumSchema'
+export { paymentSchema } from './paymentSchema'
 export {
   addFilesBodySchema,
   addFilesBodySchemaFormData,

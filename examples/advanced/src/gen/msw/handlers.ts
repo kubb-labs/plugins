@@ -1,3 +1,7 @@
+import { createPaymentBatchHandler } from './payment/createPaymentBatchHandler'
+import { createPaymentHandler } from './payment/createPaymentHandler'
+import { getPaymentByIdHandler } from './payment/getPaymentByIdHandler'
+import { listPaymentsHandler } from './payment/listPaymentsHandler'
 import { addFilesHandler } from './pet/addFilesHandler'
 import { addPetHandler } from './pet/addPetHandler'
 import { deletePetHandler } from './pet/deletePetHandler'
@@ -25,6 +29,10 @@ export function createHandlers(options?: { baseURL?: string }) {
     uploadFileHandler(undefined, options),
     streamPetEventsHandler(undefined, options),
     streamOrderEventsHandler(undefined, options),
+    listPaymentsHandler(undefined, options),
+    createPaymentHandler(undefined, options),
+    createPaymentBatchHandler(undefined, options),
+    getPaymentByIdHandler(undefined, options),
   ] as const
 }
 

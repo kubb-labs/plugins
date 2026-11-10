@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: Swagger PetStore - OpenAPI 3.0
   description: |-
@@ -722,6 +722,72 @@ components:
         - $ref: '#/components/schemas/PhoneNumber'
         - type: string
           maxLength: 15
+    Payment:
+      type: object
+      description: A payment for a store order
+      externalDocs:
+        description: Payment model
+        url: http://swagger.io
+      minProperties: 1
+      maxProperties: 10
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          exclusiveMinimum: 0
+        method:
+          type: string
+          enum:
+            - card
+            - cash
+        creditCard:
+          type: string
+        billingAddress:
+          type: string
+        labels:
+          type: array
+          items:
+            type: string
+          contains:
+            $ref: '#/components/schemas/PaymentLabel'
+          minContains: 1
+          maxContains: 2
+        metadata:
+          type: string
+          contentMediaType: application/json
+          contentSchema:
+            $ref: '#/components/schemas/PaymentMetadata'
+        receipt:
+          type: string
+          contentEncoding: base64
+      dependentRequired:
+        creditCard:
+          - billingAddress
+      if:
+        properties:
+          method:
+            const: card
+        required:
+          - method
+      then:
+        required:
+          - creditCard
+    PaymentLabel:
+      type: string
+      const: priority
+    PaymentMetadata:
+      type: object
+      properties:
+        source:
+          type: string
+    PaymentError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
   securitySchemes:
     petstore_auth:
       type: oauth2

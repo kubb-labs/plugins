@@ -22,6 +22,9 @@ externalDocs:
   url: http://swagger.io
 servers:
   - url: https://petstore3.swagger.io/api/v3
+    name: production
+  - url: https://staging.petstore3.swagger.io/api/v3
+    name: staging
 tags:
   - name: pet
     description: Everything about your Pets
@@ -35,6 +38,11 @@ tags:
       url: http://swagger.io
   - name: stream
     description: Server-Sent Events streams
+  - name: payment
+    summary: Payments
+    description: Pay for store orders
+    parent: store
+    kind: nav
 paths:
   /pets/{uuid}:
     post:
@@ -601,6 +609,143 @@ paths:
                 type: string
               itemSchema:
                 $ref: '#/components/schemas/OrderEvent'
+  /store/payments:
+    get:
+      tags:
+        - payment
+      summary: List payments
+      operationId: listPayments
+      externalDocs:
+        description: Payment guide
+        url: http://swagger.io
+      parameters:
+        - name: status
+          in: query
+          deprecated: true
+          schema:
+            type: string
+          examples:
+            settled:
+              summary: Settled payments
+              dataValue: settled
+              serializedValue: status=settled
+        - name: filter
+          in: query
+          allowEmptyValue: true
+          schema:
+            type: string
+        - name: session
+          in: cookie
+          style: cookie
+          schema:
+            type: string
+      responses:
+        '2XX':
+          summary: The payments
+          description: The payments
+          headers:
+            X-Rate-Limit:
+              description: Calls left this hour
+              required: true
+              example: 100
+              schema:
+                type: integer
+            X-Next-Page:
+              schema:
+                type: string
+              examples:
+                next:
+                  dataValue: abc
+                  serializedValue: cursor=abc
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+              examples:
+                card:
+                  dataValue:
+                    - id: 1
+                      method: card
+                      creditCard: '4111'
+                      billingAddress: Main St 1
+          links:
+            getPayment:
+              operationId: getPaymentById
+              parameters:
+                paymentId: $response.body#/0/id
+        '4XX':
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentError'
+    post:
+      tags:
+        - payment
+      summary: Pay for an order
+      operationId: createPayment
+      security:
+        - device_auth:
+            - write:payments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+            example:
+              id: 1
+              method: cash
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+  /store/payments/batch:
+    post:
+      tags:
+        - payment
+      summary: Pay for several orders at once
+      operationId: createPaymentBatch
+      requestBody:
+        content:
+          multipart/mixed:
+            schema:
+              type: array
+              prefixItems:
+                - $ref: '#/components/schemas/Payment'
+              items:
+                type: string
+            prefixEncoding:
+              - contentType: application/json
+            itemEncoding:
+              contentType: text/plain
+      responses:
+        '204':
+          description: Accepted
+  /store/payments/{paymentId}:
+    get:
+      tags:
+        - payment
+      summary: Find a payment by ID
+      operationId: getPaymentById
+      parameters:
+        - name: paymentId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The payment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
 components:
   schemas:
     PetEvent:
@@ -947,6 +1092,72 @@ components:
         image:
           $ref: '#/components/schemas/Image'
       additionalProperties: false
+    Payment:
+      type: object
+      description: A payment for a store order
+      externalDocs:
+        description: Payment model
+        url: http://swagger.io
+      minProperties: 1
+      maxProperties: 10
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          exclusiveMinimum: 0
+        method:
+          type: string
+          enum:
+            - card
+            - cash
+        creditCard:
+          type: string
+        billingAddress:
+          type: string
+        labels:
+          type: array
+          items:
+            type: string
+          contains:
+            $ref: '#/components/schemas/PaymentLabel'
+          minContains: 1
+          maxContains: 2
+        metadata:
+          type: string
+          contentMediaType: application/json
+          contentSchema:
+            $ref: '#/components/schemas/PaymentMetadata'
+        receipt:
+          type: string
+          contentEncoding: base64
+      dependentRequired:
+        creditCard:
+          - billingAddress
+      if:
+        properties:
+          method:
+            const: card
+        required:
+          - method
+      then:
+        required:
+          - creditCard
+    PaymentLabel:
+      type: string
+      const: priority
+    PaymentMetadata:
+      type: object
+      properties:
+        source:
+          type: string
+    PaymentError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
   requestBodies:
     Pet:
       description: Pet object that needs to be added to the store
@@ -970,6 +1181,15 @@ components:
       type: apiKey
       name: api_key
       in: header
+    device_auth:
+      type: oauth2
+      oauth2MetadataUrl: https://petstore3.swagger.io/.well-known/oauth-authorization-server
+      flows:
+        deviceAuthorization:
+          deviceAuthorizationUrl: https://petstore3.swagger.io/oauth/device
+          tokenUrl: https://petstore3.swagger.io/oauth/token
+          scopes:
+            write:payments: pay for orders
   parameters:
     page:
       description: to request with required page number or pagination

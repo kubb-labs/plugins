@@ -63,6 +63,7 @@ export default defineConfig({
       ],
       group: { type: 'tag' },
       inferred: true,
+      contentSchema: true,
     }),
     pluginReactQuery({
       output: {

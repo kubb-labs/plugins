@@ -20,6 +20,11 @@ export { createOrderPlacedEventFaker } from './createOrderPlacedEventFaker'
 export { createOrderShippedEventEventEnumFaker } from './createOrderShippedEventEventEnumFaker'
 export { createOrderShippedEventFaker } from './createOrderShippedEventFaker'
 export { createOrderStatusEnumFaker } from './createOrderStatusEnumFaker'
+export { createPaymentErrorFaker } from './createPaymentErrorFaker'
+export { createPaymentFaker } from './createPaymentFaker'
+export { createPaymentLabelFaker } from './createPaymentLabelFaker'
+export { createPaymentMetadataFaker } from './createPaymentMetadataFaker'
+export { createPaymentMethodEnumFaker } from './createPaymentMethodEnumFaker'
 export { createPetEventFaker } from './createPetEventFaker'
 export { createPetEventTypeEnumFaker } from './createPetEventTypeEnumFaker'
 export { createPetFaker } from './createPetFaker'
@@ -28,6 +33,20 @@ export { createPetStatusEnumFaker } from './createPetStatusEnumFaker'
 export { createPingEventEventEnumFaker } from './createPingEventEventEnumFaker'
 export { createPingEventFaker } from './createPingEventFaker'
 export { createTagTagFaker } from './createTagTagFaker'
+export {
+  createCreatePaymentBatchBodyFaker,
+  createCreatePaymentBatchResponseFaker,
+  createCreatePaymentBatchStatus204Faker,
+} from './payment/createCreatePaymentBatchFaker'
+export { createCreatePaymentBodyFaker, createCreatePaymentResponseFaker, createCreatePaymentStatus201Faker } from './payment/createCreatePaymentFaker'
+export { createGetPaymentByIdPathFaker, createGetPaymentByIdResponseFaker, createGetPaymentByIdStatus200Faker } from './payment/createGetPaymentByIdFaker'
+export {
+  createListPaymentsCookiesFaker,
+  createListPaymentsQueryFaker,
+  createListPaymentsResponseFaker,
+  createListPaymentsStatus2XXFaker,
+  createListPaymentsStatus4XXFaker,
+} from './payment/createListPaymentsFaker'
 export {
   createAddFilesBodyFaker,
   createAddFilesBodyFakerFormData,

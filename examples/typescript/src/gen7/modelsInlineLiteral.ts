@@ -40,6 +40,8 @@ export type PetStatusEnum = 'available' | 'pending' | 'sold'
  */
 export type AddPetRequestStatusEnum = 'available' | 'pending' | 'sold' | 'in store'
 
+export type PaymentMethodEnum = 'card' | 'cash'
+
 /**
  * @description Status values that need to be considered for filter
  * @default 'available'
@@ -260,6 +262,31 @@ export type ApiResponse = {
   code?: number
   type?: string
   message?: string
+}
+
+export type PaymentLabel = 'priority'
+
+export type PaymentMetadata = {
+  source?: string
+}
+
+/**
+ * @description A payment for a store order
+ * @see http://swagger.io Payment model
+ * @type object
+ */
+export type Payment = {
+  id: number
+  method?: PaymentMethodEnum
+  creditCard?: string
+  billingAddress?: string
+  labels?: Array<string>
+  metadata?: string
+  receipt?: string
+}
+
+export type PaymentError = {
+  message: string
 }
 
 export type PetNotFound = {
@@ -913,3 +940,139 @@ export type DeleteOrderResponses = {
  * @description Union of all possible responses
  */
 export type DeleteOrderResponse = DeleteOrderStatus400 | DeleteOrderStatus404
+
+export type ListPaymentsQuery = {
+  /**
+   * @deprecated
+   * @example settled
+   * @example <caption>Serialized</caption> status=settled
+   * @type string | undefined
+   */
+  status?: string
+  filter?: string
+}
+
+export type ListPaymentsCookies = {
+  session?: string
+}
+
+/**
+ * @summary The payments
+ * @see getPayment: getPaymentById({ paymentId: $response.body#/0/id })
+ * @example [{"id":1,"method":"card","creditCard":"4111","billingAddress":"Main St 1"}]
+ * @type array
+ */
+export type ListPaymentsStatus2XX = Array<Payment>
+
+export type ListPaymentsStatus4XX = PaymentError
+
+export type ListPaymentsStatus2XXHeaders = {
+  /**
+   * @description Calls left this hour
+   * @example 100
+   * @type integer
+   */
+  'X-Rate-Limit': number
+  /**
+   * @example abc
+   * @example <caption>Serialized</caption> cursor=abc
+   * @type string | undefined
+   */
+  'X-Next-Page'?: string
+}
+
+export type ListPaymentsOptions = {
+  body?: never
+  path?: never
+  query?: ListPaymentsQuery
+  headers?: never
+  cookies?: ListPaymentsCookies
+}
+
+export type ListPaymentsResponses = {
+  '2XX': ListPaymentsStatus2XX
+  '4XX': ListPaymentsStatus4XX
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type ListPaymentsResponse = ListPaymentsStatus2XX
+
+/**
+ * @description A payment for a store order
+ * @see http://swagger.io Payment model
+ * @type object
+ */
+export type CreatePaymentStatus201 = Payment
+
+/**
+ * @description A payment for a store order
+ * @example {"id":1,"method":"cash"}
+ * @see http://swagger.io Payment model
+ * @type object
+ */
+export type CreatePaymentBody = Payment
+
+export type CreatePaymentOptions = {
+  body: CreatePaymentBody
+  path?: never
+  query?: never
+  headers?: never
+}
+
+export type CreatePaymentResponses = {
+  '201': CreatePaymentStatus201
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type CreatePaymentResponse = CreatePaymentStatus201
+
+export type CreatePaymentBatchStatus204 = unknown
+
+export type CreatePaymentBatchBody = [Payment, ...Array<string>] | undefined
+
+export type CreatePaymentBatchOptions = {
+  body?: CreatePaymentBatchBody
+  path?: never
+  query?: never
+  headers?: never
+}
+
+export type CreatePaymentBatchResponses = {
+  '204': CreatePaymentBatchStatus204
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type CreatePaymentBatchResponse = CreatePaymentBatchStatus204
+
+export type GetPaymentByIdPath = {
+  paymentId: number
+}
+
+/**
+ * @description A payment for a store order
+ * @see http://swagger.io Payment model
+ * @type object
+ */
+export type GetPaymentByIdStatus200 = Payment
+
+export type GetPaymentByIdOptions = {
+  body?: never
+  path: GetPaymentByIdPath
+  query?: never
+  headers?: never
+}
+
+export type GetPaymentByIdResponses = {
+  '200': GetPaymentByIdStatus200
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetPaymentByIdResponse = GetPaymentByIdStatus200

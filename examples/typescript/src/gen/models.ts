@@ -57,6 +57,13 @@ export const addPetRequestStatusEnum = {
 
 export type AddPetRequestStatusEnumKey = (typeof addPetRequestStatusEnum)[keyof typeof addPetRequestStatusEnum]
 
+export const paymentMethodEnum = {
+  CARD: 'card',
+  CASH: 'cash',
+} as const
+
+export type PaymentMethodEnumKey = (typeof paymentMethodEnum)[keyof typeof paymentMethodEnum]
+
 export const findPetsByStatusStatus = {
   AVAILABLE: 'available',
   PENDING: 'pending',
@@ -284,6 +291,35 @@ export interface ApiResponse {
   code?: number
   type?: string
   message?: string
+}
+
+export const paymentLabel = {
+  PRIORITY: 'priority',
+} as const
+
+export type PaymentLabelKey = (typeof paymentLabel)[keyof typeof paymentLabel]
+
+export interface PaymentMetadata {
+  source?: string
+}
+
+/**
+ * @description A payment for a store order
+ * @see http://swagger.io Payment model
+ * @type object
+ */
+export interface Payment {
+  id: number
+  method?: PaymentMethodEnumKey
+  creditCard?: string
+  billingAddress?: string
+  labels?: Array<string>
+  metadata?: string
+  receipt?: string
+}
+
+export interface PaymentError {
+  message: string
 }
 
 export interface PetNotFound {
@@ -937,3 +973,139 @@ export interface DeleteOrderResponses {
  * @description Union of all possible responses
  */
 export type DeleteOrderResponse = DeleteOrderStatus400 | DeleteOrderStatus404
+
+export interface ListPaymentsQuery {
+  /**
+   * @deprecated
+   * @example settled
+   * @example <caption>Serialized</caption> status=settled
+   * @type string | undefined
+   */
+  status?: string
+  filter?: string
+}
+
+export interface ListPaymentsCookies {
+  session?: string
+}
+
+/**
+ * @summary The payments
+ * @see getPayment: getPaymentById({ paymentId: $response.body#/0/id })
+ * @example [{"id":1,"method":"card","creditCard":"4111","billingAddress":"Main St 1"}]
+ * @type array
+ */
+export type ListPaymentsStatus2XX = Array<Payment>
+
+export type ListPaymentsStatus4XX = PaymentError
+
+export interface ListPaymentsStatus2XXHeaders {
+  /**
+   * @description Calls left this hour
+   * @example 100
+   * @type integer
+   */
+  'X-Rate-Limit': number
+  /**
+   * @example abc
+   * @example <caption>Serialized</caption> cursor=abc
+   * @type string | undefined
+   */
+  'X-Next-Page'?: string
+}
+
+export interface ListPaymentsOptions {
+  body?: never
+  path?: never
+  query?: ListPaymentsQuery
+  headers?: never
+  cookies?: ListPaymentsCookies
+}
+
+export interface ListPaymentsResponses {
+  '2XX': ListPaymentsStatus2XX
+  '4XX': ListPaymentsStatus4XX
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type ListPaymentsResponse = ListPaymentsStatus2XX
+
+/**
+ * @description A payment for a store order
+ * @see http://swagger.io Payment model
+ * @type object
+ */
+export type CreatePaymentStatus201 = Payment
+
+/**
+ * @description A payment for a store order
+ * @example {"id":1,"method":"cash"}
+ * @see http://swagger.io Payment model
+ * @type object
+ */
+export type CreatePaymentBody = Payment
+
+export interface CreatePaymentOptions {
+  body: CreatePaymentBody
+  path?: never
+  query?: never
+  headers?: never
+}
+
+export interface CreatePaymentResponses {
+  '201': CreatePaymentStatus201
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type CreatePaymentResponse = CreatePaymentStatus201
+
+export type CreatePaymentBatchStatus204 = unknown
+
+export type CreatePaymentBatchBody = [Payment, ...string[]] | undefined
+
+export interface CreatePaymentBatchOptions {
+  body?: CreatePaymentBatchBody
+  path?: never
+  query?: never
+  headers?: never
+}
+
+export interface CreatePaymentBatchResponses {
+  '204': CreatePaymentBatchStatus204
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type CreatePaymentBatchResponse = CreatePaymentBatchStatus204
+
+export interface GetPaymentByIdPath {
+  paymentId: number
+}
+
+/**
+ * @description A payment for a store order
+ * @see http://swagger.io Payment model
+ * @type object
+ */
+export type GetPaymentByIdStatus200 = Payment
+
+export interface GetPaymentByIdOptions {
+  body?: never
+  path: GetPaymentByIdPath
+  query?: never
+  headers?: never
+}
+
+export interface GetPaymentByIdResponses {
+  '200': GetPaymentByIdStatus200
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetPaymentByIdResponse = GetPaymentByIdStatus200

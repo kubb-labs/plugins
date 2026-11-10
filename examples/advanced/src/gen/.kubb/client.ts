@@ -180,4 +180,8 @@ export const createClient = client.createClient
 import { formMediaTypes } from './mediaTypes.ts'
 import { streamMediaTypes } from './sse.ts'
 client.setConfig({ baseURL: 'https://petstore3.swagger.io/api/v3', mediaTypes: { ...formMediaTypes, ...streamMediaTypes } })
+/**
+ * The servers from the spec by name, for `baseURL`.
+ */
+export const servers = { production: 'https://petstore3.swagger.io/api/v3', staging: 'https://staging.petstore3.swagger.io/api/v3' } as const
 export * from './sse.ts'

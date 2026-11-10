@@ -1,4 +1,8 @@
 export { createHandlers, handlers } from './handlers'
+export { createPaymentBatchHandler, createPaymentBatchHandlerResponse204 } from './payment/createPaymentBatchHandler'
+export { createPaymentHandler, createPaymentHandlerResponse201 } from './payment/createPaymentHandler'
+export { getPaymentByIdHandler, getPaymentByIdHandlerResponse200 } from './payment/getPaymentByIdHandler'
+export { listPaymentsHandler } from './payment/listPaymentsHandler'
 export { addFilesHandler, addFilesHandlerResponse200, addFilesHandlerResponse405 } from './pet/addFilesHandler'
 export { addPetHandler, addPetHandlerResponse405 } from './pet/addPetHandler'
 export { deletePetHandler, deletePetHandlerResponse400 } from './pet/deletePetHandler'
