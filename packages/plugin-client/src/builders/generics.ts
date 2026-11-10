@@ -3,15 +3,26 @@ import type { OperationTypeNames } from '@internals/client'
 import type { ReturnTypeOption } from '../types.ts'
 
 /**
- * Builds the `RequestResult` generic arguments for one operation: the per-status responses record
- * plus the per-call `ThrowOnError` flag. `SuccessOf` / `ErrorOf` split the record inside the
- * runtime, so this only names the record and threads `ThrowOnError`.
+ * Builds the `RequestResult` generic arguments for one operation: the per-status responses record,
+ * the per-call `ThrowOnError` flag, and, unless `returnType` is `'data'`, the declared response
+ * headers by status. `SuccessOf` / `ErrorOf` split the record inside the runtime.
  *
  * @example
  * `buildRequestResultGenerics({ node, types }) // 'AddPetResponses, ThrowOnError'`
+ * @example
+ * `buildRequestResultGenerics({ node, types }) // "LoginUserResponses, ThrowOnError, { '200': LoginUserStatus200Headers }"`
  */
-export function buildRequestResultGenerics({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string {
-  return `${types.response.responses(node)}, ThrowOnError`
+export function buildRequestResultGenerics({
+  node,
+  types,
+  returnType,
+}: {
+  node: ast.OperationNode
+  types: OperationTypeNames
+  returnType?: ReturnTypeOption
+}): string {
+  const headers = returnType === 'data' ? null : buildResponseHeadersType({ node, types })
+  return [types.response.responses(node), 'ThrowOnError', headers].filter(Boolean).join(', ')
 }
 
 /**
@@ -25,28 +36,35 @@ export function buildRequestResultGenerics({ node, types }: { node: ast.Operatio
  * `buildResultType({ node, types, returnType: 'data' }) // 'Promise<UnwrappedResult<AddPetResponses, ThrowOnError>>'`
  */
 export function buildResultType({ node, types, returnType }: { node: ast.OperationNode; types: OperationTypeNames; returnType: ReturnTypeOption }): string {
-  const generics = buildRequestResultGenerics({ node, types })
+  const generics = buildRequestResultGenerics({ node, types, returnType })
   if (returnType === 'data') return `Promise<UnwrappedResult<${generics}>>`
   const headers = buildResponseHeadersType({ node, types })
-  const result = headers ? `WithHeaders<RequestResult<${generics}>, ${headers}>` : `RequestResult<${generics}>`
+  const result = headers ? `RequestResultWithHeaders<${types.response.responses(node)}, ${headers}, ThrowOnError>` : `RequestResult<${generics}>`
   if (returnType === 'plain') return `Promise<${result}>`
   return `Unwrappable<${result}>`
 }
 
 /**
- * The `{ status: headers }` record of the responses that declare `headers`, for `WithHeaders`, or `null` when none does.
+ * The `{ status: headers }` record of the responses that declare `headers`, the last `RequestResult` type argument, or
+ * `null` when none does.
  *
  * @example
  * `buildResponseHeadersType({ node, types }) // "{ '200': ListPetsStatus200Headers }"`
  */
 export function buildResponseHeadersType({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
-  const entries = node.responses.filter((response) => response.headers?.length).map((response) => `'${response.statusCode}': ${types.response.headers(node, response.statusCode)}`)
+  const resolve = types.response.headers
+  const entries = resolve ? getHeaderStatuses(node).map((statusCode) => `'${statusCode}': ${resolve.call(types.response, node, statusCode)}`) : []
   return entries.length ? `{ ${entries.join('; ')} }` : null
 }
 
+function getHeaderStatuses(node: ast.OperationNode): Array<ast.StatusCode> {
+  return node.responses.filter((response) => response.headers?.length).map((response) => response.statusCode)
+}
+
 /**
- * The type names of the headers an operation's responses declare, which its file imports for `WithHeaders`.
+ * The type names of the headers an operation's responses declare, which its file imports for `RequestResultWithHeaders`.
  */
 export function getResponseHeadersTypeNames({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<string> {
-  return node.responses.filter((response) => response.headers?.length).map((response) => types.response.headers(node, response.statusCode))
+  const resolve = types.response.headers
+  return resolve ? getHeaderStatuses(node).map((statusCode) => resolve.call(types.response, node, statusCode)) : []
 }

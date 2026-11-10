@@ -145,7 +145,16 @@ export type RequestConfig = {
   parseAs?: 'json' | 'text' | 'blob' | 'arrayBuffer' | 'stream'
   contentType?: string | { request?: string; response?: string }
   throwOnError?: boolean
-  security?: Array<{ type: string; name?: string; in?: string; scopes?: Array<string> }>
+  security?: Array<{
+    type: string
+    scheme?: string
+    name?: string
+    in?: string
+    scopes?: Array<string>
+    flows?: Record<string, Record<string, string>>
+    metadataUrl?: string
+    url?: string
+  }>
   styles?: object
   client?: typeof client
 }

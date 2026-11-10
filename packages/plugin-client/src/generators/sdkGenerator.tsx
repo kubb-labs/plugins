@@ -46,7 +46,7 @@ function resolveTypeImportNames(node: ast.OperationNode, types: OperationTypeNam
 }
 
 /**
- * The response header types a method's `WithHeaders` result names: none for a stream or for unwrapped data.
+ * The response header types a method's `RequestResultWithHeaders` names: none for a stream or for unwrapped data.
  */
 function getHeaderTypeNames(node: ast.OperationNode, types: OperationTypeNames, returnType: ReturnTypeOption): Array<string> {
   return isEventStream(node) || returnType === 'data' ? [] : getResponseHeadersTypeNames({ node, types })
@@ -193,7 +193,9 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
           : { namesByPath: new Map<string, Set<string>>(), filesByPath: new Map<string, ast.FileNode>() }
         const shapes = new Set(ops.map((op) => getEventStream(op.node)).filter(Boolean))
         const hasEventStream = shapes.size > 0
-        const hasResult = ops.some((op) => !isEventStream(op.node))
+        const resultOps = ops.filter((op) => !isEventStream(op.node))
+        const hasResult = resultOps.length > 0
+        const typedHeaders = (op: OperationData) => getHeaderTypeNames(op.node, op.types, returnType).length > 0
 
         return (
           <File key={file.path} baseName={file.baseName} path={file.path} meta={file.meta} banner={banner(file)} footer={footer(file)}>
@@ -209,8 +211,9 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
                   'ClientInstance',
                   'Options',
                   ...(returnType === 'data' ? [] : ['Unwrappable']),
-                  ...(hasResult ? [returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'] : []),
-                  ...(ops.some((op) => getHeaderTypeNames(op.node, op.types, returnType).length) ? ['WithHeaders'] : []),
+                  ...(hasResult && returnType === 'data' ? ['UnwrappedResult'] : []),
+                  ...(returnType !== 'data' && resultOps.some((op) => !typedHeaders(op)) ? ['RequestResult'] : []),
+                  ...(resultOps.some(typedHeaders) ? ['RequestResultWithHeaders'] : []),
                   ...(hasEventStream ? buildEventStreamImports({ returnType, typed: shapes.has('event'), line: shapes.has('line') }) : []),
                 ]),
               )}

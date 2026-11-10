@@ -31,7 +31,9 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       const { config, driver, resolver, root } = ctx
       const { output, validator, returnType, throwOnErrorDefault, group, importPath } = ctx.options
 
-      const types = resolveOperationTypes(driver, ctx.plugin.name)
+      const resolvedTypes = resolveOperationTypes(driver, ctx.plugin.name)
+      // A custom client module keeps the two-argument `RequestResult` it documents, so its results get no typed headers.
+      const types = importPath === undefined ? resolvedTypes : { ...resolvedTypes, response: { ...resolvedTypes.response, headers: undefined } }
 
       const pluginZod = isValidatorEnabled(validator) ? driver.getPlugin(pluginZodName) : null
       const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
@@ -90,10 +92,9 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
 
       const clientTypeImports = stream
         ? buildEventStreamImports({ returnType, typed: stream === 'event', line: stream === 'line' })
-        : [
-            ...{ plain: ['Options', 'RequestResult'], data: ['Options', 'UnwrappedResult'], full: ['Options', 'Unwrappable', 'RequestResult'] }[returnType],
-            ...(headerTypeNames.length ? ['WithHeaders'] : []),
-          ]
+        : { plain: ['Options', 'RequestResult'], data: ['Options', 'UnwrappedResult'], full: ['Options', 'Unwrappable', 'RequestResult'] }[returnType].map(
+            (name) => (name === 'RequestResult' && headerTypeNames.length ? 'RequestResultWithHeaders' : name),
+          )
 
       return (
         <File

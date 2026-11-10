@@ -22,9 +22,9 @@ export type OperationTypeNames = {
      */
     responses(node: ast.OperationNode): string
     /**
-     * Resolves the name of the type of the headers one response declares.
+     * Resolves the name of the type of the headers one response declares. Left out, results keep untyped headers.
      */
-    headers(node: ast.OperationNode, statusCode: ast.StatusCode): string
+    headers?(node: ast.OperationNode, statusCode: ast.StatusCode): string
   }
 }
 

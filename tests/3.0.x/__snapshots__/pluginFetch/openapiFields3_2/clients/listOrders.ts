@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Options, Unwrappable, RequestResult, WithHeaders } from '../.kubb/client'
+import type { Options, Unwrappable, RequestResultWithHeaders } from '../.kubb/client'
 import type { ListOrdersOptions, ListOrdersResponses, ListOrdersStatus2XXHeaders } from '../types/ListOrders'
 import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
 
@@ -11,8 +11,8 @@ import { client, withUnwrap, resolveThrowOnError } from '../.kubb/client'
  * `GET /orders`
  * @see https://example.com/docs/orders Order guide
  */
-export function listOrders<ThrowOnError extends boolean = true>(options: Options<ListOrdersOptions, ThrowOnError> = {}): Unwrappable<WithHeaders<RequestResult<ListOrdersResponses, ThrowOnError>, { '2XX': ListOrdersStatus2XXHeaders }>> {
+export function listOrders<ThrowOnError extends boolean = true>(options: Options<ListOrdersOptions, ThrowOnError> = {}): Unwrappable<RequestResultWithHeaders<ListOrdersResponses, { '2XX': ListOrdersStatus2XXHeaders }, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
-  return withUnwrap(apiClient<ListOrdersResponses, ThrowOnError>({ method: 'GET', url: '/orders', security: [{ type: 'apiKey', name: 'X-API-Key', in: 'header' }], ...config, styles: { ...config.styles, cookie: { session: { style: 'cookie' }, ...config.styles?.cookie } }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
+  return withUnwrap(apiClient<ListOrdersResponses, ThrowOnError, { '2XX': ListOrdersStatus2XXHeaders }>({ method: 'GET', url: '/orders', security: [{ type: 'apiKey', name: 'X-API-Key', in: 'header' }], ...config, styles: { ...config.styles, cookie: { session: { style: 'cookie' }, ...config.styles?.cookie } }, throwOnError: resolveThrowOnError(config.throwOnError, true) }))
 }
