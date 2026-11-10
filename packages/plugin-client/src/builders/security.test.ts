@@ -88,4 +88,13 @@ describe('getOperationSecurity', () => {
       "[[{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'apiKey', name: 'sid', in: 'cookie' }], { type: 'oauth2', scopes: ['read:pets'] }]",
     )
   })
+
+  test('quotes flow names that are not identifiers', () => {
+    const security = [
+      { type: 'oauth2' as const, flows: { implicit: { authorizationUrl: 'https://a.example.com' }, 'x-vendor': { tokenUrl: 'https://t.example.com' } } },
+    ]
+    expect(buildSecurityMetadata({ security })).toBe(
+      "[{ type: 'oauth2', flows: { implicit: { authorizationUrl: 'https://a.example.com' }, 'x-vendor': { tokenUrl: 'https://t.example.com' } } }]",
+    )
+  })
 })

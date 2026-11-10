@@ -1,4 +1,4 @@
-import { stringify } from '@internals/utils'
+import { objectKey, stringify } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 
 /**
@@ -32,8 +32,8 @@ function serializeScheme(auth: Auth): string {
   if (auth.flows && Object.keys(auth.flows).length) {
     const flows = Object.entries(auth.flows).map(
       ([name, flow]) =>
-        `${name}: { ${Object.entries(flow)
-          .map(([key, value]) => `${key}: ${stringify(value)}`)
+        `${objectKey(name)}: { ${Object.entries(flow)
+          .map(([key, value]) => `${objectKey(key)}: ${stringify(value)}`)
           .join(', ')} }`,
     )
     parts.push(`flows: { ${flows.join(', ')} }`)
