@@ -129,7 +129,10 @@ export function baseContentType(value: string | null | undefined): string | unde
   return value.split(';')[0]!.trim().toLowerCase() || undefined
 }
 
-function isJsonMediaType(contentType: string | null | undefined): boolean {
+/**
+ * Whether a media type is JSON, such as `application/json` or `application/problem+json`.
+ */
+export function isJsonMediaType(contentType: string | null | undefined): boolean {
   return /[/+]json$/.test(baseContentType(contentType) ?? '')
 }
 

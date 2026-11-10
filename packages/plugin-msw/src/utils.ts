@@ -1,15 +1,17 @@
-import { getStatusClass, toResponseContent } from '@internals/shared'
+import { toResponseContent } from '@internals/shared'
 import { jsStringEscape, objectKey, singleQuote } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
 /** The status a mock responds with. A range such as `2xx` mocks the first code of its class, `200`. */
 export function getMockStatus(statusCode: ast.StatusCode): number {
-  return /xx$/.test(statusCode) ? (getStatusClass(statusCode) ?? 2) * 100 : Number(statusCode)
+  return /^[1-5]xx$/.test(statusCode) ? Number(statusCode[0]) * 100 : Number(statusCode)
 }
 
 /** The declared headers a mock sends, each with its example's `serializedValue` or `value`, else its schema's `default` or first example. */
 export function getMockHeaders(response: ast.ResponseNode | null | undefined): Array<[name: string, value: string]> {
   return (response?.headers ?? []).flatMap((header): Array<[string, string]> => {
+    // OpenAPI ignores a `Content-Type` response header, and the mock already sends one.
+    if (header.name.toLowerCase() === 'content-type') return []
     const example = header.examples?.find((entry) => entry.serializedValue !== undefined || entry.value !== undefined)
     const value = example?.serializedValue ?? example?.value ?? header.schema.default ?? header.schema.examples?.[0]
     if (value === undefined || value === null) return []

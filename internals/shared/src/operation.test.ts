@@ -9,6 +9,7 @@ import {
   hasRequestContentTypeChoice,
   getEventStream,
   getOperationParameters,
+  getPrimarySuccessResponse,
   getRequestGroupOptionality,
   hasEventStreamContent,
   hasStreamVariant,
@@ -245,6 +246,17 @@ describe('response status helpers', () => {
     expect(isErrorStatusCode('4xx')).toBe(true)
     expect(isErrorStatusCode('5xx')).toBe(true)
     expect(isErrorStatusCode('3xx')).toBe(false)
+  })
+
+  test('prefers an exact success code over a range listed before it', () => {
+    const ranged = ast.factory.createOperation({
+      operationId: 'listPets',
+      method: 'GET',
+      path: '/pets',
+      responses: [ast.factory.createResponse({ statusCode: '2xx' }), ast.factory.createResponse({ statusCode: '200' })],
+    })
+
+    expect(getPrimarySuccessResponse(ranged)?.statusCode).toBe('200')
   })
 
   test('resolves error, success, and all response status names', () => {
