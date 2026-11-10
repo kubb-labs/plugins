@@ -50,11 +50,26 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
 }
 
 /**
+ * Serializes the OpenAPI 3.2 `prefixEncoding` and `itemEncoding` of the request body's default content type into
+ * `prefix: [...]` and `item: { ... }` entries for a `multipart/mixed` body. Only the part media types are kept.
+ */
+function serializePartsEncoding(node: ast.HttpOperationNode): Array<string> {
+  const content = node.requestBody?.content
+  const entry = content?.length === 1 ? content[0] : undefined
+  const part = (encoding: ast.EncodingNode) => (encoding.contentType ? `{ contentType: ${JSON.stringify(encoding.contentType)} }` : '{}')
+  return [
+    ...(entry?.prefixEncoding?.length ? [`prefix: [${entry.prefixEncoding.map(part).join(', ')}]`] : []),
+    ...(entry?.itemEncoding?.contentType ? [`item: ${part(entry.itemEncoding)}`] : []),
+  ]
+}
+
+/**
  * Builds the per-operation `styles` literal from the operation's parameters, grouped by location.
  * Entries are keyed by the spec name of the parameter.
  * Only parameters whose source defines `style`, `explode`, `allowReserved`, or `contentType` are
  * emitted, so calls without serialization metadata keep the runtime defaults and existing output
- * is unchanged. A form request body adds a `body` group keyed by property name from its `encoding`.
+ * is unchanged. A form request body adds a `body` group keyed by property name from its `encoding`,
+ * and a `multipart/mixed` body a `parts` group with its `prefix` and `item` encoding.
  * Returns `null` when nothing carries metadata.
  *
  * With `merge`, the literal spreads `config.styles` per parameter, so a per-call entry overrides the generated one for
@@ -69,7 +84,14 @@ function serializeBodyEncoding(node: ast.HttpOperationNode): Array<string> {
 export function buildStyles({ node, merge }: { node: ast.OperationNode; merge?: boolean }): string | null {
   if (!ast.isHttpOperationNode(node)) return null
 
-  const groups: Record<StyledLocation | 'body', Array<string>> = { path: [], query: [], header: [], cookie: [], body: serializeBodyEncoding(node) }
+  const groups: Record<StyledLocation | 'body' | 'parts', Array<string>> = {
+    path: [],
+    query: [],
+    header: [],
+    cookie: [],
+    body: serializeBodyEncoding(node),
+    parts: serializePartsEncoding(node),
+  }
 
   for (const [location, parameters] of Object.entries(getOperationParameters(node)) as Array<[StyledLocation, Array<ast.ParameterNode>]>) {
     for (const parameter of parameters) {

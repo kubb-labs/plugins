@@ -73,9 +73,12 @@ A serializer set this way runs for every call. Pass `serializer` on a single cal
 | `application/json`, `application/*+json`, `text/json`                                    | JSON                                              | JSON                                       |
 | `text/*`                                                                                 | a string                                          | text                                       |
 | `multipart/form-data`, `application/x-www-form-urlencoded`                               | `FormData` or `URLSearchParams` from an object    | `FormData`                                 |
+| `multipart/mixed`                                                                        | one part per array item                           |                                            |
 | `application/octet-stream`, `application/pdf`, `image/*`, `audio/*`, `video/*`           | a `Blob` as is                                    | `Blob`                                     |
 | `text/event-stream`, `application/jsonl`, `application/x-ndjson`, `application/json-seq` |                                                   | text, or item by item with `client.stream` |
 | `*/*`                                                                                    | JSON for objects, strings and binary bodies as is | JSON, or text when the body is not JSON    |
+
+A `multipart/mixed` body is an array. Each part gets the media type of its position in the OpenAPI 3.2 `prefixEncoding`, then `itemEncoding`, which the generated call passes as `styles.parts`. Without one, a `Blob` keeps its own type, a string is `text/plain`, and anything else is JSON.
 
 `.kubb/client.ts` registers the form media types only when the document has a form body, and the stream media types only when it streams. They are exported as `formMediaTypes` from `.kubb/mediaTypes.ts` and `streamMediaTypes` from `.kubb/sse.ts`.
 

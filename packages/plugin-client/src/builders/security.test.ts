@@ -23,7 +23,11 @@ describe('resolveCredential', () => {
       type: 'oauth2',
       metadataUrl: 'https://auth.example.com/.well-known/oauth-authorization-server',
       flows: {
-        deviceAuthorization: { deviceAuthorizationUrl: 'https://auth.example.com/device', tokenUrl: 'https://auth.example.com/token', scopes: { read: 'Read' } },
+        deviceAuthorization: {
+          deviceAuthorizationUrl: 'https://auth.example.com/device',
+          tokenUrl: 'https://auth.example.com/token',
+          scopes: { read: 'Read' },
+        },
       },
     }
     expect(resolveCredential(credential)).toStrictEqual({
@@ -35,7 +39,10 @@ describe('resolveCredential', () => {
   })
 
   test('keeps the OpenID Connect discovery URL', () => {
-    expect(resolveCredential({ type: 'openIdConnect', url: 'https://auth.example.com' })).toStrictEqual({ type: 'openIdConnect', url: 'https://auth.example.com' })
+    expect(resolveCredential({ type: 'openIdConnect', url: 'https://auth.example.com' })).toStrictEqual({
+      type: 'openIdConnect',
+      url: 'https://auth.example.com',
+    })
   })
 
   test('returns null for mutualTLS, which the runtime cannot send', () => {

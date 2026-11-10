@@ -113,6 +113,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+  /orders/batch:
+    post:
+      operationId: createOrderBatch
+      tags: [orders]
+      requestBody:
+        content:
+          multipart/mixed:
+            schema:
+              type: array
+              prefixItems:
+                - $ref: '#/components/schemas/Order'
+              items:
+                type: string
+            prefixEncoding:
+              - contentType: application/json
+            itemEncoding:
+              contentType: text/plain
+      responses:
+        '204':
+          description: Accepted
   /orders/{orderId}:
     get:
       operationId: getOrder

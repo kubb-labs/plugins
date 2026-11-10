@@ -1,6 +1,6 @@
 import type { EventStreamOptions, RequestConfig } from './core.ts'
 import { baseContentType, jsonReplacer, serializeUrlencodedBody, toValue } from './serializers.ts'
-import type { BodyEncoding, RequestBody } from './serializers.ts'
+import type { BodyEncoding, PartsEncoding, RequestBody } from './serializers.ts'
 import { ParseError } from './standardSchema.ts'
 
 /**
@@ -170,6 +170,29 @@ const multipart: MediaType = {
   decode: (response) => response.formData(),
 }
 
+/**
+ * Encodes an array as `multipart/mixed` parts (RFC 2046). A part's media type comes from `encoding`, by position in
+ * `prefix` and then `item`, else from the part: a `Blob`'s own type, `text/plain` for a string, JSON for anything else.
+ * The boundary goes on the `Blob`'s type, which the client sends as `Content-Type`.
+ */
+function toMultipartMixed(parts: Array<unknown>, encoding: PartsEncoding | undefined): Blob {
+  const boundary = `kubb-${crypto.randomUUID()}`
+  const chunks: Array<BlobPart> = []
+  parts.forEach((part, index) => {
+    const declared = (encoding?.prefix?.[index] ?? encoding?.item)?.contentType
+    const contentType =
+      declared ?? (part instanceof Blob ? part.type || 'application/octet-stream' : typeof part === 'string' ? 'text/plain' : 'application/json')
+    const value = part instanceof Blob || typeof part === 'string' ? part : JSON.stringify(part, jsonReplacer)
+    chunks.push(`--${boundary}\r\nContent-Type: ${contentType}\r\n\r\n`, value, '\r\n')
+  })
+  chunks.push(`--${boundary}--\r\n`)
+  return new Blob(chunks, { type: `multipart/mixed; boundary=${boundary}` })
+}
+
+const mixed: MediaType = {
+  encode: (body, { config }) => (isEncodedBody(body) ? body : toMultipartMixed(Array.isArray(body) ? body : [body], config.styles?.parts)),
+}
+
 const urlencoded: MediaType = {
   encode: (body, { config }) => {
     if (isEncodedBody(body)) return body
@@ -197,9 +220,11 @@ export const defaultMediaTypes: MediaTypes = {
 }
 
 /**
- * The `multipart/form-data` and `application/x-www-form-urlencoded` handlers, which follow `config.styles.body`.
+ * The `multipart/form-data` and `application/x-www-form-urlencoded` handlers, which follow `config.styles.body`, and the
+ * `multipart/mixed` one, which follows `config.styles.parts`.
  */
 export const formMediaTypes: MediaTypes = {
   'multipart/form-data': multipart,
+  'multipart/mixed': mixed,
   'application/x-www-form-urlencoded': urlencoded,
 }

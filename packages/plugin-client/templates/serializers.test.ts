@@ -23,3 +23,16 @@ describe('cookie serialization', () => {
     expect(() => serializeCookies({ sid: 'x; admin=1' }, { sid: { style: 'cookie' } })).toThrow(TypeError)
   })
 })
+
+describe('multipart/mixed body encoding', () => {
+  test('sends each part with its media type and the boundary on the Content-Type', async () => {
+    const config = { styles: { parts: { prefix: [{ contentType: 'application/json' }], item: { contentType: 'text/csv' } } } }
+    const body = formMediaTypes['multipart/mixed']!.encode!([{ id: 1 }, 'a,b'], { contentType: 'multipart/mixed', config }) as Blob
+    const boundary = body.type.match(/boundary=(.+)$/)?.[1]
+
+    expect(body.type).toMatch(/^multipart\/mixed; boundary=kubb-/)
+    expect(await body.text()).toBe(
+      `--${boundary}\r\nContent-Type: application/json\r\n\r\n{"id":1}\r\n--${boundary}\r\nContent-Type: text/csv\r\n\r\na,b\r\n--${boundary}--\r\n`,
+    )
+  })
+})

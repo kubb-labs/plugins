@@ -216,11 +216,11 @@ export function hasEventStreamContent(node: ast.OperationNode): boolean {
   return entries.some((entry) => baseContentType(entry.contentType) === 'text/event-stream' && (entries.length === 1 || Boolean(entry.schema)))
 }
 
-const formContentTypes = new Set(['multipart/form-data', 'application/x-www-form-urlencoded'])
+const formContentTypes = new Set(['multipart/form-data', 'multipart/mixed', 'application/x-www-form-urlencoded'])
 
 /**
- * Whether the request body offers `multipart/form-data` or `application/x-www-form-urlencoded`, so the client registers the
- * form media types.
+ * Whether the request body offers `multipart/form-data`, `multipart/mixed` or `application/x-www-form-urlencoded`, so the
+ * client registers the form media types.
  */
 export function hasFormBody(node: ast.OperationNode): boolean {
   return (node.requestBody?.content ?? []).some((entry) => formContentTypes.has(baseContentType(entry.contentType)))

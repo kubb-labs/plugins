@@ -69,6 +69,8 @@ export const client = createLazyClient((config) => createClientCore({ defaultTra
 
 export const createClient = client.createClient
 
+import { formMediaTypes } from './mediaTypes.ts'
+client.setConfig({ mediaTypes: { ...formMediaTypes } })
 /**
  * The servers from the spec by name, for `baseURL`.
  */
