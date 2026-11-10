@@ -9,7 +9,6 @@ import {
   resolveContentTypeVariants,
   resolveOperationFile,
   toResponseContent,
-  withUnwalkedSchemas,
 } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -80,14 +79,11 @@ export const zodGenerator = defineGenerator<PluginZod>({
       nodes: printer?.nodes,
     }
 
-    // The Zod printer prints `conditionals` and `contains`, which the visitors skip, and a string's `content` with `contentSchema`.
-    const printedNode = withUnwalkedSchemas(node, { content: contentSchema })
-
     // Rendered twice: the canonical schema decodes, the `${name}InputSchema` variant encodes.
-    const hasDirectionalNode = !mini && containsDirectionalNode({ node: printedNode, printerOptions })
+    const hasDirectionalNode = !mini && containsDirectionalNode({ node, printerOptions })
 
-    const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node: printedNode, printerOptions }) : [])
-    const importEntries = resolver.imports({ node: printedNode, root, output, group: group ?? undefined })
+    const directionalRefNames = new Set(hasDirectionalNode ? collectDirectionalRefNames({ node, printerOptions }) : [])
+    const importEntries = resolver.imports({ node, root, output, group: group ?? undefined })
     const inputImportEntries = hasDirectionalNode
       ? [...directionalRefNames].map((schemaName) => ({
           name: [resolver.schema.inputName(schemaName)],
@@ -192,10 +188,9 @@ export const zodGenerator = defineGenerator<PluginZod>({
     }) {
       if (!schema) return null
 
-      const printedSchema = withUnwalkedSchemas(schema, { content: contentSchema })
-      const directionalRefNames = direction === 'encode' && !mini ? new Set(collectDirectionalRefNames({ node: printedSchema, printerOptions })) : null
+      const directionalRefNames = direction === 'encode' && !mini ? new Set(collectDirectionalRefNames({ node: schema, printerOptions })) : null
       const imports = resolver.imports({
-        node: printedSchema,
+        node: schema,
         root,
         output,
         group: group ?? undefined,

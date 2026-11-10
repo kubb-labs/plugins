@@ -1120,14 +1120,18 @@ components:
           items:
             type: string
           contains:
-            $ref: '#/components/schemas/PaymentLabel'
+            type: string
+            const: priority
           minContains: 1
           maxContains: 2
         metadata:
           type: string
           contentMediaType: application/json
           contentSchema:
-            $ref: '#/components/schemas/PaymentMetadata'
+            type: object
+            properties:
+              source:
+                type: string
         receipt:
           type: string
           contentEncoding: base64
@@ -1143,14 +1147,6 @@ components:
       then:
         required:
           - creditCard
-    PaymentLabel:
-      type: string
-      const: priority
-    PaymentMetadata:
-      type: object
-      properties:
-        source:
-          type: string
     PaymentError:
       type: object
       required:

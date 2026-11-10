@@ -1,6 +1,4 @@
 import type { Payment } from '../models/ts/Payment'
-import { createPaymentLabelFaker } from './createPaymentLabelFaker'
-import { createPaymentMetadataFaker } from './createPaymentMetadataFaker'
 import { createPaymentMethodEnumFaker } from './createPaymentMethodEnumFaker'
 import { fakerEN as faker } from '@faker-js/faker'
 
@@ -13,8 +11,13 @@ export function createPaymentFaker<TData extends Partial<Payment> = object>(data
     method: createPaymentMethodEnumFaker(),
     creditCard: faker.string.alpha(),
     billingAddress: faker.string.alpha(),
-    labels: [...faker.helpers.multiple(() => createPaymentLabelFaker(), { count: 1 }), ...faker.helpers.multiple(() => faker.string.alpha())],
-    metadata: JSON.stringify(createPaymentMetadataFaker()),
+    labels: [
+      ...faker.helpers.multiple(() => faker.helpers.arrayElement<NonNullable<NonNullable<Payment>['labels']>[number]>(['priority']), { count: 1 }),
+      ...faker.helpers.multiple(() => faker.string.alpha()),
+    ],
+    metadata: JSON.stringify({
+      source: faker.string.alpha(),
+    }),
     receipt: btoa(faker.string.alpha()),
   }
   return {

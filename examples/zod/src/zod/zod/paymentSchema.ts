@@ -4,7 +4,6 @@
  */
 
 import { z } from '../../zod.ts'
-import { paymentLabelSchema } from './paymentLabelSchema'
 
 export const paymentSchema = z
   .pipe(
@@ -43,7 +42,7 @@ export const paymentSchema = z
         .array(z.string())
         .refine(
           (items) => {
-            const count = items.filter((item) => paymentLabelSchema.safeParse(item).success).length
+            const count = items.filter((item) => z.enum(['priority']).safeParse(item).success).length
             return count >= 1 && count <= 2
           },
           { message: 'Array must contain 1 to 2 matching items' },

@@ -273,14 +273,6 @@ export type ApiResponse = {
   message?: string
 }
 
-export const enum PaymentLabel {
-  priority = 'priority',
-}
-
-export type PaymentMetadata = {
-  source?: string
-}
-
 /**
  * @description A payment for a store order
  * @see http://swagger.io Payment model

@@ -78,7 +78,6 @@
             description: 'Pay for store orders',
             parent: 'store',
             kind: 'nav',
-            'x-displayName': 'Payments',
           },
         ],
         paths: {
@@ -1558,7 +1557,8 @@
                     type: 'string',
                   },
                   contains: {
-                    $ref: '#/components/schemas/PaymentLabel',
+                    type: 'string',
+                    const: 'priority',
                   },
                   minContains: 1,
                   maxContains: 2,
@@ -1567,7 +1567,12 @@
                   type: 'string',
                   contentMediaType: 'application/json',
                   contentSchema: {
-                    $ref: '#/components/schemas/PaymentMetadata',
+                    type: 'object',
+                    properties: {
+                      source: {
+                        type: 'string',
+                      },
+                    },
                   },
                 },
                 receipt: {
@@ -1588,18 +1593,6 @@
               },
               then: {
                 required: ['creditCard'],
-              },
-            },
-            PaymentLabel: {
-              type: 'string',
-              const: 'priority',
-            },
-            PaymentMetadata: {
-              type: 'object',
-              properties: {
-                source: {
-                  type: 'string',
-                },
               },
             },
             PaymentError: {
@@ -1702,24 +1695,6 @@
             },
           },
         },
-        'x-tagGroups': [
-          {
-            name: 'pet',
-            tags: ['pet'],
-          },
-          {
-            name: 'store',
-            tags: ['store', 'payment'],
-          },
-          {
-            name: 'stream',
-            tags: ['stream'],
-          },
-          {
-            name: 'pets',
-            tags: ['pets'],
-          },
-        ],
       }
       Redoc.init(
         data,

@@ -1,6 +1,4 @@
 import * as z from 'zod'
-import { paymentLabelSchema } from './paymentLabelSchema'
-import { paymentMetadataSchema } from './paymentMetadataSchema'
 import { paymentMethodEnumSchema } from './paymentMethodEnumSchema'
 
 export const paymentSchema = z
@@ -40,7 +38,7 @@ export const paymentSchema = z
         .array(z.string())
         .refine(
           (items) => {
-            const count = items.filter((item) => paymentLabelSchema.safeParse(item).success).length
+            const count = items.filter((item) => z.enum(['priority']).safeParse(item).success).length
             return count >= 1 && count <= 2
           },
           { message: 'Array must contain 1 to 2 matching items' },
@@ -51,7 +49,11 @@ export const paymentSchema = z
         .refine(
           (value) => {
             try {
-              return paymentMetadataSchema.safeParse(JSON.parse(value)).success
+              return z
+                .object({
+                  source: z.string().optional(),
+                })
+                .safeParse(JSON.parse(value)).success
             } catch {
               return false
             }

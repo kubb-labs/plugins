@@ -28,8 +28,6 @@ export type { OrderShippedEventEventEnumKey } from './models/ts/OrderShippedEven
 export type { OrderStatusEnumKey } from './models/ts/OrderStatusEnum'
 export type { Payment } from './models/ts/Payment'
 export type { PaymentError } from './models/ts/PaymentError'
-export type { PaymentLabelKey } from './models/ts/PaymentLabel'
-export type { PaymentMetadata } from './models/ts/PaymentMetadata'
 export type { PaymentMethodEnumKey } from './models/ts/PaymentMethodEnum'
 export type { Pet } from './models/ts/Pet'
 export type { PetEvent } from './models/ts/PetEvent'
@@ -98,8 +96,6 @@ export type {
   ListPaymentsStatus4XXSchemaType,
 } from './zod/payment/listPaymentsSchema'
 export type { PaymentErrorSchemaType } from './zod/paymentErrorSchema'
-export type { PaymentLabelSchemaType } from './zod/paymentLabelSchema'
-export type { PaymentMetadataSchemaType } from './zod/paymentMetadataSchema'
 export type { PaymentMethodEnumSchemaType } from './zod/paymentMethodEnumSchema'
 export type { PaymentSchemaType } from './zod/paymentSchema'
 export type {
@@ -314,8 +310,6 @@ export { createOrderShippedEventFaker } from './mocks/createOrderShippedEventFak
 export { createOrderStatusEnumFaker } from './mocks/createOrderStatusEnumFaker'
 export { createPaymentErrorFaker } from './mocks/createPaymentErrorFaker'
 export { createPaymentFaker } from './mocks/createPaymentFaker'
-export { createPaymentLabelFaker } from './mocks/createPaymentLabelFaker'
-export { createPaymentMetadataFaker } from './mocks/createPaymentMetadataFaker'
 export { createPaymentMethodEnumFaker } from './mocks/createPaymentMethodEnumFaker'
 export { createPetEventFaker } from './mocks/createPetEventFaker'
 export { createPetEventTypeEnumFaker } from './mocks/createPetEventTypeEnumFaker'
@@ -447,7 +441,6 @@ export { orderParamsStatusEnum } from './models/ts/OrderParamsStatusEnum'
 export { orderPlacedEventEventEnum } from './models/ts/OrderPlacedEventEventEnum'
 export { orderShippedEventEventEnum } from './models/ts/OrderShippedEventEventEnum'
 export { orderStatusEnum } from './models/ts/OrderStatusEnum'
-export { paymentLabel } from './models/ts/PaymentLabel'
 export { paymentMethodEnum } from './models/ts/PaymentMethodEnum'
 export { petEventTypeEnum } from './models/ts/PetEventTypeEnum'
 export { petStatusEnum } from './models/ts/PetStatusEnum'
@@ -535,8 +528,6 @@ export {
   listPaymentsStatus4XXSchema,
 } from './zod/payment/listPaymentsSchema'
 export { paymentErrorSchema } from './zod/paymentErrorSchema'
-export { paymentLabelSchema } from './zod/paymentLabelSchema'
-export { paymentMetadataSchema } from './zod/paymentMetadataSchema'
 export { paymentMethodEnumSchema } from './zod/paymentMethodEnumSchema'
 export { paymentSchema } from './zod/paymentSchema'
 export {

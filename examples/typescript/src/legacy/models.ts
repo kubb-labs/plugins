@@ -273,14 +273,6 @@ export interface ApiResponse {
   message?: string
 }
 
-export enum PaymentLabel {
-  priority = 'priority',
-}
-
-export interface PaymentMetadata {
-  source?: string
-}
-
 /**
  * @description A payment for a store order
  * @see http://swagger.io Payment model

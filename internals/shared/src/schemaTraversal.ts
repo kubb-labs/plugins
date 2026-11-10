@@ -1,4 +1,4 @@
-import { ast } from '@kubb/kit'
+import type { ast } from '@kubb/kit'
 
 /**
  * Converts a child schema to printer output. Plugins instantiate it with their own output type:
@@ -70,35 +70,4 @@ export function mapSchemaMembers<TOutput>(
  */
 export function mapSchemaItems<TOutput>(node: ast.ArraySchemaNode, transform: SchemaTransform<TOutput>): Array<MappedSchema<TOutput>> {
   return (node.items ?? []).map((schema) => ({ schema, output: transform(schema) }))
-}
-
-/**
- * Schemas the AST visitors skip, at any depth: `conditionals`, `contains.schema` and, unless `content` is `false`, `content.schema`.
- */
-function collectUnwalkedSchemas(node: ast.SchemaNode, { content = true }: { content?: boolean } = {}): Array<ast.SchemaNode> {
-  const found = new Set<ast.SchemaNode>()
-  const queue = [node]
-  while (queue.length > 0) {
-    const children = ast.collectSync<Array<ast.SchemaNode | undefined>>(queue.pop()!, {
-      schema: (child) => [
-        ...(child.conditionals ?? []).flatMap((entry) => [entry.if, entry.then, entry.else]),
-        ast.narrowSchema(child, ast.schemaTypes.array)?.contains?.schema ?? ast.narrowSchema(child, ast.schemaTypes.tuple)?.contains?.schema,
-        content ? ast.narrowSchema(child, ast.schemaTypes.string)?.content?.schema : undefined,
-      ],
-    })
-    for (const child of children.flat()) {
-      if (!child || found.has(child)) continue
-      found.add(child)
-      queue.push(child)
-    }
-  }
-  return [...found]
-}
-
-/**
- * `node` in a union with the schemas the visitors skip, so `resolver.imports` also imports what a printer prints for them.
- */
-export function withUnwalkedSchemas(node: ast.SchemaNode, options?: { content?: boolean }): ast.SchemaNode {
-  const unwalked = collectUnwalkedSchemas(node, options)
-  return unwalked.length > 0 ? ast.factory.createSchema({ type: 'union', members: [node, ...unwalked] }) : node
 }

@@ -293,16 +293,6 @@ export type ApiResponse = {
   message?: string
 }
 
-export const paymentLabel = {
-  priority: 'priority',
-} as const
-
-export type PaymentLabelKey = (typeof paymentLabel)[keyof typeof paymentLabel]
-
-export type PaymentMetadata = {
-  source?: string
-}
-
 /**
  * @description A payment for a store order
  * @see http://swagger.io Payment model

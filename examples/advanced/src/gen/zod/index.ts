@@ -57,8 +57,6 @@ export type {
   ListPaymentsStatus4XXSchemaType,
 } from './payment/listPaymentsSchema'
 export type { PaymentErrorSchemaType } from './paymentErrorSchema'
-export type { PaymentLabelSchemaType } from './paymentLabelSchema'
-export type { PaymentMetadataSchemaType } from './paymentMetadataSchema'
 export type { PaymentMethodEnumSchemaType } from './paymentMethodEnumSchema'
 export type { PaymentSchemaType } from './paymentSchema'
 export type {
@@ -277,8 +275,6 @@ export {
   listPaymentsStatus4XXSchema,
 } from './payment/listPaymentsSchema'
 export { paymentErrorSchema } from './paymentErrorSchema'
-export { paymentLabelSchema } from './paymentLabelSchema'
-export { paymentMetadataSchema } from './paymentMetadataSchema'
 export { paymentMethodEnumSchema } from './paymentMethodEnumSchema'
 export { paymentSchema } from './paymentSchema'
 export {

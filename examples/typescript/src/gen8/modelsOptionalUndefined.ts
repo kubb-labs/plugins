@@ -268,12 +268,6 @@ export type ApiResponse = {
   message: string | undefined
 }
 
-export type PaymentLabel = 'priority'
-
-export type PaymentMetadata = {
-  source: string | undefined
-}
-
 /**
  * @description A payment for a store order
  * @see http://swagger.io Payment model

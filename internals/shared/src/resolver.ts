@@ -1,7 +1,6 @@
 import { ensureValidVarName, toFilePath } from '@internals/utils'
 import { ast, camelCase } from '@kubb/kit'
 import type { GeneratorContext, Resolver, ResolverFile } from '@kubb/kit'
-import { withUnwalkedSchemas } from './schemaTraversal.ts'
 
 /**
  * The shared top-level `name` of the operation plugins, computed once per operation name and build.
@@ -142,13 +141,10 @@ export function createCasedFile(caseLast: (part: string) => string): ResolverFil
 type SchemaIndexContext = Pick<GeneratorContext, 'memo' | 'driver'>
 
 /**
- * Names of the schemas in a circular reference chain, computed once per build. A chain can run through `conditionals`,
- * `contains` or a string's `content`, which the visitors skip but the printers import.
+ * Names of the schemas in a circular reference chain, computed once per build.
  */
 export function getCircularNames(ctx: SchemaIndexContext): ReadonlySet<string> {
-  return ctx.memo('circularNames:set', () =>
-    ast.findCircularSchemas((ctx.driver.inputNode?.schemas ?? []).map((schema) => ({ ...withUnwalkedSchemas(schema), name: schema.name }))),
-  )
+  return ctx.memo('circularNames:set', () => ast.findCircularSchemas(ctx.driver.inputNode?.schemas ?? []))
 }
 
 /**
