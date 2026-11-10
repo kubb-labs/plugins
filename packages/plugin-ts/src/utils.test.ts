@@ -86,6 +86,22 @@ describe('buildParams', () => {
       }"
     `)
   })
+
+  it('keeps serialized examples out of examples unless asked for', () => {
+    const params = [
+      ast.factory.createParameter({
+        name: 'status',
+        schema: ast.factory.createSchema({ type: 'string' }),
+        in: 'query',
+        required: true,
+        examples: [{ value: 'settled' }, { serializedValue: 'status=settled' }],
+      }),
+    ]
+    const examples = (schema: ast.SchemaNode) => ast.narrowSchema(schema, 'object')?.properties?.[0]?.schema.examples
+
+    expect(examples(buildParams({ params }))).toStrictEqual(['settled'])
+    expect(examples(buildParams({ params, serializedExamples: true }))).toStrictEqual(['settled', '<caption>Serialized</caption> status=settled'])
+  })
 })
 
 describe('buildResponses', () => {
@@ -228,7 +244,7 @@ describe('buildResponseComments', () => {
 
 describe('getExampleValues', () => {
   it('keeps the value and adds the serialized form under a caption', () => {
-    expect(getExampleValues([{ value: { name: 'Rex' }, serializedValue: 'name=Rex' }, { serializedValue: 'a=*/' }])).toStrictEqual([
+    expect(getExampleValues([{ value: { name: 'Rex' }, serializedValue: 'name=Rex' }, { serializedValue: 'a=*/' }], true)).toStrictEqual([
       { name: 'Rex' },
       '<caption>Serialized</caption> name=Rex',
       '<caption>Serialized</caption> a=*\\/',

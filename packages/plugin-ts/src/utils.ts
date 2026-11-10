@@ -142,10 +142,10 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   return [...comments, typeTag].filter(Boolean)
 }
 
-export function getExampleValues(examples: Array<ast.ExampleNode> | undefined): Array<unknown> | undefined {
+export function getExampleValues(examples: Array<ast.ExampleNode> | undefined, serialized = false): Array<unknown> | undefined {
   const values = (examples ?? []).flatMap((example) => [
     ...(example.value !== undefined ? [example.value] : []),
-    ...(example.serializedValue !== undefined ? [`<caption>Serialized</caption> ${example.serializedValue.replaceAll('*/', '*\\/')}`] : []),
+    ...(serialized && example.serializedValue !== undefined ? [`<caption>Serialized</caption> ${example.serializedValue.replaceAll('*/', '*\\/')}`] : []),
   ])
   return values.length > 0 ? values : undefined
 }
@@ -161,6 +161,12 @@ export function buildResponseComments(response: ast.ResponseNode): Array<string>
 
 type BuildParamsSchemaOptions = {
   params: Array<ast.ParameterNode>
+  /**
+   * Adds each serialized example to `examples` as a `<caption>Serialized</caption>` JSDoc line.
+   * Leave it off when `examples` must hold values, such as for mocks.
+   * @default false
+   */
+  serializedExamples?: boolean
 }
 
 type BuildOperationSchemaOptions = {
@@ -172,7 +178,7 @@ type BuildOperationSchemaOptions = {
  * header), embedding each param's own schema (and JSDoc) directly rather than referencing a
  * separate per-param type — the group itself is the only type these params get exported as.
  */
-export function buildParams({ params }: BuildParamsSchemaOptions): ast.SchemaNode {
+export function buildParams({ params, serializedExamples }: BuildParamsSchemaOptions): ast.SchemaNode {
   return ast.factory.createSchema({
     type: 'object',
     // The group points at the `parameters` list or `headers` map that declares its first parameter.
@@ -185,7 +191,7 @@ export function buildParams({ params }: BuildParamsSchemaOptions): ast.SchemaNod
           ...param.schema,
           optional: !param.required,
           deprecated: param.deprecated || param.schema.deprecated,
-          examples: getExampleValues(param.examples) ?? param.schema.examples,
+          examples: getExampleValues(param.examples, serializedExamples) ?? param.schema.examples,
         }),
       }),
     ),

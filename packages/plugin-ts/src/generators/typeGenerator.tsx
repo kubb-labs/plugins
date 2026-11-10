@@ -117,7 +117,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         name,
         syntaxType,
         description: schema.description,
-        examples: getExampleValues(examples),
+        examples: getExampleValues(examples, true),
         comments,
         keysToOmit,
         resolver,
@@ -183,7 +183,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
       ] as const
     ).map(
       ([params, resolveName]) =>
-        params.length > 0 && renderSchemaType({ schema: buildParams({ params }), name: resolveName.call(resolver.param, node, params[0]!) }),
+        params.length > 0 &&
+        renderSchemaType({ schema: buildParams({ params, serializedExamples: true }), name: resolveName.call(resolver.param, node, params[0]!) }),
     )
 
     const requestBodyContent = node.requestBody?.content ?? []
@@ -232,7 +233,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
     })
 
     const responseHeaderTypes = node.responses.map((res) =>
-      res.headers?.length ? renderSchemaType({ schema: buildParams({ params: res.headers }), name: resolver.response.headers(node, res.statusCode) }) : null,
+      res.headers?.length
+        ? renderSchemaType({ schema: buildParams({ params: res.headers, serializedExamples: true }), name: resolver.response.headers(node, res.statusCode) })
+        : null,
     )
 
     const optionsType = renderSchemaType({
