@@ -261,13 +261,9 @@ export type ContentVariant = { name: string; suffix: string; schema: ast.SchemaN
  * Returns the entry with the schema of the value the client returns: `string` for a body read as text, such as `Pet` on
  * `application/xml`, and `blob` for `image/*`, `audio/*`, `video/*`, PDF, and octet-stream. A binary schema elsewhere is a `Blob`
  * only through `parseAs: 'blob'`, which needs every entry in `entries` binary. JSON, vendor (`application/vnd.*`), stream,
- * schemaless, and wildcard entries keep their schema. Pass it to `content.map` as is, so `entries` holds the other content types.
+ * schemaless, and wildcard entries keep their schema. `entries` is the response's full list of content types.
  */
-export function toResponseContent<T extends ContentVariantInput & ResponseContentEntry>(
-  entry: T,
-  _index?: number,
-  entries: ReadonlyArray<ResponseContentEntry> = [entry],
-): T {
+export function toResponseContent<T extends ContentVariantInput & ResponseContentEntry>(entry: T, entries: ReadonlyArray<ResponseContentEntry> = [entry]): T {
   const { contentType, schema } = entry
   if (!schema || entry.stream) return entry
 

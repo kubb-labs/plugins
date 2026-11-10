@@ -53,7 +53,7 @@ function isJson(contentType: string | undefined): boolean {
  */
 function getTextContentType(response: ast.ResponseNode | null | undefined): string | null {
   const entry = (response?.content ?? []).find((entry) => {
-    const schema = toResponseContent(entry, 0, response?.content).schema
+    const schema = toResponseContent(entry, response?.content).schema
     return !isJson(entry.contentType) && schema && ast.resolveRef(schema).primitive === 'string'
   })
   return entry?.contentType ?? null

@@ -175,7 +175,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const responseUnits = node.responses.flatMap((response) =>
       expandContentUnits(
-        (response.content ?? []).map(toResponseContent),
+        (response.content ?? []).map((entry, _, content) => toResponseContent(entry, content)),
         resolver.response.status(node, response.statusCode),
         tsResolver.response.status(node, response.statusCode),
         response.description,

@@ -142,13 +142,15 @@ function appendFormDataValue({ formData, key, value, contentType }: { formData: 
   formData.append(key, toValue(value))
 }
 
+const formDelimiters: Partial<Record<string, string>> = { spaceDelimited: ' ', pipeDelimited: '|' }
+
 function toFormData(body: Record<string, unknown>, encoding: Record<string, BodyEncoding> | undefined): FormData {
   const formData = new FormData()
   for (const [key, value] of Object.entries(body)) {
     const { contentType, style, explode } = encoding?.[key] ?? {}
     // `explode: false` sends an array as one part, its items joined by the style's delimiter.
     if (Array.isArray(value) && explode === false) {
-      const delimiter = style === 'spaceDelimited' ? ' ' : style === 'pipeDelimited' ? '|' : ','
+      const delimiter = formDelimiters[style ?? 'form'] ?? ','
       formData.append(
         key,
         value

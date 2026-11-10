@@ -464,7 +464,7 @@ describe('toResponseContent', () => {
       { contentType: 'application/geo+json', schema: pet },
       { contentType: 'application/vnd.noaa.dwml+xml', schema: blob },
     ]
-    expect(entries.map(toResponseContent)[1]!.schema).toStrictEqual(ast.factory.createSchema({ type: 'string' }))
+    expect(toResponseContent(entries[1]!, entries).schema).toStrictEqual(ast.factory.createSchema({ type: 'string' }))
     expect(toResponseContent(entries[1]!).schema).toBe(blob)
   })
 

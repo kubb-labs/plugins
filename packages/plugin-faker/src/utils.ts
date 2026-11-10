@@ -74,7 +74,7 @@ function shouldInlineSingleResponseSchema(schema: ast.SchemaNode): boolean {
  */
 export function buildResponseUnionSchema(node: ast.OperationNode, resolver: ResolverFaker): ast.SchemaNode | null {
   const responses = node.responses
-    .map((response) => ({ ...response, content: response.content?.map(toResponseContent) }))
+    .map((response) => ({ ...response, content: response.content?.map((entry, _, content) => toResponseContent(entry, content)) }))
     .filter((response) => response.content?.[0]?.schema)
 
   if (!responses.length) {
