@@ -247,8 +247,6 @@ export type Payment = {
   creditCard?: string
   billingAddress?: string
   labels?: Array<string>
-  metadata?: string
-  receipt?: string
 }
 
 export type PaymentError = {

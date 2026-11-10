@@ -5,14 +5,14 @@ import {
   applyModifiers,
   buildObjectShape,
   defaultLiteral,
-  hasInputChecks,
+  hasPropertyCounts,
   lengthConstraints,
   numberConstraints,
   patternKeySchema,
   printWithOmit,
   shouldCoerce,
 } from '../utils.ts'
-import { buildScalarNodes, buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
+import { buildScalarNodes, buildZodNodes, type ZodDialect } from './zodNodes.ts'
 
 /**
  * Partial map of node-type overrides for the Zod printer.
@@ -75,10 +75,6 @@ export type PrinterZodOptions = {
    */
   oneOfType?: PluginZod['resolvedOptions']['oneOfType']
   /**
-   * Check a string's encoded content against its `contentSchema`.
-   */
-  contentSchema?: PluginZod['resolvedOptions']['contentSchema']
-  /**
    * Date format in the OpenAPI spec (`'date'` or `'date-time'`).
    */
   dateType?: ast.ParserOptions['dateType']
@@ -140,10 +136,10 @@ function strictOneOfMember(member: string, node: ast.SchemaNode, cyclicSchemas?:
       return member
     }
 
-    // Property counts and `conditionals` print a `z.pipe(…)`, which has no `.strict()`.
+    // Property counts print a `z.pipe(…)`, which has no `.strict()`.
     if (
       schema.type === ast.schemaTypes.object &&
-      !hasInputChecks(schema) &&
+      !hasPropertyCounts(schema) &&
       (schema.additionalProperties === undefined || schema.additionalProperties === false)
     ) {
       return `${member}.strict()`
@@ -293,7 +289,6 @@ const standardDialect: ZodDialect<PrinterZodOptions> = {
   catchall: (object, value) => `${object}.catchall(${value})`,
   nullable: (value) => `${value}.nullable()`,
   unique: (array) => `${array}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })`,
-  refine: (schema, check) => `${schema}.refine(${check})`,
   extend: (base, shape) => `${base}.extend(${shape})`,
   intersection: (left, right) => `${left}.and(${right})`,
   strictMember: strictOneOfMember,
@@ -351,7 +346,7 @@ const scalarNodes: PrinterZodNodes = {
  * ```
  */
 export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
-  const nodes: PrinterZodNodes = withInputChecks({ ...buildZodNodes(standardDialect, options.cyclicSchemas), ...scalarNodes })
+  const nodes: PrinterZodNodes = { ...buildZodNodes(standardDialect, options.cyclicSchemas), ...scalarNodes }
 
   return {
     name: 'zod',

@@ -7,14 +7,13 @@ import {
   buildLiteral,
   type buildObjectShape,
   getMemberConstraint,
-  hasInputChecks,
-  inputChecks,
   integerFormatPattern,
   isClosedKeySchema,
   isObjectComposableIntersection,
   isObjectSchemaNode,
   type lengthConstraints,
   type numberConstraints,
+  objectConstraints,
   type patternKeySchema,
   preserveRequiredProperties,
   shouldCoerce,
@@ -30,7 +29,6 @@ export type ZodNodeOptions = {
   guidType?: PluginZod['resolvedOptions']['guidType']
   regexType?: PluginZod['resolvedOptions']['regexType']
   oneOfType?: PluginZod['resolvedOptions']['oneOfType']
-  contentSchema?: PluginZod['resolvedOptions']['contentSchema']
   resolver?: ResolverZod
   cyclicSchemas?: ReadonlySet<string>
   direction?: 'encode' | 'decode'
@@ -56,7 +54,6 @@ export type ZodDialect<TOptions extends ZodNodeOptions = ZodNodeOptions> = {
   catchall: (object: string, value: string) => string
   nullable: (value: string) => string
   unique: (array: string) => string
-  refine: (schema: string, check: string) => string
   extend: (base: string, shape: string) => string
   intersection: (left: string, right: string) => string
   /**
@@ -116,16 +113,13 @@ export function buildScalarNodes<TOptions extends ZodNodeOptions>(dialect: ZodDi
     null: () => 'z.null()',
     string(node) {
       const coerce = shouldCoerce(this.options.coercion, 'strings')
-      const content = this.options.contentSchema ? node.content : undefined
-      const call = coerce ? undefined : (STRING_FORMAT_CALLS.get(node.format) ?? STRING_FORMAT_CALLS.get(content?.encoding))
+      const call = coerce ? undefined : STRING_FORMAT_CALLS.get(node.format)
+      if (call) return `${call}${dialect.lengths({ ...node, regexType: this.options.regexType })}`
+
       const base = coerce ? 'z.coerce.string()' : 'z.string()'
       const pattern = node.pattern ?? integerFormatPattern(node.format)
-      const value = call
-        ? `${call}${dialect.lengths({ ...node, regexType: this.options.regexType })}`
-        : `${base}${dialect.lengths({ ...node, pattern, regexType: this.options.regexType })}`
-      const check = content && contentCheck(this, content)
 
-      return check ? dialect.refine(value, check) : value
+      return `${base}${dialect.lengths({ ...node, pattern, regexType: this.options.regexType })}`
     },
     number(node) {
       const base = shouldCoerce(this.options.coercion, 'numbers') ? 'z.coerce.number()' : 'z.number()'
@@ -256,7 +250,7 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
         return objectBase
       })()
 
-      return result
+      return objectConstraints({ value: result, node })
     },
     array(node) {
       const items = mapSchemaItems(node, (item) => this.transform(item))
@@ -264,19 +258,15 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
         .filter(Boolean)
       const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: ast.schemaTypes.unknown }))!
       const base = `z.array(${inner})${dialect.lengths({ ...node, regexType: this.options.regexType })}`
-      const unique = node.unique ? dialect.unique(base) : base
-      const contains = node.contains && containsCheck(this, node.contains)
 
-      return contains ? dialect.refine(unique, contains) : unique
+      return node.unique ? dialect.unique(base) : base
     },
     tuple(node) {
       const items = mapSchemaItems(node, (item) => this.transform(item))
         .map(({ output }) => output)
         .filter(Boolean)
-      const tuple = `z.tuple(${buildList(items)})`
-      const contains = node.contains && containsCheck(this, node.contains)
 
-      return contains ? dialect.refine(tuple, contains) : tuple
+      return `z.tuple(${buildList(items)})`
     },
     union(node) {
       const literalUnion = getLiteralUnion({ node, options: this.options })
@@ -346,73 +336,4 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
       }, firstBase)
     },
   }
-}
-
-type PrinterContext = { transform: (node: ast.SchemaNode) => string | null }
-
-/**
- * The `z.refine(…)` arguments that check a JSON string, base64-decoded when its encoding says so, against `content.schema`.
- */
-function contentCheck(ctx: PrinterContext, content: NonNullable<ast.StringSchemaNode['content']>): string | null {
-  if (!content.schema || !content.mediaType || !/[/+]json\b/i.test(content.mediaType)) return null
-  const decoded =
-    content.encoding === 'base64' ? 'atob(value)' : content.encoding === 'base64url' ? "atob(value.replace(/-/g, '+').replace(/_/g, '/'))" : 'value'
-  const schema = ctx.transform(content.schema) ?? 'z.unknown()'
-
-  return `(value) => { try { return ${schema}.safeParse(JSON.parse(${decoded})).success } catch { return false } }, { message: ${stringify(`Value is not ${content.mediaType} that matches its content schema`)} }`
-}
-
-function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | null {
-  if (min === 0 && max === undefined) return null
-  const bounds = [`count >= ${min}`, max !== undefined ? `count <= ${max}` : null].filter(Boolean).join(' && ')
-  const message = max !== undefined ? `Array must contain ${min} to ${max} matching items` : `Array must contain at least ${min} matching items`
-  const matches = ctx.transform(schema) ?? 'z.unknown()'
-
-  return `(items) => { const count = items.filter((item) => ${matches}.safeParse(item).success).length; return ${bounds} }, { message: ${stringify(message)} }`
-}
-
-/**
- * A JavaScript condition that is true when `value` matches `schema`. A required `unknown` property means "the key
- * is present", which a Zod object would accept as missing, so those keys are checked with `in`.
- */
-function matchesCondition(ctx: PrinterContext, schema: ast.SchemaNode | undefined): string {
-  if (!schema) return 'true'
-  const object = ast.narrowSchema(schema, ast.schemaTypes.object)
-  const keys =
-    object?.properties.filter((property) => property.required && property.schema.type === ast.schemaTypes.unknown).map((property) => property.name) ?? []
-  const rest = object ? { ...object, properties: object.properties.filter((property) => !keys.includes(property.name)) } : schema
-  const conditions = keys.length ? [`typeof value === "object" && value !== null && ${JSON.stringify(keys)}.every((key) => key in value)`] : []
-  // An object with no properties left still means "is an object", so only a key check stands alone.
-  const isOnlyKeys =
-    keys.length > 0 &&
-    !!object &&
-    rest.type === 'object' &&
-    rest.properties.length === 0 &&
-    rest.additionalProperties === undefined &&
-    !rest.patternProperties &&
-    !rest.propertyNames &&
-    !hasInputChecks(rest)
-  if (!isOnlyKeys) conditions.push(`${ctx.transform(rest) ?? 'z.unknown()'}.safeParse(value).success`)
-
-  return conditions.join(' && ')
-}
-
-function conditionalCheck(ctx: PrinterContext, entry: NonNullable<ast.SchemaNode['conditionals']>[number]): string {
-  return `z.refine((value) => (${matchesCondition(ctx, entry.if)} ? ${matchesCondition(ctx, entry.then)} : ${matchesCondition(ctx, entry.else)}), { message: "Value does not meet a conditional schema" })`
-}
-
-/**
- * Wraps each handler so its output first checks the raw input, see {@link inputChecks}.
- */
-export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.PrinterPartial<string, TOptions>): ast.PrinterPartial<string, TOptions> {
-  const wrapped: Record<string, unknown> = {}
-  for (const [type, handler] of Object.entries(nodes) as Array<[string, (this: PrinterContext, node: ast.SchemaNode) => string | null]>) {
-    wrapped[type] = function (this: PrinterContext, node: ast.SchemaNode) {
-      const output = handler.call(this, node)
-      // A `$ref` prints its target's variable, which already checks the target's input.
-      if (!output || node.type === ast.schemaTypes.ref || !hasInputChecks(node)) return output
-      return inputChecks({ value: output, node, conditionals: (node.conditionals ?? []).map((entry) => conditionalCheck(this, entry)) })
-    }
-  }
-  return wrapped as ast.PrinterPartial<string, TOptions>
 }

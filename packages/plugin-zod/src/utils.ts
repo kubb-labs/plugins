@@ -39,7 +39,7 @@ export function isClosedKeySchema(node: ast.SchemaNode | undefined): boolean {
  */
 export function isPlainInlineObject(node: ast.SchemaNode): boolean {
   if (node.type !== 'object') return false
-  if (hasInputChecks(node)) return false
+  if (hasPropertyCounts(node)) return false
   if (node.nullable || node.optional || node.nullish) return false
 
   const hasAdditionalProperties = node.additionalProperties !== undefined
@@ -53,11 +53,11 @@ export function isPlainInlineObject(node: ast.SchemaNode): boolean {
  * `z.discriminatedUnion` option. Covers object nodes, `$ref`s that resolve to (or are still
  * unresolved) objects, single-member unions of an object, and object-composable `allOf`.
  *
- * Property counts and `conditionals` render as a pipe. A ref into `cyclicSchemas` renders as `z.lazy(…)`.
+ * Property counts render as a pipe. A ref into `cyclicSchemas` renders as `z.lazy(…)`.
  */
 export function isObjectSchemaNode(node: ast.SchemaNode, cyclicSchemas?: ReadonlySet<string>): boolean {
   if (node.nullable || node.optional || node.nullish) return false
-  if (hasInputChecks(node)) return false
+  if (hasPropertyCounts(node)) return false
   if (node.type === 'object') {
     const hasProperties = Boolean(node.properties?.length)
     const hasTypedAdditionalProperties = Boolean(node.additionalProperties && node.additionalProperties !== true)
@@ -350,26 +350,23 @@ export function lengthChecksMini({ min, max, pattern, regexType }: LengthConstra
   return checks.length ? `.check(${checks.join(', ')})` : ''
 }
 
-/**
- * Whether the node prints inside `z.pipe(z.unknown().check(…), …)`, see {@link inputChecks}.
- */
-export function hasInputChecks(node: ast.SchemaNode): boolean {
-  return Boolean(node.conditionals?.length) || (node.type === 'object' && (node.min !== undefined || node.max !== undefined))
+export function hasPropertyCounts(node: ast.SchemaNode): boolean {
+  return node.type === 'object' && (node.min !== undefined || node.max !== undefined)
 }
 
 /**
- * Checks the raw input, before parsing strips keys or inserts defaults: property counts, then the printed `conditionals`.
+ * Checks property counts before object parsing strips unknown keys or inserts defaults.
  */
-export function inputChecks({ value, node, conditionals = [] }: { value: string; node: ast.SchemaNode; conditionals?: Array<string> }): string {
+export function objectConstraints({ value, node }: { value: string; node: ast.SchemaNode }): string {
+  if (node.type !== 'object') return value
   const checks: Array<string> = []
   const skip = 'typeof value !== "object" || value === null || Array.isArray(value)'
-  if (node.type === 'object' && node.min !== undefined) {
+  if (node.min !== undefined) {
     checks.push(`z.refine(value => ${skip} || Object.keys(value).length >= ${node.min}, { message: "Object must have at least ${node.min} properties" })`)
   }
-  if (node.type === 'object' && node.max !== undefined) {
+  if (node.max !== undefined) {
     checks.push(`z.refine(value => ${skip} || Object.keys(value).length <= ${node.max}, { message: "Object must have at most ${node.max} properties" })`)
   }
-  checks.push(...conditionals)
   return checks.length ? `z.pipe(z.unknown().check(${checks.join(', ')}), ${value})` : value
 }
 
@@ -465,7 +462,7 @@ export function getMemberConstraint({
   numbers: (constraints: NumericConstraints) => string
 }): string | undefined {
   // Checks a suffix cannot carry stay on the member's own schema.
-  if (hasInputChecks(member) || ast.narrowSchema(member, 'array')?.contains) return undefined
+  if (hasPropertyCounts(member)) return undefined
   if (member.primitive === 'string') return lengths({ ...(ast.narrowSchema(member, 'string') ?? {}), regexType }) || undefined
   if (member.primitive === 'number' || member.primitive === 'integer')
     return numbers(ast.narrowSchema(member, 'number') ?? ast.narrowSchema(member, 'integer') ?? {}) || undefined
@@ -539,7 +536,7 @@ export function printWithOmit(
     const mask = `{ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} }`
     const omit = (target: string) => {
       const inner = `${target}${unwrap}`
-      const hasObjectConstraints = hasInputChecks(meta)
+      const hasObjectConstraints = hasPropertyCounts(meta)
       const pipe = mini ? `${inner}._zod.def` : inner
       const object = hasObjectConstraints ? `${pipe}.out` : inner
       const omitted = mini ? `z.omit(${object}, ${mask})` : `${object}.omit(${mask})`

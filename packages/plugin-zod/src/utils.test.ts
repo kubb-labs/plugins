@@ -237,12 +237,6 @@ describe('omitUnwrapChain', () => {
 })
 
 describe('isObjectSchemaNode', () => {
-  test('an allOf with conditionals prints a pipe, so it returns false', () => {
-    const member = ast.factory.createSchema({ type: 'object', properties: [] })
-    const node = ast.factory.createSchema({ type: 'intersection', members: [member, member], conditionals: [{ if: member, then: member }] })
-    expect(isObjectSchemaNode(node)).toBe(false)
-  })
-
   test('plain object with properties returns true', () => {
     const node = ast.factory.createSchema({
       type: 'object',

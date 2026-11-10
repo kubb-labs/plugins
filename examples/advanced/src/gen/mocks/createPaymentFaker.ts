@@ -11,14 +11,7 @@ export function createPaymentFaker<TData extends Partial<Payment> = object>(data
     method: createPaymentMethodEnumFaker(),
     creditCard: faker.string.alpha(),
     billingAddress: faker.string.alpha(),
-    labels: [
-      ...faker.helpers.multiple(() => faker.helpers.arrayElement<NonNullable<NonNullable<Payment>['labels']>[number]>(['priority']), { count: 1 }),
-      ...faker.helpers.multiple(() => faker.string.alpha()),
-    ],
-    metadata: JSON.stringify({
-      source: faker.string.alpha(),
-    }),
-    receipt: btoa(faker.string.alpha()),
+    labels: faker.helpers.multiple(() => faker.string.alpha()),
   }
   return {
     ...defaultFakeData,

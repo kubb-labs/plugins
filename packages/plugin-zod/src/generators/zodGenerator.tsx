@@ -42,9 +42,9 @@ type BuildResponseUnionParams = {
 function getPrinter(resolver: ResolverZod, options: PrinterZodOptions, mini: boolean, direction: 'encode' | 'decode') {
   const build = () => (mini ? printerZodMini(options as PrinterZodMiniOptions) : printerZod({ ...options, direction }))
   if (options.nodes || options.keysToOmit?.length) return build()
-  const { coercion, guidType, regexType, oneOfType, contentSchema, dateType } = options
+  const { coercion, guidType, regexType, oneOfType, dateType } = options
   const coerce = (['dates', 'strings', 'numbers'] as const).map((type) => shouldCoerce(coercion, type))
-  return resolver.memo(`zodPrinter:${[mini, direction, ...coerce, guidType, regexType, oneOfType, contentSchema, dateType].join(':')}`, build)
+  return resolver.memo(`zodPrinter:${[mini, direction, ...coerce, guidType, regexType, oneOfType, dateType].join(':')}`, build)
 }
 
 /**
@@ -58,7 +58,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, regexType, oneOfType, contentSchema, compile, mini, inferred, typeGuards, importPath, group, printer } = ctx.options
+    const { output, coercion, guidType, regexType, oneOfType, compile, mini, inferred, typeGuards, importPath, group, printer } = ctx.options
     const dateType = getOasAdapter(adapter).options.dateType
 
     if (!node.name) {
@@ -67,17 +67,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
     const cyclicSchemas = getCircularNames(ctx)
-    const printerOptions: PrinterZodOptions = {
-      coercion,
-      guidType,
-      regexType,
-      oneOfType,
-      contentSchema,
-      dateType,
-      resolver,
-      cyclicSchemas,
-      nodes: printer?.nodes,
-    }
+    const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
 
     // Rendered twice: the canonical schema decodes, the `${name}InputSchema` variant encodes.
     const hasDirectionalNode = !mini && containsDirectionalNode({ node, printerOptions })
@@ -153,7 +143,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, regexType, oneOfType, contentSchema, compile, mini, inferred, importPath, group, printer } = ctx.options
+    const { output, coercion, guidType, regexType, oneOfType, compile, mini, inferred, importPath, group, printer } = ctx.options
     const dateType = getOasAdapter(adapter).options.dateType
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
@@ -163,17 +153,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     } as const
 
     const cyclicSchemas = getCircularNames(ctx)
-    const printerOptions: PrinterZodOptions = {
-      coercion,
-      guidType,
-      regexType,
-      oneOfType,
-      contentSchema,
-      dateType,
-      resolver,
-      cyclicSchemas,
-      nodes: printer?.nodes,
-    }
+    const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
 
     function renderSchemaEntry({
       schema,

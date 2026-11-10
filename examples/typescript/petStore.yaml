@@ -905,34 +905,6 @@ components:
           type: array
           items:
             type: string
-          contains:
-            type: string
-            const: priority
-          minContains: 1
-          maxContains: 2
-        metadata:
-          type: string
-          contentMediaType: application/json
-          contentSchema:
-            type: object
-            properties:
-              source:
-                type: string
-        receipt:
-          type: string
-          contentEncoding: base64
-      dependentRequired:
-        creditCard:
-          - billingAddress
-      if:
-        properties:
-          method:
-            const: card
-        required:
-          - method
-      then:
-        required:
-          - creditCard
     PaymentError:
       type: object
       required:

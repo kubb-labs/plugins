@@ -279,8 +279,6 @@ export type Payment = {
   creditCard?: string | undefined
   billingAddress?: string | undefined
   labels?: Array<string> | undefined
-  metadata?: string | undefined
-  receipt?: string | undefined
 }
 
 export type PaymentError = {

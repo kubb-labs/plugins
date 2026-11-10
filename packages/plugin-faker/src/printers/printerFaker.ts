@@ -84,12 +84,6 @@ function numberCall(kind: 'float' | 'int', { min, max, exclusive }: Pick<ast.Num
   return `faker.number.${kind}(${args ? `{ ${args} }` : ''})`
 }
 
-function encodeContent(value: string, encoding: string | undefined): string {
-  if (encoding === 'base64') return `btoa(${value})`
-  if (encoding === 'base64url') return `btoa(${value}).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '')`
-  return value
-}
-
 /**
  * A `date` or `time` value: an ISO substring, a `dateParser` call, or a `Date` when `representation` is `'date'`.
  */
@@ -197,13 +191,6 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       boolean: () => 'faker.datatype.boolean()',
       null: () => 'null',
       string(node) {
-        if (node.content?.schema && node.content.mediaType && /[/+]json\b/i.test(node.content.mediaType)) {
-          return encodeContent(`JSON.stringify(${printNested(node.content.schema, { typeName: undefined, nestedInObject: true })})`, node.content.encoding)
-        }
-        if (node.content?.encoding === 'base64' || node.content?.encoding === 'base64url') {
-          return encodeContent('faker.string.alpha()', node.content.encoding)
-        }
-
         if (node.pattern) {
           return matches(node.pattern, this.options.regexGenerator)
         }
@@ -340,23 +327,11 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
         const { min, max } = node
         const item = items[0]
-        const array = (() => {
-          if (min !== undefined && max !== undefined) return `faker.helpers.multiple(() => (${item}), { count: { min: ${min}, max: ${max} }})`
-          if (min !== undefined) return `faker.helpers.multiple(() => (${item}), { count: ${min} })`
-          if (max !== undefined) return `faker.helpers.multiple(() => (${item}), { count: { min: 0, max: ${max} }})`
+        if (min !== undefined && max !== undefined) return `faker.helpers.multiple(() => (${item}), { count: { min: ${min}, max: ${max} }})`
+        if (min !== undefined) return `faker.helpers.multiple(() => (${item}), { count: ${min} })`
+        if (max !== undefined) return `faker.helpers.multiple(() => (${item}), { count: { min: 0, max: ${max} }})`
 
-          return `faker.helpers.multiple(() => (${item}))`
-        })()
-
-        // `contains` needs at least `min` (default 1) matching items, so they go first.
-        const containsCount = node.contains ? (node.contains.min ?? 1) : 0
-        if (!node.contains || containsCount === 0) return array
-        const matching = printNested(node.contains.schema, {
-          typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[number]` : undefined,
-          nestedInObject: true,
-        })
-        const combined = `[...faker.helpers.multiple(() => (${matching}), { count: ${containsCount} }), ...${array}]`
-        return max !== undefined ? `${combined}.slice(0, ${max})` : combined
+        return `faker.helpers.multiple(() => (${item}))`
       },
       tuple(node): string {
         const items: Array<string> = (node.items ?? [])

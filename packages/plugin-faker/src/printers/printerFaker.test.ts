@@ -102,37 +102,6 @@ describe('printerFaker', () => {
     expect(print(ast.factory.createSchema({ type: 'number', max: 50 }))).toBe('faker.number.float({ max: 50 })')
   })
 
-  test('puts the items that match contains first', () => {
-    const node = ast.factory.createSchema({
-      type: 'array',
-      items: [ast.factory.createSchema({ type: 'string' })],
-      max: 3,
-      contains: { schema: ast.factory.createSchema({ type: 'enum', enumValues: ['priority'] }), min: 2 },
-    })
-
-    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe(
-      "[...faker.helpers.multiple(() => (faker.helpers.arrayElement(['priority'])), { count: 2 }), ...faker.helpers.multiple(() => (faker.string.alpha()), { count: { min: 0, max: 3 }})].slice(0, 3)",
-    )
-  })
-
-  test('mocks a string that holds JSON from its content schema', () => {
-    const node = ast.factory.createSchema({
-      type: 'string',
-      content: { mediaType: 'application/json', schema: ast.factory.createSchema({ type: 'ref', name: 'Metadata', ref: '#/components/schemas/Metadata' }) },
-    })
-
-    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('JSON.stringify(createMetadata())')
-  })
-
-  test('encodes string content as its contentEncoding says', () => {
-    const json = ast.factory.createSchema({ type: 'unknown' })
-    const print = (content: ast.StringSchemaNode['content']) =>
-      printerFaker({ resolver: resolverFaker }).print(ast.factory.createSchema({ type: 'string', content }))
-
-    expect(print({ mediaType: 'application/json', encoding: 'base64', schema: json })).toBe('btoa(JSON.stringify(undefined))')
-    expect(print({ encoding: 'base64url' })).toBe("btoa(faker.string.alpha()).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '')")
-  })
-
   test('mocks a string int32 within the 32-bit range', () => {
     const node = ast.factory.createSchema({ type: 'string', format: 'int32' })
 

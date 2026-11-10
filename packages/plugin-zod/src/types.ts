@@ -250,13 +250,6 @@ export type Options = OutputOptions & {
    */
   oneOfType?: 'union' | 'xor'
   /**
-   * Check a string's `contentSchema`: parse its JSON, base64-decoded first when `contentEncoding` says so. A base64 string
-   * without one prints `z.base64()`. Off by default, since JSON Schema treats these keywords as annotations.
-   *
-   * @default false
-   */
-  contentSchema?: boolean
-  /**
    * Wrap generated schemas with `z.compile(...)` to enable Zod's hyperoptimized
    * fast-path validation logic.
    *
@@ -322,7 +315,6 @@ export type ResolvedOptions = {
   guidType: NonNullable<Options['guidType']>
   regexType: NonNullable<Options['regexType']>
   oneOfType: NonNullable<Options['oneOfType']>
-  contentSchema: boolean
   compile: NonNullable<Options['compile']>
   mini: NonNullable<Options['mini']>
   typeGuards: NonNullable<Options['typeGuards']>

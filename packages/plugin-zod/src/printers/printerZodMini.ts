@@ -2,7 +2,7 @@ import { lazyGetter, objectKey } from '@internals/utils'
 import { ast } from '@kubb/kit'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import { applyMiniModifiers, buildObjectShape, lengthChecksMini, numberChecksMini, patternKeySchemaMini, printWithOmit, shouldCoerce } from '../utils.ts'
-import { buildZodNodes, withInputChecks, type ZodDialect } from './zodNodes.ts'
+import { buildZodNodes, type ZodDialect } from './zodNodes.ts'
 
 /**
  * Partial map of node-type overrides for the Zod Mini printer.
@@ -52,10 +52,6 @@ export type PrinterZodMiniOptions = {
    * @default 'union'
    */
   oneOfType?: PluginZod['resolvedOptions']['oneOfType']
-  /**
-   * Check a string's encoded content against its `contentSchema`.
-   */
-  contentSchema?: PluginZod['resolvedOptions']['contentSchema']
   /**
    * Transforms raw schema names into valid JavaScript identifiers.
    */
@@ -119,7 +115,6 @@ const miniDialect: ZodDialect<PrinterZodMiniOptions> = {
   catchall: (object, value) => `z.catchall(${object}, ${value})`,
   nullable: (value) => `z.nullable(${value})`,
   unique: (array) => `${array}.check(z.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" }))`,
-  refine: (schema, check) => `${schema}.check(z.refine(${check}))`,
   extend: (base, shape) => `z.extend(${base}, ${shape})`,
   intersection: (left, right) => `z.intersection(${left}, ${right})`,
 }
@@ -128,7 +123,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
   return {
     name: 'zod-mini',
     options,
-    nodes: withInputChecks({
+    nodes: {
       ...buildZodNodes(miniDialect, options.cyclicSchemas),
       bigint(node) {
         return `z.coerce.bigint()${numberChecksMini(node)}`
@@ -151,7 +146,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
 
         return 'z.date()'
       },
-    }),
+    },
     overrides: options.nodes,
     print(node) {
       return printWithOmit(

@@ -38,7 +38,6 @@ const defaultOptions: PluginZod['resolvedOptions'] = {
   guidType: 'uuid',
   regexType: 'literal',
   oneOfType: 'union',
-  contentSchema: false,
   mini: false,
   output: { path: '.', mode: 'directory' },
   exclude: [],
