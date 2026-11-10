@@ -100,7 +100,7 @@ export function createOperationParamResolver(): OperationParamResolver {
  * Lowercases the status range in a resolved name, `ListPetsStatus2XX` to `ListPetsStatus2xx`. Casing `2xx` itself gives `2Xx`.
  */
 function lowerRange(name: string): string {
-  return name.replace(/Status([1-5])XX/, 'Status$1xx')
+  return name.replace(/Status([1-5])XX/i, 'Status$1xx')
 }
 
 export function createOperationResponseResolver(): OperationResponseResolver {
