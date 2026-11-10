@@ -6,7 +6,7 @@ export type HeadersInit = Array<[string, HeaderValue]> | Record<string, HeaderVa
  */
 export type RequestBody = NonNullable<RequestInit['body']>
 
-export type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'QUERY'
+export type HttpMethod = 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'QUERY' | 'TRACE'
 
 /**
  * The OpenAPI query style. `form` is the default.
@@ -323,11 +323,13 @@ function toAsciiJson(value: unknown): string {
  * Serializes array and object headers with the OpenAPI `simple` style.
  */
 export function applyHeaderStyles(headers: HeadersInit | undefined, styles: Record<string, HeaderParamStyle> | undefined): HeadersInit | undefined {
-  if (!headers || !styles) return headers
+  // A `Headers` instance only holds strings, so there is nothing to style.
+  if (!headers || headers instanceof Headers) return headers
   const entries = Array.isArray(headers) ? headers : Object.entries(headers)
   return entries.map(([key, value]) => {
-    const style = styles[key]
-    if (!style || value === undefined || value === null) return [key, value] as [string, HeaderValue]
+    // Without an entry the parameter uses the OpenAPI default: `simple`, no explode.
+    const style = styles?.[key] ?? {}
+    if (value === undefined || value === null) return [key, value] as [string, HeaderValue]
     if (isJsonMediaType(style.contentType)) return [key, toAsciiJson(value)] as [string, HeaderValue]
     if (typeof value !== 'object') return [key, value] as [string, HeaderValue]
     return [key, serializeHeaderValue(value, style.explode ?? false)] as [string, HeaderValue]

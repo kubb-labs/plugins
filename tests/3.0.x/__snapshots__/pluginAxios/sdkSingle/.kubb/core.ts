@@ -869,7 +869,11 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
     const onValidationError = requestConfig.onValidationError ?? config.onValidationError
     const { request, mediaTypes, validate, responseContentType } = await resolveRequest({ config, requestConfig })
-    if (streaming) request.stream = true
+    if (streaming) {
+      request.stream = true
+      // `client.stream` without a response content type would otherwise ask for the default, often JSON.
+      if (getHeader(request.headers, 'accept') === undefined) request.headers['Accept'] = 'text/event-stream'
+    }
 
     const resolvedRequest = await run.request(request, requestConfig)
     const sent = await transport(resolvedRequest)
@@ -921,6 +925,8 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     const readsItems = streaming && resultSuccess && streamType?.stream !== undefined && rawStream
 
     if (streaming && resultSuccess && !readsItems && result.data != null) {
+      // Release the connection, since nobody reads this body.
+      if (rawStream) await (result.data as ReadableStream).cancel().catch(() => {})
       // `cause` is assigned, since the constructor option needs the ES2022 library.
       throw Object.assign(new TypeError(`Expected a streamed body, got ${result.contentType ?? 'a body without a content type'}`), { cause: result.data })
     }

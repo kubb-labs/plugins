@@ -41,8 +41,9 @@ import ky from 'ky'
 import { client, toRequestInit } from './gen/.kubb/client'
 
 client.setConfig({
-  // The client splits success from error itself, so ky must not throw or retry on an error status. ky also
-  // stops every call after 10 seconds unless `timeout` is off. Set a limit per call with `signal: AbortSignal.timeout(ms)`.
+  // The client splits success from error itself, so ky must not throw or retry on an error status. ky's `timeout`
+  // (10 seconds by default) only waits for the response headers and never ends a started body or stream. Turn it
+  // off and bound the whole call with `signal: AbortSignal.timeout(ms)`.
   transport: (request) => ky(request.url, { ...toRequestInit(request), throwHttpErrors: false, retry: 0, timeout: false }),
 })
 ```
