@@ -89,14 +89,26 @@ function getTextContentType(response: ast.ResponseNode | null | undefined): stri
 export function responseReturn(body: string, status: number, response: ast.ResponseNode | null | undefined): string {
   const contentType = getContentType(response)
   const headers = getMockHeaders(response)
-  const textContentType = hasResponseSchema(response) ? getTextContentType(response) : null
-  if (!textContentType) return `return ${responseLiteral(`JSON.stringify(${body})`, status, contentType, headers)}`
-
-  // A plain variable such as `data` is checked as it is, an expression such as `data ?? createPet(data)` is read once.
+  // A plain variable such as `data` is checked as it is, an expression such as `data ?? createPet()` is read once.
   const name = /^\w+$/.test(body) ? body : 'body'
-  return `${name === body ? '' : `const body = ${body}\n    `}if (typeof ${name} === 'string') return ${responseLiteral(name, status, textContentType, headers)}
+  const prelude = name === body ? '' : `const body = ${body}\n    `
 
-    return ${responseLiteral(`JSON.stringify(${name})`, status, contentType, headers)}`
+  // shortcut: one `data:` frame with the JSON payload, upgrade when a mock needs several events or the `event` and `id` fields.
+  if (contentType?.split(';')[0]!.trim().toLowerCase() === 'text/event-stream') {
+    return `${prelude}return ${responseLiteral(`${name} === undefined ? '' : \`data: \${${toJson(name)}}\\n\\n\``, status, contentType, headers)}`
+  }
+
+  const textContentType = hasResponseSchema(response) ? getTextContentType(response) : null
+  if (!textContentType) return `return ${responseLiteral(toJson(body), status, contentType, headers)}`
+
+  return `${prelude}if (typeof ${name} === 'string') return ${responseLiteral(name, status, textContentType, headers)}
+
+    return ${responseLiteral(toJson(name), status, contentType, headers)}`
+}
+
+// An `int64` mock is a `bigint`, which `JSON.stringify` rejects, so it is sent as a JSON number like the client sends it.
+function toJson(body: string): string {
+  return `JSON.stringify(${body}, (_key, value) => (typeof value === 'bigint' ? Number(value) : value))`
 }
 
 /**
@@ -130,12 +142,15 @@ function toLiteral(value: unknown): string {
   return String(value)
 }
 
+const mswMethods = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'])
+
 /**
- * Converts an HTTP method to its lowercase MSW equivalent (e.g., 'POST' → 'post'). MSW has no
- * `http.query`, so a QUERY operation maps to `http.all` and its handler checks the method itself.
+ * Converts an HTTP method to its lowercase MSW equivalent (e.g., 'POST' → 'post'). MSW has no `http.query`, `http.trace` or
+ * handler for a custom `additionalOperations` method, so such an operation maps to `http.all` and its handler checks the
+ * method itself.
  */
 export function getMswMethod(node: ast.HttpOperationNode): string {
-  return node.method === 'QUERY' ? 'all' : node.method.toLowerCase()
+  return mswMethods.has(node.method) ? node.method.toLowerCase() : 'all'
 }
 
 /**
