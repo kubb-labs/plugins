@@ -309,7 +309,7 @@ Declare heartbeat and `error` events in the document, so each has a `case` in yo
 
 ## JSON or an event stream
 
-Some APIs, such as Wikimedia EventStreams, declare the same response as `application/json` and as `text/event-stream`. Kubb generates a normal call for it, which returns a `RequestResult`. The call sends `Accept: text/event-stream`, so the server streams events. To ask for JSON, pass `contentType: { response: 'application/json' }`.
+Some APIs, such as Wikimedia EventStreams, declare the same response as `application/json` and as `text/event-stream`. Kubb generates a normal call for it, which returns a `RequestResult`. The call sends `Accept: text/event-stream`, so the server streams events. To ask for JSON, pass `contentType: { response: 'application/json' }`. Wikimedia answers JSON with an endless JSON Lines body, so also pass `parseAs: 'stream'` and read `result.data` with `parseJsonLines({ stream: result.data })` from `.kubb/client`. Without it, the call waits for a body that never ends.
 
 Check `contentType` on the result. For `text/event-stream`, `data` is the raw `ReadableStream<Uint8Array>`. Pass it to `parseEventStream` from `.kubb/client` to read the events:
 

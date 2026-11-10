@@ -137,8 +137,8 @@ describe('defaultQuerySerializer', () => {
     expect(defaultQuerySerializer({ value }, { value: { contentType: 'application/jsonl' } })).toBe('a=1')
   })
 
-  test('serializes nested objects with the deepObject style', () => {
-    expect(defaultQuerySerializer({ filter: { name: 'odie' } })).toBe('filter%5Bname%5D=odie')
+  test('serializes an object without a style as form with explode', () => {
+    expect(defaultQuerySerializer({ filter: { name: 'odie', age: 3 } })).toBe('name=odie&age=3')
   })
 
   test('skips undefined and null members', () => {
@@ -377,13 +377,29 @@ describe('applyHeaderStyles', () => {
     expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-Since': '2020-01-02T03:04:05.000Z' })
   })
 
-  test('passes through primitives and headers without metadata untouched', () => {
+  test('passes primitives through and uses the simple style for headers without metadata', () => {
     const result = applyHeaderStyles({ Authorization: 'Bearer x', 'X-Raw': [1, 2] }, { Authorization: { explode: true } })
-    expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ Authorization: 'Bearer x', 'X-Raw': [1, 2] })
+    expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ Authorization: 'Bearer x', 'X-Raw': '1,2' })
+  })
+
+  test('uses the simple style when the operation has no header styles', () => {
+    const result = applyHeaderStyles({ 'X-List': ['a', 'b'], 'X-Obj': { k: 'v' } }, undefined)
+    expect(Object.fromEntries(result as Array<[string, unknown]>)).toStrictEqual({ 'X-List': 'a,b', 'X-Obj': 'k,v' })
   })
 })
 
 describe('createClientCore', () => {
+  test('sends a null body as the JSON document null, and leaves an undefined body out', async () => {
+    const { transport, calls } = fakeTransport()
+    const client = createClientCore<string, string>({ defaultTransport: transport })
+    await client({ method: 'PATCH', url: '/pet/1', body: null, contentType: 'application/merge-patch+json' })
+    await client({ method: 'PATCH', url: '/pet/1', body: undefined })
+    expect(calls.map((call) => [call.body, call.headers['Content-Type']])).toStrictEqual([
+      ['null', 'application/merge-patch+json'],
+      [undefined, undefined],
+    ])
+  })
+
   test('returns errors for a non-throwing call and honors a per-call override', async () => {
     const { transport } = fakeTransport({ data: { message: 'invalid' }, status: 405 })
     const client = createClientCore<string, string>({ defaultTransport: transport })
@@ -1178,6 +1194,25 @@ describe('client.stream', () => {
     })
     const empty = await streamClient(async () => new Response(null, { status: 204 })).stream({ method: 'GET', url: '/events' })
     expect(await collect(empty)).toStrictEqual([])
+  })
+
+  test('asks for an event stream unless the call sets Accept', async () => {
+    const accepts: Array<string | undefined> = []
+    const transport = async (request: ResolvedRequest) => (
+      accepts.push(request.headers['Accept'] ?? request.headers['accept']),
+      new Response(null, { status: 204 })
+    )
+    await streamClient(transport).stream({ method: 'GET', url: '/events' })
+    await streamClient(transport).stream({ method: 'GET', url: '/events', headers: { accept: 'application/jsonl' } })
+    expect(accepts).toStrictEqual(['text/event-stream', 'application/jsonl'])
+  })
+
+  test('cancels a raw body it cannot stream before it throws', async () => {
+    let canceled = false
+    const body = new ReadableStream({ cancel: () => void (canceled = true) })
+    const transport = async () => new Response(body, { headers: { 'content-type': 'application/json' } })
+    await expect(streamClient(transport).stream({ method: 'GET', url: '/events', parseAs: 'stream' })).rejects.toBeInstanceOf(TypeError)
+    expect(canceled).toBe(true)
   })
 
   test('returns the error of a failed call made with throwOnError false and streams nothing', async () => {

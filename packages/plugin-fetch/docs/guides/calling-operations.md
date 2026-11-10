@@ -138,3 +138,7 @@ const url = client.getUrl({
 })
 // https://api.example.com/v1/pets/1?fields=name
 ```
+
+## TRACE operations
+
+Kubb generates a call for a `trace` operation, but `fetch` and ky reject the `TRACE` method. Use `@kubb/plugin-axios` or a custom transport for it.
