@@ -181,6 +181,14 @@ function indexedTypeName(typeName: string, propertyName: string, nestedInUnion?:
 }
 
 /**
+ * Type expression for an array's items. In a union only some branches are arrays, and indexing the others with `number`
+ * is a TS2537 error, so a union member reads the items of its array branches.
+ */
+function itemTypeName(typeName: string, nestedInUnion?: boolean): string {
+  return nestedInUnion ? `Extract<NonNullable<${typeName}>, ReadonlyArray<unknown>>[number]` : `NonNullable<${typeName}>[number]`
+}
+
+/**
  * Creates a Faker printer that generates mock data generation code from schema nodes.
  * Handles circular references gracefully by emitting memoizing getters for cyclic properties.
  */
@@ -284,7 +292,9 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           return JSON.stringify(values[0])
         }
 
-        return `faker.helpers.arrayElement${typeName ? `<${typeName}>` : ''}([${values.map(parseEnumValue).join(', ')}])`
+        // The values are asserted as the property's type, not checked against it. Inside an `allOf` or `oneOf` that type can be
+        // narrower than the enum, or `never`, and a type argument would then reject the values the schema itself lists.
+        return `faker.helpers.arrayElement([${values.map(parseEnumValue).join(', ')}]${typeName ? ` as Array<${typeName}>` : ''})`
       },
       union(node): string {
         const { discriminatorPropertyName } = node
@@ -337,7 +347,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
         const items: Array<string> = mapSchemaItems(node, (member) =>
           printNested(member, {
-            typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[number]` : undefined,
+            typeName: this.options.typeName ? itemTypeName(this.options.typeName, this.options.nestedInUnion) : undefined,
             nestedInObject: true,
           }),
         )

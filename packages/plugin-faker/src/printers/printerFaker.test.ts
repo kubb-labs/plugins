@@ -45,8 +45,21 @@ describe('printerFaker', () => {
     })
 
     expect(printerFaker({ resolver: resolverFaker, typeName: 'Settings' }).print(node)).toBe(
-      "{\n  x: faker.number.int(),\n  'a-b': faker.helpers.arrayElement<NonNullable<Settings>[\"a-b\"]>(['on', 'off']),\n}",
+      "{\n  x: faker.number.int(),\n  'a-b': faker.helpers.arrayElement(['on', 'off'] as Array<NonNullable<Settings>[\"a-b\"]>),\n}",
     )
+  })
+
+  test('reads the items of an array in a union from its array branches only', () => {
+    const item = ast.factory.createSchema({
+      type: 'object',
+      properties: [ast.factory.createProperty({ name: 'level', schema: ast.factory.createSchema({ type: 'enum', enumValues: ['low'] }) })],
+    })
+    const node = ast.factory.createSchema({
+      type: 'union',
+      members: [ast.factory.createSchema({ type: 'object', properties: [] }), ast.factory.createSchema({ type: 'array', items: [item] })],
+    })
+
+    expect(printerFaker({ resolver: resolverFaker, typeName: 'Body' }).print(node)).toContain('Extract<NonNullable<Body>, ReadonlyArray<unknown>>[number]')
   })
 
   test('falls back to the base string printer from a node override', () => {
@@ -202,7 +215,7 @@ describe('printerFaker', () => {
         typeName: `NonNullable<Address>["identifier"]`,
       }).print(node),
     ).toMatchInlineSnapshot(
-      `"[faker.number.int(), faker.string.alpha(), faker.helpers.arrayElement<NonNullable<NonNullable<Address>["identifier"]>[2]>(['NW', 'NE', 'SW', 'SE'])]"`,
+      `"[faker.number.int(), faker.string.alpha(), faker.helpers.arrayElement(['NW', 'NE', 'SW', 'SE'] as Array<NonNullable<NonNullable<Address>["identifier"]>[2]>)]"`,
     )
   })
 
@@ -326,7 +339,7 @@ describe('printerFaker', () => {
     expect(printerFaker({ resolver: resolverFaker, typeName: 'Filter', schemaName: 'Filter' }).print(node)).toMatchInlineSnapshot(
       `
       "faker.helpers.arrayElement([{}, {
-        '+order': faker.helpers.arrayElement<(NonNullable<Filter> & Record<"+order", unknown>)["+order"]>(['asc', 'desc']),
+        '+order': faker.helpers.arrayElement(['asc', 'desc'] as Array<(NonNullable<Filter> & Record<"+order", unknown>)["+order"]>),
       }])"
     `,
     )
