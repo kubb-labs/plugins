@@ -41,6 +41,10 @@ describe('defaultLiteral', () => {
     expect(defaultLiteral(ast.factory.createSchema({ type: 'object', primitive: 'object' }), null)).toBeNull()
   })
 
+  test('a default on a binary schema is dropped, since a Blob has no literal', () => {
+    expect(defaultLiteral(ast.factory.createSchema({ type: 'blob' }), 'data:text/plain;base64,dGVzdDE=')).toBeNull()
+  })
+
   test('a string default on a numeric enum is coerced to the matching member literal', () => {
     const node = ast.factory.createSchema({ type: 'enum', enumValues: [1, 3] })
     expect(defaultLiteral(node, '1')).toBe('1')
