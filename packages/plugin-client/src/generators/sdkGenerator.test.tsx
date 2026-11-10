@@ -112,6 +112,24 @@ describe('sdkGenerator operations', () => {
       options: {},
       nodes: operationNodes.map((node) => (node.path === '/store/inventory' ? { ...node, servers: [{ url: 'https://inventory.example.com' }] } : node)),
     },
+    // One method with declared response headers next to methods without: the class imports both result types.
+    {
+      name: 'sdkClassWithResponseHeaders',
+      options: {},
+      nodes: operationNodes.map((node) =>
+        node.operationId === 'deletePet'
+          ? {
+              ...node,
+              responses: node.responses.map((response) => ({
+                ...response,
+                headers: [
+                  ast.factory.createParameter({ name: 'X-Request-Id', in: 'header', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+                ],
+              })),
+            }
+          : node,
+      ),
+    },
   ] as const satisfies Array<{ name: string; options: Partial<PluginFetch['resolvedOptions']>; nodes?: Array<ast.OperationNode> }>
 
   test.each(testData)('$name', async (props) => {

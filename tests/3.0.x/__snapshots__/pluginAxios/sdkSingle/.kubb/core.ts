@@ -9,9 +9,9 @@ export * from './mediaTypes'
 export type { ValidateOption, ValidationErrorContext, ValidationErrorHandler } from './standardSchema'
 
 /**
- * The status keys that count as success. `2xx` covers every 2xx status.
+ * The status keys that count as success. `2xx` covers every 2xx status. Generated code writes it in lower case, and `2XX` is read too.
  */
-export type SuccessStatusCode = '200' | '201' | '202' | '203' | '204' | '205' | '206' | '207' | '208' | '226' | '2xx'
+export type SuccessStatusCode = '200' | '201' | '202' | '203' | '204' | '205' | '206' | '207' | '208' | '226' | '2xx' | '2XX'
 
 export type SuccessOf<TResponses> = TResponses[Extract<keyof TResponses, SuccessStatusCode>]
 
@@ -150,9 +150,23 @@ export type Unwrapped<T, ThrowOnError extends boolean> = ThrowOnError extends tr
 /**
  * What an operation returns with `returnType: 'data'`: the success body, or the full result when `throwOnError` is false.
  */
-export type UnwrappedResult<TResponses, ThrowOnError extends boolean = true, TRequest = NativeRequest, TResponse = NativeResponse> = Unwrapped<
-  RequestResult<TResponses, ThrowOnError, TRequest, TResponse>,
-  ThrowOnError
+export type UnwrappedResult<
+  TResponses,
+  ThrowOnError extends boolean = true,
+  TRequest = NativeRequest,
+  TResponse = NativeResponse,
+  THeaders = unknown,
+> = Unwrapped<RequestResult<TResponses, ThrowOnError, TRequest, TResponse, THeaders>, ThrowOnError>
+
+/**
+ * `UnwrappedResult` with the declared response headers by status, for the full result a `throwOnError: false` call resolves to.
+ */
+export type UnwrappedResultWithHeaders<TResponses, THeaders, ThrowOnError extends boolean = true> = UnwrappedResult<
+  TResponses,
+  ThrowOnError,
+  NativeRequest,
+  NativeResponse,
+  THeaders
 >
 
 /**
@@ -467,6 +481,10 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
   status: number
   statusText: string
   contentType: string | undefined
+  /**
+   * The response's `Headers`, the same on every transport.
+   */
+  headers: ResponseHeaders
   request: TRequest
   response: TResponse
 
@@ -475,6 +493,7 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
     status: number
     statusText: string
     contentType?: string
+    headers?: Headers
     request: TRequest
     response: TResponse
     method?: string
@@ -490,6 +509,7 @@ export class ResponseError<TError = unknown, TRequest = NativeRequest, TResponse
     this.status = config.status
     this.statusText = config.statusText
     this.contentType = config.contentType
+    this.headers = config.headers ?? new Headers()
     this.request = config.request
     this.response = config.response
   }
@@ -507,13 +527,15 @@ export type ResponseErrorConfig<TError = unknown> = ResponseError<TError>
 type ErrorStatus<TResponses> = Exclude<keyof TResponses, SuccessStatusCode>
 
 /**
- * The `ResponseError` an operation throws. Checking `status` narrows `data` to that status's body.
+ * The `ResponseError` an operation throws. Checking `status` narrows `data` to that status's body, and `headers.get` to
+ * the header names in `THeaders`, the same record `RequestResult` takes.
  */
-export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = NativeResponse> = [ErrorStatus<TResponses>] extends [never]
+export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = NativeResponse, THeaders = unknown> = [ErrorStatus<TResponses>] extends [never]
   ? ResponseError<unknown, TRequest, TResponse>
   : {
       [TStatus in ErrorStatus<TResponses>]: ResponseError<DataOf<TResponses[TStatus]>, TRequest, TResponse> & {
         status: ToStatusNumber<TStatus, keyof TResponses>
+        headers: HeadersFor<THeaders, TStatus>
       }
     }[ErrorStatus<TResponses>]
 
@@ -529,9 +551,9 @@ export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = Na
  * }
  * ```
  */
-export function isResponseError<TResponses = unknown, TRequest = NativeRequest, TResponse = NativeResponse>(
+export function isResponseError<TResponses = unknown, TRequest = NativeRequest, TResponse = NativeResponse, THeaders = unknown>(
   error: unknown,
-): error is ResponseErrorOf<TResponses, TRequest, TResponse> {
+): error is ResponseErrorOf<TResponses, TRequest, TResponse, THeaders> {
   return ResponseError.is(error)
 }
 
@@ -986,6 +1008,7 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
         status: result.status,
         statusText: result.statusText,
         contentType: result.contentType,
+        headers: result.headers,
         request: result.request,
         response: result.response,
         method: resolvedRequest.method,

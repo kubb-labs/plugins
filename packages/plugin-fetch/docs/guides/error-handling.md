@@ -56,6 +56,8 @@ try {
 
 The type argument is not checked at runtime, so keep the `try` around one operation.
 
+The error also carries the response's `Headers` as `error.headers`, so `error.headers.get('Retry-After')` reads the same on every transport.
+
 ## Return the error instead
 
 Pass `throwOnError: false` and the call resolves for every documented status. The result is a

@@ -655,6 +655,13 @@ describe('createClientCore', () => {
     await expect(client({ method: 'POST', url: '/pet' })).rejects.toMatchObject({ status: 405, data: { message: 'invalid' } })
   })
 
+  test('a ResponseError carries the response headers', async () => {
+    const { client } = createClient({ data: { message: 'slow down' }, status: 429, statusText: 'Too Many Requests' })
+    const error = await client({ method: 'GET', url: '/pet' }).catch((thrown: unknown) => thrown)
+    expect(ResponseError.is(error) && error.headers.get('content-type')).toBe('application/json')
+    expect(new ResponseError({ data: undefined, status: 500, statusText: '', request: 'REQ', response: 'RES' }).headers.get('x')).toBeNull()
+  })
+
   test('names the method and URL in the ResponseError message, without the query', async () => {
     const { client } = createClient({ status: 404, statusText: 'Not Found' })
     await expect(client({ method: 'GET', baseURL: 'https://api.test', url: '/pet/1', query: { api_key: 'secret' } })).rejects.toThrow(

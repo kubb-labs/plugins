@@ -1,12 +1,11 @@
 import path from 'node:path'
-import { type OperationTypeNames, type OperationTypeSource, resolveOperationTypes } from '@internals/client'
+import { getResponseHeadersTypeNames, type OperationTypeNames, type OperationTypeSource, resolveOperationTypes } from '@internals/client'
 import { getEventStream, isEventStream, operationKey, resolveOperationFile } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
 import { ast, camelCase, defineGenerator, Diagnostics } from '@kubb/kit'
 import type { Generator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
-import { getResponseHeadersTypeNames } from '../builders/generics.ts'
 import { buildEventStreamImports } from '../builders/returnStatement.ts'
 import { isValidatorEnabled } from '../builders/validatorOptions.ts'
 import { getOperationSecurity, type SecurityRequirement } from '../builders/security.ts'
@@ -15,7 +14,7 @@ import { buildValidatorHooks, type ValidatorHooks } from '../builders/validator.
 import { SdkClient } from '../components/SdkClient.tsx'
 import { StreamRuntime } from '../components/StreamRuntime.tsx'
 import { SdkFacade } from '../components/SdkFacade.tsx'
-import type { ContractClientFactory, ReturnTypeOption } from '../types.ts'
+import type { ContractClientFactory } from '../types.ts'
 
 type GeneratorContext = Parameters<NonNullable<Generator<ContractClientFactory>['operations']>>[1]
 
@@ -41,12 +40,12 @@ type Controller = {
   operations: Array<OperationData>
 }
 
-function resolveTypeImportNames(node: ast.OperationNode, types: OperationTypeNames, returnType: ReturnTypeOption): Array<string> {
-  return [types.response.options(node), types.response.responses(node), ...getHeaderTypeNames(node, types, returnType)]
+function resolveTypeImportNames(node: ast.OperationNode, types: OperationTypeNames): Array<string> {
+  return [types.response.options(node), types.response.responses(node), ...getHeaderTypeNames(node, types)]
 }
 
-function getHeaderTypeNames(node: ast.OperationNode, types: OperationTypeNames, returnType: ReturnTypeOption): Array<string> {
-  return isEventStream(node) || returnType === 'data' ? [] : getResponseHeadersTypeNames({ node, types })
+function getHeaderTypeNames(node: ast.OperationNode, types: OperationTypeNames): Array<string> {
+  return isEventStream(node) ? [] : getResponseHeadersTypeNames({ node, types })
 }
 
 /**
@@ -183,7 +182,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
       const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
         const { namesByPath: typeNamesByPath, filesByPath: typeFilesByPath } = collectImportsByFile(ops, (op) => ({
           file: op.typeFile,
-          names: resolveTypeImportNames(op.node, op.types, returnType),
+          names: resolveTypeImportNames(op.node, op.types),
         }))
         const { namesByPath: zodNamesByPath, filesByPath: zodFilesByPath } = validatorEnabled
           ? collectImportsByFile(ops, (op) => ({ file: op.zodFile, names: op.validatorHooks?.importedZodNames ?? [] }))
@@ -191,8 +190,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
         const shapes = new Set(ops.map((op) => getEventStream(op.node)).filter(Boolean))
         const hasEventStream = shapes.size > 0
         const resultOps = ops.filter((op) => !isEventStream(op.node))
-        const hasResult = resultOps.length > 0
-        const typedHeaders = (op: OperationData) => getHeaderTypeNames(op.node, op.types, returnType).length > 0
+        const typedHeaders = (op: OperationData) => getHeaderTypeNames(op.node, op.types).length > 0
+        const resultName = returnType === 'data' ? 'UnwrappedResult' : 'RequestResult'
 
         return (
           <File key={file.path} baseName={file.baseName} path={file.path} meta={file.meta} banner={banner(file)} footer={footer(file)}>
@@ -208,9 +207,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ sse
                   'ClientInstance',
                   'Options',
                   ...(returnType === 'data' ? [] : ['Unwrappable']),
-                  ...(hasResult && returnType === 'data' ? ['UnwrappedResult'] : []),
-                  ...(returnType !== 'data' && resultOps.some((op) => !typedHeaders(op)) ? ['RequestResult'] : []),
-                  ...(resultOps.some(typedHeaders) ? ['RequestResultWithHeaders'] : []),
+                  ...(resultOps.some((op) => !typedHeaders(op)) ? [resultName] : []),
+                  ...(resultOps.some(typedHeaders) ? [`${resultName}WithHeaders`] : []),
                   ...(hasEventStream ? buildEventStreamImports({ returnType, typed: shapes.has('event'), line: shapes.has('line') }) : []),
                 ]),
               )}

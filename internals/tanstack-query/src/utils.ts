@@ -14,6 +14,7 @@ import {
 import type { ast } from '@kubb/kit'
 import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
 import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
+import { buildResponseHeadersType } from '@internals/client'
 import type { ReturnTypeOption } from '@internals/client'
 import type { Infinite, Mutation, PageParamFn, Query } from './types.ts'
 
@@ -200,6 +201,12 @@ export function buildCallResultBody(call: string, options: { clientReturnType?: 
   return `return ${call}.unwrap()`
 }
 
+function buildResultType(node: ast.OperationNode, resolver: ResolverTs): string {
+  const responses = resolver.response.responses(node)
+  const headers = buildResponseHeadersType({ node, types: resolver })
+  return headers ? `RequestResultWithHeaders<${responses}, ${headers}, true>` : `RequestResult<${responses}, true>`
+}
+
 type ResponseTypes = {
   TData: string
   TError: string
@@ -219,17 +226,19 @@ type ResolvePageParamTypeParams = {
 /**
  * Builds the `TData` / `TError` type expressions shared by every generated hook, joining the resolved
  * success responses into `TData` and wrapping the error responses in `ResponseErrorConfig<...>`.
- * With `returnType` `'full'`, `TData` is the client's `RequestResult` over the operation's responses record.
+ * With `returnType` `'full'`, `TData` is the client's `RequestResult` over the operation's responses record, with the
+ * response headers the operation declares.
  */
 export function buildResponseTypes(node: ast.OperationNode, resolver: ResolverTs, options: { returnType?: ReturnTypeOption } = {}): ResponseTypes {
   const { returnType = 'data' } = options
-  return resolver.memo(`responseTypes:${returnType}:${node.method}\0${node.path}`, () => {
+  // The same operation gets typed headers from one client and not from another, so both results are kept.
+  return resolver.memo(`responseTypes:${returnType}:${Boolean(resolver.response.headers)}:${node.method}\0${node.path}`, () => {
     const successNames = resolveSuccessNames(node, resolver)
     const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.response.response(node)
     const errorNames = resolveErrorNames(node, resolver)
 
     return {
-      TData: returnType !== 'data' ? `RequestResult<${resolver.response.responses(node)}, true>` : responseName,
+      TData: returnType === 'data' ? responseName : buildResultType(node, resolver),
       TError: `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`,
     }
   })

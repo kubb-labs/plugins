@@ -6,7 +6,7 @@
 
 Return the response headers on every result, and support the OpenAPI 3.2 cookie style, `multipart/mixed` bodies and named servers.
 
-- Return the response's `Headers` as `result.headers`. For a response that declares headers, `headers.get` suggests their names once `status` is narrowed.
+- Return the response's `Headers` as `headers` on every result and on a thrown `ResponseError`. For a response that declares headers, `headers.get` suggests their names once `status` is narrowed.
 - Send a `style: cookie` parameter without percent-encoding, with `explode` on by default. A value it cannot send, such as one with `;`, throws a `TypeError`.
 - Pass an `oauth2` scheme's `flows` and `metadataUrl`, and an `openIdConnect` scheme's `url`, to the `auth` resolver.
 - Export the servers that have a `name` as `servers` from `.kubb/client.ts`.

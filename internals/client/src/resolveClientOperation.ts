@@ -22,7 +22,17 @@ export type ReturnTypeOption = 'full' | 'data' | 'plain'
  * path, a package name or alias is kept verbatim. `clientPathIsFile` tells a consumer whether to
  * make it relative to the importing file.
  */
-export type ClientOperation = { name: string; path: string; clientPath: string; clientPathIsFile: boolean; returnType: ReturnTypeOption }
+export type ClientOperation = {
+  name: string
+  path: string
+  clientPath: string
+  clientPathIsFile: boolean
+  returnType: ReturnTypeOption
+  /**
+   * Whether the client's results carry the declared response headers. A custom `importPath` client keeps untyped headers.
+   */
+  typedHeaders: boolean
+}
 
 /**
  * The client plugin options a dependent reads, including the filters that scope them per operation.
@@ -105,6 +115,7 @@ export function resolveClientOperation(options: {
       clientPath: importPath === undefined ? path.resolve(root, '.kubb/client.ts') : resolveImportPath({ importPath, operationFile: file.path }),
       clientPathIsFile: importPath === undefined || isRelativeImport(importPath),
       returnType: operationOptions.returnType ?? 'full',
+      typedHeaders: importPath === undefined,
     }
   })
 }
