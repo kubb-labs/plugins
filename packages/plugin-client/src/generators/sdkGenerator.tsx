@@ -100,7 +100,7 @@ function buildControllers(
     const tag = operationNode.tags[0]
     const name = tag ? ensureValidVarName(resolver.groupName(tag)) : resolver.className('ApiClient')
     // `group.name` names the folder and file, never the class.
-    const fileName = tag && group?.name ? ensureValidVarName(group.name({ group: camelCase(tag) })) : name
+    const fileName = tag && group ? ensureValidVarName(group.name?.({ group: camelCase(tag) }) ?? camelCase(tag)) : name
     const file = resolver.file({ name: fileName, extname: '.ts', tag, root, output, group: group ?? undefined })
     const operationData = buildOperationData(operationNode)
     const previous = acc.find((item) => item.file.path === file.path)
