@@ -38,7 +38,7 @@ function serializeRequirement(requirement: SecurityRequirement): string {
  */
 export function resolveCredential(credential: ast.AuthCredential): Auth | null {
   if (credential.type === 'apiKey') return { type: 'apiKey', name: credential.name, in: credential.in }
-  if (credential.type === 'http') return { type: 'http', scheme: credential.scheme.toLowerCase() === 'basic' ? 'basic' : 'bearer' }
+  if (credential.type === 'http') return { type: 'http', scheme: credential.scheme === 'basic' ? 'basic' : 'bearer' }
   if (credential.type === 'oauth2' || credential.type === 'openIdConnect') return { type: credential.type }
   return null
 }
@@ -71,14 +71,12 @@ export function getOperationSecurity({
     const key = requirement.map(({ scheme }) => scheme).join('\0')
     if (!requirement.length || seen.has(key)) continue
     seen.add(key)
-    const resolved: Array<Auth> = []
-    for (const { scheme, scopes } of requirement) {
+    const resolved = requirement.map(({ scheme, scopes }) => {
       const credential = credentials.get(scheme)
       const entry = credential ? resolveCredential(credential) : null
-      if (!entry) break
-      resolved.push(scopes?.length ? { ...entry, scopes } : entry)
-    }
-    if (resolved.length !== requirement.length) continue
+      return entry && scopes?.length ? { ...entry, scopes } : entry
+    })
+    if (!resolved.every((entry): entry is Auth => entry !== null)) continue
     security.push(resolved.length === 1 ? resolved[0]! : resolved)
   }
 

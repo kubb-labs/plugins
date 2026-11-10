@@ -246,8 +246,7 @@ describe('clientGenerator operation', () => {
     { name: 'streamEventsSse', node: streamEventsNode, options: {} },
     // A `stream.shape` of `event` types each event by name.
     { name: 'streamChatTypedEvents', node: streamChatNode, options: {} },
-    // returnType: 'data' unwraps the resolved call down to the bare success body.
-    // Operation-level security overriding the global default, oauth2 reduced to bearer.
+    // An operation's own oauth2 requirement with its scopes.
     {
       name: 'addPetWithSecurity',
       node: { ...createPetNode, auth: [[{ scheme: 'petstore_auth', scopes: ['write:pets', 'read:pets'] }]] },

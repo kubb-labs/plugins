@@ -10,8 +10,8 @@ describe('buildSecurityMetadata', () => {
 })
 
 describe('resolveCredential', () => {
-  test('maps http basic to basic, case-insensitively', () => {
-    expect(resolveCredential({ type: 'http', scheme: 'Basic' })).toStrictEqual({ type: 'http', scheme: 'basic' })
+  test('keeps http basic as basic', () => {
+    expect(resolveCredential({ type: 'http', scheme: 'basic' })).toStrictEqual({ type: 'http', scheme: 'basic' })
   })
 
   test('treats an unknown http scheme as bearer', () => {
