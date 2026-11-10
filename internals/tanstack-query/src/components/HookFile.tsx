@@ -30,9 +30,7 @@ type ResolvedHookFile = {
   tsResolver: ResolverTs
   contractOp: ClientOperation
   importedTypeNames: Array<string>
-  /**
-   * The client's result type the hook names with `returnType: 'full'`.
-   */
+  /** The client's result type the hook names with `returnType: 'full'`. */
   resultTypeName: 'RequestResult' | 'RequestResultWithHeaders'
   returnType: ReturnTypeOption
   banner: string | null

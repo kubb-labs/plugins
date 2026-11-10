@@ -2,17 +2,12 @@ import { getStatusClass, toResponseContent } from '@internals/shared'
 import { jsStringEscape, objectKey, singleQuote } from '@internals/utils'
 import { ast } from '@kubb/kit'
 
-/**
- * The status a mock responds with. A range such as `2XX` mocks the first code of its class, `200`.
- */
+/** The status a mock responds with. A range such as `2XX` mocks the first code of its class, `200`. */
 export function getMockStatus(statusCode: ast.StatusCode): number {
   return /XX$/i.test(statusCode) ? (getStatusClass(statusCode) ?? 2) * 100 : Number(statusCode)
 }
 
-/**
- * The declared response headers a mock sends, each with the first value found in its example's `serializedValue`, its
- * example's `value`, its schema `default`, and its schema's first example. A header without one is left out.
- */
+/** The declared headers a mock sends, each with its example's `serializedValue` or `value`, else its schema's `default` or first example. */
 export function getMockHeaders(response: ast.ResponseNode | null | undefined): Array<[name: string, value: string]> {
   return (response?.headers ?? []).flatMap((header): Array<[string, string]> => {
     const example = header.examples?.find((entry) => entry.serializedValue !== undefined || entry.value !== undefined)

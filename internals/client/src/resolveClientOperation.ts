@@ -28,9 +28,7 @@ export type ClientOperation = {
   clientPath: string
   clientPathIsFile: boolean
   returnType: ReturnTypeOption
-  /**
-   * Whether the client's results carry the declared response headers. A custom `importPath` client keeps untyped headers.
-   */
+  /** Whether the client's results carry the declared response headers. A custom `importPath` client keeps untyped headers. */
   typedHeaders: boolean
 }
 
