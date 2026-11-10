@@ -26,7 +26,7 @@ type ToNumber<T> = T extends `${infer TNumber extends number}` ? TNumber : never
  */
 export type ToStatusNumber<TStatus, TKeys = never> = TStatus extends `${infer TNumber extends number}`
   ? TNumber
-  : Uppercase<TStatus & string> extends `${infer TFirst extends '1' | '2' | '3' | '4' | '5'}XX`
+  : TStatus extends `${infer TFirst extends '1' | '2' | '3' | '4' | '5'}xx`
     ? Exclude<ToNumber<`${TFirst}${Digit}${Digit}`>, ToNumber<TKeys>>
     : number
 
@@ -716,8 +716,7 @@ export function toRequestInit(request: ResolvedRequest): RequestInit {
 
 function pickErrorValidator(error: Validator | Record<string, Validator> | undefined, status: number): Validator | undefined {
   if (!error || '~standard' in error) return error as Validator | undefined
-  const range = Object.keys(error).find((key) => key.toUpperCase() === `${String(status)[0]}XX`)
-  return error[String(status)] ?? (range ? error[range] : undefined) ?? error.default
+  return error[String(status)] ?? error[`${String(status)[0]}xx`] ?? error.default
 }
 
 // Checks the shape, so a `Response` from another realm or a polyfill counts too.

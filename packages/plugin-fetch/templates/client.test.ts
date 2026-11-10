@@ -828,7 +828,7 @@ describe('createClientCore', () => {
     })
     const call = (status: number, data: unknown, error: Record<string, ReturnType<typeof toCodeSchema>>) =>
       createClient({ data, status }).client({ method: 'GET', url: '/pet/1', throwOnError: false, validator: { error } })
-    const byStatus = { 404: toCodeSchema('not-found'), '5XX': toCodeSchema('upstream') }
+    const byStatus = { 404: toCodeSchema('not-found'), '5xx': toCodeSchema('upstream') }
 
     expect(await call(404, { code: 'not-found' }, byStatus)).toMatchObject({ status: 404, error: { checkedBy: 'not-found' } })
     await expect(call(404, { code: 'upstream' }, byStatus)).rejects.toMatchObject({ name: 'ParseError' })
@@ -1320,7 +1320,7 @@ describe('client.stream', () => {
 })
 
 describe('isResponseError', () => {
-  type Responses = { '200': { id: number }; '404': { message: string }; '4XX': { code: string }; default: { fault: true } }
+  type Responses = { '200': { id: number }; '404': { message: string }; '4xx': { code: string }; default: { fault: true } }
 
   test('narrows data by status, a range key, and default', async () => {
     const { client } = createClient({ data: { message: 'gone' }, status: 404 })
