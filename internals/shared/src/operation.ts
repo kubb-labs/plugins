@@ -220,8 +220,12 @@ function responseTypeForContent(entry: ResponseContentEntry): ResponseType | und
   if (isJsonContentType(baseType)) return undefined
   if (entry.schema?.type === 'blob') return 'blob'
   if (baseType.startsWith('text/')) return 'text'
-  if (baseType === 'application/octet-stream' || baseType === 'application/pdf' || /^(image|audio|video)\//.test(baseType)) return 'blob'
+  if (isBinaryContentType(baseType)) return 'blob'
   return undefined
+}
+
+function isBinaryContentType(baseType: string): boolean {
+  return baseType === 'application/octet-stream' || baseType === 'application/pdf' || /^(image|audio|video)\//.test(baseType)
 }
 
 /**
@@ -254,17 +258,33 @@ export type ContentVariantInput = { contentType: string; schema?: ast.SchemaNode
 export type ContentVariant = { name: string; suffix: string; schema: ast.SchemaNode; keysToOmit?: Array<string> | null; contentType: string }
 
 /**
- * Returns the entry with a `string` schema when the client runtime reads its body as text, such as `Pet` on `application/xml`.
- * JSON, binary, and stream entries keep their schema, and so do wildcards such as `application/*` and the any-type `*`, so the runtime can pick the
- * parser from the server's `Content-Type`. `text/*` reads as text.
+ * Returns the entry with the schema of the value the client returns: `string` for a body read as text, such as `Pet` on
+ * `application/xml`, and `blob` for `image/*`, `audio/*`, `video/*`, PDF, and octet-stream. A binary schema elsewhere is a `Blob`
+ * only through `parseAs: 'blob'`, which needs every entry in `entries` binary. JSON, vendor (`application/vnd.*`), stream,
+ * schemaless, and wildcard entries keep their schema. `entries` is the response's full list of content types.
  */
-export function toResponseContent<T extends ContentVariantInput & ResponseContentEntry>(entry: T): T {
+export function toResponseContent<T extends ContentVariantInput & ResponseContentEntry>(entry: T, entries: ReadonlyArray<ResponseContentEntry> = [entry]): T {
   const { contentType, schema } = entry
-  if (!schema || entry.stream || ast.resolveRef(schema).primitive === 'string') return entry
+  if (!schema || entry.stream) return entry
 
   const baseType = baseContentType(contentType)
+  const resolved = ast.resolveRef(schema)
+  if (isBinaryContentType(baseType)) {
+    return resolved.type === 'blob' ? entry : { ...entry, schema: ast.factory.createSchema({ type: 'blob' }), keysToOmit: null }
+  }
+  const isPlainMediaType = Boolean(baseType) && !isJsonContentType(baseType) && !baseType.includes('*')
+  if (resolved.type === 'blob') {
+    // shortcut: an error response never gets `parseAs`, so a lone binary schema there reads as text too but stays `Blob`.
+    const readsAsText = isPlainMediaType && !entries.every((item) => item.schema?.type === 'blob')
+    return readsAsText ? { ...entry, schema: ast.factory.createSchema({ type: 'string' }), keysToOmit: null } : entry
+  }
+  if (resolved.primitive === 'string') return entry
+
   const responseType = responseTypeForContent(entry)
-  const isText = responseType === 'text' || (!responseType && Boolean(baseType) && !isJsonContentType(baseType) && !baseType.includes('*'))
+  // A response without a body, such as a 405, has no schema to read. Only `text/*` is always text.
+  if (responseType !== 'text' && (resolved.type === 'unknown' || resolved.type === 'any' || resolved.type === 'void')) return entry
+  const isVendorJson = /^[^/]+\/vnd\./.test(baseType) && !/(xml|yaml|yml|csv)$/.test(baseType)
+  const isText = responseType === 'text' || (!responseType && isPlainMediaType && !isVendorJson)
 
   return isText ? { ...entry, schema: ast.factory.createSchema({ type: 'string' }), keysToOmit: null } : entry
 }
@@ -609,7 +629,8 @@ function buildResponseRecordEntry(node: ast.OperationNode, res: ast.ResponseNode
           ast.factory.createProperty({
             name: 'contentType',
             required: true,
-            schema: ast.factory.createSchema({ type: 'enum', enumValues: [variant.contentType] }),
+            // The runtime reports the bare media type, without parameters such as `charset` or `profile`.
+            schema: ast.factory.createSchema({ type: 'enum', enumValues: [baseContentType(variant.contentType)] }),
           }),
           ast.factory.createProperty({
             name: 'data',

@@ -201,7 +201,7 @@ describe("typeGenerator — operations: 'inline'", () => {
         statusCode: '201',
         content: [
           ast.factory.createContent({ contentType: 'application/json', schema: ref('Pet') }),
-          ast.factory.createContent({ contentType: 'application/xml', schema: ref('Pet') }),
+          ast.factory.createContent({ contentType: 'application/xml; charset=utf-8', schema: ref('Pet') }),
         ],
         description: 'Created',
       }),

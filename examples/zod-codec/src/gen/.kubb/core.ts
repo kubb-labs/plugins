@@ -553,8 +553,8 @@ function serializeUrl({
   pathStyles?: Record<string, PathParamStyle>
 }): string {
   const path = parts
-    .filter(Boolean)
-    .join('')
+    // A base URL that ends in `/` would give `//` before a path that starts with one.
+    .reduce<string>((url, part) => (part ? url + (url.endsWith('/') && part.startsWith('/') ? part.slice(1) : part) : url), '')
     .replace(/\{([^{}]+)\}/g, (_, key: string) => pathSerializer({ name: key, value: pathParams[key], options: pathStyles?.[key] }))
   return path + (search ? `?${search}` : '')
 }

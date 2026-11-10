@@ -423,7 +423,7 @@ describe('toResponseContent', () => {
   const typeOf = (contentType: string, schema: ast.SchemaNode = pet) => toResponseContent({ contentType, schema, keysToOmit: ['id'] })
 
   test('types a body the runtime returns as text as string', () => {
-    for (const contentType of ['application/xml', 'application/yaml', 'text/csv', 'text/plain; charset=utf-8', 'text/*']) {
+    for (const contentType of ['application/xml', 'application/vnd.noaa.dwml+xml', 'application/yaml', 'text/csv', 'text/plain; charset=utf-8', 'text/*']) {
       expect(typeOf(contentType)).toStrictEqual({ contentType, schema: ast.factory.createSchema({ type: 'string' }), keysToOmit: null })
     }
   })
@@ -438,6 +438,7 @@ describe('toResponseContent', () => {
       ['text/csv', blob],
       ['*/*', pet],
       ['application/*', pet],
+      ['application/vnd.github.object', pet],
     ] as const) {
       expect(typeOf(contentType, schema).schema).toBe(schema)
     }
@@ -450,6 +451,27 @@ describe('toResponseContent', () => {
   test('keeps a string schema on a text body', () => {
     const token = ast.factory.createSchema({ type: 'ref', name: 'Token', schema: ast.factory.createSchema({ type: 'string' }) })
     expect(typeOf('text/plain', token).schema).toBe(token)
+  })
+
+  test('types a body the runtime returns as a Blob as blob', () => {
+    const svg = typeOf('image/svg+xml', ast.factory.createSchema({ type: 'string' }))
+    expect(svg).toStrictEqual({ contentType: 'image/svg+xml', schema: ast.factory.createSchema({ type: 'blob' }), keysToOmit: null })
+  })
+
+  test('types a binary schema next to a JSON entry as string, since no parseAs applies', () => {
+    const blob = ast.factory.createSchema({ type: 'blob' })
+    const entries = [
+      { contentType: 'application/geo+json', schema: pet },
+      { contentType: 'application/vnd.noaa.dwml+xml', schema: blob },
+    ]
+    expect(toResponseContent(entries[1]!, entries).schema).toStrictEqual(ast.factory.createSchema({ type: 'string' }))
+    expect(toResponseContent(entries[1]!).schema).toBe(blob)
+  })
+
+  test('keeps an unknown schema on a non-text body', () => {
+    const unknown = ast.factory.createSchema({ type: 'unknown' })
+    expect(typeOf('application/x-www-form-urlencoded', unknown).schema).toBe(unknown)
+    expect(typeOf('text/plain', unknown).schema).toStrictEqual(ast.factory.createSchema({ type: 'string' }))
   })
 })
 

@@ -142,10 +142,24 @@ function appendFormDataValue({ formData, key, value, contentType }: { formData: 
   formData.append(key, toValue(value))
 }
 
+const formDelimiters: Partial<Record<string, string>> = { spaceDelimited: ' ', pipeDelimited: '|' }
+
 function toFormData(body: Record<string, unknown>, encoding: Record<string, BodyEncoding> | undefined): FormData {
   const formData = new FormData()
   for (const [key, value] of Object.entries(body)) {
-    const contentType = encoding?.[key]?.contentType
+    const { contentType, style, explode } = encoding?.[key] ?? {}
+    // `explode: false` sends an array of scalars as one part, its items joined by the style's delimiter.
+    if (Array.isArray(value) && explode === false && value.every((item) => typeof item !== 'object' || item === null || item instanceof Date)) {
+      const delimiter = formDelimiters[style ?? 'form'] ?? ','
+      formData.append(
+        key,
+        value
+          .filter((item) => item !== undefined && item !== null)
+          .map(toValue)
+          .join(delimiter),
+      )
+      continue
+    }
     for (const item of Array.isArray(value) ? value : [value]) appendFormDataValue({ formData, key, value: item, contentType })
   }
   return formData
