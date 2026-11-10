@@ -172,6 +172,13 @@ describe('defaultQuerySerializer', () => {
     expect(defaultQuerySerializer({ a: { b: { c: 1 } } }, { a: { style: 'deepObject' } })).toBe('a%5Bb%5D%5Bc%5D=1')
   })
 
+  test('deepObject style indexes an array of objects', () => {
+    expect(defaultQuerySerializer({ items: [{ price: 'p_1', quantity: 1 }] }, { items: { style: 'deepObject' } })).toBe(
+      'items%5B0%5D%5Bprice%5D=p_1&items%5B0%5D%5Bquantity%5D=1',
+    )
+    expect(defaultQuerySerializer({ expand: ['a', 'b'] }, { expand: { style: 'deepObject' } })).toBe('expand=a&expand=b')
+  })
+
   test('serializes Date values as ISO-8601', () => {
     expect(defaultQuerySerializer({ since: new Date('2020-01-02T03:04:05.000Z') })).toBe('since=2020-01-02T03%3A04%3A05.000Z')
   })
@@ -315,6 +322,17 @@ describe('built-in media types encode', () => {
       encoding: { tags: { style: 'form', explode: false }, filter: { style: 'deepObject' } },
     })
     expect(body).toBe('tags=a,b&filter%5Bx%5D=1')
+  })
+
+  test('sends a multipart array with explode false as one joined part', () => {
+    const body = encodeBody({
+      body: { labels: ['a', 'b'], pipes: ['x', 'y'], tags: ['c', 'd'] },
+      contentType: 'multipart/form-data',
+      encoding: { labels: { style: 'form', explode: false }, pipes: { style: 'pipeDelimited', explode: false } },
+    }) as FormData
+    expect(body.getAll('labels')).toStrictEqual(['a,b'])
+    expect(body.getAll('pipes')).toStrictEqual(['x|y'])
+    expect(body.getAll('tags')).toStrictEqual(['c', 'd'])
   })
 
   test('emits a bigint as a JSON number', () => {
@@ -1797,6 +1815,12 @@ describe('getUrl', () => {
   test('prefixes a per-call baseURL', () => {
     const { client } = createClient()
     expect(client.getUrl({ baseURL: 'https://example.com', url: '/pet' })).toBe('https://example.com/pet')
+  })
+
+  test('joins a baseURL with a trailing slash without a double slash', () => {
+    const { client } = createClient()
+    expect(client.getUrl({ baseURL: 'https://example.com/api/', url: '/pet' })).toBe('https://example.com/api/pet')
+    expect(client.getUrl({ baseURL: 'https://example.com/api', url: '/pet' })).toBe('https://example.com/api/pet')
   })
 
   test('a per-call baseURL replaces the configured baseURL', () => {
