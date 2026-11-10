@@ -14,7 +14,7 @@ export function createOrder(data?: Partial<Order>): Order {
     shipDateTime: faker.date.anytime().toISOString(),
     shipDate: faker.date.anytime().toISOString().substring(0, 10),
     shipTime: faker.date.anytime().toISOString().substring(11, 19),
-    status: faker.helpers.arrayElement<NonNullable<Order>['status']>(['placed', 'approved', 'delivered']),
+    status: faker.helpers.arrayElement(['placed', 'approved', 'delivered'] as Array<NonNullable<Order>['status']>),
     complete: faker.datatype.boolean(),
   }
   return {

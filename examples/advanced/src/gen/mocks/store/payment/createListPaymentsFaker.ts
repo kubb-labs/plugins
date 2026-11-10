@@ -49,5 +49,5 @@ export function createListPaymentsStatus4xxFaker(data?: Partial<PaymentError>): 
 }
 
 export function createListPaymentsResponseFaker(data?: Partial<Array<Payment>>): Array<Payment> {
-  return (data ?? faker.helpers.arrayElement([createListPaymentsStatus2xxFaker(), createListPaymentsStatus4xxFaker()])) as Array<Payment>
+  return [...faker.helpers.multiple(() => createPaymentFaker()), ...(data || []).filter((item) => item !== undefined)] as Array<Payment>
 }

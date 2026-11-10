@@ -78,6 +78,6 @@ export function createCreatePetsBodyFaker<
   } as Omit<typeof defaultFakeData, keyof NoInfer<TData>> & NoInfer<TData>
 }
 
-export function createCreatePetsResponseFaker(data?: Partial<unknown>): unknown {
-  return (data ?? faker.helpers.arrayElement([createCreatePetsStatus201Faker(), createCreatePetsStatusDefaultFaker()])) as unknown
+export function createCreatePetsResponseFaker() {
+  return undefined
 }

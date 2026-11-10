@@ -12,7 +12,7 @@ export function createOrder(data?: Partial<Order>): Order {
     petId: faker.number.bigInt(),
     quantity: faker.number.int({ max: 2147483647 }),
     shipDate: faker.date.anytime().toISOString(),
-    status: faker.helpers.arrayElement<NonNullable<Order>["status"]>(['placed', 'approved', 'delivered']),
+    status: faker.helpers.arrayElement(['placed', 'approved', 'delivered'] as Array<NonNullable<Order>["status"]>),
     complete: faker.datatype.boolean(),
   }
   return {
