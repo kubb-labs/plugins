@@ -11,8 +11,6 @@ export const orderPaymentMethodEnum = {
 export type OrderPaymentMethodEnumKey = (typeof orderPaymentMethodEnum)[keyof typeof orderPaymentMethodEnum];
 
 /**
- * @minProperties 1
- * @maxProperties 10
  * @see https://example.com/docs/order Order model
  * @type object
  */
@@ -22,9 +20,5 @@ export type Order = {
   creditCard?: string;
   billingAddress?: string;
   labels?: string[];
-  /**
-   * @contentMediaType application/json
-   * @type string | undefined
-   */
   metadata?: string;
 };

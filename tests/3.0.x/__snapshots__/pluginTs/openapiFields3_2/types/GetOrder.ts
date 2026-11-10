@@ -10,8 +10,6 @@ export type GetOrderPath = {
 };
 
 /**
- * @minProperties 1
- * @maxProperties 10
  * @see https://example.com/docs/order Order model
  * @type object
  */

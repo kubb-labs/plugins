@@ -98,9 +98,9 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
   const meta = syncSchemaRef(schema)
 
   const isArray = meta?.primitive === 'array'
+  // An object's `min`/`max` count properties, which no JSDoc tag describes.
+  const isObject = meta?.type === 'object'
   const isNumeric = meta?.primitive === 'number' || meta?.primitive === 'integer' || meta?.primitive === 'bigint'
-  // `@minimum`, `@minProperties` or `@minLength`, and their `max` pairs.
-  const boundSuffix = isNumeric ? 'imum' : meta?.type === 'object' ? 'Properties' : 'Length'
 
   const hasDescription = meta && 'description' in meta && meta.description
 
@@ -120,11 +120,9 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
     ...formatComment,
     meta && 'deprecated' in meta && meta.deprecated ? '@deprecated' : null,
     // minItems/maxItems on arrays should not be emitted as @minLength/@maxLength
-    !isArray && meta && 'min' in meta && meta.min !== undefined ? `@min${boundSuffix} ${meta.min}` : null,
-    !isArray && meta && 'max' in meta && meta.max !== undefined ? `@max${boundSuffix} ${meta.max}` : null,
+    !isArray && !isObject && meta && 'min' in meta && meta.min !== undefined ? `@${isNumeric ? 'minimum' : 'minLength'} ${meta.min}` : null,
+    !isArray && !isObject && meta && 'max' in meta && meta.max !== undefined ? `@${isNumeric ? 'maximum' : 'maxLength'} ${meta.max}` : null,
     meta && 'pattern' in meta && meta.pattern ? `@pattern ${meta.pattern}` : null,
-    meta && 'content' in meta && meta.content?.mediaType ? `@contentMediaType ${meta.content.mediaType}` : null,
-    meta && 'content' in meta && meta.content?.encoding ? `@contentEncoding ${meta.content.encoding}` : null,
     meta && 'default' in meta && meta.default !== undefined
       ? `@default ${'primitive' in meta && meta.primitive === 'string' && typeof meta.default === 'string' ? stringify(meta.default) : formatExample(meta.default)}`
       : null,

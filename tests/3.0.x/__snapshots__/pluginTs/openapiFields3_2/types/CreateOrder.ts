@@ -6,16 +6,12 @@
 import type { Order } from './Order'
 
 /**
- * @minProperties 1
- * @maxProperties 10
  * @see https://example.com/docs/order Order model
  * @type object
  */
 export type CreateOrderStatus201 = Order;
 
 /**
- * @minProperties 1
- * @maxProperties 10
  * @example {"id":1,"paymentMethod":"cash"}
  * @see https://example.com/docs/order Order model
  * @type object
