@@ -742,7 +742,9 @@ export function getOperationSuccessResponses(node: ast.OperationNode): Array<ast
 }
 
 export function getPrimarySuccessResponse(node: ast.OperationNode): ast.ResponseNode | null {
-  return getOperationSuccessResponses(node)[0] ?? null
+  const responses = getOperationSuccessResponses(node)
+  // An exact code such as `200` wins over a `2xx` range the spec lists before it.
+  return responses.find((response) => getStatusCodeNumber(response.statusCode) !== null) ?? responses[0] ?? null
 }
 
 export function resolveErrorNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {

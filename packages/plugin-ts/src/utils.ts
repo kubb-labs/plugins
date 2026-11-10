@@ -65,13 +65,6 @@ export function isInlineConstEnum(node: ast.EnumSchemaNode, enumSchemaNames?: Re
   return isConst && !(node.name && enumSchemaNames?.has(node.name))
 }
 
-/**
- * Collects JSDoc annotation strings for a schema node.
- *
- * Only uses official JSDoc tags from https://jsdoc.app/: `@description`, `@deprecated`, `@default`, `@example`, `@type`.
- * Constraint metadata (min/max length, pattern, multipleOf, min/maxProperties) is emitted as plain-text lines.
-
- */
 function isSchemaOptional(schema: ast.SchemaNode): boolean {
   return Boolean(('optional' in schema && schema.optional) || ('nullish' in schema && schema.nullish))
 }
@@ -94,6 +87,12 @@ export function isBinarySchema(schema: ast.SchemaNode): boolean {
   return !!meta && (isBlob(meta) || (meta.type === 'array' && 'items' in meta && (meta.items ?? []).some(isBlob)))
 }
 
+/**
+ * Collects JSDoc annotation strings for a schema node.
+ *
+ * Only uses official JSDoc tags from https://jsdoc.app/: `@description`, `@deprecated`, `@minimum`, `@maximum`, `@minLength`,
+ * `@maxLength`, `@pattern`, `@default`, `@example`, `@see` and `@type`.
+ */
 export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: boolean): Array<string | undefined> {
   const meta = syncSchemaRef(schema)
 
@@ -127,7 +126,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
       ? `@default ${'primitive' in meta && meta.primitive === 'string' && typeof meta.default === 'string' ? stringify(meta.default) : formatExample(meta.default)}`
       : null,
     ...exampleValues.map((example) => `@example ${formatExample(example)}`),
-    meta?.externalDocs ? `@see ${[meta.externalDocs.url, meta.externalDocs.description].filter(Boolean).join(' ')}` : null,
+    meta?.externalDocs ? `@see ${jsDocEscape([meta.externalDocs.url, meta.externalDocs.description].filter(Boolean).join(' '))}` : null,
   ].filter(Boolean)
 
   // `@type` merely repeats the TypeScript type already sitting next to the property, so it only
@@ -146,7 +145,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
 export function getExampleValues(examples: Array<ast.ExampleNode> | undefined, serialized = false): Array<unknown> | undefined {
   const values = (examples ?? []).flatMap((example) => [
     ...(example.value !== undefined ? [example.value] : []),
-    ...(serialized && example.serializedValue !== undefined ? [`<caption>Serialized</caption> ${example.serializedValue.replaceAll('*/', '*\\/')}`] : []),
+    ...(serialized && example.serializedValue !== undefined ? [`<caption>Serialized</caption> ${jsDocEscape(example.serializedValue)}`] : []),
   ])
   return values.length > 0 ? values : undefined
 }

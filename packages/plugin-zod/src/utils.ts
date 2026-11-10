@@ -386,7 +386,9 @@ export function applyModifiers({ value, schema, nullable, optional, nullish, def
   const literal = defaultValue !== undefined ? defaultLiteral(schema, defaultValue) : null
   const withDefault = literal !== null ? `${withModifier}.default(${literal})` : withModifier
   const withDescription = description ? `${withDefault}.describe(${stringify(description)})` : withDefault
-  return examples?.length ? `${withDescription}.meta({ examples: [${examples.map(formatDefault).join(', ')}] })` : withDescription
+  return examples?.length
+    ? `${withDescription}.meta({ examples: [${examples.map((example) => (example === null ? 'null' : formatDefault(example))).join(', ')}] })`
+    : withDescription
 }
 
 function modifierDepth(schema: ast.SchemaNode): number {

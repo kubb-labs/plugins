@@ -19,6 +19,20 @@ describe('printerZod', () => {
     expect(printer.print(ast.factory.createSchema({ type }))).toBe(expected)
   })
 
+  test('tuple with rest items', () => {
+    const node = ast.factory.createSchema({
+      type: 'tuple',
+      items: [ast.factory.createSchema({ type: 'string' })],
+      rest: ast.factory.createSchema({ type: 'number' }),
+    })
+
+    expect(printer.print(node)).toBe('z.tuple([z.string()], z.number())')
+  })
+
+  test('keeps a null example', () => {
+    expect(printer.print(ast.factory.createSchema({ type: 'string', examples: ['foo', null] }))).toBe("z.string().meta({ examples: ['foo', null] })")
+  })
+
   describe('string', () => {
     test('basic string', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'string' }))).toBe('z.string()')

@@ -244,10 +244,10 @@ describe('buildResponseComments', () => {
 
 describe('getExampleValues', () => {
   it('keeps the value and adds the serialized form under a caption', () => {
-    expect(getExampleValues([{ value: { name: 'Rex' }, serializedValue: 'name=Rex' }, { serializedValue: 'a=*/' }], true)).toStrictEqual([
+    expect(getExampleValues([{ value: { name: 'Rex' }, serializedValue: 'name=Rex' }, { serializedValue: 'a=1\n@deprecated' }], true)).toStrictEqual([
       { name: 'Rex' },
       '<caption>Serialized</caption> name=Rex',
-      '<caption>Serialized</caption> a=*\\/',
+      '<caption>Serialized</caption> a=1\n\\@deprecated',
     ])
     expect(getExampleValues([{ summary: 'empty' }])).toBeUndefined()
   })

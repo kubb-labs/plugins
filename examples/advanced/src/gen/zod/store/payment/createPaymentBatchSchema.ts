@@ -9,7 +9,7 @@ export const createPaymentBatchResponseSchema = createPaymentBatchStatus204Schem
 
 export type CreatePaymentBatchResponseSchemaType = z.infer<typeof createPaymentBatchResponseSchema>
 
-export const createPaymentBatchBodySchema = z.tuple([paymentSchema]).optional()
+export const createPaymentBatchBodySchema = z.tuple([paymentSchema], z.string()).optional()
 
 export type CreatePaymentBatchBodySchemaType = z.infer<typeof createPaymentBatchBodySchema>
 

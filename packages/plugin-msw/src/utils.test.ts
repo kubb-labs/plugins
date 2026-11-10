@@ -63,6 +63,23 @@ describe('getMockHeaders', () => {
     ])
   })
 
+  test('leaves out a Content-Type header, which the mock already sends', () => {
+    const response = ast.factory.createResponse({
+      statusCode: '200',
+      headers: [
+        ast.factory.createParameter({
+          name: 'content-type',
+          in: 'header',
+          required: false,
+          schema: ast.factory.createSchema({ type: 'string' }),
+          examples: [{ value: 'text/plain' }],
+        }),
+      ],
+    })
+
+    expect(getMockHeaders(response)).toStrictEqual([])
+  })
+
   test('leaves out an example a header cannot carry', () => {
     const header = (name: string, value: string) =>
       ast.factory.createParameter({ name, in: 'header', required: false, schema: ast.factory.createSchema({ type: 'string' }), examples: [{ value }] })

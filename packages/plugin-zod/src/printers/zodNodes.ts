@@ -266,7 +266,10 @@ export function buildZodNodes<TOptions extends ZodNodeOptions>(
         .map(({ output }) => output)
         .filter(Boolean)
 
-      return `z.tuple(${buildList(items)})`
+      // OpenAPI 3.1 `items` next to `prefixItems` types the elements after the positional ones.
+      const rest = node.rest ? this.transform(node.rest) : undefined
+
+      return `z.tuple(${buildList(items)}${rest ? `, ${rest}` : ''})`
     },
     union(node) {
       const literalUnion = getLiteralUnion({ node, options: this.options })

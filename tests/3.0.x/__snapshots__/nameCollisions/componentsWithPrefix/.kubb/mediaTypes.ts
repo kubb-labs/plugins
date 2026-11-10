@@ -1,6 +1,6 @@
 import type { EventStreamOptions, RequestConfig } from './core'
 import type { BodyEncoding, PartsEncoding, RequestBody } from './serializers'
-import { baseContentType, jsonReplacer, serializeUrlencodedBody, toValue } from './serializers'
+import { baseContentType, isJsonMediaType, jsonReplacer, serializeUrlencodedBody, toValue } from './serializers'
 import { ParseError } from './standardSchema'
 
 /**
@@ -183,7 +183,7 @@ function toMultipartMixed(parts: Array<unknown>, encoding: PartsEncoding | undef
     const binary = isBinaryPart(part)
     const contentType =
       declared ?? (binary ? (part instanceof Blob && part.type) || 'application/octet-stream' : typeof part === 'string' ? 'text/plain' : 'application/json')
-    const value = binary || typeof part === 'string' ? part : JSON.stringify(part, jsonReplacer)
+    const value = binary || (typeof part === 'string' && !isJsonMediaType(declared)) ? part : JSON.stringify(part, jsonReplacer)
     chunks.push(`--${boundary}\r\nContent-Type: ${contentType}\r\n\r\n`, value, '\r\n')
   })
   chunks.push(`--${boundary}--\r\n`)
