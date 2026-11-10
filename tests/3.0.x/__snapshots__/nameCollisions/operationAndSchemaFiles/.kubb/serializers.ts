@@ -246,6 +246,8 @@ function serializeStyledQueryObject({
 function serializeStyledQueryParam({ key, value, options }: { key: string; value: unknown; options: QueryParamStyle }): Array<string> {
   if (value === undefined || value === null) return []
   const encode = options.allowReserved ? encodeReserved : encodeComponent
+  // OpenAPI leaves arrays under deepObject undefined. Objects in one are indexed, `items[0][price]=p`, as nested arrays are.
+  if (Array.isArray(value) && options.style === 'deepObject' && value.some(isRecord)) return serializeDeepObject({ key, value, encode })
   if (Array.isArray(value)) return serializeStyledQueryArray({ key, value, options, encode })
   if (isRecord(value)) return serializeStyledQueryObject({ key, value, options, encode })
   return [`${encode(key)}=${encode(value)}`]
@@ -272,7 +274,12 @@ export const defaultQuerySerializer: QuerySerializer = (params, options) => {
       continue
     }
     const styled = paramOptions ?? (isRecord(value) ? {} : undefined)
-    parts.push(...(styled ? serializeStyledQueryParam({ key, value, options: styled }) : serializeDefaultQueryParam(key, value)))
+    // `URLSearchParams` writes a space as `+`, form encoding for bodies. A query follows RFC 6570, as a styled one does: `%20`.
+    parts.push(
+      ...(styled
+        ? serializeStyledQueryParam({ key, value, options: styled })
+        : serializeDefaultQueryParam(key, value).map((part) => part.replaceAll('+', '%20'))),
+    )
   }
   return parts.join('&')
 }
