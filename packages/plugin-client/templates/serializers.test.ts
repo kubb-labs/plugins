@@ -37,4 +37,12 @@ describe('multipart/mixed body encoding', () => {
       `--${boundary}\r\nContent-Type: application/json\r\n\r\n{"id":1}\r\n--${boundary}\r\nContent-Type: text/csv\r\n\r\na,b\r\n--${boundary}--\r\n`,
     )
   })
+
+  test('sends binary parts as bytes', async () => {
+    const body = formMediaTypes['multipart/mixed']!.encode!([new Uint8Array([104, 105])], { contentType: 'multipart/mixed', config: {} }) as Blob
+    const boundary = body.type.match(/boundary=(.+)$/)?.[1]
+
+    expect(boundary).toMatch(/^kubb-[0-9a-f]{32}$/)
+    expect(await body.text()).toBe(`--${boundary}\r\nContent-Type: application/octet-stream\r\n\r\nhi\r\n--${boundary}--\r\n`)
+  })
 })

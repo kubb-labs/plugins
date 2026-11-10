@@ -171,13 +171,15 @@ const multipart: MediaType = {
 }
 
 function toMultipartMixed(parts: Array<unknown>, encoding: PartsEncoding | undefined): Blob {
-  const boundary = `kubb-${crypto.randomUUID()}`
+  // `crypto.randomUUID` needs a secure context, `getRandomValues` works on plain http too.
+  const boundary = `kubb-${Array.from(crypto.getRandomValues(new Uint8Array(16)), (byte) => byte.toString(16).padStart(2, '0')).join('')}`
   const chunks: Array<BlobPart> = []
   parts.forEach((part, index) => {
     const declared = (encoding?.prefix?.[index] ?? encoding?.item)?.contentType
+    const binary = part instanceof Blob || part instanceof ArrayBuffer || ArrayBuffer.isView(part)
     const contentType =
-      declared ?? (part instanceof Blob ? part.type || 'application/octet-stream' : typeof part === 'string' ? 'text/plain' : 'application/json')
-    const value = part instanceof Blob || typeof part === 'string' ? part : JSON.stringify(part, jsonReplacer)
+      declared ?? (binary ? (part instanceof Blob && part.type) || 'application/octet-stream' : typeof part === 'string' ? 'text/plain' : 'application/json')
+    const value = binary || typeof part === 'string' ? (part as BlobPart) : JSON.stringify(part, jsonReplacer)
     chunks.push(`--${boundary}\r\nContent-Type: ${contentType}\r\n\r\n`, value, '\r\n')
   })
   chunks.push(`--${boundary}--\r\n`)
