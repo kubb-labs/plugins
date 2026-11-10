@@ -101,6 +101,26 @@ describe('buildStyles', () => {
     )
   })
 
+  test('emits the prefix and item encoding of a multipart/mixed body as a parts group', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'createBatch',
+      method: 'POST',
+      path: '/batch',
+      requestBody: {
+        content: [
+          ast.factory.createContent({
+            contentType: 'multipart/mixed',
+            schema: ast.factory.createSchema({ type: 'array', items: [] }),
+            prefixEncoding: [{ contentType: 'application/json' }, {}],
+            itemEncoding: { contentType: 'text/plain' },
+          }),
+        ],
+      },
+      responses: [],
+    })
+    expect(buildStyles({ node })).toBe("{ parts: { prefix: [{ contentType: 'application/json' }, {}], item: { contentType: 'text/plain' } } }")
+  })
+
   test('omits the body group when the request has several content types', () => {
     const content = (contentType: string) =>
       ast.factory.createContent({

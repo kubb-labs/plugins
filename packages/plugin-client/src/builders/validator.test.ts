@@ -41,7 +41,7 @@ const putEvent = ast.factory.createOperation({
   responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'ok' })],
 })
 
-// The AST type has no range keys, but the adapter passes keys such as `5XX` through as is.
+// The AST type has no lower-case range such as `4xx`, but the adapter passes one a spec writes through as is.
 function toResponse(statusCode: string) {
   return ast.factory.createResponse({ statusCode: statusCode as ast.StatusCode, schema: ast.factory.createSchema({ type: 'object', properties: [] }) })
 }

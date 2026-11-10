@@ -70,7 +70,8 @@ const integerFormats: ReadonlySet<string> = new Set(['int32', 'int64', 'uint64']
 const maxInt32 = 2_147_483_647
 
 /**
- * `faker.number.float()` or `faker.number.int()`, with `min` and `max` passed only when set.
+ * `faker.number.float()` or `faker.number.int()`, with `min` and `max` passed only when set, moved inside an exclusive
+ * bound, or needed so a lone bound does not contradict faker's default for the other.
  */
 function numberCall(kind: 'float' | 'int', { min, max, exclusive }: Pick<ast.NumberSchemaNode, 'min' | 'max' | 'exclusive'>): string {
   // An integer bound moves to the next integer. Faker never returns a float's `max`, and its `min` only by chance.

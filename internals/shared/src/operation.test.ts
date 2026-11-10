@@ -25,6 +25,7 @@ import {
   type RequestConfigResolver,
   type ResponseNameResolver,
   type ResponseStatusNameResolver,
+  toStatusKey,
 } from './operation.ts'
 import { createCasedFile } from './resolver.ts'
 
@@ -244,6 +245,9 @@ describe('response status helpers', () => {
     expect(isErrorStatusCode('4XX')).toBe(true)
     expect(isErrorStatusCode('5XX')).toBe(true)
     expect(isErrorStatusCode('3XX')).toBe(false)
+    expect(isSuccessStatusCode('2xx')).toBe(true)
+    expect(toStatusKey('5XX')).toBe('5xx')
+    expect(toStatusKey('404')).toBe('404')
   })
 
   test('resolves error, success, and all response status names', () => {
