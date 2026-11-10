@@ -122,9 +122,7 @@ describe('numberChecksMini', () => {
   })
 
   test('all constraints combined', () => {
-    expect(numberChecksMini({ min: 1, max: 99, exclusive: { min: 0, max: 100 } })).toBe(
-      '.check(z.minimum(1), z.maximum(99), z.minimum(0, { exclusive: true }), z.maximum(100, { exclusive: true }))',
-    )
+    expect(numberChecksMini({ min: 1, max: 99, exclusive: { min: 0, max: 100 } })).toBe('.check(z.minimum(1), z.maximum(99), z.gt(0), z.lt(100))')
   })
 })
 

@@ -68,7 +68,17 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const isZodImport = importPath === 'zod' || importPath === 'zod/mini'
     const cyclicSchemas = getCircularNames(ctx)
-    const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, contentSchema, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions: PrinterZodOptions = {
+      coercion,
+      guidType,
+      regexType,
+      oneOfType,
+      contentSchema,
+      dateType,
+      resolver,
+      cyclicSchemas,
+      nodes: printer?.nodes,
+    }
 
     // The Zod printer prints `conditionals` and `contains`, which the visitors skip, and a string's `content` with `contentSchema`.
     const printedNode = withUnwalkedSchemas(node, { content: contentSchema })
@@ -157,7 +167,17 @@ export const zodGenerator = defineGenerator<PluginZod>({
     } as const
 
     const cyclicSchemas = getCircularNames(ctx)
-    const printerOptions: PrinterZodOptions = { coercion, guidType, regexType, oneOfType, contentSchema, dateType, resolver, cyclicSchemas, nodes: printer?.nodes }
+    const printerOptions: PrinterZodOptions = {
+      coercion,
+      guidType,
+      regexType,
+      oneOfType,
+      contentSchema,
+      dateType,
+      resolver,
+      cyclicSchemas,
+      nodes: printer?.nodes,
+    }
 
     function renderSchemaEntry({
       schema,

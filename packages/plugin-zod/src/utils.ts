@@ -333,8 +333,8 @@ export function numberChecksMini({ min, max, exclusive, multipleOf }: NumericCon
   const checks: Array<string> = []
   if (min !== undefined) checks.push(`z.minimum(${min})`)
   if (max !== undefined) checks.push(`z.maximum(${max})`)
-  if (exclusive?.min !== undefined) checks.push(`z.minimum(${exclusive.min}, { exclusive: true })`)
-  if (exclusive?.max !== undefined) checks.push(`z.maximum(${exclusive.max}, { exclusive: true })`)
+  if (exclusive?.min !== undefined) checks.push(`z.gt(${exclusive.min})`)
+  if (exclusive?.max !== undefined) checks.push(`z.lt(${exclusive.max})`)
   if (multipleOf !== undefined) checks.push(`z.multipleOf(${multipleOf})`)
   return checks.length ? `.check(${checks.join(', ')})` : ''
 }

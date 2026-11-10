@@ -19,11 +19,20 @@ const document = {
         then: { required: ['creditCard'] },
       },
       Labels: { type: 'array', items: { type: 'string' }, contains: { const: 'priority' }, minContains: 1, maxContains: 2 },
+      Wallet: {
+        type: 'object',
+        properties: { number: { type: 'string' } },
+        dependentSchemas: { number: { required: ['cvc'], properties: { cvc: { type: 'string', minLength: 3 } } } },
+      },
       Card: { type: 'object', properties: { number: { type: 'string' }, cvc: { type: 'string' } }, dependentRequired: { number: ['cvc'] } },
       Cash: { type: 'object', properties: { amount: { type: 'number' } } },
       Choice: { oneOf: [{ $ref: '#/components/schemas/Card' }, { $ref: '#/components/schemas/Cash' }] },
       AnyObject: { if: { type: 'object' }, then: { required: ['id'] } },
-      Payload: { type: 'string', contentMediaType: 'application/json', contentSchema: { type: 'object', required: ['id'], properties: { id: { type: 'integer' } } } },
+      Payload: {
+        type: 'string',
+        contentMediaType: 'application/json',
+        contentSchema: { type: 'object', required: ['id'], properties: { id: { type: 'integer' } } },
+      },
       Encoded: {
         type: 'string',
         contentMediaType: 'application/json',
@@ -50,6 +59,15 @@ describe.each([
     { input: { method: 'cash', creditCard: '4111' }, valid: false },
   ])('checks if/then and dependentRequired for $input', ({ input, valid }) => {
     expect(evaluate('Payment').safeParse(input).success).toBe(valid)
+  })
+
+  test.each([
+    { input: {}, valid: true },
+    { input: { number: '4111' }, valid: false },
+    { input: { number: '4111', cvc: '1' }, valid: false },
+    { input: { number: '4111', cvc: '123' }, valid: true },
+  ])('checks dependentSchemas for $input', ({ input, valid }) => {
+    expect(evaluate('Wallet').safeParse(input).success).toBe(valid)
   })
 
   test('does not call `.strict()` on a oneOf member that checks its input in a pipe', () => {

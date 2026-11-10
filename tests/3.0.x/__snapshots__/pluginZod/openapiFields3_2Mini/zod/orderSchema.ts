@@ -9,7 +9,7 @@ import { prioritySchema } from './prioritySchema'
 export const orderSchema = z.pipe(z.unknown().check(z.refine(value => typeof value !== "object" || value === null || Array.isArray(value) || Object.keys(value).length >= 1, { message: "Object must have at least 1 properties" }), z.refine(value => typeof value !== "object" || value === null || Array.isArray(value) || Object.keys(value).length <= 10, { message: "Object must have at most 10 properties" }), z.refine((value) => (z.object({
   paymentMethod: z.enum(['card']),
 }).safeParse(value).success ? typeof value === "object" && value !== null && ["creditCard"].every((key) => key in value) : true), { message: "Value does not meet a conditional schema" }), z.refine((value) => (typeof value === "object" && value !== null && ["creditCard"].every((key) => key in value) ? typeof value === "object" && value !== null && ["billingAddress"].every((key) => key in value) : true), { message: "Value does not meet a conditional schema" })), z.object({
-  id: z.int().check(z.minimum(0, { exclusive: true })),
+  id: z.int().check(z.gt(0)),
   paymentMethod: z.optional(z.enum(['card', 'cash'])),
   creditCard: z.optional(z.string()),
   billingAddress: z.optional(z.string()),
