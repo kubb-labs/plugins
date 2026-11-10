@@ -62,6 +62,18 @@ describe('getMockHeaders', () => {
       ['X-Count', '3'],
     ])
   })
+
+  test('leaves out an example a header cannot carry', () => {
+    const header = (name: string, value: string) =>
+      ast.factory.createParameter({ name, in: 'header', required: false, schema: ast.factory.createSchema({ type: 'string' }), examples: [{ value }] })
+    const response = ast.factory.createResponse({
+      statusCode: '200',
+      headers: [header('X-Multi', 'line1\nline2'), header('X-Name', 'Zoë ✓'), header('X-Latin', 'Zoë')],
+    })
+
+    expect(getMockHeaders(response)).toStrictEqual([['X-Latin', 'Zoë']])
+    expect(() => new Headers(getMockHeaders(response))).not.toThrow()
+  })
 })
 
 describe('responseLiteral', () => {

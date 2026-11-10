@@ -14,7 +14,9 @@ export function getMockHeaders(response: ast.ResponseNode | null | undefined): A
     const value = example?.serializedValue ?? example?.value ?? header.schema.default ?? header.schema.examples?.[0]
     if (value === undefined || value === null) return []
     // Headers use the `simple` style, so an array is sent comma-separated.
-    return [[header.name, Array.isArray(value) ? value.join(',') : typeof value === 'object' ? Object.entries(value).flat().join(',') : String(value)]]
+    const text = Array.isArray(value) ? value.join(',') : typeof value === 'object' ? Object.entries(value).flat().join(',') : String(value)
+    // `Headers` throws on a line break or a character above U+00FF, so such an example is left out.
+    return /^[\t\x20-\x7E\x80-\xFF]*$/.test(text) ? [[header.name, text]] : []
   })
 }
 
