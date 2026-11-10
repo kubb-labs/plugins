@@ -148,7 +148,7 @@ function headersBlock(contentType: string | null, headers: Array<[string, string
 /**
  * The `new HttpResponse<string>(...)` expression a mocked handler returns.
  */
-export function responseLiteral(body: string, status: number, contentType: string | null, headers: Array<[string, string]> = []): string {
+export function responseLiteral(body: string, status: number, contentType: string | null, headers: Array<[string, string]>): string {
   return `new HttpResponse<string>(${body}, {
       status: ${status},${headersBlock(contentType, headers)}
     })`

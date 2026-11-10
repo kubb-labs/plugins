@@ -41,19 +41,24 @@ export function buildResultType({ node, types, returnType }: { node: ast.Operati
 }
 
 /**
+ * The status and type name of each response that declares headers.
+ */
+function getResponseHeaderTypes({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<[ast.StatusCode, string]> {
+  const resolve = types.response.headers
+  if (!resolve) return []
+  return node.responses
+    .filter((response) => response.headers?.length)
+    .map((response) => [response.statusCode, resolve.call(types.response, node, response.statusCode)])
+}
+
+/**
  * The `{ status: headers }` record for the last `RequestResult` type argument, or `null` when no response declares headers.
  */
-export function buildResponseHeadersType({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
-  const resolve = types.response.headers
-  const entries = resolve ? getHeaderStatuses(node).map((statusCode) => `'${statusCode}': ${resolve.call(types.response, node, statusCode)}`) : []
+function buildResponseHeadersType({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): string | null {
+  const entries = getResponseHeaderTypes({ node, types }).map(([statusCode, name]) => `'${statusCode}': ${name}`)
   return entries.length ? `{ ${entries.join('; ')} }` : null
 }
 
-function getHeaderStatuses(node: ast.OperationNode): Array<ast.StatusCode> {
-  return node.responses.filter((response) => response.headers?.length).map((response) => response.statusCode)
-}
-
 export function getResponseHeadersTypeNames({ node, types }: { node: ast.OperationNode; types: OperationTypeNames }): Array<string> {
-  const resolve = types.response.headers
-  return resolve ? getHeaderStatuses(node).map((statusCode) => resolve.call(types.response, node, statusCode)) : []
+  return getResponseHeaderTypes({ node, types }).map(([, name]) => name)
 }

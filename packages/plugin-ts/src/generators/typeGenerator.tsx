@@ -145,8 +145,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null; examples?: Array<ast.ExampleNode> }>,
       baseName: string,
       pointer: string | undefined,
-      decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
-      comments?: Array<string>,
+      { decorate, comments }: { decorate?: (schema: ast.SchemaNode) => ast.SchemaNode; comments?: Array<string> },
     ) {
       const variants = resolveContentTypeVariants(entries, baseName)
       // Inline, content types that print the same type would repeat it in the union (`Order | Order`).
@@ -206,10 +205,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
         })
       }
       // Multiple content types — generate individual types + union alias
-      return buildContentTypeVariants(requestBodyContent, resolver.response.body(node), node.requestBody!.pointer, (schema) => ({
-        ...schema,
-        description: node.requestBody!.description ?? schema.description,
-      }))
+      return buildContentTypeVariants(requestBodyContent, resolver.response.body(node), node.requestBody!.pointer, {
+        decorate: (schema) => ({ ...schema, description: node.requestBody!.description ?? schema.description }),
+      })
     }
 
     const requestType = buildRequestType()
@@ -220,7 +218,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       // Multiple content types for a single status code — generate per-variant types + a plain union.
       // The `<Name>Responses` record discriminates them by content type (see buildResponses).
       if (variants.length > 1) {
-        return buildContentTypeVariants(variants, resolver.response.status(node, res.statusCode), res.pointer, undefined, buildResponseComments(res))
+        return buildContentTypeVariants(variants, resolver.response.status(node, res.statusCode), res.pointer, { comments: buildResponseComments(res) })
       }
       const primary = variants[0] ?? content[0]
       return renderSchemaType({
