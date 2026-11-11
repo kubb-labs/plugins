@@ -567,7 +567,7 @@ export function isResponseError<TResponses = unknown, TRequest = NativeRequest, 
 }
 
 function headerEntries(headers: object): Array<[string, unknown]> {
-  if (Array.isArray(headers)) return headers
+  if (Array.isArray(headers)) return headers as Array<[string, unknown]>
   return headers instanceof Headers ? [...headers] : Object.entries(headers)
 }
 
