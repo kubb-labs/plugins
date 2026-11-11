@@ -388,11 +388,11 @@ type PrinterContext = { transform: (node: ast.SchemaNode) => string | null }
  */
 function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullable<ast.ArraySchemaNode['contains']>): string | null {
   if (min === 0 && max === undefined) return null
-  const bounds = [`count >= ${min}`, max !== undefined && `count <= ${max}`].filter(Boolean).join(' && ')
+  const countBounds = [`count >= ${min}`, max !== undefined && `count <= ${max}`].filter(Boolean).join(' && ')
   const message = max !== undefined ? `Array must contain ${min} to ${max} matching items` : `Array must contain at least ${min} matching items`
-  const matches = ctx.transform(schema) ?? 'z.unknown()'
+  const itemSchema = ctx.transform(schema) ?? 'z.unknown()'
 
-  return `(items) => { const count = items.filter((item) => ${matches}.safeParse(item).success).length; return ${bounds} }, { message: ${stringify(message)} }`
+  return `(items) => { const count = items.filter((item) => ${itemSchema}.safeParse(item).success).length; return ${countBounds} }, { message: ${stringify(message)} }`
 }
 
 /**
@@ -402,22 +402,22 @@ function containsCheck(ctx: PrinterContext, { schema, min = 1, max }: NonNullabl
 function conditionExpression(ctx: PrinterContext, schema: ast.SchemaNode | undefined): string {
   if (!schema) return 'true'
   const object = ast.narrowSchema(schema, ast.schemaTypes.object)
-  const keys =
+  const keyOnlyNames =
     object?.properties.filter((property) => property.required && property.schema.type === ast.schemaTypes.unknown).map((property) => property.name) ?? []
-  const rest = object ? { ...object, properties: object.properties.filter((property) => !keys.includes(property.name)) } : schema
+  const restSchema = object ? { ...object, properties: object.properties.filter((property) => !keyOnlyNames.includes(property.name)) } : schema
   // An object with no properties left still means "is an object", so only a key check stands alone.
   const isOnlyKeys =
-    keys.length > 0 &&
-    rest.type === 'object' &&
-    rest.properties.length === 0 &&
-    rest.additionalProperties === undefined &&
-    !rest.patternProperties &&
-    !rest.propertyNames &&
-    !hasInputChecks(rest)
+    keyOnlyNames.length > 0 &&
+    restSchema.type === 'object' &&
+    restSchema.properties.length === 0 &&
+    restSchema.additionalProperties === undefined &&
+    !restSchema.patternProperties &&
+    !restSchema.propertyNames &&
+    !hasInputChecks(restSchema)
 
   return [
-    keys.length > 0 && `typeof value === "object" && value !== null && ${JSON.stringify(keys)}.every((key) => key in value)`,
-    !isOnlyKeys && `${ctx.transform(rest) ?? 'z.unknown()'}.safeParse(value).success`,
+    keyOnlyNames.length > 0 && `typeof value === "object" && value !== null && ${JSON.stringify(keyOnlyNames)}.every((key) => key in value)`,
+    !isOnlyKeys && `${ctx.transform(restSchema) ?? 'z.unknown()'}.safeParse(value).success`,
   ]
     .filter(Boolean)
     .join(' && ')
@@ -432,11 +432,11 @@ type Handler<TOptions extends ZodNodeOptions, K extends ast.SchemaType> = (
  * Wraps each handler so its output first checks the raw input, see {@link inputChecks}.
  */
 export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.PrinterPartial<string, TOptions>): ast.PrinterPartial<string, TOptions> {
-  const wrapped: ast.PrinterPartial<string, TOptions> = {}
-  const wrap = <K extends ast.SchemaType>(type: K) => {
+  const checkedHandlers: ast.PrinterPartial<string, TOptions> = {}
+  const wrapHandler = <K extends ast.SchemaType>(type: K) => {
     const handler: Handler<TOptions, K> | undefined = nodes[type]
     if (!handler) return
-    const checked: Handler<TOptions, K> = function (node) {
+    const checkedHandler: Handler<TOptions, K> = function (node) {
       const output = handler.call(this, node)
       if (!output || !hasInputChecks(node)) return output
       return inputChecks({
@@ -449,10 +449,10 @@ export function withInputChecks<TOptions extends ZodNodeOptions>(nodes: ast.Prin
         ),
       })
     }
-    // TypeScript cannot relate `wrapped[type]` to `K` on a write, so the key and its handler are assigned together.
-    Object.assign(wrapped, { [type]: checked })
+    // TypeScript cannot relate `checkedHandlers[type]` to `K` on a write, so the key and its handler are assigned together.
+    Object.assign(checkedHandlers, { [type]: checkedHandler })
   }
-  Object.values(ast.schemaTypes).forEach(wrap)
+  Object.values(ast.schemaTypes).forEach(wrapHandler)
 
-  return wrapped
+  return checkedHandlers
 }

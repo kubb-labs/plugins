@@ -34,12 +34,12 @@ const inlineAuthKeys = ['type', 'scheme', 'name', 'in', 'scopes', 'flows', 'meta
 function serializeScheme({ ref, ...auth }: OperationAuth): string {
   const scopes = auth.scopes?.length ? auth.scopes : undefined
   if (ref) {
-    const scheme = isValidVarName(ref) ? `securitySchemes.${ref}` : `securitySchemes[${stringify(ref)}]`
-    return scopes ? `{ ...${scheme}, scopes: ${toLiteral(scopes)} }` : scheme
+    const schemeRef = isValidVarName(ref) ? `securitySchemes.${ref}` : `securitySchemes[${stringify(ref)}]`
+    return scopes ? `{ ...${schemeRef}, scopes: ${toLiteral(scopes)} }` : schemeRef
   }
   const entries = inlineAuthKeys.flatMap((key) => {
-    const value = key === 'scopes' ? scopes : auth[key]
-    return value ? [`${key}: ${toLiteral(value)}`] : []
+    const entryValue = key === 'scopes' ? scopes : auth[key]
+    return entryValue ? [`${key}: ${toLiteral(entryValue)}`] : []
   })
   return `{ ${entries.join(', ')} }`
 }

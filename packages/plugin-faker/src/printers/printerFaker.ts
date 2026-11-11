@@ -100,8 +100,8 @@ function numberCall(
   const below = (bound: number) => (step ? (Math.ceil(bound / step) - 1) * step : bound)
   // A bound past `Number.MAX_SAFE_INTEGER`, such as int64's, prints as a rounded or invalid literal, so it is left out.
   const tightestBound = (pick: (...bounds: Array<number>) => number, bounds: Array<number | undefined>) => {
-    const usable = bounds.filter((bound): bound is number => bound !== undefined && (!isWhole || Number.isSafeInteger(bound)))
-    return usable.length ? pick(...usable) : undefined
+    const safeBounds = bounds.filter((bound): bound is number => bound !== undefined && (!isWhole || Number.isSafeInteger(bound)))
+    return safeBounds.length ? pick(...safeBounds) : undefined
   }
   const lower = tightestBound(Math.max, [min !== undefined && isWhole ? Math.ceil(min) : min, exclusive?.min === undefined ? undefined : above(exclusive.min)])
   const upper = tightestBound(Math.min, [max !== undefined && isWhole ? Math.floor(max) : max, exclusive?.max === undefined ? undefined : below(exclusive.max)])
@@ -188,9 +188,9 @@ function toFakerPattern(pattern: string): string {
         if (result[classStart] !== '-') result = `${result.slice(0, classStart)}-${result.slice(classStart)}`
         continue
       }
-      const set = classEscapes.get(next)
-      if (set === undefined) result += `\\${next}`
-      if (set !== undefined) result += inClass ? set : `[${set}]`
+      const classMembers = classEscapes.get(next)
+      if (classMembers === undefined) result += `\\${next}`
+      if (classMembers !== undefined) result += inClass ? classMembers : `[${classMembers}]`
       continue
     }
     if (char === '[' && !inClass) {
@@ -397,8 +397,8 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // variant (`allOf: [ref, { type }]`) counts too: spreading its ref reads every lazy getter, which recurses without end.
         const isCyclicMember = (member: ast.SchemaNode) =>
           isCyclicRef(member, this.options) || (member.type === 'intersection' && (member.members ?? []).some((part) => isCyclicRef(part, this.options)))
-        const acyclic = (node.members ?? []).filter((member) => !isCyclicMember(member))
-        const members = acyclic.length ? acyclic : node.members
+        const acyclicMembers = (node.members ?? []).filter((member) => !isCyclicMember(member))
+        const members = acyclicMembers.length ? acyclicMembers : node.members
 
         const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) => {
           // For a discriminated union, narrow each variant to its own branch so nested
@@ -428,8 +428,8 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const objectMembers = (node.members ?? []).filter((member) => isObjectSchema(member))
         // A ref (the base) spreads first and a union last, so neither a base nor a sibling object overwrites the narrower value
         // an extension or a discriminator sets.
-        const rank = (member: ast.SchemaNode) => (member.type === 'ref' ? 0 : member.type === 'union' ? 2 : 1)
-        const members = objectMembers.length ? objectMembers.toSorted((a, b) => rank(a) - rank(b)) : node.members
+        const memberRank = (member: ast.SchemaNode) => (member.type === 'ref' ? 0 : member.type === 'union' ? 2 : 1)
+        const members = objectMembers.length ? objectMembers.toSorted((a, b) => memberRank(a) - memberRank(b)) : node.members
         const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) =>
           printNested(member, {
             nestedInObject: true,
@@ -466,10 +466,10 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const { min, max } = node
         const item = items[0]
         // Like a string, a list stays within 100 items of its minimum, however large `maxItems` is.
-        const range = max === undefined ? undefined : `{ min: ${min ?? 0}, max: ${Math.min(max, (min ?? 0) + 100)} }`
+        const countRange = max === undefined ? undefined : `{ min: ${min ?? 0}, max: ${Math.min(max, (min ?? 0) + 100)} }`
         // `uniqueArray` takes a fixed length and compares like the zod `Set` check. It returns fewer items when the generator runs out of values.
-        if (node.unique) return `faker.helpers.uniqueArray(() => (${item}), ${range ? `faker.number.int(${range})` : (min ?? 3)})`
-        if (range) return `faker.helpers.multiple(() => (${item}), { count: ${range}})`
+        if (node.unique) return `faker.helpers.uniqueArray(() => (${item}), ${countRange ? `faker.number.int(${countRange})` : (min ?? 3)})`
+        if (countRange) return `faker.helpers.multiple(() => (${item}), { count: ${countRange}})`
         if (min !== undefined) return `faker.helpers.multiple(() => (${item}), { count: ${min} })`
 
         return `faker.helpers.multiple(() => (${item}))`
@@ -499,15 +499,15 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
             : []
         const properties = [...node.properties, ...recordProperties]
         // `maxProperties` keeps the required properties first.
-        const kept = node.max === undefined ? properties : properties.toSorted((a, b) => Number(b.required) - Number(a.required)).slice(0, node.max)
+        const keptProperties = node.max === undefined ? properties : properties.toSorted((a, b) => Number(b.required) - Number(a.required)).slice(0, node.max)
         // `minProperties` adds keys from `additionalProperties`, skipping any name a declared property uses.
-        const names = new Set(properties.map((property) => property.name))
-        const extras: typeof kept = []
-        for (let index = 1; typeof valueSchema === 'object' && kept.length + extras.length < (node.min ?? 0); index++) {
+        const declaredNames = new Set(properties.map((property) => property.name))
+        const extras: typeof keptProperties = []
+        for (let index = 1; typeof valueSchema === 'object' && keptProperties.length + extras.length < (node.min ?? 0); index++) {
           const name = `additionalProperty${index}`
-          if (!names.has(name)) extras.push(ast.factory.createProperty({ name, schema: valueSchema }))
+          if (!declaredNames.has(name)) extras.push(ast.factory.createProperty({ name, schema: valueSchema }))
         }
-        const entries = [...kept, ...extras].map((property): string => {
+        const entries = [...keptProperties, ...extras].map((property): string => {
           const value: string =
             printNested(property.schema, {
               typeName: this.options.typeName ? indexedTypeName(this.options.typeName, property.name, this.options.nestedInUnion) : undefined,
