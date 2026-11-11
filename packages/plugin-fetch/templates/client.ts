@@ -54,6 +54,22 @@ export type DecodedResponse<TData = unknown, TRequest = NativeRequest, TResponse
 export type Transport<TRequest = NativeRequest, TResponse = NativeResponse> = core.Transport<TRequest, TResponse>
 export type Interceptors<TRequest = NativeRequest, TResponse = NativeResponse> = core.Interceptors<TRequest, TResponse>
 export type ClientInstance<TRequest = NativeRequest, TResponse = NativeResponse> = core.ClientInstance<TRequest, TResponse>
+export type StreamResult<
+  TResponses,
+  ThrowOnError extends boolean = true,
+  TEvent = core.ServerSentEvent<core.SuccessOf<TResponses>>,
+  TRequest = NativeRequest,
+  TResponse = NativeResponse,
+> = core.StreamResult<TResponses, ThrowOnError, TEvent, TRequest, TResponse>
+export type ResponseErrorOf<TResponses, TRequest = NativeRequest, TResponse = NativeResponse, THeaders = unknown> = core.ResponseErrorOf<
+  TResponses,
+  TRequest,
+  TResponse,
+  THeaders
+>
+export const isResponseError = core.isResponseError as <TResponses = unknown, TRequest = NativeRequest, TResponse = NativeResponse, THeaders = unknown>(
+  error: unknown,
+) => error is ResponseErrorOf<TResponses, TRequest, TResponse, THeaders>
 
 export const defaultTransport = async (request: core.ResolvedRequest): Promise<TransportResult> => {
   const nativeRequest = new Request(request.url, toRequestInit(request))
