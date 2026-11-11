@@ -12,7 +12,7 @@ import {
   maybeValueOrGetter,
   resolvePageParamType,
 } from '@internals/tanstack-query'
-import type { HookReturnTypeProps, Infinite } from '@internals/tanstack-query'
+import type { HookResultProps, Infinite } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
 
 type Props = {
@@ -35,7 +35,7 @@ type Props = {
     initialPageParam: Infinite['initialPageParam']
     queryParam?: Infinite['queryParam']
   }
-} & HookReturnTypeProps
+} & HookResultProps
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
@@ -88,8 +88,9 @@ export function Query({
   suspense,
   infinite,
   returnType,
+  typedHeaders,
 }: Props): KubbReactNode {
-  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType })
+  const { TData, TError } = buildResponseTypes(node, tsResolver, { returnType, typedHeaders })
 
   const prefix = suspense ? 'UseSuspense' : 'Use'
   const hookName = `${suspense ? 'useSuspense' : 'use'}${infinite ? 'InfiniteQuery' : 'Query'}`

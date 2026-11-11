@@ -53,7 +53,9 @@ export function buildValidatorHooks({
   const parsesResponse = zodResolver && resolveResponseValidator(validator) === 'zod'
 
   // Success responses validate with the success-only `<operation>ResponseSchema`; error bodies with the schema of their status.
-  const response = parsesResponse ? zodResolver.response.response(node) || null : null
+  // plugin-zod emits that schema only for an operation with a response body schema.
+  const hasResponseSchema = node.responses.some((res) => res.content?.some((entry) => entry.schema))
+  const response = parsesResponse && hasResponseSchema ? zodResolver.response.response(node) || null : null
   const errorParse = parsesResponse ? buildZodErrorParse(node, zodResolver) : null
   const request = zodResolver && resolveRequestValidator(validator) === 'zod' && hasRequestBody ? zodResolver.response.body(node) || null : null
 

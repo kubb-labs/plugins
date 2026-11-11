@@ -56,9 +56,16 @@ export type ResolverTs = Resolver & {
      * Encapsulates the `<operationId> Status <statusCode>` template with PascalCase applied to the result.
      *
      * @example Response status names
-     * `resolver.response.status(node, 200) // → 'ListPetsStatus200'`
+     * `resolver.response.status(node, '200') // → 'ListPetsStatus200'`
      */
     status(node: ast.OperationNode, statusCode: ast.StatusCode): string
+    /**
+     * Resolves the name for the headers a response declares.
+     *
+     * @example Response headers names
+     * `resolver.response.headers(node, '200') // → 'ListPetsStatus200Headers'`
+     */
+    headers(node: ast.OperationNode, statusCode: ast.StatusCode): string
     /**
      * Resolves the name for an operation's grouped request options type (`Options`), the
      * `{ body, path, query, headers, cookies }` bag passed to call an operation.

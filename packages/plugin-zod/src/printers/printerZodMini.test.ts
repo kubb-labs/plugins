@@ -34,6 +34,26 @@ describe('printerZodMini', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'string' }))).toBe('z.string()')
     })
 
+    test('string with a JSON contentSchema checks the parsed document', () => {
+      const code = printer.print(
+        ast.factory.createSchema({
+          type: 'string',
+          content: {
+            mediaType: 'application/json',
+            schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'integer' })] }),
+          },
+        }),
+      )!
+      const schema = new Function('z', `return ${code}`)(z) as z.ZodMiniType
+
+      expect(code).toMatchInlineSnapshot(
+        `"z.string().check(z.refine((value) => { try { return z.array(z.int()).safeParse(JSON.parse(value)).success } catch { return false } }, { message: "String must hold JSON that matches its content schema" }))"`,
+      )
+      expect(z.parse(schema, '[1]')).toBe('[1]')
+      expect(z.safeParse(schema, '["1"]').success).toBe(false)
+      expect(z.safeParse(schema, '[').success).toBe(false)
+    })
+
     test('string with length checks', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'string', min: 1, max: 10 }))).toBe('z.string().check(z.minLength(1), z.maxLength(10))')
     })
@@ -107,6 +127,16 @@ describe('printerZodMini', () => {
   describe('bigint', () => {
     test('basic bigint coerces, since JSON.parse yields a number', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'bigint' }))).toBe('z.coerce.bigint()')
+    })
+
+    test('bigint bounds print as bigint literals', () => {
+      const output = printer.print(ast.factory.createSchema({ type: 'bigint', min: 0.5, exclusive: { max: 10 }, multipleOf: 2 }))
+
+      expect(output).toBe('z.coerce.bigint().check(z.minimum(1n), z.lt(10n), z.multipleOf(2n))')
+      const schema = new Function('z', `return ${output}`)(z) as z.ZodMiniType
+      expect(schema.safeParse(4).success).toBe(true)
+      expect(schema.safeParse(3).success).toBe(false)
+      expect(schema.safeParse(10).success).toBe(false)
     })
   })
 
@@ -1081,7 +1111,9 @@ describe('printerZodMini', () => {
               ast.factory.createSchema({
                 type: 'object',
                 primitive: 'object',
-                properties: [ast.factory.createProperty({ name: 'petType', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+                properties: [
+                  ast.factory.createProperty({ name: 'petType', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: ['dog'] }) }),
+                ],
               }),
             ],
           }),
@@ -1092,9 +1124,24 @@ describe('printerZodMini', () => {
       expect(printer.print(node)).toBe(`z.discriminatedUnion('petType', [
   Cat,
   z.extend(BasePet, {
-    petType: z.string(),
+    petType: z.enum(['dog']),
   }),
 ])`)
+    })
+
+    test('falls back to z.union when a member types the discriminator as a plain string', () => {
+      const member = (name: string, schema: ast.SchemaNode) =>
+        ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [ast.factory.createProperty({ name, required: true, schema })] })
+      const node = ast.factory.createSchema({
+        type: 'union',
+        discriminatorPropertyName: 'petType',
+        members: [
+          member('petType', ast.factory.createSchema({ type: 'enum', enumValues: ['dog'] })),
+          member('petType', ast.factory.createSchema({ type: 'string' })),
+        ],
+      })
+
+      expect(printer.print(node)).toMatch(/^z\.union\(/)
     })
 
     test('falls back to z.union when a cyclic variant cannot flatten to an object', () => {

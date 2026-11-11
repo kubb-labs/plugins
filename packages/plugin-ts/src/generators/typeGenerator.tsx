@@ -12,7 +12,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import { printerTs } from '../printers/printerTs.ts'
 import type { PluginTs } from '../types'
-import { buildParams, buildResponseUnion, enumTypeName, isInlineConstEnum, resolveInlineEnumNames } from '../utils.ts'
+import { buildParams, buildResponseComments, buildResponseUnion, enumTypeName, getExampleValues, isInlineConstEnum, resolveInlineEnumNames } from '../utils.ts'
 
 /**
  * Built-in generator for `@kubb/plugin-ts`. Emits one TypeScript file per
@@ -92,7 +92,19 @@ export const typeGenerator = defineGenerator<PluginTs>({
       ? printerTs({ optionalType, arrayType, enum: enumOptions, syntaxType, resolver, enumSchemaNames, nodes: printer?.nodes })
       : null
 
-    function renderSchemaType({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
+    function renderSchemaType({
+      schema,
+      name,
+      keysToOmit,
+      examples,
+      comments,
+    }: {
+      schema: ast.SchemaNode | null
+      name: string
+      keysToOmit?: Array<string> | null
+      examples?: Array<ast.ExampleNode>
+      comments?: Array<string>
+    }) {
       if (!schema) return null
       if (!inline && enumOptions.type !== 'inlineLiteral') schema = resolveInlineEnumNames({ node: schema, owner: node.operationId, resolver, enumOptions })
 
@@ -105,6 +117,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
         name,
         syntaxType,
         description: schema.description,
+        examples: getExampleValues(examples, true),
+        comments,
         keysToOmit,
         resolver,
         enumSchemaNames,
@@ -128,10 +142,10 @@ export const typeGenerator = defineGenerator<PluginTs>({
      * query hooks and `result.data` keep the bare body.
      */
     function buildContentTypeVariants(
-      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
+      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null; examples?: Array<ast.ExampleNode> }>,
       baseName: string,
       pointer: string | undefined,
-      decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
+      { decorate, comments }: { decorate?: (schema: ast.SchemaNode) => ast.SchemaNode; comments?: Array<string> },
     ) {
       const variants = resolveContentTypeVariants(entries, baseName)
       // Inline, content types that print the same type would repeat it in the union (`Order | Order`).
@@ -149,9 +163,10 @@ export const typeGenerator = defineGenerator<PluginTs>({
               schema: decorate ? decorate(variant.schema) : variant.schema,
               name: variant.name,
               keysToOmit: variant.keysToOmit,
+              examples: entries.find((entry) => entry.contentType === variant.contentType)?.examples,
             }),
           )}
-          {renderSchemaType({ schema: unionSchema, name: baseName })}
+          {renderSchemaType({ schema: unionSchema, name: baseName, comments })}
         </>
       )
     }
@@ -167,7 +182,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
       ] as const
     ).map(
       ([params, resolveName]) =>
-        params.length > 0 && renderSchemaType({ schema: buildParams({ params }), name: resolveName.call(resolver.param, node, params[0]!) }),
+        params.length > 0 &&
+        renderSchemaType({ schema: buildParams({ params, serializedExamples: true }), name: resolveName.call(resolver.param, node, params[0]!) }),
     )
 
     const requestBodyContent = node.requestBody?.content ?? []
@@ -185,13 +201,13 @@ export const typeGenerator = defineGenerator<PluginTs>({
           },
           name: resolver.response.body(node),
           keysToOmit: entry.keysToOmit,
+          examples: entry.examples,
         })
       }
       // Multiple content types — generate individual types + union alias
-      return buildContentTypeVariants(requestBodyContent, resolver.response.body(node), node.requestBody!.pointer, (schema) => ({
-        ...schema,
-        description: node.requestBody!.description ?? schema.description,
-      }))
+      return buildContentTypeVariants(requestBodyContent, resolver.response.body(node), node.requestBody!.pointer, {
+        decorate: (schema) => ({ ...schema, description: node.requestBody!.description ?? schema.description }),
+      })
     }
 
     const requestType = buildRequestType()
@@ -202,15 +218,23 @@ export const typeGenerator = defineGenerator<PluginTs>({
       // Multiple content types for a single status code — generate per-variant types + a plain union.
       // The `<Name>Responses` record discriminates them by content type (see buildResponses).
       if (variants.length > 1) {
-        return buildContentTypeVariants(variants, resolver.response.status(node, res.statusCode), res.pointer)
+        return buildContentTypeVariants(variants, resolver.response.status(node, res.statusCode), res.pointer, { comments: buildResponseComments(res) })
       }
       const primary = variants[0] ?? content[0]
       return renderSchemaType({
         schema: primary?.schema ? { ...primary.schema, pointer: res.pointer ?? primary.schema.pointer } : ast.factory.createSchema({ type: 'unknown' }),
         name: resolver.response.status(node, res.statusCode),
         keysToOmit: primary?.keysToOmit,
+        examples: primary?.examples,
+        comments: buildResponseComments(res),
       })
     })
+
+    const responseHeaderTypes = node.responses.map((res) =>
+      res.headers?.length
+        ? renderSchemaType({ schema: buildParams({ params: res.headers, serializedExamples: true }), name: resolver.response.headers(node, res.statusCode) })
+        : null,
+    )
 
     const optionsType = renderSchemaType({
       schema: buildOptionsSchema(node, resolver, { pairContentTypes: true }),
@@ -218,7 +242,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
     })
 
     const responsesType = renderSchemaType({
-      schema: buildResponses(node, resolver),
+      // A stream variant next to another content type comes back as the unread body, as the client's `SuccessVariant` types it.
+      schema: buildResponses(node, resolver, { streamData: ast.factory.createSchema({ type: 'ref', name: 'ReadableStream<Uint8Array>' }) }),
       name: resolver.response.responses(node),
     })
 
@@ -258,6 +283,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       >
         {paramGroupTypes}
         {responseTypes}
+        {responseHeaderTypes}
         {requestType}
         {optionsType}
         {responsesType}

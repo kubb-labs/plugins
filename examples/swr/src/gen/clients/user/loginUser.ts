@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
-import type { LoginUserOptions, LoginUserResponses } from '../../models/user/LoginUser'
+import type { Options, Unwrappable, RequestResultWithHeaders } from '../../.kubb/client'
+import type { LoginUserOptions, LoginUserResponses, LoginUserStatus200Headers } from '../../models/user/LoginUser'
 import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
 
 /**
@@ -13,10 +13,15 @@ import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
  */
 export function loginUser<ThrowOnError extends boolean = true>(
   options: Options<LoginUserOptions, ThrowOnError> = {},
-): Unwrappable<RequestResult<LoginUserResponses, ThrowOnError>> {
+): Unwrappable<RequestResultWithHeaders<LoginUserResponses, { '200': LoginUserStatus200Headers }, ThrowOnError>> {
   const { client: apiClient = client, ...config } = options
 
   return withUnwrap(
-    apiClient<LoginUserResponses, ThrowOnError>({ method: 'GET', url: '/user/login', ...config, throwOnError: resolveThrowOnError(config.throwOnError, true) }),
+    apiClient<LoginUserResponses, ThrowOnError, { '200': LoginUserStatus200Headers }>({
+      method: 'GET',
+      url: '/user/login',
+      ...config,
+      throwOnError: resolveThrowOnError(config.throwOnError, true),
+    }),
   )
 }

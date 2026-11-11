@@ -1,3 +1,7 @@
+export { createPayment } from './paymentService/createPayment'
+export { createPaymentBatch } from './paymentService/createPaymentBatch'
+export { getPaymentById } from './paymentService/getPaymentById'
+export { listPayments } from './paymentService/listPayments'
 export { addFiles } from './petService/addFiles'
 export { addPet } from './petService/addPet'
 export { deletePet } from './petService/deletePet'

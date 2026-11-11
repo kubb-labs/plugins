@@ -5,7 +5,7 @@
 
 import type { Options, Unwrappable, RequestResult } from '../../.kubb/client'
 import type { GetInventoryOptions, GetInventoryResponses } from '../../models/store/GetInventory'
-import { client, withUnwrap, resolveThrowOnError } from '../../.kubb/client'
+import { client, withUnwrap, resolveThrowOnError, securitySchemes } from '../../.kubb/client'
 
 /**
  * `GET /store/inventory`
@@ -21,7 +21,7 @@ export function getInventory<ThrowOnError extends boolean = true>(
     apiClient<GetInventoryResponses, ThrowOnError>({
       method: 'GET',
       url: '/store/inventory',
-      security: [{ type: 'apiKey', name: 'api_key', in: 'header' }],
+      security: [securitySchemes.api_key],
       ...config,
       throwOnError: resolveThrowOnError(config.throwOnError, true),
     }),

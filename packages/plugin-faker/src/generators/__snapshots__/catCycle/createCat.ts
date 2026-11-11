@@ -5,19 +5,18 @@
  */
 
 import type { Cat } from './types/Cat'
-import { createPet } from './createPet'
 import { faker } from '@faker-js/faker'
 
 export function createCat<TData extends Partial<Cat> = object>(data?: TData): Omit<Cat, keyof NoInfer<TData>> & NoInfer<TData> {
   const defaultFakeData = {
     id: faker.number.int(),
     get archEnemy() {
-      const _value = faker.helpers.arrayElement([null, createPet()])
+      const _value = faker.helpers.arrayElement([null])
       Object.defineProperty(this, 'archEnemy', { value: _value, configurable: true, writable: true, enumerable: true })
       return _value
     },
     get friends() {
-      const _value = faker.helpers.multiple(() => createPet())
+      const _value = [] as NonNullable<Cat>['friends']
       Object.defineProperty(this, 'friends', { value: _value, configurable: true, writable: true, enumerable: true })
       return _value
     },

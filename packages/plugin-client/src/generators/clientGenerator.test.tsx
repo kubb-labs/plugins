@@ -1,11 +1,18 @@
-import type { Adapter, Config, PluginType } from '@kubb/kit'
+import type { Config, PluginType } from '@kubb/kit'
 import { ast, memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation, renderGeneratorOperations } from '#mocks'
+import {
+  createMockedAdapter,
+  createMockedPlugin,
+  createMockedPluginDriver,
+  matchFiles,
+  rawSources,
+  renderGeneratorOperation,
+  renderGeneratorOperations,
+} from '#mocks'
 import { resolverClient } from '../resolver.ts'
-import type { ServerDocument } from '../builders/server.ts'
 import type { ClientOptions, ClientResolvedOptions, ResolverClient } from '../types.ts'
 import { createClientGenerator } from './clientGenerator.tsx'
 
@@ -100,6 +107,16 @@ const createPetNode = ast.factory.createOperation({
     ast.factory.createResponse({ statusCode: '405', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Invalid input' }),
   ],
 })
+
+const header = (name: string) => ast.factory.createParameter({ name, in: 'header', required: true, schema: ast.factory.createSchema({ type: 'string' }) })
+
+const createPetWithHeadersNode: ast.OperationNode = {
+  ...createPetNode,
+  responses: [
+    { ...createPetNode.responses[0]!, headers: [header('Location')] },
+    { ...createPetNode.responses[1]!, headers: [header('Retry-After')] },
+  ],
+}
 
 const uploadFileNode = ast.factory.createOperation({
   operationId: 'uploadFile',
@@ -229,10 +246,6 @@ const securityMeta: ast.InputMeta = {
   ],
 }
 
-function mockedAdapterWithDocument(document: ServerDocument): Adapter {
-  return { ...createMockedAdapter(), document } as Adapter
-}
-
 describe('clientGenerator operation', () => {
   const testData = [
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
@@ -262,18 +275,35 @@ describe('clientGenerator operation', () => {
       options: {},
       meta: securityMeta,
     },
+    // Declared response headers type `headers` on the result, also on the full result `returnType: 'data'` resolves to without throwing.
+    { name: 'addPetWithResponseHeaders', node: createPetWithHeadersNode, options: {} },
+    { name: 'addPetWithResponseHeadersData', node: createPetWithHeadersNode, options: { returnType: 'data' } },
+    // A stream's declared response headers type `headers` too, so the call spells out its default item type.
+    {
+      name: 'streamEventsWithResponseHeaders',
+      node: { ...streamEventsNode, responses: [{ ...streamEventsNode.responses[0]!, headers: [header('X-Request-ID')] }] },
+      options: {},
+    },
+    {
+      name: 'streamEventsWithResponseHeadersData',
+      node: { ...streamEventsNode, responses: [{ ...streamEventsNode.responses[0]!, headers: [header('X-Request-ID')] }] },
+      options: { returnType: 'data' },
+    },
+    {
+      name: 'streamChatTypedEventsWithResponseHeaders',
+      node: { ...streamChatNode, responses: [{ ...streamChatNode.responses[0]!, headers: [header('X-Request-ID')] }] },
+      options: {},
+    },
     // A path-level `servers` entry becomes the call's default `baseURL`, before `...config` so a per-call one still wins.
     {
       name: 'streamEventsWithPathServer',
-      node: streamEventsNode,
+      node: { ...streamEventsNode, servers: [{ url: 'https://echo.websocket.org' }] },
       options: {},
-      adapter: mockedAdapterWithDocument({ paths: { '/events': { servers: [{ url: 'https://echo.websocket.org' }] } } }),
     },
   ] as const satisfies Array<{
     name: string
     node: ast.OperationNode
     options: Partial<PluginFetch['resolvedOptions']>
-    adapter?: Adapter
     meta?: ast.InputMeta
   }>
 
@@ -287,7 +317,7 @@ describe('clientGenerator operation', () => {
 
     await renderGeneratorOperation(clientGenerator, props.node, {
       config: testConfig,
-      adapter: 'adapter' in props ? props.adapter : createMockedAdapter(),
+      adapter: createMockedAdapter(),
       meta: 'meta' in props ? props.meta : undefined,
       driver,
       plugin,
@@ -345,7 +375,17 @@ describe('clientGenerator without an operation type source', () => {
 })
 
 describe('clientGenerator runtime files', () => {
-  const sseGenerator = createClientGenerator<PluginFetch>('fetch', { sse: '/templates/sse.ts' })
+  const sseGenerator = createClientGenerator<PluginFetch>('fetch', { templates: '/templates' })
+  // The files copied into `.kubb/`, the generated `config.ts`, and the footer of `client.ts`.
+  const readRuntime = (files: Array<ast.FileNode>) => {
+    const runtime = files.filter((file) => file.path.includes('.kubb/'))
+    return {
+      copied: runtime.flatMap((file) => (file.copy ? [file.path.split('.kubb/')[1]] : [])).sort(),
+      config: rawSources(runtime.filter((file) => file.baseName === 'config.ts'))[0],
+      footer: runtime.find((file) => file.baseName === 'client.ts')?.footer,
+    }
+  }
+  const serializerConfig = 'serializer: { query: serializeQuery, path: serializePath }'
 
   test.each([
     {
@@ -373,23 +413,51 @@ describe('clientGenerator runtime files', () => {
       resolver: resolverClient,
     })
 
-    const runtime = driver.fileManager.files.filter((file) => file.path.includes('.kubb/'))
-    if (!expected) return expect(runtime).toStrictEqual([])
-    expect(runtime.map((file) => [file.path.split('/').slice(-2).join('/'), file.copy, file.footer]).sort()).toStrictEqual([
-      [
-        '.kubb/client.ts',
-        undefined,
-        [
-          "import { streamMediaTypes } from './sse.ts'",
-          `client.setConfig({ ${baseURL ? `baseURL: "${baseURL}", ` : ''}mediaTypes: { ...streamMediaTypes } })`,
-          "export * from './sse.ts'",
-        ].join('\n'),
-      ],
-      ['.kubb/sse.ts', '/templates/sse.ts', undefined],
-    ])
+    const { copied, config, footer } = readRuntime(driver.fileManager.files)
+    expect(config).toContain("import { serializeQuery } from './serializers/query")
+    if (!expected) {
+      expect(copied).toStrictEqual(['serializers/path.ts', 'serializers/query.ts'])
+      expect(config).toContain(`export const defaultConfig: ClientConfig = { ${serializerConfig} }`)
+      return expect(footer).toBeUndefined()
+    }
+    expect(copied).toStrictEqual(['serializers/path.ts', 'serializers/query.ts', 'sse.ts'])
+    expect(config).toContain("import { streamMediaTypes } from './sse")
+    expect(config).toContain(
+      `export const defaultConfig: ClientConfig = { ${baseURL ? `baseURL: "${baseURL}", ` : ''}mediaTypes: { ...streamMediaTypes }, ${serializerConfig} }`,
+    )
+    expect(footer).toBe("export * from './sse.ts'")
   })
 
-  test('registers the form media types only when an operation sends a form body', async () => {
+  test('exports the named servers, the first one for a name used twice', async () => {
+    const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
+    const driver = createMockedPluginDriver({
+      name: 'runtime',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorOperations(sseGenerator, [getPetByIdNode], {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      meta: {
+        servers: [
+          { url: 'https://api.test', name: 'production' },
+          { url: 'https://eu.api.test', name: 'eu-west' },
+          { url: 'https://old.api.test', name: 'production' },
+          { url: 'https://unnamed.api.test' },
+        ],
+      },
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverClient,
+    })
+
+    expect(readRuntime(driver.fileManager.files).footer).toContain(
+      "export const servers = { production: 'https://api.test', 'eu-west': 'https://eu.api.test' } as const",
+    )
+  })
+
+  test('copies and registers only the form media types an operation sends', async () => {
     const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
     const driver = createMockedPluginDriver({
       name: 'runtime',
@@ -405,9 +473,43 @@ describe('clientGenerator runtime files', () => {
       resolver: resolverClient,
     })
 
-    const runtime = driver.fileManager.files.filter((file) => file.path.includes('.kubb/'))
-    expect(runtime.map((file) => [file.path.split('/').slice(-2).join('/'), file.footer])).toStrictEqual([
-      ['.kubb/client.ts', "import { formMediaTypes } from './mediaTypes.ts'\nclient.setConfig({ mediaTypes: { ...formMediaTypes } })"],
-    ])
+    const { copied, config } = readRuntime(driver.fileManager.files)
+    expect(copied).toStrictEqual(['mediaTypes/formData.ts', 'serializers/path.ts', 'serializers/query.ts'])
+    expect(config).toContain("import { multipartFormData } from './mediaTypes/formData")
+    expect(config).toContain(`export const defaultConfig: ClientConfig = { mediaTypes: { 'multipart/form-data': multipartFormData }, ${serializerConfig} }`)
+  })
+
+  test('copies and registers the cookie and styled path serializers for a cookie and a matrix path parameter', async () => {
+    const plugin = createMockedPlugin<PluginFetch>({ name: 'plugin-fetch', options: defaultOptions, resolver: resolverClient })
+    const driver = createMockedPluginDriver({
+      name: 'runtime',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+    const node = ast.factory.createOperation({
+      operationId: 'getStyled',
+      method: 'GET',
+      path: '/styled/{id}',
+      parameters: [
+        ast.factory.createParameter({ name: 'id', in: 'path', style: 'matrix', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+        ast.factory.createParameter({ name: 'session', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }) }),
+      ],
+      responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+    })
+
+    await renderGeneratorOperations(sseGenerator, [getPetByIdNode, node], {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverClient,
+    })
+
+    const { copied, config } = readRuntime(driver.fileManager.files)
+    expect(copied).toStrictEqual(['serializers/cookies.ts', 'serializers/path.ts', 'serializers/pathStyles.ts', 'serializers/query.ts'])
+    expect(config).toContain("import { serializeStyledPath } from './serializers/pathStyles")
+    expect(config).toContain(
+      'export const defaultConfig: ClientConfig = { serializer: { query: serializeQuery, path: serializeStyledPath, cookie: serializeCookies } }',
+    )
   })
 })

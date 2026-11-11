@@ -66,6 +66,17 @@ client.setConfig({
 
 A serializer set this way runs for every call. Pass `serializer` on a single call to override only that request.
 
+Kubb writes each serializer a spec needs into `.kubb/serializers/` and lists it in `.kubb/config.ts`, which `.kubb/client.ts` passes to `setConfig`. The core has no serializer of its own.
+
+| Key in `serializer` | File                                                                                 | Written for                    |
+| ------------------- | ------------------------------------------------------------------------------------ | ------------------------------ |
+| `query`             | `query.ts`, or `queryStyles.ts` for a spec with a styled query parameter             | every spec                     |
+| `path`              | `path.ts`, plus `pathStyles.ts` for a spec with a `label` or `matrix` path parameter | every spec                     |
+| `header`            | `headers.ts`                                                                         | a spec with a header parameter |
+| `cookie`            | `cookies.ts`                                                                         | a spec with a cookie parameter |
+
+A call that needs a serializer the spec did not register throws a `TypeError` that names the key, such as `serializer.cookie`. Set it on the client to send such a call. Without `serializer.header`, an array or object header value is sent as JSON.
+
 ## Built-in media types
 
 | Keys                                                                                     | Encodes                                           | Decodes                                    |
@@ -77,7 +88,7 @@ A serializer set this way runs for every call. Pass `serializer` on a single cal
 | `text/event-stream`, `application/jsonl`, `application/x-ndjson`, `application/json-seq` |                                                   | text, or item by item with `client.stream` |
 | `*/*`                                                                                    | JSON for objects, strings and binary bodies as is | JSON, or text when the body is not JSON    |
 
-`.kubb/client.ts` registers the form media types only when the document has a form body, and the stream media types only when it streams. They are exported as `formMediaTypes` from `.kubb/mediaTypes.ts` and `streamMediaTypes` from `.kubb/sse.ts`.
+`.kubb/client.ts` registers a form media type only when the document has a body of that type, and the stream media types only when it streams. `multipartFormData` is in `.kubb/mediaTypes/formData.ts` and `urlencoded` in `.kubb/mediaTypes/urlencoded.ts`. The stream media types are `streamMediaTypes` in `.kubb/sse.ts`.
 
 A key can be a pattern. The runtime lower-cases the type, drops its parameters, and tries the exact type, then a suffix such as `application/*+json`, then a wildcard such as `text/*`, then `*/*`. Write your own keys in lower case.
 

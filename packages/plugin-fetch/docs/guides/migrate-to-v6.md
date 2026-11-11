@@ -4,21 +4,25 @@ The fetch client keeps its API in v6, so most projects only regenerate. Find you
 
 ## What to change
 
-| Your code                                                                                                            | What to do                                                                                                           |
-| -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Calls generated functions, SDK methods, or hooks                                                                     | Regenerate. Nothing else.                                                                                            |
-| Imports from `templates/fetch.ts`, `templates/core.ts`, `templates/serializers.ts`, or `templates/standardSchema.ts` | Import from `templates/client.ts` or `@kubb/plugin-client/templates/*`. See [Template subpaths](#template-subpaths). |
-| Uses `FetchOptions`                                                                                                  | Rename it to `NativeOptions`. See [Removed exports](#removed-exports).                                               |
-| Names `EventStreamResult<Pet>`, `StreamResult`, or `UnwrappedStreamResult`                                           | Use `StreamResult` and wrap the payload in `ServerSentEvent`. See [Stream result types](#stream-result-types).       |
-| Sets `codecs`, `serializer.body`, or `responseType`                                                                  | Use `mediaTypes` and `parseAs`. See [Media types](#media-types).                                                     |
-| Calls `toEventStream`, or writes a transport that returns a parsed body                                              | Use `client.stream`, and return a web `Response`. See [Streams and transports](#streams-and-transports).             |
-| Relies on invalid JSON becoming a string, or on the error interceptor skipping network errors                        | Check [Behavior changes in the runtime](#behavior-changes-in-the-runtime). It compiles.                              |
-| Comes from 5.12 or earlier and uses streams                                                                          | Check [From 5.12 or earlier](#from-5-12-or-earlier). It compiles, so the type checker does not catch it.             |
-| Uses SDK classes with `group: { type: 'tag' }`, such as `new pet(config)`                                            | Use the new names, such as `new PetClient(config)`. See [SDK class names](#sdk-class-names).                         |
+| Your code                                                                                                                          | What to do                                                                                                           |
+| ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Calls generated functions, SDK methods, or hooks                                                                                   | Regenerate. Nothing else.                                                                                            |
+| Imports from `templates/fetch.ts`, `templates/core.ts`, `templates/serializers.ts`, or `templates/standardSchema.ts`               | Import from `templates/client.ts` or `@kubb/plugin-client/templates/*`. See [Template subpaths](#template-subpaths). |
+| Uses `FetchOptions`                                                                                                                | Rename it to `NativeOptions`. See [Removed exports](#removed-exports).                                               |
+| Names `EventStreamResult<Pet>`, `StreamResult`, or `UnwrappedStreamResult`                                                         | Use `StreamResult` and wrap the payload in `ServerSentEvent`. See [Stream result types](#stream-result-types).       |
+| Sets `codecs`, `serializer.body`, or `responseType`                                                                                | Use `mediaTypes` and `parseAs`. See [Media types](#media-types).                                                     |
+| Calls `toEventStream`, or writes a transport that returns a parsed body                                                            | Use `client.stream`, and return a web `Response`. See [Streams and transports](#streams-and-transports).             |
+| Relies on invalid JSON becoming a string, or on the error interceptor skipping network errors                                      | Check [Behavior changes in the runtime](#behavior-changes-in-the-runtime). It compiles.                              |
+| Comes from 5.12 or earlier and uses streams                                                                                        | Check [From 5.12 or earlier](#from-5-12-or-earlier). It compiles, so the type checker does not catch it.             |
+| Imports `defaultQuerySerializer`, `defaultPathSerializer`, `applyHeaderStyles`, or `serializeCookies`                              | Import the renamed function from `.kubb/serializers/`. See [Serializers](#serializers).                              |
+| Imports a `…Status2XX` type, or writes a `'2XX'` key                                                                               | Write the range in lower case. See [Status ranges](#status-ranges).                                                  |
+| Has `servers` on a path or operation, sends object query parameters or array headers without a `style`, or reads XML, YAML, or CSV | Check [Behavior changes in the runtime](#behavior-changes-in-the-runtime).                                           |
+| Groups by tag in an OpenAPI 3.2 document whose tags set `parent`                                                                   | Update the import paths. See [Tag folders](#tag-folders).                                                            |
+| Uses SDK classes with `group: { type: 'tag' }`, such as `new pet(config)`                                                          | Use the new names, such as `new PetClient(config)`. See [SDK class names](#sdk-class-names).                         |
 
 ## Upgrade steps
 
-1. Upgrade `kubb` and `@kubb/plugin-fetch` together. v6 needs Kubb 5.16.0 or later:
+1. Upgrade `kubb` and `@kubb/plugin-fetch` together. v6 needs Kubb 5.18.4 or later:
 
    ```bash
    npm install --save-dev kubb@latest @kubb/plugin-fetch@6
@@ -134,8 +138,13 @@ These compile without errors, so check them by hand:
 - An empty body is `undefined` for every media type, text included.
 - Error interceptors also get network errors, aborts, and validation errors, so narrow with `ResponseError.is` before reading `status`. Each handler gets the error the previous one returned.
 - `ResponseError.data` holds the validated body.
-- A `2XX` response key is a success, and range keys such as `4XX` type `status` as the numbers they cover.
+- A `2xx` response key is a success, and range keys such as `4xx` type `status` as the numbers they cover.
 - An auth requirement that needs several schemes sends all of them.
+- A path or operation with its own `servers` sends its calls there instead of to the client's `baseURL`. Pass `baseURL` on the call to override it. See [Set the base URL](https://kubb.dev/extensions/kubb-labs/plugin-fetch/guides/base-url).
+- An object query parameter without a `style` goes out as `name=odie&age=3`, not `filter[name]=odie`. Set `style: deepObject` in the document to keep brackets.
+- An array or object header without a `style` goes out as `X-Ids: 3,4`, not as JSON.
+- A space in a query value is sent as `%20`, not `+`.
+- An XML, YAML, or CSV response is typed `string`, and an image, audio, video, PDF, or `application/octet-stream` response is typed `Blob`.
 
 ## From 5.12 or earlier
 
@@ -143,6 +152,36 @@ These changed in 5.13 and compile without errors, so check them by hand:
 
 - A successful stream call with a body that is not a stream, such as a JSON body, throws a `TypeError` with the body as its `cause`. A successful answer with no body still ends as an empty stream.
 - An event the server ends without a blank line is dropped, as browser `EventSource` does, so end every event with one.
+
+## Serializers
+
+The serializers moved out of `.kubb/serializers.ts` into one file each, and Kubb writes a file only when the document needs it:
+
+| Before                   | After                                                                                                         | File in `.kubb/serializers/`   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `defaultQuerySerializer` | `serializeQuery`, or `serializeStyledQuery` for a document with a styled query parameter or a urlencoded body | `query.ts` or `queryStyles.ts` |
+| `defaultPathSerializer`  | `serializePath`, plus `serializeStyledPath` for a `label` or `matrix` parameter                               | `path.ts`, `pathStyles.ts`     |
+| `applyHeaderStyles`      | `serializeHeaders`                                                                                            | `headers.ts`                   |
+| `serializeCookies`       | `serializeCookies`, for a document with a cookie parameter                                                    | `cookies.ts`                   |
+
+`.kubb/config.ts` registers the ones your document needs, and `setConfig({ serializer })` merges per key, so setting `serializer.query` keeps the others. A client you build with `createClientCore` gets none, so pass them in its `serializer` config.
+
+## Status ranges
+
+A status range is written in lower case in generated names and keys. Rename the imports, and the range keys in a responses record or `validator.error` map you wrote by hand:
+
+```diff
+- import type { ListPetsStatus4XX } from './gen/types/ListPets'
++ import type { ListPetsStatus4xx } from './gen/types/ListPets'
+```
+
+## Tag folders
+
+With `group: { type: 'tag' }`, a tag whose OpenAPI 3.2 `parent` is `store` now writes to `store/payment/` instead of `payment/`. Pass `group.name` to keep one folder per tag:
+
+```typescript
+pluginFetch({ group: { type: 'tag', name: ({ group }) => group } })
+```
 
 ## SDK class names
 

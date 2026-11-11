@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { getOperationParameters, getPrimarySuccessResponse, operationFileEntry, resolveOperationFile } from '@internals/shared'
+import { getOperationParameters, getPrimarySuccessResponse, hasStreamVariant, isEventStream, operationFileEntry, resolveOperationFile } from '@internals/shared'
 import { getRelativePath } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -46,51 +46,58 @@ export const serverGenerator = defineGenerator<PluginMcp>({
       },
     }
 
-    const operationsMapped = nodes.filter(ast.isHttpOperationNode).map((node) => {
-      const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = getOperationParameters(node)
+    // `mcpGenerator` emits no handler for a stream operation, so it gets no tool either.
+    const operationsMapped = nodes
+      .filter(ast.isHttpOperationNode)
+      .filter((node) => !isEventStream(node) && !hasStreamVariant(node))
+      .map((node) => {
+        const { path: pathParams, query: queryParams, header: headerParams, cookie: cookieParams } = getOperationParameters(node)
 
-      const mcpFile = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
-      const zodFile = resolveOperationFile({
-        ctx,
-        node,
-        resolver: zodResolver,
-        root,
-        output: pluginZod.options?.output ?? output,
-        group: pluginZod.options?.group ?? undefined,
+        const mcpFile = resolver.file({ ...operationFileEntry(node, node.operationId), root, output, group: group ?? undefined })
+        const zodFile = resolveOperationFile({
+          ctx,
+          node,
+          resolver: zodResolver,
+          root,
+          output: pluginZod.options?.output ?? output,
+          group: pluginZod.options?.group ?? undefined,
+        })
+
+        const requestName = node.requestBody?.content?.[0]?.schema ? zodResolver.response.body(node) : null
+        const successStatus = getPrimarySuccessResponse(node)?.statusCode
+        const responseName = successStatus ? zodResolver.response.status(node, successStatus) : null
+
+        const resolveParams = (params: typeof pathParams) => params.map((p) => ({ name: p.name, schemaName: zodResolver.param.name(node, p) }))
+        const resolveOptional = (params: typeof pathParams) => (params.length ? resolveParams(params) : null)
+        // plugin-zod emits no per-param schema for the properties of a spread form-encoded `querystring`, only the grouped query schema.
+        const isQuerystringSpread = queryParams.some((p) => !node.parameters.includes(p))
+
+        return {
+          tool: {
+            name: node.operationId,
+            title: node.summary || undefined,
+            description: node.description || `Make a ${node.method.toUpperCase()} request to ${node.path}`,
+          },
+          mcp: {
+            name: resolver.handler.name(node),
+            file: mcpFile,
+          },
+          zod: {
+            pathParams: resolveParams(pathParams),
+            queryParams: isQuerystringSpread ? zodResolver.param.query(node, queryParams[0]!) : resolveOptional(queryParams),
+            headerParams: resolveOptional(headerParams),
+            cookieParams: resolveOptional(cookieParams),
+            requestName,
+            responseName,
+            file: zodFile,
+          },
+        }
       })
-
-      const requestName = node.requestBody?.content?.[0]?.schema ? zodResolver.response.body(node) : null
-      const successStatus = getPrimarySuccessResponse(node)?.statusCode
-      const responseName = successStatus ? zodResolver.response.status(node, successStatus) : null
-
-      const resolveParams = (params: typeof pathParams) => params.map((p) => ({ name: p.name, schemaName: zodResolver.param.name(node, p) }))
-
-      return {
-        tool: {
-          name: node.operationId,
-          title: node.summary || undefined,
-          description: node.description || `Make a ${node.method.toUpperCase()} request to ${node.path}`,
-        },
-        mcp: {
-          name: resolver.handler.name(node),
-          file: mcpFile,
-        },
-        zod: {
-          pathParams: resolveParams(pathParams),
-          queryParams: queryParams.length ? resolveParams(queryParams) : null,
-          headerParams: headerParams.length ? resolveParams(headerParams) : null,
-          cookieParams: cookieParams.length ? resolveParams(cookieParams) : null,
-          requestName,
-          responseName,
-          file: zodFile,
-        },
-      }
-    })
 
     const imports = operationsMapped.flatMap(({ mcp, zod }) => {
       const zodNames = [
         ...zod.pathParams.map((p) => p.schemaName),
-        ...(zod.queryParams ?? []).map((p) => p.schemaName),
+        ...(typeof zod.queryParams === 'string' ? [zod.queryParams] : (zod.queryParams ?? []).map((p) => p.schemaName)),
         ...(zod.headerParams ?? []).map((p) => p.schemaName),
         ...(zod.cookieParams ?? []).map((p) => p.schemaName),
         zod.requestName,

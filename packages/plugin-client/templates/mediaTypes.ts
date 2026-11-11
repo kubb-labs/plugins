@@ -1,6 +1,6 @@
 import type { EventStreamOptions, RequestConfig } from './core.ts'
-import { baseContentType, jsonReplacer, serializeUrlencodedBody, toValue } from './serializers.ts'
-import type { BodyEncoding, RequestBody } from './serializers.ts'
+import { baseContentType, jsonReplacer } from './serializers.ts'
+import type { RequestBody } from './serializers.ts'
 import { ParseError } from './standardSchema.ts'
 
 /**
@@ -11,13 +11,13 @@ export type MediaTypeContext = {
   /**
    * The response status, or `undefined` while a request body is encoded.
    */
-  status?: number
-  signal?: AbortSignal
+  status?: number | undefined
+  signal?: AbortSignal | undefined
   config: Omit<RequestConfig, 'client' | 'transport'> & EventStreamOptions
   /**
    * Where a stream records the last event ID it read, for `StreamResult.lastEventId`.
    */
-  cursor?: { lastEventId: string }
+  cursor?: { lastEventId: string } | undefined
 }
 
 /**
@@ -86,20 +86,23 @@ function encodeOrJson(body: unknown, { contentType }: MediaTypeContext): Request
   return JSON.stringify(body, jsonReplacer)
 }
 
+/**
+ * Parses JSON text, throwing a `ParseError` that names the content type when it is not valid JSON.
+ */
+export function parseJson(text: string, contentType: string | undefined): unknown {
+  try {
+    return JSON.parse(text)
+  } catch (error) {
+    throw new ParseError({ message: `Invalid JSON in a ${baseContentType(contentType)} body`, issues: [{ message: String(error) }], cause: error })
+  }
+}
+
 const json: MediaType = {
   // A string is JSON-encoded too, so it arrives as a JSON string.
   encode: (body) => (isEncodedBody(body) && typeof body !== 'string' ? body : JSON.stringify(body, jsonReplacer)),
   decode: async (response, { contentType }) => {
     const text = await response.text()
-    if (!text) return undefined
-    try {
-      return JSON.parse(text)
-    } catch (error) {
-      // `cause` is assigned, since the constructor option needs the ES2022 library.
-      throw Object.assign(new ParseError({ message: `Invalid JSON in a ${baseContentType(contentType)} body`, issues: [{ message: String(error) }] }), {
-        cause: error,
-      })
-    }
+    return text ? parseJson(text, contentType) : undefined
   },
 }
 
@@ -127,59 +130,6 @@ const catchAll: MediaType = {
   },
 }
 
-function appendFormDataValue({ formData, key, value, contentType }: { formData: FormData; key: string; value: unknown; contentType?: string }): void {
-  if (value === undefined || value === null) return
-  if (value instanceof Blob) {
-    formData.append(key, value)
-    return
-  }
-  if (typeof value === 'object' && !(value instanceof Date)) {
-    const encoded = JSON.stringify(value, jsonReplacer)
-    // A part's media type can only be set by wrapping the value in a typed Blob.
-    formData.append(key, contentType ? new Blob([encoded], { type: contentType }) : encoded)
-    return
-  }
-  formData.append(key, toValue(value))
-}
-
-const formDelimiters: Partial<Record<string, string>> = { spaceDelimited: ' ', pipeDelimited: '|' }
-
-function toFormData(body: Record<string, unknown>, encoding: Record<string, BodyEncoding> | undefined): FormData {
-  const formData = new FormData()
-  for (const [key, value] of Object.entries(body)) {
-    const { contentType, style, explode } = encoding?.[key] ?? {}
-    // `explode: false` sends an array of scalars as one part, its items joined by the style's delimiter.
-    if (Array.isArray(value) && explode === false && value.every((item) => typeof item !== 'object' || item === null || item instanceof Date)) {
-      const delimiter = formDelimiters[style ?? 'form'] ?? ','
-      formData.append(
-        key,
-        value
-          .filter((item) => item !== undefined && item !== null)
-          .map(toValue)
-          .join(delimiter),
-      )
-      continue
-    }
-    for (const item of Array.isArray(value) ? value : [value]) appendFormDataValue({ formData, key, value: item, contentType })
-  }
-  return formData
-}
-
-const multipart: MediaType = {
-  encode: (body, { config }) => (isEncodedBody(body) ? body : toFormData(body as Record<string, unknown>, config.styles?.body)),
-  decode: (response) => response.formData(),
-}
-
-const urlencoded: MediaType = {
-  encode: (body, { config }) => {
-    if (isEncodedBody(body)) return body
-    const encoding = config.styles?.body
-    const encoded = serializeUrlencodedBody(body as Record<string, unknown>, encoding ?? {})
-    return encoding ? encoded : new URLSearchParams(encoded)
-  },
-  decode: (response) => response.formData(),
-}
-
 /**
  * The media types every client knows: JSON, text, binary, and a catch-all that sends JSON and reads JSON or text.
  */
@@ -194,12 +144,4 @@ export const defaultMediaTypes: MediaTypes = {
   'audio/*': binary,
   'video/*': binary,
   '*/*': catchAll,
-}
-
-/**
- * The `multipart/form-data` and `application/x-www-form-urlencoded` handlers, which follow `config.styles.body`.
- */
-export const formMediaTypes: MediaTypes = {
-  'multipart/form-data': multipart,
-  'application/x-www-form-urlencoded': urlencoded,
 }

@@ -24,6 +24,23 @@ export type LoginUserStatus200 = LoginUserStatus200Xml | LoginUserStatus200Json
 
 export type LoginUserStatus400 = unknown
 
+export type LoginUserStatus200Headers = {
+  /**
+   * @description calls per hour allowed by the user
+   *
+   * Format: `int32`
+   * @type integer | undefined
+   */
+  'X-Rate-Limit'?: number
+  /**
+   * @description date in UTC when token expires
+   *
+   * Format: `date-time`
+   * @type string | undefined
+   */
+  'X-Expires-After'?: string
+}
+
 export type LoginUserOptions = {
   body?: never
   path?: never

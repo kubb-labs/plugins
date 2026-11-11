@@ -1,3 +1,4 @@
+import { singleQuote } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 import { Const, File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
@@ -38,9 +39,9 @@ type Props = {
     zod: {
       pathParams: Array<ZodParam>
       /**
-       * Query params — individual schemas to compose into `z.object({ ... })`.
+       * Query params — individual schemas to compose into `z.object({ ... })`, or the name of the grouped query schema.
        */
-      queryParams?: Array<ZodParam> | null
+      queryParams?: Array<ZodParam> | string | null
       /**
        * Header params — individual schemas to compose into `z.object({ ... })`.
        */
@@ -67,7 +68,7 @@ export function Server({ serverName, serverVersion, operations }: Props): KubbRe
       }
 
       if (zod.queryParams) {
-        entries.push({ key: 'query', value: zodObject(zod.queryParams) })
+        entries.push({ key: 'query', value: typeof zod.queryParams === 'string' ? zod.queryParams : zodObject(zod.queryParams) })
       }
 
       if (zod.headerParams) {
@@ -121,8 +122,8 @@ server.registerTool(${JSON.stringify(tool.name)}, {
       <File.Source name="getServer" isExportable isIndexable>
         <Function name="getServer" export>
           {`const server = new McpServer({
-  name: '${serverName}',
-  version: '${serverVersion}',
+  name: ${singleQuote(serverName)},
+  version: ${singleQuote(serverVersion)},
 })
 ${registrations}
 return server`}

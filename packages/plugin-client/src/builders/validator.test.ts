@@ -41,9 +41,8 @@ const putEvent = ast.factory.createOperation({
   responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'ok' })],
 })
 
-// The AST type has no range keys, but the adapter passes keys such as `5XX` through as is.
-function toResponse(statusCode: string) {
-  return ast.factory.createResponse({ statusCode: statusCode as ast.StatusCode, schema: ast.factory.createSchema({ type: 'object', properties: [] }) })
+function toResponse(statusCode: ast.StatusCode) {
+  return ast.factory.createResponse({ statusCode, schema: ast.factory.createSchema({ type: 'object', properties: [] }) })
 }
 
 describe('buildValidatorHooks', () => {
@@ -59,14 +58,30 @@ describe('buildValidatorHooks', () => {
       ...addPetWithError,
       responses: [
         ...addPetWithError.responses,
-        toResponse('5XX'),
+        toResponse('5xx'),
+        toResponse('4xx'),
         toResponse('default'),
         ast.factory.createResponse({ statusCode: '409', description: 'no body' }),
       ],
     }
     const hooks = buildValidatorHooks({ node, validator: 'zod', zodResolver: resolverZod })
-    expect(hooks.error).toBe("{ 422: addPetStatus422Schema, '5XX': addPetStatus5XXSchema, 'default': addPetStatusDefaultSchema }")
-    expect(hooks.importedZodNames).toStrictEqual(['addPetResponseSchema', 'addPetStatus422Schema', 'addPetStatus5XXSchema', 'addPetStatusDefaultSchema'])
+    expect(hooks.error).toBe("{ 422: addPetStatus422Schema, '5xx': addPetStatus5xxSchema, '4xx': addPetStatus4xxSchema, 'default': addPetStatusDefaultSchema }")
+    expect(hooks.importedZodNames).toStrictEqual([
+      'addPetResponseSchema',
+      'addPetStatus422Schema',
+      'addPetStatus5xxSchema',
+      'addPetStatus4xxSchema',
+      'addPetStatusDefaultSchema',
+    ])
+  })
+
+  test('wires no response validator for an operation without a response body schema, since plugin-zod emits none', () => {
+    const bodiless = [ast.factory.createResponse({ statusCode: '204', description: 'no body' })]
+    for (const responses of [[], bodiless]) {
+      const hooks = buildValidatorHooks({ node: { ...addPet, responses }, validator: 'zod', zodResolver: resolverZod })
+      expect(hooks.response).toBeNull()
+      expect(hooks.importedZodNames).toStrictEqual([])
+    }
   })
 
   test('the object form wires the request validator from the body schema', () => {

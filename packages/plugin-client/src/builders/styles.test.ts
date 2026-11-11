@@ -24,6 +24,14 @@ describe('buildStyles', () => {
     expect(buildStyles({ node })).toBe('{ header: { "X-Ids": { explode: true } }, cookie: { session_id: { explode: false } } }')
   })
 
+  test('emits the OpenAPI 3.2 cookie style for cookie parameters', () => {
+    const node = createOperation([
+      { name: 'sid', in: 'cookie', schema: stringSchema(), style: 'cookie' },
+      { name: 'theme', in: 'cookie', schema: stringSchema(), style: 'form' },
+    ])
+    expect(buildStyles({ node })).toBe("{ cookie: { sid: { style: 'cookie' } } }")
+  })
+
   test('emits allowReserved for query parameters only', () => {
     const node = createOperation([
       { name: 'path', in: 'query', schema: stringSchema(), allowReserved: true },

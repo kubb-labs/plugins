@@ -47,6 +47,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
           tsResolver={tsResolver}
           clientReturnType={contractOp.returnType}
           returnType={hook.returnType}
+          typedHeaders={hook.contractOp.typedHeaders}
         />
 
         {query && (
@@ -61,6 +62,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
               node={node}
               tsResolver={tsResolver}
               returnType={hook.returnType}
+              typedHeaders={hook.contractOp.typedHeaders}
             />
           </>
         )}

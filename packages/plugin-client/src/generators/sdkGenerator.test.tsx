@@ -1,5 +1,5 @@
 import { createGroupConfig } from '@internals/shared'
-import type { Adapter, Config, PluginType } from '@kubb/kit'
+import type { Config, PluginType } from '@kubb/kit'
 import { ast, Diagnostics, memoryStorage } from '@kubb/kit'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
@@ -110,14 +110,27 @@ describe('sdkGenerator operations', () => {
     {
       name: 'sdkClassWithOperationServer',
       options: {},
-      adapter: {
-        ...createMockedAdapter(),
-        document: {
-          paths: { '/store/inventory': { servers: [{ url: 'https://store.example.com' }], get: { servers: [{ url: 'https://inventory.example.com' }] } } },
-        },
-      } as Adapter,
+      nodes: operationNodes.map((node) => (node.path === '/store/inventory' ? { ...node, servers: [{ url: 'https://inventory.example.com' }] } : node)),
     },
-  ] as const satisfies Array<{ name: string; options: Partial<PluginFetch['resolvedOptions']>; adapter?: Adapter }>
+    // One method with declared response headers next to methods without: the class imports both result types.
+    {
+      name: 'sdkClassWithResponseHeaders',
+      options: {},
+      nodes: operationNodes.map((node) =>
+        node.operationId === 'deletePet'
+          ? {
+              ...node,
+              responses: node.responses.map((response) => ({
+                ...response,
+                headers: [
+                  ast.factory.createParameter({ name: 'X-Request-Id', in: 'header', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+                ],
+              })),
+            }
+          : node,
+      ),
+    },
+  ] as const satisfies Array<{ name: string; options: Partial<PluginFetch['resolvedOptions']>; nodes?: Array<ast.OperationNode> }>
 
   test.each(testData)('$name', async (props) => {
     const options: PluginFetch['resolvedOptions'] = { ...defaultOptions, ...props.options }
@@ -127,9 +140,9 @@ describe('sdkGenerator operations', () => {
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorOperations(createSdkGenerator<PluginFetch>(), operationNodes, {
+    await renderGeneratorOperations(createSdkGenerator<PluginFetch>(), 'nodes' in props ? props.nodes : operationNodes, {
       config: testConfig,
-      adapter: 'adapter' in props ? props.adapter : createMockedAdapter(),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,

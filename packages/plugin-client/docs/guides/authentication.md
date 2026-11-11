@@ -19,6 +19,12 @@ Each entry is one security requirement, and meeting one is enough. A requirement
 
 An operation without security requirements passes no `security` field. Use that to skip auth on public endpoints.
 
+An `oauth2` entry carries its `flows` with their URLs, and its `metadataUrl` when the spec sets `oauth2MetadataUrl`. An `openIdConnect` entry carries its discovery `url`. Your client can use them to run the flow, such as the OpenAPI 3.2 `deviceAuthorization` flow, and then send the token as a bearer token:
+
+```typescript
+security: [{ type: 'oauth2', flows: { deviceAuthorization: { deviceAuthorizationUrl: 'https://auth.example.com/device', tokenUrl: 'https://auth.example.com/token' } }, scopes: ['read'] }]
+```
+
 ## Add a bearer token from an async source
 
 The client can `await` anything before it sends the request. The client below awaits a token function you register with `setAuth`, so the token can come from a secrets store or a refresh call:

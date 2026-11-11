@@ -39,6 +39,7 @@
     "src",
     "dist",
     "templates",
+    "!templates/config.ts",
     "!templates/core.ts",
     "!templates/serializers.ts",
     "!templates/standardSchema.ts",
@@ -88,7 +89,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kubb/kit": "^5.18.2",
+    "@kubb/kit": "^5.18.4",
     "@kubb/plugin-client": "workspace:^"
   },
   "devDependencies": {

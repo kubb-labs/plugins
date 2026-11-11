@@ -11,7 +11,7 @@ export type StandardSchemaResult<TOutput> = { readonly value: TOutput; readonly 
 
 export type StandardSchemaIssue = {
   readonly message?: string
-  readonly path?: ReadonlyArray<PropertyKey | { readonly key: PropertyKey }>
+  readonly path?: ReadonlyArray<PropertyKey | { readonly key: PropertyKey }> | undefined
 }
 
 /**
@@ -19,11 +19,14 @@ export type StandardSchemaIssue = {
  */
 export class ParseError extends Error {
   readonly issues: ReadonlyArray<StandardSchemaIssue>
+  // Declared here and set below, since the `cause` constructor option needs the ES2022 library.
+  declare readonly cause?: unknown
 
-  constructor({ issues, message }: { issues: ReadonlyArray<StandardSchemaIssue>; message?: string }) {
+  constructor({ issues, message, cause }: { issues: ReadonlyArray<StandardSchemaIssue>; message?: string; cause?: unknown }) {
     super(message ?? 'Validation failed')
     this.name = 'ParseError'
     this.issues = issues
+    if (cause !== undefined) this.cause = cause
   }
 }
 
@@ -95,9 +98,9 @@ export type ValidationErrorContext = {
   value: unknown
   direction: 'request' | 'response' | 'error'
   source: 'body' | 'path' | 'query' | 'headers' | 'cookies'
-  method?: string
-  url?: string
-  status?: number
+  method?: string | undefined
+  url?: string | undefined
+  status?: number | undefined
 }
 
 /**

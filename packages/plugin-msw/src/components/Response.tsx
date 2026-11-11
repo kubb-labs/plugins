@@ -1,7 +1,7 @@
 import type { ast } from '@kubb/kit'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx'
-import { hasResponseSchema, responseReturn } from '../utils.ts'
+import { getMockStatus, responseReturn } from '../utils.ts'
 
 type Props = {
   typeName: string
@@ -10,17 +10,16 @@ type Props = {
 }
 
 export function Response({ name, typeName, response }: Props): KubbReactNode {
-  const statusCode = Number(response.statusCode)
+  // Optional, since a handler passes on the `data` it got, which may be left out.
+  const params = `data?: ${typeName}`
 
-  const params = `data${hasResponseSchema(response) ? '' : '?'}: ${typeName}`
-
-  const responseName = `${name}Response${statusCode}`
+  const responseName = `${name}Response${response.statusCode}`
 
   return (
     <File.Source name={responseName} isIndexable isExportable>
       <Function name={responseName} export params={params}>
         {`
-    ${responseReturn('data', statusCode, response)}`}
+    ${responseReturn('data', getMockStatus(response.statusCode), response)}`}
       </Function>
     </File.Source>
   )

@@ -13,7 +13,7 @@ export function createOrderFaker<TData extends Partial<Order> = object>(data?: T
       status: createOrderParamsStatusEnumFaker(),
       type: faker.string.alpha(),
     },
-    quantity: faker.number.int(),
+    quantity: faker.number.int({ max: 2147483647 }),
     orderType: createOrderOrderTypeEnumFaker(),
     type: faker.string.alpha(),
     shipDate: faker.date.anytime().toISOString(),

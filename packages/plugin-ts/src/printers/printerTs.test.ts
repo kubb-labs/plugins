@@ -5,6 +5,12 @@ import { resolverTs } from '../resolvers/resolverTs.ts'
 import { print, type TsNode } from '../factory.ts'
 import { loadParserTs, printerTs } from './printerTs.ts'
 
+function moduleNotFound(message: string): NodeJS.ErrnoException {
+  const error: NodeJS.ErrnoException = new Error(message)
+  error.code = 'MODULE_NOT_FOUND'
+  return error
+}
+
 const inlineLiteralEnum = { type: 'inlineLiteral', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
 const enumEnum = { type: 'enum', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
 const asConstEnum = { type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
@@ -46,6 +52,20 @@ describe('printerTs', () => {
     ['blob', 'Blob'],
   ] as const)('scalar type %s', async (type, expected) => {
     expect(await formatTS(printer.transform(ast.factory.createSchema({ type })))).toBe(expected)
+  })
+
+  it('keeps nullable set on an array item or a union member', async () => {
+    const nullableString = ast.factory.createSchema({ type: 'string', nullable: true })
+    const array = ast.factory.createSchema({ type: 'array', items: [nullableString] })
+    const union = ast.factory.createSchema({ type: 'union', members: [ast.factory.createSchema({ type: 'integer' }), nullableString] })
+
+    expect(await formatTS(printer.transform(array))).toBe('(string | null)[]')
+    expect(await formatTS(printer.transform(union))).toBe('number | (string | null)')
+    const literalOrString = ast.factory.createSchema({
+      type: 'union',
+      members: [ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['a'] }), nullableString],
+    })
+    expect(await formatTS(printer.transform(literalOrString))).toContain('(string & {}) | null')
   })
 
   describe('date / time', () => {
@@ -962,7 +982,7 @@ describe('loadParserTs', () => {
   })
 
   it('throws a missing-dependency diagnostic with install help when @kubb/parser-ts is not installed', () => {
-    const notFound = Object.assign(new Error("Cannot find module '@kubb/parser-ts'"), { code: 'MODULE_NOT_FOUND' })
+    const notFound = moduleNotFound("Cannot find module '@kubb/parser-ts'")
     const load = () => {
       throw notFound
     }
@@ -976,9 +996,7 @@ describe('loadParserTs', () => {
   })
 
   it('throws the missing-dependency diagnostic for the Yarn PnP missing-peer error', () => {
-    const missingPeer = Object.assign(new Error("@kubb/plugin-ts tried to access @kubb/parser-ts (a peer dependency) but it isn't provided by its ancestors"), {
-      code: 'MODULE_NOT_FOUND',
-    })
+    const missingPeer = moduleNotFound("@kubb/plugin-ts tried to access @kubb/parser-ts (a peer dependency) but it isn't provided by its ancestors")
 
     expect(() =>
       loadParserTs(() => {
@@ -988,9 +1006,7 @@ describe('loadParserTs', () => {
   })
 
   it('rethrows a missing module inside @kubb/parser-ts', () => {
-    const nested = Object.assign(new Error("Cannot find module 'typescript'\nRequire stack:\n- /node_modules/@kubb/parser-ts/dist/index.cjs"), {
-      code: 'MODULE_NOT_FOUND',
-    })
+    const nested = moduleNotFound("Cannot find module 'typescript'\nRequire stack:\n- /node_modules/@kubb/parser-ts/dist/index.cjs")
 
     expect(() =>
       loadParserTs(() => {

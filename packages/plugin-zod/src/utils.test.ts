@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest'
 import {
   applyMiniModifiers,
   applyModifiers,
+  containsIdentifier,
   defaultLiteral,
   formatDefault,
   isClosedKeySchema,
@@ -39,6 +40,10 @@ describe('formatDefault', () => {
 describe('defaultLiteral', () => {
   test('a null default is dropped so no bare .default() is emitted', () => {
     expect(defaultLiteral(ast.factory.createSchema({ type: 'object', primitive: 'object' }), null)).toBeNull()
+  })
+
+  test('a default on a binary schema is dropped, since a Blob has no literal', () => {
+    expect(defaultLiteral(ast.factory.createSchema({ type: 'blob' }), 'data:text/plain;base64,dGVzdDE=')).toBeNull()
   })
 
   test('a string default on a numeric enum is coerced to the matching member literal', () => {
@@ -102,7 +107,7 @@ describe('numberConstraints', () => {
   })
 
   test('all constraints combined', () => {
-    expect(numberConstraints({ min: 1, max: 99, exclusiveMinimum: 0, exclusiveMaximum: 100 })).toBe('.min(1).max(99).gt(0).lt(100)')
+    expect(numberConstraints({ min: 1, max: 99, exclusive: { min: 0, max: 100 } })).toBe('.min(1).max(99).gt(0).lt(100)')
   })
 })
 
@@ -122,9 +127,7 @@ describe('numberChecksMini', () => {
   })
 
   test('all constraints combined', () => {
-    expect(numberChecksMini({ min: 1, max: 99, exclusiveMinimum: 0, exclusiveMaximum: 100 })).toBe(
-      '.check(z.minimum(1), z.maximum(99), z.minimum(0, { exclusive: true }), z.maximum(100, { exclusive: true }))',
-    )
+    expect(numberChecksMini({ min: 1, max: 99, exclusive: { min: 0, max: 100 } })).toBe('.check(z.minimum(1), z.maximum(99), z.gt(0), z.lt(100))')
   })
 })
 
@@ -446,5 +449,15 @@ describe('isClosedKeySchema', () => {
       schema: ast.factory.createSchema({ type: 'string' }),
     })
     expect(isClosedKeySchema(refToString)).toBe(false)
+  })
+})
+
+describe('containsIdentifier', () => {
+  test('matches a whole identifier only', () => {
+    expect(containsIdentifier('z.array(petSchemaList)', 'petSchema')).toBe(false)
+    expect(containsIdentifier('z.array(petSchemaList).and(petSchema)', 'petSchema')).toBe(true)
+    expect(containsIdentifier('petSchema', 'petSchema')).toBe(true)
+    expect(containsIdentifier('$petSchema', 'petSchema')).toBe(false)
+    expect(containsIdentifier('anything', '')).toBe(false)
   })
 })

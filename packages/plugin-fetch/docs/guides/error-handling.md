@@ -39,7 +39,7 @@ Each generated package bundles its own `ResponseError` class, so narrow with `Re
 
 ## Narrow a thrown error by status
 
-`isResponseError<Responses>(error)` narrows a caught error to the `ResponseError` of one operation. Checking `status` then narrows `data` to the body declared for that status. A range key such as `4XX` covers its statuses that have no entry of their own, and `default` covers the rest:
+`isResponseError<Responses>(error)` narrows a caught error to the `ResponseError` of one operation. Checking `status` then narrows `data` to the body declared for that status. A range key such as `4xx` covers its statuses that have no entry of their own, and `default` covers the rest:
 
 ```typescript
 import { isResponseError } from './gen/.kubb/client'
@@ -55,6 +55,8 @@ try {
 ```
 
 The type argument is not checked at runtime, so keep the `try` around one operation.
+
+The error also carries the response's `Headers` as `error.headers`, so `error.headers.get('Retry-After')` reads the same on every transport.
 
 ## Return the error instead
 
@@ -133,7 +135,7 @@ try {
 }
 ```
 
-A `ParseError` reports schema validation issues. A `ResponseError` reports a non-2xx status. With `throwOnError: false`, the error body is checked against the schema of its status, then of its range such as `5XX`, then of `default`. A status the document leaves out, such as a `502` from a gateway, resolves with the body unchecked.
+A `ParseError` reports schema validation issues. A `ResponseError` reports a non-2xx status. With `throwOnError: false`, the error body is checked against the schema of its status, then of its range such as `5xx`, then of `default`. A status the document leaves out, such as a `502` from a gateway, resolves with the body unchecked.
 
 Calling `.unwrap()` on a `throwOnError: false` call turns that same `error` into a rejection, so a
 `try`/`catch` works there too.

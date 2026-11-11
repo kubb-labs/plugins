@@ -55,7 +55,7 @@ const validatedBody = result && 'value' in result ? result.value : body
 
 Return `validatedBody` as `data`, so a schema that transforms the value takes effect. Without a response schema, `validatedBody` is the original `body`.
 
-`error` is keyed by status, such as `{ 404: schema, '5XX': schema, default: schema }`. Pick the exact status, then its range, then `default`, and skip validation when none matches.
+`error` is keyed by status, such as `{ 404: schema, '5xx': schema, default: schema }`. Pick the exact status, then its range, then `default`, and skip validation when none matches.
 
 Set `validator: { request: 'zod' }` or `{ response: 'zod' }` to pass one direction only. Without `pluginZod()` in the plugins list, generation stops with an error.
 

@@ -19,9 +19,72 @@ describe('printerZod', () => {
     expect(printer.print(ast.factory.createSchema({ type }))).toBe(expected)
   })
 
+  test('keeps nullable set on an array item or a union member', () => {
+    const nullableString = ast.factory.createSchema({ type: 'string', nullable: true })
+    const array = ast.factory.createSchema({ type: 'array', items: [nullableString] })
+    const union = ast.factory.createSchema({ type: 'union', members: [ast.factory.createSchema({ type: 'integer' }), nullableString] })
+
+    expect(printer.print(array)).toBe('z.array(z.string().nullable())')
+    expect(printer.print(union)).toBe('z.union([z.int(), z.string().nullable()])')
+  })
+
+  test('tuple with rest items', () => {
+    const node = ast.factory.createSchema({
+      type: 'tuple',
+      items: [ast.factory.createSchema({ type: 'string' })],
+      rest: ast.factory.createSchema({ type: 'number' }),
+    })
+
+    expect(printer.print(node)).toBe('z.tuple([z.string()], z.number())')
+  })
+
+  test('keeps a null example', () => {
+    expect(printer.print(ast.factory.createSchema({ type: 'string', examples: ['foo', null] }))).toBe("z.string().meta({ examples: ['foo', null] })")
+  })
+
   describe('string', () => {
     test('basic string', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'string' }))).toBe('z.string()')
+    })
+
+    const jsonContent = ast.factory.createSchema({
+      type: 'string',
+      content: {
+        mediaType: 'application/json; charset=utf-8',
+        schema: ast.factory.createSchema({
+          type: 'object',
+          properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+        }),
+      },
+    })
+
+    test('string with a JSON contentSchema checks the parsed document', () => {
+      const code = printer.print(jsonContent)!
+      const schema = new Function('z', `return ${code}`)(z) as z.ZodType
+
+      expect(code).toMatchInlineSnapshot(`
+        "z.string().refine((value) => { try { return z.object({
+          id: z.int(),
+        }).safeParse(JSON.parse(value)).success } catch { return false } }, { message: "String must hold JSON that matches its content schema" })"
+      `)
+      expect(schema.parse('{"id":1}')).toBe('{"id":1}')
+      expect(schema.safeParse('{"id":"1"}').success).toBe(false)
+      expect(schema.safeParse('not json').success).toBe(false)
+    })
+
+    test('string with contentEncoding uses the base64 constructors', () => {
+      expect(printer.print(ast.factory.createSchema({ type: 'string', max: 8, content: { encoding: 'base64' } }))).toBe('z.base64().max(8)')
+      expect(printer.print(ast.factory.createSchema({ type: 'string', content: { encoding: 'base64url' } }))).toBe('z.base64url()')
+      expect(printer.print(ast.factory.createSchema({ type: 'string', content: { encoding: 'quoted-printable' } }))).toBe('z.string()')
+    })
+
+    test('an encoded or non-JSON document is not parsed', () => {
+      const schema = ast.factory.createSchema({ type: 'integer' })
+
+      expect(printer.print(ast.factory.createSchema({ type: 'string', content: { mediaType: 'application/json', encoding: 'base64', schema } }))).toBe(
+        'z.base64()',
+      )
+      expect(printer.print(ast.factory.createSchema({ type: 'string', content: { mediaType: 'text/html', schema } }))).toBe('z.string()')
     })
 
     test('string with coercion', () => {
@@ -194,6 +257,21 @@ describe('printerZod', () => {
   describe('bigint', () => {
     test('basic bigint coerces, since JSON.parse yields a number', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'bigint' }))).toBe('z.coerce.bigint()')
+    })
+
+    test('bigint keeps its bounds as bigint literals', () => {
+      const output = printer.print(ast.factory.createSchema({ type: 'bigint', max: 10, exclusive: { min: 0 } }))
+
+      expect(output).toBe('z.coerce.bigint().max(10n).gt(0n)')
+      const schema = new Function('z', `return ${output}`)(z) as z.ZodType
+      expect(schema.safeParse(5).success).toBe(true)
+      expect(schema.safeParse(0).success).toBe(false)
+      // A fractional bound rounds inward, so it never loosens the check.
+      expect(printer.print(ast.factory.createSchema({ type: 'bigint', min: 0.5, max: 10.5, exclusive: { min: 1.5 } }))).toBe(
+        'z.coerce.bigint().min(2n).max(10n)',
+      )
+      // A bound past the safe integer range would print as `1e+21n` or a rounded literal.
+      expect(printer.print(ast.factory.createSchema({ type: 'bigint', min: 0, max: 2 ** 63, exclusive: { max: 1e21 } }))).toBe('z.coerce.bigint().min(0n)')
     })
   })
 
@@ -747,6 +825,29 @@ describe('printerZod', () => {
   })
 
   describe('intersection', () => {
+    test('keeps the discriminator literal of a oneOf base over a sibling string property', () => {
+      const typeProperty = (schema: ast.SchemaNode) => ast.factory.createProperty({ name: 'type', required: true, schema })
+      const dog = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [
+          typeProperty(ast.factory.createSchema({ type: 'enum', enumValues: ['dog'] })),
+          ast.factory.createProperty({ name: 'bark', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ],
+      })
+      const node = ast.factory.createSchema({
+        type: 'intersection',
+        members: [
+          ast.factory.createSchema({ type: 'union', strategy: 'one', discriminatorPropertyName: 'type', members: [dog] }),
+          ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [typeProperty(ast.factory.createSchema({ type: 'string' }))] }),
+        ],
+      })
+      const schema = new Function('z', `return ${printer.print(node)}`)(z) as z.ZodType
+
+      expect(schema.safeParse({ type: 'dog' }).success).toBe(true)
+      expect(schema.safeParse({ type: 'cat' }).success).toBe(false)
+    })
+
     test('ref with string min and max constraints', () => {
       const node = ast.factory.createSchema({
         type: 'intersection',
@@ -883,16 +984,23 @@ describe('printerZod', () => {
         expect(xorPrinter.print(node)).toBe('z.xor([EmailContact, PhoneContact])')
       })
 
-      test('keeps z.discriminatedUnion with strict members for a discriminated oneOf', () => {
-        const node = ast.factory.createSchema({
-          type: 'union',
-          strategy: 'one',
-          discriminatorPropertyName: 'email',
-          members: [contactBy('email'), contactBy('phone')],
-        })
-        const code = xorPrinter.print(node)
+      test.each([
+        ['union', printer],
+        ['xor', xorPrinter],
+      ])('keeps z.discriminatedUnion with open members for a discriminated oneOf (%s)', (_, p) => {
+        const event = (name: string) =>
+          ast.factory.createSchema({
+            type: 'object',
+            primitive: 'object',
+            properties: [ast.factory.createProperty({ name: 'event', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: [name] }) })],
+          })
+        const node = ast.factory.createSchema({ type: 'union', strategy: 'one', discriminatorPropertyName: 'event', members: [event('ping'), event('done')] })
+        const code = p.print(node)
 
-        expect(code).toMatch(/^z\.discriminatedUnion\('email', \[\s+z\.strictObject\(/)
+        expect(code).toMatch(/^z\.discriminatedUnion\('event', \[\s+z\.object\(/)
+        // An SSE line such as `id: 1` is an extra key the spec allows.
+        expect(load(code).safeParse({ event: 'ping', id: '1' }).success).toBe(true)
+        expect(load(code).safeParse({ event: 'other' }).success).toBe(false)
       })
 
       test('keeps z.union for anyOf', () => {
@@ -990,6 +1098,28 @@ describe('printerZod', () => {
         ],
       })
       expect(printer.print(node)).toBe('z.union([TypeA.strict(), TypeB.strict()])')
+    })
+
+    test('oneOf union keeps a ref with property counts strict inside its pipe', () => {
+      const node = ast.factory.createSchema({
+        type: 'union',
+        strategy: 'one',
+        members: [
+          ast.factory.createSchema({
+            type: 'ref',
+            name: 'TypeA',
+            ref: '#/components/schemas/TypeA',
+            schema: ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], min: 1 }),
+          }),
+          ast.factory.createSchema({
+            type: 'ref',
+            name: 'TypeB',
+            ref: '#/components/schemas/TypeB',
+            schema: ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [] }),
+          }),
+        ],
+      })
+      expect(printer.print(node)).toBe('z.union([z.pipe(TypeA.in, TypeA.out.strict()), TypeB.strict()])')
     })
 
     test('single member union', () => {

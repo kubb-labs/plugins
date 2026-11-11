@@ -278,20 +278,24 @@ createPetsHandler(async ({ request }) => {
   })
 })
 
-describe('mswGenerator QUERY handler', () => {
-  // MSW has no `http.query`, so the handler is registered with `http.all` and answers QUERY only.
+describe.each([
+  ['QUERY', searchPetsNode],
+  ['SUBSCRIBE', { ...searchPetsNode, operationId: 'subscribePets', method: 'SUBSCRIBE' }],
+] as const)('mswGenerator %s handler', (operationMethod, node) => {
+  // MSW has no `http.query` and no helper for a custom `additionalOperations` method, so the handler is registered with
+  // `http.all` and answers its own method only.
   async function getResponse(method: string) {
-    const files = await renderOperation({ name: 'searchPets', node: searchPetsNode, options: {} })
+    const files = await renderOperation({ name: node.operationId, node, options: {} })
     const [source] = rawSources(files)
     const handlers = await importGenerated(source!)
 
-    return msw.getResponse([handlers.searchPetsHandler([{ id: 1 }])], new Request('http://localhost/pets/search', { method, body: '{}' }), {
+    return msw.getResponse([handlers[`${node.operationId}Handler`]([{ id: 1 }])], new Request('http://localhost/pets/search', { method, body: '{}' }), {
       baseUrl: 'http://localhost',
     })
   }
 
-  test('answers a QUERY request', async () => {
-    const response = await getResponse('QUERY')
+  test('answers a request with its method', async () => {
+    const response = await getResponse(operationMethod)
 
     expect(await response?.json()).toEqual([{ id: 1 }])
   })
@@ -321,6 +325,76 @@ describe('mswGenerator faker fallback', () => {
 
   test.each([null])('falls back to Faker data when data is %s', async (data) => {
     expect(await getResponseBody(data)).toEqual(fakerData)
+  })
+})
+
+describe('mswGenerator body encoding', () => {
+  const operation = (operationId: string, contentType: string) =>
+    ast.factory.createOperation({
+      operationId,
+      method: 'GET',
+      // A path of its own: the resolver names a handler by its method and path.
+      path: `/${operationId}`,
+      tags: ['pets'],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          description: 'A pet',
+          content: [ast.factory.createContent({ contentType, schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+        }),
+      ],
+    })
+
+  async function getBody(node: ast.OperationNode, data: unknown) {
+    const files = await renderOperation({ name: node.operationId, node, options: {} })
+    const handlers = await importGenerated(rawSources(files)[0]!)
+    const response = await msw.getResponse([handlers[`${node.operationId}Handler`](data)], new Request(`http://localhost/${node.operationId}`), {
+      baseUrl: 'http://localhost',
+    })
+
+    return response?.text()
+  }
+
+  test('frames an event-stream mock as one data event, and sends nothing without data', async () => {
+    expect(await getBody(operation('streamPet', 'text/event-stream'), { id: 1 })).toBe('data: {"id":1}\n\n')
+    // A string goes out unquoted, one `data:` line per line, since the client keeps string data as text.
+    expect(await getBody(operation('streamText', 'text/event-stream'), 'a\nb')).toBe('data: a\ndata: b\n\n')
+    expect(await getBody(operation('streamNoPet', 'text/event-stream'), undefined)).toBe('')
+  })
+
+  const eventOperation = (operationId: string, examples?: Array<ast.ExampleNode>) =>
+    ast.factory.createOperation({
+      operationId,
+      method: 'GET',
+      path: `/${operationId}`,
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          content: [
+            ast.factory.createContent({
+              contentType: 'text/event-stream',
+              schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+              stream: { shape: 'event' },
+              examples,
+            }),
+          ],
+        }),
+      ],
+    })
+
+  test('writes an event-shaped item as its event, id, retry, and data lines', async () => {
+    const node = eventOperation('streamEvent')
+
+    expect(await getBody(node, { event: 'ping', id: '7', retry: 1000, data: { id: 1 } })).toBe('event: ping\nid: 7\nretry: 1000\ndata: {"id":1}\n\n')
+    expect(await getBody(eventOperation('streamTextEvent'), { event: 'ping', data: 'a\nb' })).toBe('event: ping\ndata: a\ndata: b\n\n')
+    // Without a `data` line the client would drop the event.
+    expect(await getBody(eventOperation('streamPingEvent'), { event: 'ping' })).toBe('event: ping\ndata:\n\n')
+  })
+
+  test('sends a serialized SSE example as it is when there is no body', async () => {
+    const node = eventOperation('streamExample', [{ serializedValue: 'event: ping\ndata: hi\n\n' }])
+
+    expect(await getBody(node, undefined)).toBe('event: ping\ndata: hi\n\n')
   })
 })
 
@@ -361,5 +435,26 @@ describe('mswGenerator text response', () => {
 
     expect(response?.headers.get('Content-Type')).toBe('application/json')
     expect(await response?.json()).toEqual({ id: 1 })
+  })
+})
+
+describe('mswGenerator ranged statuses', () => {
+  // A range such as `4xx` gets its own helper, which answers with the first code of its class.
+  test('generates a helper per range that responds with its first code', async () => {
+    const node = ast.factory.createOperation({
+      operationId: 'getRanged',
+      method: 'GET',
+      path: '/ranged',
+      responses: (['1xx', '2xx', '4xx'] as const).map((statusCode) =>
+        ast.factory.createResponse({ statusCode, schema: ast.factory.createSchema({ type: 'object', properties: [] }) }),
+      ),
+    })
+    const files = await renderOperation({ name: 'getRanged', node, options: {} })
+    const handlers = await importGenerated(rawSources(files)[0]!)
+
+    expect(handlers.getRangedHandlerResponse4xx({ id: 1 }).status).toBe(400)
+    expect(handlers.getRangedHandlerResponse2xx({ id: 1 }).status).toBe(200)
+    // `new Response()` throws on a `1xx` status, so that range gets no helper.
+    expect(handlers.getRangedHandlerResponse1xx).toBeUndefined()
   })
 })

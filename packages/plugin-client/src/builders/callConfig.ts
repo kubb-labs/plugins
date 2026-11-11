@@ -1,4 +1,5 @@
-import { getEventStream, getPrimarySuccessResponse } from '@internals/shared'
+import { getEventStream, getPrimarySuccessResponse, hasTextEventData } from '@internals/shared'
+import { singleQuote, toLiteral } from '@internals/utils'
 import type { ast } from '@kubb/kit'
 import type { ReturnTypeOption } from '../types.ts'
 import { buildContentType } from './contentType.ts'
@@ -23,7 +24,8 @@ function buildParseAsLiteral(node: ast.HttpOperationNode): string | null {
  *
  * `mergeContentType` is `true` when the caller must destructure `contentType` from `options`, and
  * `eventStream` is `true` when the operation streams `text/event-stream` or JSON Lines. A Server-Sent Events call
- * carries its `eventShape`, which tells the runtime what the `response` validator checks on each event.
+ * carries its `eventShape`, which tells the runtime what the `response` validator checks on each event, and `rawData` when
+ * the document types each event's `data` as a string, so the runtime keeps it as text.
  */
 export function buildCallConfig({
   node,
@@ -54,15 +56,17 @@ export function buildCallConfig({
     ? `throwOnError: resolveThrowOnError(config.throwOnError, ${throwOnErrorDefault})`
     : `throwOnError: config.throwOnError ?? ${throwOnErrorDefault}`
 
+  const rawData = hasTextEventData(node)
   const callConfig = `{ ${[
-    `method: '${node.method.toUpperCase()}'`,
-    `url: '${node.path}'`,
+    `method: ${singleQuote(node.method.toUpperCase())}`,
+    `url: ${singleQuote(node.path)}`,
     baseURL ? `baseURL: ${JSON.stringify(baseURL)}` : null,
     securityLiteral ? `security: ${securityLiteral}` : null,
     ownRuntime ? null : styles,
     contentTypeLiteral,
     buildParseAsLiteral(node),
     stream === 'event' || stream === 'data' ? `eventShape: '${stream}'` : null,
+    rawData ? `rawData: ${toLiteral(rawData)}` : null,
     '...config',
     ownRuntime ? styles : null,
     validatorLiteral,

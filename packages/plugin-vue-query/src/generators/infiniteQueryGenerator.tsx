@@ -114,6 +114,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           queryParam={infiniteOptions.queryParam}
           clientReturnType={contractOp.returnType}
           returnType={hook.returnType}
+          typedHeaders={hook.contractOp.typedHeaders}
           queryKeyType="QueryKey"
           memberTypeWrapper={maybeRefOrGetter}
           unwrapName={(name) => `toValue(${name})`}
@@ -131,6 +132,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           tsResolver={tsResolver}
           infinite
           returnType={hook.returnType}
+          typedHeaders={hook.contractOp.typedHeaders}
         />
       </HookFile>
     )

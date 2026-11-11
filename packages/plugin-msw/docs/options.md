@@ -67,7 +67,7 @@ Source of the response body each handler returns.
 ::field-group
 
 :::field{name="'data'"}
-Default value. Returns the data you pass to the handler, typed with the `@kubb/plugin-ts` types. The handler uses `new HttpResponse(JSON.stringify(data), ...)`.
+Default value. Returns the data you pass to the handler, typed with the `@kubb/plugin-ts` types. The handler uses `new HttpResponse(JSON.stringify(data), ...)`. Without `data`, it sends the success response's first example from the spec, when it has one: its `value`, else its `serializedValue`, parsed for a JSON response and sent as is for a text response. Pass `null` to send a `null` body.
 :::
 
 :::field{name="'faker'"}
