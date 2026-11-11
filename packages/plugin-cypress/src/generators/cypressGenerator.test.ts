@@ -62,6 +62,7 @@ describe('cypressGenerator — baseURL', () => {
 
 describe('cypressGenerator — numeric body', () => {
   // Cypress types a request body as a string or an object, so a body that is one int64 is sent as a number and cast.
+  // A value past the safe-integer range throws.
   test('patchCounter', async () => {
     const node = ast.factory.createOperation({
       operationId: 'patchCounter',
@@ -92,7 +93,7 @@ describe('cypressGenerator — numeric body', () => {
 
 describe('cypressGenerator — cookie parameters', () => {
   // The request takes the cookies as an optional group and sends `Cookie` only when the call passes cookies. A `style: cookie`
-  // value goes out as it is, and only the array `tags` gets the explode code.
+  // value goes out as it is, and only the arrays `tags` and `ids` get the explode code. `ids` is a `form` cookie with `explode: true`.
   test('getCookies', async () => {
     const node = ast.factory.createOperation({
       operationId: 'getCookies',
@@ -107,6 +108,12 @@ describe('cypressGenerator — cookie parameters', () => {
           in: 'cookie',
           style: 'cookie',
           schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
+        }),
+        ast.factory.createParameter({
+          name: 'ids',
+          in: 'cookie',
+          explode: true,
+          schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'integer' })] }),
         }),
         ast.factory.createParameter({ name: 'x-trace', in: 'header', schema: ast.factory.createSchema({ type: 'string' }) }),
       ],

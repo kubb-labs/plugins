@@ -7,6 +7,8 @@
 import type { PatchCounterOptions, PatchCounterResponse } from './PatchCounter'
 
 export function patchCounter({ body }: PatchCounterOptions = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PatchCounterResponse> {
+  if (typeof body === 'bigint' && (body > Number.MAX_SAFE_INTEGER || body < Number.MIN_SAFE_INTEGER))
+    throw new TypeError(`Cannot send ${body}n as a JSON number without losing precision.`)
   return cy
     .request<PatchCounterResponse>({
       method: 'PATCH',

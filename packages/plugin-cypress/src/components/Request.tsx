@@ -33,7 +33,6 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
 
   // `cy.request` has no cookie option, so the cookie group goes out as a `Cookie` header. An array joins with commas, a Date
   // is ISO 8601, and an object is JSON.
-  // shortcut: ignores `explode` on `form` cookies, upgrade when a spec needs exploded form cookie arrays in Cypress.
   const cookieText =
     "value instanceof Date ? value.toISOString() : Array.isArray(value) ? value.join(',') : typeof value === 'object' ? JSON.stringify(value) : String(value)"
   // The OpenAPI 3.2 `cookie` style sends a value as it is, and throws on one it cannot send, like the generated clients do.
@@ -46,16 +45,24 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
   const isExploded = (parameter: ast.ParameterNode) => parameter.explode !== false && isComposite(parameter)
   const explodedCookies = rawParameters.filter(isExploded).map((parameter) => singleQuote(parameter.name))
   const joinedCookies = rawParameters.filter((parameter) => !isExploded(parameter)).map((parameter) => singleQuote(parameter.name))
+  // A `form` cookie explodes only when the spec sets `explode: true`, like the generated clients, and its items stay percent-encoded.
+  const explodedFormCookies = node.parameters
+    .filter((parameter) => parameter.in === 'cookie' && parameter.style !== 'cookie' && parameter.explode === true && isComposite(parameter))
+    .map((parameter) => singleQuote(parameter.name))
   const compositeLines = rawParameters.some(isComposite)
     ? `  if (Array.isArray(value)) return value.filter((item) => item != null).map(rawCookie).join(',')
   if (typeof value === 'object' && value !== null && !(value instanceof Date)) return Object.entries(value).filter(([, item]) => item != null).flat().map(rawCookie).join(',')\n`
     : ''
-  const explodeCookieLine = explodedCookies.length
-    ? `const explodeCookie = (name: string, value: unknown): Array<string> => {
-  if (Array.isArray(value)) return value.filter((item) => item != null).map((item) => \`\${name}=\${rawCookie(item)}\`)
-  if (typeof value === 'object' && value !== null && !(value instanceof Date)) return Object.entries(value).filter(([, item]) => item != null).map(([key, item]) => \`\${rawCookie(key)}=\${rawCookie(item)}\`)
-  return [\`\${name}=\${rawCookie(value)}\`]
+  const explodeCookieLine =
+    explodedCookies.length || explodedFormCookies.length
+      ? `const explodeCookie = (name: string, value: unknown, encode: (item: unknown) => string): Array<string> => {
+  if (Array.isArray(value)) return value.filter((item) => item != null).map((item) => \`\${name}=\${encode(item)}\`)
+  if (typeof value === 'object' && value !== null && !(value instanceof Date)) return Object.entries(value).filter(([, item]) => item != null).map(([key, item]) => \`\${encode(key)}=\${encode(item)}\`)
+  return [\`\${name}=\${encode(value)}\`]
 }\n`
+      : ''
+  const formCookieLine = explodedFormCookies.length
+    ? 'const formCookie = (item: unknown): string => encodeURIComponent(item instanceof Date ? item.toISOString() : String(item))\n'
     : ''
   // Keep the cookie-octet pattern in step with `rawCookieValue` in plugin-client's `templates/serializers.ts`.
   const rawCookieLine = rawCookies.length
@@ -63,21 +70,29 @@ export function Request({ baseURL = '', name, resolver, node }: Props): KubbReac
 ${compositeLines}  const text = value instanceof Date ? value.toISOString() : String(value)
   if (!/^[\\x21\\x23-\\x2B\\x2D-\\x3A\\x3C-\\x5B\\x5D-\\x7E]*$/.test(text)) throw new TypeError('A cookie has characters the cookie style cannot send, escape it first.')
   return text
-}\n${explodeCookieLine}`
+}\n`
     : ''
   const encodeCookie = joinedCookies.length
     ? `([${joinedCookies.join(', ')}].includes(name) ? rawCookie(value) : encodeURIComponent(${cookieText}))`
     : `encodeURIComponent(${cookieText})`
-  const toCookies = explodedCookies.length
-    ? `.flatMap(([name, value]) => ([${explodedCookies.join(', ')}].includes(name) ? explodeCookie(name, value) : [\`\${name}=\${${encodeCookie}}\`]))`
-    : `.map(([name, value]) => \`\${name}=\${${encodeCookie}}\`)`
+  const explodeRaw = explodedCookies.length ? `[${explodedCookies.join(', ')}].includes(name) ? explodeCookie(name, value, rawCookie) : ` : ''
+  const explodeForm = explodedFormCookies.length ? `[${explodedFormCookies.join(', ')}].includes(name) ? explodeCookie(name, value, formCookie) : ` : ''
+  const toCookies =
+    explodeRaw || explodeForm
+      ? `.flatMap(([name, value]) => (${explodeRaw}${explodeForm}[\`\${name}=\${${encodeCookie}}\`]))`
+      : `.map(([name, value]) => \`\${name}=\${${encodeCookie}}\`)`
   // Built first and sent only when non-empty, so a call without cookies keeps the cookies Cypress attaches itself.
-  const cookieLine = `${rawCookieLine}const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null)${toCookies}.join('; ')\n`
+  const cookieLine = `${rawCookieLine}${explodeCookieLine}${formCookieLine}const cookie = (Object.entries(cookies ?? {}) as Array<[string, unknown]>).filter(([, value]) => value != null)${toCookies}.join('; ')\n`
 
   // Cypress types a body as a string or an object, so a body that is one number or has no schema type is cast, and an
-  // `int64` is sent as a number.
+  // `int64` is sent as a number. Past the safe-integer range it throws, like the generated clients, instead of losing precision.
   const bodySchema = node.requestBody?.content?.[0]?.schema && ast.resolveRef(node.requestBody.content[0].schema)
   const castBody = bodySchema && (['number', 'integer', 'bigint'].includes(bodySchema.primitive ?? '') || ['unknown', 'any'].includes(bodySchema.type))
+
+  const bigintGuard =
+    bodySchema?.type === 'bigint'
+      ? "if (typeof body === 'bigint' && (body > Number.MAX_SAFE_INTEGER || body < Number.MIN_SAFE_INTEGER)) throw new TypeError(`Cannot send ${body}n as a JSON number without losing precision.`)\n"
+      : ''
 
   const requestOptions = [
     `method: ${singleQuote(node.method)}`,
@@ -89,7 +104,7 @@ ${compositeLines}  const text = value instanceof Date ? value.toISOString() : St
   ].filter(Boolean)
 
   // Cypress's catch-all `then` overload types a union body as `Chainable<Response | Pet> | Chainable<Response | string>`, so cast to the declared return type.
-  const requestCall = `${groups.cookies ? cookieLine : ''}return cy.request<${responseType}>({
+  const requestCall = `${groups.cookies ? cookieLine : ''}${bigintGuard}return cy.request<${responseType}>({
   ${requestOptions.join(',\n  ')}
 }).then((res) => res.body) as ${returnType}`
 
