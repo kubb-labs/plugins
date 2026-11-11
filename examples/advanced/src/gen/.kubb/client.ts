@@ -1,6 +1,7 @@
 import * as core from './core'
 import axios from 'axios'
 import type { AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios'
+import { defaultConfig } from './config'
 import { createClientCore, createLazyClient, getHeader } from './core'
 export * from './core'
 
@@ -174,25 +175,10 @@ export const defaultTransport: Transport = (request) => createAxiosTransport(get
  * The client every generated operation uses unless a call passes its own. It is created on first use.
  */
 export const client = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
+client.setConfig(defaultConfig)
 
 export const createClient = client.createClient
 
-import { urlencoded } from './mediaTypes/urlencoded.ts'
-import { multipartFormData } from './mediaTypes/formData.ts'
-import { multipartMixed } from './mediaTypes/mixed.ts'
-import { streamMediaTypes } from './sse.ts'
-import { serializeCookies } from './serializers/cookies.ts'
-import { serializeQuery } from './serializers/queryStyles.ts'
-client.setConfig({
-  baseURL: 'https://petstore3.swagger.io/api/v3',
-  mediaTypes: {
-    'application/x-www-form-urlencoded': urlencoded,
-    'multipart/form-data': multipartFormData,
-    'multipart/mixed': multipartMixed,
-    ...streamMediaTypes,
-  },
-  serializer: { cookie: serializeCookies, query: serializeQuery },
-})
 /**
  * The servers from the spec by name, for `baseURL`.
  */

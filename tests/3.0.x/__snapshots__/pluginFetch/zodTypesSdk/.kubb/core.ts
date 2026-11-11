@@ -1,9 +1,9 @@
 import type { NativeOptions, NativeRequest, NativeResponse } from './client'
 import type { MediaTypeContext, MediaTypes } from './mediaTypes'
-import type { HeadersInit, HttpMethod, PathParamStyle, PathSerializer, RequestBody, Serializers, Styles } from './serializers'
+import type { HeadersInit, HttpMethod, RequestBody, Serializers, Styles } from './serializers'
 import type { StandardSchemaValidator, ValidateOption, ValidationErrorHandler } from './standardSchema'
 import { defaultMediaTypes, isEncodedBody, resolveMediaType } from './mediaTypes'
-import { applyHeaderStyles, baseContentType, defaultPathSerializer, defaultQuerySerializer } from './serializers'
+import { baseContentType } from './serializers'
 import { isValidationEnabled, runValidator } from './standardSchema'
 export * from './mediaTypes'
 export type { ValidateOption, ValidationErrorContext, ValidationErrorHandler } from './standardSchema'
@@ -617,26 +617,26 @@ function deleteHeader(headers: Record<string, string>, name: string): void {
 function serializeUrl({
   parts,
   pathParams,
-  search,
-  pathSerializer = defaultPathSerializer,
-  pathStyles,
+  query,
+  serializers,
+  styles,
 }: {
   parts: Array<string | undefined>
   pathParams: Record<string, unknown>
-  search: string
-  pathSerializer?: PathSerializer
-  pathStyles?: Record<string, PathParamStyle>
+  query: Record<string, unknown>
+  serializers: Serializers
+  styles?: Styles
 }): string {
   const path = parts
     // A base URL that ends in `/` would give `//` before a path that starts with one.
     .reduce<string>((url, part) => (part ? url + (url.endsWith('/') && part.startsWith('/') ? part.slice(1) : part) : url), '')
-    .replace(/\{([^{}]+)\}/g, (_, key: string) => pathSerializer({ name: key, value: pathParams[key], options: pathStyles?.[key] }))
+    .replace(/\{([^{}]+)\}/g, (_, key: string) => requireSerializer(serializers, 'path')({ name: key, value: pathParams[key], options: styles?.path?.[key] }))
+  // A query without values needs no serializer.
+  const hasQuery = Object.values(query).some((value) => value !== undefined && value !== null)
+  const search = serializers.query || hasQuery ? requireSerializer(serializers, 'query')(query, styles?.query) : ''
   return path + (search ? `?${search}` : '')
 }
 
-/**
- * Runs handlers in the order they were added. A handler that returns nothing keeps the value.
- */
 export function createInterceptorStack<T, TContext = never, TResult = T>(): InterceptorStack<T, TContext, TResult> {
   let entries: Array<{ id: number; fn: InterceptorFn<T, TContext, TResult> }> = []
   let counter = 0
@@ -775,11 +775,11 @@ function mergeConfig<T extends { headers?: HeadersInit; mediaTypes?: MediaTypes;
   }
 }
 
-function resolveSerializers({ config, requestConfig }: { config: { serializer?: Serializers }; requestConfig: { serializer?: Serializers } }) {
-  return {
-    querySerializer: requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer,
-    pathSerializer: requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer,
-  }
+// The serializer for `name`, which `.kubb/client.ts` registers for a spec that needs it.
+function requireSerializer<TName extends keyof Serializers>(serializers: Serializers, name: TName): NonNullable<Serializers[TName]> {
+  const serializer = serializers[name]
+  if (!serializer) throw new TypeError(`Cannot send ${name} parameters without a serializer, register serializer.${name} on the client.`)
+  return serializer
 }
 
 async function resolveRequest<TBody, TRequest, TResponse>({
@@ -789,7 +789,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   config: ClientConfig<TRequest, TResponse>
   requestConfig: RequestConfig<TBody, TRequest, TResponse>
 }): Promise<{ request: ResolvedRequest; mediaTypes: MediaTypes; validate: ValidateOption | undefined; responseContentType: string | undefined }> {
-  const { querySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
+  const serializers = { ...config.serializer, ...requestConfig.serializer }
   const mediaTypes = { ...defaultMediaTypes, ...config.mediaTypes, ...requestConfig.mediaTypes }
   const onValidationError = requestConfig.onValidationError ?? config.onValidationError
   const validate = requestConfig.validate ?? config.validate
@@ -812,7 +812,8 @@ async function resolveRequest<TBody, TRequest, TResponse>({
     ),
   )
 
-  const headers = serializeHeaders(applyHeaderStyles(validatedHeaders as HeadersInit | undefined, requestConfig.styles?.header))
+  const headerValues = validatedHeaders as HeadersInit | undefined
+  const headers = serializeHeaders(serializers.header ? serializers.header(headerValues, requestConfig.styles?.header) : headerValues)
   const contentType = requestConfig.contentType
   const { request: requestContentTypeOption, response: responseContentType } = typeof contentType === 'string' ? { request: contentType } : (contentType ?? {})
   if (responseContentType && getHeader(headers, 'accept') === undefined) {
@@ -830,9 +831,7 @@ async function resolveRequest<TBody, TRequest, TResponse>({
 
   const cookies = validatedCookies as Record<string, unknown> | undefined
   if (cookies && Object.keys(cookies).length) {
-    const serializeCookies = requestConfig.serializer?.cookie ?? config.serializer?.cookie
-    if (!serializeCookies) throw new TypeError('Cannot send cookies without a cookie serializer, register serializer.cookie on the client.')
-    const cookie = serializeCookies(cookies, requestConfig.styles?.cookie)
+    const cookie = requireSerializer(serializers, 'cookie')(cookies, requestConfig.styles?.cookie)
     if (cookie) appendCookie(headers, cookie)
   }
 
@@ -867,9 +866,9 @@ async function resolveRequest<TBody, TRequest, TResponse>({
   const url = serializeUrl({
     parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
     pathParams: (validatedPath ?? {}) as Record<string, unknown>,
-    search: querySerializer(query, requestConfig.styles?.query),
-    pathSerializer,
-    pathStyles: requestConfig.styles?.path,
+    query,
+    serializers,
+    styles: requestConfig.styles,
   })
 
   const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
@@ -1099,14 +1098,13 @@ export function createClientCore<TRequest = NativeRequest, TResponse = NativeRes
     return config
   }
   client.getUrl = (requestConfig) => {
-    const { querySerializer, pathSerializer } = resolveSerializers({ config, requestConfig })
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
     return serializeUrl({
       parts: [requestConfig.baseURL ?? config.baseURL, requestConfig.url],
       pathParams: (requestConfig.path ?? {}) as Record<string, unknown>,
-      search: querySerializer(query, requestConfig.styles?.query),
-      pathSerializer,
-      pathStyles: requestConfig.styles?.path,
+      query,
+      serializers: { ...config.serializer, ...requestConfig.serializer },
+      styles: requestConfig.styles,
     })
   }
   client.interceptors = own

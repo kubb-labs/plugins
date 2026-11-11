@@ -1,16 +1,17 @@
-import { defaultPathSerializer, toValue } from '../serializers.ts'
+import { toValue } from '../serializers.ts'
 import type { PathSerializer } from '../serializers.ts'
+import { serializePath } from './path.ts'
 
 function encode(value: unknown): string {
   return encodeURIComponent(toValue(value))
 }
 
 /**
- * The path serializer for the OpenAPI `label` and `matrix` styles. A `simple` parameter uses the default serializer.
+ * The path serializer for the OpenAPI `label` and `matrix` styles. A `simple` parameter uses `serializePath`.
  */
-export const serializePath: PathSerializer = ({ name, value, options }) => {
+export const serializeStyledPath: PathSerializer = ({ name, value, options }) => {
   const style = options?.style ?? 'simple'
-  if (style === 'simple' || value === undefined || value === null) return defaultPathSerializer({ name, value, options })
+  if (style === 'simple' || value === undefined || value === null) return serializePath({ name, value, options })
   const explode = options?.explode ?? false
   const label = style === 'label'
   if (Array.isArray(value)) {

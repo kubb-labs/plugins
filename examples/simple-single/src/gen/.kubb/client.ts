@@ -1,4 +1,5 @@
 import * as core from './core'
+import { defaultConfig } from './config'
 import { createClientCore, createLazyClient, toRequestInit } from './core'
 export * from './core'
 
@@ -66,12 +67,10 @@ export const defaultTransport = async (request: core.ResolvedRequest): Promise<T
  * The client every generated operation uses unless a call passes its own. It is created on first use.
  */
 export const client = createLazyClient((config) => createClientCore({ defaultTransport, ...config }))
+client.setConfig(defaultConfig)
 
 export const createClient = client.createClient
 
-import { urlencoded } from './mediaTypes/urlencoded.ts'
-import { serializeQuery } from './serializers/queryStyles.ts'
-client.setConfig({ mediaTypes: { 'application/x-www-form-urlencoded': urlencoded }, serializer: { query: serializeQuery } })
 /**
  * The security schemes from the spec by name. A generated call sends one of them to the `auth` resolver.
  */

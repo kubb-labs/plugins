@@ -66,11 +66,16 @@ client.setConfig({
 
 A serializer set this way runs for every call. Pass `serializer` on a single call to override only that request.
 
-Cookie parameters go through `serializer.cookie`. Kubb writes `.kubb/serializers/cookies.ts` and registers its `serializeCookies` there only when the spec has a cookie parameter. To pass `cookies` on a call in a spec without one, set `serializer.cookie` yourself.
+Kubb writes each serializer a spec needs into `.kubb/serializers/` and lists it in `.kubb/config.ts`, which `.kubb/client.ts` passes to `setConfig`. The core has no serializer of its own.
 
-The default path serializer handles the `simple` style. For a spec with a `label` or `matrix` path parameter, Kubb writes `.kubb/serializers/pathStyles.ts` and registers its `serializePath` as `serializer.path`.
+| Key in `serializer` | File                                                                                 | Written for                    |
+| ------------------- | ------------------------------------------------------------------------------------ | ------------------------------ |
+| `query`             | `query.ts`, or `queryStyles.ts` for a spec with a styled query parameter             | every spec                     |
+| `path`              | `path.ts`, plus `pathStyles.ts` for a spec with a `label` or `matrix` path parameter | every spec                     |
+| `header`            | `headers.ts`                                                                         | a spec with a header parameter |
+| `cookie`            | `cookies.ts`                                                                         | a spec with a cookie parameter |
 
-The default query serializer handles parameters without a style entry. For a spec with a styled query parameter, Kubb writes `.kubb/serializers/queryStyles.ts` and registers its `serializeQuery` as `serializer.query`. The urlencoded media type uses the same file for a styled form field.
+A call that needs a serializer the spec did not register throws a `TypeError` that names the key, such as `serializer.cookie`. Set it on the client to send such a call. Without `serializer.header`, an array or object header value is sent as JSON.
 
 ## Built-in media types
 

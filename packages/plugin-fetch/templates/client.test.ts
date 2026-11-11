@@ -3,7 +3,7 @@ import {
   type Auth,
   type ClientConfig,
   createClient as createFetchClient,
-  createClientCore,
+  createClientCore as createCore,
   createLazyClient,
   defaultMediaTypes,
   defaultTransport,
@@ -23,16 +23,25 @@ import {
   withUnwrap,
 } from './client.ts'
 import type { BodyEncoding } from './serializers.ts'
-import { applyHeaderStyles, defaultPathSerializer, defaultQuerySerializer } from './serializers.ts'
 import { serializeCookies } from '../../plugin-client/templates/serializers/cookies.ts'
-import { serializePath } from '../../plugin-client/templates/serializers/pathStyles.ts'
-import { serializeQuery } from '../../plugin-client/templates/serializers/queryStyles.ts'
+import { applyHeaderStyles } from '../../plugin-client/templates/serializers/headers.ts'
+import { serializeStyledPath } from '../../plugin-client/templates/serializers/pathStyles.ts'
+import { serializeStyledQuery } from '../../plugin-client/templates/serializers/queryStyles.ts'
+import { serializePath } from '../../plugin-client/templates/serializers/path.ts'
+import { serializeQuery } from '../../plugin-client/templates/serializers/query.ts'
 import { multipartFormData } from '../../plugin-client/templates/mediaTypes/formData.ts'
 import { multipartMixed } from '../../plugin-client/templates/mediaTypes/mixed.ts'
 import { urlencoded } from '../../plugin-client/templates/mediaTypes/urlencoded.ts'
 import { streamMediaTypes } from '../../plugin-client/templates/sse.ts'
 
 const formMediaTypes = { 'multipart/form-data': multipartFormData, 'multipart/mixed': multipartMixed, 'application/x-www-form-urlencoded': urlencoded }
+
+const serializers = { query: serializeStyledQuery, path: serializeStyledPath, header: applyHeaderStyles, cookie: serializeCookies }
+
+// `.kubb/client.ts` registers the serializers of a spec. These tests register all of them.
+function createClientCore<TRequest = Request, TResponse = Response>(options: Parameters<typeof createCore<TRequest, TResponse>>[0]) {
+  return createCore<TRequest, TResponse>({ ...options, serializer: { ...serializers, ...options.serializer } })
+}
 
 type FakeResult = { data?: unknown; status?: number; statusText?: string; contentType?: string }
 
@@ -64,7 +73,6 @@ function createClient(result?: FakeResult) {
   const client = createClientCore<string, string>({
     defaultTransport: transport,
     mediaTypes: formMediaTypes,
-    serializer: { cookie: serializeCookies, path: serializePath, query: serializeQuery },
   })
   return { client, calls }
 }
@@ -115,143 +123,147 @@ describe('createInterceptorStack', () => {
   })
 })
 
-describe('defaultQuerySerializer', () => {
+describe('serializeQuery and serializeStyledQuery', () => {
   test('explodes arrays into repeated keys', () => {
-    expect(serializeQuery({ tags: ['a', 'b'] })).toBe('tags=a&tags=b')
+    expect(serializeStyledQuery({ tags: ['a', 'b'] })).toBe('tags=a&tags=b')
   })
 
   test('JSON-encodes a parameter with a JSON content type as one value', () => {
     const filter = { root: { nested: ['!#=~[]', 1] } }
-    const query = serializeQuery({ filter, page: 2 }, { filter: { contentType: 'application/json' } })
+    const query = serializeStyledQuery({ filter, page: 2 }, { filter: { contentType: 'application/json' } })
     expect(query).toBe(`filter=${encodeURIComponent(JSON.stringify(filter))}&page=2`)
     expect(new URLSearchParams(query).get('filter')).toBe(JSON.stringify(filter))
   })
 
   test('sends a JSON querystring parameter as the whole query string, without its name', () => {
     const filter = { status: 'sold' }
-    expect(serializeQuery({ filter }, { filter: { contentType: 'application/json', querystring: true } })).toBe(encodeURIComponent(JSON.stringify(filter)))
+    expect(serializeStyledQuery({ filter }, { filter: { contentType: 'application/json', querystring: true } })).toBe(
+      encodeURIComponent(JSON.stringify(filter)),
+    )
   })
 
   test('fully encodes a JSON value even when allowReserved is set', () => {
-    expect(serializeQuery({ f: { q: 'a&b#c' } }, { f: { contentType: 'application/json', allowReserved: true } })).toBe(
+    expect(serializeStyledQuery({ f: { q: 'a&b#c' } }, { f: { contentType: 'application/json', allowReserved: true } })).toBe(
       `f=${encodeURIComponent('{"q":"a&b#c"}')}`,
     )
   })
 
   test('only treats application/json and +json media types as JSON', () => {
     const value = { a: 1 }
-    expect(serializeQuery({ value }, { value: { contentType: 'application/vnd.api+json; charset=utf-8' } })).toBe(`value=${encodeURIComponent('{"a":1}')}`)
-    expect(serializeQuery({ value }, { value: { contentType: 'application/jsonl' } })).toBe('a=1')
+    expect(serializeStyledQuery({ value }, { value: { contentType: 'application/vnd.api+json; charset=utf-8' } })).toBe(
+      `value=${encodeURIComponent('{"a":1}')}`,
+    )
+    expect(serializeStyledQuery({ value }, { value: { contentType: 'application/jsonl' } })).toBe('a=1')
   })
 
   test('serializes an object without a style as form with explode', () => {
-    expect(serializeQuery({ filter: { name: 'odie', age: 3 } })).toBe('name=odie&age=3')
+    expect(serializeStyledQuery({ filter: { name: 'odie', age: 3 } })).toBe('name=odie&age=3')
   })
 
   test('skips undefined and null members', () => {
-    expect(serializeQuery({ a: 1, b: undefined, c: null })).toBe('a=1')
+    expect(serializeStyledQuery({ a: 1, b: undefined, c: null })).toBe('a=1')
   })
 
   test('form style without explode joins arrays with commas', () => {
-    expect(serializeQuery({ id: [3, 4, 5] }, { id: { style: 'form', explode: false } })).toBe('id=3,4,5')
+    expect(serializeStyledQuery({ id: [3, 4, 5] }, { id: { style: 'form', explode: false } })).toBe('id=3,4,5')
   })
 
   test('spaceDelimited and pipeDelimited join arrays without explode', () => {
-    expect(serializeQuery({ id: [3, 4, 5] }, { id: { style: 'spaceDelimited', explode: false } })).toBe('id=3%204%205')
-    expect(serializeQuery({ id: [3, 4, 5] }, { id: { style: 'pipeDelimited', explode: false } })).toBe('id=3|4|5')
+    expect(serializeStyledQuery({ id: [3, 4, 5] }, { id: { style: 'spaceDelimited', explode: false } })).toBe('id=3%204%205')
+    expect(serializeStyledQuery({ id: [3, 4, 5] }, { id: { style: 'pipeDelimited', explode: false } })).toBe('id=3|4|5')
   })
 
   test('form style with explode expands objects into top-level keys', () => {
-    expect(serializeQuery({ filter: { role: 'admin', name: 'alex' } }, { filter: { style: 'form', explode: true } })).toBe('role=admin&name=alex')
+    expect(serializeStyledQuery({ filter: { role: 'admin', name: 'alex' } }, { filter: { style: 'form', explode: true } })).toBe('role=admin&name=alex')
   })
 
   test('form style without explode flattens objects with commas', () => {
-    expect(serializeQuery({ filter: { role: 'admin', name: 'alex' } }, { filter: { style: 'form', explode: false } })).toBe('filter=role,admin,name,alex')
+    expect(serializeStyledQuery({ filter: { role: 'admin', name: 'alex' } }, { filter: { style: 'form', explode: false } })).toBe('filter=role,admin,name,alex')
   })
 
   test('deepObject style renders bracketed object keys', () => {
-    expect(serializeQuery({ filter: { role: 'admin' } }, { filter: { style: 'deepObject' } })).toBe('filter%5Brole%5D=admin')
+    expect(serializeStyledQuery({ filter: { role: 'admin' } }, { filter: { style: 'deepObject' } })).toBe('filter%5Brole%5D=admin')
   })
 
   test('deepObject style recurses into nested objects', () => {
-    expect(serializeQuery({ a: { b: { c: 1 } } }, { a: { style: 'deepObject' } })).toBe('a%5Bb%5D%5Bc%5D=1')
+    expect(serializeStyledQuery({ a: { b: { c: 1 } } }, { a: { style: 'deepObject' } })).toBe('a%5Bb%5D%5Bc%5D=1')
   })
 
   test('deepObject style indexes an array of objects', () => {
-    expect(serializeQuery({ items: [{ price: 'p_1', quantity: 1 }] }, { items: { style: 'deepObject' } })).toBe(
+    expect(serializeStyledQuery({ items: [{ price: 'p_1', quantity: 1 }] }, { items: { style: 'deepObject' } })).toBe(
       'items%5B0%5D%5Bprice%5D=p_1&items%5B0%5D%5Bquantity%5D=1',
     )
-    expect(serializeQuery({ expand: ['a', 'b'] }, { expand: { style: 'deepObject' } })).toBe('expand=a&expand=b')
+    expect(serializeStyledQuery({ expand: ['a', 'b'] }, { expand: { style: 'deepObject' } })).toBe('expand=a&expand=b')
   })
 
   test('encodes a space as %20 with or without a style', () => {
-    expect(serializeQuery({ q: 'a b', styled: 'a b', plus: 'a+b' }, { styled: { style: 'form' } })).toBe('q=a%20b&styled=a%20b&plus=a%2Bb')
+    expect(serializeStyledQuery({ q: 'a b', styled: 'a b', plus: 'a+b' }, { styled: { style: 'form' } })).toBe('q=a%20b&styled=a%20b&plus=a%2Bb')
   })
 
   test('serializes Date values as ISO-8601', () => {
-    expect(serializeQuery({ since: new Date('2020-01-02T03:04:05.000Z') })).toBe('since=2020-01-02T03%3A04%3A05.000Z')
+    expect(serializeStyledQuery({ since: new Date('2020-01-02T03:04:05.000Z') })).toBe('since=2020-01-02T03%3A04%3A05.000Z')
   })
 
   test('allowReserved leaves reserved characters unencoded', () => {
-    expect(serializeQuery({ path: '/a/b' }, { path: { allowReserved: true } })).toBe('path=/a/b')
-    expect(serializeQuery({ path: '/a/b' })).toBe('path=%2Fa%2Fb')
+    expect(serializeStyledQuery({ path: '/a/b' }, { path: { allowReserved: true } })).toBe('path=/a/b')
+    expect(serializeStyledQuery({ path: '/a/b' })).toBe('path=%2Fa%2Fb')
   })
 
   test('allowReserved still encodes characters that end the query or change a form value', () => {
-    expect(serializeQuery({ r: 'a/b?c#d', q: 'x' }, { r: { allowReserved: true } })).toBe('r=a/b?c%23d&q=x')
-    expect(serializeQuery({ r: 'a&b=c+d' }, { r: { allowReserved: true } })).toBe('r=a%26b=c%2Bd')
-    expect(serializeQuery({ r: ['a#', 'b&'] }, { r: { allowReserved: true, explode: false } })).toBe('r=a%23,b%26')
+    expect(serializeStyledQuery({ r: 'a/b?c#d', q: 'x' }, { r: { allowReserved: true } })).toBe('r=a/b?c%23d&q=x')
+    expect(serializeStyledQuery({ r: 'a&b=c+d' }, { r: { allowReserved: true } })).toBe('r=a%26b=c%2Bd')
+    expect(serializeStyledQuery({ r: ['a#', 'b&'] }, { r: { allowReserved: true, explode: false } })).toBe('r=a%23,b%26')
   })
 })
 
-describe('defaultPathSerializer', () => {
+describe('serializePath and serializeStyledPath', () => {
   test('simple style URL-encodes a primitive value', () => {
-    expect(defaultPathSerializer({ name: 'id', value: 'a b' })).toBe('a%20b')
+    expect(serializePath({ name: 'id', value: 'a b' })).toBe('a%20b')
   })
 
   test('simple style joins array members with commas', () => {
-    expect(defaultPathSerializer({ name: 'ids', value: [3, 4, 5] })).toBe('3,4,5')
+    expect(serializePath({ name: 'ids', value: [3, 4, 5] })).toBe('3,4,5')
   })
 
   test('simple style flattens objects to comma-separated key,value pairs', () => {
-    expect(defaultPathSerializer({ name: 'point', value: { x: 1, y: 2 } })).toBe('x,1,y,2')
+    expect(serializePath({ name: 'point', value: { x: 1, y: 2 } })).toBe('x,1,y,2')
   })
 
   test('simple style with explode renders objects as key=value pairs', () => {
-    expect(defaultPathSerializer({ name: 'point', value: { x: 1, y: 2 }, options: { explode: true } })).toBe('x=1,y=2')
+    expect(serializePath({ name: 'point', value: { x: 1, y: 2 }, options: { explode: true } })).toBe('x=1,y=2')
   })
 
   test('label style prefixes a dot', () => {
-    expect(serializePath({ name: 'id', value: 5, options: { style: 'label' } })).toBe('.5')
-    expect(serializePath({ name: 'ids', value: [3, 4], options: { style: 'label' } })).toBe('.3,4')
-    expect(serializePath({ name: 'ids', value: [3, 4], options: { style: 'label', explode: true } })).toBe('.3.4')
-    expect(serializePath({ name: 'point', value: { x: 1, y: 2 }, options: { style: 'label', explode: true } })).toBe('.x=1.y=2')
+    expect(serializeStyledPath({ name: 'id', value: 5, options: { style: 'label' } })).toBe('.5')
+    expect(serializeStyledPath({ name: 'ids', value: [3, 4], options: { style: 'label' } })).toBe('.3,4')
+    expect(serializeStyledPath({ name: 'ids', value: [3, 4], options: { style: 'label', explode: true } })).toBe('.3.4')
+    expect(serializeStyledPath({ name: 'point', value: { x: 1, y: 2 }, options: { style: 'label', explode: true } })).toBe('.x=1.y=2')
   })
 
   test('matrix style prefixes a named segment', () => {
-    expect(serializePath({ name: 'id', value: 5, options: { style: 'matrix' } })).toBe(';id=5')
-    expect(serializePath({ name: 'id', value: [3, 4], options: { style: 'matrix' } })).toBe(';id=3,4')
-    expect(serializePath({ name: 'id', value: [3, 4], options: { style: 'matrix', explode: true } })).toBe(';id=3;id=4')
-    expect(serializePath({ name: 'point', value: { x: 1, y: 2 }, options: { style: 'matrix', explode: true } })).toBe(';x=1;y=2')
+    expect(serializeStyledPath({ name: 'id', value: 5, options: { style: 'matrix' } })).toBe(';id=5')
+    expect(serializeStyledPath({ name: 'id', value: [3, 4], options: { style: 'matrix' } })).toBe(';id=3,4')
+    expect(serializeStyledPath({ name: 'id', value: [3, 4], options: { style: 'matrix', explode: true } })).toBe(';id=3;id=4')
+    expect(serializeStyledPath({ name: 'point', value: { x: 1, y: 2 }, options: { style: 'matrix', explode: true } })).toBe(';x=1;y=2')
   })
 
   test('throws on a styled query parameter, which needs the registered query serializer', () => {
-    expect(() => defaultQuerySerializer({ ids: [1, 2] }, { ids: { explode: false } })).toThrow('register serializer.query')
-    expect(defaultQuerySerializer({ ids: [1, 2], filter: { a: 'x y' }, skip: undefined })).toBe('ids=1&ids=2&a=x%20y')
+    expect(() => serializeQuery({ ids: [1, 2] }, { ids: { explode: false } })).toThrow('register serializer.query')
+    expect(serializeQuery({ ids: [1, 2], filter: { a: 'x y' }, skip: undefined })).toBe('ids=1&ids=2&a=x%20y')
   })
 
   test('throws on a label or matrix parameter, which needs the registered path serializer', () => {
-    expect(() => defaultPathSerializer({ name: 'id', value: 5, options: { style: 'label' } })).toThrow('register serializer.path')
-    expect(serializePath({ name: 'ids', value: [3, 4] })).toBe('3,4')
+    expect(() => serializePath({ name: 'id', value: 5, options: { style: 'label' } })).toThrow('register serializer.path')
+    expect(serializeStyledPath({ name: 'ids', value: [3, 4] })).toBe('3,4')
   })
 
   test('serializes undefined and null to an empty string', () => {
-    expect(defaultPathSerializer({ name: 'id', value: undefined })).toBe('')
-    expect(defaultPathSerializer({ name: 'id', value: null })).toBe('')
+    expect(serializePath({ name: 'id', value: undefined })).toBe('')
+    expect(serializePath({ name: 'id', value: null })).toBe('')
   })
 
   test('serializes a Date value as ISO-8601', () => {
-    expect(defaultPathSerializer({ name: 'since', value: new Date('2020-01-02T03:04:05.000Z') })).toBe('2020-01-02T03%3A04%3A05.000Z')
+    expect(serializePath({ name: 'since', value: new Date('2020-01-02T03:04:05.000Z') })).toBe('2020-01-02T03%3A04%3A05.000Z')
   })
 })
 
@@ -563,7 +575,7 @@ describe('createClientCore', () => {
 
   test('throws on cookie params without a cookie serializer, and keeps it when another serializer is set', async () => {
     const { transport } = fakeTransport()
-    const bare = createClientCore<string, string>({ defaultTransport: transport })
+    const bare = createCore<string, string>({ defaultTransport: transport })
     await expect(bare({ method: 'GET', url: '/pet', cookies: { session: 'abc' } })).rejects.toThrow('register serializer.cookie')
     await bare({ method: 'GET', url: '/pet', cookies: {} })
 
