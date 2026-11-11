@@ -475,3 +475,12 @@ test('mocks mutually recursive filters through discriminated unions in arrays', 
     Not: { type: 'object', required: ['match'], properties: { ...tag('not'), match: filter } },
   })
 })
+
+test('keeps the literal an allOf extension sets over the string of its base', async () => {
+  await expectMocksToParse({
+    Base: { type: 'object', required: ['type', 'id'], properties: { type: { type: 'string' }, id: { type: 'integer' } } },
+    Child: {
+      allOf: [{ type: 'object', required: ['type'], properties: { type: { type: 'string', enum: ['child'] } } }, { $ref: '#/components/schemas/Base' }],
+    },
+  })
+})

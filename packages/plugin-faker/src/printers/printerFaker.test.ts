@@ -201,6 +201,17 @@ describe('printerFaker', () => {
     expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe('{...{\n  type: faker.string.alpha(),\n}, ...faker.helpers.arrayElement([createDog()])}')
   })
 
+  test('spreads a referenced base before the inline object that narrows it', () => {
+    const literal = ast.factory.createSchema({
+      type: 'object',
+      properties: [ast.factory.createProperty({ name: 'type', required: true, schema: ast.factory.createSchema({ type: 'enum', enumValues: ['X'] }) })],
+    })
+    const base = ast.factory.createSchema({ type: 'ref', name: 'Base', ref: '#/components/schemas/Base' })
+    const node = ast.factory.createSchema({ type: 'intersection', members: [literal, base] })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toBe("{...createBase(), ...{\n  type: faker.helpers.arrayElement(['X']),\n}}")
+  })
+
   test('mocks unique array items within the count limits', () => {
     const node = ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })], unique: true, min: 1, max: 5 })
 

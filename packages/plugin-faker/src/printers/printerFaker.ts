@@ -364,10 +364,10 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       intersection(node): string {
         const objectMembers = (node.members ?? []).filter((member) => isObjectSchema(member))
-        // A union spreads after the plain objects, so a sibling base object cannot overwrite its discriminator.
-        const members = objectMembers.length
-          ? [...objectMembers.filter((member) => member.type !== 'union'), ...objectMembers.filter((member) => member.type === 'union')]
-          : node.members
+        // A ref (the base) spreads first and a union last, so neither a base nor a sibling object overwrites the narrower value
+        // an extension or a discriminator sets.
+        const rank = (member: ast.SchemaNode) => (member.type === 'ref' ? 0 : member.type === 'union' ? 2 : 1)
+        const members = objectMembers.length ? objectMembers.toSorted((a, b) => rank(a) - rank(b)) : node.members
         const items: Array<string> = mapSchemaMembers({ ...node, members }, (member) =>
           printNested(member, {
             nestedInObject: true,
