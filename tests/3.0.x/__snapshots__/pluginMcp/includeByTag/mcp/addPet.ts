@@ -15,13 +15,14 @@ import { addPet } from '../clients/addPet'
 export async function addPetHandler({ body }: Pick<AddPetOptions, 'body'>, ctx: ServerContext): Promise<CallToolResult> {
   const res = await addPet({ body, signal: ctx.mcpReq.signal, throwOnError: true } as Parameters<typeof addPet<true>>[0])
 
+  const text = JSON.stringify(res.data, (_key, value) => (typeof value === 'bigint' ? (Number.isSafeInteger(Number(value)) ? Number(value) : String(value)) : value))
   return {
     content: [
       {
         type: 'text',
-        text: JSON.stringify(res.data)
+        text
       }
     ],
-    structuredContent: { data: res.data }
+    structuredContent: { data: text === undefined ? undefined : JSON.parse(text) }
   }
 }
