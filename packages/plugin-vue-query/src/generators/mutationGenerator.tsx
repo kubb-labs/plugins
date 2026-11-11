@@ -61,7 +61,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
               mutationKeyName={mutationKeyName}
               clientReturnType={contractOp.returnType}
               returnType={hook.returnType}
-              typedHeaders={hook.typedHeaders}
+              typedHeaders={hook.contractOp.typedHeaders}
             />
           </>
         )}

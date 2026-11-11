@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { type OperationTypeSource, resolveOperationTypes } from '@internals/client'
+import { type OperationTypeSource, resolveOperationTypes, resultTypeName } from '@internals/client'
 import { isEventStream } from '@internals/shared'
 import { ensureValidVarName } from '@internals/utils'
 import { ast, camelCase, defineGenerator, Diagnostics } from '@kubb/kit'
@@ -144,7 +144,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>({ tem
                   'Options',
                   ...(returnType === 'data' ? [] : ['Unwrappable']),
                   ...(resultOps.some((op) => !typedHeaders(op)) ? [resultName] : []),
-                  ...(resultOps.some(typedHeaders) ? [`${resultName}WithHeaders`] : []),
+                  ...(resultOps.some(typedHeaders) ? [resultTypeName(resultName, true)] : []),
                   ...ops.filter((op) => isEventStream(op.node)).flatMap((op) => buildEventStreamImports({ node: op.node, types: op.types, returnType })),
                 ]),
               )}

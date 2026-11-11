@@ -12,7 +12,6 @@ Fix edge cases in the OpenAPI 3.1 and 3.2 support.
 
 - A `Date` header passed per call goes out as ISO text, also when the spec declares no header parameters.
 - An empty exploded cookie adds no empty `; ` segment.
-- An error validator map keyed `'5XX'` still matches, next to the lower case `'5xx'`.
 - `RequestResult` and `UnwrappedResult` from `.kubb/client.ts` take the headers type argument.
 - Faker keeps exclusive and filled-in bounds on the `multipleOf` grid, and leaves out bigint bounds past the safe integer range.
 - Zod leaves out bigint bounds past the safe integer range, which printed as `1e+21n` or a rounded literal.

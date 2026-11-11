@@ -56,7 +56,7 @@ export function createClientGenerator<TFactory extends ContractClientFactory>(na
       const clientTypeImports = stream
         ? buildEventStreamImports({ node, types, returnType })
         : { plain: ['Options', 'RequestResult'], data: ['Options', 'UnwrappedResult'], full: ['Options', 'Unwrappable', 'RequestResult'] }[returnType].map(
-            (name) => (name.endsWith('Result') ? resultTypeName(name, headerTypeNames.length) : name),
+            (name) => (name.endsWith('Result') ? resultTypeName(name, headerTypeNames.length > 0) : name),
           )
 
       return (

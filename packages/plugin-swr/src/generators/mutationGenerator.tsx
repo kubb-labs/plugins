@@ -53,7 +53,7 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
               tsResolver={hook.tsResolver}
               clientReturnType={contractOp.returnType}
               returnType={hook.returnType}
-              typedHeaders={hook.typedHeaders}
+              typedHeaders={hook.contractOp.typedHeaders}
             />
           </>
         )}

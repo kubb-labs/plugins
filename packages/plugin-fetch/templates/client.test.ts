@@ -881,8 +881,6 @@ describe('createClientCore', () => {
     expect(await call(503, { code: 'upstream' }, byStatus)).toMatchObject({ status: 503, error: { checkedBy: 'upstream' } })
     expect(await call(422, '<html>Unprocessable</html>', byStatus)).toMatchObject({ status: 422, error: '<html>Unprocessable</html>' })
 
-    expect(await call(503, { code: 'upstream' }, { '5XX': toCodeSchema('upstream') })).toMatchObject({ status: 503, error: { checkedBy: 'upstream' } })
-
     const withDefault = { 404: toCodeSchema('not-found'), default: toCodeSchema('other') }
     expect(await call(502, { code: 'other' }, withDefault)).toMatchObject({ status: 502, error: { checkedBy: 'other' } })
     await expect(call(502, '<html>Bad Gateway</html>', withDefault)).rejects.toMatchObject({ name: 'ParseError' })

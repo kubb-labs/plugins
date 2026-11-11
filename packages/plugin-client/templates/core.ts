@@ -1,7 +1,7 @@
 import type { NativeOptions, NativeRequest, NativeResponse } from './client.ts'
 import { defaultMediaTypes, isEncodedBody, resolveMediaType } from './mediaTypes.ts'
 import type { MediaTypeContext, MediaTypes } from './mediaTypes.ts'
-import { baseContentType } from './serializers.ts'
+import { baseContentType, toValue } from './serializers.ts'
 import type { HeadersInit, HttpMethod, RequestBody, Serializers, Styles } from './serializers.ts'
 import { isValidationEnabled, runValidator, type StandardSchemaValidator } from './standardSchema.ts'
 import type { ValidateOption, ValidationErrorHandler } from './standardSchema.ts'
@@ -607,7 +607,7 @@ function serializeHeaders(headers: HeadersInit | undefined): Record<string, stri
   for (const [key, value] of entries) {
     if (value === undefined || value === null) continue
     // A `Date` is a unit like in the parameter serializers, not an object to send as JSON.
-    result[key] = value instanceof Date ? value.toISOString() : typeof value === 'object' ? JSON.stringify(value) : String(value)
+    result[key] = typeof value === 'object' && !(value instanceof Date) ? JSON.stringify(value) : toValue(value)
   }
   return result
 }
@@ -762,8 +762,7 @@ export function toRequestInit(request: ResolvedRequest): RequestInit {
 function pickErrorValidator(error: Validator | Record<string, Validator> | undefined, status: number): Validator | undefined {
   if (!error || '~standard' in error) return error as Validator | undefined
   const range = String(status)[0]
-  // `5XX` is the spelling validator maps used before ranges were written in lower case.
-  return error[String(status)] ?? error[`${range}xx`] ?? error[`${range}XX`] ?? error['default']
+  return error[String(status)] ?? error[`${range}xx`] ?? error['default']
 }
 
 // Checks the shape, so a `Response` from another realm or a polyfill counts too.
