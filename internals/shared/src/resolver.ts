@@ -15,8 +15,7 @@ export function resolveOperationName(this: Resolver, name: string): string {
  * name. Leave `scope` empty for the operation's own declaration.
  *
  * The key starts from the operation's input `pointer`, which macros keep, so a plugin whose macro
- * rewrites the method or path still resolves another plugin's names for the same operation. Nodes
- * without a `pointer` fall back to the method and path.
+ * rewrites the method or path still resolves another plugin's names for the same operation.
  *
  * @example
  * ```ts
