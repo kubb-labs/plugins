@@ -301,13 +301,13 @@ export type ModifierOptions = {
  * Build `.min()` / `.max()` / `.gt()` / `.lt()` constraint chains for numbers
  * using the standard chainable Zod v4 API.
  */
-export function numberConstraints({ min, max, exclusive, multipleOf }: NumericConstraints): string {
+export function numberConstraints({ min, max, exclusive, multipleOf }: NumericConstraints, suffix: '' | 'n' = ''): string {
   return [
-    min !== undefined ? `.min(${min})` : '',
-    max !== undefined ? `.max(${max})` : '',
-    exclusive?.min !== undefined ? `.gt(${exclusive.min})` : '',
-    exclusive?.max !== undefined ? `.lt(${exclusive.max})` : '',
-    multipleOf !== undefined ? `.multipleOf(${multipleOf})` : '',
+    min !== undefined ? `.min(${min}${suffix})` : '',
+    max !== undefined ? `.max(${max}${suffix})` : '',
+    exclusive?.min !== undefined ? `.gt(${exclusive.min}${suffix})` : '',
+    exclusive?.max !== undefined ? `.lt(${exclusive.max}${suffix})` : '',
+    multipleOf !== undefined ? `.multipleOf(${multipleOf}${suffix})` : '',
   ].join('')
 }
 

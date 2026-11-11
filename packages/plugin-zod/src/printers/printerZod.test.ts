@@ -218,6 +218,15 @@ describe('printerZod', () => {
     test('basic bigint coerces, since JSON.parse yields a number', () => {
       expect(printer.print(ast.factory.createSchema({ type: 'bigint' }))).toBe('z.coerce.bigint()')
     })
+
+    test('bigint keeps its bounds as bigint literals', () => {
+      const output = printer.print(ast.factory.createSchema({ type: 'bigint', max: 10, exclusive: { min: 0 } }))
+
+      expect(output).toBe('z.coerce.bigint().max(10n).gt(0n)')
+      const schema = new Function('z', `return ${output}`)(z) as z.ZodType
+      expect(schema.safeParse(5).success).toBe(true)
+      expect(schema.safeParse(0).success).toBe(false)
+    })
   })
 
   describe('date types', () => {
