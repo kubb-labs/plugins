@@ -21,13 +21,15 @@ export type StreamResult<TResponses, ThrowOnError extends boolean = true, TEvent
   response: Response
 }
 
-export const client = Object.assign(<TResponses, ThrowOnError extends boolean = true>(config: RequestConfig) => send<TResponses, ThrowOnError>(config), {
-  stream: async <TResponses, ThrowOnError extends boolean = true, TEvent = ServerSentEvent<SuccessOf<TResponses>>>(
-    config: RequestConfig,
-  ): Promise<StreamResult<TResponses, ThrowOnError, TEvent>> => {
-    // send the request and parse the body into TEvent values
-  },
-})
+export function client<TResponses, ThrowOnError extends boolean = true>(config: RequestConfig) {
+  return send<TResponses, ThrowOnError>(config)
+}
+
+client.stream = async <TResponses, ThrowOnError extends boolean = true, TEvent = ServerSentEvent<SuccessOf<TResponses>>>(
+  config: RequestConfig,
+): Promise<StreamResult<TResponses, ThrowOnError, TEvent>> => {
+  // send the request and parse the body into TEvent values
+}
 ```
 
 A Server-Sent Events call also passes `eventShape: 'event'` or `'data'`. See [Write your client](https://kubb.dev/extensions/kubb-labs/plugin-client/guides/write-your-client).

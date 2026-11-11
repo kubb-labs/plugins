@@ -5,6 +5,12 @@ import { resolverTs } from '../resolvers/resolverTs.ts'
 import { print, type TsNode } from '../factory.ts'
 import { loadParserTs, printerTs } from './printerTs.ts'
 
+function moduleNotFound(message: string): NodeJS.ErrnoException {
+  const error: NodeJS.ErrnoException = new Error(message)
+  error.code = 'MODULE_NOT_FOUND'
+  return error
+}
+
 const inlineLiteralEnum = { type: 'inlineLiteral', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
 const enumEnum = { type: 'enum', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
 const asConstEnum = { type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
@@ -976,7 +982,7 @@ describe('loadParserTs', () => {
   })
 
   it('throws a missing-dependency diagnostic with install help when @kubb/parser-ts is not installed', () => {
-    const notFound = Object.assign(new Error("Cannot find module '@kubb/parser-ts'"), { code: 'MODULE_NOT_FOUND' })
+    const notFound = moduleNotFound("Cannot find module '@kubb/parser-ts'")
     const load = () => {
       throw notFound
     }
@@ -990,9 +996,7 @@ describe('loadParserTs', () => {
   })
 
   it('throws the missing-dependency diagnostic for the Yarn PnP missing-peer error', () => {
-    const missingPeer = Object.assign(new Error("@kubb/plugin-ts tried to access @kubb/parser-ts (a peer dependency) but it isn't provided by its ancestors"), {
-      code: 'MODULE_NOT_FOUND',
-    })
+    const missingPeer = moduleNotFound("@kubb/plugin-ts tried to access @kubb/parser-ts (a peer dependency) but it isn't provided by its ancestors")
 
     expect(() =>
       loadParserTs(() => {
@@ -1002,9 +1006,7 @@ describe('loadParserTs', () => {
   })
 
   it('rethrows a missing module inside @kubb/parser-ts', () => {
-    const nested = Object.assign(new Error("Cannot find module 'typescript'\nRequire stack:\n- /node_modules/@kubb/parser-ts/dist/index.cjs"), {
-      code: 'MODULE_NOT_FOUND',
-    })
+    const nested = moduleNotFound("Cannot find module 'typescript'\nRequire stack:\n- /node_modules/@kubb/parser-ts/dist/index.cjs")
 
     expect(() =>
       loadParserTs(() => {
