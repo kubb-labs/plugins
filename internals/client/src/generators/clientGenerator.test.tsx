@@ -287,6 +287,25 @@ describe('clientGenerator with a custom client module', () => {
 
     await matchFiles(driver.fileManager.files, 'getPetByIdPlainCustomClientPath')
   })
+  test('getPetByIdFullCustomClientPath', async () => {
+    const options: PluginClient['resolvedOptions'] = { ...defaultOptions, returnType: 'full', importPath: '@acme/api-client' }
+    const plugin = createMockedPlugin<PluginClient>({ name: 'plugin-client', options, resolver: resolverClient })
+    const driver = createMockedPluginDriver({
+      name: 'getPetByIdFullCustomClientPath',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorOperation(customClientGenerator, getPetByIdNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverClient,
+    })
+
+    await matchFiles(driver.fileManager.files, 'getPetByIdFullCustomClientPath')
+  })
 })
 
 describe('clientGenerator without an operation type source', () => {

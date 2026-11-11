@@ -36,6 +36,7 @@ export const pluginClient = defineExtension<PluginClient>({
       importPath,
       throwOnErrorDefault = true,
       validator = false,
+      returnType = 'plain',
       group,
       resolver: userResolver,
     } = options
@@ -56,7 +57,7 @@ export const pluginClient = defineExtension<PluginClient>({
       baseURL: undefined,
       throwOnErrorDefault,
       validator,
-      returnType: 'plain',
+      returnType,
       sdk: undefined,
       resolver,
     }
