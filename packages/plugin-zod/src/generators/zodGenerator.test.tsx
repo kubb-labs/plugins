@@ -1391,7 +1391,7 @@ describe('custom imports', () => {
     expect(files[0]?.imports.map((imp) => imp.path)).not.toContain('my-codec/zod')
   })
 
-  test('imports a ref inside a contentSchema, and no ref the printer does not print', async () => {
+  test('imports a ref inside a contentSchema or contains, and no ref the printer does not print', async () => {
     const ref = (name: string) => ast.factory.createSchema({ type: 'ref', name, ref: `#/components/schemas/${name}` })
     const files = await render(
       ast.factory.createSchema({
@@ -1406,11 +1406,20 @@ describe('custom imports', () => {
             name: 'labels',
             schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })], contains: { schema: ref('Label') } }),
           }),
+          ast.factory.createProperty({
+            name: 'tags',
+            // `minContains: 0` checks nothing, so it prints no check and needs no import.
+            schema: ast.factory.createSchema({
+              type: 'array',
+              items: [ast.factory.createSchema({ type: 'string' })],
+              contains: { schema: ref('Tag'), min: 0 },
+            }),
+          }),
         ],
       }),
       {},
     )
 
-    expect(files[0]?.imports.flatMap((imp) => imp.name)).toEqual(['z', 'paymentErrorSchema'])
+    expect(files[0]?.imports.flatMap((imp) => imp.name)).toEqual(['z', 'labelSchema', 'paymentErrorSchema'])
   })
 })

@@ -749,6 +749,11 @@ components:
           type: array
           items:
             type: string
+          contains:
+            type: string
+            const: priority
+          minContains: 1
+          maxContains: 2
         lastError:
           description: The error of the last failed attempt, as a JSON document
           type: string
@@ -758,6 +763,18 @@ components:
         signature:
           type: string
           contentEncoding: base64url
+      dependentRequired:
+        creditCard:
+          - billingAddress
+      if:
+        properties:
+          method:
+            const: card
+        required:
+          - method
+      then:
+        required:
+          - creditCard
     PaymentError:
       type: object
       required:

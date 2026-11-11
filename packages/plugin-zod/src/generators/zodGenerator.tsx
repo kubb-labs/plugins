@@ -50,7 +50,7 @@ function getPrinter(resolver: ResolverZod, options: PrinterZodOptions, mini: boo
 
 /**
  * The imports of a schema, with the refs inside a string's `contentSchema`. `checks` also returns the refs inside
- * `conditionals` and `contains`, which the printer does not print, so an import the printed schema never names is dropped.
+ * `conditionals` and `contains`. A check the printer leaves out, such as `minContains: 0`, names no schema, so its import is dropped.
  */
 function resolveImports(resolver: ResolverZod, params: Parameters<ResolverZod['imports']>[0], print: () => string | null | undefined) {
   const imports = resolver.imports(params)
