@@ -6,7 +6,7 @@
 import type { GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../../models/GetOrderById'
 import { http, HttpResponse } from 'msw/http'
 
-export function getOrderByIdHandlerResponse200(data: GetOrderByIdResponse) {
+export function getOrderByIdHandlerResponse200(data?: GetOrderByIdResponse) {
   if (typeof data === 'string')
     return new HttpResponse<string>(data, {
       status: 200,
@@ -51,22 +51,6 @@ export function getOrderByIdHandler(
   return http.get(`${options?.baseURL ?? 'http://localhost:3000'}/store/order/:orderId`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    if (typeof data === 'string')
-      return new HttpResponse<string>(data, {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/xml',
-        },
-      })
-
-    return new HttpResponse<string>(
-      JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? Number(value) : value)),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    )
+    return getOrderByIdHandlerResponse200(data)
   })
 }

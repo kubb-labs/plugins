@@ -3,7 +3,7 @@ import type { HttpResponseResolver } from 'msw/http'
 import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
-export function createPaymentHandlerResponse201(data: Payment) {
+export function createPaymentHandlerResponse201(data?: Payment) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 201,
     headers: {
@@ -21,12 +21,7 @@ export function createPaymentHandler(
     function handler(info) {
       if (typeof data === 'function') return data(info)
 
-      return new HttpResponse<string>(JSON.stringify(data), {
-        status: 201,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+      return createPaymentHandlerResponse201(data)
     },
   )
 }

@@ -3,7 +3,7 @@ import type { HttpResponseResolver } from 'msw/http'
 import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
-export function addFilesHandlerResponse200(data: Omit<NonNullable<Pet>, 'name'>) {
+export function addFilesHandlerResponse200(data?: Omit<NonNullable<Pet>, 'name'>) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -54,11 +54,6 @@ export function addFilesHandler(
   >(`${options?.baseURL ?? ''}/pet/files`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse<string>(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    return addFilesHandlerResponse200(data)
   })
 }

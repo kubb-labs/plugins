@@ -11,11 +11,15 @@ type Props = {
   typeName: string
   requestTypeName?: string | null
   fakerName?: string
+  /**
+   * The `...Response<status>` helper of the response this handler mocks, when its `data` has the handler's type.
+   */
+  responseName?: string
   baseURL: string | null | undefined
   node: ast.HttpOperationNode
 }
 
-export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName, node }: Props): KubbReactNode {
+export function Mock({ baseURL = '', name, fakerName, responseName, typeName, requestTypeName, node }: Props): KubbReactNode {
   const method = getMswMethod(node)
   // `http.all` matches every method on the path, so a handler for a method MSW has no helper for lets the others pass through.
   const methodGuard = method === 'all' ? `if (info.request.method !== ${singleQuote(node.method)}) return\n\n    ` : ''
@@ -41,6 +45,8 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
   // Without Faker, the spec's own response example is the default body. An explicit `null` stays a `null` body.
   const example = fakerName ? null : getExampleBody(successResponse)
   const responseBody = fakerName ? `data ?? ${fakerName}()` : example ? `data === undefined ? ${example} : data` : 'data'
+  // A spec example is not checked against the response type, so it is not passed to the typed helper.
+  const responseStatements = responseName && !example ? `return ${responseName}(${responseBody})` : responseReturn(responseBody, statusCode, successResponse)
 
   return (
     <File.Source name={name} isIndexable isExportable>
@@ -48,7 +54,7 @@ export function Mock({ baseURL = '', name, fakerName, typeName, requestTypeName,
         {`return ${httpCall}(${urlLiteral}, function handler(info) {
     ${methodGuard}if(typeof data === 'function') return data(info)
 
-    ${responseReturn(responseBody, statusCode, successResponse)}
+    ${responseStatements}
   })`}
       </Function>
     </File.Source>

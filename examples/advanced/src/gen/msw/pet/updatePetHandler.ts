@@ -4,7 +4,7 @@ import type { DefaultBodyType } from 'msw'
 import { http, HttpResponse } from 'msw/http'
 
 export function updatePetHandlerResponse200(
-  data:
+  data?:
     | (Omit<NonNullable<Pet>, 'name'> | string)
     | {
         id?: number
@@ -27,7 +27,7 @@ export function updatePetHandlerResponse200(
 }
 
 export function updatePetHandlerResponse202(
-  data:
+  data?:
     | (Omit<NonNullable<Pet>, 'name'> | string)
     | {
         id?: number
@@ -84,20 +84,7 @@ export function updatePetHandler(
     function handler(info) {
       if (typeof data === 'function') return data(info)
 
-      if (typeof data === 'string')
-        return new HttpResponse<string>(data, {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/xml',
-          },
-        })
-
-      return new HttpResponse<string>(JSON.stringify(data), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+      return updatePetHandlerResponse200(data)
     },
   )
 }

@@ -7,7 +7,7 @@
 import type { SearchPetsResponse } from './SearchPets'
 import { http, HttpResponse } from 'msw/http'
 
-export function searchPetsHandlerResponse200(data: SearchPetsResponse) {
+export function searchPetsHandlerResponse200(data?: SearchPetsResponse) {
   return new HttpResponse<string>(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -25,11 +25,6 @@ export function searchPetsHandler(
 
     if (typeof data === 'function') return data(info)
 
-    return new HttpResponse<string>(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    return searchPetsHandlerResponse200(data)
   })
 }

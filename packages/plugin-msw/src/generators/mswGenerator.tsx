@@ -1,4 +1,4 @@
-import { getEnumNames, getOperationSuccessResponses, isSuccessStatusCode, resolveOperationFile } from '@internals/shared'
+import { getEnumNames, getOperationSuccessResponses, getPrimarySuccessResponse, isSuccessStatusCode, resolveOperationFile } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/kit'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { enumTypeName, pluginTsName } from '@kubb/plugin-ts'
@@ -80,6 +80,11 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const mockResponseName =
       hasResponseNameCollision && successResponses[0] ? tsResolver.response.status(node, successResponses[0].statusCode) : type.responseName
     const hasSuccessSchema = successResponses.some((response) => hasResponseSchema(response))
+    // The handler calls the helper of the response it mocks when that helper takes the handler's own data type.
+    const primaryResponse = getPrimarySuccessResponse(node)
+    const hasResponseHelper =
+      hasResponseSchema(primaryResponse) &&
+      types.some(([response, typeName]) => response.statusCode === primaryResponse?.statusCode && typeName === mockResponseName)
 
     const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.response.body(node) : null
 
@@ -111,6 +116,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
           typeName={mockResponseName}
           requestTypeName={requestName}
           fakerName={faker && hasSuccessSchema ? faker.name : undefined}
+          responseName={hasResponseHelper ? `${mock.name}Response${primaryResponse!.statusCode}` : undefined}
           node={node}
           baseURL={baseURL}
         />
