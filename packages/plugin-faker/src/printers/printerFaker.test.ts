@@ -160,6 +160,11 @@ describe('printerFaker', () => {
     expect(print(ast.factory.createSchema({ type: 'array', items: [self] }))).toBe('[]')
     expect(print(ast.factory.createSchema({ type: 'array', items: [other] }))).toBe('[]')
     expect(print(other)).toBe('undefined as unknown')
+    const object = (required: boolean) =>
+      ast.factory.createSchema({ type: 'object', properties: [ast.factory.createProperty({ name: 'leaf', required, schema: other })] })
+    // A required ref keeps its mock, behind the lazy getter; an optional one closes the cycle.
+    expect(print(object(true))).toContain('const _value = createLeaf()')
+    expect(print(object(false))).toContain('const _value = undefined as unknown')
   })
 
   test('keeps integers and floats inside exclusive bounds', () => {
